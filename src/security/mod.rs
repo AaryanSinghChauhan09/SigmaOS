@@ -1,101 +1,66 @@
-pub mod lsm;
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
 
 pub mod audit;
 pub mod capability;
-<<<<<<< HEAD
-pub mod cleaner;
-=======
 pub mod capability_enforcer;
+pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub mod forensics;
 pub mod integrity;
+pub mod intrusion;
 pub mod mac;
-pub mod phantom;
+pub mod password;
 pub mod pki;
 pub mod pledge;
-<<<<<<< HEAD
-<<<<<<< HEAD
-pub mod vulnerability;
-pub mod parrot_parity;
-=======
-pub mod secrets;
-pub mod vault;
-pub mod vpn;
-pub mod vulnerability;
-<<<<<<< HEAD
-pub mod cleaner;
-pub mod forensics;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
->>>>>>> origin/jules-18101178622594638830-97dc43c6
-=======
-#[cfg(any())]
-pub mod clipboard;
-#[cfg(any())]
-pub mod intrusion;
-#[cfg(any())]
-pub mod password;
->>>>>>> origin/jules-6565657164915217370-c04e8c01
-=======
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
+pub mod qubes_isolation;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
 pub mod vulnerability;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
-pub use audit::{AuditEvent, AuditLogger, LogFormat, SimpleAuditEvent, SimpleAuditLogger};
+pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter as SigmaSyscallFilter};
-pub use sigma_unveil::{UnveilPermissions, UnveilEntry, UnveilState, UnveilManager};
-pub use cleaner::{SecureCleaner, TorAnonymityGate, AmnesiaManager, MetadataScrubber};
-pub use forensics::{ForensicAnalyzer, ExtractedMetadata, RecoveredFile};
+pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
+pub use capability_token::{
+    CapabilityToken as AndroidStyleCapabilityToken,
+    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
-    SecureClipboardManager, SecurityLevel, XorEncryption,
+    SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
 };
-pub use integrity::{File, IntegrityError, IntegrityMonitor, IntegrityStatus, SimpleIntegrityMonitor};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
 };
-pub use mac::{MACEngine, MACPolicy, SecurityContext as MacSecurityContext, SimpleMACEngine};
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
-pub use pki::{Certificate, PKIError, PKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-<<<<<<< HEAD
-pub use vulnerability::{
-    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
-    PenetrationAssistant,
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, ObjectType, SelinuxPermission, SecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule,
 };
-pub use parrot_parity::{
-    RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
-    GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
-};
-=======
-pub use secrets::{SecretManager, SecretStorage, SecretType};
+pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
+pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
     VaultResult,
 };
+pub use qubes_isolation::{DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError};
 pub use vpn::{
     AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-<<<<<<< HEAD
-pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner, VulnerabilitySeverity};
->>>>>>> origin/jules-18101178622594638830-97dc43c6
-=======
 // Integrity: export the monitor trait and concrete types that actually exist
 pub use integrity::{
     File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError, IntegrityMonitor,
@@ -121,4 +86,3 @@ pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
 };
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045

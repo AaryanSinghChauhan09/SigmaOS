@@ -8,9 +8,6 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
-#[cfg(any())]
-pub mod advanced_app_absorber;
-pub mod tmux;
 
 pub use advanced_app_absorber::{
     AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter, EverythingSearchEngine,
@@ -35,15 +32,9 @@ pub use screenshot::{
     ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
 };
 pub use sigma_office::{
-<<<<<<< HEAD
     CellValue, ChartType, DocumentMetadata as SigmaOfficeDocumentMetadata, DocumentNode,
     DocumentType, PresentationProcessor, ShapeType, SigmaDocument, SigmaOffice, SlideElementType,
     SpreadsheetProcessor, TextProcessor, TypographyRenderer,
-=======
-    CellValue, ChartType, DocumentMetadata as SigmaDocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
-    ShapeType, SigmaDocument, SigmaOffice, SlideElementType, SpreadsheetProcessor, TextProcessor,
-    TypographyRenderer,
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 };
 pub use tasks::{
     InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,
@@ -52,7 +43,4 @@ pub use tasks::{
 pub use terminal::{
     BashShell, ColorScheme, CommandResult, CursorStyle, IntegratedTerminal, ShellImpl, ShellType,
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
-};
-pub use tmux::{
-    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };

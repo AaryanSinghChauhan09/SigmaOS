@@ -5,15 +5,19 @@ pub mod pci;
 pub mod post;
 pub mod uefi;
 pub mod firmware;
+pub mod optimization;
+pub mod secure;
+pub mod uefi;
+pub mod verified;
+pub mod bridge_grid;
+pub mod firmware_bridge;
+pub mod pci;
+pub mod post;
 
 pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
 pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
 pub use uefi::{
-    SimpleUEFIBootloader, UEFIBootloader, SecureBoot, SimpleSecureBoot, GopFramebuffer,
-    AcpiParser, UsbHostController, MultiKernelBootSelector, SovereignBootWatchdog,
-    GopSplashCanvas, MicrokernelProfile, BootError as UefiBootError,
-};
-pub use firmware::{
-    BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
-    BootError as FirmwareBootError,
+    AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
+    MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
+    SovereignBootWatchdog, UEFIBootloader, UsbHostController,
 };

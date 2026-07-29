@@ -2,6 +2,8 @@
 #![no_main]
 
 extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
@@ -9,8 +11,6 @@ extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 pub type CertificateID = usize;
 
@@ -190,3 +190,18 @@ pub type PkiError = PKIError;
 pub use PKIManager as PkiManager;
 pub struct CertificateAuthority;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_pki_manager() {
+        let mut manager = SimplePKIManager::new();
+        let cert = SimpleCertificate::new(1, CertificateType::Root, b"Subject", b"Issuer");
+        let id = manager.issue_certificate(Box::new(cert)).unwrap();
+        assert_eq!(id, 1);
+
+        let retrieved = manager.get_certificate(1).unwrap();
+        assert_eq!(retrieved.subject(), b"Subject");
+    }
+}

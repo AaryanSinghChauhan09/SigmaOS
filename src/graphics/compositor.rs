@@ -1,13 +1,7 @@
 #![no_std]
 #![no_main]
 
-#[cfg(not(target_os = "none"))]
-extern crate alloc;
-#[cfg(not(target_os = "none"))]
-use alloc::vec::Vec;
-
 use core::mem;
-use core::sync::atomic::AtomicBool;
 /// OOP-based Graphics Compositor for SigmaOS
 /// Implements graphics composition using OOP principles with traits and structs
 /// No dependency on external graphics frameworks
@@ -73,6 +67,7 @@ impl Size {
 
 /// Rectangle
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rectangle {
     pub position: Position,
     pub size: Size,
@@ -287,14 +282,16 @@ impl Surface for BitmapSurface {
 
     fn fill_rect(&mut self, rect: Rectangle, color: Color) {
         let color_value = color.to_u32();
-        let data = self.data_mut();
         let stride = self.stride as usize / 4;
+        let height = self.size.height as i32;
+        let width = self.size.width as i32;
+        let data = self.data_mut();
 
         for y in rect.position.y.max(0) as usize
-            ..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize
+            ..(rect.position.y + rect.size.height as i32).min(height) as usize
         {
             for x in rect.position.x.max(0) as usize
-                ..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize
+                ..(rect.position.x + rect.size.width as i32).min(width) as usize
             {
                 let index = y * stride + x;
                 if index < data.len() {
@@ -517,11 +514,7 @@ pub enum GraphicsError {
 
 /// Compositor statistics
 #[repr(C)]
-<<<<<<< HEAD
 #[derive(Debug, Clone, Copy)]
-=======
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub struct CompositorStats {
     pub total_windows: usize,
     pub visible_windows: usize,
@@ -730,16 +723,7 @@ impl Compositor for SimpleCompositor {
             if let Some(ref mut window) = self.windows[window_id] {
                 let window_rect = window.rect();
                 if let Some(surface) = window.surface() {
-<<<<<<< HEAD
                     let window_data = surface.data();
-=======
-                    let output_info = output.info();
-                    let output_stride = output_info.stride as usize / 4;
-
-                    let output_data = output.data_mut();
-                    let window_data = surface.data();
-
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
                     let window_stride = surface.info().stride as usize / 4;
 
                     // Copy window surface to output
@@ -781,14 +765,12 @@ impl Compositor for SimpleCompositor {
 }
 
 /// Simple Vec implementation for no_std
-#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -915,57 +897,19 @@ impl<T> Vec<T> {
     }
 }
 
-<<<<<<< HEAD
-=======
-#[cfg(target_os = "none")]
-struct Iter<T> {
-    data: *const T,
-    len: usize,
-    index: usize,
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> Iterator for Iter<T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            unsafe {
-                let item = &*self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-struct IterMut<T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> Iterator for IterMut<T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            unsafe {
-                let item = &mut *self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
-    }
-}
-
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 // External allocator functions
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
 }

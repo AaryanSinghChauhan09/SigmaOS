@@ -257,6 +257,14 @@ impl AnonSurfShunt {
             self.anonymized_packets_routed.set(count + 1);
         }
     }
+
+    pub fn get_mode(&self) -> RoutingMode {
+        self.current_mode.get()
+    }
+
+    pub fn get_packets_routed(&self) -> u64 {
+        self.anonymized_packets_routed.get()
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -299,6 +307,10 @@ impl AppSandboxEngine {
         } else {
             policy.allow_network
         }
+    }
+
+    pub fn update_policy(&self, policy: SandboxPolicy) {
+        self.current_policy.set(policy);
     }
 }
 

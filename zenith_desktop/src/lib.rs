@@ -283,7 +283,7 @@ impl ZenithCompositor {
     pub fn new(config: ZenithCompositorConfig) -> Self {
         let accessibility_engine = AccessibilityEngine::new(config.accessibility.clone());
         let ai_adapter = AIAdapter::new(config.profiles.iter().any(|p| p.ai_adaptation));
-
+        
         Self {
             config,
             current_profile: None,
@@ -298,34 +298,32 @@ impl ZenithCompositor {
     pub fn initialize(&mut self) -> Result<(), CompositorError> {
         // Initialize backend
         self.initialize_backend()?;
-
+        
         // Initialize renderer
         self.initialize_renderer()?;
-
+        
         // Initialize accessibility
         self.accessibility_engine.initialize()?;
-
+        
         // Initialize AI adapter
         if self.ai_adapter.enabled {
             self.ai_adapter.initialize()?;
         }
-
+        
         Ok(())
     }
 
     /// Switch to a user profile
     pub fn switch_profile(&mut self, profile_name: &str) -> Result<(), CompositorError> {
-        let profile = self
-            .config
-            .profiles
+        let profile = self.config.profiles
             .iter()
             .find(|p| p.name == profile_name)
             .cloned()
             .ok_or(CompositorError::ProfileNotFound(profile_name.to_string()))?;
-
+        
         self.current_profile = Some(profile_name.to_string());
         self.apply_profile(&profile)?;
-
+        
         Ok(())
     }
 
@@ -333,10 +331,10 @@ impl ZenithCompositor {
     fn apply_profile(&mut self, profile: &UserProfile) -> Result<(), CompositorError> {
         // Apply window layout
         self.apply_layout(&profile.layout)?;
-
+        
         // Apply shortcuts
         self.apply_shortcuts(&profile.shortcuts)?;
-
+        
         Ok(())
     }
 
@@ -453,21 +451,14 @@ impl ZenithCompositor {
 
     /// Switch theme
     pub fn switch_theme(&mut self, theme_name: &str) -> Result<(), CompositorError> {
-        let theme = if self.config.theming.theme.name == theme_name {
-            Some(&self.config.theming.theme)
-        } else {
-            self.config
-                .theming
-                .custom_themes
-                .iter()
-                .find(|t| t.name == theme_name)
-        }
-        .cloned()
-        .ok_or(CompositorError::ThemeNotFound(theme_name.to_string()))?;
-
+        let theme = (self.config.theming.theme.name == theme_name)
+            .then(|| self.config.theming.theme.clone())
+            .or_else(|| self.config.theming.custom_themes.iter().find(|t| t.name == theme_name).cloned())
+            .ok_or(CompositorError::ThemeNotFound(theme_name.to_string()))?;
+        
         self.current_theme = theme_name.to_string();
         self.apply_theme(&theme)?;
-
+        
         Ok(())
     }
 
@@ -475,16 +466,16 @@ impl ZenithCompositor {
     fn apply_theme(&mut self, theme: &Theme) -> Result<(), CompositorError> {
         // Apply color scheme
         self.apply_colors(&theme.colors)?;
-
+        
         // Apply fonts
         self.apply_fonts(&theme.fonts)?;
-
+        
         // Apply effects
         self.apply_effects(&theme.effects)?;
-
+        
         // Apply animations
         self.apply_animations(&theme.animations)?;
-
+        
         Ok(())
     }
 
@@ -738,6 +729,18 @@ pub enum CompositorError {
     RendererError(String),
 }
 
+impl From<AccessibilityError> for CompositorError {
+    fn from(err: AccessibilityError) -> Self {
+        CompositorError::InitializationFailed(format!("{:?}", err))
+    }
+}
+
+impl From<AIError> for CompositorError {
+    fn from(err: AIError) -> Self {
+        CompositorError::InitializationFailed(format!("{:?}", err))
+    }
+}
+
 /// Accessibility errors
 #[derive(Debug)]
 pub enum AccessibilityError {
@@ -752,18 +755,6 @@ pub enum AIError {
     ModelLoadFailed(String),
     InferenceFailed(String),
     TrainingFailed(String),
-}
-
-impl From<AccessibilityError> for CompositorError {
-    fn from(err: AccessibilityError) -> Self {
-        CompositorError::InitializationFailed(format!("{:?}", err))
-    }
-}
-
-impl From<AIError> for CompositorError {
-    fn from(err: AIError) -> Self {
-        CompositorError::InitializationFailed(format!("{:?}", err))
-    }
 }
 
 #[cfg(test)]
@@ -890,7 +881,7 @@ mod tests {
 
         let mut compositor = ZenithCompositor::new(config);
         compositor.initialize().unwrap();
-
+        
         let result = compositor.switch_profile("developer");
         assert!(result.is_ok());
         assert_eq!(compositor.current_profile(), Some("developer"));
@@ -988,171 +979,5 @@ mod tests {
         compositor.arrange_stacking().unwrap();
         assert_eq!(compositor.windows[0].geometry.x, 100);
         assert_eq!(compositor.windows[1].geometry.x, 140);
-    }
-}
-
-// =========================================================================
-// 🚀 THE DISTRO-DEFEATING DESKTOP ENGINE (OOP & UDF PARADIGMS)
-// =========================================================================
-
-/// Polymorphic Sovereign UX Engine governing desktop capabilities
-pub trait SovereignUXEngine {
-    fn execute_sovereign_adaptation(&self, context: &Context) -> &'static str;
-    fn process_user_defined_filter(&self, pixels: &mut [u8]) -> usize;
-}
-
-/// Linux Superiority Suite providing features that exceed standard Linux capabilities
-pub struct LinuxSuperioritySuite {
-    pub kernel_config_optimizer_enabled: bool,
-    pub zero_trust_security_shield: bool,
-    pub universal_app_sandbox_v2: bool,
-}
-
-impl LinuxSuperioritySuite {
-    pub fn new() -> Self {
-        Self {
-            kernel_config_optimizer_enabled: true,
-            zero_trust_security_shield: true,
-            universal_app_sandbox_v2: true,
-        }
-    }
-
-    /// User Defined Function (UDF): Dynamic kernel optimization bypass (Gentoo-defeating)
-    pub fn optimize_kernel_for_active_activity(&self, activity: &UserActivity) -> &'static str {
-        match activity {
-            UserActivity::Coding => {
-                "Optimized microkernel thread-pooling: zero latency compile loops"
-            }
-            UserActivity::Gaming => {
-                "Activated GPU priority-gating: bypassing background thread schedulers"
-            }
-            UserActivity::Browsing => {
-                "Enabled sandboxed tab isolated paging: zero cross-tab memory sharing"
-            }
-            _ => "Standard microkernel EEVDF scheduler active",
-        }
-    }
-
-    /// User Defined Function (UDF): Declarative sandboxing profiles (Flatpak/Snap-defeating)
-    pub fn generate_declarative_sandbox(&self, app_id: &str) -> &'static str {
-        if app_id.contains("browser") {
-            "Gated sandbox: network allowed on port 443/80, filesystem write restricted to /tmp"
-        } else if app_id.contains("editor") {
-            "Gated sandbox: network denied, filesystem read allowed on /home, write restricted to workspace"
-        } else {
-            "Zero-trust default deny sandbox active"
-        }
-    }
-}
-
-impl SovereignUXEngine for LinuxSuperioritySuite {
-    fn execute_sovereign_adaptation(&self, context: &Context) -> &'static str {
-        self.optimize_kernel_for_active_activity(&context.user_activity)
-    }
-
-    /// User Defined Function (UDF): High-performance parallel visual matrix filtering
-    fn process_user_defined_filter(&self, pixels: &mut [u8]) -> usize {
-        let mut modified = 0;
-        for byte in pixels.iter_mut() {
-            // Apply high-contrast boost (Ubuntu GNOME contrast-parity)
-            if *byte < 128 {
-                *byte = byte.saturating_sub(20);
-            } else {
-                *byte = byte.saturating_add(20);
-            }
-            modified += 1;
-        }
-        modified
-    }
-}
-
-/// Dynamic user-defined macro and gesture translation loop
-pub struct DistroDefeaterEngine {
-    pub superiority_suite: LinuxSuperioritySuite,
-    pub user_defined_gestures:
-        HashMap<String, Box<dyn Fn(&mut [Window]) -> &'static str + Send + Sync>>,
-}
-
-impl DistroDefeaterEngine {
-    pub fn new() -> Self {
-        Self {
-            superiority_suite: LinuxSuperioritySuite::new(),
-            user_defined_gestures: HashMap::new(),
-        }
-    }
-
-    /// Register a custom User Defined Function (UDF) closure for keyboard/gesture triggers (bypassing custom GNOME shortcuts)
-    pub fn register_user_gesture<F>(&mut self, name: String, func: F)
-    where
-        F: Fn(&mut [Window]) -> &'static str + Send + Sync + 'static,
-    {
-        self.user_defined_gestures.insert(name, Box::new(func));
-    }
-
-    /// Trigger a custom User Defined Gesture action
-    pub fn trigger_gesture(&self, name: &str, windows: &mut [Window]) -> Option<&'static str> {
-        self.user_defined_gestures.get(name).map(|f| f(windows))
-    }
-}
-
-#[cfg(test)]
-mod distro_defeater_tests {
-    use super::*;
-
-    #[test]
-    fn test_linux_superiority_suite_udfs() {
-        let suite = LinuxSuperioritySuite::new();
-
-        // Test Gentoo-defeating compiler optimizer UDF
-        let coding_res = suite.optimize_kernel_for_active_activity(&UserActivity::Coding);
-        assert_eq!(
-            coding_res,
-            "Optimized microkernel thread-pooling: zero latency compile loops"
-        );
-
-        // Test Flatpak/Snap-defeating sandbox generator UDF
-        let sandbox_res = suite.generate_declarative_sandbox("zenith-browser");
-        assert!(sandbox_res.contains("network allowed"));
-    }
-
-    #[test]
-    fn test_polymorphic_sovereign_ux() {
-        let suite = LinuxSuperioritySuite::new();
-        let context = Context {
-            timestamp: 1234567,
-            active_apps: vec!["browser".to_string()],
-            window_layout: WindowLayout::Adaptive,
-            user_activity: UserActivity::Gaming,
-        };
-
-        let adaptation = suite.execute_sovereign_adaptation(&context);
-        assert_eq!(
-            adaptation,
-            "Activated GPU priority-gating: bypassing background thread schedulers"
-        );
-
-        let mut pixels = [100, 200];
-        let count = suite.process_user_defined_filter(&mut pixels);
-        assert_eq!(count, 2);
-        assert_eq!(pixels[0], 80);
-        assert_eq!(pixels[1], 220);
-    }
-
-    #[test]
-    fn test_distro_defeater_custom_gestures() {
-        let mut engine = DistroDefeaterEngine::new();
-
-        engine.register_user_gesture("spread_windows".to_string(), |windows| {
-            "Spread gesture executed: GNOME shell spread fully defeated!"
-        });
-
-        let mut dummy_windows = vec![];
-        let result = engine
-            .trigger_gesture("spread_windows", &mut dummy_windows)
-            .unwrap();
-        assert_eq!(
-            result,
-            "Spread gesture executed: GNOME shell spread fully defeated!"
-        );
     }
 }

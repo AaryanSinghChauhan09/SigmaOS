@@ -1,0 +1,812 @@
+    Checking sigmaos v0.1.0 (/app)
+error[E0428]: the name `orchestrator` is defined multiple times
+ --> src/automation/mod.rs:5:1
+  |
+3 | pub mod orchestrator;
+  | --------------------- previous definition of the module `orchestrator` here
+4 | pub mod system_level;
+5 | pub mod orchestrator;
+  | ^^^^^^^^^^^^^^^^^^^^^ `orchestrator` redefined here
+  |
+  = note: `orchestrator` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `cow_snapshot` is defined multiple times
+ --> src/filesystem/mod.rs:9:1
+  |
+3 | pub mod cow_snapshot;
+  | --------------------- previous definition of the module `cow_snapshot` here
+...
+9 | pub mod cow_snapshot;
+  | ^^^^^^^^^^^^^^^^^^^^^ `cow_snapshot` redefined here
+  |
+  = note: `cow_snapshot` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `backup` is defined multiple times
+ --> src/resilience/mod.rs:4:1
+  |
+2 | pub mod backup;
+  | --------------- previous definition of the module `backup` here
+3 | pub mod self_healing;
+4 | pub mod backup;
+  | ^^^^^^^^^^^^^^^ `backup` redefined here
+  |
+  = note: `backup` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `command` is defined multiple times
+ --> src/shell/mod.rs:4:1
+  |
+2 | pub mod command;
+  | ---------------- previous definition of the module `command` here
+3 | pub mod repl;
+4 | pub mod command;
+  | ^^^^^^^^^^^^^^^^ `command` redefined here
+  |
+  = note: `command` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `CowSnapshotManager` is defined multiple times
+  --> src/filesystem/mod.rs:33:18
+   |
+15 | ...use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, ...
+   |                                    ------------------ previous import of the type `CowSnapshotManager` here
+...
+33 | ...CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+   |                 ^^^^^^^^^^^^^^^^^^--
+   |                 |
+   |                 `CowSnapshotManager` reimported here
+   |                 help: remove unnecessary import
+   |
+   = note: `CowSnapshotManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `BackupSnapshot` is defined multiple times
+  --> src/resilience/mod.rs:12:18
+   |
+ 6 | pub use backup::{BackupError, BackupSnapshot, SigmaTimeshift};
+   |                               -------------- previous import of the type `BackupSnapshot` here
+...
+12 |     BackupError, BackupSnapshot, SigmaTimeshift,
+   |                  ^^^^^^^^^^^^^^--
+   |                  |
+   |                  `BackupSnapshot` reimported here
+   |                  help: remove unnecessary import
+   |
+   = note: `BackupSnapshot` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SigmaTimeshift` is defined multiple times
+  --> src/resilience/mod.rs:12:34
+   |
+ 6 | pub use backup::{BackupError, BackupSnapshot, SigmaTimeshift};
+   |                                               -------------- previous import of the type `SigmaTimeshift` here
+...
+12 |     BackupError, BackupSnapshot, SigmaTimeshift,
+   |                                  ^^^^^^^^^^^^^^-
+   |                                  |
+   |                                  `SigmaTimeshift` reimported here
+   |                                  help: remove unnecessary import
+   |
+   = note: `SigmaTimeshift` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `UniversalPackageManager` is defined multiple times
+   --> src/lib.rs:121:85
+    |
+ 95 | ...e, UniversalPackageManager,
+    |       ----------------------- previous import of the type `UniversalPackageManager` here
+...
+121 | ...ion, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, A...
+    |                                                        ^^^^^^^^^^^^^^^^^^^^^^^ `UniversalPackageManager` reimported here
+    |
+    = note: `UniversalPackageManager` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+    |
+121 |     SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager as OtherUniversalPackageManager, AdapterError,
+    |                                                                                                             +++++++++++++++++++++++++++++++
+
+error[E0252]: the name `CowSnapshot` is defined multiple times
+  --> src/filesystem/mod.rs:33:5
+   |
+15 | pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction,...
+   |                        ----------- previous import of the type `CowSnapshot` here
+...
+33 |     CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+   |     ^^^^^^^^^^^--
+   |     |
+   |     `CowSnapshot` reimported here
+   |     help: remove unnecessary import
+   |
+   = note: `CowSnapshot` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `FileTransaction` is defined multiple times
+  --> src/filesystem/mod.rs:33:38
+   |
+15 | ...owSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
+   |                                    --------------- previous import of the type `FileTransaction` here
+...
+33 | ...shotManager, FileTransaction, SnapshotState,
+   |                 ^^^^^^^^^^^^^^^--
+   |                 |
+   |                 `FileTransaction` reimported here
+   |                 help: remove unnecessary import
+   |
+   = note: `FileTransaction` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SnapshotState` is defined multiple times
+  --> src/filesystem/mod.rs:33:55
+   |
+15 | ...SnapshotManager, FileTransaction, SnapshotState};
+   |                                      ------------- previous import of the type `SnapshotState` here
+...
+33 | ...leTransaction, SnapshotState,
+   |                   ^^^^^^^^^^^^^-
+   |                   |
+   |                   `SnapshotState` reimported here
+   |                   help: remove unnecessary import
+   |
+   = note: `SnapshotState` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `BackupError` is defined multiple times
+  --> src/resilience/mod.rs:12:5
+   |
+ 6 | pub use backup::{BackupError, BackupSnapshot, SigmaTimeshift};
+   |                  ----------- previous import of the type `BackupError` here
+...
+12 |     BackupError, BackupSnapshot, SigmaTimeshift,
+   |     ^^^^^^^^^^^--
+   |     |
+   |     `BackupError` reimported here
+   |     help: remove unnecessary import
+   |
+   = note: `BackupError` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SecurityContext` is defined multiple times
+  --> src/security/mod.rs:66:5
+   |
+42 |     AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
+   |                                                                                    --------------- previous import of the type `SecurityContext` here
+...
+66 |     SecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+   |     ^^^^^^^^^^^^^^^ `SecurityContext` reimported here
+   |
+   = note: `SecurityContext` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+   |
+66 |     SecurityContext as OtherSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+   |                     +++++++++++++++++++++++
+
+error[E0432]: unresolved import `sigma_pledge`
+  --> src/security/mod.rs:45:9
+   |
+45 | pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgeProm...
+   |         ^^^^^^^^^^^^ use of unresolved module or unlinked crate `sigma_pledge`
+   |
+help: to make use of source file src/security/sigma_pledge.rs, use `mod sigma_pledge` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod sigma_pledge;
+   |
+
+error[E0432]: unresolved import `sigma_unveil`
+  --> src/security/mod.rs:46:9
+   |
+46 | pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, Un...
+   |         ^^^^^^^^^^^^ use of unresolved module or unlinked crate `sigma_unveil`
+   |
+help: to make use of source file src/security/sigma_unveil.rs, use `mod sigma_unveil` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod sigma_unveil;
+   |
+
+error[E0432]: unresolved import `package::PackageAdapter`
+  --> src/lib.rs:94:45
+   |
+94 | ...yResolver, PackageAdapter, PackageError, PackageFormat,
+   |               ^^^^^^^^^^^^^^ no `PackageAdapter` in `package`
+
+error[E0432]: unresolved imports `security::DomainID`, `security::DomainOrchestrator`, `security::DomainType`, `security::IsolatedDomain`, `security::IsolationError`
+   --> src/lib.rs:112:38
+    |
+112 |     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
+    |                                      ^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^^^^^ no `IsolatedDomain` in `security`
+    |                                      |         |                   |
+    |                                      |         |                   no `DomainType` in `security`
+    |                                      |         no `DomainOrchestrator` in `security`
+    |                                      no `DomainID` in `security`
+113 |     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSe...
+    |     ^^^^^^^^^^^^^^ no `IsolationError` in `security`
+
+error[E0432]: unresolved imports `stack::SigmaDebug`, `stack::SigmaMetrics`, `stack::SigmaTrace`, `stack::SimpleSigmaDebug`, `stack::SimpleSigmaMetrics`, `stack::SimpleSigmaTrace`
+ --> src/observability/mod.rs:6:45
+  |
+6 | ... ObservabilityStats, SigmaDebug, SigmaMetrics, SigmaTrace, SimpleMetric,
+  |                         ^^^^^^^^^^  ^^^^^^^^^^^^  ^^^^^^^^^^ no `SigmaTrace` in `observability::stack`
+  |                         |           |
+  |                         |           no `SigmaMetrics` in `observability::stack`
+  |                         no `SigmaDebug` in `observability::stack`
+7 | ...Stack, SimpleSigmaDebug, SimpleSigmaMetrics, SimpleSigmaTrace, SimpleS...
+  |           ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^ no `SimpleSigmaTrace` in `observability::stack`
+  |           |                 |
+  |           |                 no `SimpleSigmaMetrics` in `observability::stack`
+  |           |                 help: a similar name exists in the module: `SimpleMetric`
+  |           no `SimpleSigmaDebug` in `observability::stack`
+
+error[E0432]: unresolved imports `desktop::InputAuthGate`, `desktop::PqcVideoCipher`, `desktop::SigmaRendezvous`
+ --> src/remote/mod.rs:6:5
+  |
+6 |     InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSess...
+  |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^ no `PqcVideoCipher` in `remote::desktop`
+  |     |
+  |     no `InputAuthGate` in `remote::desktop`
+7 |     SessionState, SigmaRendezvous, SimpleRemoteDesktop, SimpleRemoteSessi...
+  |                   ^^^^^^^^^^^^^^^ no `SigmaRendezvous` in `remote::desktop`
+
+error[E0432]: unresolved import `audit::LogFormat`
+  --> src/security/mod.rs:24:43
+   |
+24 | pub use audit::{AuditLogger, AuditPolicy, LogFormat};
+   |                                           ^^^^^^^^^ no `LogFormat` in `security::audit`
+
+error[E0432]: unresolved import `selinux::Permission`
+  --> src/security/mod.rs:42:51
+   |
+42 | ...e, ObjectType, Permission as SelinuxPermission, SecurityContext,
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `Permission` in `security::selinux`
+   |
+   = help: consider importing this enum through its public re-export instead:
+           crate::Permission
+
+error[E0432]: unresolved imports `spec::AptPackageAdapter`, `spec::PackageAdapterFactory`, `spec::PacmanPackageAdapter`, `spec::SnapPackageAdapter`, `spec::NixPackageAdapter`, `spec::EbuildPackageAdapter`, `spec::ApkPackageAdapter`, `spec::FlatpakPackageAdapter`, `spec::TxzPackageAdapter`, `spec::XbpsPackageAdapter`, `spec::CachyCpuDetector`, `spec::CachyosPackageAdapter`, `spec::CpuArchLevel`, `spec::UniversalPackage`, `spec::UniversalPackageType`, `spec::UserDefinedPackageHook`
+  --> src/sigpkg/mod.rs:17:5
+   |
+17 |     AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
+   |     ^^^^^^^^^^^^^^^^^                     ^^^^^^^^^^^^^^^^^^^^^ no `PackageAdapterFactory` in `sigpkg::spec`
+   |     |
+   |     no `AptPackageAdapter` in `sigpkg::spec`
+18 |     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as ...
+19 |     PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
+   |     ^^^^^^^^^^^^^^^^^^^^                                       ^^^^^^^^^^^^^^^^^^ no `SnapPackageAdapter` in `sigpkg::spec`
+   |     |
+   |     no `PacmanPackageAdapter` in `sigpkg::spec`
+20 |     NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
+   |     ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^ no `FlatpakPackageAdapter` in `sigpkg::spec`
+   |     |                  |                     |
+   |     |                  |                     no `ApkPackageAdapter` in `sigpkg::spec`
+   |     |                  no `EbuildPackageAdapter` in `sigpkg::spec`
+   |     no `NixPackageAdapter` in `sigpkg::spec`
+21 |     TxzPackageAdapter, XbpsPackageAdapter,
+   |     ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^ no `XbpsPackageAdapter` in `sigpkg::spec`
+   |     |
+   |     no `TxzPackageAdapter` in `sigpkg::spec`
+22 |     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
+   |     ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+23 |     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+   |     ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+ --> src/automation/ai_optimizer.rs:4:5
+  |
+4 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/compatibility/constellation_mesh.rs:5:5
+  |
+5 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/compatibility/constellation_mesh.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/container/runtime.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `self`
+ --> src/driver/device.rs:8:17
+  |
+8 | use core::ptr::{self, NonNull};
+  |                 ^^^^
+
+warning: unused imports: `CowSnapshotManager`, `CowSnapshot`, `FileTransaction`, and `SnapshotState`
+  --> src/filesystem/mod.rs:33:5
+   |
+33 |     CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+   |     ^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
+
+warning: unused import: `AtomicU32`
+ --> src/kernel/memory.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+  |                          ^^^^^^^^^
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/kernel/meta.rs:4:5
+  |
+4 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/kernel/meta.rs:5:26
+  |
+5 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/observability/stack.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `std::path::PathBuf`
+ --> src/productivity/notes.rs:5:5
+  |
+5 | use std::path::PathBuf;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Duration`
+ --> src/productivity/screen_recorder.rs:5:17
+  |
+5 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> src/productivity/sigma_office.rs:17:5
+   |
+17 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration` and `Instant`
+ --> src/productivity/tasks.rs:5:17
+  |
+5 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^  ^^^^^^^
+
+warning: unused imports: `BackupError`, `BackupSnapshot`, and `SigmaTimeshift`
+  --> src/resilience/mod.rs:12:5
+   |
+12 |     BackupError, BackupSnapshot, SigmaTimeshift,
+   |     ^^^^^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^
+
+warning: unused import: `alloc::vec::Vec`
+ --> src/security/cleaner.rs:4:5
+  |
+4 | use alloc::vec::Vec;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/security/integrity.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/security/mac.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/security/secrets.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `SecurityContext`
+  --> src/security/mod.rs:42:84
+   |
+42 | ...sion as SelinuxPermission, SecurityContext,
+   |                               ^^^^^^^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/sigpkg/spec.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+  --> src/sigpkg/spec.rs:10:26
+   |
+10 | use core::sync::atomic::{AtomicUsize, Ordering};
+   |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `ParseError`
+ --> src/sigpkg/universal_adapter.rs:4:70
+  |
+4 | ...ersionConstraint, Dependency, ParseError};
+  |                                  ^^^^^^^^^^
+
+warning: unused import: `UniversalPackageManager`
+   --> src/lib.rs:121:85
+    |
+121 | ...PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/container/oci_runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: crate-level attribute should be in the root module
+ --> src/container/runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/device/manager.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/driver/device.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/driver/framework.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/filesystem/support.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/observability/stack.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/remote/desktop.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/remote/shell.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/audit.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/integrity.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/mac.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/pki.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/secrets.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/vulnerability.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/shell/command.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/sigpkg/spec.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/container/oci_runtime.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/container/runtime.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/device/manager.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/driver/device.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/driver/framework.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/filesystem/complete_filesystems.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/filesystem/support.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/generation_manager.rs:5:1
+  |
+5 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/gap_closing.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/observability/stack.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/remote/desktop.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/remote/shell.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/audit.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/capability_enforcer.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/capability_token.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/cleaner.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/forensics.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/integrity.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/mac.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/pki.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/scanner.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/secrets.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/selinux.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/vulnerability.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/shell/command.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/sigpkg/spec.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/sigpkg/zero_alloc_resolver.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/virtualization/namespaces.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: unused variable: `action`
+   --> src/automation/orchestrator.rs:327:27
+    |
+327 |     fn execute(&mut self, action: &SystemAction) -> Result<(), Optimiza...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_action`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `action`
+   --> src/automation/orchestrator.rs:327:27
+    |
+327 |     fn execute(&mut self, action: &SystemAction) -> Result<(), Optimiza...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_action`
+
+warning: variable does not need to be mutable
+   --> src/compatibility/endeavour.rs:158:13
+    |
+158 |         let mut words: Vec<String> = sanitized
+    |             ----^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `pid`
+   --> src/dashboard/process.rs:288:38
+    |
+288 | ...xecute_action(&mut self, pid: u32, action: ProcessAction) -> Result<...
+    |                             ^^^ help: if this is intentional, prefix it with an underscore: `_pid`
+
+warning: unused variable: `data`
+  --> src/drivers/usb_hid.rs:64:63
+   |
+64 | ...ort_type: HidReportType, data: &[u8]) -> Result<(), HidError> {
+   |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_data`
+
+warning: unused variable: `path`
+   --> src/filesystem/disk_usage.rs:211:36
+    |
+211 |     pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
+    |                                    ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `new_offset`
+   --> src/filesystem/vfs.rs:168:13
+    |
+168 |         let new_offset = file_descriptor
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_new_offset`
+
+warning: unused variable: `arguments`
+   --> src/orchestration/cross_device.rs:392:17
+    |
+392 |                 arguments,
+    |                 ^^^^^^^^^ help: try ignoring the field: `arguments: _`
+
+warning: unused variable: `font_size`
+   --> src/productivity/sigma_office.rs:405:43
+    |
+405 | ...ext(&self, text: &str, font_size: u32, position: (f32, f32)) -> Resu...
+    |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_font_size`
+
+warning: unused variable: `position`
+   --> src/productivity/sigma_office.rs:405:59
+    |
+405 | ... &str, font_size: u32, position: (f32, f32)) -> Result<Vec<u8>> {
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_position`
+
+warning: unused variable: `path`
+   --> src/productivity/sigma_office.rs:485:49
+    |
+485 | ...t(&self, doc_idx: usize, path: &str) -> Result<()> {
+    |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `path`
+   --> src/productivity/sigma_office.rs:495:37
+    |
+495 |     pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
+    |                                     ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `context`
+   --> src/resilience/self_healing.rs:101:9
+    |
+101 |         context: &HashMap<String, String>,
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context`
+
+warning: unused variable: `config`
+   --> src/security/vpn.rs:109:27
+    |
+109 |     fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionRe...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> src/security/vpn.rs:218:27
+    |
+218 |     fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionRe...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `meta`
+   --> src/sigpkg/rpm_compat.rs:114:46
+    |
+114 | ...roducible_package(&self, meta: &SpecMetadata) -> Result<[u8; 32], &'...
+    |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_meta`
+
+warning: unused variable: `format_name`
+   --> src/sigpkg/universal_adapter.rs:376:14
+    |
+376 |         for (format_name, adapter) in &self.adapters {
+    |              ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_format_name`
+
+Some errors have detailed explanations: E0252, E0428, E0432.
+For more information about an error, try `rustc --explain E0252`.
+warning: `sigmaos` (lib) generated 88 warnings (2 duplicates)
+error: could not compile `sigmaos` (lib) due to 22 previous errors; 88 warnings emitted

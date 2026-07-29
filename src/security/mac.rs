@@ -2,6 +2,8 @@
 #![no_main]
 
 extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
@@ -10,8 +12,6 @@ use core::mem;
 /// Based on Roadmap Item 62: Mandatory access control
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 /// Security context ID
 pub type ContextID = usize;
@@ -245,7 +245,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -439,3 +439,23 @@ pub use MACPolicy as MacPolicy;
 pub struct MacRule;
 pub struct MacSecurity;
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_mac_engine() {
+        let cap = EngineCapability::full();
+        let mut engine = SimpleMACEngine::new(cap);
+        let ctx_id = engine.create_context(
+            SecurityLevel::Medium,
+            SecurityDomain::System,
+            ContextCapability::full(),
+        ).unwrap();
+        let policy_cap = PolicyCapability::full();
+        let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
+        engine.register_policy(Box::new(policy)).unwrap();
+
+        assert!(engine.check_access(ctx_id, SecurityOperation::Read));
+    }
+}

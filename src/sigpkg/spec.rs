@@ -6,16 +6,12 @@ use core::mem;
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Package version
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageVersion {
     pub major: u32,
     pub minor: u32,
@@ -56,6 +52,7 @@ pub struct PackageDependency {
 
 /// Package info
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageInfo {
     pub name: [u8; 64],
     pub version: PackageVersion,
@@ -80,7 +77,7 @@ impl PackageInfo {
 
 /// Package capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageCapability {
     pub can_install: bool,
     pub can_uninstall: bool,
@@ -198,9 +195,7 @@ impl Package for SimplePackage {
     }
 
     fn dependencies(&self) -> &[PackageDependency] {
-        unsafe {
-            core::slice::from_raw_parts(self.dependencies.data, self.dependencies.len)
-        }
+        &self.dependencies
     }
 
     fn verify_signature(&self, signature: &[u8]) -> bool {
@@ -353,8 +348,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for i in 0..self.packages.len {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+        for (i, package_option) in self.packages.iter().enumerate() {
+            if let Some(ref package) = *package_option {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -363,12 +358,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if let Some(p) = self.packages.get_mut(i) {
-                *p = None;
-            }
-            if let Some(inst) = self.installed.get_mut(i) {
-                *inst = None;
-            }
+            self.packages[i] = None;
+            self.installed[i] = None;
             self.stats.total_packages -= 1;
             Ok(())
         } else {
@@ -377,8 +368,8 @@ impl PackageManager for SimplePackageManager {
     }
 
     fn get_package(&self, name: &[u8]) -> Option<&dyn Package> {
-        for i in 0..self.packages.len {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+        for package_option in self.packages.iter() {
+            if let Some(ref package) = *package_option {
                 if package.name() == name {
                     return Some(package.as_ref());
                 }
@@ -393,8 +384,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for i in 0..self.packages.len {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+        for (i, package_option) in self.packages.iter().enumerate() {
+            if let Some(ref package) = *package_option {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -403,15 +394,13 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+            if let Some(ref package) = self.packages[i] {
                 // Verify signature before installation
                 if !package.verify_signature(&package.info().checksum) {
                     return Err(PackageError::SignatureInvalid);
                 }
 
-                if let Some(inst) = self.installed.get_mut(i) {
-                    *inst = Some(true);
-                }
+                self.installed[i] = Some(true);
                 self.stats.installed_packages += 1;
                 Ok(())
             } else {
@@ -428,8 +417,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for i in 0..self.packages.len {
-            if let Some(Some(ref package)) = self.packages.get(i) {
+        for (i, package_option) in self.packages.iter().enumerate() {
+            if let Some(ref package) = *package_option {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -438,10 +427,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if let Some(&Some(true)) = self.installed.get(i) {
-                if let Some(inst) = self.installed.get_mut(i) {
-                    *inst = Some(false);
-                }
+            if self.installed[i] == Some(true) {
+                self.installed[i] = Some(false);
                 self.stats.installed_packages -= 1;
                 Ok(())
             } else {
@@ -467,8 +454,8 @@ impl PackageManager for SimplePackageManager {
 
         for dep in dependencies {
             let mut found = false;
-            for i in 0..self.packages.len {
-                if let Some(Some(ref pkg)) = self.packages.get(i) {
+            for package_option in self.packages.iter() {
+                if let Some(ref pkg) = *package_option {
                     let dep_name = dep.name;
                     let pkg_name = pkg.name();
 
@@ -497,46 +484,97 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UniversalPackageType {
-    Apt,
-    Rpm,
-    Pacman,
-    Snap,
-    Nix,
-    Ebuild,
-    Apk,
-    Flatpak,
-    Txz,
-    Xbps,
-    Cachyos,
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
 }
 
-pub trait UniversalPackage {
-    fn package_type(&self) -> UniversalPackageType;
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
 }
 
-pub struct UserDefinedPackageHook;
+// External allocator functions
 
-pub struct PackageAdapterFactory;
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
 
-pub struct AptPackageAdapter;
-pub struct PacmanPackageAdapter;
-pub struct SnapPackageAdapter;
-pub struct NixPackageAdapter;
-pub struct EbuildPackageAdapter;
-pub struct ApkPackageAdapter;
-pub struct FlatpakPackageAdapter;
-pub struct TxzPackageAdapter;
-pub struct XbpsPackageAdapter;
-pub struct CachyosPackageAdapter;
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
 
-pub struct CachyCpuDetector;
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchLevel {
-    V1,
-    V2,
-    V3,
-    V4,
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
 }

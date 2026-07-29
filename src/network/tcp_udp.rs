@@ -1,16 +1,12 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -19,7 +15,7 @@ pub type Port = u16;
 #[derive(Debug, Clone, Copy)]
 pub enum Protocol { TCP = 0, UDP = 1 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
@@ -71,10 +67,6 @@ pub struct SimpleSocket {
     pub local_port: AtomicUsize,
     pub remote_port: AtomicUsize,
     pub state: AtomicUsize,
-    pub reuse_addr: AtomicUsize,
-    pub tcp_nodelay: AtomicUsize,
-    pub rcvbuf: AtomicUsize,
-    pub sndbuf: AtomicUsize,
 }
 
 impl SimpleSocket {
@@ -85,10 +77,6 @@ impl SimpleSocket {
             local_port: AtomicUsize::new(local_port as usize),
             remote_port: AtomicUsize::new(0),
             state: AtomicUsize::new(TCPState::Closed as usize),
-            reuse_addr: AtomicUsize::new(0),
-            tcp_nodelay: AtomicUsize::new(0),
-            rcvbuf: AtomicUsize::new(4096),
-            sndbuf: AtomicUsize::new(4096),
         }
     }
 }
@@ -185,7 +173,7 @@ impl TCPConnection for SimpleSocket {
         Ok(())
     }
     fn get_state(&self) -> TCPState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
 }
 
@@ -289,7 +277,7 @@ pub struct SimpleFirewall {
 
 impl SimpleFirewall {
     pub fn new() -> Self {
-        let mut allowed_ports = [const { AtomicUsize::new(0) }; 65536];
+        let mut allowed_ports = [AtomicUsize::new(0); 65536];
         SimpleFirewall { allowed_ports }
     }
 }
@@ -342,10 +330,6 @@ pub trait NetworkStack {
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
 }
 
-pub struct NetfilterFirewall;
-pub struct RoutingTable;
-pub struct NetworkInterface;
-
 pub struct SimpleNetworkStack {
     pub sockets: Vec<Option<Box<dyn Socket>>>,
     pub next_id: AtomicUsize,
@@ -364,9 +348,6 @@ impl SimpleNetworkStack {
             next_id: AtomicUsize::new(1),
             firewall: SimpleFirewall::new(),
             congestion: RenoCongestionControl::new(),
-            netfilter: NetfilterFirewall,
-            routing_table: RoutingTable,
-            interfaces: Vec::new(),
         }
     }
 }
@@ -380,7 +361,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
         for socket_option in &mut self.sockets {
-            if let Some(ref socket) = socket_option {
+            if let Some(ref socket) = *socket_option {
                 if socket.id() == id {
                     return Ok(());
                 }
@@ -390,7 +371,7 @@ impl NetworkStack for SimpleNetworkStack {
     }
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket_option in &self.sockets {
-            if let Some(ref socket) = socket_option {
+            if let Some(ref socket) = *socket_option {
                 if socket.id() == id { return Some(socket.as_ref()); }
             }
         }
@@ -398,3 +379,72 @@ impl NetworkStack for SimpleNetworkStack {
     }
 }
 
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}

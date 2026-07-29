@@ -726,7 +726,11 @@ impl SovereignEbpfEngine {
     }
 
     /// Executes eBPF instructions on a network packet buffer or kernel probe context
-    pub fn execute_program(&mut self, program: &[u64], context: &mut [u8]) -> Result<u64, &'static str> {
+    pub fn execute_program(
+        &mut self,
+        program: &[u64],
+        context: &mut [u8],
+    ) -> Result<u64, &'static str> {
         self.program_loaded = true;
         self.registers[1] = context.as_ptr() as u64;
         self.registers[2] = context.len() as u64;
@@ -743,33 +747,47 @@ impl SovereignEbpfEngine {
             }
 
             match opcode {
-                0x07 => { // ADD immediate
+                0x07 => {
+                    // ADD immediate
                     self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(imm);
                 }
-                0x0F => { // ADD register
-                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
+                0x0F => {
+                    // ADD register
+                    self.registers[dst_reg] =
+                        self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
                 }
-                0x17 => { // SUB immediate
+                0x17 => {
+                    // SUB immediate
                     self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(imm);
                 }
-                0x1F => { // SUB register
-                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
+                0x1F => {
+                    // SUB register
+                    self.registers[dst_reg] =
+                        self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
                 }
-                0x27 => { // MOV immediate
+                0x27 => {
+                    // MOV immediate
                     self.registers[dst_reg] = imm;
                 }
-                0x2F => { // MOV register
+                0x2F => {
+                    // MOV register
                     self.registers[dst_reg] = self.registers[src_reg];
                 }
-                0x35 => { // LOAD from context with offset (packet parsing helper)
-                    let idx = if offset != 0 { offset as usize } else { imm as usize };
+                0x35 => {
+                    // LOAD from context with offset (packet parsing helper)
+                    let idx = if offset != 0 {
+                        offset as usize
+                    } else {
+                        imm as usize
+                    };
                     if idx < context.len() {
                         self.registers[dst_reg] = context[idx] as u64;
                     } else {
                         return Err("Context offset out of bounds");
                     }
                 }
-                0x95 => { // EXIT
+                0x95 => {
+                    // EXIT
                     return Ok(self.registers[0]);
                 }
                 _ => {}
@@ -843,14 +861,39 @@ pub struct Plan9Server {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NinePMessage {
-    Tversion { msize: u32, version: String },
-    Rversion { msize: u32, version: String },
-    Tattach { fid: u32, afid: u32, uname: String, aname: String },
-    Rattach { qid_path: u64 },
-    Twalk { fid: u32, newfid: u32, names: Vec<String> },
-    Rwalk { qids: Vec<u64> },
-    Tread { fid: u32, offset: u64, count: u32 },
-    Rread { data: Vec<u8> },
+    Tversion {
+        msize: u32,
+        version: String,
+    },
+    Rversion {
+        msize: u32,
+        version: String,
+    },
+    Tattach {
+        fid: u32,
+        afid: u32,
+        uname: String,
+        aname: String,
+    },
+    Rattach {
+        qid_path: u64,
+    },
+    Twalk {
+        fid: u32,
+        newfid: u32,
+        names: Vec<String>,
+    },
+    Rwalk {
+        qids: Vec<u64>,
+    },
+    Tread {
+        fid: u32,
+        offset: u64,
+        count: u32,
+    },
+    Rread {
+        data: Vec<u8>,
+    },
 }
 
 impl Plan9Server {
@@ -871,7 +914,12 @@ impl Plan9Server {
                     version: String::from("9P2000"),
                 })
             }
-            NinePMessage::Tattach { fid, afid, uname, aname } => {
+            NinePMessage::Tattach {
+                fid,
+                afid,
+                uname,
+                aname,
+            } => {
                 if !self.active_fids.contains(&fid) {
                     self.active_fids.push(fid);
                 }
@@ -997,7 +1045,7 @@ mod tests {
         // 4. EXIT: 0x9500000000000000
         let program = vec![
             0x27_0_0_0000_00000005, // MOV R0, 5
-            0x35_3_0_0000_00000002, // LOAD R3, context[2] (value: 0x30 = 48)
+            0x35_3_0_0002_00000000, // LOAD R3, context[2] (value: 0x30 = 48)
             0x0F_0_3_0000_00000000, // ADD R0, R3
             0x95_0_0_0000_00000000, // EXIT
         ];
@@ -1011,17 +1059,25 @@ mod tests {
     #[test]
     fn test_sovereign_capsicum() {
         let mut sandbox = SovereignCapsicum::new();
-        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
+        assert!(sandbox
+            .check_capability(SovereignCapsicum::CAP_READ)
+            .is_ok());
 
         // Restrict capabilities to READ and SEEK only
         sandbox.enter_capability_mode(SovereignCapsicum::CAP_READ | SovereignCapsicum::CAP_SEEK);
         assert!(sandbox.is_sandboxed);
 
-        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
-        assert!(sandbox.check_capability(SovereignCapsicum::CAP_SEEK).is_ok());
+        assert!(sandbox
+            .check_capability(SovereignCapsicum::CAP_READ)
+            .is_ok());
+        assert!(sandbox
+            .check_capability(SovereignCapsicum::CAP_SEEK)
+            .is_ok());
 
         // WRITE is not allowed
-        assert!(sandbox.check_capability(SovereignCapsicum::CAP_WRITE).is_err());
+        assert!(sandbox
+            .check_capability(SovereignCapsicum::CAP_WRITE)
+            .is_err());
     }
 
     #[test]
@@ -1029,7 +1085,10 @@ mod tests {
         let mut server = Plan9Server::new();
 
         // 1. Tversion
-        let version_req = NinePMessage::Tversion { msize: 4096, version: String::from("9P2000") };
+        let version_req = NinePMessage::Tversion {
+            msize: 4096,
+            version: String::from("9P2000"),
+        };
         let version_resp = server.handle_request(version_req).unwrap();
         if let NinePMessage::Rversion { msize, ref version } = version_resp {
             assert_eq!(msize, 4096);
@@ -1039,7 +1098,12 @@ mod tests {
         }
 
         // 2. Tattach
-        let attach_req = NinePMessage::Tattach { fid: 10, afid: 0, uname: String::from("root"), aname: String::from("root") };
+        let attach_req = NinePMessage::Tattach {
+            fid: 10,
+            afid: 0,
+            uname: String::from("root"),
+            aname: String::from("root"),
+        };
         let attach_resp = server.handle_request(attach_req).unwrap();
         if let NinePMessage::Rattach { qid_path } = attach_resp {
             assert_eq!(qid_path, 0xFF10);
@@ -1049,7 +1113,11 @@ mod tests {
         assert!(server.active_fids.contains(&10));
 
         // 3. Tread
-        let read_req = NinePMessage::Tread { fid: 10, offset: 0, count: 5 };
+        let read_req = NinePMessage::Tread {
+            fid: 10,
+            offset: 0,
+            count: 5,
+        };
         let read_resp = server.handle_request(read_req).unwrap();
         if let NinePMessage::Rread { ref data } = read_resp {
             assert_eq!(data.len(), 5);

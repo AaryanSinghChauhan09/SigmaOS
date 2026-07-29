@@ -149,9 +149,9 @@ impl DeviceManager {
     }
 
     pub fn find_device_mut(&mut self, name: &str) -> Option<&mut dyn Device> {
-        for device in self.devices.iter_mut() {
-            if device.name() == name {
-                return Some(device.as_mut());
+        for d in self.devices.iter_mut() {
+            if d.name() == name {
+                return Some(&mut **d);
             }
         }
         None

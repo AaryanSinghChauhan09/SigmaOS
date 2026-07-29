@@ -1,18 +1,30 @@
 // SigmaOS Compatibility Module
+pub mod constellation_mesh;
 pub mod cross_platform;
-pub mod india_stack_localization;
-pub mod scosmos;
+pub mod endeavour;
+pub mod legacy_adapters;
 pub mod standards;
 
-pub use cross_platform::{
-    ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
-    CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
-    SupersetApplicationCapability, TargetPlatform, TranslationLayer,
+pub use constellation_mesh::{
+    BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
+    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
+    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid,
+    LegacyCCodexGrid, LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+    StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
 };
-pub use standards::{FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager};
-pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
-pub use scosmos::{
-    ApkLoader, BinaryFormat as ScosmosBinaryFormat, BinderCallType,
-    CompatibilityError as ScosmosError, MachoLoader, PeBinaryLoader, ScosmosManager,
+pub use cross_platform::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+};
+pub use endeavour::{
+    EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
+    YayAurHelper,
+};
+pub use legacy_adapters::{
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };

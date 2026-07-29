@@ -1,41 +1,22 @@
 #![no_std]
 #![no_main]
 
-<<<<<<< HEAD
-extern crate alloc;
-use alloc::boxed::Box;
-
-=======
-#[cfg(not(target_os = "none"))]
-extern crate alloc;
-#[cfg(not(target_os = "none"))]
-use alloc::vec::Vec;
-
-use core::mem;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type VolumeID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum VolumeType {
-    Linear = 0,
-    Stripe = 1,
-    Mirror = 2,
-    RAID5 = 3,
-}
+pub enum VolumeType { Linear = 0, Stripe = 1, Mirror = 2, RAID5 = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum VolumeError {
-    Success = 0,
-    NotFound = 1,
-    CreationFailed = 2,
-}
+pub enum VolumeError { Success = 0, NotFound = 1, CreationFailed = 2 }
 
 pub trait Volume {
     fn id(&self) -> VolumeID;
@@ -43,7 +24,8 @@ pub trait Volume {
     fn volume_type(&self) -> VolumeType;
     fn size(&self) -> u64;
     fn is_mounted(&self) -> bool;
-    fn set_mounted(&self, mounted: bool);
+    fn mount(&self);
+    fn unmount(&self);
 }
 
 #[repr(C)]
@@ -72,20 +54,30 @@ impl SimpleVolume {
     }
 }
 
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
 
 impl Volume for SimpleVolume {
-    fn id(&self) -> VolumeID {
-        self.id
-    }
+    fn id(&self) -> VolumeID { self.id }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-<<<<<<< HEAD
-    fn volume_type(&self) -> VolumeType { unsafe { core::mem::transmute(self.volume_type.load(Ordering::SeqCst)) } }
-    fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
-    fn is_mounted(&self) -> bool { self.mounted.load(Ordering::SeqCst) == 1 }
-=======
     fn volume_type(&self) -> VolumeType {
         let raw = self.volume_type.load(Ordering::SeqCst) as u32;
         match raw {
@@ -95,25 +87,14 @@ impl Volume for SimpleVolume {
             _ => VolumeType::Linear,
         }
     }
-    fn size(&self) -> u64 {
-        self.size.load(Ordering::SeqCst) as u64
-    }
-    fn is_mounted(&self) -> bool {
-        self.mounted.load(Ordering::SeqCst) == 1
-    }
-    fn set_mounted(&self, mounted: bool) {
-        self.mounted.store(if mounted { 1 } else { 0 }, Ordering::SeqCst);
-    }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
+    fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
+    fn is_mounted(&self) -> bool { self.mounted.load(Ordering::SeqCst) == 1 }
+    fn mount(&self) { self.mounted.store(1, Ordering::SeqCst); }
+    fn unmount(&self) { self.mounted.store(0, Ordering::SeqCst); }
 }
 
 pub trait VolumeManager {
-    fn create_volume(
-        &mut self,
-        name: &[u8],
-        volume_type: VolumeType,
-        size: u64,
-    ) -> Result<VolumeID, VolumeError>;
+    fn create_volume(&mut self, name: &[u8], volume_type: VolumeType, size: u64) -> Result<VolumeID, VolumeError>;
     fn delete_volume(&mut self, id: VolumeID) -> Result<(), VolumeError>;
     fn get_volume(&self, id: VolumeID) -> Option<&dyn Volume>;
     fn mount_volume(&mut self, id: VolumeID) -> Result<(), VolumeError>;
@@ -136,12 +117,7 @@ impl SimpleVolumeManager {
 }
 
 impl VolumeManager for SimpleVolumeManager {
-    fn create_volume(
-        &mut self,
-        name: &[u8],
-        volume_type: VolumeType,
-        size: u64,
-    ) -> Result<VolumeID, VolumeError> {
+    fn create_volume(&mut self, name: &[u8], volume_type: VolumeType, size: u64) -> Result<VolumeID, VolumeError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let volume = SimpleVolume::new(id, name, volume_type, size);
         self.volumes.push(Some(Box::new(volume)));
@@ -162,9 +138,7 @@ impl VolumeManager for SimpleVolumeManager {
     fn get_volume(&self, id: VolumeID) -> Option<&dyn Volume> {
         for volume_option in &self.volumes {
             if let Some(ref volume) = *volume_option {
-                if volume.id() == id {
-                    return Some(volume.as_ref());
-                }
+                if volume.id() == id { return Some(volume.as_ref()); }
             }
         }
         None
@@ -174,7 +148,7 @@ impl VolumeManager for SimpleVolumeManager {
         for volume_option in &mut self.volumes {
             if let Some(ref mut volume) = *volume_option {
                 if volume.id() == id {
-                    volume.set_mounted(true);
+                    volume.mount();
                     return Ok(());
                 }
             }
@@ -186,7 +160,7 @@ impl VolumeManager for SimpleVolumeManager {
         for volume_option in &mut self.volumes {
             if let Some(ref mut volume) = *volume_option {
                 if volume.id() == id {
-                    volume.set_mounted(false);
+                    volume.unmount();
                     return Ok(());
                 }
             }
@@ -198,11 +172,7 @@ impl VolumeManager for SimpleVolumeManager {
 pub trait SnapshotManager {
     fn create_snapshot(&mut self, volume_id: VolumeID) -> Result<VolumeID, VolumeError>;
     fn delete_snapshot(&mut self, snapshot_id: VolumeID) -> Result<(), VolumeError>;
-    fn restore_snapshot(
-        &mut self,
-        volume_id: VolumeID,
-        snapshot_id: VolumeID,
-    ) -> Result<(), VolumeError>;
+    fn restore_snapshot(&mut self, volume_id: VolumeID, snapshot_id: VolumeID) -> Result<(), VolumeError>;
 }
 
 #[repr(C)]
@@ -214,6 +184,40 @@ impl SimpleSnapshotManager {
     pub fn new() -> Self {
         SimpleSnapshotManager {
             snapshots: Vec::new(),
+        }
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }
@@ -235,42 +239,18 @@ impl SnapshotManager for SimpleSnapshotManager {
         Err(VolumeError::NotFound)
     }
 
-    fn restore_snapshot(
-        &mut self,
-        _volume_id: VolumeID,
-        _snapshot_id: VolumeID,
-    ) -> Result<(), VolumeError> {
+    fn restore_snapshot(&mut self, _volume_id: VolumeID, _snapshot_id: VolumeID) -> Result<(), VolumeError> {
         Ok(())
     }
 }
 
-<<<<<<< HEAD
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-=======
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -287,80 +267,16 @@ impl<T> Vec<T> {
             item
         }
     }
-    fn as_slice(&self) -> &[T] {
-        if self.data.is_null() { &[] } else { unsafe { core::slice::from_raw_parts(self.data, self.len) } }
-    }
-    fn as_slice_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() { &mut [] } else { unsafe { core::slice::from_raw_parts_mut(self.data, self.len) } }
-    }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-<<<<<<< HEAD
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        self.as_slice()
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        self.as_slice_mut()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.as_slice().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.as_slice_mut().iter_mut()
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-=======
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045

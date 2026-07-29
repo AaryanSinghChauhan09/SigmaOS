@@ -75,7 +75,6 @@ impl SlabAllocator {
 
     /// Allocate an object from a cache
     pub fn allocate(&mut self, cache_name: &str) -> Result<*mut u8, &'static str> {
-<<<<<<< HEAD
         let (slab_idx, obj_idx, object_size, objects_per_slab) = {
             let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
             if cache.free_objects == 0 {
@@ -91,31 +90,6 @@ impl SlabAllocator {
                                 break 'outer;
                             }
                         }
-=======
-        let next_slab_id = self.next_slab_id;
-        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
-
-        // Try to find a free object in existing slabs
-        for slab in &mut cache.slabs {
-            if slab.state != SlabState::Full {
-                for obj in &mut slab.objects {
-                    if obj.is_none() {
-                        let ptr = (0x2000 + next_slab_id as usize) as *mut u8;
-                        *obj = Some(ptr);
-                        slab.inuse += 1;
-                        cache.free_objects -= 1;
-
-                        // Update slab state
-                        slab.state = if slab.inuse == cache.objects_per_slab {
-                            SlabState::Full
-                        } else if slab.inuse > 0 {
-                            SlabState::Partial
-                        } else {
-                            SlabState::Empty
-                        };
-
-                        return Ok(obj.unwrap());
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
                     }
                 }
                 if let Some((s_idx, o_idx)) = found {
@@ -152,16 +126,12 @@ impl SlabAllocator {
         }
 
         // No free objects, create a new slab
-<<<<<<< HEAD
         let (new_slab, objects_per_slab) = {
             let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
             let slab = self.create_slab(cache)?;
             (slab, cache.objects_per_slab)
         };
 
-=======
-        let new_slab = Self::create_slab_static(next_slab_id, cache)?;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         let obj = new_slab.objects[0].unwrap();
 
         let cache = self.caches.get_mut(cache_name).unwrap();
@@ -199,13 +169,12 @@ impl SlabAllocator {
         Err("Object not found in cache")
     }
 
-    /// Create a new slab for a cache (static helper to avoid self borrow conflict)
-    fn create_slab_static(next_slab_id: u64, cache: &SlabCache) -> Result<Slab, &'static str> {
+    /// Create a new slab for a cache
+    fn create_slab(&self, cache: &SlabCache) -> Result<Slab, &'static str> {
         let mut objects = Vec::with_capacity(cache.objects_per_slab);
 
         for _ in 0..cache.objects_per_slab {
-            let ptr = (0x2000 + next_slab_id as usize) as *mut u8;
-            objects.push(Some(ptr));
+            objects.push(Some(self.allocate_memory(cache.object_size)));
         }
 
         Ok(Slab {

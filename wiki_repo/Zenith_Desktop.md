@@ -377,6 +377,119 @@ clipboard get
 
 ---
 
+## 🐚 Unified CLI Control Suite (GUI-over-CLI)
+
+SigmaOS bridges command-line productivity with Graphical interface richness. Every task that can be performed via the Zenith Compositor's graphical controls can easily be done using our interactive CLI control suite.
+
+### 1. Display Configuration (`display`)
+Enables full control over monitor arrangements, refresh rates, HiDPI scaling, and HDR settings:
+```bash
+# List all active and connected outputs
+display list
+
+# Set layout positioning
+display set --primary DP-1 --secondary HDMI-1 --arrange right
+
+# Configure HiDPI scaling
+display scale --output DP-1 --factor 2.0
+
+# Set refresh rate
+display rate --output DP-1 --hz 144
+
+# Toggle High Dynamic Range
+display hdr --output DP-1 --enable true
+```
+
+### 2. Desktop Theming (`theme`)
+Switch custom themes, adjust blur radius, or configure location-aware automatic dark mode switching:
+```bash
+# List preset themes
+theme list
+
+# Change active theme
+theme set "Banaras Gold"
+
+# Customize variables
+theme configure --accent #6C63FF --blur true --radius 20
+
+# Enable time-based theme transitions
+theme auto --enable true --mode time
+```
+
+### 3. Desktop UX & Profile Swapper (`profile`)
+Polymorphically swap between standard, developer, or guest environments with different layout algorithms:
+```bash
+# List custom user profiles
+profile list
+
+# Swap active profile
+profile switch developer
+
+# Override layout algorithm
+profile layout tiling
+```
+
+### 4. Window Manager Controller (`window`)
+Create, list, move, or destroy compositor windows directly:
+```bash
+# List running windows
+window list
+
+# Create a window
+window create --title "SigmaBrowser" --app "sigma.browser" --geom "10,10,600,400"
+
+# Change state
+window state --id 1 --state Maximized
+
+# Move / resize
+window move --id 1 --x 20 --y 20 --w 800 --h 600
+
+# Focus / Close
+window focus --id 1
+window close --id 2
+```
+
+### 5. Accessibility Controls (`accessibility` / `acc`)
+Toggle screen readers, magnification zoom, or load color-blindness shader corrections:
+```bash
+# Query active accessibility settings
+acc status
+
+# Toggle screen reader
+acc screen-reader --enable true --voice "default" --speed 1.0
+
+# Adjust magnifier zoom level
+acc magnifier --zoom 2.0
+
+# Set color blind correction shader
+acc colorblind protanopia
+```
+
+### 6. Screen Record & Screenshot (`screenshot` / `record`)
+Capture high-quality, hardware-accelerated screenshots or video streams:
+```bash
+# Capture full screen
+screenshot capture --output /home/ubuntu/screenshot.png --region full
+
+# Start recording
+record start --output /home/ubuntu/recording.mp4 --codec av1 --quality high
+
+# Stop recording
+record stop
+```
+
+### 7. Secure Clipboard Manager (`clipboard`)
+Retrieve or write context safely with capability-gated validation checks:
+```bash
+# Set clipboard text
+clipboard set "Sovereign Operating System"
+
+# Retrieve clipboard text (Requires 0x5001 capability validation)
+clipboard get
+```
+
+---
+
 ## 🌐 Display Management
 
 ### Multi-Monitor Support

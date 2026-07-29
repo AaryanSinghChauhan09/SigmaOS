@@ -1,3 +1,6 @@
+#![no_std]
+#![no_main]
+
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 
@@ -6,8 +9,8 @@ use core::mem;
 
 pub type BootStatus = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 
 #[repr(C)]
@@ -106,10 +109,123 @@ impl<T> Vec<T> {
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
-pub struct GopFramebuffer;
+#[derive(Debug, Clone, Copy, Default)]
+pub struct GopFramebuffer {
+    pub base_address: u64,
+    pub size: usize,
+    pub width: u32,
+    pub height: u32,
+}
+
+#[derive(Debug, Clone, Copy, Default)]
 pub struct AcpiParser;
+
+#[derive(Debug, Clone, Copy, Default)]
 pub struct UsbHostController;
-pub struct MultiKernelBootSelector;
-pub struct SovereignBootWatchdog;
-pub struct GopSplashCanvas;
-pub struct MicrokernelProfile;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MicrokernelProfile {
+    Performance,
+    Security,
+    Minimalist,
+}
+
+#[derive(Debug, Clone)]
+pub struct MultiKernelBootSelector {
+    pub current_profile: MicrokernelProfile,
+}
+
+impl MultiKernelBootSelector {
+    pub fn new() -> Self {
+        Self {
+            current_profile: MicrokernelProfile::Performance,
+        }
+    }
+
+    pub fn select_profile(&mut self, profile: MicrokernelProfile) {
+        self.current_profile = profile;
+    }
+}
+
+impl Default for MultiKernelBootSelector {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct SovereignBootWatchdog {
+    pub counter: AtomicUsize,
+}
+
+impl SovereignBootWatchdog {
+    pub fn new() -> Self {
+        Self {
+            counter: AtomicUsize::new(0),
+        }
+    }
+
+    pub fn ping(&self) {
+        self.counter.fetch_add(1, Ordering::SeqCst);
+    }
+}
+
+impl Default for SovereignBootWatchdog {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct GopSplashCanvas {
+    pub framebuffer: GopFramebuffer,
+}
+
+impl GopSplashCanvas {
+    pub fn new(fb: GopFramebuffer) -> Self {
+        Self { framebuffer: fb }
+    }
+
+    pub fn draw_pixel(&self, _x: u32, _y: u32, _color: u32) {}
+}
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}

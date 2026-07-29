@@ -40,7 +40,7 @@ pub enum DeviceError {
 
 /// Device type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceType {
     Block = 0,
     Character = 1,
@@ -146,21 +146,7 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-<<<<<<< HEAD
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-=======
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => DeviceState::Initializing,
-                2 => DeviceState::Ready,
-                3 => DeviceState::Busy,
-                4 => DeviceState::Error,
-                5 => DeviceState::Shutdown,
-                _ => DeviceState::Uninitialized,
-            }
-        }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
 
     pub fn set_state(&self, state: DeviceState) {
@@ -178,7 +164,7 @@ impl DeviceDescriptor {
 
 /// Device state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState {
     Uninitialized = 0,
     Initializing = 1,
@@ -232,7 +218,10 @@ impl SimpleBlockDevice {
         let mut blocks = Vec::new();
 
         for _ in 0..num_blocks {
-            let block_data = vec![0u8; block_size];
+            let mut block_data = Vec::new();
+            for _ in 0..block_size {
+                block_data.push(0u8);
+            }
             blocks.push(block_data);
         }
 
@@ -346,9 +335,13 @@ impl SimpleCharacterDevice {
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Character, capability);
 
+        let mut buffer = Vec::new();
+        for _ in 0..buffer_size {
+            buffer.push(0u8);
+        }
         SimpleCharacterDevice {
             descriptor,
-            buffer: vec![0u8; buffer_size],
+            buffer,
             read_pos: 0,
             write_pos: 0,
         }
@@ -514,7 +507,7 @@ impl DeviceManager {
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id < self.departors.len() {
+        if id < self.descriptors.len() {
             self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
@@ -610,30 +603,45 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-pub struct DdeDeviceWrapper {
-    pub id: usize,
-    pub name: [u8; 32],
-    pub io_port: u16,
-    pub proto: [u8; 8],
-    pub simulated_pci_bar: [u8; 256],
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
 }
 
-impl DdeDeviceWrapper {
-    pub fn new(id: usize, name: &[u8], io_port: u16, proto: &[u8]) -> Self {
-        let mut name_arr = [0u8; 32];
-        let mut proto_arr = [0u8; 8];
-        let name_len = name.len().min(31);
-        let proto_len = proto.len().min(7);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(proto.as_ptr(), proto_arr.as_mut_ptr(), proto_len);
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
-        Self {
-            id,
-            name: name_arr,
-            io_port,
-            proto: proto_arr,
-            simulated_pci_bar: [0u8; 256],
-        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }

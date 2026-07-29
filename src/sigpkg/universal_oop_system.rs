@@ -2,7 +2,7 @@
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
-use crate::sigpkg::{Package, Version, VersionConstraint, Dependency};
+use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -168,8 +168,8 @@ impl IPackageParser for DebAdapter {
     }
 
     fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
-        let content = String::from_utf8(data.to_vec())
-            .map_err(|e| ParseError::IoError(e.to_string()))?;
+        let content =
+            String::from_utf8(data.to_vec()).map_err(|e| ParseError::IoError(e.to_string()))?;
 
         let mut name = String::new();
         let mut version_str = String::new();
@@ -209,8 +209,7 @@ impl IPackageParser for DebAdapter {
             }
         }
 
-        let version = Version::parse(&version_str)
-            .unwrap_or_else(|_| Version::new(0, 0, 0));
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
 
         let mut package: Box<dyn IPackage> = Box::new(StandardPackage {
             metadata: PackageMetadata {
@@ -230,7 +229,8 @@ impl IPackageParser for DebAdapter {
         });
 
         // Execute user-defined hooks
-        self.base.execute_hooks(package.as_mut())
+        self.base
+            .execute_hooks(package.as_mut())
             .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
 
         Ok(package)
@@ -239,22 +239,29 @@ impl IPackageParser for DebAdapter {
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let mut output = String::new();
         let meta = package.metadata();
-        
+
         output.push_str(&format!("Package: {}\n", meta.name));
-        output.push_str(&format!("Version: {}.{}.{}\n", meta.version.major, meta.version.minor, meta.version.patch));
+        output.push_str(&format!(
+            "Version: {}.{}.{}\n",
+            meta.version.major, meta.version.minor, meta.version.patch
+        ));
         output.push_str(&format!("Description: {}\n", meta.description));
         output.push_str(&format!("License: {}\n", meta.license));
         output.push_str(&format!("Maintainer: {}\n", meta.maintainer));
         output.push_str(&format!("Homepage: {}\n", meta.homepage));
         output.push_str(&format!("Architecture: {}\n", meta.architecture));
-        
+
         if !package.dependencies().is_empty() {
             output.push_str("Depends: ");
-            let dep_names: Vec<&str> = package.dependencies().iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies()
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(", "));
             output.push('\n');
         }
-        
+
         Ok(output.into_bytes())
     }
 }
@@ -289,7 +296,7 @@ impl IPackageParser for RpmAdapter {
     fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
         // Simplified RPM parsing - in production would use proper RPM library
         let content = String::from_utf8_lossy(data);
-        
+
         let mut name = "rpm-package".to_string();
         let mut version_str = "1.0.0".to_string();
         let mut description = "RPM Package".to_string();
@@ -297,11 +304,21 @@ impl IPackageParser for RpmAdapter {
 
         for line in content.lines() {
             if line.contains("Name") && line.contains(':') {
-                name = line.split(':').nth(1).unwrap_or("rpm-package").trim().to_string();
+                name = line
+                    .split(':')
+                    .nth(1)
+                    .unwrap_or("rpm-package")
+                    .trim()
+                    .to_string();
             } else if line.contains("Version") && line.contains(':') {
                 version_str = line.split(':').nth(1).unwrap_or("1.0.0").trim().to_string();
             } else if line.contains("Summary") && line.contains(':') {
-                description = line.split(':').nth(1).unwrap_or("RPM Package").trim().to_string();
+                description = line
+                    .split(':')
+                    .nth(1)
+                    .unwrap_or("RPM Package")
+                    .trim()
+                    .to_string();
             } else if line.contains("Requires") && line.contains(':') {
                 let deps_str = line.split(':').nth(1).unwrap_or("");
                 for dep in deps_str.split_whitespace() {
@@ -315,8 +332,7 @@ impl IPackageParser for RpmAdapter {
             }
         }
 
-        let version = Version::parse(&version_str)
-            .unwrap_or_else(|_| Version::new(0, 0, 0));
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
 
         let mut package: Box<dyn IPackage> = Box::new(StandardPackage {
             metadata: PackageMetadata {
@@ -335,7 +351,8 @@ impl IPackageParser for RpmAdapter {
             format: PackageFormat::Rpm,
         });
 
-        self.base.execute_hooks(package.as_mut())
+        self.base
+            .execute_hooks(package.as_mut())
             .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
 
         Ok(package)
@@ -344,18 +361,25 @@ impl IPackageParser for RpmAdapter {
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let mut output = String::new();
         let meta = package.metadata();
-        
+
         output.push_str(&format!("Name: {}\n", meta.name));
-        output.push_str(&format!("Version: {}.{}.{}\n", meta.version.major, meta.version.minor, meta.version.patch));
+        output.push_str(&format!(
+            "Version: {}.{}.{}\n",
+            meta.version.major, meta.version.minor, meta.version.patch
+        ));
         output.push_str(&format!("Summary: {}\n", meta.description));
-        
+
         if !package.dependencies().is_empty() {
             output.push_str("Requires: ");
-            let dep_names: Vec<&str> = package.dependencies().iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies()
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(" "));
             output.push('\n');
         }
-        
+
         Ok(output.into_bytes())
     }
 }
@@ -389,7 +413,7 @@ impl IPackageParser for PacmanAdapter {
 
     fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
         let content = String::from_utf8_lossy(data);
-        
+
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
@@ -411,8 +435,7 @@ impl IPackageParser for PacmanAdapter {
             }
         }
 
-        let version = Version::parse(&version_str)
-            .unwrap_or_else(|_| Version::new(0, 0, 0));
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
 
         let mut package: Box<dyn IPackage> = Box::new(StandardPackage {
             metadata: PackageMetadata {
@@ -431,7 +454,8 @@ impl IPackageParser for PacmanAdapter {
             format: PackageFormat::Pacman,
         });
 
-        self.base.execute_hooks(package.as_mut())
+        self.base
+            .execute_hooks(package.as_mut())
             .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
 
         Ok(package)
@@ -440,15 +464,18 @@ impl IPackageParser for PacmanAdapter {
     fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
         let mut output = String::new();
         let meta = package.metadata();
-        
+
         output.push_str(&format!("pkgname = {}\n", meta.name));
-        output.push_str(&format!("pkgver = {}.{}.{}\n", meta.version.major, meta.version.minor, meta.version.patch));
+        output.push_str(&format!(
+            "pkgver = {}.{}.{}\n",
+            meta.version.major, meta.version.minor, meta.version.patch
+        ));
         output.push_str(&format!("pkgdesc = {}\n", meta.description));
-        
+
         for dep in package.dependencies() {
             output.push_str(&format!("depend = {}\n", dep.name));
         }
-        
+
         Ok(output.into_bytes())
     }
 }
@@ -549,24 +576,32 @@ impl UniversalPackageManager {
 
     /// Parse package with auto-detection
     pub fn parse_package(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
-        let parser = self.factory.auto_detect_parser(data)
+        let parser = self
+            .factory
+            .auto_detect_parser(data)
             .ok_or_else(|| ParseError::InvalidFormat)?;
-        
+
         parser.parse(data)
     }
 
     /// Parse package with specific format
-    pub fn parse_package_with_format(&self, format: PackageFormat, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
-        let parser = self.factory.get_parser(format)
+    pub fn parse_package_with_format(
+        &self,
+        format: PackageFormat,
+        data: &[u8],
+    ) -> Result<Box<dyn IPackage>, ParseError> {
+        let parser = self
+            .factory
+            .get_parser(format)
             .ok_or_else(|| ParseError::UnsupportedFormat(format))?;
-        
+
         parser.parse(data)
     }
 
     /// Install a package
     pub fn install_package(&mut self, package: Box<dyn IPackage>) -> Result<(), InstallError> {
         let name = package.name().to_string();
-        
+
         // Check dependencies
         for dep in package.dependencies() {
             if !self.installed_packages.contains_key(&dep.name) {
@@ -585,7 +620,10 @@ impl UniversalPackageManager {
 
     /// List all installed packages
     pub fn list_packages(&self) -> Vec<&dyn IPackage> {
-        self.installed_packages.values().map(|p| p.as_ref()).collect()
+        self.installed_packages
+            .values()
+            .map(|p| p.as_ref())
+            .collect()
     }
 
     /// Register a custom parser
@@ -622,7 +660,7 @@ Description: A test package
 Depends: libc, libssl";
 
         assert!(adapter.can_parse(deb_data));
-        
+
         let package = adapter.parse(deb_data).unwrap();
         assert_eq!(package.name(), "test-package");
         assert_eq!(package.format(), PackageFormat::Deb);
@@ -637,7 +675,7 @@ Summary: An RPM test package
 Requires: glibc openssl";
 
         assert!(adapter.can_parse(&[0xED, 0xAB, 0xEE, 0xDB])); // RPM magic number
-        
+
         let package = adapter.parse(rpm_data).unwrap();
         assert_eq!(package.name(), "test-rpm");
         assert_eq!(package.format(), PackageFormat::Rpm);
@@ -653,7 +691,7 @@ depend = glibc
 depend = openssl";
 
         assert!(adapter.can_parse(pacman_data));
-        
+
         let package = adapter.parse(pacman_data).unwrap();
         assert_eq!(package.name(), "test-pacman");
         assert_eq!(package.format(), PackageFormat::Pacman);
@@ -662,11 +700,11 @@ depend = openssl";
     #[test]
     fn test_factory_auto_detection() {
         let factory = PackageParserFactory::new();
-        
+
         let deb_data = b"Package: auto-test
 Version: 1.0.0
 Description: Auto-detection test";
-        
+
         let parser = factory.auto_detect_parser(deb_data).unwrap();
         assert_eq!(parser.format(), PackageFormat::Deb);
     }
@@ -674,25 +712,25 @@ Description: Auto-detection test";
     #[test]
     fn test_universal_package_manager() {
         let mut manager = UniversalPackageManager::new();
-        
+
         let deb_data = b"Package: test
 Version: 1.0.0
 Description: Test";
-        
+
         let package = manager.parse_package(deb_data).unwrap();
         let name = package.name().to_string();
-        
+
         // Install without dependencies should fail
         assert!(manager.install_package(package).is_err());
-        
+
         // Install package with no dependencies
         let simple_data = b"Package: simple
 Version: 1.0.0
 Description: Simple package";
-        
+
         let simple_package = manager.parse_package(simple_data).unwrap();
         assert!(manager.install_package(simple_package).is_ok());
-        
+
         assert!(manager.get_package("simple").is_some());
     }
 }

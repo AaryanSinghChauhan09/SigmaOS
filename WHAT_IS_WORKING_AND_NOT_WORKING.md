@@ -1,431 +1,379 @@
-# 🧮 SigmaOS Core Algorithms: What's Working & What's Not Working Status Guide
+# 📑 SigmaOS Master Subsystem Diagnostics: What's Working & What's Not Working
 
-This document is the definitive master status and diagnostic reference guide for **SigmaOS**. It is curated specifically for developers and AI agents to understand what algorithms are working, what are not, why compiler and design issues exist, and how to fix them to achieve a completely compiling, highly stable, and verified green codebase.
+This document is the definitive master diagnostic and status guide for **SigmaOS**. It is created specifically for future developers and AI agents to understand exactly what is working, what is not working, why conflicts and compilation issues exist, and how to fix them to restore a fully compiled, green, and verified codebase.
 
 ---
 
 ## 📋 Table of Contents
-1. [Core Systems Overview](#1-core-systems-overview)
-2. [What is Working (Operational Subsystems)](#2-what-is-working-operational-subsystems)
-3. [What is Not Working (Overview of Compiler & Design Gaps)](#3-what-is-not-working-overview-of-compiler--design-gaps)
-4. [Deep-Dive Diagnostics: Why & How to Fix Every Blocker](#4-deep-dive-diagnostics-why--how-to-fix-every-blocker)
-    - [File 1: `src/sigpkg/mod.rs` (Duplicate `new` & Structural Gaps)](#file-1-srcsigpkgmodrs-duplicate-new--structural-gaps)
-    - [File 2: `src/ai/orchestrator.rs` (Expected `;` found `None`)](#file-2-srcaiorchestratorrs-expected--found-none)
-    - [File 3: `src/klib/paging.rs` (`#[test]` Attribute on Method)](#file-3-srcklibpagingrs-test-attribute-on-method)
-    - [File 4: `src/security/vulnerability.rs` (Duplicate Merge Blocks & ScanError)](#file-4-srcsecurityvulnerabilityrs-duplicate-merge-blocks--scanerror)
-    - [File 5: `src/security/capability.rs` (Duplicate Merge Blocks & SecurityEnforcer)](#file-5-srcsecuritycapabilityrs-duplicate-merge-blocks--securityenforcer)
-    - [File 6: `src/driver/framework.rs` (Trait Member Mismatch)](#file-6-srcdriverframeworkrs-trait-member-mismatch)
-    - [File 7: `src/container/runtime.rs` (Missing Derives & Crate Attributes)](#file-7-srccontainerruntimers-missing-derives--crate-attributes)
-    - [File 8: `src/klib/buddy_allocator.rs` (Custom `Vec<T>` Encapsulation Gaps)](#file-8-srcklibbuddy_allocatorrs-custom-vect-encapsulation-gaps)
-    - [File 9: `src/network/tcp_udp.rs` (Missing Type Bindings & Atomics copying)](#file-9-srcnetworktcp_udprs-missing-type-bindings--atomics-copying)
-    - [File 10: `src/remote/desktop.rs` (get_session & Iterators)](#file-10-srcremotedesktoprs-get_session--iterators)
-    - [File 11: `src/remote/shell.rs` (Iterator Bounds)](#file-11-srcremoteshellrs-iterator-bounds)
-    - [File 12: `src/security/audit.rs` (Iterators, EventType Derives, unwrap_or)](#file-12-srcsecurityauditrs-iterators-eventtype-derives-unwrap_or)
-    - [File 13: `src/security/integrity.rs` (update_stats)](#file-13-srcsecurityintegrityrs-update_stats)
-    - [File 14: `src/security/pki.rs` (Mismatched contains bounds)](#file-14-srcsecuritypkirs-mismatched-contains-bounds)
-    - [File 15: `src/security/secrets.rs` (std::vec::Vec missing data field)](#file-15-srcsecuritysecretsrs-stdvecvec-missing-data-field)
-5. [Systematic AI Agent Recovery Action Plan](#5-systematic-ai-agent-recovery-action-plan)
-6. [Verification & Testing Commands](#6-verification--testing-commands)
+1. [Executive Summary](#-executive-summary)
+2. [Sovereign OS Design & Principles](#-sovereign-os-design--principles)
+3. [Global Subsystem Status Table](#-global-subsystem-status-table)
+4. [Deep-Dive File-by-File Diagnostics (35 Conflicted Files)](#-deep-dive-file-by-file-diagnostics-35-conflicted-files)
+   - [Category A: Driver & Hardware Layer](#category-a-driver--hardware-layer)
+   - [Category B: Kernel, Memory, & Slab Allocations](#category-b-kernel-memory--slab-allocations)
+   - [Category C: Scheduler & Processes](#category-c-scheduler--processes)
+   - [Category D: Security, Sandboxing, & Credentials](#category-d-security-sandboxing--credentials)
+   - [Category E: Graphics, Composition, & UI](#category-e-graphics-composition--ui)
+   - [Category F: Network & Security Protocols](#category-f-network--security-protocols)
+   - [Category G: Productivity & Sovereign Office](#category-g-productivity--sovereign-office)
+   - [Category H: Storage & Filesystems](#category-h-storage--filesystems)
+   - [Category I: Core Utilities, Shell, Packaging, & Virtualization](#category-i-core-utilities-shell-packaging--virtualization)
+5. [Systematic AI Agent Restoration Blueprint](#-systematic-ai-agent-restoration-blueprint)
+6. [Command Compilation & Verification Guide](#-command-compilation--verification-guide)
 
 ---
 
-## 1. Core Systems Overview
+## ⚡ Executive Summary
 
-SigmaOS is an advanced, uncompromised capability-based operating system written in safe, zero-dependency Rust. It employs robust paradigms such as:
-- **Object-Oriented Subsystem Modularity**: Clear state isolation through dynamic dispatch and explicit traits.
-- **Strict Separation of Policy and Mechanism**: Separation of kernel runtime structures from user privilege boundaries.
-- **Post-Quantum Cryptographic (PQC) Enclaves**: Dilithium-5 and Kyber-1024 native encryption bounds.
-- **Multi-Workload Binary Compatibility Proxies**: Pluggable syscall-translation layers mapping Linux, BSD, Windows, macOS, and TempleOS HolyC to a unified kernel runtime.
+SigmaOS is an advanced, uncompromised, capability-based operating system built in safe, zero-dependency Rust. Currently, **compilation is blocked by pre-existing Git merge conflict markers** (like `<<<<<<< HEAD`, `=======`, and `>>>>>>>`) that remain inside **35 critical source files**.
 
----
+These conflicts arose from the merger of the **Digital Sovereignty branch** (which introduced comprehensive zero-dependency local productivity apps, finance engines, audio layers, and retro driver shims to natively replace hundreds of proprietary user applications) and **HEAD** (which focuses on uncompromised microkernel performance, unfragmented physical/virtual allocators, and capability token protection gates).
 
-## 2. What is Working (Operational Subsystems)
-
-The following core modules are structurally complete, logically correct, and contain rich algorithms:
-
-### A. Schedulers (`src/kernel/scheduler.rs` & `roundrobin.rs`)
-- **EEVDF (Earliest Eligible Virtual Deadline First)**: Precise timeslice deadlines.
-- **CachyBore / Burst-Oriented Scheduler**: Burstiness/sleep metrics for interactive responsiveness.
-- **Round-Robin Integration**: Fair share with Linux-style nice-scaling and FreeBSD-style wakeup boosting.
-
-### B. Compatibility Layers & Proxies (`src/compatibility/`)
-- **Lindows Win32 Emulator**: PE binary loading and Kernel32/User32 DLL dynamic mapping.
-- **Historic Linux Personalities**: Support for kernel releases spanning 0.01, 0.11, up to early 2.4 / 2.5 eras.
-- **TempleOS (RedSea & HolyC)**: Contiguous RedSea FS mapping and Ring-0 cooperative JIT shell.
-- **Advanced Core Proxies**: Self-Healing Recovery, AI-Native Runtime scheduling, Energy-Aware cost tracking, and Composable Filesystem (SigmaFS++).
-
-### C. Advanced Utilities & Personalization (`src/customization/`, `src/compression/`, `src/productivity/`)
-- **DID Personalization**: Decentralized SovereignID with Rural Layout Dynamic Personalization.
-- **SevenZip & LZMA Solid Compression**: Codecs for probability range division and sequential block streams.
-- **Sovereign PDF24 Engine**: High-fidelity raw text-to-PDF, split-merge, and password protection routines.
+Once these conflict markers are resolved, the rich core algorithms of both branches will be cleanly integrated, and the entire workspace will compile with green unit tests. This guide provides the complete blueprint for any developer or AI agent to perform these resolutions safely.
 
 ---
 
-## 3. What is Not Working (Overview of Compiler & Design Gaps)
+## 🏛️ Sovereign OS Design & Principles
 
-Currently, full compilation of the workspace is blocked by several categories of errors that arose from automated feature integrations, parallel code merges, and incomplete encapsulation in low-level utilities.
-
-### Core Compilation Blockers (Error Summary)
-- **E0592 (Duplicate Method definitions)**: Caused by duplicate constructor blocks.
-- **Syntax/Parsing errors**: Caused by unclosed braces `}` in implementations and dangling unexpected values.
-- **E0428 (Duplicate type definitions)**: Caused by duplicate trait/struct definitions within the same module namespace (parallel merge duplication).
-- **E0407 (Trait method mismatch)**: Caused by implementing methods in trait `impl` blocks that are not defined on the original trait.
-- **E0599/E0277 (Missing Trait Implementations)**: Private custom utility fields, missing `Index`/`Iterator` traits on custom `Vec<T>`, and missing `PartialEq` derives.
-- **E0425 (Undeclared types)**: Missing struct references and import declarations.
+When resolving conflicts and modifying algorithms inside SigmaOS, developers must adhere to the following principles:
+* **Object-Oriented Subsystem Modularity**: State isolation must be enforced through explicit traits and dynamic dispatch, avoiding unsafe globals.
+* **Separation of Policy and Mechanism**: Core kernel mechanisms (e.g., CPU scheduling cycles, raw page mapping) must remain strictly decoupled from user-level policy engines (e.g., security enforcers or app-launch rules).
+* **Optimization for the Common Case**: Fast-path optimizations should be prioritized (such as low-latency IPC rings, lock-free queues, and O(1) buddy order calculations).
+* **Sound Physical & Virtual Memory Management**: Ensure proper page boundaries (4KB, 2MB), contiguous physical block sizing, and robust copy-on-write mechanisms.
+* **Secure Access Gates & Privilege Levels**: Verify capability token validity on every transaction, enforcing strict zero-trust default boundaries.
 
 ---
 
-## 4. Deep-Dive Diagnostics: Why & How to Fix Every Blocker
+## 📊 Global Subsystem Status Table
 
-An AI agent or developer can resolve 100% of these compile errors by applying the following targeted diagnostic fixes.
+The following table summarizes the operational health of each SigmaOS subsystem:
 
----
-
-### File 1: `src/sigpkg/mod.rs` (Duplicate `new` & Structural Gaps)
-*   **Symptom**:
-    ```
-    error[E0592]: duplicate definitions with name `new`
-       --> src/sigpkg/mod.rs:104:5
-    error[E0063]: missing fields `changelogs`, `licenses` ... in initializer of `sigpkg::Package`
-    ```
-*   **Why**: `src/sigpkg/mod.rs` contains two overlapping `impl Package` blocks. The second `impl Package` block implements `new` but does not initialize newly added fields like `mirrors`, `signing_keys`, `licenses`, `maintainers`, and `changelogs` that exist in the `Package` struct.
-*   **How to Fix**:
-    Locate lines 125-144 in `src/sigpkg/mod.rs` and **delete** the entire second `impl Package` block:
-    ```rust
-    // DELETE THIS BLOCK ENTIRELY:
-    impl Package {
-        pub fn new(
-            name: String,
-            version: Version,
-            description: String,
-            dependencies: Vec<Dependency>,
-            checksum: String,
-        ) -> Self {
-            Self {
-                name,
-                version,
-                description,
-                dependencies,
-                checksum,
-            }
-        }
-    }
-    ```
+| Subsystem | Blocked / Operational | File Paths Affected | Description & Blockers |
+| :--- | :--- | :--- | :--- |
+| **Driver Framework** | ⚠️ Blocked by Conflicts | `src/driver/`, `src/drivers/` | Contains conflicts on driver state casting (u32/usize) and retro driver shims. |
+| **Graphics & Composition** | ⚠️ Blocked by Conflicts | `src/graphics/` | Zenith compositor structure conflicts regarding custom event types and rect bounds. |
+| **Kernel Core** | ⚠️ Blocked by Conflicts | `src/kernel/`, `src/init/` | Conflicts on slab caches, watchdog timers, and supervisor initializations. |
+| **Paging & Memory** | ⚠️ Blocked by Conflicts | `src/memory/`, `src/klib/vec.rs` | Conflicts in paging managers and custom zero-dependency dynamic vector utilities. |
+| **Networking & TLS** | ⚠️ Blocked by Conflicts | `src/net/` | Route caching and TLS secret generation conflicts. |
+| **Productivity (Office)** | ⚠️ Blocked by Conflicts | `src/productivity/` | Text/Spreadsheet engine re-exports and document manager structure conflicts. |
+| **Scheduler** | ⚠️ Blocked by Conflicts | `src/scheduler/` | Process lifecycle managers and thread-level state atomic conversions. |
+| **Security & Sandbox** | ⚠️ Blocked by Conflicts | `src/security/` | Capability gate bits, linear generator seeds, and secrets vector removals. |
+| **Shell & CLI** | ⚠️ Blocked by Conflicts | `src/shell/` | ShellVec declarations and conditional compilation targeting `none` OS. |
+| **Storage & Volume** | ⚠️ Blocked by Conflicts | `src/storage/` | Partition bounds, block-level device wrappers, and alloc traits. |
+| **Virtualization & Package**| ⚠️ Blocked by Conflicts | `src/virtualization/`, `src/package/` | Sandbox container modules and package format adapter re-exports. |
 
 ---
 
-### File 2: `src/ai/orchestrator.rs` (Expected `;` found `None`)
-*   **Symptom**:
-    ```
-    error: expected `;`, found `None`
-       --> src/ai/orchestrator.rs:153:10
-    error[E0308]: mismatched types: expected struct `ai::orchestrator::ContextWindowPruner` found enum `Option<_>`
-    ```
-*   **Why**: The `ContextWindowPruner::new` function is declared to return `Self` (which is `ContextWindowPruner`), but has a dangling `None` statement at the very end of the constructor, mismatching types.
-*   **How to Fix**:
-    Locate lines 149-156 in `src/ai/orchestrator.rs` and change it to cleanly return the initialized struct:
-    ```rust
-    // REPLACE THIS:
-    impl ContextWindowPruner {
-        pub fn new(max_lines: usize) -> Self {
-            ContextWindowPruner {
-                history: Vec::new(),
-                max_lines,
-            }
-            None
-        }
-    }
+## 🔍 Deep-Dive File-by-File Diagnostics (35 Conflicted Files)
 
-    // WITH THIS:
-    impl ContextWindowPruner {
-        pub fn new(max_lines: usize) -> Self {
-            ContextWindowPruner {
-                history: Vec::new(),
-                max_lines,
-            }
-        }
-    }
-    ```
+This section details every single file containing active conflict markers, outlining what is working, what is not, why the conflict happened, and exactly how to fix it.
 
 ---
 
-### File 3: `src/klib/paging.rs` (`#[test]` Attribute on Method)
-*   **Symptom**:
-    ```
-    error: the `#[test]` attribute may only be used on a free function
-       --> src/klib/paging.rs:676:5
-    ```
-*   **Why**: The custom `impl<T> Vec<T>` helper block at line 653 in `src/klib/paging.rs` does not have a closing brace `}`. This causes the compiler to parse all subsequent unit tests (decorated with `#[test]`) as methods belonging to `Vec<T>`, which is invalid in Rust.
-*   **How to Fix**:
-    Locate the end of the `unsafe fn grow(&mut self)` method in `src/klib/paging.rs` (around line 674) and insert a closing brace `}` to close the `impl<T> Vec<T>` block before the unit tests begin:
-    ```rust
-    // REPLACE THIS:
-        unsafe fn grow(&mut self) {
-            let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-            let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-            if !new_data.is_null() {
-                for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-                if self.capacity > 0 { free(self.data as *mut u8); }
-                self.data = new_data;
-                self.capacity = new_capacity;
-            }
-        }
+### Category A: Driver & Hardware Layer
 
-        #[test]
-        fn test_paging_and_cow() { ... }
+#### 1. `src/driver/device.rs`
+* **What's Working**: Concrete drivers for storage controllers and serial devices.
+* **What's Not Working**: Conflict inside `Driver::state(&self) -> DriverState`.
+* **Why**: The two branches conflict on whether to transmute `usize` directly or cast `Ordering::SeqCst` load to `u32` first.
+* **How to Fix**: Combine both by using a safe cast that matches the underlying target architecture representation:
+  ```rust
+  // Resolve conflict by returning safe atomic SeqCst load casted to DriverState transmute
+  pub fn state(&self) -> DriverState {
+      unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+  }
+  ```
 
-    // WITH THIS (inserted closing brace '}'):
-        unsafe fn grow(&mut self) {
-            let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-            let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-            if !new_data.is_null() {
-                for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-                if self.capacity > 0 { free(self.data as *mut u8); }
-                self.data = new_data;
-                self.capacity = new_capacity;
-            }
-        }
-    } // <-- INSERTED CLOSING BRACE HERE
+#### 2. `src/driver/framework.rs`
+* **What's Working**: Polymorphic driver registration tables and metadata catalogs.
+* **What's Not Working**: Conflict in `SimpleStorageDriver::state()` implementation.
+* **Why**: Parallel development of casting bounds on atomic states.
+* **How to Fix**: Align with `device.rs` to cast the loaded state value cleanly:
+  ```rust
+  fn state(&self) -> DriverState {
+      unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+  }
+  ```
 
-    #[test]
-    fn test_paging_and_cow() { ... }
-    ```
+#### 3. `src/drivers/main.rs`
+* **What's Working**: Driver initialization routines and hardware bus scanners.
+* **What's Not Working**: Conflict at the top of the main entry point file.
+* **Why**: Empty file on HEAD conflicted with initialization comments from the digital sovereignty branch.
+* **How to Fix**: Keep the initialization comments and ensure a clean file start:
+  ```rust
+  // SigmaOS Drivers Main Entry Point
+  ```
+
+#### 4. `src/drivers/mod.rs`
+* **What's Working**: Usb Hid, Vesa framebuffers, and GPU drivers.
+* **What's Not Working**: Multiple conflicts on module imports (`dde`, `ancient_devices`, `boot_init`) and driver release aliases.
+* **Why**: The digital sovereignty branch added shims for old hardware (CGA, SoundBlaster16) to provide retro compatibility, whereas HEAD only declared modern devices.
+* **How to Fix**: **Keep both sets of modules**. Re-export all modern and ancient devices together to provide full system versatility.
 
 ---
 
-### File 4: `src/security/vulnerability.rs` (Duplicate Merge Blocks & ScanError)
-*   **Symptom**:
-    ```
-    error[E0428]: the name `Vulnerability` is defined multiple times
-       --> src/security/vulnerability.rs:265:1
-    error[E0599]: no variant, associated function, or constant named `PackageNotFound` found for enum `vulnerability::ScanError`
-    ```
-*   **Why**:
-    1. A merge conflict resolution or file concatenation has resulted in the entire set of core types (`Vulnerability`, `SimpleVulnerability`, etc.) being declared twice in `src/security/vulnerability.rs`.
-    2. The first declaration of `ScanError` has `PackageNotFound` but the second declaration of `ScanError` is missing it, resulting in E0599.
-*   **How to Fix**:
-    Locate lines 40-264 in `src/security/vulnerability.rs` and **delete** that entire duplicate first section. Ensure the remaining declaration of `ScanError` contains all necessary variants:
-    ```rust
-    #[repr(C)]
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum ScanError {
-        Success = 0,
-        PackageNotFound = 1,
-        ScanFailed = 2,
-    }
-    ```
+### Category B: Kernel, Memory, & Slab Allocations
+
+#### 5. `src/kernel/main.rs`
+* **What's Working**: Kernel hardware setup and physical allocation table mapping.
+* **What's Not Working**: Conflict at file start.
+* **Why**: Missing initial headers/comments vs incoming branch updates.
+* **How to Fix**: Simply retain the kernel main entry description:
+  ```rust
+  // SigmaOS Kernel Main Entry Point
+  ```
+
+#### 6. `src/kernel/mod.rs`
+* **What's Working**: Core ABI managers, system sandboxes, and policy brokers.
+* **What's Not Working**: Conflicts in submodule definitions and exports.
+* **Why**: Parallel addition of watchdog managers and secure allocation models.
+* **How to Fix**: Retain both `pub mod watchdog;` and the secure allocation definitions (`pub mod secure_free;`). Re-export their primary types inside `src/lib.rs` under a unified namespace.
+
+#### 7. `src/kernel/secure_free.rs`
+* **What's Working**: Secure memory shredding and sanitization algorithms.
+* **What's Not Working**: Conflicts inside `secure_free` parameter matching.
+* **Why**: The order and naming of parameters (`is_sensitive`, `size`, `freed`) returned in the tuple changed across branches.
+* **How to Fix**: Unify the tuple signatures to yield `(is_sensitive, size, freed)` so that both memory state monitoring and safety auditing can access the fields.
+
+#### 8. `src/kernel/slab_allocator.rs`
+* **What's Working**: Slab cache page grouping and object allocation blocks.
+* **What's Not Working**: Multiple conflicts on lookup bounds and mutable cache reference grabs.
+* **Why**: HEAD uses a read-only lookup with local synchronization, while the other branch uses a mutable `get_mut` directly on the collection.
+* **How to Fix**: Standardize on local locking or use safe interior mutability patterns to access caches without breaking thread safety.
+
+#### 9. `src/klib/mod.rs`
+* **What's Working**: Standard buddy allocators and virtual paging helpers.
+* **What's Not Working**: Conflict on helper submodule declarations (like `async_runtime`).
+* **Why**: Parallel addition of asynchronous routines to aid driver communication.
+* **How to Fix**: Keep all modules, exporting both standard allocators and the custom async executor.
+
+#### 10. `src/klib/vec.rs`
+* **What's Working**: Custom `Vec<T>` struct implementing raw memory management.
+* **What's Not Working**: Extensive conflicts across 9 sections of the custom vector.
+* **Why**: The digital sovereignty branch needs userland helpers (`remove`, `insert`, custom iterators), whereas HEAD uses a highly minimal, bare-metal allocator interface.
+* **How to Fix**: Implement a comprehensive, fully-featured custom `Vec<T>` containing `remove`, `insert`, `Index`, `IndexMut`, `.iter()`, and `IntoIterator` to satisfy all dependencies without needing external collections.
 
 ---
 
-### File 5: `src/security/capability.rs` (Duplicate Merge Blocks & SecurityEnforcer)
-*   **Symptom**:
-    ```
-    error[E0428]: the name `Permission` is defined multiple times
-    error[E0560]: struct `capability::SecurityEnforcer` has no field named `bits`
-    ```
-*   **Why**:
-    1. Another file concatenation has duplicated `Permission`, `CapabilityGate`, etc.
-    2. Modifying `SecurityEnforcer` to have `bits` while it was defined with `active_tokens` causes struct mismatch fields and E0560.
-*   **How to Fix**:
-    1. Locate the duplicate definitions at lines 207-260 in `src/security/capability.rs` and **delete** them entirely.
-    2. Ensure `SecurityEnforcer` has the `active_tokens: Vec<CapabilityToken>` field or whatever fields match its capability enforcer implementation, or restore its expected structural configuration.
+### Category C: Scheduler & Processes
+
+#### 11. `src/scheduler/mod.rs`
+* **What's Working**: Earliest Eligible Virtual Deadline First (EEVDF) schedule loops.
+* **What's Not Working**: Conflict on process lifecycle manager vs basic process scheduler exports.
+* **Why**: Different namespaces used to represent tasks and processes across userland and kernel space.
+* **How to Fix**: Export both `ProcessLifecycleManager` and the basic `ProcessScheduler` models to support nested scheduling states.
+
+#### 12. `src/scheduler/process.rs`
+* **What's Working**: Thread contexts and process status trackers.
+* **What's Not Working**: Conflict on state loader transmutes.
+* **Why**: Differences in atomic sizing between 64-bit platforms and generic targets.
+* **How to Fix**: Safely cast the loaded atomic `usize` to `u32` before transmuting to process status enums.
+
+#### 13. `src/scheduler/scheduler.rs`
+* **What's Working**: CFS and nice-scaled timeslice round-robin controllers.
+* **What's Not Working**: Conflict inside imports and atomic definitions.
+* **Why**: Unmatched atomic types (`AtomicU64` vs `AtomicUsize`) for holding process runtime metrics.
+* **How to Fix**: Prefer `AtomicUsize` or conditional definitions to guarantee compilation on architectures without native 64-bit atomics.
+
+#### 14. `src/scheduler/sovereign.rs`
+* **What's Working**: Userland threads and thread synchronization primitives.
+* **What's Not Working**: Conflicts on conditional compilation headers (`target_os = "none"`).
+* **Why**: Thread tests require `std` allocator structures on development hosts.
+* **How to Fix**: Use structured conditional attributes to dynamically wrap allocator imports:
+  ```rust
+  #[cfg(not(target_os = "none"))]
+  extern crate std as alloc;
+  ```
 
 ---
 
-### File 6: `src/driver/framework.rs` (Trait Member Mismatch)
-*   **Symptom**:
-    ```
-    error[E0407]: method `set_state` is not a member of trait `Driver`
-    ```
-*   **Why**: `impl Driver for SimpleStorageDriver` implements methods `set_state`, `init`, and `probe` which are not declared on the parent `Driver` trait.
-*   **How to Fix**:
-    Move these three methods out of the `impl Driver for SimpleStorageDriver` block into a separate concrete `impl SimpleStorageDriver` block:
-    ```rust
-    impl Driver for SimpleStorageDriver {
-        fn id(&self) -> DriverID { self.id }
-        fn driver_type(&self) -> DriverType { DriverType::Storage }
-        fn state(&self) -> DriverState {
-            unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-        }
-        fn load(&mut self) -> Result<(), DriverError> { Ok(()) }
-        fn unload(&mut self) -> Result<(), DriverError> { Ok(()) }
-    }
+### Category D: Security, Sandboxing, & Credentials
 
-    impl SimpleStorageDriver {
-        pub fn set_state(&self, state: DriverState) {
-            self.state.store(state as usize, Ordering::SeqCst);
-        }
-        pub fn init(&mut self) -> Result<(), DriverError> { Ok(()) }
-        pub fn probe(&mut self) -> Result<bool, DriverError> { Ok(true) }
-    }
-    ```
+#### 15. `src/security/capability.rs`
+* **What's Working**: Security capability gates and permission boundary validators.
+* **What's Not Working**: Conflicts on security token structures and bitmask definitions.
+* **Why**: Conflicting styles of capabilities (64-bit bitfields vs advanced OO Permission sets).
+* **How to Fix**: Implement both representations: retain the raw 64-bit mask methods for high-speed syscall filtering, and the Permission objects for comprehensive sandboxing.
+
+#### 16. `src/security/mod.rs`
+* **What's Working**: Post-quantum cryptographic enclaves.
+* **What's Not Working**: Conflict on submodules like `capability_enforcer`.
+* **Why**: Adding AppSandbox and Kali/Parrot OS security modules created conflicting namespace entries.
+* **How to Fix**: Expose and declare all security submodules, making sure to re-export both `capability_enforcer` and the custom forensic filters.
+
+#### 17. `src/security/password.rs`
+* **What's Working**: Password hashing and verification algorithms.
+* **What's Not Working**: Conflict on pseudo-random password generation loops.
+* **Why**: HEAD uses a basic random helper, whereas the incoming branch implements a fully deterministic LCG (Linear Congruential Generator) using `SystemTime` as seed.
+* **How to Fix**: Keep the deterministic LCG algorithm to avoid external dependencies.
+
+#### 18. `src/security/secrets.rs`
+* **What's Working**: Post-quantum secret vaults and asymmetric keyring signing.
+* **What's Not Working**: Conflicts on secrets tracking vectors and raw data extraction.
+* **Why**: Standard `std::vec::Vec` was imported instead of the custom `Vec<T>` which uses raw data pointers, breaking access to raw pointers.
+* **How to Fix**: Avoid accessing `.data` directly on standard vectors. Instead, use `.as_ptr()` or compile against the custom pointer-wrapping collection correctly.
 
 ---
 
-### File 7: `src/container/runtime.rs` (Missing Derives & Crate Attributes)
-*   **Symptom**:
-    ```
-    warning: crate-level attribute should be in the root module
-    error[E0277]: `runtime::ContainerState` must implement `PartialEq`
-    ```
-*   **Why**:
-    1. `#![no_std]` and `#![no_main]` are specified at the top of a submodule instead of the crate root.
-    2. The `ContainerState` enum lacks equality derives (`PartialEq`, `Eq`), blocking down-stream comparisons.
-*   **How to Fix**:
-    1. Remove `#![no_std]` and `#![no_main]` from the top of the file.
-    2. Add `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` to the definition of `ContainerState`.
+### Category E: Graphics, Composition, & UI
+
+#### 19. `src/graphics/compositor.rs`
+* **What's Working**: Framebuffer composition and layer transparency blending.
+* **What's Not Working**: Conflicts on derives (`PartialEq`, `Eq`) and drawing coordinates.
+* **Why**: Zenith desktop components need structural equality for layout calculations.
+* **How to Fix**: Ensure all compositor structs (e.g., `WindowNode`, `Geometry`, `LayoutStyle`) derive both `PartialEq` and `Eq` to allow layout diffing.
+
+#### 20. `src/graphics/mod.rs`
+* **What's Working**: Color spaces, vector paths, and paint engines.
+* **What's Not Working**: Conflict on compositor and widget submodules.
+* **Why**: Merging advanced Blender-like BSDF shaders and Krita-like brushes with basic Zenith rendering paths.
+* **How to Fix**: Keep both sets of features by declaring and re-exporting all submodules.
 
 ---
 
-### File 8: `src/klib/buddy_allocator.rs` (Custom `Vec<T>` Encapsulation Gaps)
-*   **Symptom**:
-    ```
-    error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
-    ```
-*   **Why**: The custom `Vec<T>` struct defined in `src/klib/buddy_allocator.rs` does not have `pub` modifiers on its fields and lacks `Index`/`IndexMut` and iterator trait implementations.
-*   **How to Fix**:
-    Update the `Vec<T>` struct and add Index / Iterator trait implementations inside `src/klib/buddy_allocator.rs`:
-    ```rust
-    pub struct Vec<T> {
-        pub data: *mut T,
-        pub len: usize,
-        pub capacity: usize,
-    }
+### Category F: Network & Security Protocols
 
-    impl<T> core::ops::Index<usize> for Vec<T> {
-        type Output = T;
-        fn index(&self, index: usize) -> &T {
-            if index >= self.len { panic!("Index out of bounds"); }
-            unsafe { &*self.data.add(index) }
-        }
-    }
-    ```
+#### 21. `src/net/routing.rs`
+* **What's Working**: IPv4/IPv6 packet translation and interface routing.
+* **What's Not Working**: Conflict inside cache lookup matching logic.
+* **Why**: Iteration styles (indexed loop vs iterator reference match) clashed during parallel development.
+* **How to Fix**: Implement the iterator reference match block for safety and performance:
+  ```rust
+  for cached_route in &self.route_cache {
+      if self.matches_destination(destination, &cached_route.key.destination, cached_route.key.prefix_length) {
+          return Some(cached_route.clone());
+      }
+  }
+  ```
+
+#### 22. `src/net/tls.rs`
+* **What's Working**: TLS handshake negotiators and post-quantum key signers.
+* **What's Not Working**: Conflict on master secret calculation comments and borrows.
+* **Why**: Two branches had overlapping comments explaining seed expansion.
+* **How to Fix**: Cleanly remove duplicate commentary, keeping the underlying cryptographic key formulation intact.
 
 ---
 
-### File 9: `src/network/tcp_udp.rs` (Missing Type Bindings & Atomics copying)
-*   **Symptom**:
-    ```
-    error[E0425]: cannot find type `NetfilterFirewall` in this scope
-    ```
-*   **Why**: Structs `NetfilterFirewall`, `RoutingTable`, and `NetworkInterface` are referenced but not defined or imported.
-*   **How to Fix**:
-    Define simple dummy/mock structures or imports for `NetfilterFirewall`, `RoutingTable` and `NetworkInterface` inside `src/network/tcp_udp.rs`.
+### Category G: Productivity & Sovereign Office
+
+#### 23. `src/productivity/document_engine.rs`
+* **What's Working**: Multi-format document conversions (PDF, CSV, TXT).
+* **What's Not Working**: Conflicts inside test initializers and workspace creations.
+* **Why**: Constructor differences where HEAD uses default initializers, while the other branch sets specific document types.
+* **How to Fix**: Provide a Default constructor and allow dynamic format specification during engine startup.
+
+#### 24. `src/productivity/mod.rs`
+* **What's Working**: Spreadsheet processors, text editors, and presentation tools.
+* **What's Not Working**: Conflict on document metadata re-exports.
+* **Why**: Renaming conflicts between `SigmaOfficeDocumentMetadata` and `SigmaDocumentMetadata`.
+* **How to Fix**: Re-export both or aliased versions to ensure backward compatibility for other modules.
+
+#### 25. `src/productivity/sigma_office.rs`
+* **What's Working**: Complete Office Suite backend logic.
+* **What's Not Working**: Conflict inside index bounds matching.
+* **Why**: A short inline match vs an expanded `unwrap_or_else` block.
+* **How to Fix**: Keep the expanded, descriptive error handling block returning structured I/O Errors.
 
 ---
 
-### File 10: `src/remote/desktop.rs` (get_session & Iterators)
-*   **Symptom**:
-    ```
-    error[E0599]: no method named `get_session` found for reference `&SimpleRemoteDesktop`
-    error[E0277]: `&desktop::Vec<Option<Box<(dyn RemoteSession + 'static)>>>` is not an iterator
-    ```
-*   **Why**:
-    1. `SimpleRemoteDesktop` is calling `get_session` internally but it is not implemented on the concrete struct or in scope.
-    2. The custom `Vec<T>` used inside `desktop.rs` is missing an `IntoIterator` implementation for loop processing.
-*   **How to Fix**:
-    1. Implement `pub fn get_session(&self, id: SessionID) -> Option<&Box<dyn RemoteSession>>` on `SimpleRemoteDesktop`.
-    2. Provide an `.iter()` or iterator implementation for the custom `Vec<T>` in `desktop.rs` (or wrap loops with `.iter()` and ensure `.iter()` returns an iterator of references).
+### Category H: Storage & Filesystems
+
+#### 26. `src/storage/block.rs`
+* **What's Working**: Solid-state block controllers and physical track buffers.
+* **What's Not Working**: Conflicts in the file header comments.
+* **Why**: Divergent improvement references in header document notes.
+* **How to Fix**: Retain both design references to preserve architectural history.
+
+#### 27. `src/storage/volume.rs`
+* **What's Working**: Partition table parsers (GPT/MBR) and volume mounters.
+* **What's Not Working**: Conflicts on allocation constraints and memory crates.
+* **Why**: Discrepancies in conditional allocator bindings under `none` target targets.
+* **How to Fix**: Align with other modules to import `alloc` conditionally and gracefully handle bare-metal compilation.
 
 ---
 
-### File 11: `src/remote/shell.rs` (Iterator Bounds)
-*   **Symptom**:
-    ```
-    error[E0277]: `&mut remote::shell::Vec<Option<Box<(dyn RemoteShell + 'static)>>>` is not an iterator
-    ```
-*   **Why**: The custom `Vec<T>` inside `shell.rs` does not implement `IntoIterator` for standard `&mut Vec<T>` loop iterators.
-*   **How to Fix**:
-    Implement `.iter()` and `.iter_mut()` returning reference iterators, or implement `IntoIterator` for `&Vec<T>` and `&mut Vec<T>`.
+### Category I: Core Utilities, Shell, Packaging, & Virtualization
+
+#### 28. `src/init/mod.rs`
+* **What's Working**: Parallel init-subsystems and daemon supervisors.
+* **What's Not Working**: Conflicts in `InitSystem` re-exports.
+* **Why**: Parallel development of service monitors.
+* **How to Fix**: Ensure both `InitSystem` and service initializers are exported under unified names.
+
+#### 29. `src/lib.rs`
+* **What's Working**: Global module exports and standard trait mapping.
+* **What's Not Working**: Conflicts across 4 major regions (modules, uses, re-exports).
+* **Why**: Overlapping declarations of newly added sovereign applications (such as finance, audio, etc.).
+* **How to Fix**: Thoroughly merge both export branches. Ensure that all standard microkernel types (Pml4, BuddyAllocator, etc.) and all sovereign app modules (finance, audio, etc.) are available globally.
+
+#### 30. `src/memory/paging.rs`
+* **What's Working**: Page Directory controllers and huge-page mappings.
+* **What's Not Working**: Conflicts on `get_huge_entry` structures.
+* **Why**: Differences in physical pointer alignment techniques.
+* **How to Fix**: Unify the entry lookups to correctly utilize 2MB borders and return aligned Option parameters.
+
+#### 31. `src/package/mod.rs`
+* **What's Working**: Extensible packaging adapters for apt, yum, pacman.
+* **What's Not Working**: Conflicts on module listings.
+* **Why**: Parallel inclusion of `linux_translation` and custom `spkg` metadata.
+* **How to Fix**: Retain both modules, keeping both package format adaptors and translator layers in the compile scope.
+
+#### 32. `src/resilience/mod.rs`
+* **What's Working**: Kernel panic handlers and automated rollback subsystems.
+* **What's Not Working**: Conflicts on submodules.
+* **Why**: Addition of `automated_fixer` vs `backup` tools.
+* **How to Fix**: Declare and export both `automated_fixer` and `backup` modules together.
+
+#### 33. `src/shell/command.rs`
+* **What's Working**: Shell utilities (ls, clear, cp, touch).
+* **What's Not Working**: Conflicts inside `ShellVec` and system headers.
+* **Why**: Conditional compilations for bare-metal targets.
+* **How to Fix**: Cleanly isolate target constraints, using raw pointers only inside safe conditional attributes.
+
+#### 34. `src/shell/mod.rs`
+* **What's Working**: Live interactive REPL loops.
+* **What's Not Working**: Conflict on submodule declarations.
+* **Why**: The inclusion of nested command parsers.
+* **How to Fix**: Ensure `pub mod command;` is unconditionally declared to expose all standard tools.
+
+#### 35. `src/virtualization/mod.rs`
+* **What's Working**: Virtual Machine orchestrators and isolated containers.
+* **What's Not Working**: Conflict on container submodule listings.
+* **Why**: Addition of sandbox parameters and hypervisor adapters.
+* **How to Fix**: Declare and export both nested containers and virtualization manager submodules.
 
 ---
 
-### File 12: `src/security/audit.rs` (Iterators, EventType Derives, unwrap_or)
-*   **Symptom**:
-    ```
-    error[E0277]: `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>` is not an iterator
-    error[E0369]: binary operation `==` cannot be applied to type `audit::EventType`
-    error[E0599]: no method named `unwrap_or` found for type `bool`
-    ```
-*   **Why**:
-    1. Loop iterator E0277 is thrown due to missing IntoIterator trait on the custom `Vec<T>`.
-    2. `EventType` enum does not derive `PartialEq`.
-    3. `unwrap_or(false)` is called on `check_compliance`, which already returns a boolean `bool`.
-*   **How to Fix**:
-    1. Add `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` to `EventType`.
-    2. Remove the `.unwrap_or(false)` call on `self.check_compliance(event)`.
-    3. Ensure `Vec` has public fields and proper trait implementations.
+## 🛠️ Systematic AI Agent Restoration Blueprint
+
+An AI agent or developer can fully automate the conflict resolution across all 35 files by following this structured process:
+
+1. **Auto-Merge Simple Marker Sections**:
+   Write a script that parses each conflicted file, locates sections where HEAD and the incoming branch contain identical or non-overlapping code (such as comment additions or simple re-exports), and integrates them.
+2. **Handle Types and Casts Systematically**:
+   - For atomic loaders, ensure that all cast operations translate atomic `usize` safely to `u32` before transmuting to target enum structures.
+   - For custom collections, guarantee that the custom `Vec<T>` implements the core traits (`core::ops::Index`, `core::ops::IndexMut`, and `IntoIterator` on references).
+3. **Merge and Expose Both Subsystems**:
+   In files like `src/lib.rs`, `src/drivers/mod.rs`, and `src/security/mod.rs`, resolve the conflicts by **combining** both sets of module declarations rather than choosing one. This guarantees that both microkernel layers and sovereign applications compile seamlessly side-by-side.
 
 ---
 
-### File 13: `src/security/integrity.rs` (update_stats)
-*   **Symptom**:
-    ```
-    error[E0599]: no method named `update_stats` found for mutable reference `&mut SimpleIntegrityMonitor`
-    ```
-*   **Why**: `self.update_stats(status)` is called inside `integrity.rs` but `update_stats` is not defined or is defined with a mismatched signature on `SimpleIntegrityMonitor`.
-*   **How to Fix**:
-    Define `fn update_stats(&mut self, status: IntegrityState)` or adjust the signature so that the call succeeds cleanly.
+## 🚦 Command Compilation & Verification Guide
 
----
-
-### File 14: `src/security/pki.rs` (Mismatched contains bounds)
-*   **Symptom**:
-    ```
-    error[E0308]: mismatched types: expected `&usize`, found `usize` in contains()
-    ```
-*   **Why**: Calling `self.revoked.contains(id)` when `id` is a `usize` but `.contains()` requires borrowing `&id`.
-*   **How to Fix**:
-    Change the line to:
-    ```rust
-    if self.revoked.contains(&id) {
-    ```
-
----
-
-### File 15: `src/security/secrets.rs` (std::vec::Vec missing data field)
-*   **Symptom**:
-    ```
-    error[E0609]: no field `data` on type `std::vec::Vec<Option<Box<(dyn Secret + 'static)>>>`
-    ```
-*   **Why**: The code is trying to access raw pointer fields `.data` directly on standard `std::vec::Vec` or has imported standard `Vec` instead of using the custom `Vec` with unsafe pointer manipulation.
-*   **How to Fix**:
-    Ensure the file is using the correct custom `Vec` structure or perform pointer operations safely without assuming standard `Vec` has a `.data` field.
-
----
-
-## 5. Systematic AI Agent Recovery Action Plan
-
-Any subsequent AI agent can fully automate resolving these errors and pass the test suite by taking the following step-by-step actions:
-
-1.  **Eliminate Crate root warnings in Submodules**: Remove `#![no_std]` and `#![no_main]` from all files that are submodules (e.g., `src/container/runtime.rs`, `src/driver/framework.rs`, etc.).
-2.  **Close Paging Vec implementation**: Insert the missing closing brace `}` at line 674 in `src/klib/paging.rs`.
-3.  **Delete duplicate Package::new**: Delete lines 125-144 in `src/sigpkg/mod.rs`.
-4.  **Fix context window pruner syntax**: Remove the dangling `None` at line 154 in `src/ai/orchestrator.rs`.
-5.  **Prune duplicate merge segments**:
-    - Delete lines 40-264 in `src/security/vulnerability.rs`.
-    - Delete lines 207-260 in `src/security/capability.rs`.
-6.  **Fix SimpleStorageDriver trait implementation**: Extract `set_state`, `init`, and `probe` into `impl SimpleStorageDriver`.
-7.  **Derive PartialEq and Eq for ContainerState**: Ensure `ContainerState` has `#[derive(Debug, Clone, Copy, PartialEq, Eq)]`.
-8.  **Complete klib custom vectors**: Verify that both `src/klib/paging.rs` and `src/klib/buddy_allocator.rs`'s custom `Vec<T>` implement `core::ops::Index` and `core::ops::IndexMut`, have public fields/methods, and are compatible with loops.
-9.  **Fix mismatched borrows & unwraps**: Replace `.unwrap_or(false)` on boolean returns, and add `&` borrows in slice `.contains()` queries.
-
----
-
-## 6. Verification & Testing Commands
-
-To verify that all algorithms and compilation issues are cleanly resolved, run the following commands:
+Always execute the following pipeline to verify compilation safety and run all unit tests:
 
 ```bash
-# 1. Clean the build directory
+# 1. Clean workspace build target directory
 cargo clean
 
-# 2. Check that the entire library compiles without warnings or errors
+# 2. Compile and check the core library to ensure zero parser errors
 cargo check --lib
 
-# 3. Check the entire testing targets
+# 3. Check compilation of all targets including tests
 cargo check --all-targets
 
-# 4. Run the entire test suite to ensure green checks
+# 4. Run the entire test suite to ensure green checks across the board
 cargo test
 ```
+
+By systematically following this diagnostic status reference guide, the entire SigmaOS codebase can be restored to a completely stable, fully compiling, and green state!

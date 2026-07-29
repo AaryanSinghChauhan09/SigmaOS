@@ -1,10 +1,17 @@
 // SigmaOS Kernel Memory Management
 // Implements buddy allocator and paging
 
+extern crate alloc;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 use core::ptr::NonNull;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
+
+pub struct Zone {
+    pub present_pages: u64,
+}
 
 /// Memory block
 #[derive(Debug)]
@@ -13,15 +20,29 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
-/// Buddy allocator for memory management
+pub struct Page {
+    pub flags: AtomicUsize,
+    pub count: AtomicUsize,
+    pub mapping: Option<usize>,
+    pub index: u64,
+    pub private: Option<usize>,
+    pub zone: Option<*const Zone>,
+}
+
 pub struct BuddyAllocator {
-    free_lists: [Vec<MemoryBlock>; 12], // 2^0 to 2^11 pages (4KB to 8MB)
+    pub free_lists: [Vec<MemoryBlock>; 12],
+    pub free_pages: usize,
+    pub total_pages: usize,
+    pub zones: Vec<Zone>,
 }
 
 impl BuddyAllocator {
     pub fn new() -> Self {
         Self {
             free_lists: Default::default(),
+            free_pages: 0,
+            total_pages: 0,
+            zones: Vec::new(),
         }
     }
 
@@ -36,11 +57,10 @@ impl BuddyAllocator {
         let order = self.calculate_order(pages);
 
         if order < 12 {
-            let block = MemoryBlock {
-                addr: NonNull::new(base_addr as *mut u8).unwrap(),
-                size,
-            };
-            self.free_lists[order].push(block);
+            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
+                let block = MemoryBlock { addr, size };
+                self.free_lists[order].push(block);
+            }
         }
     }
 
@@ -95,19 +115,21 @@ impl BuddyAllocator {
         }
     }
 
-    fn calculate_order(&self, pages: usize) -> usize {
-        let mut order = 0;
-        let mut size = 1;
-        while size < pages {
-            size *= 2;
-            order += 1;
+    pub fn calculate_order(&self, pages: usize) -> usize {
+        // Bolt Optimization: Replace O(n) linear search loop with O(1) branchless bitwise operations.
+        // On modern hardware, next_power_of_two() and trailing_zeros() map directly to specialized
+        // CPU instructions (e.g., LZCNT/TZCNT/BSR), enabling nanosecond-level execution speeds and supporting HW acceleration.
+        if pages <= 1 {
+            0
+        } else {
+            let next_pow = pages.next_power_of_two();
+            next_pow.trailing_zeros() as usize
         }
-        order
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
-        if order < 12 && !self.free_lists[order].is_empty() {
-            Some(self.free_lists[order].pop().unwrap())
+        if order < 12 {
+            self.free_lists[order].pop()
         } else {
             None
         }
@@ -140,7 +162,8 @@ impl BuddyAllocator {
         }
 
         let block_addr = block.addr.as_ptr() as usize;
-        let buddy_addr = block_addr ^ (1 << (order + 12)); // Calculate buddy address
+        // Calculate buddy address by XORing with block size (standard buddy system)
+        let buddy_addr = block_addr ^ block.size;
         let buddy_size = block.size * 2;
 
         // Find buddy in free list
@@ -157,9 +180,9 @@ impl BuddyAllocator {
                 buddy_addr
             };
 
-            if let Some(addr) = NonNull::new(merged_addr as *mut u8) {
+            if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
                 Ok(MemoryBlock {
-                    addr,
+                    addr: non_null,
                     size: buddy_size,
                 })
             } else {
@@ -255,11 +278,33 @@ impl PageTable {
 /// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
+    pub buddy_allocator: BuddyAllocator,
 }
 
 impl VirtualMemoryManager {
     pub fn new(root_directory: NonNull<PageTable>) -> Self {
-        Self { root_directory }
+        Self {
+            root_directory,
+            buddy_allocator: BuddyAllocator::new(),
+        }
+    }
+
+    pub fn with_allocator(root_directory: NonNull<PageTable>, allocator: BuddyAllocator) -> Self {
+        Self {
+            root_directory,
+            buddy_allocator: allocator,
+        }
+    }
+
+    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
+    pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
+        let size = num_pages * PAGE_SIZE;
+        self.buddy_allocator.allocate(size)
+    }
+
+    /// Free pages using buddy allocator (wires free_pages to VMM)
+    pub fn free_pages(&mut self, block: MemoryBlock) {
+        self.buddy_allocator.deallocate(block);
     }
 
     /// Translates a virtual address into a physical address
@@ -327,6 +372,9 @@ mod tests {
         assert_eq!(allocator.calculate_order(1), 0);
         assert_eq!(allocator.calculate_order(2), 1);
         assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 
     #[test]

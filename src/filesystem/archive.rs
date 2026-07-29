@@ -280,15 +280,13 @@ impl ArchiveHandler for SevenZipArchiveHandler {
     }
 
     fn list_contents(&self, _archive: &Path) -> Result<Vec<ArchiveEntry>, ArchiveError> {
-        Ok(vec![
-            ArchiveEntry {
-                name: "file_7z.txt".to_string(),
-                size_bytes: 4096,
-                compressed_size_bytes: 1024,
-                is_directory: false,
-                modified_at: 1234567890,
-            },
-        ])
+        Ok(vec![ArchiveEntry {
+            name: "file_7z.txt".to_string(),
+            size_bytes: 4096,
+            compressed_size_bytes: 1024,
+            is_directory: false,
+            modified_at: 1234567890,
+        }])
     }
 
     fn name(&self) -> &str {
@@ -515,7 +513,9 @@ mod tests {
         let mut manager = ArchiveManager::default();
         manager.set_default_format(ArchiveFormat::SevenZip);
         let files = vec![PathBuf::from("/test/file1.txt")];
-        let res = manager.create_archive(&files, &PathBuf::from("/test/archive.7z")).unwrap();
+        let res = manager
+            .create_archive(&files, &PathBuf::from("/test/archive.7z"))
+            .unwrap();
         assert!(res.success);
         assert_eq!(res.compression_ratio, 0.4); // default normal compression
     }

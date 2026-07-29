@@ -5,23 +5,22 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PerfIpcError {
+pub enum IpcError {
     QueueFull,
     QueueEmpty,
     InvalidPayload,
 }
 
 /// Thread-Safe, Lock-Free Circular Ring-Buffer for Zero-Copy IPC
-pub struct ZeroCopyQueue<T: Copy, const N: usize> {
+pub struct ZeroCopyQueue<T, const N: usize> {
     buffer: [Option<T>; N],
     head: usize,
     tail: usize,
 }
 
-impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
+impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
         Self {
             buffer: [const { None }; N],
@@ -31,12 +30,12 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     }
 
     /// Pushes a zero-copy reference or page frame onto the queue without locks
-    pub fn enqueue(&mut self, item: T) -> Result<(), PerfIpcError> {
+    pub fn enqueue(&mut self, item: T) -> Result<(), IpcError> {
         let head = self.head;
         let tail = self.tail;
 
         if head.wrapping_sub(tail) >= N {
-            return Err(PerfIpcError::QueueFull);
+            return Err(IpcError::QueueFull);
         }
 
         let idx = head % N;
@@ -46,16 +45,16 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     }
 
     /// Pulls a zero-copy reference or page frame out of the queue
-    pub fn dequeue(&mut self) -> Result<T, PerfIpcError> {
+    pub fn dequeue(&mut self) -> Result<T, IpcError> {
         let head = self.head;
         let tail = self.tail;
 
         if tail == head {
-            return Err(PerfIpcError::QueueEmpty);
+            return Err(IpcError::QueueEmpty);
         }
 
         let idx = tail % N;
-        let item = self.buffer[idx].take().ok_or(PerfIpcError::InvalidPayload)?;
+        let item = self.buffer[idx].take().ok_or(IpcError::InvalidPayload)?;
         self.tail = tail.wrapping_add(1);
         Ok(item)
     }
@@ -76,7 +75,7 @@ impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
     }
 }
 
-impl<T: Clone + Copy, const N: usize> Default for ZeroCopyQueue<T, N> {
+impl<T: Clone, const N: usize> Default for ZeroCopyQueue<T, N> {
     fn default() -> Self {
         Self::new()
     }
@@ -373,124 +372,5 @@ mod tests {
         };
 
         assert!(vm.evaluate_priority(&process).is_err());
-    }
-}
-
-// ==========================================
-// HIGH-PERFORMANCE POWER-OF-TWO IPC OPTIMIZATION
-// ==========================================
-
-/// High-Performance, Lock-Free Circular Ring-Buffer using Power-of-Two Bitwise Masking
-pub struct PowerOfTwoZeroCopyQueue<T, const N: usize> {
-    buffer: [Option<T>; N],
-    head: AtomicUsize,
-    tail: AtomicUsize,
-}
-
-impl<T: Clone + Copy, const N: usize> PowerOfTwoZeroCopyQueue<T, N> {
-    /// Creates a new optimized queue. Enforces that size N is a power-of-two at runtime.
-    pub fn new() -> Self {
-        assert!(N > 0 && (N & (N - 1)) == 0, "Buffer size N must be a power of two for bitwise optimization");
-        Self {
-            buffer: [const { None }; N],
-            head: AtomicUsize::new(0),
-            tail: AtomicUsize::new(0),
-        }
-    }
-
-    /// Enqueues a payload using single-cycle bitwise masking instead of slow modulo/division arithmetic
-    pub fn enqueue(&mut self, item: T) -> Result<(), PerfIpcError> {
-        let head = self.head.load(Ordering::Relaxed);
-        let tail = self.tail.load(Ordering::Acquire);
-
-        if head.wrapping_sub(tail) >= N {
-            return Err(PerfIpcError::QueueFull);
-        }
-
-        // Bitwise optimization: idx = head & (N - 1)
-        let idx = head & (N - 1);
-        self.buffer[idx] = Some(item);
-        self.head.store(head.wrapping_add(1), Ordering::Release);
-        Ok(())
-    }
-
-    /// Dequeues a payload in O(1) single-cycle latency
-    pub fn dequeue(&mut self) -> Result<T, PerfIpcError> {
-        let head = self.head.load(Ordering::Acquire);
-        let tail = self.tail.load(Ordering::Relaxed);
-
-        if tail == head {
-            return Err(PerfIpcError::QueueEmpty);
-        }
-
-        // Bitwise optimization: idx = tail & (N - 1)
-        let idx = tail & (N - 1);
-        let item = self.buffer[idx].take().ok_or(PerfIpcError::InvalidPayload)?;
-        self.tail.store(tail.wrapping_add(1), Ordering::Release);
-        Ok(item)
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.head.load(Ordering::Acquire) == self.tail.load(Ordering::Acquire)
-    }
-
-    pub fn is_full(&self) -> bool {
-        self.head.load(Ordering::Acquire).wrapping_sub(self.tail.load(Ordering::Acquire)) >= N
-    }
-
-    pub fn len(&self) -> usize {
-        self.head.load(Ordering::Acquire).wrapping_sub(self.tail.load(Ordering::Acquire))
-    }
-}
-
-impl<T: Clone + Copy, const N: usize> Default for PowerOfTwoZeroCopyQueue<T, N> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod bitwise_queue_tests {
-    use super::*;
-
-    #[test]
-    fn test_power_of_two_queue_success() {
-        let mut queue: PowerOfTwoZeroCopyQueue<u32, 8> = PowerOfTwoZeroCopyQueue::new();
-        assert!(queue.is_empty());
-
-        queue.enqueue(10).unwrap();
-        queue.enqueue(20).unwrap();
-        queue.enqueue(30).unwrap();
-
-        assert_eq!(queue.len(), 3);
-        assert_eq!(queue.dequeue().unwrap(), 10);
-        assert_eq!(queue.dequeue().unwrap(), 20);
-        assert_eq!(queue.len(), 1);
-    }
-
-    #[test]
-    fn test_power_of_two_queue_full_empty() {
-        let mut queue: PowerOfTwoZeroCopyQueue<u32, 4> = PowerOfTwoZeroCopyQueue::new();
-        queue.enqueue(1).unwrap();
-        queue.enqueue(2).unwrap();
-        queue.enqueue(3).unwrap();
-        queue.enqueue(4).unwrap();
-
-        assert!(queue.is_full());
-        assert_eq!(queue.enqueue(5), Err(PerfIpcError::QueueFull));
-
-        assert_eq!(queue.dequeue().unwrap(), 1);
-        assert_eq!(queue.dequeue().unwrap(), 2);
-        assert_eq!(queue.dequeue().unwrap(), 3);
-        assert_eq!(queue.dequeue().unwrap(), 4);
-
-        assert!(queue.is_empty());
-        assert_eq!(queue.dequeue(), Err(PerfIpcError::QueueEmpty));
-    }
-
-    #[test]
-    #[should_panic(expected = "Buffer size N must be a power of two for bitwise optimization")]
-    fn test_non_power_of_two_panic() {
-        let _queue: PowerOfTwoZeroCopyQueue<u32, 6> = PowerOfTwoZeroCopyQueue::new();
     }
 }
