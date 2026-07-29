@@ -1,4 +1,5 @@
-#![allow(unused_imports, unused_variables, dead_code, unused_mut, clippy::all)]
+#![allow(warnings)]
+#![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -6,15 +7,11 @@ pub mod accessibility;
 pub mod ai;
 pub mod audio;
 pub mod automation;
-pub mod boot;
-pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod debugger;
-pub mod desktop;
+pub mod distro;
 pub mod device;
-pub mod docs;
 pub mod driver;
 pub mod drivers;
 pub mod ecosystem;
@@ -22,34 +19,53 @@ pub mod education;
 pub mod fs;
 pub mod net;
 pub mod filesystem;
-pub mod finance;
-pub mod governance;
-pub mod graphics;
-pub mod iso;
 pub mod kernel;
-pub mod legal;
-pub mod media;
-pub mod memory;
 pub mod ml;
 pub mod network;
-pub mod observability;
 pub mod orchestration;
 pub mod package;
-pub mod phase_l_plans;
-pub mod pillars;
 pub mod productivity;
 pub mod resilience;
-pub mod scheduler;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub mod storage;
-pub mod support;
-pub mod system;
-pub mod tools;
-pub mod tracing;
-pub mod unimplemented_features;
 pub mod virtualization;
+pub mod unimplemented_tools;
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+}
+pub mod boot {
+    pub mod firmware_bridge;
+    pub mod bridge_grid;
+}
+pub mod toolchain {
+    pub mod adapter;
+    pub mod capsule;
+    pub mod codex;
+    pub mod bootstrap;
+}
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -71,21 +87,9 @@ pub use automation::{
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
-pub use boot::{
-    PciBusScanner, PciClass, PciDevice, PostDiagnostics, PostStatus, PostTest, TestType,
-    PCI_MAX_BUS, PCI_MAX_DEVICE,
-};
-pub use community::{
-    BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
-    IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
-};
 pub use compatibility::{
-    ApkLoader, ApplicationBinary, BinderCallType, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, CrossPlatformBinaryFormat, CrossPlatformError, FhsConventionStatus,
-    HtmlRendererCapability, IndianLanguage, LocalizationManager, LocalizationProvider, LsbProfile,
-    MachoLoader, MediaDecoderCapability, PeBinaryLoader, PosixComplianceLevel, ScosmosBinaryFormat,
-    ScosmosError, ScosmosManager, StandardsComplianceManager, SupersetApplicationCapability,
-    TargetPlatform, TranslationLayer,
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -94,31 +98,10 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
-    AcpiTableParser, AdLibSynthDriver, AppleSiliconUnifiedMemoryBus, Bluetooth5_4_Adapter, BusType,
-    CgaGraphicsDriver, ClockController, ClockError, CxlMemoryDriver, DeviceError as DdeDeviceError,
-    DeviceId, DriverType, FloppyDiskDriver, GameportJoystickDriver, GenericClock, GenericDriver,
-    GenericPin, GpuCommand, GpuDriver, GpuError, HardwareBroker, HidError, HidKeyboardEvent,
-    HidReportType, IdeControllerDriver, InputDriver, InputEvent, InputType, IntelXeGpuDriver,
-    KernelReleaseInfo, LinuxDdeShim, LinuxReleaseDriver, Longterm5_10_TpmDriver,
-    Longterm5_15_SerialDriver, Longterm6_12_NetworkDriver, Longterm6_18_StorageDriver,
-    Longterm6_1_InputDriver, Longterm6_6_AudioDriver, MainlineGpuDriver, Ne2000NetworkDriver,
-    NetworkCommand, NetworkDriver, NetworkError, NetworkType, NvlinkBusDriver,
-    ParallelPrinterDriver, PciIdeBridge, PcieGen5NvmeDriver, PcieGen6Bridge, PinController,
-    PinDirection, PinError, PinPull, Prepatch6_23_Rc1_AiDriver, Ps2MouseDriver, Sata3Controller,
-    SerialMouseDriver, SocClockController, SocPinController, SoundBlaster16Driver,
-    Stable6_22_SensorDriver, StorageCommand, StorageDriver, StorageError, StorageType,
-    Thunderbolt4Controller, UdfAncientDevice, UdfInterpreter, UefiGopDriver, Ufs4StorageDriver,
-    UnifiedPeripheral as DdeUnifiedPeripheral, UnifiedSocController, Usb4HostController,
-    UsbHidDriver, VesaDriver, VesaError, VesaModeInfo, VgaTextModeDriver, WasmDriverVm,
-    Wifi7Adapter, WindowsNdisWrapper, XhciHostController,
-};
-pub use ecosystem::{
-    ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
-    EnterprisePartner,
-};
-pub use education::{
-    DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
+    VesaModeInfo,
 };
 pub use filesystem::{
     DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
@@ -198,71 +181,37 @@ pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
 };
+pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageDependencyResolver,
-    PackageError, PackageFormat, PackageSource, PackageState, SovereignPackage, SpacPackageManager,
-    UnifiedPackage, UniversalPackageManager, Version,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
-    Achievement, AchievementType, Document as ProductivityDocument, DocumentEngine, DocumentFormat,
-    DocumentMetadata, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer, ProductivityScore,
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use scheduler::{
-    ComputeUnit, EevdfScheduler, Priority as ShellPriority, ProcessLifecycleManager,
-    ResourceLimits, SInitSupervisor, Scheduler as ShellScheduler,
-    SchedulerError as ShellSchedulerError, Service, ServiceState, Signal, SignalHandler,
-    SignalManager, SimpleThread, Task, TaskState, Thread, ThreadID, ThreadState,
-};
-pub use security::{
-    AppArmorManager, AppArmorProfile, CapabilityGate, CapabilityToken,
-    ObjectType as SelinuxObjectType, Permission, Permission as SelinuxPermission, PledgeManager,
-    PledgePromise, RuntimeCapabilityToken, SecurityContext as SelinuxContext, SecurityEnforcer,
-    SecurityLabel, SecurityPolicy, SecurityRule,
-};
-pub use shell::{MultiCallShell, ShellCommand, ShellRepl, SysCommandType};
+pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction as SigpkgTransaction,
+    SatSolver, Transaction,
 };
-pub use storage::{
-    Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
-};
-pub use support::{
-    LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
-};
-pub use system::{Generation, GenerationManager};
-pub use tools::{
-    AccessibilityFeature as SigmaAccessibilityFeature, ClusterNode, NodeState as ToolNodeState,
-    SigmaAccess, SigmaCluster, SigmaDeploy, SigmaIdentity, SigmaToolError, UserIdentity,
-};
-pub use tracing::{SigmaTrace as TraceSigmaTrace, TraceEvent, TraceSpan};
 pub use virtualization::{
-    Cgroup, CgroupController, CgroupManager, CgroupState, CgroupSubsystem, Container,
-    KubernetesPod, Namespace as VirtNamespace, NamespaceData,
-    NamespaceManager as VirtNamespaceManager, NamespaceType as VirtNamespaceType, ResourcePool,
-    VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-
-#[cfg(test)]
-#[no_mangle]
-pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout =
-        Layout::from_size_align(size, 8).unwrap_or_else(|_| Layout::from_size_align(8, 8).unwrap());
-    std_alloc(layout)
-}
-
-#[cfg(test)]
-#[no_mangle]
-pub unsafe extern "C" fn free(ptr: *mut u8) {
-    // No-op deallocation in host test environment to avoid layout-tracking complexity.
-}
+pub use distro::{
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
+};

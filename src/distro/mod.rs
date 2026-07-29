@@ -9,7 +9,14 @@ pub mod manjaro;
 pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
+pub mod parity;
 
+pub use parity::{
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
+};
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,

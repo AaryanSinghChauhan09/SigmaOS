@@ -374,11 +374,7 @@ impl CrossDeviceOrchestrator {
                 if !self.devices.contains_key(&device_id) {
                     return Err(OrchestrationError::DeviceNotFound);
                 }
-                println!(
-                    "Syncing clipboard (size={}) with device {}",
-                    clipboard_data.len(),
-                    device_id
-                );
+                println!("Syncing clipboard (size={}) with device {}", clipboard_data.len(), device_id);
             }
             CrossDeviceAction::CastMedia {
                 device_id,
@@ -388,10 +384,7 @@ impl CrossDeviceOrchestrator {
                 if !self.devices.contains_key(&device_id) {
                     return Err(OrchestrationError::DeviceNotFound);
                 }
-                println!(
-                    "Casting media {} to device {} (play={})",
-                    media_url, device_id, play
-                );
+                println!("Casting media {} to device {} (play={})", media_url, device_id, play);
             }
             CrossDeviceAction::RemoteSyscall {
                 device_id,
@@ -405,10 +398,7 @@ impl CrossDeviceOrchestrator {
                 if capability_token == 0 {
                     return Err(OrchestrationError::ActionFailed);
                 }
-                println!(
-                    "Executing remote syscall {} on device {} with cap_token={}",
-                    syscall_number, device_id, capability_token
-                );
+                println!("Executing remote syscall {} on device {} with cap_token={}", syscall_number, device_id, capability_token);
             }
         }
         Ok(())
@@ -424,7 +414,7 @@ impl CrossDeviceOrchestrator {
                 DeviceType::Desktop,
             )
             .with_capability(DeviceCapability::FileTransfer)
-            .with_metadata("protocol_version".to_string(), "1.3".to_string()),
+            .with_metadata("protocol_version".to_string(), "1.3".to_string())
         );
         for d in &discovered {
             self.add_device(d.clone());
@@ -432,11 +422,7 @@ impl CrossDeviceOrchestrator {
         discovered
     }
 
-    pub fn sync_secure_clipboard(
-        &mut self,
-        device_id: &str,
-        data: &[u8],
-    ) -> Result<(), OrchestrationError> {
+    pub fn sync_secure_clipboard(&mut self, device_id: &str, data: &[u8]) -> Result<(), OrchestrationError> {
         if !self.devices.contains_key(device_id) {
             return Err(OrchestrationError::DeviceNotFound);
         }
@@ -448,11 +434,7 @@ impl CrossDeviceOrchestrator {
         })
     }
 
-    pub fn cast_media_stream(
-        &mut self,
-        device_id: &str,
-        stream_url: &str,
-    ) -> Result<(), OrchestrationError> {
+    pub fn cast_media_stream(&mut self, device_id: &str, stream_url: &str) -> Result<(), OrchestrationError> {
         if !self.devices.contains_key(device_id) {
             return Err(OrchestrationError::DeviceNotFound);
         }
@@ -463,12 +445,7 @@ impl CrossDeviceOrchestrator {
         })
     }
 
-    pub fn execute_secure_rpc(
-        &mut self,
-        device_id: &str,
-        syscall_num: u32,
-        cap_token: u64,
-    ) -> Result<(), OrchestrationError> {
+    pub fn execute_secure_rpc(&mut self, device_id: &str, syscall_num: u32, cap_token: u64) -> Result<(), OrchestrationError> {
         if !self.devices.contains_key(device_id) {
             return Err(OrchestrationError::DeviceNotFound);
         }
@@ -540,92 +517,6 @@ impl Default for CrossDeviceOrchestrator {
     }
 }
 
-/// LocalSendShard - Encrypted local P2P file and message transfer module (replaces LocalSend)
-pub struct LocalSendShard {
-    pub local_ip: String,
-    pub active_transfers: HashMap<String, usize>, // maps file_id -> transfer percentage
-    pub encryption_key: Vec<u8>,
-}
-
-impl LocalSendShard {
-    pub fn new(ip: &str, key: Vec<u8>) -> Self {
-        Self {
-            local_ip: ip.to_string(),
-            active_transfers: HashMap::new(),
-            encryption_key: key,
-        }
-    }
-
-    /// Prepares and encrypts a payload stream for local P2P dispatch
-    pub fn prepare_p2p_payload(&self, data: &[u8]) -> Vec<u8> {
-        let mut encrypted = Vec::with_capacity(data.len());
-        if self.encryption_key.is_empty() {
-            encrypted.extend_from_slice(data);
-        } else {
-            for (i, &byte) in data.iter().enumerate() {
-                encrypted.push(byte ^ self.encryption_key[i % self.encryption_key.len()]);
-            }
-        }
-        encrypted
-    }
-
-    /// Updates local progress for active local file streams
-    pub fn update_transfer_progress(&mut self, file_id: &str, percentage: usize) {
-        self.active_transfers
-            .insert(file_id.to_string(), percentage.min(100));
-    }
-}
-
-/// KDEConnectShard - Multi-device synchronization hub (replaces KDE Connect)
-/// Handles remote input mirroring, notification forwarding, shared clipboard sync,
-/// and cross-device media control.
-pub struct KdeConnectShard {
-    pub paired_devices: Vec<String>,
-    pub notifications_buffer: Vec<String>,
-    pub synced_clipboard_content: String,
-    pub remote_volume: u32,
-}
-
-impl KdeConnectShard {
-    pub fn new() -> Self {
-        Self {
-            paired_devices: Vec::new(),
-            notifications_buffer: Vec::new(),
-            synced_clipboard_content: String::new(),
-            remote_volume: 75,
-        }
-    }
-
-    /// Pair with a new remote smartphone, tablet, or desktop device
-    pub fn pair_device(&mut self, device_id: &str) {
-        if !self.paired_devices.contains(&device_id.to_string()) {
-            self.paired_devices.push(device_id.to_string());
-        }
-    }
-
-    /// Broadcast a notification packet to all paired companion devices
-    pub fn broadcast_notification(&mut self, sender: &str, message: &str) {
-        let entry = format!("{}: {}", sender, message);
-        self.notifications_buffer.push(entry);
-    }
-
-    /// Syncs local clipboard changes to the remote device
-    pub fn sync_clipboard(&mut self, content: &str) {
-        self.synced_clipboard_content = content.to_string();
-    }
-
-    /// Adjusts media parameters dynamically on target systems
-    pub fn adjust_remote_media_volume(&mut self, new_volume: u32) {
-        self.remote_volume = new_volume.min(100);
-    }
-}
-
-impl Default for KdeConnectShard {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Orchestration errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum OrchestrationError {
@@ -638,34 +529,6 @@ pub enum OrchestrationError {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_kdeconnect_shard() {
-        let mut kde = KdeConnectShard::new();
-        kde.pair_device("android_smartphone_1");
-        assert_eq!(kde.paired_devices.len(), 1);
-
-        kde.broadcast_notification("System", "Battery Low: 15%");
-        assert_eq!(kde.notifications_buffer.len(), 1);
-        assert_eq!(kde.notifications_buffer[0], "System: Battery Low: 15%");
-
-        kde.sync_clipboard("copied URL or password link");
-        assert_eq!(kde.synced_clipboard_content, "copied URL or password link");
-
-        kde.adjust_remote_media_volume(90);
-        assert_eq!(kde.remote_volume, 90);
-    }
-
-    #[test]
-    fn test_localsend_transfer() {
-        let mut local_send = LocalSendShard::new("192.168.1.50", vec![9, 8, 7]);
-        let raw_data = b"sovereign cross device file transfer";
-        let encrypted = local_send.prepare_p2p_payload(raw_data);
-        assert_eq!(encrypted.len(), raw_data.len());
-
-        local_send.update_transfer_progress("photo_1.png", 45);
-        assert_eq!(local_send.active_transfers.get("photo_1.png"), Some(&45));
-    }
 
     #[test]
     fn test_orchestrator_creation() {
@@ -752,8 +615,7 @@ mod tests {
         assert!(clip_res.is_ok());
 
         // 3. Media casting
-        let cast_res =
-            orchestrator.cast_media_stream("device_id_123", "http://sigmaos.local/stream.mp4");
+        let cast_res = orchestrator.cast_media_stream("device_id_123", "http://sigmaos.local/stream.mp4");
         assert!(cast_res.is_ok());
 
         // 4. Secure RPC System Calls
