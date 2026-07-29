@@ -188,4 +188,3 @@ impl PackageRecipe {
         }
     }
 }
-

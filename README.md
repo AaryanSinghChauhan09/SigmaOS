@@ -237,8 +237,6 @@ Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
 
 ---
 
-## 🏛️ Legacy / Stable C++ Microkernel Architecture (v15.2)
-
 # SigmaOS Zenith (v15.2 - Release Microkernel)
 
 The Sovereign Industrial Microkernel.
