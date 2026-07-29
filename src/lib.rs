@@ -91,7 +91,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageError, PackageFormat, PackageFormatAdapter,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
@@ -118,8 +118,9 @@ pub use shell::{
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
-    PackageDependencyResolver, PackageRecipe, PacmanAdapter, RecipeError, RecipeManager,
-    RpmAdapter, SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES,
+    PackageDependencyResolver, PackageFormatAdapter, PackageRecipe, PacmanAdapter, RecipeError,
+    RecipeManager, RpmAdapter, SatSolver, Transaction, UniversalPackageManager, Version,
+    MAX_RECIPE_DEPENDENCIES,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

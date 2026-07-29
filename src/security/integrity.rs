@@ -14,7 +14,7 @@ pub type FileID = usize;
 
 /// File integrity status
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum IntegrityStatus {
     Valid = 0,
     Modified = 1,
@@ -129,14 +129,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        let val = self.status.load(Ordering::SeqCst);
-        match val {
-            0 => IntegrityStatus::Valid,
-            1 => IntegrityStatus::Modified,
-            2 => IntegrityStatus::Corrupted,
-            3 => IntegrityStatus::Missing,
-            _ => IntegrityStatus::Valid,
-        }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -199,7 +192,6 @@ pub trait IntegrityMonitor {
 
 /// Integrity statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct IntegrityStats {
     pub total_files: usize,
     pub valid_files: usize,
@@ -303,27 +295,18 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
             return Err(IntegrityError::PermissionDenied);
         }
 
-        let mut status_to_update = None;
-        let mut final_result = Err(IntegrityError::FileNotFound);
-
         for file_option in &mut self.files {
             if let Some(ref mut file) = *file_option {
                 if file.id() == id {
                     let result = file.verify();
                     if let Ok(status) = result {
-                        status_to_update = Some(status);
+                        self.update_stats(status);
                     }
-                    final_result = result;
-                    break;
+                    return result;
                 }
             }
         }
-
-        if let Some(status) = status_to_update {
-            self.update_stats(status);
-        }
-
-        final_result
+        Err(IntegrityError::FileNotFound)
     }
 
     fn verify_all(&mut self) -> Result<Vec<FileID>, IntegrityError> {
@@ -332,22 +315,17 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         let mut modified_files = Vec::new();
-        let mut statuses = Vec::new();
 
         for file_option in &mut self.files {
             if let Some(ref mut file) = *file_option {
                 let result = file.verify();
                 if let Ok(status) = result {
-                    statuses.push(status);
                     if status != IntegrityStatus::Valid {
                         modified_files.push(file.id());
                     }
+                    self.update_stats(status);
                 }
             }
-        }
-
-        for i in 0..statuses.len() {
-            self.update_stats(statuses[i]);
         }
 
         Ok(modified_files)
@@ -386,8 +364,6 @@ impl SimpleIntegrityMonitor {
     }
 }
 
-use core::ops::{Index, IndexMut};
-
 /// Simple Vec implementation for no_std
 struct Vec<T> {
     data: *mut T,
@@ -421,14 +397,6 @@ impl<T> Vec<T> {
         self.len
     }
 
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
-    }
-
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -449,41 +417,6 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
-    }
-}
-
-impl<T> Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
     }
 }
 

@@ -14,7 +14,7 @@ pub type ContainerID = usize;
 
 /// Container state
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,
@@ -172,15 +172,7 @@ impl SimpleContainer {
     }
 
     pub fn get_state(&self) -> ContainerState {
-        let val = self.state.load(Ordering::SeqCst);
-        match val {
-            0 => ContainerState::Created,
-            1 => ContainerState::Running,
-            2 => ContainerState::Paused,
-            3 => ContainerState::Stopped,
-            4 => ContainerState::Failed,
-            _ => ContainerState::Created,
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state(&self, state: ContainerState) {
@@ -304,7 +296,6 @@ pub trait ContainerRuntime {
 
 /// Runtime statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,
@@ -532,8 +523,6 @@ impl SimpleContainerRuntime {
 }
 
 /// Simple Vec implementation for no_std
-use core::ops::{Index, IndexMut};
-
 struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -566,14 +555,6 @@ impl<T> Vec<T> {
         self.len
     }
 
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
-    }
-
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -594,41 +575,6 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
-    }
-}
-
-impl<T> Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
     }
 }
 

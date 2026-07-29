@@ -9,7 +9,6 @@ pub mod spec;
 pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
-pub mod universal_engine;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 

@@ -81,13 +81,7 @@ impl Certificate for SimpleCertificate {
         self.id
     }
     fn certificate_type(&self) -> CertificateType {
-        let val = self.certificate_type.load(Ordering::SeqCst);
-        match val {
-            0 => CertificateType::Root,
-            1 => CertificateType::Intermediate,
-            2 => CertificateType::EndEntity,
-            _ => CertificateType::Root,
-        }
+        unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) }
     }
     fn subject(&self) -> &[u8] {
         let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
@@ -173,7 +167,7 @@ impl PKIManager for SimplePKIManager {
         _issuer_id: CertificateID,
     ) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
-            if self.revoked.contains(id) {
+            if self.revoked.contains(&id) {
                 return Ok(false);
             }
             Ok(cert.is_valid())
@@ -221,8 +215,6 @@ impl CRL for SimpleCRL {
     }
 }
 
-use core::ops::{Index, IndexMut};
-
 struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -237,7 +229,6 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
-
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -249,23 +240,18 @@ impl<T> Vec<T> {
             }
         }
     }
-
-    fn len(&self) -> usize {
-        self.len
+    fn contains(&self, item: CertificateID) -> bool {
+        for i in 0..self.len {
+            unsafe {
+                let stored = core::ptr::read(self.data.add(i));
+                if stored == item {
+                    return true;
+                }
+            }
+        }
+        false
     }
-
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
-    }
-
-    fn clone(&self) -> Vec<T>
-    where
-        T: Copy,
-    {
+    fn clone(&self) -> Vec<T> {
         let mut new_vec = Vec::new();
         for i in 0..self.len {
             unsafe {
@@ -275,7 +261,6 @@ impl<T> Vec<T> {
         }
         new_vec
     }
-
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -293,55 +278,6 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
-    }
-}
-
-impl<T: PartialEq + Copy> Vec<T> {
-    fn contains(&self, item: T) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                let stored = core::ptr::read(self.data.add(i));
-                if stored == item {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-}
-
-impl<T> Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
     }
 }
 

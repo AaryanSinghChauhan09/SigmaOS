@@ -7,7 +7,6 @@ pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
-pub mod defensive_audit;
 pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
@@ -15,12 +14,9 @@ pub mod mac;
 pub mod password;
 pub mod pki;
 pub mod pledge;
-pub mod qubes_isolation;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
@@ -28,16 +24,6 @@ pub mod vulnerability;
 pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
-pub use forensics::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-};
-pub const GLOBAL_ANONSURF: u32 = 0;
-pub const GLOBAL_FORENSIC: u32 = 0;
-pub const GLOBAL_SANDBOX: u32 = 0;
 pub use capability_token::{
     CapabilityToken as AndroidStyleCapabilityToken,
     SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
@@ -56,8 +42,8 @@ pub use password::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext as SelinuxSecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule, SelinuxPermission,
+    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
@@ -81,9 +67,6 @@ pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
     SecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
-};
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
 };
 // PKI: export actual types
 pub use pki::{

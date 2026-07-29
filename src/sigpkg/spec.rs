@@ -9,45 +9,8 @@ use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub struct AptPackageAdapter;
-pub struct PackageAdapterFactory;
-pub struct PacmanPackageAdapter;
-pub struct SnapPackageAdapter;
-pub struct NixPackageAdapter;
-pub struct EbuildPackageAdapter;
-pub struct ApkPackageAdapter;
-pub struct FlatpakPackageAdapter;
-pub struct TxzPackageAdapter;
-pub struct XbpsPackageAdapter;
-pub struct CachyCpuDetector;
-
-impl CachyCpuDetector {
-    pub fn detect_level() -> CpuArchLevel {
-        CpuArchLevel::V3
-    }
-}
-
-pub struct CachyosPackageAdapter;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CpuArchLevel {
-    V1,
-    V2,
-    V3,
-    V4,
-}
-pub struct UniversalPackage;
-pub enum UniversalPackageType {
-    AppImage,
-    Flatpak,
-    Snap,
-    Native,
-}
-pub struct UserDefinedPackageHook;
-
 /// Package version
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct PackageVersion {
     pub major: u32,
     pub minor: u32,
@@ -80,7 +43,6 @@ pub trait Package {
 
 /// Package dependency
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct PackageDependency {
     pub name: [u8; 64],
     pub version_constraint: [u8; 32],
@@ -230,7 +192,7 @@ impl Package for SimplePackage {
     }
 
     fn dependencies(&self) -> &[PackageDependency] {
-        self.dependencies.as_slice()
+        &self.dependencies
     }
 
     fn verify_signature(&self, signature: &[u8]) -> bool {
@@ -299,7 +261,6 @@ pub enum PackageError {
 
 /// Package statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct PackageStats {
     pub total_packages: usize,
     pub installed_packages: usize,
@@ -519,8 +480,6 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
-use core::ops::{Index, IndexMut};
-
 /// Simple Vec implementation for no_std
 struct Vec<T> {
     data: *mut T,
@@ -554,18 +513,6 @@ impl<T> Vec<T> {
         self.len
     }
 
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
-    }
-
-    pub fn as_slice(&self) -> &[T] {
-        unsafe { core::slice::from_raw_parts(self.data, self.len) }
-    }
-
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -586,41 +533,6 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
-    }
-}
-
-impl<T> Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
     }
 }
 

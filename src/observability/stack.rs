@@ -9,13 +9,6 @@ use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub trait SigmaDebug {}
-pub trait SigmaMetrics {}
-pub trait SigmaTrace {}
-pub struct SimpleSigmaDebug;
-pub struct SimpleSigmaMetrics;
-pub struct SimpleSigmaTrace;
-
 /// Metric ID
 pub type MetricID = usize;
 
@@ -302,7 +295,7 @@ impl Span for SimpleSpan {
             return;
         }
         self.start_time
-            .store(Self::get_current_time() as usize, Ordering::SeqCst);
+            .store(Self::get_current_time(), Ordering::SeqCst);
     }
 
     fn stop(&mut self) {
@@ -310,7 +303,7 @@ impl Span for SimpleSpan {
             return;
         }
         self.end_time
-            .store(Self::get_current_time() as usize, Ordering::SeqCst);
+            .store(Self::get_current_time(), Ordering::SeqCst);
     }
 
     fn duration(&self) -> u64 {
@@ -365,7 +358,6 @@ pub enum ObservabilityError {
 
 /// Observability statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct ObservabilityStats {
     pub total_metrics: usize,
     pub total_spans: usize,
@@ -531,8 +523,6 @@ impl ObservabilityStack for SimpleObservabilityStack {
 }
 
 /// Simple Vec implementation for no_std
-use core::ops::{Index, IndexMut};
-
 struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -565,14 +555,6 @@ impl<T> Vec<T> {
         self.len
     }
 
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
-    }
-
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -593,41 +575,6 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
-    }
-}
-
-impl<T> Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
     }
 }
 

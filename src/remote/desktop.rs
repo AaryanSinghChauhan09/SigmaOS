@@ -7,10 +7,6 @@ use core::mem;
 /// Implements remote desktop access
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-pub struct InputAuthGate;
-pub struct PqcVideoCipher;
-pub struct SigmaRendezvous;
-
 pub type SessionID = usize;
 
 #[repr(C)]
@@ -34,7 +30,6 @@ pub trait RemoteSession {
     fn id(&self) -> SessionID;
     fn host(&self) -> &[u8];
     fn state(&self) -> SessionState;
-    fn set_state(&self, state: SessionState);
 }
 
 #[repr(C)]
@@ -68,17 +63,7 @@ impl RemoteSession for SimpleRemoteSession {
         &self.host[..len]
     }
     fn state(&self) -> SessionState {
-        let val = self.state.load(Ordering::SeqCst);
-        match val {
-            0 => SessionState::Disconnected,
-            1 => SessionState::Connecting,
-            2 => SessionState::Connected,
-            3 => SessionState::Error,
-            _ => SessionState::Disconnected,
-        }
-    }
-    fn set_state(&self, state: SessionState) {
-        self.state.store(state as usize, Ordering::SeqCst);
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 }
 
@@ -87,7 +72,6 @@ pub trait RemoteDesktop {
     fn disconnect(&mut self, id: SessionID) -> Result<(), RemoteError>;
     fn send_input(&self, id: SessionID, input: &[u8]) -> Result<(), RemoteError>;
     fn receive_screen(&self, id: SessionID) -> Result<Vec<u8>, RemoteError>;
-    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession>;
 }
 
 #[repr(C)]
@@ -117,7 +101,9 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
                 if session.id() == id {
-                    session.set_state(SessionState::Disconnected);
+                    session
+                        .state
+                        .store(SessionState::Disconnected as usize, Ordering::SeqCst);
                     return Ok(());
                 }
             }
@@ -192,8 +178,6 @@ impl ScreenSharing for SimpleScreenSharing {
     }
 }
 
-use core::ops::{Index, IndexMut};
-
 struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -208,7 +192,6 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
-
     fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -220,19 +203,6 @@ impl<T> Vec<T> {
             }
         }
     }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
-    }
-
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -250,41 +220,6 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
-    }
-}
-
-impl<T> Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
     }
 }
 

@@ -132,7 +132,7 @@ impl PackageFormatAdapter for DebAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("Package:") && content.contains("Version:"))
+        Ok(content.contains("Package:") || content.contains("Version:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -247,7 +247,7 @@ impl PackageFormatAdapter for RpmAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("Name:") && content.contains("Version:"))
+        Ok(content.contains("Name") || content.contains("Version"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -351,7 +351,7 @@ impl PackageFormatAdapter for PacmanAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("pkgname") && content.contains("pkgver"))
+        Ok(content.contains("pkgname") || content.contains("pkgver"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
