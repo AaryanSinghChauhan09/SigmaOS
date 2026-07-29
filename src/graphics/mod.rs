@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // SigmaOS Graphics Module
 // Image processing, rendering, and graphics operations
 
@@ -27,4 +28,12 @@ pub use zenith::{
 pub use zenith_compositor::{
     Geometry, WindowNode, WindowState, ZenithCompositor as WaylandZenithCompositor, SCREEN_HEIGHT,
     SCREEN_WIDTH,
+=======
+// Core Graphics and Composition Modules for SigmaOS
+pub mod compositor;
+
+pub use compositor::{
+    BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
+    Surface, Window,
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 };

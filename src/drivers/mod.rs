@@ -1,9 +1,13 @@
 // SigmaOS Drivers Module
 pub mod gpu;
 pub mod input;
+<<<<<<< HEAD
 pub mod legacy_floppy;
 pub mod legacy_keyboard;
 pub mod legacy_serial;
+=======
+pub mod legacy_keyboard;
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 pub mod modern_usb;
 pub mod network;
 pub mod peripheral;
@@ -13,9 +17,13 @@ pub mod vesa;
 
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
+<<<<<<< HEAD
 pub use legacy_floppy::LegacyFloppyDisk;
 pub use legacy_keyboard::LegacyKeyboard;
 pub use legacy_serial::LegacySerialPort;
+=======
+pub use legacy_keyboard::LegacyKeyboard;
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 pub use modern_usb::ModernUsbController;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};

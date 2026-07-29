@@ -1,12 +1,10 @@
-#![no_std]
-#![no_main]
+// OOP-based Container Runtime for SigmaOS
+// Implements container runtime using OOP principles with traits and structs.
 
-use core::mem;
-/// OOP-based Container Runtime for SigmaOS
-/// Implements container runtime using OOP principles with traits and structs
-/// No dependency on external container frameworks
-/// Based on Roadmap Item 17: Container runtime support
-use core::ptr::{self, NonNull};
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
@@ -14,7 +12,7 @@ pub type ContainerID = usize;
 
 /// Container state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,
@@ -45,7 +43,7 @@ pub trait Container {
 
 /// Container error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
     Success = 0,
     AlreadyStarted = 1,
@@ -86,7 +84,7 @@ impl ContainerInfo {
 
 /// Container capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerCapability {
     pub can_start: bool,
     pub can_stop: bool,
@@ -95,7 +93,7 @@ pub struct ContainerCapability {
 }
 
 impl ContainerCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         ContainerCapability {
             can_start: false,
             can_stop: false,
@@ -104,7 +102,7 @@ impl ContainerCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         ContainerCapability {
             can_start: true,
             can_stop: true,
@@ -114,8 +112,13 @@ impl ContainerCapability {
     }
 }
 
+impl Default for ContainerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple container (OOP: Concrete container class)
-#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -141,10 +144,8 @@ impl SimpleContainer {
         let name_len = name.len().min(63);
         let image_len = image.len().min(127);
 
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(image.as_ptr(), image_array.as_mut_ptr(), image_len);
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+        image_array[..image_len].copy_from_slice(&image[..image_len]);
 
         SimpleContainer {
             id,
@@ -161,9 +162,7 @@ impl SimpleContainer {
 
     pub fn set_environment(&mut self, env: &[u8]) {
         let len = env.len().min(511);
-        unsafe {
-            core::ptr::copy_nonoverlapping(env.as_ptr(), self.environment.as_mut_ptr(), len);
-        }
+        self.environment[..len].copy_from_slice(&env[..len]);
     }
 
     pub fn set_limits(&mut self, memory_limit: u64, cpu_limit: u32) {
@@ -172,7 +171,13 @@ impl SimpleContainer {
     }
 
     pub fn get_state(&self) -> ContainerState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+        match self.state.load(Ordering::SeqCst) {
+            0 => ContainerState::Created,
+            1 => ContainerState::Running,
+            2 => ContainerState::Paused,
+            3 => ContainerState::Stopped,
+            _ => ContainerState::Failed,
+        }
     }
 
     pub fn set_state(&self, state: ContainerState) {
@@ -296,7 +301,7 @@ pub trait ContainerRuntime {
 
 /// Runtime statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,
@@ -305,13 +310,19 @@ pub struct RuntimeStats {
 }
 
 impl RuntimeStats {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         RuntimeStats {
             total_containers: 0,
             running_containers: 0,
             paused_containers: 0,
             stopped_containers: 0,
         }
+    }
+}
+
+impl Default for RuntimeStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -325,7 +336,7 @@ pub struct SimpleContainerRuntime {
 
 /// Runtime capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,
@@ -333,7 +344,7 @@ pub struct RuntimeCapability {
 }
 
 impl RuntimeCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         RuntimeCapability {
             can_create: false,
             can_remove: false,
@@ -341,12 +352,18 @@ impl RuntimeCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         RuntimeCapability {
             can_create: true,
             can_remove: true,
             can_manage: true,
         }
+    }
+}
+
+impl Default for RuntimeCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -523,64 +540,36 @@ impl SimpleContainerRuntime {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
+    #[test]
+    fn test_container_lifecycle_flows() {
+        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
+        let id = runtime
+            .create_container(
+                b"nginx-service",
+                b"nginx:alpine",
+                ContainerCapability::full(),
+            )
+            .unwrap();
+
+        let stats_init = runtime.stats();
+        assert_eq!(stats_init.total_containers, 1);
+        assert_eq!(stats_init.stopped_containers, 1);
+        assert_eq!(stats_init.running_containers, 0);
+
+        // Start container
+        runtime.start_container(id).unwrap();
+        let stats_running = runtime.stats();
+        assert_eq!(stats_running.running_containers, 1);
+        assert_eq!(stats_running.stopped_containers, 0);
+
+        // Pause container
+        runtime.pause_container(id).unwrap();
+        let stats_paused = runtime.stats();
+        assert_eq!(stats_paused.paused_containers, 1);
+        assert_eq!(stats_paused.running_containers, 0);
     }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }

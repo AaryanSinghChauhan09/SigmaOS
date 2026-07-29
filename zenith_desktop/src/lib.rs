@@ -161,12 +161,12 @@ pub struct TimeBasedTheme {
 
 /// Zenith compositor
 pub struct ZenithCompositor {
-    config: ZenithCompositorConfig,
-    current_profile: Option<String>,
-    current_theme: String,
-    windows: Vec<Window>,
-    accessibility_engine: AccessibilityEngine,
-    ai_adapter: AIAdapter,
+    pub config: ZenithCompositorConfig,
+    pub current_profile: Option<String>,
+    pub current_theme: String,
+    pub windows: Vec<Window>,
+    pub accessibility_engine: AccessibilityEngine,
+    pub ai_adapter: AIAdapter,
 }
 
 /// Window representation
@@ -181,7 +181,7 @@ pub struct Window {
 }
 
 /// Window geometry
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowGeometry {
     pub x: i32,
     pub y: i32,
@@ -190,7 +190,7 @@ pub struct WindowGeometry {
 }
 
 /// Window state
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowState {
     Normal,
     Maximized,
@@ -200,7 +200,7 @@ pub enum WindowState {
 }
 
 /// Window layer
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowLayer {
     Background,
     Bottom,
@@ -262,7 +262,7 @@ pub struct Context {
 }
 
 /// User activity
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UserActivity {
     Typing,
     Reading,
@@ -351,27 +351,86 @@ impl ZenithCompositor {
         }
     }
 
-    /// Arrange windows in tiling layout
-    fn arrange_tiling(&mut self) -> Result<(), CompositorError> {
-        // Implement tiling layout algorithm
+    /// Arrange windows in tiling layout (Master-and-Stack binary tiling)
+    pub fn arrange_tiling(&mut self) -> Result<(), CompositorError> {
+        let n = self.windows.len();
+        if n == 0 {
+            return Ok(());
+        }
+
+        let screen_width = 1920;
+        let screen_height = 1080;
+
+        if n == 1 {
+            self.windows[0].geometry = WindowGeometry {
+                x: 0,
+                y: 0,
+                width: screen_width,
+                height: screen_height,
+            };
+        } else {
+            // Master takes 50% width
+            let master_width = screen_width / 2;
+            self.windows[0].geometry = WindowGeometry {
+                x: 0,
+                y: 0,
+                width: master_width,
+                height: screen_height,
+            };
+
+            // Stack takes remaining 50% width
+            let stack_width = screen_width - master_width;
+            let stack_count = n - 1;
+            let window_height = screen_height / stack_count as u32;
+
+            for i in 1..n {
+                let idx = i - 1;
+                self.windows[i].geometry = WindowGeometry {
+                    x: master_width as i32,
+                    y: (idx as u32 * window_height) as i32,
+                    width: stack_width,
+                    height: window_height,
+                };
+            }
+        }
         Ok(())
     }
 
-    /// Arrange windows in stacking layout
-    fn arrange_stacking(&mut self) -> Result<(), CompositorError> {
-        // Implement stacking layout algorithm
+    /// Arrange windows in stacking layout (Cascaded Floating Layout)
+    pub fn arrange_stacking(&mut self) -> Result<(), CompositorError> {
+        let n = self.windows.len();
+        for i in 0..n {
+            let offset = i as i32 * 40;
+            self.windows[i].geometry = WindowGeometry {
+                x: 100 + offset,
+                y: 100 + offset,
+                width: 1024,
+                height: 768,
+            };
+        }
         Ok(())
     }
 
     /// Arrange windows in tabbed layout
     fn arrange_tabbed(&mut self) -> Result<(), CompositorError> {
-        // Implement tabbed layout algorithm
+        let n = self.windows.len();
+        let screen_width = 1920;
+        let screen_height = 1080;
+
+        for i in 0..n {
+            self.windows[i].geometry = WindowGeometry {
+                x: 0,
+                y: 40, // offset for tab bar
+                width: screen_width,
+                height: screen_height - 40,
+            };
+        }
         Ok(())
     }
 
     /// Arrange windows in floating layout
     fn arrange_floating(&mut self) -> Result<(), CompositorError> {
-        // Implement floating layout algorithm
+        // Keeps user-defined floating geometry
         Ok(())
     }
 
@@ -835,6 +894,100 @@ mod tests {
         let result = compositor.switch_profile("developer");
         assert!(result.is_ok());
         assert_eq!(compositor.current_profile(), Some("developer"));
+    }
+
+    #[test]
+    fn test_tiling_and_stacking_arrangements() {
+        let config = ZenithCompositorConfig {
+            backend: CompositorBackend::Wayland,
+            renderer: RendererBackend::Vulkan,
+            accessibility: AccessibilityConfig {
+                screen_reader: false,
+                high_contrast: false,
+                magnification: 1.0,
+                reduced_motion: false,
+                keyboard_navigation: true,
+                color_blind_mode: None,
+            },
+            profiles: vec![],
+            theming: ThemingConfig {
+                theme: Theme {
+                    name: "default".to_string(),
+                    colors: ColorScheme {
+                        primary: "#007bff".to_string(),
+                        secondary: "#6c757d".to_string(),
+                        background: "#ffffff".to_string(),
+                        foreground: "#000000".to_string(),
+                        accent: "#17a2b8".to_string(),
+                        success: "#28a745".to_string(),
+                        warning: "#ffc107".to_string(),
+                        error: "#dc3545".to_string(),
+                    },
+                    fonts: FontScheme {
+                        ui_font: "sans-serif".to_string(),
+                        monospace_font: "monospace".to_string(),
+                        document_font: "serif".to_string(),
+                        base_size: 12,
+                        scaling: 1.0,
+                    },
+                    effects: VisualEffects {
+                        blur: true,
+                        transparency: 0.9,
+                        shadows: true,
+                        rounded_corners: true,
+                        animations: true,
+                    },
+                    animations: AnimationConfig {
+                        enabled: true,
+                        duration_ms: 200,
+                        easing: EasingFunction::EaseInOut,
+                        reduced_motion: false,
+                    },
+                },
+                custom_themes: vec![],
+                auto_switch: false,
+                time_based_switching: vec![],
+            },
+        };
+
+        let mut compositor = ZenithCompositor::new(config);
+
+        // Add 3 dummy windows
+        compositor.windows.push(Window {
+            id: 1,
+            title: "window1".to_string(),
+            app_id: "app1".to_string(),
+            geometry: WindowGeometry { x: 0, y: 0, width: 0, height: 0 },
+            state: WindowState::Normal,
+            layer: WindowLayer::Normal,
+        });
+        compositor.windows.push(Window {
+            id: 2,
+            title: "window2".to_string(),
+            app_id: "app2".to_string(),
+            geometry: WindowGeometry { x: 0, y: 0, width: 0, height: 0 },
+            state: WindowState::Normal,
+            layer: WindowLayer::Normal,
+        });
+        compositor.windows.push(Window {
+            id: 3,
+            title: "window3".to_string(),
+            app_id: "app3".to_string(),
+            geometry: WindowGeometry { x: 0, y: 0, width: 0, height: 0 },
+            state: WindowState::Normal,
+            layer: WindowLayer::Normal,
+        });
+
+        // Arrange tiling
+        compositor.arrange_tiling().unwrap();
+        assert_eq!(compositor.windows[0].geometry.width, 960);
+        assert_eq!(compositor.windows[1].geometry.width, 960);
+        assert_eq!(compositor.windows[1].geometry.height, 540);
+
+        // Arrange stacking
+        compositor.arrange_stacking().unwrap();
+        assert_eq!(compositor.windows[0].geometry.x, 100);
+        assert_eq!(compositor.windows[1].geometry.x, 140);
     }
 }
 

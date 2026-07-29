@@ -3,6 +3,7 @@
 
 pub mod audit;
 pub mod capability;
+<<<<<<< HEAD
 pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
@@ -21,10 +22,20 @@ pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
+=======
+pub mod integrity;
+pub mod mac;
+pub mod phantom;
+pub mod pki;
+pub mod pledge;
+pub mod secrets;
+pub mod unveil;
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 pub mod vulnerability;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+<<<<<<< HEAD
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{
     CapabilityToken as AndroidStyleCapabilityToken,
@@ -60,3 +71,8 @@ pub use vpn::{
     WireGuardHandler,
 };
 pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+=======
+pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+>>>>>>> origin/jules-15532892492441614180-73ce6847

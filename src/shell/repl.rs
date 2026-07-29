@@ -10,6 +10,7 @@ pub enum ShellCommand {
     ListProcesses,
     ListFiles,
     Exit,
+<<<<<<< HEAD
     Echo {
         message: String,
     },
@@ -58,6 +59,14 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
+=======
+    Echo { message: String },
+    Set { variable: String, value: String },
+    Get { variable: String },
+    Theme { name: String },
+    Profile { name: String },
+    A11y { feature: String, enabled: bool },
+>>>>>>> origin/jules-15532892492441614180-73ce6847
     Unknown(String),
 }
 
@@ -72,6 +81,7 @@ impl AgentAutomationEngine {
 }
 
 pub struct ShellRepl {
+<<<<<<< HEAD
     pub running: bool,
     pub variables: std::collections::HashMap<String, String>,
     pub aliases: std::collections::HashMap<String, String>,
@@ -81,6 +91,11 @@ pub struct ShellRepl {
     pub current_dir: String,
     pub services: std::collections::HashMap<String, String>,
     pub installed_packages: std::collections::HashSet<String>,
+=======
+    running: bool,
+    variables: std::collections::HashMap<String, String>,
+    prompt: String,
+>>>>>>> origin/jules-15532892492441614180-73ce6847
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
@@ -88,16 +103,24 @@ pub struct ShellRepl {
 
 impl ShellRepl {
     pub fn new() -> Self {
+<<<<<<< HEAD
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
+=======
+        let mut a11y = std::collections::HashMap::new();
+        a11y.insert("screen_reader".to_string(), false);
+        a11y.insert("high_contrast".to_string(), false);
+        a11y.insert("magnification".to_string(), false);
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
+<<<<<<< HEAD
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
@@ -106,18 +129,31 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+=======
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: a11y,
+>>>>>>> origin/jules-15532892492441614180-73ce6847
         }
     }
 
     pub fn with_prompt(prompt: String) -> Self {
+<<<<<<< HEAD
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
+=======
+        let mut a11y = std::collections::HashMap::new();
+        a11y.insert("screen_reader".to_string(), false);
+        a11y.insert("high_contrast".to_string(), false);
+        a11y.insert("magnification".to_string(), false);
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
+<<<<<<< HEAD
             aliases: std::collections::HashMap::new(),
             prompt: "ubuntu@sigmaos:~$ ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
@@ -128,6 +164,12 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+=======
+            prompt,
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: a11y,
+>>>>>>> origin/jules-15532892492441614180-73ce6847
         }
     }
 
@@ -170,7 +212,7 @@ impl ShellRepl {
         }
     }
 
-    fn parse_command(&self, input: &str) -> ShellCommand {
+    pub fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -251,13 +293,46 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    let enabled = match parts[2] {
+                        "on" | "true" | "enable" => true,
+                        _ => false,
+                    };
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        enabled,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
+<<<<<<< HEAD
                    help         - Show this help message\n\
                    ps           - List running processes\n\
                    ls           - List files\n\
@@ -271,6 +346,18 @@ impl ShellRepl {
                    set          - Set a variable\n\
                    get          - Get a variable\n\
                    exit         - Exit the shell"
+=======
+                   help             - Show this help message\n\
+                   ps               - List running processes\n\
+                   ls               - List files\n\
+                   echo             - Print a message\n\
+                   set              - Set a variable\n\
+                   get              - Get a variable\n\
+                   theme [name]     - Switch Zenith desktop theme\n\
+                   profile [name]   - Switch Zenith user profile\n\
+                   a11y [feat] [on] - Switch Zenith accessibility settings\n\
+                   exit             - Exit the shell"
+>>>>>>> origin/jules-15532892492441614180-73ce6847
                 .to_string()),
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
@@ -423,6 +510,22 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
+            ShellCommand::Theme { name } => {
+                self.current_theme = name.clone();
+                Ok(format!("Zenith Theme set to: {}", name))
+            }
+            ShellCommand::Profile { name } => {
+                self.current_profile = name.clone();
+                Ok(format!("Zenith Profile set to: {}", name))
+            }
+            ShellCommand::A11y { feature, enabled } => {
+                self.a11y_features.insert(feature.clone(), enabled);
+                Ok(format!(
+                    "Zenith Accessibility [{}] set to: {}",
+                    feature,
+                    if enabled { "on" } else { "off" }
+                ))
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -483,6 +586,31 @@ mod tests {
         };
         let result = repl.execute_command(get_cmd);
         assert_eq!(result.unwrap(), "value");
+    }
+
+    #[test]
+    fn test_theme_and_profile_commands() {
+        let mut repl = ShellRepl::new();
+
+        let theme_cmd = repl.parse_command("theme dark");
+        let res = repl.execute_command(theme_cmd).unwrap();
+        assert_eq!(repl.current_theme, "dark");
+        assert!(res.contains("dark"));
+
+        let profile_cmd = repl.parse_command("profile developer");
+        let res = repl.execute_command(profile_cmd).unwrap();
+        assert_eq!(repl.current_profile, "developer");
+        assert!(res.contains("developer"));
+    }
+
+    #[test]
+    fn test_a11y_commands() {
+        let mut repl = ShellRepl::new();
+
+        let a11y_cmd = repl.parse_command("a11y high_contrast on");
+        let res = repl.execute_command(a11y_cmd).unwrap();
+        assert_eq!(repl.a11y_features.get("high_contrast"), Some(&true));
+        assert!(res.contains("on"));
     }
 
     #[test]

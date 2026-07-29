@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Driver Framework for SigmaOS
 /// Based on Roadmap Item 1: Driver framework
@@ -16,8 +13,8 @@ pub enum DriverType {
     Network = 2,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverState {
     Unloaded = 0,
     Loaded = 1,
@@ -65,7 +62,7 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state
@@ -107,7 +104,7 @@ impl DriverFramework for SimpleDriverFramework {
         Ok(id)
     }
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in &mut self.drivers {
+        for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id {
                     return driver.load();
@@ -117,7 +114,7 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::LoadFailed)
     }
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in &mut self.drivers {
+        for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id {
                     return driver.unload();
@@ -127,7 +124,7 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::UnloadFailed)
     }
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver> {
-        for driver_option in &self.drivers {
+        for driver_option in self.drivers.iter() {
             if let Some(ref driver) = *driver_option {
                 if driver.id() == id {
                     return Some(driver.as_ref());
@@ -138,21 +135,21 @@ impl DriverFramework for SimpleDriverFramework {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -161,6 +158,23 @@ impl<T> Vec<T> {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
         }
     }
     unsafe fn grow(&mut self) {
@@ -179,6 +193,63 @@ impl<T> Vec<T> {
             }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
         }
     }
 }

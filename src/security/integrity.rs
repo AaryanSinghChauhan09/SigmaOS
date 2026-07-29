@@ -1,12 +1,18 @@
 #![no_std]
-#![no_main]
 
 use core::mem;
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
 /// Based on Roadmap Item 66: System integrity monitoring
+<<<<<<< HEAD
 use core::ptr::{self, NonNull};
+=======
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// File ID
@@ -37,8 +43,8 @@ pub trait File {
 }
 
 /// Integrity error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntegrityError {
     Success = 0,
     FileNotFound = 1,
@@ -48,6 +54,7 @@ pub enum IntegrityError {
 
 /// File info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct FileInfo {
     pub id: FileID,
     pub path: [u8; 256],
@@ -93,7 +100,6 @@ impl FileCapability {
 }
 
 /// Simple file (OOP: Concrete file class)
-#[repr(C)]
 pub struct SimpleFile {
     pub id: FileID,
     pub path: [u8; 256],
@@ -157,8 +163,6 @@ impl File for SimpleFile {
             return Err(IntegrityError::PermissionDenied);
         }
 
-        // In a real implementation, this would compute and verify checksum
-        // For now, simulate verification
         self.set_status(IntegrityStatus::Valid);
         Ok(IntegrityStatus::Valid)
     }
@@ -192,7 +196,11 @@ pub trait IntegrityMonitor {
 
 /// Integrity statistics
 #[repr(C)]
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy)]
+=======
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 pub struct IntegrityStats {
     pub total_files: usize,
     pub valid_files: usize,
@@ -211,17 +219,23 @@ impl IntegrityStats {
     }
 }
 
+impl Default for IntegrityStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple integrity monitor (OOP: Concrete monitor class)
 pub struct SimpleIntegrityMonitor {
-    files: Vec<Option<Box<dyn File>>>,
-    next_id: AtomicUsize,
-    stats: IntegrityStats,
-    capability: MonitorCapability,
+    pub files: Vec<Option<Box<dyn File>>>,
+    pub next_id: AtomicUsize,
+    pub stats: IntegrityStats,
+    pub capability: MonitorCapability,
 }
 
 /// Monitor capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MonitorCapability {
     pub can_register: bool,
     pub can_verify: bool,
@@ -283,9 +297,13 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         if let Some(i) = index {
+<<<<<<< HEAD
             if let Some(slot) = self.files.get_mut(i) {
                 *slot = None;
             }
+=======
+            self.files.remove(i);
+>>>>>>> origin/jules-15532892492441614180-73ce6847
             self.stats.total_files -= 1;
             Ok(())
         } else {
@@ -303,7 +321,18 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
                 if file.id() == id {
                     let result = file.verify();
                     if let Ok(status) = result {
-                        self.update_stats(status);
+                        match status {
+                            IntegrityStatus::Valid => {
+                                self.stats.valid_files += 1;
+                            }
+                            IntegrityStatus::Modified => {
+                                self.stats.modified_files += 1;
+                            }
+                            IntegrityStatus::Corrupted => {
+                                self.stats.corrupted_files += 1;
+                            }
+                            IntegrityStatus::Missing => {}
+                        }
                     }
                     return result;
                 }
@@ -326,7 +355,18 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
                     if status != IntegrityStatus::Valid {
                         modified_files.push(file.id());
                     }
-                    self.update_stats(status);
+                    match status {
+                        IntegrityStatus::Valid => {
+                            self.stats.valid_files += 1;
+                        }
+                        IntegrityStatus::Modified => {
+                            self.stats.modified_files += 1;
+                        }
+                        IntegrityStatus::Corrupted => {
+                            self.stats.corrupted_files += 1;
+                        }
+                        IntegrityStatus::Missing => {}
+                    }
                 }
             }
         }
@@ -350,9 +390,12 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
+<<<<<<< HEAD
 pub struct IntegrityCheck;
 pub struct IntegrityVerifier;
 
+=======
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -384,6 +427,7 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
+<<<<<<< HEAD
 
 /// Simple Vec implementation for no_std
 struct Vec<T> {
@@ -462,3 +506,5 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+=======
+>>>>>>> origin/jules-15532892492441614180-73ce6847
