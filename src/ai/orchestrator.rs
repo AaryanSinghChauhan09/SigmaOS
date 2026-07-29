@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// Local LLM Orchestrator for SigmaOS
 /// Dynamically schedules models, checks device bounds, and prunes context windows.

@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Remote Desktop for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 956
@@ -87,6 +84,17 @@ impl SimpleRemoteDesktop {
             next_id: AtomicUsize::new(1),
         }
     }
+
+    pub fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
+        for session_option in &self.sessions {
+            if let Some(ref session) = *session_option {
+                if session.id() == id {
+                    return Some(session.as_ref());
+                }
+            }
+        }
+        None
+    }
 }
 
 impl RemoteDesktop for SimpleRemoteDesktop {
@@ -131,16 +139,6 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         }
     }
 
-    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
-        for session_option in &self.sessions {
-            if let Some(ref session) = *session_option {
-                if session.id() == id {
-                    return Some(session.as_ref());
-                }
-            }
-        }
-        None
-    }
 }
 
 pub trait ScreenSharing {
@@ -226,4 +224,25 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+pub struct InputAuthGate;
+impl InputAuthGate {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+pub struct PqcVideoCipher;
+impl PqcVideoCipher {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+pub struct SigmaRendezvous;
+impl SigmaRendezvous {
+    pub fn new() -> Self {
+        Self
+    }
 }

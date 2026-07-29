@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 
@@ -108,3 +105,11 @@ impl<T> Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+pub struct GopFramebuffer;
+pub struct AcpiParser;
+pub struct UsbHostController;
+pub struct MultiKernelBootSelector;
+pub struct SovereignBootWatchdog;
+pub struct GopSplashCanvas;
+pub struct MicrokernelProfile;

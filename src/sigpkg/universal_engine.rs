@@ -298,6 +298,35 @@ fn hex_encode(bytes: &[u8; 32]) -> String {
     s
 }
 
+pub struct PackageAdapterFactory;
+pub struct SnapPackageAdapter;
+pub struct NixPackageAdapter;
+pub struct EbuildPackageAdapter;
+pub struct ApkPackageAdapter;
+pub struct FlatpakPackageAdapter;
+pub struct TxzPackageAdapter;
+pub struct XbpsPackageAdapter;
+pub struct CachyCpuDetector;
+pub struct CachyosPackageAdapter;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchLevel {
+    X86_64_v1,
+    X86_64_v2,
+    X86_64_v3,
+    X86_64_v4,
+}
+
+pub struct UniversalPackage;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UniversalPackageType {
+    AppImage,
+    Flatpak,
+    Snap,
+    Sovereign,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
