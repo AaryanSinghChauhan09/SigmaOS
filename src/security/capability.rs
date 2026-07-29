@@ -288,6 +288,14 @@ impl SecurityEnforcer {
     pub fn bits(&self) -> u64 {
         self.bits
     }
+
+    pub fn allow_capability(&mut self, bitmask: u64) {
+        self.bits |= bitmask;
+    }
+
+    pub fn contains(&self, bitmask: u64) -> bool {
+        (self.bits & bitmask) == bitmask
+    }
 }
 
 #[cfg(test)]

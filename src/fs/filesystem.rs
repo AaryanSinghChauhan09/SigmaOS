@@ -117,6 +117,7 @@ impl FileHandle {
 
 /// File info
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FileInfo {
     pub size: u64,
     pub is_directory: bool,
@@ -274,12 +275,14 @@ impl Directory {
 }
 
 /// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -352,7 +355,7 @@ pub struct Iter<T> {
     index: usize,
 }
 
-impl<T> Iterator for Iter<T> {
+impl<'a, T> Iterator for Iter<T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.len {
@@ -386,7 +389,7 @@ impl MemoryFilesystem {
 
         // Create root directory
         unsafe {
-            let root_inode = Inode::new(0);
+            let mut root_inode = Inode::new(0);
             root_inode.file_info.is_directory = true;
             root_inode.file_info.is_file = false;
 
@@ -409,7 +412,7 @@ impl MemoryFilesystem {
 
     unsafe fn allocate_inode(&mut self) -> Option<u64> {
         let id = self.next_inode_id.fetch_add(1, Ordering::SeqCst);
-        let inode = Inode::new(id);
+        let inode = Inode::new(id as u64);
         let inode_ptr = alloc(mem::size_of::<Inode>()) as *mut Inode;
 
         if inode_ptr.is_null() {
@@ -419,7 +422,7 @@ impl MemoryFilesystem {
         core::ptr::write(inode_ptr, inode);
         self.inodes.push(Some(NonNull::new_unchecked(inode_ptr)));
 
-        Some(id)
+        Some(id as u64)
     }
 
     unsafe fn get_inode(&self, id: u64) -> Option<&Inode> {
@@ -559,15 +562,16 @@ impl Filesystem for MemoryFilesystem {
         Ok(new_offset)
     }
 
-    fn mkdir(&mut self, path: &[u8]) -> Result<(), FilesystemError> {
+    fn mkdir(&self, path: &[u8]) -> Result<(), FilesystemError> {
+        let mut_self = unsafe { &mut *(self as *const MemoryFilesystem as *mut MemoryFilesystem) };
         unsafe {
-            let parent_path = self.get_parent_path(path);
-            let dir_name = self.get_last_component(path);
+            let parent_path = Self::get_parent_path(path);
+            let dir_name = Self::get_last_component(path);
 
-            let parent_inode_id = self.resolve_path(parent_path)?;
-            let dir_inode_id = self.allocate_inode().ok_or(FilesystemError::NoSpace)?;
+            let parent_inode_id = mut_self.resolve_path(parent_path)?;
+            let dir_inode_id = mut_self.allocate_inode().ok_or(FilesystemError::NoSpace)?;
 
-            if let Some(inode) = self.get_inode_mut(dir_inode_id) {
+            if let Some(inode) = mut_self.get_inode_mut(dir_inode_id) {
                 inode.file_info.is_directory = true;
                 inode.file_info.is_file = false;
             }
@@ -579,9 +583,9 @@ impl Filesystem for MemoryFilesystem {
             }
 
             core::ptr::write(dir_ptr, dir);
-            self.directories.push(Some(NonNull::new_unchecked(dir_ptr)));
+            mut_self.directories.push(Some(NonNull::new_unchecked(dir_ptr)));
 
-            if let Some(parent_dir) = self.get_directory_mut(parent_inode_id) {
+            if let Some(parent_dir) = mut_self.get_directory_mut(parent_inode_id) {
                 let entry = DirectoryEntry::new(dir_name, dir_inode_id);
                 parent_dir.add_entry(entry);
             }
@@ -590,20 +594,21 @@ impl Filesystem for MemoryFilesystem {
         }
     }
 
-    fn rmdir(&mut self, path: &[u8]) -> Result<(), FilesystemError> {
+    fn rmdir(&self, path: &[u8]) -> Result<(), FilesystemError> {
+        let mut_self = unsafe { &mut *(self as *const MemoryFilesystem as *mut MemoryFilesystem) };
         unsafe {
-            let inode_id = self.resolve_path(path)?;
+            let inode_id = mut_self.resolve_path(path)?;
 
-            if let Some(inode) = self.get_inode(inode_id) {
+            if let Some(inode) = mut_self.get_inode(inode_id) {
                 if !inode.file_info.is_directory {
                     return Err(FilesystemError::NotDirectory);
                 }
 
-                let parent_path = self.get_parent_path(path);
-                let dir_name = self.get_last_component(path);
-                let parent_inode_id = self.resolve_path(parent_path)?;
+                let parent_path = Self::get_parent_path(path);
+                let dir_name = Self::get_last_component(path);
+                let parent_inode_id = mut_self.resolve_path(parent_path)?;
 
-                if let Some(parent_dir) = self.get_directory_mut(parent_inode_id) {
+                if let Some(parent_dir) = mut_self.get_directory_mut(parent_inode_id) {
                     parent_dir.remove_entry(dir_name);
                 }
 
@@ -614,20 +619,21 @@ impl Filesystem for MemoryFilesystem {
         }
     }
 
-    fn unlink(&mut self, path: &[u8]) -> Result<(), FilesystemError> {
+    fn unlink(&self, path: &[u8]) -> Result<(), FilesystemError> {
+        let mut_self = unsafe { &mut *(self as *const MemoryFilesystem as *mut MemoryFilesystem) };
         unsafe {
-            let inode_id = self.resolve_path(path)?;
+            let inode_id = mut_self.resolve_path(path)?;
 
-            if let Some(inode) = self.get_inode(inode_id) {
+            if let Some(inode) = mut_self.get_inode(inode_id) {
                 if inode.file_info.is_directory {
                     return Err(FilesystemError::IsDirectory);
                 }
 
-                let parent_path = self.get_parent_path(path);
-                let file_name = self.get_last_component(path);
-                let parent_inode_id = self.resolve_path(parent_path)?;
+                let parent_path = Self::get_parent_path(path);
+                let file_name = Self::get_last_component(path);
+                let parent_inode_id = mut_self.resolve_path(parent_path)?;
 
-                if let Some(parent_dir) = self.get_directory_mut(parent_inode_id) {
+                if let Some(parent_dir) = mut_self.get_directory_mut(parent_inode_id) {
                     parent_dir.remove_entry(file_name);
                 }
 
@@ -652,7 +658,7 @@ impl Filesystem for MemoryFilesystem {
 }
 
 impl MemoryFilesystem {
-    unsafe fn get_parent_path(&self, path: &[u8]) -> &[u8] {
+    unsafe fn get_parent_path(path: &[u8]) -> &[u8] {
         let last_slash = path.iter().rposition(|&b| b == b'/').unwrap_or(0);
         if last_slash == 0 {
             b"/"
@@ -661,7 +667,7 @@ impl MemoryFilesystem {
         }
     }
 
-    unsafe fn get_last_component(&self, path: &[u8]) -> &[u8] {
+    unsafe fn get_last_component(path: &[u8]) -> &[u8] {
         let last_slash = path.iter().rposition(|&b| b == b'/').unwrap_or(0);
         &path[last_slash + 1..]
     }

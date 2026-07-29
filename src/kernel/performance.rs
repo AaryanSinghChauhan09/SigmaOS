@@ -15,7 +15,7 @@ pub enum PerfIpcError {
 }
 
 /// Thread-Safe, Lock-Free Circular Ring-Buffer for Zero-Copy IPC
-pub struct ZeroCopyQueue<T, const N: usize> {
+pub struct ZeroCopyQueue<T: Copy, const N: usize> {
     buffer: [Option<T>; N],
     head: usize,
     tail: usize,

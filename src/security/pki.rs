@@ -99,9 +99,21 @@ impl Certificate for SimpleCertificate {
         self.id
     }
     fn certificate_type(&self) -> CertificateType {
+<<<<<<< HEAD
         unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) }
     }
 >>>>>>> origin/jules-15532892492441614180-73ce6847
+=======
+        {
+            let raw = self.certificate_type.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => CertificateType::Intermediate,
+                2 => CertificateType::EndEntity,
+                _ => CertificateType::Root,
+            }
+        }
+    }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     fn subject(&self) -> &[u8] {
         let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
         &self.subject[..len]

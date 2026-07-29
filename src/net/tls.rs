@@ -85,7 +85,10 @@ impl TlsEngine {
 
     /// Perform TLS handshake
     pub fn handshake(&mut self, session_id: usize) -> Result<(), &'static str> {
+<<<<<<< HEAD
         // Generate master secret first to avoid borrow conflicts
+=======
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         let master_secret = self.generate_master_secret();
 
         let session = self.sessions.get_mut(session_id)

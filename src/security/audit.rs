@@ -15,6 +15,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type EventID = usize;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat { Json, Text, Binary }
+
 #[repr(usize)]
 <<<<<<< HEAD
 #[derive(Debug, Clone, Copy)]
@@ -80,7 +83,19 @@ impl AuditEvent for SimpleAuditEvent {
         self.id
     }
     fn event_type(&self) -> EventType {
+<<<<<<< HEAD
         unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
+=======
+        {
+            let raw = self.event_type.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => EventType::Authorization,
+                2 => EventType::FileAccess,
+                3 => EventType::SystemChange,
+                _ => EventType::Authentication,
+            }
+        }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     }
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64

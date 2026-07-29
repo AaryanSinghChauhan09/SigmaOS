@@ -138,7 +138,19 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
+<<<<<<< HEAD
         unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
+=======
+        {
+            let raw = self.status.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => IntegrityStatus::Modified,
+                2 => IntegrityStatus::Corrupted,
+                3 => IntegrityStatus::Missing,
+                _ => IntegrityStatus::Valid,
+            }
+        }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {

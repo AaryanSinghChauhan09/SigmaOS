@@ -2,6 +2,13 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
+<<<<<<< HEAD
+=======
+pub mod audio;
+pub mod ai;
+pub mod fs;
+pub mod net;
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -97,6 +104,7 @@ pub use drivers::{
     VesaModeInfo,
 };
 pub use filesystem::{
+<<<<<<< HEAD
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use kernel::{
@@ -108,11 +116,74 @@ pub use kernel::{
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
     IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+=======
+    DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
+    VirtualFilesystem,
+};
+pub use finance::{
+    GoodsType, GstCalculator, GstRate, GstRegime, GstResult, GstState, TdsCalculator, TdsResult,
+    TdsSection,
+};
+pub use fs::{
+    AhciSataController, AllocationStrategy as XfsAllocationStrategy, BlockStorageDevice,
+    BlockStorageError, BtrfsExtent, BtrfsFilesystem, BtrfsSnapshot, BtrfsSubvolume, CasBlock,
+    ChecksumType, CompressionType as BtrfsCompressionType, JournalBlock, JournalBlockType,
+    MerkleNode, NvmeStorageController, SigmaFs, SigmaFsCasEngine, TransactionalJournal,
+    XfsAllocationGroup, XfsExtent, XfsFilesystem, XfsInode, XfsJournal, XfsState,
+    DILITHIUM5_SIGNATURE_SIZE, SHA256_HASH_SIZE,
+};
+pub use governance::{
+    DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
+    RoadmapMilestone, TransparentRoadmap,
+};
+pub use graphics::{
+    Animation, AnimationCurve, ColorSpace, CompositorError, CompositorError as ZenithError,
+    CompositorResult, CompositorStrategy, DecodedImage, Framebuffer as GpuFramebuffer,
+    FramebufferCompositor, Geometry, GpuDevice, GpuDriver as GraphicsGpuDriver, GpuState, GpuVendor, HighContrastMode,
+    ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, LayoutStyle, Magnifier, Panel,
+    PanelOrientation, PixelFormat, RenderLayer, ScreenReader, SigmaCompositor, Widget, WindowNode,
+    WindowState, ZenithCompositor, ZenithCompositor as WaylandZenithCompositor, SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+};
+pub use iso::builder::{
+    BuildError, BuildPipeline, BuildStatus, BuildStep, GRUBConfig, ISOPackager,
+    SimpleBuildPipeline, SimpleGRUBConfig, SimpleISOPackager,
+};
+pub use kernel::{
+    AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus,
+    AllocationPolicy as NumaAllocationPolicy, BuddyAllocator, Channel, CpuInstructionExtension,
+    CpufreqManager, CpufreqPolicy, CpufreqStats, DeviceDriver, DriverError, DriverMetadata,
+    DriverRegistry, DriverType as KernelDriverType, FileFlags, FileHandle, FileSystem, FilesystemMetadata, FsError as KernelFsError,
+    GovernorType, HardwareMonitor, IoOperation, IoResult, IpcError, IpcError as PerfIpcError,
+    IpcManager, IpcMessage, LinuxAbsorptionEngine, LinuxHeritage, MapFlags, MemoryBlock,
+    MemoryError as KernelMemoryError, MemoryManager, MemoryManagerMetadata, Message, MonitorThreshold, NetworkError as KernelNetworkError,
+    NetworkStack, NetworkStackMetadata, NodeState, NumaAllocator, NumaNode,
+    PageDirectoryController, PageDirectoryEntry, Priority, Process, ProcessProfile, ProcessState,
+    RoundRobinConfig, RoundRobinScheduler, SanitizationLevel, SchedInstruction, SchedOpcode,
+    Scheduler, SchedulerError, SchedulerMetadata, SecureDriverWrapper, SecureFreeDetector,
+    SecureFreeStats, SignalDispatcher, SlabAllocator as KernelSlabAllocator, SlabCache,
+    SlabCacheStats, SlabState, SocketDomain, SocketHandle, SocketProtocol, SocketType,
+    SovereignCompilerOptimizer, SovereignIpcBus, SovereignSignal, UdfSchedVm, WatchdogAction,
+    WatchdogDevice, WatchdogManager, WatchdogState, ZeroCopyQueue, PAGE_SIZE,
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 };
 pub use network::{
+<<<<<<< HEAD
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
     ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
+=======
+    DnsError, DnsResolver, MDnsDiscovery,
+    QuicConnection, QuicError,
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState, ZeroCopyPacketRing,
+};
+pub use net::{
+    BraveShield, BrowserCore, BrowserError,
+    BrowserTab, BrowserTabState, CipherSuite, SovereignBrowser, TabCapabilities, TabContainer, TabState, TrackingProtection,
+    NetworkDriverDevice, NetworkDriverManager, NetworkDriverType, NetworkError as ZenithNetworkError, NetworkPacketFrame, RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable, Rtl8139NetworkDriver, SecurityLevel, SecurityProfile,
+    TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion,
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
@@ -162,6 +233,14 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
+<<<<<<< HEAD
+=======
+pub use scheduler::{
+    ComputeUnit, EevdfScheduler, Priority as ShellPriority,
+    SInitSupervisor, Scheduler as ShellScheduler,
+    SchedulerError as ShellSchedulerError, Service, ServiceState, SimpleThread, Task, TaskState, Thread, ThreadID, ThreadState,
+};
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,

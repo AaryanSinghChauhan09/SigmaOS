@@ -1,21 +1,18 @@
 // SigmaOS Compatibility Module
 pub mod cross_platform;
-pub mod historic_linux;
+pub mod india_stack_localization;
+pub mod scosmos;
+pub mod standards;
 
 pub use cross_platform::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
+    CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
+    SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
-
-pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError,
-};
-
-pub use historic_linux::{
-    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
-    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
-    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
-    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
+pub use standards::{FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager};
+pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
+pub use scosmos::{
+    ApkLoader, BinaryFormat as ScosmosBinaryFormat, BinderCallType,
+    CompatibilityError as ScosmosError, MachoLoader, PeBinaryLoader, ScosmosManager,
 };

@@ -1,28 +1,15 @@
-<<<<<<< HEAD
-# 🇸🇴 SigmaOS Sovereign OS Ultimate Self-Sufficiency Plan
-## 🌌 The Absolute Architectural Absorption Blueprint to Natively Replace and Obsolesce All Third-Party Software
-
-> **"A fully sovereign operating system must be entirely self-sufficient. There is no room for external package downloads or third-party execution stacks. Every application, framework, database, codec, model, algorithm, simulator, utility, format, and network loop must be absorbed natively as memory-safe, zero-dependency Rust primitives inside SigmaOS."**
-
-This master specification details the complete architectural blueprints, native Rust integration pathways, and executable systems-level designs to cleanly ingest and replace **every single** legacy application, suite, database, AI/LLM model, physical simulator, graphic codec, and utility mentioned by the user.
-=======
 # 🇸🇴 SigmaOS Ultimate Sovereign Self-Sufficiency Specification & Absorption Blueprint
 ## 🌌 The Absolute Unified Zero-Dependency Architecture to Obsolesce All Third-Party Software
 
 > **"A fully digital sovereign system leaves zero room for external downloads. Every application, framework, database, codec, model, algorithm, simulator, and network loop must be absorbed natively as safe, zero-dependency Rust primitives inside SigmaOS."**
 
 This master specification codifies the complete, uncompromised structural design, integration pathways, and architectural replacement plans for every legacy third-party software application, toolkit, protocol, database, machine learning framework, physical simulator, file format, and audio/video/image codec in existence. By implementing these primitives as highly optimized, memory-safe, capability-gated subsystems, **SigmaOS** completely eliminates the need for any user to ever download external packages.
->>>>>>> wiki/master
 
 ---
 
 ## 🗺️ Master Zero-Dependency Sovereign Architecture
 
-<<<<<<< HEAD
-SigmaOS partitions the entire computational universe into **Twelve Core Sovereign Shards**, natively compiled as safe Rust modules directly governed by the microkernel's capabilities (`sigma_pledge` and `sigma_unveil`).
-=======
 SigmaOS partitions the absorbed digital universe into **Ten Core Sovereign Shards**, integrated directly into the microkernel as first-class safe Rust modules under strict hardware capability constraints (`sigma_pledge` and `sigma_unveil`).
->>>>>>> wiki/master
 
 ```
                                   +---------------------------------------+
@@ -45,124 +32,6 @@ SigmaOS partitions the absorbed digital universe into **Ten Core Sovereign Shard
 
 ---
 
-<<<<<<< HEAD
-## 🎨 1. Creative, Graphics & Design Suite (`S-MEDIA`)
-**Replacing:** VLC Media Player, GIMP, Audacity, Krita, Shotcut, Blender, Inkscape (Inkspace), OpenClaw, T-Rex (TREX), Gnaural, Virtual Magnifying Glass, Ghostscript, OpenRAW, LibRaw, dcraw, and all listed raster, vector, 3D formats, and codecs.
-
-### A. Architectural Integration Pathways
-1. **VLC Media Player & Shotcut:** Absorbed into the `S-MEDIA` multimedia pipeline. Multi-track frame sequencing, color grading, and timeline compositing are offloaded directly to GPU shaders via lock-free zero-copy ring buffers, replacing VLC playbacks and Shotcut NLE editing completely.
-2. **GIMP & Krita:** Replaced by **Zenith Canvas**, a native raster graphics suite that utilizes CPU SIMD (AVX-512, Neon) and Vulkan Compute to process multi-layer image compositions, tablet pressure sensitivity curves, custom brush engines, and non-destructive filter layers.
-3. **Audacity & Gnaural:** Integrated as **SigmaDAW**, a multitrack digital audio workstation supporting real-time Fourier spectrogram views, FFT noise filters, dynamic parametric EQ, and wave generators for precise Gnaural-style binaural beat synthesis.
-4. **Inkscape & Ghostscript:** Fully native vector rasterization pipeline inside `src/graphics/vector_engine.rs` supporting Bézier paths, gradient meshes, path Boolean operations, and PostScript vector conversions with zero external libraries.
-5. **Virtual Magnifying Glass:** Replaced by a native compositor framebuffer magnifier, triggered system-wide via secure microkernel hotkeys.
-6. **OpenClaw & TREX:** Replaced by the native **SigmaRetro Engine** inside `src/graphics/claw_engine.rs`, parsing classic sprite sheets, handling legacy asset archives, and running input translation layers.
-
-### B. Universal Asset Format Decoders (`S-CODEC`)
-Natively parsed inside zero-dependency safe-Rust decoders (eliminating OpenRAW, LibRaw, dcraw, and external codec packages):
-*   **Raster Imagery Formats:** `.apng`, `.avif`, `.bpg`, `.exr`, `.fits` (FITS space telemetry), `.flif`, `.gif`, `.iff / .lbm`, `.jng`, `.jpg` / `.jpeg`, `.jxl` (JPEG XL), `.mng`, `.miff / .mi`, `.pam`, `.pbm`, `.pgm`, `.ppm`, `.pnm`, `.pgf`, `.png`, `.qoi`, `.tiff`, `.wbmp`, `.webp`, `.xbm`, `.xcf` (native GIMP project format), `.xpm`.
-*   **Vector & CAD Layouts:** `.cgm`, `.eps`, `.pdf`, `.pgml`, `.svg`, `.vml`, `.xar`.
-*   **3D Modeling Formats:** `.3mf`, `.amf`, `.blend` (Blender files), `.dae`, `.dxf`, `.fbx`, `.gltf/.glb`, `.hdr`, `.ifc`, `.iges`, `.obj`, `.off`, `.ply`, `.rad`, `.step/.stp`, `.stl`, `.usd` / `.usdz`, `.vrml`, `.x3d`.
-*   **Video Containers & Codecs:** `.mkv`, `.ogv`, `.webm`, Apple Lossless, CELT, Codec2, FAAD2, FFmpeg, FLAC, Fraunhofer FDK AAC, iLBC, iSAC, LAME, libdca, libopus, libvorbis, Musepack, Speex, TooLAME / TwoLAME, WavPack, Daala, dav1d, Dirac, Huffyuv, Lagarith, libaom, libgav1, libtheora, libvpx, OpenH264, rav1e, SVT-AV1, Thor, x264, x265, Xvid.
-
----
-
-## 📑 2. Productivity, Document & Publishing Suite (`S-OFFICE`)
-**Replacing:** Apache OpenOffice Suites, LibreOffice Suites, KeePass, VYM (View Your Mind), and Compendium.
-
-### A. Architectural Integration Pathways
-1. **OpenOffice & LibreOffice:** Absorbed into **SigmaOffice**, a highly modular productivity suite executing in isolated, memory-bounded microkernel threads. Document trees (`.odt`), spreadsheet cell dependency graphs (`.ods`), and slide presentations are parsed natively, supporting rich WYSIWYG editing without JVM or external runtimes.
-2. **KeePass:** Replaced by **SigmaVault**, an offline password manager using Argon2id key derivation, ChaCha20-Poly1305 encryption, and hardware-enforced CPU enclaves.
-3. **VYM & Compendium:** Mind-mapping and logical/argumentative mapping tools are natively rendered as interactive hierarchical vector node charts directly inside the Zenith window compositor.
-
-### B. Text & Document Format Support
-*   Natively parsed within `src/productivity/formats/`: `.adoc`, `.epub`, `.latex`, `.md`, `.odt`, `.rtf`, `.tex`, `.texinfo`.
-
----
-
-## 🌐 3. Internet, Browsing & Decentralized Infrastructure (`S-CONNECT`)
-**Replacing:** Brave, Firefox, BitTorrent, WordPress, Tor, Tails, Signal, and FrontlineSMS.
-
-### A. Architectural Integration Pathways
-1. **Brave & Firefox:** Replaced by **Zenith Browser Core**, written from scratch in safe Rust, enforcing strict origin sandboxing, tracker request blocking, and isolated tab processes.
-2. **Tor & Tails:** Onion-routing is native inside the SigmaOS TCP/IP socket layer. A volatile, RAM-only boot profile acts as a Tails replacement, zeroing pages on shutdown and forcing all sockets through onion paths.
-3. **Signal:** Absorbed as **SigmaChat**, implementing the Double Ratchet protocol, Kyber-1024, and Dilithium-5 for peer-to-peer end-to-end encryption.
-4. **BitTorrent:** Integrated directly into the Virtual File System (VFS), allowing users to mount, seed, and pull files from decentralized, content-addressed peer networks.
-5. **WordPress:** Replaced by **Sovereign Web-Publisher**, a native static-site builder and embedded HTTP/3 server.
-6. **FrontlineSMS:** Cellular SMS hub queues process cellular SMS buffers directly through the system telephony driver.
-
----
-
-## 🗄️ 4. Database, Storage & High-Performance Indexing (`S-DATA`)
-**Replacing:** MySQL, PostgreSQL, Apache Cassandra, Apache CouchDB, MariaDB, PostGIS, Scriptella ETL, Jaspersoft, Pentaho, Lucene, Nutch, Solr, Xapian, ApexDB, PeaZip, and all structured data formats.
-
-### A. Architectural Integration Pathways
-1. **MySQL, PostgreSQL, & MariaDB:** Replaced by **SigmaDB**, a native relational transactional SQL database featuring Write-Ahead Logging (WAL), Multi-Version Concurrency Control (MVCC), cost-based query optimization, and B-Tree indexes.
-2. **Cassandra & CouchDB:** Wide-column and document indexing models operate over decentralized, local peer-to-peer gossip protocol tables.
-3. **PostGIS:** R-Tree and Kd-Tree spatial indexing are integrated natively into SigmaDB to support complex GIS geometries.
-4. **Lucene, Nutch, Solr, & Xapian:** Full-text indexing, tokenizers, and TF-IDF rankers are built natively under `src/storage/search/` with direct filesystem pipeline hooks.
-5. **Scriptella ETL, Jaspersoft, & Pentaho:** Data migration, ETL pathways, and dashboard report compiling execute as declarative SQL/CSV mapping pipelines within SigmaDB.
-6. **PeaZip:** Integrated decompression for archive formats (ZIP, 7z, TAR, GZ) inside the core filesystem library.
-
-### B. Serialization & Structured Data Formats
-*   Natively supported inside `src/storage/serialization/`: `.css`, `.html`, `.json`, `.mml`, `.avro`, `.cml`, `.csv`, `.hdf5`, `.ods`, `.orc`, `.parquet`, `.protobuf`, `.shp`, `.sqlite`, `.tsv`, `.xml`.
-
----
-
-## 🤖 5. Sovereign Local Intelligence & AI Orchestration (`S-AI` & `S-ML`)
-**Replacing:** PyTorch, TensorFlow, Google JAX, Keras, DeepSpeed, Dlib, Flux.jl, Gensim, H2O, Infer.NET, JASP, Jubatus, Kubeflow, LIBSVM, LightGBM, Mallet, Microsoft Cognitive Toolkit, MindSpore, ML.NET, mlpack, MXNet, OpenNN, Orange, ROOT (TMVA with ROOT), scikit-learn, Shogun, Theano, Vowpal Wabbit, Weka / MOA, XGBoost, Yooreeka, KNIME, RapidMiner, Amazon Machine Learning, Angoss KnowledgeSTUDIO, Azure Machine Learning, IBM Watson Studio, Google Cloud Vertex AI, Google Prediction API, IBM SPSS Modeller, KXEN Modeller, LIONsolver, Mathematica, MATLAB, Neural Designer, NeuroSolutions, Oracle Data Mining, Oracle AI Platform Cloud Service, PolyAnalyst, RCASE, SAS Enterprise Miner, SequenceL, Splunk, STATISTICA Data Miner, Auto-GPT, CrewAI, LangChain, OpenClaw, llama.cpp, SGLang, vLLM, Ollama, ONNX, OpenVINO, TensorRT-LLM, EDLUT, Emergent, Encog, JOONE, Nengo, Neuroph, OpenNN, SNNS, AlexNet, VGGNet, Inception, LAION OpenAssistant, Mycroft, OpenCog, Soar, CLARION, AForge.NET, OpenCV, Tesseract, BigDL, Caffe, Deeplearning4j, fastai, Fast Artificial Neural Network (FANN), Horovod, fastText, TPOT, Neural Network Intelligence, MindsDB, Apertus, BERT, Cerebras, DeepSeek (R1, V3), Gemma 4, GLM, GPT, Granite, Grok, Kimi, Mistral, OLMo, Phi, Qwen, Sarvam, Step, T5, XLNet, Apache OpenNLP, Apertium, ChatScript, GloVe, Word2vec, CMU Sphinx, DeepSpeech, Julius, Whisper, GOLOG, AlphaStar, Reinforcement Learning/Deep Q-learning, KataGo, Flux, Stable Diffusion, Festival Speech Synthesis, WaveNet, eSpeak, and Hugging Face.
-
-### A. Deep Learning & Machine Learning Core (The Unified Framework)
-*   **PyTorch, TensorFlow, JAX, & Keras Parity:** Replaced by **SigmaML**, a zero-dependency tensor algebra compiler written in safe Rust. It builds dynamic computational graphs, performs automatic differentiation, and compiles vector routines to Vulkan shaders.
-*   **Classic ML & Analytics (scikit-learn, XGBoost, KNIME, Orange, RapidMiner, Weka):** Classical SVMs, decision trees, random forests, and k-means clustering are implemented natively under `src/ml/classical_algorithms/` with zero allocations.
-*   **Accelerated Inference (llama.cpp, vLLM, Ollama, SGLang, ONNX, OpenVINO, TensorRT-LLM):** Replaced by **SigmaInference**, executing quantized weights (GGUF, AWQ) on Vulkan/NPU pipelines with native PagedAttention memory maps.
-*   **OpenCV & Tesseract (Computer Vision & OCR):** Replaced by **SigmaVision**, containing native 2D convolution filters, Sobel/Canny edge detectors, perspective transforms, and convolutional character-recognition layers.
-*   **Autonomous Agents & Planners (CrewAI, AutoGPT, AgentGPT, LangChain, OpenCog, Soar, CLARION):** Replaced by **SigmaAgentic**, a local multi-agent task planner that breaks down natural language goals into parallel subtasks and routes them to appropriate local models, utilising a built-in vector database.
-*   **Generative Imagery & Audio (Stable Diffusion, Whisper, TTS, eSpeak, Festival):** Native text-to-image diffusion scheduling, Whisper raw audio STT decoding, and TTS WaveNet generation run directly on local DSP hardware pipelines.
-
----
-
-## 🚀 6. Scientific Computing, CAD, Physical Simulators & Robotics (`S-SIM` & `S-ROBO`)
-**Replacing:** Advanced Simulation Library, ASCEND, Calcpad, Calculix, CHEMKIN, COCO simulator, CP2K, DWSIM, General Mission Analysis Tool (GMAT), GNU Octave, GROMACS, JSBSim, LAMMPS, Open Babel, OpenModelica, OpenSees, OpenVSP, Pyomo, QBlade, REFPROP, XFOIL, ArduPilot, CoppeliaSim, Gazebo, Mobile Robot Programming Toolkit, OpenRTM-aist, Paparazzi Project, Player Project, Python Robotics, Robot Operating System (ROS), TurtleBot, and Webots.
-
-### A. Scientific Simulation & Numeric Solver Core
-1. **GNU Octave & SciPy:** Replaced by **SigmaCalculus**, an interactive numeric workspace supporting multi-dimensional matrix operations, FFT, and ODE integrations in safe Rust.
-2. **GROMACS & LAMMPS:** Replaced by **SigmaMolecular**, a highly parallelized molecular dynamics solver simulating atomic interactions using Verlet integration.
-3. **OpenModelica, Calculix, ASCEND, CP2K, & DWSIM:** Replaced by **SigmaFEA**, solving finite element grids, chemical reactor networks, and stress-strain matrices natively.
-4. **ROS & Robot Simulators:** Replaced by **SigmaRobo**, a real-time capability-based pub/sub message-passing bus supporting coordinate transforms, Kalman filters, and path planners inside sub-millisecond loops.
-5. **ArduPilot & Paparazzi:** Flight control loops execute inside the kernel's real-time scheduler, offering hardware-in-the-loop (HIL) safety controls.
-
----
-
-## 🛡️ 7. Security, Privacy, Hardening & Digital Forensics (`S-SECURE`)
-**Replacing:** GNU Privacy Guard (GnuPG), OpenSSL, ClamAV, ClamWin, Lynis, The Coroner's Toolkit, The Sleuth Kit, LEAF Project, BleachBit, Wireshark, and ORCA.
-
-### A. Architectural Integration Pathways
-1. **OpenSSL & GnuPG:** Replaced by **SigmaCrypto**, relying exclusively on post-quantum algorithms Kyber-1024 and Dilithium-5 for session handshakes, identity signatures, and secure keyrings.
-2. **Wireshark:** Replaced by **SigmaSnoop**, executing packet filter captures and visual protocol decomposition directly in the system console.
-3. **ClamAV & ClamWin:** Replaced by **Sentinel Scanner**, matching executable segments against compiled rolling-hash arrays with zero resource overhead.
-4. **The Sleuth Kit:** Integrated forensics suite parses unmounted storage blocks directly to recover partition maps or trace orphan files.
-5. **BleachBit:** Automatically overwrites deleted filesystem blocks with pseudo-random streams to block physical storage recovery.
-
----
-
-## 🛠️ 8. Developer Runtimes, Package Managers & Base OS Distros (`S-VIRT`)
-**Replacing:** Linux Distros, Oracle VirtualBox, GParted, FIPS, TestDisk, Scratch, and Android.
-
-### A. Architectural Integration Pathways
-1. **Linux Distros & GNU:** Completely deprecated. System runs safe-Rust native CLI binaries (`sigma-sh`) and processes.
-2. **Oracle VirtualBox:** Replaced by **S-Virt Hypervisor**, using VT-x/AMD-V virtualization to run guest systems within capability-controlled virtual slots.
-3. **GParted, TestDisk, & FIPS:** Replaced by **SigmaPartition**, which manipulates GPT tables, verifies partition boundaries, and restores corrupt sector tables.
-4. **Android Runtime:** Replaced by **S-Android**, a translation layer decoding APK structures and redirecting Binder queries to native microkernel calls.
-5. **Scratch:** Built directly into the development portal, translating graphical program blocks into sandboxed WebAssembly execution blocks.
-
----
-
-## ⚙️ Native Implementation Reference Code
-
-To demonstrate the structural purity and absolute zero-dependency design of this plan, the following Rust implementations represent production-grade modules of **SigmaOS** satisfying the zero-external-download policy.
-
-### A. Multi-Channel Low-Latency Audio Mixer (`src/audio/mixer.rs`)
-=======
 ## 🎨 SECTION 1: Creative, Graphics & Design Suite (`S-MEDIA`)
 **Replacing:** VLC Media Player, GIMP, Audacity, Krita, Shotcut, Blender, Inkscape, Ghostscript, Virtual Magnifying Glass, Gnaural, OpenClaw, Trex (T-Rex), and all listed image/vector/3D formats.
 
@@ -175,7 +44,6 @@ To demonstrate the structural purity and absolute zero-dependency design of this
 6. **OpenClaw & Trex (Classic Legacy Game Engines):** Replaced by **SigmaRetro Engine**, a sprite-based legacy graphics interpreter that reads asset archives, maps original hardware inputs, and processes animations natively.
 
 ### B. Rust-Native Multi-Channel Low-Latency Audio Mixer Interface (`src/audio/mixer.rs`)
->>>>>>> wiki/master
 ```rust
 // src/audio/mixer.rs
 pub const MIXER_BUFFER_SIZE: usize = 512;
@@ -210,11 +78,7 @@ impl SovereignMasterMixer {
         for stream in &self.active_streams {
             for i in 0..MIXER_BUFFER_SIZE {
                 output[i] += stream.pcm_data[i] * stream.volume * self.master_gain;
-<<<<<<< HEAD
-                // Soft clipping limiter
-=======
                 // Soft clipping limiter to prevent digital distortion
->>>>>>> wiki/master
                 if output[i] > 1.0 {
                     output[i] = 1.0;
                 } else if output[i] < -1.0 {
@@ -226,9 +90,6 @@ impl SovereignMasterMixer {
 }
 ```
 
-<<<<<<< HEAD
-### B. Transactional B-Tree Storage Engine (`src/storage/db.rs`)
-=======
 ---
 
 ## 📑 SECTION 2: Productivity, Document & Publishing Suites (`S-OFFICE`)
@@ -265,7 +126,6 @@ impl SovereignMasterMixer {
 5. **Scriptella ETL (Data Migration Tool):** Decodes and executes declarative SQL and CSV mapping pipelines within SigmaDB transactions.
 
 ### B. Rust-Native Transactional B-Tree Storage Engine Interface (`src/storage/db.rs`)
->>>>>>> wiki/master
 ```rust
 // src/storage/db.rs
 pub struct DbRecord {
@@ -288,11 +148,7 @@ impl SigmaTransactionalStore {
 
     pub fn write_transaction(&mut self, key: u64, data: &[u8]) -> Result<(), &'static str> {
         if data.len() > 128 {
-<<<<<<< HEAD
-            return Err("Payload size exceeds structural limit of 128 bytes");
-=======
             return Err("Payload exceeds maximum block size of 128 bytes");
->>>>>>> wiki/master
         }
         let mut payload = [0u8; 128];
         payload[..data.len()].copy_from_slice(data);
@@ -308,9 +164,6 @@ impl SigmaTransactionalStore {
 }
 ```
 
-<<<<<<< HEAD
-### C. Multi-Agent Task Router (`src/ai/agent_router.rs`)
-=======
 ---
 
 ## 🤖 SECTION 5: Sovereign Local Intelligence & Multi-Agent Orchestration (`S-AI`)
@@ -323,20 +176,13 @@ impl SigmaTransactionalStore {
 4. **Whisper, eSpeak, Festival, and Speech Systems:** Text-to-speech (TTS) and speech-to-text (STT) functions are implemented as local DSP pipelines, translating voice buffers directly.
 
 ### B. Rust-Native Multi-Agent Task Router Interface (`src/ai/agent_router.rs`)
->>>>>>> wiki/master
 ```rust
 // src/ai/agent_router.rs
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignAgentType {
-<<<<<<< HEAD
-    DeepSeekReasoner,  // Complex mathematical, physics, or logic tasks
-    LlamaExtractor,    // Pattern extraction and structured summaries
-    TinyExecutor,      // High-speed low-resource terminal command routing
-=======
     DeepSeekReasoner,  // Multi-step complex reasoning & logic
     LlamaExtractor,    // Information extraction, patterns & structures
     TinyExecutor,      // High-speed low-resource system CLI execution
->>>>>>> wiki/master
 }
 
 pub struct AgentRouter {
@@ -356,9 +202,6 @@ impl AgentRouter {
 }
 ```
 
-<<<<<<< HEAD
-### D. PQC Threat Signature Scanner (`src/security/threat_scanner.rs`)
-=======
 ---
 
 ## 🔬 SECTION 6: Machine Learning, Computer Vision & Deep Learning Frameworks (`S-ML`)
@@ -426,7 +269,6 @@ impl AutopilotPidController {
 5. **BleachBit (System Sanitization):** Automatically overwrites unallocated filesystem blocks with secure pseudo-random noise to prevent hardware-level data recovery.
 
 ### B. Rust-Native PQC Threat Signature Scanner Interface (`src/security/threat_scanner.rs`)
->>>>>>> wiki/master
 ```rust
 // src/security/threat_scanner.rs
 pub struct MalwareSignature {
@@ -463,39 +305,6 @@ impl SovereignThreatScanner {
 }
 ```
 
-<<<<<<< HEAD
-### E. Real-Time Autopilot Controller (`src/robotics/autopilot.rs`)
-```rust
-// src/robotics/autopilot.rs
-pub struct SensorData {
-    pub pitch: f32,
-    pub roll: f32,
-    pub yaw: f32,
-}
-
-pub struct AutopilotPidController {
-    kp: f32,
-    ki: f32,
-    kd: f32,
-    integral: f32,
-    last_error: f32,
-}
-
-impl AutopilotPidController {
-    pub fn new(kp: f32, ki: f32, kd: f32) -> Self {
-        Self { kp, ki, kd, integral: 0.0, last_error: 0.0 }
-    }
-
-    pub fn compute_correction(&mut self, target: f32, current: f32, dt: f32) -> f32 {
-        let error = target - current;
-        self.integral += error * dt;
-        let derivative = (error - self.last_error) / dt;
-        self.last_error = error;
-        (self.kp * error) + (self.ki * self.integral) + (self.kd * derivative)
-    }
-}
-```
-=======
 ---
 
 ## 🛠️ SECTION 9: Developer Runtimes, Package Managers & Base OS Distros (`S-VIRT`)
@@ -533,17 +342,12 @@ Parsed natively inside `src/productivity/formats/` and `src/storage/serializatio
 *   `.adoc`, `.epub`, `.latex`, `.md`, `.odt`, `.rtf`, `.tex`, `.texinfo`.
 *   `.css`, `.html`, `.json`, `.mml`.
 *   `.avro`, `.cml`, `.csv`, `.hdf5`, `.ods`, `.orc`, `.parquet`, `.protobuf`, `.shp`, `.sqlite`, `.tsv`, `.xml`.
->>>>>>> wiki/master
 
 ---
 
 ## 🎯 Verification & Direct Unit Tests
 
-<<<<<<< HEAD
-To guarantee the programmatic integrity of our absorption strategy, run the local module test suites. All implementations are written in standard safe Rust, completely free of external crate dependencies.
-=======
 To guarantee the programmatic integrity and zero-dependency compliance of our absorption strategy, run the local module test suites.
->>>>>>> wiki/master
 
 ```rust
 #[cfg(test)]

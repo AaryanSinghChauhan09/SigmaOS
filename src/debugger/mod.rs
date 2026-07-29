@@ -13,7 +13,8 @@ pub mod breakpoint;
 
 pub use breakpoint::{BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
 
-#[derive(Debug, Clone)]
+/// Breakpoint representation for software debugger
+#[derive(Debug, Clone, Copy)]
 pub struct Breakpoint {
     pub address: u64,
     pub breakpoint_type: BreakpointType,
@@ -113,7 +114,7 @@ impl MemoryRegion {
 /// Main debugger interface
 pub struct Debugger {
     state: DebuggerState,
-    breakpoints: Vec<SimpleBreakpoint>,
+    breakpoints: Vec<Breakpoint>,
     current_frame: Option<StackFrame>,
     call_stack: Vec<StackFrame>,
     memory_regions: Vec<MemoryRegion>,
@@ -153,7 +154,7 @@ impl Debugger {
         self.state = DebuggerState::Stepping;
     }
 
-    pub fn state(&self) -> DebuggerState {
+    pub fn get_state(&self) -> DebuggerState {
         self.state
     }
 
@@ -162,35 +163,35 @@ impl Debugger {
         &mut self,
         address: u64,
         breakpoint_type: BreakpointType,
-    ) -> Result<(), &'static str> {
+    ) -> Result<(), String> {
         // Check if breakpoint already exists
-        if self.breakpoints.iter().any(|bp| bp.address() == address as usize) {
-            return Err("Breakpoint already exists at this address");
+        if self.breakpoints.iter().any(|bp| bp.address == address) {
+            return Err("Breakpoint already exists at this address".to_string());
         }
 
-        let breakpoint = SimpleBreakpoint::new(self.breakpoints.len() + 1, address as usize, breakpoint_type);
+        let breakpoint = Breakpoint::new(address, breakpoint_type);
         self.breakpoints.push(breakpoint);
         Ok(())
     }
 
     /// Remove a breakpoint
-    pub fn remove_breakpoint(&mut self, address: u64) -> Result<(), &'static str> {
+    pub fn remove_breakpoint(&mut self, address: u64) -> Result<(), String> {
         let original_len = self.breakpoints.len();
-        self.breakpoints.retain(|bp| bp.address() != address as usize);
+        self.breakpoints.retain(|bp| bp.address != address);
 
         if self.breakpoints.len() == original_len {
-            return Err("Breakpoint not found at this address");
+            return Err("Breakpoint not found at this address".to_string());
         }
 
         Ok(())
     }
 
     /// Enable a breakpoint
-    pub fn enable_breakpoint(&mut self, address: u64) -> Result<(), &'static str> {
+    pub fn enable_breakpoint(&mut self, address: u64) -> Result<(), String> {
         let breakpoint = self
             .breakpoints
             .iter_mut()
-            .find(|bp| bp.address() == address as usize)
+            .find(|bp| bp.address == address)
             .ok_or("Breakpoint not found")?;
 
         breakpoint.enable();
@@ -198,11 +199,11 @@ impl Debugger {
     }
 
     /// Disable a breakpoint
-    pub fn disable_breakpoint(&mut self, address: u64) -> Result<(), &'static str> {
+    pub fn disable_breakpoint(&mut self, address: u64) -> Result<(), String> {
         let breakpoint = self
             .breakpoints
             .iter_mut()
-            .find(|bp| bp.address() == address as usize)
+            .find(|bp| bp.address == address)
             .ok_or("Breakpoint not found")?;
 
         breakpoint.disable();
@@ -210,14 +211,14 @@ impl Debugger {
     }
 
     /// Check if a breakpoint is hit
-    pub fn check_breakpoint(&self, address: u64) -> Option<&SimpleBreakpoint> {
+    pub fn check_breakpoint(&mut self, address: u64) -> Option<&Breakpoint> {
         self.breakpoints
             .iter()
-            .find(|bp| bp.address() == address as usize && bp.is_enabled())
+            .find(|bp| bp.address == address && bp.enabled)
     }
 
     /// Get all breakpoints
-    pub fn get_breakpoints(&self) -> &[SimpleBreakpoint] {
+    pub fn get_breakpoints(&self) -> &[Breakpoint] {
         &self.breakpoints
     }
 
@@ -325,36 +326,40 @@ mod tests {
 
     #[test]
     fn test_breakpoint_creation() {
-        let bp = SimpleBreakpoint::new(1, 0x1000, BreakpointType::Software);
-        assert_eq!(bp.address(), 0x1000);
-        assert!(bp.is_enabled());
+        let bp = Breakpoint::new(0x1000, BreakpointType::Software);
+        assert_eq!(bp.address, 0x1000);
+        assert!(bp.enabled);
+        assert_eq!(bp.hit_count, 0);
     }
 
     #[test]
     fn test_breakpoint_enable_disable() {
-        let mut bp = SimpleBreakpoint::new(1, 0x1000, BreakpointType::Software);
+        let mut bp = Breakpoint::new(0x1000, BreakpointType::Software);
         bp.disable();
-        assert!(!bp.is_enabled());
+        assert!(!bp.enabled);
         bp.enable();
-        assert!(bp.is_enabled());
+        assert!(bp.enabled);
     }
 
     #[test]
     fn test_breakpoint_hit() {
-        let mut bp = SimpleBreakpoint::new(1, 0x1000, BreakpointType::Software);
-        assert!(bp.is_enabled());
+        let mut bp = Breakpoint::new(0x1000, BreakpointType::Software);
+        bp.hit();
+        assert_eq!(bp.hit_count, 1);
+        bp.hit();
+        assert_eq!(bp.hit_count, 2);
     }
 
     #[test]
     fn test_debugger_attach_detach() {
         let mut debugger = Debugger::new();
-        assert_eq!(debugger.state(), DebuggerState::Detached);
+        assert_eq!(debugger.get_state(), DebuggerState::Detached);
 
         debugger.attach();
-        assert_eq!(debugger.state(), DebuggerState::Attached);
+        assert_eq!(debugger.get_state(), DebuggerState::Attached);
 
         debugger.detach();
-        assert_eq!(debugger.state(), DebuggerState::Detached);
+        assert_eq!(debugger.get_state(), DebuggerState::Detached);
     }
 
     #[test]
