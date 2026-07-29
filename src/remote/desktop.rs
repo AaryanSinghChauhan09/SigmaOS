@@ -62,9 +62,7 @@ impl RemoteSession for SimpleRemoteSession {
         let len = self.host.iter().position(|&b| b == 0).unwrap_or(128);
         &self.host[..len]
     }
-    fn state(&self) -> SessionState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
-    }
+    fn state(&self) -> SessionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) } }
 }
 
 pub trait RemoteDesktop {

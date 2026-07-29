@@ -151,7 +151,6 @@ impl ContextWindowPruner {
             history: Vec::new(),
             max_lines,
         }
-        None
     }
 
     /// Add a dialogue turn context string and prune old turns once exceeding limit (FIFO)

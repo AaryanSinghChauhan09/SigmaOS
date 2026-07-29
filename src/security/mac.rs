@@ -245,7 +245,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -458,4 +458,5 @@ mod tests {
 
         assert!(engine.check_access(ctx_id, SecurityOperation::Read));
     }
+}
 }

@@ -9,8 +9,8 @@ use core::mem;
 
 pub type BootStatus = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 
 #[repr(C)]
@@ -39,7 +39,7 @@ impl SimpleUEFIBootloader {
 }
 
 impl UEFIBootloader for SimpleUEFIBootloader {
-    fn phase(&self) -> BootPhase { unsafe { core::mem::transmute(self.phase.load(Ordering::SeqCst)) } }
+    fn phase(&self) -> BootPhase { unsafe { core::mem::transmute(self.phase.load(Ordering::SeqCst) as u32) } }
     fn load_kernel(&mut self, _kernel_data: &[u8]) -> Result<BootStatus, BootError> {
         self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
         self.kernel_loaded.store(1, Ordering::SeqCst);

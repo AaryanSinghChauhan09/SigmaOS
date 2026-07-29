@@ -146,7 +146,9 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe {
+            core::mem::transmute(self.state.load(Ordering::SeqCst) as u32)
+        }
     }
 
     pub fn set_state(&self, state: DeviceState) {
@@ -163,8 +165,8 @@ impl DeviceDescriptor {
 }
 
 /// Device state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState {
     Uninitialized = 0,
     Initializing = 1,

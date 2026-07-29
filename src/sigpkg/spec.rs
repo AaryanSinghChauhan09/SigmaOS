@@ -6,12 +6,16 @@ use core::mem;
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Package version
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PackageVersion {
     pub major: u32,
     pub minor: u32,
@@ -44,7 +48,7 @@ pub trait Package {
 
 /// Package dependency
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageDependency {
     pub name: [u8; 64],
     pub version_constraint: [u8; 32],
@@ -265,7 +269,7 @@ pub enum PackageError {
 
 /// Package statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageStats {
     pub total_packages: usize,
     pub installed_packages: usize,

@@ -358,7 +358,7 @@ pub enum ObservabilityError {
 
 /// Observability statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ObservabilityStats {
     pub total_metrics: usize,
     pub total_spans: usize,
