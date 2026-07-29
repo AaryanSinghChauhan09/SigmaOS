@@ -63,6 +63,9 @@ pub struct PackageInfo {
     pub size: u64,
     pub checksum: [u8; 64],
     pub capability: PackageCapability,
+    pub signature_key_id: u32,
+    pub is_signed: bool,
+    pub is_fhs_compliant: bool,
 }
 
 impl PackageInfo {
@@ -74,6 +77,9 @@ impl PackageInfo {
             size: 0,
             checksum: [0; 64],
             capability: PackageCapability::new(),
+            signature_key_id: 0,
+            is_signed: false,
+            is_fhs_compliant: false,
         }
     }
 }
@@ -116,6 +122,9 @@ pub struct SimplePackage {
     pub signature: [u8; 256],
     pub dependencies: Vec<PackageDependency>,
     pub capability: PackageCapability,
+    pub signature_key_id: u32,
+    pub is_signed: bool,
+    pub is_fhs_compliant: bool,
 }
 
 impl SimplePackage {
@@ -136,6 +145,9 @@ impl SimplePackage {
             signature: [0; 256],
             dependencies: Vec::new(),
             capability,
+            signature_key_id: 0,
+            is_signed: false,
+            is_fhs_compliant: false,
         }
     }
 
@@ -225,6 +237,9 @@ impl Package for SimplePackage {
             size: self.size,
             checksum: self.checksum,
             capability: self.capability,
+            signature_key_id: self.signature_key_id,
+            is_signed: self.is_signed,
+            is_fhs_compliant: self.is_fhs_compliant,
         }
     }
 }

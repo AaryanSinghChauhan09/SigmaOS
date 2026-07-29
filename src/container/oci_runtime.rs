@@ -1,3 +1,6 @@
+#![no_std]
+#![no_main]
+
 use core::mem;
 /// OOP-based Container Runtime Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 17
@@ -17,7 +20,7 @@ pub enum ContainerState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
     Success = 0,
     InvalidConfig = 1,
@@ -69,7 +72,13 @@ impl Container for SimpleContainer {
         &self.name[..len]
     }
     fn state(&self) -> ContainerState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+        match self.state.load(Ordering::SeqCst) {
+            0 => ContainerState::Created,
+            1 => ContainerState::Running,
+            2 => ContainerState::Paused,
+            3 => ContainerState::Stopped,
+            _ => ContainerState::Deleting,
+        }
     }
 
     fn start(&mut self) -> Result<(), ContainerError> {
@@ -317,8 +326,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut self.oci_spec.containers {
-            if let Some(ref mut container) = *container_option {
+        for container_option in &mut *self.oci_spec.containers {
+            if let Some(ref mut container) = container_option {
                 if container.id() == id {
                     return container.start();
                 }
@@ -328,8 +337,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut self.oci_spec.containers {
-            if let Some(ref mut container) = *container_option {
+        for container_option in &mut *self.oci_spec.containers {
+            if let Some(ref mut container) = container_option {
                 if container.id() == id {
                     return container.stop();
                 }
@@ -353,8 +362,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
     fn list_containers(&self) -> Vec<ContainerID> {
         let mut ids = Vec::new();
-        for container_option in &self.oci_spec.containers {
-            if let Some(ref container) = *container_option {
+        for container_option in &*self.oci_spec.containers {
+            if let Some(ref container) = container_option {
                 ids.push(container.id());
             }
         }
@@ -366,6 +375,27 @@ struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
 impl<T> Vec<T> {
@@ -427,6 +457,20 @@ impl<T> Vec<T> {
     }
 }
 
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

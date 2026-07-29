@@ -1,8 +1,7 @@
-//! SigPkg: Community Recipe Packaging (Arch Linux Absorption)
-//!
-//! Zero-allocation package manager parsing simple, signed declarative community recipes.
+// SigmaOS Package Recipes
+// Build recipes for package compilation and installation
 
-use crate::sigpkg::{Dependency, Version};
+use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use std::collections::HashMap;
 
 /// Build system type
@@ -14,53 +13,9 @@ pub enum BuildSystem {
     Autotools,
     Meson,
     Ninja,
-    Custom,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    InvalidFormat,
-    MissingField,
-    SignatureMismatch,
-    DependencyConflict,
-    InvalidName,
-    InvalidSource,
-    InvalidHash,
-    NoBuildCommands,
-    InvalidRecipe,
-    NotFound,
-    InvalidSyntax,
-    SerializationError,
-}
-
-pub struct RecipeManager {
-    pub recipes: Vec<PackageRecipe>,
-}
-
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self {
-            recipes: Vec::new(),
-        }
-    }
-
-    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
-        self.recipes.push(recipe);
-        Ok(())
-    }
-
-    pub fn list_recipes(&self) -> Vec<PackageRecipe> {
-        self.recipes.clone()
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Declarative package recipes.
+/// Package recipe
 #[derive(Debug, Clone)]
 pub struct PackageRecipe {
     pub name: String,
@@ -82,7 +37,7 @@ pub struct PackageRecipe {
 
 impl PackageRecipe {
     pub fn new(name: String, version: Version) -> Self {
-        PackageRecipe {
+        Self {
             name,
             version,
             description: String::new(),
@@ -94,8 +49,8 @@ impl PackageRecipe {
             install_commands: Vec::new(),
             environment: HashMap::new(),
             pkgrel: 1,
-            arch: String::new(),
-            license_spdx: String::new(),
+            arch: "x86_64".to_string(),
+            license_spdx: "GPL".to_string(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
         }
@@ -175,18 +130,80 @@ impl PackageRecipe {
 
     pub fn get_build_script(&self) -> String {
         match self.build_system {
-            BuildSystem::Cargo => "cargo build --release\ncargo install --path .".to_string(),
-            BuildSystem::Make => "make -j$(nproc)\nmake install".to_string(),
+            BuildSystem::Cargo => {
+                format!("cargo build --release\ncargo install --path .")
+            }
+            BuildSystem::Make => {
+                format!("make -j$(nproc)\nmake install")
+            }
             BuildSystem::CMake => {
-                "mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install".to_string()
+                format!("mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install")
             }
-            BuildSystem::Autotools => "./configure\nmake -j$(nproc)\nmake install".to_string(),
+            BuildSystem::Autotools => {
+                format!("./configure\nmake -j$(nproc)\nmake install")
+            }
             BuildSystem::Meson => {
-                "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
+                format!("meson setup build\nmeson compile -C build\nmeson install -C build")
             }
-            BuildSystem::Ninja => "ninja\nninja install".to_string(),
-            BuildSystem::Custom => "make custom_build".to_string(),
+            BuildSystem::Ninja => {
+                format!("ninja\nninja install")
+            }
         }
+    }
+}
+
+/// Recipe errors
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RecipeError {
+    InvalidName,
+    InvalidSource,
+    InvalidHash,
+    NoBuildCommands,
+    DependencyConflict,
+    BuildFailed,
+}
+
+/// Recipe manager
+pub struct RecipeManager {
+    recipes: HashMap<String, PackageRecipe>,
+}
+
+impl RecipeManager {
+    pub fn new() -> Self {
+        Self {
+            recipes: HashMap::new(),
+        }
+    }
+
+    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
+        recipe.validate()?;
+        let key = format!("{}@{}", recipe.name, recipe.version);
+        self.recipes.insert(key, recipe);
+        Ok(())
+    }
+
+    pub fn get_recipe(&self, name: &str, version: &Version) -> Option<&PackageRecipe> {
+        let key = format!("{}@{}", name, version);
+        self.recipes.get(&key)
+    }
+
+    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
+        self.recipes.values().collect()
+    }
+
+    pub fn find_by_name(&self, name: &str) -> Vec<&PackageRecipe> {
+        self.recipes.values().filter(|r| r.name == name).collect()
+    }
+
+    pub fn remove_recipe(&mut self, name: &str, version: &Version) {
+        let key = format!("{}@{}", name, version);
+        self.recipes.remove(&key);
+    }
+}
+
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
