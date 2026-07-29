@@ -90,7 +90,7 @@ pub enum SlideElementType {
 }
 
 /// Shape types for slides
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum ShapeType {
     Rectangle,
     Circle,
@@ -238,7 +238,7 @@ impl TextProcessor {
     }
 }
 
-/// Spreadsheet processor (Absorbs OpenOffice Calc / LibreOffice Calc features)
+/// Spreadsheet processor
 pub struct SpreadsheetProcessor {
     document: SigmaDocument,
     cells: HashMap<(u32, u32), CellValue>,
@@ -284,57 +284,6 @@ impl SpreadsheetProcessor {
             formula: Some(formula.to_string()),
         };
         self.document.add_node(node)
-    }
-
-    /// Evaluates financial and mathematical formulas on cell ranges (e.g. SUM(0,0,0,5) or AVERAGE(0,0,2,0))
-    pub fn evaluate_financial_formula(&self, formula_text: &str) -> Result<CellValue> {
-        let clean = formula_text.trim().to_uppercase();
-        if clean.starts_with("SUM(") && clean.ends_with(")") {
-            // Evaluates cells range sum
-            let range_str = &clean[4..clean.len() - 1];
-            let parts: Vec<&str> = range_str.split(',').collect();
-            if parts.len() == 4 {
-                let r1: u32 = parts[0].parse().unwrap_or(0);
-                let c1: u32 = parts[1].parse().unwrap_or(0);
-                let r2: u32 = parts[2].parse().unwrap_or(0);
-                let c2: u32 = parts[3].parse().unwrap_or(0);
-
-                let mut sum = 0.0;
-                for r in r1..=r2 {
-                    for c in c1..=c2 {
-                        if let Some(CellValue::Number(num)) = self.get_cell(r, c) {
-                            sum += num;
-                        }
-                    }
-                }
-                return Ok(CellValue::Number(sum));
-            }
-        } else if clean.starts_with("AVERAGE(") && clean.ends_with(")") {
-            // Evaluates cells range average
-            let range_str = &clean[8..clean.len() - 1];
-            let parts: Vec<&str> = range_str.split(',').collect();
-            if parts.len() == 4 {
-                let r1: u32 = parts[0].parse().unwrap_or(0);
-                let c1: u32 = parts[1].parse().unwrap_or(0);
-                let r2: u32 = parts[2].parse().unwrap_or(0);
-                let c2: u32 = parts[3].parse().unwrap_or(0);
-
-                let mut sum = 0.0;
-                let mut count = 0;
-                for r in r1..=r2 {
-                    for c in c1..=c2 {
-                        if let Some(CellValue::Number(num)) = self.get_cell(r, c) {
-                            sum += num;
-                            count += 1;
-                        }
-                    }
-                }
-                if count > 0 {
-                    return Ok(CellValue::Number(sum / count as f64));
-                }
-            }
-        }
-        Ok(CellValue::Empty)
     }
 
     /// Get cell value
@@ -439,65 +388,6 @@ impl PresentationProcessor {
     }
 }
 
-/// Translator to bridge LibreOffice (ODF/XML) format gaps with SigmaOffice semantic trees
-pub struct LibreOfficeTranslator;
-
-impl LibreOfficeTranslator {
-    /// Translates LibreOffice .odt or .docx raw XML format to SigmaOffice semantic text nodes
-    pub fn import_text_document(xml_content: &str) -> Vec<DocumentNode> {
-        let mut nodes = Vec::new();
-        // Simulates high-fidelity XML parser for bridge translation
-        for line in xml_content.lines() {
-            let trimmed = line.trim();
-            if trimmed.contains("<text:h") || trimmed.contains("<h1>") {
-                // heading parsing
-                let heading_content = trimmed
-                    .replace("<text:h>", "")
-                    .replace("</text:h>", "")
-                    .replace("<h1>", "")
-                    .replace("</h1>", "");
-                nodes.push(DocumentNode::Heading {
-                    level: 1,
-                    content: heading_content,
-                });
-            } else if trimmed.contains("<text:p") || trimmed.contains("<p>") {
-                // paragraph parsing
-                let paragraph_content = trimmed
-                    .replace("<text:p>", "")
-                    .replace("</text:p>", "")
-                    .replace("<p>", "")
-                    .replace("</p>", "");
-                nodes.push(DocumentNode::Text {
-                    content: paragraph_content,
-                    bold: false,
-                    italic: false,
-                    underline: false,
-                    font_size: 11,
-                    color: [0, 0, 0, 255],
-                });
-                nodes.push(DocumentNode::Paragraph);
-            }
-        }
-        nodes
-    }
-
-    /// Translates LibreOffice .ods or .xlsx spreadsheet range to CellValues
-    pub fn import_spreadsheet_cells(csv_or_xml: &str) -> HashMap<(u32, u32), CellValue> {
-        let mut cells = HashMap::new();
-        for (r, line) in csv_or_xml.lines().enumerate() {
-            for (c, item) in line.split(',').enumerate() {
-                let trimmed = item.trim();
-                if let Ok(num) = trimmed.parse::<f64>() {
-                    cells.insert((r as u32, c as u32), CellValue::Number(num));
-                } else if !trimmed.is_empty() {
-                    cells.insert((r as u32, c as u32), CellValue::Text(trimmed.to_string()));
-                }
-            }
-        }
-        cells
-    }
-}
-
 /// Native typography renderer for Zenith compositor
 pub struct TypographyRenderer {
     font_cache: HashMap<String, Vec<u8>>,
@@ -557,11 +447,7 @@ impl SigmaOffice {
 
     /// Create new spreadsheet
     pub fn create_spreadsheet(&mut self, title: String) -> Result<SpreadsheetProcessor> {
-        let doc = SigmaDocument::new(
-            DocumentType::Spreadsheet,
-            title.clone(),
-            self.capability.clone(),
-        );
+        let doc = SigmaDocument::new(DocumentType::Spreadsheet, title.clone(), self.capability.clone());
         self.documents.push(doc);
         self.active_document = Some(self.documents.len() - 1);
 
@@ -570,11 +456,7 @@ impl SigmaOffice {
 
     /// Create new presentation
     pub fn create_presentation(&mut self, title: String) -> Result<PresentationProcessor> {
-        let doc = SigmaDocument::new(
-            DocumentType::Presentation,
-            title.clone(),
-            self.capability.clone(),
-        );
+        let doc = SigmaDocument::new(DocumentType::Presentation, title.clone(), self.capability.clone());
         self.documents.push(doc);
         self.active_document = Some(self.documents.len() - 1);
 
@@ -594,13 +476,7 @@ impl SigmaOffice {
     /// Save document to SigmaFS
     pub fn save_document(&self, doc_idx: usize, _path: &str) -> Result<()> {
         // In real implementation, this would save to SigmaFS with capability checks
-<<<<<<< HEAD
         let _doc = self.documents.get(doc_idx).ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found"))?;
-=======
-        let _doc = self.documents.get(doc_idx).ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found")
-        })?;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         // Save logic here
         Ok(())
     }
@@ -610,118 +486,6 @@ impl SigmaOffice {
         // In real implementation, this would load from SigmaFS with capability checks
         // Load logic here
         Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Not implemented").into())
-    }
-}
-
-// ==========================================
-// ADDITIONAL ABSORBED ECOSYSTEM PROJECTS
-// ==========================================
-
-/// VSCodeShard - Embedded Zero-Dependency Code Editor & AI Assistant (Replaces VS Code & JetBrains IDEs)
-pub struct VSCodeShard {
-    pub file_path: String,
-    pub source_buffer: String,
-    pub active_language: String, // "rust", "zig", "nim"
-}
-
-impl VSCodeShard {
-    pub fn new(path: &str, language: &str) -> Self {
-        Self {
-            file_path: path.to_string(),
-            source_buffer: String::new(),
-            active_language: language.to_string(),
-        }
-    }
-
-    pub fn insert_source(&mut self, code: &str) {
-        self.source_buffer.push_str(code);
-    }
-
-    /// Simulates syntax highlighting by returning tagged tokens
-    pub fn generate_syntax_tokens(&self) -> Vec<(&str, &'static str)> {
-        let mut tokens = Vec::new();
-        let words = self.source_buffer.split_whitespace();
-        for word in words {
-            if word == "fn" || word == "pub" || word == "struct" || word == "impl" || word == "let" || word == "mut" {
-                tokens.push((word, "keyword"));
-            } else if word.ends_with('(') {
-                tokens.push((word, "function"));
-            } else {
-                tokens.push((word, "text"));
-            }
-        }
-        tokens
-    }
-
-    /// Simulates AI assistant autocomplete / suggested code loops
-    pub fn trigger_ai_code_suggestion(&self) -> Option<String> {
-        if self.source_buffer.contains("pub fn main") {
-            Some("() {\n    println!(\"Hello Sovereign World!\");\n}".to_string())
-        } else if self.source_buffer.contains("pub struct") {
-            Some(" {\n    id: u32,\n    name: String,\n}".to_string())
-        } else {
-            None
-        }
-    }
-}
-
-/// CAD Draw Primitives
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum CadPrimitive {
-    Line { start: (f32, f32), end: (f32, f32) },
-    Circle { center: (f32, f32), radius: f32 },
-    Box { top_left: (f32, f32), size: (f32, f32) },
-}
-
-/// SigmaCAD - Embedded 2D Vector CAD Sketcher (Replaces LibreCAD / FreeCAD)
-pub struct SigmaCAD {
-    pub primitives: Vec<CadPrimitive>,
-    pub grid_snapping: bool,
-    pub tolerance: f32,
-}
-
-impl SigmaCAD {
-    pub fn new() -> Self {
-        Self {
-            primitives: Vec::new(),
-            grid_snapping: true,
-            tolerance: 0.01,
-        }
-    }
-
-    pub fn add_primitive(&mut self, primitive: CadPrimitive) {
-        self.primitives.push(primitive);
-    }
-
-    /// Rescales all sketches dynamically on physical dimension shifts
-    pub fn rescale_canvas(&mut self, scale_factor: f32) {
-        for prim in &mut self.primitives {
-            match prim {
-                CadPrimitive::Line { start, end } => {
-                    start.0 *= scale_factor;
-                    start.1 *= scale_factor;
-                    end.0 *= scale_factor;
-                    end.1 *= scale_factor;
-                }
-                CadPrimitive::Circle { center, radius } => {
-                    center.0 *= scale_factor;
-                    center.1 *= scale_factor;
-                    *radius *= scale_factor;
-                }
-                CadPrimitive::Box { top_left, size } => {
-                    top_left.0 *= scale_factor;
-                    top_left.1 *= scale_factor;
-                    size.0 *= scale_factor;
-                    size.1 *= scale_factor;
-                }
-            }
-        }
-    }
-}
-
-impl Default for SigmaCAD {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -781,69 +545,5 @@ mod tests {
         processor.add_slide().unwrap();
 
         assert_eq!(processor.total_slides(), 2);
-    }
-
-    #[test]
-    fn test_spreadsheet_formula_evaluator() {
-        let capability = sigma_types::CapabilityToken { id: 1 };
-        let mut processor = SpreadsheetProcessor::new("Finances".to_string(), capability);
-
-        processor.set_cell(0, 0, CellValue::Number(10.0)).unwrap();
-        processor.set_cell(0, 1, CellValue::Number(20.0)).unwrap();
-        processor.set_cell(1, 0, CellValue::Number(30.0)).unwrap();
-        processor.set_cell(1, 1, CellValue::Number(40.0)).unwrap();
-
-        let sum_res = processor.evaluate_financial_formula("SUM(0,0,1,1)").unwrap();
-        assert_eq!(sum_res, CellValue::Number(100.0));
-
-        let avg_res = processor.evaluate_financial_formula("AVERAGE(0,0,1,1)").unwrap();
-        assert_eq!(avg_res, CellValue::Number(25.0));
-    }
-
-    #[test]
-    fn test_vscode_editor_shard() {
-        let mut editor = VSCodeShard::new("src/main.rs", "rust");
-        editor.insert_source("pub fn main");
-
-        let suggestion = editor.trigger_ai_code_suggestion().unwrap();
-        assert!(suggestion.contains("println"));
-
-        let tokens = editor.generate_syntax_tokens();
-        assert_eq!(tokens.len(), 3);
-        assert_eq!(tokens[0].1, "keyword");
-    }
-
-    #[test]
-    fn test_sigmacad_sketcher() {
-        let mut cad = SigmaCAD::new();
-        cad.add_primitive(CadPrimitive::Line { start: (0.0, 0.0), end: (10.0, 10.0) });
-        cad.add_primitive(CadPrimitive::Circle { center: (5.0, 5.0), radius: 2.5 });
-
-        assert_eq!(cad.primitives.len(), 2);
-        cad.rescale_canvas(2.0);
-
-        if let CadPrimitive::Circle { center, radius } = cad.primitives[1] {
-            assert_eq!(center, (10.0, 10.0));
-            assert_eq!(radius, 5.0);
-        } else {
-            panic!("Expected circle primitive");
-        }
-    }
-
-    #[test]
-    fn test_libreoffice_interoperability_translator() {
-        let xml_doc = "<h1>Introduction</h1>\n<p>This is a converted paragraph from LibreOffice ODT.</p>";
-        let nodes = LibreOfficeTranslator::import_text_document(xml_doc);
-        assert_eq!(nodes.len(), 3); // Heading + Text + Paragraph
-
-        if let DocumentNode::Heading { level, content } = &nodes[0] {
-            assert_eq!(*level, 1);
-            assert_eq!(content, "Introduction");
-        }
-
-        let csv_sheet = "10.5, 20.0\n30.1, Label";
-        let cells = LibreOfficeTranslator::import_spreadsheet_cells(csv_sheet);
-        assert_eq!(cells.get(&(0, 0)), Some(&CellValue::Number(10.5)));
-        assert_eq!(cells.get(&(1, 1)), Some(&CellValue::Text("Label".to_string())));
     }
 }

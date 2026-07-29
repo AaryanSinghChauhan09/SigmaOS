@@ -53,30 +53,17 @@ impl SecureFreeDetector {
 
     /// Securely free memory
     pub fn secure_free(&mut self, address: usize, ptr: *mut u8) -> Result<(), &'static str> {
-<<<<<<< HEAD
-        let (freed, size, is_sensitive) = {
-=======
-        let (is_sensitive, size) = {
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
+        let (size, is_sensitive, already_freed) = {
             let record = self
                 .allocations
                 .get(&address)
                 .ok_or("Allocation not found")?;
-<<<<<<< HEAD
-            (record.freed, record.size, record.is_sensitive)
+            (record.size, record.is_sensitive, record.freed)
         };
 
-        if freed {
+        if already_freed {
             return Err("Double free detected");
         }
-=======
-
-            if record.freed {
-                return Err("Double free detected");
-            }
-            (record.is_sensitive, record.size)
-        };
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
         // Sanitize based on level
         match self.sanitization_level {

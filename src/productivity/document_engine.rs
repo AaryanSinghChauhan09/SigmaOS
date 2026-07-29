@@ -87,7 +87,7 @@ impl DocumentEngine {
     }
 
     /// Create a new document
-    pub fn create_document(title: String, author: String, content: String) -> Document {
+    pub fn create_document(&self, title: String, author: String, content: String) -> Document {
         let word_count = content.split_whitespace().count();
         let character_count = content.chars().count();
         let timestamp = 0; // Would use actual timestamp
@@ -106,7 +106,7 @@ impl DocumentEngine {
     }
 
     /// Load document from string
-    pub fn load_document(filename: String, content: String) -> Document {
+    pub fn load_document(&self, filename: String, content: String) -> Document {
         let format = Self::detect_format(&filename, &content);
         let word_count = content.split_whitespace().count();
         let character_count = content.chars().count();
@@ -308,7 +308,8 @@ mod tests {
 
     #[test]
     fn test_replace_text() {
-        let mut doc = DocumentEngine::create_document(
+        let engine = DocumentEngine::new();
+        let mut doc = engine.create_document(
             "Test".to_string(),
             "Author".to_string(),
             "Hello World".to_string(),
