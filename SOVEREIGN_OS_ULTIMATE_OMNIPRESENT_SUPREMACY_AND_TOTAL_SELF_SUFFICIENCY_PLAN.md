@@ -1,5 +1,5 @@
 # 🇸🇴 SigmaOS Sovereign OS Ultimate Omnipresent Supremacy and Total Self-Sufficiency Plan
-## 🌌 The Grand Unified Architectural Blueprint to Natively Replace and Obsolesce All Third-Party Software, Databases, Libraries, Codecs, AI Models, Network Protocols, and Simulators
+## 🌌 The Grand Unified Architectural Blueprint Natively Replacing and Obsolescing All Third-Party Software, Databases, Libraries, Codecs, AI Models, Network Protocols, and Simulators
 
 > **"An absolutely sovereign operating system must contain no external references, no dynamic library links to foreign layers, and no runtime dependency on external packages. Every tool, platform, library, database, codec, model, pipeline, protocol, and simulator must be absorbed natively as memory-safe, zero-dependency, capability-gated Rust primitives inside SigmaOS."**
 
@@ -69,7 +69,7 @@ SigmaOS partitions the entire computational universe into **Twelve Core Sovereig
 ---
 
 ## 🗄️ 4. Database, Storage & High-Performance Indexing (`S-DATA`)
-**Replacing:** MySQL, PostgreSQL, Apache Cassandra, Apache CouchDB, MariaDB, PostGIS, Scriptella ETL, Jaspersoft, Pentaho, Lucene, Nutch, Solr, Xapian, ApexDB, PeaZip, and all structured data formats.
+**Replacing:** MySQL, PostgreSQL, Apache Cassandra, Apache CouchDB, MariaDB, PostGIS, Scriptella ETL, Jaspersoft, Pentaho, Lucene, Nutch, Solr, Xapiand, ApexDB, PeaZip, and all structured data formats.
 
 ### A. Architectural Integration Pathways
 1. **MySQL, PostgreSQL, & MariaDB:** Replaced by **SigmaDB**, a native relational transactional SQL database featuring Write-Ahead Logging (WAL), Multi-Version Concurrency Control (MVCC), cost-based query optimization, and B-Tree indexes.

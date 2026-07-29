@@ -104,19 +104,6 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-<<<<<<< HEAD
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-    }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
-=======
         {
             let raw = self.state.load(Ordering::SeqCst) as u32;
             match raw {
@@ -126,7 +113,6 @@ impl Driver for SimpleDriver {
             }
         }
     }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     fn load(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Active);
         Ok(())

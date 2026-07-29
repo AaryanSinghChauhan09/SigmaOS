@@ -73,6 +73,8 @@ impl Size {
 
 /// Rectangle
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rectangle {
     pub position: Position,
     pub size: Size,
@@ -88,16 +90,16 @@ impl Rectangle {
 
     pub fn contains(&self, point: Position) -> bool {
         point.x >= self.position.x
-            && point.x < self.position.x + self.size.width as i32
+            && point.x < self.position.x + width_bound
             && point.y >= self.position.y
-            && point.y < self.position.y + self.size.height as i32
+            && point.y < self.position.y + height_bound
     }
 
     pub fn intersects(&self, other: &Rectangle) -> bool {
         self.position.x < other.position.x + other.size.width as i32
-            && self.position.x + self.size.width as i32 > other.position.x
+            && self.position.x + width_bound > other.position.x
             && self.position.y < other.position.y + other.size.height as i32
-            && self.position.y + self.size.height as i32 > other.position.y
+            && self.position.y + height_bound > other.position.y
     }
 }
 
@@ -287,14 +289,16 @@ impl Surface for BitmapSurface {
 
     fn fill_rect(&mut self, rect: Rectangle, color: Color) {
         let color_value = color.to_u32();
-        let data = self.data_mut();
         let stride = self.stride as usize / 4;
+        let height_bound = height_bound;
+        let width_bound = width_bound;
+        let data = self.data_mut();
 
         for y in rect.position.y.max(0) as usize
-            ..(rect.position.y + rect.size.height as i32).min(self.size.height as i32) as usize
+            ..(rect.position.y + rect.size.height as i32).min(height_bound) as usize
         {
             for x in rect.position.x.max(0) as usize
-                ..(rect.position.x + rect.size.width as i32).min(self.size.width as i32) as usize
+                ..(rect.position.x + rect.size.width as i32).min(width_bound) as usize
             {
                 let index = y * stride + x;
                 if index < data.len() {
@@ -517,11 +521,7 @@ pub enum GraphicsError {
 
 /// Compositor statistics
 #[repr(C)]
-<<<<<<< HEAD
-#[derive(Debug, Clone, Copy)]
-=======
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub struct CompositorStats {
     pub total_windows: usize,
     pub visible_windows: usize,
@@ -730,16 +730,12 @@ impl Compositor for SimpleCompositor {
             if let Some(ref mut window) = self.windows[window_id] {
                 let window_rect = window.rect();
                 if let Some(surface) = window.surface() {
-<<<<<<< HEAD
-                    let window_data = surface.data();
-=======
                     let output_info = output.info();
                     let output_stride = output_info.stride as usize / 4;
 
                     let output_data = output.data_mut();
                     let window_data = surface.data();
 
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
                     let window_stride = surface.info().stride as usize / 4;
 
                     // Copy window surface to output
@@ -782,12 +778,14 @@ impl Compositor for SimpleCompositor {
 
 /// Simple Vec implementation for no_std
 #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
@@ -915,8 +913,7 @@ impl<T> Vec<T> {
     }
 }
 
-<<<<<<< HEAD
-=======
+#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 struct Iter<T> {
     data: *const T,
@@ -924,6 +921,7 @@ struct Iter<T> {
     index: usize,
 }
 
+#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<'a, T> Iterator for Iter<T> {
     type Item = &'a T;
@@ -941,12 +939,14 @@ impl<'a, T> Iterator for Iter<T> {
 }
 
 #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 struct IterMut<T> {
     data: *mut T,
     len: usize,
     index: usize,
 }
 
+#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<'a, T> Iterator for IterMut<T> {
     type Item = &'a mut T;
@@ -963,7 +963,6 @@ impl<'a, T> Iterator for IterMut<T> {
     }
 }
 
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 // External allocator functions
 extern "C" {
     fn alloc(size: usize) -> *mut u8;

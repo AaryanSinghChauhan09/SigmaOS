@@ -13,11 +13,8 @@ pub mod breakthroughs;
 pub mod ipc;
 pub mod linux_absorb;
 pub mod subsystem;
-<<<<<<< HEAD
-=======
 // pub mod traits;
 pub mod watchdog;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
@@ -29,15 +26,12 @@ pub use crate::container::runtime::oci::{
 };
 pub use generation_manager::{Generation, GenerationManager};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-<<<<<<< HEAD
-=======
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
     AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionEngine as LinuxAbsorptionEngine,
     AbsorptionError, AbsorptionStatus, ConversionRule, ConversionRuleType,
     SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
 };
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use meta::{
     ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
@@ -48,10 +42,6 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-<<<<<<< HEAD
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-=======
 pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
@@ -100,4 +90,3 @@ pub use net::{
     SockAddrIn, SocketLayer, SocketType as NetSocketType, Tbf, TcpConnection, TcpSegment, TcpState,
 };
 pub use syscall::{SyscallArgs, SyscallError, SyscallNr, SyscallResult, SyscallTable};
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045

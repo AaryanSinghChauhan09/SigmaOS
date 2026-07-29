@@ -2,13 +2,10 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
-<<<<<<< HEAD
-=======
 pub mod audio;
 pub mod ai;
 pub mod fs;
 pub mod net;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -45,10 +42,7 @@ pub mod hardware {
 pub mod power {
     pub mod governor;
 }
-pub mod ai {
-    pub mod agent;
-    pub mod orchestrator;
-}
+
 pub mod boot;
 pub mod toolchain {
     pub mod adapter;
@@ -104,19 +98,6 @@ pub use drivers::{
     VesaModeInfo,
 };
 pub use filesystem::{
-<<<<<<< HEAD
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
-};
-pub use kernel::{
-    ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
-    Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
-    KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver, NetPod,
-    PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
-    ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
-    Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
-    UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
-    IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
-=======
     DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
     VirtualFilesystem,
 };
@@ -166,14 +147,8 @@ pub use kernel::{
     SlabCacheStats, SlabState, SocketDomain, SocketHandle, SocketProtocol, SocketType,
     SovereignCompilerOptimizer, SovereignIpcBus, SovereignSignal, UdfSchedVm, WatchdogAction,
     WatchdogDevice, WatchdogManager, WatchdogState, ZeroCopyQueue, PAGE_SIZE,
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 };
 pub use network::{
-<<<<<<< HEAD
-    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
-    RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
-    ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
-=======
     DnsError, DnsResolver, MDnsDiscovery,
     QuicConnection, QuicError,
     TcpConnection, TcpError, TcpSegment, TcpStack, TcpState, ZeroCopyPacketRing,
@@ -183,7 +158,6 @@ pub use net::{
     BrowserTab, BrowserTabState, CipherSuite, SovereignBrowser, TabCapabilities, TabContainer, TabState, TrackingProtection,
     NetworkDriverDevice, NetworkDriverManager, NetworkDriverType, NetworkError as ZenithNetworkError, NetworkPacketFrame, RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable, Rtl8139NetworkDriver, SecurityLevel, SecurityProfile,
     TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion,
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
@@ -233,14 +207,11 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-<<<<<<< HEAD
-=======
 pub use scheduler::{
     ComputeUnit, EevdfScheduler, Priority as ShellPriority,
     SInitSupervisor, Scheduler as ShellScheduler,
     SchedulerError as ShellSchedulerError, Service, ServiceState, SimpleThread, Task, TaskState, Thread, ThreadID, ThreadState,
 };
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,

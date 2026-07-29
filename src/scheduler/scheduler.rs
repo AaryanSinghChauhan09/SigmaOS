@@ -6,12 +6,7 @@
 /// No dependency on external scheduler frameworks
 
 use core::ptr::{self, NonNull};
-<<<<<<< HEAD
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-=======
 use core::sync::atomic::{AtomicUsize, AtomicU64, Ordering};
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -31,7 +26,7 @@ pub trait Schedulable {
     fn last_run_time(&self) -> u64;
     /// Set last run time
     fn set_last_run_time(&mut self, time: u64);
-        /// Get task ID
+            /// Get task ID
     fn task_id(&self) -> usize;
     /// Get task capability
     fn capability(&self) -> TaskCapability;
@@ -99,10 +94,6 @@ impl Schedulable for Task {
     }
 
     fn state(&self) -> TaskState {
-<<<<<<< HEAD
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
-=======
         {
             let raw = self.state.load(Ordering::SeqCst) as u32;
             match raw {
@@ -112,7 +103,6 @@ impl Schedulable for Task {
                 4 => TaskState::Terminated,
                 _ => TaskState::Ready,
             }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         }
     }
 
