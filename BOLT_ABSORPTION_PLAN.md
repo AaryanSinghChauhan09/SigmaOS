@@ -1,3 +1,21 @@
+<<<<<<< HEAD
+# BOLT ABSORPTION PLAN
+
+This document integrates the zero-dependency, high-performance optimization principles of Bolt (⚡) alongside Palette (🎨) and Sentinel (🛡️). It outlines our master absorption roadmap for 500+ GitHub repositories.
+
+## ⚡ Bolt: Performance Absorption Blueprint
+- Avoid external allocators on hot-paths.
+- Maximize branchless execution and lock-free concurrency (e.g. Compare-And-Swap scheduler loops).
+- Implement NUMA-aware Task queues.
+
+## 🎨 Palette: Delightful Micro-UX Integration
+- High-efficiency Vulkan direct-to-compositor rendering bypassing legacy protocols (X11/Wayland).
+- Smooth responsive transitions and screen-reader accessibility native hooks.
+
+## 🛡️ Sentinel: Forensic and Threat Mitigation Guardrails
+- Secure hardware-assisted attested write-once-read-many (WORM) security logs.
+- Memory protection guarantees: W^X page execution checks, custom canary protectors, and automatic zeroization.
+=======
 # ⚡🎨🛡️ SigmaOS Agent Integration & Absorption Master Plan
 
 This document details the exhaustive, production-grade integration and absorption plan for **SigmaOS** to natively incorporate the core philosophies, coding standards, journals, and daily operational processes of three world-class specialized autonomous agents:
@@ -16,11 +34,6 @@ By formally institutionalizing these three personas, SigmaOS establishes a conti
 - Every millisecond, microsecond, and instruction count matters.
 - Measure first, optimize second.
 - Do not sacrifice code readability for marginal micro-optimizations.
-
-### Core Performance Principles
-- Avoid external allocators on hot-paths.
-- Maximize branchless execution and lock-free concurrency (e.g. Compare-And-Swap scheduler loops).
-- Implement NUMA-aware Task queues.
 
 ### The Daily Process
 
@@ -95,10 +108,6 @@ By formally institutionalizing these three personas, SigmaOS establishes a conti
 - Accessibility (a11y) is not optional; it is a fundamental requirement.
 - Every interactive transition and state change should feel smooth and seamless.
 - Good UX is invisible—it simply works without friction.
-
-### Core UI/UX Principles
-- High-efficiency Vulkan direct-to-compositor rendering bypassing legacy protocols (X11/Wayland).
-- Smooth responsive transitions and screen-reader accessibility native hooks.
 
 ### UI Coding Standards
 
@@ -197,10 +206,6 @@ By formally institutionalizing these three personas, SigmaOS establishes a conti
 - Defense in Depth: Enforce multiple overlapping layers of protection.
 - Fail Securely: Error states must never expose raw pointers, system paths, or stack traces.
 - Trust Nothing: Validate, sanitize, and capability-gate all inputs.
-
-### Core Security Principles
-- Secure hardware-assisted attested write-once-read-many (WORM) security logs.
-- Memory protection guarantees: W^X page execution checks, custom canary protectors, and automatic zeroization.
 
 ### Security Coding Standards
 
@@ -313,3 +318,4 @@ To maintain standard operational records and ensure persistent learning, the thr
 **Action/Prevention:** [How to apply / prevent next time]
 ```
 No routine or generic logs may be committed; entries are reserved exclusively for critical, codebase-specific engineering insights.
+>>>>>>> wiki/master

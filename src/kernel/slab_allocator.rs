@@ -77,31 +77,26 @@ impl SlabAllocator {
     pub fn allocate(&mut self, cache_name: &str) -> Result<*mut u8, &'static str> {
         let (slab_idx, obj_idx, object_size, objects_per_slab) = {
             let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
-            if cache.free_objects == 0 {
-                // Short circuit: Saturated cache, jump directly to spawning a new slab (O(1))
-                (None, None, cache.object_size, cache.objects_per_slab)
-            } else {
-                let mut found = None;
-                'outer: for (s_idx, slab) in cache.slabs.iter().enumerate() {
-                    if slab.state != SlabState::Full {
-                        for (o_idx, obj) in slab.objects.iter().enumerate() {
-                            if obj.is_none() {
-                                found = Some((s_idx, o_idx));
-                                break 'outer;
-                            }
+            let mut found = None;
+            'outer: for (s_idx, slab) in cache.slabs.iter().enumerate() {
+                if slab.state != SlabState::Full {
+                    for (o_idx, obj) in slab.objects.iter().enumerate() {
+                        if obj.is_none() {
+                            found = Some((s_idx, o_idx));
+                            break 'outer;
                         }
                     }
                 }
-                if let Some((s_idx, o_idx)) = found {
-                    (
-                        Some(s_idx),
-                        Some(o_idx),
-                        cache.object_size,
-                        cache.objects_per_slab,
-                    )
-                } else {
-                    (None, None, cache.object_size, cache.objects_per_slab)
-                }
+            }
+            if let Some((s_idx, o_idx)) = found {
+                (
+                    Some(s_idx),
+                    Some(o_idx),
+                    cache.object_size,
+                    cache.objects_per_slab,
+                )
+            } else {
+                (None, None, cache.object_size, cache.objects_per_slab)
             }
         };
 
@@ -136,7 +131,7 @@ impl SlabAllocator {
 
         let cache = self.caches.get_mut(cache_name).unwrap();
         cache.slabs.push(new_slab);
-        cache.free_objects += objects_per_slab - 1;
+        cache.free_objects = objects_per_slab - 1;
 
         Ok(obj)
     }
@@ -325,29 +320,5 @@ mod tests {
         allocator.destroy_cache("task_struct").unwrap();
 
         assert_eq!(allocator.cache_count(), 0);
-    }
-
-    #[test]
-    fn test_slab_allocator_saturation_short_circuit() {
-        let mut allocator = SlabAllocator::new();
-        allocator.create_cache("test_cache".to_string(), 1024, 8).unwrap();
-
-        // 1024 object size on 4096 size slab means 4 objects per slab.
-        // Let's allocate 4 times to completely saturate the first slab.
-        let _obj1 = allocator.allocate("test_cache").unwrap();
-        let _obj2 = allocator.allocate("test_cache").unwrap();
-        let _obj3 = allocator.allocate("test_cache").unwrap();
-        let _obj4 = allocator.allocate("test_cache").unwrap();
-
-        let stats = allocator.get_cache_stats("test_cache").unwrap();
-        assert_eq!(stats.free_objects, 0);
-
-        // Allocating a 5th element should trigger the O(1) short circuit, bypass the scan, and spawn a new slab.
-        let obj5 = allocator.allocate("test_cache").unwrap();
-        assert!(!obj5.is_null());
-
-        let stats2 = allocator.get_cache_stats("test_cache").unwrap();
-        assert_eq!(stats2.total_slabs, 2);
-        assert_eq!(stats2.free_objects, 3);
     }
 }

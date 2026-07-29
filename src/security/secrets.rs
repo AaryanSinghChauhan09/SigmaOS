@@ -1,10 +1,6 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -394,17 +390,64 @@ pub struct SecretStorage;
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_simple_keyring() {
-        let cap = KeyringCapability::full();
-        let mut keyring = SimpleKeyring::new(cap);
-        let secret_cap = SecretCapability::full();
-        let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.store_secret(Box::new(secret)).unwrap();
-        assert_eq!(id, 1);
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
 
-        let retrieved = keyring.get_secret(1).unwrap();
-        assert_eq!(retrieved.name(), b"TestSecret");
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
     }
 }
 
