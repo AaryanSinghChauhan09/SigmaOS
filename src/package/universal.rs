@@ -20,7 +20,11 @@ impl SemVer {
         if parts.next().is_some() {
             return None;
         }
-        Some(Self { major, minor, patch })
+        Some(Self {
+            major,
+            minor,
+            patch,
+        })
     }
 }
 
@@ -236,12 +240,20 @@ impl PackageFormatAdapter for AptDebAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Purging DEB package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Purging DEB package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Refreshing and updating DEB package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Refreshing and updating DEB package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -279,12 +291,20 @@ impl PackageFormatAdapter for YumRpmAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Erasing RPM package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Erasing RPM package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Running transaction check & upgrade for RPM package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Running transaction check & upgrade for RPM package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -322,12 +342,20 @@ impl PackageFormatAdapter for PacmanAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Removing pacman package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Removing pacman package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Sysupgrade pacman package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Sysupgrade pacman package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -365,12 +393,20 @@ impl PackageFormatAdapter for SnapAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Unmounting snap package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Unmounting snap package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Refreshing snap package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Refreshing snap package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -408,12 +444,20 @@ impl PackageFormatAdapter for FlatpakAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Uninstalling flatpak package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Uninstalling flatpak package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Updating flatpak package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Updating flatpak package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -451,12 +495,20 @@ impl PackageFormatAdapter for SigmaPkgAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Deleting native SigmaPkg package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Deleting native SigmaPkg package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Atomic rollback-safe update of SigmaPkg package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Atomic rollback-safe update of SigmaPkg package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -494,12 +546,20 @@ impl PackageFormatAdapter for NixAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Garbage collecting Nix package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Garbage collecting Nix package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Rebuilding Nix environment for {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Rebuilding Nix environment for {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -537,12 +597,20 @@ impl PackageFormatAdapter for GentooEbuildAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Unmerging Gentoo package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Unmerging Gentoo package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Re-emerging and compiling Gentoo package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Re-emerging and compiling Gentoo package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -580,12 +648,20 @@ impl PackageFormatAdapter for AlpineApkAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Deleting APK package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Deleting APK package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Upgrading APK package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Upgrading APK package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -623,12 +699,20 @@ impl PackageFormatAdapter for SlackwareTxzAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Removing Slackware package {} via removepkg", self.adapter_name(), package.name);
+        println!(
+            "[{}] Removing Slackware package {} via removepkg",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Upgrading Slackware package {} via upgradepkg", self.adapter_name(), package.name);
+        println!(
+            "[{}] Upgrading Slackware package {} via upgradepkg",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -666,12 +750,20 @@ impl PackageFormatAdapter for VoidXbpsAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Removing XBPS package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Removing XBPS package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Updating XBPS package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Updating XBPS package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -709,12 +801,20 @@ impl PackageFormatAdapter for CachyosAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Removing cachyos package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Removing cachyos package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Refreshing and upgrading CachyOS package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Refreshing and upgrading CachyOS package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -895,7 +995,9 @@ pub struct LocalMetadataCache {
 
 impl LocalMetadataCache {
     pub fn new() -> Self {
-        Self { cache: HashMap::new() }
+        Self {
+            cache: HashMap::new(),
+        }
     }
     pub fn insert(&mut self, name: String, package: UnifiedPackage) {
         self.cache.insert(name, package);
@@ -909,7 +1011,8 @@ impl LocalMetadataCache {
 // Universal Package Manager
 // ----------------------------------------------------
 
-pub type UserHook = std::sync::Arc<dyn Fn(&mut UnifiedPackage) -> Result<(), PackageError> + Send + Sync>;
+pub type UserHook =
+    std::sync::Arc<dyn Fn(&mut UnifiedPackage) -> Result<(), PackageError> + Send + Sync>;
 
 #[derive(Debug, Clone)]
 pub struct Checkpoint {
@@ -935,7 +1038,10 @@ impl TransactionHistory {
         let id = self.next_id;
         self.next_id += 1;
         let keys = installed.keys().cloned().collect();
-        self.checkpoints.push(Checkpoint { id, installed_keys: keys });
+        self.checkpoints.push(Checkpoint {
+            id,
+            installed_keys: keys,
+        });
         id
     }
 
@@ -972,22 +1078,38 @@ impl UniversalPackageManager {
     }
 
     fn add_default_adapters(&mut self) {
-        self.adapters.insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
-        self.adapters.insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
-        self.adapters.insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
-        self.adapters.insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
-        self.adapters.insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
-        self.adapters.insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
-        self.adapters.insert(PackageFormat::Nix, Box::new(NixAdapter::new()));
-        self.adapters.insert(PackageFormat::Ebuild, Box::new(GentooEbuildAdapter::new()));
-        self.adapters.insert(PackageFormat::Apk, Box::new(AlpineApkAdapter::new()));
-        self.adapters.insert(PackageFormat::Txz, Box::new(SlackwareTxzAdapter::new()));
-        self.adapters.insert(PackageFormat::Xbps, Box::new(VoidXbpsAdapter::new()));
-        self.adapters.insert(PackageFormat::Cachyos, Box::new(CachyosAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Nix, Box::new(NixAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Ebuild, Box::new(GentooEbuildAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Apk, Box::new(AlpineApkAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Txz, Box::new(SlackwareTxzAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Xbps, Box::new(VoidXbpsAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Cachyos, Box::new(CachyosAdapter::new()));
     }
 
     /// Dynamic polymorphic registration of custom format adapters
-    pub fn register_adapter(&mut self, format: PackageFormat, adapter: Box<dyn PackageFormatAdapter>) {
+    pub fn register_adapter(
+        &mut self,
+        format: PackageFormat,
+        adapter: Box<dyn PackageFormatAdapter>,
+    ) {
         self.adapters.insert(format, adapter);
     }
 
@@ -1001,7 +1123,8 @@ impl UniversalPackageManager {
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
-        self.metadata_cache.insert(package.name.clone(), package.clone());
+        self.metadata_cache
+            .insert(package.name.clone(), package.clone());
         self.packages.insert(package.name.clone(), package);
     }
 
@@ -1354,7 +1477,9 @@ mod tests {
             "failing-adapter"
         }
         fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Err(PackageError::InstallationFailed("Simulated crash".to_string()))
+            Err(PackageError::InstallationFailed(
+                "Simulated crash".to_string(),
+            ))
         }
         fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
             Ok(())
@@ -1478,7 +1603,9 @@ mod tests {
         // Add a global verification hook UDF
         manager.add_global_hook(|package: &mut UnifiedPackage| -> Result<(), PackageError> {
             if package.name == "malicious-package" {
-                return Err(PackageError::InstallationFailed("Blocked malicious package via UDF".to_string()));
+                return Err(PackageError::InstallationFailed(
+                    "Blocked malicious package via UDF".to_string(),
+                ));
             }
             package.checksum = "UDF_VERIFIED_CHECKSUM_TOKEN_99".to_string();
             Ok(())

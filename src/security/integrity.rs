@@ -3,6 +3,8 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::mem;
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
@@ -10,8 +12,6 @@ use core::mem;
 /// Based on Roadmap Item 66: System integrity monitoring
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 /// File ID
 pub type FileID = usize;
@@ -133,9 +133,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe {
-            core::mem::transmute(self.status.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -405,4 +403,3 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
-

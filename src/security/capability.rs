@@ -1,16 +1,10 @@
-//! Capability Tokens: Privilege Isolation (Android/AOSP Absorption)
-//!
-//! Cryptographic capability gates replacing legacy Unix file permissions.
+// SigmaOS Capability-Based Security System
+// Implements 64-bit hardware-enforced capability model
 
 extern crate alloc;
-use alloc::vec::Vec;
-<<<<<<< HEAD
 use alloc::string::String;
-=======
-use alloc::string::{String, ToString};
->>>>>>> origin/jules-18101178622594638830-97dc43c6
+use alloc::vec::Vec;
 
-/// Permission enum representing privilege actions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
     NetworkTcp,
@@ -28,10 +22,7 @@ pub struct CapabilityToken {
     pub allowed_paths: Vec<String>,
     pub allowed_ports: Vec<u16>,
     pub is_revoked: bool,
-<<<<<<< HEAD
     pub bits: u64,
-=======
->>>>>>> origin/jules-18101178622594638830-97dc43c6
 }
 
 impl CapabilityToken {
@@ -41,15 +32,11 @@ impl CapabilityToken {
             allowed_paths: Vec::new(),
             allowed_ports: Vec::new(),
             is_revoked: false,
-<<<<<<< HEAD
             bits: 0,
-=======
->>>>>>> origin/jules-18101178622594638830-97dc43c6
         }
     }
 
     pub fn new_with_params(id: u64, paths: &'static [&'static str], ports: &'static [u16]) -> Self {
-<<<<<<< HEAD
         CapabilityToken {
             id,
             allowed_paths: paths.iter().map(|&s| String::from(s)).collect(),
@@ -57,57 +44,6 @@ impl CapabilityToken {
             is_revoked: false,
             bits: 0,
         }
-=======
-        let mut allowed_paths = Vec::new();
-        for &path in paths {
-            allowed_paths.push(path.to_string());
-        }
-        CapabilityToken {
-            id,
-            allowed_paths,
-            allowed_ports: ports.to_vec(),
-            is_revoked: false,
-        }
-    }
-
-    /// Retrieve the token bits/id
-    pub fn bits(&self) -> u64 {
-        self.id
-    }
-
-    /// Builder to allow a network port
-    pub fn allow_network(mut self, _proto: &str, port: u16) -> Self {
-        // mitigate port-allocation bitmask pollution by masking out bits 16-31
-        let masked_port = port & 0xFFFF;
-        self.allowed_ports.push(masked_port);
-        self
-    }
-
-    /// Builder to allow read access on a path
-    pub fn allow_read(mut self, path: &str) -> Self {
-        if is_safe_path(path) {
-            self.allowed_paths.push(path.to_string());
-        }
-        self
-    }
-
-    /// Builder to allow write access on a path
-    pub fn allow_write(mut self, path: &str) -> Self {
-        if is_safe_path(path) {
-            self.allowed_paths.push(path.to_string());
-        }
-        self
-    }
-
-    /// Builder to allow process execution
-    pub fn allow_exec(self) -> Self {
-        self
-    }
-
-    /// Builder to allow IPC access
-    pub fn allow_ipc(self) -> Self {
-        self
->>>>>>> origin/jules-18101178622594638830-97dc43c6
     }
 
     /// Verifies if the token permits access to a given path.
@@ -177,7 +113,6 @@ impl CapabilityToken {
     }
 }
 
-<<<<<<< HEAD
 impl Default for CapabilityToken {
     fn default() -> Self {
         Self::new()
@@ -187,25 +122,10 @@ impl Default for CapabilityToken {
 #[derive(Debug, Clone)]
 pub struct CapabilityGate {
     pub token: CapabilityToken,
-=======
-/// Checks if a path is safe to prevent directory traversals and sandbox escapes
-pub fn is_safe_path(path: &str) -> bool {
-    if path.contains("..") {
-        return false;
-    }
-    true
-}
-
-/// Capability gate for process-level capability verification
-#[derive(Debug, Clone)]
-pub struct CapabilityGate {
-    pub active_token: Option<CapabilityToken>,
->>>>>>> origin/jules-18101178622594638830-97dc43c6
 }
 
 impl CapabilityGate {
     pub fn new() -> Self {
-<<<<<<< HEAD
         Self {
             token: CapabilityToken::new(),
         }
@@ -223,13 +143,6 @@ impl CapabilityGate {
 impl Default for CapabilityGate {
     fn default() -> Self {
         Self::new()
-=======
-        Self { active_token: None }
-    }
-
-    pub fn set_capability(&mut self, token: CapabilityToken) {
-        self.active_token = Some(token);
->>>>>>> origin/jules-18101178622594638830-97dc43c6
     }
 }
 
@@ -239,7 +152,6 @@ pub struct SecurityEnforcer {
 
 impl SecurityEnforcer {
     pub fn new() -> Self {
-<<<<<<< HEAD
         Self { bits: 0 }
     }
 
@@ -264,7 +176,7 @@ impl SecurityEnforcer {
 
     /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") || path == "/" {
+        if path.starts_with("/var/www") {
             self.bits |= 1 << 2;
         }
         self
@@ -304,14 +216,6 @@ impl SecurityEnforcer {
     pub fn bits(&self) -> u64 {
         self.bits
     }
-
-    pub fn allow_capability(&mut self, bitmask: u64) {
-        self.bits |= bitmask;
-    }
-
-    pub fn contains(&self, bitmask: u64) -> bool {
-        (self.bits & bitmask) == bitmask
-    }
 }
 
 #[cfg(test)]
@@ -349,26 +253,5 @@ mod tests {
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
-=======
-        SecurityEnforcer {
-            active_tokens: Vec::new(),
-        }
-    }
-
-    pub fn register_token(&mut self, token: CapabilityToken) {
-        self.active_tokens.push(token);
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
->>>>>>> origin/jules-18101178622594638830-97dc43c6
     }
 }

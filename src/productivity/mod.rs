@@ -54,5 +54,5 @@ pub use terminal::{
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
 pub use tmux::{
-    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };

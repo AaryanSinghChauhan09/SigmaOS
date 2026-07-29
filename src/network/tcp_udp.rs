@@ -3,21 +3,23 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+use core::mem;
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 pub type SocketID = usize;
 pub type Port = u16;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum Protocol { TCP = 0, UDP = 1 }
+pub enum Protocol {
+    TCP = 0,
+    UDP = 1,
+}
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -149,13 +151,17 @@ pub trait TCPConnection {
 
 impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
-        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
-        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
     fn listen(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Listen as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Listen as usize, Ordering::SeqCst);
         Ok(())
     }
     fn accept(&mut self) -> Result<SocketID, NetworkError> {
@@ -181,7 +187,8 @@ impl TCPConnection for SimpleSocket {
         Ok(len)
     }
     fn close(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Closed as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Closed as usize, Ordering::SeqCst);
         Ok(())
     }
     fn get_state(&self) -> TCPState {
@@ -196,7 +203,8 @@ pub trait UDPSocket {
 
 impl UDPSocket for SimpleSocket {
     fn sendto(&mut self, data: &[u8], remote_port: Port) -> Result<usize, NetworkError> {
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
         Ok(data.len())
     }
     fn recvfrom(&mut self, buffer: &mut [u8]) -> Result<(usize, Port), NetworkError> {
@@ -243,7 +251,9 @@ impl CongestionControl for RenoCongestionControl {
         self.ssthresh.store(cwnd / 2, Ordering::SeqCst);
         self.cwnd.store(1, Ordering::SeqCst);
     }
-    fn get_cwnd(&self) -> usize { self.cwnd.load(Ordering::SeqCst) }
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
 }
 
 #[repr(C)]
@@ -271,9 +281,12 @@ impl CongestionControl for BBRCongestionControl {
         self.cwnd.store(target, Ordering::SeqCst);
     }
     fn on_loss(&mut self) {
-        self.cwnd.store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
+        self.cwnd
+            .store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
     }
-    fn get_cwnd(&self) -> usize { self.cwnd.load(Ordering::SeqCst) }
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
 }
 
 pub trait Firewall {
@@ -318,13 +331,16 @@ pub struct ZeroCopyNetwork {
 
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
-        ZeroCopyNetwork { dma_buffer: AtomicUsize::new(0) }
+        ZeroCopyNetwork {
+            dma_buffer: AtomicUsize::new(0),
+        }
     }
 }
 
 impl ZeroCopy for ZeroCopyNetwork {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
-        self.dma_buffer.store(data.as_ptr() as usize, Ordering::SeqCst);
+        self.dma_buffer
+            .store(data.as_ptr() as usize, Ordering::SeqCst);
         Ok(data.len())
     }
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError> {
@@ -391,10 +407,11 @@ impl NetworkStack for SimpleNetworkStack {
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket_option in &self.sockets {
             if let Some(ref socket) = socket_option {
-                if socket.id() == id { return Some(socket.as_ref()); }
+                if socket.id() == id {
+                    return Some(socket.as_ref());
+                }
             }
         }
         None
     }
 }
-

@@ -3,6 +3,8 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Observability Stack for SigmaOS
 /// Implements observability using OOP principles with traits and structs
@@ -10,8 +12,6 @@ use core::mem;
 /// Based on Roadmap Item 90: Observability stack
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 /// Metric ID
 pub type MetricID = usize;
@@ -526,5 +526,3 @@ impl ObservabilityStack for SimpleObservabilityStack {
         self.stats
     }
 }
-
-/// Simple Vec implementation for no_std

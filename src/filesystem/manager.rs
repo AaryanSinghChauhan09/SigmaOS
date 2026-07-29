@@ -457,9 +457,8 @@ mod tests {
     #[test]
     fn test_list_directory() {
         let manager = FileManager::default();
-        let items = manager
-            .list_directory(&PathBuf::from("/home/user"))
-            .unwrap();
+        let path = PathBuf::from("/home/user");
+        let items = manager.list_directory(&path).unwrap();
         assert!(!items.is_empty());
     }
 
@@ -467,9 +466,7 @@ mod tests {
     fn test_navigate() {
         let mut manager = FileManager::default();
         let path = PathBuf::from("/home/user/Documents");
-        manager
-            .navigate(&PathBuf::from("/home/user/Documents"))
-            .unwrap();
+        manager.navigate(&path).unwrap();
         assert_eq!(
             manager.current_path(),
             PathBuf::from("/home/user/Documents")

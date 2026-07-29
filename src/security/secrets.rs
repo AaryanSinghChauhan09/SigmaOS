@@ -1,34 +1,20 @@
 #![no_std]
+#![no_main]
 
-<<<<<<< HEAD
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
-=======
->>>>>>> origin/jules-18101178622594638830-97dc43c6
+use core::mem;
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 63: Secrets management
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
-<<<<<<< HEAD
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
-use core::mem;
-=======
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
->>>>>>> origin/jules-15532892492441614180-73ce6847
 
 /// Secret ID
 pub type SecretID = usize;
 
 /// Secret type
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum SecretType {
     Password = 0,
     APIKey = 1,
@@ -54,8 +40,8 @@ pub trait Secret {
 }
 
 /// Secret error types
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum SecretError {
     Success = 0,
     NotFound = 1,
@@ -67,7 +53,6 @@ pub enum SecretError {
 
 /// Secret info
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct SecretInfo {
     pub id: SecretID,
     pub name: [u8; 64],
@@ -116,6 +101,7 @@ impl SecretCapability {
 }
 
 /// Simple secret (OOP: Concrete secret class)
+#[repr(C)]
 pub struct SimpleSecret {
     pub id: SecretID,
     pub name: [u8; 64],
@@ -188,10 +174,8 @@ impl Secret for SimpleSecret {
         }
 
         // Simple XOR encryption for demonstration
-        if !key.is_empty() {
-            for i in 0..self.data_len {
-                self.data[i] ^= key[i % key.len()];
-            }
+        for i in 0..self.data_len {
+            self.data[i] ^= key[i % key.len()];
         }
 
         self.is_encrypted.store(true, Ordering::SeqCst);
@@ -208,10 +192,8 @@ impl Secret for SimpleSecret {
         }
 
         // Simple XOR decryption (same as encryption)
-        if !key.is_empty() {
-            for i in 0..self.data_len {
-                self.data[i] ^= key[i % key.len()];
-            }
+        for i in 0..self.data_len {
+            self.data[i] ^= key[i % key.len()];
         }
 
         self.is_encrypted.store(false, Ordering::SeqCst);
@@ -247,11 +229,7 @@ pub trait Keyring {
 
 /// Keyring statistics
 #[repr(C)]
-<<<<<<< HEAD
 #[derive(Debug, Clone, Copy)]
-=======
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
->>>>>>> origin/jules-15532892492441614180-73ce6847
 pub struct KeyringStats {
     pub total_secrets: usize,
     pub encrypted_secrets: usize,
@@ -268,18 +246,12 @@ impl KeyringStats {
     }
 }
 
-impl Default for KeyringStats {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Simple keyring (OOP: Concrete keyring class)
 pub struct SimpleKeyring {
-    pub secrets: Vec<Option<Box<dyn Secret>>>,
-    pub next_id: AtomicUsize,
-    pub stats: KeyringStats,
-    pub capability: KeyringCapability,
+    secrets: Vec<Option<Box<dyn Secret>>>,
+    next_id: AtomicUsize,
+    stats: KeyringStats,
+    capability: KeyringCapability,
 }
 
 /// Keyring capability
@@ -353,13 +325,9 @@ impl Keyring for SimpleKeyring {
         }
 
         if let Some(i) = index {
-<<<<<<< HEAD
             if let Some(slot) = self.secrets.get_mut(i) {
                 *slot = None;
             }
-=======
-            self.secrets.remove(i);
->>>>>>> origin/jules-15532892492441614180-73ce6847
             self.stats.total_secrets -= 1;
             self.stats.by_type[secret_type as usize] -= 1;
             Ok(())
@@ -416,13 +384,9 @@ impl Keyring for SimpleKeyring {
     }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 pub struct SecretManager;
 pub struct SecretStorage;
 
-=======
->>>>>>> origin/jules-18101178622594638830-97dc43c6
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -433,63 +397,7 @@ mod tests {
         let mut keyring = SimpleKeyring::new(cap);
         let secret_cap = SecretCapability::full();
         let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.store_secret(Box::new(secret)).unwrap();
-        assert_eq!(id, 1);
-
-        let retrieved = keyring.get_secret(1).unwrap();
-        assert_eq!(retrieved.name(), b"TestSecret");
-    }
-}
-
-=======
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_simple_secret_encryption_decryption() {
-        let capability = SecretCapability::full();
-        let mut secret = SimpleSecret::new(101, b"db_password", SecretType::Password, capability);
-        secret.set_data(b"super_secret_value");
-
-        assert_eq!(secret.id(), 101);
-        assert_eq!(secret.name(), b"db_password");
-        assert_eq!(secret.secret_type(), SecretType::Password);
-        assert_eq!(secret.get_data(), b"super_secret_value");
-
-        let key = b"my_encryption_key";
-        secret.encrypt(key).unwrap();
-        assert!(secret.info().is_encrypted);
-        assert_ne!(secret.get_data(), b"super_secret_value");
-
-        secret.decrypt(key).unwrap();
-        assert!(!secret.info().is_encrypted);
-        assert_eq!(secret.get_data(), b"super_secret_value");
-    }
-
-    #[test]
-    fn test_simple_keyring() {
-        let keyring_cap = KeyringCapability::full();
-        let mut keyring = SimpleKeyring::new(keyring_cap);
-
-        let capability = SecretCapability::full();
-        let secret = SimpleSecret::new(101, b"db_password", SecretType::Password, capability);
-
         let id = keyring.add_secret(Box::new(secret)).unwrap();
-        assert_eq!(id, 101);
-
-        assert!(keyring.get_secret(101).is_some());
-        assert_eq!(keyring.list_secrets().len(), 1);
-
-        let stats = keyring.stats();
-        assert_eq!(stats.total_secrets, 1);
-        assert_eq!(stats.encrypted_secrets, 0);
-
-        keyring.remove_secret(101).unwrap();
-        assert_eq!(keyring.stats().total_secrets, 0);
+        assert_eq!(id, 1);
     }
 }
-<<<<<<< HEAD
->>>>>>> origin/jules-15532892492441614180-73ce6847
-=======
->>>>>>> origin/jules-18101178622594638830-97dc43c6

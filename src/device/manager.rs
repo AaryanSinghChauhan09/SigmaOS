@@ -1,3 +1,6 @@
+#![no_std]
+#![no_main]
+
 use core::mem;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
@@ -64,16 +67,7 @@ impl Device for SimpleDevice {
         &self.name[..len]
     }
     fn device_class(&self) -> DeviceClass {
-        {
-            let raw = self.device_class.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => DeviceClass::Character,
-                2 => DeviceClass::Network,
-                3 => DeviceClass::Input,
-                4 => DeviceClass::Output,
-                _ => DeviceClass::Block,
-            }
-        }
+        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst) as u32) }
     }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {
@@ -116,10 +110,9 @@ impl DeviceManager for SimpleDeviceManager {
     }
 
     fn unregister_device(&mut self, id: DeviceID) -> Result<(), DeviceError> {
-        for device_option in self.devices.iter_mut() {
+        for device_option in &mut self.devices {
             if let Some(ref device) = *device_option {
                 if device.id() == id {
-                    *device_option = None;
                     return Ok(());
                 }
             }
@@ -128,7 +121,7 @@ impl DeviceManager for SimpleDeviceManager {
     }
 
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
-        for device_option in self.devices.iter() {
+        for device_option in &self.devices {
             if let Some(ref device) = *device_option {
                 if device.id() == id {
                     return Some(device.as_ref());
@@ -140,7 +133,7 @@ impl DeviceManager for SimpleDeviceManager {
 
     fn list_devices(&self, device_class: DeviceClass) -> Vec<DeviceID> {
         let mut ids = Vec::new();
-        for device_option in self.devices.iter() {
+        for device_option in &self.devices {
             if let Some(ref device) = *device_option {
                 if device.device_class() == device_class {
                     ids.push(device.id());
@@ -152,7 +145,7 @@ impl DeviceManager for SimpleDeviceManager {
 
     fn scan_devices(&mut self) -> Vec<DeviceID> {
         let mut ids = Vec::new();
-        for device_option in self.devices.iter() {
+        for device_option in &self.devices {
             if let Some(ref device) = *device_option {
                 ids.push(device.id());
             }
@@ -242,21 +235,21 @@ impl DeviceHotplug for SimpleDeviceHotplug {
     }
 }
 
-pub struct Vec<T> {
+struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
-    pub fn push(&mut self, item: T) {
+    fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -265,23 +258,6 @@ impl<T> Vec<T> {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
-        }
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
         }
     }
     unsafe fn grow(&mut self) {
@@ -300,63 +276,6 @@ impl<T> Vec<T> {
             }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
         }
     }
 }

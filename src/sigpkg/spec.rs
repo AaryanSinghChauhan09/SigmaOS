@@ -7,8 +7,8 @@ use core::mem;
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -198,9 +198,7 @@ impl Package for SimplePackage {
     }
 
     fn dependencies(&self) -> &[PackageDependency] {
-        unsafe {
-            core::slice::from_raw_parts(self.dependencies.data, self.dependencies.len)
-        }
+        unsafe { core::slice::from_raw_parts(self.dependencies.data, self.dependencies.len) }
     }
 
     fn verify_signature(&self, signature: &[u8]) -> bool {
