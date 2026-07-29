@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Observability Stack for SigmaOS
 /// Implements observability using OOP principles with traits and structs
@@ -583,4 +580,37 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+pub trait SigmaDebug {
+    fn debug_info(&self) -> &[u8];
+}
+
+pub trait SigmaMetrics {
+    fn metrics_info(&self) -> &[u8];
+}
+
+pub trait SigmaTrace {
+    fn trace_info(&self) -> &[u8];
+}
+
+pub struct SimpleSigmaDebug;
+impl SigmaDebug for SimpleSigmaDebug {
+    fn debug_info(&self) -> &[u8] {
+        b"SimpleSigmaDebug"
+    }
+}
+
+pub struct SimpleSigmaMetrics;
+impl SigmaMetrics for SimpleSigmaMetrics {
+    fn metrics_info(&self) -> &[u8] {
+        b"SimpleSigmaMetrics"
+    }
+}
+
+pub struct SimpleSigmaTrace;
+impl SigmaTrace for SimpleSigmaTrace {
+    fn trace_info(&self) -> &[u8] {
+        b"SimpleSigmaTrace"
+    }
 }

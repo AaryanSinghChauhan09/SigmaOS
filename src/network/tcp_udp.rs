@@ -348,6 +348,9 @@ impl SimpleNetworkStack {
             next_id: AtomicUsize::new(1),
             firewall: SimpleFirewall::new(),
             congestion: RenoCongestionControl::new(),
+            netfilter: NetfilterFirewall::new(),
+            routing_table: RoutingTable::new(),
+            interfaces: Vec::new(),
         }
     }
 }
@@ -405,3 +408,19 @@ impl<T> Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+pub struct NetfilterFirewall;
+impl NetfilterFirewall {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+pub struct RoutingTable;
+impl RoutingTable {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+pub struct NetworkInterface;

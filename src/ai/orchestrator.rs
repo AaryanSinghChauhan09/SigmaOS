@@ -1,11 +1,7 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// Local LLM Orchestrator for SigmaOS
 /// Dynamically schedules models, checks device bounds, and prunes context windows.
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -151,7 +147,6 @@ impl ContextWindowPruner {
             history: Vec::new(),
             max_lines,
         }
-        None
     }
 
     /// Add a dialogue turn context string and prune old turns once exceeding limit (FIFO)

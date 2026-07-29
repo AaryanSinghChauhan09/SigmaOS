@@ -38,9 +38,6 @@ pub mod hardware {
 pub mod power {
     pub mod governor;
 }
-pub mod observability {
-    pub mod profiler;
-}
 pub mod ai {
     pub mod agent;
     pub mod orchestrator;
@@ -140,7 +137,6 @@ pub use distro::{
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
     MpiCommunicator,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -176,7 +172,7 @@ pub use shell::{
 };
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{

@@ -51,6 +51,8 @@ pub trait PageTableEntry {
     fn set_physical_address(&mut self, addr: PhysicalAddress);
     fn is_huge(&self) -> bool { false }
     fn is_giant(&self) -> bool { false }
+    fn is_cow(&self) -> bool { false }
+    fn set_cow(&mut self, cow: bool);
 }
 
 #[repr(C)]
@@ -94,6 +96,7 @@ impl PageTableEntry for SimplePageTableEntry {
     fn set_user_accessible(&mut self, user: bool) {
         self.user_accessible.store(if user { 1 } else { 0 }, Ordering::SeqCst);
     }
+    fn is_cow(&self) -> bool { self.cow.load(Ordering::SeqCst) == 1 }
     fn set_cow(&mut self, cow: bool) {
         self.cow.store(if cow { 1 } else { 0 }, Ordering::SeqCst);
     }
@@ -161,6 +164,8 @@ pub trait VirtualMemoryManager {
     fn unmap_page(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
     fn get_physical(&self, virt: VirtualAddress) -> Option<PhysicalAddress>;
     fn handle_page_fault(&mut self, virt: VirtualAddress, error_code: usize) -> Result<(), PageFaultError>;
+    fn map_large_page(&mut self, virt: VirtualAddress, phys: PhysicalAddress, size: PageSize, user: bool, writable: bool) -> Result<(), PageFaultError>;
+    fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
 }
 
 pub struct SimpleVMM {
@@ -672,6 +677,30 @@ impl<T> Vec<T> {
             self.capacity = new_capacity;
         }
     }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
     #[test]
     fn test_paging_and_cow() {

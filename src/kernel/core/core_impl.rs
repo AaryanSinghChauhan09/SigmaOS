@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Kernel Core for SigmaOS
 /// Implements kernel core using OOP principles with traits and structs
 /// No dependency on external kernel frameworks

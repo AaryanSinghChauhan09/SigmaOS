@@ -595,3 +595,31 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+
+pub struct DdeDeviceWrapper {
+    pub id: usize,
+    pub name: [u8; 32],
+    pub io_port: u16,
+    pub proto: [u8; 8],
+    pub simulated_pci_bar: [u8; 256],
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(id: usize, name: &[u8], io_port: u16, proto: &[u8]) -> Self {
+        let mut name_arr = [0u8; 32];
+        let mut proto_arr = [0u8; 8];
+        let name_len = name.len().min(31);
+        let proto_len = proto.len().min(7);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), name_len);
+            core::ptr::copy_nonoverlapping(proto.as_ptr(), proto_arr.as_mut_ptr(), proto_len);
+        }
+        Self {
+            id,
+            name: name_arr,
+            io_port,
+            proto: proto_arr,
+            simulated_pci_bar: [0u8; 256],
+        }
+    }
+}

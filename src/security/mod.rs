@@ -22,9 +22,16 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod clipboard;
-pub mod intrusion;
-pub mod password;
+pub mod bridge;
+pub mod defensive_audit;
+pub mod lsm;
+pub mod parrot;
+pub mod parrot_kali;
+pub mod parrot_parity;
+pub mod phantom;
+pub mod prism;
+pub mod qubes_isolation;
+pub mod sandbox;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -47,7 +54,7 @@ pub use password::{
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
+    AppArmorManager, AppArmorProfile, ObjectType, SelinuxPermission, SecurityContext,
     SecurityLabel, SecurityPolicy, SecurityRule,
 };
 pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
@@ -63,3 +70,4 @@ pub use vpn::{
     WireGuardHandler,
 };
 pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
+pub use qubes_isolation::{DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError};
