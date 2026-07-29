@@ -55,6 +55,33 @@ pub enum ShellCommand {
     AgentRun {
         task_id: usize,
     },
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
+    Pwd,
+    Theme {
+        theme_name: String,
+    },
+    Profile {
+        profile_name: String,
+    },
+    A11y {
+        feature: String,
+        status: String,
+    },
     Unknown(String),
 }
 
@@ -109,6 +136,13 @@ pub struct ShellRepl {
     aliases: std::collections::HashMap<String, String>,
     prompt: String,
     agent_engine: AgentAutomationEngine,
+    pub services: std::collections::HashMap<String, String>,
+    pub installed_packages: std::collections::HashSet<String>,
+    pub current_user: String,
+    pub current_dir: String,
+    pub current_theme: String,
+    pub current_profile: String,
+    pub a11y_features: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
@@ -117,27 +151,27 @@ impl ShellRepl {
         services.insert("cron".to_string(), "Running".to_string());
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
-        Self {
-            running: true,
-            variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
-            prompt: "sigma-sh> ".to_string(),
-            agent_engine: AgentAutomationEngine::new(),
-        }
-    }
 
-    pub fn with_prompt(prompt: String) -> Self {
-        let mut services = std::collections::HashMap::new();
-        services.insert("systemd-networkd".to_string(), "Running".to_string());
-        services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Running".to_string());
+        let mut installed_packages = std::collections::HashSet::new();
+        installed_packages.insert("sigma-sh".to_string());
+        installed_packages.insert("sigma-vim".to_string());
+
+        let mut a11y_features = std::collections::HashMap::new();
+        a11y_features.insert("high_contrast".to_string(), false);
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt,
+            prompt: "ubuntu@sigmaos:~$ ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
+            services,
+            installed_packages,
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            current_theme: "light".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features,
         }
     }
 
@@ -224,6 +258,62 @@ impl ShellRepl {
             "ls" => ShellCommand::ListFiles,
             "exit" | "quit" => ShellCommand::Exit,
             "pwd" => ShellCommand::Pwd,
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        theme_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        profile_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        status: parts[2].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        theme_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        profile_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        status: parts[2].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "whoami" => ShellCommand::WhoAmI,
             "echo" => {
                 let message = parts[1..].join(" ");
@@ -483,7 +573,7 @@ impl ShellRepl {
                         let mut results = Vec::new();
                         let all_packages = ["sigma-sh", "sigma-vim", "sigma-curl", "sigma-gcc", "sigma-git", "sigma-python"];
                         for pkg in &all_packages {
-                            if pkg.contains(&query) {
+                            if pkg.contains(query.as_str()) {
                                 results.push(format!("{} - Package matching query", pkg));
                             }
                         }
@@ -581,6 +671,32 @@ impl ShellRepl {
                 } else {
                     Err(format!("Agent task #{} not found", task_id))
                 }
+            }
+            ShellCommand::Theme { theme_name } => {
+                self.current_theme = theme_name.clone();
+                Ok(format!("Theme changed to {}.", theme_name))
+            }
+            ShellCommand::Profile { profile_name } => {
+                self.current_profile = profile_name.clone();
+                Ok(format!("Profile changed to {}.", profile_name))
+            }
+            ShellCommand::A11y { feature, status } => {
+                let enabled = status == "on";
+                self.a11y_features.insert(feature.clone(), enabled);
+                Ok(format!("Accessibility feature '{}' turned {}.", feature, status))
+            }
+            ShellCommand::Theme { theme_name } => {
+                self.current_theme = theme_name.clone();
+                Ok(format!("Theme changed to {}.", theme_name))
+            }
+            ShellCommand::Profile { profile_name } => {
+                self.current_profile = profile_name.clone();
+                Ok(format!("Profile changed to {}.", profile_name))
+            }
+            ShellCommand::A11y { feature, status } => {
+                let enabled = status == "on";
+                self.a11y_features.insert(feature.clone(), enabled);
+                Ok(format!("Accessibility feature '{}' turned {}.", feature, status))
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }

@@ -36,8 +36,8 @@ pub struct VmPerformanceMetrics {
 /// Thread-Safe, Lock-Free Circular Ring-Buffer for Zero-Copy IPC
 pub struct ZeroCopyQueue<T, const N: usize> {
     buffer: [Option<T>; N],
-    head: usize,
-    tail: usize,
+    head: AtomicUsize,
+    tail: AtomicUsize,
     metrics: ZeroCopyMetrics,
 }
 
@@ -45,8 +45,8 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
     pub fn new() -> Self {
         Self {
             buffer: [const { None }; N],
-            head: 0,
-            tail: 0,
+            head: AtomicUsize::new(0),
+            tail: AtomicUsize::new(0),
             metrics: ZeroCopyMetrics::default(),
         }
     }
@@ -63,10 +63,10 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
 
         let idx = head % N;
         self.buffer[idx] = Some(item);
-        self.head = head.wrapping_add(1);
+        self.head.store(head.wrapping_add(1), Ordering::Release);
         self.metrics.enqueued_count += 1;
 
-        let current_size = self.head.wrapping_sub(self.tail);
+        let current_size = head.wrapping_add(1).wrapping_sub(tail);
         if current_size > self.metrics.peak_occupancy {
             self.metrics.peak_occupancy = current_size;
         }
@@ -89,7 +89,7 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
             self.metrics.empty_errors += 1;
             IpcError::InvalidPayload
         })?;
-        self.tail = tail.wrapping_add(1);
+        self.tail.store(tail.wrapping_add(1), Ordering::Release);
         self.metrics.dequeued_count += 1;
         Ok(item)
     }
@@ -112,11 +112,6 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
         self.head
             .load(Ordering::Acquire)
             .wrapping_sub(self.tail.load(Ordering::Acquire))
-    }
-
-    /// Get high-fidelity performance metrics for the queue
-    pub fn get_metrics(&self) -> ZeroCopyMetrics {
-        self.metrics
     }
 
     /// Get high-fidelity performance metrics for the queue

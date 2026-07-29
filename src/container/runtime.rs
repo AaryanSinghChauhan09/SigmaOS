@@ -11,6 +11,34 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// Container ID
 pub type ContainerID = usize;
 
+/// Container Capability
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
+}
+
+/// Container Info
+#[derive(Debug, Clone, Copy)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
+}
+
+/// Resource Configuration
+pub struct ResourceConfig;
+
+/// Container Manager
+pub struct ContainerManager;
+
 /// Container state
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,6 +79,9 @@ pub enum ContainerError {
     InvalidConfig,
     ResourceLimit,
     CapabilityDenied,
+    PermissionDenied,
+    AlreadyStarted,
+    AlreadyStopped,
 }
 
 pub struct NamespaceConfig {
@@ -153,7 +184,7 @@ pub struct OciMount {
     pub options: Vec<String>,
 }
 
-pub enum ContainerState {
+pub enum OciContainerState {
     Created,
     Running,
     Paused,
@@ -161,21 +192,21 @@ pub enum ContainerState {
     Deleted,
 }
 
-pub struct Container {
+pub struct OciContainer {
     pub id: String,
     pub bundle: String,
     pub config: OciSpec,
     pub image: String,
-    pub state: ContainerState,
+    pub state: OciContainerState,
     pub pid: Option<u64>,
     pub rootfs: String,
     pub layers: Vec<String>,
     pub namespaces: NamespaceConfig,
 }
 
-impl Container {
+impl OciContainer {
     pub fn new(id: &str, bundle: &str) -> Self {
-        Container {
+        OciContainer {
             id: id.to_string(),
             bundle: bundle.to_string(),
             config: OciSpec {
@@ -193,7 +224,7 @@ impl Container {
                 mounts: Vec::new(),
             },
             image: String::new(),
-            state: ContainerState::Created,
+            state: OciContainerState::Created,
             pid: None,
             rootfs: String::new(),
             layers: Vec::new(),
@@ -203,15 +234,15 @@ impl Container {
 }
 
 pub trait Runtime: Send + Sync {
-    fn create(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-    fn start(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-    fn kill(&mut self, container: &mut Container, signal: i32) -> Result<(), ContainerError>;
-    fn delete(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-    fn pause(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-    fn resume(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-    fn exec(&mut self, container: &mut Container, args: &[String]) -> Result<(), ContainerError>;
-    fn state(&self, container: &Container) -> Result<ContainerState, ContainerError>;
-    fn update(&mut self, container: &mut Container, resources: &ResourceConfig) -> Result<(), ContainerError>;
+    fn create(&mut self, container: &mut OciContainer) -> Result<(), ContainerError>;
+    fn start(&mut self, container: &mut OciContainer) -> Result<(), ContainerError>;
+    fn kill(&mut self, container: &mut OciContainer, signal: i32) -> Result<(), ContainerError>;
+    fn delete(&mut self, container: &mut OciContainer) -> Result<(), ContainerError>;
+    fn pause(&mut self, container: &mut OciContainer) -> Result<(), ContainerError>;
+    fn resume(&mut self, container: &mut OciContainer) -> Result<(), ContainerError>;
+    fn exec(&mut self, container: &mut OciContainer, args: &[String]) -> Result<(), ContainerError>;
+    fn state(&self, container: &OciContainer) -> Result<OciContainerState, ContainerError>;
+    fn update(&mut self, container: &mut OciContainer, resources: &ResourceConfig) -> Result<(), ContainerError>;
 }
 
 impl ContainerCapability {

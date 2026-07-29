@@ -1,6 +1,6 @@
 use core::mem;
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { pub data: *mut T, pub len: usize, pub capacity: usize }
 
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
@@ -86,6 +86,27 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8, self.capacity * mem::size_of::<T>()); }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
 }

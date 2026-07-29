@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+use crate::klib::Vec;
+use core::ops::{Deref, DerefMut};
 
 /// OOP-based Boot Performance Optimization for SigmaOS
 /// Implements boot optimization using OOP principles with traits and structs
@@ -223,6 +223,7 @@ pub trait BootOptimizer {
 
 /// Boot statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct BootStats {
     pub total_services: usize,
     pub ready_services: usize,
@@ -328,7 +329,7 @@ impl BootOptimizer for SimpleBootOptimizer {
             return Err(BootError::InitializationFailed);
         }
 
-        for service_option in &mut self.services {
+        for service_option in &mut *self.services {
             if let Some(ref mut service) = *service_option {
                 if service.id() == id {
                     let result = service.initialize();
@@ -355,7 +356,7 @@ impl BootOptimizer for SimpleBootOptimizer {
         // Collect all service IDs with their priorities
         let mut services_with_priority: Vec<(ServiceID, ServicePriority)> = Vec::new();
 
-        for service_option in &self.services {
+        for service_option in &*self.services {
             if let Some(ref service) = *service_option {
                 services_with_priority.push((service.id(), service.priority()));
             }
@@ -372,8 +373,8 @@ impl BootOptimizer for SimpleBootOptimizer {
             }
         }
 
-        for (id, _) in services_with_priority {
-            ordered_ids.push(id);
+        for (id, _) in &*services_with_priority {
+            ordered_ids.push(*id);
         }
 
         Ok(ordered_ids)
@@ -386,15 +387,15 @@ impl BootOptimizer for SimpleBootOptimizer {
 
         let optimized_order = self.optimize_boot_order()?;
 
-        for id in optimized_order {
-            let _ = self.initialize_service(id);
+        for id in &*optimized_order {
+            let _ = self.initialize_service(*id);
         }
 
         Ok(())
     }
 
     fn get_service(&self, id: ServiceID) -> Option<&dyn BootService> {
-        for service_option in &self.services {
+        for service_option in &*self.services {
             if let Some(ref service) = *service_option {
                 if service.id() == id {
                     return Some(service.as_ref());
@@ -409,73 +410,3 @@ impl BootOptimizer for SimpleBootOptimizer {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}

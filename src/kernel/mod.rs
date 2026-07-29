@@ -11,12 +11,17 @@ pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
 pub mod breakthroughs;
+pub mod ipc;
+pub mod linux_absorb;
+pub mod vfs;
+pub mod subsystem;
+pub mod traits;
 
-pub use boot::firmware::{
+pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
 };
 pub use bus::{Bus, PciBus, UsableBus};
-pub use container::runtime::{
+pub use crate::container::runtime::{
     Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
     ResourceConfig, Runtime,
 };

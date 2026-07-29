@@ -5,6 +5,8 @@
 // Core library for SigmaOS operating system
 #![allow(clippy::all, unused)]
 
+pub mod klib;
+pub mod container;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -44,10 +46,7 @@ pub mod ai {
     pub mod agent;
     pub mod orchestrator;
 }
-pub mod boot {
-    pub mod firmware_bridge;
-    pub mod bridge_grid;
-}
+pub mod boot;
 pub mod toolchain {
     pub mod adapter;
     pub mod capsule;
@@ -100,7 +99,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{

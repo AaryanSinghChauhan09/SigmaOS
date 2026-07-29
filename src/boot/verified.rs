@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+use crate::klib::Vec;
+use core::ops::{Deref, DerefMut};
 
 /// OOP-based Verified Boot for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 561
@@ -12,7 +12,7 @@ pub type BootStageID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BootStage { Firmware = 0, Bootloader = 1, Kernel = 2, Initramfs = 3, Userspace = 4 }
+pub enum BootStageEnum { Firmware = 0, Bootloader = 1, Kernel = 2, Initramfs = 3, Userspace = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -20,7 +20,7 @@ pub enum BootError { Success = 0, SignatureInvalid = 1, StageFailed = 2, Verific
 
 pub trait BootStage {
     fn id(&self) -> BootStageID;
-    fn stage_type(&self) -> BootStage;
+    fn stage_type(&self) -> BootStageEnum;
     fn hash(&self) -> &[u8];
     fn signature(&self) -> &[u8];
     fn verify(&self, public_key: &[u8]) -> Result<bool, BootError>;
@@ -35,7 +35,7 @@ pub struct SimpleBootStage {
 }
 
 impl SimpleBootStage {
-    pub fn new(id: BootStageID, stage_type: BootStage, hash: &[u8], signature: &[u8]) -> Self {
+    pub fn new(id: BootStageID, stage_type: BootStageEnum, hash: &[u8], signature: &[u8]) -> Self {
         let mut hash_array = [0u8; 64];
         let mut sig_array = [0u8; 128];
         let hash_len = hash.len().min(63);
@@ -55,18 +55,18 @@ impl SimpleBootStage {
 
 impl BootStage for SimpleBootStage {
     fn id(&self) -> BootStageID { self.id }
-    fn stage_type(&self) -> BootStage { {
+    fn stage_type(&self) -> BootStageEnum { {
         let raw = self.stage_type.load(Ordering::SeqCst) as u32;
         match raw {
-            1 => BootStage::Bootloader,
-            2 => BootStage::Kernel,
-            3 => BootStage::Initramfs,
-            4 => BootStage::Userspace,
-            _ => BootStage::Firmware,
+            1 => BootStageEnum::Bootloader,
+            2 => BootStageEnum::Kernel,
+            3 => BootStageEnum::Initramfs,
+            4 => BootStageEnum::Userspace,
+            _ => BootStageEnum::Firmware,
         }
     } }
-    fn hash(&self) -> &Self::hash { &self.hash }
-    fn signature(&self) -> &Self::signature { &self.signature }
+    fn hash(&self) -> &[u8] { &self.hash }
+    fn signature(&self) -> &[u8] { &self.signature }
 
     fn verify(&self, _public_key: &[u8]) -> Result<bool, BootError> {
         Ok(true)
@@ -101,7 +101,7 @@ impl BootChain for SimpleBootChain {
     }
 
     fn verify_chain(&self, public_key: &[u8]) -> Result<bool, BootError> {
-        for stage_option in &self.stages {
+        for stage_option in &*self.stages {
             if let Some(ref stage) = *stage_option {
                 if !stage.verify(public_key)? {
                     return Ok(false);
@@ -112,7 +112,7 @@ impl BootChain for SimpleBootChain {
     }
 
     fn get_stage(&self, id: BootStageID) -> Option<&dyn BootStage> {
-        for stage_option in &self.stages {
+        for stage_option in &*self.stages {
             if let Some(ref stage) = *stage_option {
                 if stage.id() == id { return Some(stage.as_ref()); }
             }
@@ -260,52 +260,3 @@ impl BootMeasurement for SimpleBootMeasurement {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

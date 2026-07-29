@@ -85,8 +85,9 @@ impl DinitServiceManager {
 
         // Recursively start dependencies first (Dinit logic)
         let deps = self.services[idx].dependencies.clone();
-        for dep in &deps {
-            let dep_name = &dep[..dep.iter().position(|&b| b == 0).unwrap_or(32)];
+        for dep in &*deps {
+            let pos = dep.iter().position(|&b| b == 0).unwrap_or(32);
+            let dep_name = &dep[..pos];
             self.start_service(dep_name)?;
         }
 

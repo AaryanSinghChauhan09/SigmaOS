@@ -31,12 +31,21 @@ pub trait DeviceDriver: Any + Send + Sync {
     fn as_any_mut(&mut self) -> &mut dyn Any;
 }
 
-#[derive(Debug, Clone)]
 pub struct DriverRegistration {
     pub driver: Box<dyn Driver>,
     pub priority: u32,
     pub builtin: bool,
     pub loaded: bool,
+}
+
+impl core::fmt::Debug for DriverRegistration {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("DriverRegistration")
+            .field("priority", &self.priority)
+            .field("builtin", &self.builtin)
+            .field("loaded", &self.loaded)
+            .finish()
+    }
 }
 
 pub struct DriverRegistry {
@@ -112,10 +121,12 @@ impl DriverRegistry {
     }
 
     pub fn find_driver_mut(&mut self, name: &str) -> Option<&mut dyn Driver> {
-        self.drivers
-            .iter_mut()
-            .find(|d| d.driver.driver_name() == name)
-            .map(|d| d.driver.as_mut())
+        for d in self.drivers.iter_mut() {
+            if d.driver.driver_name() == name {
+                return Some(&mut *d.driver);
+            }
+        }
+        None
     }
 
     pub fn register_device(&mut self, device: Box<dyn Device>) -> Result<(), DriverError> {
@@ -131,18 +142,21 @@ impl DriverRegistry {
     }
 
     pub fn probe_and_bind(&mut self) -> Result<(), DriverError> {
+        let mut bindings_to_apply = alloc::vec::Vec::new();
         for device in self.device_manager.devices() {
             for reg in &mut self.drivers {
                 if !reg.loaded && reg.driver.probe(device) {
                     if let Some(driver) = reg.driver.as_driver_impl_mut() {
                         driver.init()?;
-                        self.device_manager
-                            .bind_driver(device.name(), reg.driver.driver_name())?;
+                        bindings_to_apply.push((device.name().to_string(), reg.driver.driver_name().to_string()));
                         reg.loaded = true;
                         break;
                     }
                 }
             }
+        }
+        for (device_name, driver_name) in bindings_to_apply {
+            self.device_manager.bind_driver(&device_name, &driver_name)?;
         }
         Ok(())
     }

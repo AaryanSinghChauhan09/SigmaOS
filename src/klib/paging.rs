@@ -8,6 +8,23 @@ use crate::klib::vec::Vec;
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageSize {
+    Standard4KB,
+    Huge2MB,
+    Giant1GB,
+}
+
+impl PageSize {
+    pub fn byte_size(&self) -> usize {
+        match self {
+            PageSize::Standard4KB => 4096,
+            PageSize::Huge2MB => 2097152,
+            PageSize::Giant1GB => 1073741824,
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum PageTableLevel {
@@ -107,7 +124,6 @@ impl PageTableEntry for SimplePageTableEntry {
 pub trait PageTable {
     fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry;
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry;
-    fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry;
     fn set_entry(&mut self, index: usize, entry: SimplePageTableEntry);
     fn get_physical_address(&self) -> PhysicalAddress;
 }
@@ -493,23 +509,33 @@ impl VirtualMemoryManager for SimpleVMM {
             return None;
         }
 
-        if let Some(ref pdpt) = self.pdpt_tables[pml4_idx] {
-            let pdpt_entry = pdpt.get_entry_ref(pdpt_idx);
-            if !pdpt_entry.is_present() {
-                return None;
-            }
-            
-            if let Some(ref pd) = self.pd_tables[pdpt_idx] {
-                let pd_entry = pd.get_entry_ref(pd_idx);
-                if !pd_entry.is_present() {
+        if pml4_idx < self.pdpt_tables.len() {
+            if let Some(ref pdpt) = self.pdpt_tables[pml4_idx] {
+                let pdpt_entry = pdpt.get_entry_ref(pdpt_idx);
+                if !pdpt_entry.is_present() {
                     return None;
                 }
                 
-                if let Some(ref pt) = self.pt_tables[pd_idx] {
-                    let pt_entry = pt.get_entry_ref(pt_idx);
-                    if pt_entry.is_present() {
-                        let page_offset = virt & 0xFFF;
-                        return Some(pt_entry.get_physical_address() | page_offset);
+                let pdpt_phys = pml4_entry.get_physical_address();
+                let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+                if pd_idx_in_vec < self.pd_tables.len() {
+                    if let Some(ref pd) = self.pd_tables[pd_idx_in_vec] {
+                        let pd_entry = pd.get_entry_ref(pd_idx);
+                        if !pd_entry.is_present() {
+                            return None;
+                        }
+
+                        let pd_phys = pdpt_entry.get_physical_address();
+                        let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+                        if pt_idx_in_vec < self.pt_tables.len() {
+                            if let Some(ref pt) = self.pt_tables[pt_idx_in_vec] {
+                                let pt_entry = pt.get_entry_ref(pt_idx);
+                                if pt_entry.is_present() {
+                                    let page_offset = virt & 0xFFF;
+                                    return Some(pt_entry.get_physical_address() | page_offset);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -529,24 +555,34 @@ impl VirtualMemoryManager for SimpleVMM {
             return Err(PageFaultError::NotPresent);
         }
 
-        if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
-            let pdpt_entry = pdpt.get_entry(pdpt_idx);
-            if !pdpt_entry.is_present() {
-                return Err(PageFaultError::NotPresent);
-            }
-
-            if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
-                let pd_entry = pd.get_entry(pd_idx);
-                if !pd_entry.is_present() {
+        if pml4_idx < self.pdpt_tables.len() {
+            if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
+                let pdpt_entry = pdpt.get_entry(pdpt_idx);
+                if !pdpt_entry.is_present() {
                     return Err(PageFaultError::NotPresent);
                 }
 
-                if let Some(ref mut pt) = self.pt_tables[pd_idx] {
-                    let pt_entry = pt.get_entry(pt_idx);
-                    if pt_entry.is_present() {
-                        pt_entry.set_writable(false);
-                        pt_entry.set_cow(true);
-                        return Ok(());
+                let pdpt_phys = pml4_entry.get_physical_address();
+                let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+                if pd_idx_in_vec < self.pd_tables.len() {
+                    if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+                        let pd_entry = pd.get_entry(pd_idx);
+                        if !pd_entry.is_present() {
+                            return Err(PageFaultError::NotPresent);
+                        }
+
+                        let pd_phys = pdpt_entry.get_physical_address();
+                        let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+                        if pt_idx_in_vec < self.pt_tables.len() {
+                            if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
+                                let pt_entry = pt.get_entry(pt_idx);
+                                if pt_entry.is_present() {
+                                    pt_entry.set_writable(false);
+                                    pt_entry.set_cow(true);
+                                    return Ok(());
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -712,26 +748,6 @@ mod tests {
 
         assert!(pm.destroy_address_space(space_id).is_ok());
     }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
 
     #[test]
     fn test_paging_and_cow() {
@@ -752,3 +768,5 @@ mod tests {
         assert_ne!(vmm.get_physical(0x1000).unwrap(), 0x2000000);
     }
 }
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
