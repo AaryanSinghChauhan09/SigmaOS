@@ -202,56 +202,6 @@ impl SecurityEnforcer {
     }
 }
 
-/// Permission types
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp = 0,
-    NetworkUdp = 1,
-    FileRead = 2,
-    FileWrite = 3,
-    ProcessExec = 4,
-    Ipc = 5,
-}
-
-/// Capability gate for syscall validation
-pub struct CapabilityGate {
-    /// Current capability token
-    current: AtomicU64,
-}
-
-impl CapabilityGate {
-    /// Create new capability gate
-    pub fn new() -> Self {
-        Self {
-            current: AtomicU64::new(0),
-        }
-    }
-
-    /// Set current capability
-    pub fn set_capability(&self, token: CapabilityToken) {
-        self.current.store(token.bits(), Ordering::SeqCst);
-    }
-
-    /// Validate syscall against current capability
-    pub fn validate_syscall(&self, permission: Permission) -> bool {
-        let current = self.current.load(Ordering::SeqCst);
-        (current & (1 << permission as u64)) != 0
-    }
-
-    /// Get current capability
-    pub fn current_capability(&self) -> CapabilityToken {
-        CapabilityToken {
-            bits: self.current.load(Ordering::SeqCst),
-        }
-    }
-}
-
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

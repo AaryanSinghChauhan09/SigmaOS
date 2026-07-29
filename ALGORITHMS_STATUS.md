@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 # 🛠️ SigmaOS Algorithms, Compilation, & Subsystem Status Guide
 
-This document serves as the definitive, hyper-detailed master status guide for any software engineer or AI agent working on SigmaOS. It details what is working, what is not working, why these issues exist, lists the exact compilation-blocking errors, and provides precise, copy-pasteable instructions to resolve every compiler error instantly.
+This document serves as the definitive, hyper-detailed master status guide for any software engineer or AI agent working on SigmaOS. It details what is working, what is not working, why these issues exist, lists the exact compilation-blocking errors, and provides precise instructions to resolve every compiler error.
 
 ---
 
@@ -53,18 +52,26 @@ The following algorithms and subsystems are structurally and logically complete:
 
 1. **EEVDF Scheduler (`src/kernel/scheduler.rs` & `roundrobin.rs`)**
    - Implements Earliest Eligible Virtual Deadline First (EEVDF) for precise task deadlines, alongside an auxiliary round-robin mechanism.
+   - **Complexity**: Min-heap binary tree for EDF deadlines; balanced virtual-runtime allocation slices for CFS.
 
 2. **Package Dependency Resolver (`src/sigpkg/resolver.rs`)**
    - Implements a DPLL-based SAT solver with cycle detection and range constraint verification for packages.
 
 3. **Capability-Based Security Gate (`src/security/capability.rs` & `pledge.rs`)**
    - Implements unprivileged-process restriction policies via pledge and unveil semantics.
+   - **Complexity**: Bitwise mask-comparisons over syscall gates and capability tokens.
 
 4. **Virtual Filesystem (`src/filesystem/vfs.rs`)**
    - Implements virtual inode and file descriptor routing with capability permissions.
 
 5. **Historic Linux ABI Layer (`src/compatibility/historic_linux.rs`)**
-   - Provides an impressive backwards-compatibility engine spanning early era emulation (0.01/0.11 up to 2.4/2.5) with full sandbox virtualizations, driver shims, and package converts.
+   - Provides an backwards-compatibility engine spanning early era emulation (0.01/0.11 up to 2.4/2.5) with full sandbox virtualizations, driver shims, and package converts.
+
+6. **S-MM Memory Manager (Buddy Allocator)**
+   - Implements safe, zero-dependency, $O(1)$ buddy order calculations using branchless CPU instruction mapping.
+
+7. **S-AI Multi-Agent Task Planner**
+   - Implements linear cosine similarity lookups over local vector storage databases.
 
 ---
 
@@ -191,106 +198,14 @@ The following algorithms and subsystems are structurally and logically complete:
 | **Kernel Structure** | Monolithic or traditional microkernel | OOP microservices + Self-healing rollback snapshots |
 | **Scheduler** | Performance-oriented scheduling (CFS) | Energy-aware dynamic balancing + AI predictive pre-fetching |
 | **Security** | SELinux/AppArmor access policies | Zero-trust default sandbox + PQC region encryption |
-| **Extensibility** | Loadable kernel modules (.ko) | Safe, live User-defined kernel scripting functions |
+| **Extensibility** | Inserts heavy kernel modules | **User-Defined Functions** | Safe scripting sandbox for core algorithms. |
 
 ---
 
 ## 🔍 Deep Dive: Why & How to Fix Every Active Compilation Error
 
-### Issue 1: Multiple conflicting implementations of `Default` for `SimplePageTableEntry` in `src/klib/paging.rs`
-* **Why it occurs**: In `src/klib/paging.rs`, the `Default` trait is implemented multiple times for `SimplePageTableEntry`. This happens due to duplicate source-code blocks added during multiple feature integrations.
-* **Exact Code Fix**: Locate `src/klib/paging.rs` and remove any duplicate `impl Default for SimplePageTableEntry` blocks, keeping only one clean implementation.
-
-### Issue 2: Conflicting implementations of `Debug`, `Clone`, and `Copy` for `DriverError` in `src/driver/framework.rs`
-* **Why it occurs**: In `src/driver/framework.rs`, `DriverError` is declared with `#[derive(Debug, Clone, Copy, PartialEq, Eq)]` on its definition block, but also has explicit manual or duplicate macro derives lower down in the file.
-* **Exact Code Fix**: Inspect `src/driver/framework.rs`. Remove the duplicate derives or redundant `impl` blocks for `Debug`, `Clone`, and `Copy` traits for `DriverError`.
-
-### Issue 3: Conflicting implementations of `Debug` and `Clone` in `src/drivers/gpu.rs`
-* **Why it occurs**: The structures `DrmModeInfo`, `DrmCrtc`, and `DrmConnector` in `src/drivers/gpu.rs` contain duplicate `#[derive(...)]` macro blocks or duplicate implementations of `Debug` and `Clone`.
-* **Exact Code Fix**: Edit `src/drivers/gpu.rs` and eliminate duplicate `derive` directives for these three structures.
-
-### Issue 4: Conflicting implementations of `Default`, `BsdSocket` in `src/network/tcp_udp.rs`
-* **Why it occurs**: In `src/network/tcp_udp.rs`, there are multiple overlapping or duplicate `impl Default` and `impl BsdSocket` blocks for `RenoCongestionControl`, `BBRCongestionControl`, `SimpleNetworkStack`, and `SimpleSocket`.
-* **Exact Code Fix**: Consolidate or delete the duplicate trait implementations in `src/network/tcp_udp.rs` to leave exactly one per type.
-
-### Issue 5: Unresolved module/crate `mem` in `src/network/tcp_udp.rs`
-* **Why it occurs**: The call `mem::size_of::<T>()` is used inside `src/network/tcp_udp.rs` at line 749, but the `core::mem` or `std::mem` module is not imported.
-* **Exact Code Fix**: Add `use core::mem;` or `use std::mem;` at the top of `src/network/tcp_udp.rs`.
-
-### Issue 6: Mismatched methods in `BsdSocket` trait implementation in `src/network/tcp_udp.rs`
-* **Why it occurs**: Methods `protocol()`, `local_port()`, and `remote_port()` are implemented for `BsdSocket`, but those methods are not declared inside the original `BsdSocket` trait definition (possibly defined in `src/network/stack.rs` or `src/network/mod.rs`).
-* **Exact Code Fix**: Either add these method signatures to the `BsdSocket` trait definition or remove them from the implementation blocks where they do not match.
-
-### Issue 7: Conflicting implementations of `Clone`, `Copy`, `PartialEq`, `Eq` for `BuildSystem` in `src/sigpkg/recipe.rs`
-* **Why it occurs**: In `src/sigpkg/recipe.rs`, `recipe::BuildSystem` has redundant derive macros or manual trait implementations that conflict.
-* **Exact Code Fix**: Clean up the duplicate `derive` statements in `src/sigpkg/recipe.rs`.
-
-### Issue 8: Missing definitions for `SimpleDriver` in `src/driver/framework.rs`
-* **Why it occurs**: The struct `SimpleDriver` is reference/implemented in `src/driver/framework.rs` but it is never declared or was accidentally renamed.
-* **Exact Code Fix**: Ensure `pub struct SimpleDriver` is correctly declared in `src/driver/framework.rs`.
-
-### Issue 9: Missing `DriverMetadata` import/definition in `src/kernel/driver.rs`
-* **Why it occurs**: The `DriverMetadata` structure is referenced in `src/kernel/driver.rs` but is not imported.
-* **Exact Code Fix**: Import `DriverMetadata` by adding `use crate::kernel::bus::DriverMetadata;` or `use crate::kernel::DriverMetadata;` at the top of `src/kernel/driver.rs`.
-
-### Issue 10: Unresolved variable `a11y` in `src/shell/repl.rs`
-* **Why it occurs**: In `src/shell/repl.rs`, `a11y` is referenced in `a11y_features: a11y,` but `a11y` is not bound/defined in that scope.
-* **Exact Code Fix**: Locate the context in `src/shell/repl.rs` where `a11y` is used and declare it, or pass the correct boolean flag (e.g. `false`).
-
----
-
-## 🔮 Advanced Proxy-Based Compatibility Subsystems
-
-SigmaOS has evolved into a fully **proxy-based architecture** that integrates 7 advanced object-oriented compatibility systems in `src/compatibility/proxy.rs`:
-
-### 1. Universal ABI Translator (ISyscallTranslator)
-*   **Purpose**: Traditional OSes do not run Linux, BSD, Windows, and macOS binaries natively.
-*   **Design**: Implements a highly polymorphic system where each foreign OS is represented as a subclass conforming to a common translation trait, enabling zero-overhead native execution of polyglot binaries.
-*   **Status**: Fully operational with unit tests.
-
-### 2. Composable Filesystem (SigmaFS++)
-*   **Purpose**: Standard file systems are monolithic and inflexible.
-*   **Design**: Breaks storage operations into composable plugins allowing dynamic injection of post-quantum encryption, block-level deduplication, and AI-driven semantic queries.
-*   **Status**: Fully operational with unit tests.
-
-### 3. Self-Healing Kernel
-*   **Purpose**: Kernel Panics normally require hard reboots.
-*   **Design**: The integrity monitor maps faults to dynamic recovery strategies, executing automated quarantine of suspicious processes, hot-swapping drivers, and git-like state rollbacks.
-*   **Status**: Fully operational with unit tests.
-
-### 4. AI-Native Runtime
-*   **Purpose**: AI models are normally treated as userland applications instead of first-class kernel constructs.
-*   **Design**: Model runtimes are scheduled directly by the microkernel, managing dynamic pre-fetching of tensors, GPU mapping, and pipeline parallelization.
-*   **Status**: Fully operational with unit tests.
-
-### 5. Energy-Aware Scheduler
-*   **Purpose**: Current operating systems schedule for CPU performance without predicting power or thermal costs.
-*   **Design**: Integrates workload energy cost predictors into the scheduler core, dynamically adjusting task mapping to satisfy strict carbon-neutral or thermal constraints.
-*   **Status**: Fully operational with unit tests.
-
-### 6. User-Defined Kernel Functions
-*   **Purpose**: Researchers and power-users cannot easily customize kernel scheduling/allocation without recompilation.
-*   **Design**: Exposes a safe bytecode execution engine (similar to eBPF) that allows researchers to register hot-swappable custom scheduling policies or memory page allocators dynamically.
-*   **Status**: Fully operational with unit tests.
-
-### 7. Privacy-First Sandbox
-*   **Purpose**: Operating systems usually bolt on sandboxing after compiling.
-*   **Design**: Every process runs inside an encrypted, zero-trust hardware enclave by default, utilizing post-quantum cryptographic primitives inside standard kernel calls.
-*   **Status**: Fully operational with unit tests.
-
----
-
-## 📊 Competitive Edge vs. Traditional OSes
-
-| Subsystem | Traditional OS (Linux / Windows) | SigmaOS Innovation | Strategic Edge |
-| :--- | :--- | :--- | :--- |
-| **ABI Translation** | Emulation (Wine, WSL2) or VMs | **Universal ABI Translator** | Polyglot native execution without VM overhead. |
-| **Filesystem** | Monolithic, rigid (Ext4, NTFS) | **SigmaFS++** | Plug-and-play block encryption + semantic search. |
-| **Kernel Resilience**| Reboots on Panic, manual patches | **Self-Healing Kernel** | Automated quarantine + live rollback snapshots. |
-| **AI Workloads** | Standard userland processes | **AI-Native Runtime** | Model execution scheduled directly by the microkernel. |
-| **Scheduler** | Performance & fair share only | **Energy-Aware Scheduler** | Real-time carbon/battery/thermal constraint tracking. |
-| **Extensibility** | Inserts heavy kernel modules | **User-Defined Functions** | Safe scripting sandbox for core algorithms. |
-| **Sandboxing** | Bolted-on (SELinux, AppArmor) | **Privacy-First Sandbox** | Zero-trust default enclaves with PQ-crypto. |
+For precise file-by-file compile error troubleshooting and comprehensive code fixes, please refer to the main diagnostic guide:
+👉 **[WHAT_IS_WORKING_AND_NOT_WORKING.md](./WHAT_IS_WORKING_AND_NOT_WORKING.md)**
 
 ---
 
@@ -313,29 +228,3 @@ cargo test
 ```
 
 This ensures zero-error status, enabling rapid, clean feature and driver development across the SigmaOS microkernel.
-=======
-# 🧮 SigmaOS Core Algorithms Status
-
-This document registers the active implementation status of critical algorithms and zero-dependency utilities inside **SigmaOS**.
-
----
-
-## 📈 Algorithmic Index
-
-### 1. S-MM Memory Manager (Buddy Allocator)
-*   **State:** Stable & Production Ready.
-*   **Complexity:** $O(1)$ buddy order calculations using branchless CPU instruction mapping.
-*   **Zero-Dependency:** 100% custom, native Rust implementations.
-
-### 2. S-SCHED Predictive Scheduler (EDF + CFS)
-*   **State:** Complete.
-*   **Complexity:** Min-heap binary tree for EDF deadlines; balanced virtual-runtime allocation slices for CFS.
-
-### 3. S-AI Multi-Agent Task Planner
-*   **State:** Complete.
-*   **Complexity:** Linear cosine similarity lookup over local vector storage databases.
-
-### 4. S-SEC Security Sandbox (Pledge & Unveil)
-*   **State:** Integrated.
-*   **Complexity:** Bitwise mask-comparisons over syscall gates and capability tokens.
->>>>>>> wiki/master

@@ -672,6 +672,11 @@ impl<T> Vec<T> {
             self.capacity = new_capacity;
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
     #[test]
     fn test_paging_and_cow() {

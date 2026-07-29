@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -13,7 +10,7 @@ pub type ContainerID = usize;
 
 /// Container state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,
@@ -154,9 +151,7 @@ impl SimpleContainer {
     }
 
     pub fn get_state(&self) -> ContainerState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst) as u32)
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
 
     pub fn set_state(&self, state: ContainerState) {

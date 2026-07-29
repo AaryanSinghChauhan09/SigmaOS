@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Container Runtime Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 17
@@ -10,7 +7,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type ContainerID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,
