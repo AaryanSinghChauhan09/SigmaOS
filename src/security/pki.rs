@@ -1,12 +1,16 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 pub type CertificateID = usize;
 
@@ -61,7 +65,7 @@ impl SimpleCertificate {
 
 impl Certificate for SimpleCertificate {
     fn id(&self) -> CertificateID { self.id }
-    fn certificate_type(&self) -> CertificateType { unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst) as u32) } }
+    fn certificate_type(&self) -> CertificateType { unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) } }
     fn subject(&self) -> &[u8] {
         let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
         &self.subject[..len]
@@ -186,20 +190,3 @@ pub type PkiError = PKIError;
 pub use PKIManager as PkiManager;
 pub struct CertificateAuthority;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-impl Vec<CertificateID> {
-    fn contains(&self, item: CertificateID) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                if *self.data.add(i) == item {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-}
-}
