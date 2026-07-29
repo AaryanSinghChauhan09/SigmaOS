@@ -497,3 +497,46 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UniversalPackageType {
+    Apt,
+    Rpm,
+    Pacman,
+    Snap,
+    Nix,
+    Ebuild,
+    Apk,
+    Flatpak,
+    Txz,
+    Xbps,
+    Cachyos,
+}
+
+pub trait UniversalPackage {
+    fn package_type(&self) -> UniversalPackageType;
+}
+
+pub struct UserDefinedPackageHook;
+
+pub struct PackageAdapterFactory;
+
+pub struct AptPackageAdapter;
+pub struct PacmanPackageAdapter;
+pub struct SnapPackageAdapter;
+pub struct NixPackageAdapter;
+pub struct EbuildPackageAdapter;
+pub struct ApkPackageAdapter;
+pub struct FlatpakPackageAdapter;
+pub struct TxzPackageAdapter;
+pub struct XbpsPackageAdapter;
+pub struct CachyosPackageAdapter;
+
+pub struct CachyCpuDetector;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchLevel {
+    V1,
+    V2,
+    V3,
+    V4,
+}
