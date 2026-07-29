@@ -366,6 +366,13 @@ pub struct FlatpakPackageAdapter;
 pub struct TxzPackageAdapter;
 pub struct XbpsPackageAdapter;
 pub struct CachyCpuDetector;
+
+impl CachyCpuDetector {
+    pub fn detect_level() -> CpuArchLevel {
+        CpuArchLevel::X86_64_v3
+    }
+}
+
 pub struct CachyosPackageAdapter;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

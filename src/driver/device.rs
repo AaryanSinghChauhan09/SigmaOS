@@ -40,7 +40,7 @@ pub enum DeviceError {
 
 /// Device type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceType {
     Block = 0,
     Character = 1,
@@ -146,7 +146,7 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
 
     pub fn set_state(&self, state: DeviceState) {
@@ -164,7 +164,7 @@ impl DeviceDescriptor {
 
 /// Device state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState {
     Uninitialized = 0,
     Initializing = 1,
@@ -218,7 +218,10 @@ impl SimpleBlockDevice {
         let mut blocks = Vec::new();
 
         for _ in 0..num_blocks {
-            let block_data = vec![0u8; block_size];
+            let mut block_data = Vec::new();
+            for _ in 0..block_size {
+                block_data.push(0u8);
+            }
             blocks.push(block_data);
         }
 
@@ -332,9 +335,13 @@ impl SimpleCharacterDevice {
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Character, capability);
 
+        let mut buffer = Vec::new();
+        for _ in 0..buffer_size {
+            buffer.push(0u8);
+        }
         SimpleCharacterDevice {
             descriptor,
-            buffer: vec![0u8; buffer_size],
+            buffer,
             read_pos: 0,
             write_pos: 0,
         }
@@ -500,7 +507,7 @@ impl DeviceManager {
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id < self.departors.len() {
+        if id < self.descriptors.len() {
             self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
@@ -594,4 +601,47 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
 }

@@ -75,38 +75,68 @@ impl SlabAllocator {
 
     /// Allocate an object from a cache
     pub fn allocate(&mut self, cache_name: &str) -> Result<*mut u8, &'static str> {
-        let next_slab_id = self.next_slab_id;
-        let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
-
-        // Try to find a free object in existing slabs
-        for slab in &mut cache.slabs {
-            if slab.state != SlabState::Full {
-                for obj in &mut slab.objects {
-                    if obj.is_none() {
-                        *obj = Some(Self::allocate_memory(next_slab_id, cache.object_size));
-                        slab.inuse += 1;
-                        cache.free_objects -= 1;
-
-                        // Update slab state
-                        slab.state = if slab.inuse == cache.objects_per_slab {
-                            SlabState::Full
-                        } else if slab.inuse > 0 {
-                            SlabState::Partial
-                        } else {
-                            SlabState::Empty
-                        };
-
-                        return Ok(obj.unwrap());
+        let (slab_idx, obj_idx, object_size, objects_per_slab) = {
+            let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
+            if cache.free_objects == 0 {
+                // Short circuit: Saturated cache, jump directly to spawning a new slab (O(1))
+                (None, None, cache.object_size, cache.objects_per_slab)
+            } else {
+                let mut found = None;
+                'outer: for (s_idx, slab) in cache.slabs.iter().enumerate() {
+                    if slab.state != SlabState::Full {
+                        for (o_idx, obj) in slab.objects.iter().enumerate() {
+                            if obj.is_none() {
+                                found = Some((s_idx, o_idx));
+                                break 'outer;
+                            }
+                        }
                     }
                 }
+                if let Some((s_idx, o_idx)) = found {
+                    (
+                        Some(s_idx),
+                        Some(o_idx),
+                        cache.object_size,
+                        cache.objects_per_slab,
+                    )
+                } else {
+                    (None, None, cache.object_size, cache.objects_per_slab)
+                }
             }
+        };
+
+        if let (Some(s_idx), Some(obj_idx)) = (slab_idx, obj_idx) {
+            let ptr = self.allocate_memory(object_size);
+            let cache = self.caches.get_mut(cache_name).unwrap();
+            let slab = &mut cache.slabs[s_idx];
+            slab.objects[obj_idx] = Some(ptr);
+            slab.inuse += 1;
+            cache.free_objects -= 1;
+
+            // Update slab state
+            slab.state = if slab.inuse == objects_per_slab {
+                SlabState::Full
+            } else if slab.inuse > 0 {
+                SlabState::Partial
+            } else {
+                SlabState::Empty
+            };
+
+            return Ok(ptr);
         }
 
         // No free objects, create a new slab
-        let new_slab = Self::create_slab(next_slab_id, cache)?;
+        let (new_slab, objects_per_slab) = {
+            let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
+            let slab = self.create_slab(cache)?;
+            (slab, cache.objects_per_slab)
+        };
+
         let obj = new_slab.objects[0].unwrap();
+
+        let cache = self.caches.get_mut(cache_name).unwrap();
         cache.slabs.push(new_slab);
-        cache.free_objects = cache.objects_per_slab - 1;
+        cache.free_objects += objects_per_slab - 1;
 
         Ok(obj)
     }
@@ -140,11 +170,11 @@ impl SlabAllocator {
     }
 
     /// Create a new slab for a cache
-    fn create_slab(next_slab_id: u64, cache: &SlabCache) -> Result<Slab, &'static str> {
+    fn create_slab(&self, cache: &SlabCache) -> Result<Slab, &'static str> {
         let mut objects = Vec::with_capacity(cache.objects_per_slab);
 
         for _ in 0..cache.objects_per_slab {
-            objects.push(Some(Self::allocate_memory(next_slab_id, cache.object_size)));
+            objects.push(Some(self.allocate_memory(cache.object_size)));
         }
 
         Ok(Slab {
@@ -155,10 +185,10 @@ impl SlabAllocator {
     }
 
     /// Allocate memory (simplified - would use actual allocator)
-    fn allocate_memory(next_slab_id: u64, _size: usize) -> *mut u8 {
-        // In a real implementation, this would use the underlying page allocator
-        // For now, return a dummy pointer
-        (0x2000 + next_slab_id as usize) as *mut u8
+    fn allocate_memory(&self, size: usize) -> *mut u8 {
+        static COUNTER: core::sync::atomic::AtomicUsize = core::sync::atomic::AtomicUsize::new(0);
+        let id = COUNTER.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
+        (0x2000 + id) as *mut u8
     }
 
     /// Get cache statistics
@@ -295,5 +325,29 @@ mod tests {
         allocator.destroy_cache("task_struct").unwrap();
 
         assert_eq!(allocator.cache_count(), 0);
+    }
+
+    #[test]
+    fn test_slab_allocator_saturation_short_circuit() {
+        let mut allocator = SlabAllocator::new();
+        allocator.create_cache("test_cache".to_string(), 1024, 8).unwrap();
+
+        // 1024 object size on 4096 size slab means 4 objects per slab.
+        // Let's allocate 4 times to completely saturate the first slab.
+        let _obj1 = allocator.allocate("test_cache").unwrap();
+        let _obj2 = allocator.allocate("test_cache").unwrap();
+        let _obj3 = allocator.allocate("test_cache").unwrap();
+        let _obj4 = allocator.allocate("test_cache").unwrap();
+
+        let stats = allocator.get_cache_stats("test_cache").unwrap();
+        assert_eq!(stats.free_objects, 0);
+
+        // Allocating a 5th element should trigger the O(1) short circuit, bypass the scan, and spawn a new slab.
+        let obj5 = allocator.allocate("test_cache").unwrap();
+        assert!(!obj5.is_null());
+
+        let stats2 = allocator.get_cache_stats("test_cache").unwrap();
+        assert_eq!(stats2.total_slabs, 2);
+        assert_eq!(stats2.free_objects, 3);
     }
 }

@@ -295,7 +295,7 @@ impl Span for SimpleSpan {
             return;
         }
         self.start_time
-            .store(Self::get_current_time(), Ordering::SeqCst);
+            .store(Self::get_current_time() as usize, Ordering::SeqCst);
     }
 
     fn stop(&mut self) {
@@ -303,7 +303,7 @@ impl Span for SimpleSpan {
             return;
         }
         self.end_time
-            .store(Self::get_current_time(), Ordering::SeqCst);
+            .store(Self::get_current_time() as usize, Ordering::SeqCst);
     }
 
     fn duration(&self) -> u64 {
@@ -358,6 +358,7 @@ pub enum ObservabilityError {
 
 /// Observability statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ObservabilityStats {
     pub total_metrics: usize,
     pub total_spans: usize,
@@ -582,4 +583,80 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+pub trait SigmaDebug {
+    fn debug_info(&self) -> &[u8];
+}
+
+pub trait SigmaMetrics {
+    fn metrics_count(&self) -> usize;
+}
+
+pub trait SigmaTrace {
+    fn trace_id(&self) -> usize;
+}
+
+pub struct SimpleSigmaDebug;
+impl SigmaDebug for SimpleSigmaDebug {
+    fn debug_info(&self) -> &[u8] {
+        b"SimpleSigmaDebug"
+    }
+}
+
+pub struct SimpleSigmaMetrics;
+impl SigmaMetrics for SimpleSigmaMetrics {
+    fn metrics_count(&self) -> usize {
+        0
+    }
+}
+
+pub struct SimpleSigmaTrace;
+impl SigmaTrace for SimpleSigmaTrace {
+    fn trace_id(&self) -> usize {
+        0
+    }
 }

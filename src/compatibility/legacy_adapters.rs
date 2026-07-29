@@ -213,9 +213,9 @@ impl LegacySecurityAdapter {
     /// Converts ancient 9-bit octal file modes (e.g. 0o755) to secure microkernel `CapabilityToken`
     pub fn mode_to_capability(&self, mode: u32) -> CapabilityToken {
         if mode == 0o777 || (self.allow_suid && (mode & 0o4000) != 0) {
-            CapabilityToken::from_bits(0xFFFF) // Master override
+            CapabilityToken { bits: 0xFFFF } // Master override
         } else {
-            CapabilityToken::from_bits(0x04) // Limited read token
+            CapabilityToken { bits: 0x04 } // Limited read token
         }
     }
 }

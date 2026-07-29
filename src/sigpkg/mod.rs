@@ -11,17 +11,22 @@ pub mod transaction;
 pub mod universal_adapter;
 pub mod verifier;
 pub mod zero_alloc_resolver;
+pub mod universal_engine;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use spec::{
-    ApkPackageAdapter, AptPackageAdapter, CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-    EbuildPackageAdapter, FlatpakPackageAdapter, ManagerCapability, NixPackageAdapter,
-    PackageAdapterFactory, PackageCapability, PackageDependency, PackageError as SpecPackageError,
+    ManagerCapability, PackageCapability, PackageDependency, PackageError as SpecPackageError,
     PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
+    SimplePackage, SimplePackageManager,
+};
+pub use universal_engine::{
+    ApkPackageAdapter, AptPackageAdapter, CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
+    EbuildPackageAdapter, FlatpakPackageAdapter, NixPackageAdapter,
+    PackageAdapterFactory,
+    PacmanPackageAdapter, SnapPackageAdapter,
     TxzPackageAdapter, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
     XbpsPackageAdapter,
 };

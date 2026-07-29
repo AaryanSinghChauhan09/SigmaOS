@@ -30,6 +30,7 @@ pub trait RemoteSession {
     fn id(&self) -> SessionID;
     fn host(&self) -> &[u8];
     fn state(&self) -> SessionState;
+    fn set_state(&self, state: SessionState);
 }
 
 #[repr(C)]
@@ -63,7 +64,10 @@ impl RemoteSession for SimpleRemoteSession {
         &self.host[..len]
     }
     fn state(&self) -> SessionState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+    }
+    fn set_state(&self, state: SessionState) {
+        self.state.store(state as usize, Ordering::SeqCst);
     }
 }
 
@@ -101,9 +105,7 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
                 if session.id() == id {
-                    session
-                        .state
-                        .store(SessionState::Disconnected as usize, Ordering::SeqCst);
+                    session.set_state(SessionState::Disconnected);
                     return Ok(());
                 }
             }
@@ -112,26 +114,35 @@ impl RemoteDesktop for SimpleRemoteDesktop {
     }
 
     fn send_input(&self, id: SessionID, _input: &[u8]) -> Result<(), RemoteError> {
-        if self.get_session(id).is_some() {
-            Ok(())
-        } else {
-            Err(RemoteError::NotFound)
+        for s in self.sessions.iter() {
+            if let Some(ref session) = s {
+                if session.id() == id {
+                    return Ok(());
+                }
+            }
         }
+        Err(RemoteError::NotFound)
     }
 
     fn receive_screen(&self, id: SessionID) -> Result<Vec<u8>, RemoteError> {
-        if self.get_session(id).is_some() {
-            let mut screen = Vec::new();
-            for _ in 0..1920 * 1080 * 4 {
-                screen.push(0u8);
+        for s in self.sessions.iter() {
+            if let Some(ref session) = s {
+                if session.id() == id {
+                    let mut screen = Vec::new();
+                    for _ in 0..1920 * 1080 * 4 {
+                        screen.push(0u8);
+                    }
+                    return Ok(screen);
+                }
             }
-            Ok(screen)
-        } else {
-            Err(RemoteError::NotFound)
         }
+        Err(RemoteError::NotFound)
     }
 
-    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
+}
+
+impl SimpleRemoteDesktop {
+    pub fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
         for session_option in &self.sessions {
             if let Some(ref session) = *session_option {
                 if session.id() == id {
@@ -226,4 +237,68 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+pub struct InputAuthGate;
+impl InputAuthGate {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+pub struct PqcVideoCipher;
+impl PqcVideoCipher {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+pub struct SigmaRendezvous;
+impl SigmaRendezvous {
+    pub fn new() -> Self {
+        Self
+    }
 }

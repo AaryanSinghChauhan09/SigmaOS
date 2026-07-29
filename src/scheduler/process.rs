@@ -183,19 +183,8 @@ impl SimpleProcess {
     }
 
     pub fn get_state(&self) -> ProcessState {
-<<<<<<< HEAD
         unsafe {
             core::mem::transmute(self.state.load(Ordering::SeqCst))
-=======
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => ProcessState::Running,
-                2 => ProcessState::Blocked,
-                3 => ProcessState::Terminated,
-                _ => ProcessState::Ready,
-            }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         }
     }
 
@@ -204,20 +193,8 @@ impl SimpleProcess {
     }
 
     pub fn get_priority(&self) -> ProcessPriority {
-<<<<<<< HEAD
         unsafe {
             core::mem::transmute(self.priority.load(Ordering::SeqCst))
-=======
-        {
-            let raw = self.priority.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => ProcessPriority::Low,
-                2 => ProcessPriority::Normal,
-                3 => ProcessPriority::High,
-                4 => ProcessPriority::Critical,
-                _ => ProcessPriority::Idle,
-            }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         }
     }
 

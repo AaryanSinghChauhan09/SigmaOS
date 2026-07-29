@@ -82,7 +82,7 @@ pub use network::{
     ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
 };
 pub use observability::{
-    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
+    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace, SimpleSigmaDebug, SimpleSigmaMetrics, SimpleSigmaTrace,
     SimpleObservabilityStack,
 };
 pub use orchestration::{
@@ -91,7 +91,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
@@ -118,8 +118,8 @@ pub use shell::{
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
-    PackageDependencyResolver, PackageFormatAdapter, PackageRecipe, PacmanAdapter, RecipeError,
-    RecipeManager, RpmAdapter, SatSolver, Transaction, UniversalPackageManager, Version,
+    PackageDependencyResolver, PackageFormatAdapter as SigpkgPackageFormatAdapter, PackageRecipe, PacmanAdapter, RecipeError,
+    RecipeManager, RpmAdapter, SatSolver, Transaction, UniversalPackageManager as SigpkgUniversalPackageManager, Version,
     MAX_RECIPE_DEPENDENCIES,
 };
 pub use virtualization::{

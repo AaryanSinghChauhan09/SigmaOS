@@ -1,3 +1,4 @@
+use core::sync::atomic::{AtomicU64, Ordering};
 // SigmaOS Capability-Based Security System
 // Implements 64-bit hardware-enforced capability model
 

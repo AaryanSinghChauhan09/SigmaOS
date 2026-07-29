@@ -11,6 +11,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Package version
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageVersion {
     pub major: u32,
     pub minor: u32,
@@ -43,6 +44,7 @@ pub trait Package {
 
 /// Package dependency
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageDependency {
     pub name: [u8; 64],
     pub version_constraint: [u8; 32],
@@ -50,6 +52,7 @@ pub struct PackageDependency {
 
 /// Package info
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageInfo {
     pub name: [u8; 64],
     pub version: PackageVersion,
@@ -74,7 +77,7 @@ impl PackageInfo {
 
 /// Package capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageCapability {
     pub can_install: bool,
     pub can_uninstall: bool,
@@ -261,6 +264,7 @@ pub enum PackageError {
 
 /// Package statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageStats {
     pub total_packages: usize,
     pub installed_packages: usize,
@@ -364,7 +368,7 @@ impl PackageManager for SimplePackageManager {
     }
 
     fn get_package(&self, name: &[u8]) -> Option<&dyn Package> {
-        for package_option in &self.packages {
+        for package_option in self.packages.iter() {
             if let Some(ref package) = *package_option {
                 if package.name() == name {
                     return Some(package.as_ref());
@@ -450,7 +454,7 @@ impl PackageManager for SimplePackageManager {
 
         for dep in dependencies {
             let mut found = false;
-            for package_option in &self.packages {
+            for package_option in self.packages.iter() {
                 if let Some(ref pkg) = *package_option {
                     let dep_name = dep.name;
                     let pkg_name = pkg.name();
@@ -537,7 +541,40 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
 }

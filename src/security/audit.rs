@@ -10,7 +10,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type EventID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
     Authentication = 0,
     Authorization = 1,
@@ -65,7 +65,7 @@ impl AuditEvent for SimpleAuditEvent {
         self.id
     }
     fn event_type(&self) -> EventType {
-        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst) as u32) }
     }
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64
@@ -134,7 +134,7 @@ impl AuditLogger for SimpleAuditLogger {
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError> {
         let mut i = 0;
         while i < self.events.len() {
-            if let Some(ref event) = *self.events[i] {
+            if let Some(ref event) = self.events[i] {
                 if event.timestamp() < older_than {
                     self.events.remove(i);
                 } else {
@@ -167,16 +167,16 @@ impl SimpleAuditPolicy {
 }
 
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
         if self.require_authentication.load(Ordering::SeqCst) == 1 {
-            Ok(event.event_type() == EventType::Authentication)
+            event.event_type() == EventType::Authentication
         } else {
-            Ok(true)
+            true
         }
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event).unwrap_or(false) {
+        if self.check_compliance(event) {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)
@@ -242,4 +242,54 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat {
+    Text,
+    Json,
+    Binary,
 }

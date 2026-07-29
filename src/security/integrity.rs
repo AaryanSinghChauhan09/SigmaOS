@@ -14,7 +14,7 @@ pub type FileID = usize;
 
 /// File integrity status
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntegrityStatus {
     Valid = 0,
     Modified = 1,
@@ -129,7 +129,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst) as u32) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -192,6 +192,7 @@ pub trait IntegrityMonitor {
 
 /// Integrity statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct IntegrityStats {
     pub total_files: usize,
     pub valid_files: usize,
@@ -295,12 +296,17 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
             return Err(IntegrityError::PermissionDenied);
         }
 
-        for file_option in &mut self.files {
-            if let Some(ref mut file) = *file_option {
+        for i in 0..self.files.len() {
+            if let Some(ref mut file) = self.files[i] {
                 if file.id() == id {
                     let result = file.verify();
-                    if let Ok(status) = result {
-                        self.update_stats(status);
+                    if let Ok(ref status) = result {
+                        match status {
+                            IntegrityStatus::Valid => self.stats.valid_files += 1,
+                            IntegrityStatus::Modified => self.stats.modified_files += 1,
+                            IntegrityStatus::Corrupted => self.stats.corrupted_files += 1,
+                            IntegrityStatus::Missing => self.stats.corrupted_files += 1,
+                        }
                     }
                     return result;
                 }
@@ -316,14 +322,19 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
 
         let mut modified_files = Vec::new();
 
-        for file_option in &mut self.files {
-            if let Some(ref mut file) = *file_option {
+        for i in 0..self.files.len() {
+            if let Some(ref mut file) = self.files[i] {
                 let result = file.verify();
-                if let Ok(status) = result {
-                    if status != IntegrityStatus::Valid {
+                if let Ok(ref status) = result {
+                    if *status != IntegrityStatus::Valid {
                         modified_files.push(file.id());
                     }
-                    self.update_stats(status);
+                    match status {
+                        IntegrityStatus::Valid => self.stats.valid_files += 1,
+                        IntegrityStatus::Modified => self.stats.modified_files += 1,
+                        IntegrityStatus::Corrupted => self.stats.corrupted_files += 1,
+                        IntegrityStatus::Missing => self.stats.corrupted_files += 1,
+                    }
                 }
             }
         }
@@ -424,4 +435,47 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
 }
