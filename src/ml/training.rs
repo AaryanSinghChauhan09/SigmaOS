@@ -1,12 +1,16 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+
 /// OOP-based ML Training for SigmaOS
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 936
 /// Implements model training and optimization
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 pub type TrainingID = usize;
 
@@ -122,7 +126,7 @@ impl Trainer for SimpleTrainer {
 
     fn train_step(&mut self, session_id: TrainingID, inputs: &[f32], targets: &[f32]) -> Result<(), TrainingError> {
         for session_option in &mut self.sessions {
-            if let Some(ref mut session) = *session_option {
+            if let Some(ref mut session) = session_option {
                 if session.id() == session_id {
                     let epoch = session.epoch.fetch_add(1, Ordering::SeqCst);
 
@@ -148,7 +152,7 @@ impl Trainer for SimpleTrainer {
 
     fn get_session(&self, id: TrainingID) -> Option<&dyn TrainingSession> {
         for session_option in &self.sessions {
-            if let Some(ref session) = *session_option {
+            if let Some(ref session) = session_option {
                 if session.id() == id { return Some(session.as_ref()); }
             }
         }
@@ -209,29 +213,3 @@ impl DataLoader for SimpleDataLoader {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
