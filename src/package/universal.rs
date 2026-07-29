@@ -627,6 +627,7 @@ impl Default for DependencyResolver {
     }
 }
 
+<<<<<<< HEAD
 // ----------------------------------------------------
 // Local Metadata Cache
 // ----------------------------------------------------
@@ -652,12 +653,74 @@ impl LocalMetadataCache {
 // ----------------------------------------------------
 
 /// Universal package manager using dynamic dispatch to modularly handle various package format adapters
+=======
+/// Transactional package manager checkpoint
+#[derive(Debug, Clone)]
+pub struct PackageCheckpoint {
+    pub checkpoint_id: usize,
+    pub installed_keys: Vec<String>,
+}
+
+/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub checkpoints: Vec<PackageCheckpoint>,
+    pub next_checkpoint_id: usize,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        TransactionalHistory {
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 1,
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        let mut keys = Vec::new();
+        for key in installed.keys() {
+            keys.push(key.clone());
+        }
+
+        self.checkpoints.push(PackageCheckpoint {
+            checkpoint_id: id,
+            installed_keys: keys,
+        });
+
+        id
+    }
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        for i in 0..self.checkpoints.len() {
+            if self.checkpoints[i].checkpoint_id == id {
+                return Some(&self.checkpoints[i]);
+            }
+        }
+        None
+    }
+}
+
+impl Default for TransactionalHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Universal package manager
+>>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, Box<dyn PackageFormatAdapter>>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
+<<<<<<< HEAD
     pub metadata_cache: LocalMetadataCache,
+=======
+    pub transaction_history: TransactionalHistory,
+>>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003
 }
 
 impl UniversalPackageManager {
@@ -667,7 +730,11 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
+<<<<<<< HEAD
             metadata_cache: LocalMetadataCache::new(),
+=======
+            transaction_history: TransactionalHistory::new(),
+>>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003
         };
 
         manager.add_default_adapters();
@@ -929,6 +996,7 @@ mod tests {
     }
 
     #[test]
+<<<<<<< HEAD
     fn test_apt_deb_adapter_flow() {
         let adapter = AptDebAdapter::new();
         assert_eq!(adapter.format(), PackageFormat::Deb);
@@ -1058,5 +1126,29 @@ mod tests {
         assert!(result.is_err());
         // Verify installed count is 0
         assert_eq!(manager.list_installed().len(), 0);
+=======
+    fn test_transactional_rollback() {
+        let mut manager = UniversalPackageManager::new();
+        let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+        let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+
+        manager.add_package(pkg1);
+        manager.add_package(pkg2);
+
+        // 1. Create a baseline checkpoint (empty)
+        let checkpoint_id = manager.create_checkpoint();
+        assert_eq!(checkpoint_id, 1);
+
+        // 2. Install pkg1 and pkg2
+        manager.install("pkg1").unwrap();
+        manager.install("pkg2").unwrap();
+        assert_eq!(manager.installed_packages.len(), 2);
+
+        // 3. Roll back to baseline checkpoint
+        manager.rollback_to_checkpoint(checkpoint_id).unwrap();
+        assert_eq!(manager.installed_packages.len(), 0);
+>>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003
     }
 }
