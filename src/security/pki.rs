@@ -1,6 +1,10 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
@@ -10,7 +14,7 @@ use core::mem;
 
 pub type CertificateID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum CertificateType { Root = 0, Intermediate = 1, EndEntity = 2 }
 
@@ -110,8 +114,8 @@ impl PKIManager for SimplePKIManager {
     }
 
     fn revoke_certificate(&mut self, id: CertificateID) -> Result<(), PKIError> {
-        for cert_option in &self.certificates {
-            if let Some(ref cert) = *cert_option {
+        for i in 0..self.certificates.len() {
+            if let Some(Some(ref cert)) = self.certificates.get(i) {
                 if cert.id() == id {
                     self.revoked.push(id);
                     return Ok(());
@@ -122,8 +126,8 @@ impl PKIManager for SimplePKIManager {
     }
 
     fn get_certificate(&self, id: CertificateID) -> Option<&dyn Certificate> {
-        for cert_option in &self.certificates {
-            if let Some(ref cert) = *cert_option {
+        for i in 0..self.certificates.len() {
+            if let Some(Some(ref cert)) = self.certificates.get(i) {
                 if cert.id() == id { return Some(cert.as_ref()); }
             }
         }
@@ -132,7 +136,7 @@ impl PKIManager for SimplePKIManager {
 
     fn verify_certificate(&self, id: CertificateID, _issuer_id: CertificateID) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
-            if self.revoked.contains(&id) {
+            if self.revoked.contains(id) {
                 return Ok(false);
             }
             Ok(cert.is_valid())
@@ -167,9 +171,11 @@ impl CRL for SimpleCRL {
     }
 
     fn is_revoked(&self, cert_id: CertificateID) -> bool {
-        for &(id, _) in &self.revoked {
-            if id == cert_id {
-                return true;
+        for i in 0..self.revoked.len() {
+            if let Some(&(id, _)) = self.revoked.get(i) {
+                if id == cert_id {
+                    return true;
+                }
             }
         }
         false
@@ -180,50 +186,23 @@ impl CRL for SimpleCRL {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub type PkiError = PKIError;
+pub use PKIManager as PkiManager;
+pub struct CertificateAuthority;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    fn contains(&self, item: CertificateID) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                let stored = core::ptr::read(self.data.add(i));
-                if stored == item {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-    fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
-        }
-        new_vec
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_pki_manager() {
+        let mut manager = SimplePKIManager::new();
+        let cert = SimpleCertificate::new(1, CertificateType::Root, b"Subject", b"Issuer");
+        let id = manager.issue_certificate(Box::new(cert)).unwrap();
+        assert_eq!(id, 1);
+
+        let retrieved = manager.get_certificate(1).unwrap();
+        assert_eq!(retrieved.subject(), b"Subject");
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+}

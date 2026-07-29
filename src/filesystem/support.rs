@@ -49,7 +49,13 @@ impl SimpleFilesystem {
 impl Filesystem for SimpleFilesystem {
     fn id(&self) -> FilesystemID { self.id }
     fn fs_type(&self) -> FilesystemType { unsafe { core::mem::transmute(self.fs_type.load(Ordering::SeqCst) as u32) } }
-
+    fn mountpoint(&self) -> &[u8] {
+        let len = self.mountpoint.iter().position(|&b| b == 0).unwrap_or(256);
+        &self.mountpoint[..len]
+    }
+    fn is_mounted(&self) -> bool {
+        self.mounted.load(Ordering::SeqCst) != 0
+    }
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {
         let len = mountpoint.len().min(255);
         for i in 0..len {

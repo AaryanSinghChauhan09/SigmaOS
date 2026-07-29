@@ -1,13 +1,17 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 63: Secrets management
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
 use core::mem;
 
 /// Secret ID
@@ -225,6 +229,7 @@ pub trait Keyring {
 
 /// Keyring statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct KeyringStats {
     pub total_secrets: usize,
     pub encrypted_secrets: usize,
@@ -309,8 +314,8 @@ impl Keyring for SimpleKeyring {
         let mut index = None;
         let mut secret_type = SecretType::Password;
 
-        for (i, secret_option) in self.secrets.iter().enumerate() {
-            if let Some(ref secret) = *secret_option {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
                 if secret.id() == id {
                     index = Some(i);
                     secret_type = secret.secret_type();
@@ -320,7 +325,9 @@ impl Keyring for SimpleKeyring {
         }
 
         if let Some(i) = index {
-            self.secrets[i] = None;
+            if let Some(slot) = self.secrets.get_mut(i) {
+                *slot = None;
+            }
             self.stats.total_secrets -= 1;
             self.stats.by_type[secret_type as usize] -= 1;
             Ok(())
@@ -330,8 +337,8 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret(&self, id: SecretID) -> Option<&dyn Secret> {
-        for secret_option in &self.secrets {
-            if let Some(ref secret) = *secret_option {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
                 if secret.id() == id {
                     return Some(secret.as_ref());
                 }
@@ -341,10 +348,13 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        for secret_option in &mut self.secrets {
-            if let Some(ref mut secret) = *secret_option {
-                if secret.id() == id {
-                    return Some(secret);
+        for i in 0..self.secrets.len() {
+            unsafe {
+                let slot = &mut *self.secrets.data.add(i);
+                if let Some(ref mut secret) = *slot {
+                    if secret.id() == id {
+                        return Some(secret);
+                    }
                 }
             }
         }
@@ -353,8 +363,8 @@ impl Keyring for SimpleKeyring {
 
     fn list_secrets(&self) -> Vec<SecretID> {
         let mut ids = Vec::new();
-        for secret_option in &self.secrets {
-            if let Some(ref secret) = *secret_option {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
                 ids.push(secret.id());
             }
         }
@@ -362,11 +372,11 @@ impl Keyring for SimpleKeyring {
     }
 
     fn stats(&self) -> KeyringStats {
-        let mut stats = self.stats.clone();
+        let mut stats = self.stats;
         stats.encrypted_secrets = 0;
 
-        for secret_option in &self.secrets {
-            if let Some(ref secret) = *secret_option {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
                 if secret.info().is_encrypted {
                     stats.encrypted_secrets += 1;
                 }
@@ -377,60 +387,25 @@ impl Keyring for SimpleKeyring {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+pub struct SecretManager;
+pub struct SecretStorage;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+    #[test]
+    fn test_simple_keyring() {
+        let cap = KeyringCapability::full();
+        let mut keyring = SimpleKeyring::new(cap);
+        let secret_cap = SecretCapability::full();
+        let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
+        let id = keyring.store_secret(Box::new(secret)).unwrap();
+        assert_eq!(id, 1);
 
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+        let retrieved = keyring.get_secret(1).unwrap();
+        assert_eq!(retrieved.name(), b"TestSecret");
     }
 }
 
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }

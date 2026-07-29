@@ -1,13 +1,12 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Device trait (OOP interface)
 pub trait Device {
@@ -124,7 +123,12 @@ pub struct DeviceDescriptor {
 }
 
 impl DeviceDescriptor {
-    pub fn new(id: usize, name: &[u8], device_type: DeviceType, capability: DeviceCapability) -> Self {
+    pub fn new(
+        id: usize,
+        name: &[u8],
+        device_type: DeviceType,
+        capability: DeviceCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let len = name.len().min(63);
         unsafe {
@@ -161,8 +165,8 @@ impl DeviceDescriptor {
 }
 
 /// Device state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState {
     Uninitialized = 0,
     Initializing = 1,
@@ -446,7 +450,13 @@ impl DeviceManager {
         }
     }
 
-    pub fn register_device(&mut self, device: Box<dyn Device>, name: &[u8], device_type: DeviceType, capability: DeviceCapability) -> Result<usize, DeviceError> {
+    pub fn register_device(
+        &mut self,
+        device: Box<dyn Device>,
+        name: &[u8],
+        device_type: DeviceType,
+        capability: DeviceCapability,
+    ) -> Result<usize, DeviceError> {
         let id = self.next_device_id.fetch_add(1, Ordering::SeqCst);
         let descriptor = DeviceDescriptor::new(id, name, device_type, capability);
 
@@ -560,7 +570,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

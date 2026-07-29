@@ -8,9 +8,6 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
-pub mod spec;
-pub mod zero_alloc_resolver;
-pub mod universal_adapter;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use spec::{
@@ -24,22 +21,27 @@ pub use spec::{
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
+};
+pub use universal_oop_system::{
+    IPackage, IPackageParser, PackageFormat, PackageMetadata,
+    PackageParserFactory, UniversalPackageManager,
+    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
+    UserDefinedHook, ParseError, InstallError, HookError,
 };
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
-    major: u64,
-    minor: u64,
-    patch: u64,
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
 }
 
 impl Version {

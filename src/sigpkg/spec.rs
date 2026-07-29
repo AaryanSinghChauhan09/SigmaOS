@@ -1,18 +1,17 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
-
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Package version
 #[repr(C)]
@@ -143,7 +142,11 @@ impl SimplePackage {
     pub fn set_description(&mut self, description: &[u8]) {
         let len = description.len().min(255);
         unsafe {
-            core::ptr::copy_nonoverlapping(description.as_ptr(), self.description.as_mut_ptr(), len);
+            core::ptr::copy_nonoverlapping(
+                description.as_ptr(),
+                self.description.as_mut_ptr(),
+                len,
+            );
         }
     }
 
@@ -170,7 +173,11 @@ impl SimplePackage {
 
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(version_constraint.as_ptr(), constraint_array.as_mut_ptr(), constraint_len);
+            core::ptr::copy_nonoverlapping(
+                version_constraint.as_ptr(),
+                constraint_array.as_mut_ptr(),
+                constraint_len,
+            );
         }
 
         self.dependencies.push(PackageDependency {
@@ -191,7 +198,9 @@ impl Package for SimplePackage {
     }
 
     fn dependencies(&self) -> &[PackageDependency] {
-        &self.dependencies
+        unsafe {
+            core::slice::from_raw_parts(self.dependencies.data, self.dependencies.len)
+        }
     }
 
     fn verify_signature(&self, signature: &[u8]) -> bool {
@@ -237,7 +246,10 @@ pub trait PackageManager {
     /// Update package
     fn update(&mut self, name: &[u8]) -> Result<(), PackageError>;
     /// Resolve dependencies
-    fn resolve_dependencies(&self, package: &dyn Package) -> Result<Vec<PackageDependency>, PackageError>;
+    fn resolve_dependencies(
+        &self,
+        package: &dyn Package,
+    ) -> Result<Vec<PackageDependency>, PackageError>;
     /// Get manager statistics
     fn stats(&self) -> PackageStats;
 }
@@ -341,8 +353,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for (i, package_option) in self.packages.iter().enumerate() {
-            if let Some(ref package) = *package_option {
+        for i in 0..self.packages.len {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -351,8 +363,12 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            self.packages[i] = None;
-            self.installed[i] = None;
+            if let Some(p) = self.packages.get_mut(i) {
+                *p = None;
+            }
+            if let Some(inst) = self.installed.get_mut(i) {
+                *inst = None;
+            }
             self.stats.total_packages -= 1;
             Ok(())
         } else {
@@ -361,8 +377,8 @@ impl PackageManager for SimplePackageManager {
     }
 
     fn get_package(&self, name: &[u8]) -> Option<&dyn Package> {
-        for package_option in &self.packages {
-            if let Some(ref package) = *package_option {
+        for i in 0..self.packages.len {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 if package.name() == name {
                     return Some(package.as_ref());
                 }
@@ -377,8 +393,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for (i, package_option) in self.packages.iter().enumerate() {
-            if let Some(ref package) = *package_option {
+        for i in 0..self.packages.len {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -387,13 +403,15 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if let Some(ref package) = self.packages[i] {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 // Verify signature before installation
                 if !package.verify_signature(&package.info().checksum) {
                     return Err(PackageError::SignatureInvalid);
                 }
 
-                self.installed[i] = Some(true);
+                if let Some(inst) = self.installed.get_mut(i) {
+                    *inst = Some(true);
+                }
                 self.stats.installed_packages += 1;
                 Ok(())
             } else {
@@ -410,8 +428,8 @@ impl PackageManager for SimplePackageManager {
         }
 
         let mut index = None;
-        for (i, package_option) in self.packages.iter().enumerate() {
-            if let Some(ref package) = *package_option {
+        for i in 0..self.packages.len {
+            if let Some(Some(ref package)) = self.packages.get(i) {
                 if package.name() == name {
                     index = Some(i);
                     break;
@@ -420,8 +438,10 @@ impl PackageManager for SimplePackageManager {
         }
 
         if let Some(i) = index {
-            if self.installed[i] == Some(true) {
-                self.installed[i] = Some(false);
+            if let Some(&Some(true)) = self.installed.get(i) {
+                if let Some(inst) = self.installed.get_mut(i) {
+                    *inst = Some(false);
+                }
                 self.stats.installed_packages -= 1;
                 Ok(())
             } else {
@@ -438,17 +458,20 @@ impl PackageManager for SimplePackageManager {
         self.install(name)
     }
 
-    fn resolve_dependencies(&self, package: &dyn Package) -> Result<Vec<PackageDependency>, PackageError> {
+    fn resolve_dependencies(
+        &self,
+        package: &dyn Package,
+    ) -> Result<Vec<PackageDependency>, PackageError> {
         let mut resolved = Vec::new();
         let dependencies = package.dependencies();
 
         for dep in dependencies {
             let mut found = false;
-            for package_option in &self.packages {
-                if let Some(ref pkg) = *package_option {
+            for i in 0..self.packages.len {
+                if let Some(Some(ref pkg)) = self.packages.get(i) {
                     let dep_name = dep.name;
                     let pkg_name = pkg.name();
-                    
+
                     let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
                     let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
 
@@ -474,3 +497,80 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

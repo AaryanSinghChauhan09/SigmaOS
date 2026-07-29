@@ -20,9 +20,7 @@ pub struct SecurityEnforcer {
 
 impl SecurityEnforcer {
     pub fn new() -> Self {
-        Self {
-            tokens: [None; 32],
-        }
+        Self { tokens: [None; 32] }
     }
 
     pub fn assign_token(&mut self, token: CapabilityToken) -> Result<(), &'static str> {

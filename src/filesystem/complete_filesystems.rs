@@ -198,8 +198,16 @@ impl FileSystem for NtfsFileSystem {
         }
         self.mounted = true;
         // Populate system records
-        self.records.push(NtfsRecord { record_id: 0, signature: *b"FILE", is_in_use: true });
-        self.records.push(NtfsRecord { record_id: 1, signature: *b"FILE", is_in_use: true });
+        self.records.push(NtfsRecord {
+            record_id: 0,
+            signature: *b"FILE",
+            is_in_use: true,
+        });
+        self.records.push(NtfsRecord {
+            record_id: 1,
+            signature: *b"FILE",
+            is_in_use: true,
+        });
         Ok(())
     }
 
@@ -468,7 +476,7 @@ impl ExFatFileSystem {
     pub fn new() -> Self {
         Self {
             mounted: false,
-            bytes_per_sector_shift: 9, // 512 bytes
+            bytes_per_sector_shift: 9,    // 512 bytes
             sectors_per_cluster_shift: 3, // 8 sectors (4096 bytes)
             num_fats: 1,
             active_fat: 0,

@@ -256,8 +256,8 @@ mod tests {
         assert_eq!(
             event,
             InputEvent::MouseMove {
-                delta_x: 5, // 2 * 2.5
-                delta_y: -10 // - (4 * 2.5)
+                delta_x: 5,   // 2 * 2.5
+                delta_y: -10  // - (4 * 2.5)
             }
         );
     }
