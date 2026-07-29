@@ -1,28 +1,30 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
-pub mod arch_compat;
 pub mod recipe;
 pub mod resolver;
-pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
 
-pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     major: u64,
     minor: u64,
     patch: u64,
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {
@@ -34,8 +36,9 @@ impl Version {
         }
     }
 
-    /// Parses version input safely with a zero-allocation, stateless next() token iterator over '.' separators
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
+        // Optimized to be entirely allocation-free by using inline parsing with iterators.
+        // This avoids heap-allocated collections like Vec inside utility version parsing.
         let mut parts = version_str.split('.');
 
         let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
@@ -74,11 +77,6 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
-    pub mirrors: Vec<String>,
-    pub signing_keys: Vec<String>,
-    pub licenses: Vec<String>,
-    pub maintainers: Vec<String>,
-    pub changelogs: Vec<String>,
 }
 
 impl Package {
@@ -95,11 +93,6 @@ impl Package {
             description,
             dependencies,
             checksum,
-            mirrors: Vec::new(),
-            signing_keys: Vec::new(),
-            licenses: Vec::new(),
-            maintainers: Vec::new(),
-            changelogs: Vec::new(),
         }
     }
 }

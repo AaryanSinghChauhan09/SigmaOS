@@ -26,12 +26,6 @@ pub enum GpuCommand {
 }
 
 #[derive(Debug, Clone)]
-pub struct DrmModeInfo {
-    pub hdisplay: u16,
-    pub vdisplay: u16,
-}
-
-#[derive(Debug, Clone)]
 pub struct DrmCrtc {
     pub id: u32,
     pub x: u32,
@@ -46,32 +40,15 @@ pub struct DrmConnector {
     pub id: u32,
     pub connected: bool,
     pub modes: Vec<DrmModeInfo>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DrmModeInfo {
+    pub hdisplay: u16,
+    pub vdisplay: u16,
 }
 
 /// GPU driver interface
-#[derive(Debug, Clone)]
-pub struct DrmModeInfo {
-    pub hdisplay: u16,
-    pub vdisplay: u16,
-}
-
-#[derive(Debug, Clone)]
-pub struct DrmCrtc {
-    pub id: u32,
-    pub x: u32,
-    pub y: u32,
-    pub width: u32,
-    pub height: u32,
-    pub active: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct DrmConnector {
-    pub id: u32,
-    pub connected: bool,
-    pub modes: Vec<DrmModeInfo>,
-}
-
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,
@@ -105,6 +82,7 @@ impl GpuDriver {
                 y,
                 width,
                 height,
+                ..
             } => {
                 let color = 0xFFFFFF; // White
                 for row in y..(y + height).min(self.height) {
@@ -132,6 +110,35 @@ impl GpuDriver {
 
     pub fn has_capability(&self, capability: u64) -> bool {
         (self.capabilities.bits() & capability) != 0
+    }
+
+    /// DRM/KMS mode setting API
+    pub fn set_drm_mode(
+        &mut self,
+        connector_id: u32,
+        crtc_id: u32,
+        mode: DrmModeInfo,
+    ) -> Result<(), GpuError> {
+        self.width = mode.hdisplay as u32;
+        self.height = mode.vdisplay as u32;
+        self.frame_buffer = vec![0; (self.width * self.height) as usize];
+
+        self.crtc = Some(DrmCrtc {
+            id: crtc_id,
+            x: 0,
+            y: 0,
+            width: self.width,
+            height: self.height,
+            active: true,
+        });
+
+        self.connector = Some(DrmConnector {
+            id: connector_id,
+            connected: true,
+            modes: vec![mode],
+        });
+
+        Ok(())
     }
 }
 

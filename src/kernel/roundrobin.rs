@@ -143,7 +143,8 @@ impl RoundRobinScheduler {
                             (Priority::Realtime, _) => true,
                             (Priority::High, Priority::Realtime) => false,
                             (Priority::High, _) => true,
-                            (Priority::Normal, Priority::Realtime) | (Priority::Normal, Priority::High) => false,
+                            (Priority::Normal, Priority::Realtime)
+                            | (Priority::Normal, Priority::High) => false,
                             (Priority::Normal, _) => true,
                             (Priority::Low, Priority::Idle) => true,
                             (Priority::Low, _) => false,
@@ -163,7 +164,9 @@ impl RoundRobinScheduler {
         let start_index = self.current_index;
         loop {
             let entry = &self.processes[self.current_index];
-            if entry.process.state == ProcessState::Ready && entry.process.priority == target_priority {
+            if entry.process.state == ProcessState::Ready
+                && entry.process.priority == target_priority
+            {
                 return Some(&self.processes[self.current_index].process);
             }
             self.current_index = (self.current_index + 1) % self.processes.len();

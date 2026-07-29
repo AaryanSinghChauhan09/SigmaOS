@@ -132,9 +132,9 @@ const HID_SCANCODE_TO_ASCII: [u8; 57] = [
 /// HID USB Scancode to ASCII mapping (French AZERTY, first 58 scancodes)
 const HID_SCANCODE_TO_ASCII_AZERTY: [u8; 57] = [
     0, 0, 0, 0, b'q', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j', b'k', b'l', b',', b'n',
-    b'o', b'p', b'a', b'r', b's', b't', b'u', b'v', b'z', b'x', b'y', b'w', b'&', b'e', b'"', b'\'',
-    b'(', b'-', b'e', b'_', b'c', b'a', b'\n', 0, b'\x08', b'\t', b' ', b')', b'=', b'^', b'$',
-    b'*', 0, b'm', b'u', b'~', b';', b':', b'!',
+    b'o', b'p', b'a', b'r', b's', b't', b'u', b'v', b'z', b'x', b'y', b'w', b'&', b'e', b'"',
+    b'\'', b'(', b'-', b'e', b'_', b'c', b'a', b'\n', 0, b'\x08', b'\t', b' ', b')', b'=', b'^',
+    b'$', b'*', 0, b'm', b'u', b'~', b';', b':', b'!',
 ];
 
 /// Standalone HID Keyboard implementing PeripheralDevice for PeripheralManager

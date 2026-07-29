@@ -782,10 +782,10 @@ impl KrishiHelper {
     /// Using official MSP rates for FY 2024-25
     pub fn estimate_msp_value(&self, crop: CropType, quintals: f64) -> f64 {
         let rate_per_quintal = match crop {
-            CropType::Wheat => 2275.0,     // Wheat MSP
-            CropType::Paddy => 2183.0,     // Paddy Common MSP
-            CropType::Sugarcane => 315.0,  // Fair and Remunerative Price (FRP)
-            CropType::Cotton => 6620.0,    // Cotton Medium Staple MSP
+            CropType::Wheat => 2275.0,    // Wheat MSP
+            CropType::Paddy => 2183.0,    // Paddy Common MSP
+            CropType::Sugarcane => 315.0, // Fair and Remunerative Price (FRP)
+            CropType::Cotton => 6620.0,   // Cotton Medium Staple MSP
         };
         quintals * rate_per_quintal
     }
@@ -868,7 +868,11 @@ impl VyaparHelper {
     }
 
     /// Calculate CGST and SGST split from gross selling price (GST-inclusive billing)
-    pub fn calculate_inclusive_gst(&self, inclusive_price: f64, gst_rate_pct: f64) -> InvoiceResult {
+    pub fn calculate_inclusive_gst(
+        &self,
+        inclusive_price: f64,
+        gst_rate_pct: f64,
+    ) -> InvoiceResult {
         if inclusive_price <= 0.0 || gst_rate_pct < 0.0 {
             return InvoiceResult {
                 taxable_value: 0.0,

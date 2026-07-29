@@ -237,7 +237,10 @@ impl LocalLlmEngine {
 
         // Determine output based on format
         let text_output = match request.format {
-            InferenceFormat::Json => "{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON\"}".to_string(),
+            InferenceFormat::Json => {
+                "{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON\"}"
+                    .to_string()
+            }
             _ => "Generated response placeholder".to_string(),
         };
 

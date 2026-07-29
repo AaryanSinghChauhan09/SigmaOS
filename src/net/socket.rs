@@ -1,30 +1,22 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
 /// OOP-based Socket API for SigmaOS
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
 /// Implements socket creation and network communication
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SocketID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SocketType {
-    Stream = 0,
-    Datagram = 1,
-    Raw = 2,
-}
+pub enum SocketType { Stream = 0, Datagram = 1, Raw = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum SocketError {
-    Success = 0,
-    NotFound = 1,
-    ConnectionFailed = 2,
-    SendFailed = 3,
-}
+pub enum SocketError { Success = 0, NotFound = 1, ConnectionFailed = 2, SendFailed = 3 }
 
 pub trait Socket {
     fn id(&self) -> SocketID;
@@ -53,35 +45,27 @@ impl SimpleSocket {
 }
 
 impl Socket for SimpleSocket {
-    fn id(&self) -> SocketID {
-        self.id
-    }
-    fn socket_type(&self) -> SocketType {
-        {
-            let raw = self.socket_type.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => SocketType::Datagram,
-                2 => SocketType::Raw,
-                _ => SocketType::Stream,
-            }
+    fn id(&self) -> SocketID { self.id }
+    fn socket_type(&self) -> SocketType { {
+        let raw = self.socket_type.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => SocketType::Datagram,
+            2 => SocketType::Raw,
+            _ => SocketType::Stream,
         }
-    }
-    fn is_connected(&self) -> bool {
-        self.connected.load(Ordering::SeqCst) == 1
-    }
-    fn is_bound(&self) -> bool {
-        self.bound.load(Ordering::SeqCst) == 1
-    }
+    } }
+    fn is_connected(&self) -> bool { self.connected.load(Ordering::SeqCst) == 1 }
+    fn is_bound(&self) -> bool { self.bound.load(Ordering::SeqCst) == 1 }
 }
 
 pub trait SocketManager {
     fn create_socket(&mut self, socket_type: SocketType) -> Result<SocketID, SocketError>;
-    fn close_socket(&mut self, id: SocketID) -> Result<(), SocketError>;
+    def close_socket(&mut self, id: SocketID) -> Result<(), SocketError>;
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
-    fn bind(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
-    fn connect(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
-    fn send(&mut self, id: SocketID, data: &[u8]) -> Result<usize, SocketError>;
-    fn receive(&mut self, id: SocketID, buffer: &mut [u8]) -> Result<usize, SocketError>;
+    def bind(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
+    def connect(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
+    def send(&mut self, id: SocketID, data: &[u8]) -> Result<usize, SocketError>;
+    def receive(&mut self, id: SocketID, buffer: &mut [u8]) -> Result<usize, SocketError>;
 }
 
 #[repr(C)]
@@ -121,9 +105,7 @@ impl SocketManager for SimpleSocketManager {
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket_option in &self.sockets {
             if let Some(ref socket) = *socket_option {
-                if socket.id() == id {
-                    return Some(socket.as_ref());
-                }
+                if socket.id() == id { return Some(socket.as_ref()); }
             }
         }
         None
@@ -202,25 +184,13 @@ impl SocketListener for SimpleSocketListener {
     }
 }
 
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -228,39 +198,15 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

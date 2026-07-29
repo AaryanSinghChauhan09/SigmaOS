@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -74,6 +76,10 @@ impl Default for ContextCapability {
         Self::new()
     }
 }
+
+pub type MacPolicy = dyn MACPolicy;
+pub type MacRule = PolicyInfo;
+pub type MacSecurity = SimpleMACEngine;
 
 impl SecurityContext {
     pub fn new(
@@ -446,10 +452,6 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
-pub use MACPolicy as MacPolicy;
-pub struct MacRule;
-pub struct MacSecurity;
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -496,11 +498,3 @@ mod tests {
         assert_eq!(stats.access_denied, 1);
     }
 }
-
-pub type MacPolicy = dyn MACPolicy;
-
-#[derive(Debug, Clone)]
-pub struct MacRule;
-
-#[derive(Debug, Clone)]
-pub struct MacSecurity;

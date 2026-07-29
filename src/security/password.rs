@@ -205,7 +205,6 @@ impl PasswordManager {
     ) -> Result<PasswordManagerResult, PasswordError> {
         self.check_auto_lock()?;
 
-        let service_name = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -215,7 +214,7 @@ impl PasswordManager {
 
         let service_name = encrypted_entry.service.clone();
         self.passwords
-            .insert(encrypted_entry.id.clone(), encrypted_entry.clone());
+            .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
 
         Ok(PasswordManagerResult {
@@ -254,7 +253,6 @@ impl PasswordManager {
             return Err(PasswordError::PasswordNotFound(entry.id.clone()));
         }
 
-        let service_name = entry.service.clone();
         let encrypted_password = self.encrypt_password(&entry.encrypted_password)?;
 
         let encrypted_entry = PasswordEntry {
@@ -268,7 +266,7 @@ impl PasswordManager {
 
         let service_name = encrypted_entry.service.clone();
         self.passwords
-            .insert(encrypted_entry.id.clone(), encrypted_entry.clone());
+            .insert(encrypted_entry.id.clone(), encrypted_entry);
         self.last_access = Some(std::time::Instant::now());
 
         Ok(PasswordManagerResult {
@@ -392,9 +390,6 @@ impl PasswordManager {
 
     /// Encrypt password
     fn encrypt_password(&self, password: &[u8]) -> Result<Vec<u8>, PasswordError> {
-        if self.master_key.is_empty() {
-            return Err(PasswordError::EncryptionError("Master key cannot be empty".to_string()));
-        }
         // Simulated encryption
         let mut encrypted = password.to_vec();
         for (i, byte) in encrypted.iter_mut().enumerate() {
@@ -405,9 +400,6 @@ impl PasswordManager {
 
     /// Decrypt password
     fn decrypt_password(&self, encrypted: &[u8]) -> Result<Vec<u8>, PasswordError> {
-        if self.master_key.is_empty() {
-            return Err(PasswordError::DecryptionError("Master key cannot be empty".to_string()));
-        }
         // Simulated decryption
         let mut decrypted = encrypted.to_vec();
         for (i, byte) in decrypted.iter_mut().enumerate() {
@@ -432,22 +424,16 @@ impl PasswordManager {
             charset.extend_from_slice(SYMBOLS);
         }
 
-<<<<<<< HEAD
         let mut password = String::new();
-        for _ in 0..length {
-            let rand_val: u64 = rand::random();
-            let index = (rand_val as usize) % charset.len();
-=======
+        // Simple, zero-dependency, safe LCG pseudo-random generator using nanosecond seed
         let mut seed = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos() as u64;
 
-        let mut password = String::new();
         for _ in 0..length {
             seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
-            let index = (seed % charset.len() as u64) as usize;
->>>>>>> origin/improve-os-architecture-13148548228877311559
+            let index = (seed as usize) % charset.len();
             password.push(charset[index] as char);
         }
 

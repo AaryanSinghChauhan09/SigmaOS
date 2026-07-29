@@ -1,3 +1,5 @@
+#![no_std]
+
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
@@ -214,6 +216,9 @@ impl Default for IntegrityStats {
     }
 }
 
+pub type IntegrityCheck = SimpleFile;
+pub type IntegrityVerifier = SimpleIntegrityMonitor;
+
 /// Simple integrity monitor (OOP: Concrete monitor class)
 pub struct SimpleIntegrityMonitor {
     pub files: Vec<Option<Box<dyn File>>>,
@@ -373,9 +378,6 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
-pub struct IntegrityCheck;
-pub struct IntegrityVerifier;
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -407,9 +409,3 @@ mod tests {
         assert_eq!(monitor.stats().total_files, 0);
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct IntegrityCheck;
-
-#[derive(Debug, Clone)]
-pub struct IntegrityVerifier;

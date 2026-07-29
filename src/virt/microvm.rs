@@ -1,6 +1,6 @@
 use core::mem;
 /// OOP-based MicroVM Sandboxing Foundation for SigmaOS
-/// Implements microVM sandboxing using OOP principles with traits and structs
+/// I/// Implements microVM sandboxing using OOP principles with traits and structs
 /// No dependency on external virtualization frameworks
 /// Based on Roadmap Item 19: MicroVM sandboxing foundation
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -473,6 +473,7 @@ impl SandboxManager for SimpleSandboxManager {
     }
 }
 
+
 /// Simple Vec implementation for no_std
 impl<T> Default for Vec<T> {
     fn default() -> Self {
@@ -505,15 +506,16 @@ impl<T> Vec<T> {
                 self.grow();
             }
 
-        // 1. Create a Strict sandbox microVM (e.g. secure, zero network/shared filesystem)
-        let microvm_strict_id = manager
-            .create_microvm(b"strict-secure-vbox", SandboxPolicy::Strict)
-            .unwrap();
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
 
-        // 2. Create a Permissive sandbox microVM (e.g. development mode)
-        let _microvm_permissive_id = manager
-            .create_microvm(b"permissive-dev-box", SandboxPolicy::Permissive)
-            .unwrap();
+    fn len(&self) -> usize {
+        self.len
+    }
 
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
@@ -537,14 +539,20 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
 
-        // Retrieve and start strict sandbox microVM
-        assert!(manager.start_microvm(microvm_strict_id).is_ok());
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
 
-        let microvm_strict = manager.get_microvm(microvm_strict_id).unwrap();
-        assert_eq!(microvm_strict.state(), MicroVMState::Running);
-        assert_eq!(microvm_strict.sandbox_policy(), SandboxPolicy::Strict);
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
     }
 }
 
@@ -593,7 +601,7 @@ pub struct VecIter<'a, T> {
 impl<'a, T> Iterator for VecIter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
+        if self.index < self.vec.len {
             let item = unsafe { &*self.vec.data.add(self.index) };
             self.index += 1;
             Some(item)

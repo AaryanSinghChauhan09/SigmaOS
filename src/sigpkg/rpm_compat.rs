@@ -1,7 +1,6 @@
 /// RedHat/Fedora SPEC & RPM Compatibility Translation Engine
 /// Translates .spec dependencies, validates GPG package provenance,
 /// and converts RPM archives to natively installable sigpkgs.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type PackageID = usize;

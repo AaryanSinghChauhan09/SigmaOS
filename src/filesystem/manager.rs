@@ -457,7 +457,9 @@ mod tests {
     #[test]
     fn test_list_directory() {
         let manager = FileManager::default();
-        let items = manager.list_directory(&PathBuf::from("/home/user")).unwrap();
+        let items = manager
+            .list_directory(&PathBuf::from("/home/user"))
+            .unwrap();
         assert!(!items.is_empty());
     }
 
