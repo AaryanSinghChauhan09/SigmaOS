@@ -497,80 +497,46 @@ impl PackageManager for SimplePackageManager {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UniversalPackageType {
+    Apt,
+    Rpm,
+    Pacman,
+    Snap,
+    Nix,
+    Ebuild,
+    Apk,
+    Flatpak,
+    Txz,
+    Xbps,
+    Cachyos,
 }
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    fn get(&self, index: usize) -> Option<&T> {
-        if index < self.len {
-            unsafe { Some(&*self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-        if index < self.len {
-            unsafe { Some(&mut *self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
+pub trait UniversalPackage {
+    fn package_type(&self) -> UniversalPackageType;
 }
 
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+pub struct UserDefinedPackageHook;
+
+pub struct PackageAdapterFactory;
+
+pub struct AptPackageAdapter;
+pub struct PacmanPackageAdapter;
+pub struct SnapPackageAdapter;
+pub struct NixPackageAdapter;
+pub struct EbuildPackageAdapter;
+pub struct ApkPackageAdapter;
+pub struct FlatpakPackageAdapter;
+pub struct TxzPackageAdapter;
+pub struct XbpsPackageAdapter;
+pub struct CachyosPackageAdapter;
+
+pub struct CachyCpuDetector;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchLevel {
+    V1,
+    V2,
+    V3,
+    V4,
 }

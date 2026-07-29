@@ -576,3 +576,4 @@ mod tests {
 
         assert!(pm.destroy_address_space(space_id).is_ok());
     }
+}

@@ -380,13 +380,10 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        for i in 0..self.secrets.len() {
-            unsafe {
-                let slot = &mut *self.secrets.data.add(i);
-                if let Some(ref mut secret) = *slot {
-                    if secret.id() == id {
-                        return Some(secret);
-                    }
+        for slot in &mut self.secrets {
+            if let Some(ref mut secret) = slot {
+                if secret.id() == id {
+                    return Some(secret);
                 }
             }
         }

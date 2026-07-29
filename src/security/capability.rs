@@ -163,6 +163,18 @@ impl CapabilityToken {
         self.bits |= 16;
         self
     }
+
+    pub fn has_permission(&self, permission: Permission) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        (self.bits & (1 << permission as u64)) != 0
+    }
+
+    pub fn revoke_all(&mut self) {
+        self.bits = 0;
+        self.is_revoked = true;
+    }
 }
 
 <<<<<<< HEAD
@@ -201,6 +213,10 @@ impl CapabilityGate {
 
     pub fn set_capability(&mut self, token: CapabilityToken) {
         self.token = token;
+    }
+
+    pub fn validate_syscall(&self, permission: Permission) -> bool {
+        self.token.has_permission(permission)
     }
 }
 
@@ -329,7 +345,7 @@ mod tests {
 
     #[test]
     fn test_capability_gate_validation() {
-        let gate = CapabilityGate::new();
+        let mut gate = CapabilityGate::new();
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
