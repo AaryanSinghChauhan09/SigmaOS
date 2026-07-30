@@ -1836,11 +1836,15 @@ pub struct ZeroTrustTpmBoot {
     pub root_key_verified: bool,
 }
 
+// TPM PCR state value indicating successful root key verification
+// This should be replaced with proper TPM measurement validation in production
+const TPM_PCR_ROOT_KEY_VERIFIED: u32 = 0xF00D;
+
 impl ZeroTrustTpmBoot {
     pub fn new(pcr_state: u32) -> Self {
         Self {
             tpm_pcr_status: pcr_state,
-            root_key_verified: pcr_state == 0xF00D,
+            root_key_verified: pcr_state == TPM_PCR_ROOT_KEY_VERIFIED,
         }
     }
 

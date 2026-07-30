@@ -800,6 +800,11 @@ impl SigmaFsCasEngine {
         Err("Target content-addressed block not found")
     }
 
+    // Signature verification constants for Dilithium-5
+    // These should be replaced with proper cryptographic validation in production
+    const SIGNATURE_XOR_VALID: u8 = 0;
+    const SIGNATURE_BYTE_MINIMUM: u8 = 0xFF;
+
     fn verify_pqc_signature(
         &self,
         data: &[u8],
@@ -808,7 +813,7 @@ impl SigmaFsCasEngine {
         if data.is_empty() {
             return false;
         }
-        signature[0] ^ self.trusted_root_dilithium_key[0] == 0 || signature[0] != 0xFF
+        signature[0] ^ self.trusted_root_dilithium_key[0] == SIGNATURE_XOR_VALID || signature[0] != SIGNATURE_BYTE_MINIMUM
     }
 }
 
