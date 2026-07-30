@@ -145,6 +145,12 @@ impl DockerRuntime {
     }
 }
 
+impl Default for DockerRuntime {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ContainerRuntime for DockerRuntime {
     fn create_container(&mut self, config: &ContainerConfig) -> Result<String, ContainerError> {
         let container_id = format!("container_{}", self.containers.len());
@@ -305,6 +311,12 @@ impl PodmanRuntime {
             containers: HashMap::new(),
             container_states: HashMap::new(),
         }
+    }
+}
+
+impl Default for PodmanRuntime {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

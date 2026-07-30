@@ -54,8 +54,8 @@ impl PackageDependencyResolver {
         idx: &mut usize,
     ) -> bool {
         // Cycle detected
-        for i in 0..*idx {
-            if visited[i] == name {
+        for item in visited.iter().take(*idx) {
+            if *item == name {
                 return false;
             }
         }
@@ -81,11 +81,9 @@ impl PackageDependencyResolver {
     }
 
     fn find_recipe(&self, name: &'static str) -> Option<&PackageRecipe> {
-        for slot in self.registry.iter() {
-            if let Some(ref r) = slot {
-                if r.name == name {
-                    return Some(r);
-                }
+        for r in self.registry.iter().flatten() {
+            if r.name == name {
+                return Some(r);
             }
         }
         None
