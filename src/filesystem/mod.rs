@@ -25,7 +25,9 @@ pub use manager::{
     ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
-pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+pub use smart_symlink::{
+    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkKernelPersona, SymlinkResolverRule,
+};
 pub use support::{
     Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
     SimpleFilesystemManager,

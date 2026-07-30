@@ -10,7 +10,9 @@ use sigmaos::compatibility::{
     WorkloadProfile, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
     GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
-use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+use sigmaos::filesystem::{
+    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkKernelPersona, SymlinkResolverRule,
+};
 use sigmaos::security::{
     AnonSurfShunt, AppSandboxEngine, DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter,
     MaliciousSignature, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC,
@@ -176,17 +178,17 @@ mod tests {
 
         // Case 1: Primary target exists
         let res1 =
-            link1.resolve_symlink(KernelPersona::Linux_6_x, true, &[false, false], &rule, None);
+            link1.resolve_symlink(SymlinkKernelPersona::Linux_6_x, true, &[false, false], &rule, None);
         assert_eq!(res1, Ok("/usr/lib/modern/libc.so"));
 
         // Case 2: Primary target broken, heals to fallback index 1
         let res2 =
-            link1.resolve_symlink(KernelPersona::Linux_6_x, false, &[false, true], &rule, None);
+            link1.resolve_symlink(SymlinkKernelPersona::Linux_6_x, false, &[false, true], &rule, None);
         assert_eq!(res2, Ok("/lib/libc.so"));
 
         // Case 3: Complete orphaning
         let res3 = link1.resolve_symlink(
-            KernelPersona::Linux_6_x,
+            SymlinkKernelPersona::Linux_6_x,
             false,
             &[false, false],
             &rule,
@@ -198,7 +200,7 @@ mod tests {
         let mut loop_err = Ok("");
         for _ in 0..12 {
             loop_err = link1.resolve_symlink(
-                KernelPersona::Linux_6_x,
+                SymlinkKernelPersona::Linux_6_x,
                 true,
                 &[false, false],
                 &rule,
@@ -217,7 +219,7 @@ mod tests {
         let legacy_rule = LegacyLinuxRule;
         // On modern Linux_6_x kernel, Legacy rule rejects and points directly to first fallback path
         let res_legacy = link1.resolve_symlink(
-            KernelPersona::Linux_6_x,
+            SymlinkKernelPersona::Linux_6_x,
             true,
             &[false, false],
             &legacy_rule,

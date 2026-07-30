@@ -541,6 +541,36 @@ impl DeviceManager {
     }
 }
 
+/// DDE Device Wrapper
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DdeDeviceWrapper {
+    pub id: u32,
+    pub name: [u8; 32],
+    pub base_port: u16,
+    pub signature: [u8; 8],
+    pub simulated_pci_bar: [u8; 256],
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(id: u32, name_bytes: &[u8], base_port: u16, signature_bytes: &[u8]) -> Self {
+        let mut name = [0u8; 32];
+        let len = name_bytes.len().min(32);
+        name[..len].copy_from_slice(&name_bytes[..len]);
+
+        let mut signature = [0u8; 8];
+        let sig_len = signature_bytes.len().min(8);
+        signature[..sig_len].copy_from_slice(&signature_bytes[..sig_len]);
+
+        Self {
+            id,
+            name,
+            base_port,
+            signature,
+            simulated_pci_bar: [0u8; 256],
+        }
+    }
+}
+
 /// Simple Vec implementation for no_std
 struct Vec<T> {
     data: *mut T,
