@@ -18,6 +18,11 @@ impl CapabilityToken {
         Self { bits: 0 }
     }
 
+    /// Create capability token from bits
+    pub fn from_bits(bits: u64) -> Self {
+        Self { bits }
+    }
+
     /// Allow network access
     pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
         match protocol {

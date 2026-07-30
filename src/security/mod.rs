@@ -23,6 +23,8 @@ pub mod qubes_isolation;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vulnerability;
+pub mod defensive_audit;
+pub mod parrot_parity;
 
 pub use audit::{AuditLogger, AuditPolicy, LogFormat};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -85,4 +87,13 @@ pub use secrets::{
 pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
+};
+// Parrot Parity and Defensive Audit
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
+};
+pub use parrot_parity::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };

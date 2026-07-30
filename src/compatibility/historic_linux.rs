@@ -392,6 +392,10 @@ impl KernelPersonaVM {
     pub fn hot_swap_persona(&self, persona: KernelPersona) {
         self.current_persona.set(persona);
     }
+
+    pub fn get_persona(&self) -> KernelPersona {
+        self.current_persona.get()
+    }
 }
 
 impl Default for KernelPersonaVM {
@@ -497,6 +501,10 @@ impl WorkloadOptimizer {
 
     pub fn apply_workload_tuning(&self, profile: WorkloadProfile) {
         self.active_profile.set(profile);
+    }
+
+    pub fn get_profile(&self) -> WorkloadProfile {
+        self.active_profile.get()
     }
 }
 
