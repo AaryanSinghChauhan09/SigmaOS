@@ -198,6 +198,7 @@ impl Default for UdfSchedVm {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_zero_copy_queue() {
