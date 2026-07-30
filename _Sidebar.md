@@ -4,6 +4,7 @@
 - [Home](Home)
 - [About SigmaOS](SigmaOS-Userspace-Boot)
 - [Vision](SigmaOS-Vision-2026)
+- [System Diagnostics (What is Working & What is Not)](What-Is-Working-and-What-Is-Not)
 
 ## Architecture
 - [Kernel Internals](SigmaOS-Kernel-Internals)
