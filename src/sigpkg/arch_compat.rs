@@ -94,7 +94,7 @@ impl RollingSyncManager {
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
-            if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
+            if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
                 if remote_ver > installed_ver {
                     updates.push((pkg_name.clone(), *installed_ver, *remote_ver));
                 }
