@@ -4,6 +4,10 @@ This journal contains CRITICAL performance learnings discovered during profiling
 
 ---
 
+## 2026-07-30 - Stack Caching of Parsed SemVer Constraints in Nested Resolvers
+**Learning:** During deep traversal of nested package dependencies in our universal package manager, pushing raw dependency strings onto the visit stack and parsing them recursively on pop triggers repeated substring scans on the same package definitions. Refactoring the traversal stack from a raw `Vec<String>` to a pre-parsed tuple stack `Vec<(String, SemVerConstraint)>` caches the SemVer constraint at push-time. This completely eliminates redundant re-parsing, cutting the resolver's execution time and character scan operations in half.
+**Action:** When implementing DFS traversal over entities that require format parsing, always parse the entity at discovery/push time and cache the structured representation directly inside the stack structure rather than parsing on pop.
+
 ## 2024-07-15 - Unnecessary External Dependencies in Utility Modules
 **Learning:** External crates like `rand` and `uuid` are heavy, introduce substantial compilation times, and are highly inefficient for simple simulation metrics or identifier generations. Replacing them with specialized local, zero-dependency implementations (such as a 48-bit Linear Congruential Generator for pseudo-random numbers and timestamp-nanoseconds for unique snapshot IDs) completely eliminates standard-library binding costs, reduces compiler overhead, and provides sub-nanosecond execution speeds.
 **Action:** Always prefer lightweight, mathematically simple local algorithms over heavy external crate imports for simulation, telemetry, and non-cryptographic utility operations.

@@ -748,25 +748,24 @@ impl DependencyResolver {
 
     /// Parse a dependency string (e.g. "curl>=7.81.0" or just "curl") into package name and constraint
     pub fn parse_dependency(dep_str: &str) -> (String, SemVerConstraint) {
-        let operators = [">=", "<=", ">", "<", "="];
-        for op in &operators {
-            if let Some(idx) = dep_str.find(op) {
-                let name = dep_str[..idx].trim().to_string();
-                let constraint_str = &dep_str[idx..];
-                let constraint = SemVerConstraint::parse(constraint_str);
-                return (name, constraint);
-            }
+        // Optimize: scan string once for first comparison operator boundary rather than 5 separate finds.
+        if let Some(idx) = dep_str.find(|c| c == '>' || c == '<' || c == '=') {
+            let name = dep_str[..idx].trim().to_string();
+            let constraint_str = &dep_str[idx..];
+            let constraint = SemVerConstraint::parse(constraint_str);
+            (name, constraint)
+        } else {
+            (dep_str.trim().to_string(), SemVerConstraint::Any)
         }
-        (dep_str.trim().to_string(), SemVerConstraint::Any)
     }
 
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
-        let mut to_visit = vec![package_name.to_string()];
+        // Optimize: keep parsed name and constraints in the stack to avoid redundant parsing operations on pop.
+        let mut to_visit = vec![(package_name.to_string(), SemVerConstraint::Any)];
         let mut visited = std::collections::HashSet::new();
 
-        while let Some(current) = to_visit.pop() {
-            let (name, constraint) = Self::parse_dependency(&current);
+        while let Some((name, constraint)) = to_visit.pop() {
             if visited.contains(&name) {
                 continue;
             }
@@ -787,9 +786,9 @@ impl DependencyResolver {
 
                 // Push dependencies of this package
                 for dep in &package.dependencies {
-                    let (dep_name, _) = Self::parse_dependency(dep);
+                    let (dep_name, dep_constraint) = Self::parse_dependency(dep);
                     if !visited.contains(&dep_name) {
-                        to_visit.push(dep.clone());
+                        to_visit.push((dep_name, dep_constraint));
                     }
                 }
                 resolved.push(name);
