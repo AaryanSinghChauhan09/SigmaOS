@@ -138,7 +138,6 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         }
         Err(RemoteError::NotFound)
     }
-
 }
 
 impl SimpleRemoteDesktop {
@@ -239,7 +238,6 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -270,7 +268,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

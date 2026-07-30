@@ -150,7 +150,9 @@ impl ForensicStorageFilter {
     pub fn secure_memory_wipe(&self, target_buffer: &mut [u8]) {
         for byte in target_buffer.iter_mut() {
             // Write volatile zero states safely
-            unsafe { core::ptr::write_volatile(byte, 0x00); }
+            unsafe {
+                core::ptr::write_volatile(byte, 0x00);
+            }
         }
     }
 }

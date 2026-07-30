@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SymlinkKernelPersona {
     Linux_2_6,
@@ -11,7 +10,6 @@ pub enum SymlinkKernelPersona {
 // SigmaOS Smart Symbolic Link Engine
 // Zero-dependency, #![no_std] compliant, highly-optimized
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
-
 
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};

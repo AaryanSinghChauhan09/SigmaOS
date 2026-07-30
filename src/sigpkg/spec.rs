@@ -568,7 +568,6 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;

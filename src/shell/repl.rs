@@ -177,11 +177,9 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "echo" => {
-                ShellCommand::Echo {
-                    message: parts[1..].join(" "),
-                }
-            }
+            "echo" => ShellCommand::Echo {
+                message: parts[1..].join(" "),
+            },
             "rm" => {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {
@@ -645,7 +643,6 @@ mod tests {
         assert_eq!(out, "Removed file: testfile.txt");
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct AgentTask {

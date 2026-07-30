@@ -447,7 +447,11 @@ impl SigmaOffice {
 
     /// Create new spreadsheet
     pub fn create_spreadsheet(&mut self, title: String) -> Result<SpreadsheetProcessor> {
-        let doc = SigmaDocument::new(DocumentType::Spreadsheet, title.clone(), self.capability.clone());
+        let doc = SigmaDocument::new(
+            DocumentType::Spreadsheet,
+            title.clone(),
+            self.capability.clone(),
+        );
         self.documents.push(doc);
         self.active_document = Some(self.documents.len() - 1);
 
@@ -456,7 +460,11 @@ impl SigmaOffice {
 
     /// Create new presentation
     pub fn create_presentation(&mut self, title: String) -> Result<PresentationProcessor> {
-        let doc = SigmaDocument::new(DocumentType::Presentation, title.clone(), self.capability.clone());
+        let doc = SigmaDocument::new(
+            DocumentType::Presentation,
+            title.clone(),
+            self.capability.clone(),
+        );
         self.documents.push(doc);
         self.active_document = Some(self.documents.len() - 1);
 
@@ -476,7 +484,9 @@ impl SigmaOffice {
     /// Save document to SigmaFS
     pub fn save_document(&self, doc_idx: usize, _path: &str) -> Result<()> {
         // In real implementation, this would save to SigmaFS with capability checks
-        let _doc = self.documents.get(doc_idx).ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found"))?;
+        let _doc = self.documents.get(doc_idx).ok_or_else(|| {
+            std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found")
+        })?;
         // Save logic here
         Ok(())
     }
