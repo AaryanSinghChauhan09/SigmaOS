@@ -738,3 +738,4 @@ mod tests {
         let res2 = vmm.map_large_page(virt_1gb, unaligned_phys, PageSize::Giant1GB, false, true);
         assert!(matches!(res2, Err(PageFaultError::InvalidAddress)));
     }
+}
