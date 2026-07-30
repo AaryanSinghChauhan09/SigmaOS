@@ -411,7 +411,17 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
-#[cfg(target_os = "none")]
+<<<<<<< HEAD
+pub struct ShellVec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
+
+impl<T> ShellVec<T> {
+    pub fn new() -> Self {
+        ShellVec {
+=======
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 struct Vec<T> {
@@ -422,10 +432,10 @@ struct Vec<T> {
 
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
@@ -462,6 +472,22 @@ impl<T> Vec<T> {
     }
 }
 
+<<<<<<< HEAD
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+=======
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;

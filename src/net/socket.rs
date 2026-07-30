@@ -1,7 +1,3 @@
-#+--
-# src/net/socket.rs
-# Fixed all `def` keywords with `fn` to resolve syntax error
-#+--
 #![no_std]
 #![no_main]
 
@@ -64,12 +60,12 @@ impl Socket for SimpleSocket {
 
 pub trait SocketManager {
     fn create_socket(&mut self, socket_type: SocketType) -> Result<SocketID, SocketError>;
-    fn close_socket(&mut self, id: SocketID) -> Result<(), SocketError>;
+    def close_socket(&mut self, id: SocketID) -> Result<(), SocketError>;
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
-    fn bind(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
-    fn connect(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
-    fn send(&mut self, id: SocketID, data: &[u8]) -> Result<usize, SocketError>;
-    fn receive(&mut self, id: SocketID, buffer: &mut [u8]) -> Result<usize, SocketError>;
+    def bind(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
+    def connect(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
+    def send(&mut self, id: SocketID, data: &[u8]) -> Result<usize, SocketError>;
+    def receive(&mut self, id: SocketID, buffer: &mut [u8]) -> Result<usize, SocketError>;
 }
 
 #[repr(C)]

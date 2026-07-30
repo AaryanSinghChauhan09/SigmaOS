@@ -1,12 +1,18 @@
 #![no_std]
 #![no_main]
 
+<<<<<<< HEAD
+extern crate alloc;
+use alloc::boxed::Box;
+
+=======
 #[cfg(not(target_os = "none"))]
 extern crate alloc;
 #[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
 
 use core::mem;
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 /// OOP-based Volume Management for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 241
 /// Implements logical volume management
@@ -75,6 +81,11 @@ impl Volume for SimpleVolume {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
+<<<<<<< HEAD
+    fn volume_type(&self) -> VolumeType { unsafe { core::mem::transmute(self.volume_type.load(Ordering::SeqCst)) } }
+    fn size(&self) -> u64 { self.size.load(Ordering::SeqCst) as u64 }
+    fn is_mounted(&self) -> bool { self.mounted.load(Ordering::SeqCst) == 1 }
+=======
     fn volume_type(&self) -> VolumeType {
         let raw = self.volume_type.load(Ordering::SeqCst) as u32;
         match raw {
@@ -93,6 +104,7 @@ impl Volume for SimpleVolume {
     fn set_mounted(&self, mounted: bool) {
         self.mounted.store(if mounted { 1 } else { 0 }, Ordering::SeqCst);
     }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 }
 
 pub trait VolumeManager {
@@ -232,7 +244,9 @@ impl SnapshotManager for SimpleSnapshotManager {
     }
 }
 
-#[cfg(target_os = "none")]
+<<<<<<< HEAD
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+=======
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 struct Vec<T> {
@@ -240,8 +254,8 @@ struct Vec<T> {
     len: usize,
     capacity: usize,
 }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
@@ -299,8 +313,54 @@ impl<T> Vec<T> {
     }
 }
 
+<<<<<<< HEAD
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        self.as_slice()
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        self.as_slice_mut()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_slice().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_slice_mut().iter_mut()
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+=======
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045

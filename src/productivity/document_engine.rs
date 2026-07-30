@@ -244,6 +244,10 @@ mod tests {
 
     #[test]
     fn test_create_document() {
+<<<<<<< HEAD
+        let engine = DocumentEngine::new();
+=======
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         let doc = DocumentEngine::create_document(
             "Test Document".to_string(),
             "Author".to_string(),
@@ -257,7 +261,13 @@ mod tests {
 
     #[test]
     fn test_load_document() {
+<<<<<<< HEAD
+        let engine = DocumentEngine::new();
+        let doc =
+            DocumentEngine::load_document("test.md".to_string(), "# Title\nContent".to_string());
+=======
         let doc = DocumentEngine::load_document("test.md".to_string(), "# Title\nContent".to_string());
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
         assert_eq!(doc.metadata.format, DocumentFormat::Markdown);
         assert_eq!(doc.content, "# Title\nContent");
@@ -265,6 +275,10 @@ mod tests {
 
     #[test]
     fn test_convert_to_markdown() {
+<<<<<<< HEAD
+        let engine = DocumentEngine::new();
+=======
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         let doc = DocumentEngine::create_document(
             "Test".to_string(),
             "Author".to_string(),
@@ -278,6 +292,10 @@ mod tests {
 
     #[test]
     fn test_search_text() {
+<<<<<<< HEAD
+        let engine = DocumentEngine::new();
+=======
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         let doc = DocumentEngine::create_document(
             "Test".to_string(),
             "Author".to_string(),

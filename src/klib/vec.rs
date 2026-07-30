@@ -1,3 +1,20 @@
+<<<<<<< HEAD
+#![no_std]
+#![no_main]
+
+use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+
+pub struct Vec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
+
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+=======
 // Custom, Zero-Dependency Dynamic Vector Collection for SigmaOS
 // Eliminates pre-defined collection libraries by managing raw pointer allocations directly
 
@@ -21,12 +38,15 @@ impl<T> Vec<T> {
     /// Creates a new, empty custom vector
     pub fn new() -> Self {
         Self {
+>>>>>>> origin/jules-15532892492441614180-73ce6847
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
 
+<<<<<<< HEAD
+=======
     /// Returns the length of the vector
     pub fn len(&self) -> usize {
         self.len
@@ -38,11 +58,21 @@ impl<T> Vec<T> {
     }
 
     /// Pushes an item to the end of the vector, dynamically growing if needed
+>>>>>>> origin/jules-15532892492441614180-73ce6847
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
             }
+<<<<<<< HEAD
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+=======
 
             core::ptr::write(self.data.add(self.len), item);
             self.len += 1;
@@ -50,6 +80,7 @@ impl<T> Vec<T> {
     }
 
     /// Pops an item from the end of the vector
+>>>>>>> origin/jules-15532892492441614180-73ce6847
     pub fn pop(&mut self) -> Option<T> {
         if self.len == 0 {
             None
@@ -59,10 +90,17 @@ impl<T> Vec<T> {
         }
     }
 
+<<<<<<< HEAD
+    pub fn remove(&mut self, index: usize) -> T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+=======
     /// Removes an item at the specified index, shifting trailing elements left
     pub fn remove(&mut self, index: usize) -> T {
         assert!(index < self.len, "Index out of bounds!");
 
+>>>>>>> origin/jules-15532892492441614180-73ce6847
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -73,6 +111,43 @@ impl<T> Vec<T> {
         }
     }
 
+<<<<<<< HEAD
+    pub fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
+        let mut write_idx = 0;
+        for i in 0..self.len {
+            let item = &self[i];
+            if f(item) {
+                if write_idx != i {
+                    unsafe {
+                        core::ptr::copy_nonoverlapping(
+                            self.data.add(i),
+                            self.data.add(write_idx),
+                            1,
+                        );
+                    }
+                }
+                write_idx += 1;
+            } else {
+                unsafe {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+            }
+        }
+        self.len = write_idx;
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+=======
     /// Checks if the vector contains an item matching a predicate
     pub fn contains<F>(&self, mut f: F) -> bool
     where
@@ -89,12 +164,35 @@ impl<T> Vec<T> {
     }
 
     /// Helper to grow the backing memory capacity
+>>>>>>> origin/jules-15532892492441614180-73ce6847
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
         } else {
             self.capacity * 2
         };
+<<<<<<< HEAD
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+=======
         let size = core::mem::size_of::<T>();
         let align = core::mem::align_of::<T>();
 
@@ -131,19 +229,36 @@ impl<T> Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {
         assert!(index < self.len, "Index out of bounds!");
+>>>>>>> origin/jules-15532892492441614180-73ce6847
         unsafe { &*self.data.add(index) }
     }
 }
 
+<<<<<<< HEAD
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+=======
 impl<T> IndexMut<usize> for Vec<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         assert!(index < self.len, "Index out of bounds!");
+>>>>>>> origin/jules-15532892492441614180-73ce6847
         unsafe { &mut *self.data.add(index) }
     }
 }
 
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
+<<<<<<< HEAD
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+=======
         if self.capacity > 0 && !self.data.is_null() {
             let size = core::mem::size_of::<T>();
             if size > 0 {
@@ -160,11 +275,30 @@ impl<T> Drop for Vec<T> {
                         Layout::from_size_align_unchecked(self.capacity * size, align),
                     );
                 }
+>>>>>>> origin/jules-15532892492441614180-73ce6847
             }
         }
     }
 }
 
+<<<<<<< HEAD
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+=======
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = Vec::new();
@@ -271,4 +405,5 @@ mod tests {
         assert!(vec.contains(|&x| x == 42));
         assert!(!vec.contains(|&x| x == 100));
     }
+>>>>>>> origin/jules-15532892492441614180-73ce6847
 }

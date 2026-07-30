@@ -3,15 +3,24 @@
 
 use core::mem;
 /// OOP-based Block Storage for SigmaOS
+<<<<<<< HEAD
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 101
+/// Implements block device abstraction and storage management
+
+=======
 /// Based on 100-Improvement-Ideas.md storage management concepts
 /// Implements comprehensive block device abstraction, partition management,
 /// and caching for high-performance storage operations
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BlockDeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
+<<<<<<< HEAD
+pub enum BlockDeviceType { HDD = 0, SSD = 1, NVMe = 2, Virtual = 3 }
+=======
 pub enum BlockDeviceType {
     HDD = 0,
     SSD = 1,
@@ -19,6 +28,7 @@ pub enum BlockDeviceType {
     Virtual = 3,
     RAMDisk = 4,
 }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -63,6 +73,12 @@ impl SimpleBlockDevice {
 }
 
 impl BlockDevice for SimpleBlockDevice {
+<<<<<<< HEAD
+    fn id(&self) -> BlockDeviceID { self.id }
+    fn device_type(&self) -> BlockDeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
+    fn block_size(&self) -> usize { self.block_size.load(Ordering::SeqCst) }
+    fn total_blocks(&self) -> usize { self.total_blocks.load(Ordering::SeqCst) }
+=======
     fn id(&self) -> BlockDeviceID {
         self.id
     }
@@ -81,6 +97,7 @@ impl BlockDevice for SimpleBlockDevice {
     fn total_blocks(&self) -> usize {
         self.total_blocks.load(Ordering::SeqCst)
     }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
     fn read_block(&self, _block_num: usize, _buffer: &mut [u8]) -> Result<(), BlockError> {
         Ok(())
@@ -277,14 +294,12 @@ impl BlockCache for SimpleBlockCache {
 
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {

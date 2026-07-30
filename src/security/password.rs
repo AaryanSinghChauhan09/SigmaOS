@@ -424,6 +424,11 @@ impl PasswordManager {
         }
 
         let mut password = String::new();
+<<<<<<< HEAD
+
+        for _ in 0..length {
+            let index = (rand::random::<u64>() as usize) % charset.len();
+=======
         // Simple, zero-dependency, safe LCG pseudo-random generator using nanosecond seed
         let mut seed = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -433,6 +438,7 @@ impl PasswordManager {
         for _ in 0..length {
             seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
             let index = (seed as usize) % charset.len();
+>>>>>>> origin/jules-18101178622594638830-97dc43c6
             password.push(charset[index] as char);
         }
 

@@ -146,6 +146,9 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
+<<<<<<< HEAD
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+=======
         {
             let raw = self.state.load(Ordering::SeqCst) as u32;
             match raw {
@@ -157,6 +160,7 @@ impl DeviceDescriptor {
                 _ => DeviceState::Uninitialized,
             }
         }
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     }
 
     pub fn set_state(&self, state: DeviceState) {

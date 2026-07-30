@@ -89,7 +89,6 @@ impl PageTableEntry {
 }
 
 #[derive(Clone)]
-#[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
@@ -163,6 +162,13 @@ impl PageDirectory {
     pub fn get_table_mut(&mut self, idx: usize) -> Option<&mut PageTable> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
+<<<<<<< HEAD
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
+    }
+=======
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 }
 
 impl Default for PageDirectory {
@@ -210,6 +216,13 @@ impl PageDirectoryPointerTable {
     pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
+<<<<<<< HEAD
+
+    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
+        self.huge_entries.get(idx).and_then(|e| e.as_ref())
+    }
+=======
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 }
 
 impl Default for PageDirectoryPointerTable {
@@ -281,6 +294,25 @@ impl SimpleVMM {
         virt: VirtualAddress,
         phys: PhysicalAddress,
     ) -> Result<(), MemoryError> {
+<<<<<<< HEAD
+        self.map_page_with_flags(virt, phys, true, false)
+    }
+
+    /// Maps a standard 4KB page with flags
+    pub fn map_page_with_flags(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        writable: bool,
+        execute_disable: bool,
+    ) -> Result<(), MemoryError> {
+        // Alignment verification check (4KB = 4096 bytes = 0xFFF mask)
+        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
+            return Err(MemoryError::InvalidAddress);
+        }
+
+=======
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -389,10 +421,15 @@ impl SimpleVMM {
         &mut self,
         virt: VirtualAddress,
     ) -> Result<PhysicalAddress, MemoryError> {
+<<<<<<< HEAD
+        self.get_physical_address_with_access(virt, false, false)
+    }
+=======
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
         let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
+>>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
     /// Resolves virtual address while validating and recording access permissions (Read/Write/Execute)
     /// Incorporates Copy-on-Write (CoW) page-splitting for KSM merged pages upon write intents.
