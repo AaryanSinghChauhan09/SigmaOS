@@ -12,6 +12,7 @@ pub mod sandbox;
 pub mod shredder;
 pub mod snapshot;
 pub mod startup;
+pub mod state;
 
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
@@ -55,4 +56,8 @@ pub use startup::{
     DependencyBasedOptimizer, ProfileBasedOptimizer, ServicePriority, StartupAnalysis,
     StartupOptimizationResult, StartupOptimizationStrategy, StartupOptimizer, StartupProfile,
     StartupService,
+};
+pub use state::{
+    DeclarativeStateGraph, StateError, StateNode, StateValue, SystemConfiguration,
+    get_system_config, get_system_config_mut, init_system_config,
 };
