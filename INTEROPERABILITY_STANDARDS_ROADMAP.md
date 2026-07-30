@@ -90,43 +90,7 @@ pub fn get_standard_device_node(path: &str) -> Option<DeviceNodeInfo> {
 
 ---
 
-## 🎨 6. Standard Theme Engines, CLI Search, and Settings Hub Interfaces (Rust)
-
-To match the customizability of GTK/Qt while keeping a minimal, unified `#![no_std]` footprint:
-*   **Theme Engine**: Employs a declarative parser for `.sigma-theme` specifications, translating UI color structures to framebuffers and terminal colors.
-*   **Unified Search**: Instantiates a cached trie-based prefix matching system to resolve system files, settings, and wiki keywords.
-
-```rust
-// Represents a standardized unified theme color definition
-#[derive(Debug, Clone, Copy)]
-pub struct SigmaThemeColors {
-    pub primary: u32,
-    pub secondary: u32,
-    pub background: u32,
-    pub text: u32,
-}
-
-pub struct ThemeEngine {
-    pub current_colors: SigmaThemeColors,
-}
-
-impl ThemeEngine {
-    pub fn new() -> Self {
-        Self {
-            current_colors: SigmaThemeColors {
-                primary: 0x7C3AED,
-                secondary: 0x10B981,
-                background: 0x0F172A,
-                text: 0xF1F5F9,
-            },
-        }
-    }
-}
-```
-
----
-
-## 📅 7. Step-by-Step Implementation Roadmap
+## 📅 6. Step-by-Step Implementation Roadmap
 
 - [ ] **Phase 1 (Validation)**: Complete POSIX compliance and FHS path checker traits in `src/compatibility/standards.rs`.
 - [ ] **Phase 2 (FHS Overlays)**: Integrate path verification logic directly into the VFS mount subsystem (`src/filesystem/vfs.rs`).

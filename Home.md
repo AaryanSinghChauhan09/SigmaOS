@@ -6,18 +6,6 @@
 ---
 
 ## 🎯 Overview
-<<<<<<< HEAD
-
-SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
-
-### Core Pillars
-
-- **Post-Quantum Cryptography**: Native Kyber-1024 KEM + Dilithium-5 signatures (NIST FIPS 203/204).
-- **Capability-Based Security**: 64-bit hardware-enforced permission model replacing legacy ACLs.
-- **Shard Architecture**: 600+ hot-swappable kernel modules with zero-latency IPC.
-- **AI-Native Design**: Local LLM inference as a first-class OS primitive.
-- **India-First**: Native GST, Income Tax, UPI, and 22-language support.
-=======
 
 SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
 
@@ -29,7 +17,6 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
 
->>>>>>> wiki/master
 
 ---
 
@@ -37,13 +24,6 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 
 SigmaOS decomposes the traditional monolithic kernel into specialized, isolated shards. The interaction between these shards is governed by a capability-enforced transaction bus.
 
-<<<<<<< HEAD
-=======
-### OOP Architecture Plan
-
-SigmaOS is undergoing a 9-pillar OOP-based architecture redesign grounded in Linux kernel subsystems and Linux distro best practices. See the [OOP Development Plan](OOP_Development_Plan.md) for the full implementation roadmap.
-
->>>>>>> wiki/master
 ```mermaid
 graph TD
     UserLand[Userland Applications] -->|Syscall Capability Gate| KernelGate[S-SEC Security Shard]
@@ -55,22 +35,12 @@ graph TD
     Bus --> S-AI[S-AI: Local LLM Orchestrator]
 ```
 
-<<<<<<< HEAD
-- **S-MM**: Sovereign Memory Manager (Buddy Allocator + Page Directory Controller).
-- **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF + EEVDF).
-- **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
-- **S-SEC**: Security Framework (PQC + MAC + Sandbox).
-- **S-AI**: AI Task Orchestrator (Local LLM routing).
-- **S-IPC**: Zero-Copy Capability-Gated Message Queue.
-- **S-Signal**: Capability-Gated Signal Dispatcher.
-=======
 - **S-MM**: Sovereign Memory Manager (Buddy Allocator).
 - **S-SCHED**: Predictive Multi-Priority Scheduler (MLFQ + CFS + EDF).
 - **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
 - **S-SEC**: Security Framework (PQC + MAC + Sandbox).
 - **S-AI**: AI Task Orchestrator (Local LLM routing).
 
->>>>>>> wiki/master
 
 ---
 
@@ -128,82 +98,6 @@ For a detailed review of all security policies, see the canonical [Security Fram
 
 ---
 
-<<<<<<< HEAD
-## 📋 Implementation Status
-
-### ✅ Completed Features
-
-#### Kernel Performance
-- **Zero-Copy IPC Queue**: Lock-free ring buffer for kernel IPC
-- **UDF Scheduler VM**: User-Defined Function bytecode scheduler
-- **EEVDF Scheduler**: Earliest Eligible Virtual Deadline First scheduling
-- **S-INIT Supervisor**: s6-style hierarchical service supervision
-- **Gap Filling**: S-IPC, S-Signal, S-MM implementations
-
-#### Distro Absorption
-- **CPU Feature Detection**: Gentoo-style compiler optimizations (AVX512, AMX, Neon, SVE)
-- **S-PAC Package Manager**: Arch-style rolling upgrades with DPLL SAT solver
-- **JIT Optimization Selector**: Dynamic CPU extension enumeration
-
-#### Networking
-- **ZenithNet**: Zero-copy networking stack
-- **Polymorphic Network Drivers**: E1000, RTL8139, VirtIO Net
-- **Zero-Copy Packet Ring**: DMA ring buffer interface
-- **SovereignBrowser**: Native browser core with Brave Shield adblocking
-- **Firefox Containers**: Tab isolation and cookie partitioning
-
-#### Filesystem
-- **SigmaFS**: Crash-consistent Merkle tree filesystem
-- **JBD2-Style Journal**: Transactional logging with CRC32C
-- **CoW Architecture**: Copy-on-Write node management
-- **Polymorphic Storage**: NVMe and AHCI SATA controllers
-
-#### System Tools
-- **SigmaDeploy**: Automated provisioning with TFTP/DHCP netboot
-- **SigmaCluster**: Grid orchestrator with node management
-- **SigmaIdentity**: Enterprise directory with LDAP/Kerberos
-- **SigmaAccess**: Visual and audio inclusivity toolkit
-
-#### Compatibility
-- **S-COSMOS**: Cross-platform compatibility shard
-- **S-WINE**: Windows PE binary translator
-- **S-COCOA**: macOS Mach-O application wrapper
-- **S-ANDROID**: Android APK loader with Binder emulation
-
-#### Graphics
-- **Zenith Compositor**: Direct-to-hardware framebuffer splicing
-- **GNOME/KDE/COSMIC**: Feature absorption from major DEs
-- **Accessibility**: Screen reader, high contrast, magnification
-- **Animation System**: Linear, EaseIn, EaseOut, EaseInOut curves
-
-#### AI
-- **S-AI Engine**: Local AI engine and multi-agent automation
-- **SovereignML**: Zero-dependency tensor computation
-- **Agent Orchestrator**: Multi-agent task planner
-- **Compute Backends**: CPU SIMD, Vulkan GPU, NPU support
-
----
-
-## 🛠️ Development
-
-### Building from Source
-
-```bash
-# Install Rust toolchain
-rustup install nightly
-rustup default nightly
-
-# Build the kernel
-cargo build --release
-
-# Run tests
-cargo test
-```
-
-### Contributing
-
-SigmaOS welcomes contributions! Please see [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/CONTRIBUTING.md) for guidelines.
-=======
 ## 📚 Canonical Documentation (GitHub Wiki)
 
 ```text
@@ -233,21 +127,21 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 **Desktop & Productivity:**
 - ✅ Zenith Desktop prototype
-- ✅ Screen recorder with GPU acceleration
-- ✅ Screenshot tool with annotation
-- ✅ Calendar + task manager
-- ✅ Email client with IMAP/SMTP
-- ✅ Note-taking app with Markdown
-- ✅ Code editor with LSP support
+- 🔄 Screen recorder with GPU acceleration
+- 🔄 Screenshot tool with annotation
+- 🔄 Calendar + task manager
+- 🔄 Email client with IMAP/SMTP
+- 🔄 Note-taking app with Markdown
+- 🔄 Code editor with LSP support
 - ✅ Integrated terminal
 - ✅ Clipboard manager with history
-- ✅ Task manager
+- 🔄 Task manager
 
 **Security:**
 - ✅ Encrypted file vault
-- ✅ Password manager with biometric unlock
+- 🔄 Password manager with biometric unlock
 - ✅ Intrusion detection system
-- ✅ Secure VPN client
+- 🔄 Secure VPN client
 - ✅ Capability-based security framework
 
 **System Tools:**
@@ -256,24 +150,24 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Disk usage analyzer
 - ✅ System monitor
 - ✅ Process manager
-- ✅ Virtual machine manager (QEMU/KVM)
-- ✅ Container manager (Docker/Podman)
+- 🔄 Virtual machine manager (QEMU/KVM)
+- 🔄 Container manager (Docker/Podman)
 
 **Package Management:**
 - ✅ sigma-pkg CLI
-- ✅ Universal package manager
-- ✅ Rollback package snapshots
+- 🔄 Universal package manager
+- 🔄 Rollback package snapshots
 
 **Networking:**
-- ✅ Cloud sync engine
-- ✅ Built-in torrent client
-- ✅ Network traffic analyzer
+- 🔄 Cloud sync engine
+- 🔄 Built-in torrent client
+- 🔄 Network traffic analyzer
 
 **AI & Automation:**
-- ✅ AI orchestrator for system optimization
+- 🔄 AI orchestrator for system optimization
 
 **Customization:**
-- ✅ Unified control center
+- 🔄 Unified control center
 - ✅ Declarative theming engine
 
 **Boot & Deployment:**
@@ -295,109 +189,15 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - VESA framebuffer driver
 - Package recipes
 
->>>>>>> wiki/master
 
 ---
 
 ## 📚 Documentation
 
-<<<<<<< HEAD
-- [Architecture Overview](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
-- [Security Framework](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Security_Framework)
-- [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
-- [Network Stack](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Network_Stack)
-- [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
-
----
-
-## 📄 License
-
-SigmaOS is licensed under the [SigmaOS Sovereign License](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/LICENSE.md).
-
----
-
-## 🙏 Acknowledgments
-
-SigmaOS draws inspiration from and builds upon concepts from:
-- Linux kernel heritage (v0.01 through 6.x)
-- Gentoo (CPU optimizations)
-- Arch Linux (rolling package management)
-- NixOS (atomic state management)
-- Debian (stability focus)
-- And many other open-source projects
-
-## 📚 Canonical Documentation (GitHub Wiki)
-
-```text
-Phase F (Competitor Crusher)   ████████████████████  100% ✅
-Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
-Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
-```
-
-### Current Status
-
-**Kernel Core:**
-- ✅ Kernel scheduler (MLFQ+CFS+EDF)
-- ✅ Syscalls (I/O + Process)
-- ✅ Physical MM (buddy allocator)
-- 🔄 Virtual MM (paging) - Partial
-- ✅ APIC + timer
-- ✅ sigma_pledge + sigma_unveil
-- ✅ Kyber-1024 KEM + Dilithium-5
-- 🔄 TCP/UDP stack - Partial
-- ✅ Ext4 + FAT32 filesystems
-- ✅ NVMe + USB xHCI drivers
-- ✅ Zenith Desktop prototype
-- ✅ sigma-pkg CLI
-- ⬜ Bootable ISO (Phase G)
-
-**Linux Kernel Absorption:**
-- ✅ NixOS-style atomic generation manager
-- ✅ Arch-style SAT solver and package parser
-- ✅ Android-style runtime capability token guard
-- ✅ Kali-style isolated system tracing sandbox
-- ✅ BusyBox-style multi-call shell parser
-- ✅ Image decoder (PNG, JPEG, GIF, BMP, WebP, TIFF)
-- ✅ Audio codec (FLAC, MP3, OGG Vorbis, WAV)
-- ✅ Document engine (Markdown, LaTeX, RTF, ODT, ODS)
-- ✅ Browser core with tab isolation and adblocker
-- ✅ SQL database engine with ACID transactions
-- ✅ Advanced memory management (NUMA allocator, slab allocator, secure free detection)
-- ✅ Complete TCP/IP networking stack (IPv6, routing, TLS)
-- ✅ Security frameworks (SELinux/AppArmor equivalent)
-- ✅ Virtualization support (namespaces, cgroups)
-- ✅ Power management (CPUFreq scaling)
-- ✅ Hardware monitoring and watchdog support
-- ✅ Journaling filesystems (Btrfs, XFS)
-- ✅ GPU drivers (basic GPU acceleration)
-- ✅ Audio stack (ALSA equivalent)
-
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### High-Impact Areas
-
-- Round-robin scheduler implementation
-- Buddy allocator completion
-- sigma-sh REPL
-- USB HID keyboard driver
-- VESA framebuffer driver
-- Package recipes
-
-
----
-
-## 📚 Documentation
-
-=======
->>>>>>> wiki/master
 ### Repository Documentation
 
 - [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
+- [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
 - [Roadmap](Roadmap.md) — Development plan
 - [INSTALL.md](INSTALL.md) — Build instructions
@@ -412,12 +212,9 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 - **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
-<<<<<<< HEAD
-=======
 - **Kernel Evolution**: [Kernel Evolution Architecture](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Kernel_Evolution_Architecture)
 - **Driver Ecosystem**: [Driver Ecosystem](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Driver_Ecosystem)
 - **Strategic Planning**: [Gap Filling Strategic Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/GAP_FILLING_STRATEGIC_PLAN)
->>>>>>> wiki/master
 - **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
 - **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
 - **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
@@ -437,3 +234,64 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 ## 📄 License
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
+
+---
+
+# SigmaOS Zenith (v15.2 - Release Microkernel)
+
+The Sovereign Industrial Microkernel.
+
+This branch represents the core modular microkernel layout of SigmaOS, structured to align with established Linux distribution layouts for robustness, isolation, and silicon-direct execution.
+
+---
+
+## 🏛️ Design Specification & Architecture Layers
+
+SigmaOS is organized into isolated functional layers to guarantee complete safety and hardware-isolation boundary conditions:
+
+### 1. Kernel Layer (`/kernel/`)
+- **Process Scheduler**: Multi-level Feedback Queue (MLFQ) and Round-Robin scheduler handling task priorities and time-slice yields.
+- **Memory Management**: Physical Page Frame Allocator (PMM) and Virtual Memory Paging (VMM) supporting 4-level paging tables.
+- **Hardware Drivers**: Low-level abstractions for COM1 serial logs, PS/2 keyboards, standard VGA text mode, and ATA disk sector operations.
+
+### 2. Standard Libraries (`/lib/`)
+- **Sovereign Libc**: Independent, zero-dependency C11 standard library implementation providing `sigma_printf`, memory manipulators (`memcpy`, `memset`), string utilities, and attestation helpers (`crc32`).
+
+### 3. Init System (`/init/`)
+- **PID 1 Bootstrap**: Orchestrates clean startup sequences using Runlevels (1 to 5) to boot vital telemetry, load the virtual file system, initialize the TCP/IP stack, and spawn the user shell in order.
+
+### 4. Virtual File System (`/fs/`)
+- **VFS Interface**: Standardizes operations like `open`, `close`, `read`, and `write` via file descriptor tables and inode indexing.
+- **Ext4/FAT32 Drivers**: Handles block storage, reads superblock states, and walks clusters.
+
+### 5. Networking Stack (`/net/`)
+- **Loopback NIC**: Direct virtual hardware interface loopback (`lo` at `127.0.0.1`).
+- **TCP/IP Suite**: Custom TCP 3-way handshake state machine and UDP port binding.
+- **DNS Lookup**: Local resolver mapping domain endpoints to IPv4 destinations.
+
+### 6. Userland utilities (`/usr/`)
+- **sh Shell**: Interactive CLI command execution environment mapping user inputs to system calls.
+
+---
+
+## 🛠️ Build, Test, & Execution Instructions
+
+### Dependencies
+- Make, NASM assembler, GCC, QEMU
+
+### 1. Compile all Modular Subsystems
+```bash
+make clean
+make all
+```
+
+### 2. Running the Emulator
+```bash
+qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio -m 2G
+```
+
+### 3. Running Unit Tests
+```bash
+npm run test
+```
+All unit tests in `/tests` must return green states before submitting patches.

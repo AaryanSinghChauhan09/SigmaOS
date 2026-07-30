@@ -6,6 +6,78 @@ This document outlines the 9-pillar OOP development plan for SigmaOS, grounded i
 
 ---
 
+## 🏗️ Core OOP Design Patterns & Interfaces
+
+To achieve ultimate extensibility, reliability, and modularity, SigmaOS implements enterprise-grade OOP design patterns natively in Rust:
+
+### 1. The Singleton Pattern (Driver & Package Registries)
+Ensures central management structures are thread-safe and instantiated exactly once using lock-free synchronization wrappers:
+
+```rust
+// Thread-safe lock-free Singleton Pattern
+pub struct DriverRegistry {
+    drivers: Arc<RwLock<Vec<Box<dyn DeviceDriver>>>>,
+}
+
+impl DriverRegistry {
+    pub fn global() -> &'static Self {
+        static INSTANCE: OnceCell<DriverRegistry> = OnceCell::new();
+        INSTANCE.get_or_init(|| DriverRegistry {
+            drivers: Arc::new(RwLock::new(Vec::new())),
+        })
+    }
+}
+```
+
+### 2. The Factory Pattern (Polymorphic Driver Loader)
+Dynamically creates driver instances based on PCI vendor/device profiles:
+
+```rust
+pub struct DriverFactory;
+
+impl DriverFactory {
+    pub fn create_driver(vendor_id: u16, device_id: u16) -> Option<Box<dyn DeviceDriver>> {
+        match (vendor_id, device_id) {
+            (0x8086, 0x100E) => Some(Box::new(IntelProEthernetDriver::new())),
+            (0x10DE, 0x1F08) => Some(Box::new(NvidiaGpuDriver::new())),
+            _ => None,
+        }
+    }
+}
+```
+
+### 3. The Observer Pattern (System Event Dispatcher)
+Allows microkernel shards (such as S-SEC and S-NET) to react to hardware hot-plugging, memory thresholds, or intrusion alarms synchronously:
+
+```rust
+pub trait EventObserver: Send + Sync {
+    fn on_event(&self, event: &SystemEvent);
+}
+
+pub struct SystemEventDispatcher {
+    observers: Vec<Weak<dyn EventObserver>>,
+}
+```
+
+### 4. Legacy Compatibility Wrapper (LegacyAdapter Pattern)
+Encapsulates historical Linux system calls, mapping them transparently to safe modern capability-gated equivalent APIs:
+
+```rust
+pub struct LegacySyscallAdapter {
+    kernel_persona: KernelPersona,
+}
+
+impl LegacySyscallAdapter {
+    pub fn execute_sys_open(&self, path: &str, flags: i32) -> Result<FileDescriptor, LError> {
+        // Transparent transition from legacy flags to CapabilityToken validation
+        let token = CapabilityToken::from_legacy_flags(flags);
+        SovereignVfs::open_file_with_token(path, token)
+    }
+}
+```
+
+---
+
 ## Pillar 1: Device Driver Framework
 
 **Linux Kernel Inspiration:** `driver/core` (kobject/device/bus model)
@@ -222,7 +294,7 @@ This document outlines the 9-pillar OOP development plan for SigmaOS, grounded i
 
 4. **Capability Tokens**: Each operation checks `CapabilityToken` for authorization, similar to Linux's capability-based security model.
 
-5. **Sysfs Attributes**: `KernelObject::sysfs_attrs()` and `sysfs_show()`/`sysfs_store()` mirror Linux's sysfs attribute groups.
+5. **Syssys Attributes**: `KernelObject::sysfs_attrs()` and `sysfs_show()`/`sysfs_store()` mirror Linux's sysfs attribute groups.
 
 6. **SchedClass Hierarchy**: The 5 scheduling classes (Stop, Deadline, RT, Fair, Idle) directly mirror Linux's `kernel/sched/` class hierarchy.
 

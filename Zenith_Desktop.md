@@ -26,6 +26,106 @@
 
 ---
 
+## 🔁 Compositor Event Loop
+
+To maintain solid, stutter-free 120 FPS window composition, Zenith runs an asynchronous, lock-free event loop that multiplexes input handling, surface trees updates, and display frame presentation:
+
+```rust
+// ZenithCompositor Main Event Loop
+pub struct ZenithEventLoop {
+    input_queue: LockFreeQueue<InputEvent>,
+    damage_tracker: DamageTracker,
+    scene_graph: Arc<RwLock<SceneGraph>>,
+    vsync_timer: VsyncTimer,
+}
+
+impl ZenithEventLoop {
+    pub fn run(&mut self) -> ! {
+        loop {
+            // 1. Poll input queue with low-latency drivers
+            while let Some(event) = self.input_queue.pop() {
+                self.process_input(event);
+            }
+
+            // 2. Refresh frame if damage or Vsync tick is registered
+            if self.damage_tracker.is_damaged() && self.vsync_timer.tick_ready() {
+                let scene = self.scene_graph.read().unwrap();
+                self.render_frame(&scene);
+                self.damage_tracker.clear();
+            }
+
+            // 3. Sleep briefly to yield CPU or wait for ACPI timer interrupts
+            self.yield_now();
+        }
+    }
+
+    fn render_frame(&self, scene: &SceneGraph) {
+        // Zero-copy DMA-BUF presentation to KMS/DRM display layers
+        for layer in scene.layers() {
+            if let Some(buf) = layer.dma_buffer() {
+                self.present_buffer(buf);
+            }
+        }
+    }
+}
+```
+
+---
+
+## 📐 Layout Paradigms
+
+Zenith implements native, highly modular tiling and floating window layout paradigms:
+
+1. **Auto-Tiling Mode:** Organizes windows dynamically into a non-overlapping grid (binary tree structure). Side panels, docks, and applications scale automatically when new tiles are opened.
+2. **Floating Mode:** Traditional floating window manager with overlap support, depth sorting (Z-index), and custom window shadows.
+3. **Picture-in-Picture (PiP) Overlay:** Capability-gated overlays that float on top of all virtual workspaces.
+
+---
+
+## ⌨️ System Keyboard Shortcuts
+
+Zenith features standard, intuitive system keyboard shortcuts for ultimate navigation efficiency:
+
+Shortcut | Context | Action
+--- | --- | ---
+`Super + Enter` | Desktop | Launch `sigma-sh` in Terminal
+`Super + Q` | Window | Close focused window
+`Super + Tab` | Workspace | Toggle between active workspaces
+`Super + Shift + Left/Right` | Window | Move focused window to next monitor
+`Super + Space` | Desktop | Launch Search / Command Launcher
+`Super + Ctrl + S` | Capture | Take interactive screenshot
+`Super + Ctrl + R` | Capture | Toggle screen recorder
+`Super + Alt + H` | Accessibility | Toggle Screen Reader
+`Super + Alt + Z` | Accessibility | Toggle Screen Magnifier
+
+---
+
+## ♿ WCAG & Screen Reader Accessibility Tags
+
+Sovereignty requires standard accessibility. Zenith emits semantic accessibility descriptors and screen-reader metadata directly from visual compositor elements:
+
+```rust
+// Screen Reader Accessibility descriptor layout
+pub struct AccessibleElement {
+    pub id: ElementID,
+    pub role: AccessibleRole,         // e.g., Button, Input, Container, Alert
+    pub label: String,                // ARIA equivalent label
+    pub active_state: ElementState,   // Focused, Expanded, Selected, Disabled
+    pub keyboard_shortcut: Option<String>,
+}
+
+impl AccessibleElement {
+    pub fn serialize_to_reader(&self) -> String {
+        format!(
+            "[Element: {:?}], Name: '{}', Status: {:?}, Key: {:?}",
+            self.role, self.label, self.active_state, self.keyboard_shortcut
+        )
+    }
+}
+```
+
+---
+
 ## ✨ Core Features
 
 ### Wayland Protocol Compatibility
@@ -47,11 +147,11 @@ ZenithCompositor implements the core Wayland protocol plus key extensions:
 ### Rendering Pipeline
 
 ```
-Application renders → wl_buffer (DMA-BUF or SHM) 
-    → ZenithCompositor (damage tracking) 
-    → Scene graph (sorted by z-order) 
-    → GPU backend (Vulkan render pass) 
-    → KMS/DRM (vsync atomic commit) 
+Application renders → wl_buffer (DMA-BUF or SHM)
+    → ZenithCompositor (damage tracking)
+    → Scene graph (sorted by z-order)
+    → GPU backend (Vulkan render pass)
+    → KMS/DRM (vsync atomic commit)
     → Display
 ```
 
@@ -70,7 +170,7 @@ ZenithCompositor uses **server-side decorations (SSD)** with a clean sovereign a
 
 ### Sigma Taskbar
 
-- **Sigma Dock** — macOS-style app dock with magnetic hover animations
+- **Sigma Dock** — app dock with magnetic hover animations
 - **Smart Workspace** — AI-suggested workspace grouping (related apps grouped together)
 - **Quick Settings** — One-click access to Wi-Fi, Bluetooth, Volume, Brightness
 - **Notification Center** — Grouped, actionable notifications with rich media previews
@@ -162,11 +262,118 @@ easing = "ease-out-cubic"
 | Midnight Teal | Cyberpunk-inspired teal on near-black |
 | Paper White | Light mode — off-white with ink accents |
 
-### Dynamic Theming
+---
 
-- **Time-based** — Auto-switch to light/dark at sunrise/sunset
-- **Location-aware** — Sunrise/sunset calculated from device location
-- **App-specific** — Different accent colors per application
+## 🐚 Unified CLI Control Suite (GUI-over-CLI)
+
+SigmaOS bridges command-line productivity with Graphical interface richness. Every task that can be performed via the Zenith Compositor's graphical controls can easily be done using our interactive CLI control suite.
+
+### 1. Display Configuration (`display`)
+Enables full control over monitor arrangements, refresh rates, HiDPI scaling, and HDR settings:
+```bash
+# List all active and connected outputs
+display list
+
+# Set layout positioning
+display set --primary DP-1 --secondary HDMI-1 --arrange right
+
+# Configure HiDPI scaling
+display scale --output DP-1 --factor 2.0
+
+# Set refresh rate
+display rate --output DP-1 --hz 144
+
+# Toggle High Dynamic Range
+display hdr --output DP-1 --enable true
+```
+
+### 2. Desktop Theming (`theme`)
+Switch custom themes, adjust blur radius, or configure location-aware automatic dark mode switching:
+```bash
+# List preset themes
+theme list
+
+# Change active theme
+theme set "Banaras Gold"
+
+# Customize variables
+theme configure --accent #6C63FF --blur true --radius 20
+
+# Enable time-based theme transitions
+theme auto --enable true --mode time
+```
+
+### 3. Desktop UX & Profile Swapper (`profile`)
+Polymorphically swap between standard, developer, or guest environments with different layout algorithms:
+```bash
+# List custom user profiles
+profile list
+
+# Swap active profile
+profile switch developer
+
+# Override layout algorithm
+profile layout tiling
+```
+
+### 4. Window Manager Controller (`window`)
+Create, list, move, or destroy compositor windows directly:
+```bash
+# List running windows
+window list
+
+# Create a window
+window create --title "SigmaBrowser" --app "sigma.browser" --geom "10,10,600,400"
+
+# Change state
+window state --id 1 --state Maximized
+
+# Move / resize
+window move --id 1 --x 20 --y 20 --w 800 --h 600
+
+# Focus / Close
+window focus --id 1
+window close --id 2
+```
+
+### 5. Accessibility Controls (`accessibility` / `acc`)
+Toggle screen readers, magnification zoom, or load color-blindness shader corrections:
+```bash
+# Query active accessibility settings
+acc status
+
+# Toggle screen reader
+acc screen-reader --enable true --voice "default" --speed 1.0
+
+# Adjust magnifier zoom level
+acc magnifier --zoom 2.0
+
+# Set color blind correction shader
+acc colorblind protanopia
+```
+
+### 6. Screen Record & Screenshot (`screenshot` / `record`)
+Capture high-quality, hardware-accelerated screenshots or video streams:
+```bash
+# Capture full screen
+screenshot capture --output /home/ubuntu/screenshot.png --region full
+
+# Start recording
+record start --output /home/ubuntu/recording.mp4 --codec av1 --quality high
+
+# Stop recording
+record stop
+```
+
+### 7. Secure Clipboard Manager (`clipboard`)
+Retrieve or write context safely with capability-gated validation checks:
+```bash
+# Set clipboard text
+clipboard set "Sovereign Operating System"
+
+# Retrieve clipboard text (Requires 0x5001 capability validation)
+clipboard get
+```
 
 ---
 
@@ -350,156 +557,3 @@ ZenithCompositor enforces:
 - [SigmaMedia Frameworks](SigmaMedia-Frameworks) — Built-in media playback in Zenith
 - [Advanced Absorption Matrix](Advanced_Absorption) — How Zenith replaces legacy DEs
 - [Maturity & Distro-Parity Roadmap](Maturity_Parity_Roadmap) — Desktop milestone status
-<<<<<<< HEAD
-=======
-
-
----
-## Merged from Zenith-Desktop.md
-# Zenith Desktop Environment
-
-The Zenith Desktop is SigmaOS's flagship UI — a sovereign, compositor-first desktop environment with AI-driven personalisation, spatial audio, and full accessibility.
-
----
-
-## Architecture
-
-```
-Zenith Desktop (zenith_desktop/)
-    │
-    ├── Compositor (C++ native — Phase G)
-    │     └── ZenithDesktopEnvironment.cpp
-    ├── Window Manager
-    │     └── zenith_desktop/wm/
-    ├── Neural UI (AVX-512 accelerated)
-    │     └── zenith_desktop/neural/sigma_neural_ui.cpp
-    ├── Theme Engine
-    │     └── zenith_desktop/theme/
-    ├── Personalisation
-    │     └── zenith_desktop/personalization/
-    ├── App Store
-    │     └── zenith_desktop/appstore/
-    ├── Notifications
-    │     └── zenith_desktop/notifications/
-    ├── Settings
-    │     └── zenith_desktop/settings/
-    └── Accessibility
-          └── zenith_desktop/a11y/
-```
-
----
-
-## Current State
-
-| Component | Status |
-|-----------|--------|
-| JS prototype (browser) | ✅ Working in browser profile |
-| C++ compositor | 🔄 In progress — Phase G |
-| Auto-tiling WM | 🔄 Implemented, needs input integration |
-| Theme engine | ✅ Implemented |
-| Neural UI (AVX-512) | ✅ Implemented |
-| Accessibility (SSR) | 🔄 Partial |
-| Indian IME | ⬜ Phase H |
-| sigma-ai LLM daemon | ⬜ Phase H |
-| App store UI | 🔄 Demo in `release/app` |
-
----
-
-## Window Management (`zenith_desktop/wm/`)
-
-Zenith uses a **hybrid tiling + floating** window manager:
-
-```
-Workspaces: 1–9 (switch with Super+1 through Super+9)
-Tiling modes:
-  - Master/stack (default)
-  - Grid (Super+G)
-  - Fullscreen (Super+F)
-  - Floating (Super+Shift+Space)
-
-Key bindings (default):
-  Super+Enter     New terminal
-  Super+D         App launcher (sigma-spotlight)
-  Super+Q         Close window
-  Super+H/L       Resize master pane
-  Super+Shift+R   Reload config
-```
-
----
-
-## Theme System (`zenith_desktop/theme/`)
-
-```bash
-# List available themes
-sigma-theme list
-
-# Apply a theme
-sigma-theme apply midnight-sovereign
-
-# Create a custom theme
-sigma-theme new my-theme --base midnight-sovereign
-```
-
-**Built-in themes:**
-- `midnight-sovereign` — dark blue/purple
-- `solar-zenith` — warm amber + white
-- `forest-minimal` — muted green
-- `arctic-pure` — clean white/grey
-
-Theme structure: CSS-like variables → compositor applies to all windows.
-
----
-
-## Neural UI (`zenith_desktop/neural/sigma_neural_ui.cpp`)
-
-AI-driven adaptive UI using AVX-512 SIMD acceleration:
-
-- **Predictive pre-loading**: predicts next app the user will open based on context
-- **Adaptive layouts**: rearranges widgets based on usage patterns
-- **Smart notifications**: batches low-priority notifications, surfaces critical ones immediately
-- **Energy-aware rendering**: reduces refresh rate when battery low
-
----
-
-## Accessibility (`zenith_desktop/a11y/`)
-
-- **Sovereign Screen Reader (SSR)**: reads UI elements aloud via sigma-voice
-- **High-contrast themes**: automatic inversion for visual impairments
-- **Keyboard-only navigation**: full WCAG 2.1 AA compliance target
-- **Switch access**: single-switch scanning for motor impairments
-- **Font scaling**: 75%–300% without layout break
-- **Braille display**: planned via sigma-braille daemon (Phase H)
-
----
-
-## Zenith Widgets (`zenith_desktop/modules/`)
-
-Pre-installed widgets on the desktop panel:
-
-| Widget | File | Function |
-|--------|------|---------|
-| System telemetry | `sigma_widget_sys_telemetry.cpp` | CPU/RAM/net graphs |
-| AI monitor | `sigma_widget_ai_monitor.cpp` | LLM inference usage |
-| Crypto shield | `sigma_widget_crypto_shield.cpp` | Active PQC connections |
-| App launcher | `sigma_widget_app_launcher.cpp` | Quick-launch dock |
-| Quick settings | `sigma_widget_quick_settings.cpp` | Wi-Fi, volume, brightness |
-
----
-
-## Desktop Build & Run
-
-```bash
-# Build Zenith desktop
-make PROFILE=standalone all -j$(nproc)
-
-# Run JS prototype in browser (current demo)
-open sigma-web/index.html
-
-# Run native compositor in QEMU (Phase G)
-make PROFILE=standalone qemu
-```
-
----
-
-*See also: [Architecture-Overview](Architecture-Overview) · [Release-Profiles](Release-Profiles) · [Sigma-Desktop-Environment](Sigma-Desktop-Environment)*
->>>>>>> wiki/master

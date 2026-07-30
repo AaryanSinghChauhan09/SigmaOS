@@ -86,40 +86,7 @@ impl CpuRegisterContext {
 
 ---
 
-## 📋 6. Core Automation, Macro Recording, and Auto-Optimization Subsystems (Rust)
-
-To match the automation power of modern environments, SigmaOS implements:
-*   **Task Scheduler**: A lock-free, chronological job execution list that parses crontab syntax.
-*   **Macro Recorder & Auto-Optimizer**: Records system-wide user shell inputs into `.sigma-macro` scripts, and invokes adaptive cache/performance governor tuning dynamically.
-
-```rust
-// Represents a scheduled automation task trigger
-#[derive(Debug, Clone, Copy)]
-pub struct AutomationTask {
-    pub id: usize,
-    pub cron_hour: u8,
-    pub cron_minute: u8,
-    pub require_ac_power: bool,
-}
-
-pub struct AutomationEngine {
-    pub is_recording_macro: bool,
-    pub is_idle_optimization_enabled: bool,
-}
-
-impl AutomationEngine {
-    pub fn new() -> Self {
-        Self {
-            is_recording_macro: false,
-            is_idle_optimization_enabled: true,
-        }
-    }
-}
-```
-
----
-
-## 📅 7. Step-by-Step Implementation Roadmap
+## 📅 6. Step-by-Step Implementation Roadmap
 
 - [ ] **Phase 1 (Verification)**: Complete EEVDF real-time priority schedules and HPC bypass hooks in `src/kernel/scheduler.rs`.
 - [ ] **Phase 2 (Zig HPC Shard)**: Develop low-latency clustering communication and direct DMA bypass drivers in Zig.

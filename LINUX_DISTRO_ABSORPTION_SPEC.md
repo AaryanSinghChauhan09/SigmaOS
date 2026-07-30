@@ -73,8 +73,6 @@ SigmaOS completely discards legacy Unix file permissions, user IDs, and `sudo` e
   ```
 - **Runtime Prompting:** If a process attempts to execute a restricted action (e.g., opening a socket or reading a directory), the kernel’s `SecurityEnforcer` queries the active context. If the action lacks a cryptographically-signed permission token, the action is blocked, and a prompt is generated for user delegation.
 
-<<<<<<< HEAD
-=======
 ### 2.4 Kali Linux Defeating Strategy: The SigmaSec Suite & AI-Native Sovereign Layer
 To defeat Kali Linux, SigmaOS goes beyond simple penetration testing tools and security utilities, positioning itself as a next‑generation secure OS with broader usability, AI automation, and compliance baked natively into the microkernel and userland.
 
@@ -113,7 +111,6 @@ To defeat Kali Linux, SigmaOS goes beyond simple penetration testing tools and s
 *   **SigmaNet Mesh:** Peer-to-peer secure mesh networking for out-of-band collaboration.
 *   **Cloud Pentest Mode:** Distributed vulnerability assessments executing across SigmaCloud nodes.
 
->>>>>>> wiki/master
 ---
 
 ## 🔄 3. Continuous Upstream Synchronization Protocol

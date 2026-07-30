@@ -1,14 +1,6 @@
-<<<<<<< HEAD
-# ⚙️ SigmaOS SOLID-Principled Innovation & Parity Plan
-
-This document establishes the strategic, SOLID-principled roadmap for **SigmaOS** to achieve absolute architectural superiority over legacy monolithic and hybrid systems (such as Linux, BSD, Windows, and macOS) by systematically addressing outstanding gaps and introducing unique, microkernel-native capabilities.
-
----
-=======
 # SOLID PRINCIPLED OS INNOVATION PLAN
 
 This plan implements and codifies the absolute innovation strategy for SigmaOS using Object-Oriented Design (OOD) and SOLID software engineering principles at the microkernel level. It addresses existing gaps with legacy operating systems and establishes unique, microkernel-native capabilities.
->>>>>>> wiki/master
 
 ## 🧩 1. Subsystem Gaps vs. Legacy Operating Systems
 
