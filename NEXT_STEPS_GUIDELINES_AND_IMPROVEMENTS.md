@@ -53,22 +53,60 @@ Welcome to the comprehensive, next-generation **Next Steps, Guidelines, and Cont
 ## 🔍 Comprehensive Multi-Dimensional Audit & Report
 
 ### 1. Code Quality & Testing
-- **Syntax Errors & Compiler Bugs Detected:**
-  1. **Multiple Applicable Items in Scope (`E0034`):**
-     - *Location:* `src/sigpkg/mod.rs`
-     - *Issue:* Two separate `impl Package` blocks are defined. Both implement `pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String)`. One block initializes the package with fields like `mirrors`, `signing_keys`, `licenses`, `maintainers`, and `changelogs` set to default empty vectors, while the other initializes only basic fields. This causes a direct collision in files like `src/sigpkg/store.rs`, `src/sigpkg/transaction.rs`, and `src/sigpkg/verifier.rs` which instantiate `Package::new(...)`.
-  2. **Missing Fields in Struct Initializer (`E0063`):**
-     - *Location:* `src/sigpkg/mod.rs:134`
-     - *Issue:* Struct initialization within the second `Package::new` method fails to provide values for newly added metadata fields (`mirrors`, `signing_keys`, `licenses`, `maintainers`, `changelogs`), resulting in a compiler mismatch.
-  3. **Mismatched Types (`E0308`):**
-     - *Location:* `src/ai/orchestrator.rs:154`
-     - *Issue:* Inside `ContextWindowPruner::new()`, the return type is declared as `Self` (`ContextWindowPruner`), but the function block evaluates to `None` (an `Option` wrapper). This mismatch blocks compilation of the orchestrator module.
-- **Unused Imports & Dead Code Warnings:**
-  - 150+ warnings exist during compilation, primarily due to unused variables/fields in `src/kernel/linux_absorb.rs` (e.g., `offset`, `handle`, `path`, `packet`), unused variables in `src/klib/buddy_allocator.rs` (`total_frames`), and redundant mutability declarations in `src/security/vpn.rs` and `src/shell/command.rs`.
-- **Refactoring Opportunities:**
-  - **Repetitive Compat Tools:** The 40+ compatible CLI tools under `tools/sigma_*_compat.rs` (e.g., `sigma_ls_compat.rs`, `sigma_grep_compat.rs`) contain highly repetitive structure mapping. These should be refactored into a unified command routing macro or compiled as dynamic sub-commands within a single, cohesive binary.
-- **Edge Cases & Error Handling:**
-  - Zero-sized allocations or raw physical page allocations in `BuddyAllocator` require boundary-checking helper methods to catch integer wrapping under heavy memory stress.
+*   **🚨 THE DREADED MERGE CONFLICTS BLOCKER (35 FILES IDENTIFIED):**
+    A critical code-quality issue exists directly on the `main` branch: **35 source files** in the `src/` directory contain committed raw merge conflict markers (`<<<<<<< HEAD`, `=======`, `>>>>>>>`). This completely breaks the Rust compilation chain, preventing all local developer work and CI builds.
+    *Files containing conflict markers include:*
+    1.  `src/productivity/document_engine.rs`
+    2.  `src/productivity/sigma_office.rs`
+    3.  `src/productivity/mod.rs`
+    4.  `src/scheduler/sovereign.rs`
+    5.  `src/scheduler/scheduler.rs`
+    6.  `src/scheduler/mod.rs`
+    7.  `src/scheduler/process.rs`
+    8.  `src/drivers/main.rs`
+    9.  `src/drivers/mod.rs`
+    10. `src/security/capability.rs`
+    11. `src/security/password.rs`
+    12. `src/security/secrets.rs`
+    13. `src/security/mod.rs`
+    14. `src/init/mod.rs`
+    15. `src/klib/vec.rs`
+    16. `src/klib/mod.rs`
+    17. `src/resilience/mod.rs`
+    18. `src/net/routing.rs`
+    19. `src/net/tls.rs`
+    20. `src/package/mod.rs`
+    21. `src/virtualization/mod.rs`
+    22. `src/memory/paging.rs`
+    23. `src/lib.rs`
+    24. `src/storage/volume.rs`
+    25. `src/storage/block.rs`
+    26. `src/graphics/compositor.rs`
+    27. `src/graphics/mod.rs`
+    28. `src/kernel/main.rs`
+    29. `src/kernel/secure_free.rs`
+    30. `src/kernel/slab_allocator.rs`
+    31. `src/kernel/mod.rs`
+    32. `src/shell/command.rs`
+    33. `src/shell/mod.rs`
+    34. `src/driver/device.rs`
+    35. `src/driver/framework.rs`
+*   **Syntax Errors & Compiler Bugs Detected:**
+    1. **Multiple Applicable Items in Scope (`E0034`):**
+       - *Location:* `src/sigpkg/mod.rs`
+       - *Issue:* Two separate `impl Package` blocks are defined. Both implement `pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String)`. One block initializes the package with fields like `mirrors`, `signing_keys`, `licenses`, `maintainers`, and `changelogs` set to default empty vectors, while the other initializes only basic fields. This causes a direct collision in files like `src/sigpkg/store.rs`, `src/sigpkg/transaction.rs`, and `src/sigpkg/verifier.rs` which instantiate `Package::new(...)`.
+    2. **Missing Fields in Struct Initializer (`E0063`):**
+       - *Location:* `src/sigpkg/mod.rs:134`
+       - *Issue:* Struct initialization within the second `Package::new` method fails to provide values for newly added metadata fields (`mirrors`, `signing_keys`, `licenses`, `maintainers`, `changelogs`), resulting in a compiler mismatch.
+    3. **Mismatched Types (`E0308`):**
+       - *Location:* `src/ai/orchestrator.rs:154`
+       - *Issue:* Inside `ContextWindowPruner::new()`, the return type is declared as `Self` (`ContextWindowPruner`), but the function block evaluates to `None` (an `Option` wrapper). This mismatch blocks compilation of the orchestrator module.
+*   **Unused Imports & Dead Code Warnings:**
+    - 150+ warnings exist during compilation, primarily due to unused variables/fields in `src/kernel/linux_absorb.rs` (e.g., `offset`, `handle`, `path`, `packet`), unused variables in `src/klib/buddy_allocator.rs` (`total_frames`), and redundant mutability declarations in `src/security/vpn.rs` and `src/shell/command.rs`.
+*   **Refactoring Opportunities:**
+    - **Repetitive Compat Tools:** The 40+ compatible CLI tools under `tools/sigma_*_compat.rs` (e.g., `sigma_ls_compat.rs`, `sigma_grep_compat.rs`) contain highly repetitive structure mapping. These should be refactored into a unified command routing macro or compiled as dynamic sub-commands within a single, cohesive binary.
+*   **Edge Cases & Error Handling:**
+    - Zero-sized allocations or raw physical page allocations in `BuddyAllocator` require boundary-checking helper methods to catch integer wrapping under heavy memory stress.
 
 ### 2. Performance & Optimization
 - **Slab Allocator Bottleneck:**
@@ -155,6 +193,7 @@ To bridge the gap between our high-performance prototype and full-fledged produc
 
 | Priority | Area / Task | Expected Impact | Target Subsystem | Recommended Action |
 | :---: | :--- | :---: | :---: | :--- |
+| **CRITICAL** | Clear Raw Merge Conflicts | Direct Compilation | Whole Repository | Cleanse raw conflict markers from the 35 source files on the `main` branch. |
 | **CRITICAL** | Resolve Duplicate `Package::new` | Direct Compilation | Package Manager | Refactor duplicate `impl Package` blocks in `src/sigpkg/mod.rs` to keep a single, complete constructor. |
 | **CRITICAL** | Fix orchestrator return type | Direct Compilation | AI Orchestrator | Correct `ContextWindowPruner::new` to return `Self` instead of `None` wrapper in `src/ai/orchestrator.rs`. |
 | **High** | Upgrade Weak XOR Crypto | Security Shield | Secret Vault | Replace basic bitwise XOR masks in `src/security/secrets.rs` with safe AES-256-GCM/Kyber-1024 routines. |

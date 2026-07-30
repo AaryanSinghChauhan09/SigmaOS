@@ -30,3 +30,8 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 ## 2025-10-24 - Attested Cryptographic Audits
 **Learning:** Normal filesystem logging is susceptible to modifications when a system is compromised.
 **Prevention:** Utilizing WORM (write-once-read-many) structures ensures that cryptographic audit logs cannot be modified once they are committed.
+
+## 2026-07-29 - Unresolved Source Conflict Markers as CI Denial-of-Service Vectors
+**Vulnerability:** Permitting unmerged git conflicts to be committed to production branches (such as `main`) results in immediate parser/compiler termination, acting as an unintended Denial-of-Service (DoS) on continuous-integration security validation pipelines.
+**Learning:** Any committed parser markers stop compiler diagnostics from performing security/CVE audits. Standard static-analysis checks must run a raw conflict scan prior to pull-request merges to protect integration stability.
+**Prevention:** Deploy pre-commit hooks that explicitly scan for the exact conflict sequences (`<<<<<<<`, `=======`, `>>>>>>>`) across all source code paths.
