@@ -1,5 +1,5 @@
 # 🇸🇴 SigmaOS Sovereign OS Ultimate Omnipresent Supremacy and Total Self-Sufficiency Plan
-## 🌌 The Grand Unified Architectural Blueprint Natively Replacing and Obsolescing All Third-Party Software, Databases, Libraries, Codecs, AI Models, Network Protocols, and Simulators
+## 🌌 The Grand Unified Architectural Blueprint to Natively Replace and Obsolesce All Third-Party Software, Databases, Libraries, Codecs, AI Models, Network Protocols, and Simulators
 
 > **"An absolutely sovereign operating system must contain no external references, no dynamic library links to foreign layers, and no runtime dependency on external packages. Every tool, platform, library, database, codec, model, pipeline, protocol, and simulator must be absorbed natively as memory-safe, zero-dependency, capability-gated Rust primitives inside SigmaOS."**
 
@@ -75,7 +75,7 @@ SigmaOS partitions the entire computational universe into **Twelve Core Sovereig
 1. **MySQL, PostgreSQL, & MariaDB:** Replaced by **SigmaDB**, a native relational transactional SQL database featuring Write-Ahead Logging (WAL), Multi-Version Concurrency Control (MVCC), cost-based query optimization, and B-Tree indexes.
 2. **Cassandra & CouchDB:** Wide-column and document indexing models operate over decentralized, local peer-to-peer gossip protocol tables.
 3. **PostGIS:** R-Tree and Kd-Tree spatial indexing are integrated natively into SigmaDB to support complex GIS geometries.
-4. **Lucene, Nutch, Solr, & Xapian:** Full-text indexing, tokenizers, and TF-IDF rankers are built natively under `src/storage/search/` with direct filesystem pipeline hooks.
+4. **Lucene, Nutch, Solr, & Xapiand:** Full-text indexing, tokenizers, and TF-IDF rankers are built natively under `src/storage/search/` with direct filesystem pipeline hooks.
 5. **Scriptella ETL, Jaspersoft, & Pentaho:** Data migration, ETL pathways, and dashboard report compiling execute as declarative SQL/CSV mapping pipelines within SigmaDB.
 6. **PeaZip:** Integrated decompression for archive formats (ZIP, 7z, TAR, GZ) inside the core filesystem library.
 7. **ApexDB:** Natively absorbed as high-speed key-value tables running directly inside memory partitions.
