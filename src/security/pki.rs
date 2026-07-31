@@ -1,5 +1,4 @@
 #![no_std]
-#![no_main]
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -118,7 +117,6 @@ pub trait PKIManager {
     ) -> Result<bool, PKIError>;
 }
 
-#[repr(C)]
 pub struct SimplePKIManager {
     pub certificates: Vec<Option<Box<dyn Certificate>>>,
     pub revoked: Vec<CertificateID>,
@@ -132,6 +130,12 @@ impl SimplePKIManager {
             revoked: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimplePKIManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -187,7 +191,6 @@ pub trait CRL {
     fn get_crl(&self) -> Vec<(CertificateID, u32)>;
 }
 
-#[repr(C)]
 pub struct SimpleCRL {
     pub revoked: Vec<(CertificateID, u32)>,
 }
@@ -197,6 +200,12 @@ impl SimpleCRL {
         SimpleCRL {
             revoked: Vec::new(),
         }
+    }
+}
+
+impl Default for SimpleCRL {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

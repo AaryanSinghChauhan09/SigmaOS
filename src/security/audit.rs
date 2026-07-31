@@ -1,5 +1,4 @@
 #![no_std]
-#![no_main]
 
 use core::mem;
 /// OOP-based Security Audit for SigmaOS
@@ -86,7 +85,6 @@ pub trait AuditLogger {
     fn clear_events(&mut self, older_than: u64) -> Result<(), AuditError>;
 }
 
-#[repr(C)]
 pub struct SimpleAuditLogger {
     pub events: Vec<Option<Box<dyn AuditEvent>>>,
     pub next_id: AtomicUsize,
@@ -98,6 +96,12 @@ impl SimpleAuditLogger {
             events: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAuditLogger {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -153,7 +157,6 @@ pub trait AuditPolicy {
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError>;
 }
 
-#[repr(C)]
 pub struct SimpleAuditPolicy {
     pub require_authentication: AtomicUsize,
 }
@@ -163,6 +166,12 @@ impl SimpleAuditPolicy {
         SimpleAuditPolicy {
             require_authentication: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAuditPolicy {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -209,15 +218,28 @@ impl<T> Vec<T> {
             }
         }
     }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
+
+    #[test]
+    fn test_simple_audit_logger() {
+        let mut logger = SimpleAuditLogger::new();
+        let event = Box::new(SimpleAuditEvent::new(
+            101,
+            EventType::Authentication,
+            42,
+            b"User logged in",
+        ));
+        let id = logger.log_event(event).unwrap();
+        assert_eq!(id, 101);
+
+        let retrieved = logger.get_event(101).unwrap();
+        assert_eq!(retrieved.id(), 101);
+
+        let queried = logger.query_events(EventType::Authentication, 42);
+        assert_eq!(queried.len(), 1);
+        assert_eq!(queried[0], 101);
+
+        logger.clear_events(2000000).unwrap();
+        assert!(logger.get_event(101).is_none());
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {

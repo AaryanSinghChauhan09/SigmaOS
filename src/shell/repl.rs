@@ -188,7 +188,7 @@ impl ShellRepl {
         }
     }
 
-    fn parse_command(&self, input: &str) -> ShellCommand {
+    pub fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -318,11 +318,43 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    let enabled = match parts[2] {
+                        "on" | "true" | "enable" => true,
+                        _ => false,
+                    };
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        enabled,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
                    help         - Show this help message\n\
@@ -490,6 +522,22 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
+            ShellCommand::Theme { name } => {
+                self.current_theme = name.clone();
+                Ok(format!("Zenith Theme set to: {}", name))
+            }
+            ShellCommand::Profile { name } => {
+                self.current_profile = name.clone();
+                Ok(format!("Zenith Profile set to: {}", name))
+            }
+            ShellCommand::A11y { feature, enabled } => {
+                self.a11y_features.insert(feature.clone(), enabled);
+                Ok(format!(
+                    "Zenith Accessibility [{}] set to: {}",
+                    feature,
+                    if enabled { "on" } else { "off" }
+                ))
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -550,6 +598,31 @@ mod tests {
         };
         let result = repl.execute_command(get_cmd);
         assert_eq!(result.unwrap(), "value");
+    }
+
+    #[test]
+    fn test_theme_and_profile_commands() {
+        let mut repl = ShellRepl::new();
+
+        let theme_cmd = repl.parse_command("theme dark");
+        let res = repl.execute_command(theme_cmd).unwrap();
+        assert_eq!(repl.current_theme, "dark");
+        assert!(res.contains("dark"));
+
+        let profile_cmd = repl.parse_command("profile developer");
+        let res = repl.execute_command(profile_cmd).unwrap();
+        assert_eq!(repl.current_profile, "developer");
+        assert!(res.contains("developer"));
+    }
+
+    #[test]
+    fn test_a11y_commands() {
+        let mut repl = ShellRepl::new();
+
+        let a11y_cmd = repl.parse_command("a11y high_contrast on");
+        let res = repl.execute_command(a11y_cmd).unwrap();
+        assert_eq!(repl.a11y_features.get("high_contrast"), Some(&true));
+        assert!(res.contains("on"));
     }
 
     #[test]

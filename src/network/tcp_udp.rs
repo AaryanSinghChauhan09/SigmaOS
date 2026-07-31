@@ -4,7 +4,6 @@
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -144,13 +143,17 @@ pub trait TCPConnection {
 
 impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
-        self.state.store(TCPState::SynSent as usize, Ordering::SeqCst);
-        self.state.store(TCPState::Established as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::SynSent as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Established as usize, Ordering::SeqCst);
         Ok(())
     }
     fn listen(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Listen as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Listen as usize, Ordering::SeqCst);
         Ok(())
     }
     fn accept(&mut self) -> Result<SocketID, NetworkError> {
@@ -176,7 +179,8 @@ impl TCPConnection for SimpleSocket {
         Ok(len)
     }
     fn close(&mut self) -> Result<(), NetworkError> {
-        self.state.store(TCPState::Closed as usize, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Closed as usize, Ordering::SeqCst);
         Ok(())
     }
     fn get_state(&self) -> TCPState {
@@ -191,7 +195,8 @@ pub trait UDPSocket {
 
 impl UDPSocket for SimpleSocket {
     fn sendto(&mut self, data: &[u8], remote_port: Port) -> Result<usize, NetworkError> {
-        self.remote_port.store(remote_port as usize, Ordering::SeqCst);
+        self.remote_port
+            .store(remote_port as usize, Ordering::SeqCst);
         Ok(data.len())
     }
     fn recvfrom(&mut self, buffer: &mut [u8]) -> Result<(usize, Port), NetworkError> {
@@ -209,7 +214,6 @@ pub trait CongestionControl {
     fn get_cwnd(&self) -> usize;
 }
 
-#[repr(C)]
 pub struct RenoCongestionControl {
     pub cwnd: AtomicUsize,
     pub ssthresh: AtomicUsize,
@@ -221,6 +225,12 @@ impl RenoCongestionControl {
             cwnd: AtomicUsize::new(10),
             ssthresh: AtomicUsize::new(65535),
         }
+    }
+}
+
+impl Default for RenoCongestionControl {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -238,10 +248,11 @@ impl CongestionControl for RenoCongestionControl {
         self.ssthresh.store(cwnd / 2, Ordering::SeqCst);
         self.cwnd.store(1, Ordering::SeqCst);
     }
-    fn get_cwnd(&self) -> usize { self.cwnd.load(Ordering::SeqCst) }
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
 }
 
-#[repr(C)]
 pub struct BBRCongestionControl {
     pub cwnd: AtomicUsize,
     pub bw_estimate: AtomicUsize,
@@ -258,6 +269,12 @@ impl BBRCongestionControl {
     }
 }
 
+impl Default for BBRCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CongestionControl for BBRCongestionControl {
     fn update_cwnd(&mut self, _acked: usize) {
         let bw = self.bw_estimate.load(Ordering::SeqCst);
@@ -266,9 +283,12 @@ impl CongestionControl for BBRCongestionControl {
         self.cwnd.store(target, Ordering::SeqCst);
     }
     fn on_loss(&mut self) {
-        self.cwnd.store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
+        self.cwnd
+            .store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
     }
-    fn get_cwnd(&self) -> usize { self.cwnd.load(Ordering::SeqCst) }
+    fn get_cwnd(&self) -> usize {
+        self.cwnd.load(Ordering::SeqCst)
+    }
 }
 
 pub trait Firewall {
@@ -373,7 +393,6 @@ pub trait ZeroCopy {
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError>;
 }
 
-#[repr(C)]
 pub struct ZeroCopyNetwork {
     pub dma_buffer: AtomicUsize,
 }
@@ -386,13 +405,22 @@ impl Default for ZeroCopyNetwork {
 
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
-        ZeroCopyNetwork { dma_buffer: AtomicUsize::new(0) }
+        ZeroCopyNetwork {
+            dma_buffer: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl Default for ZeroCopyNetwork {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 impl ZeroCopy for ZeroCopyNetwork {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
-        self.dma_buffer.store(data.as_ptr() as usize, Ordering::SeqCst);
+        self.dma_buffer
+            .store(data.as_ptr() as usize, Ordering::SeqCst);
         Ok(data.len())
     }
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError> {
@@ -580,6 +608,12 @@ impl SimpleNetworkStack {
     }
 }
 
+impl Default for SimpleNetworkStack {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
@@ -591,6 +625,7 @@ impl NetworkStack for SimpleNetworkStack {
         for socket_option in &mut self.sockets {
             if let Some(ref socket) = *socket_option {
                 if socket.id() == id {
+                    *socket_option = None;
                     return Ok(());
                 }
             }
@@ -600,7 +635,9 @@ impl NetworkStack for SimpleNetworkStack {
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         for socket_option in &self.sockets {
             if let Some(ref socket) = *socket_option {
-                if socket.id() == id { return Some(socket.as_ref()); }
+                if socket.id() == id {
+                    return Some(socket.as_ref());
+                }
             }
         }
         None

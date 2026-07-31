@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// OOP-based Container Runtime for SigmaOS
+// Implements container runtime using OOP principles with traits and structs.
 
 use core::mem;
 use core::ptr::{self, NonNull};
@@ -84,7 +84,7 @@ pub trait Container {
 
 /// Container error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
     Success = 0,
     AlreadyStarted = 1,
@@ -125,7 +125,7 @@ impl ContainerInfo {
 
 /// Container capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerCapability {
     pub can_start: bool,
     pub can_stop: bool,
@@ -134,7 +134,7 @@ pub struct ContainerCapability {
 }
 
 impl ContainerCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         ContainerCapability {
             can_start: false,
             can_stop: false,
@@ -143,7 +143,7 @@ impl ContainerCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         ContainerCapability {
             can_start: true,
             can_stop: true,
@@ -153,8 +153,13 @@ impl ContainerCapability {
     }
 }
 
+impl Default for ContainerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple container (OOP: Concrete container class)
-#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -180,10 +185,8 @@ impl SimpleContainer {
         let name_len = name.len().min(63);
         let image_len = image.len().min(127);
 
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(image.as_ptr(), image_array.as_mut_ptr(), image_len);
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+        image_array[..image_len].copy_from_slice(&image[..image_len]);
 
         SimpleContainer {
             id,
@@ -200,9 +203,7 @@ impl SimpleContainer {
 
     pub fn set_environment(&mut self, env: &[u8]) {
         let len = env.len().min(511);
-        unsafe {
-            core::ptr::copy_nonoverlapping(env.as_ptr(), self.environment.as_mut_ptr(), len);
-        }
+        self.environment[..len].copy_from_slice(&env[..len]);
     }
 
     pub fn set_limits(&mut self, memory_limit: u64, cpu_limit: u32) {
@@ -344,13 +345,19 @@ pub struct RuntimeStats {
 }
 
 impl RuntimeStats {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         RuntimeStats {
             total_containers: 0,
             running_containers: 0,
             paused_containers: 0,
             stopped_containers: 0,
         }
+    }
+}
+
+impl Default for RuntimeStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -364,7 +371,7 @@ pub struct SimpleContainerRuntime {
 
 /// Runtime capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,
@@ -372,7 +379,7 @@ pub struct RuntimeCapability {
 }
 
 impl RuntimeCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         RuntimeCapability {
             can_create: false,
             can_remove: false,
@@ -380,12 +387,18 @@ impl RuntimeCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         RuntimeCapability {
             can_create: true,
             can_remove: true,
             can_manage: true,
         }
+    }
+}
+
+impl Default for RuntimeCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -584,12 +597,11 @@ impl<T> Vec<T> {
                 self.grow();
             }
 
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
+        // Start container
+        runtime.start_container(id).unwrap();
+        let stats_running = runtime.stats();
+        assert_eq!(stats_running.running_containers, 1);
+        assert_eq!(stats_running.stopped_containers, 0);
 
     pub fn len(&self) -> usize {
         self.len

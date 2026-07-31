@@ -1,5 +1,4 @@
 #![no_std]
-#![no_main]
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -17,8 +16,8 @@ use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 pub type SecretID = usize;
 
 /// Secret type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecretType {
     Password = 0,
     APIKey = 1,
@@ -44,8 +43,8 @@ pub trait Secret {
 }
 
 /// Secret error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecretError {
     Success = 0,
     NotFound = 1,
@@ -57,6 +56,7 @@ pub enum SecretError {
 
 /// Secret info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SecretInfo {
     pub id: SecretID,
     pub name: [u8; 64],
@@ -105,7 +105,6 @@ impl SecretCapability {
 }
 
 /// Simple secret (OOP: Concrete secret class)
-#[repr(C)]
 pub struct SimpleSecret {
     pub id: SecretID,
     pub name: [u8; 64],
@@ -178,8 +177,10 @@ impl Secret for SimpleSecret {
         }
 
         // Simple XOR encryption for demonstration
-        for i in 0..self.data_len {
-            self.data[i] ^= key[i % key.len()];
+        if !key.is_empty() {
+            for i in 0..self.data_len {
+                self.data[i] ^= key[i % key.len()];
+            }
         }
 
         self.is_encrypted.store(true, Ordering::SeqCst);
@@ -196,8 +197,10 @@ impl Secret for SimpleSecret {
         }
 
         // Simple XOR decryption (same as encryption)
-        for i in 0..self.data_len {
-            self.data[i] ^= key[i % key.len()];
+        if !key.is_empty() {
+            for i in 0..self.data_len {
+                self.data[i] ^= key[i % key.len()];
+            }
         }
 
         self.is_encrypted.store(false, Ordering::SeqCst);
@@ -250,12 +253,18 @@ impl KeyringStats {
     }
 }
 
+impl Default for KeyringStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple keyring (OOP: Concrete keyring class)
 pub struct SimpleKeyring {
-    secrets: Vec<Option<Box<dyn Secret>>>,
-    next_id: AtomicUsize,
-    stats: KeyringStats,
-    capability: KeyringCapability,
+    pub secrets: Vec<Option<Box<dyn Secret>>>,
+    pub next_id: AtomicUsize,
+    pub stats: KeyringStats,
+    pub capability: KeyringCapability,
 }
 
 /// Keyring capability

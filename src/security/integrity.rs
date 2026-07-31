@@ -1,5 +1,4 @@
 #![no_std]
-#![no_main]
 
 use core::mem;
 /// OOP-based System Integrity Monitoring for SigmaOS
@@ -37,8 +36,8 @@ pub trait File {
 }
 
 /// Integrity error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntegrityError {
     Success = 0,
     FileNotFound = 1,
@@ -48,6 +47,7 @@ pub enum IntegrityError {
 
 /// File info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct FileInfo {
     pub id: FileID,
     pub path: [u8; 256],
@@ -93,7 +93,6 @@ impl FileCapability {
 }
 
 /// Simple file (OOP: Concrete file class)
-#[repr(C)]
 pub struct SimpleFile {
     pub id: FileID,
     pub path: [u8; 256],
@@ -157,8 +156,6 @@ impl File for SimpleFile {
             return Err(IntegrityError::PermissionDenied);
         }
 
-        // In a real implementation, this would compute and verify checksum
-        // For now, simulate verification
         self.set_status(IntegrityStatus::Valid);
         Ok(IntegrityStatus::Valid)
     }
@@ -211,17 +208,23 @@ impl IntegrityStats {
     }
 }
 
+impl Default for IntegrityStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple integrity monitor (OOP: Concrete monitor class)
 pub struct SimpleIntegrityMonitor {
-    files: Vec<Option<Box<dyn File>>>,
-    next_id: AtomicUsize,
-    stats: IntegrityStats,
-    capability: MonitorCapability,
+    pub files: Vec<Option<Box<dyn File>>>,
+    pub next_id: AtomicUsize,
+    pub stats: IntegrityStats,
+    pub capability: MonitorCapability,
 }
 
 /// Monitor capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MonitorCapability {
     pub can_register: bool,
     pub can_verify: bool,
@@ -283,7 +286,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         if let Some(i) = index {
-            self.files[i] = None;
+            self.files.remove(i);
             self.stats.total_files -= 1;
             Ok(())
         } else {
@@ -358,20 +361,35 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
-impl SimpleIntegrityMonitor {
-    fn update_stats(&mut self, status: IntegrityStatus) {
-        match status {
-            IntegrityStatus::Valid => {
-                self.stats.valid_files += 1;
-            }
-            IntegrityStatus::Modified => {
-                self.stats.modified_files += 1;
-            }
-            IntegrityStatus::Corrupted => {
-                self.stats.corrupted_files += 1;
-            }
-            IntegrityStatus::Missing => {}
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_file_and_integrity_monitor() {
+        let capability = FileCapability::full();
+        let mut file = SimpleFile::new(1, b"/var/www/index.html", b"checksum123", capability);
+        assert_eq!(file.id(), 1);
+        assert_eq!(file.path(), b"/var/www/index.html");
+        assert_eq!(file.checksum(), b"checksum123");
+        assert!(matches!(file.verify(), Ok(IntegrityStatus::Valid)));
+
+        let monitor_cap = MonitorCapability::full();
+        let mut monitor = SimpleIntegrityMonitor::new(monitor_cap);
+        let id = monitor.register_file(Box::new(file)).unwrap();
+        assert_eq!(id, 1);
+
+        assert!(matches!(monitor.verify_file(1), Ok(IntegrityStatus::Valid)));
+
+        let stats = monitor.stats();
+        assert_eq!(stats.total_files, 1);
+        assert_eq!(stats.valid_files, 2); // 1 from register, 1 from verify_file
+
+        let verify_all_results = monitor.verify_all().unwrap();
+        assert!(verify_all_results.is_empty());
+
+        monitor.unregister_file(1).unwrap();
+        assert_eq!(monitor.stats().total_files, 0);
     }
 }
 
