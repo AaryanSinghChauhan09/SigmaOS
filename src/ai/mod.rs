@@ -19,6 +19,8 @@ pub use llm::{
     LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
     QuantizationType, InferenceBackend, BatchingStrategy,
     StreamingLlmEngine, StreamingInference,
+    JaxTensorSharding, SwiGluActivation, GrokMoeRouter, RotaryPositionEmbedding,
+    GrokGqaMapper, GrokWeightStreamer,
 };
 pub use orchestrator::{AgentOrchestrator, SimpleAgentOrchestrator, AgentState};
 pub use sai::{
