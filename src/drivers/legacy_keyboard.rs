@@ -8,6 +8,12 @@ pub struct LegacyKeyboard {
     power_state: PowerState,
 }
 
+impl Default for LegacyKeyboard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LegacyKeyboard {
     pub fn new() -> Self {
         Self {
@@ -40,7 +46,7 @@ impl PeripheralDevice for LegacyKeyboard {
         if self.power_state != PowerState::On {
             return Err("Device is sleeping or off");
         }
-        
+
         // Dummy read: simulate reading a scancode
         if !buffer.is_empty() {
             buffer[0] = 0x1E; // Scancode for 'A'

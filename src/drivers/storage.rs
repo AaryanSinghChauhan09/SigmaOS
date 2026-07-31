@@ -58,7 +58,7 @@ impl StorageDriver {
                 let size = (sectors as usize) * (self.block_size as usize);
                 Ok(vec![0; size])
             }
-            StorageCommand::Write { lba, data } => {
+            StorageCommand::Write { lba, data: _ } => {
                 if lba >= self.total_blocks {
                     return Err(StorageError::InvalidLBA);
                 }

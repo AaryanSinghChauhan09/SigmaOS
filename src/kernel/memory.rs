@@ -7,7 +7,7 @@ use core::ptr::NonNull;
 pub const PAGE_SIZE: usize = 4096;
 
 /// Memory block
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
@@ -44,6 +44,22 @@ impl BuddyAllocator {
         }
     }
 
+    /// Create a checkpoint of the allocator's current free list state (Phase 1.1)
+    pub fn create_checkpoint(&self) -> [Vec<MemoryBlock>; 12] {
+        let mut checkpoint: [Vec<MemoryBlock>; 12] = Default::default();
+        for order in 0..12 {
+            for block in &self.free_lists[order] {
+                checkpoint[order].push(*block);
+            }
+        }
+        checkpoint
+    }
+
+    /// Restore the allocator to a previously checkpointed state to recover from crash exceptions (Phase 1.1)
+    pub fn restore_checkpoint(&mut self, checkpoint: [Vec<MemoryBlock>; 12]) {
+        self.free_lists = checkpoint;
+    }
+
     pub fn get_free_memory(&self) -> usize {
         self.free_lists
             .iter()
@@ -66,7 +82,7 @@ impl BuddyAllocator {
             return None;
         }
 
-        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+        let pages = size.div_ceil(PAGE_SIZE);
         let order = self.calculate_order(pages);
 
         // Find smallest block that can satisfy request
@@ -199,6 +215,12 @@ impl PageFlags {
 #[repr(C)]
 pub struct PageTableEntry(u64);
 
+impl Default for PageTableEntry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PageTableEntry {
     pub fn new() -> Self {
         Self(0)
@@ -220,7 +242,7 @@ impl PageTableEntry {
     pub fn is_present(&self) -> bool {
         (self.0 & PageFlags::PRESENT) != 0
     }
-    
+
     pub fn clear(&mut self) {
         self.0 = 0;
     }
@@ -230,6 +252,12 @@ impl PageTableEntry {
 #[repr(align(4096))]
 pub struct PageTable {
     pub entries: [PageTableEntry; 512],
+}
+
+impl Default for PageTable {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PageTable {
@@ -256,7 +284,7 @@ impl VirtualMemoryManager {
         // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_ref() };
-        
+
         let entry = &root.entries[pt_index as usize];
         if entry.is_present() {
             Some(entry.get_addr() + (virtual_addr & 0xFFF))
@@ -266,15 +294,20 @@ impl VirtualMemoryManager {
     }
 
     /// Maps a virtual page to a physical frame
-    pub fn map_page(&mut self, virtual_addr: u64, physical_addr: u64, flags: PageFlags) -> Result<(), &'static str> {
+    pub fn map_page(
+        &mut self,
+        virtual_addr: u64,
+        physical_addr: u64,
+        flags: PageFlags,
+    ) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
-        
+
         let entry = &mut root.entries[pt_index as usize];
         if entry.is_present() {
             return Err("Page already mapped!");
         }
-        
+
         entry.set_addr(physical_addr, flags);
         Ok(())
     }
@@ -283,12 +316,12 @@ impl VirtualMemoryManager {
     pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
-        
+
         let entry = &mut root.entries[pt_index as usize];
         if !entry.is_present() {
             return Err("Page is not mapped!");
         }
-        
+
         entry.clear();
         Ok(())
     }
@@ -317,7 +350,33 @@ mod tests {
         let mut allocator = BuddyAllocator::new();
         // This would need actual memory to work properly
         // For now, just test the interface
-        let result = allocator.allocate(4096);
+        let _result = allocator.allocate(4096);
         // Will fail without actual memory, but tests the flow
+    }
+
+    #[test]
+    fn test_checkpoint_and_state_recovery() {
+        let mut allocator = BuddyAllocator::new();
+        allocator.initialize_memory(0x1000, 4096); // 1 page (order 0)
+        allocator.initialize_memory(0x3000, 8192); // 2 pages (order 1)
+        assert_eq!(allocator.get_free_memory(), 12288);
+
+        // Checkpoint original state
+        let checkpoint = allocator.create_checkpoint();
+
+        // Perform mock allocations which modify state
+        let _block1 = allocator.allocate(4096).unwrap();
+        let _block2 = allocator.allocate(8192).unwrap();
+        assert_eq!(allocator.get_free_memory(), 0);
+
+        // Simulated crash/unwinding: Restore from checkpoint to recover state
+        allocator.restore_checkpoint(checkpoint);
+
+        // State is perfectly restored
+        assert_eq!(allocator.get_free_memory(), 12288);
+
+        // Verify we can allocate the same blocks again successfully
+        let block_retry = allocator.allocate(4096).unwrap();
+        assert_eq!(block_retry.size, 4096);
     }
 }
