@@ -1,11 +1,13 @@
 // SigmaOS Kernel Module
 pub mod breakthroughs;
 pub mod gap_closing;
+pub mod gap_filling;
 pub mod generation_manager;
 pub mod ipc;
 pub mod memory;
 pub mod meta;
 pub mod paging;
+pub mod performance;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;

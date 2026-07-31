@@ -1,10 +1,13 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
+pub mod crypto;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
@@ -12,6 +15,8 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+#[path = "klib/vec.rs"]
+pub mod klib_vec;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
@@ -51,6 +56,10 @@ pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
     ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
     SimpleContainer, SimpleContainerRuntime,
+};
+pub use crypto::encryption::{
+    CipherType, CryptoError, EncryptionKey, EncryptionService, KeyID, SimpleEncryptionKey,
+    SimpleEncryptionService,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

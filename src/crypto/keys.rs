@@ -9,12 +9,12 @@ use core::mem;
 
 pub type KeyID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyType { Symmetric = 0, Asymmetric = 1, HMAC = 2 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyState { Active = 0, Revoked = 1, Expired = 2 }
 
 pub trait Key {
