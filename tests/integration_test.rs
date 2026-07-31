@@ -227,4 +227,26 @@ mod tests {
         );
         assert_eq!(res_legacy, Ok("/usr/lib/legacy/libc.so"));
     }
+
+    #[test]
+    fn test_encryption_service_integration() {
+        use sigmaos::crypto::encryption::{
+            SimpleEncryptionService, SimpleEncryptionKey, EncryptionService, CipherType
+        };
+
+        let mut service = SimpleEncryptionService::new();
+        let key_data = b"INTEGRATION_KEY_DATA_SIGMAOS";
+        let key = Box::new(SimpleEncryptionKey::new(500, CipherType::XOR, key_data));
+
+        let key_id = service.add_key(key).unwrap();
+        assert_eq!(key_id, 500);
+
+        let plaintext = b"Hello, Integration Test Encryption!";
+        let ciphertext = service.encrypt(plaintext, key_id).unwrap();
+
+        assert_ne!(&*ciphertext, plaintext);
+
+        let decrypted = service.decrypt(&ciphertext, key_id).unwrap();
+        assert_eq!(&*decrypted, plaintext);
+    }
 }

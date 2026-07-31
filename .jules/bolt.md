@@ -39,3 +39,7 @@ This journal contains CRITICAL performance learnings discovered during profiling
 ## 2026-07-27 - Single-Pass Cycle-Zip Iterators for XOR Encryption
 **Learning:** Using indexed loops with modulo divisions (`i % key.len()`) to implement XOR encryption / decryption on string arrays prevents the Rust compiler from applying auto-vectorization optimizations and adds heavy loop-index lookup cost. Replacing the indexed loop with a single-pass `zip(key.iter().cycle())` iterator chain removes all index lookup checks and speeds up encryption/decryption on large payloads by up to 38%.
 **Action:** Use `iter().cycle()` and `zip()` iterator chains instead of manually index-bound modulo loops for byte-level cryptographic transformations.
+
+## 2026-07-30 - Single-Cycle Bitwise Masking for Power-of-Two Ring Buffers
+**Learning:** Performing modulo `%` operations on index pointers inside hot loops (like in the S-IPC queue or circular queues) incurs a costly division penalty (10-40 CPU cycles). Since ring buffer limits like `IPC_QUEUE_CAPACITY` are fixed powers of two, replacing `% IPC_QUEUE_CAPACITY` with `& (IPC_QUEUE_CAPACITY - 1)` compiles down to a single clock cycle, significantly reducing message-routing latency.
+**Action:** Ensure that all constant-capacity circular queue and ring-buffer index wraps use power-of-two bounds optimized with bitwise AND masking.

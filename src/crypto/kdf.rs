@@ -10,8 +10,8 @@ use core::mem;
 
 pub type KDFID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KDFAlgorithm { HKDF_SHA256 = 0, HKDF_SHA512 = 1, PBKDF2 = 2 }
 
 #[repr(C)]
