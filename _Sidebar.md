@@ -102,6 +102,7 @@
 
 ## Roadmaps & Planning
 - [Roadmap Index](Roadmap-Index)
+- [What is Working and What is Not](What-Is-Working-and-What-Is-Not)
 - [Sector Specific Modules](Sector-Specific-Modules-Roadmap)
 - [Improvement Plan](Roadmap-Improvement-Plan)
 - [Release Manifest](Release-Manifest)
