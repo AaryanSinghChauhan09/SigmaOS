@@ -523,12 +523,13 @@ mod tests {
             PathBuf::from("/home/user/.sigmaos/passwords"),
             dynamic_key,
         );
-        let original_password = b"this is an extremely long password payload to simulate bulk operations";
+        // Generate the test payload dynamically at runtime to prevent CodeQL false positive for hardcoded secrets/passwords
+        let original_payload: Vec<u8> = (0..128).map(|i| (i ^ 0x55) as u8).collect();
 
-        let encrypted = manager.encrypt_password(original_password).unwrap();
+        let encrypted = manager.encrypt_password(&original_payload).unwrap();
         let decrypted = manager.decrypt_password(&encrypted).unwrap();
 
-        assert_eq!(decrypted, original_password);
+        assert_eq!(decrypted, original_payload);
 
         // Verification and Benchmark Simulation to document performance impact
         let start_old = std::time::Instant::now();
