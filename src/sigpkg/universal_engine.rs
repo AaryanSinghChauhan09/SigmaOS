@@ -263,7 +263,7 @@ impl SovereignPackageManager {
     pub fn register_udf_hook(&mut self, hook: UserDefinedPackageHook) {
         self.hooks
             .entry(hook.hook_type)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(hook);
     }
 

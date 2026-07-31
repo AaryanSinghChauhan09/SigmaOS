@@ -36,9 +36,12 @@ pub enum AdapterError {
     HookError(String),
 }
 
+/// Type alias for user-defined hooks to avoid complexity warnings
+pub type UserHook = Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>;
+
 /// Debian/Ubuntu .deb package adapter
 pub struct DebAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl DebAdapter {
@@ -73,14 +76,14 @@ impl PackageFormatAdapter for DebAdapter {
         let mut dependencies = Vec::new();
 
         for line in content.lines() {
-            if line.starts_with("Package: ") {
-                name = line[9..].to_string();
-            } else if line.starts_with("Version: ") {
-                version_str = line[9..].to_string();
-            } else if line.starts_with("Description: ") {
-                description = line[13..].to_string();
-            } else if line.starts_with("Depends: ") {
-                let deps_str = &line[9..];
+            if let Some(rest) = line.strip_prefix("Package: ") {
+                name = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("Version: ") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("Description: ") {
+                description = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("Depends: ") {
+                let deps_str = rest;
                 for dep in deps_str.split(',') {
                     let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
                     if !dep_name.is_empty() {
@@ -156,7 +159,7 @@ impl Default for DebAdapter {
 
 /// Fedora/RHEL .rpm package adapter
 pub struct RpmAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl RpmAdapter {
@@ -271,7 +274,7 @@ impl Default for RpmAdapter {
 
 /// Arch Linux pacman package adapter
 pub struct PacmanAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl PacmanAdapter {
@@ -305,14 +308,14 @@ impl PackageFormatAdapter for PacmanAdapter {
         let mut dependencies = Vec::new();
 
         for line in content.lines() {
-            if line.starts_with("pkgname = ") {
-                name = line[10..].to_string();
-            } else if line.starts_with("pkgver = ") {
-                version_str = line[9..].to_string();
-            } else if line.starts_with("pkgdesc = ") {
-                description = line[10..].to_string();
-            } else if line.starts_with("depend = ") {
-                let dep_name = line[9..].to_string();
+            if let Some(rest) = line.strip_prefix("pkgname = ") {
+                name = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("pkgver = ") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("pkgdesc = ") {
+                description = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("depend = ") {
+                let dep_name = rest.to_string();
                 dependencies.push(Dependency {
                     name: dep_name,
                     version_constraint: VersionConstraint::Any,
@@ -375,7 +378,7 @@ impl Default for PacmanAdapter {
 
 /// Nix Package Adapter (OOPS Concrete Implementation)
 pub struct NixAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl NixAdapter {
@@ -409,22 +412,22 @@ impl PackageFormatAdapter for NixAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("pname = \"") {
-                if let Some(end) = trimmed[9..].find('"') {
-                    name = trimmed[9..9 + end].to_string();
+            if let Some(rest) = trimmed.strip_prefix("pname = \"") {
+                if let Some(end) = rest.find('"') {
+                    name = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("version = \"") {
-                if let Some(end) = trimmed[11..].find('"') {
-                    version_str = trimmed[11..11 + end].to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("version = \"") {
+                if let Some(end) = rest.find('"') {
+                    version_str = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("meta.description = \"") {
-                if let Some(end) = trimmed[20..].find('"') {
-                    description = trimmed[20..20 + end].to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("meta.description = \"") {
+                if let Some(end) = rest.find('"') {
+                    description = rest[..end].to_string();
                 }
             } else if trimmed.contains("buildInputs = [") {
                 if let Some(start_idx) = trimmed.find('[') {
                     if let Some(end_idx) = trimmed.find(']') {
-                        let deps_part = &trimmed[start_idx + 1..end_idx];
+                        let deps_part = &trimmed[start_idx+1..end_idx];
                         for dep in deps_part.split_whitespace() {
                             dependencies.push(Dependency {
                                 name: dep.to_string(),
@@ -455,10 +458,7 @@ impl PackageFormatAdapter for NixAdapter {
             "  version = \"{}.{}.{}\";\n",
             package.version.major, package.version.minor, package.version.patch
         ));
-        output.push_str(&format!(
-            "  meta.description = \"{}\";\n",
-            package.description
-        ));
+        output.push_str(&format!("  meta.description = \"{}\";\n", package.description));
         if !package.dependencies.is_empty() {
             let dep_names: Vec<&str> = package
                 .dependencies
@@ -498,7 +498,7 @@ impl Default for NixAdapter {
 
 /// Gentoo Ebuild Package Adapter (OOPS Concrete Implementation)
 pub struct EbuildAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl EbuildAdapter {
@@ -532,21 +532,21 @@ impl PackageFormatAdapter for EbuildAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("PN=\"") {
-                if let Some(end) = trimmed[4..].find('"') {
-                    name = trimmed[4..4 + end].to_string();
+            if let Some(rest) = trimmed.strip_prefix("PN=\"") {
+                if let Some(end) = rest.find('"') {
+                    name = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("PV=\"") {
-                if let Some(end) = trimmed[4..].find('"') {
-                    version_str = trimmed[4..4 + end].to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("PV=\"") {
+                if let Some(end) = rest.find('"') {
+                    version_str = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("DESCRIPTION=\"") {
-                if let Some(end) = trimmed[13..].find('"') {
-                    description = trimmed[13..13 + end].to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("DESCRIPTION=\"") {
+                if let Some(end) = rest.find('"') {
+                    description = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("RDEPEND=\"") {
-                if let Some(end) = trimmed[9..].find('"') {
-                    let deps_part = &trimmed[9..9 + end];
+            } else if let Some(rest) = trimmed.strip_prefix("RDEPEND=\"") {
+                if let Some(end) = rest.find('"') {
+                    let deps_part = &rest[..end];
                     for dep in deps_part.split_whitespace() {
                         dependencies.push(Dependency {
                             name: dep.to_string(),
@@ -614,7 +614,7 @@ impl Default for EbuildAdapter {
 
 /// Alpine APK Package Adapter (OOPS Concrete Implementation)
 pub struct ApkAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl ApkAdapter {
@@ -648,14 +648,14 @@ impl PackageFormatAdapter for ApkAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("P:") {
-                name = trimmed[2..].to_string();
-            } else if trimmed.starts_with("V:") {
-                version_str = trimmed[2..].to_string();
-            } else if trimmed.starts_with("T:") {
-                description = trimmed[2..].to_string();
-            } else if trimmed.starts_with("D:") {
-                let deps_part = &trimmed[2..];
+            if let Some(rest) = trimmed.strip_prefix("P:") {
+                name = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("V:") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("T:") {
+                description = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("D:") {
+                let deps_part = rest;
                 for dep in deps_part.split_whitespace() {
                     dependencies.push(Dependency {
                         name: dep.to_string(),
@@ -722,7 +722,7 @@ impl Default for ApkAdapter {
 
 /// Slackware TXZ slack-desc Package Adapter (OOPS Concrete Implementation)
 pub struct TxzAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl TxzAdapter {
@@ -756,14 +756,14 @@ impl PackageFormatAdapter for TxzAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("PACKAGE_NAME=") {
-                name = trimmed[13..].to_string();
-            } else if trimmed.starts_with("PACKAGE_VERSION=") {
-                version_str = trimmed[16..].to_string();
-            } else if trimmed.starts_with("PACKAGE_DESC=") {
-                description = trimmed[13..].to_string();
-            } else if trimmed.starts_with("PACKAGE_REQUIRED=") {
-                let deps_part = &trimmed[17..];
+            if let Some(rest) = trimmed.strip_prefix("PACKAGE_NAME=") {
+                name = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("PACKAGE_VERSION=") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("PACKAGE_DESC=") {
+                description = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("PACKAGE_REQUIRED=") {
+                let deps_part = rest;
                 for dep in deps_part.split(',') {
                     let dep_name = dep.trim();
                     if !dep_name.is_empty() {
@@ -833,7 +833,7 @@ impl Default for TxzAdapter {
 
 /// Void Linux XBPS Package Adapter (OOPS Concrete Implementation)
 pub struct XbpsAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl XbpsAdapter {
@@ -867,14 +867,14 @@ impl PackageFormatAdapter for XbpsAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("pkgname=") {
-                name = trimmed[8..].to_string();
-            } else if trimmed.starts_with("version=") {
-                version_str = trimmed[8..].to_string();
-            } else if trimmed.starts_with("short_desc=") {
-                description = trimmed[11..].to_string();
-            } else if trimmed.starts_with("depends=") {
-                let deps_part = trimmed[8..].trim_matches('"');
+            if let Some(rest) = trimmed.strip_prefix("pkgname=") {
+                name = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("version=") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("short_desc=") {
+                description = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("depends=") {
+                let deps_part = rest.trim_matches('"');
                 for dep in deps_part.split_whitespace() {
                     dependencies.push(Dependency {
                         name: dep.to_string(),
@@ -941,7 +941,7 @@ impl Default for XbpsAdapter {
 
 /// CachyOS Microarchitecture Optimized Package Adapter (OOPS Concrete Implementation)
 pub struct CachyosAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl CachyosAdapter {
@@ -975,15 +975,15 @@ impl PackageFormatAdapter for CachyosAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("pkgname = ") {
-                name = trimmed[10..].to_string();
-            } else if trimmed.starts_with("pkgver = ") {
-                version_str = trimmed[9..].to_string();
-            } else if trimmed.starts_with("pkgdesc = ") {
-                description = trimmed[10..].to_string();
-            } else if trimmed.starts_with("depend = ") {
+            if let Some(rest) = trimmed.strip_prefix("pkgname = ") {
+                name = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("pkgver = ") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("pkgdesc = ") {
+                description = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("depend = ") {
                 dependencies.push(Dependency {
-                    name: trimmed[9..].to_string(),
+                    name: rest.to_string(),
                     version_constraint: VersionConstraint::Any,
                 });
             }
@@ -1042,7 +1042,7 @@ impl Default for CachyosAdapter {
 
 /// Snap Package Adapter (OOPS Concrete Implementation)
 pub struct SnapAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl SnapAdapter {
@@ -1076,14 +1076,14 @@ impl PackageFormatAdapter for SnapAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("name: ") {
-                name = trimmed[6..].trim().to_string();
-            } else if trimmed.starts_with("version: ") {
-                version_str = trimmed[9..].trim().to_string();
-            } else if trimmed.starts_with("summary: ") {
-                description = trimmed[9..].trim().to_string();
-            } else if trimmed.starts_with("requires: ") {
-                let deps_part = trimmed[10..].trim();
+            if let Some(rest) = trimmed.strip_prefix("name: ") {
+                name = rest.trim().to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("version: ") {
+                version_str = rest.trim().to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("summary: ") {
+                description = rest.trim().to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("requires: ") {
+                let deps_part = rest.trim();
                 for dep in deps_part.split_whitespace() {
                     dependencies.push(Dependency {
                         name: dep.to_string(),
@@ -1127,8 +1127,7 @@ impl PackageFormatAdapter for SnapAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("name:")
-            && (content.contains("confinement:") || content.contains("grade:")))
+        Ok(content.contains("name:") && (content.contains("confinement:") || content.contains("grade:")))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -1152,7 +1151,7 @@ impl Default for SnapAdapter {
 
 /// Flatpak Package Adapter (OOPS Concrete Implementation)
 pub struct FlatpakAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl FlatpakAdapter {
@@ -1186,15 +1185,15 @@ impl PackageFormatAdapter for FlatpakAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("name=") {
-                name = trimmed[5..].to_string();
-            } else if trimmed.starts_with("version=") {
-                version_str = trimmed[8..].to_string();
-            } else if trimmed.starts_with("description=") {
-                description = trimmed[12..].to_string();
-            } else if trimmed.starts_with("sdk=") {
+            if let Some(rest) = trimmed.strip_prefix("name=") {
+                name = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("version=") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("description=") {
+                description = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("sdk=") {
                 dependencies.push(Dependency {
-                    name: trimmed[4..].to_string(),
+                    name: rest.to_string(),
                     version_constraint: VersionConstraint::Any,
                 });
             }
@@ -1253,7 +1252,7 @@ impl Default for FlatpakAdapter {
 
 /// Clear Linux swupd Package Adapter (OOPS Concrete Implementation)
 pub struct SwupdAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl SwupdAdapter {
@@ -1287,14 +1286,14 @@ impl PackageFormatAdapter for SwupdAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("bundle: ") {
-                name = trimmed[8..].to_string();
-            } else if trimmed.starts_with("version: ") {
-                version_str = trimmed[9..].to_string();
-            } else if trimmed.starts_with("desc: ") {
-                description = trimmed[6..].to_string();
-            } else if trimmed.starts_with("include: ") {
-                let dep_name = trimmed[9..].to_string();
+            if let Some(rest) = trimmed.strip_prefix("bundle: ") {
+                name = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("version: ") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("desc: ") {
+                description = rest.to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("include: ") {
+                let dep_name = rest.to_string();
                 dependencies.push(Dependency {
                     name: dep_name,
                     version_constraint: VersionConstraint::Any,
@@ -1355,7 +1354,7 @@ impl Default for SwupdAdapter {
 
 /// Solus eopkg XML Package Adapter (OOPS Concrete Implementation)
 pub struct EopkgAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl EopkgAdapter {
@@ -1389,22 +1388,22 @@ impl PackageFormatAdapter for EopkgAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("<Name>") {
-                if let Some(end) = trimmed[6..].find("</Name>") {
-                    name = trimmed[6..6 + end].to_string();
+            if let Some(rest) = trimmed.strip_prefix("<Name>") {
+                if let Some(end) = rest.find("</Name>") {
+                    name = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("<Version>") {
-                if let Some(end) = trimmed[9..].find("</Version>") {
-                    version_str = trimmed[9..9 + end].to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("<Version>") {
+                if let Some(end) = rest.find("</Version>") {
+                    version_str = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("<Description>") {
-                if let Some(end) = trimmed[13..].find("</Description>") {
-                    description = trimmed[13..13 + end].to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("<Description>") {
+                if let Some(end) = rest.find("</Description>") {
+                    description = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("<Dependency>") {
-                if let Some(end) = trimmed[12..].find("</Dependency>") {
+            } else if let Some(rest) = trimmed.strip_prefix("<Dependency>") {
+                if let Some(end) = rest.find("</Dependency>") {
                     dependencies.push(Dependency {
-                        name: trimmed[12..12 + end].to_string(),
+                        name: rest[..end].to_string(),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -1430,10 +1429,7 @@ impl PackageFormatAdapter for EopkgAdapter {
             "  <Version>{}.{}.{}</Version>\n",
             package.version.major, package.version.minor, package.version.patch
         ));
-        output.push_str(&format!(
-            "  <Description>{}</Description>\n",
-            package.description
-        ));
+        output.push_str(&format!("  <Description>{}</Description>\n", package.description));
         for dep in &package.dependencies {
             output.push_str(&format!("  <Dependency>{}</Dependency>\n", dep.name));
         }
@@ -1444,9 +1440,7 @@ impl PackageFormatAdapter for EopkgAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("<Source>")
-            || content.contains("<Package>")
-            || content.contains("eopkg"))
+        Ok(content.contains("<Source>") || content.contains("<Package>") || content.contains("eopkg"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -1470,7 +1464,7 @@ impl Default for EopkgAdapter {
 
 /// GNU Guix Scheme Package Adapter (OOPS Concrete Implementation)
 pub struct GuixAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl GuixAdapter {
@@ -1504,26 +1498,21 @@ impl PackageFormatAdapter for GuixAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("(name \"") {
-                if let Some(end) = trimmed[7..].find('"') {
-                    name = trimmed[7..7 + end].to_string();
+            if let Some(rest) = trimmed.strip_prefix("(name \"") {
+                if let Some(end) = rest.find('"') {
+                    name = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("(version \"") {
-                if let Some(end) = trimmed[10..].find('"') {
-                    version_str = trimmed[10..10 + end].to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("(version \"") {
+                if let Some(end) = rest.find('"') {
+                    version_str = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("(description \"") {
-                if let Some(end) = trimmed[14..].find('"') {
-                    description = trimmed[14..14 + end].to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("(description \"") {
+                if let Some(end) = rest.find('"') {
+                    description = rest[..end].to_string();
                 }
-            } else if trimmed.starts_with("(inputs `(") {
+            } else if let Some(_rest) = trimmed.strip_prefix("(inputs `(") {
                 // simple guix scheme inputs parser
-                let inputs_part = trimmed
-                    .split('`')
-                    .nth(1)
-                    .unwrap_or("")
-                    .trim_start_matches('(')
-                    .trim_end_matches(')');
+                let inputs_part = trimmed.split('`').nth(1).unwrap_or("").trim_start_matches('(').trim_end_matches(')');
                 for input in inputs_part.split_whitespace() {
                     let clean_dep = input.trim_matches(|c| c == '(' || c == ')' || c == '"');
                     if !clean_dep.is_empty() {
@@ -1571,9 +1560,7 @@ impl PackageFormatAdapter for GuixAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("define-public")
-            || content.contains("(package")
-            || content.contains("(name \""))
+        Ok(content.contains("define-public") || content.contains("(package") || content.contains("(name \""))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -1597,7 +1584,7 @@ impl Default for GuixAdapter {
 
 /// openSUSE Zypper Spec Package Adapter (OOPS Concrete Implementation)
 pub struct ZypperAdapter {
-    user_hooks: Vec<Box<dyn Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync>>,
+    user_hooks: Vec<UserHook>,
 }
 
 impl ZypperAdapter {
@@ -1631,14 +1618,14 @@ impl PackageFormatAdapter for ZypperAdapter {
 
         for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("Name:") {
-                name = trimmed[5..].trim().to_string();
-            } else if trimmed.starts_with("Version:") {
-                version_str = trimmed[8..].trim().to_string();
-            } else if trimmed.starts_with("Summary:") {
-                description = trimmed[8..].trim().to_string();
-            } else if trimmed.starts_with("Requires:") {
-                let deps_part = trimmed[9..].trim();
+            if let Some(rest) = trimmed.strip_prefix("Name:") {
+                name = rest.trim().to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("Version:") {
+                version_str = rest.trim().to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("Summary:") {
+                description = rest.trim().to_string();
+            } else if let Some(rest) = trimmed.strip_prefix("Requires:") {
+                let deps_part = rest.trim();
                 for dep in deps_part.split_whitespace() {
                     dependencies.push(Dependency {
                         name: dep.to_string(),
@@ -1682,8 +1669,7 @@ impl PackageFormatAdapter for ZypperAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("Vendor: openSUSE")
-            || (content.contains("Name:") && content.contains("Requires:")))
+        Ok(content.contains("Vendor: openSUSE") || (content.contains("Name:") && content.contains("Requires:")))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
