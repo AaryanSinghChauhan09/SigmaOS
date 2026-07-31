@@ -12,6 +12,7 @@ pub mod universal_adapter;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 pub mod universal_engine;
+pub mod universal_oop_system;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
