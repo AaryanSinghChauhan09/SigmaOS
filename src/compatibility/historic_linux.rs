@@ -426,6 +426,40 @@ mod tests {
         );
         assert!(builder.execute_bootstrap_stage(4).is_err());
     }
+
+    #[test]
+    fn test_os_tutorial_absorption() {
+        // 1. Protected Mode Switch Tests
+        let mut pm_switch = ProtectedModeSwitchSimulator::new();
+        assert!(pm_switch.execute_switch_to_pm().is_err()); // fails because GDT not loaded
+
+        pm_switch.lgdt();
+        assert!(pm_switch.execute_switch_to_pm().is_ok());
+        assert!(pm_switch.cr0_pe_bit);
+        assert_eq!(pm_switch.active_cs_segment, 0x08);
+        assert_eq!(pm_switch.active_ds_segment, 0x10);
+
+        // 2. VGA Text Mode Screen Driver Tests
+        let mut vga = VgaTextModeDriverSimulator::new();
+        vga.write_char('S', 0x0F); // white text on black background
+        assert_eq!(vga.buffer[0], ('S' as u16) | (0x0F << 8));
+        assert_eq!(vga.cursor_offset, 1);
+
+        assert_eq!(vga.update_cursor_via_ports(0x3D4, 0).unwrap(), 1);
+        vga.update_cursor_via_ports(0x3D5, 42).unwrap();
+        assert_eq!(vga.cursor_offset, 42);
+
+        // 3. PIC Keyboard Controller Tests
+        let mut keyboard = PicKeyboardController::new();
+        assert_eq!(keyboard.master_pic_mask, 0xFF);
+
+        keyboard.init_pic();
+        assert_eq!(keyboard.master_pic_mask, 0xFD); // IRQ1 unmasked
+
+        assert_eq!(keyboard.poll_port_60_read(0x10), 'q');
+        assert_eq!(keyboard.poll_port_60_read(0x1F), 's');
+        assert_eq!(keyboard.poll_port_60_read(0x99), '?');
+    }
 }
 
 // ==========================================
