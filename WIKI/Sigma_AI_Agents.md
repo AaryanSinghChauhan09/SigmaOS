@@ -94,13 +94,13 @@ pub struct PredictiveModel {
 }
 
 impl AiOptimizer {
-    pub fn predict_optimal_priority(&self, process: &Process, history: &[SystemState])
+    pub fn predict_optimal_priority(&self, process: &Process, history: &[SystemState]) 
         -> Priority;
-
-    pub fn suggest_memory_prefetch(&self, access_patterns: &[MemoryAccess])
+    
+    pub fn suggest_memory_prefetch(&self, access_patterns: &[MemoryAccess]) 
         -> Vec<PagePrefetchHint>;
-
-    pub fn detect_anomalous_behavior(&self, syscall_trace: &[SyscallEvent])
+    
+    pub fn detect_anomalous_behavior(&self, syscall_trace: &[SyscallEvent]) 
         -> AnomalyReport;
 }
 ```

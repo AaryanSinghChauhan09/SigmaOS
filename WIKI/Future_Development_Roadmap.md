@@ -1,65 +1,61 @@
-# 🚀 SigmaOS Future Development & Leapfrog Roadmap
+# SigmaOS Future Development Roadmap
 
-This document establishes the strategic, long-term engineering plan for the future expansion and leapfrogging capabilities of **SigmaOS's core subsystems**, focusing on package distribution, system observability, compatibility standards, and high-performance real-time scheduling.
+> A comprehensive strategy for Drivers, Applications, Performance, Speed, and Ecosystem Expansion in SigmaOS.
 
----
+## 1. Driver & Hardware Ecosystem
 
-## 🏗️ 1. Technical Vision: Outclassing Mainstream OS Ecosystems
+The goal is to achieve seamless hardware compatibility across all modern architectures while maintaining our strict security and stability requirements.
 
-Traditional monolithic kernels and release distributions introduce architectural bottlenecks. SigmaOS utilizes **Zero-Dependency, Multi-Language Hybrid Shards** and **Capability-Based Sandboxing** to achieve superior security, determinism, and developer agility.
+### Phase 1: Unified Driver Architecture (UDA)
 
-```
-       +-------------------------------------------------------+
-       |                  Sovereign Core Shards                |
-       +-------------------------------------------------------+
-            |                        |                       |
-            v                        v                       v
-   +-----------------+      +-----------------+      +-----------------+
-   |   PQC Spec v2   |      |  SigmaTrace VM  |      |   POSIX Tiers   |
-   | (Kyber/Dilithium|      | (Low-Overhead)  |      | (Modular Subs)  |
-   +-----------------+      +-----------------+      +-----------------+
-```
+* **Rust-First Driver Framework**: Transition legacy C drivers to safe Rust using our `sigma-hal` (Hardware Abstraction Layer).
+* **Out-of-Tree Auto-Signing**: Implement a daemon that automatically compiles, signs, and loads DKMS-style out-of-tree drivers (e.g., NVIDIA, ZFS) using ephemeral, locally generated keys tied to the Secure Boot chain.
+* **Microkernel Driver Sandboxing**: Move network and USB drivers into unprivileged, isolated microVMs to prevent monolithic kernel panics from faulty hardware drivers.
+
+### Phase 2: AI-Assisted Compatibility
+
+* **Automated HCL Parsing**: AI agent parses hardware specifications and automatically fetches the exact driver required without user intervention.
+* **Telemetry-Driven Bug Fixes**: Anonymized crash logs from driver panics are aggregated and sent to SigmaOS servers, where AI suggests patches automatically.
 
 ---
 
-## 📦 2. Domain 1: Package Distribution & Quantum-Safe Trust (Rust)
+## 2. Application Ecosystem & Delivery
 
-### 2.1 Next-Gen Package Recipes & Trust Chains
-- **Inspiration**: Secure Debian APT, Nix, and Gentoo Portage.
-- **Future Architecture**: Package recipes will be extended with complete post-quantum cryptography (PQC) validation keys (using Kyber-1024 and Dilithium-5) to completely replace standard legacy GPG signing, defending against future quantum computing attacks.
-- **Reproducible Build Pipeline**: Integrate standard build environment variables (such as `SOURCE_DATE_EPOCH` in compilation Makefile pipelines) to achieve 100% bit-for-bit deterministic, reproducible binary artifacts.
+Applications must be fast, sandboxed by default, and seamlessly integrated into the Zenith Desktop experience.
 
----
+### Phase 1: Containerized Application Delivery
 
-## 🔍 3. Domain 2: Low-Overhead Kernel & System Observability (Rust / Zig)
+* **Sigma-AppImage / Flatpak Hybrid**: Develop a native application format that is immutable, containerized, and uses delta-updates to save bandwidth.
+* **Capability-Based Permissions UI**: Applications must request permissions (Camera, Microphone, Network) at runtime, with clear user prompts via Zenith Desktop.
+* **Cross-Distro Compatibility Layer**: Ensure binaries compiled for Ubuntu/Fedora run natively via a lightweight translation layer.
 
-### 3.1 Sandboxed eBPF-like Dynamic Tracing
-- **Inspiration**: Linux `eBPF`/`perf` and BSD `DTrace`.
-- **Future Architecture**: Extend the observability stack (`src/observability/stack.rs`) with custom `SigmaTrace` sandboxed dynamic probing VMs, allowing developers to safely hook system calls and schedulers events with near-zero trace overhead.
-- **Prometheus-ready Telemetry**: Automate the collection of memory allocators fragmentation and page-fault metrics to expose through high-speed, lock-free `SigmaMetrics` endpoints.
+### Phase 2: Native Toolkits & AI
 
----
-
-## ⚖️ 4. Domain 3: Interoperability, FHS, & POSIX Tiers (Rust / Zig)
-
-### 4.1 Modular Compatibility Layers
-- **Inspiration**: LSB (Linux Standard Base), Wine, and macOS Rosetta.
-- **Future Architecture**: Implement modular POSIX compatibility tiers inside `src/compatibility/` where POSIX syscall assumptions are translated to capability-gated IPC transactions in user-space, avoiding kernel bloat.
-- **FHS Overlay Symlinks**: Mount standard compliance paths (e.g. `/bin`, `/etc`, `/usr/lib`, `/var`) dynamically using capability-gated overlays over our distributed, immutable sovereign file system.
+* **Sigma UI Toolkit**: A GPU-accelerated, Wayland-native GUI toolkit optimized for Rust and Nim.
+* **AI-Accelerated Frameworks**: Provide native SDKs for LLM inference, allowing any app to tap into the local `sigma_ai_engine` without shipping its own heavy ML libraries.
 
 ---
 
-## ⚡ 5. Domain 4: Real-Time EEVDF & HPC Cluster Scheduling (Rust)
+## 3. Performance & Speed Optimizations
 
-### 5.1 Hard Preemption RT and Slurm-style Clustering
-- **Inspiration**: Linux `PREEMPT_RT` and HPC `Slurm`/`MPI`.
-- **Future Architecture**: Tune the EEVDF scheduler in `src/kernel/scheduler.rs` with hard preemption paths for RT priorities, guaranteeing bounded interrupt handling latencies.
-- **Clustered Memory-Bypass Routing**: Support memory mapped DMA bypass for MPI-based supercomputing clusters, ensuring microsecond message-passing latency.
+SigmaOS aims to be the fastest OS on the market, minimizing latency from boot to application launch.
+
+### Phase 1: Boot Time & Kernel Speed
+
+* **Sub-Second Boot**: Optimize `sigmad` to parallelize all non-blocking services. Use `kexec` for fast reboots.
+* **Profile-Guided Optimization (PGO)**: Compile the entire kernel and base userland using PGO and Link-Time Optimization (LTO) to maximize cache hits and branch prediction.
+* **Zero-Copy Networking**: Implement `io_uring` and eBPF-based network routing to bypass the traditional kernel network stack for high-throughput applications.
+
+### Phase 2: Memory & Storage
+
+* **Advanced Memory Compression**: Implement zswap/zram equivalents optimized with hardware accelerators to compress memory pages instantly.
+* **Predictive Prefetching**: The OS learns the user's daily habits and pre-loads applications into RAM before the user even clicks the icon.
+* **Filesystem Optimizations**: Introduce SigmaFs (our native CoW filesystem) optimized specifically for NVMe SSDs, bypassing legacy block layer overhead.
 
 ---
 
-## 📅 6. Step-by-Step Implementation Roadmap
+## 4. Ecosystem & Marketplace
 
-- [ ] **Phase 1 (Validation)**: Complete core traits and verification tests for standards, packages, and observability.
-- [ ] **Phase 2 (Parity)**: Implement real-time scheduling preemption gates and FHS directory mounts.
-- [ ] **Phase 3 (Leapfrog)**: Launch sandboxed user-defined dynamic tracing engines and fully automated, AI-driven performance optimization loops.
+* **Decentralized Package Registry**: Move away from single points of failure. Use a globally distributed, IPFS-backed package registry verified by blockchain-style signatures.
+* **SigmaOS Developer SDK**: Release a comprehensive SDK including our Nim/Rust bindings, design system tokens, and debugging tools.
+* **Niche Profile Expansions**: Expand our profiles beyond "Work" and "Personal" to include "Gaming" (optimized Vulkan layers) and "Pro Audio" (PREEMPT_RT auto-tuning).

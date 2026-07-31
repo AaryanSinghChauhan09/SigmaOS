@@ -1,0 +1,21 @@
+# SigmaOS Universal Features & Competitor USPs
+
+SigmaOS is designed to not just replace existing operating systems, but to absorb their best features natively at the microkernel level, ensuring zero-dependency, silicon-direct execution.
+
+## Absorbed Features
+
+1. **Sigma TimeMachine (macOS USP)*****Concept:**Zero-copy Copy-on-Write (CoW) filesystem snapshots.* **Implementation:** `tools/sigma_timemachine.c` allows instantaneous root-level rollback without external backup software.
+
+2. **Sigma Subsystem Layer (Windows WSL/Compatibility USP)*****Concept:**Native execution of alien binaries (Linux ELF, Windows PE).* **Implementation:** `tools/sigma_subsystem.c` translates syscalls in real-time, allowing users to run Linux tools natively within SigmaOS without a hypervisor.
+
+3. **Sigma DTrace (Linux eBPF/Solaris DTrace USP)*****Concept:**Dynamic, low-overhead kernel and userspace observability.* **Implementation:** `tools/sigma_dtrace.c` enables real-time probe insertion into running production systems to trace memory, IO, and CPU bottlenecks.
+
+4. **Sigma RT Analyzer (QNX/VxWorks RTOS USP)*****Concept:**Hard real-time determinism and latency bounding.* **Implementation:** `tools/sigma_rt_analyzer.c` continuously profiles interrupt latency and context switch times to guarantee RTOS compliance.
+
+5. **Sigma Cgroups (Linux cgroups v2 / Kubernetes ResourceQuota USP)*****Concept:**Native silicon resource accounting and auto-throttle governance.* **Implementation:** `kernel/core/SovereignCgroup.cpp` and `tools/sigma_cgroup.cpp` enable CPU quota, memory limits, and I/O weights with an auto-governor sweep.
+
+6. **Sigma ZFS Storage Pools (OpenZFS / APFS / NTFS USP)*****Concept:**Transactional physical block device pooling, CoW snapshot guarantees, and striping/mirroring.* **Implementation:** `kernel/core/SovereignZFSPool.cpp` and `tools/sigma_zfs.cpp` implement a bare-metal RAID-Z transactional space allocator.
+
+7. **Sigma OverlayFS Union Mount (Linux OverlayFS / UnionFS USP)*****Concept:**Directory union mounting with transactional Copy-Up-On-Write redirection for live system boot.* **Implementation:** `kernel/core/SovereignOverlayFS.cpp` and `tools/sigma_overlayfs.cpp` implement a dynamic overlay union filesystem.
+
+8. **Sigma LBU Local State persistence (Alpine LBU / Diskless persistent state USP)*****Concept:**Diskless configuration state packing and persistent RAM archiving via boot flash backup.* **Implementation:** `kernel/core/SovereignLBU.cpp` and `tools/sigma_lbu.cpp` implement a bare-metal state serializer.

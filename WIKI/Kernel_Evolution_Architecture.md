@@ -169,7 +169,7 @@ pub struct DriverRegistry {
 ### AbsorbedUsbHidDriver
 - **Linux Heritage**: `drivers/hid/usbhid/usbkbd.c`
 - **Absorption Date**: 2026-07-20
-- **Modifications**:
+- **Modifications**: 
   - Converted C to Rust
   - Added memory safety guarantees
   - Implemented capability-based access

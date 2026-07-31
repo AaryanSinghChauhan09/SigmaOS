@@ -1,6 +1,6 @@
 # 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
-> **"Sovereignty is the ultimate efficiency."**
+> **"Sovereignty is the ultimate efficiency."**  
 > The world's first industrial-grade microkernel designed for total digital autonomy, post-quantum resilience, and Indian industrial compliance.
 
 ---
