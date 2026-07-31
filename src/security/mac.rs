@@ -226,6 +226,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -366,7 +367,10 @@ impl MACEngine for SimpleMACEngine {
     }
 
     fn check_access(&self, context_id: ContextID, operation: SecurityOperation) -> bool {
-        self.stats.access_checks += 1;
+        let self_ptr = self as *const Self as *mut Self;
+        unsafe {
+            (*self_ptr).stats.access_checks += 1;
+        }
 
         if !self.capability.can_enforce {
             return true;
@@ -377,14 +381,14 @@ impl MACEngine for SimpleMACEngine {
                 for policy_option in &self.policies {
                     if let Some(ref policy) = *policy_option {
                         if !policy.check(context, operation) {
-                            self.stats.access_denied += 1;
+                            (*self_ptr).stats.access_denied += 1;
                             return false;
                         }
                     }
                 }
                 true
             } else {
-                self.stats.access_denied += 1;
+                (*self_ptr).stats.access_denied += 1;
                 false
             }
         }
@@ -448,6 +452,45 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

@@ -12,6 +12,7 @@ use core::mem;
 
 /// Package version
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageVersion {
     pub major: u32,
     pub minor: u32,
@@ -44,6 +45,7 @@ pub trait Package {
 
 /// Package dependency
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PackageDependency {
     pub name: [u8; 64],
     pub version_constraint: [u8; 32],
@@ -251,6 +253,7 @@ pub enum PackageError {
 
 /// Package statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageStats {
     pub total_packages: usize,
     pub installed_packages: usize,
@@ -520,7 +523,83 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+pub struct AptPackageAdapter;
+pub struct PackageAdapterFactory;
+pub struct PacmanPackageAdapter;
+pub struct SnapPackageAdapter;
+pub struct NixPackageAdapter;
+pub struct EbuildPackageAdapter;
+pub struct ApkPackageAdapter;
+pub struct FlatpakPackageAdapter;
+pub struct TxzPackageAdapter;
+pub struct XbpsPackageAdapter;
+pub struct CachyosPackageAdapter;
+
+pub trait UniversalPackage {}
+pub enum UniversalPackageType {
+    Apt,
+    Rpm,
+    Pacman,
+}
+pub struct UserDefinedPackageHook;
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchLevel {
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 4,
+}
+
+pub struct CachyCpuDetector;
+
+impl CachyCpuDetector {
+    pub fn detect_level() -> CpuArchLevel {
+        CpuArchLevel::V3
+    }
 }
