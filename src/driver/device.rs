@@ -445,11 +445,78 @@ impl CharacterDevice for SimpleCharacterDevice {
     }
 }
 
+/// Linux-history inspired Early Boot Parameter Override Entry
+/// Maps a device identifier or legacy serial/io port to custom base IO, IRQs, or UDF bytecode overrides.
+/// This allows SigmaOS to work with older unsupported devices (ISA cards, custom PC clones, legacy serial, etc.)
+/// without needing a massive compiled-in driver binary, satisfying OOP size-reduction goals.
+pub struct EarlyBootParameterOverride {
+    pub device_name: [u8; 32],
+    pub port_io_override: u16,
+    pub irq_override: u8,
+    pub udf_bytecode: [u8; 16], // Light bytecode override for custom scaling/reg mapping
+    pub udf_len: usize,
+}
+
+impl EarlyBootParameterOverride {
+    pub fn new(device_name: &[u8], port: u16, irq: u8, bytecode: &[u8]) -> Self {
+        let mut name_array = [0u8; 32];
+        let len = device_name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(device_name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+
+        let mut bc_array = [0u8; 16];
+        let bc_len = bytecode.len().min(16);
+        for i in 0..bc_len {
+            bc_array[i] = bytecode[i];
+        }
+
+        EarlyBootParameterOverride {
+            device_name: name_array,
+            port_io_override: port,
+            irq_override: irq,
+            udf_bytecode: bc_array,
+            udf_len: bc_len,
+        }
+    }
+}
+
+/// Linux-inspired early parameter override table for unmatched legacy devices
+pub struct LinuxEarlyOverrideTable {
+    pub overrides: Vec<Option<EarlyBootParameterOverride>>,
+}
+
+impl LinuxEarlyOverrideTable {
+    pub fn new() -> Self {
+        LinuxEarlyOverrideTable {
+            overrides: Vec::new(),
+        }
+    }
+
+    pub fn register_override(&mut self, entry: EarlyBootParameterOverride) {
+        self.overrides.push(Some(entry));
+    }
+
+    /// Checks if a legacy device has early boot-override configuration from early Linux history
+    pub fn lookup(&self, device_name: &[u8]) -> Option<&EarlyBootParameterOverride> {
+        for i in 0..self.overrides.len() {
+            if let Some(ref entry) = self.overrides[i] {
+                let entry_name_len = entry.device_name.iter().position(|&b| b == 0).unwrap_or(32);
+                if &entry.device_name[..entry_name_len] == device_name {
+                    return Some(entry);
+                }
+            }
+        }
+        None
+    }
+}
+
 /// Device manager (OOP: Manager class)
 pub struct DeviceManager {
     devices: Vec<Option<Box<dyn Device>>>,
     descriptors: Vec<Option<NonNull<DeviceDescriptor>>>,
     next_device_id: AtomicUsize,
+    pub linux_override_table: LinuxEarlyOverrideTable,
 }
 
 impl Default for DeviceManager {
@@ -464,6 +531,7 @@ impl DeviceManager {
             devices: Vec::new(),
             descriptors: Vec::new(),
             next_device_id: AtomicUsize::new(1),
+            linux_override_table: LinuxEarlyOverrideTable::new(),
         }
     }
 
@@ -493,34 +561,35 @@ impl DeviceManager {
     }
 
     pub fn unregister_device(&mut self, id: usize) -> Result<(), DeviceError> {
-        if id >= self.devices.len() {
+        if id == 0 || id - 1 >= self.devices.len() {
             return Err(DeviceError::InvalidParameter);
         }
 
-        self.devices[id] = None;
+        let idx = id - 1;
+        self.devices[idx] = None;
 
-        if let Some(descriptor_ptr) = self.descriptors[id] {
+        if let Some(descriptor_ptr) = self.descriptors[idx] {
             unsafe {
                 core::ptr::drop_in_place(descriptor_ptr.as_ptr());
                 free(descriptor_ptr.as_ptr() as *mut u8);
             }
         }
 
-        self.descriptors[id] = None;
+        self.descriptors[idx] = None;
         Ok(())
     }
 
     pub fn get_device(&mut self, id: usize) -> Option<&mut Box<dyn Device>> {
-        if id < self.devices.len() {
-            self.devices[id].as_mut()
+        if id > 0 && id - 1 < self.devices.len() {
+            self.devices[id - 1].as_mut()
         } else {
             None
         }
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id < self.descriptors.len() {
-            self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
+        if id > 0 && id - 1 < self.descriptors.len() {
+            self.descriptors[id - 1].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
         }

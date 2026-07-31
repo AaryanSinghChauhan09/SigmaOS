@@ -1,7 +1,6 @@
 /// OOP-based ML Inference Engine for SigmaOS
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 926
 /// Implements neural network inference and model loading
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::Vec;
 
@@ -105,8 +104,8 @@ impl InferenceEngine for SimpleInferenceEngine {
     }
 
     fn unload_model(&mut self, id: ModelID) -> Result<(), MLError> {
-        for model_option in &mut self.models {
-            if let Some(ref model) = *model_option {
+        for i in 0..self.models.len {
+            if let Some(ref model) = self.models[i] {
                 if model.id() == id {
                     *model_option = None;
                     return Ok(());
@@ -117,9 +116,11 @@ impl InferenceEngine for SimpleInferenceEngine {
     }
 
     fn get_model(&self, id: ModelID) -> Option<&dyn MLModel> {
-        for model_option in &self.models {
-            if let Some(ref model) = *model_option {
-                if model.id() == id { return Some(model.as_ref()); }
+        for i in 0..self.models.len {
+            if let Some(ref model) = self.models[i] {
+                if model.id() == id {
+                    return Some(model.as_ref());
+                }
             }
         }
         None
@@ -148,6 +149,11 @@ pub struct SimpleTensor {
 
 impl SimpleTensor {
     pub fn new(shape: &[usize]) -> Self {
+        let mut shape_vec = Vec::new();
+        for &dim in shape {
+            shape_vec.push(dim);
+        }
+
         let mut size = 1;
         for &dim in shape {
             size *= dim;
@@ -168,8 +174,12 @@ impl SimpleTensor {
 }
 
 impl Tensor for SimpleTensor {
-    fn shape(&self) -> &[usize] { &self.shape }
-    fn data(&self) -> &[f32] { &self.data }
+    fn shape(&self) -> &[usize] {
+        unsafe { ::core::slice::from_raw_parts(self.shape.data, self.shape.len) }
+    }
+    fn data(&self) -> &[f32] {
+        unsafe { ::core::slice::from_raw_parts(self.data.data, self.data.len) }
+    }
 
     fn reshape(&mut self, new_shape: &[usize]) -> Result<(), MLError> {
         let mut new_size = 1;
@@ -177,7 +187,7 @@ impl Tensor for SimpleTensor {
             new_size *= dim;
         }
 
-        if new_size != self.data.len() {
+        if new_size != self.data.len {
             return Err(MLError::InvalidInput);
         }
 
@@ -190,35 +200,55 @@ impl Tensor for SimpleTensor {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self {
+        Vec {
+            data: ::core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
+                ::core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    fn to_vec(&self) -> Vec<T> {
+    pub fn to_vec(&self) -> Vec<T> {
         let mut new_vec = Vec::new();
         for i in 0..self.len {
             unsafe {
-                let item = core::ptr::read(self.data.add(i));
+                let item = ::core::ptr::read(self.data.add(i));
                 new_vec.push(item);
             }
         }
         new_vec
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                ::core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }

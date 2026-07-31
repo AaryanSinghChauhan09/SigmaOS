@@ -206,8 +206,8 @@ impl MemoryPool for SimpleBuddyAllocator {
 
     fn get_used_frames(&self) -> usize {
         let mut used = 0;
-        for block_option in &self.blocks {
-            if let Some(ref block) = *block_option {
+        for i in 0..self.blocks.len() {
+            if let Some(ref block) = self.blocks[i] {
                 if block.free.load(Ordering::SeqCst) == 0 {
                     used += 1;
                 }

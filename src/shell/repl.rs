@@ -88,6 +88,50 @@ pub enum ShellCommand {
     Unknown(String),
 }
 
+/// Represents an automated action task executed by an AI agent
+#[derive(Debug, Clone)]
+pub struct AgentTask {
+    pub task_id: usize,
+    pub description: String,
+    pub commands: Vec<String>,
+}
+
+/// AI Agent Automation Engine inside SigmaOS REPL
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine {
+    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
+    pub next_task_id: usize,
+}
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine {
+            registered_tasks: std::collections::HashMap::new(),
+            next_task_id: 1,
+        }
+    }
+
+    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
+        let id = self.next_task_id;
+        self.next_task_id += 1;
+        self.registered_tasks.insert(
+            id,
+            AgentTask {
+                task_id: id,
+                description,
+                commands,
+            },
+        );
+        id
+    }
+}
+
+impl Default for AgentAutomationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Shell REPL
 pub struct ShellRepl {
     pub running: bool,
@@ -172,7 +216,21 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    fn execute_line(&mut self, line: &str) {
+    pub fn execute_line(&mut self, line: &str) {
+        if line.contains(';') {
+            let subcommands: Vec<&str> = line.split(';').collect();
+            for sub in subcommands {
+                let trimmed = sub.trim();
+                if !trimmed.is_empty() {
+                    self.execute_single_line(trimmed);
+                }
+            }
+        } else {
+            self.execute_single_line(line);
+        }
+    }
+
+    fn execute_single_line(&mut self, line: &str) {
         let command = self.parse_command(line);
         let result = self.execute_command(command);
 

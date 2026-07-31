@@ -150,6 +150,11 @@ impl RoundRobinScheduler {
             return;
         }
 
+        // Safeguard current_index boundaries to prevent any out of bounds panic
+        if self.current_index >= self.processes.len() {
+            self.current_index = 0;
+        }
+
         let needs_switch = {
             let entry = &mut self.processes[self.current_index];
             entry.cpu_time_used += 1;

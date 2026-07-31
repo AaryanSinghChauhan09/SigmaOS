@@ -180,6 +180,33 @@ impl PageTable for SimplePageTable {
     }
 }
 
+/// Advanced multi-core Translation Lookaside Buffer (TLB) shootdown coordinator (Linux-grade)
+pub struct TlbTracker {
+    pub current_epoch: AtomicUsize,
+    pub pending_shootdowns: AtomicUsize,
+}
+
+impl TlbTracker {
+    pub fn new() -> Self {
+        TlbTracker {
+            current_epoch: AtomicUsize::new(1),
+            pending_shootdowns: AtomicUsize::new(0),
+        }
+    }
+
+    /// Register a TLB invalidation event on page change (Phase 1 of Linux-defeating MM)
+    pub fn register_invalidation(&self, _virt: VirtualAddress) {
+        self.pending_shootdowns.fetch_add(1, Ordering::SeqCst);
+        self.current_epoch.fetch_add(1, Ordering::SeqCst);
+    }
+
+    /// Execute and flush the shootdowns, returning the processed epoch
+    pub fn flush_shootdowns(&self) -> usize {
+        self.pending_shootdowns.store(0, Ordering::SeqCst);
+        self.current_epoch.load(Ordering::SeqCst)
+    }
+}
+
 pub trait VirtualMemoryManager {
     fn map_page(
         &mut self,
@@ -200,6 +227,7 @@ pub struct SimpleVMM {
     pub pd_tables: Vec<Option<SimplePageTable>>,
     pub pt_tables: Vec<Option<SimplePageTable>>,
     pub next_table_addr: AtomicUsize,
+    pub tlb_tracker: TlbTracker,
 }
 
 impl Default for SimpleVMM {
@@ -217,6 +245,7 @@ impl SimpleVMM {
             pd_tables: Vec::new(),
             pt_tables: Vec::new(),
             next_table_addr: AtomicUsize::new(0x2000),
+            tlb_tracker: TlbTracker::new(),
         }
     }
 

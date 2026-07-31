@@ -178,11 +178,10 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     }
 }
 
-pub trait TaskQueue {
-    fn enqueue(&mut self, task: &[u8], priority: u8);
-    fn dequeue(&mut self) -> Option<[u8; 256]>;
-    fn peek(&self) -> Option<&[u8]>;
-    fn size(&self) -> usize;
+/// A sliding context window history pruner
+pub struct ContextWindowPruner {
+    pub history: Vec<[u8; 128]>,
+    pub max_lines: usize,
 }
 
 pub struct SimpleTaskQueue {
