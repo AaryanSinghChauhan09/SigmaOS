@@ -4,7 +4,7 @@
 # Set standard reproducible build epoch timestamp
 export SOURCE_DATE_EPOCH ?= 1716000000
 
-.PHONY: all clean build kernel drivers userspace test test-unit test-integration test-qemu help
+.PHONY: all clean build kernel drivers userspace test test-unit test-integration test-qemu help singularity
 
 # Default target
 all: build
@@ -110,6 +110,13 @@ mrproper: distclean
 	@echo "Mrproper complete."
 
 # Build complete system (Unified profile routing with no circular warnings)
+singularity:
+	@mkdir -p build
+	@echo "Building SigmaOS Singularity Microkernel..."
+	@cargo build --release
+	@cp target/release/sigma_kernel sigmaos.bin
+	@echo "Singularity microkernel build complete."
+
 build:
 	@mkdir -p build
 	@echo "Building SigmaOS (Profile: $(PROFILE), Arch: $(ARCH))..."

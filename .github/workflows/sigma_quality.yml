@@ -21,14 +21,14 @@ jobs:
 
     - name: Run clang-tidy
       run: |
-        clang-tidy kernel/core/*.cpp userland/*.cpp -- -I./include -std=c++17
+        find kernel/ userland/ -name "*.cpp" | xargs clang-tidy -- -I./include -std=c++17
 
     - name: Run cppcheck on kernel shards
       run: |
         cppcheck --enable=all --inconclusive --library=std \
                  --suppress=missingIncludeSystem \
                  --error-exitcode=1 \
-                 kernel/core/ kernel/shards/ userland/ \
+                 kernel/ userland/ \
                  2>&1 | tee cppcheck_report.txt
 
     - name: Check Markdown linting
@@ -36,7 +36,7 @@ jobs:
         markdownlint docs/*.md *.md
 
     - name: Upload cppcheck report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: cppcheck-report
