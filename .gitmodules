@@ -16,11 +16,11 @@
 
 [submodule "lib/mesa"]
 	path = lib/mesa
-	url = https://github.com/mesa3d/mesa.git
+	url = https://gitlab.freedesktop.org/mesa/mesa.git
 
 [submodule "lib/musl"]
 	path = lib/musl
-	url = https://github.com/rrichardson/musl.git
+	url = https://github.com/musl-libc/musl.git
 
 [submodule "lib/openrc"]
 	path = lib/openrc

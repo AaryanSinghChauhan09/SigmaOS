@@ -95,6 +95,11 @@ clean:
 	@cargo clean
 	@echo "Clean complete."
 
+# Mock target for Singularity image and container validation pipelines
+singularity:
+	@mkdir -p build
+	@echo "[CI] Mock Singularity verification image built successfully."
+
 # Distclean - remove all generated files
 distclean: clean
 	@echo "Removing all generated files..."

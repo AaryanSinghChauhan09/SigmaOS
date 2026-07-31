@@ -1,12 +1,3 @@
-# 🛡️ SigmaOS — Future Development & Package Absorption Roadmap
-
-> **"Digital Sovereignty through Atomic Reproducibility and Local Intelligence."**
-> This document details the master architectural blueprint and action plan for the evolution of SigmaOS, incorporating unified package management, interoperability with major Linux distribution ecosystems, security hardening, user-experience refinement, and performance autotuning.
-
----
-
-## 🗺️ Master Strategic Timeline
-
 # SIGMAOS ULTIMATE DEVELOPMENT ROADMAP & SYSTEM SPECIFICATION
 
 This document serves as the canonical master engineering blueprint and strategic roadmap for the future expansion and market domination of **SigmaOS's core subsystems**. Built as a from-scratch, zero-dependency, zero-trust, bare-metal operating system targeting high-performance x86_64 systems, SigmaOS combines post-quantum cryptography (Kyber-1024, Dilithium-5), a custom TCP/IP stack, the custom crash-consistent Ext4/JBD2 journaling SigmaFS, and the bare-metal Zenith compositor. This specification maps the ultimate path to rendering legacy operating systems, traditional Linux distributions, and Microsoft's Windows Subsystem for Linux (WSL) obsolete.
@@ -19,20 +10,6 @@ This document serves as the canonical master engineering blueprint and strategic
 
 To break the hardware isolation bottlenecks and fragmentations common in legacy monolithic architectures, SigmaOS normalizes low-level hardware communication over an elegant, zero-dependency, Object-Oriented interface. This design abstracts the physical differences between historic x86 systems (utilizing legacy Port I/O (PIO), legacy ISA DMA channels, and polled interrupts) and modern high-frequency PCIe Gen 6 and MMIO interfaces under a single polymorphic base class.
 
-```mermaid
-gantt
-    title SigmaOS Development & Absorption Phases
-    dateFormat  YYYY-MM-DD
-    section Phase 0: Kernel Foundations
-    IDT, TSS, Usermode, CryptFS, PCI Scan :active, p0, 2026-07-15, 30d
-    section Phase 1: Shell Polish
-    In-Page Window Manager, PWA Apps, Lock Screen : p1, after p0, 20d
-    section Phase 2: App Completions
-    PTY Allocator, SigmaTerm, AI Integrations, Layers : p2, after p1, 20d
-    section Phase 3: Platform Features
-    Bubblewrap Sandbox, Cloud Sync, Cross-App Clipboard : p3, after p2, 15d
-    section section Phase 4: Ecosystem
-    App SDK, App Store, Wiki Integration, Signed Releases : p4, after p3, 15d
 ```
 +-----------------------------------------------------------------------------------+
 |                            Unified Peripheral Manager                             |
@@ -86,32 +63,6 @@ pub enum DriverError {
     DeviceNotPresent,
 }
 
-## 1. Audit & Package Discovery: SigmaOS vs. Linux Distros
-
-To achieve maturity and distro-parity, SigmaOS is analyzed against the four pillar paradigms of modern package management.
-
-### 📊 Comparative Analysis Matrix
-
-| Feature / Paradigm | Ubuntu (`apt` / `dpkg`) | Arch Linux (`pacman` / `libalpm`) | Fedora (`dnf5` / `rpm`) | NixOS (`nix` / Functional) | **SigmaOS (`sigpkg`)** |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Configuration** | Imperative (stateful files) | Imperative (binary updates) | Imperative (stateful repos) | **Purely Declarative** (Nix expression) | **Declarative Profile** (`sigma.toml`) |
-| **Transaction Model** | Non-atomic (potential half-installs) | Non-atomic (direct unpack) | Transactional (rollback logs) | **Atomic & Pure** (symlink swap) | **Atomic** (Staging & Symlink swap) |
-| **Isolation / Sandboxing** | None (runs as root/user) | None natively (helper tools) | None natively | Read-only Nix Store isolation | **Sandbox Compartments** (Bubblewrap + Landlock) |
-| **Reproducibility** | Low (depends on mirror states) | Low (archive logs only) | Low (historical mirrors) | **100% Hermetic / Identical** | **Deterministic Content-Addressed Store** |
-| **Dependency Model** | Boolean SAT (Aptitude) | Direct DAG resolution | libsolv (SAT-solver) | Input-addressed hashing DAG | **SAT-Solver (DPLL-based in safe Rust)** |
-| **Rollback Capability** | Manual / Apt-clone (risky) | System snapshotting (Btrfs) | History rollbacks (RPM db) | **Native Generations** (O(1) revert) | **O(1) Generation Rollback** via SQLite/history snapshot |
-
-### 🔍 Identified Gaps in SigmaOS Prototype
-
-1. **Dependency Resolution Resilience**: The primitive parser could fail on circular/cyclic dependencies. We must adopt a full DPLL (Davis-Putnam-Logemann-Loveland) SAT solver that optimizes install routes.
-2. **Atomic Rollback & Generation Management**: A broken upgrade should leave the system completely unharmed. We require O(1) symlink-based switching.
-3. **Sandbox Isolation for Installs**: Running package install-hooks (`postinst` / `preinst`) poses extreme security risks. SigmaOS must execute these hooks within heavily restricted Bubblewrap and Landlock micro-sandboxes.
-4. **Reproducibility & Hash Verification**: Unlike traditional package managers that rely on timestamps, all packages in SigmaPkg must be content-addressed via cryptographic hashes (using SHA-3 256) and validated using Post-Quantum Signatures (Dilithium-5).
-
----
-
-## 2. Architecture & Design of SigmaPkg (`sigpkg`)
-
 pub trait PeripheralDevice {
     fn initialize(&mut self) -> Result<(), DriverError>;
     fn query_class(&self) -> DeviceClass;
@@ -164,48 +115,23 @@ When the system polls a physical bus slot during scanning:
 
 ### B. Sandboxed User-Defined Function (UDF) Driver Interpreter Sandbox
 
-`sigpkg` is designed as a zero-dependency, zero-allocation-ready, safe Rust package manager that enforces absolute atomicity.
+To prevent bloating the microkernel footprint with thousands of legacy hardware files, SigmaOS introduces a secure **User-Defined Function (UDF) Driver Interpreter** executing inside an isolated kernel sandbox.
 
-```text
-                  [ Declarative Profile: sigma.toml ]
-                                  │
-                                  ▼
-                     ┌─────────────────────────┐
-                     │  SAT-Solver Dependency  │
-                     │  Resolver (DPLL Rust)   │
-                     └────────────┬────────────┘
-                                  │ (Computes optimized DAG)
-                                  ▼
-                     ┌─────────────────────────┐
-                     │ Cryptographic Verifier  │
-                     │ (Dilithium-5 + SHA3)    │
-                     └────────────┬────────────┘
-                                  │ (Checks PQ signature)
-                                  ▼
-                     ┌─────────────────────────┐
-                     │  Sandbox Extractor /   │
-                     │  Bubblewrap Isolation   │
-                     └────────────┬────────────┘
-                                  │ (Atomic write to /var/store)
-                                  ▼
-                     ┌─────────────────────────┐
-                     │    Atomic Symlink Swapper   │
-                     │   (O(1) Gen Rollback)   │
-                     └─────────────────────────┘
 ```
-
-### ⚙️ Core Modules & Mechanics
-
-* **SAT-Solver Resolver**: Translates packages and constraints into boolean clauses. Solves dependencies deterministically, identifying conflicts prior to downloading.
-* **Content-Addressed Store**: Every compiled artifact resides under `/var/sigma-pkg/store/<sha3-256-hash>-<package-name>/`. Multiple versions coexist flawlessly.
-* **Sandbox Extractor**: Unpacks files using user-space namespaces (`CLONE_NEWUSER`, `CLONE_NEWNS`). No write permissions outside the designated directory are granted.
-* **PQC Dilithium-5 Verification**: All `.spkg` archives are signed with Dilithium-5. The verification engine handles keyrings natively.
-
----
-
-## 3. Linux Package Absorption Framework
-
-SigmaOS implements translation and compatibility wrappers to digest packages from standard Linux repositories, run them securely, and expose native capabilities.
++-----------------------------------------------------------------------------+
+|                             Sovereign Microkernel                           |
+|                                                                             |
+|  +-------------------------+             +-------------------------------+  |
+|  | Unified Peripheral Bus  | <=========> | Sandboxed UdfInterpreter (VM) |  |
+|  +-------------------------+             +-------------------------------+  |
++--------------------------------------------------|--------------------------+
+                                                   v
+                                      +--------------------------+
+                                      |   UDF Bytecode Binary    | (e.g. < 2KB)
+                                      | - Secure Register Map    |
+                                      | - Range-Checked Registers|
+                                      +--------------------------+
+```
 
 #### 1. Sandboxed VM State (`UdfVm`)
 *   **Registers:** Exposes 8 static 64-bit virtual registers (`R0` through `R7`) and a 64-bit program counter (`PC`).
@@ -312,51 +238,21 @@ impl SCosmosEmulator {
 
 Traditional operating system ecosystems suffer from severe fragmentation, bloat, and legacy design flaws. SigmaOS systematically identifies these structural deficiencies and implements elegant, zero-dependency `#![no_std]` abstractions designed to absorb and dominate key features from every major Linux distribution and operating system on the market:
 
-### 📥 Translation Compartments
-
-```text
-               ┌────────────────────────────────────────┐
-               │         Linux Package Source           │
-               │   (APT .deb / Pacman .tar.zst / RPM)   │
-               └───────────────────┬────────────────────┘
-                                   │
-                                   ▼
-               ┌────────────────────────────────────────┐
-               │     SigmaOS Compatibility Wrappers     │
-               │      (apt-compat / pacman-compat)      │
-               └───────────────────┬────────────────────┘
-                                   │ (Metadata translation / Symlink remapping)
-                                   ▼
-               ┌────────────────────────────────────────┐
-               │    Sovereign Execution Compartment     │
-               │        (Sandboxed via Bubblewrap)       │
-               └────────────────────────────────────────┘
 ```
-
-#### 1. APT Compatibility Layer (`apt-compat`)
-
-* **Metadata Translator**: Translates Debian control files (`control`) to standard `sigma.toml` metadata.
-* **Hook Sandboxing**: Executes complex bash-based `preinst`/`postinst` scripts inside a clean-slate bubblewrap compartment where `/etc`, `/var`, and `/usr` are mounted as read-only.
-* **Paths Remapping**: Intercepts absolute paths (e.g., `/lib/x86_64-linux-gnu`) and points them to content-addressed stores.
-
-#### 2. Pacman Compatibility Layer (`pacman-compat`)
-
-* **ALPM Bridge**: Translates `.PKGINFO` and database specifications.
-* **Dependency Map**: Matches Arch packaging definitions with local equivalents.
-
-#### 3. DNF/RPM Compatibility Layer (`dnf-compat`)
-
-* **RPM Header Extraction**: Intercepts CPIO archives within `.rpm` packages and unpacks them into content-addressed destinations.
-
-#### 4. Nix Derivation Consumer (`nix-compat`)
-
-* **Hermetic Build Import**: Consumes Nix store paths directly. Since Nix store paths are already content-addressed and isolated, they map perfectly to `/var/sigma-pkg/store/`.
-
----
-
-## 4. Branch Lifecycle, Testing, and Integration Strategy
-
-To maintain a pristine mainline branch, SigmaOS employs an automated pipeline for feature branches.
++-------------------------------------------------------------------------------------+
+|                                DISTRO ABSORPTION LAYER                              |
++-------------------------------------------------------------------------------------+
+|  [S-DNF (Fedora)]  |  [S-PAC (Arch)]   | [S-INIT (systemd)] | [S-TREE (OSTree)]     |
+|  - CAS Packages    |  - SAT Solver     | - Decoupled S6     | - Immutable CoW Roots |
+|  - No Shell Hooks  |  - Transactional  |   Supervisors      | - Zero-Reboot Updates |
++-------------------------------------------------------------------------------------+
+                                          |
+                                          v
++-------------------------------------------------------------------------------------+
+|                        S-WINE & S-COSMOS COMPATIBILITY SHARDS                       |
+|  - Direct Win32 Translation   - Cocoa/X11 Emulators   - Android/Linux Container VM  |
++-------------------------------------------------------------------------------------+
+```
 
 *   **Ubuntu & Debian (Sovereign Package Abstraction & Clean FHS):**
     *   *The Legacy Flaw:* Massive, fragmented systemd dependencies, heavy configuration overhead, and insecure package installers executing dynamic post-install shell hooks with administrative ambient rights.
@@ -435,140 +331,27 @@ To deliver an elegant, intuitive, and highly adaptable user environment, Zenith 
 
 SigmaOS implements **S-Pantheon**, a bare-metal, high-performance, and secure realization of the elementary OS design vision. Running directly on top of the Zenith Compositor, S-Pantheon outclasses Linux-based alternatives by eliminating heavy GTK and Mutter runtimes entirely.
 
-### 🌲 Active Branch Registrations
-
-* **Drivers (Shards)**:
-  * `feature/shards/audio-driver` (Rust audio prototype)
-  * `feature/shards/essential-drivers` (GPU and core framework)
-  * `feature/shards/input-driver` (Zig-based HID driver)
-  * `feature/shards/network-driver` (Zig-based NIC driver)
-  * `feature/shards/storage-driver` (Rust storage framework)
-* **Sovereign Systems**:
-  * `feature/sovereign/adr-tracker` (ADR verification)
-  * `feature/sovereign/dosage-calc` (Healthcare safety module)
-  * `feature/sovereign/gst-calculator` (Financial localization)
-  * `feature/sovereign/load-calc` (Predictive load calculator)
-  * `feature/sovereign/msme-registry` (Indian industrial compliance)
-  * `feature/sovereign/netstack` (Sovereign TCP/IP stack)
-
-### 🔄 Branch Integration & Merge Workflow
-
-1. **Automated Rebase**: For each branch, pull latest `main`, perform non-interactive rebase.
-2. **Conflict Scrubber**: Run `scrub_conflicts.ps1` or similar cleanup tools.
-3. **Build & Test Isolation**: Execute compilation against standalone, rtos, and cloud profiles.
-4. **Fast-Forward Merge**: On successful pipeline completion, perform merge into `main` keeping clean linear commits.
-5. **Clean up**: Remove remote branch on origin, update `CHANGELOG.md` with branch absorption summaries.
-
----
-
-## 5. Documentation Migration & Wiki Sync Operations
-
-SigmaOS documentation is living. Once a feature or specification is fully coded, its design documents are migrated from the source repository to the centralized GitHub Wiki.
-
-### 📋 Migration Workflow
-
-```text
-[ Finalized Code Implementation ] ──► [ Convert Doc to Wiki Slug Format ] ──► [ Copy to wiki_repo/ ] ──► [ Delete original .md in Repo ]
 ```
-
-* **Deduplication Safeguard**: Prevents file sync confusion.
-* **Slug conversion**: Spaces in `.md` filenames are transformed into dashes natively (e.g., `doc_audit_backlog.md` -> `Doc-Audit-Backlog.md`).
-* **Canonical Index**: `Advanced_Absorption` serves as the primary gateway for all distro absorption maps.
-
----
-
-## 6. Performance Optimization Strategy (Bolt's Journal)
-
-### ⚡ Optimization Guidelines
-
-* **Avoid Nested Loops**: Avoid O(N²) iterations; swap with HashMaps or pre-indexed static tables.
-* **Hoisting Operations**: Hoist checks, matches, and reference dereferences out of tight render and pixel loops.
-* **Zero-Allocation**: Utilize stack allocations or static buffers where possible to eliminate heap overhead in microkernel paths.
-
-### 📝 Bolt's Performance Journal Entries
-
-#### 2026-07-13 - SIMD String bitwise operations
-
-* **Learning**: Direct bitwise conversions can introduce silent bugs in non-lowercase ASCII ranges.
-* **Action**: Apply inverse logical masking (`_mm_andnot_si128`) to properly preserve delimiters and special characters.
-
-#### 2026-07-13 - Hoisting Pixel Loop Checks
-
-* **Learning**: Doing high-frequency pixel drawing by matching options inside the loop creates massive branch-prediction overhead.
-* **Action**: Hoist state checking outside of the loops; perform bulk row copies using `core::ptr::copy` (representing SIMD-optimized `memmove`).
-
-#### 2026-07-14 - Allocation-Free SemVer Comparison in Package Manager
-
-* **Learning**: Doing repetitive SemVer comparisons using string splitting and dynamic vector collections creates heavy allocation pressures in performance-critical dependency-resolution loops.
-* **Action**: Implement an allocation-free SemVer parser with inline iterator walks that parse and compare numeric major/minor/patch segments without allocating dynamic arrays.
-
----
-
-## 7. UX, Delight & Accessibility Design (Palette's Standards)
-
-### 🎨 Visual & Access Standards
-
-* **Keyboard-First Navigation**: Ensure all controls support Tab-focus state tracking (`focus-visible`).
-* **ARIA Integrity**: Icon-only buttons must supply a descriptive `aria-label`.
-* **State Indicators**: Async actions require immediate disabled button states and circular loading spinners to prevent double-submit.
-* **Action Pathway Clarity**: Form failures must highlight the exact field failing validation with human-readable corrective actions.
-* **Interactive CLI Empty States**: When lists or query results are empty, sigpkg displays a clear yellow status message accompanied by actionable next-step suggestions (such as exact commands or tips) to reduce user dropoff.
-
----
-
-## 8. Security & Defense in Depth (Sentinel's Playbook)
-
-### 🛡️ Core Security Postulates
-
-* **Input Validation**: Never trust inputs. Validate string bounds, parameter values, and format descriptors at every boundaries.
-* **Secure Error Responses**: Never leak kernel addresses, file paths, or stack traces in userland error responses.
-* **Zero-Secrets Policy**: Absolutely no API keys, credentials, or development passwords should exist in code; feed them via secure environment descriptors or TPM-backed keychain modules.
-* **Namespace Isolation**: Bubblewrap compartmentalizes third-party package runtimes, rejecting root access privileges.
-* **Strict Package Name Validation**: Pre-validate all user-supplied package inputs via strict alphanumeric boundaries (allowing only standard alphanumeric characters, dashes, and underscores) to eliminate Path Traversal (`../../`) and command injection vectors.
-
----
-
-## 9. Sigma Updater: Daily Package Ecosystem & Upstream Distro Report
-
-### 📢 Daily Distro Tracking - July 13, 2026
-
-#### 📦 1. Arch Linux Upstream: Pacman 7.1.0 Release
-
-* **What's New**:
-  * Downloader sandbox overhaul using **Landlock** and `NO_NEW_PRIVS` to lock down network download processes.
-  * Strict default database and package verification: `SigLevel = Required` is now enforced.
-  * Parallel compilation stripping and reproducible source tarball sorting.
-* **Absorption Blueprint for SigmaOS**:
-  * **Landlock integration**: We can adopt the Landlock system call gating model into `sigpkg`'s fetcher module. By pinning the downloader process to allow only the networking socket creation syscalls (`socket`, `connect`, `sendto`, `recvfrom`), we insulate SigmaOS from remote exploits during package downloads.
-
-#### 📦 2. Debian/Ubuntu Upstream: APT 2.9 & 3.0 UI Paradigm
-
-* **What's New**:
-  * Transitioning to terminal-based columnar grids, structured progress bars, and localized color pallets to improve human parse speeds on heavy package transactions.
-* **Absorption Blueprint for SigmaOS**:
-  * **Beautiful CLI output**: Inject APT-style structured columns and color-coded transaction summary reports into `sigpkg`'s CLI interface.
-
-#### 📦 3. RedHat/Fedora Upstream: DNF5 / Libdnf consolidation
-
-* **What's New**:
-  * DNF5 consolidates all backend operations into a unified, high-performance C++ core, slashing footprint sizes and execution overhead by up to 40%.
-* **Absorption Blueprint for SigmaOS**:
-  * **Unified C-FFI API**: Replicate DNF5's architecture by exposing standard C-FFI hooks from `sigpkg` (such as `sigpkg_create_tx` and `sigpkg_tx_commit`). This allows SigmaOS's multi-language userland services (written in Rust, Nim, and Go) to drive atomic updates with absolute minimum memory footprint.
-
-#### 📦 4. NixOS Upstream: Functional Evaluation Cache Optimizations
-
-* **What's New**:
-  * Extremely fast evaluation caching for declarative inputs, improving evaluation times on massive system states.
-* **Absorption Blueprint for SigmaOS**:
-  * **Lockfile Caching**: Implement similar input-hashed caching in `sigpkg`'s resolver. If the input `sigma.toml` has not modified its dependency hashes, the solver bypasses clause generation, speeding up dry-runs to < 5ms.
-
----
-
-## 🎯 Proposed Next Steps & Recommendations
-
-1. **PQC Signatures Activation**: Integrate the kernel Dilithium-5 verify hooks directly into the `sigpkg_tx_verify` routine to prevent supply-chain attacks.
-2. **Auto-Rebase CI Integration**: Write a Github Action to automatically rebase all listed feature branches against `main` once daily.
-3. **APT/Pacman Translation Module Tests**: Write concrete mock test harnesses that feed standard `.deb` metadata to verify correct translation to `sigma.toml`.
++-----------------------------------------------------------------------------------------+
+|                              S-PANTHEON COMPOSITOR ARCHITECTURE                         |
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|  [ Zenith Display Controller (Ring 0 Framebuffer / Direct DRM/KMS Blitting) ]           |
+|                                         ^                                               |
+|                                         | (Zero-Copy Double-Buffered Frame Synthesis)   |
+|                  +----------------------------------------------+                       |
+|                  |     Zenith Compositor / S-Pantheon Canvas    |                       |
+|                  +----------------------------------------------+                       |
+|                      |                  |                  |                            |
+|        (Wingpanel Events)         (Gala Geometry)    (Plank Dock Layers)                |
+|              v                          v                  v                            |
+|     +------------------+       +------------------+       +-------------------+         |
+|     |  S-Wingpanel     |       |  S-Gala Manager  |       |  S-Plank Dock     |         |
+|     |  Status/Menus    |       |  Tiling / Decor  |       |  Predictive Icons |         |
+|     +------------------+       +------------------+       +-------------------+         |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
+```
 
 #### 1. S-Gala Window Manager & Tiling Broker
 *   **Design Architecture:** Encapsulates window trees as safe, polymorphic structures managed via a central `GalaWindowManager` class.
@@ -596,7 +379,6 @@ SigmaOS documentation is living. Once a feature or specification is fully coded,
 ### A. Code Purity & Bare-Metal Object-Oriented Principles (OOP)
 
 Every core service, driver, and emulator inside SigmaOS is constructed under strict systems-level, zero-dependency requirements. The architecture completely forbids standard libraries (`std::` or built-in compiler runtime allocators). To maintain maximum maintainability and modularity, SigmaOS uses elegant, Object-Oriented patterns implemented securely in modern low-level systems languages (Rust, Zig, Nim):
-
 ```rust
 // ==============================================================================
 // OOP BARE-METAL DESIGN PATTERN: The Device Factory Pattern
@@ -705,6 +487,87 @@ impl PeripheralManager {
             None
         }
     }
+}
+```
+
+---
+
+## 💾 9. LEAPFROGGING KERNEL.ORG: THE SOVEREIGN CORE MICROKERNEL UPGRADE
+
+While standard monolithic Linux kernels hosted on **kernel.org** (mainline, LTS, and stable distributions) compile schedulers, memory managers, and peripheral drivers directly into a single highly privileged Ring 0 supervisor space, SigmaOS establishes a superior microkernel paradigm.
+
+We analyze kernel.org's advanced subsystems—including EEVDF scheduling, eBPF tracing, io_uring asynchronous execution, multi-queue block layers, and lockless RCU synchronization—translating them into safe, zero-dependency, Object-Oriented, and microkernel-friendly abstractions.
+
+```
+       +-----------------------------------------------------------+
+       |           Monolithic Linux Kernel (kernel.org)             |
+       |  - eBPF JIT compilation inside Ring 0 (high attack surface)|
+       |  - io_uring asynchronous loops shared inside supervisor    |
+       |  - Read-Copy-Update (RCU) linked lists prone to lock skew  |
+       +-----------------------------------------------------------+
+                                    vs.
+       +-----------------------------------------------------------+
+       |              SigmaOS Sovereign Microkernel                |
+       |  - Isolated userland driver shards gating physical memory |
+       |  - Zero-Allocation EEVDF Scheduler (cache-coherent queues)|
+       |  - Lock-free, zero-copy atomic CAS command rings           |
+       +-----------------------------------------------------------+
+```
+
+### 9.1 Zero-Allocation EEVDF Scheduler (`kernel::scheduler`)
+Linux 6.6 merged the Earliest Eligible Virtual Deadline First (EEVDF) scheduler to replace the CFS scheduler. However, Linux's implementation relies heavily on dynamic kernel heap allocations for task structures, exposing the scheduler to latency spikes under OOM pressures.
+*   **Sovereign EEVDF Implementation:** Organizes scheduled execution units as statically pre-allocated polymorphic `RealTimeTask` slots.
+*   **Virtual Runtime Adjustment:** Virtual runtimes and priority eligibility weights are calculated using bitwise shift optimizations, preventing floating-point overhead inside critical scheduling loops.
+
+### 9.2 Safe Userland eBPF: Sandboxed Bytecode VM Tracing (`kernel::trace`)
+Linux eBPF loads JIT-compiled bytecode directly inside the Ring 0 kernel supervisor to monitor networking packets and trace syscalls. This has introduced critical vulnerabilities allowing attackers to escape sandboxes and leak kernel registers.
+*   **Sovereign Sandbox VM:** SigmaOS isolates diagnostic and tracing filters inside a sandboxed Ring 3 userland virtual machine (`UdfVm`).
+*   **Boundary Gating:** The tracing bytecode VM operates on a strictly pre-allocated, range-checked 512-byte stack frame. Any instruction attempting to access out-of-bounds page table memory is immediately terminated by the microkernel supervisor before execution, ensuring absolute safety.
+
+### 9.3 Lock-Free Asynchronous I/O Rings (io_uring Parity)
+Linux `io_uring` establishes shared submission and completion queues between userspace and the monolithic kernel, boosting storage throughput. But sharing raw buffers within Ring 0 compromises zero-trust isolation boundaries.
+*   **Sovereign Command Rings:** Guest applications submit asynchronous requests into lock-free, zero-copy, and content-addressed circular rings (`PowerOfTwoZeroCopyQueue`).
+*   **Atomic CAS Dispatch:** Requests are dispatched and processed by isolated user-space driver shards. Updates are posted atomically to completion rings using atomic CAS (Compare-And-Swap) operations without supervisor context-switch interventions.
+
+### 9.4 Multi-Queue Block Layers (blk-mq Parity)
+Linux's multi-queue block layer (`blk-mq`) maps I/O requests across separate hardware submission queues to exploit high-speed multi-core systems.
+*   **Sovereign Multi-Queue Storage:** The microkernel instantiates a dedicated storage queue per CPU core, mapped directly to NVMe/PCIe hardware MSI-X registers.
+*   **Polymorphic Queue Trait:** Storage requests implement a unified, abstract `StorageRequest` trait, allowing the block subsystem to process diverse hardware formats (such as ancient PIO sectors or PCIe Gen6 DMA ranges) polymorphically through a single, consistent class interface.
+
+### 9.5 Lockless Synchronization: Sovereign RCU (`kernel::sync`)
+Monolithic Linux utilizes Read-Copy-Update (RCU) synchronization locks to perform thread-safe reads while deferring memory reclamation to grace periods.
+*   **Sovereign Deferred De-allocation:** SigmaOS utilizes a lock-free epoch-based reclamation tracker. Writers allocate a new version of the state node atomically, while readers navigate older versions concurrently without locks.
+*   **Epoch Reclamation:** The previous state node is automatically garbage-collected and zero-wiped by `S-AMNESIA` once the active epoch shifts and all concurrent reader threads exit the critical section.
+
+### 9.6 Kernel.org Dominance OOP Specification (Pseudocode)
+
+```rust
+pub enum SchedDeadline {
+    RealTime(u64),
+    FairShare(u32),
+    Idle,
+}
+
+pub struct TaskContext {
+    pub task_id: u32,
+    pub deadline: SchedDeadline,
+    pub active_epoch: u64,
+}
+
+pub trait ISovereignScheduler {
+    // Registers a new task slot statically to prevent runtime allocation failures
+    fn register_task(&mut self, task: TaskContext) -> Result<(), u32>;
+
+    // Evaluates EEVDF virtual deadlines utilizing branchless math operations
+    fn select_next_task(&mut self) -> Option<u32>;
+
+    // Gracefully retires memory epochs during lockless concurrent reads
+    fn retire_epoch(&mut self, epoch: u64) -> Result<(), u32>;
+}
+
+pub struct SovereignKernelCore {
+    // Core kernel singleton coordinates schedulers and lock-free epoch syncs
+    pub scheduler: Box<dyn ISovereignScheduler>,
 }
 ```
 
@@ -837,3 +700,20 @@ This matrix maps our ultimate **100-Item Future Development Roadmap** directly i
 *   **Phase V: Edge AI, Automation, and Self-Hosting Autonomy (Items 81-100):**
     *   *Strategic Actions:* Deploy the SigmaAI offline assistant agent; context-aware terminal commands suggestion models; local LLM inference engines; ML training logs tracking; OCI microVM virtualization container runtimes; on-device self-hosting compilers (C/Rust/Zig/Nim).
     *   *Core Alignment:* Achieve total digital sovereignty and full hardware ecosystem independence, powering advanced edge clusters, students setups, and corporate workstations natively.
+
+
+---
+
+### E. Unified Regulatory & Compliance Overlay
+
+SigmaOS introduces a layered, modular regulatory and compliance engine built on low-level zero-dependency paradigms to ensure absolute compliance with international standards:
+
+1. **S-GDPR / S-CCPA (Zero-Trace Amnesic Privacy Shield):**
+   Enforces programmatic data protection. User profiles utilize ephemeral, amnesic memory pages that are cryptographically shredded using post-quantum zeroing logic upon context termination or exit.
+2. **S-HIPAA (Protected Cryptographic Vault):**
+   Provides strict data-access validation. Every file handle targeting medical or biometric telemetry is cryptographically isolated via base capability tokens and derived under Kyber-1024 ephemeral key pairs.
+3. **S-WCAG / S-Access (Universal Accessibility Interface):**
+   Direct screen-reader blitting via Zenith graphics compositor. Screen magnification, high-contrast layouts, and voice command controls are natively supported at the core display level with zero external dependencies.
+4. **S-SOC2 / S-ISO27001 (Merkle Audit Trails):**
+   Maintains immutable, append-only security logs stored inside chronological Merkle-tree event chains. Every permission escalation, capability token change, and user login writes a hardware-level cryptographic event payload ensuring perfect auditability.
+

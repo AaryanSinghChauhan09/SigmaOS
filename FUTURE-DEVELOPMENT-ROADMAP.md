@@ -379,7 +379,6 @@ SigmaOS implements **S-Pantheon**, a bare-metal, high-performance, and secure re
 ### A. Code Purity & Bare-Metal Object-Oriented Principles (OOP)
 
 Every core service, driver, and emulator inside SigmaOS is constructed under strict systems-level, zero-dependency requirements. The architecture completely forbids standard libraries (`std::` or built-in compiler runtime allocators). To maintain maximum maintainability and modularity, SigmaOS uses elegant, Object-Oriented patterns implemented securely in modern low-level systems languages (Rust, Zig, Nim):
-
 ```rust
 // ==============================================================================
 // OOP BARE-METAL DESIGN PATTERN: The Device Factory Pattern
@@ -572,6 +571,8 @@ pub struct SovereignKernelCore {
 }
 ```
 
+---
+
 ### B. Unified Regulatory Compliance & Secure Engineering Stack
 
 To secure adoption within mission-critical sectors (defense, healthcare, infrastructure, government), SigmaOS embeds regulatory compliance directly into the software architecture, rather than treating compliance as a secondary configuration layer:
@@ -699,3 +700,20 @@ This matrix maps our ultimate **100-Item Future Development Roadmap** directly i
 *   **Phase V: Edge AI, Automation, and Self-Hosting Autonomy (Items 81-100):**
     *   *Strategic Actions:* Deploy the SigmaAI offline assistant agent; context-aware terminal commands suggestion models; local LLM inference engines; ML training logs tracking; OCI microVM virtualization container runtimes; on-device self-hosting compilers (C/Rust/Zig/Nim).
     *   *Core Alignment:* Achieve total digital sovereignty and full hardware ecosystem independence, powering advanced edge clusters, students setups, and corporate workstations natively.
+
+
+---
+
+### E. Unified Regulatory & Compliance Overlay
+
+SigmaOS introduces a layered, modular regulatory and compliance engine built on low-level zero-dependency paradigms to ensure absolute compliance with international standards:
+
+1. **S-GDPR / S-CCPA (Zero-Trace Amnesic Privacy Shield):**
+   Enforces programmatic data protection. User profiles utilize ephemeral, amnesic memory pages that are cryptographically shredded using post-quantum zeroing logic upon context termination or exit.
+2. **S-HIPAA (Protected Cryptographic Vault):**
+   Provides strict data-access validation. Every file handle targeting medical or biometric telemetry is cryptographically isolated via base capability tokens and derived under Kyber-1024 ephemeral key pairs.
+3. **S-WCAG / S-Access (Universal Accessibility Interface):**
+   Direct screen-reader blitting via Zenith graphics compositor. Screen magnification, high-contrast layouts, and voice command controls are natively supported at the core display level with zero external dependencies.
+4. **S-SOC2 / S-ISO27001 (Merkle Audit Trails):**
+   Maintains immutable, append-only security logs stored inside chronological Merkle-tree event chains. Every permission escalation, capability token change, and user login writes a hardware-level cryptographic event payload ensuring perfect auditability.
+
