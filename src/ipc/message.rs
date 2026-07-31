@@ -1,17 +1,18 @@
+// OOP-based IPC Message System for SigmaOS
+// Based on Ideas-999-Structured: Kernel & Hardware Item 131
+// Implements message passing and shared memory IPC
+
 #![no_std]
-#![no_main]
 
-/// OOP-based IPC Message System for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 131
-/// Implements message passing and shared memory IPC
-
+extern crate alloc;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type ChannelID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IPCError { Success = 0, ChannelFull = 1, ChannelEmpty = 2, InvalidChannel = 3 }
 
 pub trait MessageChannel {
@@ -288,7 +289,6 @@ impl<T> Vec<T> {
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -319,7 +319,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

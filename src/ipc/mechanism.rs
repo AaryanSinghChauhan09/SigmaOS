@@ -1,32 +1,34 @@
+// OOP-based IPC Mechanism for SigmaOS
+// Based on Roadmap Item 9: IPC mechanism
+
 #![no_std]
-#![no_main]
 
-/// OOP-based IPC Mechanism for SigmaOS
-/// Based on Roadmap Item 9: IPC mechanism
-
+extern crate alloc;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type ChannelID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ChannelType { MessageQueue = 0, SharedMemory = 1, Pipe = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ChannelState { Closed = 0, Open = 1 }
 
 pub trait Channel {
     fn id(&self) -> ChannelID;
     fn channel_type(&self) -> ChannelType;
     fn state(&self) -> ChannelState;
+    fn close(&mut self);
     fn send(&mut self, data: &[u8]) -> Result<(), IPCError>;
     fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError>;
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IPCError { Success = 0, SendFailed = 1, ReceiveFailed = 2 }
 
 #[repr(C)]
@@ -53,7 +55,15 @@ impl SimpleChannel {
 impl Channel for SimpleChannel {
     fn id(&self) -> ChannelID { self.id }
     fn channel_type(&self) -> ChannelType { self.channel_type }
-    fn state(&self) -> ChannelState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ChannelState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => ChannelState::Closed,
+            _ => ChannelState::Open,
+        }
+    }
+    fn close(&mut self) {
+        self.state.store(ChannelState::Closed as usize, Ordering::SeqCst);
+    }
     fn send(&mut self, data: &[u8]) -> Result<(), IPCError> {
         let bytes = data.len().min(4096);
         unsafe { core::ptr::copy_nonoverlapping(data.as_ptr(), self.buffer.as_mut_ptr(), bytes); }
@@ -94,7 +104,7 @@ impl IPCMechanism for SimpleIPCMechanism {
         for channel_option in &mut self.channels {
             if let Some(ref mut channel) = *channel_option {
                 if channel.id() == id {
-                    channel.state.store(ChannelState::Closed as usize, Ordering::SeqCst);
+                    channel.close();
                     return Ok(());
                 }
             }
@@ -138,7 +148,6 @@ impl<T> Vec<T> {
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -169,7 +178,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

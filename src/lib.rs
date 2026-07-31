@@ -2,6 +2,7 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
+pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -11,6 +12,7 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod ipc;
 pub mod kernel;
 pub mod network;
 pub mod observability;
@@ -27,6 +29,22 @@ pub mod virtualization;
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
+};
+pub use ai::{
+    AIAgent, SimpleAIAgent,
+    LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
+    QuantizationType, InferenceBackend, BatchingStrategy,
+    StreamingLlmEngine, StreamingInference,
+    AgentOrchestrator, SimpleAgentOrchestrator, AgentState,
+    SaiAgent, SaiOrchestrator, AgentTask, SaiTask,
+    AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+    AiSystemService, AiServiceManager, AiServiceConfig, AiServiceState,
+    ResourceManagementService, PredictiveMaintenanceService, AdaptiveSchedulingService,
+    AiServiceType, ServicePriority, AiServiceMetrics,
+    VoiceAssistant, VoiceModel, VoiceRecognizer, VoiceSynthesizer,
+    RecognitionResult, SynthesisResult, AudioFormat, SynthesisModel,
+    JaxTensorSharding, SwiGluActivation, GrokMoeRouter, RotaryPositionEmbedding,
+    GrokGqaMapper, GrokWeightStreamer,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -112,6 +130,11 @@ pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise,
     SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
+pub use ipc::{
+    IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
+    Pipe, MessageQueue, SharedMemory, IPCManager,
+    SerenityIpcMessage, SerenitySharedBackingStore, SerenityIpcSandboxEnforcer,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
