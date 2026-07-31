@@ -15,6 +15,7 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod ipc;
 pub mod kernel;
 pub mod network;
 pub mod observability;
@@ -134,6 +135,11 @@ pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise,
     SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+};
+pub use ipc::{
+    IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
+    Pipe, MessageQueue, SharedMemory, IPCManager,
+    SerenityIpcMessage, SerenitySharedBackingStore, SerenityIpcSandboxEnforcer,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
