@@ -70,23 +70,24 @@ pub use vpn::{
 };
 // Integrity: export the monitor trait and concrete types that actually exist
 pub use integrity::{
-    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError, IntegrityMonitor,
-    IntegrityStats, IntegrityStatus, MonitorCapability, SimpleFile, SimpleIntegrityMonitor,
+    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError as SecIntegrityError,
+    IntegrityStats, IntegrityStatus as SecIntegrityStatus, MonitorCapability, SimpleFile,
+    SimpleIntegrityMonitor as SecSimpleIntegrityMonitor,
 };
 // MAC: export what the module actually defines
 pub use mac::{
-    ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
+    ContextCapability, ContextID, EngineCapability as MacEngineCapability,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
     SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
     SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{
-    Certificate, PKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
+    PKIManager as SecPKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
 };
 // Secrets: export actual types
 pub use secrets::{
-    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SecretType,
+    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo,
     SimpleKeyring, SimpleSecret,
 };
 // Vulnerability: export actual types

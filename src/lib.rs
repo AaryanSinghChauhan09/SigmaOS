@@ -143,6 +143,7 @@ pub use ipc::{
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
+    AcpMessage, AcpMessageType, ShellContext, TerminalErrorHook, IntelligentTerminal,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
