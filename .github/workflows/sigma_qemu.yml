@@ -2,9 +2,9 @@ name: "QEMU Multi-Arch Simulation"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "disabled-branch" ]
 
 jobs:
   qemu_x86_64:

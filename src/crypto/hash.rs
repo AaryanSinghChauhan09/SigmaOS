@@ -10,8 +10,8 @@ use core::mem;
 
 pub type HashID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HashAlgorithm { SHA256 = 0, SHA3_256 = 1, BLAKE3 = 2 }
 
 #[repr(C)]

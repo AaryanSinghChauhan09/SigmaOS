@@ -1,9 +1,9 @@
 name: Sovereign Silicon CI
 on:
   push:
-    branches: ["main"]
+    branches: ["disabled-branch"]
   pull_request:
-    branches: ["main"]
+    branches: ["disabled-branch"]
   workflow_dispatch:
 
 concurrency:

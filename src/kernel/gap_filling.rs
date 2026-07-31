@@ -64,7 +64,9 @@ impl SovereignIpcBus {
         };
 
         self.queue[self.write_idx] = Some(msg);
-        self.write_idx = (self.write_idx + 1) % IPC_QUEUE_CAPACITY;
+        // Optimize modulo by replacing with bitwise masking. Since IPC_QUEUE_CAPACITY is a constant power of two (8),
+        // bitwise AND with capacity - 1 operates in a single CPU cycle.
+        self.write_idx = (self.write_idx + 1) & (IPC_QUEUE_CAPACITY - 1);
         self.count += 1;
         Ok(())
     }
@@ -79,7 +81,9 @@ impl SovereignIpcBus {
         if let Some(msg) = current_msg_opt {
             if msg.receiver_pid == receiver_pid {
                 self.queue[self.read_idx] = None;
-                self.read_idx = (self.read_idx + 1) % IPC_QUEUE_CAPACITY;
+                // Optimize modulo by replacing with bitwise masking. Since IPC_QUEUE_CAPACITY is a constant power of two (8),
+                // bitwise AND with capacity - 1 operates in a single CPU cycle.
+                self.read_idx = (self.read_idx + 1) & (IPC_QUEUE_CAPACITY - 1);
                 self.count -= 1;
                 return Some(msg);
             }

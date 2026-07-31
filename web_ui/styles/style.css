@@ -1,0 +1,14 @@
+/* SigmaOS Zenith Glassmorphism Aesthetic Stylesheet */
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: sans-serif;
+}
+
+.zenith-panel {
+    background: rgba(255, 255, 255, 0.1);
+    /* Glassmorphism requirement: backdrop-filter */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}

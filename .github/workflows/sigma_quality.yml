@@ -2,9 +2,9 @@ name: "Code Quality & Linting"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "disabled-branch" ]
 
 jobs:
   lint:

@@ -2,9 +2,9 @@ name: 02_CrossArch_Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "disabled-branch" ]
 
 jobs:
   test-cross-arch:

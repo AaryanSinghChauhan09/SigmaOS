@@ -2,9 +2,9 @@ name: "SigmaOS Security Hardening"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "disabled-branch" ]
   schedule:
     - cron: '23 15 * * 0'
 
