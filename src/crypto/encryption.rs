@@ -1,5 +1,8 @@
 #![no_std]
 
+extern crate alloc;
+use alloc::boxed::Box;
+
 /// OOP-based Encryption Service for SigmaOS
 /// Based on Roadmap Item 15: Encryption service
 
@@ -78,7 +81,6 @@ impl EncryptionService for SimpleEncryptionService {
                     for (i, byte) in data.iter().enumerate() {
                         encrypted.push(*byte ^ key_bytes[i % len]);
                     }
-                    return Ok(encrypted);
                 }
             }
         }
@@ -98,7 +100,6 @@ impl EncryptionService for SimpleEncryptionService {
                     for (i, byte) in data.iter().enumerate() {
                         decrypted.push(*byte ^ key_bytes[i % len]);
                     }
-                    return Ok(decrypted);
                 }
             }
         }

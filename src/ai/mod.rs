@@ -39,3 +39,7 @@ pub use voice::{
     VoiceAssistant, VoiceModel, VoiceRecognizer, VoiceSynthesizer,
     RecognitionResult, SynthesisResult, AudioFormat, SynthesisModel,
 };
+pub use open_computer::{
+    OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
+    AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
+};
