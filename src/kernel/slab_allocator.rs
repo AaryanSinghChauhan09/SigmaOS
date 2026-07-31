@@ -75,23 +75,6 @@ impl SlabAllocator {
 
     /// Allocate an object from a cache
     pub fn allocate(&mut self, cache_name: &str) -> Result<*mut u8, &'static str> {
-<<<<<<< HEAD
-        let (slab_idx, obj_idx, object_size, objects_per_slab) = {
-            let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
-            if cache.free_objects == 0 {
-                // Short circuit: Saturated cache, jump directly to spawning a new slab (O(1))
-                (None, None, cache.object_size, cache.objects_per_slab)
-            } else {
-                let mut found = None;
-                'outer: for (s_idx, slab) in cache.slabs.iter().enumerate() {
-                    if slab.state != SlabState::Full {
-                        for (o_idx, obj) in slab.objects.iter().enumerate() {
-                            if obj.is_none() {
-                                found = Some((s_idx, o_idx));
-                                break 'outer;
-                            }
-                        }
-=======
         let next_slab_id = self.next_slab_id;
         let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
 
@@ -115,7 +98,6 @@ impl SlabAllocator {
                         };
 
                         return Ok(obj.unwrap());
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
                     }
                 }
                 if let Some((s_idx, o_idx)) = found {
@@ -152,16 +134,7 @@ impl SlabAllocator {
         }
 
         // No free objects, create a new slab
-<<<<<<< HEAD
-        let (new_slab, objects_per_slab) = {
-            let cache = self.caches.get(cache_name).ok_or("Cache not found")?;
-            let slab = self.create_slab(cache)?;
-            (slab, cache.objects_per_slab)
-        };
-
-=======
         let new_slab = Self::create_slab_static(next_slab_id, cache)?;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
         let obj = new_slab.objects[0].unwrap();
 
         let cache = self.caches.get_mut(cache_name).unwrap();

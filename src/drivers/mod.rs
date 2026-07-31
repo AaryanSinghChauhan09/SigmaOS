@@ -15,16 +15,10 @@ pub mod usb_hid;
 pub mod vesa;
 pub mod boot_init;
 pub mod dde;
-#[cfg(any())]
-pub mod even_more_devices;
+pub mod ancient_devices;
+pub mod kernel_io_suite;
 pub mod flipper_gpio_sensor;
 
-<<<<<<< HEAD
-pub use even_more_devices::*;
-pub use gpu::{GpuCommand, GpuDriver, GpuError};
-pub use input::{InputDriver, InputEvent, InputType};
-pub use kernel_releases::*;
-=======
 pub use ancient_devices::{
     create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
     UdfAncientDevice,
@@ -56,14 +50,11 @@ pub use kernel_io_suite::{
     WpaTokenType,
 };
 pub use kernel_releases::{
-    KernelReleaseInfo, Linux5_15ReleaseDriver, Linux6_12ReleaseDriver, Linux6_1ReleaseDriver,
-    Linux6_6ReleaseDriver, LinuxReleaseDriver, LongtermReleaseDriver, MainlineReleaseDriver,
-    PrepatchReleaseDriver, RcReleaseDriver, StableReleaseDriver,
+    KernelReleaseInfo, LinuxReleaseDriver,
     Longterm5_10_TpmDriver, Longterm5_15_SerialDriver,
     Longterm6_12_NetworkDriver, Longterm6_18_StorageDriver, Longterm6_1_InputDriver,
     Longterm6_6_AudioDriver, MainlineGpuDriver, Prepatch6_23_Rc1_AiDriver, Stable6_22_SensorDriver,
 };
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub use legacy_keyboard::LegacyKeyboard;
 pub use legacy_serial::LegacySerialPort;
 pub use legacy_floppy::LegacyFloppyDisk;
@@ -74,8 +65,6 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
-<<<<<<< HEAD
-=======
 
 // Test and backward compatibility aliases
 pub type Bluetooth5_4Adapter = Bluetooth5_4_Adapter;
@@ -88,4 +77,3 @@ pub type PrepatchRcDriver3 = Longterm6_6_AudioDriver;
 pub type PrepatchRcDriver4 = Longterm6_1_InputDriver;
 pub type PrepatchRcDriver5 = Longterm5_15_SerialDriver;
 pub type PrepatchRcDriver6 = Longterm5_10_TpmDriver;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045

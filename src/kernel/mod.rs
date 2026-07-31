@@ -7,37 +7,56 @@ pub mod memory;
 pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
-#[cfg(any())]
-pub mod breakthroughs;
-#[cfg(any())]
-pub mod ipc;
 pub mod linux_absorb;
 pub mod subsystem;
-<<<<<<< HEAD
-=======
-// pub mod traits;
 pub mod watchdog;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
+
+// Modules that were missing submodules declarations:
+pub mod bus;
+pub mod profiler;
+pub mod roundrobin;
+pub mod scheduler;
+pub mod secure_free;
+pub mod slab_allocator;
+pub mod driver;
+pub mod sigma_kernel_autotuner;
+pub mod self_healing;
+pub mod user_defined;
+pub mod cpufreq;
+pub mod gap_filling;
+pub mod cpu_features;
+pub mod ebpf;
+pub mod device;
+pub mod object;
+pub mod traits;
+pub mod udkf;
+pub mod numa_allocator;
+pub mod block_dev;
+
+// Subdirectories:
+pub mod proc;
+pub mod fs;
+pub mod irq;
+pub mod mm;
+pub mod power;
+pub mod crypto;
+pub mod net;
+pub mod syscall;
+pub mod vfs;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
 };
 pub use bus::{Bus, PciBus, UsableBus};
-pub use crate::container::runtime::oci::{
-    Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
-    ResourceConfig, Runtime,
-};
+pub use crate::container::{Container, ContainerState};
 pub use generation_manager::{Generation, GenerationManager};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
-<<<<<<< HEAD
-=======
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
-    AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionEngine as LinuxAbsorptionEngine,
+    AbsorbedTcpStack, AbsorbedUsbHidDriver, LinuxAbsorptionEngine,
     AbsorptionError, AbsorptionStatus, ConversionRule, ConversionRuleType,
     SecurityHardeningLevel, SecurityPolicy, SecurityRestriction,
 };
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use meta::{
     ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
@@ -48,10 +67,6 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-<<<<<<< HEAD
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-=======
 pub use profiler::{KernelProfiler, ProfileEntry, ProfilerStatistics, ScopeTimer, Timer};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
@@ -100,4 +115,12 @@ pub use net::{
     SockAddrIn, SocketLayer, SocketType as NetSocketType, Tbf, TcpConnection, TcpSegment, TcpState,
 };
 pub use syscall::{SyscallArgs, SyscallError, SyscallNr, SyscallResult, SyscallTable};
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
+
+pub use breakthroughs::{
+    UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
+    EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
+};
+pub use gap_closing::{
+    GapError, Pml4PageTableEntry, VirtualMemoryPagingManager, IrqRoutingTable,
+    AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+};

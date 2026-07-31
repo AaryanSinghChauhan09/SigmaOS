@@ -527,4 +527,11 @@ impl ObservabilityStack for SimpleObservabilityStack {
     }
 }
 
-/// Simple Vec implementation for no_std
+/// Stub traits and structs to preserve architectural definitions
+pub trait SigmaDebug {}
+pub trait SigmaMetrics {}
+pub trait SigmaTrace {}
+
+pub struct SimpleSigmaDebug;
+pub struct SimpleSigmaMetrics;
+pub struct SimpleSigmaTrace;

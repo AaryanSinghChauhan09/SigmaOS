@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
 
-<<<<<<< HEAD
-=======
 #[cfg(not(target_os = "none"))]
 extern crate alloc;
 #[cfg(not(target_os = "none"))]
@@ -10,7 +8,6 @@ use alloc::vec::Vec;
 
 use core::mem;
 use core::sync::atomic::AtomicUsize;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 /// OOP-based Sovereign Scheduler for SigmaOS
 /// Based on Roadmap Item: Functional Kernel Scheduler Implementation (Critical Blocker)
 /// Implements MLFQ (Multi-Level Feedback Queue) and MCS (Machine-to-Core Scheduling)
@@ -55,11 +52,6 @@ impl SimpleThread {
 }
 
 impl Thread for SimpleThread {
-<<<<<<< HEAD
-    fn id(&self) -> ThreadID { self.id }
-    fn state(&self) -> ThreadState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    fn priority(&self) -> Priority { self.priority }
-=======
     fn id(&self) -> ThreadID {
         self.id
     }
@@ -77,7 +69,6 @@ impl Thread for SimpleThread {
     fn priority(&self) -> Priority {
         self.priority
     }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     fn set_state(&mut self, state: ThreadState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
@@ -245,9 +236,6 @@ impl RealTimeScheduler for SimpleRealTimeScheduler {
     }
 }
 
-<<<<<<< HEAD
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-=======
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
@@ -256,7 +244,6 @@ struct Vec<T> {
     len: usize,
     capacity: usize,
 }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
@@ -300,12 +287,8 @@ impl<T> Vec<T> {
     }
 }
 
-<<<<<<< HEAD
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-=======
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
