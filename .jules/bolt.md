@@ -4,10 +4,6 @@ This journal contains CRITICAL performance learnings discovered during profiling
 
 ---
 
-## 2026-07-30 - Stack Caching of Parsed SemVer Constraints in Nested Resolvers
-**Learning:** During deep traversal of nested package dependencies in our universal package manager, pushing raw dependency strings onto the visit stack and parsing them recursively on pop triggers repeated substring scans on the same package definitions. Refactoring the traversal stack from a raw `Vec<String>` to a pre-parsed tuple stack `Vec<(String, SemVerConstraint)>` caches the SemVer constraint at push-time. This completely eliminates redundant re-parsing, cutting the resolver's execution time and character scan operations in half.
-**Action:** When implementing DFS traversal over entities that require format parsing, always parse the entity at discovery/push time and cache the structured representation directly inside the stack structure rather than parsing on pop.
-
 ## 2024-07-15 - Unnecessary External Dependencies in Utility Modules
 **Learning:** External crates like `rand` and `uuid` are heavy, introduce substantial compilation times, and are highly inefficient for simple simulation metrics or identifier generations. Replacing them with specialized local, zero-dependency implementations (such as a 48-bit Linear Congruential Generator for pseudo-random numbers and timestamp-nanoseconds for unique snapshot IDs) completely eliminates standard-library binding costs, reduces compiler overhead, and provides sub-nanosecond execution speeds.
 **Action:** Always prefer lightweight, mathematically simple local algorithms over heavy external crate imports for simulation, telemetry, and non-cryptographic utility operations.
@@ -44,6 +40,6 @@ This journal contains CRITICAL performance learnings discovered during profiling
 **Learning:** Using indexed loops with modulo divisions (`i % key.len()`) to implement XOR encryption / decryption on string arrays prevents the Rust compiler from applying auto-vectorization optimizations and adds heavy loop-index lookup cost. Replacing the indexed loop with a single-pass `zip(key.iter().cycle())` iterator chain removes all index lookup checks and speeds up encryption/decryption on large payloads by up to 38%.
 **Action:** Use `iter().cycle()` and `zip()` iterator chains instead of manually index-bound modulo loops for byte-level cryptographic transformations.
 
-## 2026-07-30 - Single-Cycle Bitwise Masking for Power-of-Two Ring Buffers
-**Learning:** Performing modulo `%` operations on index pointers inside hot loops (like in the S-IPC queue or circular queues) incurs a costly division penalty (10-40 CPU cycles). Since ring buffer limits like `IPC_QUEUE_CAPACITY` are fixed powers of two, replacing `% IPC_QUEUE_CAPACITY` with `& (IPC_QUEUE_CAPACITY - 1)` compiles down to a single clock cycle, significantly reducing message-routing latency.
-**Action:** Ensure that all constant-capacity circular queue and ring-buffer index wraps use power-of-two bounds optimized with bitwise AND masking.
+## 2026-07-30 - Eliminating Index Modulo divisions in Password Manager simulated XOR Encryption
+**Learning:** Standard index loops with dynamically sized modulo keys (`i % master_key.len()`) create compiler-preventing code patterns for autovectorization and incur constant division operations at runtime. Replacing the index loop with a single-pass `.zip(key.iter().cycle())` iterator chain eliminates all division overhead and index-bounds verification.
+**Action:** Always favor lazy cycle-and-zip iterator sequences over manual index logic when applying byte-level cryptographic/masking transformations.
