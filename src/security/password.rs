@@ -1,9 +1,9 @@
 // SigmaOS Password Manager
 // OOP-based password management with biometric unlock and encryption
 
+use rand::Rng;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use rand::Rng;
 
 /// Password entry
 #[derive(Debug, Clone)]
@@ -393,7 +393,9 @@ impl PasswordManager {
     /// Encrypt password
     fn encrypt_password(&self, password: &[u8]) -> Result<Vec<u8>, PasswordError> {
         if self.master_key.is_empty() {
-            return Err(PasswordError::EncryptionError("Master key cannot be empty".to_string()));
+            return Err(PasswordError::EncryptionError(
+                "Master key cannot be empty".to_string(),
+            ));
         }
         // Optimize: Use single-pass cycle + zip iterator chain to eliminate repeated modulo index divisions
         let encrypted: Vec<u8> = password
@@ -407,7 +409,9 @@ impl PasswordManager {
     /// Decrypt password
     fn decrypt_password(&self, encrypted: &[u8]) -> Result<Vec<u8>, PasswordError> {
         if self.master_key.is_empty() {
-            return Err(PasswordError::DecryptionError("Master key cannot be empty".to_string()));
+            return Err(PasswordError::DecryptionError(
+                "Master key cannot be empty".to_string(),
+            ));
         }
         // Optimize: Use single-pass cycle + zip iterator chain to eliminate repeated modulo index divisions
         let decrypted: Vec<u8> = encrypted
@@ -434,7 +438,7 @@ impl PasswordManager {
             charset.extend_from_slice(SYMBOLS);
         }
 
-let mut password = String::new();
+        let mut password = String::new();
         for _ in 0..length {
             let rand_val: u64 = rand::random();
             let index = (rand_val as usize) % charset.len();

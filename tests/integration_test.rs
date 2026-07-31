@@ -177,13 +177,23 @@ mod tests {
         let rule = LinuxPersonaRule;
 
         // Case 1: Primary target exists
-        let res1 =
-            link1.resolve_symlink(SymlinkKernelPersona::Linux_6_x, true, &[false, false], &rule, None);
+        let res1 = link1.resolve_symlink(
+            SymlinkKernelPersona::Linux_6_x,
+            true,
+            &[false, false],
+            &rule,
+            None,
+        );
         assert_eq!(res1, Ok("/usr/lib/modern/libc.so"));
 
         // Case 2: Primary target broken, heals to fallback index 1
-        let res2 =
-            link1.resolve_symlink(SymlinkKernelPersona::Linux_6_x, false, &[false, true], &rule, None);
+        let res2 = link1.resolve_symlink(
+            SymlinkKernelPersona::Linux_6_x,
+            false,
+            &[false, true],
+            &rule,
+            None,
+        );
         assert_eq!(res2, Ok("/lib/libc.so"));
 
         // Case 3: Complete orphaning

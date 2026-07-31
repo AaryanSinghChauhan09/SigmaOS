@@ -411,20 +411,20 @@ impl PackageFormatAdapter for NixAdapter {
             let trimmed = line.trim();
             if trimmed.starts_with("pname = \"") {
                 if let Some(end) = trimmed[9..].find('"') {
-                    name = trimmed[9..9+end].to_string();
+                    name = trimmed[9..9 + end].to_string();
                 }
             } else if trimmed.starts_with("version = \"") {
                 if let Some(end) = trimmed[11..].find('"') {
-                    version_str = trimmed[11..11+end].to_string();
+                    version_str = trimmed[11..11 + end].to_string();
                 }
             } else if trimmed.starts_with("meta.description = \"") {
                 if let Some(end) = trimmed[20..].find('"') {
-                    description = trimmed[20..20+end].to_string();
+                    description = trimmed[20..20 + end].to_string();
                 }
             } else if trimmed.contains("buildInputs = [") {
                 if let Some(start_idx) = trimmed.find('[') {
                     if let Some(end_idx) = trimmed.find(']') {
-                        let deps_part = &trimmed[start_idx+1..end_idx];
+                        let deps_part = &trimmed[start_idx + 1..end_idx];
                         for dep in deps_part.split_whitespace() {
                             dependencies.push(Dependency {
                                 name: dep.to_string(),
@@ -455,7 +455,10 @@ impl PackageFormatAdapter for NixAdapter {
             "  version = \"{}.{}.{}\";\n",
             package.version.major, package.version.minor, package.version.patch
         ));
-        output.push_str(&format!("  meta.description = \"{}\";\n", package.description));
+        output.push_str(&format!(
+            "  meta.description = \"{}\";\n",
+            package.description
+        ));
         if !package.dependencies.is_empty() {
             let dep_names: Vec<&str> = package
                 .dependencies
@@ -531,19 +534,19 @@ impl PackageFormatAdapter for EbuildAdapter {
             let trimmed = line.trim();
             if trimmed.starts_with("PN=\"") {
                 if let Some(end) = trimmed[4..].find('"') {
-                    name = trimmed[4..4+end].to_string();
+                    name = trimmed[4..4 + end].to_string();
                 }
             } else if trimmed.starts_with("PV=\"") {
                 if let Some(end) = trimmed[4..].find('"') {
-                    version_str = trimmed[4..4+end].to_string();
+                    version_str = trimmed[4..4 + end].to_string();
                 }
             } else if trimmed.starts_with("DESCRIPTION=\"") {
                 if let Some(end) = trimmed[13..].find('"') {
-                    description = trimmed[13..13+end].to_string();
+                    description = trimmed[13..13 + end].to_string();
                 }
             } else if trimmed.starts_with("RDEPEND=\"") {
                 if let Some(end) = trimmed[9..].find('"') {
-                    let deps_part = &trimmed[9..9+end];
+                    let deps_part = &trimmed[9..9 + end];
                     for dep in deps_part.split_whitespace() {
                         dependencies.push(Dependency {
                             name: dep.to_string(),
@@ -1124,7 +1127,8 @@ impl PackageFormatAdapter for SnapAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("name:") && (content.contains("confinement:") || content.contains("grade:")))
+        Ok(content.contains("name:")
+            && (content.contains("confinement:") || content.contains("grade:")))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -1387,20 +1391,20 @@ impl PackageFormatAdapter for EopkgAdapter {
             let trimmed = line.trim();
             if trimmed.starts_with("<Name>") {
                 if let Some(end) = trimmed[6..].find("</Name>") {
-                    name = trimmed[6..6+end].to_string();
+                    name = trimmed[6..6 + end].to_string();
                 }
             } else if trimmed.starts_with("<Version>") {
                 if let Some(end) = trimmed[9..].find("</Version>") {
-                    version_str = trimmed[9..9+end].to_string();
+                    version_str = trimmed[9..9 + end].to_string();
                 }
             } else if trimmed.starts_with("<Description>") {
                 if let Some(end) = trimmed[13..].find("</Description>") {
-                    description = trimmed[13..13+end].to_string();
+                    description = trimmed[13..13 + end].to_string();
                 }
             } else if trimmed.starts_with("<Dependency>") {
                 if let Some(end) = trimmed[12..].find("</Dependency>") {
                     dependencies.push(Dependency {
-                        name: trimmed[12..12+end].to_string(),
+                        name: trimmed[12..12 + end].to_string(),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -1426,7 +1430,10 @@ impl PackageFormatAdapter for EopkgAdapter {
             "  <Version>{}.{}.{}</Version>\n",
             package.version.major, package.version.minor, package.version.patch
         ));
-        output.push_str(&format!("  <Description>{}</Description>\n", package.description));
+        output.push_str(&format!(
+            "  <Description>{}</Description>\n",
+            package.description
+        ));
         for dep in &package.dependencies {
             output.push_str(&format!("  <Dependency>{}</Dependency>\n", dep.name));
         }
@@ -1437,7 +1444,9 @@ impl PackageFormatAdapter for EopkgAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("<Source>") || content.contains("<Package>") || content.contains("eopkg"))
+        Ok(content.contains("<Source>")
+            || content.contains("<Package>")
+            || content.contains("eopkg"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -1497,19 +1506,24 @@ impl PackageFormatAdapter for GuixAdapter {
             let trimmed = line.trim();
             if trimmed.starts_with("(name \"") {
                 if let Some(end) = trimmed[7..].find('"') {
-                    name = trimmed[7..7+end].to_string();
+                    name = trimmed[7..7 + end].to_string();
                 }
             } else if trimmed.starts_with("(version \"") {
                 if let Some(end) = trimmed[10..].find('"') {
-                    version_str = trimmed[10..10+end].to_string();
+                    version_str = trimmed[10..10 + end].to_string();
                 }
             } else if trimmed.starts_with("(description \"") {
                 if let Some(end) = trimmed[14..].find('"') {
-                    description = trimmed[14..14+end].to_string();
+                    description = trimmed[14..14 + end].to_string();
                 }
             } else if trimmed.starts_with("(inputs `(") {
                 // simple guix scheme inputs parser
-                let inputs_part = trimmed.split('`').nth(1).unwrap_or("").trim_start_matches('(').trim_end_matches(')');
+                let inputs_part = trimmed
+                    .split('`')
+                    .nth(1)
+                    .unwrap_or("")
+                    .trim_start_matches('(')
+                    .trim_end_matches(')');
                 for input in inputs_part.split_whitespace() {
                     let clean_dep = input.trim_matches(|c| c == '(' || c == ')' || c == '"');
                     if !clean_dep.is_empty() {
@@ -1557,7 +1571,9 @@ impl PackageFormatAdapter for GuixAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("define-public") || content.contains("(package") || content.contains("(name \""))
+        Ok(content.contains("define-public")
+            || content.contains("(package")
+            || content.contains("(name \""))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -1666,7 +1682,8 @@ impl PackageFormatAdapter for ZypperAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("Vendor: openSUSE") || (content.contains("Name:") && content.contains("Requires:")))
+        Ok(content.contains("Vendor: openSUSE")
+            || (content.contains("Name:") && content.contains("Requires:")))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
