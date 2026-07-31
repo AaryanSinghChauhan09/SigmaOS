@@ -1,5 +1,3 @@
-#![no_std]
-#![no_main]
 
 use core::mem;
 /// OOP-based Buddy Allocator for SigmaOS
@@ -51,7 +49,7 @@ pub struct SimpleBuddyAllocator {
 }
 
 impl SimpleBuddyAllocator {
-    pub fn new(max_order: usize, total_frames: usize) -> Self {
+    pub fn new(max_order: usize, _total_frames: usize) -> Self {
         let mut free_lists: [Vec<BlockID>; 12] = [
             Vec::new(),
             Vec::new(),

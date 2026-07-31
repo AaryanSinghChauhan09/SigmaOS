@@ -1,21 +1,18 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Screen Reader for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 816
 /// Implements text-to-speech and accessibility
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use crate::klib::Vec;
 
 pub type VoiceID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VoiceGender { Male = 0, Female = 1, Neutral = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AccessibilityError { Success = 0, NotFound = 1 }
 
 pub trait Voice {
@@ -56,7 +53,13 @@ impl Voice for SimpleVoice {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn gender(&self) -> VoiceGender { unsafe { core::mem::transmute(self.gender.load(Ordering::SeqCst)) } }
+    fn gender(&self) -> VoiceGender {
+        match self.gender.load(Ordering::SeqCst) {
+            0 => VoiceGender::Male,
+            1 => VoiceGender::Female,
+            _ => VoiceGender::Neutral,
+        }
+    }
     fn rate(&self) -> f32 { (self.rate.load(Ordering::SeqCst) as f32) / 100.0 }
     
     fn set_rate(&mut self, rate: f32) {
@@ -108,14 +111,20 @@ impl ScreenReader for SimpleScreenReader {
     fn resume(&mut self) {
         self.speaking.store(1, Ordering::SeqCst);
     }
-    
-    fn get_voice(&self, id: VoiceID) -> Option<&dyn Voice> {
+}
+
+impl SimpleScreenReader {
+    pub fn get_voice(&self, id: VoiceID) -> Option<&dyn Voice> {
         for voice_option in &self.voices {
             if let Some(ref voice) = *voice_option {
                 if voice.id() == id { return Some(voice.as_ref()); }
             }
         }
         None
+    }
+
+    pub fn register_voice(&mut self, voice: Box<dyn Voice>) {
+        self.voices.push(Some(voice));
     }
 }
 
@@ -147,28 +156,27 @@ impl BrailleDisplay for SimpleBrailleDisplay {
     fn get_cells(&self) -> &[u8] { &self.cells }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+    #[test]
+    fn test_screen_reader_and_voices() {
+        let mut reader = SimpleScreenReader::new();
+        let voice = SimpleVoice::new(42, b"Alice", VoiceGender::Female);
+        reader.register_voice(Box::new(voice));
+
+        assert!(reader.get_voice(42).is_some());
+        assert_eq!(reader.get_voice(42).unwrap().gender(), VoiceGender::Female);
+        assert_eq!(reader.speak(b"Hello", 42), Ok(()));
+        assert_eq!(reader.speak(b"Hello", 999), Err(AccessibilityError::NotFound));
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    #[test]
+    fn test_braille_display() {
+        let mut display = SimpleBrailleDisplay::new();
+        display.refresh(b"Braille info");
+        assert_eq!(&display.get_cells()[..12], b"Braille info");
     }
 }
 

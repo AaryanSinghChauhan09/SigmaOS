@@ -86,9 +86,16 @@ pub trait DriverFramework {
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
 }
 
+#[allow(dead_code)]
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
     next_id: AtomicUsize,
+}
+
+impl Default for SimpleDriverFramework {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleDriverFramework {

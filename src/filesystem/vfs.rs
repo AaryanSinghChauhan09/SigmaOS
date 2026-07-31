@@ -1,7 +1,7 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
 
-use crate::security::CapabilityToken;
+use crate::security::{CapabilityToken, Permission};
 use std::collections::HashMap;
 
 /// File type
@@ -212,6 +212,22 @@ impl VirtualFilesystem {
         inode.modified = 0; // In production, actual timestamp
 
         Ok(bytes_written)
+    }
+
+    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
+    pub fn read_file_gated(&mut self, fd: u64, buffer: &mut [u8], token: &CapabilityToken) -> Result<usize, FsError> {
+        if !token.has_permission(Permission::FileRead) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.read_file(fd, buffer)
+    }
+
+    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
+    pub fn write_file_gated(&mut self, fd: u64, buffer: &[u8], token: &CapabilityToken) -> Result<usize, FsError> {
+        if !token.has_permission(Permission::FileWrite) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.write_file(fd, buffer)
     }
 
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {

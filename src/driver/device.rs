@@ -89,6 +89,12 @@ pub struct DeviceCapability {
     pub can_interrupt: bool,
 }
 
+impl Default for DeviceCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DeviceCapability {
     pub fn new() -> Self {
         DeviceCapability {
@@ -446,6 +452,12 @@ pub struct DeviceManager {
     next_device_id: AtomicUsize,
 }
 
+impl Default for DeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {
@@ -576,6 +588,12 @@ struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<T> Vec<T> {
