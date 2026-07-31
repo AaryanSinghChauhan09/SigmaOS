@@ -20,11 +20,7 @@ impl SemVer {
         if parts.next().is_some() {
             return None;
         }
-        Some(Self {
-            major,
-            minor,
-            patch,
-        })
+        Some(Self { major, minor, patch })
     }
 }
 
@@ -94,12 +90,6 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
-    Nix,      // nix expression
-    Ebuild,   // gentoo ebuild
-    Apk,      // alpine apk
-    Txz,      // slackware pkgtool
-    Xbps,     // void xbps
-    Cachyos,  // CachyOS optimized format
 }
 
 /// Package source
@@ -240,327 +230,12 @@ impl PackageFormatAdapter for AptDebAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Purging DEB package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Purging DEB package {}", self.adapter_name(), package.name);
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Refreshing and updating DEB package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-}
-
-/// CachyosOptimizationAdapter simulates microarchitecture-optimized repository selection
-pub struct CachyosOptimizationAdapter {
-    pub detected_cpu_level: crate::sigpkg::CpuArchLevel,
-}
-
-impl CachyosOptimizationAdapter {
-    pub fn new() -> Self {
-        Self {
-            detected_cpu_level: crate::sigpkg::CachyCpuDetector::detect_level(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for CachyosOptimizationAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Cachyos
-    }
-
-    fn adapter_name(&self) -> &str {
-        "cachyos"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] CPU microarchitecture level detected: {:?}. Selecting best-optimized mirror (-march=x86-64-v{:?}) for package {}",
-            self.adapter_name(),
-            self.detected_cpu_level,
-            self.detected_cpu_level as u8,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Deleting optimized package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Running microarchitecture-optimized rebuild check for {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-}
-
-/// SlackwareTxzAdapter handles Slackware pkgtool package format (`.txz`)
-pub struct SlackwareTxzAdapter {
-    pub install_log_path: String,
-}
-
-impl SlackwareTxzAdapter {
-    pub fn new() -> Self {
-        Self {
-            install_log_path: "/var/log/packages".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for SlackwareTxzAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Txz
-    }
-
-    fn adapter_name(&self) -> &str {
-        "pkgtool"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Logging to {}. Unpacking Slackware TXZ package {}",
-            self.adapter_name(),
-            self.install_log_path,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Removing slackware package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Upgrading slackware package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-}
-
-/// VoidXbpsAdapter handles Void Linux XBPS binaries
-pub struct VoidXbpsAdapter {
-    pub xbps_db_path: String,
-}
-
-impl VoidXbpsAdapter {
-    pub fn new() -> Self {
-        Self {
-            xbps_db_path: "/var/db/xbps".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for VoidXbpsAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Xbps
-    }
-
-    fn adapter_name(&self) -> &str {
-        "xbps"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Updating XBPS db at {}. Installing Void XBPS package {}",
-            self.adapter_name(),
-            self.xbps_db_path,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Purging Void XBPS package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Upgrading Void XBPS package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-}
-
-/// NixAdapter handles declarative Nix expressions
-pub struct NixAdapter {
-    pub store_dir: String,
-}
-
-impl NixAdapter {
-    pub fn new() -> Self {
-        Self {
-            store_dir: "/nix/store".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for NixAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Nix
-    }
-
-    fn adapter_name(&self) -> &str {
-        "nix"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Constructing store path under {}. Realizing Nix derivation for {}",
-            self.adapter_name(),
-            self.store_dir,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Garbage collecting Nix path for {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Updating Nix channel / derivation target {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-}
-
-/// GentooEbuildAdapter handles Gentoo source ebuild ports
-pub struct GentooEbuildAdapter {
-    pub portage_dir: String,
-}
-
-impl GentooEbuildAdapter {
-    pub fn new() -> Self {
-        Self {
-            portage_dir: "/var/db/repos/gentoo".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for GentooEbuildAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Ebuild
-    }
-
-    fn adapter_name(&self) -> &str {
-        "ebuild"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Fetching ebuild from {}. Compiling and emerging source package {}",
-            self.adapter_name(),
-            self.portage_dir,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Unmerging Gentoo package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Emerging updates for package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-}
-
-/// AlpineApkAdapter handles lightweight Alpine APK binaries
-pub struct AlpineApkAdapter {
-    pub apk_cache_dir: String,
-}
-
-impl AlpineApkAdapter {
-    pub fn new() -> Self {
-        Self {
-            apk_cache_dir: "/etc/apk/cache".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for AlpineApkAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Apk
-    }
-
-    fn adapter_name(&self) -> &str {
-        "apk"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Downloading index to {}. Installing Alpine APK {}",
-            self.adapter_name(),
-            self.apk_cache_dir,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Deleting Alpine APK package {}",
-            self.adapter_name(),
-            package.name
-        );
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Upgrading Alpine APK package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Refreshing and updating DEB package {}", self.adapter_name(), package.name);
         Ok(())
     }
 }
@@ -598,20 +273,12 @@ impl PackageFormatAdapter for YumRpmAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Erasing RPM package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Erasing RPM package {}", self.adapter_name(), package.name);
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Running transaction check & upgrade for RPM package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Running transaction check & upgrade for RPM package {}", self.adapter_name(), package.name);
         Ok(())
     }
 }
@@ -649,20 +316,12 @@ impl PackageFormatAdapter for PacmanAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Removing pacman package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Removing pacman package {}", self.adapter_name(), package.name);
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Sysupgrade pacman package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Sysupgrade pacman package {}", self.adapter_name(), package.name);
         Ok(())
     }
 }
@@ -700,20 +359,12 @@ impl PackageFormatAdapter for SnapAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Unmounting snap package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Unmounting snap package {}", self.adapter_name(), package.name);
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Refreshing snap package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Refreshing snap package {}", self.adapter_name(), package.name);
         Ok(())
     }
 }
@@ -751,20 +402,12 @@ impl PackageFormatAdapter for FlatpakAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Uninstalling flatpak package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Uninstalling flatpak package {}", self.adapter_name(), package.name);
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Updating flatpak package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Updating flatpak package {}", self.adapter_name(), package.name);
         Ok(())
     }
 }
@@ -802,20 +445,12 @@ impl PackageFormatAdapter for SigmaPkgAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Deleting native SigmaPkg package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Deleting native SigmaPkg package {}", self.adapter_name(), package.name);
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Atomic rollback-safe update of SigmaPkg package {}",
-            self.adapter_name(),
-            package.name
-        );
+        println!("[{}] Atomic rollback-safe update of SigmaPkg package {}", self.adapter_name(), package.name);
         Ok(())
     }
 }
@@ -849,24 +484,25 @@ impl DependencyResolver {
 
     /// Parse a dependency string (e.g. "curl>=7.81.0" or just "curl") into package name and constraint
     pub fn parse_dependency(dep_str: &str) -> (String, SemVerConstraint) {
-        // Optimize: scan string once for first comparison operator boundary rather than 5 separate finds.
-        if let Some(idx) = dep_str.find(|c| c == '>' || c == '<' || c == '=') {
-            let name = dep_str[..idx].trim().to_string();
-            let constraint_str = &dep_str[idx..];
-            let constraint = SemVerConstraint::parse(constraint_str);
-            (name, constraint)
-        } else {
-            (dep_str.trim().to_string(), SemVerConstraint::Any)
+        let operators = [">=", "<=", ">", "<", "="];
+        for op in &operators {
+            if let Some(idx) = dep_str.find(op) {
+                let name = dep_str[..idx].trim().to_string();
+                let constraint_str = &dep_str[idx..];
+                let constraint = SemVerConstraint::parse(constraint_str);
+                return (name, constraint);
+            }
         }
+        (dep_str.trim().to_string(), SemVerConstraint::Any)
     }
 
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
-        // Optimize: keep parsed name and constraints in the stack to avoid redundant parsing operations on pop.
-        let mut to_visit = vec![(package_name.to_string(), SemVerConstraint::Any)];
+        let mut to_visit = vec![package_name.to_string()];
         let mut visited = std::collections::HashSet::new();
 
-        while let Some((name, constraint)) = to_visit.pop() {
+        while let Some(current) = to_visit.pop() {
+            let (name, constraint) = Self::parse_dependency(&current);
             if visited.contains(&name) {
                 continue;
             }
@@ -887,9 +523,9 @@ impl DependencyResolver {
 
                 // Push dependencies of this package
                 for dep in &package.dependencies {
-                    let (dep_name, dep_constraint) = Self::parse_dependency(dep);
+                    let (dep_name, _) = Self::parse_dependency(dep);
                     if !visited.contains(&dep_name) {
-                        to_visit.push((dep_name, dep_constraint));
+                        to_visit.push(dep.clone());
                     }
                 }
                 resolved.push(name);
@@ -1066,47 +702,22 @@ impl UniversalPackageManager {
     }
 
     fn add_default_adapters(&mut self) {
-        self.adapters
-            .insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Nix, Box::new(NixAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Ebuild, Box::new(GentooEbuildAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Apk, Box::new(AlpineApkAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Txz, Box::new(SlackwareTxzAdapter::new()));
-        self.adapters
-            .insert(PackageFormat::Xbps, Box::new(VoidXbpsAdapter::new()));
-        self.adapters.insert(
-            PackageFormat::Cachyos,
-            Box::new(CachyosOptimizationAdapter::new()),
-        );
+        self.adapters.insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
+        self.adapters.insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
+        self.adapters.insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
+        self.adapters.insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
+        self.adapters.insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
+        self.adapters.insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
     }
 
     /// Dynamic polymorphic registration of custom format adapters
-    pub fn register_adapter(
-        &mut self,
-        format: PackageFormat,
-        adapter: Box<dyn PackageFormatAdapter>,
-    ) {
+    pub fn register_adapter(&mut self, format: PackageFormat, adapter: Box<dyn PackageFormatAdapter>) {
         self.adapters.insert(format, adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
-        self.metadata_cache
-            .insert(package.name.clone(), package.clone());
+        self.metadata_cache.insert(package.name.clone(), package.clone());
         self.packages.insert(package.name.clone(), package);
     }
 
@@ -1293,7 +904,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 12);
+        assert_eq!(manager.adapters.len(), 6);
     }
 
     #[test]
@@ -1342,43 +953,6 @@ mod tests {
         manager.add_package(package);
         assert!(manager.install("test").is_ok());
         assert_eq!(manager.installed_packages.len(), 1);
-    }
-
-    #[test]
-    fn test_linux_adapters_install_and_translation() {
-        let mut manager = UniversalPackageManager::new();
-
-        let nix_pkg = UnifiedPackage::new("nix-test".to_string(), "2.0.0".to_string())
-            .with_format(PackageFormat::Nix);
-        manager.add_package(nix_pkg);
-        assert!(manager.install("nix-test").is_ok());
-
-        let ebuild_pkg = UnifiedPackage::new("ebuild-test".to_string(), "3.0.0".to_string())
-            .with_format(PackageFormat::Ebuild);
-        manager.add_package(ebuild_pkg);
-        assert!(manager.install("ebuild-test").is_ok());
-
-        let apk_pkg = UnifiedPackage::new("apk-test".to_string(), "1.2.0".to_string())
-            .with_format(PackageFormat::Apk);
-        manager.add_package(apk_pkg);
-        assert!(manager.install("apk-test").is_ok());
-
-        let txz_pkg = UnifiedPackage::new("txz-test".to_string(), "5.4.1".to_string())
-            .with_format(PackageFormat::Txz);
-        manager.add_package(txz_pkg);
-        assert!(manager.install("txz-test").is_ok());
-
-        let xbps_pkg = UnifiedPackage::new("xbps-test".to_string(), "2024.03.11".to_string())
-            .with_format(PackageFormat::Xbps);
-        manager.add_package(xbps_pkg);
-        assert!(manager.install("xbps-test").is_ok());
-
-        let cachy_pkg = UnifiedPackage::new("cachy-test".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::Cachyos);
-        manager.add_package(cachy_pkg);
-        assert!(manager.install("cachy-test").is_ok());
-
-        assert_eq!(manager.installed_packages.len(), 6);
     }
 
     #[test]

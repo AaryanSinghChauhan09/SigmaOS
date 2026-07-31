@@ -4,20 +4,21 @@
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
-use core::ptr::NonNull;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
-
-pub struct Zone {
-    pub present_pages: u64,
-}
 
 /// Memory block
 #[derive(Debug)]
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
+}
+
+use core::ptr::NonNull;
+
+pub struct Zone {
+    pub present_pages: u64,
 }
 
 pub struct Page {
@@ -27,6 +28,12 @@ pub struct Page {
     pub index: u64,
     pub private: Option<usize>,
     pub zone: Option<*const Zone>,
+}
+
+impl Page {
+    pub fn dec_ref(&self) -> bool {
+        self.count.fetch_sub(1, Ordering::SeqCst) == 1
+    }
 }
 
 pub struct BuddyAllocator {
@@ -44,12 +51,6 @@ impl BuddyAllocator {
             total_pages: 0,
             zones: Vec::new(),
         }
-    }
-
-    pub fn with_memory(base_addr: usize, size: usize) -> Self {
-        let mut allocator = Self::new();
-        allocator.initialize_memory(base_addr, size);
-        allocator
     }
 
     pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {
@@ -115,7 +116,7 @@ impl BuddyAllocator {
         }
     }
 
-    pub fn calculate_order(&self, pages: usize) -> usize {
+    fn calculate_order(&self, pages: usize) -> usize {
         // Bolt Optimization: Replace O(n) linear search loop with O(1) branchless bitwise operations.
         // On modern hardware, next_power_of_two() and trailing_zeros() map directly to specialized
         // CPU instructions (e.g., LZCNT/TZCNT/BSR), enabling nanosecond-level execution speeds and supporting HW acceleration.
