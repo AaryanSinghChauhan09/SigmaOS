@@ -216,7 +216,7 @@ jobs:
 
       - name: Build with coverage instrumentation
         run: |
-          cmake -B build \
+          cmake -B build -S tests/cpp_host \
             -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage" \
             -DCMAKE_BUILD_TYPE=Debug
           cmake --build build --target test_kernel -j$(nproc) || true
