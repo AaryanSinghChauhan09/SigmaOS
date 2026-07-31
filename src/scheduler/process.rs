@@ -1,6 +1,12 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+#[cfg(not(target_os = "none"))]
+use alloc::boxed::Box;
+
 /// OOP-based Process Scheduler for SigmaOS
 /// Implements process scheduling using OOP principles with traits and structs
 /// No dependency on external scheduling frameworks
@@ -76,6 +82,7 @@ impl ProcessInfo {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &[T] {
@@ -87,6 +94,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut [T] {
         if self.data.is_null() {
@@ -97,6 +105,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if !self.data.is_null() {
@@ -110,6 +119,7 @@ impl<T> Drop for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
@@ -119,6 +129,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
@@ -183,8 +194,11 @@ impl SimpleProcess {
     }
 
     pub fn get_state(&self) -> ProcessState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        match self.state.load(Ordering::SeqCst) {
+            1 => ProcessState::Running,
+            2 => ProcessState::Blocked,
+            3 => ProcessState::Terminated,
+            _ => ProcessState::Ready,
         }
     }
 
@@ -193,8 +207,12 @@ impl SimpleProcess {
     }
 
     pub fn get_priority(&self) -> ProcessPriority {
-        unsafe {
-            core::mem::transmute(self.priority.load(Ordering::SeqCst))
+        match self.priority.load(Ordering::SeqCst) {
+            0 => ProcessPriority::Idle,
+            1 => ProcessPriority::Low,
+            3 => ProcessPriority::High,
+            4 => ProcessPriority::Critical,
+            _ => ProcessPriority::Normal,
         }
     }
 
@@ -274,6 +292,7 @@ pub enum SchedulerError {
 
 /// Scheduler statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SchedulerStats {
     pub total_processes: usize,
     pub ready_processes: usize,

@@ -1,12 +1,17 @@
+//! OOP-based IPC System for SigmaOS with SerenityOS Parity
+//!
+//! Implements strongly-typed message routing, shared-memory window backing stores,
+//! and capability-gated security gates inspired by SerenityOS LibIPC and WindowServer.
+
 #![no_std]
-#![no_main]
 
-/// OOP-based IPC System for SigmaOS
-/// Implements inter-process communication using OOP principles with traits and structs
-/// No dependency on external IPC frameworks
-
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::string::String;
+use alloc::string::ToString;
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
 use core::mem;
 
 /// IPC endpoint trait (OOP interface)
@@ -23,7 +28,7 @@ pub trait IPCEndpoint {
 
 /// IPC error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IPCError {
     Success = 0,
     NotConnected = 1,
@@ -36,7 +41,7 @@ pub enum IPCError {
 
 /// IPC type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IPCType {
     Pipe = 0,
     MessageQueue = 1,
@@ -47,6 +52,7 @@ pub enum IPCType {
 
 /// IPC info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct IPCInfo {
     pub ipc_type: IPCType,
     pub capacity: usize,
@@ -67,12 +73,15 @@ impl IPCInfo {
 
 /// IPC capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct IPCCapability {
     pub can_send: bool,
     pub can_receive: bool,
     pub can_create: bool,
     pub can_destroy: bool,
+    // Serenity parity sandboxing rules
+    pub allow_send_fd: bool,
+    pub allow_unix_sockets: bool,
 }
 
 impl IPCCapability {
@@ -82,6 +91,8 @@ impl IPCCapability {
             can_receive: false,
             can_create: false,
             can_destroy: false,
+            allow_send_fd: false,
+            allow_unix_sockets: false,
         }
     }
 
@@ -91,6 +102,8 @@ impl IPCCapability {
             can_receive: true,
             can_create: true,
             can_destroy: true,
+            allow_send_fd: true,
+            allow_unix_sockets: true,
         }
     }
 }
@@ -155,7 +168,7 @@ impl IPCEndpoint for Pipe {
                 return Err(IPCError::BufferFull);
             }
 
-            for (i, &byte) in message.iter().enumerate() {
+            for &byte in message {
                 let write_pos = self.write_pos.load(Ordering::SeqCst) % self.buffer_size;
                 *(buffer.add(write_pos)) = byte;
                 self.write_pos.fetch_add(1, Ordering::SeqCst);
@@ -221,21 +234,25 @@ impl Drop for Pipe {
 #[repr(C)]
 pub struct MessageQueue {
     pub id: usize,
-    pub messages: Vec<Message>,
+    pub messages: CustomIpcVec<Message>,
     pub capacity: usize,
     pub capability: IPCCapability,
 }
 
 #[repr(C)]
 pub struct Message {
-    pub data: Vec<u8>,
+    pub data: CustomIpcVec<u8>,
     pub priority: u8,
 }
 
 impl Message {
     pub fn new(data: &[u8], priority: u8) -> Self {
+        let mut v = CustomIpcVec::new();
+        for &byte in data {
+            v.push(byte);
+        }
         Message {
-            data: data.to_vec(),
+            data: v,
             priority,
         }
     }
@@ -245,7 +262,7 @@ impl MessageQueue {
     pub fn new(id: usize, capacity: usize, capability: IPCCapability) -> Self {
         MessageQueue {
             id,
-            messages: Vec::new(),
+            messages: CustomIpcVec::new(),
             capacity,
             capability,
         }
@@ -414,21 +431,194 @@ impl Drop for SharedMemory {
     }
 }
 
-/// IPC manager (OOP: Manager class)
+// =========================================================================
+// SerenityOS Parity Extensions: Strongly-Typed IPC, WindowServer Backing, Sandboxing
+// =========================================================================
+
+/// Serenity-inspired strongly-typed IPC messages.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SerenityIpcMessage {
+    /// WindowServer Backing Store mapping updates: (window_id, shm_id, width, height)
+    UpdateBackingStore { window_id: usize, shm_id: usize, width: usize, height: usize },
+    /// Standard key/mouse input event message: (window_id, event_type, x, y)
+    InputEvent { window_id: usize, event_type: u32, x: i32, y: i32 },
+    /// General system call adaptation payload: (syscall_id, payload)
+    SyscallShim { syscall_id: usize, payload: Vec<u8> },
+}
+
+impl SerenityIpcMessage {
+    /// Serialize the message into strongly-typed bytes
+    pub fn serialize(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        match self {
+            Self::UpdateBackingStore { window_id, shm_id, width, height } => {
+                out.push(1); // Msg Type ID
+                out.extend_from_slice(&window_id.to_le_bytes());
+                out.extend_from_slice(&shm_id.to_le_bytes());
+                out.extend_from_slice(&width.to_le_bytes());
+                out.extend_from_slice(&height.to_le_bytes());
+            }
+            Self::InputEvent { window_id, event_type, x, y } => {
+                out.push(2); // Msg Type ID
+                out.extend_from_slice(&window_id.to_le_bytes());
+                out.extend_from_slice(&event_type.to_le_bytes());
+                out.extend_from_slice(&x.to_le_bytes());
+                out.extend_from_slice(&y.to_le_bytes());
+            }
+            Self::SyscallShim { syscall_id, payload } => {
+                out.push(3); // Msg Type ID
+                out.extend_from_slice(&syscall_id.to_le_bytes());
+                out.extend_from_slice(&payload);
+            }
+        }
+        out
+    }
+
+    /// Deserialize raw bytes back into strongly-typed messages
+    pub fn deserialize(bytes: &[u8]) -> Option<Self> {
+        if bytes.is_empty() {
+            return None;
+        }
+        let type_id = bytes[0];
+        match type_id {
+            1 => {
+                let sz = mem::size_of::<usize>();
+                if bytes.len() < 1 + 4 * sz {
+                    return None;
+                }
+
+                let read_usize = |offset: usize| {
+                    let mut b = [0; mem::size_of::<usize>()];
+                    b.copy_from_slice(&bytes[offset..offset + sz]);
+                    usize::from_le_bytes(b)
+                };
+
+                let window_id = read_usize(1);
+                let shm_id = read_usize(1 + sz);
+                let width = read_usize(1 + 2 * sz);
+                let height = read_usize(1 + 3 * sz);
+                Some(Self::UpdateBackingStore { window_id, shm_id, width, height })
+            }
+            2 => {
+                let sz = mem::size_of::<usize>();
+                if bytes.len() < 1 + sz + 12 {
+                    return None;
+                }
+
+                let read_usize = |offset: usize| {
+                    let mut b = [0; mem::size_of::<usize>()];
+                    b.copy_from_slice(&bytes[offset..offset + sz]);
+                    usize::from_le_bytes(b)
+                };
+
+                let read_u32 = |offset: usize| {
+                    let mut b = [0; 4];
+                    b.copy_from_slice(&bytes[offset..offset + 4]);
+                    u32::from_le_bytes(b)
+                };
+
+                let read_i32 = |offset: usize| {
+                    let mut b = [0; 4];
+                    b.copy_from_slice(&bytes[offset..offset + 4]);
+                    i32::from_le_bytes(b)
+                };
+
+                let window_id = read_usize(1);
+                let event_type = read_u32(1 + sz);
+                let x = read_i32(1 + sz + 4);
+                let y = read_i32(1 + sz + 8);
+                Some(Self::InputEvent { window_id, event_type, x, y })
+            }
+            3 => {
+                let sz = mem::size_of::<usize>();
+                if bytes.len() < 1 + sz {
+                    return None;
+                }
+                let mut b = [0; mem::size_of::<usize>()];
+                b.copy_from_slice(&bytes[1..1 + sz]);
+                let syscall_id = usize::from_le_bytes(b);
+                let payload = bytes[1 + sz..].to_vec();
+                Some(Self::SyscallShim { syscall_id, payload })
+            }
+            _ => None,
+        }
+    }
+}
+
+/// Serenity WindowServer Backing Store interface.
+/// Encapsulates direct shared-memory painting backing buffers.
+pub struct SerenitySharedBackingStore {
+    pub shm_id: usize,
+    pub width: usize,
+    pub height: usize,
+    pub stride: usize,
+}
+
+impl SerenitySharedBackingStore {
+    pub fn new(shm_id: usize, width: usize, height: usize) -> Self {
+        Self {
+            shm_id,
+            width,
+            height,
+            stride: width * 4, // 32-bit RGBA pixel formats
+        }
+    }
+
+    /// Read or write pixel offsets in the backing store buffer mapped via shared memory.
+    pub fn get_pixel_offset(&self, x: usize, y: usize) -> usize {
+        y * self.stride + x * 4
+    }
+}
+
+/// Serenity-style Sandboxed IPC Enforcer.
+/// Ensures that processes sandboxed with pledge/unveil restrictions cannot bypass sandbox boundaries
+/// by sending or receiving file descriptors or establishing disallowed socket connections over IPC.
+pub struct SerenityIpcSandboxEnforcer {
+    pub has_send_fd_pledge: bool,
+    pub has_unix_sockets_pledge: bool,
+}
+
+impl SerenityIpcSandboxEnforcer {
+    pub fn new(has_send_fd_pledge: bool, has_unix_sockets_pledge: bool) -> Self {
+        Self {
+            has_send_fd_pledge,
+            has_unix_sockets_pledge,
+        }
+    }
+
+    /// Validate whether a message or dynamic transfer is allowed under the current sandbox parameters.
+    pub fn validate_ipc_transfer(&self, is_sending_fd: bool, is_unix_connect: bool) -> Result<(), IPCError> {
+        if is_sending_fd && !self.has_send_fd_pledge {
+            return Err(IPCError::PermissionDenied);
+        }
+        if is_unix_connect && !self.has_unix_sockets_pledge {
+            return Err(IPCError::PermissionDenied);
+        }
+        Ok(())
+    }
+}
+
+// =========================================================================
+// IPC manager (OOP: Manager class)
+// =========================================================================
+
 pub struct IPCManager {
-    pipes: Vec<Option<NonNull<Pipe>>>,
-    message_queues: Vec<Option<NonNull<MessageQueue>>>,
-    shared_memories: Vec<Option<NonNull<SharedMemory>>>,
+    pipes: CustomIpcVec<Option<NonNull<Pipe>>>,
+    message_queues: CustomIpcVec<Option<NonNull<MessageQueue>>>,
+    shared_memories: CustomIpcVec<Option<NonNull<SharedMemory>>>,
     next_id: AtomicUsize,
+    // Serenity Parity Enforcer integration
+    pub sandbox_enforcer: SerenityIpcSandboxEnforcer,
 }
 
 impl IPCManager {
     pub fn new() -> Self {
         IPCManager {
-            pipes: Vec::new(),
-            message_queues: Vec::new(),
-            shared_memories: Vec::new(),
+            pipes: CustomIpcVec::new(),
+            message_queues: CustomIpcVec::new(),
+            shared_memories: CustomIpcVec::new(),
             next_id: AtomicUsize::new(1),
+            sandbox_enforcer: SerenityIpcSandboxEnforcer::new(true, true),
         }
     }
 
@@ -574,23 +764,23 @@ impl IPCManager {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
+/// Simple CustomIpcVec implementation for no_std
+pub struct CustomIpcVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
+impl<T> CustomIpcVec<T> {
+    pub fn new() -> Self {
+        CustomIpcVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
 
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -603,7 +793,7 @@ impl<T> Vec<T> {
         }
     }
 
-    fn remove(&mut self, index: usize) -> T {
+    pub fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
@@ -612,15 +802,15 @@ impl<T> Vec<T> {
         }
     }
 
-    fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.len = 0;
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len
     }
 
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len == 0
     }
 
@@ -649,8 +839,7 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for CustomIpcVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
         if self.data.is_null() {
@@ -661,7 +850,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for CustomIpcVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
             &mut []
@@ -671,7 +860,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a CustomIpcVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
 
@@ -681,13 +870,69 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut CustomIpcVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+// =========================================================================
+// Tests
+// =========================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_serenity_ipc_message_serialization() {
+        let msg = SerenityIpcMessage::UpdateBackingStore {
+            window_id: 12,
+            shm_id: 45,
+            width: 800,
+            height: 600,
+        };
+        let bytes = msg.serialize();
+        assert_eq!(bytes[0], 1); // Msg Type ID 1
+
+        let decoded = SerenityIpcMessage::deserialize(&bytes).unwrap();
+        assert_eq!(msg, decoded);
+    }
+
+    #[test]
+    fn test_serenity_input_event_serialization() {
+        let msg = SerenityIpcMessage::InputEvent {
+            window_id: 3,
+            event_type: 100,
+            x: -25,
+            y: 400,
+        };
+        let bytes = msg.serialize();
+        assert_eq!(bytes[0], 2); // Msg Type ID 2
+
+        let decoded = SerenityIpcMessage::deserialize(&bytes).unwrap();
+        assert_eq!(msg, decoded);
+    }
+
+    #[test]
+    fn test_shared_backing_store() {
+        let backing = SerenitySharedBackingStore::new(99, 1024, 768);
+        assert_eq!(backing.get_pixel_offset(10, 20), 20 * 1024 * 4 + 10 * 4);
+    }
+
+    #[test]
+    fn test_serenity_ipc_sandboxing() {
+        let enforcer = SerenityIpcSandboxEnforcer::new(false, false);
+        // Blocking FD sends since send_fd capability is not pledged
+        assert!(enforcer.validate_ipc_transfer(true, false).is_err());
+        // Blocking unix sockets since unix sockets are not pledged
+        assert!(enforcer.validate_ipc_transfer(false, true).is_err());
+
+        let enforcer_full = SerenityIpcSandboxEnforcer::new(true, true);
+        assert!(enforcer_full.validate_ipc_transfer(true, true).is_ok());
     }
 }
