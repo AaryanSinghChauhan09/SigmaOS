@@ -2,12 +2,11 @@
 #![no_main]
 
 use core::mem;
-/// OOP-based Container Runtime for SigmaOS
-/// Implements container runtime using OOP principles with traits and structs
-/// No dependency on external container frameworks
-/// Based on Roadmap Item 17: Container runtime support
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+extern crate alloc;
+use alloc::boxed::Box;
 
 /// Container ID
 pub type ContainerID = usize;
@@ -21,6 +20,46 @@ pub enum ContainerState {
     Paused = 2,
     Stopped = 3,
     Failed = 4,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
+}
+
+impl ContainerCapability {
+    pub fn new() -> Self {
+        ContainerCapability {
+            can_start: false,
+            can_stop: false,
+            can_pause: false,
+            can_modify: false,
+        }
+    }
+
+    pub fn full() -> Self {
+        ContainerCapability {
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
+            can_modify: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
 }
 
 /// Container trait (OOP interface)
@@ -524,14 +563,14 @@ impl SimpleContainerRuntime {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
@@ -539,7 +578,7 @@ impl<T> Vec<T> {
         }
     }
 
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -552,7 +591,7 @@ impl<T> Vec<T> {
         }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len
     }
 
@@ -562,15 +601,12 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let layout = std::alloc::Layout::from_size_align(new_capacity * mem::size_of::<T>(), 8).unwrap();
+        let new_data = std::alloc::alloc(layout) as *mut T;
 
         if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
             }
 
             self.data = new_data;

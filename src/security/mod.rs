@@ -25,6 +25,9 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod clipboard;
+pub mod intrusion;
+pub mod password;
 
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};

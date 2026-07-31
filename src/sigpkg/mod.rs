@@ -44,9 +44,9 @@ pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
-    major: u64,
-    minor: u64,
-    patch: u64,
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
 }
 
 impl Version {

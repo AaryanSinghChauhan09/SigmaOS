@@ -58,6 +58,33 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
+    Pwd,
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
+    Theme {
+        theme_name: String,
+    },
+    Profile {
+        profile_name: String,
+    },
+    A11y {
+        feature: String,
+        state: String,
+    },
     Unknown(String),
 }
 
@@ -211,6 +238,34 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Mkdir {
                         dirname: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        theme_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        profile_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        state: parts[2].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())

@@ -114,6 +114,8 @@ pub use package::{
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+    SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
+    TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,

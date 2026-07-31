@@ -2,18 +2,17 @@
 #![no_main]
 
 use core::mem;
-/// OOP-based Driver Framework for SigmaOS
-/// Based on Roadmap Item 1: Driver framework
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
+    Storage = 3,
 }
 
 #[repr(C)]
@@ -47,34 +46,40 @@ pub struct SimpleDriver {
     pub state: AtomicUsize,
 }
 
-impl SimpleDriver {
-    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        SimpleDriver {
+impl SimpleStorageDriver {
+    pub fn new(id: DriverID) -> Self {
+        SimpleStorageDriver {
             id,
-            driver_type,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
 }
 
-impl Driver for SimpleDriver {
+impl Driver for SimpleStorageDriver {
     fn id(&self) -> DriverID {
         self.id
     }
     fn driver_type(&self) -> DriverType {
-        self.driver_type
+        DriverType::Storage
     }
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state
-            .store(DriverState::Loaded as usize, Ordering::SeqCst);
+        self.set_state(DriverState::Active);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state
-            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.set_state(DriverState::Unloaded);
         Ok(())
     }
 }
@@ -104,6 +109,27 @@ impl SimpleDriverFramework {
             drivers: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+
+    fn verify_dependencies(&self, driver: &dyn Driver) -> bool {
+        for &dep in driver.dependencies() {
+            let mut dep_found = false;
+            for option_d in self.drivers.iter() {
+                if let Some(ref d) = *option_d {
+                    // Check if matching driver is loaded
+                    let dt = d.driver_type() as usize;
+                    let dep_t = dep as usize;
+                    if dt == dep_t && d.state() == DriverState::Active {
+                        dep_found = true;
+                        break;
+                    }
+                }
+            }
+            if !dep_found {
+                return false;
+            }
+        }
+        true
     }
 }
 

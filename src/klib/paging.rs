@@ -131,6 +131,7 @@ pub trait PageTable {
     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry;
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry;
     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry;
+    fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry;
     fn set_entry(&mut self, index: usize, entry: SimplePageTableEntry);
     fn get_physical_address(&self) -> PhysicalAddress;
 }
