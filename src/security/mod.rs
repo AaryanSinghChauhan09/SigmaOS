@@ -25,8 +25,12 @@ pub mod sigma_unveil;
 pub mod vulnerability;
 pub mod defensive_audit;
 pub mod parrot_parity;
+pub mod visa_harness;
+pub mod leanstral;
 
 pub use audit::{AuditLogger, AuditPolicy, LogFormat};
+pub use visa_harness::{VisaVulnerabilityAgenticHarness, VvahFinding, PipelineStage, ValidationVerdict};
+pub use leanstral::{LeanstralSafeVerify, FormalSafetyCertificate};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{

@@ -7,8 +7,14 @@ pub mod orchestrator;
 pub mod sai;
 pub mod system;
 pub mod voice;
+pub mod qwenpaw;
+pub mod perplexity;
+pub mod awesome_ai;
 
 pub use agent::{AIAgent, SimpleAIAgent};
+pub use qwenpaw::{PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentCommunicationProtocol};
+pub use perplexity::{PerplexitySearchCli, PerplexitySearchResult, PerplexitySnippetResult};
+pub use awesome_ai::{AwesomeCodeAiRegistry, AwesomeToolInfo};
 pub use llm::{
     LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
     QuantizationType, InferenceBackend, BatchingStrategy,
