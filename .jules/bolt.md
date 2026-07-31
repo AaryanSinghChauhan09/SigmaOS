@@ -39,3 +39,7 @@ This journal contains CRITICAL performance learnings discovered during profiling
 ## 2026-07-27 - Single-Pass Cycle-Zip Iterators for XOR Encryption
 **Learning:** Using indexed loops with modulo divisions (`i % key.len()`) to implement XOR encryption / decryption on string arrays prevents the Rust compiler from applying auto-vectorization optimizations and adds heavy loop-index lookup cost. Replacing the indexed loop with a single-pass `zip(key.iter().cycle())` iterator chain removes all index lookup checks and speeds up encryption/decryption on large payloads by up to 38%.
 **Action:** Use `iter().cycle()` and `zip()` iterator chains instead of manually index-bound modulo loops for byte-level cryptographic transformations.
+
+## 2026-07-30 - Eliminating Index Modulo divisions in Password Manager simulated XOR Encryption
+**Learning:** Standard index loops with dynamically sized modulo keys (`i % master_key.len()`) create compiler-preventing code patterns for autovectorization and incur constant division operations at runtime. Replacing the index loop with a single-pass `.zip(key.iter().cycle())` iterator chain eliminates all division overhead and index-bounds verification.
+**Action:** Always favor lazy cycle-and-zip iterator sequences over manual index logic when applying byte-level cryptographic/masking transformations.
