@@ -243,3 +243,11 @@ To ensure standard x86 and operating system tutorials (such as cfenollosa/os-tut
 1. **Protected Mode Switching (`ProtectedModeSwitchSimulator`)**: Models Global Descriptor Table (GDT) Segment selectors, Real-to-Protected mode toggles on CPU Control Register 0 (`CR0.PE` bit), and far jumps.
 2. **VGA Port-IO Video Driver (`VgaTextModeDriverSimulator`)**: Emulates direct character writing starting at `0xB8000`, scrolling rows, and updating cursors using the Index and Data registers of CRT Controllers (`0x3D4`/`0x3D5`).
 3. **Dual PIC PS/2 Keyboards (`PicKeyboardController`)**: Simulates 8259 master/slave PIC unmasking, interrupt lines, and direct scancode-to-ASCII translations from PS/2 Port `0x60`.
+
+## 🧭 6. Perplexity WANDR Deep Research Integration (`src/ai/next_gen.rs`)
+
+To ensure cutting-edge deep research and systematic claims extraction engines are natively integrated, SigmaOS clean-room implements the core tenets of Perplexity AI's WANDR framework:
+
+1. **Entity Disambiguation (`disambiguate_entity`)**: Intelligently matches, links, and reconciles synonymous mentions of real-world entities.
+2. **Structured Evidence Extraction (`extract_evidence`)**: Sifts through high-volume ingested document corpuses (`ResearchDocument`) to isolate matching evidence.
+3. **Evidence-Backed Synthesis (`synthesize_answer`)**: Transactionally compiles structured answers backed directly by validated, inline citations and source URLs.
