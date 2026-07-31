@@ -117,6 +117,10 @@ build:
 ifeq ($(PROFILE),browser)
 	@wasm-pack build --target web
 endif
+	@if command -v g++ >/dev/null 2>&1; then \
+		echo "Compiling C++ test_host for CodeQL trace..."; \
+		g++ -O2 tests/cpp_host/test_host.cpp -o build/host_tests || true; \
+	fi
 	@./scripts/build-iso.sh
 	@echo "Build complete."
 
