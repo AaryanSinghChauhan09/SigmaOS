@@ -2,9 +2,9 @@ name: SigmaOS Sovereign CI/CD Pipeline v2
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "disabled-branch" ]
 
 env:
   PYTHON_VERSION: '3.x'

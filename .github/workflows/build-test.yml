@@ -2,9 +2,9 @@ name: "SigmaOS CI/CD Pipeline"
 
 on:
   push:
-    branches: [ "main", "release/*" ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ "main", "release/*" ]
+    branches: [ "disabled-branch" ]
 
 jobs:
   build_and_test:

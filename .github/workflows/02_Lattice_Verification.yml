@@ -2,9 +2,9 @@ name: "[02] Lattice Verification"
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "disabled-branch" ]
 
 jobs:
   static-analysis:

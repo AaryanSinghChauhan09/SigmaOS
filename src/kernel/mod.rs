@@ -9,6 +9,7 @@ pub mod roundrobin;
 pub mod scheduler;
 pub mod meta;
 pub mod paging;
+pub mod performance;
 pub mod policy_mechanism;
 pub mod breakthroughs;
 pub mod ipc;

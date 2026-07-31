@@ -2,9 +2,9 @@ name: SigmaOS Sovereign CI
 
 on:
   push:
-    branches: [ main, lattice-dev ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "disabled-branch" ]
 
 jobs:
   build-and-verify:

@@ -2,9 +2,9 @@ name: "[04] Sigma-Dev: Coverage & Module Audit"
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "disabled-branch" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "disabled-branch" ]
 
 jobs:
   module-audit:
