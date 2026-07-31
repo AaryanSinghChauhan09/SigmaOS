@@ -30,7 +30,7 @@ pub trait FirmwareInterface: Send + Sync {
     fn get_efi_system_table(&self) -> Result<Option<*mut u8>, BootError>;
     fn get_smp_info(&self) -> Result<SmpInfo, BootError>;
     fn set_wakeup_vector(&self, vec: usize) -> Result<(), BootError>;
-    fn get_firmware_fingerprint(&self) -> Option<FirmwareancyInfo>;
+    fn get_firmware_fingerprint(&self) -> Option<FirmwareInfo>;
 }
 
 #[derive(Debug, Clone)]
