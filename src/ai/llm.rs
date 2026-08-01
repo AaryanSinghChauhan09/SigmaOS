@@ -500,7 +500,7 @@ impl LocalLlmEngine {
         assert_eq!(experts.len(), 4);
         assert!(aux_loss >= 0.0);
 
-        Ok(InferenceResponse::new(
+        let mut response = InferenceResponse::new(
             "Generated response placeholder".to_string(),
             10,
             100,
