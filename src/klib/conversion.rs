@@ -169,7 +169,7 @@ mod tests {
     #[test]
     fn test_hex_to_bytes() {
         let hex = "48656c6c6f";
-        let bytes = hex_to_bytes(hex).unwrap();
+        let bytes = hex_to_bytes(hex).expect("Failed to convert hex to bytes");
         assert_eq!(bytes, b"Hello");
     }
 
@@ -190,7 +190,7 @@ mod tests {
     #[test]
     fn test_binary_to_bytes() {
         let binary = "0100100001100101011011000110110001101111";
-        let bytes = binary_to_bytes(binary).unwrap();
+        let bytes = binary_to_bytes(binary).expect("Failed to convert binary to bytes");
         assert_eq!(bytes, b"Hello");
     }
 
@@ -210,8 +210,8 @@ mod tests {
 
     #[test]
     fn test_base_to_dec() {
-        assert_eq!(base_to_dec("ff", 16).unwrap(), 255);
-        assert_eq!(base_to_dec("11111111", 2).unwrap(), 255);
-        assert_eq!(base_to_dec("255", 10).unwrap(), 255);
+        assert_eq!(base_to_dec("ff", 16).expect("Failed to convert base 16 to decimal"), 255);
+        assert_eq!(base_to_dec("11111111", 2).expect("Failed to convert base 2 to decimal"), 255);
+        assert_eq!(base_to_dec("255", 10).expect("Failed to convert base 10 to decimal"), 255);
     }
 }
