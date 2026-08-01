@@ -1,11 +1,13 @@
 // SigmaOS Kernel Library
-pub mod vec;
 pub mod buddy_allocator;
-pub mod paging;
 pub mod error;
+pub mod paging;
 pub mod string;
 pub mod uuid;
+pub mod vec;
 
-pub use vec::Vec;
-pub use string::{strlen, strcmp, strcpy, strcat, strstr, strchr, atoi, itoa, memcpy, memset, memcmp};
+pub use string::{
+    atoi, itoa, memcmp, memcpy, memset, strcat, strchr, strcmp, strcpy, strlen, strstr,
+};
 pub use uuid::Uuid;
+pub use vec::Vec;

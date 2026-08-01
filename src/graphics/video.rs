@@ -41,7 +41,11 @@ impl VideoFrame {
         for _ in 0..size {
             pixels.push(PixelRgba::new(0, 0, 0, 255));
         }
-        VideoFrame { width, height, pixels }
+        VideoFrame {
+            width,
+            height,
+            pixels,
+        }
     }
 }
 
@@ -202,7 +206,7 @@ pub struct OverlayItem {
     pub width: u32,
     pub height: u32,
     pub opacity: f32, // 0.0 to 1.0
-    pub z_index: u32,  // Render order layer
+    pub z_index: u32, // Render order layer
 }
 
 /// Represents a configured scene consisting of prioritized overlay items
@@ -262,7 +266,12 @@ impl StreamingOverlayManager {
         self.scenes.insert(scene.name.clone(), scene);
     }
 
-    pub fn switch_scene(&mut self, scene_name: &str, transition: &str, duration_frames: u32) -> Result<(), &'static str> {
+    pub fn switch_scene(
+        &mut self,
+        scene_name: &str,
+        transition: &str,
+        duration_frames: u32,
+    ) -> Result<(), &'static str> {
         if !self.scenes.contains_key(scene_name) {
             return Err("Scene not registered in overlay manager");
         }
@@ -302,11 +311,11 @@ impl StreamingOverlayManager {
 
                         // Generate mock source pixel based on type
                         let src_color = match overlay.source_type {
-                            OverlaySourceType::Webcam => PixelRgba::new(0, 0, 200, 255),       // Blue-tinted webcam
+                            OverlaySourceType::Webcam => PixelRgba::new(0, 0, 200, 255), // Blue-tinted webcam
                             OverlaySourceType::GameCapture => PixelRgba::new(10, 10, 10, 255), // Dark game capture
-                            OverlaySourceType::ChatBox => PixelRgba::new(50, 50, 50, 200),    // Dark-gray semi-transparent chat
-                            OverlaySourceType::AlertBox => PixelRgba::new(255, 165, 0, 255),   // Orange alert
-                            OverlaySourceType::StreamLabel => PixelRgba::new(0, 255, 0, 255),  // Green label
+                            OverlaySourceType::ChatBox => PixelRgba::new(50, 50, 50, 200), // Dark-gray semi-transparent chat
+                            OverlaySourceType::AlertBox => PixelRgba::new(255, 165, 0, 255), // Orange alert
+                            OverlaySourceType::StreamLabel => PixelRgba::new(0, 255, 0, 255), // Green label
                         };
 
                         let alpha = overlay.opacity;
@@ -373,7 +382,11 @@ mod tests {
     #[test]
     fn test_subtitle_overlay() {
         let mut frame = VideoFrame::new(100, 100);
-        let overlay = SubtitleOverlayEffect::new("Hello World".to_string(), 10, PixelRgba::new(255, 0, 0, 128));
+        let overlay = SubtitleOverlayEffect::new(
+            "Hello World".to_string(),
+            10,
+            PixelRgba::new(255, 0, 0, 128),
+        );
         overlay.process_frame(&mut frame).unwrap();
         // Check that pixels in lower fifth of frame have been blended
         let idx = 85 * 100 + 50;

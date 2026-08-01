@@ -17,7 +17,11 @@ impl Vec3 {
     }
 
     pub fn zero() -> Self {
-        Vec3 { x: 0.0, y: 0.0, z: 0.0 }
+        Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
     }
 
     pub fn add(&self, other: Vec3) -> Vec3 {
@@ -237,7 +241,12 @@ impl BlenderRenderEngine {
     }
 
     /// Renders the 3D scene onto a 2D viewport
-    pub fn render_viewport(&self, width: u32, height: u32, shader: MaterialShader) -> Vec<ColorRgba> {
+    pub fn render_viewport(
+        &self,
+        width: u32,
+        height: u32,
+        shader: MaterialShader,
+    ) -> Vec<ColorRgba> {
         let size = (width * height) as usize;
         let mut viewport = vec![self.sky_color; size];
 
@@ -257,7 +266,8 @@ impl BlenderRenderEngine {
                 let px = (2.0 * ((x as f32 + 0.5) / width as f32) - 1.0) * half_w;
                 let py = (1.0 - 2.0 * ((y as f32 + 0.5) / height as f32)) * half_h;
 
-                let ray_dir = cam_right.mul(px)
+                let ray_dir = cam_right
+                    .mul(px)
                     .add(cam_up.mul(py))
                     .add(cam_dir)
                     .normalize();
@@ -320,8 +330,11 @@ impl BlenderRenderEngine {
         // Specular (Phong shading approximation)
         let view_dir = self.camera.position.sub(hit_point).normalize();
         let reflect_dir = light_dir.mul(-1.0).reflect(normal).normalize();
-        let specular_intensity = view_dir.dot(reflect_dir).max(0.0)
-            .powf(1.0 / shader.roughness.max(0.01)) * shader.specular;
+        let specular_intensity = view_dir
+            .dot(reflect_dir)
+            .max(0.0)
+            .powf(1.0 / shader.roughness.max(0.01))
+            * shader.specular;
 
         let total_light = shader.ambient + diffuse_intensity + specular_intensity;
 

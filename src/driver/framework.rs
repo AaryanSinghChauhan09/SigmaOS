@@ -598,11 +598,17 @@ mod tests {
 
         // 3. Load first driver (Storage, has zero dependencies)
         assert!(framework.load_driver(10).is_ok());
-        assert_eq!(framework.get_driver(10).unwrap().state(), DriverState::Active);
+        assert_eq!(
+            framework.get_driver(10).unwrap().state(),
+            DriverState::Active
+        );
 
         // 4. Hot-swap / Unload Storage driver
         assert!(framework.unload_driver(10).is_ok());
-        assert_eq!(framework.get_driver(10).unwrap().state(), DriverState::Unloaded);
+        assert_eq!(
+            framework.get_driver(10).unwrap().state(),
+            DriverState::Unloaded
+        );
     }
 
     #[test]
@@ -618,7 +624,10 @@ mod tests {
         assert!(framework.register_driver(storage).is_ok());
 
         // Try to load network_dep -> should fail since Storage isn't loaded/Active
-        assert_eq!(framework.load_driver(100), Err(DriverError::DependencyMissing));
+        assert_eq!(
+            framework.load_driver(100),
+            Err(DriverError::DependencyMissing)
+        );
 
         // Load storage first
         assert!(framework.load_driver(200).is_ok());

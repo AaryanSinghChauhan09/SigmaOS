@@ -17,18 +17,28 @@ pub struct PeripheralArchiveGrid {
 impl PeripheralArchiveGrid {
     pub fn new(slot: GridSlotType) -> Self {
         match slot {
-            GridSlotType::FloppyDisk => {
-                PeripheralArchiveGrid { slot_type: slot, sector_capacity: 2880, tape_reel_feet: 0 }
-            }
-            GridSlotType::TapeDrive => {
-                PeripheralArchiveGrid { slot_type: slot, sector_capacity: 0, tape_reel_feet: 1200 }
-            }
+            GridSlotType::FloppyDisk => PeripheralArchiveGrid {
+                slot_type: slot,
+                sector_capacity: 2880,
+                tape_reel_feet: 0,
+            },
+            GridSlotType::TapeDrive => PeripheralArchiveGrid {
+                slot_type: slot,
+                sector_capacity: 0,
+                tape_reel_feet: 1200,
+            },
             GridSlotType::CrtDisplay => {
-                PeripheralArchiveGrid { slot_type: slot, sector_capacity: 64000, tape_reel_feet: 0 } // 320x200 8bpp
+                PeripheralArchiveGrid {
+                    slot_type: slot,
+                    sector_capacity: 64000,
+                    tape_reel_feet: 0,
+                } // 320x200 8bpp
             }
-            GridSlotType::DotMatrixPrinter => {
-                PeripheralArchiveGrid { slot_type: slot, sector_capacity: 0, tape_reel_feet: 0 }
-            }
+            GridSlotType::DotMatrixPrinter => PeripheralArchiveGrid {
+                slot_type: slot,
+                sector_capacity: 0,
+                tape_reel_feet: 0,
+            },
         }
     }
 

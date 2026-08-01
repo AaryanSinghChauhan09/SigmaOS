@@ -1,29 +1,30 @@
 // SigmaOS Kernel Module
+pub mod breakthroughs;
 pub mod ipc;
 pub mod memory;
-pub mod roundrobin;
-pub mod scheduler;
 pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
-pub mod breakthroughs;
+pub mod roundrobin;
+pub mod scheduler;
 
+pub use breakthroughs::{
+    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions,
+};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError, SchedulerError as RoundRobinSchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use meta::{
-    MetaKernel, KernelPersona, KernelPlugin, KernelPluginManager, MicroDriver,
-    ABIManager, NetPod, KernelGraph, LegacyScheduler,
+    ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
+    MetaKernel, MicroDriver, NetPod,
 };
-pub use paging::{
-    PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2,
-};
+pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
 pub use policy_mechanism::{
-    ResourceBroker, PolicyManager, ProtectionDomain, InterruptMechanism, FastPathIpc,
-    PrivilegeLevel, PolicyError,
+    FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
+    ResourceBroker,
 };
-pub use breakthroughs::{
-    UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
-    EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
+pub use roundrobin::{
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError,
+    SchedulerError as RoundRobinSchedulerError,
 };
+pub use scheduler::{Priority, Process, ProcessState, Scheduler};

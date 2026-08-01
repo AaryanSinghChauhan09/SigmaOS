@@ -59,7 +59,12 @@ pub struct PolymorphicDriverPackageAdapter {
 }
 
 impl PolymorphicDriverPackageAdapter {
-    pub fn new(name: &'static str, format: PackageFormat, driver_id: DriverID, driver_type: DriverType) -> Self {
+    pub fn new(
+        name: &'static str,
+        format: PackageFormat,
+        driver_id: DriverID,
+        driver_type: DriverType,
+    ) -> Self {
         Self {
             name,
             format,
@@ -86,7 +91,10 @@ impl PolymorphicDriverPackageAdapter {
     }
 
     /// Simulate dynamic uninstallation mapping package action to unload native driver API
-    pub fn unload_and_uninstall_driver(&self, driver: &mut SimpleDriver) -> Result<(), DriverError> {
+    pub fn unload_and_uninstall_driver(
+        &self,
+        driver: &mut SimpleDriver,
+    ) -> Result<(), DriverError> {
         println!(
             "PolymorphicDriverPackageAdapter: Uninstalling package {} and unloading driver ID {}.",
             self.name, self.driver_id

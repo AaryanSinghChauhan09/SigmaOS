@@ -1,6 +1,5 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
-
 // SigmaOS Library
 // Core library for SigmaOS operating system
 #![allow(clippy::all, unused)]
@@ -21,10 +20,10 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod graphics {
-    pub mod paint;
-    pub mod video;
     pub mod compositor;
+    pub mod paint;
     pub mod render3d;
+    pub mod video;
 }
 pub mod init;
 pub mod interrupt;
@@ -41,8 +40,8 @@ pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
 pub mod hardware {
-    pub mod win32;
     pub mod compatibility;
+    pub mod win32;
 }
 pub mod power {
     pub mod governor;
@@ -51,18 +50,18 @@ pub mod observability {
     pub mod profiler;
 }
 pub mod boot {
-    pub mod firmware_bridge;
     pub mod bridge_grid;
+    pub mod firmware_bridge;
 }
 pub mod toolchain {
     pub mod adapter;
+    pub mod bootstrap;
     pub mod capsule;
     pub mod codex;
-    pub mod bootstrap;
 }
 pub mod scheduler {
-    pub mod numa_scheduler;
     pub mod energy_aware;
+    pub mod numa_scheduler;
 }
 pub mod crypto {
     pub mod vectorized_pqc;
@@ -83,10 +82,10 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime as CompatibilityContainerRuntime, TargetPlatform, TranslationLayer,
-    WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus,
-    EflCanvasElement, MokshaProfile, MokshaDesktopManager,
+    ApplicationBinary, AtifTrajectoryMonitor, BinaryFormat, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ContainerRuntime as CompatibilityContainerRuntime,
+    EflCanvasElement, MokshaDesktopManager, MokshaProfile, RelayNexus, TargetPlatform,
+    TranslationLayer, VerifierConsensus, WandrEvent,
 };
 pub use container::{
     Container, ContainerCapability, ContainerError, ContainerID, ContainerInfo, ContainerRuntime,

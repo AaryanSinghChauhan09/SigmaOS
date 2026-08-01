@@ -20,7 +20,11 @@ impl SemVer {
         if parts.next().is_some() {
             return None;
         }
-        Some(Self { major, minor, patch })
+        Some(Self {
+            major,
+            minor,
+            patch,
+        })
     }
 }
 
@@ -230,12 +234,20 @@ impl PackageFormatAdapter for AptDebAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Purging DEB package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Purging DEB package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Refreshing and updating DEB package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Refreshing and updating DEB package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -273,12 +285,20 @@ impl PackageFormatAdapter for YumRpmAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Erasing RPM package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Erasing RPM package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Running transaction check & upgrade for RPM package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Running transaction check & upgrade for RPM package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -316,12 +336,20 @@ impl PackageFormatAdapter for PacmanAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Removing pacman package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Removing pacman package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Sysupgrade pacman package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Sysupgrade pacman package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -359,12 +387,20 @@ impl PackageFormatAdapter for SnapAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Unmounting snap package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Unmounting snap package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Refreshing snap package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Refreshing snap package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -402,12 +438,20 @@ impl PackageFormatAdapter for FlatpakAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Uninstalling flatpak package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Uninstalling flatpak package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Updating flatpak package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Updating flatpak package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -445,12 +489,20 @@ impl PackageFormatAdapter for SigmaPkgAdapter {
     }
 
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Deleting native SigmaPkg package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Deleting native SigmaPkg package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Atomic rollback-safe update of SigmaPkg package {}", self.adapter_name(), package.name);
+        println!(
+            "[{}] Atomic rollback-safe update of SigmaPkg package {}",
+            self.adapter_name(),
+            package.name
+        );
         Ok(())
     }
 }
@@ -702,22 +754,33 @@ impl UniversalPackageManager {
     }
 
     fn add_default_adapters(&mut self) {
-        self.adapters.insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
-        self.adapters.insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
-        self.adapters.insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
-        self.adapters.insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
-        self.adapters.insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
-        self.adapters.insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
+        self.adapters
+            .insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
     }
 
     /// Dynamic polymorphic registration of custom format adapters
-    pub fn register_adapter(&mut self, format: PackageFormat, adapter: Box<dyn PackageFormatAdapter>) {
+    pub fn register_adapter(
+        &mut self,
+        format: PackageFormat,
+        adapter: Box<dyn PackageFormatAdapter>,
+    ) {
         self.adapters.insert(format, adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
-        self.metadata_cache.insert(package.name.clone(), package.clone());
+        self.metadata_cache
+            .insert(package.name.clone(), package.clone());
         self.packages.insert(package.name.clone(), package);
     }
 
