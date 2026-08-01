@@ -55,7 +55,7 @@ impl ImageComposition {
     /// Basic blend mode simulation (flatten image)
     pub fn flatten(&self) -> Vec<Pixel> {
         let mut result = alloc::vec![Pixel { r: 0, g: 0, b: 0, a: 255 }; self.width * self.height];
-        
+
         for layer in &self.layers {
             for (i, p) in layer.pixels.iter().enumerate() {
                 // Simplified "Normal" blending: just overwrite if opaque.
@@ -79,24 +79,48 @@ mod tests {
         let layer1 = Layer {
             name: "Background",
             pixels: alloc::vec![Pixel { r: 255, g: 0, b: 0, a: 255 }; 4],
-            width: 2, height: 2,
+            width: 2,
+            height: 2,
             blend_mode: BlendMode::Normal,
             opacity: 1.0,
         };
         let layer2 = Layer {
             name: "Foreground",
             pixels: alloc::vec![
-                Pixel { r: 0, g: 255, b: 0, a: 255 }, Pixel { r: 0, g: 0, b: 0, a: 0 },
-                Pixel { r: 0, g: 0, b: 0, a: 0 }, Pixel { r: 0, g: 255, b: 0, a: 255 }
+                Pixel {
+                    r: 0,
+                    g: 255,
+                    b: 0,
+                    a: 255
+                },
+                Pixel {
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    a: 0
+                },
+                Pixel {
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    a: 0
+                },
+                Pixel {
+                    r: 0,
+                    g: 255,
+                    b: 0,
+                    a: 255
+                }
             ],
-            width: 2, height: 2,
+            width: 2,
+            height: 2,
             blend_mode: BlendMode::Normal,
             opacity: 1.0,
         };
-        
+
         comp.add_layer(layer1);
         comp.add_layer(layer2);
-        
+
         let flat = comp.flatten();
         assert_eq!(flat[0].g, 255); // Top layer pixel
         assert_eq!(flat[1].r, 255); // Bottom layer pixel (top was transparent)

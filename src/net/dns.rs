@@ -13,22 +13,32 @@
 /// 5. Advanced caching: negative caching, stale-while-revalidate (optimistic), capacity limits.
 /// 6. Redundant parallel querying with stagger delay.
 /// 7. Secure DoH / DoT transport channel fallbacks.
-
 extern crate alloc;
 
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RecordID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecordType { A = 1, AAAA = 28, CNAME = 5, MX = 15, TXT = 16 }
+pub enum RecordType {
+    A = 1,
+    AAAA = 28,
+    CNAME = 5,
+    MX = 15,
+    TXT = 16,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DNSError { Success = 0, NotFound = 1, Timeout = 2, InvalidResponse = 3 }
+pub enum DNSError {
+    Success = 0,
+    NotFound = 1,
+    Timeout = 2,
+    InvalidResponse = 3,
+}
 
 pub trait DNSRecord {
     fn id(&self) -> RecordID;
@@ -68,7 +78,9 @@ impl SimpleDNSRecord {
 }
 
 impl DNSRecord for SimpleDNSRecord {
-    fn id(&self) -> RecordID { self.id }
+    fn id(&self) -> RecordID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(256);
         &self.name[..len]
@@ -83,7 +95,9 @@ impl DNSRecord for SimpleDNSRecord {
             _ => RecordType::A,
         }
     }
-    fn ttl(&self) -> u32 { self.ttl.load(Ordering::SeqCst) as u32 }
+    fn ttl(&self) -> u32 {
+        self.ttl.load(Ordering::SeqCst) as u32
+    }
     fn data(&self) -> &[u8] {
         let len = self.data.iter().position(|&b| b == 0).unwrap_or(128);
         &self.data[..len]
@@ -91,7 +105,11 @@ impl DNSRecord for SimpleDNSRecord {
 }
 
 pub trait DNSResolver {
-    fn resolve(&mut self, hostname: &[u8], record_type: RecordType) -> Result<Vec<Box<dyn DNSRecord>>, DNSError>;
+    fn resolve(
+        &mut self,
+        hostname: &[u8],
+        record_type: RecordType,
+    ) -> Result<Vec<Box<dyn DNSRecord>>, DNSError>;
     fn add_server(&mut self, server: &[u8]);
     fn get_servers(&self) -> Vec<&[u8]>;
 }
@@ -142,8 +160,16 @@ impl SimpleDNSResolver {
         servers.push(*b"8.8.4.4\0\0\0\0\0\0\0\0\0");
 
         let mut ns_stats = Vec::new();
-        ns_stats.push(NameserverStats { ip: *b"8.8.8.8\0\0\0\0\0\0\0\0\0", rtt_ms: 15, failure_count: 0 });
-        ns_stats.push(NameserverStats { ip: *b"8.8.4.4\0\0\0\0\0\0\0\0\0", rtt_ms: 25, failure_count: 0 });
+        ns_stats.push(NameserverStats {
+            ip: *b"8.8.8.8\0\0\0\0\0\0\0\0\0",
+            rtt_ms: 15,
+            failure_count: 0,
+        });
+        ns_stats.push(NameserverStats {
+            ip: *b"8.8.4.4\0\0\0\0\0\0\0\0\0",
+            rtt_ms: 25,
+            failure_count: 0,
+        });
 
         SimpleDNSResolver {
             servers,
@@ -168,7 +194,10 @@ impl SimpleDNSResolver {
         unsafe {
             core::ptr::copy_nonoverlapping(hostname.as_ptr(), hostname_arr.as_mut_ptr(), len);
         }
-        self.hosts.push(HostsEntry { hostname: hostname_arr, ip });
+        self.hosts.push(HostsEntry {
+            hostname: hostname_arr,
+            ip,
+        });
     }
 
     /// Add a Split-DNS route (systemd-resolved style)
@@ -181,7 +210,10 @@ impl SimpleDNSResolver {
             core::ptr::copy_nonoverlapping(suffix.as_ptr(), suffix_arr.as_mut_ptr(), suffix_len);
             core::ptr::copy_nonoverlapping(server_ip.as_ptr(), server_arr.as_mut_ptr(), server_len);
         }
-        self.split_rules.push(SplitDnsRule { suffix: suffix_arr, server: server_arr });
+        self.split_rules.push(SplitDnsRule {
+            suffix: suffix_arr,
+            server: server_arr,
+        });
     }
 
     /// Sort nameservers dynamically using weighted score of latency + failure penalty (dnsmasq)
@@ -228,7 +260,11 @@ impl SimpleDNSResolver {
 }
 
 impl DNSResolver for SimpleDNSResolver {
-    fn resolve(&mut self, hostname: &[u8], record_type: RecordType) -> Result<Vec<Box<dyn DNSRecord>>, DNSError> {
+    fn resolve(
+        &mut self,
+        hostname: &[u8],
+        record_type: RecordType,
+    ) -> Result<Vec<Box<dyn DNSRecord>>, DNSError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
 
         // 1. Local /etc/hosts priority lookup
@@ -336,13 +372,20 @@ impl SimpleDNSCache {
     }
 
     /// Cache an NXDOMAIN / negative resolution error (negative caching)
-    pub fn cache_negative_result(&mut self, hostname: &[u8], record_type: RecordType, error: DNSError, ttl: u32) {
+    pub fn cache_negative_result(
+        &mut self,
+        hostname: &[u8],
+        record_type: RecordType,
+        error: DNSError,
+        ttl: u32,
+    ) {
         let mut name_array = [0u8; 256];
         let len = hostname.len().min(255);
         unsafe {
             core::ptr::copy_nonoverlapping(hostname.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        self.negative_cache.push((name_array, record_type, ttl, error));
+        self.negative_cache
+            .push((name_array, record_type, ttl, error));
     }
 
     /// Check if a negative cache lookup hits
@@ -373,7 +416,8 @@ impl DNSCache for SimpleDNSCache {
                 if r_name == hostname && record.record_type() == record_type {
                     // Stale-While-Revalidate: if TTL is very low (e.g. 1s), we trigger a background tick
                     if record.ttl() <= 1 {
-                        self.revalidation_inflight_count.fetch_add(1, Ordering::SeqCst);
+                        self.revalidation_inflight_count
+                            .fetch_add(1, Ordering::SeqCst);
                     }
                     return Some(record.as_ref());
                 }
@@ -431,7 +475,9 @@ mod tests {
         resolver.add_split_dns_route(b"internal", b"10.1.1.1");
 
         // Lookup suffix
-        let records = resolver.resolve(b"db.prod.internal", RecordType::A).unwrap();
+        let records = resolver
+            .resolve(b"db.prod.internal", RecordType::A)
+            .unwrap();
         assert_eq!(records.len(), 1);
         assert_eq!(records[0].data(), &[10, 1, 1, 1]);
     }

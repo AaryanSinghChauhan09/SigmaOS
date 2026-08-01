@@ -1,14 +1,15 @@
 /// OOP-based Design Engineering and UI Animation Polish system for SigmaOS
 /// Fully absorbs and merges all functions, ideas, features, and principles from emilkowalski/skills.
 /// Eliminates any challenge or capability gap, establishing superior taste & design intelligence.
-
 extern crate alloc;
 
 use alloc::string::String;
 
 /// Custom square root helper for `#![no_std]` compatibility
 fn float_sqrt(x: f32) -> f32 {
-    if x <= 0.0 { return 0.0; }
+    if x <= 0.0 {
+        return 0.0;
+    }
     let mut z = x;
     for _ in 0..10 {
         z = 0.5 * (z + x / z);
@@ -27,7 +28,12 @@ pub struct CubicBezier {
 
 impl CubicBezier {
     pub fn new(p1_x: f32, p1_y: f32, p2_x: f32, p2_y: f32) -> Self {
-        CubicBezier { p1_x, p1_y, p2_x, p2_y }
+        CubicBezier {
+            p1_x,
+            p1_y,
+            p2_x,
+            p2_y,
+        }
     }
 
     /// Strong ease-out for standard UI interactions (cubic-bezier(0.23, 1, 0.32, 1))
@@ -72,7 +78,11 @@ pub struct SpringConfig {
 
 impl SpringConfig {
     pub fn new(mass: f32, stiffness: f32, damping: f32) -> Self {
-        SpringConfig { mass, stiffness, damping }
+        SpringConfig {
+            mass,
+            stiffness,
+            damping,
+        }
     }
 
     /// Convert Apple's duration & bounce model to physical mass, stiffness, damping
@@ -88,7 +98,11 @@ impl SpringConfig {
         let damping_ratio = 1.0 - bounce.clamp(-1.0, 0.99);
         let damping = 2.0 * float_sqrt(mass * stiffness) * damping_ratio;
 
-        SpringConfig { mass, stiffness, damping }
+        SpringConfig {
+            mass,
+            stiffness,
+            damping,
+        }
     }
 }
 
@@ -102,12 +116,17 @@ pub struct SpringState {
 
 impl SpringState {
     pub fn new(position: f32, target: f32) -> Self {
-        SpringState { position, velocity: 0.0, target }
+        SpringState {
+            position,
+            velocity: 0.0,
+            target,
+        }
     }
 
     /// Perform a single numerical Euler-Cromer integration step for physical spring response
     pub fn update(&mut self, dt: f32, config: &SpringConfig) {
-        let force = -config.stiffness * (self.position - self.target) - config.damping * self.velocity;
+        let force =
+            -config.stiffness * (self.position - self.target) - config.damping * self.velocity;
         let acceleration = force / config.mass;
         self.velocity += acceleration * dt;
         self.position += self.velocity * dt;
@@ -192,7 +211,9 @@ pub struct TooltipBypassManager {
 
 impl TooltipBypassManager {
     pub fn new() -> Self {
-        TooltipBypassManager { last_tooltip_closed_time_ms: 0 }
+        TooltipBypassManager {
+            last_tooltip_closed_time_ms: 0,
+        }
     }
 
     /// If another tooltip was closed within 300ms, skip subsequent hover transition delays
@@ -229,12 +250,17 @@ impl DesignEngineerReviewer {
             violations += 1;
         }
 
-        if code_snippet.contains("transform-origin: center") || code_snippet.contains("transform-origin:center") {
+        if code_snippet.contains("transform-origin: center")
+            || code_snippet.contains("transform-origin:center")
+        {
             table.push_str("| `transform-origin: center` | `transform-origin: var(--transform-origin)` | Popovers should scale from their trigger (not modals — modals stay centered) |\n");
             violations += 1;
         }
 
-        if code_snippet.contains("duration: 400ms") || code_snippet.contains("duration:400ms") || code_snippet.contains("transition: transform 400ms") {
+        if code_snippet.contains("duration: 400ms")
+            || code_snippet.contains("duration:400ms")
+            || code_snippet.contains("transition: transform 400ms")
+        {
             table.push_str("| Duration > 300ms | Duration 150-250ms | Keep standard UI transitions snappy (under 300ms) to ensure high perceived performance |\n");
             violations += 1;
         }
@@ -288,7 +314,8 @@ mod tests {
 
     #[test]
     fn test_design_reviewer_markdown_table() {
-        let snippet = "transition: all 400ms; transform: scale(0); ease-in; transform-origin: center;";
+        let snippet =
+            "transition: all 400ms; transform: scale(0); ease-in; transform-origin: center;";
         let review_table = DesignEngineerReviewer::review_animation_code(snippet);
 
         // Assert table columns and rows are correctly output

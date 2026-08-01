@@ -43,17 +43,17 @@ impl LsbCompliance {
             distro_id: "SigmaOS".to_string(),
         }
     }
-    
+
     pub fn check_fhs_compliance(&self) -> bool {
         // Check if standard FHS directories exist
         // In a real implementation, this would check filesystem
         true
     }
-    
+
     pub fn get_lsb_version(&self) -> &str {
         &self.version
     }
-    
+
     pub fn get_distro_id(&self) -> &str {
         &self.distro_id
     }
@@ -85,34 +85,34 @@ impl Service {
             dependencies: Vec::new(),
         }
     }
-    
+
     pub fn add_dependency(&mut self, dep: String) {
         self.dependencies.push(dep);
     }
-    
+
     pub fn start(&mut self) -> Result<(), ServiceError> {
         // Check dependencies
         for dep in &self.dependencies {
             // In real implementation, check if dependency is running
         }
-        
+
         self.state = ServiceState::Running;
         Ok(())
     }
-    
+
     pub fn stop(&mut self) -> Result<(), ServiceError> {
         self.state = ServiceState::Stopped;
         Ok(())
     }
-    
+
     pub fn enable(&mut self) {
         self.state = ServiceState::Enabled;
     }
-    
+
     pub fn disable(&mut self) {
         self.state = ServiceState::Disabled;
     }
-    
+
     pub fn get_state(&self) -> ServiceState {
         self.state.clone()
     }
@@ -139,22 +139,22 @@ impl PackageManager {
             installed_packages: Vec::new(),
         }
     }
-    
+
     pub fn add_repository(&mut self, repo: String) {
         self.repositories.push(repo);
     }
-    
+
     pub fn install_package(&mut self, package: &str) -> Result<(), PackageError> {
         // Check if package is already installed
         if self.installed_packages.contains(&package.to_string()) {
             return Err(PackageError::AlreadyInstalled);
         }
-        
+
         // In real implementation, download and install package
         self.installed_packages.push(package.to_string());
         Ok(())
     }
-    
+
     pub fn remove_package(&mut self, package: &str) -> Result<(), PackageError> {
         if let Some(pos) = self.installed_packages.iter().position(|x| x == package) {
             self.installed_packages.remove(pos);
@@ -163,12 +163,12 @@ impl PackageManager {
             Err(PackageError::NotInstalled)
         }
     }
-    
+
     pub fn update_cache(&mut self) -> Result<(), PackageError> {
         // In real implementation, update package cache
         Ok(())
     }
-    
+
     pub fn upgrade_system(&mut self) -> Result<(), PackageError> {
         // In real implementation, upgrade all packages
         Ok(())
@@ -195,7 +195,7 @@ impl LinuxCompat {
             path: "/usr/bin:/bin:/usr/sbin:/sbin".to_string(),
         }
     }
-    
+
     pub fn which(&self, command: &str) -> Option<String> {
         for dir in self.path.split(':') {
             let full_path = format!("{}/{}", dir, command);
@@ -206,7 +206,7 @@ impl LinuxCompat {
         }
         None
     }
-    
+
     pub fn set_path(&mut self, path: String) {
         self.path = path;
     }

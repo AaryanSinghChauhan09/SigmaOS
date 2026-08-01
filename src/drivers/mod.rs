@@ -1,4 +1,8 @@
 // SigmaOS Drivers Module
+pub mod boot_init;
+pub mod dde;
+pub mod even_more_devices;
+pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
 pub mod legacy_keyboard;

@@ -11,7 +11,11 @@ pub type FilesystemID = usize;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
+pub enum FilesystemType {
+    Ext4 = 0,
+    Btrfs = 1,
+    ZFS = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -384,4 +388,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

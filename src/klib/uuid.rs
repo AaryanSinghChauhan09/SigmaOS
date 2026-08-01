@@ -17,38 +17,38 @@ impl Uuid {
     pub fn new() -> Self {
         static COUNTER: AtomicU64 = AtomicU64::new(1);
         let counter = COUNTER.fetch_add(1, Ordering::SeqCst);
-        
+
         let mut data = [0u8; 16];
-        
+
         // Simple deterministic UUID generation based on counter
         // In a real system, this would use hardware entropy
         let bytes = counter.to_le_bytes();
         for (i, &byte) in bytes.iter().enumerate() {
             data[i] = byte;
         }
-        
+
         // Set version bits (UUID v4)
         data[6] = (data[6] & 0x0F) | 0x40; // Version 4
         data[8] = (data[8] & 0x3F) | 0x80; // Variant 1
-        
+
         Uuid { data }
     }
-    
+
     /// Create UUID from bytes
     pub fn from_bytes(bytes: [u8; 16]) -> Self {
         Uuid { data: bytes }
     }
-    
+
     /// Convert UUID to bytes
     pub fn as_bytes(&self) -> &[u8; 16] {
         &self.data
     }
-    
+
     /// Convert UUID to string representation
     pub fn to_string(&self) -> String {
         // Format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
         let mut result = String::new();
-        
+
         for i in 0..16 {
             if i == 4 || i == 6 || i == 8 || i == 10 {
                 result.push('-');
@@ -56,24 +56,24 @@ impl Uuid {
             result.push(char::from_digit(self.data[i] as u32 >> 4, 16).unwrap_or('0'));
             result.push(char::from_digit(self.data[i] as u32 & 0x0F, 16).unwrap_or('0'));
         }
-        
+
         result
     }
-    
+
     /// Parse UUID from string
     pub fn parse_str(s: &str) -> Option<Self> {
         let chars: Vec<char> = s.chars().filter(|c| *c != '-').collect();
         if chars.len() != 32 {
             return None;
         }
-        
+
         let mut data = [0u8; 16];
         for i in 0..16 {
             let high = char::to_digit(chars[i * 2], 16)? as u8;
             let low = char::to_digit(chars[i * 2 + 1], 16)? as u8;
             data[i] = (high << 4) | low;
         }
-        
+
         Some(Uuid { data })
     }
 }
