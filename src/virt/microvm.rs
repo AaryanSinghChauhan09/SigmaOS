@@ -1,6 +1,6 @@
 use core::mem;
 /// OOP-based MicroVM Sandboxing Foundation for SigmaOS
-/// I/// Implements microVM sandboxing using OOP principles with traits and structs
+/// Implements microVM sandboxing using OOP principles with traits and structs
 /// No dependency on external virtualization frameworks
 /// Based on Roadmap Item 19: MicroVM sandboxing foundation
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -473,7 +473,6 @@ impl SandboxManager for SimpleSandboxManager {
     }
 }
 
-
 /// Simple Vec implementation for no_std
 impl<T> Default for Vec<T> {
     fn default() -> Self {
@@ -539,7 +538,7 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
             for i in 0..self.len {
@@ -601,7 +600,7 @@ pub struct VecIter<'a, T> {
 impl<'a, T> Iterator for VecIter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len {
+        if self.index < self.vec.len() {
             let item = unsafe { &*self.vec.data.add(self.index) };
             self.index += 1;
             Some(item)
@@ -683,26 +682,3 @@ mod tests {
         assert_eq!(microvm_strict.sandbox_policy(), SandboxPolicy::Strict);
     }
 }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-

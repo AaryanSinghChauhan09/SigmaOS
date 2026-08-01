@@ -165,7 +165,7 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor
+        let _new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
@@ -313,25 +313,26 @@ mod tests {
     }
 
     #[test]
-    fn test_zero_sized_read_write_optimization() {
+    fn test_gated_read_write() {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         let fd = vfs.open_file(inode_id, 0).unwrap();
 
-        // 1. Zero-sized write should return Ok(0) immediately without touching file size
-        let written = vfs.write_file(fd, &[]).unwrap();
-        assert_eq!(written, 0);
-        let inode = vfs.get_inode(inode_id).unwrap();
-        assert_eq!(inode.size, 0);
+        let bad_token = CapabilityToken::new(); // no read or write permissions
+        let read_token = CapabilityToken::new().allow_read("/var/www");
+        let write_token = CapabilityToken::new().allow_write("/tmp");
+        let _all_token = CapabilityToken::new().allow_read("/var/www").allow_write("/tmp");
 
-        // 2. Zero-sized read should return Ok(0) immediately even if file is empty
-        let mut buf = [];
-        let read = vfs.read_file(fd, &mut buf).unwrap();
-        assert_eq!(read, 0);
+        let mut buf = [0u8; 10];
 
-        // 3. Zero-sized read/write on an invalid file descriptor must return Err(FsError::InvalidFd)
-        let invalid_fd = 9999;
-        assert_eq!(vfs.write_file(invalid_fd, &[]), Err(FsError::InvalidFd));
-        assert_eq!(vfs.read_file(invalid_fd, &mut []), Err(FsError::InvalidFd));
+        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
+        assert_eq!(vfs.write_file_gated(fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
+        assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
+
+        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
     }
 }

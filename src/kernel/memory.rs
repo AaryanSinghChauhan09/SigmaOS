@@ -14,7 +14,7 @@ pub struct Zone {
 }
 
 /// Memory block
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,

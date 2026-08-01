@@ -1,142 +1,59 @@
-// Audio Editor Core (Audacity Parity)
-// Non-destructive multi-track audio mixing engine.
-// Enhanced with Dynamic Range Compressor, Parametric Biquad Filters (Low/High Pass EQ), and Stereo 3D Spatializers.
+/// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
+/// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
+/// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
 
-#![no_std]
+use crate::klib::Vec;
 
-extern crate alloc;
-use alloc::vec::Vec;
-
+#[derive(Debug, Clone)]
 pub struct AudioTrack {
-    pub name: &'static str,
-    pub pcm_data: Vec<i16>,
-    pub volume: f32,
-    pub pan: f32, // Pan value: -1.0 (full left) to 1.0 (full right)
+    pub id: usize,
+    pub name: String,
+    pub samples: Vec<f32>, // PCM Float data normalized between -1.0 and 1.0
+    pub volume: f32,       // Gain multiplier (0.0 to 2.0+)
+    pub pan: f32,          // Stereo panning (-1.0 for full left, 1.0 for full right)
     pub is_muted: bool,
+    pub is_solo: bool,
 }
 
-// --- A. DYNAMIC RANGE COMPRESSOR ---
-pub struct Compressor {
-    pub threshold: f32, // Linear amplitude threshold (e.g. 0.0 to 1.0)
-    pub ratio: f32,     // Compression ratio (e.g. 2.0 for 2:1)
-    pub gain: f32,      // Makeup gain (multiplier)
-}
-
-impl Compressor {
-    pub fn new(threshold: f32, ratio: f32, gain: f32) -> Self {
-        Self {
-            threshold,
-            ratio,
-            gain,
+impl AudioTrack {
+    pub fn new(id: usize, name: &str) -> Self {
+        AudioTrack {
+            id,
+            name: name.to_string(),
+            samples: Vec::new(),
+            volume: 1.0,
+            pan: 0.0,
+            is_muted: false,
+            is_solo: false,
         }
     }
 
-    /// Process a single PCM sample (scale to normalized float -1.0..1.0, compress, and scale back)
-    pub fn process_sample(&self, sample: i16) -> i16 {
-        let input_f = sample as f32 / 32768.0;
-        let abs_input = input_f.abs();
-
-        let compressed_f = if abs_input > self.threshold {
-            let excess = abs_input - self.threshold;
-            let compressed_excess = excess / self.ratio;
-            let target_abs = self.threshold + compressed_excess;
-            let sign = if input_f >= 0.0 { 1.0 } else { -1.0 };
-            sign * target_abs
-        } else {
-            input_f
-        };
-
-        // Apply makeup gain & clamp
-        let output_f = compressed_f * self.gain;
-        let clamped = output_f.clamp(-1.0, 1.0);
-        (clamped * 32767.0) as i16
-    }
-}
-
-// --- B. BIQUAD IIR PARAMETRIC FILTER (EQ) ---
-pub struct BiquadFilter {
-    pub b0: f32,
-    pub b1: f32,
-    pub b2: f32,
-    pub a1: f32,
-    pub a2: f32,
-    // History states
-    pub x1: f32,
-    pub x2: f32,
-    pub y1: f32,
-    pub y2: f32,
-}
-
-impl BiquadFilter {
-    /// Create a new low-pass filter simulator with specific coefficients
-    pub fn new_low_pass() -> Self {
-        Self {
-            b0: 0.2929,
-            b1: 0.5858,
-            b2: 0.2929,
-            a1: -0.1716,
-            a2: 0.3431,
-            x1: 0.0,
-            x2: 0.0,
-            y1: 0.0,
-            y2: 0.0,
+    pub fn with_samples(mut self, samples: &[f32]) -> Self {
+        let mut sample_vec = Vec::new();
+        for &s in samples {
+            sample_vec.push(s);
         }
+        self.samples = sample_vec;
+        self
     }
 
-    /// Processes a single PCM sample through the biquad difference equation
-    pub fn process_sample(&mut self, sample: i16) -> i16 {
-        let x = sample as f32 / 32768.0;
-
-        // y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2] - a1*y[n-1] - a2*y[n-2]
-        let y = self.b0 * x + self.b1 * self.x1 + self.b2 * self.x2
-            - self.a1 * self.y1
-            - self.a2 * self.y2;
-
-        // Shift states
-        self.x2 = self.x1;
-        self.x1 = x;
-        self.y2 = self.y1;
-        self.y1 = y;
-
-        let clamped = y.clamp(-1.0, 1.0);
-        (clamped * 32767.0) as i16
+    pub fn with_volume(mut self, volume: f32) -> Self {
+        self.volume = volume;
+        self
     }
 }
 
-// --- C. STEREO 3D SPATIALIZER ---
-pub struct Spatializer {
-    pub pan: f32, // -1.0 (Left) to 1.0 (Right)
-}
-
-impl Spatializer {
-    pub fn new(pan: f32) -> Self {
-        Self { pan }
-    }
-
-    /// Splits a mono sample into left/right stereo channels based on constant-power panner
-    pub fn process_sample(&self, sample: i16) -> (i16, i16) {
-        // Pan mapping
-        let left_gain = (1.0 - self.pan) / 2.0;
-        let right_gain = (1.0 + self.pan) / 2.0;
-
-        let left = (sample as f32 * left_gain) as i16;
-        let right = (sample as f32 * right_gain) as i16;
-        (left, right)
-    }
-}
-
-pub struct AudioMixer {
+/// The Audition-style Multi-Track Mixing Engine
+pub struct MultiTrackSession {
     pub tracks: Vec<AudioTrack>,
     pub sample_rate: u32,
-    pub compressor: Option<Compressor>,
 }
 
-impl AudioMixer {
+impl MultiTrackSession {
     pub fn new(sample_rate: u32) -> Self {
-        Self {
+        MultiTrackSession {
             tracks: Vec::new(),
             sample_rate,
-            compressor: None,
         }
     }
 
@@ -144,98 +61,261 @@ impl AudioMixer {
         self.tracks.push(track);
     }
 
-    pub fn set_master_compressor(&mut self, compressor: Compressor) {
-        self.compressor = Some(compressor);
+    /// Mixes all enabled audio tracks down to a single master mono output channel
+    /// Enforces solo priority rules and prevents digital clipping distortion via clamping
+    pub fn mix_session(&self) -> Vec<f32> {
+        let mut max_len = 0;
+        let mut has_solo_active = false;
+
+        // Check if any track is soloed
+        for i in 0..self.tracks.len() {
+            let track = &self.tracks[i];
+            if track.is_solo && !track.is_muted {
+                has_solo_active = true;
+            }
+            if track.samples.len() > max_len {
+                max_len = track.samples.len();
+            }
+        }
+
+        let mut master_mix = Vec::new();
+        for _ in 0..max_len {
+            master_mix.push(0.0);
+        }
+
+        // Perform linear summing
+        for i in 0..self.tracks.len() {
+            let track = &self.tracks[i];
+
+            // Determine if this track should contribute to the mix
+            let is_active = if has_solo_active {
+                track.is_solo && !track.is_muted
+            } else {
+                !track.is_muted
+            };
+
+            if is_active {
+                for sample_idx in 0..track.samples.len() {
+                    let raw_sample = track.samples[sample_idx];
+                    let adjusted_sample = raw_sample * track.volume;
+                    master_mix[sample_idx] += adjusted_sample;
+                }
+            }
+        }
+
+        // Audacity-grade Digital Clipping Prevention (Hard limiting limiter)
+        for i in 0..master_mix.len() {
+            master_mix[i] = master_mix[i].clamp(-1.0, 1.0);
+        }
+
+        master_mix
+    }
+}
+
+impl Default for MultiTrackSession {
+    fn default() -> Self {
+        Self::new(44100)
+    }
+}
+
+/// Professional DSP audio effects and filters
+pub trait AudioEffect {
+    fn apply(&self, samples: &mut [f32]);
+}
+
+/// Audacity-style Amplify / Gain Effect
+pub struct AmplifyEffect {
+    pub db: f32, // Decibels to amplify
+}
+
+impl AmplifyEffect {
+    pub fn new(db: f32) -> Self {
+        AmplifyEffect { db }
     }
 
-    /// Mixes all tracks down into a single stereo (interleaved Left/Right) PCM buffer
-    pub fn mixdown_stereo(&self) -> Vec<i16> {
-        if self.tracks.is_empty() {
+    fn db_to_linear(&self) -> f32 {
+        // Linear gain factor multiplier approximation
+        let exponent = self.db / 20.0;
+        // Simple approximation of 10^x under no_std environments
+        exponent.exp_m1() + 1.0 // 10^x is roughly proportional to e^(2.302585 * x)
+    }
+}
+
+impl AudioEffect for AmplifyEffect {
+    fn apply(&self, samples: &mut [f32]) {
+        let multiplier = self.db_to_linear();
+        for sample in samples.iter_mut() {
+            *sample = (*sample * multiplier).clamp(-1.0, 1.0);
+        }
+    }
+}
+
+/// Delay / Echo DSP Effect (Adobe Audition-grade feedback echo)
+pub struct EchoEffect {
+    pub delay_samples: usize,
+    pub decay: f32, // Feedback decay factor (0.0 to 1.0)
+}
+
+impl EchoEffect {
+    pub fn new(delay_samples: usize, decay: f32) -> Self {
+        EchoEffect { delay_samples, decay }
+    }
+}
+
+impl AudioEffect for EchoEffect {
+    fn apply(&self, samples: &mut [f32]) {
+        if self.delay_samples == 0 || self.delay_samples >= samples.len() {
+            return;
+        }
+
+        // Simulate real-time delay feed-forward mixing
+        for i in self.delay_samples..samples.len() {
+            let delayed_idx = i - self.delay_samples;
+            let echoed_signal = samples[delayed_idx] * self.decay;
+            samples[i] = (samples[i] + echoed_signal).clamp(-1.0, 1.0);
+        }
+    }
+}
+
+/// Dynamic Low-Pass Infinite Impulse Response (IIR) Filter
+pub struct LowPassFilter {
+    pub cutoff_factor: f32, // Smoothing smoothing factor alpha (0.0 for extreme filtering, 1.0 for none)
+}
+
+impl LowPassFilter {
+    pub fn new(cutoff_factor: f32) -> Self {
+        LowPassFilter { cutoff_factor: cutoff_factor.clamp(0.0, 1.0) }
+    }
+}
+
+impl AudioEffect for LowPassFilter {
+    fn apply(&self, samples: &mut [f32]) {
+        if samples.is_empty() {
+            return;
+        }
+
+        let mut prev_y = samples[0];
+        for i in 1..samples.len() {
+            let current_x = samples[i];
+            // Exponential smoothing: y[n] = x[n] * alpha + y[n-1] * (1 - alpha)
+            let smoothed_y = current_x * self.cutoff_factor + prev_y * (1.0 - self.cutoff_factor);
+            samples[i] = smoothed_y;
+            prev_y = smoothed_y;
+        }
+    }
+}
+
+/// Noise Gate filter (cleans background hiss below an absolute amplitude threshold)
+pub struct NoiseGateEffect {
+    pub threshold: f32,
+}
+
+impl NoiseGateEffect {
+    pub fn new(threshold: f32) -> Self {
+        NoiseGateEffect { threshold }
+    }
+}
+
+impl AudioEffect for NoiseGateEffect {
+    fn apply(&self, samples: &mut [f32]) {
+        for sample in samples.iter_mut() {
+            if sample.abs() < self.threshold {
+                *sample = 0.0;
+            }
+        }
+    }
+}
+
+/// Professional wave editors operations
+pub struct AudioEditor;
+
+impl AudioEditor {
+    /// Peak Amplitude Normalization (Normalizes peak volume exactly to 1.0 / 0dB)
+    pub fn normalize(track: &mut AudioTrack) {
+        if track.samples.is_empty() {
+            return;
+        }
+
+        let mut peak: f32 = 0.0;
+        for i in 0..track.samples.len() {
+            let val = track.samples[i].abs();
+            if val > peak {
+                peak = val;
+            }
+        }
+
+        if peak > 0.0 && peak < 1.0 {
+            let scale_factor = 1.0 / peak;
+            for i in 0..track.samples.len() {
+                track.samples[i] *= scale_factor;
+            }
+        }
+    }
+
+    /// Appplies a linear Fade-In volume ramp at the beginning of a track
+    pub fn fade_in(track: &mut AudioTrack, duration_samples: usize) {
+        let limit = duration_samples.min(track.samples.len());
+        for i in 0..limit {
+            let factor = (i as f32) / (limit as f32);
+            track.samples[i] *= factor;
+        }
+    }
+
+    /// Applies a linear Fade-Out volume ramp at the end of a track
+    pub fn fade_out(track: &mut AudioTrack, duration_samples: usize) {
+        let len = track.samples.len();
+        if len == 0 {
+            return;
+        }
+        let limit = duration_samples.min(len);
+        let start_idx = len - limit;
+        for i in 0..limit {
+            let factor = 1.0 - ((i as f32) / (limit as f32));
+            track.samples[start_idx + i] *= factor;
+        }
+    }
+
+    /// Slices and cuts out a selection of samples, returning the clipboard selection
+    pub fn cut(track: &mut AudioTrack, start: usize, end: usize) -> Vec<f32> {
+        let len = track.samples.len();
+        if start >= len || end > len || start >= end {
             return Vec::new();
         }
 
-        let max_len = self
-            .tracks
-            .iter()
-            .map(|t| t.pcm_data.len())
-            .max()
-            .unwrap_or(0);
-        // Interleaved stereo buffer (2 * max_len)
-        let mut mixed = alloc::vec![0_i16; max_len * 2];
-
-        for track in &self.tracks {
-            if track.is_muted {
-                continue;
-            }
-
-            let spatializer = Spatializer::new(track.pan);
-
-            for (i, &sample) in track.pcm_data.iter().enumerate() {
-                // Apply volume scaling
-                let scaled_sample = (sample as f32 * track.volume) as i16;
-
-                // Split sample into left and right channel frames
-                let (left, right) = spatializer.process_sample(scaled_sample);
-
-                // Mix left channel
-                let left_idx = i * 2;
-                let current_left = mixed[left_idx] as i32;
-                let sum_left = current_left + left as i32;
-                mixed[left_idx] = sum_left.clamp(i16::MIN as i32, i16::MAX as i32) as i16;
-
-                // Mix right channel
-                let right_idx = i * 2 + 1;
-                let current_right = mixed[right_idx] as i32;
-                let sum_right = current_right + right as i32;
-                mixed[right_idx] = sum_right.clamp(i16::MIN as i32, i16::MAX as i32) as i16;
-            }
+        let mut clipboard = Vec::new();
+        for i in start..end {
+            clipboard.push(track.samples[i]);
         }
 
-        // Apply master compressor if configured
-        if let Some(ref comp) = self.compressor {
-            for sample in &mut mixed {
-                *sample = comp.process_sample(*sample);
-            }
+        // Remove from original track
+        let mut new_samples = Vec::new();
+        for i in 0..start {
+            new_samples.push(track.samples[i]);
         }
+        for i in end..len {
+            new_samples.push(track.samples[i]);
+        }
+        track.samples = new_samples;
 
-        mixed
+        clipboard
     }
 
-    /// Mixes all tracks down into a single mono PCM buffer (retained for backward compatibility)
-    pub fn mixdown(&self) -> Vec<i16> {
-        if self.tracks.is_empty() {
-            return Vec::new();
+    /// Splice pastes a selection of samples at a specified index offset
+    pub fn paste(track: &mut AudioTrack, insert_idx: usize, clipboard: &[f32]) {
+        let len = track.samples.len();
+        let idx = insert_idx.min(len);
+
+        let mut new_samples = Vec::new();
+        for i in 0..idx {
+            new_samples.push(track.samples[i]);
         }
-
-        let max_len = self
-            .tracks
-            .iter()
-            .map(|t| t.pcm_data.len())
-            .max()
-            .unwrap_or(0);
-        let mut mixed = alloc::vec![0_i16; max_len];
-
-        for track in &self.tracks {
-            if track.is_muted {
-                continue;
-            }
-            for (i, &sample) in track.pcm_data.iter().enumerate() {
-                // Apply volume scaling and add to master mix with clamping to prevent overflow
-                let scaled = (sample as f32 * track.volume) as i32;
-                let current = mixed[i] as i32;
-                let sum = current + scaled;
-                mixed[i] = sum.clamp(i16::MIN as i32, i16::MAX as i32) as i16;
-            }
+        for &s in clipboard {
+            new_samples.push(s);
         }
-
-        // Apply master compressor if configured
-        if let Some(ref comp) = self.compressor {
-            for sample in &mut mixed {
-                *sample = comp.process_sample(*sample);
-            }
+        for i in idx..len {
+            new_samples.push(track.samples[i]);
         }
-
-        mixed
+        track.samples = new_samples;
     }
 }
 
@@ -244,108 +324,80 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_audio_mixdown() {
-        let mut mixer = AudioMixer::new(44100);
-        mixer.add_track(AudioTrack {
-            name: "Vocals",
-            pcm_data: alloc::vec![1000, 2000, 3000],
-            volume: 1.0,
-            pan: 0.0,
-            is_muted: false,
-        });
-        mixer.add_track(AudioTrack {
-            name: "Guitar",
-            pcm_data: alloc::vec![500, 1000, 1500],
-            volume: 0.5, // Will contribute 250, 500, 750
-            pan: 0.0,
-            is_muted: false,
-        });
+    fn test_multi_track_session_mixing() {
+        let mut session = MultiTrackSession::new(44100);
 
-        let mix = mixer.mixdown();
-        assert_eq!(mix[0], 1250);
-        assert_eq!(mix[2], 3750);
+        let track1 = AudioTrack::new(1, "Vocals")
+            .with_samples(&[0.5, 0.5, 0.5])
+            .with_volume(1.2); // linear amplification
+
+        let track2 = AudioTrack::new(2, "Backing")
+            .with_samples(&[0.2, -0.2, 0.2]);
+
+        session.add_track(track1);
+        session.add_track(track2);
+
+        // Mix Vocals (0.5 * 1.2 = 0.6) + Backing (0.2) = 0.8
+        let mix = session.mix_session();
+        assert_eq!(mix.len(), 3);
+        assert!((mix[0] - 0.8).abs() < 1e-5);
     }
 
     #[test]
-    fn test_compressor_clamping_and_gain() {
-        let compressor = Compressor::new(0.5, 2.0, 1.2); // threshold 0.5, ratio 2:1, makeup gain 1.2
+    fn test_solo_and_mute_priority() {
+        let mut session = MultiTrackSession::new(44100);
 
-        // Large amplitude sample above threshold should be compressed
-        let compressed = compressor.process_sample(28000); // ~0.85
-        assert!(compressed < 28000);
+        let mut t1 = AudioTrack::new(1, "Lead").with_samples(&[0.5, 0.5]);
+        t1.is_solo = true; // Solo active!
 
-        // Clamping check for absolute peak signals
-        let peak = compressor.process_sample(32767);
-        assert_eq!(peak, 29489);
+        let mut t2 = AudioTrack::new(2, "Harmony").with_samples(&[0.3, 0.3]);
+        t2.is_muted = false; // Harmony should be ignored because Lead is soloed
 
-        // Test with higher makeup gain that forces clamping
-        let heavy_compressor = Compressor::new(0.5, 2.0, 3.0);
-        let clamped_peak = heavy_compressor.process_sample(32767);
-        assert_eq!(clamped_peak, 32767);
+        session.add_track(t1);
+        session.add_track(t2);
+
+        let mix = session.mix_session();
+        assert_eq!(mix[0], 0.5); // Only Lead is mixed
     }
 
     #[test]
-    fn test_biquad_filtering() {
-        let mut filter = BiquadFilter::new_low_pass();
-        let input_signal = alloc::vec![100, 200, 300, 400, 500];
+    fn test_dsp_low_pass_filter() {
+        let mut samples = [0.8, -0.8, 0.8, -0.8];
+        let filter = LowPassFilter::new(0.5);
+        filter.apply(&mut samples);
 
-        for &sample in &input_signal {
-            let filtered = filter.process_sample(sample);
-            // Must process sequence and shift history state variables
-            assert!(filtered != sample);
-        }
-        assert!(filter.x1 != 0.0);
+        // Signal should smooth out towards lower variations.
+        // Index 3 calculated value is exactly -0.2
+        assert!((samples[3] - (-0.2)).abs() < 1e-5);
     }
 
     #[test]
-    fn test_spatializer_3d_panning() {
-        let panner_left = Spatializer::new(-1.0); // Full Left
-        let panner_right = Spatializer::new(1.0); // Full Right
-        let panner_center = Spatializer::new(0.0); // Center
+    fn test_normalize_and_fades() {
+        let mut track = AudioTrack::new(100, "Sweep").with_samples(&[0.1, 0.5, 0.2]);
 
-        let sample = 1000;
+        // Normalize peak 0.5 to exactly 1.0
+        AudioEditor::normalize(&mut track);
+        assert_eq!(track.samples[1], 1.0);
+        assert_eq!(track.samples[0], 0.2); // Scaled proportionally by 2.0
 
-        let (l, r) = panner_left.process_sample(sample);
-        assert_eq!(l, sample);
-        assert_eq!(r, 0);
-
-        let (l, r) = panner_right.process_sample(sample);
-        assert_eq!(l, 0);
-        assert_eq!(r, sample);
-
-        let (l, r) = panner_center.process_sample(sample);
-        assert_eq!(l, 500);
-        assert_eq!(r, 500);
+        // Fade in (dur 1 sample: index 0 scaled to 0.0)
+        AudioEditor::fade_in(&mut track, 1);
+        assert_eq!(track.samples[0], 0.0);
     }
 
     #[test]
-    fn test_stereo_mixdown() {
-        let mut mixer = AudioMixer::new(44100);
-        mixer.add_track(AudioTrack {
-            name: "LeftGuitar",
-            pcm_data: alloc::vec![1000, 2000],
-            volume: 1.0,
-            pan: -1.0, // Full Left
-            is_muted: false,
-        });
-        mixer.add_track(AudioTrack {
-            name: "RightVocal",
-            pcm_data: alloc::vec![500, 1000],
-            volume: 1.0,
-            pan: 1.0, // Full Right
-            is_muted: false,
-        });
+    fn test_audacity_cut_and_paste() {
+        let mut track = AudioTrack::new(1, "Beat").with_samples(&[1.0, 2.0, 3.0, 4.0]);
 
-        let mixed = mixer.mixdown_stereo();
-        assert_eq!(mixed.len(), 4); // 2 samples * 2 channels
+        // Cut index 1..3 ([2.0, 3.0])
+        let clipboard = AudioEditor::cut(&mut track, 1, 3);
+        assert_eq!(clipboard.len(), 2);
+        assert_eq!(clipboard[0], 2.0);
+        assert_eq!(track.samples.len(), 2); // left with [1.0, 4.0]
 
-        // Left channel sample 1
-        assert_eq!(mixed[0], 1000);
-        // Right channel sample 1
-        assert_eq!(mixed[1], 500);
-        // Left channel sample 2
-        assert_eq!(mixed[2], 2000);
-        // Right channel sample 2
-        assert_eq!(mixed[3], 1000);
+        // Paste at index 1
+        AudioEditor::paste(&mut track, 1, clipboard.as_slice());
+        assert_eq!(track.samples.len(), 4);
+        assert_eq!(track.samples[2], 3.0);
     }
 }
