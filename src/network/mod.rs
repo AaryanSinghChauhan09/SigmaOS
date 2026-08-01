@@ -1,10 +1,12 @@
 // SigmaOS Network Stack Module
 pub mod tcp;
-pub mod ring_buffer_stack;
-pub mod enterprise;
+pub mod legacy_net;
+pub mod revival;
 
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-pub use ring_buffer_stack::{
-    IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket, TcpState as RingTcpState,
-    compute_checksum, ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
+pub use legacy_net::{
+    LegacyProtocol, LegacyProtocolAdapter,
+};
+pub use revival::{
+    RevivalProtocol, NetRevival,
 };

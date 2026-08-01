@@ -7,6 +7,8 @@ pub mod manager;
 pub mod smart_symlink;
 pub mod support;
 pub mod vfs;
+pub mod legacy_fs;
+pub mod sigma_fs;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -32,3 +34,9 @@ pub use support::{
     SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use legacy_fs::{
+    LegacyFsType, LegacyFSAdapter,
+};
+pub use sigma_fs::{
+    FileBlock, SigmaFS,
+};

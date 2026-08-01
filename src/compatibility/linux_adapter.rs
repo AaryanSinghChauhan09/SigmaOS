@@ -125,7 +125,3 @@ mod tests {
         assert_eq!(adapter.active_windows, 1);
     }
 }
-
-pub struct LegacyDriverAdapter;
-pub struct LegacyFSAdapter;
-pub struct LegacyProtocolAdapter;
