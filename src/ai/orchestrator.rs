@@ -88,6 +88,15 @@ impl SimpleAgentOrchestrator {
             next_id: AtomicUsize::new(1),
         }
     }
+<<<<<<< HEAD
+=======
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+>>>>>>> origin/jules-reactos-subsystem-10297355184030413522
 }
 
 impl AgentOrchestrator for SimpleAgentOrchestrator {
@@ -106,6 +115,7 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                     }
                 }
             }
+<<<<<<< HEAD
             Err(AgentError::NotFound)
         } else {
             for agent_option in &mut self.agents {
@@ -113,10 +123,17 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                     if agent.state() == AgentState::Idle {
                         return agent.execute(task);
                     }
+=======
+        } else if !self.agents.is_empty() {
+            for agent_option in &mut self.agents {
+                if let Some(ref mut agent) = *agent_option {
+                    return agent.execute(task);
+>>>>>>> origin/jules-reactos-subsystem-10297355184030413522
                 }
             }
             Err(AgentError::NotFound)
         }
+        Err(AgentError::NotFound)
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
@@ -146,7 +163,17 @@ pub trait TaskQueue {
     fn size(&self) -> usize;
 }
 
+<<<<<<< HEAD
 #[repr(C)]
+=======
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn peek(&self) -> Option<&[u8]>;
+    fn size(&self) -> usize;
+}
+
+>>>>>>> origin/jules-reactos-subsystem-10297355184030413522
 pub struct SimpleTaskQueue {
     pub tasks: Vec<([u8; 256], u8)>,
 }
