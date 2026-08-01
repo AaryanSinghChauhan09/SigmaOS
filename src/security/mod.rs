@@ -3,12 +3,17 @@
 
 pub mod audit;
 pub mod capability;
-pub mod nemoclaw;
+pub mod integrity;
+pub mod mac;
+pub mod phantom;
+pub mod pki;
 pub mod pledge;
+pub mod secrets;
+pub mod unveil;
 pub mod vulnerability;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
+pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{ExploitPayload, PenetrationAssistant};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};

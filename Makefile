@@ -115,13 +115,6 @@ mrproper: distclean
 	@echo "Mrproper complete."
 
 # Build complete system (Unified profile routing with no circular warnings)
-singularity:
-	@mkdir -p build
-	@echo "Building SigmaOS Singularity Microkernel..."
-	@cargo build --release
-	@cp target/release/sigma_kernel sigmaos.bin
-	@echo "Singularity microkernel build complete."
-
 build:
 	@mkdir -p build
 	@echo "Building SigmaOS (Profile: $(PROFILE), Arch: $(ARCH))..."
@@ -129,10 +122,6 @@ build:
 ifeq ($(PROFILE),browser)
 	@wasm-pack build --target web
 endif
-	@if command -v g++ >/dev/null 2>&1; then \
-		echo "Compiling C++ test_host for CodeQL trace..."; \
-		g++ -O2 tests/cpp_host/test_host.cpp -o build/host_tests || true; \
-	fi
 	@./scripts/build-iso.sh
 	@echo "Build complete."
 

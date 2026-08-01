@@ -27,34 +27,12 @@ pub enum ShellCommand {
     ListProcesses,
     ListFiles,
     Exit,
-    Echo {
-        message: String,
-    },
-    Set {
-        variable: String,
-        value: String,
-    },
-    Get {
-        variable: String,
-    },
-    Alias {
-        name: String,
-        value: String,
-    },
-    Unalias {
-        name: String,
-    },
-    Run {
-        variable: String,
-    },
-    AgentList,
-    AgentRegister {
-        description: String,
-        commands: String,
-    },
-    AgentRun {
-        task_id: usize,
-    },
+    Echo { message: String },
+    Set { variable: String, value: String },
+    Get { variable: String },
+    Theme { name: String },
+    Profile { name: String },
+    A11y { feature: String, enabled: bool },
     Unknown(String),
 }
 
@@ -108,27 +86,43 @@ pub struct ShellRepl {
     variables: std::collections::HashMap<String, String>,
     aliases: std::collections::HashMap<String, String>,
     prompt: String,
-    agent_engine: AgentAutomationEngine,
+    pub current_theme: String,
+    pub current_profile: String,
+    pub a11y_features: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
     pub fn new() -> Self {
+        let mut a11y = std::collections::HashMap::new();
+        a11y.insert("screen_reader".to_string(), false);
+        a11y.insert("high_contrast".to_string(), false);
+        a11y.insert("magnification".to_string(), false);
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
-            agent_engine: AgentAutomationEngine::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: a11y,
         }
     }
 
     pub fn with_prompt(prompt: String) -> Self {
+        let mut a11y = std::collections::HashMap::new();
+        a11y.insert("screen_reader".to_string(), false);
+        a11y.insert("high_contrast".to_string(), false);
+        a11y.insert("magnification".to_string(), false);
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
             prompt,
-            agent_engine: AgentAutomationEngine::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: a11y,
         }
     }
 
@@ -186,18 +180,7 @@ impl ShellRepl {
     }
 
     pub fn parse_command(&self, input: &str) -> ShellCommand {
-        let mut expanded_input = input.to_string();
-        let first_word = input.split_whitespace().next().unwrap_or("");
-        if let Some(alias_value) = self.aliases.get(first_word) {
-            let rest = if input.len() > first_word.len() {
-                &input[first_word.len()..]
-            } else {
-                ""
-            };
-            expanded_input = format!("{}{}", alias_value, rest);
-        }
-
-        let parts: Vec<&str> = expanded_input.split_whitespace().collect();
+        let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
             return ShellCommand::Unknown(input.to_string());
@@ -354,62 +337,33 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "alias" => {
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
                 if parts.len() >= 3 {
-                    ShellCommand::Alias {
-                        name: parts[1].to_string(),
-                        value: parts[2..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "unalias" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Unalias {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "run" | "exec" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Run {
-                        variable: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "agent" => {
-                if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::AgentList,
-                        "run" => {
-                            if parts.len() >= 3 {
-                                if let Ok(id) = parts[2].parse::<usize>() {
-                                    ShellCommand::AgentRun { task_id: id }
-                                } else {
-                                    ShellCommand::Unknown(input.to_string())
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        "register" => {
-                            if parts.len() >= 4 {
-                                let desc = parts[2].to_string();
-                                let cmds = parts[3..].join(" ");
-                                ShellCommand::AgentRegister {
-                                    description: desc,
-                                    commands: cmds,
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
+                    let enabled = match parts[2] {
+                        "on" | "true" | "enable" => true,
+                        _ => false,
+                    };
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        enabled,
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -422,17 +376,16 @@ impl ShellRepl {
     pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help    - Show this help message\n\
-                   ps      - List running processes\n\
-                   ls      - List files\n\
-                   echo    - Print a message\n\
-                   set     - Set a variable\n\
-                   get     - Get a variable\n\
-                   alias   - Create a command shortcut/alias\n\
-                   unalias - Remove an alias\n\
-                   run     - Execute an automated macro/script variable\n\
-                   agent   - Interface for AI Agent Automation tasks (register, list, run)\n\
-                   exit    - Exit the shell"
+                   help             - Show this help message\n\
+                   ps               - List running processes\n\
+                   ls               - List files\n\
+                   echo             - Print a message\n\
+                   set              - Set a variable\n\
+                   get              - Get a variable\n\
+                   theme [name]     - Switch Zenith desktop theme\n\
+                   profile [name]   - Switch Zenith user profile\n\
+                   a11y [feat] [on] - Switch Zenith accessibility settings\n\
+                   exit             - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
@@ -585,70 +538,21 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Alias { name, value } => {
-                self.aliases.insert(name.clone(), value.clone());
-                Ok(format!("alias {} = {}", name, value))
+            ShellCommand::Theme { name } => {
+                self.current_theme = name.clone();
+                Ok(format!("Zenith Theme set to: {}", name))
             }
-            ShellCommand::Unalias { name } => {
-                if self.aliases.remove(&name).is_some() {
-                    Ok(format!("Removed alias {}", name))
-                } else {
-                    Err(format!("Alias '{}' not found", name))
-                }
+            ShellCommand::Profile { name } => {
+                self.current_profile = name.clone();
+                Ok(format!("Zenith Profile set to: {}", name))
             }
-            ShellCommand::Run { variable } => {
-                if let Some(val) = self.variables.get(&variable).cloned() {
-                    self.execute_line(&val);
-                    Ok(format!("Executed macro '{}'", variable))
-                } else {
-                    Err(format!("Variable/Macro '{}' not found", variable))
-                }
-            }
-            ShellCommand::AgentRegister {
-                description,
-                commands,
-            } => {
-                let cmd_list: Vec<String> =
-                    commands.split(';').map(|s| s.trim().to_string()).collect();
-                let id = self
-                    .agent_engine
-                    .register_task(description.clone(), cmd_list);
+            ShellCommand::A11y { feature, enabled } => {
+                self.a11y_features.insert(feature.clone(), enabled);
                 Ok(format!(
-                    "Agent task #{} registered successfully: {}",
-                    id, description
+                    "Zenith Accessibility [{}] set to: {}",
+                    feature,
+                    if enabled { "on" } else { "off" }
                 ))
-            }
-            ShellCommand::AgentList => {
-                if self.agent_engine.registered_tasks.is_empty() {
-                    Ok("No agent automation tasks registered.".to_string())
-                } else {
-                    let mut list_str = "Registered Agent Automation Tasks:\n".to_string();
-                    for (id, task) in &self.agent_engine.registered_tasks {
-                        list_str.push_str(&format!(
-                            "  [#{}] {} (Commands: {})\n",
-                            id,
-                            task.description,
-                            task.commands.join("; ")
-                        ));
-                    }
-                    Ok(list_str)
-                }
-            }
-            ShellCommand::AgentRun { task_id } => {
-                if let Some(task) = self.agent_engine.registered_tasks.get(&task_id).cloned() {
-                    let mut result_str = format!("[Agent Automation Run #{}]\n", task_id);
-                    result_str.push_str(&format!("Task Description: {}\n", task.description));
-                    result_str.push_str("-----------------------------\n");
-                    for (idx, cmd) in task.commands.iter().enumerate() {
-                        result_str.push_str(&format!("Step {}: Executing '{}'...\n", idx + 1, cmd));
-                        self.execute_line(cmd);
-                    }
-                    result_str.push_str("-----------------------------\n");
-                    result_str.push_str("[Agent Automation Complete: Success]");
-                    Ok(result_str)
-                } else {
-                    Err(format!("Agent task #{} not found", task_id))
-                }
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
