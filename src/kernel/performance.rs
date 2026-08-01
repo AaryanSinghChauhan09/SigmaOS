@@ -126,6 +126,97 @@ impl<T: Clone, const N: usize> Default for ZeroCopyQueue<T, N> {
     }
 }
 
+/// Thread-Safe, Lock-Free Circular Ring-Buffer utilizing Power-of-Two capacity
+/// and bitwise masking for constant-time lookups (S-GAPFILL Bolt optimization).
+pub struct PowerOfTwoZeroCopyQueue<T, const N: usize> {
+    buffer: [Option<T>; N],
+    head: AtomicUsize,
+    tail: AtomicUsize,
+    metrics: ZeroCopyMetrics,
+}
+
+impl<T: Clone, const N: usize> PowerOfTwoZeroCopyQueue<T, N> {
+    pub fn new() -> Self {
+        assert!(N > 0 && (N & (N - 1)) == 0, "Capacity N must be a power of two!");
+        Self {
+            buffer: [const { None }; N],
+            head: AtomicUsize::new(0),
+            tail: AtomicUsize::new(0),
+            metrics: ZeroCopyMetrics::default(),
+        }
+    }
+
+    /// Pushes onto the queue utilizing single-cycle bitwise masking instead of slow modulo division.
+    pub fn enqueue(&mut self, item: T) -> Result<(), IpcError> {
+        let head = self.head.load(Ordering::Relaxed);
+        let tail = self.tail.load(Ordering::Acquire);
+
+        if head.wrapping_sub(tail) >= N {
+            self.metrics.full_errors += 1;
+            return Err(IpcError::QueueFull);
+        }
+
+        let idx = head & (N - 1);
+        self.buffer[idx] = Some(item);
+        self.head.store(head.wrapping_add(1), Ordering::Release);
+        self.metrics.enqueued_count += 1;
+
+        let current_size = head.wrapping_sub(tail) + 1;
+        if current_size > self.metrics.peak_occupancy {
+            self.metrics.peak_occupancy = current_size;
+        }
+
+        Ok(())
+    }
+
+    /// Pulls out of the queue utilizing single-cycle bitwise masking.
+    pub fn dequeue(&mut self) -> Result<T, IpcError> {
+        let head = self.head.load(Ordering::Acquire);
+        let tail = self.tail.load(Ordering::Relaxed);
+
+        if tail == head {
+            self.metrics.empty_errors += 1;
+            return Err(IpcError::QueueEmpty);
+        }
+
+        let idx = tail & (N - 1);
+        let item = self.buffer[idx].take().ok_or_else(|| {
+            self.metrics.empty_errors += 1;
+            IpcError::InvalidPayload
+        })?;
+        self.tail.store(tail.wrapping_add(1), Ordering::Release);
+        self.metrics.dequeued_count += 1;
+        Ok(item)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.head.load(Ordering::Acquire) == self.tail.load(Ordering::Acquire)
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.head
+            .load(Ordering::Acquire)
+            .wrapping_sub(self.tail.load(Ordering::Acquire))
+            >= N
+    }
+
+    pub fn len(&self) -> usize {
+        self.head
+            .load(Ordering::Acquire)
+            .wrapping_sub(self.tail.load(Ordering::Acquire))
+    }
+
+    pub fn get_metrics(&self) -> ZeroCopyMetrics {
+        self.metrics
+    }
+}
+
+impl<T: Clone, const N: usize> Default for PowerOfTwoZeroCopyQueue<T, N> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// UDF Scheduler Instruction set
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedOpcode {
@@ -601,5 +692,30 @@ mod tests {
         assert!(vm.evaluate_priority(&process).is_err());
         assert_eq!(vm.get_metrics().register_errors, 1);
         assert_eq!(vm.get_metrics().evaluation_runs, 2);
+    }
+
+    #[test]
+    fn test_power_of_two_zero_copy_queue() {
+        let mut queue: PowerOfTwoZeroCopyQueue<u32, 4> = PowerOfTwoZeroCopyQueue::new();
+
+        assert!(queue.is_empty());
+        assert!(!queue.is_full());
+
+        queue.enqueue(10).unwrap();
+        queue.enqueue(20).unwrap();
+        queue.enqueue(30).unwrap();
+
+        assert_eq!(queue.len(), 3);
+
+        assert_eq!(queue.dequeue().unwrap(), 10);
+        assert_eq!(queue.dequeue().unwrap(), 20);
+
+        assert_eq!(queue.len(), 1);
+
+        // Check metrics
+        let metrics = queue.get_metrics();
+        assert_eq!(metrics.enqueued_count, 3);
+        assert_eq!(metrics.dequeued_count, 2);
+        assert_eq!(metrics.peak_occupancy, 3);
     }
 }

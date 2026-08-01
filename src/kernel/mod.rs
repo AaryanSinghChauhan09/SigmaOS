@@ -9,12 +9,12 @@ pub mod roundrobin;
 pub mod scheduler;
 pub mod meta;
 pub mod paging;
-pub mod performance;
 pub mod policy_mechanism;
 pub mod breakthroughs;
 pub mod ipc;
 pub mod linux_absorb;
 pub mod subsystem;
+pub mod generation_manager;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
@@ -51,3 +51,5 @@ pub use breakthroughs::{
     UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
     EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
 };
+pub use generation_manager::{Generation, GenerationManager};
+pub use performance::{PowerOfTwoZeroCopyQueue, ZeroCopyQueue, IpcError as PerfIpcError};

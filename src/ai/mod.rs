@@ -10,6 +10,7 @@ pub mod voice;
 pub mod qwenpaw;
 pub mod perplexity;
 pub mod awesome_ai;
+pub mod open_computer;
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use qwenpaw::{PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentCommunicationProtocol};
@@ -23,9 +24,6 @@ pub use llm::{
     GrokGqaMapper, GrokWeightStreamer,
 };
 pub use orchestrator::{AgentOrchestrator, SimpleAgentOrchestrator, AgentState};
-pub use sai::{
-    Agent, AgentRole, AgentTask as Task, TaskStatus,
-};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,

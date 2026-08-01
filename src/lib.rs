@@ -8,6 +8,7 @@ extern crate alloc;
 
 pub mod accessibility;
 pub mod ai;
+pub mod boot;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -20,6 +21,7 @@ pub mod drivers;
 pub mod filesystem;
 pub mod ipc;
 pub mod kernel;
+pub mod klib;
 #[path = "klib/vec.rs"]
 pub mod klib_vec;
 pub mod network;
@@ -105,6 +107,7 @@ pub use kernel::{
     PrivilegeLevel, Process, ProcessState, ProtectionDomain, ResourceBroker, RoundRobinConfig,
     RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions, PAGE_SIZE,
+    PowerOfTwoZeroCopyQueue, ZeroCopyQueue,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,

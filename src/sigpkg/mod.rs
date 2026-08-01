@@ -18,7 +18,6 @@ pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use spec::{
     ManagerCapability, PackageCapability, PackageDependency, PackageError as SpecPackageError,
     PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
