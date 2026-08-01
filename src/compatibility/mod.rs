@@ -1,19 +1,28 @@
 // SigmaOS Compatibility Module
+pub mod chimera_linux;
 pub mod cross_platform;
-pub mod india_stack;
 pub mod mint_linux;
-pub mod reactos;
+pub mod relay_nexus;
+pub mod bodhi_moksha;
 
+pub use endeavour::{
+    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
+    Mirror, WelcomeTab,
+};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
-pub use mint_linux::{
-    MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, MintUpdateManager,
-    SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor,
-};
 pub use reactos::{
     NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
     RegistryHive,
 };
+
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
+    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+};
+
+pub use relay_nexus::{WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus};
+pub use bodhi_moksha::{EflCanvasElement, MokshaProfile, MokshaDesktopManager};
