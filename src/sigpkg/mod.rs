@@ -1,12 +1,17 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod linux_compat;
 pub mod recipe;
 pub mod resolver;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
 
+pub use linux_compat::{
+    DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
+    TranslatedMetadata, TranslatorError,
+};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
