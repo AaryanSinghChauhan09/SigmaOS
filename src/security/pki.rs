@@ -230,16 +230,18 @@ pub type PkiError = PKIError;
 pub use PKIManager as PkiManager;
 pub struct CertificateAuthority;
 
-impl Vec<CertificateID> {
-    fn contains(&self, item: CertificateID) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                let stored = core::ptr::read(self.data.add(i));
-                if stored == item {
-                    return true;
-                }
-            }
-        }
-        false
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_pki_manager() {
+        let mut manager = SimplePKIManager::new();
+        let cert = SimpleCertificate::new(1, CertificateType::Root, b"Subject", b"Issuer");
+        let id = manager.issue_certificate(Box::new(cert)).unwrap();
+        assert_eq!(id, 1);
+
+        let retrieved = manager.get_certificate(1).unwrap();
+        assert_eq!(retrieved.subject(), b"Subject");
     }
 }

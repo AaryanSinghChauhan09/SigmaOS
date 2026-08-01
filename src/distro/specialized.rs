@@ -534,18 +534,9 @@ pub struct ThreeTierReleaseModel {
 impl ThreeTierReleaseModel {
     pub fn new() -> Self {
         let mut channels = HashMap::new();
-        channels.insert(
-            "sigma.next".to_string(),
-            "Rolling, experimental, daily updates".to_string(),
-        );
-        channels.insert(
-            "sigma.beta".to_string(),
-            "Pre-release, weekly, mostly stable".to_string(),
-        );
-        channels.insert(
-            "sigma.stable".to_string(),
-            "Production LTS, quarterly security-only".to_string(),
-        );
+        channels.insert("sigma.next".to_string(), "Rolling, experimental, daily updates".to_string());
+        channels.insert("sigma.beta".to_string(), "Pre-release, weekly, mostly stable".to_string());
+        channels.insert("sigma.stable".to_string(), "Production LTS, quarterly security-only".to_string());
 
         Self {
             active_channel: "sigma.stable".to_string(),
@@ -572,10 +563,7 @@ impl ThreeTierReleaseModel {
     pub fn set_channel(&mut self, channel: &str) -> Result<String, &'static str> {
         if self.channels.contains_key(channel) {
             self.active_channel = channel.to_string();
-            Ok(format!(
-                "Σ [PKG] Channel set to {} (LTS). No experimental features.",
-                channel
-            ))
+            Ok(format!("Σ [PKG] Channel set to {} (LTS). No experimental features.", channel))
         } else {
             Err("Unknown release channel")
         }
@@ -612,12 +600,7 @@ impl DebianSocialContract {
         }
     }
 
-    pub fn evaluate_social_contract_compliance(
-        &self,
-        is_open_source: bool,
-        is_bug_public: bool,
-        is_user_needs_prioritized: bool,
-    ) -> bool {
+    pub fn evaluate_social_contract_compliance(&self, is_open_source: bool, is_bug_public: bool, is_user_needs_prioritized: bool) -> bool {
         if self.open_source_only && !is_open_source {
             return false;
         }

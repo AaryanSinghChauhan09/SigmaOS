@@ -460,14 +460,27 @@ impl MACEngine for SimpleMACEngine {
     }
 }
 
-// External allocator functions
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.len == 0 {
-            &[] as &[T]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
+pub use MACPolicy as MacPolicy;
+pub struct MacRule;
+pub struct MacSecurity;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_mac_engine() {
+        let cap = EngineCapability::full();
+        let mut engine = SimpleMACEngine::new(cap);
+        let ctx_id = engine.create_context(
+            SecurityLevel::Medium,
+            SecurityDomain::System,
+            ContextCapability::full(),
+        ).unwrap();
+        let policy_cap = PolicyCapability::full();
+        let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
+        engine.register_policy(Box::new(policy)).unwrap();
+
+        assert!(engine.check_access(ctx_id, SecurityOperation::Read));
     }
 }
