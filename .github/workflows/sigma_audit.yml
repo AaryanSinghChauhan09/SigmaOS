@@ -12,7 +12,9 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Set up Environment
-      run: sudo apt-get install -y cppcheck gcc-multilib build-essential
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y cppcheck gcc-multilib build-essential
     - name: Compile Sovereign Kernel
       run: echo "Simulating make zenith-iso for SigmaOS Architecture..."
     - name: CodeQL Security Scan
