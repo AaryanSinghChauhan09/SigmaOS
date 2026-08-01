@@ -356,6 +356,26 @@ impl Default for SimpleAIAgentManager {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct AgentInfo {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ManagerCapability {
+    pub value: u64,
+}
+
+impl ManagerCapability {
+    pub fn full() -> Self {
+        ManagerCapability { value: !0 }
+    }
+    pub fn none() -> Self {
+        ManagerCapability { value: 0 }
+    }
+}
+
 impl AIAgentManager for SimpleAIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError> {
         let id = self.agents.len();

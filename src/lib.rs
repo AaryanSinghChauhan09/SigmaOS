@@ -16,7 +16,6 @@ pub mod filesystem;
 pub mod gpu;
 pub mod graphics;
 pub mod kernel;
-pub mod klib;
 pub mod media;
 pub mod network;
 pub mod observability;

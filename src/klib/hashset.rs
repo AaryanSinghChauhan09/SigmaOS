@@ -1,7 +1,7 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::HashMap;
+use super::{HashMap, hashmap::HashMapIter};
 
 pub struct HashSet<T>
 where
@@ -64,13 +64,16 @@ where
     }
 }
 
-pub struct HashSetIter<'a, T> {
+pub struct HashSetIter<'a, T>
+where
+    T: PartialEq + Clone + 'a,
+{
     map_iter: HashMapIter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>
 where
-    T: PartialEq + Clone,
+    T: PartialEq + Clone + 'a,
 {
     type Item = &'a T;
 
