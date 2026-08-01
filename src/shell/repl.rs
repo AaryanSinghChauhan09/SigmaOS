@@ -3,15 +3,6 @@
 
 use std::io::{self, BufRead, Write};
 
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -56,33 +47,6 @@ pub enum ShellCommand {
     },
     Rm {
         filename: String,
-    },
-    Theme {
-        theme_name: String,
-    },
-    Profile {
-        profile_name: String,
-    },
-    A11y {
-        feature: String,
-        state: String,
-    },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
     },
     Theme {
         theme_name: String,
@@ -338,34 +302,6 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        theme_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        profile_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        state: parts[2].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "set" => {
                 if parts.len() >= 3 {
                     ShellCommand::Set {
@@ -380,38 +316,6 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Get {
                         variable: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    let enabled = match parts[2] {
-                        "on" | "true" | "enable" => true,
-                        _ => false,
-                    };
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        enabled,
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -589,22 +493,6 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Theme { name } => {
-                self.current_theme = name.clone();
-                Ok(format!("Zenith Theme set to: {}", name))
-            }
-            ShellCommand::Profile { name } => {
-                self.current_profile = name.clone();
-                Ok(format!("Zenith Profile set to: {}", name))
-            }
-            ShellCommand::A11y { feature, enabled } => {
-                self.a11y_features.insert(feature.clone(), enabled);
-                Ok(format!(
-                    "Zenith Accessibility [{}] set to: {}",
-                    feature,
-                    if enabled { "on" } else { "off" }
-                ))
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -836,42 +724,5 @@ mod tests {
         assert!(matches!(cmd, ShellCommand::Rm { .. }));
         let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Removed file: testfile.txt");
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AgentTask {
-    pub task_id: usize,
-    pub description: String,
-    pub commands: Vec<String>,
-}
-
-/// AI Agent Automation Engine inside SigmaOS REPL
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine {
-    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
-    pub next_task_id: usize,
-}
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine {
-            registered_tasks: std::collections::HashMap::new(),
-            next_task_id: 1,
-        }
-    }
-
-    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
-        let id = self.next_task_id;
-        self.next_task_id += 1;
-        self.registered_tasks.insert(
-            id,
-            AgentTask {
-                task_id: id,
-                description,
-                commands,
-            },
-        );
-        id
     }
 }
