@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::boxed::Box;
 use crate::klib::Vec;
 /// OOP-based Screen Magnifier for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 826
@@ -92,7 +94,8 @@ impl MagnifierManager for SimpleMagnifierManager {
 
     fn destroy_magnifier(&mut self, id: MagnifierID) -> Result<(), MagnifierError> {
         for magnifier_option in &mut self.magnifiers {
-            if let Some(ref magnifier) = *magnifier_option {
+            if let Some(ref magnifier_box) = *magnifier_option {
+                let magnifier: &dyn Magnifier = &**magnifier_box;
                 if magnifier.id() == id {
                     *magnifier_option = None;
                     return Ok(());
@@ -104,9 +107,10 @@ impl MagnifierManager for SimpleMagnifierManager {
 
     fn get_magnifier(&self, id: MagnifierID) -> Option<&dyn Magnifier> {
         for magnifier_option in &self.magnifiers {
-            if let Some(ref magnifier) = *magnifier_option {
+            if let Some(ref magnifier_box) = *magnifier_option {
+                let magnifier: &dyn Magnifier = &**magnifier_box;
                 if magnifier.id() == id {
-                    return Some(magnifier.as_ref());
+                    return Some(magnifier);
                 }
             }
         }

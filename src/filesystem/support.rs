@@ -59,7 +59,7 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        unsafe { core::mem::transmute(self.fs_type.load(Ordering::SeqCst) as u32) }
+        unsafe { core::mem::transmute(self.fs_type.load(Ordering::SeqCst) as usize) }
     }
 
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {
@@ -262,10 +262,10 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 }
 
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+pub struct Vec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
 }
 
 impl<T> Vec<T> {
@@ -388,6 +388,19 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

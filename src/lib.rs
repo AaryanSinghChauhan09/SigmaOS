@@ -2,6 +2,7 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
+pub mod klib;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -93,6 +94,9 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+    DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
+    LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
+    RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,

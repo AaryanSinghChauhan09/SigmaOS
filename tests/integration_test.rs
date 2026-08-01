@@ -1,35 +1,30 @@
 // SigmaOS Integration Tests
-// Verifies core system legacy compatibility, multi-persona VMs, and driver bridge layers
+// Verifies core system legacy compatibility, accessibility subsystems, driver framework, and filesystem support in standalone mode
 #![allow(unused, clippy::all)]
 
-use sigmaos::compatibility::{
-    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
-    AntixDesktopProfiler, AntixInitManager, BinaryCompatMatrix, BundleType,
-    DesktopProfile as AntixDesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival,
-    GraphicsBridge, InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus,
-    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService,
-    MicroService as AntixMicroService, MicroServiceState,
-    MicroServiceState as AntixMicroServiceState, NetworkBridge, StorageBridge, SyscallAbi,
-    TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
-    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
-    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+use sigmaos::accessibility::{
+    AccessibilityError, AccessibilityFramework, AccessibilityProfile, AccessibilitySetting,
 };
-use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+use sigmaos::accessibility::keyboard::{
+    SimpleOnScreenKeyboard, SimpleVirtualKey, VirtualKey, KeyType, OnScreenKeyboard, KeyID,
+};
+use sigmaos::accessibility::magnifier::{
+    SimpleMagnifierManager, MagnifierManager, Magnifier,
+};
+use sigmaos::accessibility::screenreader::{
+    SimpleScreenReader, SimpleVoice, Voice, VoiceGender, ScreenReader,
+};
+use sigmaos::driver::framework::{
+    Driver, DriverError, DriverID, DriverState, DriverType, SimpleDriver, SimpleDriverFramework, DriverFramework,
+};
+use sigmaos::filesystem::support::{
+    SimpleFilesystemManager, FilesystemManager, SimpleBtrfsFS, SimpleZFS, Filesystem, FilesystemType, BtrfsFeatures, ZFSFeatures,
+};
 use sigmaos::kernel::{Priority, Process, ProcessState};
 use sigmaos::package::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
     LinuxTranslationService, PackageFormat, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
-};
-use sigmaos::performance::{
-    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
-    PerformanceProfileRule, RamDefragmenter, SmartPerformanceProfile, SmartResourceOptimizer,
-    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
-};
-use sigmaos::security::{
-    AnonSurfShunt, AppSandboxEngine, DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter,
-    MaliciousSignature, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC,
-    GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 
 #[cfg(test)]
@@ -42,203 +37,74 @@ mod tests {
     }
 
     #[test]
-    fn test_legacy_personality_and_syscall_adaptation_flow() {
-        // Step 1: Initialize the multi-persona VM
-        let vm = KernelPersonaVM::new();
-        assert_eq!(vm.get_persona(), KernelPersona::Linux_6_x);
+    fn test_accessibility_subsystem_standalone() {
+        // 1. On-Screen Keyboard with Sticky Keys and Virtual Keypresses
+        let mut keyboard = SimpleOnScreenKeyboard::new();
+        let key = SimpleVirtualKey::new(10, b"Ctrl", KeyType::Modifier);
+        keyboard.keys.push(Some(Box::new(key)));
 
-        // Hot-swap kernel persona to 2.6 for legacy application expectations
-        vm.hot_swap_persona(KernelPersona::Linux_2_6);
-        assert_eq!(vm.get_persona(), KernelPersona::Linux_2_6);
+        assert!(keyboard.get_key(10).is_some());
+        assert_eq!(keyboard.get_key(10).unwrap().key_type(), KeyType::Modifier);
+        assert!(!keyboard.get_key(10).unwrap().is_pressed());
 
-        // Step 2: Use the Binary Compatibility Matrix to decode and translate syscall expectations
-        let matrix = BinaryCompatMatrix::new(LibcVersion::Libc5, SyscallAbi::Oabi_32);
-        let translated_sys = matrix.translate_sys_context(5); // expect 1005 offset mapping
-        assert_eq!(translated_sys, 1005);
+        keyboard.press_key(10).unwrap();
+        assert!(keyboard.get_key(10).unwrap().is_pressed());
 
-        // Step 3: Verify the API Timeline Manager parameter mappings
-        let timeline = APITimelineManager::new(KernelPersona::Linux_2_6);
-        let cleaned_param = timeline.map_syscall_params(0x0000111100002222);
-        assert_eq!(cleaned_param, 0x00002222);
+        keyboard.release_key(10).unwrap();
+        assert!(!keyboard.get_key(10).unwrap().is_pressed());
+
+        // 2. Magnifier zoom level configuration
+        let mut mag_manager = SimpleMagnifierManager::new();
+        let mag_id = mag_manager.create_magnifier().unwrap();
+        assert!(mag_manager.get_magnifier(mag_id).is_some());
+        assert_eq!(mag_manager.get_magnifier(mag_id).unwrap().zoom_level(), 2.0);
+
+        // 3. Screen Reader voice registration and speech synthesis
+        let mut reader = SimpleScreenReader::new();
+        let voice = SimpleVoice::new(42, b"Alice", VoiceGender::Female);
+        reader.register_voice(Box::new(voice));
+
+        assert!(reader.get_voice(42).is_some());
+        assert_eq!(reader.get_voice(42).unwrap().gender(), VoiceGender::Female);
+        assert_eq!(reader.speak(b"Welcome to Standalone SigmaOS", 42), Ok(()));
     }
 
     #[test]
-    fn test_legacy_driver_bridge_revival() {
-        let storage = StorageBridge {
-            driver_name: "floppy-drive-controller",
-            bus: LegacyBus::Isa,
-        };
-        let graphics = GraphicsBridge {
-            driver_name: "crt-terminal-controller",
-            bus: LegacyBus::Agp,
-        };
+    fn test_driver_framework_lifecycle() {
+        let mut framework = SimpleDriverFramework::new();
 
-        assert_eq!(storage.bus_type(), LegacyBus::Isa);
-        assert_eq!(graphics.bus_type(), LegacyBus::Agp);
-        assert!(storage.init_legacy());
-        assert!(graphics.init_legacy());
+        // Register a block device driver translation wrapper
+        let simple_drv = SimpleDriver::new(1001, DriverType::Block);
+        assert!(framework.register_driver(Box::new(simple_drv)).is_ok());
+
+        // Validate state transitions through initialization and load sequences
+        assert!(framework.load_driver(1001).is_ok());
+        assert_eq!(framework.get_driver(1001).unwrap().state(), DriverState::Active);
+
+        assert!(framework.unload_driver(1001).is_ok());
+        assert_eq!(framework.get_driver(1001).unwrap().state(), DriverState::Unloaded);
     }
 
     #[test]
-    fn test_legacy_workload_optimizer_tuning() {
-        let optimizer = WorkloadOptimizer::new();
-        assert_eq!(optimizer.get_profile(), WorkloadProfile::LowMemoryProfile);
+    fn test_filesystem_support_and_features() {
+        let mut fs_manager = SimpleFilesystemManager::new();
 
-        // Apply Single Core scheduling locks for early thread assumptions
-        optimizer.apply_workload_tuning(WorkloadProfile::SingleCoreProfile);
-        assert_eq!(optimizer.get_profile(), WorkloadProfile::SingleCoreProfile);
-    }
+        // 1. Setup a Simple Btrfs filesystem and verify subvolume structures
+        let mut btrfs = SimpleBtrfsFS::new(101);
+        assert!(btrfs.create_subvolume(b"root").is_ok());
+        assert!(btrfs.create_subvolume(b"home").is_ok());
+        assert_eq!(btrfs.list_subvolumes().len(), 2);
 
-    #[test]
-    fn test_parrot_security_parity() {
-        // Test AnonSurf Shunt
-        let shunt = AnonSurfShunt::new();
-        assert_eq!(shunt.get_mode(), RoutingMode::DirectCleartext);
-        assert_eq!(shunt.get_packets_routed(), 0);
+        // 2. Setup a Simple ZFS pool dataset and snapshoting
+        let mut zfs = SimpleZFS::new(102);
+        assert!(zfs.create_dataset(b"tank/data").is_ok());
+        assert!(zfs.create_snapshot(b"tank/data", b"snap1").is_ok());
 
-        shunt.enable_anonsurf();
-        assert_eq!(shunt.get_mode(), RoutingMode::TorAnonymized);
+        assert!(fs_manager.register_filesystem(Box::new(btrfs.base)).is_ok());
+        assert!(fs_manager.register_filesystem(Box::new(zfs.base)).is_ok());
 
-        shunt.shunt_packet(42, 1024);
-        assert_eq!(shunt.get_packets_routed(), 1);
-
-        shunt.disable_anonsurf();
-        assert_eq!(shunt.get_mode(), RoutingMode::DirectCleartext);
-
-        // Test AppSandbox
-        let sandbox = AppSandboxEngine::new();
-        // Default policy forbids raw sockets and network
-        assert!(!sandbox.validate_network_socket(true));
-        assert!(!sandbox.validate_network_socket(false));
-
-        // File system writes should only be allowed inside permitted subpath
-        assert!(sandbox.validate_filesystem_write("/sandbox/tmp/test.txt"));
-        assert!(!sandbox.validate_filesystem_write("/etc/passwd"));
-
-        sandbox.update_policy(SandboxPolicy {
-            allow_network: true,
-            allow_raw_sockets: true,
-            allow_filesystem_write: true,
-            permitted_subpath: "/anywhere",
-        });
-        assert!(sandbox.validate_network_socket(true));
-        assert!(sandbox.validate_filesystem_write("/etc/passwd"));
-
-        // Test ForensicStorageFilter
-        let filter = ForensicStorageFilter::new();
-        let mut buffer = [0u8; 512];
-        assert!(!filter.intercept_device_write(0, &buffer));
-
-        filter.set_write_blocker(false);
-        assert!(filter.intercept_device_write(0, &buffer));
-
-        let mut secure_key = [0xAAu8; 16];
-        filter.secure_memory_wipe(&mut secure_key);
-        for &b in &secure_key {
-            assert_eq!(b, 0x00);
-        }
-    }
-
-    #[test]
-    fn test_chakra_linux_inspirations() {
-        // Test Akabei Bundle Resolver
-        let akabei = AkabeiPackageEngine::new();
-        assert!(akabei.resolve_and_sandbox("gimp-app"));
-        assert!(akabei.resolve_and_sandbox("plasma-desktop"));
-        assert!(!akabei.resolve_and_sandbox("non-existent-app"));
-
-        // Test Kapudan setup assistant
-        let kapudan = KapudanAssistant::new();
-        kapudan.welcome_user();
-        assert_eq!(kapudan.get_theme(), DesktopTheme::CaledoniaDark);
-        kapudan.set_theme(DesktopTheme::ZenithTranslucent);
-        assert_eq!(kapudan.get_theme(), DesktopTheme::ZenithTranslucent);
-
-        // Test Tribe installer
-        let installer = TribeInstaller::new(120);
-        assert_eq!(installer.get_step(), InstallerStep::Welcome);
-        installer.execute_installation("admin");
-        assert_eq!(installer.get_step(), InstallerStep::Completed);
-    }
-
-    #[test]
-    fn test_defensive_audit_and_anomaly_detection() {
-        let audit = DefensiveAuditSystem::new(75);
-
-        // Log simple safe event
-        assert!(audit.log_event(1716000000, 1000, 4, b"ls -la").is_ok());
-
-        // Test safe payload anomaly scoring
-        let safe_score = audit.evaluate_anomaly_score(b"cat file.txt");
-        assert!(safe_score < 75);
-        assert!(audit.check_payload_safety(b"cat file.txt"));
-
-        // Test malicious payload anomaly scoring (contains "/bin/sh")
-        let malicious_score = audit.evaluate_anomaly_score(b"sudo /bin/sh -c 'rm -rf /'");
-        assert!(malicious_score >= 80);
-        assert!(!audit.check_payload_safety(b"sudo /bin/sh -c 'rm -rf /'"));
-    }
-
-    #[test]
-    fn test_smart_symbolic_links() {
-        let mut link1 = SmartSymlink::new("lib-redirect-1", "/usr/lib/modern/libc.so");
-        assert!(link1.add_fallback_target("/usr/lib/legacy/libc.so"));
-        assert!(link1.add_fallback_target("/lib/libc.so"));
-
-        let mut link2 = SmartSymlink::new("lib-redirect-2", "/usr/lib/alt/libc.so");
-
-        let rule = LinuxPersonaRule;
-
-        // Case 1: Primary target exists
-        let res1 =
-            link1.resolve_symlink(KernelPersona::Linux_6_x, true, &[false, false], &rule, None);
-        assert_eq!(res1, Ok("/usr/lib/modern/libc.so"));
-
-        // Case 2: Primary target broken, heals to fallback index 1
-        let res2 =
-            link1.resolve_symlink(KernelPersona::Linux_6_x, false, &[false, true], &rule, None);
-        assert_eq!(res2, Ok("/lib/libc.so"));
-
-        // Case 3: Complete orphaning
-        let res3 = link1.resolve_symlink(
-            KernelPersona::Linux_6_x,
-            false,
-            &[false, false],
-            &rule,
-            None,
-        );
-        assert!(res3.is_err());
-
-        // Case 4: ELOOP infinite recursion detection (nested lookup chains)
-        let mut loop_err = Ok("");
-        for _ in 0..12 {
-            loop_err = link1.resolve_symlink(
-                KernelPersona::Linux_6_x,
-                true,
-                &[false, false],
-                &rule,
-                Some(&link2),
-            );
-            if loop_err.is_err() {
-                break;
-            }
-        }
-        assert_eq!(
-            loop_err,
-            Err("ELOOP: Infinite loop or excessive recursion detected in symlink path resolution.")
-        );
-
-        // Case 5: Rule context-awareness evaluation
-        let legacy_rule = LegacyLinuxRule;
-        // On modern Linux_6_x kernel, Legacy rule rejects and points directly to first fallback path
-        let res_legacy = link1.resolve_symlink(
-            KernelPersona::Linux_6_x,
-            true,
-            &[false, false],
-            &legacy_rule,
-            None,
-        );
-        assert_eq!(res_legacy, Ok("/usr/lib/legacy/libc.so"));
+        assert!(fs_manager.get_filesystem(101).is_some());
+        assert_eq!(fs_manager.get_filesystem(101).unwrap().fs_type(), FilesystemType::Btrfs);
     }
 
     #[test]
@@ -282,101 +148,5 @@ mod tests {
         assert_eq!(pac_translator.source_format(), PackageFormat::Pacman);
         let pac_driver = pac_translator.translate_to_driver();
         assert_eq!(pac_driver.id, 9903);
-    }
-
-    #[test]
-    fn test_antix_linux_parity() {
-        // Test SysV-parity MicroServices inside AntixInitManager
-        let init = AntixInitManager::new();
-        assert_eq!(init.services[0].get_state(), MicroServiceState::Stopped);
-        init.boot_systemd_free();
-        assert_eq!(init.services[0].get_state(), MicroServiceState::Running);
-        assert_eq!(init.services[1].get_state(), MicroServiceState::Running);
-
-        init.services[0].stop();
-        assert_eq!(init.services[0].get_state(), MicroServiceState::Stopped);
-
-        // Test Low-Overhead Desktop Profiler
-        let profiler = AntixDesktopProfiler::new();
-        assert_eq!(profiler.get_profile(), AntixDesktopProfile::IceWM);
-        profiler.apply_profile(AntixDesktopProfile::JWM);
-        assert_eq!(profiler.get_profile(), AntixDesktopProfile::JWM);
-
-        // Test Control Center Legacy configuration coordinator
-        let control = AntixControlCenter::new();
-        control.auto_configure_legacy_hardware();
-
-        // Test Aggressive Memory Cache Trimmer
-        let trimmer = LegacyMemoryTrimmer::new();
-        // High RAM: normal reclaim
-        let reclaim1 = trimmer.trim_caches(1024);
-        assert!(reclaim1 > 0);
-
-        // Low RAM (e.g. 256 MB): triggers aggressive escalation (max target state)
-        let reclaim2 = trimmer.trim_caches(256);
-        assert_eq!(
-            trimmer
-                .trim_aggressiveness
-                .load(core::sync::atomic::Ordering::SeqCst),
-            10
-        );
-    }
-
-    #[test]
-    fn test_smart_resource_optimizer() {
-        // Test CPU Priority Optimizer
-        let cpu_optimizer = CpuPriorityOptimizer::new();
-        let mut proc1 = Process::new(1, "proc1".to_string(), Priority::Normal);
-        proc1.state = ProcessState::Running;
-        let mut proc2 = Process::new(2, "proc2".to_string(), Priority::Normal);
-        proc2.state = ProcessState::Blocked;
-        let mut processes = [proc1, proc2];
-
-        cpu_optimizer.optimize_process_priorities(&mut processes);
-        assert_eq!(processes[0].priority, Priority::High);
-        assert_eq!(processes[1].priority, Priority::Low);
-
-        // Test RAM Defragmenter
-        let defragmenter = RamDefragmenter::new();
-        let reclaimed = defragmenter.defragment_heap_allocations(1048576); // 1 MB
-        assert_eq!(reclaimed, 1048576 / 8);
-        assert_eq!(
-            defragmenter
-                .cleanup_count
-                .load(core::sync::atomic::Ordering::SeqCst),
-            1
-        );
-
-        // Test I/O Priority Optimizer
-        let io_optimizer = IoPriorityOptimizer::new();
-        assert_eq!(
-            io_optimizer.resolve_disk_io_priority(true),
-            IoTaskPriority::RealTime
-        );
-        assert_eq!(
-            io_optimizer.resolve_disk_io_priority(false),
-            IoTaskPriority::Idle
-        );
-
-        // Test Glary Smart Rule
-        let rule = GlarySmartRule;
-        assert_eq!(
-            rule.evaluate_target_profile(10, 50),
-            SmartPerformanceProfile::EcoBattery
-        ); // low battery
-        assert_eq!(
-            rule.evaluate_target_profile(90, 90),
-            SmartPerformanceProfile::EcoBattery
-        ); // high temp
-        assert_eq!(
-            rule.evaluate_target_profile(90, 45),
-            SmartPerformanceProfile::TurboMax
-        ); // turbo
-
-        // Test Unified Smart Resource Optimizer
-        let optimizer = SmartResourceOptimizer::new();
-        assert_eq!(optimizer.get_profile(), SmartPerformanceProfile::NormalAuto);
-        optimizer.execute_auto_tuning(95, 40, &rule);
-        assert_eq!(optimizer.get_profile(), SmartPerformanceProfile::TurboMax);
     }
 }

@@ -1,3 +1,5 @@
+extern crate alloc;
+use alloc::boxed::Box;
 use crate::klib::Vec;
 /// OOP-based Accessibility Keyboard for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 836
@@ -109,7 +111,8 @@ impl SimpleOnScreenKeyboard {
 impl OnScreenKeyboard for SimpleOnScreenKeyboard {
     fn press_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError> {
         for key_option in &mut self.keys {
-            if let Some(ref mut key) = *key_option {
+            if let Some(ref mut key_box) = *key_option {
+                let key: &mut dyn VirtualKey = &mut **key_box;
                 if key.id() == key_id {
                     key.set_pressed(true);
                     return Ok(());
@@ -121,7 +124,8 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
 
     fn release_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError> {
         for key_option in &mut self.keys {
-            if let Some(ref mut key) = *key_option {
+            if let Some(ref mut key_box) = *key_option {
+                let key: &mut dyn VirtualKey = &mut **key_box;
                 if key.id() == key_id {
                     key.set_pressed(false);
                     return Ok(());
@@ -133,9 +137,10 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
 
     fn get_key(&self, id: KeyID) -> Option<&dyn VirtualKey> {
         for key_option in &self.keys {
-            if let Some(ref key) = *key_option {
+            if let Some(ref key_box) = *key_option {
+                let key: &dyn VirtualKey = &**key_box;
                 if key.id() == id {
-                    return Some(key.as_ref());
+                    return Some(key);
                 }
             }
         }
