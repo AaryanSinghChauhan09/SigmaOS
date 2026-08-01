@@ -52,8 +52,7 @@ impl SimpleAIAgent {
         SimpleAIAgent {
             id,
             name: name_array,
-            memory_required_mb,
-            target,
+            state: AtomicUsize::new(0),
         }
     }
 }
@@ -115,6 +114,7 @@ impl SimpleAgentOrchestrator {
             next_id: AtomicUsize::new(1),
         }
     }
+}
 
 impl Default for SimpleAgentOrchestrator {
     fn default() -> Self {
@@ -142,39 +142,14 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                     }
                 }
             }
-            DeviceTarget::Cpu => {
-                // CPU is always standard fallback with VM paging bounds
-            }
-        }
-
-        let resource = ModelResource::new(name, size_mb, final_device);
-        self.active_models.push(Some(resource));
-
-        Ok(final_device)
-    }
-
-    /// Evict model resources on shutdown/unload
-    pub fn evict_model(&mut self, name: &[u8]) -> Result<(), OrchestratorError> {
-        for i in 0..self.active_models.len {
-            if let Some(ref res) = self.active_models[i] {
-                let len = res.name.iter().position(|&b| b == 0).unwrap_or(32);
-                if &res.name[..len] == name {
-                    match res.target {
-                        DeviceTarget::Gpu => {
-                            self.allocated_gpu_memory_mb
-                                .fetch_sub(res.memory_required_mb, Ordering::SeqCst);
-                        }
-                        DeviceTarget::Tpu => {
-                            self.allocated_tpu_memory_mb
-                                .fetch_sub(res.memory_required_mb, Ordering::SeqCst);
-                        }
-                        DeviceTarget::Cpu => {}
-                    }
-                    self.active_models[i] = None;
-                    return Ok(());
+        } else if !self.agents.is_empty() {
+            for agent_option in &mut self.agents {
+                if let Some(ref mut agent) = *agent_option {
+                    return agent.execute(task);
                 }
             }
         }
+        Err(AgentError::NotFound)
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
@@ -203,6 +178,13 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
 pub struct ContextWindowPruner {
     pub history: Vec<[u8; 128]>,
     pub max_lines: usize,
+}
+
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn peek(&self) -> Option<&[u8]>;
+    fn size(&self) -> usize;
 }
 
 pub struct SimpleTaskQueue {
