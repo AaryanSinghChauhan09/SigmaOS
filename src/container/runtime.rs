@@ -596,12 +596,10 @@ impl<T> Vec<T> {
             if self.len >= self.capacity {
                 self.grow();
             }
-
-        // Start container
-        runtime.start_container(id).unwrap();
-        let stats_running = runtime.stats();
-        assert_eq!(stats_running.running_containers, 1);
-        assert_eq!(stats_running.stopped_containers, 0);
+            core::ptr::write(self.data.add(self.len), item);
+            self.len += 1;
+        }
+    }
 
     pub fn len(&self) -> usize {
         self.len

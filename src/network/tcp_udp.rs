@@ -739,7 +739,7 @@ impl<T> Vec<T> {
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
             if self.capacity > 0 { free(self.data as *mut u8); }
@@ -751,6 +751,43 @@ impl<T> Vec<T> {
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
