@@ -32,9 +32,7 @@ else
 fi
 
 # 3. Build ISO using grub-mkrescue if available, otherwise generate simulated bootable ISO container
-if command -v grub-mkrescue >/dev/null 2>&1; then
-    echo "[BUILD-ISO] Generating bootable SigmaOS ISO via grub-mkrescue..."
-    grub-mkrescue -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT"
+if command -v grub-mkrescue >/dev/null 2>&1 && { echo "[BUILD-ISO] Generating bootable SigmaOS ISO via grub-mkrescue..."; grub-mkrescue -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT"; }; then
     echo "[BUILD-ISO] Success! Bootable ISO created at $BUILD_DIR/sigmaos.iso"
 elif command -v xorriso >/dev/null 2>&1; then
     echo "[BUILD-ISO] Generating SigmaOS ISO via xorriso..."
