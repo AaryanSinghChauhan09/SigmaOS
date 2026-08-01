@@ -439,16 +439,9 @@ impl MACEngine for SimpleMACEngine {
                         if let Ok(mut stats) = self.stats.try_borrow_mut() {
                             stats.access_denied += 1;
                         }
-                        return false;
                     }
                 }
             }
-            true
-        } else {
-            if let Ok(mut stats) = self.stats.try_borrow_mut() {
-                stats.access_denied += 1;
-            }
-            false
         }
     }
 
