@@ -6,7 +6,11 @@
 #![allow(clippy::all, unused)]
 
 pub mod accessibility;
-pub mod ai;
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+    pub mod runtime;
+}
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -16,7 +20,12 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod graphics;
+pub mod graphics {
+    pub mod paint;
+    pub mod video;
+    pub mod compositor;
+    pub mod render3d;
+}
 pub mod init;
 pub mod interrupt;
 pub mod kernel;
@@ -31,12 +40,6 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
-pub mod graphics {
-    pub mod paint;
-    pub mod video;
-    pub mod compositor;
-    pub mod render3d;
-}
 pub mod hardware {
     pub mod win32;
     pub mod compatibility;
@@ -46,11 +49,6 @@ pub mod power {
 }
 pub mod observability {
     pub mod profiler;
-}
-pub mod ai {
-    pub mod agent;
-    pub mod orchestrator;
-    pub mod runtime;
 }
 pub mod boot {
     pub mod firmware_bridge;
