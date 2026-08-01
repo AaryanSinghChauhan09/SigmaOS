@@ -3,5 +3,9 @@ pub mod vec;
 pub mod buddy_allocator;
 pub mod paging;
 pub mod error;
+pub mod string;
+pub mod uuid;
 
 pub use vec::Vec;
+pub use string::{strlen, strcmp, strcpy, strcat, strstr, strchr, atoi, itoa, memcpy, memset, memcmp};
+pub use uuid::Uuid;
