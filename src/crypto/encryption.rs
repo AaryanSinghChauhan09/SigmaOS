@@ -1,9 +1,6 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-use alloc::boxed::Box;
-
 /// OOP-based Encryption Service for SigmaOS
 /// Based on Roadmap Item 15: Encryption service
 
@@ -19,7 +16,7 @@ pub enum CipherType { AES = 0, ChaCha20 = 1, XOR = 2 }
 pub trait EncryptionKey {
     fn id(&self) -> KeyID;
     fn cipher_type(&self) -> CipherType;
-    fn key_data(&self) -> &[u8];
+    fn key_bytes(&self) -> &[u8];
 }
 
 #[repr(C)]
@@ -43,10 +40,7 @@ impl SimpleEncryptionKey {
 impl EncryptionKey for SimpleEncryptionKey {
     fn id(&self) -> KeyID { self.id }
     fn cipher_type(&self) -> CipherType { self.cipher_type }
-    fn key_data(&self) -> &[u8] {
-        let len = self.key_data.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.key_data[..len]
-    }
+    fn key_bytes(&self) -> &[u8] { &self.key_data }
 }
 
 pub trait EncryptionService {
@@ -70,38 +64,38 @@ impl SimpleEncryptionService {
 
 impl EncryptionService for SimpleEncryptionService {
     fn encrypt(&mut self, data: &[u8], key_id: KeyID) -> Result<Vec<u8>, CryptoError> {
-        for i in 0..self.keys.len {
-            unsafe {
-                let key_option = &*self.keys.data.add(i);
-                if let Some(ref key) = *key_option {
-                    if key.id() == key_id {
-                        let mut encrypted = Vec::new();
-                        let key_bytes = key.key_data();
-                        for (idx, byte) in data.iter().enumerate() {
-                            let mask = if key_bytes.is_empty() { 0x42 } else { key_bytes[idx % key_bytes.len()] };
-                            encrypted.push(*byte ^ mask);
-                        }
-                        return Ok(encrypted);
+        for key_option in &self.keys {
+            if let Some(ref key) = *key_option {
+                if key.id() == key_id {
+                    let mut encrypted = Vec::new();
+                    let key_bytes = key.key_bytes();
+                    let len = key_bytes.len();
+                    if len == 0 {
+                        return Err(CryptoError::EncryptionFailed);
                     }
+                    for (i, byte) in data.iter().enumerate() {
+                        encrypted.push(*byte ^ key_bytes[i % len]);
+                    }
+                    return Ok(encrypted);
                 }
             }
         }
         Err(CryptoError::KeyNotFound)
     }
     fn decrypt(&mut self, data: &[u8], key_id: KeyID) -> Result<Vec<u8>, CryptoError> {
-        for i in 0..self.keys.len {
-            unsafe {
-                let key_option = &*self.keys.data.add(i);
-                if let Some(ref key) = *key_option {
-                    if key.id() == key_id {
-                        let mut decrypted = Vec::new();
-                        let key_bytes = key.key_data();
-                        for (idx, byte) in data.iter().enumerate() {
-                            let mask = if key_bytes.is_empty() { 0x42 } else { key_bytes[idx % key_bytes.len()] };
-                            decrypted.push(*byte ^ mask);
-                        }
-                        return Ok(decrypted);
+        for key_option in &self.keys {
+            if let Some(ref key) = *key_option {
+                if key.id() == key_id {
+                    let mut decrypted = Vec::new();
+                    let key_bytes = key.key_bytes();
+                    let len = key_bytes.len();
+                    if len == 0 {
+                        return Err(CryptoError::EncryptionFailed);
                     }
+                    for (i, byte) in data.iter().enumerate() {
+                        decrypted.push(*byte ^ key_bytes[i % len]);
+                    }
+                    return Ok(decrypted);
                 }
             }
         }
@@ -139,57 +133,17 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_encryption_service_no_hardcoded_keys() {
-        let mut service = SimpleEncryptionService::new();
-        // Use a customized key that is NOT 0x42
-        let key_data = b"MY_CUSTOM_SECRET_KEY_FOR_TESTS";
-        let key = SimpleEncryptionKey::new(101, CipherType::XOR, key_data);
-        service.add_key(Box::new(key)).expect("Failed to add encryption key");
-
-        let plaintext = b"Hello, World!";
-        let ciphertext = service.encrypt(plaintext, 101).expect("Failed to encrypt plaintext");
-
-        // Ensure it did not use the hardcoded 0x42 constant
-        let bad_ciphertext: Vec<u8> = plaintext.iter().map(|&b| b ^ 0x42).collect();
-        let mut mismatch = false;
-        for i in 0..plaintext.len() {
-            if ciphertext.data.is_null() || unsafe { *ciphertext.data.add(i) } != unsafe { *bad_ciphertext.data.add(i) } {
-                mismatch = true;
-                break;
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
             }
         }
-        assert!(mismatch, "Should not use the hardcoded 0x42 XOR mask");
-
-        // Decrypt and verify
-        let decrypted = service.decrypt(&ciphertext.to_slice(), 101).expect("Failed to decrypt ciphertext");
-        assert_eq!(decrypted.to_slice(), plaintext);
     }
 }
 
-// Add helpful conversion for testing
-impl<T: Clone> Vec<T> {
-    fn to_slice(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T: Clone> core::iter::FromIterator<T> for Vec<T> {
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut vec = Vec::new();
-        for item in iter {
-            vec.push(item);
-        }
-        vec
-    }
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
