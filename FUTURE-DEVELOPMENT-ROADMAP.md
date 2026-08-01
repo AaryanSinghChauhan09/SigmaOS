@@ -234,3 +234,11 @@ To measure our progress toward full parity with legacy Linux distributions, the 
 | **Apps** | Bundled applications| Minimal shell utils | Text editor + terminal| Media players + IDE | Office suite + CAD |
 | **Cloud** | Container runtime | Mock virtualization | Sandboxed containers| OCI‑compliant engine| Kubernetes scale orchestration|
 | **Hardware** | Supported architectures| x86_64 only | x86_64 bare-metal | ARM64 Support | RISC‑V bare-metal |
+
+## Section 32: Competitive Convergence & Competitor Absorption (WANDR & Bodhi Moksha)
+
+### 32.1 Perplexity WANDR Absorption
+SigmaOS integrates wide-and-deep research loops inspired by Perplexity's WANDR framework. Through decentralized agent-mediated task execution Nexus and ATIF (Agent Trajectory Monitor) monitors, SigmaOS handles automated search, entity disambiguation, and consensus-driven evidence-backed extraction natively within our sandboxed AI core, surpassing hypervisor-based setups.
+
+### 32.2 Bodhi Linux / Moksha Desktop Convergence
+SigmaOS absorbs Moksha's ultra-lightweight Enlightenment Foundation Libraries (EFL) principles. We implement a custom low-overhead Canvas renderer and profile configurator (supporting PowerSaver, Composite, and Minimal profiles), providing high-fidelity composite windows with zero-latency desktop state graphs, rendering standard X11/Wayland overhead obsolete.
