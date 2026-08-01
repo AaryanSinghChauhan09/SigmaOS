@@ -85,6 +85,57 @@ pub trait InputDriver: Driver {
 
 // Concrete Driver Classes (OOP Implementation)
 
+pub struct SimpleDriver {
+    pub id: DriverID,
+    pub driver_type: DriverType,
+    pub state: AtomicUsize,
+}
+
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        Self {
+            id,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
+    }
+}
+
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Active);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Unloaded);
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        &[]
+    }
+}
+
 pub struct SimpleStorageDriver {
     pub id: DriverID,
     pub state: AtomicUsize,
