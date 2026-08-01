@@ -1,6 +1,6 @@
 # SigmaOS - NEXT STEPS GUIDELINES & ROADMAP FOR CONTINUOUS IMPROVEMENTS
 
-Welcome to the definitive Next Steps, Guidelines, and Roadmap for continuous quality, performance, security, and OOP structural advancements within SigmaOS. This document has been compiled directly on the `main` branch to outline concrete, high-impact improvements, priority rankings, and guidelines.
+Welcome to the definitive Next Steps, Guidelines, and Roadmap for continuous quality, performance, security, and OOP structural advancements within SigmaOS. This document has been updated directly on the `main` branch to outline concrete, high-impact improvements, priority rankings, and guidelines.
 
 ---
 
@@ -135,23 +135,36 @@ Welcome to the definitive Next Steps, Guidelines, and Roadmap for continuous qua
 
 ## 1. Code Quality & Testing
 ### Findings & Diagnostics
-* **Delimiter & Syntax Integrity:** Identified and resolved a syntax delimiter issue in `src/klib/paging.rs` where the `impl ProcessMemory for SimpleProcessMemory` was unclosed, blocking standard `cargo test` and `cargo check`.
-* **Linting & Style Checks:** Verified using standard Cargo linting tools. The codebase enforces strict warning levels.
-* **Unit Test Coverage:** High coverage exists on scheduler engines (`src/kernel/scheduler.rs`), buddy allocators (`src/kernel/memory.rs`), and productivity suites. Untested modules include specialized edge conditions in UEFI boot configurations and lower-level driver interrupt handlers.
-* **Refactoring Needs:** Complex, repetitive structural patterns are present in `src/unimplemented_features.rs` and macro testing blocks inside `src/shell/repl.rs`.
+* **Transmute size mismatches (usize to u32):** In files like `src/security/audit.rs`, `src/security/integrity.rs`, `src/security/pki.rs`, and `src/security/vulnerability.rs`, `core::mem::transmute` is applied to types with mismatched bit-widths (64-bit `usize` vs 32-bit representation enums) on x86_64 host environments, causing compiler errors.
+* **Moving out of shared references:** Move errors (E0507) occur in `src/security/integrity.rs` (moving `self.stats`), `src/security/mac.rs` (moving `self.stats`), and `src/sigpkg/spec.rs` (moving `self.version` and `self.stats`), because types behind shared references do not implement `Copy` or `Clone`.
+* **Non-exhaustive pattern matches (E0004):** `src/sigpkg/recipe.rs` fails to cover new variants inside `BuildSystem` and `RecipeError` enums, violating completeness patterns.
+* **Delimiter & Syntax Integrity:** Syntax and brackets inside `src/klib/paging.rs` and `src/shell/repl.rs` were resolved to enable compiler toolchain parsing.
+* **Linting & Style Checks:** Verified using compiler-enforced lint annotations. Bypassing global clippy blocks is selective.
+* **Unit Test Coverage:** High coverage exists on scheduler engines, buddy allocators, and productivity suites.
 
 ### Recommendations & Guidelines
-* **Strict Syntax Verification Rule:** Before committing, verify curly brace parity on all modified files using automated AST tools or standard `cargo check --tests`.
+* **Type-Safe Value Casting:** Instead of using unsafe and volatile transmutes across mismatched bit-widths, use explicit boundary matches or integer conversion gates. For example:
+  ```rust
+  fn event_type(&self) -> EventType {
+      match self.event_type.load(Ordering::SeqCst) {
+          0 => EventType::Authentication,
+          1 => EventType::Authorization,
+          2 => EventType::FileAccess,
+          _ => EventType::SystemChange,
+      }
+  }
+  ```
+* **Deriving Clone & Copy on Metadata Structs:** Always ensure that simple statistic-aggregating structs (such as `IntegrityStats`, `MACStats`, `PackageVersion`, and `PackageStats`) implement `Clone` and `Copy` to avoid E0507 "move out of shared reference" errors.
+* **Pattern Exhaustiveness Check:** In all pattern matches over system or package enums, ensure fallback pattern `_` or exhaustive variant handling is written to avoid compilation blocking on new variants.
 * **Dry Run Verification:** Implement unit tests for specialized edge cases like zero-sized buffer reads/writes and high-concurrency scheduling.
-* **Repetitive Code Reduction:** Refactor duplicate terminal commands and nested matching structures into functional helper methods.
 
 ---
 
 ## 2. Performance & Optimization
 ### Findings & Diagnostics
 * **Zero-Sized Buffer Redundancy:** VFS read/write paths were previously executing redundant allocation logic for zero-sized operations.
-* **Scheduler Bottlenecks:** The EEVDF scheduler maintains high precision, but queue updates under extreme loads can benefit from branchless calculations.
-* **Build Time Performance:** Deep dependency trees in standard targets can be optimized by segregating non-kernel components (e.g., UI, CAD suites) into separate workspaces or features.
+* **Scheduler Bottlenecks:** CFS and EEVDF scheduler queues can benefit from branchless calculations and lock-free atomic queue structures.
+* **Build Time Performance:** Deep dependency trees in standard targets are optimized by maintaining minimal external dependencies (`uuid 1.4` and `rand 0.10`).
 
 ### Recommendations & Guidelines
 * **Zero-Allocation DMA Guards:** For bare-metal targets, introduce strict non-allocating boundaries. No heap allocations are allowed in core scheduling and interrupt-handling hot paths.
@@ -161,13 +174,14 @@ Welcome to the definitive Next Steps, Guidelines, and Roadmap for continuous qua
 
 ## 3. Security & Compliance
 ### Findings & Diagnostics
+* **Insecure Encryption Schemes:** Found simple XOR "encryption/decryption" schemes inside the credentials vault and secrets manager (`src/security/secrets.rs`).
 * **Hardcoded Secret Auditing:** Zero hardcoded API keys or credentials were found.
-* **License Audit:** High compliance is maintained. The codebase relies on MIT, Apache-2.0, or BSD licensed dependencies.
-* **Compliance Frameworks:** GDPR, HIPAA, and WCAG screen-reader tag supports have been structural focuses in UI modules and Zenith Desktop rendering loops.
+* **Compliance Frameworks:** GDPR, HIPAA, WCAG, and ISO 27001 compliance layers have been integrated as structural specifications, but require automated checking loops.
 
 ### Recommendations & Guidelines
 * **Buffer Hardening Rules:** Implement runtime guards against buffer-overrun and integer overflows. Use wrapping operations (`wrapping_add`, `wrapping_sub`) in all packet-parsing algorithms.
 * **GDPR Compliance Logging:** Ensure error logs never output sensitive credentials, user data, or kernel memory traces to standard log outputs.
+* **Upgrade Insecure Vault Cryptography:** Transition insecure XOR encryption algorithms to modern, lightweight post-quantum cryptographic primitives (such as Kyber and Dilithium) or AES-GCM-256 for secure local storage.
 
 ---
 
@@ -582,11 +596,12 @@ SigmaOS is ambitious—AI-native, sovereign, and India-first—but compared to L
 
 | Rank | Subsystem / Task | Priority | Expected Impact | Recommended Next Step |
 |---|---|---|---|---|
-| **1** | Delimiter Syntax Verification | **CRITICAL** | Codebase Compilability | Apply fix for delimiter/syntax on klib/paging.rs |
-| **2** | OOP Driver Factory Pattern | **High** | Modular Driver Architecture | Implement `DriverFactory` inside `src/drivers/mod.rs` |
-| **3** | Non-Allocating Scheduler Path | **High** | Core Latency reduction | Refactor `numa_scheduler.rs` to avoid allocation loops |
-| **4** | API Secrets Auditing CI check | **Medium** | Prevention of credential leaks | Integrate automatic scanning tool to CI pipeline |
-| **5** | Stale Branch Cleanup | **Low** | Cleaner Repository State | Prune merged git tracking branches |
+| **1** | Resolve Transmute Size Mismatches | **CRITICAL** | Subsystem Compilability | Refactor bit-width transmutes into explicit enum maps |
+| **2** | Derive Clone/Copy on Stats structs | **High** | Eliminates E0507 "Move" Errors | Add Clone/Copy to stats and spec structs in security/sigpkg |
+| **3** | Pattern Match Completeness | **High** | Eliminates E0004 pattern errors | Complete BuildSystem & RecipeError branches |
+| **4** | Non-Allocating Scheduler Path | **High** | Core Latency reduction | Refactor `numa_scheduler.rs` to avoid allocation loops |
+| **5** | API Secrets Auditing CI check | **Medium** | Prevention of credential leaks | Integrate automatic scanning tool to CI pipeline |
+| **6** | Stale Branch Cleanup | **Low** | Cleaner Repository State | Prune merged git tracking branches |
 
 ---
 
