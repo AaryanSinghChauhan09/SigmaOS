@@ -1,5 +1,5 @@
 // SigmaOS Canonical Clean-Room Absorption Daemons
-// Independent, zero-dependency reimplementations of Ubuntu's core tooling
+// Independent, zero-dependency reimplementations of Ubuntu's and derived distros' (Bodhi Linux) core tooling
 
 use std::collections::HashMap;
 
@@ -135,40 +135,161 @@ impl SigmaCurtin {
     }
 }
 
-pub struct SigmaLivepatchPatch {
-    pub target_symbol: String,
-    pub old_function_address: usize,
-    pub new_function_address: usize,
-    pub checksum: String,
+// =========================================================================
+// 1. SigmaEcosystemShell (Moksha Desktop Parity - shelves, gadgets, edge flips)
+// =========================================================================
+
+pub struct SigmaEcosystemShell {
+    pub shelves_count: usize,
+    pub active_gadgets: Vec<String>,
+    pub edge_flip_enabled: bool,
 }
 
-pub struct SigmaLivepatch {
-    pub active_patches: HashMap<String, SigmaLivepatchPatch>,
-    pub redirection_log: Vec<String>,
-}
-
-impl SigmaLivepatch {
+impl SigmaEcosystemShell {
     pub fn new() -> Self {
-        SigmaLivepatch {
-            active_patches: HashMap::new(),
-            redirection_log: Vec::new(),
+        SigmaEcosystemShell {
+            shelves_count: 1, // Default main shelf
+            active_gadgets: Vec::new(),
+            edge_flip_enabled: true,
         }
     }
 
-    pub fn register_patch(&mut self, patch: SigmaLivepatchPatch) -> Result<(), &'static str> {
-        if patch.old_function_address == 0 || patch.new_function_address == 0 {
-            return Err("Invalid memory address offset");
-        }
-        self.redirection_log.push(format!(
-            "LIVEPATCH: Redirecting calls of '{}' (0x{:x}) to patched body (0x{:x}). Checksum={}.",
-            patch.target_symbol, patch.old_function_address, patch.new_function_address, patch.checksum
-        ));
-        self.active_patches.insert(patch.target_symbol.clone(), patch);
-        Ok(())
+    pub fn register_shelf(&mut self) -> usize {
+        self.shelves_count += 1;
+        self.shelves_count
     }
 
-    pub fn redirect_call(&self, target_symbol: &str) -> Option<usize> {
-        self.active_patches.get(target_symbol).map(|patch| patch.new_function_address)
+    pub fn load_gadget(&mut self, gadget: &str) {
+        self.active_gadgets.push(gadget.to_string());
+    }
+
+    pub fn trigger_screen_edge_flip(&self, cursor_x: i32, screen_width: i32) -> bool {
+        if !self.edge_flip_enabled {
+            return false;
+        }
+        // Flip to next desktop if cursor touches horizontal boundaries
+        cursor_x <= 0 || cursor_x >= screen_width - 1
+    }
+}
+
+// =========================================================================
+// 2. SigmaAppPackResolver (Bodhi AppPack resolver parity)
+// =========================================================================
+
+pub struct SigmaAppPackResolver {
+    pub resolved_apps: Vec<String>,
+    pub metadata_cache_loaded: bool,
+}
+
+impl SigmaAppPackResolver {
+    pub fn new() -> Self {
+        SigmaAppPackResolver {
+            resolved_apps: Vec::new(),
+            metadata_cache_loaded: false,
+        }
+    }
+
+    pub fn load_apppack_bundle_manifest(&mut self, manifest: &str) -> Result<usize, String> {
+        self.metadata_cache_loaded = true;
+        if manifest.contains("apppack:") {
+            let mut apps_count = 0;
+            for line in manifest.lines() {
+                let line = line.trim();
+                if line.starts_with("- ") {
+                    let app = line[2..].to_string();
+                    self.resolved_apps.push(app);
+                    apps_count += 1;
+                }
+            }
+            Ok(apps_count)
+        } else {
+            Err("Invalid AppPack bundle manifest header".to_string())
+        }
+    }
+}
+
+// =========================================================================
+// 3. SigmaQuickstartWizard (Bodhi Quickstart Parity - wizard first-boot)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WizardStep {
+    LanguageSelection,
+    ThemeProfileSelection,
+    PackageSourceConfig,
+    Completed,
+}
+
+pub struct SigmaQuickstartWizard {
+    pub current_step: WizardStep,
+    pub selected_language: String,
+    pub selected_theme: String,
+}
+
+impl SigmaQuickstartWizard {
+    pub fn new() -> Self {
+        SigmaQuickstartWizard {
+            current_step: WizardStep::LanguageSelection,
+            selected_language: "en_US".to_string(),
+            selected_theme: "MokshaStandard".to_string(),
+        }
+    }
+
+    pub fn advance_step(&mut self) -> WizardStep {
+        self.current_step = match self.current_step {
+            WizardStep::LanguageSelection => WizardStep::ThemeProfileSelection,
+            WizardStep::ThemeProfileSelection => WizardStep::PackageSourceConfig,
+            _ => WizardStep::Completed,
+        };
+        self.current_step
+    }
+
+    pub fn select_language(&mut self, lang: &str) {
+        self.selected_language = lang.to_string();
+    }
+
+    pub fn select_theme(&mut self, theme: &str) {
+        self.selected_theme = theme.to_string();
+    }
+}
+
+// =========================================================================
+// 4. SigmaLiveRemasterBuilder (Bodhi SystemRemaster Parity - custom live templates)
+// =========================================================================
+
+pub struct RemasterFile {
+    pub original_path: String,
+    pub compressed_size: usize,
+}
+
+pub struct SigmaLiveRemasterBuilder {
+    pub active_remaster_id: String,
+    pub files_to_include: Vec<RemasterFile>,
+    pub live_iso_generated: bool,
+}
+
+impl SigmaLiveRemasterBuilder {
+    pub fn new(id: &str) -> Self {
+        SigmaLiveRemasterBuilder {
+            active_remaster_id: id.to_string(),
+            files_to_include: Vec::new(),
+            live_iso_generated: false,
+        }
+    }
+
+    pub fn add_system_file_to_live_image(&mut self, path: &str, raw_data_size: usize) {
+        self.files_to_include.push(RemasterFile {
+            original_path: path.to_string(),
+            compressed_size: raw_data_size / 3, // Emulated high-ratio squashfs compression
+        });
+    }
+
+    pub fn generate_bootable_rescue_iso(&mut self) -> Result<String, String> {
+        if self.files_to_include.is_empty() {
+            return Err("No system files included in remaster template".to_string());
+        }
+        self.live_iso_generated = true;
+        Ok(format!("/var/lib/remaster/live-rescue-{}.iso", self.active_remaster_id))
     }
 }
 
@@ -199,26 +320,51 @@ mod tests {
     }
 
     #[test]
-    fn test_sigma_livepatch() {
-        let mut patcher = SigmaLivepatch::new();
-        let patch = SigmaLivepatchPatch {
-            target_symbol: "sys_read".to_string(),
-            old_function_address: 0xffffffff8122c400,
-            new_function_address: 0xffffffffc0300100,
-            checksum: "livepatch-sha256-abcde".to_string(),
-        };
+    fn test_sigma_ecosystem_shell_desktop() {
+        let mut shell = SigmaEcosystemShell::new();
+        assert_eq!(shell.register_shelf(), 2);
 
-        assert!(patcher.register_patch(patch).is_ok());
-        assert_eq!(patcher.redirect_call("sys_read").unwrap(), 0xffffffffc0300100);
-        assert!(patcher.redirect_call("sys_write").is_none());
-        assert_eq!(patcher.redirection_log.len(), 1);
+        shell.load_gadget("cpu_monitor");
+        shell.load_gadget("battery_indicator");
+        assert_eq!(shell.active_gadgets.len(), 2);
 
-        let invalid_patch = SigmaLivepatchPatch {
-            target_symbol: "sys_write".to_string(),
-            old_function_address: 0,
-            new_function_address: 0,
-            checksum: "invalid-checksum".to_string(),
-        };
-        assert!(patcher.register_patch(invalid_patch).is_err());
+        assert!(shell.trigger_screen_edge_flip(0, 1920));
+        assert!(!shell.trigger_screen_edge_flip(500, 1920));
+    }
+
+    #[test]
+    fn test_sigma_apppack_resolver() {
+        let mut resolver = SigmaAppPackResolver::new();
+        let manifest = "apppack: true\n- midori\n- leafpad\n- pcmanfm\n";
+
+        let count = resolver.load_apppack_bundle_manifest(manifest).unwrap();
+        assert_eq!(count, 3);
+        assert_eq!(resolver.resolved_apps[0], "midori");
+    }
+
+    #[test]
+    fn test_sigma_quickstart_wizard() {
+        let mut wizard = SigmaQuickstartWizard::new();
+        assert_eq!(wizard.current_step, WizardStep::LanguageSelection);
+
+        wizard.select_language("es_ES");
+        wizard.select_theme("MokshaGreen");
+
+        assert_eq!(wizard.advance_step(), WizardStep::ThemeProfileSelection);
+        assert_eq!(wizard.selected_language, "es_ES");
+        assert_eq!(wizard.selected_theme, "MokshaGreen");
+    }
+
+    #[test]
+    fn test_sigma_live_remaster() {
+        let mut builder = SigmaLiveRemasterBuilder::new("sigma-remaster-v1");
+        assert!(builder.generate_bootable_rescue_iso().is_err());
+
+        builder.add_system_file_to_live_image("/etc/shadow", 2048);
+        builder.add_system_file_to_live_image("/bin/sh", 102400);
+
+        let iso_path = builder.generate_bootable_rescue_iso().unwrap();
+        assert_eq!(iso_path, "/var/lib/remaster/live-rescue-sigma-remaster-v1.iso");
+        assert!(builder.live_iso_generated);
     }
 }

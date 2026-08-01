@@ -243,8 +243,7 @@ impl SandboxCodeExecutor {
     /// Verifies if a generated command/code matches safety criteria before executing in Ring 3
     pub fn execute_code_sandboxed(&self, code: &[u8]) -> Result<Vec<u8>, AutoGenError> {
         // Block obvious exploits or privilege escalations
-        let has_escalation = code.windows(7).any(|w| w == b"root" || w == b"sudo")
-            || code.windows(5).any(|w| w == b"chmod");
+        let has_escalation = code.windows(4).any(|w| w == b"root" || w == b"sudo") || code.windows(5).any(|w| w == b"chmod");
         if has_escalation {
             return Err(AutoGenError::SandboxViolation);
         }
@@ -280,7 +279,7 @@ mod tests {
         let reply = agent.generate_reply().unwrap();
         assert!(reply.content_len > 0);
         let content = &reply.content[..reply.content_len];
-        assert!(content.windows(11).any(|w| w == b"calculator"));
+        assert!(content.windows(10).any(|w| w == b"calculator"));
     }
 
     #[test]

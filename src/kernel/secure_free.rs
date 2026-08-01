@@ -53,17 +53,17 @@ impl SecureFreeDetector {
 
     /// Securely free memory
     pub fn secure_free(&mut self, address: usize, ptr: *mut u8) -> Result<(), &'static str> {
-        let (size, is_sensitive, already_freed) = {
+        let (is_sensitive, size) = {
             let record = self
                 .allocations
                 .get(&address)
                 .ok_or("Allocation not found")?;
-            (record.size, record.is_sensitive, record.freed)
-        };
 
-        if already_freed {
-            return Err("Double free detected");
-        }
+            if record.freed {
+                return Err("Double free detected");
+            }
+            (record.is_sensitive, record.size)
+        };
 
         // Sanitize based on level
         match self.sanitization_level {

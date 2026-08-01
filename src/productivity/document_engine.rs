@@ -87,7 +87,7 @@ impl DocumentEngine {
     }
 
     /// Create a new document
-    pub fn create_document(&self, title: String, author: String, content: String) -> Document {
+    pub fn create_document(title: String, author: String, content: String) -> Document {
         let word_count = content.split_whitespace().count();
         let character_count = content.chars().count();
         let timestamp = 0; // Would use actual timestamp
@@ -106,7 +106,7 @@ impl DocumentEngine {
     }
 
     /// Load document from string
-    pub fn load_document(&self, filename: String, content: String) -> Document {
+    pub fn load_document(filename: String, content: String) -> Document {
         let format = Self::detect_format(&filename, &content);
         let word_count = content.split_whitespace().count();
         let character_count = content.chars().count();
@@ -244,7 +244,6 @@ mod tests {
 
     #[test]
     fn test_create_document() {
-        let engine = DocumentEngine::new();
         let doc = DocumentEngine::create_document(
             "Test Document".to_string(),
             "Author".to_string(),
@@ -258,9 +257,7 @@ mod tests {
 
     #[test]
     fn test_load_document() {
-        let engine = DocumentEngine::new();
-        let doc =
-            DocumentEngine::load_document("test.md".to_string(), "# Title\nContent".to_string());
+        let doc = DocumentEngine::load_document("test.md".to_string(), "# Title\nContent".to_string());
 
         assert_eq!(doc.metadata.format, DocumentFormat::Markdown);
         assert_eq!(doc.content, "# Title\nContent");
@@ -268,7 +265,6 @@ mod tests {
 
     #[test]
     fn test_convert_to_markdown() {
-        let engine = DocumentEngine::new();
         let doc = DocumentEngine::create_document(
             "Test".to_string(),
             "Author".to_string(),
@@ -282,7 +278,6 @@ mod tests {
 
     #[test]
     fn test_search_text() {
-        let engine = DocumentEngine::new();
         let doc = DocumentEngine::create_document(
             "Test".to_string(),
             "Author".to_string(),
@@ -295,8 +290,7 @@ mod tests {
 
     #[test]
     fn test_replace_text() {
-        let engine = DocumentEngine::new();
-        let mut doc = engine.create_document(
+        let mut doc = DocumentEngine::create_document(
             "Test".to_string(),
             "Author".to_string(),
             "Hello World".to_string(),

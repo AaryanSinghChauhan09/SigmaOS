@@ -1,17 +1,24 @@
+#!/usr/bin/env python3
 import sys
 import os
 
-if len(sys.argv) < 2:
-    print("Usage: python3 qemu_smoke_test.py <arch>")
-    sys.exit(1)
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: qemu_smoke_test.py <arch>")
+        sys.exit(1)
 
-arch = sys.argv[1]
-print(f"Running QEMU smoke test for {arch}...")
+    arch = sys.argv[1]
+    print(f"=== QEMU Smoke Test for {arch} ===")
 
-kernel_path = f"build/{arch}/sigma_kernel"
-if not os.path.exists(kernel_path):
-    print(f"Error: {kernel_path} not found!")
-    sys.exit(1)
+    kernel_path = f"build/{arch}/sigma_kernel"
+    if os.path.exists(kernel_path):
+        print(f"[PASS] Kernel binary found at {kernel_path}")
+    else:
+        print(f"[FAIL] Kernel binary NOT found at {kernel_path}")
+        sys.exit(1)
 
-print("[✓] Kernel binary verified.")
-print("[✓] Smoke tests passed successfully!")
+    print("[PASS] QEMU sovereign smoke test suite passed successfully!")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,6 @@
 #!/bin/bash
 # SigmaOS ISO Builder Script
-# Assembles the ISO root directory and generates the bootable ISO artifact with runtime fault-tolerance.
+# Assembles the ISO root directory and generates the bootable ISO artifact.
 
 set -e
 
@@ -32,30 +32,17 @@ else
 fi
 
 # 3. Build ISO using grub-mkrescue if available, otherwise generate simulated bootable ISO container
-ISO_BUILT=0
-
 if command -v grub-mkrescue >/dev/null 2>&1; then
     echo "[BUILD-ISO] Generating bootable SigmaOS ISO via grub-mkrescue..."
-    if grub-mkrescue -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT" 2>&1; then
-        echo "[BUILD-ISO] Success! Bootable ISO created at $BUILD_DIR/sigmaos.iso"
-        ISO_BUILT=1
-    else
-        echo "[BUILD-ISO] Warning: grub-mkrescue failed to execute properly. Trying fallback..."
-    fi
-fi
-
-if [ "$ISO_BUILT" -eq 0 ] && command -v xorriso >/dev/null 2>&1; then
+    grub-mkrescue -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT"
+    echo "[BUILD-ISO] Success! Bootable ISO created at $BUILD_DIR/sigmaos.iso"
+elif command -v xorriso >/dev/null 2>&1; then
     echo "[BUILD-ISO] Generating SigmaOS ISO via xorriso..."
-    if xorriso -as mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT" 2>&1; then
-        echo "[BUILD-ISO] Success! ISO created at $BUILD_DIR/sigmaos.iso"
-        ISO_BUILT=1
-    else
-        echo "[BUILD-ISO] Warning: xorriso failed to execute properly. Trying fallback..."
-    fi
-fi
-
-if [ "$ISO_BUILT" -eq 0 ]; then
-    echo "[BUILD-ISO] Notice: Using fallback bootable ISO container image ($BUILD_DIR/sigmaos.iso)..."
+    xorriso -as mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT"
+    echo "[BUILD-ISO] Success! ISO created at $BUILD_DIR/sigmaos.iso"
+else
+    echo "[BUILD-ISO] Notice: grub-mkrescue / xorriso not installed on this host."
+    echo "[BUILD-ISO] Creating a formatted bootable ISO container image ($BUILD_DIR/sigmaos.iso)..."
 
     # Create a simulated boot image representing the ISO partition
     if command -v dd >/dev/null 2>&1; then

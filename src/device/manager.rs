@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
@@ -9,7 +6,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DeviceID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceClass {
     Block = 0,
@@ -67,7 +64,7 @@ impl Device for SimpleDevice {
         &self.name[..len]
     }
     fn device_class(&self) -> DeviceClass {
-        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst) as u32) }
+        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst)) }
     }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {
@@ -93,12 +90,6 @@ pub struct SimpleDeviceManager {
     pub next_id: AtomicUsize,
 }
 
-impl Default for SimpleDeviceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl SimpleDeviceManager {
     pub fn new() -> Self {
         SimpleDeviceManager {
@@ -116,7 +107,7 @@ impl DeviceManager for SimpleDeviceManager {
     }
 
     fn unregister_device(&mut self, id: DeviceID) -> Result<(), DeviceError> {
-        for device_option in &mut self.devices {
+        for device_option in self.devices.iter_mut() {
             if let Some(ref device) = *device_option {
                 if device.id() == id {
                     return Ok(());
@@ -127,7 +118,7 @@ impl DeviceManager for SimpleDeviceManager {
     }
 
     fn get_device(&self, id: DeviceID) -> Option<&dyn Device> {
-        for device_option in &self.devices {
+        for device_option in self.devices.iter() {
             if let Some(ref device) = *device_option {
                 if device.id() == id {
                     return Some(device.as_ref());
@@ -139,7 +130,7 @@ impl DeviceManager for SimpleDeviceManager {
 
     fn list_devices(&self, device_class: DeviceClass) -> Vec<DeviceID> {
         let mut ids = Vec::new();
-        for device_option in &self.devices {
+        for device_option in self.devices.iter() {
             if let Some(ref device) = *device_option {
                 if device.device_class() == device_class {
                     ids.push(device.id());
@@ -151,7 +142,7 @@ impl DeviceManager for SimpleDeviceManager {
 
     fn scan_devices(&mut self) -> Vec<DeviceID> {
         let mut ids = Vec::new();
-        for device_option in &self.devices {
+        for device_option in self.devices.iter() {
             if let Some(ref device) = *device_option {
                 ids.push(device.id());
             }
@@ -184,7 +175,9 @@ impl DeviceDriver for SimpleDeviceDriver {
     }
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        buffer.fill(0u8);
+        for i in 0..buffer.len() {
+            buffer[i] = 0u8;
+        }
         Ok(buffer.len())
     }
 
@@ -208,12 +201,6 @@ pub struct SimpleDeviceHotplug {
     pub enabled: AtomicUsize,
     pub added_devices: Vec<DeviceID>,
     pub removed_devices: Vec<DeviceID>,
-}
-
-impl Default for SimpleDeviceHotplug {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleDeviceHotplug {
@@ -245,21 +232,21 @@ impl DeviceHotplug for SimpleDeviceHotplug {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -268,6 +255,23 @@ impl<T> Vec<T> {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
         }
     }
     unsafe fn grow(&mut self) {
@@ -290,48 +294,77 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
 }

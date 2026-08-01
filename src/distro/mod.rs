@@ -9,7 +9,7 @@ pub mod manjaro;
 pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
-pub mod parity;
+pub mod tiny_core;
 
 pub use parity::{
     InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
@@ -51,7 +51,10 @@ pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
 pub use specialized::{
-    AptCacheSimulator, CanFrame, DebianPolicyEnforcer, DebianSocialContract, DpkgMultiArch,
-    EcuController, EduChallenge, EduPlayground, FreezeBasedStabilization, HpcClusterJob,
-    HpcJobState, MpiCommunicator, ThreeTierReleaseModel,
+    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
+    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
+    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+};
+pub use tiny_core::{
+    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
 };

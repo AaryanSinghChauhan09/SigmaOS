@@ -1,6 +1,12 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+#[cfg(not(target_os = "none"))]
+use alloc::boxed::Box;
+
 use core::mem;
 /// OOP-based Scheduler for SigmaOS
 /// Implements process/thread scheduling using OOP principles with traits and structs
@@ -26,8 +32,14 @@ pub trait Schedulable {
     fn last_run_time(&self) -> u64;
     /// Set last run time
     fn set_last_run_time(&mut self, time: u64);
-    /// Get task ID
+                /// Get task ID
     fn task_id(&self) -> usize;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
     /// Get task capability
     fn capability(&self) -> TaskCapability;
 }
@@ -80,6 +92,7 @@ impl Task {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &[T] {
@@ -91,6 +104,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut [T] {
         if self.data.is_null() {
@@ -101,6 +115,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if !self.data.is_null() {
@@ -114,6 +129,7 @@ impl<T> Drop for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
@@ -123,6 +139,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
@@ -521,12 +538,14 @@ impl Scheduler for PriorityScheduler {
 }
 
 /// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -594,6 +613,7 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

@@ -68,6 +68,9 @@ pub struct PackageMetadata {
     pub checksum: String,
     pub size: u64,
     pub install_date: Option<u64>,
+    pub pqc_signature: Option<String>,
+    pub gpg_key_id: Option<String>,
+    pub supported_architectures: Vec<String>,
 }
 
 // ============================================================================
@@ -224,6 +227,9 @@ impl IPackageParser for DebAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Deb,
@@ -350,6 +356,9 @@ impl IPackageParser for RpmAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Rpm,
@@ -453,6 +462,9 @@ impl IPackageParser for PacmanAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Pacman,
@@ -560,6 +572,9 @@ impl IPackageParser for EbuildAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Ebuild,
@@ -663,6 +678,9 @@ impl IPackageParser for ApkAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Apk,
@@ -776,6 +794,9 @@ impl IPackageParser for NixAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Nix,
@@ -878,6 +899,9 @@ impl IPackageParser for FlatpakAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Flatpak,
@@ -977,6 +1001,9 @@ impl IPackageParser for SnapAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Snap,
@@ -1081,6 +1108,9 @@ impl IPackageParser for AppImageAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::AppImage,
@@ -1185,6 +1215,9 @@ impl IPackageParser for XbpsAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Xbps,
@@ -1291,6 +1324,9 @@ impl IPackageParser for TxzAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Txz,
@@ -1399,6 +1435,9 @@ impl IPackageParser for EopkgAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Eopkg,
@@ -1499,6 +1538,9 @@ impl IPackageParser for ZypperAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Zypper,
@@ -1612,6 +1654,9 @@ impl IPackageParser for GuixAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Guix,
@@ -1717,6 +1762,9 @@ impl IPackageParser for SigmaAdapter {
                 checksum: String::new(),
                 size: 0,
                 install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
             },
             dependencies,
             format: PackageFormat::Sigma,
@@ -1852,6 +1900,7 @@ impl Default for PackageParserFactory {
 pub struct UniversalPackageManager {
     factory: PackageParserFactory,
     installed_packages: HashMap<String, Box<dyn IPackage>>,
+    pub global_hooks: Vec<Arc<dyn UserDefinedHook>>,
 }
 
 impl UniversalPackageManager {
@@ -1859,7 +1908,19 @@ impl UniversalPackageManager {
         Self {
             factory: PackageParserFactory::new(),
             installed_packages: HashMap::new(),
+            global_hooks: Vec::new(),
         }
+    }
+
+    pub fn add_global_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
+        self.global_hooks.push(hook);
+    }
+
+    pub fn execute_hook_chain(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
+        for hook in &self.global_hooks {
+            hook.execute(package)?;
+        }
+        Ok(())
     }
 
     /// Parse package with auto-detection
@@ -1887,7 +1948,7 @@ impl UniversalPackageManager {
     }
 
     /// Install a package
-    pub fn install_package(&mut self, package: Box<dyn IPackage>) -> Result<(), InstallError> {
+    pub fn install_package(&mut self, mut package: Box<dyn IPackage>) -> Result<(), InstallError> {
         let name = package.name().to_string();
 
         // Check dependencies
@@ -1895,6 +1956,11 @@ impl UniversalPackageManager {
             if !self.installed_packages.contains_key(&dep.name) {
                 return Err(InstallError::MissingDependency(dep.name.clone()));
             }
+        }
+
+        // Execute hook chain before/during install
+        if let Err(e) = self.execute_hook_chain(package.as_mut()) {
+            return Err(InstallError::InstallFailed(format!("Hook chain failed: {:?}", e)));
         }
 
         self.installed_packages.insert(name, package);

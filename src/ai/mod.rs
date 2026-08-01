@@ -1,43 +1,16 @@
-// SigmaOS AI Module
-// S-AI engine, agents, orchestrator, and local inference
+// SigmaOS AI-Native Subsystem Module
 
 pub mod agent;
-pub mod llm;
 pub mod orchestrator;
-pub mod sai;
-pub mod system;
-pub mod voice;
-pub mod qwenpaw;
-pub mod perplexity;
-pub mod awesome_ai;
-pub mod open_computer;
+pub mod wiki;
 
-pub use agent::{AIAgent, SimpleAIAgent};
-pub use qwenpaw::{PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentCommunicationProtocol};
-pub use perplexity::{PerplexitySearchCli, PerplexitySearchResult, PerplexitySnippetResult};
-pub use awesome_ai::{AwesomeCodeAiRegistry, AwesomeToolInfo};
-pub use llm::{
-    LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
-    QuantizationType, InferenceBackend, BatchingStrategy,
-    StreamingLlmEngine, StreamingInference,
-    JaxTensorSharding, SwiGluActivation, GrokMoeRouter, RotaryPositionEmbedding,
-    GrokGqaMapper, GrokWeightStreamer,
+pub use agent::{
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    ManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
 };
-pub use orchestrator::{AgentOrchestrator, SimpleAgentOrchestrator, AgentState};
-pub use sai::{
-    Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
-    AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+pub use orchestrator::{
+    AIAgent as OrchestratorAIAgent, AgentCommunication, AgentError, AgentID, AgentOrchestrator,
+    AgentState as OrchestratorAgentState, SimpleAIAgent as SimpleOrchestratorAgent,
+    SimpleAgentCommunication, SimpleAgentOrchestrator, SimpleTaskQueue, TaskQueue,
 };
-pub use system::{
-    AiSystemService, AiServiceManager, AiServiceConfig, AiServiceState,
-    ResourceManagementService, PredictiveMaintenanceService, AdaptiveSchedulingService,
-    AiServiceType, ServicePriority, AiServiceMetrics,
-};
-pub use voice::{
-    VoiceAssistant, VoiceModel, VoiceRecognizer, VoiceSynthesizer,
-    RecognitionResult, SynthesisResult, AudioFormat, SynthesisModel,
-};
-pub use open_computer::{
-    OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
-    AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
-};
+pub use wiki::{SovereignWikiEngine, WikiArticle};

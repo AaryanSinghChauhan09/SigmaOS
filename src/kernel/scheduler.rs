@@ -32,7 +32,7 @@ pub struct Process {
     pub runtime: Duration,
     pub virtual_deadline: u64,
     pub time_slice: Duration,
-    pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
+    pub core_affinity: Option<usize>, // Core affinity for multi-core/HPC setups
 }
 
 impl Process {
@@ -45,7 +45,7 @@ impl Process {
             runtime: Duration::from_secs(0),
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
-            edf_deadline: None,
+            core_affinity: None,
         }
     }
 
@@ -99,25 +99,11 @@ impl Scheduler {
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
-        // Find process with Earliest Deadline First (EDF) if real-time constraints are present
-        let mut edf_ready_process: Option<&Process> = None;
-        for p in &self.processes {
-            if p.state == ProcessState::Ready && p.edf_deadline.is_some() {
-                if let Some(current_best) = edf_ready_process {
-                    if p.edf_deadline.unwrap() < current_best.edf_deadline.unwrap() {
-                        edf_ready_process = Some(p);
-                    }
-                } else {
-                    edf_ready_process = Some(p);
-                }
-            }
-        }
+        self.schedule_on_core(0)
+    }
 
-        if let Some(edf_proc) = edf_ready_process {
-            return Some(edf_proc);
-        }
-
-        // Otherwise, fall back to EEVDF earliest eligible virtual deadline
+    pub fn schedule_on_core(&self, target_core: usize) -> Option<&Process> {
+        // Find process with earliest eligible virtual deadline matching core affinity
         let now = self.current_time;
 
         if self.is_realtime_profile {
@@ -125,7 +111,11 @@ impl Scheduler {
             let rt_proc = self
                 .processes
                 .iter()
-                .filter(|p| p.state == ProcessState::Ready && p.priority == Priority::Realtime)
+                .filter(|p| {
+                    p.state == ProcessState::Ready
+                        && p.priority == Priority::Realtime
+                        && p.core_affinity.map_or(true, |c| c == target_core)
+                })
                 .min_by_key(|p| p.virtual_deadline);
             if rt_proc.is_some() {
                 return rt_proc;
@@ -134,8 +124,27 @@ impl Scheduler {
 
         self.processes
             .iter()
-            .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
+            .filter(|p| {
+                p.state == ProcessState::Ready
+                    && p.virtual_deadline <= now
+                    && p.core_affinity.map_or(true, |c| c == target_core)
+            })
             .min_by_key(|p| p.virtual_deadline)
+    }
+
+    /// Check if a higher-priority task can preempt the currently running process
+    pub fn check_preemption(&self, running_pid: u64) -> bool {
+        let running_proc = self.processes.iter().find(|p| p.pid == running_pid);
+        let highest_ready = self.processes
+            .iter()
+            .filter(|p| p.state == ProcessState::Ready)
+            .max_by_key(|p| p.priority);
+
+        match (running_proc, highest_ready) {
+            (Some(run), Some(ready)) => ready.priority > run.priority,
+            (None, Some(_)) => true,
+            _ => false,
+        }
     }
 
     pub fn tick(&mut self) {
@@ -202,23 +211,26 @@ mod tests {
     }
 
     #[test]
-    fn test_edf_realtime_scheduler_tick() {
+    fn test_realtime_preemption_and_core_affinity() {
         let mut scheduler = Scheduler::new();
+        scheduler.enable_realtime_profile(true);
 
-        // Add regular process
-        let p_normal = Process::new(1, "normal".to_string(), Priority::Normal);
-        scheduler.add_process(p_normal);
+        // Process 1: Normal task on Core 0
+        let mut p1 = Process::new(1, "normal_task".to_string(), Priority::Normal);
+        p1.core_affinity = Some(0);
+        scheduler.add_process(p1);
 
-        // Add real-time processes with explicit EDF deadlines
-        let p_rt_late = Process::new(2, "rt_late".to_string(), Priority::Realtime).with_edf(100);
-        let p_rt_early = Process::new(3, "rt_early".to_string(), Priority::Realtime).with_edf(50);
+        // Process 2: Realtime task on Core 1
+        let mut p2 = Process::new(2, "rt_task".to_string(), Priority::Realtime);
+        p2.core_affinity = Some(1);
+        scheduler.add_process(p2);
 
-        scheduler.add_process(p_rt_late);
-        scheduler.add_process(p_rt_early);
+        // schedule on Core 1 should pick the Realtime task (Process 2)
+        let scheduled_core1 = scheduler.schedule_on_core(1);
+        assert!(scheduled_core1.is_some());
+        assert_eq!(scheduled_core1.unwrap().pid, 2);
 
-        // Schedule should pick rt_early (absolute deadline 50) first, because it is the earliest real-time deadline
-        let chosen = scheduler.schedule().unwrap();
-        assert_eq!(chosen.pid, 3);
-        assert_eq!(chosen.name, "rt_early");
+        // Preemption check: Higher priority (Realtime) should preempt Normal
+        assert!(scheduler.check_preemption(1));
     }
 }

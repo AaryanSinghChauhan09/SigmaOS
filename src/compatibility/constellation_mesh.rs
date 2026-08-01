@@ -23,11 +23,7 @@ impl KernelConstellationGrid {
     }
 
     pub fn register_star_node(&mut self, version: &'static str, x: u32, y: u32) {
-        self.nodes.push(ConstellationNode {
-            kernel_version: version,
-            coordinate_x: x,
-            coordinate_y: y,
-        });
+        self.nodes.push(ConstellationNode { kernel_version: version, coordinate_x: x, coordinate_y: y });
     }
 
     /// Aligns a given binary execution path to its associated kernel version "star"
@@ -57,9 +53,7 @@ pub trait SyscallAlmanacHub {
 
 pub struct FileAlmanacHub;
 impl SyscallAlmanacHub for FileAlmanacHub {
-    fn namespace(&self) -> &'static str {
-        "File"
-    }
+    fn namespace(&self) -> &'static str { "File" }
     fn lookup_syscall(&self, sys_num: usize) -> Option<&'static str> {
         match sys_num {
             3 => Some("sys_read"),
@@ -71,9 +65,7 @@ impl SyscallAlmanacHub for FileAlmanacHub {
 
 pub struct NetworkAlmanacHub;
 impl SyscallAlmanacHub for NetworkAlmanacHub {
-    fn namespace(&self) -> &'static str {
-        "Network"
-    }
+    fn namespace(&self) -> &'static str { "Network" }
     fn lookup_syscall(&self, sys_num: usize) -> Option<&'static str> {
         match sys_num {
             359 => Some("sys_socket"),
@@ -85,9 +77,7 @@ impl SyscallAlmanacHub for NetworkAlmanacHub {
 
 pub struct ProcessAlmanacHub;
 impl SyscallAlmanacHub for ProcessAlmanacHub {
-    fn namespace(&self) -> &'static str {
-        "Process"
-    }
+    fn namespace(&self) -> &'static str { "Process" }
     fn lookup_syscall(&self, sys_num: usize) -> Option<&'static str> {
         match sys_num {
             57 => Some("sys_fork"),
@@ -106,43 +96,25 @@ pub trait DriverArchiveGridV2 {
 
 pub struct StorageArchiveGridV2;
 impl DriverArchiveGridV2 for StorageArchiveGridV2 {
-    fn lineage(&self) -> &'static str {
-        "Storage"
-    }
+    fn lineage(&self) -> &'static str { "Storage" }
     fn lookup_driver_dependency(&self, driver_id: u32) -> Option<&'static str> {
-        if driver_id == 0x101 {
-            Some("ISA Controller")
-        } else {
-            None
-        }
+        if driver_id == 0x101 { Some("ISA Controller") } else { None }
     }
 }
 
 pub struct NetworkArchiveGridV2;
 impl DriverArchiveGridV2 for NetworkArchiveGridV2 {
-    fn lineage(&self) -> &'static str {
-        "Network"
-    }
+    fn lineage(&self) -> &'static str { "Network" }
     fn lookup_driver_dependency(&self, driver_id: u32) -> Option<&'static str> {
-        if driver_id == 0x202 {
-            Some("PCI Network Controller")
-        } else {
-            None
-        }
+        if driver_id == 0x202 { Some("PCI Network Controller") } else { None }
     }
 }
 
 pub struct GraphicsArchiveGridV2;
 impl DriverArchiveGridV2 for GraphicsArchiveGridV2 {
-    fn lineage(&self) -> &'static str {
-        "Graphics"
-    }
+    fn lineage(&self) -> &'static str { "Graphics" }
     fn lookup_driver_dependency(&self, driver_id: u32) -> Option<&'static str> {
-        if driver_id == 0x303 {
-            Some("AGP GART Driver")
-        } else {
-            None
-        }
+        if driver_id == 0x303 { Some("AGP GART Driver") } else { None }
     }
 }
 
@@ -155,9 +127,7 @@ pub trait FirmwareGatewayMesh {
 
 pub struct BIOSGatewayMesh;
 impl FirmwareGatewayMesh for BIOSGatewayMesh {
-    fn gateway_type(&self) -> &'static str {
-        "BIOS"
-    }
+    fn gateway_type(&self) -> &'static str { "BIOS" }
     fn verify_boot_path(&self, entry_vector: u64) -> bool {
         entry_vector == 0x7C00 // Standard MBR sector boot pointer
     }
@@ -165,9 +135,7 @@ impl FirmwareGatewayMesh for BIOSGatewayMesh {
 
 pub struct UEFIGatewayMesh;
 impl FirmwareGatewayMesh for UEFIGatewayMesh {
-    fn gateway_type(&self) -> &'static str {
-        "UEFI"
-    }
+    fn gateway_type(&self) -> &'static str { "UEFI" }
     fn verify_boot_path(&self, entry_vector: u64) -> bool {
         entry_vector >= 0x100000 // PE32+ high memory entry
     }
@@ -175,9 +143,7 @@ impl FirmwareGatewayMesh for UEFIGatewayMesh {
 
 pub struct CorebootGatewayMesh;
 impl FirmwareGatewayMesh for CorebootGatewayMesh {
-    fn gateway_type(&self) -> &'static str {
-        "Coreboot"
-    }
+    fn gateway_type(&self) -> &'static str { "Coreboot" }
     fn verify_boot_path(&self, entry_vector: u64) -> bool {
         entry_vector == 0xFFFFFFF0 // Reset vector at top of memory
     }
@@ -192,9 +158,7 @@ pub trait BuildCodexGrid {
 
 pub struct LegacyCCodexGrid;
 impl BuildCodexGrid for LegacyCCodexGrid {
-    fn build_profile(&self) -> &'static str {
-        "Legacy C"
-    }
+    fn build_profile(&self) -> &'static str { "Legacy C" }
     fn lookup_compiler_options(&self, _source_type: &str) -> &'static str {
         "-std=gnu89 -fno-stack-protector"
     }
@@ -202,9 +166,7 @@ impl BuildCodexGrid for LegacyCCodexGrid {
 
 pub struct LegacyCppCodexGrid;
 impl BuildCodexGrid for LegacyCppCodexGrid {
-    fn build_profile(&self) -> &'static str {
-        "Legacy C++"
-    }
+    fn build_profile(&self) -> &'static str { "Legacy C++" }
     fn lookup_compiler_options(&self, _source_type: &str) -> &'static str {
         "-std=c++98 -fno-rtti"
     }
@@ -212,9 +174,7 @@ impl BuildCodexGrid for LegacyCppCodexGrid {
 
 pub struct LegacyAsmCodexGrid;
 impl BuildCodexGrid for LegacyAsmCodexGrid {
-    fn build_profile(&self) -> &'static str {
-        "Legacy Assembly"
-    }
+    fn build_profile(&self) -> &'static str { "Legacy Assembly" }
     fn lookup_compiler_options(&self, _source_type: &str) -> &'static str {
         "-f elf32"
     }
@@ -229,9 +189,7 @@ pub trait SecurityConstellation {
 
 pub struct DACConstellation;
 impl SecurityConstellation for DACConstellation {
-    fn security_node_name(&self) -> &'static str {
-        "Unix DAC"
-    }
+    fn security_node_name(&self) -> &'static str { "Unix DAC" }
     fn evaluate_security_rule(&self, app_token: u32) -> bool {
         (app_token & 0o400) != 0 // Traditional read bit
     }
@@ -239,9 +197,7 @@ impl SecurityConstellation for DACConstellation {
 
 pub struct SELinuxConstellation;
 impl SecurityConstellation for SELinuxConstellation {
-    fn security_node_name(&self) -> &'static str {
-        "Early SELinux"
-    }
+    fn security_node_name(&self) -> &'static str { "Early SELinux" }
     fn evaluate_security_rule(&self, app_token: u32) -> bool {
         app_token == 0x8000 // Policy matches targeted context
     }
@@ -249,9 +205,7 @@ impl SecurityConstellation for SELinuxConstellation {
 
 pub struct ZeroTrustConstellation;
 impl SecurityConstellation for ZeroTrustConstellation {
-    fn security_node_name(&self) -> &'static str {
-        "Modern Zero-Trust"
-    }
+    fn security_node_name(&self) -> &'static str { "Modern Zero-Trust" }
     fn evaluate_security_rule(&self, app_token: u32) -> bool {
         app_token == 0xFFFFFFFF // Exclusive capability mask validation
     }
@@ -266,9 +220,7 @@ pub trait PeripheralArchiveMesh {
 
 pub struct FloppyMesh;
 impl PeripheralArchiveMesh for FloppyMesh {
-    fn peripheral_class(&self) -> &'static str {
-        "Floppy Diskette"
-    }
+    fn peripheral_class(&self) -> &'static str { "Floppy Diskette" }
     fn process_io_request(&self, _sector: u32, out_buffer: &mut [u8]) -> usize {
         if !out_buffer.is_empty() {
             out_buffer[0] = 0xE5; // Standard 1.44M sector fill byte
@@ -281,9 +233,7 @@ impl PeripheralArchiveMesh for FloppyMesh {
 
 pub struct TapeMesh;
 impl PeripheralArchiveMesh for TapeMesh {
-    fn peripheral_class(&self) -> &'static str {
-        "Legacy Magnetic Tape"
-    }
+    fn peripheral_class(&self) -> &'static str { "Legacy Magnetic Tape" }
     fn process_io_request(&self, _sector: u32, out_buffer: &mut [u8]) -> usize {
         if !out_buffer.is_empty() {
             out_buffer[0] = 0x55;
@@ -296,9 +246,7 @@ impl PeripheralArchiveMesh for TapeMesh {
 
 pub struct CRTMesh;
 impl PeripheralArchiveMesh for CRTMesh {
-    fn peripheral_class(&self) -> &'static str {
-        "Cathode-Ray Tube Monitor"
-    }
+    fn peripheral_class(&self) -> &'static str { "Cathode-Ray Tube Monitor" }
     fn process_io_request(&self, _sector: u32, out_buffer: &mut [u8]) -> usize {
         if !out_buffer.is_empty() {
             out_buffer[0] = 0x07; // ASCII bell/frequency
@@ -311,9 +259,7 @@ impl PeripheralArchiveMesh for CRTMesh {
 
 pub struct DotMatrixMesh;
 impl PeripheralArchiveMesh for DotMatrixMesh {
-    fn peripheral_class(&self) -> &'static str {
-        "Dot-Matrix Printer"
-    }
+    fn peripheral_class(&self) -> &'static str { "Dot-Matrix Printer" }
     fn process_io_request(&self, _sector: u32, out_buffer: &mut [u8]) -> usize {
         if !out_buffer.is_empty() {
             out_buffer[0] = b'\n'; // Line-feed
@@ -492,18 +438,9 @@ mod tests {
         let graphics = GraphicsArchiveGridV2;
 
         assert_eq!(storage.lineage(), "Storage");
-        assert_eq!(
-            storage.lookup_driver_dependency(0x101).unwrap(),
-            "ISA Controller"
-        );
-        assert_eq!(
-            network.lookup_driver_dependency(0x202).unwrap(),
-            "PCI Network Controller"
-        );
-        assert_eq!(
-            graphics.lookup_driver_dependency(0x303).unwrap(),
-            "AGP GART Driver"
-        );
+        assert_eq!(storage.lookup_driver_dependency(0x101).unwrap(), "ISA Controller");
+        assert_eq!(network.lookup_driver_dependency(0x202).unwrap(), "PCI Network Controller");
+        assert_eq!(graphics.lookup_driver_dependency(0x303).unwrap(), "AGP GART Driver");
 
         let bios = BIOSGatewayMesh;
         let uefi = UEFIGatewayMesh;
@@ -521,14 +458,8 @@ mod tests {
         let asm_codex = LegacyAsmCodexGrid;
 
         assert_eq!(c_codex.build_profile(), "Legacy C");
-        assert_eq!(
-            c_codex.lookup_compiler_options("c"),
-            "-std=gnu89 -fno-stack-protector"
-        );
-        assert_eq!(
-            cpp_codex.lookup_compiler_options("cpp"),
-            "-std=c++98 -fno-rtti"
-        );
+        assert_eq!(c_codex.lookup_compiler_options("c"), "-std=gnu89 -fno-stack-protector");
+        assert_eq!(cpp_codex.lookup_compiler_options("cpp"), "-std=c++98 -fno-rtti");
         assert_eq!(asm_codex.lookup_compiler_options("asm"), "-f elf32");
 
         let dac = DACConstellation;
@@ -556,46 +487,5 @@ mod tests {
 
         assert_eq!(matrix.process_io_request(0, &mut out), 1);
         assert_eq!(out[0], b'\n');
-    }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
     }
 }

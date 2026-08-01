@@ -1,13 +1,14 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 /// Package version
 #[repr(C)]
@@ -44,7 +45,7 @@ pub trait Package {
 
 /// Package dependency
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct PackageDependency {
     pub name: [u8; 64],
     pub version_constraint: [u8; 32],
@@ -52,7 +53,6 @@ pub struct PackageDependency {
 
 /// Package info
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PackageInfo {
     pub name: [u8; 64],
     pub version: PackageVersion,
@@ -60,6 +60,9 @@ pub struct PackageInfo {
     pub size: u64,
     pub checksum: [u8; 64],
     pub capability: PackageCapability,
+    pub signature_key_id: u32,
+    pub is_signed: bool,
+    pub is_fhs_compliant: bool,
 }
 
 impl PackageInfo {
@@ -71,13 +74,16 @@ impl PackageInfo {
             size: 0,
             checksum: [0; 64],
             capability: PackageCapability::new(),
+            signature_key_id: 0,
+            is_signed: false,
+            is_fhs_compliant: false,
         }
     }
 }
 
 /// Package capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct PackageCapability {
     pub can_install: bool,
     pub can_uninstall: bool,
@@ -113,6 +119,9 @@ pub struct SimplePackage {
     pub signature: [u8; 256],
     pub dependencies: Vec<PackageDependency>,
     pub capability: PackageCapability,
+    pub signature_key_id: u32,
+    pub is_signed: bool,
+    pub is_fhs_compliant: bool,
 }
 
 impl SimplePackage {
@@ -133,17 +142,16 @@ impl SimplePackage {
             signature: [0; 256],
             dependencies: Vec::new(),
             capability,
+            signature_key_id: 0,
+            is_signed: false,
+            is_fhs_compliant: false,
         }
     }
 
     pub fn set_description(&mut self, description: &[u8]) {
         let len = description.len().min(255);
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                description.as_ptr(),
-                self.description.as_mut_ptr(),
-                len,
-            );
+            core::ptr::copy_nonoverlapping(description.as_ptr(), self.description.as_mut_ptr(), len);
         }
     }
 
@@ -170,11 +178,7 @@ impl SimplePackage {
 
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(
-                version_constraint.as_ptr(),
-                constraint_array.as_mut_ptr(),
-                constraint_len,
-            );
+            core::ptr::copy_nonoverlapping(version_constraint.as_ptr(), constraint_array.as_mut_ptr(), constraint_len);
         }
 
         self.dependencies.push(PackageDependency {
@@ -222,6 +226,9 @@ impl Package for SimplePackage {
             size: self.size,
             checksum: self.checksum,
             capability: self.capability,
+            signature_key_id: self.signature_key_id,
+            is_signed: self.is_signed,
+            is_fhs_compliant: self.is_fhs_compliant,
         }
     }
 }
@@ -241,10 +248,7 @@ pub trait PackageManager {
     /// Update package
     fn update(&mut self, name: &[u8]) -> Result<(), PackageError>;
     /// Resolve dependencies
-    fn resolve_dependencies(
-        &self,
-        package: &dyn Package,
-    ) -> Result<Vec<PackageDependency>, PackageError>;
+    fn resolve_dependencies(&self, package: &dyn Package) -> Result<Vec<PackageDependency>, PackageError>;
     /// Get manager statistics
     fn stats(&self) -> PackageStats;
 }
@@ -368,7 +372,7 @@ impl PackageManager for SimplePackageManager {
     }
 
     fn get_package(&self, name: &[u8]) -> Option<&dyn Package> {
-        for package_option in self.packages.iter() {
+        for package_option in &self.packages {
             if let Some(ref package) = *package_option {
                 if package.name() == name {
                     return Some(package.as_ref());
@@ -445,20 +449,17 @@ impl PackageManager for SimplePackageManager {
         self.install(name)
     }
 
-    fn resolve_dependencies(
-        &self,
-        package: &dyn Package,
-    ) -> Result<Vec<PackageDependency>, PackageError> {
+    fn resolve_dependencies(&self, package: &dyn Package) -> Result<Vec<PackageDependency>, PackageError> {
         let mut resolved = Vec::new();
         let dependencies = package.dependencies();
 
         for dep in dependencies {
             let mut found = false;
-            for package_option in self.packages.iter() {
+            for package_option in &self.packages {
                 if let Some(ref pkg) = *package_option {
                     let dep_name = dep.name;
                     let pkg_name = pkg.name();
-
+                    
                     let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
                     let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
 
@@ -518,11 +519,7 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -541,12 +538,11 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
+        if self.len == 0 {
+            &[] as &[T]
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
@@ -555,11 +551,29 @@ impl<T> core::ops::Deref for Vec<T> {
 
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
+        if self.len == 0 {
+            &mut [] as &mut [T]
         } else {
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -568,12 +582,39 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuArchLevel {
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 4,
+}
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+pub struct CachyCpuDetector;
+
+impl CachyCpuDetector {
+    pub fn detect_level() -> CpuArchLevel {
+        CpuArchLevel::V3
     }
 }
+
+pub struct AptPackageAdapter;
+pub struct PackageAdapterFactory;
+pub struct PacmanPackageAdapter;
+pub struct SnapPackageAdapter;
+pub struct NixPackageAdapter;
+pub struct EbuildPackageAdapter;
+pub struct ApkPackageAdapter;
+pub struct FlatpakPackageAdapter;
+pub struct TxzPackageAdapter;
+pub struct XbpsPackageAdapter;
+pub struct CachyosPackageAdapter;
+
+pub trait UniversalPackage {}
+pub enum UniversalPackageType {
+    Apt,
+    Rpm,
+    Pacman,
+}
+pub struct UserDefinedPackageHook;

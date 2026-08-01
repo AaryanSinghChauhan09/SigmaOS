@@ -188,9 +188,7 @@ mod tests {
         );
 
         // Enforce with valid token - should succeed
-        assert!(policy
-            .enforce_allocation_policy(&broker, 50, &valid_token)
-            .is_ok());
+        assert!(policy.enforce_allocation_policy(&broker, 50, &valid_token).is_ok());
 
         // Mechanism: Apply raw allocation
         broker.allocate_raw(50);

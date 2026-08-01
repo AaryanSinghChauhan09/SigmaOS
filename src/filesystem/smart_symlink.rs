@@ -1,16 +1,8 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SymlinkKernelPersona {
-    Linux_2_6,
-    Linux_3_x,
-    Linux_4_x,
-    Linux_5_x,
-    Linux_6_x,
-}
-
 // SigmaOS Smart Symbolic Link Engine
 // Zero-dependency, #![no_std] compliant, highly-optimized
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
 
+use crate::compatibility::KernelPersona;
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 
@@ -21,7 +13,7 @@ const MAX_FALLBACK_PATHS: usize = 4;
 /// Evaluates custom environmental rules to dynamically point to different directories or versions
 pub trait SymlinkResolverRule {
     fn name(&self) -> &'static str;
-    fn evaluate(&self, persona: SymlinkKernelPersona) -> bool;
+    fn evaluate(&self, persona: KernelPersona) -> bool;
 }
 
 pub struct LinuxPersonaRule;
@@ -29,13 +21,13 @@ impl SymlinkResolverRule for LinuxPersonaRule {
     fn name(&self) -> &'static str {
         "linux-persona-rule"
     }
-    fn evaluate(&self, persona: SymlinkKernelPersona) -> bool {
+    fn evaluate(&self, persona: KernelPersona) -> bool {
         match persona {
-            SymlinkKernelPersona::Linux_2_6
-            | SymlinkKernelPersona::Linux_3_x
-            | SymlinkKernelPersona::Linux_4_x
-            | SymlinkKernelPersona::Linux_5_x
-            | SymlinkKernelPersona::Linux_6_x => true,
+            KernelPersona::Linux_2_6
+            | KernelPersona::Linux_3_x
+            | KernelPersona::Linux_4_x
+            | KernelPersona::Linux_5_x
+            | KernelPersona::Linux_6_x => true,
         }
     }
 }
@@ -45,9 +37,9 @@ impl SymlinkResolverRule for LegacyLinuxRule {
     fn name(&self) -> &'static str {
         "legacy-linux-rule"
     }
-    fn evaluate(&self, persona: SymlinkKernelPersona) -> bool {
+    fn evaluate(&self, persona: KernelPersona) -> bool {
         match persona {
-            SymlinkKernelPersona::Linux_2_6 => true,
+            KernelPersona::Linux_2_6 => true,
             _ => false,
         }
     }
@@ -90,7 +82,7 @@ impl SmartSymlink {
 
     fn resolve_internal(
         &self,
-        persona: SymlinkKernelPersona,
+        persona: KernelPersona,
         primary_exists: bool,
         fallback_existence: &[bool],
         rule: &dyn SymlinkResolverRule,
@@ -138,7 +130,7 @@ impl SmartSymlink {
     /// Prevents classical infinite loops via depth-based termination (ELOOP mitigation)
     pub fn resolve_symlink(
         &self,
-        persona: SymlinkKernelPersona,
+        persona: KernelPersona,
         primary_exists: bool,
         fallback_existence: &[bool],
         rule: &dyn SymlinkResolverRule,

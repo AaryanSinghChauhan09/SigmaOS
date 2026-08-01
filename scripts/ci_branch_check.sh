@@ -1,5 +1,4 @@
 #!/bin/bash
-# SPDX-License-Identifier: MIT
 # SigmaOS CI Branch Parity and Feature Matrix Verification Script
 # Verifies presence of core strategic roadmap and documentation assets on active branches.
 
@@ -15,12 +14,8 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-echo "=== SigmaOS CI Branch Parity Checker ==="
-if [ -n "$BRANCH" ]; then
-    echo "Verifying branch: $BRANCH"
-else
-    echo "No branch specified, checking default parity..."
-fi
+echo "=== SigmaOS CI Branch Parity Check ==="
+echo "Active target branch: ${BRANCH:-unknown}"
 
 # Verify presence of core strategic files
 REQUIRED_FILES=(
@@ -29,18 +24,14 @@ REQUIRED_FILES=(
     "CHANGELOG.md"
 )
 
-PASS=0
-FAIL=0
 for file in "${REQUIRED_FILES[@]}"; do
     if [ -f "$file" ]; then
-        echo "[OK] Required file found: $file"
-        PASS=$((PASS + 1))
+        echo "[SUCCESS] Required file found: $file"
     else
-        echo "[WARN] File missing (non-fatal): $file"
-        FAIL=$((FAIL + 1))
+        echo "[ERROR] Mandatory file missing: $file"
+        exit 1
     fi
 done
 
-echo "=== Branch Parity Check Complete: $PASS passed, $FAIL warnings ==="
-echo "Branch verification check successful! No blocking parity issues found."
+echo "=== All Branch Parity Verification Rules Passed Perfectly! ==="
 exit 0
