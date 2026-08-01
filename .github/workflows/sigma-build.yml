@@ -233,7 +233,7 @@ jobs:
                --directory tests/cpp_host/build_cov \
                --output-file coverage.info
           lcov --remove coverage.info '/usr/*' '*/googletest/*' \
-               --output-file coverage.info
+               --output-file coverage.info --ignore-errors unused
 
       - name: Convert lcov → Cobertura XML
         run: lcov_cobertura coverage.info --output coverage.xml

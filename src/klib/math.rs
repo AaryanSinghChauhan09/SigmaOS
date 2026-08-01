@@ -5,17 +5,29 @@
 
 /// Custom absolute value function
 pub fn abs(x: i32) -> i32 {
-    if x < 0 { -x } else { x }
+    if x < 0 {
+        -x
+    } else {
+        x
+    }
 }
 
 /// Custom minimum function
 pub fn min<T: PartialOrd>(a: T, b: T) -> T {
-    if a < b { a } else { b }
+    if a < b {
+        a
+    } else {
+        b
+    }
 }
 
 /// Custom maximum function
 pub fn max<T: PartialOrd>(a: T, b: T) -> T {
-    if a > b { a } else { b }
+    if a > b {
+        a
+    } else {
+        b
+    }
 }
 
 /// Custom clamp function
@@ -34,7 +46,7 @@ pub fn pow(base: u32, exp: u32) -> u32 {
     let mut result = 1u32;
     let mut base = base;
     let mut exp = exp;
-    
+
     while exp > 0 {
         if exp % 2 == 1 {
             result *= base;
@@ -42,7 +54,7 @@ pub fn pow(base: u32, exp: u32) -> u32 {
         base *= base;
         exp /= 2;
     }
-    
+
     result
 }
 
@@ -54,11 +66,11 @@ pub fn sqrt(n: f64) -> f64 {
     if n == 0.0 || n == 1.0 {
         return n;
     }
-    
+
     let mut low = 0.0;
     let mut high = n;
     let mut mid = (low + high) / 2.0;
-    
+
     while (mid * mid - n).abs() > 0.0001 {
         if mid * mid > n {
             high = mid;
@@ -67,7 +79,7 @@ pub fn sqrt(n: f64) -> f64 {
         }
         mid = (low + high) / 2.0;
     }
-    
+
     mid
 }
 
@@ -76,13 +88,13 @@ pub fn log2(mut n: u32) -> u32 {
     if n == 0 {
         return u32::MAX; // Undefined for 0
     }
-    
+
     let mut log = 0u32;
     while n > 1 {
         n >>= 1;
         log += 1;
     }
-    
+
     log
 }
 
@@ -91,13 +103,13 @@ pub fn log10(mut n: u32) -> u32 {
     if n == 0 {
         return u32::MAX; // Undefined for 0
     }
-    
+
     let mut log = 0u32;
     while n >= 10 {
         n /= 10;
         log += 1;
     }
-    
+
     log
 }
 
@@ -105,13 +117,13 @@ pub fn log10(mut n: u32) -> u32 {
 pub fn gcd(a: u32, b: u32) -> u32 {
     let mut a = a;
     let mut b = b;
-    
+
     while b != 0 {
         let temp = b;
         b = a % b;
         a = temp;
     }
-    
+
     a
 }
 
@@ -120,7 +132,7 @@ pub fn lcm(a: u32, b: u32) -> u32 {
     if a == 0 || b == 0 {
         return 0;
     }
-    
+
     (a / gcd(a, b)) * b
 }
 
@@ -135,7 +147,7 @@ pub fn is_prime(n: u32) -> bool {
     if n % 2 == 0 || n % 3 == 0 {
         return false;
     }
-    
+
     let mut i = 5u32;
     while i * i <= n {
         if n % i == 0 || n % (i + 2) == 0 {
@@ -143,7 +155,7 @@ pub fn is_prime(n: u32) -> bool {
         }
         i += 6;
     }
-    
+
     true
 }
 

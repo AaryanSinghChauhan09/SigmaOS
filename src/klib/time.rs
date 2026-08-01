@@ -19,18 +19,18 @@ impl Time {
             seconds: seconds % 60,
         }
     }
-    
+
     pub fn to_seconds(&self) -> u32 {
         (self.hours as u32 * 3600) + (self.minutes as u32 * 60) + self.seconds as u32
     }
-    
+
     pub fn from_seconds(total_seconds: u32) -> Self {
         let hours = (total_seconds / 3600) as u8 % 24;
         let minutes = ((total_seconds % 3600) / 60) as u8;
         let seconds = (total_seconds % 60) as u8;
         Time::new(hours, minutes, seconds)
     }
-    
+
     pub fn add_seconds(&self, seconds: u32) -> Self {
         let total = self.to_seconds() + seconds;
         Self::from_seconds(total)
@@ -53,7 +53,7 @@ impl Date {
             day: day.min(31),
         }
     }
-    
+
     pub fn days_in_month(month: u8, year: u16) -> u8 {
         match month {
             1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
@@ -68,16 +68,16 @@ impl Date {
             _ => 30,
         }
     }
-    
+
     pub fn is_leap_year(year: u16) -> bool {
         (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
     }
-    
+
     pub fn add_days(&self, days: u32) -> Self {
         let mut day = self.day as u32 + days;
         let mut month = self.month;
         let mut year = self.year;
-        
+
         while day > Self::days_in_month(month, year) as u32 {
             day -= Self::days_in_month(month, year) as u32;
             month += 1;
@@ -86,7 +86,7 @@ impl Date {
                 year += 1;
             }
         }
-        
+
         Date::new(year, month, day as u8)
     }
 }
@@ -102,13 +102,10 @@ impl Timestamp {
     pub fn new(date: Date, time: Time) -> Self {
         Timestamp { date, time }
     }
-    
+
     pub fn now() -> Self {
         // In a real implementation, this would get the actual time
-        Timestamp::new(
-            Date::new(2024, 8, 1),
-            Time::new(0, 0, 0),
-        )
+        Timestamp::new(Date::new(2024, 8, 1), Time::new(0, 0, 0))
     }
 }
 
@@ -139,7 +136,7 @@ mod tests {
     fn test_time() {
         let time = Time::new(12, 30, 45);
         assert_eq!(time.to_seconds(), 45045);
-        
+
         let time2 = Time::from_seconds(45045);
         assert_eq!(time2.hours, 12);
         assert_eq!(time2.minutes, 30);

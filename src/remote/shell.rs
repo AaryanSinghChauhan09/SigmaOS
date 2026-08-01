@@ -1,8 +1,8 @@
 // OOP-based Remote Shell for SigmaOS
 // Implements remote shell access using OOP principles with traits and structs.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ShellID = usize;
 
@@ -112,8 +112,18 @@ impl ShellManager for SimpleShellManager {
 }
 
 pub trait FileTransfer {
-    fn upload(&self, shell_id: ShellID, local_path: &[u8], remote_path: &[u8]) -> Result<(), ShellError>;
-    fn download(&self, shell_id: ShellID, remote_path: &[u8], local_path: &[u8]) -> Result<(), ShellError>;
+    fn upload(
+        &self,
+        shell_id: ShellID,
+        local_path: &[u8],
+        remote_path: &[u8],
+    ) -> Result<(), ShellError>;
+    fn download(
+        &self,
+        shell_id: ShellID,
+        remote_path: &[u8],
+        local_path: &[u8],
+    ) -> Result<(), ShellError>;
 }
 
 #[repr(C)]
@@ -128,7 +138,12 @@ impl SimpleFileTransfer {
 }
 
 impl FileTransfer for SimpleFileTransfer {
-    fn upload(&self, shell_id: ShellID, _local_path: &[u8], _remote_path: &[u8]) -> Result<(), ShellError> {
+    fn upload(
+        &self,
+        shell_id: ShellID,
+        _local_path: &[u8],
+        _remote_path: &[u8],
+    ) -> Result<(), ShellError> {
         if self.manager.get_shell(shell_id).is_some() {
             Ok(())
         } else {
@@ -136,7 +151,12 @@ impl FileTransfer for SimpleFileTransfer {
         }
     }
 
-    fn download(&self, shell_id: ShellID, _remote_path: &[u8], _local_path: &[u8]) -> Result<(), ShellError> {
+    fn download(
+        &self,
+        shell_id: ShellID,
+        _remote_path: &[u8],
+        _local_path: &[u8],
+    ) -> Result<(), ShellError> {
         if self.manager.get_shell(shell_id).is_some() {
             Ok(())
         } else {

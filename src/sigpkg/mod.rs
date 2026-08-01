@@ -2,18 +2,20 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod importer;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
-pub mod importer;
 
-pub use importer::{DebPackageImporter, RpmPackageImporter, PacmanPackageImporter, PackageImporter};
+pub use importer::{
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
+};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
-pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
+pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;

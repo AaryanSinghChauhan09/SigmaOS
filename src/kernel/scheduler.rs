@@ -130,7 +130,8 @@ impl Scheduler {
     /// Check if a higher-priority task can preempt the currently running process
     pub fn check_preemption(&self, running_pid: u64) -> bool {
         let running_proc = self.processes.iter().find(|p| p.pid == running_pid);
-        let highest_ready = self.processes
+        let highest_ready = self
+            .processes
             .iter()
             .filter(|p| p.state == ProcessState::Ready)
             .max_by_key(|p| p.priority);
