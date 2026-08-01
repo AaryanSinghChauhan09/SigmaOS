@@ -156,7 +156,7 @@ impl RoundRobinScheduler {
             let slice = entry.time_slice_ticks(self.config.time_slice);
             let yielding = entry.yield_requested;
             entry.yield_requested = false;
-            yielding || (entry.cpu_time_used % slice == 0)
+            yielding || entry.cpu_time_used.is_multiple_of(slice)
         };
 
         if needs_switch {
@@ -325,8 +325,14 @@ mod tests {
         };
         let mut scheduler = RoundRobinScheduler::with_config(config);
 
-        assert!(scheduler.add_process(Process::new(1, "test1".to_string(), Priority::Normal)).is_ok());
-        assert!(scheduler.add_process(Process::new(2, "test2".to_string(), Priority::Normal)).is_ok());
-        assert!(scheduler.add_process(Process::new(3, "test3".to_string(), Priority::Normal)).is_err());
+        assert!(scheduler
+            .add_process(Process::new(1, "test1".to_string(), Priority::Normal))
+            .is_ok());
+        assert!(scheduler
+            .add_process(Process::new(2, "test2".to_string(), Priority::Normal))
+            .is_ok());
+        assert!(scheduler
+            .add_process(Process::new(3, "test3".to_string(), Priority::Normal))
+            .is_err());
     }
 }
