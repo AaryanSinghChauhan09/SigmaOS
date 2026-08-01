@@ -1,6 +1,10 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
@@ -11,7 +15,7 @@ use core::mem;
 pub type CertificateID = usize;
 
 #[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum CertificateType { Root = 0, Intermediate = 1, EndEntity = 2 }
 
 #[repr(C)]
@@ -110,8 +114,8 @@ impl PKIManager for SimplePKIManager {
     }
 
     fn revoke_certificate(&mut self, id: CertificateID) -> Result<(), PKIError> {
-        for cert_option in &self.certificates {
-            if let Some(ref cert) = *cert_option {
+        for i in 0..self.certificates.len() {
+            if let Some(Some(ref cert)) = self.certificates.get(i) {
                 if cert.id() == id {
                     self.revoked.push(id);
                     return Ok(());
@@ -122,8 +126,8 @@ impl PKIManager for SimplePKIManager {
     }
 
     fn get_certificate(&self, id: CertificateID) -> Option<&dyn Certificate> {
-        for cert_option in &self.certificates {
-            if let Some(ref cert) = *cert_option {
+        for i in 0..self.certificates.len() {
+            if let Some(Some(ref cert)) = self.certificates.get(i) {
                 if cert.id() == id { return Some(cert.as_ref()); }
             }
         }
@@ -167,9 +171,11 @@ impl CRL for SimpleCRL {
     }
 
     fn is_revoked(&self, cert_id: CertificateID) -> bool {
-        for &(id, _) in &self.revoked {
-            if id == cert_id {
-                return true;
+        for i in 0..self.revoked.len() {
+            if let Some(&(id, _)) = self.revoked.get(i) {
+                if id == cert_id {
+                    return true;
+                }
             }
         }
         false
@@ -180,93 +186,22 @@ impl CRL for SimpleCRL {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub type PkiError = PKIError;
+pub use PKIManager as PkiManager;
+pub struct CertificateAuthority;
 
-impl Vec<CertificateID> {
-    fn contains(&self, item: CertificateID) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                let stored = core::ptr::read(self.data.add(i));
-                if stored == item {
-                    return true;
-                }
-            }
-        }
-        false
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_pki_manager() {
+        let mut manager = SimplePKIManager::new();
+        let cert = SimpleCertificate::new(1, CertificateType::Root, b"Subject", b"Issuer");
+        let id = manager.issue_certificate(Box::new(cert)).unwrap();
+        assert_eq!(id, 1);
+
+        let retrieved = manager.get_certificate(1).unwrap();
+        assert_eq!(retrieved.subject(), b"Subject");
     }
 }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn clone(&self) -> Vec<T> {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                let item = core::ptr::read(self.data.add(i));
-                new_vec.push(item);
-            }
-        }
-        new_vec
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.len == 0 {
-            &[] as &[T]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.len == 0 {
-            &mut [] as &mut [T]
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

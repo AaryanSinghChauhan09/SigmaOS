@@ -142,6 +142,110 @@ impl CameraManager for SimpleCameraManager {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WebcamEffectType {
+    None,
+    ChromaKey {
+        key_r: u8, key_g: u8, key_b: u8,
+        tolerance: u8,
+        replace_r: u8, replace_g: u8, replace_b: u8,
+    },
+    Grayscale,
+    Sepia,
+    Negative,
+}
+
+pub struct SigmaWebcamEffectsProcessor {
+    pub active_effect: WebcamEffectType,
+}
+
+impl SigmaWebcamEffectsProcessor {
+    pub fn new() -> Self {
+        Self {
+            active_effect: WebcamEffectType::None,
+        }
+    }
+
+    pub fn set_effect(&mut self, effect: WebcamEffectType) {
+        self.active_effect = effect;
+    }
+
+    /// Processes raw RGB24 frames in-place (3 bytes per pixel: R, G, B)
+    pub fn apply_effect(&self, width: u32, height: u32, frame_buffer: &mut [u8]) {
+        let pixel_count = (width * height) as usize;
+        let buffer_size = pixel_count * 3;
+        if frame_buffer.len() < buffer_size {
+            return;
+        }
+
+        match self.active_effect {
+            WebcamEffectType::None => {},
+            WebcamEffectType::ChromaKey { key_r, key_g, key_b, tolerance, replace_r, replace_g, replace_b } => {
+                for i in 0..pixel_count {
+                    let offset = i * 3;
+                    let r = frame_buffer[offset];
+                    let g = frame_buffer[offset + 1];
+                    let b = frame_buffer[offset + 2];
+
+                    // Compute Euclidean distance in RGB color space
+                    let diff_r = (r as i32 - key_r as i32).abs();
+                    let diff_g = (g as i32 - key_g as i32).abs();
+                    let diff_b = (b as i32 - key_b as i32).abs();
+
+                    if diff_r <= tolerance as i32 && diff_g <= tolerance as i32 && diff_b <= tolerance as i32 {
+                        frame_buffer[offset] = replace_r;
+                        frame_buffer[offset + 1] = replace_g;
+                        frame_buffer[offset + 2] = replace_b;
+                    }
+                }
+            }
+            WebcamEffectType::Grayscale => {
+                for i in 0..pixel_count {
+                    let offset = i * 3;
+                    let r = frame_buffer[offset] as u32;
+                    let g = frame_buffer[offset + 1] as u32;
+                    let b = frame_buffer[offset + 2] as u32;
+                    let gray = ((r + g + b) / 3) as u8;
+
+                    frame_buffer[offset] = gray;
+                    frame_buffer[offset + 1] = gray;
+                    frame_buffer[offset + 2] = gray;
+                }
+            }
+            WebcamEffectType::Sepia => {
+                for i in 0..pixel_count {
+                    let offset = i * 3;
+                    let r = frame_buffer[offset] as f32;
+                    let g = frame_buffer[offset + 1] as f32;
+                    let b = frame_buffer[offset + 2] as f32;
+
+                    let sepia_r = (r * 0.393 + g * 0.769 + b * 0.189).min(255.0) as u8;
+                    let sepia_g = (r * 0.349 + g * 0.686 + b * 0.168).min(255.0) as u8;
+                    let sepia_b = (r * 0.272 + g * 0.534 + b * 0.131).min(255.0) as u8;
+
+                    frame_buffer[offset] = sepia_r;
+                    frame_buffer[offset + 1] = sepia_g;
+                    frame_buffer[offset + 2] = sepia_b;
+                }
+            }
+            WebcamEffectType::Negative => {
+                for i in 0..pixel_count {
+                    let offset = i * 3;
+                    frame_buffer[offset] = 255 - frame_buffer[offset];
+                    frame_buffer[offset + 1] = 255 - frame_buffer[offset + 1];
+                    frame_buffer[offset + 2] = 255 - frame_buffer[offset + 2];
+                }
+            }
+        }
+    }
+}
+
+impl Default for SigmaWebcamEffectsProcessor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub trait VideoRecorder {
     fn start_recording(&mut self, camera_id: CameraID, output: &[u8]) -> Result<(), CameraError>;
     fn stop_recording(&mut self, camera_id: CameraID) -> Result<(), CameraError>;
@@ -229,45 +333,51 @@ impl<T> Vec<T> {
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
+    #[test]
+    fn test_webcam_effects() {
+        let mut processor = SigmaWebcamEffectsProcessor::new();
+        assert_eq!(processor.active_effect, WebcamEffectType::None);
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
+        // Test Green Screen Chroma Key replacement
+        processor.set_effect(WebcamEffectType::ChromaKey {
+            key_r: 0, key_g: 255, key_b: 0, // Green key
+            tolerance: 10,
+            replace_r: 42, replace_g: 42, replace_b: 42, // Gray replacement
+        });
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+        let mut frame = [
+            0, 255, 0,    // Pixel 1: Pure Green (matched)
+            100, 100, 100 // Pixel 2: Gray (not matched)
+        ];
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
+        processor.apply_effect(2, 1, &mut frame);
+        assert_eq!(frame[0], 42);
+        assert_eq!(frame[1], 42);
+        assert_eq!(frame[2], 42);
+        assert_eq!(frame[3], 100);
 
+        // Test Grayscale conversion
+        processor.set_effect(WebcamEffectType::Grayscale);
+        let mut frame_gray = [
+            10, 20, 30, // Pixel 1: average is (10+20+30)/3 = 20
+        ];
+        processor.apply_effect(1, 1, &mut frame_gray);
+        assert_eq!(frame_gray[0], 20);
+        assert_eq!(frame_gray[1], 20);
+        assert_eq!(frame_gray[2], 20);
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        // Test Negative filter
+        processor.set_effect(WebcamEffectType::Negative);
+        let mut frame_neg = [
+            100, 200, 50,
+        ];
+        processor.apply_effect(1, 1, &mut frame_neg);
+        assert_eq!(frame_neg[0], 155);
+        assert_eq!(frame_neg[1], 55);
+        assert_eq!(frame_neg[2], 205);
     }
 }
