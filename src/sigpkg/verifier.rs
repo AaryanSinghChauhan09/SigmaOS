@@ -57,8 +57,7 @@ impl CryptoVerifier {
         let mut current_key = key_id;
         let mut max_trust = TrustLevel::Unknown;
 
-        for _ in 0..10 {
-            // Prevent infinite recursion cycles
+        for _ in 0..10 { // Prevent infinite recursion cycles
             if let Some(record) = self.trust_chain.iter().find(|r| r.key_id == current_key) {
                 if record.trust_level > max_trust {
                     max_trust = record.trust_level;
@@ -206,15 +205,9 @@ mod tests {
         });
 
         // Test trust path tracking: intermediate_01 should trust recursively to Ultimate trust level
-        assert_eq!(
-            verifier.verify_key_trust("intermediate_01"),
-            TrustLevel::Ultimate
-        );
+        assert_eq!(verifier.verify_key_trust("intermediate_01"), TrustLevel::Ultimate);
 
         // Key with Unknown trust level
-        assert_eq!(
-            verifier.verify_key_trust("random_unknown_key"),
-            TrustLevel::Unknown
-        );
+        assert_eq!(verifier.verify_key_trust("random_unknown_key"), TrustLevel::Unknown);
     }
 }

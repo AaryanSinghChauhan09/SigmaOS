@@ -123,29 +123,41 @@ impl VesaDriver {
         if x >= self.mode_info.width || y >= self.mode_info.height {
             return Err(VesaError::OutOfBounds);
         }
-        let offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
-        let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
-        if fb_addr.is_null() {
-            return Ok(()); // No framebuffer mapped (simulation mode)
+        #[cfg(target_os = "none")]
+        {
+            let offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
+            let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
+            if !fb_addr.is_null() {
+                // Safety: Only valid when running on bare-metal with an MMIO framebuffer.
+                unsafe {
+                    fb_addr.add(offset / 4).write_volatile(color);
+                }
+            }
         }
-        // Safety: Only valid when running on bare-metal with an MMIO framebuffer.
-        unsafe {
-            fb_addr.add(offset / 4).write_volatile(color);
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = (y, x, color);
         }
         Ok(())
     }
 
     /// Fill the entire screen with a 32-bit ARGB color.
     pub fn fill_screen(&self, color: u32) -> Result<(), VesaError> {
-        let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
-        let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
-        if fb_addr.is_null() {
-            return Ok(());
-        }
-        unsafe {
-            for i in 0..total_pixels {
-                fb_addr.add(i).write_volatile(color);
+        #[cfg(target_os = "none")]
+        {
+            let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
+            let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
+            if !fb_addr.is_null() {
+                unsafe {
+                    for i in 0..total_pixels {
+                        fb_addr.add(i).write_volatile(color);
+                    }
+                }
             }
+        }
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = color;
         }
         Ok(())
     }

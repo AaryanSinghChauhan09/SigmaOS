@@ -1,10 +1,9 @@
 // SigmaOS Compatibility Module
-pub mod chimera_linux;
 pub mod cross_platform;
-pub mod mint_linux;
-pub mod relay_nexus;
-pub mod bodhi_moksha;
-pub mod garuda_zen;
+pub mod standards;
+pub mod legacy_adapters;
+pub mod constellation_mesh;
+pub mod endeavour;
 
 pub use endeavour::{
     EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
@@ -14,17 +13,18 @@ pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
-pub use reactos::{
-    NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
-    RegistryHive,
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };
-
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+pub use legacy_adapters::{
+    LegacyKernelAdapter, LegacyDriverAdapter, LegacyPackageAdapter, LegacyFSAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };
-
-pub use relay_nexus::{WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus};
-pub use bodhi_moksha::{EflCanvasElement, MokshaProfile, MokshaDesktopManager};
-pub use garuda_zen::{ZenInteractivityGovernor, TimeshiftBtrfsEngine, ZramSwapManager, NohangOomGuard};
+pub use constellation_mesh::{
+    KernelConstellationGrid, ConstellationNode, SyscallAlmanacHub, FileAlmanacHub, NetworkAlmanacHub,
+    ProcessAlmanacHub, DriverArchiveGridV2, StorageArchiveGridV2, NetworkArchiveGridV2,
+    GraphicsArchiveGridV2, FirmwareGatewayMesh, BIOSGatewayMesh, UEFIGatewayMesh,
+    CorebootGatewayMesh, BuildCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyAsmCodexGrid,
+    SecurityConstellation, DACConstellation, SELinuxConstellation, ZeroTrustConstellation,
+    PeripheralArchiveMesh, FloppyMesh, TapeMesh, CRTMesh, DotMatrixMesh,
+};

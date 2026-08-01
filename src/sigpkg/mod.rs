@@ -8,7 +8,9 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod importer;
 
+pub use importer::{DebPackageImporter, RpmPackageImporter, PacmanPackageImporter, PackageImporter};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
