@@ -585,7 +585,6 @@ struct Vec<T> {
     len: usize,
     capacity: usize,
 }
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
