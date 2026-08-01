@@ -159,3 +159,7 @@ mod tests {
         assert!(filter.is_filter_enabled());
     }
 }
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+

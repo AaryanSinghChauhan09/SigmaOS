@@ -1,6 +1,7 @@
 //! Intelligent Terminal with Agent Client Protocol (ACP) Engine integration.
 //! Merges Microsoft's Intelligent Terminal capabilities natively into SigmaOS's shell.
 
+extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;

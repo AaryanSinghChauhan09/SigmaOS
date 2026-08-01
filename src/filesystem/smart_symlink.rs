@@ -2,7 +2,7 @@
 // Zero-dependency, #![no_std] compliant, highly-optimized
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
 
-use crate::compatibility::KernelPersona;
+use crate::kernel::KernelPersona;
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 

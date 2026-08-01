@@ -20,12 +20,6 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
-use core::ptr::NonNull;
-
-pub struct Zone {
-    pub present_pages: u64,
-}
-
 pub struct Page {
     pub flags: AtomicUsize,
     pub count: AtomicUsize,

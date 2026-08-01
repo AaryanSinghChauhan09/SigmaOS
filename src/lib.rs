@@ -6,6 +6,11 @@
 #![allow(clippy::all, unused)]
 
 pub mod accessibility;
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+    pub mod runtime;
+}
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -15,26 +20,29 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod graphics {
+    pub mod paint;
+    pub mod video;
+    pub mod compositor;
+    pub mod render3d;
+}
+pub mod init;
+pub mod interrupt;
 pub mod kernel;
 pub mod klib;
-pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
+pub mod plugin;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
-pub mod graphics {
-    pub mod compositor;
-    pub mod paint;
-    pub mod video;
-}
 pub mod hardware {
-    pub mod compatibility;
     pub mod win32;
+    pub mod compatibility;
 }
 pub mod power {
     pub mod governor;
@@ -42,8 +50,10 @@ pub mod power {
 pub mod observability {
     pub mod profiler;
 }
-pub mod ai;
-pub mod boot;
+pub mod boot {
+    pub mod firmware_bridge;
+    pub mod bridge_grid;
+}
 pub mod toolchain {
     pub mod adapter;
     pub mod capsule;
@@ -52,6 +62,7 @@ pub mod toolchain {
 }
 pub mod scheduler {
     pub mod numa_scheduler;
+    pub mod energy_aware;
 }
 pub mod crypto {
     pub mod vectorized_pqc;
@@ -61,6 +72,11 @@ pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
 };
+pub use ai::{
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    SovereignWikiEngine, WikiArticle,
+};
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
@@ -68,8 +84,16 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
-    ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator,
+    ContainerRuntime as CompatibilityContainerRuntime, TargetPlatform, TranslationLayer,
+    WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus,
+    EflCanvasElement, MokshaProfile, MokshaDesktopManager,
+};
+pub use container::{
+    Container, ContainerCapability, ContainerError, ContainerID, ContainerInfo, ContainerRuntime,
+    ContainerState, Namespace, OciContainer, OciContainerError, OciContainerID,
+    OciContainerRuntime, OciContainerState, RuntimeCapability, RuntimeStats, Sandbox,
+    SimpleContainer, SimpleContainerRuntime, SimpleOciContainer, SimpleOciContainerRuntime,
+    SimpleSandbox,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -85,7 +109,13 @@ pub use drivers::{
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
-    ClusterState as DefragClusterState, FragmentedFile, DefragStats, DiskDefragmenter,
+};
+pub use interrupt::{
+    ColorCode, ExceptionType, InterruptDescriptor as HardwareInterruptDescriptor,
+    InterruptError as HardwareInterruptError, InterruptHandler as HardwareInterruptHandler,
+    InterruptManager as HardwareInterruptManager, ScreenChar,
+    SimpleInterruptHandler as SimpleHardwareInterruptHandler, TaskStateSegment, VGAColor,
+    VGATextBuffer, GDT, IDT, PIC,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
@@ -98,26 +128,31 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use plugin::{
+    ManagerCapability, Plugin, PluginCapability, PluginError, PluginID, PluginInfo, PluginManager,
+    PluginState, PluginStats, SimplePlugin, SimplePluginManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
-    SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
-    TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use security::{
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, UnveilManager,
+    UnveilPermission, UnveilRestriction,
+};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
 };
 pub use virtualization::{
-    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
-    VirtualizationOrchestrator, VirtualizationTech, VmState,
+    Container as VirtualContainer, KubernetesPod, ResourcePool, VirtualMachine,
+    VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
