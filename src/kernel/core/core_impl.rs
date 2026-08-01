@@ -116,7 +116,7 @@ impl SimpleKernelTask {
 
     pub fn get_state(&self) -> TaskState {
         unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+            core::mem::transmute::<usize, TaskState>(self.state.load(Ordering::SeqCst))
         }
     }
 

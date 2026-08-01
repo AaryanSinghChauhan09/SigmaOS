@@ -48,7 +48,7 @@ impl SimpleHashFunction {
 
 impl HashFunction for SimpleHashFunction {
     fn id(&self) -> HashID { self.id }
-    fn algorithm(&self) -> HashAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
+    fn algorithm(&self) -> HashAlgorithm { unsafe { core::mem::transmute::<usize, HashAlgorithm>(self.algorithm.load(Ordering::SeqCst)) } }
     fn hash_size(&self) -> usize { 32 }
 
     fn compute(&self, data: &[u8]) -> Result<Vec<u8>, HashError> {

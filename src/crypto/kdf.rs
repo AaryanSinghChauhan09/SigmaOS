@@ -41,7 +41,7 @@ impl SimpleKeyDerivation {
 
 impl KeyDerivation for SimpleKeyDerivation {
     fn id(&self) -> KDFID { self.id }
-    fn algorithm(&self) -> KDFAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
+    fn algorithm(&self) -> KDFAlgorithm { unsafe { core::mem::transmute::<usize, KDFAlgorithm>(self.algorithm.load(Ordering::SeqCst)) } }
 
     fn derive(&self, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError> {
         let mut derived = Vec::new();
