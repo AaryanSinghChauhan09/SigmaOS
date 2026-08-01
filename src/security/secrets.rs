@@ -1,6 +1,10 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -396,10 +400,10 @@ mod tests {
         let mut keyring = SimpleKeyring::new(cap);
         let secret_cap = SecretCapability::full();
         let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.add_secret(Box::new(secret)).expect("Failed to add secret to keyring");
+        let id = keyring.store_secret(Box::new(secret)).unwrap();
         assert_eq!(id, 1);
 
-        let retrieved = keyring.get_secret(1).expect("Failed to retrieve secret from keyring");
+        let retrieved = keyring.get_secret(1).unwrap();
         assert_eq!(retrieved.name(), b"TestSecret");
     }
 }
