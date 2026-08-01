@@ -10,7 +10,9 @@ pub mod scheduler;
 pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
-pub mod breakthroughs;
+pub mod proc;
+pub mod roundrobin;
+pub mod scheduler;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,

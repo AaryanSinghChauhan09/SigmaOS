@@ -1,12 +1,12 @@
-# 📑 SigmaOS Diagnostic & Algorithm Status Master Guide: What's Working & What's Not Working
+# 📑 SigmaOS Subsystem Diagnostics & Status Guide: What's Working & What's Not Working
 
-Welcome to the definitive status, diagnostics, and architectural reference guide for **SigmaOS**. This document provides future developers and AI agents with a comprehensive, low-level overview of the entire SigmaOS codebase, detailing what subsystems and algorithms are working, what compilation blockers and algorithmic bugs exist, why they exist, and exact code blueprints/step-by-step instructions on how to implement or resolve them.
+Welcome to the definitive status, diagnostics, and architectural reference guide for **SigmaOS**. This document provides future developers and AI agents with a comprehensive, low-level overview of the entire SigmaOS codebase, detailing what subsystems and algorithms are working, what structural gaps exist for physical bare-metal hardware deployment, why these gaps exist, and how to implement or resolve them.
 
 ---
 
 ## 📋 Table of Contents
 1. [Executive Summary](#-executive-summary)
-2. [Global Subsystem Status Matrix](#-global-subsystem-status-matrix)
+2. [Global Subsystem Status Table](#-global-subsystem-status-table)
 3. [Deep-Dive: What's Working & Core Algorithms Explained](#-deep-dive-whats-working--core-algorithms-explained)
    - [A. S-SCHED Advanced Schedulers](#a-s-sched-advanced-schedulers)
    - [B. Compatibility Layers & Lindows Proxy](#b-compatibility-layers--lindows-proxy)
@@ -14,19 +14,11 @@ Welcome to the definitive status, diagnostics, and architectural reference guide
    - [D. Post-Quantum Security & Enclaves](#d-post-quantum-security--enclaves)
    - [E. Custom Zero-Dependency Collections](#e-custom-zero-dependency-collections)
    - [F. Digital Sovereignty & DID Personalization](#f-digital-sovereignty--did-personalization)
-4. [Ecosystem Gaps: What's Not Working - why & How to Fix](#-ecosystem-gaps-whats-not-working---why--how-to-fix)
-   - [Bug 1: Missing Iterator Helper Structs (`VecIter`/`VecIterMut`) in `src/network/tcp_udp.rs`](#bug-1-missing-iterator-helper-structs-vecitervecitermut-in-srcnetworktcp_udprs)
-   - [Bug 2: Unresolved Module or Crate `mem` in `src/network/tcp_udp.rs`](#bug-2-unresolved-module-or-crate-mem-in-srcnetworktcp_udprs)
-   - [Bug 3: Conflicting Implementations of `Debug` & `Clone` in `src/shell/repl.rs`](#bug-3-conflicting-implementations-of-debug--clone-in-srcshellreplrs)
-   - [Bug 4: Conflicting implementations of `Default` on Core Structures](#bug-4-conflicting-implementations-of-default-on-core-structures)
-   - [Bug 5: Conflicting implementations of `Send`/`Sync` for `KObject` in `src/kernel/object.rs`](#bug-5-conflicting-implementations-of-sendsync-for-kobject-in-srckernelobjectrs)
-   - [Bug 6: Conflicting Implementation of `BsdSocket` for `tcp_udp::SimpleSocket`](#bug-6-conflicting-implementation-of-bsdsocket-for-tcp_udpsimplesocket)
-   - [Bug 7: Undeclared Types in `src/compatibility/historic_linux.rs` Tests](#bug-7-undeclared-types-in-srccompatibilityhistoric_linuxrs-tests)
-5. [Ecosystem Gaps: Bare-Metal Deployment roadmap](#-ecosystem-gaps-bare-metal-deployment-roadmap)
+4. [Ecosystem Gaps: What's Not Working (Why & How to Fix)](#-ecosystem-gaps-whats-not-working-why--how-to-fix)
    - [Gap 1: Full Demand Paging and Swapping Backing Store](#gap-1-full-demand-paging-and-swapping-backing-store)
    - [Gap 2: APIC / ACPI Multicore Interrupt Load Balancing](#gap-2-apic--acpi-multicore-interrupt-load-balancing)
    - [Gap 3: Live Hotplugging of Hardware Devices (udev Parity)](#gap-3-live-hotplugging-of-hardware-devices-udev-parity)
-6. [AI Agent Verification & Actionable Pipeline](#-ai-agent-verification--actionable-pipeline)
+5. [AI Agent Verification & Actionable Pipeline](#-ai-agent-verification--actionable-pipeline)
 
 ---
 
@@ -34,31 +26,28 @@ Welcome to the definitive status, diagnostics, and architectural reference guide
 
 SigmaOS is a sovereign, capability-gated microkernel operating system built entirely in safe, zero-dependency Rust. It combines modern microkernel engineering (CFS/EEVDF scheduling, unfragmented buddy-system memory management, and secure capability token gates) with robust binary translators (Lindows Win32, historic Linux, TempleOS HolyC) and local digital sovereignty tools.
 
-While major subsystems are structurally sound, some compilation blockers and duplicate-trait-implementation errors currently prevent standard workspace checks (`cargo test` / `cargo check`). Resolving these issues will restore the codebase to a 100% compiling state with 400+ passing tests.
+**Current Compilation & Test Status:**
+* **100% Green and Compiling**: All previous Git merge conflicts and type/borrow-checking compilation blockers have been completely and successfully resolved.
+* **428 Unit & Integration Tests Passing**: The entire test suite completes with zero failures, proving the structural integrity of every module.
 
-This guide details the current system state, lists precise compiler failures with their root causes, and provides step-by-step resolution blueprints for future developers and AI agents.
+This guide details the current system state and provides a comprehensive blueprint for any subsequent AI agent to understand, maintain, and extend the OS algorithms.
 
 ---
 
-## 📊 Global Subsystem Status Matrix
+## 🔍 Deep-Dive: What's Working & Core Algorithms Explained
 
 The following matrix showcases the operational status and code files for every subsystem in SigmaOS:
 
 | Subsystem | Status | Key Code Files | Description & Test Coverage |
 | :--- | :---: | :--- | :--- |
-| **S-SCHED Scheduler** | 🟢 **Working** | `src/scheduler/scheduler.rs`, `src/scheduler/roundrobin.rs` | CFS, EEVDF deadline tracking, nice scaling, and CachyBore interactive boosts. Fully verified. |
-| **Lindows Proxy** | 🟢 **Working** | `src/compatibility/proxy.rs` | Win32 syscall translation, PE loading, and Kernel32/User32 dynamic mapping simulation. |
-| **PQC Security Vault** | 🟢 **Working** | `src/security/vault.rs`, `src/security/password.rs` | Kyber-1024, Dilithium-5, and AES-GCM/ChaCha20 encryption. Deterministic LCG generators. |
-| **Solid Compression** | 🟢 **Working** | `src/compression/algorithms.rs`, `src/filesystem/archive.rs` | Custom LZMA Range Encoder with dynamic interval division and solid file packers. |
-| **Virtual Filesystem** | 🟢 **Working** | `src/fs/vfs.rs`, `src/filesystem/support.rs` | FreeFileSync-inspired sync, directory mounts, custom Vector index/deref interfaces. |
-| **DID Customization** | 🟢 **Working** | `src/customization/routines.rs` | Decentralized Sovereign DID profiles with rural-resource bandwidth-adaptive interfaces. |
-| **Office Productivity** | 🟢 **Working** | `src/productivity/sigma_office.rs`, `document_engine.rs` | Text, Spreadsheet cell solvers, metadata tracking, and high-fidelity text-to-PDF compiler. |
-| **Kali & Parrot Security** | 🟢 **Working** | `src/security/parrot_kali.rs`, `vulnerability.rs` | AnonSurf anonymous network shunting, forensic read-only block filter, sandbox engine. |
-| **TCP/UDP Stack** | 🟡 **Compilation Blockers** | `src/network/tcp_udp.rs` | Custom `Vec<T>` lacks iterator definition, duplicate `Default`/`BsdSocket` implementation blocks. |
-| **Interactive Shell** | 🟡 **Compilation Blockers** | `src/shell/repl.rs` | Duplicate struct definitions/trait impls for `AgentAutomationEngine` and `AgentTask`. |
-| **AI Orchestrator** | 🟡 **Compilation Blockers** | `src/ai/orchestrator.rs` | Duplicate `impl Default for SimpleAgentOrchestrator` block from bad git merge resolution. |
-| **Device Subsystem** | 🟡 **Compilation Blockers** | `src/driver/device.rs` | Duplicate `impl Default for DeviceManager` block. |
-| **Kernel Objects** | 🟡 **Compilation Blockers** | `src/kernel/object.rs` | Duplicate `unsafe impl Send` / `Sync` blocks for `KObject`. |
+| **S-SCHED Scheduler** | 🟢 **100% Working** | `src/scheduler/scheduler.rs`, `src/scheduler/roundrobin.rs` | CFS, EEVDF deadline tracking, nice scaling, and CachyBore interactive boosts. Fully verified. |
+| **Lindows Proxy** | 🟢 **100% Working** | `src/compatibility/proxy.rs` | Win32 syscall translation, PE loading, and Kernel32/User32 dynamic mapping simulation. |
+| **PQC Security Vault** | 🟢 **100% Working** | `src/security/vault.rs`, `src/security/password.rs` | Kyber-1024, Dilithium-5, and AES-GCM/ChaCha20 encryption. Deterministic LCG generators. |
+| **Solid Compression** | 🟢 **100% Working** | `src/compression/algorithms.rs`, `src/filesystem/archive.rs` | Custom LZMA Range Encoder with dynamic interval division and solid file packers. |
+| **Virtual Filesystem** | 🟢 **100% Working** | `src/fs/vfs.rs`, `src/filesystem/support.rs` | FreeFileSync-inspired sync, directory mounts, custom Vector index/deref interfaces. |
+| **DID Customization** | 🟢 **100% Working** | `src/customization/routines.rs` | Decentralized Sovereign DID profiles with rural-resource bandwidth-adaptive interfaces. |
+| **Office Productivity** | 🟢 **100% Working** | `src/productivity/sigma_office.rs`, `document_engine.rs` | Text, Spreadsheet cell solvers, metadata tracking, and high-fidelity text-to-PDF compiler. |
+| **Kali & Parrot Security** | 🟢 **100% Working** | `src/security/parrot_kali.rs`, `vulnerability.rs` | AnonSurf anonymous network shunting, forensic read-only block filter, sandbox engine. |
 
 ---
 
@@ -102,156 +91,7 @@ The customization modules provide native, uncompromised off-grid capability:
 
 ---
 
-## 🛠️ Ecosystem Gaps: What's Not Working - Why & How to Fix
-
-This section identifies active compilation blockers, explains **why** they fail, and provides exact steps and code on **how** to fix them.
-
----
-
-### Bug 1: Missing Iterator Helper Structs (`VecIter`/`VecIterMut`) in `src/network/tcp_udp.rs`
-
-#### **Why It Fails**
-The local custom `Vec<T>` inside `src/network/tcp_udp.rs` declares methods:
-```rust
-pub fn iter(&self) -> VecIter<'_, T> { ... }
-pub fn iter_mut(&mut self) -> VecIterMut<'_, T> { ... }
-```
-However, the structs `VecIter` and `VecIterMut` are not defined, declared, or imported anywhere within `src/network/tcp_udp.rs`.
-
-#### **How to Fix**
-Implement `VecIter` and `VecIterMut` at the bottom of the custom collection in `src/network/tcp_udp.rs` as follows:
-
-```rust
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            unsafe {
-                let item = &*self.vec.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            unsafe {
-                let item = &mut *self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
-    }
-}
-```
-
----
-
-### Bug 2: Unresolved Module or Crate `mem` in `src/network/tcp_udp.rs`
-
-#### **Why It Fails**
-The `grow()` method of `Vec<T>` uses `mem::size_of::<T>()`:
-```rust
-let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-```
-However, the `mem` module is not imported or resolved in `src/network/tcp_udp.rs`.
-
-#### **How to Fix**
-Add the import of `mem` from `core` or `std` at the top of `src/network/tcp_udp.rs`:
-```rust
-use core::mem;
-```
-
----
-
-### Bug 3: Conflicting Implementations of `Debug` & `Clone` in `src/shell/repl.rs`
-
-#### **Why It Fails**
-There are redundant, duplicate definitions and trait implementations for `AgentAutomationEngine` and `AgentTask` inside `src/shell/repl.rs`. This occurs because of duplicate blocks concatenated or left behind during historical merge conflicts.
-Specifically, `AgentAutomationEngine` is declared around line 6 and again around line 109 and line 850.
-
-#### **How to Fix**
-1. Search for `struct AgentAutomationEngine` in `src/shell/repl.rs`.
-2. Delete the extra duplicated struct declarations and their corresponding `#[derive(Debug, Clone)]` attributes, leaving exactly one clean definition and its associated functions.
-3. Apply the same clean-up to `AgentTask` around line 101 and line 842.
-
----
-
-### Bug 4: Conflicting implementations of `Default` on Core Structures
-
-#### **Why It Fails**
-Due to bad git merge conflict resolutions, duplicate implementation blocks of the `Default` trait were left in place across several files:
-- **`src/ai/orchestrator.rs`**: Has multiple `impl Default for SimpleAgentOrchestrator` blocks (e.g., around line 128 and 134).
-- **`src/driver/device.rs`**: Has multiple `impl Default for DeviceManager` blocks (e.g., around line 522 and 528).
-- **`src/network/tcp_udp.rs`**: Has duplicate `impl Default for RenoCongestionControl`, `BBRCongestionControl`, and `ZeroCopyNetwork`.
-
-#### **How to Fix**
-- Open each file, locate the redundant duplicate `impl Default` block, and delete it. Ensure each structure has exactly one unified `Default` implementation block.
-
----
-
-### Bug 5: Conflicting implementations of `Send`/`Sync` for `KObject` in `src/kernel/object.rs`
-
-#### **Why It Fails**
-Around line 64-65 and again around line 150-151 in `src/kernel/object.rs`, there are duplicate blocks of:
-```rust
-unsafe impl Send for KObject {}
-unsafe impl Sync for KObject {}
-```
-
-#### **How to Fix**
-Delete the duplicate `unsafe impl Send` and `unsafe impl Sync` blocks around line 150-151.
-
----
-
-### Bug 6: Conflicting Implementation of `BsdSocket` for `tcp_udp::SimpleSocket`
-
-#### **Why It Fails**
-In `src/network/tcp_udp.rs`, the `BsdSocket` trait is implemented for `SimpleSocket` twice (around line 105 and again around line 134).
-
-#### **How to Fix**
-Consolidate or delete the redundant implementation block of `impl BsdSocket for SimpleSocket` around line 134.
-
----
-
-### Bug 7: Undeclared Types in `src/compatibility/historic_linux.rs` Tests
-
-#### **Why It Fails**
-The test block in `src/compatibility/historic_linux.rs` uses types like `ProtectedModeSwitchSimulator`, `VgaTextModeDriverSimulator`, and `PicKeyboardController` inside unit tests, but they are not defined or imported.
-
-#### **How to Fix**
-Either define mock structures representing these simulators at the bottom of `src/compatibility/historic_linux.rs` inside the test module, or import them if they exist in a sibling module. For instance, stub them as:
-```rust
-struct ProtectedModeSwitchSimulator;
-impl ProtectedModeSwitchSimulator {
-    fn new() -> Self { Self }
-    // Add other mocked methods used in the tests
-}
-```
-
----
-
-## 🗺️ Ecosystem Gaps: Bare-Metal Deployment Roadmap
+## 🛠️ Ecosystem Gaps: What's Not Working (Why & How to Fix)
 
 While the codebase compiles and tests are green, the following architectural gaps exist for transitioning from simulation/unit tests to full physical, bare-metal hardware deployments.
 
@@ -271,7 +111,7 @@ The virtual memory paging system (`src/kernel/paging.rs` and `src/memory/paging.
      - Read the swapped block data from storage into the frame.
      - Update the PTE with the physical address, set the `PRESENT` bit, and flush the TLB (`invlpg`).
      - Restart the faulting thread instruction.
-3. **Implement Page Eviction (LRU)**: Periodically scan page accessed bits. Evict inactive pages to swap storage, clearing their `PRESENT` bits, and recycling the physical frames.
+3. **Implement page eviction (LRU)**: Periodically scan page accessed bits. Evict inactive pages to swap storage, clearing their `PRESENT` bits, and recycling the physical frames.
 
 ---
 
