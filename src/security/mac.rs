@@ -4,6 +4,12 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+use core::mem;
+/// OOP-based Mandatory Access Control for SigmaOS
+/// Implements MAC using OOP principles with traits and structs
+/// No dependency on external security frameworks
+/// Based on Roadmap Item 62: Mandatory access control
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Security context ID
@@ -453,13 +459,11 @@ mod tests {
     fn test_simple_mac_engine() {
         let cap = EngineCapability::full();
         let mut engine = SimpleMACEngine::new(cap);
-        let ctx_id = engine
-            .create_context(
-                SecurityLevel::Medium,
-                SecurityDomain::System,
-                ContextCapability::full(),
-            )
-            .unwrap();
+        let ctx_id = engine.create_context(
+            SecurityLevel::Medium,
+            SecurityDomain::System,
+            ContextCapability::full(),
+        ).unwrap();
         let policy_cap = PolicyCapability::full();
         let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
         engine.register_policy(Box::new(policy)).unwrap();
