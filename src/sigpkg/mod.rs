@@ -110,7 +110,7 @@ mod tests {
 
     #[test]
     fn test_version_parsing() {
-        let version = Version::parse("1.2.3").unwrap();
+        let version = Version::parse("1.2.3").expect("Failed to parse version string");
         assert_eq!(version, Version::new(1, 2, 3));
     }
 

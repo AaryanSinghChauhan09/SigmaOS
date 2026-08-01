@@ -756,7 +756,7 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
+    let layout = Layout::from_size_align(size, 8).expect("Failed to create memory layout");
     std_alloc(layout)
 }
 
@@ -780,10 +780,10 @@ mod tests {
         let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
         assert_eq!(socket.get_state(), TCPState::Closed);
 
-        socket.listen().unwrap();
+        socket.listen().expect("Failed to listen on socket");
         assert_eq!(socket.get_state(), TCPState::Listen);
 
-        socket.connect(443).unwrap();
+        socket.connect(443).expect("Failed to connect to socket");
         assert_eq!(socket.get_state(), TCPState::Established);
     }
 
@@ -813,13 +813,13 @@ mod tests {
     #[test]
     fn test_bsd_socket_options() {
         let socket = SimpleSocket::new(100, Protocol::TCP, 80);
-        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 0);
+        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).expect("Failed to get socket option"), 0);
 
-        socket.set_opt(SocketOption::ReuseAddr, 1).unwrap();
-        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).unwrap(), 1);
+        socket.set_opt(SocketOption::ReuseAddr, 1).expect("Failed to set socket option");
+        assert_eq!(socket.get_opt(SocketOption::ReuseAddr).expect("Failed to get socket option"), 1);
 
-        socket.set_opt(SocketOption::RcvBuf, 131072).unwrap();
-        assert_eq!(socket.get_opt(SocketOption::RcvBuf).unwrap(), 131072);
+        socket.set_opt(SocketOption::RcvBuf, 131072).expect("Failed to set socket option");
+        assert_eq!(socket.get_opt(SocketOption::RcvBuf).expect("Failed to get socket option"), 131072);
     }
 
     #[test]
