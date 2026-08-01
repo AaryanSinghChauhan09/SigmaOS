@@ -14,8 +14,8 @@ use core::mem;
 pub type FileID = usize;
 
 /// File integrity status
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntegrityStatus {
     Valid = 0,
     Modified = 1,
@@ -191,6 +191,7 @@ pub trait IntegrityMonitor {
 
 /// Integrity statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct IntegrityStats {
     pub total_files: usize,
     pub valid_files: usize,
@@ -314,6 +315,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         let mut modified_files = Vec::new();
+        let mut updates = Vec::new();
 
         for file_option in &mut self.files {
             if let Some(ref mut file) = *file_option {
@@ -322,9 +324,13 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
                     if status != IntegrityStatus::Valid {
                         modified_files.push(file.id());
                     }
-                    self.update_stats(status);
+                    updates.push((file.id(), status));
                 }
             }
+        }
+
+        for (_, status) in &updates {
+            self.update_stats(*status);
         }
 
         Ok(modified_files)
@@ -416,6 +422,45 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

@@ -3,7 +3,7 @@ pub mod stack;
 
 pub use stack::{
     Metric, MetricCapability, MetricID, MetricInfo, MetricType, ObservabilityError,
-    ObservabilityStack, ObservabilityStats, SigmaDebug, SigmaMetrics, SigmaTrace, SimpleMetric,
-    SimpleObservabilityStack, SimpleSigmaDebug, SimpleSigmaMetrics, SimpleSigmaTrace, SimpleSpan,
+    ObservabilityStack, ObservabilityStats, SimpleMetric,
+    SimpleObservabilityStack, SimpleSpan,
     Span, SpanCapability, SpanInfo, StackCapability, TraceID,
 };

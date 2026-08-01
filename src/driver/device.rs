@@ -41,7 +41,7 @@ pub enum DeviceError {
 
 /// Device type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceType {
     Block = 0,
     Character = 1,
@@ -161,8 +161,8 @@ impl DeviceDescriptor {
 }
 
 /// Device state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState {
     Uninitialized = 0,
     Initializing = 1,
@@ -198,7 +198,7 @@ pub trait NetworkDevice: Device {
 /// Simple block device implementation (OOP: Concrete class)
 pub struct SimpleBlockDevice {
     descriptor: DeviceDescriptor,
-    blocks: Vec<Vec<u8>>,
+    blocks: LocalVec<LocalVec<u8>>,
     block_size: usize,
 }
 
@@ -213,10 +213,13 @@ impl SimpleBlockDevice {
         };
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Block, capability);
-        let mut blocks = Vec::new();
+        let mut blocks = LocalVec::new();
 
         for _ in 0..num_blocks {
-            let block_data = vec![0u8; block_size];
+            let mut block_data = LocalVec::new();
+            for _ in 0..block_size {
+                block_data.push(0u8);
+            }
             blocks.push(block_data);
         }
 
@@ -313,7 +316,7 @@ impl BlockDevice for SimpleBlockDevice {
 /// Simple character device implementation (OOP: Concrete class)
 pub struct SimpleCharacterDevice {
     descriptor: DeviceDescriptor,
-    buffer: Vec<u8>,
+    buffer: LocalVec<u8>,
     read_pos: usize,
     write_pos: usize,
 }
@@ -330,9 +333,14 @@ impl SimpleCharacterDevice {
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Character, capability);
 
+        let mut buffer = LocalVec::new();
+        for _ in 0..buffer_size {
+            buffer.push(0u8);
+        }
+
         SimpleCharacterDevice {
             descriptor,
-            buffer: vec![0u8; buffer_size],
+            buffer,
             read_pos: 0,
             write_pos: 0,
         }
@@ -432,16 +440,16 @@ impl CharacterDevice for SimpleCharacterDevice {
 
 /// Device manager (OOP: Manager class)
 pub struct DeviceManager {
-    devices: Vec<Option<Box<dyn Device>>>,
-    descriptors: Vec<Option<NonNull<DeviceDescriptor>>>,
+    devices: LocalVec<Option<Box<dyn Device>>>,
+    descriptors: LocalVec<Option<NonNull<DeviceDescriptor>>>,
     next_device_id: AtomicUsize,
 }
 
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {
-            devices: Vec::new(),
-            descriptors: Vec::new(),
+            devices: LocalVec::new(),
+            descriptors: LocalVec::new(),
             next_device_id: AtomicUsize::new(1),
         }
     }
@@ -492,7 +500,7 @@ impl DeviceManager {
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id < self.departors.len() {
+        if id < self.descriptors.len() {
             self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
@@ -512,8 +520,8 @@ impl DeviceManager {
         None
     }
 
-    pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<usize> {
-        let mut ids = Vec::new();
+    pub fn get_devices_by_type(&self, device_type: DeviceType) -> LocalVec<usize> {
+        let mut ids = LocalVec::new();
         for (id, desc_option) in self.descriptors.iter().enumerate() {
             if let Some(desc_ptr) = *desc_option {
                 let desc = unsafe { &*desc_ptr.as_ptr() };
@@ -527,22 +535,22 @@ impl DeviceManager {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+pub struct LocalVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
+impl<T> LocalVec<T> {
+    pub fn new() -> Self {
+        LocalVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
 
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -555,7 +563,7 @@ impl<T> Vec<T> {
         }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len
     }
 
@@ -575,6 +583,45 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+impl<T> core::ops::Deref for LocalVec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for LocalVec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a LocalVec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut LocalVec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 

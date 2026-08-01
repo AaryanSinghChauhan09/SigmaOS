@@ -10,8 +10,8 @@ use core::mem;
 
 pub type SessionID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionState { Disconnected = 0, Connecting = 1, Connected = 2, Error = 3 }
 
 #[repr(C)]
@@ -22,6 +22,7 @@ pub trait RemoteSession {
     fn id(&self) -> SessionID;
     fn host(&self) -> &[u8];
     fn state(&self) -> SessionState;
+    fn set_state(&self, state: SessionState);
 }
 
 #[repr(C)]
@@ -53,6 +54,7 @@ impl RemoteSession for SimpleRemoteSession {
         &self.host[..len]
     }
     fn state(&self) -> SessionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn set_state(&self, state: SessionState) { self.state.store(state as usize, Ordering::SeqCst); }
 }
 
 pub trait RemoteDesktop {
@@ -69,6 +71,14 @@ pub struct SimpleRemoteDesktop {
 }
 
 impl SimpleRemoteDesktop {
+    pub fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
+        for session_option in &self.sessions {
+            if let Some(ref session) = *session_option {
+                if session.id() == id { return Some(session.as_ref()); }
+            }
+        }
+        None
+    }
     pub fn new() -> Self {
         SimpleRemoteDesktop {
             sessions: Vec::new(),
@@ -89,7 +99,7 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         for session_option in &mut self.sessions {
             if let Some(ref mut session) = *session_option {
                 if session.id() == id {
-                    session.state.store(SessionState::Disconnected as usize, Ordering::SeqCst);
+                    session.set_state(SessionState::Disconnected);
                     return Ok(());
                 }
             }
@@ -117,14 +127,7 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         }
     }
     
-    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
-        for session_option in &self.sessions {
-            if let Some(ref session) = *session_option {
-                if session.id() == id { return Some(session.as_ref()); }
-            }
-        }
-        None
-    }
+
 }
 
 pub trait ScreenSharing {
@@ -185,4 +188,47 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+pub struct InputAuthGate;
+pub struct PqcVideoCipher;
+pub struct SigmaRendezvous;
