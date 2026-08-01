@@ -1,13 +1,11 @@
 // OOP-based Container Runtime for SigmaOS
 // Implements container runtime using OOP principles with traits and structs.
 
-use core::mem;
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
-
 extern crate alloc;
+
 use alloc::boxed::Box;
-use crate::klib_vec::Vec;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
 pub type ContainerID = usize;
@@ -21,46 +19,6 @@ pub enum ContainerState {
     Paused = 2,
     Stopped = 3,
     Failed = 4,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
-impl ContainerCapability {
-    pub fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
 }
 
 /// Container trait (OOP interface)
@@ -96,6 +54,19 @@ pub enum ContainerError {
     ResourceLimit = 6,
 }
 
+/// Container info
+#[repr(C)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
+}
+
 impl ContainerInfo {
     pub fn new(id: ContainerID) -> Self {
         ContainerInfo {
@@ -107,6 +78,36 @@ impl ContainerInfo {
             memory_limit: 0,
             cpu_limit: 0,
             capability: ContainerCapability::new(),
+        }
+    }
+}
+
+/// Container capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
+}
+
+impl ContainerCapability {
+    pub const fn new() -> Self {
+        ContainerCapability {
+            can_start: false,
+            can_stop: false,
+            can_pause: false,
+            can_modify: false,
+        }
+    }
+
+    pub const fn full() -> Self {
+        ContainerCapability {
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
+            can_modify: true,
         }
     }
 }
@@ -170,7 +171,13 @@ impl SimpleContainer {
     }
 
     pub fn get_state(&self) -> ContainerState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+        match self.state.load(Ordering::SeqCst) {
+            0 => ContainerState::Created,
+            1 => ContainerState::Running,
+            2 => ContainerState::Paused,
+            3 => ContainerState::Stopped,
+            _ => ContainerState::Failed,
+        }
     }
 
     pub fn set_state(&self, state: ContainerState) {
@@ -533,12 +540,36 @@ impl SimpleContainerRuntime {
     }
 }
 
-pub mod oci {
-    pub use crate::container::oci_runtime::{Container, ContainerState};
-    pub struct ContainerManager;
-    pub struct NamespaceConfig;
-    pub struct NamespaceSet;
-    pub struct OciSpec;
-    pub struct ResourceConfig;
-    pub struct Runtime;
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_container_lifecycle_flows() {
+        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
+        let id = runtime
+            .create_container(
+                b"nginx-service",
+                b"nginx:alpine",
+                ContainerCapability::full(),
+            )
+            .unwrap();
+
+        let stats_init = runtime.stats();
+        assert_eq!(stats_init.total_containers, 1);
+        assert_eq!(stats_init.stopped_containers, 1);
+        assert_eq!(stats_init.running_containers, 0);
+
+        // Start container
+        runtime.start_container(id).unwrap();
+        let stats_running = runtime.stats();
+        assert_eq!(stats_running.running_containers, 1);
+        assert_eq!(stats_running.stopped_containers, 0);
+
+        // Pause container
+        runtime.pause_container(id).unwrap();
+        let stats_paused = runtime.stats();
+        assert_eq!(stats_paused.paused_containers, 1);
+        assert_eq!(stats_paused.running_containers, 0);
+    }
 }

@@ -1,15 +1,11 @@
 // OOP-based Container Runtime Support for SigmaOS
 // Implements OCI runtime and sandboxed container primitives.
 
-use core::mem;
-/// OOP-based Container Runtime Support for SigmaOS
-/// Based on Ideas-999-Structured: Core System Item 17
-/// Implements OCI runtime and sandboxed container primitives
-use core::sync::atomic::{AtomicUsize, Ordering};
-
 extern crate alloc;
+
 use alloc::boxed::Box;
-use crate::klib_vec::Vec;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ContainerID = usize;
 
@@ -69,12 +65,20 @@ impl Container for SimpleContainer {
     fn id(&self) -> ContainerID {
         self.id
     }
+
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
+
     fn state(&self) -> ContainerState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+        match self.state.load(Ordering::SeqCst) {
+            0 => ContainerState::Created,
+            1 => ContainerState::Running,
+            2 => ContainerState::Paused,
+            3 => ContainerState::Stopped,
+            _ => ContainerState::Deleting,
+        }
     }
 
     fn start(&mut self) -> Result<(), ContainerError> {
@@ -168,7 +172,6 @@ pub trait Sandbox {
     ) -> Result<(), ContainerError>;
 }
 
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Namespace {
     PID = 0,
@@ -247,6 +250,12 @@ pub struct SimpleImageManager {
 impl SimpleImageManager {
     pub fn new() -> Self {
         SimpleImageManager { images: Vec::new() }
+    }
+}
+
+impl Default for SimpleImageManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -374,5 +383,30 @@ impl ContainerRuntime for SimpleContainerRuntime {
             }
         }
         ids
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_oci_container_and_sandbox_namespaces() {
+        let mut runtime = SimpleContainerRuntime::new();
+        let id = runtime
+            .create_container(b"redis-pod", b"redis:alpine")
+            .unwrap();
+
+        assert_eq!(runtime.list_containers().len(), 1);
+        assert_eq!(runtime.sandbox.namespaces.len(), 2); // PID and Network namespaces assigned!
+        assert_eq!(runtime.sandbox.namespaces[0].1, Namespace::PID);
+        assert_eq!(runtime.sandbox.namespaces[1].1, Namespace::Network);
+
+        // Start container
+        runtime.start_container(id).unwrap();
+
+        // Remove container
+        runtime.remove_container(id).unwrap();
+        assert_eq!(runtime.list_containers().len(), 0);
     }
 }
