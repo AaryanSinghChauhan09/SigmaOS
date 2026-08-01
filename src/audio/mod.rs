@@ -1,17 +1,8 @@
-// SigmaOS Audio Module
-// Audio processing, codec support, and audio operations
+// SigmaOS Audio Subsystem Module
 
-pub mod alsa;
-pub mod audio_codec;
 pub mod driver;
-pub mod editor;
-pub mod ffmpeg_core;
+pub mod podcast;
 
-pub use alsa::{
-    AlsaAudioStack, AudioDirection, AudioFormat as AlsaFormat, ChannelConfig, MixerControl,
-    PcmStream, SampleRate,
+pub use podcast::{
+    AudioClip, AudioMasteringEffect, AudioTrack, PodcastEpisode, PodcastFeed, PodcastRecorder,
 };
-pub use audio_codec::{
-    AudioChannels, AudioCodec, AudioFormat, AudioMetadata, AudioSampleRate, DecodedAudio,
-};
-pub use driver::{AudioDevice, AudioDeviceID, AudioError, AudioType};

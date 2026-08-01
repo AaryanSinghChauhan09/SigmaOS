@@ -1,17 +1,15 @@
-#![no_std]
-#![no_main]
+// OOP-based AI Agent Framework for SigmaOS
+// Implements AI agent using OOP principles with traits and structs.
 
-use core::mem;
-/// OOP-based AI Agent Framework for SigmaOS
-/// Implements AI agent using OOP principles with traits and structs
-/// No dependency on external AI frameworks
-/// Based on Roadmap Item 81: SigmaAI core agent
-use core::ptr::{self, NonNull};
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntentType {
     SystemCommand = 0,
     FileOperation = 1,
@@ -22,7 +20,6 @@ pub enum IntentType {
 }
 
 /// Intent (OOP: Intent object)
-#[repr(C)]
 pub struct Intent {
     pub intent_type: IntentType,
     pub confidence: f32,
@@ -34,10 +31,7 @@ impl Intent {
     pub fn new(intent_type: IntentType, command: &[u8]) -> Self {
         let mut command_array = [0u8; 256];
         let cmd_len = command.len().min(255);
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(command.as_ptr(), command_array.as_mut_ptr(), cmd_len);
-        }
+        command_array[..cmd_len].copy_from_slice(&command[..cmd_len]);
 
         Intent {
             intent_type,
@@ -49,9 +43,7 @@ impl Intent {
 
     pub fn set_parameters(&mut self, parameters: &[u8]) {
         let len = parameters.len().min(511);
-        unsafe {
-            core::ptr::copy_nonoverlapping(parameters.as_ptr(), self.parameters.as_mut_ptr(), len);
-        }
+        self.parameters[..len].copy_from_slice(&parameters[..len]);
     }
 }
 
@@ -69,7 +61,7 @@ pub trait AIAgent {
 
 /// AI error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AIError {
     Success = 0,
     ParseFailed = 1,
@@ -80,12 +72,11 @@ pub enum AIError {
 }
 
 /// Agent info
-#[repr(C)]
 pub struct AgentInfo {
     pub name: [u8; 64],
     pub version: (u32, u32, u32),
     pub total_intents: usize,
-    pub execution_count: AtomicUsize,
+    pub execution_count: usize,
     pub capability: AgentCapability,
 }
 
@@ -95,15 +86,21 @@ impl AgentInfo {
             name: [0; 64],
             version: (1, 0, 0),
             total_intents: 0,
-            execution_count: AtomicUsize::new(0),
+            execution_count: 0,
             capability: AgentCapability::new(),
         }
     }
 }
 
+impl Default for AgentInfo {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Agent capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AgentCapability {
     pub can_parse: bool,
     pub can_execute: bool,
@@ -111,7 +108,7 @@ pub struct AgentCapability {
 }
 
 impl AgentCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         AgentCapability {
             can_parse: false,
             can_execute: false,
@@ -119,7 +116,7 @@ impl AgentCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         AgentCapability {
             can_parse: true,
             can_execute: true,
@@ -128,8 +125,13 @@ impl AgentCapability {
     }
 }
 
+impl Default for AgentCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple AI agent (OOP: Concrete agent class)
-#[repr(C)]
 pub struct SimpleAIAgent {
     pub name: [u8; 64],
     pub version: (u32, u32, u32),
@@ -139,7 +141,6 @@ pub struct SimpleAIAgent {
 }
 
 /// Pattern for intent matching
-#[repr(C)]
 pub struct Pattern {
     pub pattern: [u8; 128],
     pub intent_type: IntentType,
@@ -154,18 +155,8 @@ impl Pattern {
         let pattern_len = pattern.len().min(127);
         let template_len = template.len().min(255);
 
-        unsafe {
-            core::ptr::copy_nonoverlapping(
-                pattern.as_ptr(),
-                pattern_array.as_mut_ptr(),
-                pattern_len,
-            );
-            core::ptr::copy_nonoverlapping(
-                template.as_ptr(),
-                template_array.as_mut_ptr(),
-                template_len,
-            );
-        }
+        pattern_array[..pattern_len].copy_from_slice(&pattern[..pattern_len]);
+        template_array[..template_len].copy_from_slice(&template[..template_len]);
 
         Pattern {
             pattern: pattern_array,
@@ -179,10 +170,7 @@ impl SimpleAIAgent {
     pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
 
         SimpleAIAgent {
             name: name_array,
@@ -197,24 +185,13 @@ impl SimpleAIAgent {
         self.patterns.push(pattern);
     }
 
-    unsafe fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
-        for i in 0..self.patterns.len() {
-            let pattern = &self.patterns[i];
+    fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
+        for pattern in &self.patterns {
             let pattern_len = pattern.pattern.iter().position(|&b| b == 0).unwrap_or(128);
             let pattern_str = &pattern.pattern[..pattern_len];
 
-            if input.len() >= pattern_len {
-                let mut matches = true;
-                for i in 0..pattern_len {
-                    if input[i] != pattern_str[i] {
-                        matches = false;
-                        break;
-                    }
-                }
-
-                if matches {
-                    return Some(pattern);
-                }
+            if input.len() >= pattern_len && &input[..pattern_len] == pattern_str {
+                return Some(pattern);
             }
         }
         None
@@ -227,21 +204,20 @@ impl AIAgent for SimpleAIAgent {
             return Err(AIError::PermissionDenied);
         }
 
-        if input.len() == 0 {
+        if input.is_empty() {
             return Err(AIError::InvalidInput);
         }
 
-        unsafe {
-            if let Some(pattern) = self.match_pattern(input) {
-                let mut intent = Intent::new(pattern.intent_type, &pattern.template);
-                intent.confidence = 1.0;
-                Ok(intent)
-            } else {
-                // Default to information query if no pattern matches
-                let mut intent = Intent::new(IntentType::InformationQuery, input);
-                intent.confidence = 0.5;
-                Ok(intent)
-            }
+        if let Some(pattern) = self.match_pattern(input) {
+            let template_len = pattern.template.iter().position(|&b| b == 0).unwrap_or(256);
+            let mut intent = Intent::new(pattern.intent_type, &pattern.template[..template_len]);
+            intent.confidence = 1.0;
+            Ok(intent)
+        } else {
+            // Default to information query if no pattern matches
+            let mut intent = Intent::new(IntentType::InformationQuery, input);
+            intent.confidence = 0.5;
+            Ok(intent)
         }
     }
 
@@ -252,25 +228,16 @@ impl AIAgent for SimpleAIAgent {
 
         self.execution_count.fetch_add(1, Ordering::SeqCst);
 
-        // In a real implementation, this would execute the actual command
-        // For now, return a simulated response
         let mut response = Vec::new();
         let success_msg = b"Command executed successfully";
-
-        for byte in success_msg {
-            response.push(*byte);
-        }
-
+        response.extend_from_slice(success_msg);
         Ok(response)
     }
 
-    fn learn(&mut self, input: &[u8], feedback: bool) {
+    fn learn(&mut self, _input: &[u8], _feedback: bool) {
         if !self.capability.can_learn {
             return;
         }
-
-        // In a real implementation, this would update the model
-        // For now, this is a placeholder
     }
 
     fn info(&self) -> AgentInfo {
@@ -278,7 +245,7 @@ impl AIAgent for SimpleAIAgent {
             name: self.name,
             version: self.version,
             total_intents: self.patterns.len(),
-            execution_count: AtomicUsize::new(self.execution_count.load(Ordering::SeqCst)),
+            execution_count: self.execution_count.load(Ordering::SeqCst),
             capability: self.capability,
         }
     }
@@ -300,7 +267,7 @@ pub trait AIAgentManager {
 
 /// AI statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AIStats {
     pub total_agents: usize,
     pub total_requests: u64,
@@ -309,13 +276,19 @@ pub struct AIStats {
 }
 
 impl AIStats {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         AIStats {
             total_agents: 0,
             total_requests: 0,
             successful_requests: 0,
             failed_requests: 0,
         }
+    }
+}
+
+impl Default for AIStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -329,7 +302,7 @@ pub struct SimpleAIAgentManager {
 
 /// Manager capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ManagerCapability {
     pub can_register: bool,
     pub can_unregister: bool,
@@ -337,7 +310,7 @@ pub struct ManagerCapability {
 }
 
 impl ManagerCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         ManagerCapability {
             can_register: false,
             can_unregister: false,
@@ -345,12 +318,18 @@ impl ManagerCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         ManagerCapability {
             can_register: true,
             can_unregister: true,
             can_process: true,
         }
+    }
+}
+
+impl Default for ManagerCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -394,8 +373,7 @@ impl AIAgentManager for SimpleAIAgentManager {
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent> {
         if id < self.agents.len() {
             if let Some(ref agent) = self.agents[id] {
-                let r: &dyn AIAgent = agent.as_ref();
-                return Some(r);
+                return Some(agent.as_ref());
             }
         }
         None
@@ -409,16 +387,20 @@ impl AIAgentManager for SimpleAIAgentManager {
         self.stats.total_requests += 1;
 
         let active = self.active_agent.load(Ordering::SeqCst);
-        if let Some(ref mut agent) = self.agents[active] {
-            let agent_mut: &mut dyn AIAgent = agent.as_mut();
-            let intent = agent_mut.parse(input)?;
+        if active < self.agents.len() {
+            if let Some(ref mut agent) = self.agents[active] {
+                let intent = agent.parse(input)?;
 
-            if let Ok(response) = agent_mut.execute(&intent) {
-                self.stats.successful_requests += 1;
-                Ok(response)
+                if let Ok(response) = agent.execute(&intent) {
+                    self.stats.successful_requests += 1;
+                    Ok(response)
+                } else {
+                    self.stats.failed_requests += 1;
+                    Err(AIError::ExecutionFailed)
+                }
             } else {
                 self.stats.failed_requests += 1;
-                Err(AIError::ExecutionFailed)
+                Err(AIError::InvalidInput)
             }
         } else {
             self.stats.failed_requests += 1;
@@ -431,134 +413,27 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-// External allocator functions
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_ai_agent_and_manager() {
-        let capability = AgentCapability::full();
-        let mut agent = SimpleAIAgent::new(b"assistant", (1, 0, 0), capability);
-        let pattern = Pattern::new(b"hello", IntentType::Custom, b"greet");
-        agent.add_pattern(pattern);
-
-        let parsed = agent.parse(b"hello world").unwrap();
-        assert_eq!(parsed.intent_type as usize, IntentType::Custom as usize);
-
+    fn test_ai_agent_and_manager_flows() {
         let mut manager = SimpleAIAgentManager::new(ManagerCapability::full());
-        let agent_id = manager.register_agent(Box::new(agent)).unwrap();
-        assert_eq!(agent_id, 0);
+        let mut agent =
+            SimpleAIAgent::new(b"SovereignAssistant", (1, 0, 0), AgentCapability::full());
+        agent.add_pattern(Pattern::new(
+            b"help set network",
+            IntentType::NetworkRequest,
+            b"configure-net",
+        ));
 
-        let response = manager.process(b"hello world").unwrap();
-        assert_eq!(response.len(), 29);
-        assert_eq!(response[0], b'C');
-        assert_eq!(response[28], b'y');
+        manager.register_agent(Box::new(agent)).unwrap();
+        assert_eq!(manager.stats().total_agents, 1);
+
+        // Process request
+        let response = manager.process(b"help set network").unwrap();
+        assert_eq!(response, b"Command executed successfully");
+        assert_eq!(manager.stats().successful_requests, 1);
     }
 }

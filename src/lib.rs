@@ -1,22 +1,30 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
+pub mod ai;
+pub mod audio;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod graphics;
+pub mod init;
+pub mod interrupt;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;
-pub mod performance;
+pub mod plugin;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
@@ -28,22 +36,30 @@ pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
 };
+pub use ai::{
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    SovereignWikiEngine, WikiArticle,
+};
+pub use audio::{
+    AudioClip, AudioMasteringEffect, AudioTrack, PodcastEpisode, PodcastFeed, PodcastRecorder,
+};
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
-    AntixDesktopProfiler, AntixInitManager, ApplicationBinary, BinaryCompatMatrix, BinaryFormat,
-    BundleType, CompatibilityError, CompatibilityManager, CompatibilityMode, ContainerRuntime,
-    DesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival, GraphicsBridge,
-    InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
-    LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService, MicroServiceState,
-    NetworkBridge, StorageBridge, SyscallAbi, TargetPlatform, TranslationLayer, TribeInstaller,
-    WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP,
-    GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM,
-    GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime as CompatibilityContainerRuntime, InterimLispVM, LispVal, MntReformLpcDriver,
+    ReformPowerStats, TargetPlatform, TranslationLayer,
+};
+pub use container::{
+    Container, ContainerCapability, ContainerError, ContainerID, ContainerInfo, ContainerRuntime,
+    ContainerState, Namespace, OciContainer, OciContainerError, OciContainerID,
+    OciContainerRuntime, OciContainerState, RuntimeCapability, RuntimeStats, Sandbox,
+    SimpleContainer, SimpleContainerRuntime, SimpleOciContainer, SimpleOciContainerRuntime,
+    SimpleSandbox,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -58,8 +74,18 @@ pub use drivers::{
     VesaModeInfo,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
-    SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+};
+pub use graphics::{
+    BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
+    Surface, VideoClip, VideoEffect, VideoTimeline, VideoTrack, Window,
+};
+pub use interrupt::{
+    ColorCode, ExceptionType, InterruptDescriptor as HardwareInterruptDescriptor,
+    InterruptError as HardwareInterruptError, InterruptHandler as HardwareInterruptHandler,
+    InterruptManager as HardwareInterruptManager, ScreenChar,
+    SimpleInterruptHandler as SimpleHardwareInterruptHandler, TaskStateSegment, VGAColor,
+    VGATextBuffer, GDT, IDT, PIC,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
@@ -72,17 +98,12 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DebPackageDriverTranslator, DependencyResolver, GenericLinuxTranslationUdf,
-    LinuxDriverPackageTranslator, LinuxTranslationService, PackageAdapter, PackageError,
-    PackageFormat, PackageSource, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, UnifiedPackage, UniversalPackageManager,
-    GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use performance::{
-    CallGraph, CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
-    PerformanceProfileRule, Profile, ProfileType, Profiler, ProfilerError, RamDefragmenter,
-    SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
-    SmartResourceOptimizer, GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+pub use plugin::{
+    ManagerCapability, Plugin, PluginCapability, PluginError, PluginID, PluginInfo, PluginManager,
+    PluginState, PluginStats, SimplePlugin, SimplePluginManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -93,10 +114,8 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, UnveilManager,
+    UnveilPermission, UnveilRestriction,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
@@ -104,6 +123,6 @@ pub use sigpkg::{
     SatSolver, Transaction,
 };
 pub use virtualization::{
-    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
-    VirtualizationOrchestrator, VirtualizationTech, VmState,
+    Container as VirtualContainer, KubernetesPod, ResourcePool, VirtualMachine,
+    VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
