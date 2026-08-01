@@ -2,9 +2,6 @@
 // Implements graphics composition using OOP principles with traits and structs
 // No dependency on external graphics frameworks
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
@@ -611,17 +608,15 @@ impl Compositor for SimpleCompositor {
         // Otherwise, we render directly to output.
         let use_double_buffering = self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
 
-        if use_double_buffering {
-            let back = self.back_buffer.as_mut().unwrap();
-            back.clear(Color::rgb(0, 0, 0));
-
-            // Compose windows in order (back to front)
-            for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                    let window_rect = window.rect();
-                    if let Some(surface) = window.surface() {
-                        let window_stride = surface.info().stride as usize / 4;
-                        let window_data = surface.data();
+        // Compose windows in order (back to front)
+        for &window_id in &self.window_order {
+            if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                let window_rect = window.rect();
+                let output_stride = output.info().stride as usize / 4;
+                if let Some(surface) = window.surface() {
+                    let window_stride = surface.info().stride as usize / 4;
+                    let window_data = surface.data();
+                    let output_data = output.data_mut();
 
                         let back_stride = back.info().stride as usize / 4;
                         let back_data = back.data_mut();
@@ -704,5 +699,18 @@ impl Compositor for SimpleCompositor {
         let mut stats = self.stats.clone();
         stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
         stats
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_compositor_flow() {
+        let mut comp = SimpleCompositor::new(CompositorCapability::full());
+        let window = SimpleWindow::new(1, Rectangle::new(0, 0, 10, 10), WindowCapability::full());
+        comp.add_window(Box::new(window)).unwrap();
+        assert_eq!(comp.stats().total_windows, 1);
     }
 }

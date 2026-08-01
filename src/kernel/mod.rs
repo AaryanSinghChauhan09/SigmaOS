@@ -13,6 +13,8 @@ pub mod policy_mechanism;
 pub mod proc;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod self_healing;
+pub mod udkf;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
@@ -34,18 +36,9 @@ pub use linux_absorb::{
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use meta::{
-    MetaKernel, KernelPersona, KernelPlugin, KernelPluginManager, MicroDriver,
-    ABIManager, NetPod, KernelGraph, LegacyScheduler,
+pub use self_healing::{
+    SovereignSelfHealingKernel,
 };
-pub use paging::{
-    PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2,
-};
-pub use policy_mechanism::{
-    ResourceBroker, PolicyManager, ProtectionDomain, InterruptMechanism, FastPathIpc,
-    PrivilegeLevel, PolicyError,
-};
-pub use breakthroughs::{
-    UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
-    EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
+pub use udkf::{
+    UdkfHook, UserDefinedKernelFunctions,
 };

@@ -16,7 +16,9 @@ pub mod parrot_parity;
 pub mod password;
 pub mod pki;
 pub mod pledge;
-pub mod qubes_isolation;
+pub mod bridge;
+pub mod prism;
+pub mod sandbox;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -38,4 +40,12 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
+pub use bridge::{
+    LegacySecurityType, SecurityBridge,
+};
+pub use prism::{
+    SecurityFacet, SecurityPrism,
+};
+pub use sandbox::{
+    SandboxRule, PrivacyFirstSandbox,
+};

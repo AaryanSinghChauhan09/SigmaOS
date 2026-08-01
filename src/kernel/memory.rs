@@ -70,7 +70,10 @@ impl BuddyAllocator {
 
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock { addr, size };
+                let block = MemoryBlock {
+                    addr,
+                    size,
+                };
                 self.free_lists[order].push(block);
             }
         }
