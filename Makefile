@@ -4,7 +4,7 @@
 # Set standard reproducible build epoch timestamp
 export SOURCE_DATE_EPOCH ?= 1716000000
 
-.PHONY: all clean build kernel drivers userspace test test-unit test-integration test-qemu help singularity
+.PHONY: all clean build kernel drivers userspace test test-unit test-integration test-qemu help
 
 # Default target
 all: build

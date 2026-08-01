@@ -4,16 +4,8 @@ name: "Security Code Scanning"
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'src/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
   pull_request:
     branches: [ "main" ]
-    paths:
-      - 'src/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
   schedule:
     - cron: '30 18 * * 1' # Runs every Monday at 18:30 UTC
 
