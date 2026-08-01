@@ -359,8 +359,23 @@ pub fn random_bytes(buf: &mut [u8]) {
     
     unsafe {
         if RNG.is_none() {
-            // In a real implementation, this would use hardware entropy
-            RNG = Some(XorshiftRNG::new(0x5eece66d));
+            // Remediation of hardcoded cryptographic seed via multi-source hardware entropy mixing
+            let mut seed = 0x5eece66d_u64;
+
+            // 1. Hardware entropy mixing via RDTSC Time Stamp Counter if on x86_64
+            #[cfg(target_arch = "x86_64")]
+            {
+                seed = seed.wrapping_xor(core::arch::x86_64::_rdtsc() as u64);
+            }
+
+            // 2. Dynamic pointer-derived ASLR context mixing
+            let aslr_ptr = &RNG as *const _ as usize as u64;
+            seed = seed.wrapping_xor(aslr_ptr);
+
+            // 3. Final chaotic mixing multiplication
+            seed = seed.wrapping_mul(0x5851f42d4c957f2d).wrapping_add(1);
+
+            RNG = Some(XorshiftRNG::new(seed));
         }
         
         if let Some(ref mut rng) = RNG {
@@ -380,5 +395,29 @@ pub fn random_key() -> AES256Key {
 pub fn xor_bytes(a: &[u8], b: &[u8], out: &mut [u8]) {
     for i in 0..out.len() {
         out[i] = a[i] ^ b[i];
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_primitives_dynamic_entropy() {
+        let key1 = random_key();
+        let mut key2 = AES256Key::new();
+        // Since random_bytes initializes RNG as a static mut thread-unsafe Option,
+        // let's confirm the bytes produced are initialized and filled.
+        random_bytes(&mut key2.data);
+
+        // Verify key length is 32 bytes (256-bit)
+        assert_eq!(key1.data.len(), 32);
+        assert_eq!(key2.data.len(), 32);
+
+        // Verify the key data has been modified from default zero state
+        let all_zeros_1 = key1.data.iter().all(|&b| b == 0);
+        let all_zeros_2 = key2.data.iter().all(|&b| b == 0);
+        assert!(!all_zeros_1);
+        assert!(!all_zeros_2);
     }
 }

@@ -1,14 +1,8 @@
 // SigmaOS Virtualization Module
 pub mod container;
 pub mod orchestration;
-<<<<<<< HEAD
-pub mod vm_manager;
-=======
-#[cfg(any())]
-pub mod container;
-#[cfg(any())]
 pub mod namespaces;
->>>>>>> origin/jules-6565657164915217370-c04e8c01
+pub mod vm_manager;
 
 pub use container::{
     ContainerConfig, ContainerError, ContainerInfo, ContainerRuntime, ContainerRuntimeManager,

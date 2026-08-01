@@ -9,7 +9,7 @@ use crate::accessibility::{
     AccessibilitySetting,
 };
 use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
+    ApplicationBinary, cross_platform::BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
 };
 use crate::customization::{CustomizationEngine, Theme as CustomTheme};
 use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};

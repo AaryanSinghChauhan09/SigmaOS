@@ -7,7 +7,6 @@ extern crate alloc;
 use alloc::vec::Vec;
 
 use core::mem;
-use core::sync::atomic::AtomicBool;
 /// OOP-based Graphics Compositor for SigmaOS
 /// Implements graphics composition using OOP principles with traits and structs
 /// No dependency on external graphics frameworks
@@ -517,11 +516,7 @@ pub enum GraphicsError {
 
 /// Compositor statistics
 #[repr(C)]
-<<<<<<< HEAD
-#[derive(Debug, Clone, Copy)]
-=======
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub struct CompositorStats {
     pub total_windows: usize,
     pub visible_windows: usize,
@@ -730,16 +725,12 @@ impl Compositor for SimpleCompositor {
             if let Some(ref mut window) = self.windows[window_id] {
                 let window_rect = window.rect();
                 if let Some(surface) = window.surface() {
-<<<<<<< HEAD
-                    let window_data = surface.data();
-=======
                     let output_info = output.info();
                     let output_stride = output_info.stride as usize / 4;
 
                     let output_data = output.data_mut();
                     let window_data = surface.data();
 
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
                     let window_stride = surface.info().stride as usize / 4;
 
                     // Copy window surface to output
@@ -915,8 +906,6 @@ impl<T> Vec<T> {
     }
 }
 
-<<<<<<< HEAD
-=======
 #[cfg(target_os = "none")]
 struct Iter<T> {
     data: *const T,
@@ -963,7 +952,6 @@ impl<'a, T> Iterator for IterMut<T> {
     }
 }
 
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 // External allocator functions
 extern "C" {
     fn alloc(size: usize) -> *mut u8;

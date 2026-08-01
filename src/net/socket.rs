@@ -5,6 +5,13 @@
 /// Based on Ideas-999-Structured: Networking & Communication Item 771
 /// Implements socket creation and network communication
 
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::boxed::Box;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -60,12 +67,12 @@ impl Socket for SimpleSocket {
 
 pub trait SocketManager {
     fn create_socket(&mut self, socket_type: SocketType) -> Result<SocketID, SocketError>;
-    def close_socket(&mut self, id: SocketID) -> Result<(), SocketError>;
+    fn close_socket(&mut self, id: SocketID) -> Result<(), SocketError>;
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket>;
-    def bind(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
-    def connect(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
-    def send(&mut self, id: SocketID, data: &[u8]) -> Result<usize, SocketError>;
-    def receive(&mut self, id: SocketID, buffer: &mut [u8]) -> Result<usize, SocketError>;
+    fn bind(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
+    fn connect(&mut self, id: SocketID, address: &[u8], port: u16) -> Result<(), SocketError>;
+    fn send(&mut self, id: SocketID, data: &[u8]) -> Result<usize, SocketError>;
+    fn receive(&mut self, id: SocketID, buffer: &mut [u8]) -> Result<usize, SocketError>;
 }
 
 #[repr(C)]
@@ -184,8 +191,33 @@ impl SocketListener for SimpleSocketListener {
     }
 }
 
+#[cfg(target_os = "none")]
+struct Box<T: ?Sized>(*mut T);
+
+#[cfg(target_os = "none")]
+impl<T> Box<T> {
+    fn new(val: T) -> Self {
+        unsafe {
+            let ptr = alloc(mem::size_of::<T>()) as *mut T;
+            if !ptr.is_null() {
+                core::ptr::write(ptr, val);
+            }
+            Box(ptr)
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T: ?Sized> AsRef<T> for Box<T> {
+    fn as_ref(&self) -> &T {
+        unsafe { &*self.0 }
+    }
+}
+
+#[cfg(target_os = "none")]
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
@@ -209,4 +241,5 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
