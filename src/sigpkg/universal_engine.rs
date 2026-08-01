@@ -267,6 +267,32 @@ impl SovereignPackageManager {
             .push(hook);
     }
 
+    /// Dynamically routes package resolution to the most optimal microarchitecture binary based on CPU capability level (V4 down to V1)
+    pub fn resolve_optimized_package(&self, pkg_name: &str, cpu_level: CpuArchLevel) -> String {
+        let target_suffix = match cpu_level {
+            CpuArchLevel::X86_64_v4 => "-v4",
+            CpuArchLevel::X86_64_v3 => "-v3",
+            CpuArchLevel::X86_64_v2 => "-v2",
+            CpuArchLevel::X86_64_v1 => "",
+        };
+
+        // Simulated check if the optimized package suffix is supported or falls back
+        let candidates = [
+            format!("{}{}", pkg_name, target_suffix),
+            format!("{}-v3", pkg_name),
+            format!("{}-v2", pkg_name),
+            pkg_name.to_string(),
+        ];
+
+        for candidate in &candidates {
+            if self.installed_packages.contains_key(candidate) {
+                return candidate.clone();
+            }
+        }
+
+        pkg_name.to_string()
+    }
+
     /// Performs dynamic polymorphic installation of any package format, invoking custom UDFs and supporting rollback on failure
     pub fn install_package(
         &mut self,

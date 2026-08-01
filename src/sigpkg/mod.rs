@@ -7,6 +7,9 @@ pub mod store;
 pub mod transaction;
 pub mod verifier;
 pub mod importer;
+pub mod universal_oop_system;
+pub mod universal_adapter;
+pub mod universal_engine;
 
 pub use importer::{DebPackageImporter, RpmPackageImporter, PacmanPackageImporter, PackageImporter};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
@@ -77,6 +80,9 @@ pub struct Package {
     pub licenses: Vec<String>,
     pub maintainers: Vec<String>,
     pub changelogs: Vec<String>,
+    pub pqc_signature: Option<String>,
+    pub gpg_key_id: Option<String>,
+    pub supported_architectures: Vec<String>,
 }
 
 impl Package {
@@ -98,6 +104,9 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
+            pqc_signature: None,
+            gpg_key_id: None,
+            supported_architectures: Vec::new(),
         }
     }
 }
