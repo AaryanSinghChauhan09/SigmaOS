@@ -1,5 +1,5 @@
 // SigmaOS Network Stack Module
-pub mod stack;
+pub mod enterprise;
 pub mod tcp;
 pub mod legacy_net;
 pub mod revival;

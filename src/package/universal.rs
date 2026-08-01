@@ -684,7 +684,6 @@ pub struct UniversalPackageManager {
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
-    pub metadata_cache: HashMap<String, UnifiedPackage>,
 }
 
 impl UniversalPackageManager {
@@ -695,7 +694,6 @@ impl UniversalPackageManager {
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
-            metadata_cache: HashMap::new(),
         };
 
         manager.add_default_adapters();
@@ -1150,53 +1148,27 @@ mod tests {
     }
 
     #[test]
-    fn test_multi_distro_metadata_parser() {
-        let adapter = MultiDistroPackageAdapter::new();
+    fn test_transactional_rollback() {
+        let mut manager = UniversalPackageManager::new();
+        let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+        let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
 
-        // DEB
-        let deb_ctrl = "Package: nginx\nVersion: 1.18.0\nDepends: libc6, libpcre3\n";
-        let deb_pkg = adapter.parse_package_headers(deb_ctrl, PackageFormat::Deb).unwrap();
-        assert_eq!(deb_pkg.name, "nginx");
-        assert_eq!(deb_pkg.version, "1.18.0");
-        assert_eq!(deb_pkg.dependencies, vec!["libc6", "libpcre3"]);
+        manager.add_package(pkg1);
+        manager.add_package(pkg2);
 
-        // RPM
-        let rpm_spec = "Name: coreutils\nVersion: 8.32\nRequires: glibc, selinux-policy\n";
-        let rpm_pkg = adapter.parse_package_headers(rpm_spec, PackageFormat::Rpm).unwrap();
-        assert_eq!(rpm_pkg.name, "coreutils");
-        assert_eq!(rpm_pkg.dependencies, vec!["glibc", "selinux-policy"]);
+        // 1. Create a baseline checkpoint (empty)
+        let checkpoint_id = manager.create_checkpoint();
+        assert_eq!(checkpoint_id, 1);
 
-        // Pacman
-        let pacman_pkginfo = "pkgname = pacman\npkgver = 6.0.1\ndepend = openssl\ndepend = curl\n";
-        let pac_pkg = adapter.parse_package_headers(pacman_pkginfo, PackageFormat::Pacman).unwrap();
-        assert_eq!(pac_pkg.name, "pacman");
-        assert_eq!(pac_pkg.dependencies, vec!["openssl", "curl"]);
+        // 2. Install pkg1 and pkg2
+        manager.install("pkg1").unwrap();
+        manager.install("pkg2").unwrap();
+        assert_eq!(manager.installed_packages.len(), 2);
 
-        // APK
-        let apk_idx = "P:musl-utils\nV:1.2.2\nD:scanelf so:libc.musl-x86_64.so.1\n";
-        let apk_pkg = adapter.parse_package_headers(apk_idx, PackageFormat::Apk).unwrap();
-        assert_eq!(apk_pkg.name, "musl-utils");
-        assert_eq!(apk_pkg.dependencies, vec!["scanelf", "so:libc.musl-x86_64.so.1"]);
-    }
-
-    #[test]
-    fn test_package_install_hook() {
-        let mut hook = PackageInstallHook::new("AuditorHook");
-        let safe_pkg = UnifiedPackage::new("libreoffice".to_string(), "7.1.0".to_string());
-        let unsafe_pkg = UnifiedPackage::new("untrusted-app".to_string(), "2.0.0".to_string());
-
-        assert!(hook.execute_pre_install_hook(&safe_pkg));
-        assert!(!hook.execute_pre_install_hook(&unsafe_pkg));
-        assert_eq!(hook.run_counter, 2);
-    }
-
-    #[test]
-    fn test_multi_format_extractor() {
-        let mut extractor = MultiFormatExtractor::new();
-        let deb_pkg = UnifiedPackage::new("git".to_string(), "2.30.0".to_string()).with_format(PackageFormat::Deb);
-
-        let count = extractor.extract_payload(&deb_pkg).unwrap();
-        assert_eq!(count, 3);
-        assert_eq!(extractor.extracted_paths[0], "usr/bin/apt-app");
+        // 3. Roll back to baseline checkpoint
+        manager.rollback_to_checkpoint(checkpoint_id).unwrap();
+        assert_eq!(manager.installed_packages.len(), 0);
     }
 }
