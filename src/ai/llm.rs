@@ -199,6 +199,13 @@ pub struct LocalLlmEngine {
 }
 
 impl LocalLlmEngine {
+    pub fn generate_object(&self, schema_desc: &str) -> Result<String, String> {
+        if !self.loaded {
+            return Err("Model not loaded".to_string());
+        }
+        Ok(format!("{{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON for {}\"}}", schema_desc))
+    }
+
     pub fn new(config: LlmConfig) -> Self {
         Self {
             config,
@@ -244,11 +251,25 @@ impl LocalLlmEngine {
         // For now, return a placeholder response
         let start_time = 0; // Would use actual timing
 
-        Ok(InferenceResponse::new(
+        let mut response = InferenceResponse::new(
             "Generated response placeholder".to_string(),
             10,
             100,
-        ))
+        );
+
+        if !request.tools.is_empty() {
+            let mut calls = Vec::new();
+            for tool in &request.tools {
+                calls.push(ToolCall {
+                    id: "call_0".to_string(),
+                    name: tool.name.clone(),
+                    arguments_json: "{}".to_string(),
+                });
+            }
+            response = response.with_tool_calls(calls);
+        }
+
+        Ok(response)
     }
 
     /// Run batched inference
