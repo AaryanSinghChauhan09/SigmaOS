@@ -11,7 +11,11 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod gpu;
+pub mod graphics;
 pub mod kernel;
+pub mod klib;
+pub mod media;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
@@ -23,6 +27,10 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+
+pub use media::{
+    CaptureSource, GpuEncoderType, RecorderState, SovereignScreenRecorder, RecordingStats,
+};
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -112,6 +120,10 @@ pub use resilience::{
 pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise,
+    SecurityPolicy, SecurityRule, SecurityLabel, SelinuxPermission, ObjectType, SecurityContext,
+    AppArmorProfile, AppArmorManager,
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature,
+    IntrusionMonitor, IntrusionSeverity, AuditLogEntry, HardenedAuditTrail, secure_zeroize,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,

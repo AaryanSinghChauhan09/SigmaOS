@@ -1,6 +1,9 @@
 // Core Graphics and Composition Modules for SigmaOS
 pub mod compositor;
 pub mod video_editor;
+pub mod video;
+
+pub use video::{PixelRgba, VideoFrame};
 
 pub use compositor::{
     BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,

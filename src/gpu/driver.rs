@@ -10,8 +10,8 @@ use core::mem;
 
 pub type GPUDeviceID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GPUVendor { Intel = 0, AMD = 1, NVIDIA = 2, Other = 3 }
 
 #[repr(C)]
@@ -94,8 +94,9 @@ impl GPUManager for SimpleGPUManager {
 
     fn get_primary_gpu(&self) -> Option<&dyn GPUDevice> {
         if !self.gpus.is_empty() {
-            if let Some(ref gpu) = *self.gpus[0] {
-                return Some(gpu.as_ref());
+            if let Some(ref gpu) = self.gpus[0] {
+                let g: &dyn GPUDevice = &**gpu;
+                return Some(g);
             }
         }
         None

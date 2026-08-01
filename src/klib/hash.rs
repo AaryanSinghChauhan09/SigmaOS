@@ -23,7 +23,7 @@ pub fn simple_hash(data: &[u8]) -> u64 {
 
 /// XOR-based hash for integers
 pub fn xor_hash(value: u64) -> u64 {
-    value ^ 0x517cc1b727220a954
+    value ^ 0x517cc1b727220a95
 }
 
 /// Simple FNV-1a hash implementation
