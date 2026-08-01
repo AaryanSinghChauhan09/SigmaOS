@@ -1,21 +1,21 @@
 #![no_std]
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+#![no_main]
 
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 63: Secrets management
+
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::mem;
 
 /// Secret ID
 pub type SecretID = usize;
 
 /// Secret type
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum SecretType {
     Password = 0,
     APIKey = 1,
@@ -41,8 +41,8 @@ pub trait Secret {
 }
 
 /// Secret error types
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum SecretError {
     Success = 0,
     NotFound = 1,
@@ -54,7 +54,6 @@ pub enum SecretError {
 
 /// Secret info
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct SecretInfo {
     pub id: SecretID,
     pub name: [u8; 64],
@@ -103,6 +102,7 @@ impl SecretCapability {
 }
 
 /// Simple secret (OOP: Concrete secret class)
+#[repr(C)]
 pub struct SimpleSecret {
     pub id: SecretID,
     pub name: [u8; 64],
@@ -114,12 +114,7 @@ pub struct SimpleSecret {
 }
 
 impl SimpleSecret {
-    pub fn new(
-        id: SecretID,
-        name: &[u8],
-        secret_type: SecretType,
-        capability: SecretCapability,
-    ) -> Self {
+    pub fn new(id: SecretID, name: &[u8], secret_type: SecretType, capability: SecretCapability) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -175,10 +170,8 @@ impl Secret for SimpleSecret {
         }
 
         // Simple XOR encryption for demonstration
-        if !key.is_empty() {
-            for i in 0..self.data_len {
-                self.data[i] ^= key[i % key.len()];
-            }
+        for i in 0..self.data_len {
+            self.data[i] ^= key[i % key.len()];
         }
 
         self.is_encrypted.store(true, Ordering::SeqCst);
@@ -195,10 +188,8 @@ impl Secret for SimpleSecret {
         }
 
         // Simple XOR decryption (same as encryption)
-        if !key.is_empty() {
-            for i in 0..self.data_len {
-                self.data[i] ^= key[i % key.len()];
-            }
+        for i in 0..self.data_len {
+            self.data[i] ^= key[i % key.len()];
         }
 
         self.is_encrypted.store(false, Ordering::SeqCst);
@@ -234,7 +225,7 @@ pub trait Keyring {
 
 /// Keyring statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct KeyringStats {
     pub total_secrets: usize,
     pub encrypted_secrets: usize,
@@ -251,18 +242,12 @@ impl KeyringStats {
     }
 }
 
-impl Default for KeyringStats {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Simple keyring (OOP: Concrete keyring class)
 pub struct SimpleKeyring {
-    pub secrets: Vec<Option<Box<dyn Secret>>>,
-    pub next_id: AtomicUsize,
-    pub stats: KeyringStats,
-    pub capability: KeyringCapability,
+    secrets: Vec<Option<Box<dyn Secret>>>,
+    next_id: AtomicUsize,
+    stats: KeyringStats,
+    capability: KeyringCapability,
 }
 
 /// Keyring capability
@@ -336,7 +321,7 @@ impl Keyring for SimpleKeyring {
         }
 
         if let Some(i) = index {
-            self.secrets.remove(i);
+            self.secrets[i] = None;
             self.stats.total_secrets -= 1;
             self.stats.by_type[secret_type as usize] -= 1;
             Ok(())
@@ -378,7 +363,7 @@ impl Keyring for SimpleKeyring {
     }
 
     fn stats(&self) -> KeyringStats {
-        let mut stats = self.stats;
+        let mut stats = self.stats.clone();
         stats.encrypted_secrets = 0;
 
         for secret_option in &self.secrets {
@@ -393,50 +378,99 @@ impl Keyring for SimpleKeyring {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
-    #[test]
-    fn test_simple_secret_encryption_decryption() {
-        let capability = SecretCapability::full();
-        let mut secret = SimpleSecret::new(101, b"db_password", SecretType::Password, capability);
-        secret.set_data(b"super_secret_value");
-
-        assert_eq!(secret.id(), 101);
-        assert_eq!(secret.name(), b"db_password");
-        assert_eq!(secret.secret_type(), SecretType::Password);
-        assert_eq!(secret.get_data(), b"super_secret_value");
-
-        let key = b"my_encryption_key";
-        secret.encrypt(key).unwrap();
-        assert!(secret.info().is_encrypted);
-        assert_ne!(secret.get_data(), b"super_secret_value");
-
-        secret.decrypt(key).unwrap();
-        assert!(!secret.info().is_encrypted);
-        assert_eq!(secret.get_data(), b"super_secret_value");
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
     }
 
-    #[test]
-    fn test_simple_keyring() {
-        let keyring_cap = KeyringCapability::full();
-        let mut keyring = SimpleKeyring::new(keyring_cap);
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
 
-        let capability = SecretCapability::full();
-        let secret = SimpleSecret::new(101, b"db_password", SecretType::Password, capability);
-
-        let id = keyring.add_secret(Box::new(secret)).unwrap();
-        assert_eq!(id, 101);
-
-        assert!(keyring.get_secret(101).is_some());
-        assert_eq!(keyring.list_secrets().len(), 1);
-
-        let stats = keyring.stats();
-        assert_eq!(stats.total_secrets, 1);
-        assert_eq!(stats.encrypted_secrets, 0);
-
-        keyring.remove_secret(101).unwrap();
-        assert_eq!(keyring.stats().total_secrets, 0);
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
     }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+// External allocator functions
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

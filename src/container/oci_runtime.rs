@@ -13,15 +13,9 @@ use crate::klib_vec::Vec;
 
 pub type ContainerID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ContainerState {
-    Created = 0,
-    Running = 1,
-    Paused = 2,
-    Stopped = 3,
-    Deleting = 4,
-}
+pub enum ContainerState { Created = 0, Running = 1, Paused = 2, Stopped = 3, Deleting = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

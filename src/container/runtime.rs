@@ -1,13 +1,14 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -17,7 +18,7 @@ use crate::klib_vec::Vec;
 pub type ContainerID = usize;
 
 /// Container state
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
@@ -58,6 +59,19 @@ pub enum ContainerError {
     StopFailed = 4,
     PermissionDenied = 5,
     ResourceLimit = 6,
+}
+
+/// Container info
+#[repr(C)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
 }
 
 impl ContainerInfo {

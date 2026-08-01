@@ -169,7 +169,7 @@ impl DeviceDescriptor {
 }
 
 /// Device state
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState {
     Uninitialized = 0,
@@ -206,7 +206,7 @@ pub trait NetworkDevice: Device {
 /// Simple block device implementation (OOP: Concrete class)
 pub struct SimpleBlockDevice {
     descriptor: DeviceDescriptor,
-    blocks: Vec<Vec<u8>>,
+    blocks: LocalVec<LocalVec<u8>>,
     block_size: usize,
 }
 
@@ -221,10 +221,10 @@ impl SimpleBlockDevice {
         };
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Block, capability);
-        let mut blocks = Vec::new();
+        let mut blocks = LocalVec::new();
 
         for _ in 0..num_blocks {
-            let mut block_data = Vec::new();
+            let mut block_data = LocalVec::new();
             for _ in 0..block_size {
                 block_data.push(0u8);
             }
@@ -324,7 +324,7 @@ impl BlockDevice for SimpleBlockDevice {
 /// Simple character device implementation (OOP: Concrete class)
 pub struct SimpleCharacterDevice {
     descriptor: DeviceDescriptor,
-    buffer: Vec<u8>,
+    buffer: LocalVec<u8>,
     read_pos: usize,
     write_pos: usize,
 }
@@ -341,10 +341,11 @@ impl SimpleCharacterDevice {
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Character, capability);
 
-        let mut buffer = Vec::new();
+        let mut buffer = LocalVec::new();
         for _ in 0..buffer_size {
             buffer.push(0u8);
         }
+
         SimpleCharacterDevice {
             descriptor,
             buffer,
@@ -483,13 +484,13 @@ impl EarlyBootParameterOverride {
 
 /// Linux-inspired early parameter override table for unmatched legacy devices
 pub struct LinuxEarlyOverrideTable {
-    pub overrides: Vec<Option<EarlyBootParameterOverride>>,
+    pub overrides: LocalVec<Option<EarlyBootParameterOverride>>,
 }
 
 impl LinuxEarlyOverrideTable {
     pub fn new() -> Self {
         LinuxEarlyOverrideTable {
-            overrides: Vec::new(),
+            overrides: LocalVec::new(),
         }
     }
 
@@ -513,8 +514,8 @@ impl LinuxEarlyOverrideTable {
 
 /// Device manager (OOP: Manager class)
 pub struct DeviceManager {
-    devices: Vec<Option<Box<dyn Device>>>,
-    descriptors: Vec<Option<NonNull<DeviceDescriptor>>>,
+    devices: LocalVec<Option<Box<dyn Device>>>,
+    descriptors: LocalVec<Option<NonNull<DeviceDescriptor>>>,
     next_device_id: AtomicUsize,
     pub linux_override_table: LinuxEarlyOverrideTable,
 }
@@ -528,8 +529,8 @@ impl Default for DeviceManager {
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {
-            devices: Vec::new(),
-            descriptors: Vec::new(),
+            devices: LocalVec::new(),
+            descriptors: LocalVec::new(),
             next_device_id: AtomicUsize::new(1),
             linux_override_table: LinuxEarlyOverrideTable::new(),
         }
@@ -608,8 +609,8 @@ impl DeviceManager {
         None
     }
 
-    pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<usize> {
-        let mut ids = Vec::new();
+    pub fn get_devices_by_type(&self, device_type: DeviceType) -> LocalVec<usize> {
+        let mut ids = LocalVec::new();
         for (id, desc_option) in self.descriptors.iter().enumerate() {
             if let Some(desc_ptr) = *desc_option {
                 let desc = unsafe { &*desc_ptr.as_ptr() };
@@ -653,28 +654,22 @@ impl DdeDeviceWrapper {
 }
 
 /// Simple Vec implementation for no_std
-struct Vec<T> {
+pub struct LocalVec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
+impl<T> LocalVec<T> {
+    pub fn new() -> Self {
+        LocalVec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
 
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -687,8 +682,13 @@ impl<T> Vec<T> {
         }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        use core::ops::Deref;
+        self.deref().iter()
     }
 
     unsafe fn grow(&mut self) {
@@ -714,49 +714,47 @@ impl<T> Vec<T> {
     }
 }
 
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-impl<T> core::ops::Deref for Vec<T> {
+impl<T> core::ops::Deref for LocalVec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
+        if self.len == 0 {
+            &[] as &[T]
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
+impl<T> core::ops::DerefMut for LocalVec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
+        if self.len == 0 {
+            &mut [] as &mut [T]
         } else {
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
+impl<'a, T> IntoIterator for &'a LocalVec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
-
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::Deref;
         self.deref().iter()
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
+impl<'a, T> IntoIterator for &'a mut LocalVec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
-
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
     }
+}
+
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

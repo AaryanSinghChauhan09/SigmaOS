@@ -7,34 +7,27 @@ pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
-pub mod defensive_audit;
 pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
 pub mod mac;
-pub mod parrot_parity;
 pub mod password;
 pub mod pki;
 pub mod pledge;
-pub mod qubes_isolation;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
+pub mod qubes_isolation;
 
-pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
-pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
-pub use audit::{AuditLogger, AuditPolicy, LogFormat};
+pub use audit::{AuditLogger, AuditPolicy};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
-pub use capability_token::{
-    CapabilityToken as AndroidStyleCapabilityToken,
-    SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP,
-};
+pub use capability_token::{CapabilityToken as AndroidStyleCapabilityToken, SecurityEnforcer as AndroidStyleSecurityEnforcer, PORT_ALLOW_SSL, PORT_ALLOW_TCP};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
@@ -48,13 +41,12 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
-    SecurityRule, SelinuxPermission,
+    AppArmorManager, AppArmorProfile, ObjectType, SelinuxPermission, SecurityContext as SelinuxSecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule,
 };
+pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
+pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
@@ -67,24 +59,22 @@ pub use vpn::{
 };
 // Integrity: export the monitor trait and concrete types that actually exist
 pub use integrity::{
-    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError as SecIntegrityError,
-    IntegrityStats, IntegrityStatus as SecIntegrityStatus, MonitorCapability, SimpleFile,
-    SimpleIntegrityMonitor as SecSimpleIntegrityMonitor,
+    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError, IntegrityMonitor,
+    IntegrityStats, IntegrityStatus, MonitorCapability, SimpleFile, SimpleIntegrityMonitor,
 };
 // MAC: export what the module actually defines
 pub use mac::{
-    ContextCapability, ContextID, EngineCapability as MacEngineCapability,
+    ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
-    SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{
-    PKIManager as SecPKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
+    Certificate, PKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
 };
 // Secrets: export actual types
 pub use secrets::{
-    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo,
+    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SecretType,
     SimpleKeyring, SimpleSecret,
 };
 // Vulnerability: export actual types
@@ -92,12 +82,6 @@ pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
 };
-// Parrot Parity and Defensive Audit
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
-pub use parrot_parity::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-};
+
+
+pub use qubes_isolation::{DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError};
