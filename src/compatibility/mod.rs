@@ -4,6 +4,7 @@ pub mod standards;
 pub mod legacy_adapters;
 pub mod constellation_mesh;
 pub mod endeavour;
+pub mod linux_security;
 
 pub use endeavour::{
     EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
@@ -27,4 +28,9 @@ pub use constellation_mesh::{
     CorebootGatewayMesh, BuildCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyAsmCodexGrid,
     SecurityConstellation, DACConstellation, SELinuxConstellation, ZeroTrustConstellation,
     PeripheralArchiveMesh, FloppyMesh, TapeMesh, CRTMesh, DotMatrixMesh,
+};
+
+pub use linux_security::{
+    LinuxCapability, SecurityContext, AppArmorProfile, SecurityModuleManager,
+    UserNamespace, NamespaceType, NamespaceManager, SecurityPolicy,
 };
