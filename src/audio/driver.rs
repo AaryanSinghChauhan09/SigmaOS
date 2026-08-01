@@ -1,17 +1,14 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements audio device management and playback
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use crate::klib::Vec;
 
 pub type AudioDeviceID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum AudioType { Playback = 0, Capture = 1, Duplex = 2 }
 
 #[repr(C)]
@@ -56,7 +53,13 @@ impl AudioDevice for SimpleAudioDevice {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn audio_type(&self) -> AudioType { unsafe { core::mem::transmute(self.audio_type.load(Ordering::SeqCst)) } }
+    fn audio_type(&self) -> AudioType {
+        match self.audio_type.load(Ordering::SeqCst) {
+            0 => AudioType::Playback,
+            1 => AudioType::Capture,
+            _ => AudioType::Duplex,
+        }
+    }
     fn sample_rate(&self) -> u32 { self.sample_rate.load(Ordering::SeqCst) as u32 }
 
     fn initialize(&mut self) -> Result<(), AudioError> {
@@ -213,30 +216,3 @@ impl AudioStream for SimpleAudioStream {
         Ok(0)
     }
 }
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
