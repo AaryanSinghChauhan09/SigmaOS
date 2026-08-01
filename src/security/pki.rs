@@ -83,7 +83,7 @@ impl Certificate for SimpleCertificate {
         self.id
     }
     fn certificate_type(&self) -> CertificateType {
-        unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute::<usize, CertificateType>(self.certificate_type.load(Ordering::SeqCst)) }
     }
     fn subject(&self) -> &[u8] {
         let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
