@@ -1,12 +1,12 @@
 #![no_std]
 #![no_main]
 
+use crate::sigpkg::PackageImporter;
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 696
 /// Implements command parsing, execution, and built-in commands
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::sigpkg::PackageImporter;
 
 pub type CommandID = usize;
 
@@ -145,7 +145,8 @@ impl ShellCommand for ImportPacmanCommand {
 
     fn execute(&mut self, _args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError> {
         let mut output = Vec::new();
-        let raw_pkgbuild = "pkgname=neovim\npkgver=0.9.4\npkgdesc=Vim-fork focused on extensibility and usability";
+        let raw_pkgbuild =
+            "pkgname=neovim\npkgver=0.9.4\npkgdesc=Vim-fork focused on extensibility and usability";
         let importer = crate::sigpkg::PacmanPackageImporter::new();
         if let Ok(recipe) = importer.translate_metadata(raw_pkgbuild) {
             let msg = "Arch Pacman package successfully imported to SigmaOS recipe: ";
@@ -350,7 +351,9 @@ pub struct ShellAliasManager {
 
 impl ShellAliasManager {
     pub fn new() -> Self {
-        Self { aliases: Vec::new() }
+        Self {
+            aliases: Vec::new(),
+        }
     }
 
     pub fn set_alias(&mut self, shortcut: &[u8], expansion: &[u8]) {
@@ -377,7 +380,10 @@ impl ShellAliasManager {
     }
 
     pub fn expand(&self, input: &[u8]) -> Vec<u8> {
-        let name_len = input.iter().position(|&b| b == 0 || b == b' ').unwrap_or(input.len());
+        let name_len = input
+            .iter()
+            .position(|&b| b == 0 || b == b' ')
+            .unwrap_or(input.len());
         let cmd_word = &input[..name_len];
 
         for &(ref shortcut, ref exp) in &*self.aliases {
@@ -412,7 +418,9 @@ pub struct UserDefinedFunctionManager {
 
 impl UserDefinedFunctionManager {
     pub fn new() -> Self {
-        Self { functions: Vec::new() }
+        Self {
+            functions: Vec::new(),
+        }
     }
 
     pub fn define_function(&mut self, name: &[u8], commands: &[&[u8]]) {
@@ -456,7 +464,9 @@ pub struct AutocompleteEngine {
 
 impl AutocompleteEngine {
     pub fn new() -> Self {
-        Self { search_index: Vec::new() }
+        Self {
+            search_index: Vec::new(),
+        }
     }
 
     pub fn feed_completions(&mut self, items: &[[u8; 32]]) {
@@ -497,7 +507,8 @@ impl ShellOptimizer {
 
     pub fn record_execution(&self, ticks: usize) -> &'static str {
         self.command_count.fetch_add(1, Ordering::SeqCst);
-        self.total_execution_ticks.fetch_add(ticks, Ordering::SeqCst);
+        self.total_execution_ticks
+            .fetch_add(ticks, Ordering::SeqCst);
 
         if ticks > 500 {
             "Optimization Advice: Command spent significant ticks. Consider indexing standard paths or utilizing the Self Healing Kernel engine!"
@@ -861,10 +872,9 @@ mod tests {
     #[test]
     fn test_user_defined_functions() {
         let mut session = SimpleShellSession::new();
-        session.function_manager.define_function(
-            b"sysup",
-            &[b"sigstandards", b"sigmetrics"]
-        );
+        session
+            .function_manager
+            .define_function(b"sysup", &[b"sigstandards", b"sigmetrics"]);
 
         let output = session.execute_line(b"sysup").unwrap();
         // Since both sub-commands run:

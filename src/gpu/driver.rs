@@ -1,22 +1,31 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based GPU Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements GPU device management and rendering
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type GPUDeviceID = usize;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GPUVendor { Intel = 0, AMD = 1, NVIDIA = 2, Other = 3 }
+pub enum GPUVendor {
+    Intel = 0,
+    AMD = 1,
+    NVIDIA = 2,
+    Other = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum GPUError { Success = 0, NotFound = 1, InitFailed = 2, RenderFailed = 3 }
+pub enum GPUError {
+    Success = 0,
+    NotFound = 1,
+    InitFailed = 2,
+    RenderFailed = 3,
+}
 
 pub trait GPUDevice {
     fn id(&self) -> GPUDeviceID;
@@ -51,13 +60,19 @@ impl SimpleGPUDevice {
 }
 
 impl GPUDevice for SimpleGPUDevice {
-    fn id(&self) -> GPUDeviceID { self.id }
-    fn vendor(&self) -> GPUVendor { unsafe { core::mem::transmute(self.vendor.load(Ordering::SeqCst)) } }
+    fn id(&self) -> GPUDeviceID {
+        self.id
+    }
+    fn vendor(&self) -> GPUVendor {
+        unsafe { core::mem::transmute(self.vendor.load(Ordering::SeqCst)) }
+    }
     fn model(&self) -> &[u8] {
         let len = self.model.iter().position(|&b| b == 0).unwrap_or(64);
         &self.model[..len]
     }
-    fn vram_size(&self) -> usize { self.vram_size.load(Ordering::SeqCst) }
+    fn vram_size(&self) -> usize {
+        self.vram_size.load(Ordering::SeqCst)
+    }
 
     fn initialize(&mut self) -> Result<(), GPUError> {
         Ok(())
@@ -114,7 +129,12 @@ impl GPUManager for SimpleGPUManager {
 }
 
 pub trait Framebuffer {
-    fn create_framebuffer(&mut self, width: usize, height: usize, format: u32) -> Result<usize, GPUError>;
+    fn create_framebuffer(
+        &mut self,
+        width: usize,
+        height: usize,
+        format: u32,
+    ) -> Result<usize, GPUError>;
     fn bind_framebuffer(&mut self, fb_id: usize) -> Result<(), GPUError>;
     fn clear(&mut self, color: u32) -> Result<(), GPUError>;
     fn swap_buffers(&mut self) -> Result<(), GPUError>;
@@ -138,7 +158,12 @@ impl SimpleFramebuffer {
 }
 
 impl Framebuffer for SimpleFramebuffer {
-    fn create_framebuffer(&mut self, width: usize, height: usize, format: u32) -> Result<usize, GPUError> {
+    fn create_framebuffer(
+        &mut self,
+        width: usize,
+        height: usize,
+        format: u32,
+    ) -> Result<usize, GPUError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         self.framebuffers.push((id, width, height, format));
         Ok(id)
@@ -164,7 +189,11 @@ impl Framebuffer for SimpleFramebuffer {
 }
 
 pub trait RenderPipeline {
-    fn create_pipeline(&mut self, vertex_shader: &[u8], fragment_shader: &[u8]) -> Result<usize, GPUError>;
+    fn create_pipeline(
+        &mut self,
+        vertex_shader: &[u8],
+        fragment_shader: &[u8],
+    ) -> Result<usize, GPUError>;
     fn bind_pipeline(&mut self, pipeline_id: usize) -> Result<(), GPUError>;
     fn draw(&mut self, vertex_count: usize) -> Result<(), GPUError>;
 }
@@ -187,14 +216,22 @@ impl SimpleRenderPipeline {
 }
 
 impl RenderPipeline for SimpleRenderPipeline {
-    fn create_pipeline(&mut self, vertex_shader: &[u8], fragment_shader: &[u8]) -> Result<usize, GPUError> {
+    fn create_pipeline(
+        &mut self,
+        vertex_shader: &[u8],
+        fragment_shader: &[u8],
+    ) -> Result<usize, GPUError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let mut vs_array = [0u8; 256];
         let mut fs_array = [0u8; 256];
         let vs_len = vertex_shader.len().min(255);
         let fs_len = fragment_shader.len().min(255);
-        for i in 0..vs_len { vs_array[i] = vertex_shader[i]; }
-        for i in 0..fs_len { fs_array[i] = fragment_shader[i]; }
+        for i in 0..vs_len {
+            vs_array[i] = vertex_shader[i];
+        }
+        for i in 0..fs_len {
+            fs_array[i] = fragment_shader[i];
+        }
         self.pipelines.push((id, vs_array, fs_array));
         Ok(id)
     }
@@ -214,34 +251,58 @@ impl RenderPipeline for SimpleRenderPipeline {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    fn is_empty(&self) -> bool { self.len == 0 }
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -273,7 +334,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

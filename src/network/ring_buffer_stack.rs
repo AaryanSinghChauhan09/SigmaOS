@@ -117,11 +117,18 @@ impl TcpSocket {
     }
 
     /// Process incoming segment to drive TCP state machine asynchronously
-    pub fn process_segment(&mut self, flags: u8, seq: u32, ack: u32, payload_len: usize) -> Option<NetworkPacket> {
+    pub fn process_segment(
+        &mut self,
+        flags: u8,
+        seq: u32,
+        ack: u32,
+        payload_len: usize,
+    ) -> Option<NetworkPacket> {
         match self.state {
             TcpState::Closed => None,
             TcpState::Listen => {
-                if flags & 0x02 != 0 { // SYN
+                if flags & 0x02 != 0 {
+                    // SYN
                     self.state = TcpState::SynReceived;
                     self.ack_number = seq + 1;
                     // Prepare SYN-ACK response
@@ -131,7 +138,8 @@ impl TcpSocket {
                 }
             }
             TcpState::SynSent => {
-                if flags & 0x12 == 0x12 { // SYN-ACK
+                if flags & 0x12 == 0x12 {
+                    // SYN-ACK
                     self.state = TcpState::Established;
                     self.ack_number = seq + 1;
                     self.seq_number = ack;
@@ -141,7 +149,8 @@ impl TcpSocket {
                 }
             }
             TcpState::Established => {
-                if flags & 0x01 != 0 { // FIN
+                if flags & 0x01 != 0 {
+                    // FIN
                     self.state = TcpState::CloseWait;
                     self.ack_number = seq + 1;
                     self.send_packet(0x10) // ACK
@@ -194,7 +203,9 @@ mod tests {
 
     #[test]
     fn test_checksum_and_tcp_state_machine() {
-        let data = [0x45u8, 0x00, 0x00, 0x28, 0x1A, 0x2B, 0x40, 0x00, 0x40, 0x06, 0x00, 0x00];
+        let data = [
+            0x45u8, 0x00, 0x00, 0x28, 0x1A, 0x2B, 0x40, 0x00, 0x40, 0x06, 0x00, 0x00,
+        ];
         let csum = compute_checksum(&data);
         assert_ne!(csum, 0);
 
@@ -206,6 +217,9 @@ mod tests {
         let response = socket.process_segment(0x02, 500, 0, 0).unwrap();
         assert_eq!(socket.state, TcpState::SynReceived);
         assert_eq!(socket.ack_number, 501);
-        assert_eq!(response.buffer[ETHERNET_HEADER_LEN + IPV4_HEADER_LEN + 13], 0x12); // SYN-ACK
+        assert_eq!(
+            response.buffer[ETHERNET_HEADER_LEN + IPV4_HEADER_LEN + 13],
+            0x12
+        ); // SYN-ACK
     }
 }

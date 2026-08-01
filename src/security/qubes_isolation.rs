@@ -37,7 +37,12 @@ pub struct IsolatedDomain {
 }
 
 impl IsolatedDomain {
-    pub fn new(id: DomainID, name_str: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Self {
+    pub fn new(
+        id: DomainID,
+        name_str: &[u8],
+        domain_type: DomainType,
+        caps: CapabilityToken,
+    ) -> Self {
         let mut name_arr = [0u8; 32];
         let len = name_str.len().min(31);
         for i in 0..len {
@@ -68,7 +73,12 @@ impl DomainOrchestrator {
     }
 
     /// Spawns a compartmentalized secure domain with custom hardware capability tokens
-    pub fn spawn_domain(&mut self, name: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Result<DomainID, IsolationError> {
+    pub fn spawn_domain(
+        &mut self,
+        name: &[u8],
+        domain_type: DomainType,
+        caps: CapabilityToken,
+    ) -> Result<DomainID, IsolationError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let domain = IsolatedDomain::new(id, name, domain_type, caps);
         self.domains.push(Some(domain));
@@ -89,7 +99,12 @@ impl DomainOrchestrator {
     }
 
     /// Routes inter-domain requests securely via capability-gated microkernel IPC pathways (Qrexec equivalent)
-    pub fn send_interdomain_request(&self, src_id: DomainID, dest_id: DomainID, req_payload: &[u8]) -> Result<Vec<u8>, IsolationError> {
+    pub fn send_interdomain_request(
+        &self,
+        src_id: DomainID,
+        dest_id: DomainID,
+        req_payload: &[u8],
+    ) -> Result<Vec<u8>, IsolationError> {
         let mut src_domain = None;
         let mut dest_domain = None;
 
@@ -322,18 +337,34 @@ mod tests {
         let mut orchestrator = DomainOrchestrator::new();
 
         // 1. Spawn Net domain with full hardware token (0xFFFF)
-        let net_id = orchestrator.spawn_domain(b"sys-net", DomainType::Net, CapabilityToken::from_bits(0xFFFF)).expect("Failed to spawn Net domain");
+        let net_id = orchestrator
+            .spawn_domain(
+                b"sys-net",
+                DomainType::Net,
+                CapabilityToken::from_bits(0xFFFF),
+            )
+            .expect("Failed to spawn Net domain");
 
         // 2. Spawn standard App domain with no Net capability (bits = 0x00)
-        let app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).expect("Failed to spawn App domain");
+        let app_id = orchestrator
+            .spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00))
+            .expect("Failed to spawn App domain");
 
         // 3. Send interdomain IPC - Should fail due to zero Net capabilities on AppVM
         let res = orchestrator.send_interdomain_request(app_id, net_id, b"Ping Net");
         assert_eq!(res, Err(IsolationError::PermissionDenied));
 
         // 4. Spawn a trust-authorized AppVM with Net permission (bits = 0x02)
-        let secure_app_id = orchestrator.spawn_domain(b"secure-app", DomainType::App, CapabilityToken::from_bits(0x02)).expect("Failed to spawn secure App domain");
-        let secure_res = orchestrator.send_interdomain_request(secure_app_id, net_id, b"Ping Net").expect("Failed to send interdomain request");
+        let secure_app_id = orchestrator
+            .spawn_domain(
+                b"secure-app",
+                DomainType::App,
+                CapabilityToken::from_bits(0x02),
+            )
+            .expect("Failed to spawn secure App domain");
+        let secure_res = orchestrator
+            .send_interdomain_request(secure_app_id, net_id, b"Ping Net")
+            .expect("Failed to send interdomain request");
         assert_eq!(secure_res[0], b'P');
         assert_eq!(secure_res[secure_res.len() - 1], b'R'); // Response confirmation
     }
@@ -342,8 +373,16 @@ mod tests {
     fn test_qubes_disposable_domain_cleanup() {
         let mut orchestrator = DomainOrchestrator::new();
 
-        let app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
-        let disp_id = orchestrator.spawn_domain(b"disp-browser", DomainType::Disposable, CapabilityToken::from_bits(0x00)).unwrap();
+        let app_id = orchestrator
+            .spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00))
+            .unwrap();
+        let disp_id = orchestrator
+            .spawn_domain(
+                b"disp-browser",
+                DomainType::Disposable,
+                CapabilityToken::from_bits(0x00),
+            )
+            .unwrap();
 
         assert_eq!(orchestrator.active_domains_count(), 2);
 
@@ -353,6 +392,9 @@ mod tests {
         assert_eq!(orchestrator.active_domains_count(), 1);
 
         // Ensure browser is fully purged
-        assert_eq!(orchestrator.terminate_domain(disp_id), Err(IsolationError::DomainNotFound));
+        assert_eq!(
+            orchestrator.terminate_domain(disp_id),
+            Err(IsolationError::DomainNotFound)
+        );
     }
 }

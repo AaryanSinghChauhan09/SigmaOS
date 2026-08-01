@@ -5,13 +5,13 @@
 //! precise frame rate regulation, pre-record buffering, and real-time telemetry HUD tracking.
 
 extern crate alloc;
+use alloc::collections::VecDeque;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::collections::VecDeque;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
+use crate::gpu::driver::{GPUDeviceID, GPUVendor};
 use crate::graphics::video::{PixelRgba, VideoFrame};
-use crate::gpu::driver::{GPUVendor, GPUDeviceID};
 
 /// Screen recorder status states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,7 +49,7 @@ pub struct AudioTrack {
 /// Dynamic Bitrate Mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BitrateMode {
-    ConstantBitrate (u32), // CBR in kbps
+    ConstantBitrate(u32),                      // CBR in kbps
     VariableBitrate { target: u32, max: u32 }, // VBR
 }
 
@@ -119,8 +119,14 @@ impl SovereignScreenRecorder {
             encoder_type: GpuEncoderType::CpuSoftwareFallback,
             target_fps: 60,
             bitrate_control: BitrateMode::ConstantBitrate(12000), // 12 Mbps default
-            system_audio: AudioTrack { name: "System Audio".to_string(), samples: Vec::new() },
-            microphone_audio: AudioTrack { name: "Microphone Input".to_string(), samples: Vec::new() },
+            system_audio: AudioTrack {
+                name: "System Audio".to_string(),
+                samples: Vec::new(),
+            },
+            microphone_audio: AudioTrack {
+                name: "Microphone Input".to_string(),
+                samples: Vec::new(),
+            },
             pre_record_enabled: false,
             pre_record_duration_ms: 10000, // 10 seconds default
             pre_record_buffer: VecDeque::new(),
@@ -213,7 +219,8 @@ impl SovereignScreenRecorder {
 
         // Finalize compression statistics
         if self.stats.raw_bytes_captured > 0 {
-            self.stats.compression_ratio = self.stats.raw_bytes_captured as f32 / self.stats.compressed_bytes_stored.max(1) as f32;
+            self.stats.compression_ratio = self.stats.raw_bytes_captured as f32
+                / self.stats.compressed_bytes_stored.max(1) as f32;
         }
 
         Ok(format!(
@@ -225,31 +232,47 @@ impl SovereignScreenRecorder {
     /// Triggers hotkey shortcut event handlers (Bandicam Parity)
     pub fn handle_hotkey_trigger(&mut self, keycode: u32) -> Option<String> {
         match keycode {
-            112 => { // F12: Start / Stop
+            112 => {
+                // F12: Start / Stop
                 if self.state == RecorderState::Recording {
                     self.stop_recording().ok()
                 } else {
-                    self.start_recording().ok().map(|_| "Recording started via F12 hotkey.".to_string())
+                    self.start_recording()
+                        .ok()
+                        .map(|_| "Recording started via F12 hotkey.".to_string())
                 }
             }
-            111 => { // F11: Pause / Resume
+            111 => {
+                // F11: Pause / Resume
                 if self.state == RecorderState::Recording {
-                    self.pause_recording().ok().map(|_| "Recording paused via F11 hotkey.".to_string())
+                    self.pause_recording()
+                        .ok()
+                        .map(|_| "Recording paused via F11 hotkey.".to_string())
                 } else if self.state == RecorderState::Paused {
-                    self.resume_recording().ok().map(|_| "Recording resumed via F11 hotkey.".to_string())
+                    self.resume_recording()
+                        .ok()
+                        .map(|_| "Recording resumed via F11 hotkey.".to_string())
                 } else {
                     None
                 }
             }
-            110 => { // F10: Capture Screenshot
-                Some(format!("F10: Captured clean screenshot stored at {}_screenshot.png", self.destination_path))
+            110 => {
+                // F10: Capture Screenshot
+                Some(format!(
+                    "F10: Captured clean screenshot stored at {}_screenshot.png",
+                    self.destination_path
+                ))
             }
             _ => None,
         }
     }
 
     /// Process and push a newly captured screen frame through the recording queue
-    pub fn process_input_frame(&mut self, mut frame: VideoFrame, timestamp_ms: u64) -> Result<(), &'static str> {
+    pub fn process_input_frame(
+        &mut self,
+        mut frame: VideoFrame,
+        timestamp_ms: u64,
+    ) -> Result<(), &'static str> {
         // Enforce frame skip regulation based on target FPS and frame delta
         if self.last_frame_timestamp_ms > 0 {
             let delta = timestamp_ms - self.last_frame_timestamp_ms;
@@ -272,7 +295,10 @@ impl SovereignScreenRecorder {
 
         // 3. Pre-record buffer processing
         if self.pre_record_enabled {
-            self.pre_record_buffer.push_back(BufferedFrame { timestamp_ms, frame: frame.clone() });
+            self.pre_record_buffer.push_back(BufferedFrame {
+                timestamp_ms,
+                frame: frame.clone(),
+            });
             let cutoff = if timestamp_ms > self.pre_record_duration_ms {
                 timestamp_ms - self.pre_record_duration_ms
             } else {
@@ -300,7 +326,8 @@ impl SovereignScreenRecorder {
             self.stats.compressed_bytes_stored += compressed_size;
 
             // Update live telemetry statistics
-            self.stats.duration_seconds = (self.stats.total_frames_captured as f32) / self.target_fps as f32;
+            self.stats.duration_seconds =
+                (self.stats.total_frames_captured as f32) / self.target_fps as f32;
             self.stats.current_fps = self.target_fps;
             self.stats.gpu_utilization = match self.encoder_type {
                 GpuEncoderType::NvidiaNvenc => 22.5,
@@ -339,7 +366,9 @@ impl SovereignScreenRecorder {
 
     /// Blends yellow mouse cursor highlights on top of current frame buffer
     fn overlay_cursor(&self, frame: &mut VideoFrame) {
-        if frame.width == 0 || frame.height == 0 { return; }
+        if frame.width == 0 || frame.height == 0 {
+            return;
+        }
         let cx = self.cursor.x as usize;
         let cy = self.cursor.y as usize;
 
@@ -354,7 +383,9 @@ impl SovereignScreenRecorder {
 
     /// Render standard SigmaOS non-intrusive watermark text box
     fn overlay_watermark(&self, frame: &mut VideoFrame) {
-        if frame.width < 100 || frame.height < 20 { return; }
+        if frame.width < 100 || frame.height < 20 {
+            return;
+        }
         // Simple 10x80 pixels solid green watermark bar in top-right corner
         let start_y = 5usize;
         let end_y = 15usize;
