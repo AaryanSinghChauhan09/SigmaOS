@@ -62,6 +62,10 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
         }
 
         let idx = head % N;
+        if idx >= N {
+            self.metrics.full_errors += 1;
+            return Err(IpcError::InvalidPayload);
+        }
         self.buffer[idx] = Some(item);
         self.head.store(head.wrapping_add(1), Ordering::Release);
         self.metrics.enqueued_count += 1;
@@ -85,6 +89,10 @@ impl<T: Clone, const N: usize> ZeroCopyQueue<T, N> {
         }
 
         let idx = tail % N;
+        if idx >= N {
+            self.metrics.empty_errors += 1;
+            return Err(IpcError::InvalidPayload);
+        }
         let item = self.buffer[idx].take().ok_or_else(|| {
             self.metrics.empty_errors += 1;
             IpcError::InvalidPayload
@@ -157,6 +165,10 @@ impl<T: Clone, const N: usize> PowerOfTwoZeroCopyQueue<T, N> {
         }
 
         let idx = head & (N - 1);
+        if idx >= N {
+            self.metrics.full_errors += 1;
+            return Err(IpcError::InvalidPayload);
+        }
         self.buffer[idx] = Some(item);
         self.head.store(head.wrapping_add(1), Ordering::Release);
         self.metrics.enqueued_count += 1;
@@ -180,6 +192,10 @@ impl<T: Clone, const N: usize> PowerOfTwoZeroCopyQueue<T, N> {
         }
 
         let idx = tail & (N - 1);
+        if idx >= N {
+            self.metrics.empty_errors += 1;
+            return Err(IpcError::InvalidPayload);
+        }
         let item = self.buffer[idx].take().ok_or_else(|| {
             self.metrics.empty_errors += 1;
             IpcError::InvalidPayload
