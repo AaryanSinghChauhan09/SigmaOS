@@ -5,9 +5,8 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
-pub mod defragmenter;
+pub mod smart_symlink;
 
-pub use defragmenter::{ClusterState, FragmentedFile, DefragStats, DiskDefragmenter};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
@@ -26,3 +25,6 @@ pub use support::{
     SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use smart_symlink::{
+    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkKernelPersona, SymlinkResolverRule,
+};

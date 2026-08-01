@@ -2,42 +2,40 @@
 // S-AI engine, agents, orchestrator, and local inference
 
 pub mod agent;
-pub mod autogen;
 pub mod llm;
 pub mod orchestrator;
 pub mod sai;
-pub mod openclaw;
 pub mod system;
 pub mod voice;
+pub mod qwenpaw;
+pub mod perplexity;
+pub mod awesome_ai;
 pub mod open_computer;
 
-pub use openclaw::{
-    ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
-};
-
 pub use agent::{AIAgent, SimpleAIAgent};
-pub use autogen::{
-    AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
-    GroupChat, SandboxCodeExecutor,
-};
+pub use qwenpaw::{PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentCommunicationProtocol};
+pub use perplexity::{PerplexitySearchCli, PerplexitySearchResult, PerplexitySnippetResult};
+pub use awesome_ai::{AwesomeCodeAiRegistry, AwesomeToolInfo};
 pub use llm::{
-    BatchingStrategy, InferenceBackend, InferenceRequest, InferenceResponse, LlmConfig,
-    LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
+    LlmConfig, LocalLlmEngine, InferenceRequest, InferenceResponse,
+    QuantizationType, InferenceBackend, BatchingStrategy,
+    StreamingLlmEngine, StreamingInference,
+    JaxTensorSharding, SwiGluActivation, GrokMoeRouter, RotaryPositionEmbedding,
+    GrokGqaMapper, GrokWeightStreamer,
 };
-pub use orchestrator::{AgentOrchestrator, AgentState, SimpleAgentOrchestrator};
+pub use orchestrator::{AgentOrchestrator, SimpleAgentOrchestrator, AgentState};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
     AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
 };
-pub use sai::{Agent, AgentRole, AgentTask as Task, TaskStatus};
 pub use system::{
-    AdaptiveSchedulingService, AiServiceConfig, AiServiceManager, AiServiceMetrics, AiServiceState,
-    AiServiceType, AiSystemService, PredictiveMaintenanceService, ResourceManagementService,
-    ServicePriority,
+    AiSystemService, AiServiceManager, AiServiceConfig, AiServiceState,
+    ResourceManagementService, PredictiveMaintenanceService, AdaptiveSchedulingService,
+    AiServiceType, ServicePriority, AiServiceMetrics,
 };
 pub use voice::{
-    AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
-    VoiceRecognizer, VoiceSynthesizer,
+    VoiceAssistant, VoiceModel, VoiceRecognizer, VoiceSynthesizer,
+    RecognitionResult, SynthesisResult, AudioFormat, SynthesisModel,
 };
 pub use open_computer::{
     OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,

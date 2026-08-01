@@ -3,15 +3,6 @@
 
 use std::io::{self, BufRead, Write};
 
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -67,22 +58,51 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Livepatch {
-        args: Vec<String>,
-    },
-    Cron {
-        args: Vec<String>,
-    },
-    Vm {
-        args: Vec<String>,
-    },
-    Research {
-        query: String,
-    },
-    Camera {
-        effect: String,
-    },
     Unknown(String),
+}
+
+/// Represents an automated action task executed by an AI agent
+#[derive(Debug, Clone)]
+pub struct AgentTask {
+    pub task_id: usize,
+    pub description: String,
+    pub commands: Vec<String>,
+}
+
+/// AI Agent Automation Engine inside SigmaOS REPL
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine {
+    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
+    pub next_task_id: usize,
+}
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine {
+            registered_tasks: std::collections::HashMap::new(),
+            next_task_id: 1,
+        }
+    }
+
+    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
+        let id = self.next_task_id;
+        self.next_task_id += 1;
+        self.registered_tasks.insert(
+            id,
+            AgentTask {
+                task_id: id,
+                description,
+                commands,
+            },
+        );
+        id
+    }
+}
+
+impl Default for AgentAutomationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Shell REPL
@@ -155,10 +175,10 @@ impl ShellRepl {
 
         while self.running {
             print!("{}", self.prompt);
-            stdout.flush().expect("Failed to flush stdout");
+            stdout.flush().unwrap();
 
             let mut input = String::new();
-            stdin.lock().read_line(&mut input).expect("Failed to read line from stdin");
+            stdin.lock().read_line(&mut input).unwrap();
 
             let input = input.trim();
             if !input.is_empty() {
@@ -169,7 +189,21 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    fn execute_line(&mut self, line: &str) {
+    pub fn execute_line(&mut self, line: &str) {
+        if line.contains(';') {
+            let subcommands: Vec<&str> = line.split(';').collect();
+            for sub in subcommands {
+                let trimmed = sub.trim();
+                if !trimmed.is_empty() {
+                    self.execute_single_line(trimmed);
+                }
+            }
+        } else {
+            self.execute_single_line(line);
+        }
+    }
+
+    fn execute_single_line(&mut self, line: &str) {
         let command = self.parse_command(line);
         let result = self.execute_command(command);
 
@@ -185,7 +219,7 @@ impl ShellRepl {
         }
     }
 
-    fn parse_command(&self, input: &str) -> ShellCommand {
+    pub fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -201,6 +235,27 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "echo" => ShellCommand::Echo {
+                message: parts[1..].join(" "),
+            },
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "cat" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Cat {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -266,31 +321,11 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "livepatch" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Livepatch { args }
-            }
-            "cron" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Cron { args }
-            }
-            "vm" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Vm { args }
-            }
-            "research" => {
-                let query = parts[1..].join(" ");
-                ShellCommand::Research { query }
-            }
-            "camera" => {
-                let effect = parts[1..].join(" ");
-                ShellCommand::Camera { effect }
-            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
                    help         - Show this help message\n\
@@ -449,55 +484,6 @@ impl ShellRepl {
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
             }
-            ShellCommand::Livepatch { args } => {
-                if args.is_empty() {
-                    Ok("livepatch: Subcommands: list, apply <symbol> <addr1> <addr2>".to_string())
-                } else if args[0] == "list" {
-                    Ok("sys_read -> 0xffffffffc0300100 (Active)".to_string())
-                } else if args[0] == "apply" && args.len() >= 4 {
-                    Ok(format!("Successfully registered livepatch redirect for '{}' from 0x{} to 0x{}", args[1], args[2], args[3]))
-                } else {
-                    Err("livepatch: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Cron { args } => {
-                if args.is_empty() {
-                    Ok("cron: Subcommands: list, add <name> <cmd> <schedule>".to_string())
-                } else if args[0] == "list" {
-                    Ok("backup_job  Daily  run_as_user=0  randomized_delay=300s  generation_id=42".to_string())
-                } else if args[0] == "add" && args.len() >= 4 {
-                    Ok(format!("Successfully added multi-distro cron job '{}' to execute '{}'", args[1], args[2]))
-                } else {
-                    Err("cron: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Vm { args } => {
-                if args.is_empty() {
-                    Ok("vm: Subcommands: list, start <name>, stop <name>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Intel-VM  Intel VT-x (VMX)  Stopped  hpet=true  iommu_protection=AMD-Vi".to_string())
-                } else if args[0] == "start" && args.len() >= 2 {
-                    Ok(format!("Starting VM '{}' with hardware VT-x acceleration...", args[1]))
-                } else if args[0] == "stop" && args.len() >= 2 {
-                    Ok(format!("Stopping VM '{}'...", args[1]))
-                } else {
-                    Err("vm: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Research { query } => {
-                if query.is_empty() {
-                    Err("research: Please specify a research query".to_string())
-                } else {
-                    Ok(format!("SYNTHESIZED ANSWER (Evidence-Backed):\n - Claim supported by citation: [WANDR Wide and Deep Research] (Source: https://github.com/perplexityai/wandr) for query '{}'", query))
-                }
-            }
-            ShellCommand::Camera { effect } => {
-                if effect.is_empty() {
-                    Ok("camera: Current effect: None. Supported effects: ChromaKey, Grayscale, Sepia, Negative".to_string())
-                } else {
-                    Ok(format!("Webcam effect successfully updated to '{}' (ManyCam/Snap Camera compatibility)", effect))
-                }
-            }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -550,7 +536,7 @@ mod tests {
             message: "test".to_string(),
         };
         let result = repl.execute_command(command);
-        assert_eq!(result.expect("Failed to execute echo command"), "test");
+        assert_eq!(result.unwrap(), "test");
     }
 
     #[test]
@@ -560,20 +546,45 @@ mod tests {
             variable: "test".to_string(),
             value: "value".to_string(),
         };
-        repl.execute_command(set_cmd).expect("Failed to execute set command");
+        repl.execute_command(set_cmd).unwrap();
 
         let get_cmd = ShellCommand::Get {
             variable: "test".to_string(),
         };
         let result = repl.execute_command(get_cmd);
-        assert_eq!(result.expect("Failed to execute get command"), "value");
+        assert_eq!(result.unwrap(), "value");
+    }
+
+    #[test]
+    fn test_theme_and_profile_commands() {
+        let mut repl = ShellRepl::new();
+
+        let theme_cmd = repl.parse_command("theme dark");
+        let res = repl.execute_command(theme_cmd).unwrap();
+        assert_eq!(repl.current_theme, "dark");
+        assert!(res.contains("dark"));
+
+        let profile_cmd = repl.parse_command("profile developer");
+        let res = repl.execute_command(profile_cmd).unwrap();
+        assert_eq!(repl.current_profile, "developer");
+        assert!(res.contains("developer"));
+    }
+
+    #[test]
+    fn test_a11y_commands() {
+        let mut repl = ShellRepl::new();
+
+        let a11y_cmd = repl.parse_command("a11y high_contrast on");
+        let res = repl.execute_command(a11y_cmd).unwrap();
+        assert_eq!(repl.a11y_features.get("high_contrast"), Some(&true));
+        assert!(res.contains("on"));
     }
 
     #[test]
     fn test_exit() {
         let mut repl = ShellRepl::new();
         let command = ShellCommand::Exit;
-        repl.execute_command(command).expect("Failed to execute exit command");
+        repl.execute_command(command).unwrap();
         assert!(!repl.running);
     }
 
@@ -581,11 +592,11 @@ mod tests {
     fn test_pwd_whoami() {
         let mut repl = ShellRepl::new();
         assert_eq!(
-            repl.execute_command(ShellCommand::Pwd).expect("Failed to execute pwd command"),
+            repl.execute_command(ShellCommand::Pwd).unwrap(),
             "/home/ubuntu"
         );
         assert_eq!(
-            repl.execute_command(ShellCommand::WhoAmI).expect("Failed to execute whoami command"),
+            repl.execute_command(ShellCommand::WhoAmI).unwrap(),
             "ubuntu"
         );
     }
@@ -599,8 +610,8 @@ mod tests {
                 password: Some("admin".to_string())
             })
             .is_ok());
-        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).expect("Failed to execute whoami command"), "root");
-        assert_eq!(repl.execute_command(ShellCommand::Pwd).expect("Failed to execute pwd command"), "/root");
+        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).unwrap(), "root");
+        assert_eq!(repl.execute_command(ShellCommand::Pwd).unwrap(), "/root");
     }
 
     #[test]
@@ -675,7 +686,7 @@ mod tests {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("uname");
         assert!(matches!(cmd, ShellCommand::Uname));
-        let out = repl.execute_command(cmd).expect("Failed to execute uname command");
+        let out = repl.execute_command(cmd).unwrap();
         assert!(out.contains("sigmaos"));
     }
 
@@ -684,7 +695,7 @@ mod tests {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("clear");
         assert!(matches!(cmd, ShellCommand::Clear));
-        let out = repl.execute_command(cmd).expect("Failed to execute clear command");
+        let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "\x1B[2J\x1B[H");
     }
 
@@ -693,7 +704,7 @@ mod tests {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("touch testfile.txt");
         assert!(matches!(cmd, ShellCommand::Touch { .. }));
-        let out = repl.execute_command(cmd).expect("Failed to execute touch command");
+        let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Created empty file: testfile.txt");
     }
 
@@ -702,7 +713,7 @@ mod tests {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("mkdir testdir");
         assert!(matches!(cmd, ShellCommand::Mkdir { .. }));
-        let out = repl.execute_command(cmd).expect("Failed to execute mkdir command");
+        let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Created directory: testdir");
     }
 
@@ -713,40 +724,5 @@ mod tests {
         assert!(matches!(cmd, ShellCommand::Rm { .. }));
         let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Removed file: testfile.txt");
-    }
-
-    #[test]
-    fn test_extended_cli_commands() {
-        let mut repl = ShellRepl::new();
-
-        // 1. Livepatch Command Test
-        let cmd_livepatch = repl.parse_command("livepatch apply sys_read 8122c400 c0300100");
-        assert!(matches!(cmd_livepatch, ShellCommand::Livepatch { .. }));
-        let out_livepatch = repl.execute_command(cmd_livepatch).unwrap();
-        assert!(out_livepatch.contains("Successfully registered"));
-
-        // 2. Cron Command Test
-        let cmd_cron = repl.parse_command("cron list");
-        assert!(matches!(cmd_cron, ShellCommand::Cron { .. }));
-        let out_cron = repl.execute_command(cmd_cron).unwrap();
-        assert!(out_cron.contains("backup_job"));
-
-        // 3. VM Command Test
-        let cmd_vm = repl.parse_command("vm start Intel-VM");
-        assert!(matches!(cmd_vm, ShellCommand::Vm { .. }));
-        let out_vm = repl.execute_command(cmd_vm).unwrap();
-        assert!(out_vm.contains("Starting VM"));
-
-        // 4. Research Command Test
-        let cmd_res = repl.parse_command("research Perplexity");
-        assert!(matches!(cmd_res, ShellCommand::Research { .. }));
-        let out_res = repl.execute_command(cmd_res).unwrap();
-        assert!(out_res.contains("SYNTHESIZED ANSWER"));
-
-        // 5. Camera Command Test
-        let cmd_cam = repl.parse_command("camera Sepia");
-        assert!(matches!(cmd_cam, ShellCommand::Camera { .. }));
-        let out_cam = repl.execute_command(cmd_cam).unwrap();
-        assert!(out_cam.contains("Webcam effect successfully updated"));
     }
 }

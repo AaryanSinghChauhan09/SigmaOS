@@ -208,7 +208,3 @@ mod tests {
         assert!(!sticky.is_sticky(5));
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-

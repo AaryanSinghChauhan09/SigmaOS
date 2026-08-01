@@ -5,39 +5,43 @@ pub mod arch_compat;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
+pub mod universal_adapter;
 pub mod verifier;
+pub mod zero_alloc_resolver;
+pub mod universal_engine;
+pub mod universal_oop_system;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-pub use spec::{
-    AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
-    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
-    NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
-    TxzPackageAdapter, XbpsPackageAdapter,
-    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
-};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
+pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
+pub use spec::{
+    ManagerCapability, PackageCapability, PackageDependency, PackageError as SpecPackageError,
+    PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
+    SimplePackage, SimplePackageManager,
+};
+pub use universal_engine::{
+    ApkPackageAdapter, AptPackageAdapter, CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
+    EbuildPackageAdapter, FlatpakPackageAdapter, NixPackageAdapter,
+    PackageAdapterFactory,
+    PacmanPackageAdapter, SnapPackageAdapter,
+    TxzPackageAdapter, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+    XbpsPackageAdapter,
+};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
+pub use universal_adapter::{
+    AdapterError, DebAdapter, PackageFormatAdapter, PacmanAdapter, RpmAdapter,
+    UniversalPackageManager,
+};
 pub use verifier::CryptoVerifier;
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
-};
-pub use universal_oop_system::{
-    IPackage, IPackageParser, PackageFormat, PackageMetadata,
-    PackageParserFactory, UniversalPackageManager,
-    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError, InstallError, HookError,
-};
 
 /// Package version using SemVer
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,
     pub minor: u64,

@@ -179,7 +179,3 @@ mod tests {
         assert_eq!(&display.get_cells()[..12], b"Braille info");
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-

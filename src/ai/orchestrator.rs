@@ -178,6 +178,13 @@ pub trait TaskQueue {
     fn size(&self) -> usize;
 }
 
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn peek(&self) -> Option<&[u8]>;
+    fn size(&self) -> usize;
+}
+
 pub struct SimpleTaskQueue {
     pub tasks: Vec<([u8; 256], u8)>,
 }

@@ -82,6 +82,12 @@ impl AgentCapability {
     }
 }
 
+impl Default for AgentCapability {
+    fn default() -> Self {
+        Self::none()
+    }
+}
+
 /// Simple AI agent (OOP: Concrete agent class)
 pub struct SimpleAIAgent {
     pub name: String,
@@ -154,23 +160,13 @@ impl SimpleAIAgent {
         self.patterns.push(pattern);
     }
 
-    unsafe fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
+    fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
         for pattern in &self.patterns {
             let pattern_len = pattern.pattern.iter().position(|&b| b == 0).unwrap_or(128);
             let pattern_str = &pattern.pattern[..pattern_len];
 
-            if input.len() >= pattern_len {
-                let mut matches = true;
-                for i in 0..pattern_len {
-                    if input[i] != pattern_str[i] {
-                        matches = false;
-                        break;
-                    }
-                }
-
-                if matches {
-                    return Some(pattern);
-                }
+            if input.len() >= pattern_len && &input[..pattern_len] == pattern_str {
+                return Some(pattern);
             }
         }
         None
