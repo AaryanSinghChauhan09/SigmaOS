@@ -1,5 +1,5 @@
 // SigmaOS Compatibility Module
-pub mod constellation;
+pub mod constellation_mesh;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
@@ -8,7 +8,7 @@ pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
-pub mod freedos;
+pub mod india_professional_tools;
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -17,20 +17,24 @@ pub use legacy_adapters::{
     LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
     GLOBAL_WORKLOAD_OPTIMIZER,
 };
-pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
 
+pub use constellation_mesh::{
+    BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
+    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
+    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid,
+    LegacyCCodexGrid, LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+    StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
+};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat,
     CompatibilityError, CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
-pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
-
-pub use historic_linux::{
-    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
-    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
-    VintagePackageConverter, VintageVirtualizationSandbox,
+pub use endeavour::{
+    EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
+    YayAurHelper,
 };
 
 pub use mint_linux::{
@@ -58,4 +62,9 @@ pub use relay_nexus::{
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+};
+
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
+    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
 };
