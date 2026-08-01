@@ -151,10 +151,10 @@ mod tests {
         // Use a customized key that is NOT 0x42
         let key_data = b"MY_CUSTOM_SECRET_KEY_FOR_TESTS";
         let key = SimpleEncryptionKey::new(101, CipherType::XOR, key_data);
-        service.add_key(Box::new(key)).unwrap();
+        service.add_key(Box::new(key)).expect("Failed to add encryption key");
 
         let plaintext = b"Hello, World!";
-        let ciphertext = service.encrypt(plaintext, 101).unwrap();
+        let ciphertext = service.encrypt(plaintext, 101).expect("Failed to encrypt plaintext");
 
         // Ensure it did not use the hardcoded 0x42 constant
         let bad_ciphertext: Vec<u8> = plaintext.iter().map(|&b| b ^ 0x42).collect();
@@ -168,7 +168,7 @@ mod tests {
         assert!(mismatch, "Should not use the hardcoded 0x42 XOR mask");
 
         // Decrypt and verify
-        let decrypted = service.decrypt(&ciphertext.to_slice(), 101).unwrap();
+        let decrypted = service.decrypt(&ciphertext.to_slice(), 101).expect("Failed to decrypt ciphertext");
         assert_eq!(decrypted.to_slice(), plaintext);
     }
 }

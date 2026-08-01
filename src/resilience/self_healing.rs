@@ -514,8 +514,8 @@ mod tests {
         // Let's add more shards to trigger Degraded Safety Mode below 50%)
         monitor.register_shard("S-FS", 5);
         monitor.register_shard("S-SCHED", 5);
-        monitor.send_heartbeat("S-FS", 1000).unwrap();
-        monitor.send_heartbeat("S-SCHED", 1000).unwrap();
+        monitor.send_heartbeat("S-FS", 1000).expect("Failed to send heartbeat for S-FS");
+        monitor.send_heartbeat("S-SCHED", 1000).expect("Failed to send heartbeat for S-SCHED");
 
         let dead_four = monitor.check_shards_health(1010);
         assert_eq!(dead_four.len(), 4); // 4 dead shards * 15 deduction = 60. Health = 40%

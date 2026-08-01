@@ -155,10 +155,10 @@ impl ShellRepl {
 
         while self.running {
             print!("{}", self.prompt);
-            stdout.flush().unwrap();
+            stdout.flush().expect("Failed to flush stdout");
 
             let mut input = String::new();
-            stdin.lock().read_line(&mut input).unwrap();
+            stdin.lock().read_line(&mut input).expect("Failed to read line from stdin");
 
             let input = input.trim();
             if !input.is_empty() {
@@ -550,7 +550,7 @@ mod tests {
             message: "test".to_string(),
         };
         let result = repl.execute_command(command);
-        assert_eq!(result.unwrap(), "test");
+        assert_eq!(result.expect("Failed to execute echo command"), "test");
     }
 
     #[test]
@@ -560,20 +560,20 @@ mod tests {
             variable: "test".to_string(),
             value: "value".to_string(),
         };
-        repl.execute_command(set_cmd).unwrap();
+        repl.execute_command(set_cmd).expect("Failed to execute set command");
 
         let get_cmd = ShellCommand::Get {
             variable: "test".to_string(),
         };
         let result = repl.execute_command(get_cmd);
-        assert_eq!(result.unwrap(), "value");
+        assert_eq!(result.expect("Failed to execute get command"), "value");
     }
 
     #[test]
     fn test_exit() {
         let mut repl = ShellRepl::new();
         let command = ShellCommand::Exit;
-        repl.execute_command(command).unwrap();
+        repl.execute_command(command).expect("Failed to execute exit command");
         assert!(!repl.running);
     }
 
@@ -581,11 +581,11 @@ mod tests {
     fn test_pwd_whoami() {
         let mut repl = ShellRepl::new();
         assert_eq!(
-            repl.execute_command(ShellCommand::Pwd).unwrap(),
+            repl.execute_command(ShellCommand::Pwd).expect("Failed to execute pwd command"),
             "/home/ubuntu"
         );
         assert_eq!(
-            repl.execute_command(ShellCommand::WhoAmI).unwrap(),
+            repl.execute_command(ShellCommand::WhoAmI).expect("Failed to execute whoami command"),
             "ubuntu"
         );
     }
@@ -599,8 +599,8 @@ mod tests {
                 password: Some("admin".to_string())
             })
             .is_ok());
-        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).unwrap(), "root");
-        assert_eq!(repl.execute_command(ShellCommand::Pwd).unwrap(), "/root");
+        assert_eq!(repl.execute_command(ShellCommand::WhoAmI).expect("Failed to execute whoami command"), "root");
+        assert_eq!(repl.execute_command(ShellCommand::Pwd).expect("Failed to execute pwd command"), "/root");
     }
 
     #[test]
@@ -675,7 +675,7 @@ mod tests {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("uname");
         assert!(matches!(cmd, ShellCommand::Uname));
-        let out = repl.execute_command(cmd).unwrap();
+        let out = repl.execute_command(cmd).expect("Failed to execute uname command");
         assert!(out.contains("sigmaos"));
     }
 
@@ -684,7 +684,7 @@ mod tests {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("clear");
         assert!(matches!(cmd, ShellCommand::Clear));
-        let out = repl.execute_command(cmd).unwrap();
+        let out = repl.execute_command(cmd).expect("Failed to execute clear command");
         assert_eq!(out, "\x1B[2J\x1B[H");
     }
 
@@ -693,7 +693,7 @@ mod tests {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("touch testfile.txt");
         assert!(matches!(cmd, ShellCommand::Touch { .. }));
-        let out = repl.execute_command(cmd).unwrap();
+        let out = repl.execute_command(cmd).expect("Failed to execute touch command");
         assert_eq!(out, "Created empty file: testfile.txt");
     }
 
@@ -702,7 +702,7 @@ mod tests {
         let mut repl = ShellRepl::new();
         let cmd = repl.parse_command("mkdir testdir");
         assert!(matches!(cmd, ShellCommand::Mkdir { .. }));
-        let out = repl.execute_command(cmd).unwrap();
+        let out = repl.execute_command(cmd).expect("Failed to execute mkdir command");
         assert_eq!(out, "Created directory: testdir");
     }
 
