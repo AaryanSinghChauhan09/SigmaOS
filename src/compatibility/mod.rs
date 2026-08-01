@@ -8,6 +8,7 @@ pub mod solid_kernel;
 pub mod wasm_sandbox;
 pub mod absorb_tools;
 pub mod tiny_core;
+pub mod linux_init;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -58,4 +59,11 @@ pub use absorb_tools::{
 
 pub use tiny_core::{
     TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
+};
+
+pub use linux_init::{
+    Runlevel, SystemState, DependencyType, ServiceDependency,
+    InitService, InitSystem, InitError,
+    ProcessSupervisor, SupervisedProcess, RestartPolicy, ProcessState,
+    SystemLogger, LogEntry, LogLevel,
 };
