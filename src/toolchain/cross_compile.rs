@@ -11,7 +11,7 @@ use core::mem;
 pub type ToolchainID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Architecture { X86_64 = 0, ARM64 = 1, RISCV64 = 2, PPC64 = 3 }
 
 #[repr(C)]
@@ -114,7 +114,7 @@ impl CrossCompiler for SimpleCrossCompiler {
     }
 
     fn compile_for_target(&mut self, source: &[u8], target: Architecture) -> Result<Vec<u8>, ToolchainError> {
-        for toolchain_option in &mut self.toolchains {
+        for toolchain_option in self.toolchains.iter_mut() {
             if let Some(ref mut toolchain) = *toolchain_option {
                 if toolchain.target_arch() == target {
                     return toolchain.compile(source);
@@ -125,7 +125,7 @@ impl CrossCompiler for SimpleCrossCompiler {
     }
 
     fn get_toolchain(&self, id: ToolchainID) -> Option<&dyn Toolchain> {
-        for toolchain_option in &self.toolchains {
+        for toolchain_option in self.toolchains.iter() {
             if let Some(ref toolchain) = *toolchain_option {
                 if toolchain.id() == id { return Some(toolchain.as_ref()); }
             }
@@ -181,6 +181,7 @@ pub trait BuildConfiguration {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BuildConfig {
     pub cflags: [u8; 256],
     pub cppflags: [u8; 256],
@@ -274,7 +275,31 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
 
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() { &[] }
+        else { unsafe { core::slice::from_raw_parts(self.data, self.len) } }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() { &mut [] }
+        else { unsafe { core::slice::from_raw_parts_mut(self.data, self.len) } }
+    }
+}
+
 impl<T> Vec<T> {
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        let slice: &[T] = self;
+        slice.iter()
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        let slice: &mut [T] = self;
+        slice.iter_mut()
+    }
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
         unsafe {

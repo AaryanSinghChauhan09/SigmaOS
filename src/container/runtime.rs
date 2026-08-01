@@ -608,8 +608,7 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let layout =
-            std::alloc::Layout::from_size_align(new_capacity * mem::size_of::<T>(), 8).unwrap();
+        let layout = std::alloc::Layout::from_size_align(new_capacity * mem::size_of::<T>(), 8).unwrap();
         let new_data = std::alloc::alloc(layout) as *mut T;
 
         if !new_data.is_null() {
@@ -625,10 +624,10 @@ impl<T> Vec<T> {
 
 pub mod oci {
     extern crate alloc;
-    use super::ContainerError;
     use alloc::string::String;
-    use alloc::string::ToString;
     use alloc::vec::Vec;
+    use alloc::string::ToString;
+    use super::ContainerError;
 
     pub struct NamespaceConfig {
         pub pid: bool,
@@ -762,11 +761,7 @@ pub mod oci {
                         args: Vec::new(),
                         env: Vec::new(),
                         cwd: String::from("/"),
-                        user: OciUser {
-                            uid: 0,
-                            gid: 0,
-                            additional_gids: Vec::new(),
-                        },
+                        user: OciUser { uid: 0, gid: 0, additional_gids: Vec::new() },
                         capabilities: Vec::new(),
                         rlimits: Vec::new(),
                         no_new_privileges: false,
@@ -790,17 +785,9 @@ pub mod oci {
         fn delete(&mut self, container: &mut Container) -> Result<(), ContainerError>;
         fn pause(&mut self, container: &mut Container) -> Result<(), ContainerError>;
         fn resume(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-        fn exec(
-            &mut self,
-            container: &mut Container,
-            args: &[String],
-        ) -> Result<(), ContainerError>;
+        fn exec(&mut self, container: &mut Container, args: &[String]) -> Result<(), ContainerError>;
         fn state(&self, container: &Container) -> Result<ContainerState, ContainerError>;
-        fn update(
-            &mut self,
-            container: &mut Container,
-            resources: &ResourceConfig,
-        ) -> Result<(), ContainerError>;
+        fn update(&mut self, container: &mut Container, resources: &ResourceConfig) -> Result<(), ContainerError>;
     }
 
     pub struct ResourceConfig {
