@@ -54,6 +54,12 @@ impl RecipeManager {
     }
 }
 
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 
 
 

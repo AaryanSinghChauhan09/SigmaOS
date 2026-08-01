@@ -82,12 +82,6 @@ impl AgentCapability {
     }
 }
 
-impl Default for AgentCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Simple AI agent (OOP: Concrete agent class)
 pub struct SimpleAIAgent {
     pub name: String,
@@ -335,12 +329,6 @@ pub struct AIStats {
 pub struct SimpleAIAgentManager {
     pub agents: Vec<Box<dyn AIAgent>>,
     pub stats: AIStats,
-}
-
-impl Default for ManagerCapability {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleAIAgentManager {

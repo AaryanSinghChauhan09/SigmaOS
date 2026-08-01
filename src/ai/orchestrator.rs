@@ -72,8 +72,7 @@ impl AIAgent for SimpleAIAgent {
     }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state
-            .store(AgentState::Busy as usize, Ordering::SeqCst);
+        self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
         for &byte in self.name.as_bytes() {
             result.push(byte);
@@ -122,12 +121,6 @@ impl SimpleAgentOrchestrator {
 
     pub fn set_response_timeout(&mut self, secs: u32) {
         self.response_timeout_secs = secs;
-    }
-}
-
-impl Default for SimpleAgentOrchestrator {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

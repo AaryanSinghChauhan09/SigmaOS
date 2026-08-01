@@ -684,11 +684,6 @@ impl Compositor for SimpleCompositor {
             }
         }
 
-        // Swap back to front buffer automatically if needed
-        if self.double_buffering.load(Ordering::SeqCst) {
-            self.swap_buffers()?;
-        }
-
         Ok(())
     }
 

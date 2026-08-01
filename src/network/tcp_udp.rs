@@ -4,6 +4,7 @@
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -131,35 +132,6 @@ impl BsdSocket for SimpleSocket {
     }
 }
 
-impl BsdSocket for SimpleSocket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => {
-                self.reuse_addr.store(val, Ordering::SeqCst);
-            }
-            SocketOption::TcpNoDelay => {
-                self.tcp_nodelay.store(val, Ordering::SeqCst);
-            }
-            SocketOption::RcvBuf => {
-                self.rcvbuf.store(val, Ordering::SeqCst);
-            }
-            SocketOption::SndBuf => {
-                self.sndbuf.store(val, Ordering::SeqCst);
-            }
-        }
-        Ok(())
-    }
-
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
-            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
-            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
-            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
-        }
-    }
-}
-
 pub trait TCPConnection {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError>;
     fn listen(&mut self) -> Result<(), NetworkError>;
@@ -248,12 +220,6 @@ pub struct RenoCongestionControl {
     pub ssthresh: AtomicUsize,
 }
 
-impl Default for RenoCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl RenoCongestionControl {
     pub fn new() -> Self {
         RenoCongestionControl {
@@ -292,12 +258,6 @@ pub struct BBRCongestionControl {
     pub cwnd: AtomicUsize,
     pub bw_estimate: AtomicUsize,
     pub rtt_min: AtomicUsize,
-}
-
-impl Default for BBRCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl BBRCongestionControl {

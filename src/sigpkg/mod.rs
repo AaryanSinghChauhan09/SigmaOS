@@ -10,28 +10,11 @@ pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
 pub mod verifier;
-pub mod zero_alloc_resolver;
-pub mod universal_engine;
-pub mod universal_oop_system;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
-pub use spec::{
-    ManagerCapability, PackageCapability, PackageDependency, PackageError as SpecPackageError,
-    PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    SimplePackage, SimplePackageManager,
-};
-pub use universal_engine::{
-    ApkPackageAdapter, AptPackageAdapter, CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-    EbuildPackageAdapter, FlatpakPackageAdapter, NixPackageAdapter,
-    PackageAdapterFactory,
-    PacmanPackageAdapter, SnapPackageAdapter,
-    TxzPackageAdapter, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
-    XbpsPackageAdapter,
-};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use universal_adapter::{
@@ -47,6 +30,12 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {

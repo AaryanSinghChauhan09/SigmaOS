@@ -24,6 +24,3 @@ pub use support::{
     SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use complete_filesystems::{
-    FileSystem, FatFileSystem, FatVersion, NtfsFileSystem, ExFatFileSystem, BtrfsFileSystem, HfsPlusFileSystem, ExtFileSystem, ExtVersion,
-};

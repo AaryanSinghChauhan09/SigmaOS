@@ -25,11 +25,11 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
-pub mod qubes_isolation;
+pub mod clipboard;
+pub mod intrusion;
+pub mod password;
 
-pub use audit::{AuditLogger, AuditPolicy};
+pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{

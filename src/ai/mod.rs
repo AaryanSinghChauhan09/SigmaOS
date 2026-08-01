@@ -7,9 +7,9 @@ pub mod orchestrator;
 pub mod sai;
 pub mod system;
 pub mod voice;
-pub mod qwenpaw;
-pub mod perplexity;
-pub mod awesome_ai;
+pub mod lift_engine;
+
+pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use qwenpaw::{PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentCommunicationProtocol};

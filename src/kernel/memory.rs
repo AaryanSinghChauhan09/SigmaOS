@@ -14,10 +14,16 @@ pub struct Zone {
 }
 
 /// Memory block
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
+}
+
+use core::ptr::NonNull;
+
+pub struct Zone {
+    pub present_pages: u64,
 }
 
 pub struct Page {
@@ -27,6 +33,12 @@ pub struct Page {
     pub index: u64,
     pub private: Option<usize>,
     pub zone: Option<*const Zone>,
+}
+
+impl Page {
+    pub fn dec_ref(&self) -> bool {
+        self.count.fetch_sub(1, Ordering::SeqCst) == 1
+    }
 }
 
 pub struct BuddyAllocator {
