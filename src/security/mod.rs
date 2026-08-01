@@ -3,11 +3,8 @@
 
 pub mod capability;
 pub mod pledge;
-pub mod vulnerability;
+pub mod qubes_isolation;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{
-    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
-    PenetrationAssistant,
-};
+pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
