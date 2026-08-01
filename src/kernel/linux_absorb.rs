@@ -762,8 +762,9 @@ impl SovereignEbpfEngine {
                     self.registers[dst_reg] = self.registers[src_reg];
                 }
                 0x35 => { // LOAD from context with offset (packet parsing helper)
-                    if offset >= 0 && (offset as usize) < context.len() {
-                        self.registers[dst_reg] = context[offset as usize] as u64;
+                    let idx = if offset != 0 { offset as usize } else { imm as usize };
+                    if idx < context.len() {
+                        self.registers[dst_reg] = context[idx] as u64;
                     } else {
                         return Err("Context offset out of bounds");
                     }
