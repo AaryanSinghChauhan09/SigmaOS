@@ -155,10 +155,10 @@ impl ShellRepl {
 
         while self.running {
             print!("{}", self.prompt);
-            stdout.flush().unwrap();
+            stdout.flush().expect("Failed to flush stdout");
 
             let mut input = String::new();
-            stdin.lock().read_line(&mut input).unwrap();
+            stdin.lock().read_line(&mut input).expect("Failed to read line from stdin");
 
             let input = input.trim();
             if !input.is_empty() {
