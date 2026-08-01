@@ -1,5 +1,5 @@
 // Typed Error Hierarchy for SigmaOS
-// Definitively structures system-wide errors into five major subsystems.
+// Definitively structures system-wide errors into five major subsystems
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigmaError {
