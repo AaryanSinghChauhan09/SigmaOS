@@ -34,9 +34,7 @@ fi
 # 3. Build ISO using grub-mkrescue if available, otherwise generate simulated bootable ISO container
 if command -v grub-mkrescue >/dev/null 2>&1 && grub-mkrescue -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT" >/dev/null 2>&1; then
     echo "[BUILD-ISO] Success! Bootable ISO created at $BUILD_DIR/sigmaos.iso"
-elif command -v xorriso >/dev/null 2>&1; then
-    echo "[BUILD-ISO] Generating SigmaOS ISO via xorriso..."
-    xorriso -as mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT"
+elif command -v xorriso >/dev/null 2>&1 && xorriso -as mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT" >/dev/null 2>&1; then
     echo "[BUILD-ISO] Success! ISO created at $BUILD_DIR/sigmaos.iso"
 else
     echo "[BUILD-ISO] Notice: grub-mkrescue / xorriso not installed on this host."
