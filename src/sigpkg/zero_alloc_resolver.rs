@@ -54,10 +54,8 @@ impl PackageDependencyResolver {
         idx: &mut usize,
     ) -> bool {
         // Cycle detected
-        for item in visited.iter().take(*idx) {
-            if *item == name {
-                return false;
-            }
+        if visited[..*idx].contains(&name) {
+            return false;
         }
 
         // Add to visited
@@ -81,12 +79,7 @@ impl PackageDependencyResolver {
     }
 
     fn find_recipe(&self, name: &'static str) -> Option<&PackageRecipe> {
-        for r in self.registry.iter().flatten() {
-            if r.name == name {
-                return Some(r);
-            }
-        }
-        None
+        self.registry.iter().flatten().find(|r| r.name == name)
     }
 }
 
