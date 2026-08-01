@@ -1,21 +1,18 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Accessibility Keyboard for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 836
 /// Implements on-screen keyboard and accessibility input
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use crate::klib::Vec;
 
 pub type KeyID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyType { Character = 0, Modifier = 1, Function = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyboardError { Success = 0, NotFound = 1 }
 
 pub trait VirtualKey {
@@ -23,6 +20,7 @@ pub trait VirtualKey {
     fn label(&self) -> &[u8];
     fn key_type(&self) -> KeyType;
     fn is_pressed(&self) -> bool;
+    fn set_pressed(&self, pressed: bool);
 }
 
 #[repr(C)]
@@ -55,15 +53,24 @@ impl VirtualKey for SimpleVirtualKey {
         let len = self.label.iter().position(|&b| b == 0).unwrap_or(8);
         &self.label[..len]
     }
-    fn key_type(&self) -> KeyType { unsafe { core::mem::transmute(self.key_type.load(Ordering::SeqCst)) } }
+    fn key_type(&self) -> KeyType {
+        match self.key_type.load(Ordering::SeqCst) {
+            0 => KeyType::Character,
+            1 => KeyType::Modifier,
+            _ => KeyType::Function,
+        }
+    }
     fn is_pressed(&self) -> bool { self.pressed.load(Ordering::SeqCst) == 1 }
+    fn set_pressed(&self, pressed: bool) {
+        self.pressed.store(if pressed { 1 } else { 0 }, Ordering::SeqCst);
+    }
 }
 
 pub trait OnScreenKeyboard {
     fn press_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError>;
     fn release_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError>;
     fn get_key(&self, id: KeyID) -> Option<&dyn VirtualKey>;
-    def set_layout(&mut self, layout: &[u8]);
+    fn set_layout(&mut self, layout: &[u8]);
 }
 
 #[repr(C)]
@@ -93,7 +100,7 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
         for key_option in &mut self.keys {
             if let Some(ref mut key) = *key_option {
                 if key.id() == key_id {
-                    key.pressed.store(1, Ordering::SeqCst);
+                    key.set_pressed(true);
                     return Ok(());
                 }
             }
@@ -105,7 +112,7 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
         for key_option in &mut self.keys {
             if let Some(ref mut key) = *key_option {
                 if key.id() == key_id {
-                    key.pressed.store(0, Ordering::SeqCst);
+                    key.set_pressed(false);
                     return Ok(());
                 }
             }
@@ -170,50 +177,34 @@ impl StickyKeys for SimpleStickyKeys {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+    #[test]
+    fn test_virtual_keys() {
+        let mut keyboard = SimpleOnScreenKeyboard::new();
+        let key = SimpleVirtualKey::new(10, b"Ctrl", KeyType::Modifier);
+        keyboard.keys.push(Some(Box::new(key)));
+
+        assert!(keyboard.get_key(10).is_some());
+        assert_eq!(keyboard.get_key(10).unwrap().key_type(), KeyType::Modifier);
+        assert!(!keyboard.get_key(10).unwrap().is_pressed());
+
+        keyboard.press_key(10).unwrap();
+        assert!(keyboard.get_key(10).unwrap().is_pressed());
+
+        keyboard.release_key(10).unwrap();
+        assert!(!keyboard.get_key(10).unwrap().is_pressed());
     }
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    fn contains(&self, item: KeyID) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                let stored = core::ptr::read(self.data.add(i));
-                if stored == item {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    #[test]
+    fn test_sticky_keys() {
+        let mut sticky = SimpleStickyKeys::new();
+        assert!(!sticky.is_sticky(5));
+        sticky.enable_sticky(5);
+        assert!(sticky.is_sticky(5));
+        sticky.disable_sticky(5);
+        assert!(!sticky.is_sticky(5));
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
