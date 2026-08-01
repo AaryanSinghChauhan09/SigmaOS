@@ -98,7 +98,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        _context: &HashMap<String, String>,
+        context: &HashMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;
@@ -190,7 +190,9 @@ impl SelfHealingModule {
     }
 
     pub fn rollback_to_snapshot(&mut self, id: &str) -> Result<(), ResilienceError> {
-        let snapshot = self.get_snapshot(id).ok_or(ResilienceError::SnapshotNotFound)?;
+        let snapshot = self
+            .get_snapshot(id)
+            .ok_or(ResilienceError::SnapshotNotFound)?;
         println!("Rolling back to snapshot: {}", snapshot.description);
 
         // Simulate rollback
@@ -514,8 +516,8 @@ mod tests {
         // Let's add more shards to trigger Degraded Safety Mode below 50%)
         monitor.register_shard("S-FS", 5);
         monitor.register_shard("S-SCHED", 5);
-        monitor.send_heartbeat("S-FS", 1000).expect("Failed to send heartbeat for S-FS");
-        monitor.send_heartbeat("S-SCHED", 1000).expect("Failed to send heartbeat for S-SCHED");
+        monitor.send_heartbeat("S-FS", 1000).unwrap();
+        monitor.send_heartbeat("S-SCHED", 1000).unwrap();
 
         let dead_four = monitor.check_shards_health(1010);
         assert_eq!(dead_four.len(), 4); // 4 dead shards * 15 deduction = 60. Health = 40%
