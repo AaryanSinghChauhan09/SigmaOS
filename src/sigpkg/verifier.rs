@@ -3,9 +3,26 @@
 
 use crate::sigpkg::Package;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum TrustLevel {
+    Unknown = 0,
+    Never = 1,
+    Marginal = 2,
+    Full = 3,
+    Ultimate = 4,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GpgTrustChain {
+    pub key_id: String,
+    pub trust_level: TrustLevel,
+    pub parent_key_id: Option<String>,
+}
+
 /// Cryptographic verifier for package signatures
 pub struct CryptoVerifier {
     trusted_keys: Vec<String>,
+    trust_chain: Vec<GpgTrustChain>,
 }
 
 impl CryptoVerifier {
@@ -13,12 +30,51 @@ impl CryptoVerifier {
     pub fn new() -> Self {
         Self {
             trusted_keys: Vec::new(),
+            trust_chain: Vec::new(),
         }
     }
 
-    /// Add trusted key
+    /// Add trusted key with associated GPG trust level and hierarchy parent
     pub fn add_trusted_key(&mut self, key: String) {
-        self.trusted_keys.push(key);
+        self.trusted_keys.push(key.clone());
+        self.trust_chain.push(GpgTrustChain {
+            key_id: key,
+            trust_level: TrustLevel::Full,
+            parent_key_id: None,
+        });
+    }
+
+    /// Register a detailed GPG trust chain record for key verification hierarchies
+    pub fn add_trust_chain_record(&mut self, record: GpgTrustChain) {
+        if !self.trusted_keys.contains(&record.key_id) {
+            self.trusted_keys.push(record.key_id.clone());
+        }
+        self.trust_chain.push(record);
+    }
+
+    /// Verify key trust recursively back to an ultimately trusted root
+    pub fn verify_key_trust(&self, key_id: &str) -> TrustLevel {
+        let mut current_key = key_id;
+        let mut max_trust = TrustLevel::Unknown;
+
+        for _ in 0..10 { // Prevent infinite recursion cycles
+            if let Some(record) = self.trust_chain.iter().find(|r| r.key_id == current_key) {
+                if record.trust_level > max_trust {
+                    max_trust = record.trust_level;
+                }
+                if record.trust_level == TrustLevel::Ultimate {
+                    return TrustLevel::Ultimate;
+                }
+                if let Some(ref parent) = record.parent_key_id {
+                    current_key = parent;
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        max_trust
     }
 
     /// Verify package signature
@@ -114,13 +170,13 @@ mod tests {
         let mut verifier = CryptoVerifier::new();
         verifier.add_trusted_key("test_key".to_string());
 
-        let package = Package {
-            name: "test".to_string(),
-            version: crate::sigpkg::Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: Vec::new(),
-            checksum: "test_checksum".to_string(),
-        };
+        let package = Package::new(
+            "test".to_string(),
+            crate::sigpkg::Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            "test_checksum".to_string(),
+        );
 
         let data = b"test data";
         let signature = b"test signature";
@@ -128,5 +184,30 @@ mod tests {
         // This will fail due to hash mismatch, but tests the flow
         let result = verifier.verify(&package, signature, data);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_gpg_trust_hierarchy_verification() {
+        let mut verifier = CryptoVerifier::new();
+
+        // Root GPG Key with Ultimate trust level
+        verifier.add_trust_chain_record(GpgTrustChain {
+            key_id: "root_key_01".to_string(),
+            trust_level: TrustLevel::Ultimate,
+            parent_key_id: None,
+        });
+
+        // Intermediate signing key with Marginal trust, signed by Root key
+        verifier.add_trust_chain_record(GpgTrustChain {
+            key_id: "intermediate_01".to_string(),
+            trust_level: TrustLevel::Marginal,
+            parent_key_id: Some("root_key_01".to_string()),
+        });
+
+        // Test trust path tracking: intermediate_01 should trust recursively to Ultimate trust level
+        assert_eq!(verifier.verify_key_trust("intermediate_01"), TrustLevel::Ultimate);
+
+        // Key with Unknown trust level
+        assert_eq!(verifier.verify_key_trust("random_unknown_key"), TrustLevel::Unknown);
     }
 }

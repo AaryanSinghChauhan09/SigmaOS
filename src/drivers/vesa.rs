@@ -1,8 +1,8 @@
 // SigmaOS VESA Framebuffer Driver
 // Hardware abstraction for VESA BIOS extensions + PeripheralDevice OOP integration
 
-use crate::security::CapabilityToken;
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use crate::security::CapabilityToken;
 
 /// VESA mode info
 #[derive(Debug, Clone)]
@@ -123,37 +123,53 @@ impl VesaDriver {
         if x >= self.mode_info.width || y >= self.mode_info.height {
             return Err(VesaError::OutOfBounds);
         }
-        let offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
-        let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
-        if fb_addr.is_null() {
-            return Ok(()); // No framebuffer mapped (simulation mode)
+        #[cfg(target_os = "none")]
+        {
+            let offset = (y * self.mode_info.pitch + x * (self.mode_info.bpp / 8)) as usize;
+            let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
+            if !fb_addr.is_null() {
+                // Safety: Only valid when running on bare-metal with an MMIO framebuffer.
+                unsafe {
+                    fb_addr.add(offset / 4).write_volatile(color);
+                }
+            }
         }
-        // Safety: Only valid when running on bare-metal with an MMIO framebuffer.
-        unsafe {
-            fb_addr.add(offset / 4).write_volatile(color);
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = (y, x, color);
         }
         Ok(())
     }
 
     /// Fill the entire screen with a 32-bit ARGB color.
     pub fn fill_screen(&self, color: u32) -> Result<(), VesaError> {
-        let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
-        let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
-        if fb_addr.is_null() {
-            return Ok(());
-        }
-        unsafe {
-            for i in 0..total_pixels {
-                fb_addr.add(i).write_volatile(color);
+        #[cfg(target_os = "none")]
+        {
+            let total_pixels = (self.mode_info.width * self.mode_info.height) as usize;
+            let fb_addr = self.mode_info.framebuffer_addr as *mut u32;
+            if !fb_addr.is_null() {
+                unsafe {
+                    for i in 0..total_pixels {
+                        fb_addr.add(i).write_volatile(color);
+                    }
+                }
             }
+        }
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = color;
         }
         Ok(())
     }
 }
 
 impl PeripheralDevice for VesaDriver {
-    fn name(&self) -> &'static str { "VESA Framebuffer" }
-    fn generation(&self) -> DeviceGeneration { DeviceGeneration::Legacy }
+    fn name(&self) -> &'static str {
+        "VESA Framebuffer"
+    }
+    fn generation(&self) -> DeviceGeneration {
+        DeviceGeneration::Legacy
+    }
 
     fn initialize(&mut self) -> Result<(), &'static str> {
         self.initialize().map_err(|_| "VESA: Initialization failed")
@@ -162,9 +178,12 @@ impl PeripheralDevice for VesaDriver {
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
         // Framebuffers are write-only; return mode info bytes instead
         let info = [
-            (self.mode_info.width >> 8) as u8, (self.mode_info.width & 0xFF) as u8,
-            (self.mode_info.height >> 8) as u8, (self.mode_info.height & 0xFF) as u8,
-            self.mode_info.bpp as u8, self.current_mode as u8,
+            (self.mode_info.width >> 8) as u8,
+            (self.mode_info.width & 0xFF) as u8,
+            (self.mode_info.height >> 8) as u8,
+            (self.mode_info.height & 0xFF) as u8,
+            self.mode_info.bpp as u8,
+            self.current_mode as u8,
         ];
         let len = buffer.len().min(info.len());
         buffer[..len].copy_from_slice(&info[..len]);
@@ -176,9 +195,10 @@ impl PeripheralDevice for VesaDriver {
         let mut written = 0;
         let mut idx = 0;
         while idx + 7 < data.len() {
-            let x = u32::from_be_bytes([0, 0, data[idx], data[idx+1]]);
-            let y = u32::from_be_bytes([0, 0, data[idx+2], data[idx+3]]);
-            let color = u32::from_be_bytes([data[idx+4], data[idx+5], data[idx+6], data[idx+7]]);
+            let x = u32::from_be_bytes([0, 0, data[idx], data[idx + 1]]);
+            let y = u32::from_be_bytes([0, 0, data[idx + 2], data[idx + 3]]);
+            let color =
+                u32::from_be_bytes([data[idx + 4], data[idx + 5], data[idx + 6], data[idx + 7]]);
             self.write_pixel_raw(x, y, color).ok();
             idx += 8;
             written += 8;
@@ -186,7 +206,9 @@ impl PeripheralDevice for VesaDriver {
         Ok(written)
     }
 
-    fn set_power_state(&mut self, _state: PowerState) -> Result<(), &'static str> { Ok(()) }
+    fn set_power_state(&mut self, _state: PowerState) -> Result<(), &'static str> {
+        Ok(())
+    }
 
     fn shutdown(&mut self) -> Result<(), &'static str> {
         self.fill_screen(0x00000000).ok();
@@ -195,7 +217,9 @@ impl PeripheralDevice for VesaDriver {
 }
 
 impl Default for VesaDriver {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// VESA errors
