@@ -54,11 +54,9 @@ impl RecipeManager {
     }
 }
 
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+
+
+
 
 /// Declarative package recipes.
 pub struct PackageRecipe {

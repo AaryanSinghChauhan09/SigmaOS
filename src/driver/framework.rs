@@ -15,13 +15,9 @@ pub enum DriverType {
     Storage = 3,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum DriverState {
-    Unloaded = 0,
-    Loaded = 1,
-    Active = 2,
-}
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverState { Unloaded = 0, Loaded = 1, Active = 2 }
 
 pub trait Driver {
     fn id(&self) -> DriverID;
@@ -216,16 +212,11 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
+        if self.len == 0 {
+            &[] as &[T]
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
@@ -234,8 +225,8 @@ impl<T> core::ops::Deref for Vec<T> {
 
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
+        if self.len == 0 {
+            &mut [] as &mut [T]
         } else {
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
@@ -245,7 +236,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
-
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::Deref;
         self.deref().iter()
@@ -255,9 +245,10 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
-
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
     }
 }
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

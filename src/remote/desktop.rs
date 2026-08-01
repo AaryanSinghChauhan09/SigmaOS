@@ -9,14 +9,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SessionID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum SessionState {
-    Disconnected = 0,
-    Connecting = 1,
-    Connected = 2,
-    Error = 3,
-}
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SessionState { Disconnected = 0, Connecting = 1, Connected = 2, Error = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -63,12 +58,8 @@ impl RemoteSession for SimpleRemoteSession {
         let len = self.host.iter().position(|&b| b == 0).unwrap_or(128);
         &self.host[..len]
     }
-    fn state(&self) -> SessionState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
-    }
-    fn set_state(&self, state: SessionState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
+    fn state(&self) -> SessionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn set_state(&self, state: SessionState) { self.state.store(state as usize, Ordering::SeqCst); }
 }
 
 pub trait RemoteDesktop {
@@ -85,6 +76,14 @@ pub struct SimpleRemoteDesktop {
 }
 
 impl SimpleRemoteDesktop {
+    pub fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
+        for session_option in &self.sessions {
+            if let Some(ref session) = *session_option {
+                if session.id() == id { return Some(session.as_ref()); }
+            }
+        }
+        None
+    }
     pub fn new() -> Self {
         SimpleRemoteDesktop {
             sessions: Vec::new(),
@@ -123,34 +122,8 @@ impl RemoteDesktop for SimpleRemoteDesktop {
         }
         Err(RemoteError::NotFound)
     }
+    
 
-    fn receive_screen(&self, id: SessionID) -> Result<Vec<u8>, RemoteError> {
-        for s in self.sessions.iter() {
-            if let Some(ref session) = s {
-                if session.id() == id {
-                    let mut screen = Vec::new();
-                    for _ in 0..1920 * 1080 * 4 {
-                        screen.push(0u8);
-                    }
-                    return Ok(screen);
-                }
-            }
-        }
-        Err(RemoteError::NotFound)
-    }
-}
-
-impl SimpleRemoteDesktop {
-    pub fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
-        for session_option in &self.sessions {
-            if let Some(ref session) = *session_option {
-                if session.id() == id {
-                    return Some(session.as_ref());
-                }
-            }
-        }
-        None
-    }
 }
 
 pub trait ScreenSharing {
@@ -233,16 +206,11 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
+        if self.len == 0 {
+            &[] as &[T]
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
@@ -251,8 +219,8 @@ impl<T> core::ops::Deref for Vec<T> {
 
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
+        if self.len == 0 {
+            &mut [] as &mut [T]
         } else {
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
@@ -262,7 +230,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
-
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::Deref;
         self.deref().iter()
@@ -272,30 +239,14 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
-
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
     }
 }
 
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
 pub struct InputAuthGate;
-impl InputAuthGate {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
 pub struct PqcVideoCipher;
-impl PqcVideoCipher {
-    pub fn new() -> Self {
-        Self
-    }
-}
-
 pub struct SigmaRendezvous;
-impl SigmaRendezvous {
-    pub fn new() -> Self {
-        Self
-    }
-}

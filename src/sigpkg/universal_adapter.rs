@@ -76,14 +76,14 @@ impl PackageFormatAdapter for DebAdapter {
         let mut dependencies = Vec::new();
 
         for line in content.lines() {
-            if let Some(rest) = line.strip_prefix("Package: ") {
-                name = rest.to_string();
-            } else if let Some(rest) = line.strip_prefix("Version: ") {
-                version_str = rest.to_string();
-            } else if let Some(rest) = line.strip_prefix("Description: ") {
-                description = rest.to_string();
-            } else if let Some(rest) = line.strip_prefix("Depends: ") {
-                let deps_str = rest;
+            if line.starts_with("Package: ") {
+                name = line[9..].to_string();
+            } else if line.starts_with("Version: ") {
+                version_str = line[9..].to_string();
+            } else if line.starts_with("Description: ") {
+                description = line[13..].to_string();
+            } else if line.starts_with("Depends: ") {
+                let deps_str = &line[9..];
                 for dep in deps_str.split(',') {
                     let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
                     if !dep_name.is_empty() {
@@ -134,8 +134,8 @@ impl PackageFormatAdapter for DebAdapter {
         // Basic validation: check if it looks like a debian control file
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-
-        Ok(content.contains("Package:"))
+        
+        Ok(content.contains("Package:") && content.contains("Version:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -168,11 +168,8 @@ impl RpmAdapter {
             user_hooks: Vec::new(),
         }
     }
-
-    pub fn add_hook<F>(&mut self, hook: F)
-    where
-        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
-    {
+    
+    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
         self.user_hooks.push(Box::new(hook));
     }
 }
@@ -249,8 +246,8 @@ impl PackageFormatAdapter for RpmAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-
-        Ok(content.contains("Name:") || content.contains("Summary:"))
+        
+        Ok(content.contains("Name:") && content.contains("Version:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -353,8 +350,8 @@ impl PackageFormatAdapter for PacmanAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-
-        Ok(content.contains("pkgname") || content.contains("pkgver"))
+        
+        Ok(content.contains("pkgname") && content.contains("pkgver"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {

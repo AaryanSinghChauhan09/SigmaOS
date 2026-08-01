@@ -25,13 +25,11 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod clipboard;
-pub mod intrusion;
-pub mod password;
+pub mod sigma_pledge;
+pub mod sigma_unveil;
+pub mod qubes_isolation;
 
-pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
-pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
-pub use audit::{AuditLogger, AuditPolicy, LogFormat};
+pub use audit::{AuditLogger, AuditPolicy};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use capability_enforcer::{CapabilityToken as RuntimeCapabilityToken, SecurityEnforcer};
 pub use capability_token::{
@@ -51,12 +49,9 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
 pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
-    SecurityRule, SelinuxPermission,
+    AppArmorManager, AppArmorProfile, ObjectType, SelinuxPermission, SecurityContext as SelinuxSecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule,
 };
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
@@ -78,8 +73,7 @@ pub use integrity::{
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
-    SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{
@@ -95,12 +89,6 @@ pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
 };
-// Parrot Parity and Defensive Audit
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
-pub use parrot_parity::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-};
+
+
+pub use qubes_isolation::{DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError};
