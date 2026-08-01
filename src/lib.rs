@@ -61,6 +61,17 @@ pub use compatibility::{
     SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
     TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
     YayAurHelper, ZeroTrustConstellation,
+    StarlingCompositor, StarlingWidgetTree, StarlingX11Server, StarlingTilingEngine,
+    CosmicDesktopEngine, PopShellTiling, System76Scheduler, System76PowerSwitcher,
+    BudgieAppletManager, BudgieShuffler, BudgieLayoutSwitcher,
+    RhinoPkgUnified, PacstallAur, UnicornDesktopShell,
+    MokshaDesktopEngine, BodhiProfileSelector, MokshaGadgetManager,
+    PantheonGalaWindowManager, GraniteHigLibrary, ElementaryAppCenter,
+    UbuntuDockManager, SnapcraftRuntime, UbuntuProEsm,
+    MaasProvisioner, JujuOrchestrator, MultipassVmlight,
+    ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
+    DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
+    LizardInstaller, CoasAdminSuite,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,

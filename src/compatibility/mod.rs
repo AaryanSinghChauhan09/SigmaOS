@@ -5,6 +5,7 @@ pub mod endeavour;
 pub mod legacy_adapters;
 pub mod linux_security;
 pub mod standards;
+pub mod overtake;
 
 pub use constellation_mesh::{
     BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
@@ -33,4 +34,18 @@ pub use standards::{
 pub use linux_security::{
     AppArmorProfile, LinuxCapability, NamespaceManager, NamespaceType, SecurityContext,
     SecurityModuleManager, SecurityPolicy, UserNamespace,
+};
+
+pub use overtake::{
+    StarlingCompositor, StarlingWidgetTree, StarlingX11Server, StarlingTilingEngine,
+    CosmicDesktopEngine, PopShellTiling, System76Scheduler, System76PowerSwitcher,
+    BudgieAppletManager, BudgieShuffler, BudgieLayoutSwitcher,
+    RhinoPkgUnified, PacstallAur, UnicornDesktopShell,
+    MokshaDesktopEngine, BodhiProfileSelector, MokshaGadgetManager,
+    PantheonGalaWindowManager, GraniteHigLibrary, ElementaryAppCenter,
+    UbuntuDockManager, SnapcraftRuntime, UbuntuProEsm,
+    MaasProvisioner, JujuOrchestrator, MultipassVmlight,
+    ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
+    DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
+    LizardInstaller, CoasAdminSuite,
 };
