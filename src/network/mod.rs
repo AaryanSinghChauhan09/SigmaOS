@@ -1,7 +1,6 @@
 // SigmaOS Network Stack Module
 pub mod stack;
 pub mod tcp;
-pub mod tcp_udp;
 pub mod ring_buffer_stack;
 
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};

@@ -1,4 +1,4 @@
-# 🚀 SigmaOS Future Development & Leapfrog Roadmap
+# 🚀 SigmaOS 3-Year Strategic Vision Roadmap
 
 This document establishes the strategic, long-term engineering plan for the future expansion and leapfrogging capabilities of **SigmaOS's core subsystems**, focusing on package distribution, system observability, compatibility standards, and high-performance real-time scheduling.
 

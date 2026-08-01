@@ -18,20 +18,14 @@ pub struct KernelPersona {
 
 impl MetaKernel {
     pub fn new() -> Self {
-        Self {
-            personas: Vec::new(),
-        }
+        Self { personas: Vec::new() }
     }
 
     pub fn register_persona(&mut self, persona: KernelPersona) {
         self.personas.push(persona);
     }
 
-    pub fn execute_workload(
-        &self,
-        persona_name: &str,
-        task_cost: usize,
-    ) -> Result<usize, &'static str> {
+    pub fn execute_workload(&self, persona_name: &str, task_cost: usize) -> Result<usize, &'static str> {
         for p in self.personas.iter() {
             if p.name == persona_name {
                 // Return processed cycle cost simulated under correct persona orchestration
@@ -58,45 +52,27 @@ pub struct SchedulerPlugin {
     pub name: &'static str,
 }
 impl KernelPlugin for SchedulerPlugin {
-    fn name(&self) -> &'static str {
-        self.name
-    }
-    fn plugin_type(&self) -> &'static str {
-        "Scheduler"
-    }
-    fn execute(&self) -> Result<(), &'static str> {
-        Ok(())
-    }
+    fn name(&self) -> &'static str { self.name }
+    fn plugin_type(&self) -> &'static str { "Scheduler" }
+    fn execute(&self) -> Result<(), &'static str> { Ok(()) }
 }
 
 pub struct MemoryPlugin {
     pub name: &'static str,
 }
 impl KernelPlugin for MemoryPlugin {
-    fn name(&self) -> &'static str {
-        self.name
-    }
-    fn plugin_type(&self) -> &'static str {
-        "Memory"
-    }
-    fn execute(&self) -> Result<(), &'static str> {
-        Ok(())
-    }
+    fn name(&self) -> &'static str { self.name }
+    fn plugin_type(&self) -> &'static str { "Memory" }
+    fn execute(&self) -> Result<(), &'static str> { Ok(()) }
 }
 
 pub struct SecurityPlugin {
     pub name: &'static str,
 }
 impl KernelPlugin for SecurityPlugin {
-    fn name(&self) -> &'static str {
-        self.name
-    }
-    fn plugin_type(&self) -> &'static str {
-        "Security"
-    }
-    fn execute(&self) -> Result<(), &'static str> {
-        Ok(())
-    }
+    fn name(&self) -> &'static str { self.name }
+    fn plugin_type(&self) -> &'static str { "Security" }
+    fn execute(&self) -> Result<(), &'static str> { Ok(()) }
 }
 
 pub struct KernelPluginManager {
@@ -105,9 +81,7 @@ pub struct KernelPluginManager {
 
 impl KernelPluginManager {
     pub fn new() -> Self {
-        Self {
-            plugins: Vec::new(),
-        }
+        Self { plugins: Vec::new() }
     }
 
     pub fn load_plugin(&mut self, plugin: Box<dyn KernelPlugin>) {
@@ -138,36 +112,24 @@ pub struct FloppyMicroDriver {
     pub io_base: u16,
 }
 impl MicroDriver for FloppyMicroDriver {
-    fn hardware_id(&self) -> u32 {
-        0x82077AA
-    }
-    fn read_register(&self, _offset: u16) -> u8 {
-        0xE5
-    } // Floppy default status
+    fn hardware_id(&self) -> u32 { 0x82077AA }
+    fn read_register(&self, _offset: u16) -> u8 { 0xE5 } // Floppy default status
 }
 
 pub struct ISASoundMicroDriver {
     pub io_base: u16,
 }
 impl MicroDriver for ISASoundMicroDriver {
-    fn hardware_id(&self) -> u32 {
-        0x1600
-    }
-    fn read_register(&self, _offset: u16) -> u8 {
-        0xAA
-    } // SoundBlaster response
+    fn hardware_id(&self) -> u32 { 0x1600 }
+    fn read_register(&self, _offset: u16) -> u8 { 0xAA } // SoundBlaster response
 }
 
 pub struct AGPMicroDriver {
     pub io_base: u16,
 }
 impl MicroDriver for AGPMicroDriver {
-    fn hardware_id(&self) -> u32 {
-        0x4000
-    }
-    fn read_register(&self, _offset: u16) -> u8 {
-        0xFF
-    } // Graphics active
+    fn hardware_id(&self) -> u32 { 0x4000 }
+    fn read_register(&self, _offset: u16) -> u8 { 0xFF } // Graphics active
 }
 
 /// 4. Cross-Kernel ABI Layer 2.0
@@ -182,11 +144,7 @@ impl ABIManager {
     }
 
     /// Emulates stack alignment and instruction mapping differences for older ABIs
-    pub fn translate_stack_frame(
-        &self,
-        target_abi: &str,
-        raw_stack: &mut [u64],
-    ) -> Result<(), &'static str> {
+    pub fn translate_stack_frame(&self, target_abi: &str, raw_stack: &mut [u64]) -> Result<(), &'static str> {
         if target_abi == "x86LegacyABI" && self.current_abi == "x86_64" {
             // Emulate 32-bit stack translation (collapsing 64-bit bounds)
             for val in raw_stack.iter_mut() {
@@ -215,22 +173,14 @@ impl NetPod {
     }
 
     /// Wraps classic protocol packets inside standard contemporary UDP/IP tunnels
-    pub fn encapsulate_legacy_frame(
-        &self,
-        raw_frame: &[u8],
-        bridged_out: &mut [u8],
-    ) -> Result<usize, &'static str> {
+    pub fn encapsulate_legacy_frame(&self, raw_frame: &[u8], bridged_out: &mut [u8]) -> Result<usize, &'static str> {
         if bridged_out.len() < raw_frame.len() + 4 {
             return Err("Bridge packet size constraints exceeded");
         }
         // Inject IPX/NetBEUI signature header
         bridged_out[0] = 0xAA;
         bridged_out[1] = 0xBB;
-        bridged_out[2] = if self.protocol_type == "IPX/SPX" {
-            1
-        } else {
-            2
-        };
+        bridged_out[2] = if self.protocol_type == "IPX/SPX" { 1 } else { 2 };
         bridged_out[3] = raw_frame.len() as u8;
 
         for i in 0..raw_frame.len() {
@@ -438,16 +388,8 @@ mod tests {
     #[test]
     fn test_metakernel_persona_orchestration() {
         let mut meta = MetaKernel::new();
-        meta.register_persona(KernelPersona {
-            name: "linux_2_6",
-            api_version: "2.6.32",
-            active_processes: 5,
-        });
-        meta.register_persona(KernelPersona {
-            name: "linux_6_x",
-            api_version: "6.1.0",
-            active_processes: 10,
-        });
+        meta.register_persona(KernelPersona { name: "linux_2_6", api_version: "2.6.32", active_processes: 5 });
+        meta.register_persona(KernelPersona { name: "linux_6_x", api_version: "6.1.0", active_processes: 10 });
 
         assert_eq!(meta.active_personas_count(), 2);
         assert_eq!(meta.execute_workload("linux_2_6", 50).unwrap(), 100);
@@ -478,9 +420,7 @@ mod tests {
     fn test_abi_and_networking_pods() {
         let abi = ABIManager::new("x86_64");
         let mut stack = [10, 20, 30];
-        assert!(abi
-            .translate_stack_frame("x86LegacyABI", &mut stack)
-            .is_ok());
+        assert!(abi.translate_stack_frame("x86LegacyABI", &mut stack).is_ok());
         assert_eq!(stack[0], 10);
 
         let pod = NetPod::new("IPX/SPX");
@@ -499,46 +439,5 @@ mod tests {
 
         let sched = LegacyScheduler::new("CFS");
         assert_eq!(sched.calculate_priority_heuristic(0, 100), 20);
-    }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
     }
 }

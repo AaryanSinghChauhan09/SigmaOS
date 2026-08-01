@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
@@ -11,7 +8,13 @@ pub type DeviceID = usize;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceClass { Block = 0, Character = 1, Network = 2, Input = 3, Output = 4 }
+pub enum DeviceClass {
+    Block = 0,
+    Character = 1,
+    Network = 2,
+    Input = 3,
+    Output = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -61,7 +64,7 @@ impl Device for SimpleDevice {
         &self.name[..len]
     }
     fn device_class(&self) -> DeviceClass {
-        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst) as u32) }
+        unsafe { core::mem::transmute(self.device_class.load(Ordering::SeqCst)) }
     }
 
     fn initialize(&mut self) -> Result<(), DeviceError> {
@@ -239,21 +242,21 @@ impl DeviceHotplug for SimpleDeviceHotplug {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -262,6 +265,23 @@ impl<T> Vec<T> {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
         }
     }
     unsafe fn grow(&mut self) {
@@ -323,4 +343,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}

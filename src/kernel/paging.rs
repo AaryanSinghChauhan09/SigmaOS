@@ -22,12 +22,8 @@ impl PageTableFlags {
 pub struct PageTableEntry(u64);
 
 impl PageTableEntry {
-    pub fn is_unused(&self) -> bool {
-        self.0 == 0
-    }
-    pub fn set_unused(&mut self) {
-        self.0 = 0;
-    }
+    pub fn is_unused(&self) -> bool { self.0 == 0 }
+    pub fn set_unused(&mut self) { self.0 = 0; }
 
     pub fn flags(&self) -> PageTableFlags {
         PageTableFlags(self.0 & 0xFFF0_0000_0000_0FFF)
@@ -115,11 +111,7 @@ impl VirtualMemoryManagerV2 {
         let pml4_entry = &mut pml4.entries[pml4_index];
         let pdpt_addr = if pml4_entry.is_unused() {
             let mut table_ptr = allocator().ok_or("Out of memory for PDPT")?;
-            table_ptr
-                .as_mut()
-                .entries
-                .iter_mut()
-                .for_each(|e| e.set_unused());
+            table_ptr.as_mut().entries.iter_mut().for_each(|e| e.set_unused());
             let addr = table_ptr.as_ptr() as u64;
             pml4_entry.set_frame(addr, flags);
             addr
@@ -131,11 +123,7 @@ impl VirtualMemoryManagerV2 {
         let pdpt_entry = &mut pdpt.entries[pdpt_index];
         let pd_addr = if pdpt_entry.is_unused() {
             let mut table_ptr = allocator().ok_or("Out of memory for PD")?;
-            table_ptr
-                .as_mut()
-                .entries
-                .iter_mut()
-                .for_each(|e| e.set_unused());
+            table_ptr.as_mut().entries.iter_mut().for_each(|e| e.set_unused());
             let addr = table_ptr.as_ptr() as u64;
             pdpt_entry.set_frame(addr, flags);
             addr
@@ -147,11 +135,7 @@ impl VirtualMemoryManagerV2 {
         let pd_entry = &mut pd.entries[pd_index];
         let pt_addr = if pd_entry.is_unused() {
             let mut table_ptr = allocator().ok_or("Out of memory for PT")?;
-            table_ptr
-                .as_mut()
-                .entries
-                .iter_mut()
-                .for_each(|e| e.set_unused());
+            table_ptr.as_mut().entries.iter_mut().for_each(|e| e.set_unused());
             let addr = table_ptr.as_ptr() as u64;
             pd_entry.set_frame(addr, flags);
             addr

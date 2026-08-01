@@ -23,9 +23,7 @@ pub struct EosMirrorReflector {
 
 impl EosMirrorReflector {
     pub fn new() -> Self {
-        Self {
-            mirrors: Vec::new(),
-        }
+        Self { mirrors: Vec::new() }
     }
 
     pub fn add_mirror(&mut self, mirror: Mirror) {
@@ -34,11 +32,7 @@ impl EosMirrorReflector {
 
     /// Ranks mirrors using a custom score: (latency_ms * 2) - (speed_kbps / 10).
     /// Lower score is better.
-    pub fn rank_mirrors(
-        &mut self,
-        country_filter: Option<&str>,
-        protocol_filter: Option<&str>,
-    ) -> Vec<Mirror> {
+    pub fn rank_mirrors(&mut self, country_filter: Option<&str>, protocol_filter: Option<&str>) -> Vec<Mirror> {
         let mut filtered: Vec<Mirror> = self
             .mirrors
             .iter()
@@ -222,8 +216,12 @@ impl YayAurHelper {
                     Ok(format!("sigpkg install {}", pkg_name))
                 }
             }
-            "-Ss" if parts.len() > 2 => Ok(format!("sigpkg search --all {}", parts[2])),
-            "-Rns" if parts.len() > 2 => Ok(format!("sigpkg remove --recursive {}", parts[2])),
+            "-Ss" if parts.len() > 2 => {
+                Ok(format!("sigpkg search --all {}", parts[2]))
+            }
+            "-Rns" if parts.len() > 2 => {
+                Ok(format!("sigpkg remove --recursive {}", parts[2]))
+            }
             _ => Err("Unsupported yay operation flags"),
         }
     }
@@ -282,9 +280,7 @@ mod tests {
         let update_msg = welcome.run_post_install_update();
         assert!(update_msg.contains("Running initial post-installation"));
 
-        assert!(welcome
-            .install_recommended_addon("eos-settings-greeter")
-            .is_ok());
+        assert!(welcome.install_recommended_addon("eos-settings-greeter").is_ok());
         assert_eq!(welcome.packages_installed_via_welcome.len(), 1);
     }
 

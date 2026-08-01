@@ -17,11 +17,7 @@ impl UniversalAbiTranslator {
         Self { host_platform }
     }
 
-    pub fn translate_abi_syscall(
-        &self,
-        platform: &str,
-        syscall_num: usize,
-    ) -> Option<&'static str> {
+    pub fn translate_abi_syscall(&self, platform: &str, syscall_num: usize) -> Option<&'static str> {
         match (platform, syscall_num) {
             ("Windows", 0x2A) => Some("sys_win32_create_window"), // Emulated Win32 call
             ("Linux", 9) => Some("sys_mmap"),
@@ -51,16 +47,11 @@ impl SigmaFsPlusPlus {
     /// Writes data and logs write transactions onto a secure blockchain ledger block hash
     pub fn write_and_audit(&self, path: &str, data: &[u8], out_audit_hash: &mut [u8; 32]) -> usize {
         let size = data.len();
-        self.blocks_written
-            .fetch_add((size + 4095) / 4096, Ordering::SeqCst);
+        self.blocks_written.fetch_add((size + 4095) / 4096, Ordering::SeqCst);
 
         // Compute simulated blockchain hash of file state for audit trail
         for i in 0..32 {
-            out_audit_hash[i] = if i < path.len() {
-                path.as_bytes()[i] ^ 0x55
-            } else {
-                0xAA
-            };
+            out_audit_hash[i] = if i < path.len() { path.as_bytes()[i] ^ 0x55 } else { 0xAA };
         }
         size
     }
@@ -78,9 +69,7 @@ pub struct SelfHealingKernel {
 
 impl SelfHealingKernel {
     pub const fn new(checksum: u64) -> Self {
-        Self {
-            system_checksum: checksum,
-        }
+        Self { system_checksum: checksum }
     }
 
     /// Scans kernel memory and triggers self-healing rollback if integrity is compromised
@@ -102,9 +91,7 @@ pub struct AiNativeRuntime {
 
 impl AiNativeRuntime {
     pub const fn new() -> Self {
-        Self {
-            active_models: AtomicUsize::new(0),
-        }
+        Self { active_models: AtomicUsize::new(0) }
     }
 
     pub fn register_model_context(&self) {
@@ -131,9 +118,7 @@ pub struct EnergyAwareScheduler {
 
 impl EnergyAwareScheduler {
     pub const fn new(limit: u32) -> Self {
-        Self {
-            max_thermal_limit_celsius: limit,
-        }
+        Self { max_thermal_limit_celsius: limit }
     }
 
     /// Predicts optimal CPU frequency multiplier based on current thermal state
@@ -159,17 +144,11 @@ pub struct UserDefinedKernelFunctions {
 
 impl UserDefinedKernelFunctions {
     pub const fn new() -> Self {
-        Self {
-            script_count: AtomicUsize::new(0),
-        }
+        Self { script_count: AtomicUsize::new(0) }
     }
 
     /// Safe sandboxed execution of user-supplied custom allocator logic
-    pub fn execute_custom_script(
-        &self,
-        script_bytecode: &[u8],
-        state_reg: &mut u32,
-    ) -> Result<(), &'static str> {
+    pub fn execute_custom_script(&self, script_bytecode: &[u8], state_reg: &mut u32) -> Result<(), &'static str> {
         if script_bytecode.is_empty() {
             return Err("Empty script bytecode");
         }
@@ -197,11 +176,7 @@ impl PrivacyFirstSandbox {
     }
 
     /// Secure capability check and post-quantum handshake logic validation
-    pub fn validate_and_execute_secure_call(
-        &self,
-        token: &CapabilityToken,
-        required_mask: u64,
-    ) -> bool {
+    pub fn validate_and_execute_secure_call(&self, token: &CapabilityToken, required_mask: u64) -> bool {
         if !self.is_sandboxed {
             return true;
         }
@@ -377,10 +352,7 @@ mod tests {
         assert_eq!(stable_res, "System integral and stable");
 
         let bad_res = kernel.verify_and_heal(0x112233).unwrap();
-        assert_eq!(
-            bad_res,
-            "Integrity violation detected: Rollback applied successfully"
-        );
+        assert_eq!(bad_res, "Integrity violation detected: Rollback applied successfully");
 
         let ai = AiNativeRuntime::new();
         ai.register_model_context();
@@ -400,9 +372,7 @@ mod tests {
         let scripting = UserDefinedKernelFunctions::new();
         let bytecode = [5u8];
         let mut state = 10;
-        assert!(scripting
-            .execute_custom_script(&bytecode, &mut state)
-            .is_ok());
+        assert!(scripting.execute_custom_script(&bytecode, &mut state).is_ok());
         assert_eq!(state, 50);
         assert_eq!(scripting.script_count(), 1);
 
@@ -410,46 +380,5 @@ mod tests {
         let token = CapabilityToken::from_bits(0x0F);
         assert!(sandbox.validate_and_execute_secure_call(&token, 0x0C));
         assert!(!sandbox.validate_and_execute_secure_call(&token, 0x80));
-    }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
     }
 }

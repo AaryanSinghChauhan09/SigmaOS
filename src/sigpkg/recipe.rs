@@ -97,8 +97,8 @@ impl PackageRecipe {
             install_commands: Vec::new(),
             environment: HashMap::new(),
             pkgrel: 1,
-            arch: String::new(),
-            license_spdx: String::new(),
+            arch: "x86_64".to_string(),
+            license_spdx: "GPL".to_string(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
         }

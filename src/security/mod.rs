@@ -17,17 +17,6 @@ pub mod password;
 pub mod pki;
 pub mod pledge;
 pub mod qubes_isolation;
-pub mod scanner;
-pub mod secrets;
-pub mod selinux;
-pub mod sigma_pledge;
-pub mod sigma_unveil;
-pub mod vault;
-pub mod vpn;
-pub mod vulnerability;
-pub mod clipboard;
-pub mod intrusion;
-pub mod password;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -49,46 +38,4 @@ pub use password::{
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SelinuxPermission, SecurityContext as SelinuxSecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule,
-};
-pub use vault::{
-    Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
-    EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
-    VaultResult,
-};
-pub use vpn::{
-    AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
-    VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
-    WireGuardHandler,
-};
-// Integrity: export the monitor trait and concrete types that actually exist
-pub use integrity::{
-    File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError as SecIntegrityError,
-    IntegrityStats, IntegrityStatus as SecIntegrityStatus, MonitorCapability, SimpleFile,
-    SimpleIntegrityMonitor as SecSimpleIntegrityMonitor,
-};
-// MAC: export what the module actually defines
-pub use mac::{
-    ContextCapability, ContextID, EngineCapability as MacEngineCapability,
-    MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
-};
-// PKI: export actual types
-pub use pki::{
-    PKIManager as SecPKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
-};
-// Secrets: export actual types
-pub use secrets::{
-    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo,
-    SimpleKeyring, SimpleSecret,
-};
-// Vulnerability: export actual types
-pub use vulnerability::{
-    CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
-    SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
-};
-
-
-pub use qubes_isolation::{DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError};
+pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
