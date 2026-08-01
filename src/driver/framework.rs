@@ -1,8 +1,8 @@
+use crate::klib::Vec;
 use core::mem;
 /// OOP-based Driver Framework for SigmaOS
 /// Based on Driver Management Roadmap (OOP-based)
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 pub type DriverID = usize;
 

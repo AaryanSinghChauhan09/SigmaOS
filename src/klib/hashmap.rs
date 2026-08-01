@@ -191,9 +191,7 @@ where
     }
 
     pub fn values(&self) -> HashMapValues<'_, K, V> {
-        HashMapValues {
-            iter: self.iter(),
-        }
+        HashMapValues { iter: self.iter() }
     }
 
     pub fn values_mut(&mut self) -> HashMapValuesMut<'_, K, V> {
@@ -203,9 +201,7 @@ where
     }
 
     pub fn keys(&self) -> HashMapKeys<'_, K, V> {
-        HashMapKeys {
-            iter: self.iter(),
-        }
+        HashMapKeys { iter: self.iter() }
     }
 
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
@@ -230,7 +226,7 @@ where
 
     fn grow(&mut self) {
         let mut old_buckets = core::mem::replace(&mut self.buckets, Vec::new());
-        
+
         self.capacity *= 2;
         self.resize_buckets();
         self.len = 0;
@@ -271,12 +267,10 @@ where
         F: FnOnce() -> V,
     {
         match self {
-            Entry::Occupied(entry) => {
-                unsafe {
-                    let bucket = entry.map.buckets[entry.bucket_idx].as_mut().unwrap();
-                    core::mem::transmute(&mut bucket[entry.item_idx].1)
-                }
-            }
+            Entry::Occupied(entry) => unsafe {
+                let bucket = entry.map.buckets[entry.bucket_idx].as_mut().unwrap();
+                core::mem::transmute(&mut bucket[entry.item_idx].1)
+            },
             Entry::Vacant(entry) => {
                 let value = default();
                 let key = entry.key;
@@ -291,9 +285,7 @@ where
                 map.len += 1;
 
                 let last_idx = bucket.len() - 1;
-                unsafe {
-                    core::mem::transmute(&mut bucket[last_idx].1)
-                }
+                unsafe { core::mem::transmute(&mut bucket[last_idx].1) }
             }
         }
     }
@@ -384,7 +376,10 @@ impl<'a, K, V> Iterator for HashMapIterMut<'a, K, V> {
                 if let Some(ref mut bucket) = *bucket_opt {
                     if self.item_idx < bucket.len() {
                         let item = &mut bucket[self.item_idx];
-                        let item_ref = (core::mem::transmute(&item.0), core::mem::transmute(&mut item.1));
+                        let item_ref = (
+                            core::mem::transmute(&item.0),
+                            core::mem::transmute(&mut item.1),
+                        );
                         self.item_idx += 1;
                         return Some(item_ref);
                     }
@@ -473,7 +468,7 @@ mod tests {
         let mut map = HashMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
-        
+
         assert_eq!(map.get(&"key1"), Some(&"value1"));
         assert_eq!(map.get(&"key2"), Some(&"value2"));
         assert_eq!(map.get(&"key3"), None);
@@ -492,7 +487,7 @@ mod tests {
         let mut map = HashMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
-        
+
         let mut count = 0;
         for _ in map.iter() {
             count += 1;

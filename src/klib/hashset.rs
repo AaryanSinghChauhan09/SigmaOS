@@ -89,7 +89,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         set.insert(2);
-        
+
         assert!(set.contains(&1));
         assert!(set.contains(&2));
         assert!(!set.contains(&3));
@@ -108,7 +108,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         set.insert(2);
-        
+
         let mut count = 0;
         for _ in set.iter() {
             count += 1;
