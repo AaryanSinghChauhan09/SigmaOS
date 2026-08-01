@@ -1,24 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
-// Interactive shell with full desktop GUI-parity and defensive auditing commands
+// Interactive shell for SigmaOS
 
-use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
-
-use crate::accessibility::{
-    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
-    AccessibilitySetting,
-};
-use crate::compatibility::{
-    ApplicationBinary, cross_platform::BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
-};
-use crate::customization::{CustomizationEngine, Theme as CustomTheme};
-use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
-use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
-use crate::virtualization::{
-    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
-    VmState,
-};
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -27,7 +10,6 @@ pub enum ShellCommand {
     ListProcesses,
     ListFiles,
     Exit,
-    History,
     Echo {
         message: String,
     },
@@ -55,37 +37,6 @@ pub enum ShellCommand {
     },
     AgentRun {
         task_id: usize,
-    },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
-    },
-    Dnf {
-        subcommand: String,
-        package: Option<String>,
-    },
-    Theme {
-        name: String,
-    },
-    Profile {
-        name: String,
-    },
-    A11y {
-        feature: String,
-        state: String,
     },
     Unknown(String),
 }
@@ -136,56 +87,36 @@ impl Default for AgentAutomationEngine {
 
 /// Shell REPL
 pub struct ShellRepl {
-    pub running: bool,
-    pub variables: std::collections::HashMap<String, String>,
-    pub aliases: std::collections::HashMap<String, String>,
-    pub prompt: String,
-    pub agent_engine: AgentAutomationEngine,
-    pub services: std::collections::HashMap<String, String>,
-    pub installed_packages: std::collections::HashSet<String>,
-    pub current_user: String,
-    pub current_dir: String,
-    pub current_theme: String,
-    pub current_profile: String,
-    pub a11y_features: std::collections::HashMap<String, bool>,
-    pub command_history: Vec<String>,
+    running: bool,
+    variables: std::collections::HashMap<String, String>,
+    aliases: std::collections::HashMap<String, String>,
+    prompt: String,
+    agent_engine: AgentAutomationEngine,
 }
 
 impl ShellRepl {
     pub fn new() -> Self {
-        let mut services = std::collections::HashMap::new();
-        services.insert("cron".to_string(), "Running".to_string());
-        services.insert("systemd-networkd".to_string(), "Running".to_string());
-        services.insert("systemd-logind".to_string(), "Running".to_string());
-
-        let mut a11y_features = std::collections::HashMap::new();
-        a11y_features.insert("high_contrast".to_string(), false);
-
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
-            services,
-            installed_packages: std::collections::HashSet::new(),
-            current_user: "ubuntu".to_string(),
-            current_dir: "/home/ubuntu".to_string(),
-            current_theme: "light".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features,
-            command_history: Vec::new(),
         }
     }
 
     pub fn with_prompt(prompt: String) -> Self {
-        let mut shell = Self::new();
-        shell.prompt = prompt;
-        shell
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
+            prompt,
+            agent_engine: AgentAutomationEngine::new(),
+        }
     }
 
     pub fn run(&mut self) {
-        println!("SigmaOS Shell v0.1.0 (GUI-Parity & Security Auditing Enabled)");
+        println!("SigmaOS Shell v0.1.0");
         println!("Type 'help' for available commands\n");
 
         let stdin = io::stdin();
@@ -208,7 +139,6 @@ impl ShellRepl {
     }
 
     pub fn execute_line(&mut self, line: &str) {
-        self.command_history.push(line.to_string());
         if line.contains(';') {
             let subcommands: Vec<&str> = line.split(';').collect();
             for sub in subcommands {
@@ -261,84 +191,9 @@ impl ShellRepl {
             "ps" => ShellCommand::ListProcesses,
             "ls" => ShellCommand::ListFiles,
             "exit" | "quit" => ShellCommand::Exit,
-            "history" => ShellCommand::History,
-            "pwd" => ShellCommand::Pwd,
-            "whoami" => ShellCommand::WhoAmI,
             "echo" => {
                 let message = parts[1..].join(" ");
                 ShellCommand::Echo { message }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    let password = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password,
-                    }
-                } else {
-                    ShellCommand::Su {
-                        username: "root".to_string(),
-                        password: None,
-                    }
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    let action = parts[1].to_string();
-                    let service = if parts.len() >= 3 {
-                        parts[2].to_string()
-                    } else {
-                        String::new()
-                    };
-                    ShellCommand::Systemctl { action, service }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Apt {
-                        subcommand,
-                        package,
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "dnf" | "yum" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Dnf {
-                        subcommand,
-                        package,
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
             }
             "set" => {
                 if parts.len() >= 3 {
@@ -420,34 +275,6 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        state: parts[2].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -465,21 +292,11 @@ impl ShellRepl {
                    unalias - Remove an alias\n\
                    run     - Execute an automated macro/script variable\n\
                    agent   - Interface for AI Agent Automation tasks (register, list, run)\n\
-                   dnf     - Package manager for AlmaLinux (install, update, list)\n\
-                   history - Show command execution history\n\
                    exit    - Exit the shell"
                 .to_string()),
-            ShellCommand::History => {
-                let mut history_str = String::new();
-                for (idx, cmd) in self.command_history.iter().enumerate() {
-                    history_str.push_str(&format!("  {}  {}\n", idx + 1, cmd));
-                }
-                Ok(history_str)
-            }
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
-                   2    systemd     Running\n\
-                   3    udevd       Running"
+                   2    kernel      Running"
                 .to_string()),
             ShellCommand::ListFiles => Ok("README.md\n\
                    Cargo.toml\n\
@@ -489,149 +306,6 @@ impl ShellRepl {
             ShellCommand::Exit => {
                 self.running = false;
                 Ok(String::new())
-            }
-            ShellCommand::Pwd => Ok(self.current_dir.clone()),
-            ShellCommand::WhoAmI => Ok(self.current_user.clone()),
-            ShellCommand::Su { username, password } => {
-                if username == "root" {
-                    let pwd = password.unwrap_or_default();
-                    if pwd == "admin" || pwd == "root" {
-                        self.current_user = "root".to_string();
-                        self.current_dir = "/root".to_string();
-                        self.prompt = "root@sigmaos:# ".to_string();
-                        Ok("Successfully logged in as root.".to_string())
-                    } else {
-                        Err("su: Authentication failure (hint: use 'su root admin')".to_string())
-                    }
-                } else {
-                    self.current_user = username.clone();
-                    self.current_dir = format!("/home/{}", username);
-                    self.prompt = format!("{}@sigmaos:~$ ", username);
-                    Ok(format!("Logged in as {}.", username))
-                }
-            }
-            ShellCommand::Cat { filename } => {
-                if filename == "README.md" {
-                    Ok("# 🛡️ SigmaOS — Sovereign, AI-Native Operating System".to_string())
-                } else if filename == "Cargo.toml" {
-                    Ok("[package]\nname = \"sigmaos\"\nversion = \"0.1.0\"".to_string())
-                } else {
-                    Err(format!("cat: {}: No such file or directory", filename))
-                }
-            }
-            ShellCommand::Systemctl { action, service } => {
-                if action == "list" || action == "status" && service.is_empty() {
-                    let mut list_str = "UNIT                ACTIVE   SUB\n".to_string();
-                    for (s, st) in &self.services {
-                        list_str.push_str(&format!("{:<20} {}  {}\n", s, if st == "Running" { "active" } else { "inactive" }, st));
-                    }
-                    Ok(list_str)
-                } else if action == "start" {
-                    if self.services.contains_key(&service) {
-                        self.services.insert(service.clone(), "Running".to_string());
-                        Ok(format!("Started {} service.", service))
-                    } else {
-                        Err(format!("Failed to start {}.service: Unit not found.", service))
-                    }
-                } else if action == "stop" {
-                    if self.services.contains_key(&service) {
-                        self.services.insert(service.clone(), "Stopped".to_string());
-                        Ok(format!("Stopped {} service.", service))
-                    } else {
-                        Err(format!("Failed to stop {}.service: Unit not found.", service))
-                    }
-                } else if action == "status" {
-                    if let Some(status) = self.services.get(&service) {
-                        Ok(format!("● {}.service\n   Active: {} ({})\n   Main PID: 1234", service, if status == "Running" { "active" } else { "inactive" }, status))
-                    } else {
-                        Err(format!("Unit {}.service could not be found.", service))
-                    }
-                } else {
-                    Err(format!("systemctl: Unknown action '{}'", action))
-                }
-            }
-            ShellCommand::Apt { subcommand, package } => {
-                if subcommand == "update" {
-                    Ok("Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease\n\
-                        Get:2 http://security.ubuntu.com/ubuntu noble-security InRelease\n\
-                        Reading package lists... Done\n\
-                        Building dependency tree... Done\n\
-                        All packages are up to date."
-                        .to_string())
-                } else if subcommand == "list" {
-                    let mut list_str = "Listing installed packages...\n".to_string();
-                    for pkg in &self.installed_packages {
-                        list_str.push_str(&format!("{}/noble,now 1.0.0 amd64 [installed]\n", pkg));
-                    }
-                    Ok(list_str)
-                } else if subcommand == "search" {
-                    let query = package.unwrap_or_default();
-                    if query.is_empty() {
-                        Ok("sigma-sh - Sovereign Shell\n\
-                            sigma-vim - High-fidelity Editor\n\
-                            sigma-curl - Lightweight HTTP Client"
-                            .to_string())
-                    } else {
-                        let mut results = Vec::new();
-                        let all_packages = ["sigma-sh", "sigma-vim", "sigma-curl", "sigma-gcc", "sigma-git", "sigma-python"];
-                        for pkg in &all_packages {
-                            if pkg.contains(&query) {
-                                results.push(format!("{} - Package matching query", pkg));
-                            }
-                        }
-                        if results.is_empty() {
-                            Ok("No matching packages found.".to_string())
-                        } else {
-                            Ok(results.join("\n"))
-                        }
-                    }
-                } else if subcommand == "install" {
-                    let pkg = package.ok_or_else(|| "apt: Please specify a package to install".to_string())?;
-                    self.installed_packages.insert(pkg.clone());
-                    Ok(format!("Reading package lists...\n\
-                                Building dependency tree...\n\
-                                The following NEW packages will be installed:\n\
-                                  {}\n\
-                                Preparing to unpack ...\n\
-                                Unpacking {} ...\n\
-                                Setting up {} ...\n\
-                                Successfully installed.", pkg, pkg, pkg))
-                } else {
-                    Err(format!("apt: Unknown command '{}'", subcommand))
-                }
-            }
-            ShellCommand::Dnf { subcommand, package } => {
-                if subcommand == "check-update" || subcommand == "update" && package.is_none() {
-                    Ok("AlmaLinux x86_64 Repository                              12 kB/s | 3.8 kB     00:00\n\
-                        AlmaLinux BaseOS                                        45 kB/s | 4.3 MB     00:01\n\
-                        AlmaLinux AppStream                                     82 kB/s | 8.1 MB     00:01\n\
-                        AlmaLinux Extras                                        10 kB/s | 1.2 MB     00:00\n\
-                        Dependencies resolved.\n\
-                        Nothing to do. Complete!".to_string())
-                } else if subcommand == "install" {
-                    let pkg = package.ok_or_else(|| "dnf: Please specify a package to install".to_string())?;
-                    self.installed_packages.insert(pkg.clone());
-                    Ok(format!("AlmaLinux AppStream                                     82 kB/s | 8.1 MB     00:01\n\
-                                Resolving dependencies...\n\
-                                Running transaction check...\n\
-                                Transaction search completed.\n\
-                                To install:\n\
-                                  {}  noarch  1.0.0-1.el9  almalinux-appstream  124 k\n\
-                                Proceed with changes? [y/N]: y\n\
-                                Downloading Packages:\n\
-                                Running transaction test...\n\
-                                Installing {}...\n\
-                                Verifying {}...\n\
-                                Complete!", pkg, pkg, pkg))
-                } else if subcommand == "list" {
-                    let mut list_str = "Installed Packages\n".to_string();
-                    for pkg in &self.installed_packages {
-                        list_str.push_str(&format!("{:<20} 1.0.0-1.el9  @almalinux-appstream\n", pkg));
-                    }
-                    Ok(list_str)
-                } else {
-                    Err(format!("dnf: Unknown command '{}'", subcommand))
-                }
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
@@ -707,19 +381,6 @@ impl ShellRepl {
                     Err(format!("Agent task #{} not found", task_id))
                 }
             }
-            ShellCommand::Theme { name } => {
-                self.current_theme = name.clone();
-                Ok(format!("Theme changed to {}", name))
-            }
-            ShellCommand::Profile { name } => {
-                self.current_profile = name.clone();
-                Ok(format!("Profile changed to {}", name))
-            }
-            ShellCommand::A11y { feature, state } => {
-                let enabled = state == "on" || state == "true" || state == "enabled";
-                self.a11y_features.insert(feature.clone(), enabled);
-                Ok(format!("Accessibility feature {} is now {}", feature, state))
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -739,7 +400,7 @@ mod tests {
     fn test_repl_creation() {
         let repl = ShellRepl::new();
         assert!(repl.running);
-        assert_eq!(repl.prompt, "ubuntu@sigmaos:~$ ");
+        assert_eq!(repl.prompt, "sigma-sh> ");
     }
 
     #[test]
@@ -747,15 +408,6 @@ mod tests {
         let repl = ShellRepl::new();
         let command = repl.parse_command("help");
         assert!(matches!(command, ShellCommand::Help));
-    }
-
-    #[test]
-    fn test_history_logging() {
-        let mut repl = ShellRepl::new();
-        repl.execute_line("echo 123");
-        let command = repl.parse_command("history");
-        let res = repl.execute_command(command).unwrap();
-        assert!(res.contains("echo 123"));
     }
 
     #[test]
@@ -789,31 +441,6 @@ mod tests {
         };
         let result = repl.execute_command(get_cmd);
         assert_eq!(result.unwrap(), "value");
-    }
-
-    #[test]
-    fn test_theme_and_profile_commands() {
-        let mut repl = ShellRepl::new();
-
-        let theme_cmd = repl.parse_command("theme dark");
-        let res = repl.execute_command(theme_cmd).unwrap();
-        assert_eq!(repl.current_theme, "dark");
-        assert!(res.contains("dark"));
-
-        let profile_cmd = repl.parse_command("profile developer");
-        let res = repl.execute_command(profile_cmd).unwrap();
-        assert_eq!(repl.current_profile, "developer");
-        assert!(res.contains("developer"));
-    }
-
-    #[test]
-    fn test_a11y_commands() {
-        let mut repl = ShellRepl::new();
-
-        let a11y_cmd = repl.parse_command("a11y high_contrast on");
-        let res = repl.execute_command(a11y_cmd).unwrap();
-        assert_eq!(repl.a11y_features.get("high_contrast"), Some(&true));
-        assert!(res.contains("on"));
     }
 
     #[test]
@@ -883,17 +510,5 @@ mod tests {
         let run_res = repl.execute_command(run_cmd).unwrap();
         assert!(run_res.contains("[Agent Automation Run #1]"));
         assert!(run_res.contains("[Agent Automation Complete: Success]"));
-    }
-
-    #[test]
-    fn test_dnf_package_manager() {
-        let mut repl = ShellRepl::new();
-        let check_cmd = repl.parse_command("dnf check-update");
-        let res = repl.execute_command(check_cmd).unwrap();
-        assert!(res.contains("AlmaLinux"));
-
-        let install_cmd = repl.parse_command("dnf install almalinux-release");
-        let res_install = repl.execute_command(install_cmd).unwrap();
-        assert!(res_install.contains("Complete!"));
     }
 }
