@@ -2,19 +2,11 @@
 // Capability-based security, pledge, and access control
 
 pub mod capability;
+pub mod nemoclaw;
 pub mod pledge;
-pub mod bridge;
-pub mod prism;
-pub mod sandbox;
+pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use bridge::{
-    LegacySecurityType, SecurityBridge,
-};
-pub use prism::{
-    SecurityFacet, SecurityPrism,
-};
-pub use sandbox::{
-    SandboxRule, PrivacyFirstSandbox,
-};
+pub use vulnerability::{ExploitPayload, PenetrationAssistant};
