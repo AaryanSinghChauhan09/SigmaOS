@@ -170,6 +170,41 @@ impl<T: Clone> Clone for Vec<T> {
     }
 }
 
+impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.as_slice().fmt(f)
+    }
+}
+
+impl<T: PartialEq> PartialEq for Vec<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_slice() == other.as_slice()
+    }
+}
+
+impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
+    fn eq(&self, other: &[U]) -> bool {
+        self.as_slice() == other
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+impl<T: PartialEq<U>, U> PartialEq<std::vec::Vec<U>> for Vec<T> {
+    fn eq(&self, other: &std::vec::Vec<U>) -> bool {
+        self.as_slice() == other.as_slice()
+    }
+}
+
+impl<T> core::iter::FromIterator<T> for Vec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut vec = Vec::new();
+        for item in iter {
+            vec.push(item);
+        }
+        vec
+    }
+}
+
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {

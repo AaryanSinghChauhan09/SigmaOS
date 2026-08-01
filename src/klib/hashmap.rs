@@ -395,6 +395,19 @@ impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
     }
 }
 
+impl<K, V, const N: usize> From<[(K, V); N]> for HashMap<K, V>
+where
+    K: Eq + Hash + Clone,
+    V: Clone,
+{
+    fn from(arr: [(K, V); N]) -> Self {
+        let mut map = HashMap::with_capacity(N);
+        for (k, v) in arr {
+            map.insert(k, v);
+        }
+        map
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
