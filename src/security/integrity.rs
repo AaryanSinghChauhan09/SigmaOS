@@ -1,20 +1,21 @@
 #![no_std]
 
+use core::mem;
 /// OOP-based System Integrity Monitoring for SigmaOS
 /// Implements integrity monitoring using OOP principles with traits and structs
 /// No dependency on external integrity frameworks
 /// Based on Roadmap Item 66: System integrity monitoring
+use core::sync::atomic::{AtomicUsize, Ordering};
+
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::vec::Vec;
-
-use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib_vec::Vec;
 
 /// File ID
 pub type FileID = usize;
 
 /// File integrity status
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntegrityStatus {
     Valid = 0,
@@ -49,7 +50,7 @@ pub enum IntegrityError {
 
 /// File info
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FileInfo {
     pub id: FileID,
     pub path: [u8; 256],
@@ -72,7 +73,7 @@ impl FileInfo {
 
 /// File capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FileCapability {
     pub can_verify: bool,
     pub can_modify: bool,
@@ -130,7 +131,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe { core::mem::transmute::<usize, IntegrityStatus>(self.status.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst) as u32) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -301,22 +302,16 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
             return Err(IntegrityError::PermissionDenied);
         }
 
-        for file_option in &mut self.files {
-            if let Some(ref mut file) = *file_option {
+        for i in 0..self.files.len() {
+            if let Some(ref mut file) = self.files[i] {
                 if file.id() == id {
                     let result = file.verify();
-                    if let Ok(status) = result {
+                    if let Ok(ref status) = result {
                         match status {
-                            IntegrityStatus::Valid => {
-                                self.stats.valid_files += 1;
-                            }
-                            IntegrityStatus::Modified => {
-                                self.stats.modified_files += 1;
-                            }
-                            IntegrityStatus::Corrupted => {
-                                self.stats.corrupted_files += 1;
-                            }
-                            IntegrityStatus::Missing => {}
+                            IntegrityStatus::Valid => self.stats.valid_files += 1,
+                            IntegrityStatus::Modified => self.stats.modified_files += 1,
+                            IntegrityStatus::Corrupted => self.stats.corrupted_files += 1,
+                            IntegrityStatus::Missing => self.stats.corrupted_files += 1,
                         }
                     }
                     return result;
@@ -333,24 +328,18 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
 
         let mut modified_files = Vec::new();
 
-        for file_option in &mut self.files {
-            if let Some(ref mut file) = *file_option {
+        for i in 0..self.files.len() {
+            if let Some(ref mut file) = self.files[i] {
                 let result = file.verify();
-                if let Ok(status) = result {
-                    if status != IntegrityStatus::Valid {
+                if let Ok(ref status) = result {
+                    if *status != IntegrityStatus::Valid {
                         modified_files.push(file.id());
                     }
                     match status {
-                        IntegrityStatus::Valid => {
-                            self.stats.valid_files += 1;
-                        }
-                        IntegrityStatus::Modified => {
-                            self.stats.modified_files += 1;
-                        }
-                        IntegrityStatus::Corrupted => {
-                            self.stats.corrupted_files += 1;
-                        }
-                        IntegrityStatus::Missing => {}
+                        IntegrityStatus::Valid => self.stats.valid_files += 1,
+                        IntegrityStatus::Modified => self.stats.modified_files += 1,
+                        IntegrityStatus::Corrupted => self.stats.corrupted_files += 1,
+                        IntegrityStatus::Missing => self.stats.corrupted_files += 1,
                     }
                 }
             }
