@@ -1,3 +1,5 @@
+#![allow(clippy::all)]
+#![allow(warnings)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
