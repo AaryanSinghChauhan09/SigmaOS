@@ -20,8 +20,8 @@ echo "Active target branch: ${BRANCH:-unknown}"
 # Verify presence of core strategic files
 REQUIRED_FILES=(
     "FUTURE-DEVELOPMENT-ROADMAP.md"
-    "README.md"
-    "CHANGELOG.md"
+    "wiki/README.md"
+    "wiki/CHANGELOG.md"
 )
 
 for file in "${REQUIRED_FILES[@]}"; do

@@ -2,7 +2,7 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
-pub mod klib;
+pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -36,6 +36,12 @@ pub use media::{
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
+};
+pub use ai::{
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    SovereignWikiEngine, WikiArticle, ApmDependency, ApmLockfile, ApmManifest, ApmPolicy,
+    ApmStatus, DependencySource, McpServer, SovereignApmEngine,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
