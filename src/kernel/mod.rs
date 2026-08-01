@@ -34,7 +34,7 @@ pub use linux_absorb::{
     SecurityRestriction,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use self_healing::{
     SovereignSelfHealingKernel,

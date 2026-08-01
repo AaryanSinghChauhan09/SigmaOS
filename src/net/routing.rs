@@ -93,7 +93,7 @@ impl RoutingTable {
     }
 
     /// Lookup a route for a destination
-    pub fn lookup_route(&mut self, destination: &str) -> Option<&RouteEntry> {
+    pub fn lookup_route(&mut self, destination: &str) -> Option<RouteEntry> {
         // Check cache first
         let mut found_idx = None;
         for i in 0..self.route_cache.len() {

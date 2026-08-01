@@ -1,7 +1,13 @@
 #![no_std]
 #![no_main]
 
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+
 use core::mem;
+use core::sync::atomic::AtomicUsize;
 /// OOP-based Sovereign Scheduler for SigmaOS
 /// Based on Roadmap Item: Functional Kernel Scheduler Implementation (Critical Blocker)
 /// Implements MLFQ (Multi-Level Feedback Queue) and MCS (Machine-to-Core Scheduling)
@@ -311,12 +317,14 @@ impl RealTimeScheduler for SimpleRealTimeScheduler {
     }
 }
 
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {

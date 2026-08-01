@@ -276,12 +276,14 @@ impl Directory {
 
 /// Simple Vec implementation for no_std
 #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
     pub fn new() -> Self {
