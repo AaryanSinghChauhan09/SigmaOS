@@ -3,15 +3,6 @@
 
 use std::io::{self, BufRead, Write};
 
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -56,33 +47,6 @@ pub enum ShellCommand {
     },
     Rm {
         filename: String,
-    },
-    Theme {
-        theme_name: String,
-    },
-    Profile {
-        profile_name: String,
-    },
-    A11y {
-        feature: String,
-        state: String,
-    },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
     },
     Theme {
         theme_name: String,
@@ -836,42 +800,5 @@ mod tests {
         assert!(matches!(cmd, ShellCommand::Rm { .. }));
         let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Removed file: testfile.txt");
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AgentTask {
-    pub task_id: usize,
-    pub description: String,
-    pub commands: Vec<String>,
-}
-
-/// AI Agent Automation Engine inside SigmaOS REPL
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine {
-    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
-    pub next_task_id: usize,
-}
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine {
-            registered_tasks: std::collections::HashMap::new(),
-            next_task_id: 1,
-        }
-    }
-
-    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
-        let id = self.next_task_id;
-        self.next_task_id += 1;
-        self.registered_tasks.insert(
-            id,
-            AgentTask {
-                task_id: id,
-                description,
-                commands,
-            },
-        );
-        id
     }
 }

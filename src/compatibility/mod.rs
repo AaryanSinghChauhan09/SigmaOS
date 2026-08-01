@@ -6,16 +6,13 @@ pub mod endeavour;
 pub mod historic_linux;
 pub mod legacy_adapters;
 pub mod standards;
-pub mod constellation_mesh;
-pub mod endeavour;
-pub mod legacy_adapters;
 pub mod linux_adapter;
 pub mod lattice_grid;
 pub mod solid_kernel;
-pub mod historic_linux;
 pub mod oldlinux;
 pub mod wasm_sandbox;
 pub mod templeos;
+pub mod india_professional_tools;
 
 pub use chakra::{
     AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
