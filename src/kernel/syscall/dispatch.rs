@@ -136,37 +136,15 @@ impl SyscallDispatcher {
             return -1;
         }
 
-        // Call handler function
-        // In real implementation, would call the function pointer
-        // let syscall_fn: fn(&mut SyscallContext) -> isize = core::mem::transmute(handler);
-        // let result = syscall_fn(ctx);
-        
-        let result = self.default_handler(ctx, number);
+        // Highly-optimized direct jump table (fast-path syscall dispatch) inspired by Linux kernel
+        let syscall_fn: extern "C" fn(&mut SyscallContext) -> isize = unsafe { core::mem::transmute(handler) };
+        let result = syscall_fn(ctx);
         
         if result < 0 {
             self.error_count.fetch_add(1, Ordering::SeqCst);
         }
         
         result
-    }
-
-    fn default_handler(&self, ctx: &mut SyscallContext, number: usize) -> isize {
-        // Default stub implementation
-        match number {
-            SYS_EXIT => {
-                // Exit syscall - no return
-                0
-            }
-            SYS_GETPID => {
-                // Return fake PID
-                ctx.return_value.store(1, Ordering::SeqCst);
-                1
-            }
-            _ => {
-                ctx.error_code.store(38, Ordering::SeqCst); // ENOSYS
-                -1
-            }
-        }
     }
 
     /// Get syscall call count

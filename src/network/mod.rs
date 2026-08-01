@@ -3,6 +3,7 @@ pub mod stack;
 pub mod tcp;
 pub mod tcp_udp;
 pub mod ring_buffer_stack;
+pub mod enterprise;
 
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};

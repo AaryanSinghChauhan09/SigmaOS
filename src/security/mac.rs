@@ -4,16 +4,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
-use core::mem;
-/// OOP-based Mandatory Access Control for SigmaOS
-/// Implements MAC using OOP principles with traits and structs
-/// No dependency on external security frameworks
-/// Based on Roadmap Item 62: Mandatory access control
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Security context ID
@@ -261,7 +251,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -339,9 +329,9 @@ impl SimpleMACEngine {
         }
     }
 
-    unsafe fn get_context(&self, id: ContextID) -> Option<&SecurityContext> {
-        for i in 0..self.contexts.len() {
-            if let Some(Some(ref context)) = self.contexts.get(i) {
+    fn get_context(&self, id: ContextID) -> Option<&SecurityContext> {
+        for slot in &self.contexts {
+            if let Some(ref context) = *slot {
                 if context.id == id {
                     return Some(context);
                 }
@@ -369,9 +359,7 @@ impl MACEngine for SimpleMACEngine {
         }
 
         if id < self.policies.len() {
-            if let Some(slot) = self.policies.get_mut(id) {
-                *slot = None;
-            }
+            self.policies[id] = None;
             self.total_policies.fetch_sub(1, Ordering::SeqCst);
             Ok(())
         } else {
@@ -402,8 +390,8 @@ impl MACEngine for SimpleMACEngine {
         }
 
         let mut index = None;
-        for i in 0..self.contexts.len() {
-            if let Some(Some(ref context)) = self.contexts.get(i) {
+        for (i, slot) in self.contexts.iter().enumerate() {
+            if let Some(ref context) = *slot {
                 if context.id == id {
                     index = Some(i);
                     break;
@@ -412,9 +400,7 @@ impl MACEngine for SimpleMACEngine {
         }
 
         if let Some(i) = index {
-            if let Some(slot) = self.contexts.get_mut(i) {
-                *slot = None;
-            }
+            self.contexts[i] = None;
             self.total_contexts.fetch_sub(1, Ordering::SeqCst);
             Ok(())
         } else {
@@ -429,27 +415,18 @@ impl MACEngine for SimpleMACEngine {
             return true;
         }
 
-        unsafe {
-            if let Some(context) = self.get_context(context_id) {
-                for i in 0..self.policies.len() {
-                    if let Some(Some(ref policy)) = self.policies.get(i) {
-                        if !policy.check(context, operation) {
-                            self.access_denied.fetch_add(1, Ordering::SeqCst);
-                            return false;
-                        }
+        if let Some(context) = self.get_context(context_id) {
+            for slot in &self.policies {
+                if let Some(ref policy) = *slot {
+                    if !policy.check(context, operation) {
+                        self.access_denied.fetch_add(1, Ordering::SeqCst);
                         return false;
                     }
                 }
-                true
-            } else {
-                self.access_denied.fetch_add(1, Ordering::SeqCst);
-                false
             }
             true
         } else {
-            if let Ok(mut stats) = self.stats.try_borrow_mut() {
-                stats.access_denied += 1;
-            }
+            self.access_denied.fetch_add(1, Ordering::SeqCst);
             false
         }
     }

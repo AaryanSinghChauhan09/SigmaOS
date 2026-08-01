@@ -131,35 +131,6 @@ impl BsdSocket for SimpleSocket {
     }
 }
 
-impl BsdSocket for SimpleSocket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => {
-                self.reuse_addr.store(val, Ordering::SeqCst);
-            }
-            SocketOption::TcpNoDelay => {
-                self.tcp_nodelay.store(val, Ordering::SeqCst);
-            }
-            SocketOption::RcvBuf => {
-                self.rcvbuf.store(val, Ordering::SeqCst);
-            }
-            SocketOption::SndBuf => {
-                self.sndbuf.store(val, Ordering::SeqCst);
-            }
-        }
-        Ok(())
-    }
-
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
-            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
-            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
-            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
-        }
-    }
-}
-
 pub trait TCPConnection {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError>;
     fn listen(&mut self) -> Result<(), NetworkError>;
@@ -263,12 +234,6 @@ impl RenoCongestionControl {
     }
 }
 
-impl Default for RenoCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl CongestionControl for RenoCongestionControl {
     fn update_cwnd(&mut self, acked: usize) {
         let cwnd = self.cwnd.load(Ordering::SeqCst);
@@ -307,12 +272,6 @@ impl BBRCongestionControl {
             bw_estimate: AtomicUsize::new(1000),
             rtt_min: AtomicUsize::new(10),
         }
-    }
-}
-
-impl Default for BBRCongestionControl {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -449,12 +408,6 @@ impl ZeroCopyNetwork {
         ZeroCopyNetwork {
             dma_buffer: AtomicUsize::new(0),
         }
-    }
-}
-
-impl Default for ZeroCopyNetwork {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -685,111 +638,4 @@ impl NetworkStack for SimpleNetworkStack {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn len(&self) -> usize { self.len }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-    pub fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
-        let mut write_idx = 0;
-        for i in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(i);
-                if f(item) {
-                    if write_idx != i {
-                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
-                    }
-                    write_idx += 1;
-                }
-            }
-        }
-        self.len = write_idx;
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
+use crate::klib_vec::Vec;

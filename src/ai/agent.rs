@@ -84,7 +84,7 @@ impl AgentCapability {
 
 impl Default for AgentCapability {
     fn default() -> Self {
-        Self::new()
+        Self::none()
     }
 }
 
@@ -335,12 +335,6 @@ pub struct AIStats {
 pub struct SimpleAIAgentManager {
     pub agents: Vec<Box<dyn AIAgent>>,
     pub stats: AIStats,
-}
-
-impl Default for ManagerCapability {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleAIAgentManager {
