@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 pub mod klib;
 pub mod accessibility;
 pub mod ai;
@@ -16,7 +18,6 @@ pub mod filesystem;
 pub mod gpu;
 pub mod graphics;
 pub mod kernel;
-pub mod klib;
 pub mod media;
 pub mod network;
 pub mod observability;
@@ -41,7 +42,7 @@ pub use accessibility::{
 };
 pub use ai::{
     AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
-    ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    Pattern, SimpleAIAgent, SimpleAIAgentManager,
     SovereignWikiEngine, WikiArticle, ApmDependency, ApmLockfile, ApmManifest, ApmPolicy,
     ApmStatus, DependencySource, McpServer, SovereignApmEngine,
 };
@@ -113,6 +114,7 @@ pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
 };
+pub use core::ops::Deref;
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -131,8 +133,8 @@ pub use productivity::{
 };
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    RemoteSession as _, RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
+    SigmaRendezvous, SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
 };
 pub use resilience::{
