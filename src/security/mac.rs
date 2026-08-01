@@ -437,7 +437,6 @@ impl MACEngine for SimpleMACEngine {
                             self.access_denied.fetch_add(1, Ordering::SeqCst);
                             return false;
                         }
-                        return false;
                     }
                 }
                 true
@@ -445,12 +444,6 @@ impl MACEngine for SimpleMACEngine {
                 self.access_denied.fetch_add(1, Ordering::SeqCst);
                 false
             }
-            true
-        } else {
-            if let Ok(mut stats) = self.stats.try_borrow_mut() {
-                stats.access_denied += 1;
-            }
-            false
         }
     }
 
