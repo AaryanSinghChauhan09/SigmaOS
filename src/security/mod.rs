@@ -4,6 +4,7 @@
 pub mod capability;
 pub mod defensive_audit;
 pub mod hardening;
+pub mod parrot_kali;
 pub mod pledge;
 pub mod qubes_isolation;
 pub mod selinux;
@@ -20,4 +21,8 @@ pub use qubes_isolation::{
 pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
+};
+pub use parrot_kali::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, GLOBAL_ANONSURF, GLOBAL_FORENSIC,
+    GLOBAL_SANDBOX, RoutingMode, SandboxPolicy,
 };

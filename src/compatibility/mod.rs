@@ -2,6 +2,7 @@
 pub mod constellation_mesh;
 pub mod cross_platform;
 pub mod endeavour;
+pub mod historic_linux;
 pub mod legacy_adapters;
 pub mod linux_security;
 pub mod standards;
@@ -48,4 +49,20 @@ pub use overtake::{
     ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
     DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
     LizardInstaller, CoasAdminSuite,
+};
+
+pub use historic_linux::{
+    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
+    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
+    VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
+    ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
+    AntixDesktopProfiler, AntixInitManager, BinaryCompatMatrix, BundleType,
+    DesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus,
+    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService,
+    MicroServiceState, NetworkBridge, StorageBridge, SyscallAbi,
+    TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
