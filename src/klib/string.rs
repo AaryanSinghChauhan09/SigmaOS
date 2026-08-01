@@ -55,24 +55,24 @@ pub fn itoa(mut n: i32) -> String {
     if n == 0 {
         return "0".to_string();
     }
-
+    
     let mut result = String::new();
     let negative = n < 0;
-
+    
     if negative {
         n = -n;
     }
-
+    
     while n > 0 {
         let digit = (n % 10) as u8;
         result.push((b'0' + digit) as char);
         n /= 10;
     }
-
+    
     if negative {
         result.push('-');
     }
-
+    
     result.chars().rev().collect()
 }
 
@@ -81,7 +81,7 @@ pub unsafe fn memcpy(dest: *mut u8, src: *const u8, n: usize) {
     if dest.is_null() || src.is_null() {
         return;
     }
-
+    
     for i in 0..n {
         *dest.add(i) = *src.add(i);
     }
@@ -92,7 +92,7 @@ pub unsafe fn memset(s: *mut u8, c: u8, n: usize) {
     if s.is_null() {
         return;
     }
-
+    
     for i in 0..n {
         *s.add(i) = c;
     }
@@ -103,7 +103,7 @@ pub unsafe fn memcmp(s1: *const u8, s2: *const u8, n: usize) -> i32 {
     if s1.is_null() || s2.is_null() {
         return 0;
     }
-
+    
     for i in 0..n {
         let b1 = *s1.add(i);
         let b2 = *s2.add(i);
@@ -111,7 +111,7 @@ pub unsafe fn memcmp(s1: *const u8, s2: *const u8, n: usize) -> i32 {
             return (b1 as i32) - (b2 as i32);
         }
     }
-
+    
     0
 }
 
