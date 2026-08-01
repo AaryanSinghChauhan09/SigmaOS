@@ -32,8 +32,10 @@ pub trait Schedulable {
     fn last_run_time(&self) -> u64;
     /// Set last run time
     fn set_last_run_time(&mut self, time: u64);
-            /// Get task ID
+                /// Get task ID
     fn task_id(&self) -> usize;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
     /// Get task capability
     fn capability(&self) -> TaskCapability;
     /// Get task capability

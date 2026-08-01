@@ -18,6 +18,9 @@ pub enum LogFormat { Json, Text, Binary }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogFormat { Json, Text, Binary }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat { Json, Text, Binary }
+
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {
