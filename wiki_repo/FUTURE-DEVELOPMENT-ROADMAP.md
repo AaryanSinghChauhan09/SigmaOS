@@ -446,7 +446,7 @@ SigmaOS maps, unifies, and traces the absolute master list of 100 core developme
 32. **Package vulnerability scanning**: Scan incoming third-party metadata against CVE records automatically in CI/CD.
 33. **Build farm automation**: Deploy auto-scaling, decentralized build environments for continuous multi-target compilation.
 34. **Language runtime management**: Embed zero-dependency runtimes for Python, Node.js, and Java inside userland sandboxes.
-35. **Flatpak/Container integration**: Support sandboxed graphical applications alongside native package stores.
+35. **Flatpak/Container integration**: Support sandboxed desktop apps alongside native packages.
 36. **Package quality gates**: Automate semantic package lints, style enforcement, and dependency assertions before release.
 37. **Binary compatibility layer**: Map standard Linux ABI expectations directly into S-COSMOS translation matrices.
 38. **Developer package templates**: Deliver clean, pre-configured boilerplate scaffolding for new software repositories.
