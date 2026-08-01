@@ -2,11 +2,17 @@
 // Capability-based security, pledge, and access control
 
 pub mod capability;
-pub mod nemoclaw;
+pub mod defensive_audit;
+pub mod parrot;
 pub mod pledge;
-pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
+};
+pub use parrot::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{ExploitPayload, PenetrationAssistant};

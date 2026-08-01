@@ -4,20 +4,27 @@
 
 use sigmaos::compatibility::{
     APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
-    AntixDesktopProfiler, AntixInitManager, BinaryCompatMatrix, BundleType, DesktopProfile,
-    DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival, GraphicsBridge, InstallerStep,
-    KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyMemoryTrimmer,
-    LegacyPluginManager, LibcVersion, MicroService, MicroServiceState, NetworkBridge,
-    StorageBridge, SyscallAbi, TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI,
-    GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN,
-    GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
-    GLOBAL_WORKLOAD_OPTIMIZER,
+    AntixDesktopProfiler, AntixInitManager, BinaryCompatMatrix, BundleType,
+    DesktopProfile as AntixDesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus,
+    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService,
+    MicroService as AntixMicroService, MicroServiceState,
+    MicroServiceState as AntixMicroServiceState, NetworkBridge, StorageBridge, SyscallAbi,
+    TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+use sigmaos::kernel::{Priority, Process, ProcessState};
 use sigmaos::package::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
     LinuxTranslationService, PackageFormat, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
+};
+use sigmaos::performance::{
+    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
+    PerformanceProfileRule, RamDefragmenter, SmartPerformanceProfile, SmartResourceOptimizer,
+    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
 };
 use sigmaos::security::{
     AnonSurfShunt, AppSandboxEngine, DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter,
@@ -291,9 +298,9 @@ mod tests {
 
         // Test Low-Overhead Desktop Profiler
         let profiler = AntixDesktopProfiler::new();
-        assert_eq!(profiler.get_profile(), DesktopProfile::IceWM);
-        profiler.apply_profile(DesktopProfile::JWM);
-        assert_eq!(profiler.get_profile(), DesktopProfile::JWM);
+        assert_eq!(profiler.get_profile(), AntixDesktopProfile::IceWM);
+        profiler.apply_profile(AntixDesktopProfile::JWM);
+        assert_eq!(profiler.get_profile(), AntixDesktopProfile::JWM);
 
         // Test Control Center Legacy configuration coordinator
         let control = AntixControlCenter::new();
@@ -313,5 +320,63 @@ mod tests {
                 .load(core::sync::atomic::Ordering::SeqCst),
             10
         );
+    }
+
+    #[test]
+    fn test_smart_resource_optimizer() {
+        // Test CPU Priority Optimizer
+        let cpu_optimizer = CpuPriorityOptimizer::new();
+        let mut proc1 = Process::new(1, "proc1".to_string(), Priority::Normal);
+        proc1.state = ProcessState::Running;
+        let mut proc2 = Process::new(2, "proc2".to_string(), Priority::Normal);
+        proc2.state = ProcessState::Blocked;
+        let mut processes = [proc1, proc2];
+
+        cpu_optimizer.optimize_process_priorities(&mut processes);
+        assert_eq!(processes[0].priority, Priority::High);
+        assert_eq!(processes[1].priority, Priority::Low);
+
+        // Test RAM Defragmenter
+        let defragmenter = RamDefragmenter::new();
+        let reclaimed = defragmenter.defragment_heap_allocations(1048576); // 1 MB
+        assert_eq!(reclaimed, 1048576 / 8);
+        assert_eq!(
+            defragmenter
+                .cleanup_count
+                .load(core::sync::atomic::Ordering::SeqCst),
+            1
+        );
+
+        // Test I/O Priority Optimizer
+        let io_optimizer = IoPriorityOptimizer::new();
+        assert_eq!(
+            io_optimizer.resolve_disk_io_priority(true),
+            IoTaskPriority::RealTime
+        );
+        assert_eq!(
+            io_optimizer.resolve_disk_io_priority(false),
+            IoTaskPriority::Idle
+        );
+
+        // Test Glary Smart Rule
+        let rule = GlarySmartRule;
+        assert_eq!(
+            rule.evaluate_target_profile(10, 50),
+            SmartPerformanceProfile::EcoBattery
+        ); // low battery
+        assert_eq!(
+            rule.evaluate_target_profile(90, 90),
+            SmartPerformanceProfile::EcoBattery
+        ); // high temp
+        assert_eq!(
+            rule.evaluate_target_profile(90, 45),
+            SmartPerformanceProfile::TurboMax
+        ); // turbo
+
+        // Test Unified Smart Resource Optimizer
+        let optimizer = SmartResourceOptimizer::new();
+        assert_eq!(optimizer.get_profile(), SmartPerformanceProfile::NormalAuto);
+        optimizer.execute_auto_tuning(95, 40, &rule);
+        assert_eq!(optimizer.get_profile(), SmartPerformanceProfile::TurboMax);
     }
 }
