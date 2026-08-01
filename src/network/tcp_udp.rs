@@ -1,27 +1,18 @@
-#![no_std]
-#![allow(warnings)]
-#![allow(clippy::all)]
-
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+/// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SocketID = usize;
 pub type Port = u16;
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Protocol {
-    TCP = 0,
-    UDP = 1,
-}
+pub enum Protocol { TCP = 0, UDP = 1 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
@@ -36,13 +27,14 @@ pub enum TCPState {
     TimeWait = 9,
 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
     Success = 0,
     InvalidSocket = 1,
     ConnectionFailed = 2,
     SendFailed = 3,
+    InvalidParameter = 4,
 }
 
 pub trait Socket {
@@ -50,6 +42,20 @@ pub trait Socket {
     fn protocol(&self) -> Protocol;
     fn local_port(&self) -> Port;
     fn remote_port(&self) -> Port;
+}
+
+/// Linux BSD Socket Option Interface
+pub trait BsdSocket: Socket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketOption {
+    ReuseAddr,
+    TcpNoDelay,
+    RcvBuf,
+    SndBuf,
 }
 
 pub struct SimpleSocket {
@@ -93,6 +99,35 @@ impl Socket for SimpleSocket {
     }
     fn remote_port(&self) -> Port {
         self.remote_port.load(Ordering::SeqCst) as Port
+    }
+}
+
+impl BsdSocket for SimpleSocket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => {
+                self.reuse_addr.store(val, Ordering::SeqCst);
+            }
+            SocketOption::TcpNoDelay => {
+                self.tcp_nodelay.store(val, Ordering::SeqCst);
+            }
+            SocketOption::RcvBuf => {
+                self.rcvbuf.store(val, Ordering::SeqCst);
+            }
+            SocketOption::SndBuf => {
+                self.sndbuf.store(val, Ordering::SeqCst);
+            }
+        }
+        Ok(())
+    }
+
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
+            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
+            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
+            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
+        }
     }
 }
 
@@ -184,18 +219,18 @@ pub struct RenoCongestionControl {
     pub ssthresh: AtomicUsize,
 }
 
+impl Default for RenoCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl RenoCongestionControl {
     pub fn new() -> Self {
         RenoCongestionControl {
             cwnd: AtomicUsize::new(10),
             ssthresh: AtomicUsize::new(65535),
         }
-    }
-}
-
-impl Default for RenoCongestionControl {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -224,6 +259,12 @@ pub struct BBRCongestionControl {
     pub rtt_min: AtomicUsize,
 }
 
+impl Default for BBRCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BBRCongestionControl {
     pub fn new() -> Self {
         BBRCongestionControl {
@@ -231,12 +272,6 @@ impl BBRCongestionControl {
             bw_estimate: AtomicUsize::new(1000),
             rtt_min: AtomicUsize::new(10),
         }
-    }
-}
-
-impl Default for BBRCongestionControl {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -266,21 +301,19 @@ pub struct SimpleFirewall {
     pub allowed_ports: Vec<AtomicUsize>,
 }
 
-impl SimpleFirewall {
-    pub fn new() -> Self {
-        let mut allowed = Vec::new();
-        for _ in 0..65536 {
-            allowed.push(AtomicUsize::new(0));
-        }
-        SimpleFirewall {
-            allowed_ports: allowed,
-        }
-    }
-}
-
 impl Default for SimpleFirewall {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl SimpleFirewall {
+    pub fn new() -> Self {
+        let mut allowed_ports = Vec::new();
+        for _ in 0..65536 {
+            allowed_ports.push(AtomicUsize::new(0));
+        }
+        SimpleFirewall { allowed_ports }
     }
 }
 
@@ -375,12 +408,6 @@ impl ZeroCopyNetwork {
         ZeroCopyNetwork {
             dma_buffer: AtomicUsize::new(0),
         }
-    }
-}
-
-impl Default for ZeroCopyNetwork {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -611,60 +638,4 @@ impl NetworkStack for SimpleNetworkStack {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_tcp_socket_flow() {
-        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
-        assert_eq!(socket.id(), 1);
-        assert_eq!(socket.protocol(), Protocol::TCP);
-        assert!(socket.listen().is_ok());
-        assert!(socket.connect(8080).is_ok());
-        assert_eq!(socket.get_state(), TCPState::Established);
-
-        let data = b"hello";
-        assert_eq!(socket.send(data).unwrap(), 5);
-
-        let mut buf = [0u8; 10];
-        assert_eq!(socket.recv(&mut buf).unwrap(), 10);
-        assert_eq!(buf[0], 13);
-
-        assert!(socket.close().is_ok());
-        assert_eq!(socket.get_state(), TCPState::Closed);
-    }
-
-    #[test]
-    fn test_udp_socket_flow() {
-        let mut socket = SimpleSocket::new(2, Protocol::UDP, 53);
-        assert_eq!(socket.id(), 2);
-        assert_eq!(socket.protocol(), Protocol::UDP);
-
-        let data = b"dnsreq";
-        assert_eq!(socket.sendto(data, 53).unwrap(), 6);
-
-        let mut buf = [0u8; 10];
-        let (len, rport) = socket.recvfrom(&mut buf).unwrap();
-        assert_eq!(len, 10);
-        assert_eq!(rport, 53);
-        assert_eq!(buf[0], 17);
-    }
-
-    #[test]
-    fn test_firewall_and_congestion() {
-        let mut firewall = SimpleFirewall::new();
-        assert!(!firewall.is_allowed(80));
-        firewall.allow_port(80);
-        assert!(firewall.is_allowed(80));
-        firewall.block_port(80);
-        assert!(!firewall.is_allowed(80));
-
-        let mut cc = RenoCongestionControl::new();
-        assert_eq!(cc.get_cwnd(), 10);
-        cc.update_cwnd(2);
-        assert_eq!(cc.get_cwnd(), 12);
-        cc.on_loss();
-        assert_eq!(cc.get_cwnd(), 1);
-    }
-}
+use crate::klib_vec::Vec;

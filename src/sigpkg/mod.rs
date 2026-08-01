@@ -14,6 +14,19 @@ pub mod universal_engine;
 pub use importer::{DebPackageImporter, RpmPackageImporter, PacmanPackageImporter, PackageImporter};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
+pub use spec::{
+    ManagerCapability, PackageCapability, PackageDependency, PackageError as SpecPackageError,
+    PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
+    SimplePackage, SimplePackageManager,
+};
+pub use universal_engine::{
+    ApkPackageAdapter, AptPackageAdapter, CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
+    EbuildPackageAdapter, FlatpakPackageAdapter, NixPackageAdapter,
+    PackageAdapterFactory,
+    PacmanPackageAdapter, SnapPackageAdapter,
+    TxzPackageAdapter, UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+    XbpsPackageAdapter,
+};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;

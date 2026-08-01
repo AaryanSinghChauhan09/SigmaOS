@@ -7,6 +7,7 @@
 
 pub mod accessibility;
 pub mod ai;
+pub mod boot;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -21,6 +22,8 @@ pub mod init;
 pub mod interrupt;
 pub mod kernel;
 pub mod klib;
+#[path = "klib/vec.rs"]
+pub mod klib_vec;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -120,8 +123,28 @@ pub use interrupt::{
     VGATextBuffer, GDT, IDT, PIC,
 };
 pub use kernel::{
+<<<<<<< HEAD
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+=======
+    ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
+    Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph,
+    KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler, MemoryBlock, Message,
+    MetaKernel, MicroDriver, NetPod, PolicyError, PolicyManager, Priority, PrivacyFirstSandbox,
+    PrivilegeLevel, Process, ProcessState, ProtectionDomain, ResourceBroker, RoundRobinConfig,
+    RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions, PAGE_SIZE,
+    PowerOfTwoZeroCopyQueue, ZeroCopyQueue,
+};
+pub use network::{
+    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
+    RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
+    ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
+};
+pub use observability::{
+    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
+    SimpleObservabilityStack, SimpleSigmaDebug, SimpleSigmaMetrics, SimpleSigmaTrace,
+>>>>>>> origin/bolt-circular-queue-optimization-7229757369581215657
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{

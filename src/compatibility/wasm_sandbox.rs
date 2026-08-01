@@ -3,7 +3,7 @@
 /// to achieve Wasmer/Wasmtime/wasm3 parity inside SigmaOS.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
+use crate::klib_vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WasmState {

@@ -129,6 +129,12 @@ impl AgentCapability {
     }
 }
 
+impl Default for AgentCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple AI agent (OOP: Concrete agent class)
 #[repr(C)]
 pub struct SimpleAIAgent {
