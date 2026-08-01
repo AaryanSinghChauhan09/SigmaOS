@@ -12,6 +12,8 @@ pub enum DriverType {
     Network = 1,
     Graphics = 2,
     Input = 3,
+    Block = 4,
+    Char = 5,
 }
 
 #[repr(usize)]
@@ -147,6 +149,57 @@ impl StorageDriver for SimpleStorageDriver {
             return Err(DriverError::LoadFailed);
         }
         Ok(buf.len())
+    }
+}
+
+pub struct SimpleDriver {
+    pub id: DriverID,
+    pub driver_type: DriverType,
+    pub state: AtomicUsize,
+}
+
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver {
+            id,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
+    }
+}
+
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Active);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Unloaded);
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        &[]
     }
 }
 
@@ -540,11 +593,17 @@ mod tests {
 
         // 3. Load first driver (Storage, has zero dependencies)
         assert!(framework.load_driver(10).is_ok());
-        assert_eq!(framework.get_driver(10).unwrap().state(), DriverState::Active);
+        assert_eq!(
+            framework.get_driver(10).unwrap().state(),
+            DriverState::Active
+        );
 
         // 4. Hot-swap / Unload Storage driver
         assert!(framework.unload_driver(10).is_ok());
-        assert_eq!(framework.get_driver(10).unwrap().state(), DriverState::Unloaded);
+        assert_eq!(
+            framework.get_driver(10).unwrap().state(),
+            DriverState::Unloaded
+        );
     }
 
     #[test]
@@ -560,7 +619,10 @@ mod tests {
         assert!(framework.register_driver(storage).is_ok());
 
         // Try to load network_dep -> should fail since Storage isn't loaded/Active
-        assert_eq!(framework.load_driver(100), Err(DriverError::DependencyMissing));
+        assert_eq!(
+            framework.load_driver(100),
+            Err(DriverError::DependencyMissing)
+        );
 
         // Load storage first
         assert!(framework.load_driver(200).is_ok());

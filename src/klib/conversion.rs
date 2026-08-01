@@ -7,17 +7,17 @@
 pub fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, ()> {
     let mut bytes = Vec::new();
     let chars: Vec<char> = hex.chars().collect();
-    
+
     if chars.len() % 2 != 0 {
         return Err(());
     }
-    
+
     for i in (0..chars.len()).step_by(2) {
         let high = char_to_hex(chars[i])?;
         let low = char_to_hex(chars[i + 1])?;
         bytes.push((high << 4) | low);
     }
-    
+
     Ok(bytes)
 }
 
@@ -33,35 +33,36 @@ pub fn bytes_to_hex(bytes: &[u8]) -> String {
 
 /// Custom base64 encoding
 pub fn base64_encode(input: &[u8]) -> String {
-    const BASE64_CHARS: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    
+    const BASE64_CHARS: &[u8; 64] =
+        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
     let mut result = String::new();
     let mut chunks = input.chunks(3);
-    
+
     for chunk in chunks {
         let mut buffer = [0u8; 3];
         buffer[..chunk.len()].copy_from_slice(chunk);
-        
+
         let b0 = buffer[0];
         let b1 = if chunk.len() > 1 { buffer[1] } else { 0 };
         let b2 = if chunk.len() > 2 { buffer[2] } else { 0 };
-        
+
         result.push(BASE64_CHARS[(b0 >> 2) as usize] as char);
         result.push(BASE64_CHARS[((b0 & 0x03) << 4 | (b1 >> 4)) as usize] as char);
-        
+
         if chunk.len() > 1 {
             result.push(BASE64_CHARS[((b1 & 0x0F) << 2 | (b2 >> 6)) as usize] as char);
         } else {
             result.push('=');
         }
-        
+
         if chunk.len() > 2 {
             result.push(BASE64_CHARS[(b2 & 0x3F) as usize] as char);
         } else {
             result.push('=');
         }
     }
-    
+
     result
 }
 
@@ -79,11 +80,11 @@ fn char_to_hex(c: char) -> Result<u8, ()> {
 pub fn binary_to_bytes(binary: &str) -> Result<Vec<u8>, ()> {
     let mut bytes = Vec::new();
     let chars: Vec<char> = binary.chars().collect();
-    
+
     if chars.len() % 8 != 0 {
         return Err(());
     }
-    
+
     for i in (0..chars.len()).step_by(8) {
         let mut byte = 0u8;
         for j in 0..8 {
@@ -95,7 +96,7 @@ pub fn binary_to_bytes(binary: &str) -> Result<Vec<u8>, ()> {
         }
         bytes.push(byte);
     }
-    
+
     Ok(bytes)
 }
 
@@ -115,11 +116,11 @@ pub fn dec_to_base(mut n: u64, base: u8) -> String {
     if base < 2 || base > 36 {
         return String::new();
     }
-    
+
     if n == 0 {
         return "0".to_string();
     }
-    
+
     let mut result = String::new();
     while n > 0 {
         let digit = (n % base as u64) as u8;
@@ -130,7 +131,7 @@ pub fn dec_to_base(mut n: u64, base: u8) -> String {
         });
         n /= base as u64;
     }
-    
+
     result.chars().rev().collect()
 }
 
@@ -139,7 +140,7 @@ pub fn base_to_dec(s: &str, base: u8) -> Result<u64, ()> {
     if base < 2 || base > 36 {
         return Err(());
     }
-    
+
     let mut result = 0u64;
     for c in s.chars() {
         let digit = if c.is_digit(10) {
@@ -151,14 +152,14 @@ pub fn base_to_dec(s: &str, base: u8) -> Result<u64, ()> {
         } else {
             return Err(());
         };
-        
+
         if digit >= base as u64 {
             return Err(());
         }
-        
+
         result = result * base as u64 + digit;
     }
-    
+
     Ok(result)
 }
 
@@ -210,8 +211,17 @@ mod tests {
 
     #[test]
     fn test_base_to_dec() {
-        assert_eq!(base_to_dec("ff", 16).expect("Failed to convert base 16 to decimal"), 255);
-        assert_eq!(base_to_dec("11111111", 2).expect("Failed to convert base 2 to decimal"), 255);
-        assert_eq!(base_to_dec("255", 10).expect("Failed to convert base 10 to decimal"), 255);
+        assert_eq!(
+            base_to_dec("ff", 16).expect("Failed to convert base 16 to decimal"),
+            255
+        );
+        assert_eq!(
+            base_to_dec("11111111", 2).expect("Failed to convert base 2 to decimal"),
+            255
+        );
+        assert_eq!(
+            base_to_dec("255", 10).expect("Failed to convert base 10 to decimal"),
+            255
+        );
     }
 }
