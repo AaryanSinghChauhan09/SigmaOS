@@ -1,13 +1,12 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Device trait (OOP interface)
 pub trait Device {
@@ -41,7 +40,7 @@ pub enum DeviceError {
 
 /// Device type
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum DeviceType {
     Block = 0,
     Character = 1,
@@ -124,7 +123,12 @@ pub struct DeviceDescriptor {
 }
 
 impl DeviceDescriptor {
-    pub fn new(id: usize, name: &[u8], device_type: DeviceType, capability: DeviceCapability) -> Self {
+    pub fn new(
+        id: usize,
+        name: &[u8],
+        device_type: DeviceType,
+        capability: DeviceCapability,
+    ) -> Self {
         let mut name_array = [0u8; 64];
         let len = name.len().min(63);
         unsafe {
@@ -142,8 +146,16 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        {
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => DeviceState::Initializing,
+                2 => DeviceState::Ready,
+                3 => DeviceState::Busy,
+                4 => DeviceState::Error,
+                5 => DeviceState::Shutdown,
+                _ => DeviceState::Uninitialized,
+            }
         }
     }
 
@@ -161,8 +173,8 @@ impl DeviceDescriptor {
 }
 
 /// Device state
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum DeviceState {
     Uninitialized = 0,
     Initializing = 1,
@@ -198,7 +210,7 @@ pub trait NetworkDevice: Device {
 /// Simple block device implementation (OOP: Concrete class)
 pub struct SimpleBlockDevice {
     descriptor: DeviceDescriptor,
-    blocks: LocalVec<LocalVec<u8>>,
+    blocks: Vec<Vec<u8>>,
     block_size: usize,
 }
 
@@ -213,13 +225,10 @@ impl SimpleBlockDevice {
         };
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Block, capability);
-        let mut blocks = LocalVec::new();
+        let mut blocks = Vec::new();
 
         for _ in 0..num_blocks {
-            let mut block_data = LocalVec::new();
-            for _ in 0..block_size {
-                block_data.push(0u8);
-            }
+            let block_data = vec![0u8; block_size];
             blocks.push(block_data);
         }
 
@@ -316,7 +325,7 @@ impl BlockDevice for SimpleBlockDevice {
 /// Simple character device implementation (OOP: Concrete class)
 pub struct SimpleCharacterDevice {
     descriptor: DeviceDescriptor,
-    buffer: LocalVec<u8>,
+    buffer: Vec<u8>,
     read_pos: usize,
     write_pos: usize,
 }
@@ -333,14 +342,9 @@ impl SimpleCharacterDevice {
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Character, capability);
 
-        let mut buffer = LocalVec::new();
-        for _ in 0..buffer_size {
-            buffer.push(0u8);
-        }
-
         SimpleCharacterDevice {
             descriptor,
-            buffer,
+            buffer: vec![0u8; buffer_size],
             read_pos: 0,
             write_pos: 0,
         }
@@ -440,21 +444,27 @@ impl CharacterDevice for SimpleCharacterDevice {
 
 /// Device manager (OOP: Manager class)
 pub struct DeviceManager {
-    devices: LocalVec<Option<Box<dyn Device>>>,
-    descriptors: LocalVec<Option<NonNull<DeviceDescriptor>>>,
+    devices: Vec<Option<Box<dyn Device>>>,
+    descriptors: Vec<Option<NonNull<DeviceDescriptor>>>,
     next_device_id: AtomicUsize,
 }
 
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {
-            devices: LocalVec::new(),
-            descriptors: LocalVec::new(),
+            devices: Vec::new(),
+            descriptors: Vec::new(),
             next_device_id: AtomicUsize::new(1),
         }
     }
 
-    pub fn register_device(&mut self, device: Box<dyn Device>, name: &[u8], device_type: DeviceType, capability: DeviceCapability) -> Result<usize, DeviceError> {
+    pub fn register_device(
+        &mut self,
+        device: Box<dyn Device>,
+        name: &[u8],
+        device_type: DeviceType,
+        capability: DeviceCapability,
+    ) -> Result<usize, DeviceError> {
         let id = self.next_device_id.fetch_add(1, Ordering::SeqCst);
         let descriptor = DeviceDescriptor::new(id, name, device_type, capability);
 
@@ -500,7 +510,7 @@ impl DeviceManager {
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id < self.descriptors.len() {
+        if id < self.departors.len() {
             self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
@@ -520,8 +530,8 @@ impl DeviceManager {
         None
     }
 
-    pub fn get_devices_by_type(&self, device_type: DeviceType) -> LocalVec<usize> {
-        let mut ids = LocalVec::new();
+    pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<usize> {
+        let mut ids = Vec::new();
         for (id, desc_option) in self.descriptors.iter().enumerate() {
             if let Some(desc_ptr) = *desc_option {
                 let desc = unsafe { &*desc_ptr.as_ptr() };
@@ -535,22 +545,22 @@ impl DeviceManager {
 }
 
 /// Simple Vec implementation for no_std
-pub struct LocalVec<T> {
+struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-impl<T> LocalVec<T> {
-    pub fn new() -> Self {
-        LocalVec {
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
 
-    pub fn push(&mut self, item: T) {
+    fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -563,12 +573,16 @@ impl<T> LocalVec<T> {
         }
     }
 
-    pub fn len(&self) -> usize {
+    fn len(&self) -> usize {
         self.len
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -586,47 +600,36 @@ impl<T> LocalVec<T> {
     }
 }
 
-impl<T> core::ops::Deref for LocalVec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.len == 0 {
-            &[] as &[T]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for LocalVec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.len == 0 {
-            &mut [] as &mut [T]
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a LocalVec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut LocalVec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
-
 // External allocator functions
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+pub struct DdeDeviceWrapper {
+    pub id: usize,
+    pub name: [u8; 32],
+    pub io_port: u16,
+    pub proto: [u8; 8],
+    pub simulated_pci_bar: [u8; 256],
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(id: usize, name: &[u8], io_port: u16, proto: &[u8]) -> Self {
+        let mut name_arr = [0u8; 32];
+        let mut proto_arr = [0u8; 8];
+        let name_len = name.len().min(31);
+        let proto_len = proto.len().min(7);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), name_len);
+            core::ptr::copy_nonoverlapping(proto.as_ptr(), proto_arr.as_mut_ptr(), proto_len);
+        }
+        Self {
+            id,
+            name: name_arr,
+            io_port,
+            proto: proto_arr,
+            simulated_pci_bar: [0u8; 256],
+        }
+    }
 }

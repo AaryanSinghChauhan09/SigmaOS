@@ -93,13 +93,11 @@ impl RoutingTable {
     }
 
     /// Lookup a route for a destination
-    pub fn lookup_route(&mut self, destination: &str) -> Option<&RouteEntry> {
+    pub fn lookup_route(&mut self, destination: &str) -> Option<RouteEntry> {
         // Check cache first
-        let mut found_idx = None;
-        for i in 0..self.route_cache.len() {
-            if self.matches_destination(destination, &self.route_cache[i].key.destination, self.route_cache[i].key.prefix_length) {
-                found_idx = Some(i);
-                break;
+        for cached_route in &self.route_cache {
+            if self.matches_destination(destination, &cached_route.key.destination, cached_route.key.prefix_length) {
+                return Some(cached_route.clone());
             }
         }
 
@@ -135,11 +133,7 @@ impl RoutingTable {
             }
         }
 
-        if let Some(ref key) = best_route_key {
-            self.routes.get(key)
-        } else {
-            None
-        }
+        best_route.cloned()
     }
 
     /// Check if destination matches a route prefix

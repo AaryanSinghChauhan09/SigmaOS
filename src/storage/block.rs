@@ -3,16 +3,22 @@
 
 use core::mem;
 /// OOP-based Block Storage for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 101
-/// Implements block device abstraction and storage management
-
+/// Based on 100-Improvement-Ideas.md storage management concepts
+/// Implements comprehensive block device abstraction, partition management,
+/// and caching for high-performance storage operations
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type BlockDeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum BlockDeviceType { HDD = 0, SSD = 1, NVMe = 2, Virtual = 3 }
+pub enum BlockDeviceType {
+    HDD = 0,
+    SSD = 1,
+    NVMe = 2,
+    Virtual = 3,
+    RAMDisk = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -56,63 +62,25 @@ impl SimpleBlockDevice {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
 impl BlockDevice for SimpleBlockDevice {
-    fn id(&self) -> BlockDeviceID { self.id }
-    fn device_type(&self) -> BlockDeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
-    fn block_size(&self) -> usize { self.block_size.load(Ordering::SeqCst) }
-    fn total_blocks(&self) -> usize { self.total_blocks.load(Ordering::SeqCst) }
+    fn id(&self) -> BlockDeviceID {
+        self.id
+    }
+    fn device_type(&self) -> BlockDeviceType {
+        match self.device_type.load(Ordering::SeqCst) as u32 {
+            1 => BlockDeviceType::SSD,
+            2 => BlockDeviceType::NVMe,
+            3 => BlockDeviceType::Virtual,
+            4 => BlockDeviceType::RAMDisk,
+            _ => BlockDeviceType::HDD,
+        }
+    }
+    fn block_size(&self) -> usize {
+        self.block_size.load(Ordering::SeqCst)
+    }
+    fn total_blocks(&self) -> usize {
+        self.total_blocks.load(Ordering::SeqCst)
+    }
 
     fn read_block(&self, _block_num: usize, _buffer: &mut [u8]) -> Result<(), BlockError> {
         Ok(())
