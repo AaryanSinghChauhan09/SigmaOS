@@ -77,7 +77,8 @@ pub use accessibility::{
 pub use ai::{
     AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
     ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
-    SovereignWikiEngine, WikiArticle,
+    SovereignWikiEngine, WikiArticle, ApmDependency, ApmLockfile, ApmManifest, ApmPolicy,
+    ApmStatus, DependencySource, McpServer, SovereignApmEngine,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,

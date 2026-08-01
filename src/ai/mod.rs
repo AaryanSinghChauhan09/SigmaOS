@@ -3,6 +3,7 @@
 pub mod agent;
 pub mod orchestrator;
 pub mod wiki;
+pub mod apm;
 
 pub use agent::{
     AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
@@ -14,3 +15,7 @@ pub use orchestrator::{
     SimpleAgentCommunication, SimpleAgentOrchestrator, SimpleTaskQueue, TaskQueue,
 };
 pub use wiki::{SovereignWikiEngine, WikiArticle};
+pub use apm::{
+    ApmDependency, ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, McpServer,
+    SovereignApmEngine,
+};
