@@ -142,9 +142,9 @@ impl LinuxDriverPackageTranslator for DebPackageDriverTranslator {
             self.name, self.payload_size
         );
         let driver_type = if self.is_kernel_module {
-            DriverType::Block
+            DriverType::Storage
         } else {
-            DriverType::Char
+            DriverType::Input
         };
         SimpleDriver::new(9901, driver_type)
     }
@@ -175,7 +175,7 @@ impl LinuxDriverPackageTranslator for RpmPackageDriverTranslator {
                 "PackageTranslator: RPM signature is valid. Provisioning micro-driver bridge."
             );
         }
-        SimpleDriver::new(9902, DriverType::Char)
+        SimpleDriver::new(9902, DriverType::Input)
     }
 }
 

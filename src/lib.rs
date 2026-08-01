@@ -1,6 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -16,6 +17,7 @@ pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub mod performance;
 pub mod productivity;
 pub mod remote;
 pub mod resilience;

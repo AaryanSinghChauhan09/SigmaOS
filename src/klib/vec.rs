@@ -10,7 +10,92 @@ pub struct Vec<T> {
     pub capacity: usize,
 }
 
+pub struct Iter<'a, T> {
+    ptr: *const T,
+    end: *const T,
+    _marker: core::marker::PhantomData<&'a T>,
+}
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.ptr == self.end {
+            None
+        } else {
+            unsafe {
+                let result = &*self.ptr;
+                self.ptr = self.ptr.add(1);
+                Some(result)
+            }
+        }
+    }
+}
+
+pub struct IterMut<'a, T> {
+    ptr: *mut T,
+    end: *mut T,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for IterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.ptr == self.end {
+            None
+        } else {
+            unsafe {
+                let result = &mut *self.ptr;
+                self.ptr = self.ptr.add(1);
+                Some(result)
+            }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+impl<T: PartialEq> Vec<T> {
+    pub fn contains(&self, item: &T) -> bool {
+        for i in 0..self.len {
+            if &self[i] == item {
+                return true;
+            }
+        }
+        false
+    }
+}
+
 impl<T> Vec<T> {
+    pub fn iter(&self) -> Iter<'_, T> {
+        Iter {
+            ptr: self.data,
+            end: unsafe { if self.data.is_null() { self.data } else { self.data.add(self.len) } },
+            _marker: core::marker::PhantomData,
+        }
+    }
+
+    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+        IterMut {
+            ptr: self.data,
+            end: unsafe { if self.data.is_null() { self.data } else { self.data.add(self.len) } },
+            _marker: core::marker::PhantomData,
+        }
+    }
+
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),

@@ -1,4 +1,5 @@
 // SigmaOS Compatibility Module
+pub mod historic_linux;
 pub mod cross_platform;
 pub mod standards;
 pub mod legacy_adapters;
@@ -33,4 +34,20 @@ pub use constellation_mesh::{
 pub use linux_security::{
     LinuxCapability, SecurityContext, AppArmorProfile, SecurityModuleManager,
     UserNamespace, NamespaceType, NamespaceManager, SecurityPolicy,
+};
+
+pub use historic_linux::{
+    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
+    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
+    VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
+    ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
+    AntixDesktopProfiler, AntixInitManager, BinaryCompatMatrix, BundleType,
+    DesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus,
+    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService,
+    MicroServiceState, NetworkBridge, StorageBridge, SyscallAbi,
+    TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
