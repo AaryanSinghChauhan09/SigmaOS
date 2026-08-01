@@ -1,22 +1,29 @@
-#![allow(warnings)]
-#![allow(clippy::all)]
-
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod audio {
+    pub mod driver;
+    pub mod editor;
+}
+pub use audio::driver::{
+    AudioDeviceID, AudioType, AudioError, AudioDevice, SimpleAudioDevice, AudioManager,
+    SimpleAudioManager, AudioMixer, SimpleAudioMixer, AudioStream, SimpleAudioStream,
+};
+pub use audio::editor::{
+    AudioTrack, MultiTrackSession, AudioEffect, AmplifyEffect, EchoEffect, LowPassFilter, NoiseGateEffect, AudioEditor,
+};
+
 pub mod accessibility;
-pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
+pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
-pub mod klib;
-pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -30,10 +37,9 @@ pub mod virtualization;
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
-};
-pub use ai::{
-    agent::{AIAgent, AIAgentManager, AIError, AIStats, SimpleAIAgent, SimpleAIAgentManager},
-    orchestrator::{ContextWindowPruner, DeviceTarget, LocalLlmOrchestrator, OrchestratorError},
+    VoiceID, VoiceGender, SimpleVoice, Voice, ScreenReader, SimpleScreenReader, BrailleDisplay, SimpleBrailleDisplay,
+    MagnifierID, Magnifier, SimpleMagnifier, MagnifierManager, SimpleMagnifierManager, ColorFilter, SimpleColorFilter,
+    KeyID, KeyType, VirtualKey, SimpleVirtualKey, OnScreenKeyboard, SimpleOnScreenKeyboard, StickyKeys, SimpleStickyKeys,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -42,10 +48,10 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, GstCalculator, IndiaStackError, MintBackupTool, MintSoftwareManager,
-    MintUpdateItem, MintUpdateLevel, MintUpdateManager, MockUPIService, MultilingualSupport,
-    NtHandle, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader, RegistryHive,
-    SoftwareMeta, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
+    ContainerRuntime, TargetPlatform, TranslationLayer, WasmState, WasmModule, WasmSandboxEngine,
+    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
+    DpllSatSolver, CasObject, ContentAddressedStorage,
+    TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -66,10 +72,7 @@ pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
-pub use network::{
-    EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
-    TcpStack, TcpState,
-};
+pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -88,17 +91,45 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, DefaultDenyNetworkPolicy, NemoClawError,
-    OpenShellAgentSandbox, Permission, PledgeManager, PledgePromise, PrivacyRouter,
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
+    PenetrationAssistant,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, DebianPackageTranslator,
-    LinuxPackageCompatManager, LinuxPackageType, PackageRecipe, RecipeError, RecipeManager,
-    RpmPackageTranslator, SatSolver, Transaction, TranslatedMetadata, TranslatorError,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction, AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
 };
 pub use virtualization::{
-    Container, DeterministicError, DeterministicHypervisor, DeterministicVirtualMachine,
-    KubernetesPod, ResourcePool, VirtualCpuContext, VirtualMachine, VirtualizationError,
-    VirtualizationOrchestrator, VirtualizationTech, VmExecutionSnapshot, VmState,
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+
+pub mod init {
+    pub mod systemd_init;
+}
+pub use init::systemd_init::{
+    SystemdEngine, SystemdUnit, UnitState, UnitType,
+};
+
+pub mod ai {
+    pub mod next_gen;
+    pub mod wandr;
+}
+pub use ai::next_gen::{
+    WorkloadType, AdaptiveKernelPersona, PredictiveSyscallTranslator, DeviceTargetType,
+    AiTask, AiScheduler, EnergyGovernorMode, EnergyAwareScheduler, ModelType,
+    AIModel, MultiModelOrchestrator,
+};
+pub use ai::wandr::{
+    WandrTask, WandrDocument, ResearchResult, WandrEvaluator, SigmaWandrAgent, WandrResearchAgent,
+};
+
+pub mod virt;
+pub use virt::hypervisor::{
+    Guest, GuestID, GuestState, Hypervisor, HypervisorError, SimpleGuest, SimpleHypervisor,
+    VirtualizationGeneration,
+};
+pub use virt::microvm::{
+    MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
 };

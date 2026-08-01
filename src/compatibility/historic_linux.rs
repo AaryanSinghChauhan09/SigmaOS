@@ -1,8 +1,8 @@
-use crate::driver::device::DdeDeviceWrapper;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::driver::device::DdeDeviceWrapper;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxEra {
@@ -47,8 +47,8 @@ impl HistoricSyscallEmulator for Era0_11SyscallEmulator {
         // Early Linux used EAX for syscall number, EBX, ECX, EDX for arguments
         match state.eax {
             0 => Err(HistoricError::SyscallNotImplemented), // sys_setup
-            1 => Ok(42),                                    // sys_exit (dummy code)
-            2 => Ok(101),                                   // sys_fork (simulated pid)
+            1 => Ok(42), // sys_exit (dummy code)
+            2 => Ok(101), // sys_fork (simulated pid)
             3 => {
                 // sys_read(fd, buf, count)
                 let count = state.edx;
@@ -248,104 +248,11 @@ pub enum HistoricError {
     MemoryAccessViolation,
     InvalidIoPortAccess,
     UnsupportedPackageFormat,
-    LfsBuildFailure,
-}
-
-/// Simulated LFS Stage 1 and 2 Toolchain builder
-pub struct LfsToolchainBuilder {
-    pub current_stage: u8,
-}
-
-impl LfsToolchainBuilder {
-    pub fn new() -> Self {
-        Self { current_stage: 1 }
-    }
-
-    pub fn execute_bootstrap_stage(&mut self, stage: u8) -> Result<&'static str, HistoricError> {
-        if stage > 3 {
-            return Err(HistoricError::LfsBuildFailure);
-        }
-        self.current_stage = stage;
-        match stage {
-            1 => Ok("LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"),
-            2 => Ok("LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"),
-            3 => Ok("LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"),
-            _ => Err(HistoricError::LfsBuildFailure),
-        }
-    }
-}
-
-impl Default for LfsToolchainBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// TinyCore-style RAM-only Ephemeral Execution Engine.
-/// Achieves minimal idle execution memory limits (below 30MB of RAM) through compressed read-only extensions (.tcz)
-/// mounted into a high-speed in-memory VFS overlay with copy-on-write persistence separation.
-pub struct TinyCoreEphemeralEngine {
-    pub mounted_extensions: std::collections::HashMap<String, usize>, // ext_name -> payload_size
-    pub volatile_overlay_ram_bytes: usize,
-    pub persistence_enabled: bool,
-}
-
-impl TinyCoreEphemeralEngine {
-    pub fn new() -> Self {
-        TinyCoreEphemeralEngine {
-            mounted_extensions: std::collections::HashMap::new(),
-            volatile_overlay_ram_bytes: 0,
-            persistence_enabled: false,
-        }
-    }
-
-    pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
-        if ext_name.is_empty() || size_bytes == 0 {
-            return Err(HistoricError::MemoryAccessViolation);
-        }
-        self.mounted_extensions.insert(ext_name.to_string(), size_bytes);
-        Ok(())
-    }
-
-    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
-        if self.persistence_enabled {
-            return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
-        }
-        self.volatile_overlay_ram_bytes += data_len;
-        Ok(self.volatile_overlay_ram_bytes)
-    }
-
-    pub fn reset_ephemeral_state(&mut self) {
-        // Drop volatile in-memory overlay structures completely on reset
-        self.volatile_overlay_ram_bytes = 0;
-    }
-}
-
-impl Default for TinyCoreEphemeralEngine {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_tinycore_ephemeral_engine() {
-        let mut engine = TinyCoreEphemeralEngine::new();
-        assert!(!engine.persistence_enabled);
-        assert_eq!(engine.volatile_overlay_ram_bytes, 0);
-
-        engine.load_compressed_extension("coreutils.tcz", 1024 * 1024).unwrap();
-        assert_eq!(*engine.mounted_extensions.get("coreutils.tcz").unwrap(), 1024 * 1024);
-
-        let overlay_size = engine.write_to_volatile_overlay("/tmp/logs.txt", 512).unwrap();
-        assert_eq!(overlay_size, 512);
-
-        engine.reset_ephemeral_state();
-        assert_eq!(engine.volatile_overlay_ram_bytes, 0);
-    }
 
     #[test]
     fn test_era_emulation_getpid() {
@@ -362,10 +269,10 @@ mod tests {
     fn test_era_emulation_read() {
         let emu = Era0_11SyscallEmulator;
         let mut state = HistoricalCpuState {
-            eax: 3,      // sys_read
-            ebx: 0,      // stdin
+            eax: 3, // sys_read
+            ebx: 0, // stdin
             ecx: 0x1000, // buffer
-            edx: 12,     // count
+            edx: 12, // count
             ..Default::default()
         };
         let bytes_read = emu.emulate_syscall(&mut state).unwrap();
@@ -377,7 +284,7 @@ mod tests {
         let emu = Era1_0SyscallEmulator::new();
         let mut state = HistoricalCpuState {
             eax: 102, // sys_socketcall
-            ebx: 1,   // socket()
+            ebx: 1, // socket()
             ..Default::default()
         };
         let fd = emu.emulate_syscall(&mut state).unwrap();
@@ -407,23 +314,5 @@ mod tests {
         let conv = VintagePackageConverter;
         let res = conv.convert_package("old_bash", "tar.Z").unwrap();
         assert_eq!(res, "old_bash-sigpkg-compat");
-    }
-
-    #[test]
-    fn test_lfs_toolchain_stages() {
-        let mut builder = LfsToolchainBuilder::new();
-        assert_eq!(
-            builder.execute_bootstrap_stage(1).unwrap(),
-            "LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"
-        );
-        assert_eq!(
-            builder.execute_bootstrap_stage(2).unwrap(),
-            "LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"
-        );
-        assert_eq!(
-            builder.execute_bootstrap_stage(3).unwrap(),
-            "LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"
-        );
-        assert!(builder.execute_bootstrap_stage(4).is_err());
     }
 }
