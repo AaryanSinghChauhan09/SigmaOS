@@ -203,7 +203,6 @@ impl StorageDriver for SimpleStorageDriver {
     }
 }
 
-
 pub struct SimpleNetworkDriver {
     pub id: DriverID,
     pub state: AtomicUsize,

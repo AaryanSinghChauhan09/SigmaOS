@@ -45,9 +45,7 @@ impl IsolatedDomain {
     ) -> Self {
         let mut name_arr = [0u8; 32];
         let len = name_str.len().min(31);
-        for i in 0..len {
-            name_arr[i] = name_str[i];
-        }
+        name_arr[..len].copy_from_slice(&name_str[..len]);
         Self {
             id,
             name: name_arr,
@@ -62,6 +60,12 @@ impl IsolatedDomain {
 pub struct DomainOrchestrator {
     domains: Vec<Option<IsolatedDomain>>,
     next_id: AtomicUsize,
+}
+
+impl Default for DomainOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl DomainOrchestrator {
@@ -196,6 +200,12 @@ impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
     }
 }
 
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -217,6 +227,9 @@ impl<T> Vec<T> {
     }
     pub fn len(&self) -> usize {
         self.len
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {

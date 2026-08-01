@@ -41,10 +41,7 @@ where
         // Simple hash function - in production use a proper hash
         let mut hash: usize = 0;
         let key_bytes = unsafe {
-            core::slice::from_raw_parts(
-                key as *const K as *const u8,
-                core::mem::size_of::<K>(),
-            )
+            core::slice::from_raw_parts(key as *const K as *const u8, core::mem::size_of::<K>())
         };
         for (i, &byte) in key_bytes.iter().enumerate() {
             hash = hash.wrapping_add((byte as usize) * (i + 1));
@@ -152,15 +149,11 @@ where
     }
 
     pub fn values(&self) -> HashMapValues<'_, K, V> {
-        HashMapValues {
-            iter: self.iter(),
-        }
+        HashMapValues { iter: self.iter() }
     }
 
     pub fn keys(&self) -> HashMapKeys<'_, K, V> {
-        HashMapKeys {
-            iter: self.iter(),
-        }
+        HashMapKeys { iter: self.iter() }
     }
 
     pub fn iter_mut(&mut self) -> HashMapIterMut<'_, K, V> {
@@ -188,7 +181,10 @@ where
     {
         let self_ptr = self as *mut Self;
         if let Some(value) = self.get_mut(&key) {
-            Entry::Occupied(OccupiedEntry { value, _marker: core::marker::PhantomData })
+            Entry::Occupied(OccupiedEntry {
+                value,
+                _marker: core::marker::PhantomData,
+            })
         } else {
             unsafe {
                 Entry::Vacant(VacantEntry {
@@ -214,7 +210,6 @@ where
             }
         }
     }
-
 }
 
 impl<K, V> Default for HashMap<K, V>
@@ -428,7 +423,7 @@ mod tests {
         let mut map = HashMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
-        
+
         assert_eq!(map.get(&"key1"), Some(&"value1"));
         assert_eq!(map.get(&"key2"), Some(&"value2"));
         assert_eq!(map.get(&"key3"), None);
@@ -447,7 +442,7 @@ mod tests {
         let mut map = HashMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
-        
+
         let mut count = 0;
         for (_key, _value) in map.iter() {
             count += 1;

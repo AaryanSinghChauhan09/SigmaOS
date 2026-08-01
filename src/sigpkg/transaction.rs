@@ -1,3 +1,5 @@
+#![allow(clippy::large_enum_variant)]
+
 // Transaction Manager for SigmaPkg
 // Atomic package installation and rollback
 

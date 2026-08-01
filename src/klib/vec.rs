@@ -10,7 +10,6 @@ pub struct Vec<T> {
     pub capacity: usize,
 }
 
-
 impl<T: PartialEq> Vec<T> {
     pub fn contains(&self, item: &T) -> bool {
         for i in 0..self.len {

@@ -167,7 +167,7 @@ mod tests {
         deque.push_back(1);
         deque.push_back(2);
         deque.push_front(0);
-        
+
         assert_eq!(deque.front(), Some(&0));
         assert_eq!(deque.back(), Some(&2));
         assert_eq!(deque.len(), 3);
@@ -178,7 +178,7 @@ mod tests {
         let mut deque: VecDeque<i32> = VecDeque::new();
         deque.push_back(1);
         deque.push_back(2);
-        
+
         assert_eq!(deque.pop_front(), Some(1));
         assert_eq!(deque.pop_front(), Some(2));
         assert_eq!(deque.pop_front(), None);
@@ -190,7 +190,7 @@ mod tests {
         deque.push_back(1);
         deque.push_back(2);
         deque.push_front(0);
-        
+
         let items: std::vec::Vec<i32> = deque.iter().cloned().collect();
         assert_eq!(items, vec![0, 1, 2]);
     }

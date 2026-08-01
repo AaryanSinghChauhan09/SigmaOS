@@ -2,23 +2,23 @@
 // Verifies core system legacy compatibility, accessibility subsystems, driver framework, and filesystem support in standalone mode
 #![allow(unused, clippy::all)]
 
+use sigmaos::accessibility::keyboard::{
+    KeyID, KeyType, OnScreenKeyboard, SimpleOnScreenKeyboard, SimpleVirtualKey, VirtualKey,
+};
+use sigmaos::accessibility::magnifier::{Magnifier, MagnifierManager, SimpleMagnifierManager};
+use sigmaos::accessibility::screenreader::{
+    ScreenReader, SimpleScreenReader, SimpleVoice, Voice, VoiceGender,
+};
 use sigmaos::accessibility::{
     AccessibilityError, AccessibilityFramework, AccessibilityProfile, AccessibilitySetting,
 };
-use sigmaos::accessibility::keyboard::{
-    SimpleOnScreenKeyboard, SimpleVirtualKey, VirtualKey, KeyType, OnScreenKeyboard, KeyID,
-};
-use sigmaos::accessibility::magnifier::{
-    SimpleMagnifierManager, MagnifierManager, Magnifier,
-};
-use sigmaos::accessibility::screenreader::{
-    SimpleScreenReader, SimpleVoice, Voice, VoiceGender, ScreenReader,
-};
 use sigmaos::driver::framework::{
-    Driver, DriverError, DriverID, DriverState, DriverType, SimpleDriver, SimpleDriverFramework, DriverFramework,
+    Driver, DriverError, DriverFramework, DriverID, DriverState, DriverType, SimpleDriver,
+    SimpleDriverFramework,
 };
 use sigmaos::filesystem::support::{
-    SimpleFilesystemManager, FilesystemManager, SimpleBtrfsFS, SimpleZFS, Filesystem, FilesystemType, BtrfsFeatures, ZFSFeatures,
+    BtrfsFeatures, Filesystem, FilesystemManager, FilesystemType, SimpleBtrfsFS,
+    SimpleFilesystemManager, SimpleZFS, ZFSFeatures,
 };
 use sigmaos::kernel::{Priority, Process, ProcessState};
 use sigmaos::package::{
@@ -98,10 +98,16 @@ mod tests {
 
         // Validate state transitions through initialization and load sequences
         assert!(framework.load_driver(1001).is_ok());
-        assert_eq!(framework.get_driver(1001).unwrap().state(), DriverState::Active);
+        assert_eq!(
+            framework.get_driver(1001).unwrap().state(),
+            DriverState::Active
+        );
 
         assert!(framework.unload_driver(1001).is_ok());
-        assert_eq!(framework.get_driver(1001).unwrap().state(), DriverState::Unloaded);
+        assert_eq!(
+            framework.get_driver(1001).unwrap().state(),
+            DriverState::Unloaded
+        );
     }
 
     #[test]
@@ -123,7 +129,10 @@ mod tests {
         assert!(fs_manager.register_filesystem(Box::new(zfs.base)).is_ok());
 
         assert!(fs_manager.get_filesystem(101).is_some());
-        assert_eq!(fs_manager.get_filesystem(101).unwrap().fs_type(), FilesystemType::Btrfs);
+        assert_eq!(
+            fs_manager.get_filesystem(101).unwrap().fs_type(),
+            FilesystemType::Btrfs
+        );
     }
 
     #[test]
