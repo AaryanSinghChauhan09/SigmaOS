@@ -44,6 +44,7 @@ impl PageTableEntry {
 
 #[derive(Clone)]
 #[derive(Clone)]
+#[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
@@ -74,6 +75,7 @@ impl Default for PageTable {
     }
 }
 
+#[derive(Clone)]
 #[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectory {
@@ -110,6 +112,7 @@ impl Default for PageDirectory {
     }
 }
 
+#[derive(Clone)]
 #[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectoryPointerTable {

@@ -245,8 +245,10 @@ impl SnapshotManager for SimpleSnapshotManager {
 }
 
 #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
