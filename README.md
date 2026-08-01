@@ -143,26 +143,33 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📚 Documentation
 
+> **All plans, roadmaps, blueprints, and specifications have been migrated to the [GitHub Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).**
+
 ### Repository Documentation
 
-- [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
-- [Roadmap](Roadmap.md) — Development plan
-- [INSTALL.md](INSTALL.md) — Build instructions
-- [CONTRIBUTING.md](CONTRIBUTING.md) — Contribution guidelines
-- [SECURITY_POLICY.md](SECURITY_POLICY.md) — Security policy
-- [SUPPORT.md](SUPPORT.md) — Support and troubleshooting
-- [FAQ](FAQ.md) — Common questions (coming soon)
-
+- [CONTRIBUTING.md](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CONTRIBUTING) — Contribution guidelines
+- [CHANGELOG.md](CHANGELOG.md) — Version history
 
 ### GitHub Wiki (Canonical Documentation)
 
-Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
+All detailed documentation, roadmaps, plans, and blueprints live in the GitHub Wiki:
 
-- **Master Roadmap**: [Maturity & Distro-Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Maturity_Parity_Roadmap)
-- **Advanced Core Architecture**: [Advanced Absorption Matrix](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Advanced_Absorption)
-- **Filesystem Design**: [SigmaFS Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaFS_Innovations)
-- **Interactive UI Compositor**: [SigmaMedia Frameworks](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/SigmaMedia_Frameworks)
-- **Local AI Daemon**: [Sigma AI Agents](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Sigma_AI_Agents)
+- 🗺️ **[Future Development Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FUTURE-DEVELOPMENT-ROADMAP)** — Long-term vision
+- 🔧 **[Improvement Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ImprovementPlan)** — Master improvement tracking
+- 🐧 **[Linux Distro Parity Roadmap](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/LINUX_DISTRO_PARITY_ROADMAP)** — Distro compatibility plans
+- 🛡️ **[Defensive Audit Systems](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/DEFENSIVE_AUDIT_SYSTEMS_BLUEPRINT)** — Security audit blueprints
+- 💾 **[Filesystem Spec](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/FILESYSTEM_SPEC)** — SigmaFS specification
+- 🖥️ **[Win32 Compatibility](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/WIN32_COMPATIBILITY_PLANS)** — Windows compatibility layer
+- 📡 **[Interoperability Standards](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/INTEROPERABILITY_STANDARDS_ROADMAP)** — Cross-platform interop
+- ⚡ **[Realtime & HPC Scheduling](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/REALTIME_HPC_SCHEDULING_ROADMAP)** — Scheduling subsystem
+- 🔍 **[Observability & Tracing](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/OBSERVABILITY_TRACING_ROADMAP)** — System observability
+- 📦 **[OCI Container Runtime](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/OCI_CONTAINER_RUNTIME_ROADMAP)** — Container support
+- 🧩 **[Constellation Mesh](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/CONSTELLATION_MESH_ROADMAP)** — Distributed mesh network
+- 🔒 **[Qubes Isolation](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/QUBES_ISOLATION_ROADMAP)** — Compartmentalized security
+- 📋 **[Next Steps Guidelines](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NEXT_STEPS_GUIDELINES)** — Current priorities
+- 🏛️ **[3-Year Strategic Vision](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/3-YEAR-STRATEGIC-VISION)** — Strategic direction
+- 📊 **[What's Working & Not Working](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/WHAT_IS_WORKING_AND_NOT_WORKING)** — System status
+- 🌐 **[Full Wiki Index](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)** — All documentation
 
 
 ---
