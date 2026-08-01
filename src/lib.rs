@@ -87,6 +87,8 @@ pub use automation::{
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime as CompatibilityContainerRuntime, TargetPlatform, TranslationLayer,
+    WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus,
+    EflCanvasElement, MokshaProfile, MokshaDesktopManager,
 };
 pub use container::{
     Container, ContainerCapability, ContainerError, ContainerID, ContainerInfo, ContainerRuntime,

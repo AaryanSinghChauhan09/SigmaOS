@@ -234,3 +234,27 @@ To measure our progress toward full parity with legacy Linux distributions, the 
 | **Apps** | Bundled applications| Minimal shell utils | Text editor + terminal| Media players + IDE | Office suite + CAD |
 | **Cloud** | Container runtime | Mock virtualization | Sandboxed containers| OCI‑compliant engine| Kubernetes scale orchestration|
 | **Hardware** | Supported architectures| x86_64 only | x86_64 bare-metal | ARM64 Support | RISC‑V bare-metal |
+
+---
+
+## 🔬 Section 32: WANDR & Bodhi/Moksha Ecosystem Integration (Absorption Matrix)
+
+SigmaOS fully absorbs, adapts, and implements the functional design principles and capabilities of Perplexity AI's WANDR research benchmark and Bodhi Linux's Moksha Desktop visual paradigm to ensure they are cleanly integrated and cease to pose an ecosystem challenge.
+
+### 1. WANDR Research Orchestration (The wide-and-deep research paradigm)
+WANDR is a benchmarking and task execution harness designed for complex information work requiring exhaustive discovery, systematic extraction, precise disambiguation, and structured verification.
+
+SigmaOS implements a native, zero-dependency `#![no_std]` wide-and-deep research controller directly on top of the `LatticeGrid` and `SaiEngine` layers, formalizing the following subsystems:
+- **Relay Nexus**: A generic task agent tracking repository-patch execution trajectories, snapshotting execution workspaces, and collecting output files to adapt remote provider completions to local workspaces.
+- **Harbor Task Translators**: Secure, containerized task packaging parsing declarative instructions, resource contracts, and verification scoring rubrics.
+- **ATIF Trajectory Monitors**: Structured task event loggers writing JSONL trails for real-time validation and multi-agent consensus validation.
+- **Verifier Consensus**: Autonomous local judges querying search APIs, fetching pages, resolving and disambiguating entities, and outputting evidence-backed HTML diagnostic reports.
+
+### 2. Bodhi Linux & Moksha Desktop Optimizations
+Bodhi Linux is celebrated for its lightweight, distraction-free desktop computing experience driven by the Moksha Desktop and the Enlightenment Foundation Libraries (EFL).
+
+SigmaOS integrates these paradigms directly into the **Zenith Desktop compositor** and custom shell elements to ensure rapid UI visual scaling under minimal memory constraints:
+- **EFL-Style Canvas (Evas-Parity)**: A low-overhead stateful rendering canvas that avoids redundant damage regions and tracks layout boundaries to prevent redraw loops.
+- **Moksha profile selectors**: Declarative theme, font, and panel layouts loaded dynamically without heap allocations, preserving 120 FPS performance.
+- **Low-Overhead Desktop Panel components**: Modular taskbar (Plank-parity), app drawers, status observatories, and quick system control buttons that operate inside isolated capability-gated namespaces.
+- **Fast-path styling sheets**: Integrated CSS/XFCE-parity desktop profile sheets to ensure instant system personalization with zero runtime layout translation cost.

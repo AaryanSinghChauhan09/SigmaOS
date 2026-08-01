@@ -115,6 +115,7 @@ impl SimpleAgentOrchestrator {
             next_id: AtomicUsize::new(1),
         }
     }
+}
 
 impl Default for SimpleAgentOrchestrator {
     fn default() -> Self {
