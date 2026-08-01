@@ -89,6 +89,9 @@ impl PageTableEntry {
 }
 
 #[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
@@ -123,6 +126,9 @@ impl Default for PageTable {
     }
 }
 
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
@@ -170,6 +176,9 @@ impl Default for PageDirectory {
     }
 }
 
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,

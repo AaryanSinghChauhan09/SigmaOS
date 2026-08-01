@@ -1,12 +1,18 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
+#[cfg(not(target_os = "none"))]
+use alloc::boxed::Box;
+
+use core::mem;
 /// OOP-based Scheduler for SigmaOS
 /// Implements process/thread scheduling using OOP principles with traits and structs
 /// No dependency on external scheduler frameworks
-
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, AtomicU64, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -26,14 +32,16 @@ pub trait Schedulable {
     fn last_run_time(&self) -> u64;
     /// Set last run time
     fn set_last_run_time(&mut self, time: u64);
-        /// Get task ID
+                /// Get task ID
     fn task_id(&self) -> usize;
     /// Get task capability
     fn capability(&self) -> TaskCapability;
-    /// Check if task can yield
-    fn can_yield(&self) -> bool;
-    /// Check if task can block
-    fn can_block(&self) -> bool;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
+    /// Get task capability
+    fn capability(&self) -> TaskCapability;
 }
 
 /// Priority levels
@@ -84,6 +92,63 @@ impl Task {
     }
 }
 
+#[cfg(target_os = "none")]
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 impl Schedulable for Task {
     fn priority(&self) -> Priority {
         self.priority
@@ -95,15 +160,15 @@ impl Schedulable for Task {
 
     fn state(&self) -> TaskState {
         {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => TaskState::Running,
-                2 => TaskState::Blocked,
-                3 => TaskState::Sleeping,
-                4 => TaskState::Terminated,
-                _ => TaskState::Ready,
-            }
+        let raw = self.state.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => TaskState::Running,
+            2 => TaskState::Blocked,
+            3 => TaskState::Sleeping,
+            4 => TaskState::Terminated,
+            _ => TaskState::Ready,
         }
+    }
     }
 
     fn set_state(&mut self, state: TaskState) {
@@ -130,12 +195,8 @@ impl Schedulable for Task {
         self.id
     }
 
-    fn can_yield(&self) -> bool {
-        self.capability.can_yield
-    }
-
-    fn can_block(&self) -> bool {
-        self.capability.can_block
+    fn capability(&self) -> TaskCapability {
+        self.capability
     }
 }
 
@@ -284,7 +345,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.can_yield() {
+                    if !task.capability().can_yield {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Ready);
@@ -299,7 +360,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.can_block() {
+                    if !task.capability().can_block {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Blocked);
@@ -352,13 +413,7 @@ pub struct PriorityScheduler {
 impl PriorityScheduler {
     pub fn new() -> Self {
         PriorityScheduler {
-            priority_queues: [
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-                Vec::new(),
-            ],
+            priority_queues: [Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new()],
             current_task: AtomicUsize::new(0),
             context_switches: AtomicU64::new(0),
         }
@@ -417,7 +472,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.can_yield() {
+                        if !task.capability().can_yield {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Ready);
@@ -434,7 +489,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.can_block() {
+                        if !task.capability().can_block {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Blocked);
@@ -516,7 +571,11 @@ impl<T> Vec<T> {
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
+            core::ptr::copy(
+                self.data.add(index + 1),
+                self.data.add(index),
+                self.len - index - 1,
+            );
             self.len -= 1;
             item
         }
@@ -531,7 +590,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

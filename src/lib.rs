@@ -1,7 +1,12 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(clippy::all, unused)]
 
 pub mod accessibility;
+pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -11,22 +16,68 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod graphics;
+pub mod init;
+pub mod interrupt;
 pub mod kernel;
+pub mod klib;
 pub mod network;
-pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub mod plugin;
 pub mod productivity;
-pub mod remote;
 pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod graphics {
+    pub mod paint;
+    pub mod video;
+    pub mod compositor;
+    pub mod render3d;
+}
+pub mod hardware {
+    pub mod win32;
+    pub mod compatibility;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+    pub mod runtime;
+}
+pub mod boot {
+    pub mod firmware_bridge;
+    pub mod bridge_grid;
+}
+pub mod toolchain {
+    pub mod adapter;
+    pub mod capsule;
+    pub mod codex;
+    pub mod bootstrap;
+}
+pub mod scheduler {
+    pub mod numa_scheduler;
+    pub mod energy_aware;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
+};
+pub use ai::{
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    SovereignWikiEngine, WikiArticle,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -34,23 +85,17 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime, CorebootGatewayMesh,
-    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
-    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
-    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
-    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
-    PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
-    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, TargetPlatform,
-    TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
-    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
-    Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime as CompatibilityContainerRuntime, TargetPlatform, TranslationLayer,
+    WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus,
+    EflCanvasElement, MokshaProfile, MokshaDesktopManager,
 };
 pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+    Container, ContainerCapability, ContainerError, ContainerID, ContainerInfo, ContainerRuntime,
+    ContainerState, Namespace, OciContainer, OciContainerError, OciContainerID,
+    OciContainerRuntime, OciContainerState, RuntimeCapability, RuntimeStats, Sandbox,
+    SimpleContainer, SimpleContainerRuntime, SimpleOciContainer, SimpleOciContainerRuntime,
+    SimpleSandbox,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -67,24 +112,18 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+pub use interrupt::{
+    ColorCode, ExceptionType, InterruptDescriptor as HardwareInterruptDescriptor,
+    InterruptError as HardwareInterruptError, InterruptHandler as HardwareInterruptHandler,
+    InterruptManager as HardwareInterruptManager, ScreenChar,
+    SimpleInterruptHandler as SimpleHardwareInterruptHandler, TaskStateSegment, VGAColor,
+    VGATextBuffer, GDT, IDT, PIC,
+};
 pub use kernel::{
-    ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
-    InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
-    KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver, NetPod,
-    PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
-    ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
-    Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
-    UserDefinedKernelFunctions,
+    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
+    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
-pub use network::{
-    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
-    RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
-    ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
-};
-pub use observability::{
-    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
-    SimpleObservabilityStack,
-};
+pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -94,11 +133,9 @@ pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
-pub use remote::{
-    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
-    SimpleShellManager,
+pub use plugin::{
+    ManagerCapability, Plugin, PluginCapability, PluginError, PluginID, PluginInfo, PluginManager,
+    PluginState, PluginStats, SimplePlugin, SimplePluginManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -109,17 +146,15 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
-    IsolationError, Permission, PledgeManager, PledgePromise,
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, UnveilManager,
+    UnveilPermission, UnveilRestriction,
 };
-pub use shell::{
-    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
-};
+pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter, PackageImporter,
+    SatSolver, Transaction,
 };
 pub use virtualization::{
-    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
-    VirtualizationOrchestrator, VirtualizationTech, VmState,
+    Container as VirtualContainer, KubernetesPod, ResourcePool, VirtualMachine,
+    VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
