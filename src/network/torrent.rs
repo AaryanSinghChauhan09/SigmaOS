@@ -1,7 +1,7 @@
 // SigmaOS Built-in Torrent Client
 // OOP-based BitTorrent client with peer management
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};

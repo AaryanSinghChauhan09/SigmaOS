@@ -1,6 +1,6 @@
 /// SigmaOS Workqueue async deferred execution engine
 /// Runs deferred kernel tasks in thread context
-use std::collections::VecDeque;
+use crate::klib::VecDeque;
 
 pub struct Work {
     pub name: String,

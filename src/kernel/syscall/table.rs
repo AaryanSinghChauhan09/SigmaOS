@@ -2,7 +2,7 @@ use core::sync::atomic::{AtomicU64, Ordering};
 /// SigmaOS System Call Table — Phase K expansion
 /// Absorbs Linux syscall interface: POSIX-complete table with 300+ syscalls
 /// Categories: fs, mm, proc, net, time, signal, ipc, sched, crypto, io_uring
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

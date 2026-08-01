@@ -1,7 +1,7 @@
 // SigmaOS Kernel Feature Lattice & Syscall Tracker
 // Encapsulates fine-grained feature path selection and lifecycle-aware syscall tracking
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum LatticeFeature {

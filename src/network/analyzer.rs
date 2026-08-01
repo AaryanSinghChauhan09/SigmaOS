@@ -1,7 +1,7 @@
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::time::{Duration, Instant};
 

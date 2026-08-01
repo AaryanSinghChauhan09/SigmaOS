@@ -1,7 +1,7 @@
 // SigmaOS Ecosystem Integration Framework
 // Mobile/embedded presence matrices, enterprise partnerships, and hardware/software certification pipelines
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Hardware architectures supported by SigmaOS
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

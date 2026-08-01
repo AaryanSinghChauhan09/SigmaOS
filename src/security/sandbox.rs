@@ -2,7 +2,7 @@
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Absorbs advanced security controls from SELinux, AppArmor, and Firejail to satisfy Common Criteria and FIPS compliance
 
-use std::collections::HashSet;
+use crate::klib::HashSet;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SandboxRule {

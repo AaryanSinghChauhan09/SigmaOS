@@ -6,7 +6,7 @@ use crate::kernel::subsystems::registry::{
 /// NS DP8390 chipset: 10BASE-2 (coax), 10BASE-T (twisted pair)
 /// Also covers RTL8139 PCI NIC and Intel e1000 Gigabit
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::collections::VecDeque;
+use crate::klib::VecDeque;
 use std::vec::Vec;
 
 /// Ethernet frame constants

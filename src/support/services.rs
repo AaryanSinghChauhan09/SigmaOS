@@ -1,7 +1,7 @@
 // SigmaOS Support & Services Framework
 // Professional support tiers, LTS maintenance guarantees, and disaster recovery configurations
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Professional support levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// HPC Cluster Job State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,7 +1,7 @@
 // SigmaOS Constellation & Museum Architecture for Legacy Compatibility (SigmaConstellation)
 // Implements Kernel Constellations, Syscall Chronicles, Driver Museums, Firmware Pavilions, Build Archives, Security Pavilions, and Peripheral Museums.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 // ==========================================
 // 1. Kernel Personality Constellation (KernelConstellation)

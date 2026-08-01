@@ -1,7 +1,7 @@
 // SigmaOS Cross-Device Orchestration
 // IoT, smart home, and cloud integration baked into the OS
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Device type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

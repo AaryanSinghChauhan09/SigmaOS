@@ -1,7 +1,7 @@
 // SigmaOS Cloud Sync
 // OOP-based cloud synchronization for files and settings
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 

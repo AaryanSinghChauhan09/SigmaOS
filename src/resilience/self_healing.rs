@@ -1,7 +1,7 @@
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Recovery event type

@@ -2,7 +2,7 @@
 // Implements robust OOP principles with custom split, zoom, broadcast, and copy register functions
 // Built to outperform and exceed standard tmux capabilities of Linux distributions
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::ops::Range;
 
 /// Direction for splitting terminal panes

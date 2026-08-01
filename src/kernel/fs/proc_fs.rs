@@ -1,6 +1,6 @@
 /// SigmaOS proc filesystem (/proc) implementation
 /// Provides dynamic system statistics and process information in-memory
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::{String, ToString};
 
 pub struct ProcEntry {

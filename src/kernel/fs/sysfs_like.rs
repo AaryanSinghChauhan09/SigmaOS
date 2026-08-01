@@ -1,6 +1,6 @@
 /// SigmaOS sysfs-like device tree implementation
 /// Exposes devices, drivers, and attributes in a structured tree
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::{String, ToString};
 
 pub struct SysfsAttribute {

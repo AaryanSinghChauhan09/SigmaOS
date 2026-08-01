@@ -1,6 +1,6 @@
 /// SigmaOS POSIX signals implementation
 /// Based on early and modern Linux signals design
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

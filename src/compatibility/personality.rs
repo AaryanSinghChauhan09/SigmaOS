@@ -1,7 +1,7 @@
 // SigmaOS Sharded Personality & Legacy Compatibility Subsystem (SigmaPersonality)
 // Implements sharded kernels, syscall capsules, driver emulators, firmware personas, build capsules, security grids, and peripheral pods.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 // ==========================================
 // 1. Kernel Personality Sharding (KernelShard)

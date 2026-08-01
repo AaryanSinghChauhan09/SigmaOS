@@ -1,6 +1,6 @@
 /// SigmaOS NUMA (Non-Uniform Memory Access) Topology manager
 /// Tracks NUMA nodes and handles node-local memory allocation preferences
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct NumaNode {

@@ -2,7 +2,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

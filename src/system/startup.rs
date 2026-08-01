@@ -1,7 +1,7 @@
 // SigmaOS Startup Optimizer
 // OOP-based startup process optimization with dependency analysis
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 

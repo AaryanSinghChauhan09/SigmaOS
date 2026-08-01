@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Represents an AI SysAdmin Recommendation or Action
 #[derive(Debug, Clone, PartialEq, Eq)]

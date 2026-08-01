@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Configuration hook representing enterprise configuration scripts (e.g. Ansible playbook, Puppet manifest).
 #[derive(Debug, Clone)]

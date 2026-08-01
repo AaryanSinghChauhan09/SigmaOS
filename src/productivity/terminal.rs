@@ -1,7 +1,7 @@
 // SigmaOS Integrated Terminal
 // OOP-based terminal emulator with shell integration
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Terminal session
 #[derive(Debug, Clone)]

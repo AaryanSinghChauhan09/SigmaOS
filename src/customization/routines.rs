@@ -1,7 +1,7 @@
 // SigmaOS Customization Engine
 // Samsung Modes & Routines-style automation and theming
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Automation trigger type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -16,7 +16,7 @@
 //! ```
 
 use sigma_types::{CapabilityToken, Result};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Window state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

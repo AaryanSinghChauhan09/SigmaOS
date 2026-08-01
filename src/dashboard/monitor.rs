@@ -1,7 +1,7 @@
 // SigmaOS Unified Dashboard System
 // Publisher-grade dashboards for system monitoring and productivity
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// System metric type

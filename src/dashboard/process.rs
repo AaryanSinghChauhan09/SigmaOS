@@ -1,7 +1,7 @@
 // SigmaOS Process Manager
 // OOP-based process management with monitoring and control
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// Process info

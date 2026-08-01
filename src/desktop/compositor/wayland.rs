@@ -3,7 +3,7 @@
 // Provides zero-copy hardware-accelerated surface rendering.
 
 use crate::drivers::{GpuDriver, GpuCommand};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Wayland Protocol Object IDs
 pub type WaylandId = u32;

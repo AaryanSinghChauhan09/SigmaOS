@@ -1,7 +1,7 @@
 // SigmaOS Software Updater
 // OOP-based system update management with rollback support
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// Update channel

@@ -1,7 +1,7 @@
 // SigmaOS Performance Enhancer
 // Auto resource optimizer with OOP-based design
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// OOP trait for optimization strategies

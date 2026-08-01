@@ -1,7 +1,7 @@
 // SigmaOS AI-Powered System-Level Automation
 // Extended Samsung Modes & Routines for system-level workflows
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 /// System event type

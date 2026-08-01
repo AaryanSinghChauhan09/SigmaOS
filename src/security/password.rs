@@ -1,7 +1,7 @@
 // SigmaOS Password Manager
 // OOP-based password management with biometric unlock and encryption
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::PathBuf;
 
 /// Password entry

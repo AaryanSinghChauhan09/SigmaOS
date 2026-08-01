@@ -1,7 +1,7 @@
 // SigmaOS Memory Leak Detector
 // OOP-based memory leak detection with tracking and analysis
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// Memory allocation record

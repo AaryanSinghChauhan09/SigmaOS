@@ -1,7 +1,7 @@
 //! Automated Hardware and Peripheral Driver Certification Suite for SigmaOS
 //! Verifies compliance and execution metrics for third-party OEM device drivers.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TestResult {

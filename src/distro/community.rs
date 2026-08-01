@@ -2,7 +2,7 @@
 //! Governs the registration, validation, and metadata for community-driven package repos.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RepoSecurityLevel {

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Represents a compiled target architecture.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

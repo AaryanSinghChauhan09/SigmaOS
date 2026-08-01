@@ -3,7 +3,7 @@
 //! Implements 7 advanced proxy subsystems to seamlessly bridge legacy software/hardware
 //! with modern microkernel OOP capabilities.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 // =========================================================================
 // 1. Kernel Personality Proxy

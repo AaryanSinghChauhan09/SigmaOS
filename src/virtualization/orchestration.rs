@@ -1,7 +1,7 @@
 // SigmaOS Built-in Virtualization Support
 // KVM/QEMU, Docker, and Kubernetes orchestration preconfigured
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Virtualization technology
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

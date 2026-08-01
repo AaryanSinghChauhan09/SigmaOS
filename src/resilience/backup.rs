@@ -1,7 +1,7 @@
 // SigmaOS Polish-Parity System Backup (SigmaTimeshift)
 // Designed for automated, transaction-safe snapshots and system recovery
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

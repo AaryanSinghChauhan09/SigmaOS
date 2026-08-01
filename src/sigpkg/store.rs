@@ -2,7 +2,7 @@
 // Stores packages by SHA3-256 hash for reproducibility
 
 use crate::sigpkg::Package;
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::PathBuf;
 
 /// Content-addressed store

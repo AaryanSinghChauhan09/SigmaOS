@@ -13,7 +13,7 @@
 //! - **Zero-Dependency**: No external libraries, pure Rust implementation
 
 use sigma_types::{CapabilityToken, Result};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::sync::Arc;
 
 /// Document type enumeration

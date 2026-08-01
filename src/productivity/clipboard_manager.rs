@@ -1,7 +1,7 @@
 // SigmaOS Clipboard Manager
 // OOP-based clipboard management with history and type support
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// Clipboard item type

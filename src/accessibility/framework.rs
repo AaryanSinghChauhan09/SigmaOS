@@ -1,7 +1,7 @@
 // SigmaOS Accessibility Framework
 // Advanced vision, hearing, mobility, and cognitive support
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Accessibility category
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

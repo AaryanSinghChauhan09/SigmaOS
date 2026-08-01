@@ -2,7 +2,7 @@
 // Localized, high-performance, OOP-compliant tools for Indian Professionals.
 // Refers to India-Apps-Overview.md and India-first architecture.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// 1. Legal & Judicial Professionals (`sigma-judicial`)
 /// Manages Bharatiya Nyaya Sanhita (BNS), Bharatiya Nagarik Suraksha Sanhita (BNSS),

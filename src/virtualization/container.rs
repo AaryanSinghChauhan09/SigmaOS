@@ -1,7 +1,7 @@
 // SigmaOS Container Runtime
 // OOP-based container management with Docker and Podman support
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::PathBuf;
 
 /// Container configuration

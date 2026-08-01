@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -1,7 +1,7 @@
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Traffic Control — QDisc (Queueing Discipline) Layer
 /// Absorbs Linux tc subsystem: pfifo, pfifo_fast, SFQ, TBF, HTB, CAKE, FQ-CoDel
-use std::collections::VecDeque;
+use crate::klib::VecDeque;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

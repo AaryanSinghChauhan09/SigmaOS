@@ -1,6 +1,6 @@
 /// SigmaOS Huge Pages and hugetlbfs memory support
 /// Standard huge pages: 2MB or 1GB configurations to reduce TLB misses
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum HugePageSize {

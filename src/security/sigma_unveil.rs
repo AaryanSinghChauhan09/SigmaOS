@@ -13,7 +13,7 @@
 //! ```
 
 use sigma_types::{CapabilityToken, Result};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Access permissions for unveiled paths

@@ -1,7 +1,7 @@
 // SigmaOS Sovereign Self-Healing Kernel
 // Deploys active system integrity checkers, memory quarantine, and AI-generated hot patches
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 pub struct SovereignSelfHealingKernel {
     pub integrity_hashes: HashMap<String, String>, // file paths -> baseline hashes

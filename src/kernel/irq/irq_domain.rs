@@ -1,7 +1,7 @@
 /// SigmaOS IRQ Domain mapper
 /// Maps physical hardware interrupts (hwirq) to virtual interrupt numbers (virq)
 /// Inspired by the Linux irq_domain architecture
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 pub struct IrqDomain {
     pub name: String,

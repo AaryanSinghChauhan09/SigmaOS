@@ -1,7 +1,7 @@
 // SigmaOS Task Manager
 // OOP-based task management with Kanban boards and reminders
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// Task

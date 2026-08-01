@@ -1,7 +1,7 @@
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {

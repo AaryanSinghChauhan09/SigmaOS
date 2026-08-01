@@ -1,7 +1,7 @@
 // SigmaOS System Restore Snapshots
 // OOP-based system snapshot and restore functionality
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 

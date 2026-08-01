@@ -1,7 +1,7 @@
 // SigmaOS Email Client
 // OOP-based email client with IMAP/SMTP support and organization
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Email address
 #[derive(Debug, Clone)]

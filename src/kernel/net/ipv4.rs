@@ -2,7 +2,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS IPv4 Network Stack
 /// ARP, IPv4 routing, ICMP echo, raw packet I/O
 /// Absorbs Linux net/ipv4/: arp.c, ip_input.c, ip_output.c, icmp.c
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

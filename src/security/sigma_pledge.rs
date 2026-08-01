@@ -14,7 +14,7 @@
 //! ```
 
 use sigma_types::{CapabilityToken, Result};
-use std::collections::HashSet;
+use crate::klib::HashSet;
 
 /// Pledge namespaces representing different syscall categories
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

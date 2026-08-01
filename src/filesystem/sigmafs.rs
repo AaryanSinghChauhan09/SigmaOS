@@ -1,7 +1,7 @@
 use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaFS: Content-Addressed, Post-Quantum Cryptography (PQC) Encrypted Filesystem
 /// Implements a full Merkle-tree DAG structure for content addressing.
-use std::collections::BTreeMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

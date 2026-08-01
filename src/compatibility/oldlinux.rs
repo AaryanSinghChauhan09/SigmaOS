@@ -3,7 +3,7 @@
 //! Based on early Linux kernel releases (0.01, 0.11, 0.12, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0)
 //! from the Princeton University history archives.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Historical early Linux release metadata
 #[derive(Debug, Clone)]

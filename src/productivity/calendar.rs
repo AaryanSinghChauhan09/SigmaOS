@@ -1,7 +1,7 @@
 // SigmaOS Calendar App
 // OOP-based calendar with events, reminders, and scheduling
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 /// Event type

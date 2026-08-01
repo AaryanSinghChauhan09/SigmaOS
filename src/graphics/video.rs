@@ -184,7 +184,7 @@ impl TimelineClip for VideoClip {
 // 4. Concrete Streaming Overlay Manager (Streamlabs & XSplit)
 // ==========================================
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Type of overlay source (Webcam, Game Capture, Chat Box, Alerts, Labels)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

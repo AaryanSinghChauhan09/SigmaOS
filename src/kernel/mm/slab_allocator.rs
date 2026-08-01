@@ -1,7 +1,7 @@
 /// SigmaOS SLAB/SLUB memory allocator
 /// Inspired by Bonwick's 1994 paper and the Linux kernel SLUB allocator.
 /// Exposes caches for fixed-size allocations to prevent fragmentation.
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::vec::Vec;
 
 pub struct Slab {

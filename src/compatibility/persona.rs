@@ -1,7 +1,7 @@
 // SigmaOS Kernel Persona Containers & Syscall Graph
 // Encapsulates lightweight legacy kernel version mimicry and graph-based dynamic syscall mapping
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PersonaVersion {

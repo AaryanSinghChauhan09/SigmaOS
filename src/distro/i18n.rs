@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Represents a Language Pack for translating system messages.
 #[derive(Debug, Clone)]

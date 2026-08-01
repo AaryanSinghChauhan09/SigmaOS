@@ -1,7 +1,7 @@
 use crate::kernel::scheduler::Process;
 /// SigmaOS OOM (Out Of Memory) Killer implementation
 /// Calculates badness score of processes and kills the worst culprit
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 pub struct OomKiller {
     oom_scores_adj: HashMap<u64, i32>,

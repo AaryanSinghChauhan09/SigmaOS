@@ -1,7 +1,7 @@
 // SigmaOS File Manager
 // OOP-based file management with advanced features
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 
 /// File item

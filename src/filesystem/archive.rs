@@ -1,7 +1,7 @@
 // SigmaOS Archive Manager
 // OOP-based archive creation and extraction with multiple formats
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Archive format

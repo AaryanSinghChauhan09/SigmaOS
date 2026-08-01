@@ -1,7 +1,7 @@
 // SigmaOS Legal & Licensing Framework
 // Clear licensing policies, patent/IP strategy, and compliance certification metrics
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Supported open-source and proprietary license types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -1,7 +1,7 @@
 // SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)
 // Stores legacy drivers in secure vault entries with lineage metadata and dependency chains
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 pub struct VaultEntry {
     pub id: usize,

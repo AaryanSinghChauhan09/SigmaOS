@@ -1,7 +1,7 @@
 // SigmaOS Polish-Parity Software Store & Update Manager (SigmaStore)
 // Designed for software installation, package upgrades, and security auditing
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StoreError {

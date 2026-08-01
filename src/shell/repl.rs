@@ -1,7 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell with full desktop GUI-parity and defensive auditing commands
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::io::{self, BufRead, Write};
 
 use crate::accessibility::{

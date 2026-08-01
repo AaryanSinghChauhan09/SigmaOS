@@ -3,7 +3,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use core::time::Duration;
 /// SigmaOS Advanced Process Lifecycle Management
 /// Absorbs Linux fork/exec/exit/waitpid and Copy-on-Write semantics
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 

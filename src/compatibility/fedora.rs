@@ -1,7 +1,7 @@
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.

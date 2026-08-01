@@ -1,7 +1,7 @@
 // SigmaOS Encrypted File Vault
 // OOP-based encrypted file storage with post-quantum cryptography
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 

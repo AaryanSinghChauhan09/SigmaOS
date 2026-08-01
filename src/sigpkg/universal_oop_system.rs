@@ -3,7 +3,7 @@
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::sync::Arc;
 
 // ============================================================================

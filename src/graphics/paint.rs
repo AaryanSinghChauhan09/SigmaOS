@@ -1,7 +1,7 @@
 // SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)
 // Designed for high-performance raster image canvas and layer filtering
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Image processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

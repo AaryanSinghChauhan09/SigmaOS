@@ -1,7 +1,7 @@
 // SigmaOS Intrusion Detection System
 // OOP-based IDS with anomaly detection and rule-based analysis
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::net::IpAddr;
 use std::time::Instant;
 

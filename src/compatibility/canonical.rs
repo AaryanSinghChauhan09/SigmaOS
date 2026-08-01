@@ -1,7 +1,7 @@
 // SigmaOS Canonical Clean-Room Absorption Daemons
 // Independent, zero-dependency reimplementations of Ubuntu's core tooling
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 pub struct SigmaSubiquity {
     pub autoinstall_parsed: bool,

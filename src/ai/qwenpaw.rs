@@ -5,7 +5,7 @@
 // 2. PawToolGuard & PawFileGuard (Security layers)
 // 3. PawAgentCommunicationProtocol (Multi-agent orchestration/ACP)
 
-use std::collections::VecDeque;
+use crate::klib::VecDeque;
 
 pub struct PawThreeLayerMemory {
     pub live_context: Vec<String>,

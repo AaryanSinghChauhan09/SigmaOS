@@ -1,7 +1,7 @@
 // SigmaOS Note-taking App
 // OOP-based note management with rich text and organization
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::PathBuf;
 
 /// Note

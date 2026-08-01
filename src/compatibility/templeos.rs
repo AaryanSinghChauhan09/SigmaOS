@@ -2,7 +2,7 @@
 //!
 //! Implements HolyC JIT shell, 64-bit RedSea FS, Holy Oracle, and Ring-0 Cooperative Scheduler.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 // =========================================================================
 // 1. HolyC JIT Compiler Shell

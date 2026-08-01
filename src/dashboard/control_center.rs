@@ -1,7 +1,7 @@
 // SigmaOS Unified Control Center
 // OOP-based centralized settings panel with modular architecture
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Control panel type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -1,7 +1,7 @@
 // SigmaOS Code Editor
 // OOP-based code editor with syntax highlighting and LSP integration
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::PathBuf;
 
 /// Document

@@ -2,7 +2,7 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]

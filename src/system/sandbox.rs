@@ -1,7 +1,7 @@
 // SigmaOS Process Sandbox Manager
 // OOP-based process sandboxing with capability-based security
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Sandbox profile

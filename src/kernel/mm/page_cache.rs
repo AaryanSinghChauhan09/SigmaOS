@@ -1,7 +1,7 @@
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Page Cache — absorbs Linux mm/filemap.c and mm/page-writeback.c
 /// Caches file data in memory pages, tracks dirty pages, writeback pressure
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::vec::Vec;
 
 pub const PAGE_SIZE: usize = 4096;

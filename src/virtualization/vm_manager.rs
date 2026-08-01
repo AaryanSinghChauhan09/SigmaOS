@@ -1,7 +1,7 @@
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::PathBuf;
 
 /// VM configuration

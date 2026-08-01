@@ -1,7 +1,7 @@
 // SigmaOS Education & Outreach Framework
 // Training ecosystem, university partnerships, and standardized documentation validation
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Training path / certification details
 #[derive(Debug, Clone)]

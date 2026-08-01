@@ -1,7 +1,7 @@
 // SigmaOS Kernel Personality Prism & Syscall Ledgerbook
 // Refracts workloads into different kernel behaviors and maintains historical syscall fallbacks
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PrismFacet {

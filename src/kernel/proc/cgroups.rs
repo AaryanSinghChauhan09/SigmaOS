@@ -1,6 +1,6 @@
 /// SigmaOS cgroups v2 resource controller implementation
 /// Controls CPU limits, Memory limits, and PID limits
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

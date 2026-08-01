@@ -1,6 +1,6 @@
 /// SigmaOS devtmpfs (/dev) pseudo-filesystem
 /// Automatically registers and creates device files when drivers boot
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::string::{String, ToString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

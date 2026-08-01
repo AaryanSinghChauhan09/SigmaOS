@@ -1,7 +1,7 @@
 // SigmaOS Disk Usage Analyzer
 // OOP-based disk space analysis with visualization
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Disk usage info

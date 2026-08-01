@@ -1,7 +1,7 @@
 // SigmaOS Gamified Productivity System
 // Built-in goal trackers, Pomodoro timers, and progress dashboards
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 use std::time::{Duration, Instant};
 
 /// Achievement type
