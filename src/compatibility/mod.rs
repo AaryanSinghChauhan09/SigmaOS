@@ -9,6 +9,7 @@ pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
 pub mod india_professional_tools;
+pub mod linux_standards;
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -67,4 +68,9 @@ pub use solid_kernel::{
 pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+};
+
+pub use linux_standards::{
+    LsbCompliance, Service, ServiceState, ServiceError,
+    PackageManager, PackageError, LinuxCompat,
 };
