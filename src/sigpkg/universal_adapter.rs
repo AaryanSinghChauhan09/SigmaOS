@@ -58,7 +58,7 @@ impl UniversalPackageAdapter {
             }
             if let Some(pos) = line.find(':') {
                 let key = line[..pos].trim();
-                let val = line[pos + 1..].trim();
+                let val = line.get(pos + 1..).unwrap_or("").trim();
                 match key {
                     "Package" => package = val.to_string(),
                     "Version" => version = val.to_string(),
@@ -137,7 +137,7 @@ impl UniversalPackageAdapter {
             }
             if let Some(pos) = line.find(':') {
                 let key = line[..pos].trim();
-                let val = line[pos + 1..].trim();
+                let val = line.get(pos + 1..).unwrap_or("").trim();
                 in_plugs_block = false;
                 match key {
                     "name" => name = val.trim_matches(|c| c == '"' || c == '\'').to_string(),

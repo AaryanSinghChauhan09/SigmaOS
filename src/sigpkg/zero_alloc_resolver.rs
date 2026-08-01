@@ -68,8 +68,7 @@ impl PackageDependencyResolver {
 
         // Find package and check dependencies recursively
         if let Some(recipe) = self.find_recipe(name) {
-            for dep_idx in 0..recipe.dep_count {
-                let dep_name = recipe.dependencies[dep_idx];
+            for dep_name in &recipe.dependencies[..recipe.dep_count] {
                 if !self.check_cycles(dep_name, visited, idx) {
                     return false;
                 }
@@ -79,7 +78,7 @@ impl PackageDependencyResolver {
     }
 
     fn find_recipe(&self, name: &'static str) -> Option<&PackageRecipe> {
-        self.registry.iter().flatten().find(|r| r.name == name)
+        self.registry.iter().find_map(|opt| opt.as_ref()).find(|r| r.name == name)
     }
 }
 
