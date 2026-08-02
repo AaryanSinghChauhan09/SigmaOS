@@ -1,26 +1,26 @@
 // Universal Package Adapter System
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 
-use crate::sigpkg::{Package, Version, VersionConstraint, Dependency, ParseError};
+use crate::sigpkg::{Dependency, Package, ParseError, Version, VersionConstraint};
 use std::collections::HashMap;
 
 /// Abstract trait for package format adapters (OOPS principle)
 pub trait PackageFormatAdapter: Send + Sync {
     /// Get the format name (e.g., "deb", "rpm", "pacman")
     fn format_name(&self) -> &str;
-    
+
     /// Parse package metadata from distro-specific format
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError>;
-    
+
     /// Convert SigmaOS package to distro-specific format
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError>;
-    
+
     /// Validate package integrity
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError>;
-    
+
     /// Extract dependencies from package
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError>;
-    
+
     /// User-defined hook for custom package processing
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError>;
 }
@@ -47,9 +47,12 @@ impl DebAdapter {
             user_hooks: Vec::new(),
         }
     }
-    
+
     /// Add user-defined processing hook
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
@@ -58,17 +61,17 @@ impl PackageFormatAdapter for DebAdapter {
     fn format_name(&self) -> &str {
         "deb"
     }
-    
+
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
         // Parse debian control file format
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
-        
+
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
         let mut dependencies = Vec::new();
-        
+
         for line in content.lines() {
             if line.starts_with("Package: ") {
                 name = line[9..].to_string();
@@ -77,7 +80,7 @@ impl PackageFormatAdapter for DebAdapter {
             } else if line.starts_with("Description: ") {
                 description = line[13..].to_string();
             } else if line.starts_with("Depends: ") {
-                let deps_str = line[9..];
+                let deps_str = &line[9..];
                 for dep in deps_str.split(',') {
                     let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
                     if !dep_name.is_empty() {
@@ -89,42 +92,54 @@ impl PackageFormatAdapter for DebAdapter {
                 }
             }
         }
-        
-        let version = Version::parse(&version_str)
-            .unwrap_or_else(|_| Version::new(0, 0, 0));
-        
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
-    
+
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str(&format!("Package: {}\n", package.name));
-        output.push_str(&format!("Version: {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!(
+            "Version: {}.{}.{}\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
         output.push_str(&format!("Description: {}\n", package.description));
-        
+
         if !package.dependencies.is_empty() {
             output.push_str("Depends: ");
-            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(", "));
             output.push('\n');
         }
-        
+
         Ok(output.into_bytes())
     }
-    
+
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         // Basic validation: check if it looks like a debian control file
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        
+
         Ok(content.contains("Package:") || content.contains("Version:"))
     }
-    
+
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;
         Ok(package.dependencies)
     }
-    
+
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
         for hook in &self.user_hooks {
             hook(package)?;
@@ -150,8 +165,11 @@ impl RpmAdapter {
             user_hooks: Vec::new(),
         }
     }
-    
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
@@ -160,17 +178,17 @@ impl PackageFormatAdapter for RpmAdapter {
     fn format_name(&self) -> &str {
         "rpm"
     }
-    
+
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
         // Parse RPM header format (simplified)
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
-        
+
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
         let mut dependencies = Vec::new();
-        
+
         for line in content.lines() {
             if line.contains("Name") && line.contains(':') {
                 name = line.split(':').nth(1).unwrap_or("").trim().to_string();
@@ -190,41 +208,53 @@ impl PackageFormatAdapter for RpmAdapter {
                 }
             }
         }
-        
-        let version = Version::parse(&version_str)
-            .unwrap_or_else(|_| Version::new(0, 0, 0));
-        
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
-    
+
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str(&format!("Name: {}\n", package.name));
-        output.push_str(&format!("Version: {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!(
+            "Version: {}.{}.{}\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
         output.push_str(&format!("Summary: {}\n", package.description));
-        
+
         if !package.dependencies.is_empty() {
             output.push_str("Requires: ");
-            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(" "));
             output.push('\n');
         }
-        
+
         Ok(output.into_bytes())
     }
-    
+
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        
+
         Ok(content.contains("Name") || content.contains("Version"))
     }
-    
+
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;
         Ok(package.dependencies)
     }
-    
+
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
         for hook in &self.user_hooks {
             hook(package)?;
@@ -250,8 +280,11 @@ impl PacmanAdapter {
             user_hooks: Vec::new(),
         }
     }
-    
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
@@ -260,17 +293,17 @@ impl PackageFormatAdapter for PacmanAdapter {
     fn format_name(&self) -> &str {
         "pacman"
     }
-    
+
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
         // Parse .PKGINFO format
         let content = String::from_utf8(data.to_vec())
             .map_err(|e| AdapterError::ParseError(e.to_string()))?;
-        
+
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
         let mut dependencies = Vec::new();
-        
+
         for line in content.lines() {
             if line.starts_with("pkgname = ") {
                 name = line[10..].to_string();
@@ -286,38 +319,46 @@ impl PackageFormatAdapter for PacmanAdapter {
                 });
             }
         }
-        
-        let version = Version::parse(&version_str)
-            .unwrap_or_else(|_| Version::new(0, 0, 0));
-        
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
-    
+
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str(&format!("pkgname = {}\n", package.name));
-        output.push_str(&format!("pkgver = {}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!(
+            "pkgver = {}.{}.{}\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
         output.push_str(&format!("pkgdesc = {}\n", package.description));
-        
+
         for dep in &package.dependencies {
             output.push_str(&format!("depend = {}\n", dep.name));
         }
-        
+
         Ok(output.into_bytes())
     }
-    
+
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        
+
         Ok(content.contains("pkgname") || content.contains("pkgver"))
     }
-    
+
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;
         Ok(package.dependencies)
     }
-    
+
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
         for hook in &self.user_hooks {
             hook(package)?;
@@ -339,17 +380,25 @@ pub struct ApkAdapter {
 
 impl ApkAdapter {
     pub fn new() -> Self {
-        Self { user_hooks: Vec::new() }
+        Self {
+            user_hooks: Vec::new(),
+        }
     }
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
 
 impl PackageFormatAdapter for ApkAdapter {
-    fn format_name(&self) -> &str { "apk" }
+    fn format_name(&self) -> &str {
+        "apk"
+    }
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
@@ -365,28 +414,45 @@ impl PackageFormatAdapter for ApkAdapter {
             } else if line.starts_with("D:") {
                 let deps_str = line[2..].to_string();
                 for dep in deps_str.split_whitespace() {
-                    dependencies.push(Dependency { name: dep.to_string(), version_constraint: VersionConstraint::Any });
+                    dependencies.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
                 }
             }
         }
         let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str(&format!("P:{}\n", package.name));
-        output.push_str(&format!("V:{}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!(
+            "V:{}.{}.{}\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
         output.push_str(&format!("T:{}\n", package.description));
         if !package.dependencies.is_empty() {
             output.push_str("D:");
-            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(" "));
             output.push('\n');
         }
         Ok(output.into_bytes())
     }
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
         Ok(content.contains("P:") || content.contains("V:"))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -394,13 +460,17 @@ impl PackageFormatAdapter for ApkAdapter {
         Ok(package.dependencies)
     }
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
-        for hook in &self.user_hooks { hook(package)?; }
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
         Ok(())
     }
 }
 
 impl Default for ApkAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// NixOS derivation package adapter
@@ -410,17 +480,25 @@ pub struct NixAdapter {
 
 impl NixAdapter {
     pub fn new() -> Self {
-        Self { user_hooks: Vec::new() }
+        Self {
+            user_hooks: Vec::new(),
+        }
     }
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
 
 impl PackageFormatAdapter for NixAdapter {
-    fn format_name(&self) -> &str { "nix" }
+    fn format_name(&self) -> &str {
+        "nix"
+    }
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
@@ -429,35 +507,68 @@ impl PackageFormatAdapter for NixAdapter {
         for line in content.lines() {
             if line.contains("pname =") {
                 let parts: Vec<&str> = line.split('"').collect();
-                if parts.len() >= 2 { name = parts[1].to_string(); }
+                if parts.len() >= 2 {
+                    name = parts[1].to_string();
+                }
             } else if line.contains("version =") {
                 let parts: Vec<&str> = line.split('"').collect();
-                if parts.len() >= 2 { version_str = parts[1].to_string(); }
+                if parts.len() >= 2 {
+                    version_str = parts[1].to_string();
+                }
             } else if line.contains("description =") {
                 let parts: Vec<&str> = line.split('"').collect();
-                if parts.len() >= 2 { description = parts[1].to_string(); }
+                if parts.len() >= 2 {
+                    description = parts[1].to_string();
+                }
             } else if line.contains("buildInputs =") {
                 // extract dependencies simply
-                let parts: Vec<&str> = line.split('[').nth(1).unwrap_or("").split(']').next().unwrap_or("").split_whitespace().collect();
+                let parts: Vec<&str> = line
+                    .split('[')
+                    .nth(1)
+                    .unwrap_or("")
+                    .split(']')
+                    .next()
+                    .unwrap_or("")
+                    .split_whitespace()
+                    .collect();
                 for dep in parts {
                     if !dep.is_empty() {
-                        dependencies.push(Dependency { name: dep.to_string(), version_constraint: VersionConstraint::Any });
+                        dependencies.push(Dependency {
+                            name: dep.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
                     }
                 }
             }
         }
         let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str("{\n");
         output.push_str(&format!("  pname = \"{}\";\n", package.name));
-        output.push_str(&format!("  version = \"{}.{}.{}\";\n", package.version.major, package.version.minor, package.version.patch));
-        output.push_str(&format!("  meta.description = \"{}\";\n", package.description));
+        output.push_str(&format!(
+            "  version = \"{}.{}.{}\";\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
+        output.push_str(&format!(
+            "  meta.description = \"{}\";\n",
+            package.description
+        ));
         if !package.dependencies.is_empty() {
             output.push_str("  buildInputs = [ ");
-            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(" "));
             output.push_str(" ];\n");
         }
@@ -465,7 +576,8 @@ impl PackageFormatAdapter for NixAdapter {
         Ok(output.into_bytes())
     }
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
         Ok(content.contains("pname =") || content.contains("buildInputs"))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -473,13 +585,17 @@ impl PackageFormatAdapter for NixAdapter {
         Ok(package.dependencies)
     }
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
-        for hook in &self.user_hooks { hook(package)?; }
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
         Ok(())
     }
 }
 
 impl Default for NixAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Gentoo Portage Ebuild package adapter
@@ -489,17 +605,25 @@ pub struct EbuildAdapter {
 
 impl EbuildAdapter {
     pub fn new() -> Self {
-        Self { user_hooks: Vec::new() }
+        Self {
+            user_hooks: Vec::new(),
+        }
     }
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
 
 impl PackageFormatAdapter for EbuildAdapter {
-    fn format_name(&self) -> &str { "ebuild" }
+    fn format_name(&self) -> &str {
+        "ebuild"
+    }
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
@@ -513,32 +637,53 @@ impl PackageFormatAdapter for EbuildAdapter {
             } else if line.starts_with("DESCRIPTION=") {
                 description = line[12..].replace('"', "").replace('\'', "");
             } else if line.starts_with("DEPEND=") {
-                let deps_str = line[7..].replace('"', "").replace('\'', "").replace('(', "").replace(')', "");
+                let deps_str = line[7..]
+                    .replace('"', "")
+                    .replace('\'', "")
+                    .replace('(', "")
+                    .replace(')', "");
                 for dep in deps_str.split_whitespace() {
                     if !dep.is_empty() {
-                        dependencies.push(Dependency { name: dep.to_string(), version_constraint: VersionConstraint::Any });
+                        dependencies.push(Dependency {
+                            name: dep.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
                     }
                 }
             }
         }
         let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str(&format!("PN=\"{}\"\n", package.name));
-        output.push_str(&format!("PV=\"{}.{}.{}\"\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!(
+            "PV=\"{}.{}.{}\"\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
         output.push_str(&format!("DESCRIPTION=\"{}\"\n", package.description));
         if !package.dependencies.is_empty() {
             output.push_str("DEPEND=\"");
-            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(" "));
             output.push_str("\"\n");
         }
         Ok(output.into_bytes())
     }
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
         Ok(content.contains("PN=") || content.contains("PV="))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -546,13 +691,17 @@ impl PackageFormatAdapter for EbuildAdapter {
         Ok(package.dependencies)
     }
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
-        for hook in &self.user_hooks { hook(package)?; }
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
         Ok(())
     }
 }
 
 impl Default for EbuildAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Universal Package Manager (OOPS Facade Pattern)
@@ -567,7 +716,7 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             default_adapter: None,
         };
-        
+
         // Register built-in adapters
         manager.register_adapter(Box::new(DebAdapter::new()));
         manager.register_adapter(Box::new(RpmAdapter::new()));
@@ -575,28 +724,28 @@ impl UniversalPackageManager {
         manager.register_adapter(Box::new(ApkAdapter::new()));
         manager.register_adapter(Box::new(NixAdapter::new()));
         manager.register_adapter(Box::new(EbuildAdapter::new()));
-        
+
         manager
     }
-    
+
     /// Register a custom package format adapter
     pub fn register_adapter(&mut self, adapter: Box<dyn PackageFormatAdapter>) {
         let format_name = adapter.format_name().to_string();
         self.adapters.insert(format_name.clone(), adapter);
-        
+
         // Set as default if no default exists
         if self.default_adapter.is_none() {
             self.default_adapter = Some(format_name);
         }
     }
-    
+
     /// Set default adapter for unknown formats
     pub fn set_default_adapter(&mut self, format_name: &str) {
         if self.adapters.contains_key(format_name) {
             self.default_adapter = Some(format_name.to_string());
         }
     }
-    
+
     /// Auto-detect package format and parse
     pub fn auto_parse(&self, data: &[u8]) -> Result<Package, AdapterError> {
         for (format_name, adapter) in &self.adapters {
@@ -606,7 +755,7 @@ impl UniversalPackageManager {
                 return Ok(package);
             }
         }
-        
+
         // Try default adapter as fallback
         if let Some(default_name) = &self.default_adapter {
             if let Some(adapter) = self.adapters.get(default_name) {
@@ -615,28 +764,40 @@ impl UniversalPackageManager {
                 return Ok(package);
             }
         }
-        
+
         Err(AdapterError::InvalidFormat)
     }
-    
+
     /// Parse package with specific format
-    pub fn parse_with_format(&self, format_name: &str, data: &[u8]) -> Result<Package, AdapterError> {
-        let adapter = self.adapters.get(format_name)
+    pub fn parse_with_format(
+        &self,
+        format_name: &str,
+        data: &[u8],
+    ) -> Result<Package, AdapterError> {
+        let adapter = self
+            .adapters
+            .get(format_name)
             .ok_or_else(|| AdapterError::UnsupportedFeature(format_name.to_string()))?;
-        
+
         let mut package = adapter.parse_package(data)?;
         adapter.process_hook(&mut package)?;
         Ok(package)
     }
-    
+
     /// Convert package between formats
-    pub fn convert_format(&self, package: &Package, target_format: &str) -> Result<Vec<u8>, AdapterError> {
-        let adapter = self.adapters.get(target_format)
+    pub fn convert_format(
+        &self,
+        package: &Package,
+        target_format: &str,
+    ) -> Result<Vec<u8>, AdapterError> {
+        let adapter = self
+            .adapters
+            .get(target_format)
             .ok_or_else(|| AdapterError::UnsupportedFeature(target_format.to_string()))?;
-        
+
         adapter.serialize_package(package)
     }
-    
+
     /// Get list of supported formats
     pub fn supported_formats(&self) -> Vec<String> {
         self.adapters.keys().cloned().collect()
@@ -652,7 +813,7 @@ impl Default for UniversalPackageManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_deb_adapter_parsing() {
         let adapter = DebAdapter::new();
@@ -660,13 +821,13 @@ mod tests {
 Version: 1.0.0
 Description: A test package
 Depends: libc, libssl";
-        
+
         let package = adapter.parse_package(deb_data).unwrap();
         assert_eq!(package.name, "test-package");
         assert_eq!(package.version.major, 1);
         assert_eq!(package.dependencies.len(), 2);
     }
-    
+
     #[test]
     fn test_rpm_adapter_parsing() {
         let adapter = RpmAdapter::new();
@@ -674,12 +835,12 @@ Depends: libc, libssl";
 Version: 2.0.0
 Summary: An RPM test package
 Requires: glibc openssl";
-        
+
         let package = adapter.parse_package(rpm_data).unwrap();
         assert_eq!(package.name, "test-rpm");
         assert_eq!(package.version.major, 2);
     }
-    
+
     #[test]
     fn test_pacman_adapter_parsing() {
         let adapter = PacmanAdapter::new();
@@ -688,7 +849,7 @@ pkgver = 3.0.0
 pkgdesc = A Pacman test package
 depend = glibc
 depend = openssl";
-        
+
         let package = adapter.parse_package(pacman_data).unwrap();
         assert_eq!(package.name, "test-pacman");
         assert_eq!(package.version.major, 3);
@@ -717,44 +878,45 @@ depend = openssl";
     #[test]
     fn test_ebuild_adapter_parsing() {
         let adapter = EbuildAdapter::new();
-        let ebuild_data = b"PN=\"test-ebuild\"\nPV=\"6.2.3\"\nDESCRIPTION=\"Gentoo test\"\nDEPEND=\"gcc clang\"";
+        let ebuild_data =
+            b"PN=\"test-ebuild\"\nPV=\"6.2.3\"\nDESCRIPTION=\"Gentoo test\"\nDEPEND=\"gcc clang\"";
         let pkg = adapter.parse_package(ebuild_data).unwrap();
         assert_eq!(pkg.name, "test-ebuild");
         assert_eq!(pkg.version.major, 6);
         assert_eq!(pkg.dependencies.len(), 2);
     }
-    
+
     #[test]
     fn test_universal_manager_auto_parse() {
         let manager = UniversalPackageManager::new();
         let deb_data = b"Package: auto-test
 Version: 1.0.0
 Description: Auto-detection test";
-        
+
         let package = manager.auto_parse(deb_data).unwrap();
         assert_eq!(package.name, "auto-test");
     }
-    
+
     #[test]
     fn test_user_defined_hook() {
         let mut adapter = DebAdapter::new();
-        
+
         // Add a user-defined hook that modifies the package
         adapter.add_hook(|package: &mut Package| -> Result<(), AdapterError> {
             package.name = format!("hooked-{}", package.name);
             Ok(())
         });
-        
+
         let deb_data = b"Package: original
 Version: 1.0.0
 Description: Hook test";
-        
+
         let mut package = adapter.parse_package(deb_data).unwrap();
         adapter.process_hook(&mut package).unwrap();
-        
+
         assert_eq!(package.name, "hooked-original");
     }
-    
+
     #[test]
     fn test_format_conversion() {
         let manager = UniversalPackageManager::new();
@@ -765,10 +927,10 @@ Description: Hook test";
             vec![],
             String::new(),
         );
-        
+
         let rpm_data = manager.convert_format(&package, "rpm").unwrap();
         let rpm_str = String::from_utf8(rpm_data).unwrap();
-        
+
         assert!(rpm_str.contains("Name: convert-test"));
         assert!(rpm_str.contains("Version: 1.0.0"));
     }

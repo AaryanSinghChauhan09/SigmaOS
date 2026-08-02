@@ -62,7 +62,7 @@ pub struct SovereignPipe {
     pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
     pub max_capacity: usize,
     pub bytes_transferred: u64,
-    pub non_blocking: bool,        // Non-blocking mode flag (Linux inspired)
+    pub non_blocking: bool, // Non-blocking mode flag (Linux inspired)
 }
 
 impl SovereignPipe {
@@ -207,8 +207,8 @@ pub enum IpcError {
     ChannelFull,
     PermissionDenied,
     InvalidMessage,
-    WouldBlock,   // Non-blocking write target is full / read target empty
-    BrokenPipe,   // Attempted pipe write after reader disconnected
+    WouldBlock, // Non-blocking write target is full / read target empty
+    BrokenPipe, // Attempted pipe write after reader disconnected
 }
 
 #[cfg(test)]
@@ -285,7 +285,10 @@ mod tests {
         assert!(pipe.write_structure(vec![9, 9, 9]).is_ok());
 
         // Second write under non-blocking mode with full capacity should return WouldBlock
-        assert_eq!(pipe.write_structure(vec![8, 8, 8]), Err(IpcError::WouldBlock));
+        assert_eq!(
+            pipe.write_structure(vec![8, 8, 8]),
+            Err(IpcError::WouldBlock)
+        );
     }
 
     #[test]
