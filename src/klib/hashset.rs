@@ -1,18 +1,19 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::hashmap::{HashMap, HashMapIter};
+use super::HashMap;
+use crate::klib::hashmap::HashMapIter;
 
 pub struct HashSet<T>
 where
-    T: PartialEq + Clone + core::hash::Hash,
+    T: Eq + PartialEq + Clone + core::hash::Hash,
 {
     map: HashMap<T, ()>,
 }
 
 impl<T> HashSet<T>
 where
-    T: PartialEq + Clone + core::hash::Hash,
+    T: Eq + PartialEq + Clone + core::hash::Hash,
 {
     pub fn new() -> Self {
         HashSet {
@@ -57,7 +58,7 @@ where
 
 impl<T> Default for HashSet<T>
 where
-    T: PartialEq + Clone + core::hash::Hash,
+    T: Eq + PartialEq + Clone + core::hash::Hash,
 {
     fn default() -> Self {
         Self::new()
@@ -70,7 +71,7 @@ pub struct HashSetIter<'a, T> {
 
 impl<'a, T> Iterator for HashSetIter<'a, T>
 where
-    T: PartialEq + Clone + core::hash::Hash,
+    T: Eq + PartialEq + Clone + core::hash::Hash,
 {
     type Item = &'a T;
 
@@ -88,7 +89,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         set.insert(2);
-        
+
         assert!(set.contains(&1));
         assert!(set.contains(&2));
         assert!(!set.contains(&3));
@@ -107,7 +108,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         set.insert(2);
-        
+
         let mut count = 0;
         for _ in set.iter() {
             count += 1;

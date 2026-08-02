@@ -1,8 +1,8 @@
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
-use crate::sigpkg::{Dependency, Version};
-use std::collections::HashMap;
+use crate::klib::HashMap;
+use crate::sigpkg::{Dependency, Version, VersionConstraint};
 
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,10 @@ pub struct PackageRecipe {
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
     pub pkgrel: u32,
+    pub arch: String,
+    pub license_spdx: String,
     pub prepare_commands: Vec<String>,
+    pub package_commands: Vec<String>,
 }
 
 impl PackageRecipe {
@@ -46,7 +49,10 @@ impl PackageRecipe {
             install_commands: Vec::new(),
             environment: HashMap::new(),
             pkgrel: 1,
+            arch: "x86_64".to_string(),
+            license_spdx: "GPL".to_string(),
             prepare_commands: Vec::new(),
+            package_commands: Vec::new(),
         }
     }
 
@@ -81,8 +87,8 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.prepare_commands.push(command);
+    pub fn with_env(mut self, key: String, value: String) -> Self {
+        self.environment.insert(key, value);
         self
     }
 
@@ -91,8 +97,18 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_env(mut self, key: String, value: String) -> Self {
-        self.environment.insert(key, value);
+    pub fn with_arch(mut self, arch: String) -> Self {
+        self.arch = arch;
+        self
+    }
+
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
+        self
+    }
+
+    pub fn with_package_command(mut self, command: String) -> Self {
+        self.package_commands.push(command);
         self
     }
 
@@ -114,16 +130,24 @@ impl PackageRecipe {
 
     pub fn get_build_script(&self) -> String {
         match self.build_system {
-            BuildSystem::Cargo => "cargo build --release\ncargo install --path .".to_string(),
-            BuildSystem::Make => "make -j$(nproc)\nmake install".to_string(),
+            BuildSystem::Cargo => {
+                format!("cargo build --release\ncargo install --path .")
+            }
+            BuildSystem::Make => {
+                format!("make -j$(nproc)\nmake install")
+            }
             BuildSystem::CMake => {
-                "mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install".to_string()
+                format!("mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install")
             }
-            BuildSystem::Autotools => "./configure\nmake -j$(nproc)\nmake install".to_string(),
+            BuildSystem::Autotools => {
+                format!("./configure\nmake -j$(nproc)\nmake install")
+            }
             BuildSystem::Meson => {
-                "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
+                format!("meson setup build\nmeson compile -C build\nmeson install -C build")
             }
-            BuildSystem::Ninja => "ninja\nninja install".to_string(),
+            BuildSystem::Ninja => {
+                format!("ninja\nninja install")
+            }
         }
     }
 }
@@ -238,5 +262,27 @@ mod tests {
 
         let script = recipe.get_build_script();
         assert!(script.contains("cargo build"));
+    }
+
+    #[test]
+    fn test_pkgbuild_and_aur_compilation_fields() {
+        let recipe = PackageRecipe::new("neofetch-pqc".to_string(), Version::new(7, 1, 0))
+            .with_pkgrel(3)
+            .with_arch("aarch64".to_string())
+            .with_source(
+                "https://github.com/dylanaraps/neofetch".to_string(),
+                "hash_neofetch".to_string(),
+            )
+            .with_prepare_command("patch -p1 < pqc_patch.diff".to_string())
+            .with_build_command("make build".to_string())
+            .with_package_command("make DESTDIR=\"$pkgdir\" install".to_string());
+
+        assert_eq!(recipe.pkgrel, 3);
+        assert_eq!(recipe.arch, "aarch64");
+        assert_eq!(recipe.prepare_commands[0], "patch -p1 < pqc_patch.diff");
+        assert_eq!(
+            recipe.package_commands[0],
+            "make DESTDIR=\"$pkgdir\" install"
+        );
     }
 }

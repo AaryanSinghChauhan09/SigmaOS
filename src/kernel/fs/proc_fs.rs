@@ -2,6 +2,7 @@
 /// Provides dynamic system statistics and process information in-memory
 use crate::klib::HashMap;
 use std::string::{String, ToString};
+use std::vec::Vec;
 
 pub struct ProcEntry {
     pub name: String,
@@ -48,8 +49,30 @@ impl ProcFileSystem {
     }
 
     pub fn read_file(&self, path: &str) -> Result<String, &'static str> {
-        let entry = self.entries.get(path).ok_or("File not found in /proc")?;
-        Ok((entry.content_generator)())
+        if let Some(entry) = self.entries.get(path) {
+            return Ok((entry.content_generator)());
+        }
+
+        // Support dynamic process directory checks: e.g. path matches "[pid]/status"
+        let parts: Vec<&str> = path.split('/').collect();
+        if parts.len() == 2 {
+            let pid_res = parts[0].parse::<u64>();
+            if let Ok(pid) = pid_res {
+                let cmd = parts[1];
+                if cmd == "status" {
+                    return Ok(format!(
+                        "Name:\tprocess_{}\nState:\tR (running)\nTgid:\t{}\nPid:\t{}\nPPid:\t1\nThreads:\t1\nVmSize:\t4096 kB\nVmRSS:\t512 kB\n",
+                        pid, pid, pid
+                    ));
+                } else if cmd == "cmdline" {
+                    return Ok(format!("/bin/process_{}\0--daemon\0", pid));
+                } else if cmd == "stat" {
+                    return Ok(format!("{} (process_{}) R 1 1 0 0 0 4194304 0 0 0 0 0 0 0 0 20 0 1 0 1337 4194304 512", pid, pid));
+                }
+            }
+        }
+
+        Err("File not found in /proc")
     }
 }
 
@@ -71,5 +94,16 @@ mod tests {
 
         proc_fs.register_file("uptime", || "42.00 42.00\n".to_string());
         assert_eq!(proc_fs.read_file("uptime").unwrap(), "42.00 42.00\n");
+
+        // Verify dynamic Linux distro /proc/[pid]/status, cmdline, and stat mappings
+        let status = proc_fs.read_file("1234/status").unwrap();
+        assert!(status.contains("Name:\tprocess_1234"));
+        assert!(status.contains("VmSize:\t4096 kB"));
+
+        let cmdline = proc_fs.read_file("1234/cmdline").unwrap();
+        assert_eq!(cmdline, "/bin/process_1234\0--daemon\0");
+
+        let stat = proc_fs.read_file("1234/stat").unwrap();
+        assert!(stat.contains("R 1 1 0"));
     }
 }
