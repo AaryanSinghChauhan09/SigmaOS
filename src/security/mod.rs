@@ -2,22 +2,17 @@
 // Capability-based security, pledge, and access control
 
 pub mod capability;
-pub mod defensive_audit;
-pub mod hardening;
+pub mod kali_stack;
+pub mod nemoclaw;
 pub mod pledge;
-pub mod qubes_isolation;
-pub mod selinux;
+pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+pub use kali_stack::{
+    CronDaemon, CronJob, DmesgLog, FirewallRule, IptablesFirewall, KaliError,
+    PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
+    TmuxPane,
 };
+pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
-    SecurityRule, SelinuxPermission,
-};
+pub use vulnerability::{ExploitPayload, PenetrationAssistant};

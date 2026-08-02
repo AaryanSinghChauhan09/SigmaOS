@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
 > **"Sovereignty is the ultimate efficiency."**
@@ -120,53 +119,7 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
 - ✅ Zenith Desktop prototype
-<<<<<<< HEAD:wiki/README.md
 - ✅ sigma-pkg CLI
-=======
-- 🔄 Screen recorder with GPU acceleration
-- 🔄 Screenshot tool with annotation
-- 🔄 Calendar + task manager
-- 🔄 Email client with IMAP/SMTP
-- 🔄 Note-taking app with Markdown
-- 🔄 Code editor with LSP support
-- ✅ Integrated terminal
-- ✅ Clipboard manager with history
-- 🔄 Task manager
-
-**Security:**
-- ✅ Encrypted file vault
-- 🔄 Password manager with biometric unlock
-- ✅ Intrusion detection system
-- 🔄 Secure VPN client
-- ✅ Capability-based security framework
-
-**System Tools:**
-- ✅ File manager
-- ✅ Archive manager
-- ✅ Disk usage analyzer
-- ✅ System monitor
-- ✅ Process manager
-- 🔄 Virtual machine manager (QEMU/KVM)
-- 🔄 Container manager (Docker/Podman)
-
-**Package Management:**
-- ✅ sigma-pkg CLI
-- 🔄 Universal package manager
-- 🔄 Rollback package snapshots
-
-**Networking:**
-- 🔄 Cloud sync engine
-- 🔄 Built-in torrent client
-- 🔄 Network traffic analyzer
-
-**AI & Automation:**
-- 🔄 AI orchestrator for system optimization
-
-**Customization:**
-- 🔄 Unified control center
-- ✅ Declarative theming engine
-
-**Boot & Deployment:**
 - ⬜ Bootable ISO (Phase G)
 
 
@@ -192,8 +145,6 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Repository Documentation
 
-- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
-- [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
 - [Roadmap](Roadmap.md) — Development plan
 - [INSTALL.md](INSTALL.md) — Build instructions
@@ -216,76 +167,6 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 ---
 
-## 🏛️ Design Specification & Architecture Layers (Zenith Release Microkernel)
-
-This section represents the core modular microkernel layout of SigmaOS, structured to align with established Linux distribution layouts for robustness, isolation, and silicon-direct execution.
-
-SigmaOS is organized into isolated functional layers to guarantee complete safety and safety-critical isolation boundary conditions:
-
-## 🏛️ Design Specification & Architecture Layers
-
-SigmaOS is organized into isolated functional layers to guarantee complete safety and hardware-isolation boundary conditions:
-
-### 1. Kernel Layer (`/kernel/`)
-- **Process Scheduler**: Multi-level Feedback Queue (MLFQ) and Round-Robin scheduler handling task priorities and time-slice yields.
-- **Memory Management**: Physical Page Frame Allocator (PMM) and Virtual Memory Paging (VMM) supporting 4-level paging tables.
-- **Hardware Drivers**: Low-level abstractions for COM1 serial logs, PS/2 keyboards, standard VGA text mode, and ATA disk sector operations.
-
-### 2. Standard Libraries (`/lib/`)
-- **Sovereign Libc**: Independent, zero-dependency C11 standard library implementation providing `sigma_printf`, memory manipulators (`memcpy`, `memset`), string utilities, and attestation helpers (`crc32`).
-
-### 3. Init System (`/init/`)
-- **PID 1 Bootstrap**: Orchestrates clean startup sequences using Runlevels (1 to 5) to boot vital telemetry, load the virtual file system, initialize the TCP/IP stack, and spawn the user shell in order.
-
-### 4. Virtual File System (`/fs/`)
-- **VFS Interface**: Standardizes operations like `open`, `close`, `read`, and `write` via file descriptor tables and inode indexing.
-- **Ext4/FAT32 Drivers**: Handles block storage, reads superblock states, and walks clusters.
-
-### 5. Networking Stack (`/net/`)
-- **Loopback NIC**: Direct virtual hardware interface loopback (`lo` at `127.0.0.1`).
-- **TCP/IP Suite**: Custom TCP 3-way handshake state machine and UDP port binding.
-- **DNS Lookup**: Local resolver mapping domain endpoints to IPv4 destinations.
-
-### 6. Userland utilities (`/usr/`)
-- **sh Shell**: Interactive CLI command execution environment mapping user inputs to system calls.
-
----
-
-## 🛠️ Build, Test, & Execution Instructions
-
-### Dependencies
-- Make, NASM assembler, GCC, QEMU
-
-### 1. Compile all Modular Subsystems
-```bash
-make clean
-make all
-```
-
-### 2. Running the Emulator
-```bash
-qemu-system-x86_64 -cdrom build/sigmaos.iso -serial stdio -m 2G
-```
-
-### 3. Running Unit Tests
-```bash
-npm run test
-```
-All unit tests in `/tests` must return green states before submitting patches.
-
-
----
-
 ## 📄 License
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
-=======
-# SigmaOS Documentation Wiki
-
-Welcome to the SigmaOS development wiki. This directory contains detailed architectural resources and specifications for our sovereign operating system.
-
-## Table of Contents
-1. [Core Microkernel Specification](../FUTURE-DEVELOPMENT-ROADMAP.md)
-2. [Driver Subsystem and Hardware Integration](../FUTURE-DEVELOPMENT-ROADMAP.md)
-3. [Zenith Desktop and Compositor Architecture](../FUTURE-DEVELOPMENT-ROADMAP.md)
->>>>>>> origin/jules-driver-improvements-linux-inspired-5291856075380713095
