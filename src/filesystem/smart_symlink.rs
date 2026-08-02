@@ -23,13 +23,7 @@ impl SymlinkResolverRule for LinuxPersonaRule {
         "linux-persona-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        match persona {
-            KernelPersona::Linux_2_6
-            | KernelPersona::Linux_3_x
-            | KernelPersona::Linux_4_x
-            | KernelPersona::Linux_5_x
-            | KernelPersona::Linux_6_x => true,
-        }
+        persona.name.starts_with("linux")
     }
 }
 
@@ -39,10 +33,7 @@ impl SymlinkResolverRule for LegacyLinuxRule {
         "legacy-linux-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        match persona {
-            KernelPersona::Linux_2_6 => true,
-            _ => false,
-        }
+        persona.name == "linux_2_6"
     }
 }
 
