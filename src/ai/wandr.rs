@@ -1,7 +1,6 @@
 /// WANDR (Wide And Deep Research) Agent & Benchmark Engine for SigmaOS
 /// Replicates the design, features, metrics, and core principles of Perplexity AI's WANDR research benchmark
 /// Solves structured, high-volume information work requiring broad discovery (wide), systematic extraction, disambiguation, and auditable synthesis (deep).
-
 use crate::klib::Vec;
 
 #[derive(Debug, Clone)]
@@ -87,7 +86,8 @@ impl WandrResearchAgent for SigmaWandrAgent {
                     doc_has_discovery = true;
 
                     // 2. Precise Entity Disambiguation: Map discovered entity name to custom canonical GUID
-                    let canonical_id = format!("GUID-{}", expected.to_uppercase().replace(' ', "_"));
+                    let canonical_id =
+                        format!("GUID-{}", expected.to_uppercase().replace(' ', "_"));
                     let disambiguation_pair = (expected.clone(), canonical_id.clone());
                     if !disambiguated.contains(&disambiguation_pair) {
                         disambiguated.push(disambiguation_pair);
@@ -98,7 +98,9 @@ impl WandrResearchAgent for SigmaWandrAgent {
             // 3. Deep Extraction Phase: Extract structured attributes from contextually discovered documents
             if doc_has_discovery {
                 for (ent, attr) in &task.expected_attributes {
-                    if doc.text.to_lowercase().contains(&ent.to_lowercase()) && doc.text.contains(attr) {
+                    if doc.text.to_lowercase().contains(&ent.to_lowercase())
+                        && doc.text.contains(attr)
+                    {
                         let extracted_pair = (ent.clone(), attr.clone());
                         if !extracted.contains(&extracted_pair) {
                             extracted.push(extracted_pair);
@@ -116,12 +118,19 @@ impl WandrResearchAgent for SigmaWandrAgent {
         // 5. Build Synthesis Report with explicit auditable citations
         report.push_str("Found Discovered Entities:\n");
         for ent in &discovered {
-            report.push_str(&format!("- {} (Verified Canonical ID: GUID-{})\n", ent, ent.to_uppercase().replace(' ', "_")));
+            report.push_str(&format!(
+                "- {} (Verified Canonical ID: GUID-{})\n",
+                ent,
+                ent.to_uppercase().replace(' ', "_")
+            ));
         }
 
         report.push_str("\nExtracted Structured Attributes:\n");
         for (ent, attr) in &extracted {
-            report.push_str(&format!("- Entity '{}' exhibits attribute: {}\n", ent, attr));
+            report.push_str(&format!(
+                "- Entity '{}' exhibits attribute: {}\n",
+                ent, attr
+            ));
         }
 
         report.push_str("\nCitations & Evidence Audit Trail:\n");
@@ -148,7 +157,12 @@ impl WandrEvaluator {
     }
 
     /// Evaluates research agent output on a specific WandrTask, returning precision/recall composite scores
-    pub fn evaluate(&self, agent: &dyn WandrResearchAgent, task: &WandrTask, corpus: &[WandrDocument]) -> WandrEvaluationReport {
+    pub fn evaluate(
+        &self,
+        agent: &dyn WandrResearchAgent,
+        task: &WandrTask,
+        corpus: &[WandrDocument],
+    ) -> WandrEvaluationReport {
         let start_time = std::time::Instant::now();
         let result = agent.execute_research(task, corpus);
         let duration = start_time.elapsed();
@@ -207,7 +221,8 @@ impl WandrEvaluator {
         };
 
         // 5. Composite WANDR Performance Score (Weighted Geometric Mean of all scores)
-        let composite_score = (discovery_score * disambiguation_score * extraction_score * citation_score).powf(0.25);
+        let composite_score =
+            (discovery_score * disambiguation_score * extraction_score * citation_score).powf(0.25);
 
         WandrEvaluationReport {
             task_id: task.id,
