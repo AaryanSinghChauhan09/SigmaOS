@@ -50,7 +50,9 @@ impl SimpleHasher {
     }
 
     pub fn write(&mut self, byte: u8) {
-        self.state = self.state.wrapping_shl(5)
+        self.state = self
+            .state
+            .wrapping_shl(5)
             .wrapping_add(self.state)
             .wrapping_add(byte as u64);
     }
@@ -73,7 +75,9 @@ impl core::hash::Hasher for SimpleHasher {
 
     fn write(&mut self, bytes: &[u8]) {
         for &byte in bytes {
-            self.state = self.state.wrapping_shl(5)
+            self.state = self
+                .state
+                .wrapping_shl(5)
                 .wrapping_add(self.state)
                 .wrapping_add(byte as u64);
         }
