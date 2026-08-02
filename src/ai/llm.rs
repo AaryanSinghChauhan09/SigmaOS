@@ -107,14 +107,12 @@ impl Default for LlmConfig {
     }
 }
 
-/// Tool representation for agent tools integration
 #[derive(Debug, Clone)]
-pub struct Tool {
+pub struct ToolDefinition {
     pub name: String,
     pub description: String,
 }
 
-/// Tool Call representation
 #[derive(Debug, Clone)]
 pub struct ToolCall {
     pub id: String,
@@ -129,7 +127,7 @@ pub struct InferenceRequest {
     pub max_tokens: usize,
     pub stop_sequences: Vec<String>,
     pub temperature: Option<f32>,
-    pub tools: Vec<Tool>,
+    pub tools: Vec<ToolDefinition>,
 }
 
 impl InferenceRequest {
@@ -150,11 +148,6 @@ impl InferenceRequest {
 
     pub fn with_stop_sequence(mut self, sequence: String) -> Self {
         self.stop_sequences.push(sequence);
-        self
-    }
-
-    pub fn with_tool(mut self, tool: Tool) -> Self {
-        self.tools.push(tool);
         self
     }
 }

@@ -2,12 +2,53 @@
 #![no_main]
 
 use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub struct Vec<T> {
     pub data: *mut T,
     pub len: usize,
     pub capacity: usize,
+}
+
+pub struct Iter<'a, T> {
+    ptr: *const T,
+    end: *const T,
+    _marker: core::marker::PhantomData<&'a T>,
+}
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.ptr == self.end {
+            None
+        } else {
+            unsafe {
+                let result = &*self.ptr;
+                self.ptr = self.ptr.add(1);
+                Some(result)
+            }
+        }
+    }
+}
+
+pub struct IterMut<'a, T> {
+    ptr: *mut T,
+    end: *mut T,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for IterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.ptr == self.end {
+            None
+        } else {
+            unsafe {
+                let result = &mut *self.ptr;
+                self.ptr = self.ptr.add(1);
+                Some(result)
+            }
+        }
+    }
 }
 
 impl<T: PartialEq> Vec<T> {
@@ -22,27 +63,19 @@ impl<T: PartialEq> Vec<T> {
 }
 
 impl<T> Vec<T> {
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        self.as_slice().iter()
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        self.as_mut_slice().iter_mut()
-    }
-
-    pub fn as_slice(&self) -> &[T] {
-        if self.len == 0 {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+    pub fn iter(&self) -> Iter<'_, T> {
+        Iter {
+            ptr: self.data,
+            end: unsafe { if self.data.is_null() { self.data } else { self.data.add(self.len) } },
+            _marker: core::marker::PhantomData,
         }
     }
 
-    pub fn as_mut_slice(&mut self) -> &mut [T] {
-        if self.len == 0 {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+    pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+        IterMut {
+            ptr: self.data,
+            end: unsafe { if self.data.is_null() { self.data } else { self.data.add(self.len) } },
+            _marker: core::marker::PhantomData,
         }
     }
 
@@ -66,6 +99,23 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn insert(&mut self, index: usize, item: T) {
+        if index > self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            // shift elements to the right
+            for i in (index..self.len).rev() {
+                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+            }
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
     pub fn pop(&mut self) -> Option<T> {
         if self.len == 0 {
             None
@@ -86,22 +136,6 @@ impl<T> Vec<T> {
             }
             self.len -= 1;
             item
-        }
-    }
-
-    pub fn insert(&mut self, index: usize, item: T) {
-        if index > self.len {
-            panic!("index out of bounds");
-        }
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            for i in (index..self.len).rev() {
-                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
-            }
-            core::ptr::write(self.data.add(index), item);
-            self.len += 1;
         }
     }
 
@@ -160,61 +194,24 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for item in self.iter() {
-            new_vec.push(item.clone());
-        }
-        new_vec
-    }
-}
-
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        self.as_slice().fmt(f)
-    }
-}
-
-impl<T: PartialEq> PartialEq for Vec<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.as_slice() == other.as_slice()
-    }
-}
-
-impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
-    fn eq(&self, other: &[U]) -> bool {
-        self.as_slice() == other
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-impl<T: PartialEq<U>, U> PartialEq<std::vec::Vec<U>> for Vec<T> {
-    fn eq(&self, other: &std::vec::Vec<U>) -> bool {
-        self.as_slice() == other.as_slice()
-    }
-}
-
-impl<T> core::iter::FromIterator<T> for Vec<T> {
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut vec = Vec::new();
-        for item in iter {
-            vec.push(item);
-        }
-        vec
-    }
-}
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
-        self.as_slice()
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
     }
 }
 
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_mut_slice()
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
     }
 }
 
@@ -222,7 +219,8 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+        use core::ops::Deref;
+        self.deref().iter()
     }
 }
 
@@ -230,7 +228,8 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -266,6 +265,16 @@ impl<T> Drop for Vec<T> {
     }
 }
 
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for item in self.iter() {
+            new_vec.push(item.clone());
+        }
+        new_vec
+    }
+}
+
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
@@ -275,6 +284,9 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn free(ptr: *mut u8) {
+    use std::alloc::{dealloc, Layout};
+    // We don't have the layout layout size here, so we leak or let std dealloc?
+    // Actually, in hosted mode, leaking is fine because we don't have layout size, or we can use layout if we tracked it, but leak is safe since it's just for testing.
     let _ = ptr;
 }
 
