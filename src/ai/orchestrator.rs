@@ -116,6 +116,7 @@ impl SimpleAgentOrchestrator {
             response_timeout_secs: 30,
         }
     }
+}
 
     pub fn set_model_temperature(&mut self, temp: f32) {
         self.model_temperature = temp;

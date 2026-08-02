@@ -409,7 +409,7 @@ impl TCPIPStack {
         let socket = Socket::new(socket_type, protocol);
         socket.fd.store(fd, Ordering::SeqCst);
 
-        let socket_ptr = alloc(core::mem::size_of::<Socket>()) as *mut Socket;
+        let socket_ptr = extern_alloc(core::mem::size_of::<Socket>()) as *mut Socket;
         if socket_ptr.is_null() {
             return None;
         }
@@ -730,7 +730,8 @@ pub unsafe fn close_socket(fd: usize) -> bool {
 
 // External allocator functions
 extern "C" {
-    fn alloc(size: usize) -> *mut u8;
+    #[link_name = "alloc"]
+    fn extern_alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
 

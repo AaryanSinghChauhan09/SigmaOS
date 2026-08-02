@@ -37,13 +37,13 @@ pub trait Schedulable {
     /// Get task capability
     fn capability(&self) -> TaskCapability;
 
-    // CFS & EEVDF state variables
-    fn vruntime(&self) -> u64;
-    fn set_vruntime(&mut self, val: u64);
-    fn eligibility_time(&self) -> u64;
-    fn set_eligibility_time(&mut self, val: u64);
-    fn virtual_deadline(&self) -> u64;
-    fn set_virtual_deadline(&mut self, val: u64);
+    // CFS & EEVDF state variables with default implementations for backward compatibility
+    fn vruntime(&self) -> u64 { 0 }
+    fn set_vruntime(&mut self, _val: u64) {}
+    fn eligibility_time(&self) -> u64 { 0 }
+    fn set_eligibility_time(&mut self, _val: u64) {}
+    fn virtual_deadline(&self) -> u64 { 0 }
+    fn set_virtual_deadline(&mut self, _val: u64) {}
 }
 
 /// Priority levels
@@ -963,7 +963,7 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = extern_alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
             for i in 0..self.len {
@@ -983,7 +983,8 @@ impl<T> Vec<T> {
 // External allocator functions
 #[cfg(target_os = "none")]
 extern "C" {
-    fn alloc(size: usize) -> *mut u8;
+    #[link_name = "alloc"]
+    fn extern_alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
 
