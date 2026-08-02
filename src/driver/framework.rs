@@ -1,8 +1,9 @@
-use crate::klib::Vec;
-use core::mem;
 /// OOP-based Driver Framework for SigmaOS
 /// Based on Driver Management Roadmap (OOP-based)
+
+use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type DriverID = usize;
 
@@ -134,8 +135,6 @@ pub trait GraphicsDriver: Driver {
 pub trait InputDriver: Driver {
     fn poll_events(&mut self) -> Result<usize, DriverError>;
 }
-
-// Concrete Driver Classes (OOP Implementation)
 
 pub struct SimpleStorageDriver {
     pub id: DriverID,
@@ -310,12 +309,13 @@ impl Bus for UsbBus {
 // Factory Pattern (Dynamic Driver Factory Instantiation)
 
 pub struct DriverFactory;
+
 impl DriverFactory {
-    pub fn create_driver(id: DriverID, driver_type: DriverType) -> Box<dyn Driver> {
+    pub fn create_driver_box(id: DriverID, driver_type: DriverType) -> alloc::boxed::Box<dyn Driver> {
         match driver_type {
-            DriverType::Storage => Box::new(SimpleStorageDriver::new(id)),
-            DriverType::Network => Box::new(SimpleNetworkDriver::new(id, &[])),
-            _ => Box::new(SimpleStorageDriver::new(id)), // Fallback
+            DriverType::Storage => alloc::boxed::Box::new(SimpleStorageDriver::new(id)),
+            DriverType::Network => alloc::boxed::Box::new(SimpleNetworkDriver::new(id, &[])),
+            _ => alloc::boxed::Box::new(SimpleStorageDriver::new(id)), // Fallback
         }
     }
 }
@@ -323,7 +323,7 @@ impl DriverFactory {
 // Core OOP Driver Framework with Dependency Resolution & Hot-Swapping
 
 pub trait DriverFramework {
-    fn register_driver(&mut self, driver: Box<dyn Driver>) -> Result<DriverID, DriverError>;
+    fn register_driver(&mut self, driver: alloc::boxed::Box<dyn Driver>) -> Result<DriverID, DriverError>;
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
@@ -331,7 +331,7 @@ pub trait DriverFramework {
 }
 
 pub struct SimpleDriverFramework {
-    drivers: Vec<Option<Box<dyn Driver>>>,
+    drivers: Vec<Option<alloc::boxed::Box<dyn Driver>>>,
     next_id: AtomicUsize,
 }
 
@@ -350,6 +350,7 @@ impl SimpleDriverFramework {
             let mut found = false;
             for driver_option in self.drivers.iter() {
                 if let Some(ref d) = *driver_option {
+                    let d: &dyn Driver = &**d;
                     if d.driver_type() == dep && d.state() == DriverState::Active {
                         found = true;
                         break;
@@ -365,7 +366,7 @@ impl SimpleDriverFramework {
 }
 
 impl DriverFramework for SimpleDriverFramework {
-    fn register_driver(&mut self, driver: Box<dyn Driver>) -> Result<DriverID, DriverError> {
+    fn register_driver(&mut self, driver: alloc::boxed::Box<dyn Driver>) -> Result<DriverID, DriverError> {
         let id = driver.id();
         self.drivers.push(Some(driver));
         Ok(id)
@@ -376,10 +377,9 @@ impl DriverFramework for SimpleDriverFramework {
         let mut dep_ok = false;
         for i in 0..self.drivers.len() {
             if let Some(ref d) = self.drivers[i] {
-                if d.id() == id {
-                    dep_ok = self.verify_dependencies(d.as_ref());
-                    break;
-                }
+                let d: &dyn Driver = &**d;
+                dep_ok = self.verify_dependencies(d);
+                break;
             }
         }
 
@@ -389,6 +389,7 @@ impl DriverFramework for SimpleDriverFramework {
 
         for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
+                let driver: &mut dyn Driver = &mut **driver;
                 if driver.id() == id {
                     driver.init()?;
                     if driver.probe()? {
@@ -405,6 +406,7 @@ impl DriverFramework for SimpleDriverFramework {
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
         for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
+                let driver: &mut dyn Driver = &mut **driver;
                 if driver.id() == id {
                     driver.shutdown()?;
                     return driver.unload();
@@ -417,8 +419,9 @@ impl DriverFramework for SimpleDriverFramework {
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver> {
         for driver_option in self.drivers.iter() {
             if let Some(ref driver) = *driver_option {
+                let driver: &dyn Driver = &**driver;
                 if driver.id() == id {
-                    return Some(driver.as_ref());
+                    return Some(driver);
                 }
             }
         }
@@ -429,6 +432,7 @@ impl DriverFramework for SimpleDriverFramework {
         let mut ids = Vec::new();
         for driver_option in self.drivers.iter() {
             if let Some(ref d) = *driver_option {
+                let d: &dyn Driver = &**d;
                 if d.driver_type() == driver_type {
                     ids.push(d.id());
                 }
@@ -447,8 +451,8 @@ mod tests {
         let mut framework = SimpleDriverFramework::new();
 
         // 1. Create drivers using Factory Pattern
-        let storage = DriverFactory::create_driver(10, DriverType::Storage);
-        let network = DriverFactory::create_driver(20, DriverType::Network);
+        let storage = DriverFactory::create_driver_box(10, DriverType::Storage);
+        let network = DriverFactory::create_driver_box(20, DriverType::Network);
 
         // 2. Register both drivers
         assert!(framework.register_driver(storage).is_ok());
@@ -475,8 +479,8 @@ mod tests {
 
         // Declare a network driver that relies on Storage being Active
         let static_deps: &'static [DriverType] = &[DriverType::Storage];
-        let network_dep = Box::new(SimpleNetworkDriver::new(100, static_deps));
-        let storage = Box::new(SimpleStorageDriver::new(200));
+        let network_dep = alloc::boxed::Box::new(SimpleNetworkDriver::new(100, static_deps));
+        let storage = alloc::boxed::Box::new(SimpleStorageDriver::new(200));
 
         assert!(framework.register_driver(network_dep).is_ok());
         assert!(framework.register_driver(storage).is_ok());

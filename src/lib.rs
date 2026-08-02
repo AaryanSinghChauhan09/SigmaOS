@@ -1,8 +1,9 @@
-#![allow(clippy::all)]
-#![allow(warnings)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
+pub mod klib;
 pub mod accessibility;
 pub mod ai;
 pub mod automation;
@@ -17,7 +18,6 @@ pub mod filesystem;
 pub mod gpu;
 pub mod graphics;
 pub mod kernel;
-pub mod klib;
 pub mod media;
 pub mod network;
 pub mod observability;
@@ -41,10 +41,10 @@ pub use accessibility::{
     AccessibilityProfile, AccessibilitySetting,
 };
 pub use ai::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, ApmDependency,
-    ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, Intent, IntentType,
-    ManagerCapability as AiManagerCapability, McpServer, Pattern, SimpleAIAgent,
-    SimpleAIAgentManager, SovereignApmEngine, SovereignWikiEngine, WikiArticle,
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    SovereignWikiEngine, WikiArticle, ApmDependency, ApmLockfile, ApmManifest, ApmPolicy,
+    ApmStatus, DependencySource, McpServer, SovereignApmEngine,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -52,26 +52,29 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BodhiProfileSelector, BudgieAppletManager,
-    BudgieLayoutSwitcher, BudgieShuffler, BuildCodexGrid, CoasAdminSuite, CompatibilityError,
+    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
     CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
-    CorebootGatewayMesh, CosmicDesktopEngine, DACConstellation, DotMatrixMesh, DrakxtoolsSuite,
-    DriverArchiveGridV2, ElementaryAppCenter, EosLogTool, EosMirrorReflector, EosUpdateNotifier,
-    EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh,
-    GraniteHigLibrary, GraphicsArchiveGridV2, HarddrakeDetector, JujuOrchestrator,
-    KernelConstellationGrid, LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LizardInstaller, LsbProfile,
-    MaasProvisioner, Mirror as EosMirror, MokshaDesktopEngine, MokshaGadgetManager,
-    MultipassVmlight, NetworkAlmanacHub, NetworkArchiveGridV2, PacstallAur,
-    PantheonGalaWindowManager, PeripheralArchiveMesh, PopShellTiling, PosixComplianceLevel,
-    ProcessAlmanacHub, RhinoPkgUnified, SELinuxConstellation, SecurityConstellation,
-    SnapcraftRuntime, StandardsComplianceManager, StarlingCompositor, StarlingTilingEngine,
-    StarlingWidgetTree, StarlingX11Server, StorageArchiveGridV2, SyscallAlmanacHub,
-    System76PowerSwitcher, System76Scheduler, TapeMesh, TargetPlatform, TranslationLayer,
-    UEFIGatewayMesh, UbuntuDockManager, UbuntuProEsm, UnicornDesktopShell, UrpmiPackageResolver,
-    WelcomeTab as EosWelcomeTab, YayAurHelper, ZeroTrustConstellation, ZorinConnectBridge,
-    ZorinLookChanger, ZorinWinePreflight,
+    CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
+    EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub,
+    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
+    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, LsbProfile, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation,
+    SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
+    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
+    YayAurHelper, ZeroTrustConstellation,
+    StarlingCompositor, StarlingWidgetTree, StarlingX11Server, StarlingTilingEngine,
+    CosmicDesktopEngine, PopShellTiling, System76Scheduler, System76PowerSwitcher,
+    BudgieAppletManager, BudgieShuffler, BudgieLayoutSwitcher,
+    RhinoPkgUnified, PacstallAur, UnicornDesktopShell,
+    MokshaDesktopEngine, BodhiProfileSelector, MokshaGadgetManager,
+    PantheonGalaWindowManager, GraniteHigLibrary, ElementaryAppCenter,
+    UbuntuDockManager, SnapcraftRuntime, UbuntuProEsm,
+    MaasProvisioner, JujuOrchestrator, MultipassVmlight,
+    ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
+    DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
+    LizardInstaller, CoasAdminSuite,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -111,17 +114,18 @@ pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
 };
+pub use core::ops::Deref;
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DebPackageDriverTranslator, DependencyResolver, GenericLinuxTranslationUdf,
-    LinuxDriverPackageTranslator, LinuxTranslationService, PackageAdapter, PackageError,
-    PackageFormat, PackageSource, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, UnifiedPackage, UniversalPackageManager,
-    GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
+    DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
+    LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
+    RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
 pub use productivity::{
     Achievement, AchievementType, AegisubEngine, GamifiedProductivity, Goal, PomodoroState,
@@ -129,8 +133,8 @@ pub use productivity::{
 };
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    RemoteSession as _, RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
+    SigmaRendezvous, SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
 };
 pub use resilience::{
