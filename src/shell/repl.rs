@@ -256,6 +256,20 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "echo" => {
+                ShellCommand::Echo {
+                    message: parts[1..].join(" "),
+                }
+            }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {

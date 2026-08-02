@@ -378,13 +378,36 @@ impl DriverFramework for SimpleDriverFramework {
         Ok(id)
     }
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
+        let mut target_idx = None;
         for i in 0..self.drivers.len() {
-            if let Some(ref mut driver) = self.drivers[i] {
+            if let Some(ref driver) = self.drivers[i] {
                 if driver.id() == id {
-                    return driver.load();
+                    target_idx = Some(i);
+                    break;
                 }
             }
         }
+
+        if let Some(idx) = target_idx {
+            let deps = self.drivers[idx].as_ref().unwrap().dependencies();
+            for &dep_type in deps {
+                let mut dep_satisfied = false;
+                for other_option in &self.drivers {
+                    if let Some(ref other) = *other_option {
+                        if other.driver_type() == dep_type && other.state() == DriverState::Active {
+                            dep_satisfied = true;
+                            break;
+                        }
+                    }
+                }
+                if !dep_satisfied {
+                    return Err(DriverError::DependencyMissing);
+                }
+            }
+
+            return self.drivers[idx].as_mut().unwrap().load();
+        }
+
         Err(DriverError::LoadFailed)
     }
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
