@@ -11,6 +11,7 @@ pub mod voice;
 pub mod lift_engine;
 pub mod wiki;
 pub mod apm;
+pub mod open_computer;
 
 pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
 
@@ -41,8 +42,14 @@ pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
 };
+<<<<<<< HEAD
 pub use wiki::{SovereignWikiEngine, WikiArticle};
 pub use apm::{
     ApmDependency, ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, McpServer,
     SovereignApmEngine,
+=======
+pub use open_computer::{
+    OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
+    AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
+>>>>>>> origin/jules-880081283500171861-1eb07604
 };

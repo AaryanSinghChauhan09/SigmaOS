@@ -1,7 +1,7 @@
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Recovery event type
@@ -98,7 +98,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        _context: &HashMap<String, String>,
+        context: &HashMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;
@@ -374,15 +374,11 @@ impl SystemStabilityMonitor {
         };
         self.heartbeats.insert(shard_name.to_string(), heartbeat);
         // Default guard rule: max 3 crashes within 10 seconds before isolating
-        self.fault_guards
-            .insert(shard_name.to_string(), DoubleFaultGuard::new(3, 10));
+        self.fault_guards.insert(shard_name.to_string(), DoubleFaultGuard::new(3, 10));
     }
 
     pub fn send_heartbeat(&mut self, shard_name: &str, timestamp: u64) -> Result<(), &'static str> {
-        let heartbeat = self
-            .heartbeats
-            .get_mut(shard_name)
-            .ok_or("Shard not registered")?;
+        let heartbeat = self.heartbeats.get_mut(shard_name).ok_or("Shard not registered")?;
         heartbeat.last_heartbeat_timestamp = timestamp;
         Ok(())
     }
@@ -416,15 +412,8 @@ impl SystemStabilityMonitor {
     }
 
     /// Tracks recovery crashes. Prevents endless restart cascades.
-    pub fn record_recovery_attempt(
-        &mut self,
-        shard_name: &str,
-        timestamp: u64,
-    ) -> Result<(), &'static str> {
-        let guard = self
-            .fault_guards
-            .get_mut(shard_name)
-            .ok_or("Fault guard not registered for shard")?;
+    pub fn record_recovery_attempt(&mut self, shard_name: &str, timestamp: u64) -> Result<(), &'static str> {
+        let guard = self.fault_guards.get_mut(shard_name).ok_or("Fault guard not registered for shard")?;
         guard.record_attempt(timestamp)
     }
 }
@@ -527,12 +516,8 @@ mod tests {
         // Let's add more shards to trigger Degraded Safety Mode below 50%)
         monitor.register_shard("S-FS", 5);
         monitor.register_shard("S-SCHED", 5);
-        monitor
-            .send_heartbeat("S-FS", 1000)
-            .expect("Failed to send heartbeat for S-FS");
-        monitor
-            .send_heartbeat("S-SCHED", 1000)
-            .expect("Failed to send heartbeat for S-SCHED");
+        monitor.send_heartbeat("S-FS", 1000).unwrap();
+        monitor.send_heartbeat("S-SCHED", 1000).unwrap();
 
         let dead_four = monitor.check_shards_health(1010);
         assert_eq!(dead_four.len(), 4); // 4 dead shards * 15 deduction = 60. Health = 40%

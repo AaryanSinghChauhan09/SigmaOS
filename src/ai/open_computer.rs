@@ -2,7 +2,7 @@
 // Purpose-built, highly isolated, DOM/A11y-based agent microkernel environments.
 // Absorbs, merges, and enhances all features from Mintplex-Labs/anything-llm/open-computer.
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// Open Computer update/connection state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

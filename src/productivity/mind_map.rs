@@ -2,7 +2,7 @@
 // Purpose-built, highly interactive hierarchical visualization tool inspired by XMind, MindMeister, and NiceMind.
 // Exposes rich styling, relationship boundaries, task progress tracking, and layouts.
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// Mind Map layouts (Radial, OrgChart, LogicChart)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

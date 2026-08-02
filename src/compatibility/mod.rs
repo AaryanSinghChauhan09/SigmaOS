@@ -15,6 +15,7 @@ pub mod standards;
 pub mod overtake;
 pub mod tiny_core;
 pub mod wasm_sandbox;
+pub mod india_professional_tools;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -93,4 +94,9 @@ pub use absorb_tools::{
     FancyZonesManager, PowerToysRunEngine, FileLocksmith, AwakeService, ColorPickerUtility, ScreenZone,
     MftEverythingIndexer, EverythingQueryCache, MftRecord,
     ProcessExplorer, ProcessMonitor, AutorunsDetector, TcpView, ProcessTreeNode, ProcMonEvent, TcpConnection,
+};
+
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
+    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
 };
