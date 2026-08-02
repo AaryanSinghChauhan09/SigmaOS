@@ -5,8 +5,8 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 
 // ==========================================
 // 1. Starling Build (Starling Desktop) Features
@@ -1046,7 +1046,10 @@ mod tests {
     fn test_elementary_os_simulation() {
         let gala = PantheonGalaWindowManager::new();
         assert!(gala.physics_enabled);
-        assert_eq!(gala.trigger_workspace_switch(), "mutter-physics-slide-completed");
+        assert_eq!(
+            gala.trigger_workspace_switch(),
+            "mutter-physics-slide-completed"
+        );
 
         let granite = GraniteHigLibrary::new();
         assert!(granite.validate_widget_margins(12));
@@ -1105,7 +1108,10 @@ mod tests {
         assert_eq!(bridge.paired_devices[0], "Pixel-8");
 
         let wine = ZorinWinePreflight::new();
-        assert_eq!(wine.intercept_exe("winrar.exe"), "launch-wine-bottles-helper");
+        assert_eq!(
+            wine.intercept_exe("winrar.exe"),
+            "launch-wine-bottles-helper"
+        );
         assert_eq!(wine.intercept_exe("winrar.dmg"), "pass-through-native");
     }
 

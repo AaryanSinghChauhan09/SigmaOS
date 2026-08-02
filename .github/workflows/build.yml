@@ -17,7 +17,7 @@ jobs:
     - name: Install Toolchain
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential gcc-x86-64-linux-gnu nasm qemu-system-x86 xorriso grub-pc-bin grub-efi-amd64-bin
+        sudo apt-get install -y build-essential gcc-x86-64-linux-gnu nasm qemu-system-x86 xorriso grub-pc-bin grub-efi-amd64-bin mtools
         sudo apt-get install -y cppcheck clang-tidy doxygen
 
     - name: Static Analysis & Compliance
