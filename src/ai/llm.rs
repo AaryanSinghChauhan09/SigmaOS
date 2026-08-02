@@ -107,6 +107,19 @@ impl Default for LlmConfig {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct ToolDefinition {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct ToolCall {
+    pub id: String,
+    pub name: String,
+    pub arguments_json: String,
+}
+
 /// Inference request
 #[derive(Debug, Clone)]
 pub struct InferenceRequest {
@@ -114,6 +127,7 @@ pub struct InferenceRequest {
     pub max_tokens: usize,
     pub stop_sequences: Vec<String>,
     pub temperature: Option<f32>,
+    pub tools: Vec<ToolDefinition>,
 }
 
 impl InferenceRequest {
@@ -123,6 +137,7 @@ impl InferenceRequest {
             max_tokens: 256,
             stop_sequences: Vec::new(),
             temperature: None,
+            tools: Vec::new(),
         }
     }
 
@@ -144,6 +159,7 @@ pub struct InferenceResponse {
     pub tokens_generated: usize,
     pub inference_time_ms: u32,
     pub tokens_per_second: f32,
+    pub tool_calls: Vec<ToolCall>,
 }
 
 impl InferenceResponse {
@@ -159,7 +175,13 @@ impl InferenceResponse {
             tokens_generated,
             inference_time_ms,
             tokens_per_second,
+            tool_calls: Vec::new(),
         }
+    }
+
+    pub fn with_tool_calls(mut self, calls: Vec<ToolCall>) -> Self {
+        self.tool_calls = calls;
+        self
     }
 }
 

@@ -382,6 +382,26 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct AgentInfo {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ManagerCapability {
+    pub can_manage: bool,
+}
+
+impl ManagerCapability {
+    pub fn new() -> Self {
+        Self { can_manage: true }
+    }
+    pub fn full() -> Self {
+        Self { can_manage: true }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
