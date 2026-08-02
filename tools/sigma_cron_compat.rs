@@ -662,330 +662,333 @@ unsafe fn get_timestamp() -> SigmaU64 {
 mod tests {
     use super::*;
 
+    // Run all tests sequentially inside one test wrapper to avoid parallel mutable static race conditions
     #[test]
-    fn test_sigma_cron_advanced() {
+    fn test_all_cron_sequential() {
         unsafe {
-            cron_init();
-
-            // Test advanced step parsing ("*/15")
-            let mut minute_field = [0u8; 60];
-            parse_cron_field(b"*/15\0".as_ptr(), &mut minute_field);
-            assert_eq!(minute_field[0], 1);
-            assert_eq!(minute_field[15], 1);
-            assert_eq!(minute_field[30], 1);
-            assert_eq!(minute_field[45], 1);
-            assert_eq!(minute_field[5], 0);
-
-            // Test range parsing ("2-5")
-            let mut hour_field = [0u8; 24];
-            parse_cron_field(b"2-5\0".as_ptr(), &mut hour_field);
-            assert_eq!(hour_field[1], 0);
-            assert_eq!(hour_field[2], 1);
-            assert_eq!(hour_field[3], 1);
-            assert_eq!(hour_field[4], 1);
-            assert_eq!(hour_field[5], 1);
-            assert_eq!(hour_field[6], 0);
-
-            // Test extended cron creation with all multi-distro parameters
-            let res = cron_add_job_ext(
-                b"backup_job\0".as_ptr(),
-                b"tar -czf /backup/sys.tar.gz\0".as_ptr(),
-                b"*/15\0".as_ptr(),
-                b"2-5\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                CronCategory::Daily as u8,
-                0,    // Alpine/Busybox: root user
-                300,  // Arch: 5-minute jitter delay
-                42,   // NixOS: generation ID 42
-            );
-            assert_eq!(res, 0);
-            assert_eq!(cron_get_job_count(), 1);
-
-            let mut jobs_list = [CronJob {
-                name: [0; 64],
-                command: [0; 256],
-                schedule: CronSchedule {
-                    minute: [0; 60],
-                    hour: [0; 24],
-                    day_of_month: [0; 31],
-                    month: [0; 12],
-                    day_of_week: [0; 7],
-                },
-                enabled: false,
-                last_run: 0,
-                next_run: 0,
-                category: 0,
-                run_as_user: 0,
-                randomized_delay_sec: 0,
-                generation_id: 0,
-                max_load_average: 0,
-                run_if_missed: false,
-                selinux_context: [0; 64],
-                mailto: [0; 64],
-                allow_overlap: true,
-                is_running: false,
-            }; 1];
-
-            cron_list_jobs(jobs_list.as_mut_ptr(), 1);
-            let retrieved_job = &jobs_list[0];
-
-            assert_eq!(retrieved_job.category, CronCategory::Daily as u8);
-            assert_eq!(retrieved_job.run_as_user, 0);
-            assert_eq!(retrieved_job.randomized_delay_sec, 300);
-            assert_eq!(retrieved_job.generation_id, 42);
+            test_sigma_cron_advanced();
+            test_linux_distro_features();
         }
     }
 
-    #[test]
-    fn test_linux_distro_features() {
-        unsafe {
-            cron_init();
-            cron_reset_logs();
+    unsafe fn test_sigma_cron_advanced() {
+        cron_init();
 
-            // Set system load high (e.g. 3.00, represented as 300)
-            cron_set_system_load(300);
+        // Test advanced step parsing ("*/15")
+        let mut minute_field = [0u8; 60];
+        parse_cron_field(b"*/15\0".as_ptr(), &mut minute_field);
+        assert_eq!(minute_field[0], 1);
+        assert_eq!(minute_field[15], 1);
+        assert_eq!(minute_field[30], 1);
+        assert_eq!(minute_field[45], 1);
+        assert_eq!(minute_field[5], 0);
 
-            // 1. Gentoo load average mitigation test
-            let res_load = cron_add_job_linux(
-                b"gentoo_job\0".as_ptr(),
-                b"echo high_load_task\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                CronCategory::Custom as u8,
-                1000,
-                0,
-                1,
-                250, // max_load_average: 2.50 (current is 3.00, so it should be skipped)
-                true,
-                core::ptr::null(),
-                core::ptr::null(),
-                true,
-            );
-            assert_eq!(res_load, 0);
+        // Test range parsing ("2-5")
+        let mut hour_field = [0u8; 24];
+        parse_cron_field(b"2-5\0".as_ptr(), &mut hour_field);
+        assert_eq!(hour_field[1], 0);
+        assert_eq!(hour_field[2], 1);
+        assert_eq!(hour_field[3], 1);
+        assert_eq!(hour_field[4], 1);
+        assert_eq!(hour_field[5], 1);
+        assert_eq!(hour_field[6], 0);
 
-            // This job has high/unlimited load average allowed (0 = disabled)
-            let res_normal = cron_add_job_linux(
-                b"normal_job\0".as_ptr(),
-                b"echo normal_task\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                CronCategory::Custom as u8,
-                1000,
-                0,
-                1,
-                0, // no limit
-                true,
-                core::ptr::null(),
-                core::ptr::null(),
-                true,
-            );
-            assert_eq!(res_normal, 0);
+        // Test extended cron creation with all multi-distro parameters
+        let res = cron_add_job_ext(
+            b"backup_job\0".as_ptr(),
+            b"tar -czf /backup/sys.tar.gz\0".as_ptr(),
+            b"*/15\0".as_ptr(),
+            b"2-5\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            CronCategory::Daily as u8,
+            0,    // Alpine/Busybox: root user
+            300,  // Arch: 5-minute jitter delay
+            42,   // NixOS: generation ID 42
+        );
+        assert_eq!(res, 0);
+        assert_eq!(cron_get_job_count(), 1);
 
-            // Execute cron_check_and_run
-            cron_check_and_run();
+        let mut jobs_list = [CronJob {
+            name: [0; 64],
+            command: [0; 256],
+            schedule: CronSchedule {
+                minute: [0; 60],
+                hour: [0; 24],
+                day_of_month: [0; 31],
+                month: [0; 12],
+                day_of_week: [0; 7],
+            },
+            enabled: false,
+            last_run: 0,
+            next_run: 0,
+            category: 0,
+            run_as_user: 0,
+            randomized_delay_sec: 0,
+            generation_id: 0,
+            max_load_average: 0,
+            run_if_missed: false,
+            selinux_context: [0; 64],
+            mailto: [0; 64],
+            allow_overlap: true,
+            is_running: false,
+        }; 1];
 
-            // Check that gentoo_job was skipped due to load, and normal_job executed
-            let mut found_skipped_load = false;
-            let mut found_executed_normal = false;
-            for idx in 0..cron_get_log_count() {
-                let mut name_buf = [0u8; 64];
-                let mut act_buf = [0u8; 32];
-                let mut uid = 0;
-                cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
+        cron_list_jobs(jobs_list.as_mut_ptr(), 1);
+        let retrieved_job = &jobs_list[0];
 
-                let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
-                let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
+        assert_eq!(retrieved_job.category, CronCategory::Daily as u8);
+        assert_eq!(retrieved_job.run_as_user, 0);
+        assert_eq!(retrieved_job.randomized_delay_sec, 300);
+        assert_eq!(retrieved_job.generation_id, 42);
+    }
 
-                if name_str.starts_with("gentoo_job") && act_str == "skipped_load" {
-                    found_skipped_load = true;
-                }
-                if name_str.starts_with("normal_job") && act_str == "executed" {
-                    found_executed_normal = true;
-                }
+    unsafe fn test_linux_distro_features() {
+        cron_init();
+        cron_reset_logs();
+
+        // Set system load high (e.g. 3.00, represented as 300)
+        cron_set_system_load(300);
+
+        // 1. Gentoo load average mitigation test
+        let res_load = cron_add_job_linux(
+            b"gentoo_job\0".as_ptr(),
+            b"echo high_load_task\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            CronCategory::Custom as u8,
+            1000,
+            0,
+            1,
+            250, // max_load_average: 2.50 (current is 3.00, so it should be skipped)
+            true,
+            core::ptr::null(),
+            core::ptr::null(),
+            true,
+        );
+        assert_eq!(res_load, 0);
+
+        // This job has high/unlimited load average allowed (0 = disabled)
+        let res_normal = cron_add_job_linux(
+            b"normal_job\0".as_ptr(),
+            b"echo normal_task\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            CronCategory::Custom as u8,
+            1000,
+            0,
+            1,
+            0, // no limit
+            true,
+            core::ptr::null(),
+            core::ptr::null(),
+            true,
+        );
+        assert_eq!(res_normal, 0);
+
+        // Execute cron_check_and_run
+        cron_check_and_run();
+
+        // Check that gentoo_job was skipped due to load, and normal_job executed
+        let mut found_skipped_load = false;
+        let mut found_executed_normal = false;
+        for idx in 0..cron_get_log_count() {
+            let mut name_buf = [0u8; 64];
+            let mut act_buf = [0u8; 32];
+            let mut uid = 0;
+            cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
+
+            let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
+            let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
+
+            if name_str.starts_with("gentoo_job") && act_str == "skipped_load" {
+                found_skipped_load = true;
             }
-            assert!(found_skipped_load);
-            assert!(found_executed_normal);
-
-            // 2. Cronie flock-style overlapping prevention test
-            cron_init();
-            cron_reset_logs();
-            cron_set_system_load(100); // normal load
-
-            let res_overlap = cron_add_job_linux(
-                b"overlap_job\0".as_ptr(),
-                b"echo parallel_task\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                CronCategory::Custom as u8,
-                1000,
-                0,
-                1,
-                0,
-                true,
-                core::ptr::null(),
-                core::ptr::null(),
-                false, // allow_overlap = false
-            );
-            assert_eq!(res_overlap, 0);
-
-            // Manually mark job as running
-            CRON_JOBS[0].is_running = true;
-
-            cron_check_and_run();
-
-            // Verify it was skipped due to overlap
-            let mut found_skipped_overlap = false;
-            for idx in 0..cron_get_log_count() {
-                let mut name_buf = [0u8; 64];
-                let mut act_buf = [0u8; 32];
-                let mut uid = 0;
-                cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
-
-                let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
-                let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
-
-                if name_str.starts_with("overlap_job") && act_str == "skipped_overlap" {
-                    found_skipped_overlap = true;
-                }
+            if name_str.starts_with("normal_job") && act_str == "executed" {
+                found_executed_normal = true;
             }
-            assert!(found_skipped_overlap);
-
-            // 3. Debian/Anacron offline catch-up test
-            cron_init();
-            cron_reset_logs();
-
-            // Add anacron-like job (run_if_missed = true)
-            let res_anacron = cron_add_job_linux(
-                b"anacron_job\0".as_ptr(),
-                b"echo offline_task\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                CronCategory::Custom as u8,
-                1000,
-                0,
-                1,
-                0,
-                true, // run_if_missed = true
-                core::ptr::null(),
-                core::ptr::null(),
-                true,
-            );
-            assert_eq!(res_anacron, 0);
-
-            // Add standard job (run_if_missed = false)
-            let res_standard_missed = cron_add_job_linux(
-                b"standard_job\0".as_ptr(),
-                b"echo standard_offline_task\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                CronCategory::Custom as u8,
-                1000,
-                0,
-                1,
-                0,
-                false, // run_if_missed = false
-                core::ptr::null(),
-                core::ptr::null(),
-                true,
-            );
-            assert_eq!(res_standard_missed, 0);
-
-            // Simulate that next_run is 10, but current_time is 100 (missed by 90 ticks)
-            CRON_JOBS[0].next_run = 10;
-            CRON_JOBS[1].next_run = 10;
-
-            // Set counter so get_timestamp returns 100
-            for _ in 0..100 {
-                get_timestamp();
-            }
-
-            cron_check_and_run();
-
-            // Verify anacron_job ran, but standard_job was skipped_missed
-            let mut found_anacron_executed = false;
-            let mut found_standard_skipped_missed = false;
-            for idx in 0..cron_get_log_count() {
-                let mut name_buf = [0u8; 64];
-                let mut act_buf = [0u8; 32];
-                let mut uid = 0;
-                cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
-
-                let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
-                let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
-
-                if name_str.starts_with("anacron_job") && act_str == "executed" {
-                    found_anacron_executed = true;
-                }
-                if name_str.starts_with("standard_job") && act_str == "skipped_missed" {
-                    found_standard_skipped_missed = true;
-                }
-            }
-            assert!(found_anacron_executed);
-            assert!(found_standard_skipped_missed);
-
-            // 4. SELinux & Mailto logging integration test
-            cron_init();
-            cron_reset_logs();
-
-            let res_sec = cron_add_job_linux(
-                b"secure_job\0".as_ptr(),
-                b"echo sec\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                b"*\0".as_ptr(),
-                CronCategory::Custom as u8,
-                0, // Root
-                0,
-                1,
-                0,
-                true,
-                b"system_u:system_r:cronjob_t:s0\0".as_ptr(),
-                b"admin@sigmaos.org\0".as_ptr(),
-                true,
-            );
-            assert_eq!(res_sec, 0);
-
-            cron_check_and_run();
-
-            let mut found_selinux = false;
-            let mut found_mail = false;
-            for idx in 0..cron_get_log_count() {
-                let mut name_buf = [0u8; 64];
-                let mut act_buf = [0u8; 32];
-                let mut uid = 0;
-                cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
-
-                let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
-                let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
-
-                if name_str.starts_with("secure_job") && act_str == "selinux_enforced" {
-                    found_selinux = true;
-                }
-                if name_str.starts_with("secure_job") && act_str == "mail_dispatched" {
-                    found_mail = true;
-                }
-            }
-            assert!(found_selinux);
-            assert!(found_mail);
         }
+        assert!(found_skipped_load);
+        assert!(found_executed_normal);
+
+        // 2. Cronie flock-style overlapping prevention test
+        cron_init();
+        cron_reset_logs();
+        cron_set_system_load(100); // normal load
+
+        let res_overlap = cron_add_job_linux(
+            b"overlap_job\0".as_ptr(),
+            b"echo parallel_task\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            CronCategory::Custom as u8,
+            1000,
+            0,
+            1,
+            0,
+            true,
+            core::ptr::null(),
+            core::ptr::null(),
+            false, // allow_overlap = false
+        );
+        assert_eq!(res_overlap, 0);
+
+        // Manually mark job as running
+        CRON_JOBS[0].is_running = true;
+
+        cron_check_and_run();
+
+        // Verify it was skipped due to overlap
+        let mut found_skipped_overlap = false;
+        for idx in 0..cron_get_log_count() {
+            let mut name_buf = [0u8; 64];
+            let mut act_buf = [0u8; 32];
+            let mut uid = 0;
+            cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
+
+            let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
+            let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
+
+            if name_str.starts_with("overlap_job") && act_str == "skipped_overlap" {
+                found_skipped_overlap = true;
+            }
+        }
+        assert!(found_skipped_overlap);
+
+        // 3. Debian/Anacron offline catch-up test
+        cron_init();
+        cron_reset_logs();
+
+        // Add anacron-like job (run_if_missed = true)
+        let res_anacron = cron_add_job_linux(
+            b"anacron_job\0".as_ptr(),
+            b"echo offline_task\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            CronCategory::Custom as u8,
+            1000,
+            0,
+            1,
+            0,
+            true, // run_if_missed = true
+            core::ptr::null(),
+            core::ptr::null(),
+            true,
+        );
+        assert_eq!(res_anacron, 0);
+
+        // Add standard job (run_if_missed = false)
+        let res_standard_missed = cron_add_job_linux(
+            b"standard_job\0".as_ptr(),
+            b"echo standard_offline_task\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            CronCategory::Custom as u8,
+            1000,
+            0,
+            1,
+            0,
+            false, // run_if_missed = false
+            core::ptr::null(),
+            core::ptr::null(),
+            true,
+        );
+        assert_eq!(res_standard_missed, 0);
+
+        // Simulate that next_run is 10, but current_time is 100 (missed by 90 ticks)
+        CRON_JOBS[0].next_run = 10;
+        CRON_JOBS[1].next_run = 10;
+
+        // Set counter so get_timestamp returns 100
+        for _ in 0..100 {
+            get_timestamp();
+        }
+
+        cron_check_and_run();
+
+        // Verify anacron_job ran, but standard_job was skipped_missed
+        let mut found_anacron_executed = false;
+        let mut found_standard_skipped_missed = false;
+        for idx in 0..cron_get_log_count() {
+            let mut name_buf = [0u8; 64];
+            let mut act_buf = [0u8; 32];
+            let mut uid = 0;
+            cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
+
+            let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
+            let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
+
+            if name_str.starts_with("anacron_job") && act_str == "executed" {
+                found_anacron_executed = true;
+            }
+            if name_str.starts_with("standard_job") && act_str == "skipped_missed" {
+                found_standard_skipped_missed = true;
+            }
+        }
+        assert!(found_anacron_executed);
+        assert!(found_standard_skipped_missed);
+
+        // 4. SELinux & Mailto logging integration test
+        cron_init();
+        cron_reset_logs();
+
+        let res_sec = cron_add_job_linux(
+            b"secure_job\0".as_ptr(),
+            b"echo sec\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            b"*\0".as_ptr(),
+            CronCategory::Custom as u8,
+            0, // Root
+            0,
+            1,
+            0,
+            true,
+            b"system_u:system_r:cronjob_t:s0\0".as_ptr(),
+            b"admin@sigmaos.org\0".as_ptr(),
+            true,
+        );
+        assert_eq!(res_sec, 0);
+
+        cron_check_and_run();
+
+        let mut found_selinux = false;
+        let mut found_mail = false;
+        for idx in 0..cron_get_log_count() {
+            let mut name_buf = [0u8; 64];
+            let mut act_buf = [0u8; 32];
+            let mut uid = 0;
+            cron_get_log_entry(idx, name_buf.as_mut_ptr(), act_buf.as_mut_ptr(), &mut uid);
+
+            let name_str = core::str::from_utf8(&name_buf).unwrap().trim_end_matches('\0');
+            let act_str = core::str::from_utf8(&act_buf).unwrap().trim_end_matches('\0');
+
+            if name_str.starts_with("secure_job") && act_str == "selinux_enforced" {
+                found_selinux = true;
+            }
+            if name_str.starts_with("secure_job") && act_str == "mail_dispatched" {
+                found_mail = true;
+            }
+        }
+        assert!(found_selinux);
+        assert!(found_mail);
     }
 }
