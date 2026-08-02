@@ -7,7 +7,7 @@
 pub fn djb2_hash(s: &str) -> u64 {
     let mut hash: u64 = 5381;
     for byte in s.bytes() {
-        hash = ((hash << 5) + hash) + byte as u64;
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
     }
     hash
 }
@@ -16,7 +16,7 @@ pub fn djb2_hash(s: &str) -> u64 {
 pub fn simple_hash(data: &[u8]) -> u64 {
     let mut hash: u64 = 5381;
     for &byte in data {
-        hash = ((hash << 5) + hash) + byte as u64;
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
     }
     hash
 }
@@ -50,7 +50,7 @@ impl SimpleHasher {
     }
 
     pub fn write(&mut self, byte: u8) {
-        self.state = ((self.state << 5) + self.state) + byte as u64;
+        self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
     }
 
     pub fn finish(&self) -> u64 {
@@ -71,7 +71,7 @@ impl core::hash::Hasher for SimpleHasher {
 
     fn write(&mut self, bytes: &[u8]) {
         for &byte in bytes {
-            self.state = ((self.state << 5) + self.state) + byte as u64;
+            self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
         }
     }
 }

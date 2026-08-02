@@ -12,6 +12,20 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
+    Ebuild,   // Gentoo
+    Apk,      // Alpine
+    Nix,      // NixOS
+    AppImage, // AppImage
+    Xbps,     // Void Linux
+    Txz,      // Slackware
+    Eopkg,    // Solus
+    Zypper,   // openSUSE
+    Guix,     // GNU Guix
+}
+
+/// User defined verification hook
+pub trait UserHook: Send + Sync {
+    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
 }
 
 /// Package source
@@ -89,6 +103,7 @@ pub struct PackageAdapter {
     pub format: PackageFormat,
     pub adapter_name: String,
     pub capabilities: Vec<String>,
+    pub hooks: Vec<std::sync::Arc<dyn UserHook>>,
 }
 
 impl PackageAdapter {
@@ -97,7 +112,12 @@ impl PackageAdapter {
             format,
             adapter_name,
             capabilities: Vec::new(),
+            hooks: Vec::new(),
         }
+    }
+
+    pub fn add_hook(&mut self, hook: std::sync::Arc<dyn UserHook>) {
+        self.hooks.push(hook);
     }
 
     pub fn can_handle(&self, package: &UnifiedPackage) -> bool {
@@ -109,7 +129,9 @@ impl PackageAdapter {
             "Installing {} using {} adapter",
             package.name, self.adapter_name
         );
-        // Simulate installation
+        for hook in &self.hooks {
+            hook.execute(package)?;
+        }
         Ok(())
     }
 
@@ -118,7 +140,9 @@ impl PackageAdapter {
             "Removing {} using {} adapter",
             package.name, self.adapter_name
         );
-        // Simulate removal
+        for hook in &self.hooks {
+            hook.execute(package)?;
+        }
         Ok(())
     }
 
@@ -127,7 +151,9 @@ impl PackageAdapter {
             "Updating {} using {} adapter",
             package.name, self.adapter_name
         );
-        // Simulate update
+        for hook in &self.hooks {
+            hook.execute(package)?;
+        }
         Ok(())
     }
 }
@@ -158,18 +184,18 @@ impl DependencyResolver {
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
         let mut to_visit = vec![package_name.to_string()];
-        let mut visited = std::collections::HashSet::new();
+        let mut visited = std::collections::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
-            if visited.contains(&current) {
+            if visited.contains::<String>(&current) {
                 continue;
             }
 
             visited.insert(current.clone());
 
-            if let Some(package) = self.packages.get(&current) {
+            if let Some(package) = self.packages.get::<str>(current.as_str()) {
                 for dep in &package.dependencies {
-                    if !visited.contains(dep) {
+                    if !visited.contains::<String>(dep) {
                         to_visit.push(dep.clone());
                     }
                 }
@@ -187,9 +213,12 @@ impl DependencyResolver {
 
         for (i, pkg1_name) in packages.iter().enumerate() {
             for pkg2_name in packages.iter().skip(i + 1) {
-                if let (Some(pkg1), Some(pkg2)) =
-                    (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
-                {
+                if let (Some(pkg1), Some(pkg2)) = (
+                    self.packages.get::<str>(pkg1_name.as_str()),
+                    self.packages.get::<str>(pkg2_name.as_str()),
+                ) {
+                    let pkg1: &UnifiedPackage = pkg1;
+                    let pkg2: &UnifiedPackage = pkg2;
                     if pkg1.has_conflict_with(pkg2) {
                         conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
                     }
@@ -207,8 +236,12 @@ impl DependencyResolver {
             ConflictResolution::PreferNewest => {
                 // Prefer the package with higher version
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
-                    {
+                    if let (Some(p1), Some(p2)) = (
+                        self.packages.get::<str>(pkg1.as_str()),
+                        self.packages.get::<str>(pkg2.as_str()),
+                    ) {
+                        let p1: &UnifiedPackage = p1;
+                        let p2: &UnifiedPackage = p2;
                         if p1.version > p2.version {
                             resolution.push(pkg1.clone());
                         } else {
@@ -220,8 +253,12 @@ impl DependencyResolver {
             ConflictResolution::PreferOldest => {
                 // Prefer the package with lower version
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
-                    {
+                    if let (Some(p1), Some(p2)) = (
+                        self.packages.get::<str>(pkg1.as_str()),
+                        self.packages.get::<str>(pkg2.as_str()),
+                    ) {
+                        let p1: &UnifiedPackage = p1;
+                        let p2: &UnifiedPackage = p2;
                         if p1.version < p2.version {
                             resolution.push(pkg1.clone());
                         } else {
@@ -233,8 +270,12 @@ impl DependencyResolver {
             ConflictResolution::PreferNative => {
                 // Prefer SigmaPkg format
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
-                    {
+                    if let (Some(p1), Some(p2)) = (
+                        self.packages.get::<str>(pkg1.as_str()),
+                        self.packages.get::<str>(pkg2.as_str()),
+                    ) {
+                        let p1: &UnifiedPackage = p1;
+                        let p2: &UnifiedPackage = p2;
                         if p1.formats.contains(&PackageFormat::SigmaPkg) {
                             resolution.push(pkg1.clone());
                         } else if p2.formats.contains(&PackageFormat::SigmaPkg) {
@@ -292,7 +333,7 @@ impl TransactionalHistory {
 
         let mut keys = Vec::new();
         for key in installed.keys() {
-            keys.push(key.clone());
+            keys.push((*key).clone());
         }
 
         self.checkpoints.push(PackageCheckpoint {
@@ -351,6 +392,15 @@ impl UniversalPackageManager {
         let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
         let flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
         let sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
+        let ebuild_adapter = PackageAdapter::new(PackageFormat::Ebuild, "ebuild".to_string());
+        let apk_adapter = PackageAdapter::new(PackageFormat::Apk, "apk".to_string());
+        let nix_adapter = PackageAdapter::new(PackageFormat::Nix, "nix".to_string());
+        let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
+        let xbps_adapter = PackageAdapter::new(PackageFormat::Xbps, "xbps".to_string());
+        let txz_adapter = PackageAdapter::new(PackageFormat::Txz, "txz".to_string());
+        let eopkg_adapter = PackageAdapter::new(PackageFormat::Eopkg, "eopkg".to_string());
+        let zypper_adapter = PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string());
+        let guix_adapter = PackageAdapter::new(PackageFormat::Guix, "guix".to_string());
 
         self.adapters.insert(PackageFormat::Deb, apt_adapter);
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
@@ -360,6 +410,15 @@ impl UniversalPackageManager {
             .insert(PackageFormat::Flatpak, flatpak_adapter);
         self.adapters
             .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
+        self.adapters.insert(PackageFormat::Ebuild, ebuild_adapter);
+        self.adapters.insert(PackageFormat::Apk, apk_adapter);
+        self.adapters.insert(PackageFormat::Nix, nix_adapter);
+        self.adapters.insert(PackageFormat::AppImage, appimage_adapter);
+        self.adapters.insert(PackageFormat::Xbps, xbps_adapter);
+        self.adapters.insert(PackageFormat::Txz, txz_adapter);
+        self.adapters.insert(PackageFormat::Eopkg, eopkg_adapter);
+        self.adapters.insert(PackageFormat::Zypper, zypper_adapter);
+        self.adapters.insert(PackageFormat::Guix, guix_adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -408,10 +467,12 @@ impl UniversalPackageManager {
 
         // Install packages
         for dep_name in dependencies {
-            if let Some(package) = self.packages.get(&dep_name) {
+            if let Some(package) = self.packages.get::<str>(dep_name.as_str()) {
+                let package: &UnifiedPackage = package;
                 // Find appropriate adapter
                 for format in &package.formats {
-                    if let Some(adapter) = self.adapters.get(format) {
+                    if let Some(adapter) = self.adapters.get::<PackageFormat>(format) {
+                        let adapter: &PackageAdapter = adapter;
                         adapter.install(package)?;
                         break;
                     }
@@ -427,9 +488,11 @@ impl UniversalPackageManager {
     }
 
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
-        if let Some(package) = self.installed_packages.get(package_name) {
+        if let Some(package) = self.installed_packages.get::<str>(package_name) {
+            let package: &UnifiedPackage = package;
             for format in &package.formats {
-                if let Some(adapter) = self.adapters.get(format) {
+                if let Some(adapter) = self.adapters.get::<PackageFormat>(format) {
+                    let adapter: &PackageAdapter = adapter;
                     adapter.remove(package)?;
                     break;
                 }
@@ -440,9 +503,11 @@ impl UniversalPackageManager {
     }
 
     pub fn update(&mut self, package_name: &str) -> Result<(), PackageError> {
-        if let Some(package) = self.installed_packages.get(package_name) {
+        if let Some(package) = self.installed_packages.get::<str>(package_name) {
+            let package: &UnifiedPackage = package;
             for format in &package.formats {
-                if let Some(adapter) = self.adapters.get(format) {
+                if let Some(adapter) = self.adapters.get::<PackageFormat>(format) {
+                    let adapter: &PackageAdapter = adapter;
                     adapter.update(package)?;
                     break;
                 }
@@ -490,7 +555,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 6);
+        assert_eq!(manager.adapters.len(), 15);
     }
 
     #[test]
