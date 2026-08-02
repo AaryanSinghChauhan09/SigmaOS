@@ -126,6 +126,7 @@ pub enum DnfOp {
     Remove,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DnfTransaction {
     pub id: usize,
     pub operation: DnfOp,

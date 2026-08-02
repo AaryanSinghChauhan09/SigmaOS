@@ -651,3 +651,38 @@ mod tests {
         assert!(!timeshift.restore_snapshot("invalid_id"));
     }
 }
+
+// Compatibility Shims
+pub type MintUpdateLevel = UpdateRiskLevel;
+pub type MintUpdatePackage = MintUpdateItem;
+
+#[derive(Debug, Clone)]
+pub struct MintAppMetadata {
+    pub name: String,
+    pub description: String,
+}
+
+pub type MintSoftwareManager = MintInstallSoftwareManager;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintReportAlertSeverity {
+    Warning,
+    Error,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintReportAlert {
+    pub message: String,
+    pub severity: MintReportAlertSeverity,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintReportSystem {
+    pub alerts: Vec<MintReportAlert>,
+}
+
+impl MintReportSystem {
+    pub fn new() -> Self {
+        Self { alerts: Vec::new() }
+    }
+}

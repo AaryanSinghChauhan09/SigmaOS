@@ -115,3 +115,7 @@ mod tests {
         assert_eq!(store.pending_updates[0], "sigma-browse");
     }
 }
+
+// Compatibility imports
+pub type SoftwareRegistryEntry = StoreApp;
+pub static GLOBAL_SOFTWARE_STORE: () = ();

@@ -26,7 +26,7 @@ use sigmaos::package::{
     LinuxTranslationService, PackageFormat, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
-use sigmaos::security::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
+use sigmaos::security::defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
 
 #[cfg(test)]
 mod tests {

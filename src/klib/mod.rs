@@ -17,27 +17,22 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Kernel Library
+pub mod async_runtime;
 pub mod btreemap;
 pub mod buddy_allocator;
-pub mod paging;
+pub mod conversion;
+pub mod error;
+pub mod hash;
 pub mod hashmap;
 pub mod hashset;
 pub mod math;
 pub mod paging;
+pub mod store;
 pub mod string;
 pub mod time;
 pub mod uuid;
 pub mod vec;
 pub mod vecdeque;
-pub mod string;
-pub mod hash;
-pub mod time;
-pub mod math;
-pub mod uuid;
-pub mod conversion;
-pub mod error;
-pub mod store;
-pub mod async_runtime;
 
 pub use btreemap::BTreeMap;
 pub use conversion::{

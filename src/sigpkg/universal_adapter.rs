@@ -851,3 +851,30 @@ Description: Hook test";
         assert!(rpm_str.contains("Version: 1.0.0"));
     }
 }
+
+// Compatibility Shims & Types
+pub type UniversalPackageAdapter = UniversalPackageManager;
+
+#[derive(Debug, Clone)]
+pub struct AptDebManifest {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanPkgbuild {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlatpakManifest {
+    pub name: String,
+    pub version: String,
+}

@@ -30,6 +30,8 @@ pub mod openclaw;
 pub mod system;
 pub mod voice;
 pub mod wiki;
+pub mod next_gen;
+pub mod wandr;
 
 pub use lift_engine::{
     Citation, DocumentExtractor, ExtractionResult, ExtractionSchema, FieldType, LiftError,

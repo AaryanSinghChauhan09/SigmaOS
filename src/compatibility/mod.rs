@@ -52,6 +52,13 @@ pub use cross_platform::{
     ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+};
+pub use legacy_adapters::{
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
 pub use endeavour::{
     EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
     YayAurHelper,

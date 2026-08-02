@@ -230,11 +230,6 @@ where
         }
     }
 
-    pub fn clear(&mut self) {
-        self.resize_buckets();
-        self.len = 0;
-    }
-
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V>
     where
         K: Clone,
@@ -272,59 +267,6 @@ where
     }
 }
 
-pub enum Entry<'a, K, V> {
-    Occupied(OccupiedEntry<'a, K, V>),
-    Vacant(VacantEntry<'a, K, V>),
-}
-
-pub struct OccupiedEntry<'a, K, V> {
-    bucket_idx: usize,
-    item_idx: usize,
-    map: &'a mut HashMap<K, V>,
-}
-
-pub struct VacantEntry<'a, K, V> {
-    key: K,
-    bucket_idx: usize,
-    map: &'a mut HashMap<K, V>,
-}
-
-impl<'a, K, V> Entry<'a, K, V>
-where
-    K: PartialEq + core::hash::Hash,
-{
-    pub fn or_insert_with<F>(self, default: F) -> &'a mut V
-    where
-        F: FnOnce() -> V,
-    {
-        match self {
-            Entry::Occupied(entry) => unsafe {
-                let bucket = entry.map.buckets[entry.bucket_idx].as_mut().unwrap();
-                core::mem::transmute(&mut bucket[entry.item_idx].1)
-            },
-            Entry::Vacant(entry) => {
-                let value = default();
-                let key = entry.key;
-                let map = entry.map;
-                let bucket_idx = entry.bucket_idx;
-
-                if map.buckets[bucket_idx].is_none() {
-                    map.buckets[bucket_idx] = Some(Vec::new());
-                }
-                let bucket = map.buckets[bucket_idx].as_mut().unwrap();
-                bucket.push((key, value));
-                map.len += 1;
-
-                let last_idx = bucket.len() - 1;
-                unsafe { core::mem::transmute(&mut bucket[last_idx].1) }
-            }
-        }
-    }
-
-    pub fn or_insert(self, default: V) -> &'a mut V {
-        self.or_insert_with(|| default)
-    }
-}
 
 impl<K, V> Default for HashMap<K, V>
 where

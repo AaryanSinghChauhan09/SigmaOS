@@ -282,6 +282,10 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 }
 
+pub trait SymlinkResolverRule {
+    fn is_legacy(&self) -> bool;
+}
+
 pub struct LegacyLinuxRule;
 pub struct LinuxPersonaRule;
 impl SymlinkResolverRule for LinuxPersonaRule {

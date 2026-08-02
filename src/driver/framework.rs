@@ -24,7 +24,6 @@ use core::mem;
 extern crate alloc;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 use alloc::boxed::Box;
 
 pub type DriverID = usize;
@@ -47,16 +46,8 @@ pub enum DriverState {
     Active = 2,
 }
 
-pub trait Driver {
-    fn id(&self) -> DriverID;
-    fn driver_type(&self) -> DriverType;
-    fn state(&self) -> DriverState;
-    fn load(&mut self) -> Result<(), DriverError>;
-    fn unload(&mut self) -> Result<(), DriverError>;
-}
-
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
@@ -356,6 +347,7 @@ pub trait DriverFramework {
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
+    fn query_by_type(&self, driver_type: DriverType) -> Vec<DriverID>;
 }
 
 #[allow(dead_code)]

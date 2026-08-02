@@ -741,16 +741,15 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
+#[cfg(target_os = "none")]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -762,6 +761,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
@@ -772,8 +772,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
     #[allow(clippy::new_without_default)]
@@ -819,6 +817,7 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if !self.data.is_null() {

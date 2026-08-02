@@ -16,7 +16,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::driver::device::DdeDeviceWrapper;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -879,3 +878,91 @@ pub static GLOBAL_ANTIX_INIT: () = ();
 pub static GLOBAL_KAPUDAN: () = ();
 pub static GLOBAL_MEMORY_TRIMMER: () = ();
 pub static GLOBAL_TRIBE: () = ();
+
+pub struct ProtectedModeSwitchSimulator {
+    pub cr0_pe_bit: bool,
+    pub active_cs_segment: u16,
+    pub active_ds_segment: u16,
+    pub gdt_loaded: bool,
+}
+
+impl ProtectedModeSwitchSimulator {
+    pub fn new() -> Self {
+        Self {
+            cr0_pe_bit: false,
+            active_cs_segment: 0,
+            active_ds_segment: 0,
+            gdt_loaded: false,
+        }
+    }
+
+    pub fn lgdt(&mut self) {
+        self.gdt_loaded = true;
+    }
+
+    pub fn execute_switch_to_pm(&mut self) -> Result<(), &'static str> {
+        if !self.gdt_loaded {
+            return Err("GDT not loaded!");
+        }
+        self.cr0_pe_bit = true;
+        self.active_cs_segment = 0x08;
+        self.active_ds_segment = 0x10;
+        Ok(())
+    }
+}
+
+pub struct VgaTextModeDriverSimulator {
+    pub buffer: [u16; 2000],
+    pub cursor_offset: usize,
+}
+
+impl VgaTextModeDriverSimulator {
+    pub fn new() -> Self {
+        Self {
+            buffer: [0; 2000],
+            cursor_offset: 0,
+        }
+    }
+
+    pub fn write_char(&mut self, ch: char, color: u8) {
+        if self.cursor_offset < 2000 {
+            self.buffer[self.cursor_offset] = (ch as u16) | ((color as u16) << 8);
+            self.cursor_offset += 1;
+        }
+    }
+
+    pub fn update_cursor_via_ports(&mut self, port: u16, val: u8) -> Result<usize, &'static str> {
+        if port == 0x3D4 {
+            Ok(1)
+        } else if port == 0x3D5 {
+            self.cursor_offset = val as usize;
+            Ok(self.cursor_offset)
+        } else {
+            Err("Invalid port")
+        }
+    }
+}
+
+pub struct PicKeyboardController {
+    pub master_pic_mask: u8,
+}
+
+impl PicKeyboardController {
+    pub fn new() -> Self {
+        Self {
+            master_pic_mask: 0xFF,
+        }
+    }
+
+    pub fn init_pic(&mut self) {
+        self.master_pic_mask = 0xFD; // IRQ1 unmasked (keyboard)
+    }
+
+    pub fn poll_port_60_read(&self, scancode: u8) -> char {
+        match scancode {
+            0x10 => 'q',
+            0x1F => 's',
+            _ => '?',
+        }
+    }
+}

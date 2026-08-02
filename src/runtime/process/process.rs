@@ -32,7 +32,7 @@ pub type ProcessID = usize;
 
 /// Process state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
     Uninitialized = 0,
     Created = 1,
@@ -163,8 +163,15 @@ impl Process {
     }
 
     pub fn get_state(&self) -> ProcessState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        let val = self.state.load(Ordering::SeqCst);
+        match val {
+            1 => ProcessState::Created,
+            2 => ProcessState::Running,
+            3 => ProcessState::Sleeping,
+            4 => ProcessState::Stopped,
+            5 => ProcessState::Zombie,
+            6 => ProcessState::Terminated,
+            _ => ProcessState::Uninitialized,
         }
     }
 
