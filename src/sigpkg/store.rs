@@ -108,13 +108,13 @@ mod tests {
     #[test]
     fn test_add_package() {
         let mut store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
-        let package = Package {
-            name: "test".to_string(),
-            version: crate::sigpkg::Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: Vec::new(),
-            checksum: String::new(),
-        };
+        let package = Package::new(
+            "test".to_string(),
+            crate::sigpkg::Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
 
         let data = b"test data";
         let hash = store.add(package, data).unwrap();
@@ -124,13 +124,13 @@ mod tests {
     #[test]
     fn test_get_package() {
         let mut store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
-        let package = Package {
-            name: "test".to_string(),
-            version: crate::sigpkg::Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: Vec::new(),
-            checksum: String::new(),
-        };
+        let package = Package::new(
+            "test".to_string(),
+            crate::sigpkg::Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
 
         store.add(package.clone(), b"test data").unwrap();
         let retrieved = store.get("test").unwrap();
@@ -140,13 +140,13 @@ mod tests {
     #[test]
     fn test_remove_package() {
         let mut store = ContentAddressedStore::new(PathBuf::from("/tmp/test"));
-        let package = Package {
-            name: "test".to_string(),
-            version: crate::sigpkg::Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: Vec::new(),
-            checksum: String::new(),
-        };
+        let package = Package::new(
+            "test".to_string(),
+            crate::sigpkg::Version::new(1, 0, 0),
+            String::new(),
+            Vec::new(),
+            String::new(),
+        );
 
         store.add(package, b"test data").unwrap();
         store.remove("test").unwrap();
