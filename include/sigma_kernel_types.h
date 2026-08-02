@@ -5,6 +5,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> origin/jules-4213023701309535613-b11406ba
 =======
@@ -13,11 +14,14 @@
 
 =======
 >>>>>>> origin/jules-driver-improvements-linux-inspired-5291856075380713095
+=======
+>>>>>>> origin/jules-13571719274074749109-6af93541
 typedef unsigned char      sigma_u8;
 typedef unsigned short     sigma_u16;
 typedef unsigned int       sigma_u32;
 typedef unsigned long long sigma_u64;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 typedef signed char        sigma_s8;
 typedef short              sigma_s16;
@@ -70,3 +74,18 @@ typedef int                sigma_status;
 
 #endif // SIGMA_KERNEL_TYPES_H
 >>>>>>> origin/jules-driver-improvements-linux-inspired-5291856075380713095
+=======
+typedef signed char        sigma_s8;
+typedef signed short       sigma_s16;
+typedef signed int         sigma_s32;
+typedef signed long long   sigma_s64;
+
+typedef unsigned long      sigma_size_t;
+typedef unsigned long      sigma_uintptr_t;
+
+typedef int                sigma_bool;
+#define SIGMA_TRUE         1
+#define SIGMA_FALSE        0
+
+#endif // SIGMA_KERNEL_TYPES_H
+>>>>>>> origin/jules-13571719274074749109-6af93541
