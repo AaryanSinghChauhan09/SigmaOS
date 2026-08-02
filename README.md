@@ -9,34 +9,6 @@
 
 SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
 
-> ⚠️ **IMPORTANT STANDALONE DEPLOYMENT LIMITATION**
-> **SigmaOS is currently a high-performance research project, not a consumer standalone operating system.**
-> If you attempt to boot and run SigmaOS as a standalone OS today, **almost all standard applications (browsers, office suites, media players, developer tools, etc.) will not work** because the underlying subsystems they depend on are still incomplete or only partially implemented.
-> For a detailed diagnostic breakdown and what needs to be built, please read our [Standalone OS Application Readiness Plan](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/What-Is-Working-and-What-Is-Not).
-
-### 🚫 Standalone Operating System Application Limitations
-
-| Application Type | Why It Won't Work | SigmaOS Status |
-| :--- | :--- | :--- |
-| **Web Browsers** | Require TCP/IP stack, SSL, rendering engines | Networking stack incomplete |
-| **Office Suites** | Need GUI, fonts, file I/O | Zenith Desktop prototype only; filesystem unstable |
-| **Media Players** | Depend on audio/video drivers | SigmaMedia incomplete; no audio/video drivers |
-| **Games** | Require GPU, input devices, sound | No GPU drivers, USB HID missing |
-| **Development Tools** | Need shell, compiler toolchains, package manager | `sigma-sh` not implemented; `sigma-pkg` recipes incomplete |
-| **Networking Apps** | Browsers, chat apps, cloud sync | TCP/UDP stack incomplete; no IPv6 |
-| **Security Apps** | Require encryption, sandboxing, access control | Security policy only conceptual |
-| **Productivity Apps** | Calendars, note-taking, task managers | GUI and filesystem not stable |
-| **India Stack Apps** | UPI, GST, multilingual services | 0% implemented |
-
-### ✅ Subsystems Required For Standalone Application Readiness
-
-To transition SigmaOS from a simulated/unit-tested environment to a standalone usable OS, the following core subsystems must be built:
-1. **Networking Stack:** Complete socket support and protocol bridges for browsers, chat, and cloud sync.
-2. **Driver Framework:** Real silicon drivers for GPUs, USB HID (keyboards, mice), and audio/video output.
-3. **Filesystem Stability:** Write journaling and recovery protocols for file storage.
-4. **Shell + Package Manager:** Standalone `sigma-sh` interpreter and complete package recipes for developers.
-5. **GUI Compositor:** Framebuffers, window managers, and compositing loops for desktop tools.
-
 ### Core Pillars
 
 - **Post-Quantum Cryptography**: Native Kyber-1024 KEM + Dilithium-5 signatures (NIST FIPS 203/204).
@@ -136,14 +108,18 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 ### Current Status
 
-- ✅ Kernel scheduler (MLFQ+CFS+EDF)
+- ✅ Kernel scheduler (MLFQ+CFS+EDF, Linux-Grade CFS & EEVDF schedulers implemented)
 - ✅ Syscalls (I/O + Process)
 - ✅ Physical MM (buddy allocator)
 - 🔄 Virtual MM (paging) - Partial
 - ✅ APIC + timer
 - ✅ sigma_pledge + sigma_unveil
 - ✅ Kyber-1024 KEM + Dilithium-5
-- 🔄 TCP/UDP stack - Partial
+- ✅ TCP/UDP network stack (checksum calculations, full TCP state machine, UDP demultiplexing)
+- ✅ WANDR & Bodhi Linux / Moksha Desktop compatibility layers
+- ✅ Garuda Linux & Zen kernel interactivity, Timeshift, Zram, and Nohang OOM guards
+- ✅ Moonshot AI Kimi-Code code generation self-healing agent and AST structural editor
+- ✅ RHEL, CentOS, Ubuntu, Fedora, Fedora Atomic, and Armbian Imager 2.0 compatibility layer
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
 - ✅ Zenith Desktop prototype

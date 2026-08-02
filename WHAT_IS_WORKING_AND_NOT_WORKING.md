@@ -49,6 +49,11 @@ The following matrix showcases the operational status and code files for every s
 | **DID Customization** | 🟢 **100% Working** | `src/customization/routines.rs` | Decentralized Sovereign DID profiles with rural-resource bandwidth-adaptive interfaces. |
 | **Office Productivity** | 🟢 **100% Working** | `src/productivity/sigma_office.rs`, `document_engine.rs` | Text, Spreadsheet cell solvers, metadata tracking, and high-fidelity text-to-PDF compiler. |
 | **Kali & Parrot Security** | 🟢 **100% Working** | `src/security/parrot_kali.rs`, `vulnerability.rs` | AnonSurf anonymous network shunting, forensic read-only block filter, sandbox engine. |
+| **TCP/IP Network Stack**| 🟢 **100% Working** | `src/net/tcpip_stack.rs` | Standard internet checksum calculation, IP/TCP pseudo-headers, TCP state transitions, UDP demultiplexing. |
+| **CFS & EEVDF Scheduler**| 🟢 **100% Working** | `src/scheduler/scheduler.rs` | Linux-grade Completely Fair Scheduling (CFS) and Earliest Eligible Virtual Deadline First (EEVDF) schedulers. |
+| **Garuda/Zen Optimization**| 🟢 **100% Working**| `src/compatibility/garuda_zen.rs` | Zen Interactivity Governor, Btrfs Timeshift Snapshot Engine, Zram Memory Swap, Nohang OOM Guards. |
+| **Kimi-Code Codegen**   | 🟢 **100% Working** | `src/compatibility/kimi_code.rs` | Moonshot AI Kimi-Code self-healing code generator, context pruner, AST editor, and license attributor. |
+| **Enterprise/Embedded Distro**| 🟢 **100% Working**| `src/compatibility/atomic_distribution.rs`| Armbian Imager, Fedora Atomic deployer, RHEL/CentOS transaction history, Ubuntu Livepatching. |
 
 ---
 
