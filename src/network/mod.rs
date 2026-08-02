@@ -2,6 +2,7 @@
 pub mod stack;
 pub mod tcp;
 pub mod tcp_udp;
+pub mod ring_buffer_stack;
 
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use ring_buffer_stack::{
