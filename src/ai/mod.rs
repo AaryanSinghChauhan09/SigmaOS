@@ -24,14 +24,14 @@ pub mod apm;
 pub mod autogen;
 pub mod lift_engine;
 pub mod llm;
+pub mod next_gen;
+pub mod openclaw;
 pub mod orchestrator;
 pub mod sai;
-pub mod openclaw;
 pub mod system;
 pub mod voice;
-pub mod wiki;
-pub mod next_gen;
 pub mod wandr;
+pub mod wiki;
 
 pub use lift_engine::{
     Citation, DocumentExtractor, ExtractionResult, ExtractionSchema, FieldType, LiftError,

@@ -18,7 +18,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 use super::{hashmap::HashMapIter, HashMap};
 
 pub struct HashSet<T>

@@ -122,16 +122,13 @@ impl OpenFileDescription {
 /// Process-Local File Descriptor
 #[derive(Debug, Clone)]
 pub struct FileDescriptor {
-    pub ofd_id: u64,      // Points to the system-wide OpenFileDescription
-    pub flags: u32,       // FD-specific flags (e.g. FD_CLOEXEC)
+    pub ofd_id: u64, // Points to the system-wide OpenFileDescription
+    pub flags: u32,  // FD-specific flags (e.g. FD_CLOEXEC)
 }
 
 impl FileDescriptor {
     pub fn new(ofd_id: u64, flags: u32) -> Self {
-        Self {
-            ofd_id,
-            flags,
-        }
+        Self { ofd_id, flags }
     }
 }
 
@@ -220,7 +217,8 @@ impl VirtualFilesystem {
         let new_fd = self.next_fd;
         self.next_fd += 1;
 
-        let new_file_descriptor = FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
+        let new_file_descriptor =
+            FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
         self.file_descriptors.insert(new_fd, new_file_descriptor);
 
         Ok(new_fd)
@@ -253,7 +251,8 @@ impl VirtualFilesystem {
 
         ofd.ref_count += 1;
 
-        let new_file_descriptor = FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
+        let new_file_descriptor =
+            FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
         self.file_descriptors.insert(new_fd, new_file_descriptor);
 
         Ok(())
@@ -281,20 +280,14 @@ impl VirtualFilesystem {
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get(&fd)
-            .ok_or(FsError::InvalidFd)?;
+        let file_descriptor = self.file_descriptors.get(&fd).ok_or(FsError::InvalidFd)?;
 
         let ofd = self
             .open_file_descriptions
             .get_mut(&file_descriptor.ofd_id)
             .ok_or(FsError::InvalidFd)?;
 
-        let inode = self
-            .inodes
-            .get(&ofd.inode_id)
-            .ok_or(FsError::NotFound)?;
+        let inode = self.inodes.get(&ofd.inode_id).ok_or(FsError::NotFound)?;
 
         // Check read permission
         if !inode.permissions.read {
@@ -315,10 +308,7 @@ impl VirtualFilesystem {
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get(&fd)
-            .ok_or(FsError::InvalidFd)?;
+        let file_descriptor = self.file_descriptors.get(&fd).ok_or(FsError::InvalidFd)?;
 
         let ofd = self
             .open_file_descriptions

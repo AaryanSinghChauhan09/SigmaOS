@@ -19,27 +19,27 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod importer;
 pub mod recipe;
 pub mod resolver;
+pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
-pub mod verifier;
-pub mod rpm_compat;
 pub mod universal_adapter;
-pub mod importer;
+pub mod verifier;
 
+pub use importer::{
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
+};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
-pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
+pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
-pub use verifier::CryptoVerifier;
 pub use universal_adapter::{
-    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
+    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
 };
-pub use importer::{
-    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
-};
+pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

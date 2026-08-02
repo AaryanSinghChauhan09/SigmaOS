@@ -19,13 +19,12 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// Custom Process Management for SigmaOS
 /// Implements process management without relying on std::process
 /// Uses capability-based access control
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Process ID
 pub type ProcessID = usize;
@@ -273,7 +272,11 @@ impl ProcessManager {
         }
     }
 
-    pub unsafe fn create_process(&mut self, ppid: ProcessID, capability: ProcessCapability) -> Option<ProcessID> {
+    pub unsafe fn create_process(
+        &mut self,
+        ppid: ProcessID,
+        capability: ProcessCapability,
+    ) -> Option<ProcessID> {
         if !capability.can_create {
             return None;
         }
@@ -366,7 +369,11 @@ impl ProcessManager {
         }
     }
 
-    pub unsafe fn set_process_priority(&mut self, pid: ProcessID, priority: ProcessPriority) -> bool {
+    pub unsafe fn set_process_priority(
+        &mut self,
+        pid: ProcessID,
+        priority: ProcessPriority,
+    ) -> bool {
         if pid >= 256 {
             return false;
         }
@@ -441,7 +448,7 @@ impl ProcessManager {
 
         if let Some(process_ptr) = self.processes[pid] {
             let process = &*process_ptr.as_ptr();
-            
+
             // In a real implementation, this would wait for process to terminate
             // For now, check if already terminated
             if process.get_state() == ProcessState::Terminated {

@@ -19,7 +19,6 @@
 /// Custom Enterprise & Embedded Linux Distribution Compatibility Subsystems for SigmaOS
 /// Implements Armbian Imager 2.0 block burning, Fedora Atomic OS-tree deployment manager,
 /// RHEL/CentOS DNF history rollbacks, and Ubuntu Livepatching dynamic function hooks.
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
@@ -56,7 +55,8 @@ impl ArmbianImager {
     }
 
     pub fn verify_sectors(&self, simulated_errors: usize) -> bool {
-        self.bad_sectors_found.store(simulated_errors, Ordering::SeqCst);
+        self.bad_sectors_found
+            .store(simulated_errors, Ordering::SeqCst);
         simulated_errors == 0
     }
 }
@@ -82,7 +82,8 @@ impl AtomicDeployer {
     }
 
     pub fn stage_deployment(&self, rootfs_version: usize) -> bool {
-        self.staged_deployment_id.store(rootfs_version, Ordering::SeqCst);
+        self.staged_deployment_id
+            .store(rootfs_version, Ordering::SeqCst);
         true
     }
 
@@ -94,7 +95,8 @@ impl AtomicDeployer {
 
         let previous_active = self.active_deployment_id.load(Ordering::SeqCst);
         self.active_deployment_id.store(staged, Ordering::SeqCst);
-        self.staged_deployment_id.store(previous_active, Ordering::SeqCst); // Save previous active as rollback path
+        self.staged_deployment_id
+            .store(previous_active, Ordering::SeqCst); // Save previous active as rollback path
         self.rollback_available.store(true, Ordering::SeqCst);
         true
     }
@@ -108,8 +110,10 @@ impl AtomicDeployer {
         let current_active = self.active_deployment_id.load(Ordering::SeqCst);
         let previous_active = self.staged_deployment_id.load(Ordering::SeqCst);
 
-        self.active_deployment_id.store(previous_active, Ordering::SeqCst);
-        self.staged_deployment_id.store(current_active, Ordering::SeqCst);
+        self.active_deployment_id
+            .store(previous_active, Ordering::SeqCst);
+        self.staged_deployment_id
+            .store(current_active, Ordering::SeqCst);
         self.rollback_available.store(false, Ordering::SeqCst); // Rollback consumed
         true
     }

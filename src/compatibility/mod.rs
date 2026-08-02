@@ -17,24 +17,24 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Compatibility Module
+pub mod atomic_distribution;
+pub mod bodhi_moksha;
+pub mod cachy_os;
+pub mod chimera_linux;
 pub mod constellation_mesh;
 pub mod cross_platform;
+pub mod elf_execution;
+pub mod endeavour;
+pub mod garuda_zen;
 pub mod historic_linux;
+pub mod india_professional_tools;
+pub mod kimi_code;
 pub mod legacy_adapters;
 pub mod linux_security;
 pub mod mint_linux;
-pub mod endeavour;
-pub mod chimera_linux;
 pub mod overtake;
-pub mod india_professional_tools;
-pub mod relay_nexus;
-pub mod bodhi_moksha;
-pub mod garuda_zen;
-pub mod kimi_code;
-pub mod atomic_distribution;
-pub mod cachy_os;
-pub mod elf_execution;
 pub mod penetration_assistant;
+pub mod relay_nexus;
 pub mod sssd;
 pub mod standards;
 
@@ -47,32 +47,31 @@ pub use constellation_mesh::{
     StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
 };
 pub use cross_platform::{
-    ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat,
-    CompatibilityError, CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
+    ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat, CompatibilityError,
+    CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
-};
-pub use standards::{
-    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
-};
-pub use legacy_adapters::{
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };
 pub use endeavour::{
     EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
     YayAurHelper,
 };
+pub use legacy_adapters::{
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
+};
 
 pub use mint_linux::{
-    MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-    MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
-    MintReportSystem,
+    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
+    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
 };
 
 pub use chimera_linux::{
-    DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
-    ApkPackageMetadata, ApkPackageStore,
+    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
+    DinitServiceState,
 };
 
 pub use overtake::{
@@ -103,16 +102,24 @@ pub use historic_linux::{
 };
 
 pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker, JudicialTimelinePlanner,
+    MsmeComplianceEngine, PMWaniHotspotController,
 };
 
-pub use relay_nexus::{WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus};
-pub use bodhi_moksha::{EflCanvasElement, MokshaProfile, MokshaDesktopManager};
-pub use garuda_zen::{ZenInteractivityGovernor, TimeshiftBtrfsEngine, ZramSwapManager, NohangOomGuard};
-pub use kimi_code::{KimiCodeGenerator, KimiContextPruner, KimiAstEditor, KimiLicenseAttributor};
-pub use atomic_distribution::{ArmbianImager, AtomicDeployer, DnfHistoryManager, LivepatchGovernor, DnfOp};
-pub use cachy_os::{BoreSchedulerGovernor, SchedPolicy, AnanicyManager, V4OptimizedPackageManager, CachyInitramfs};
-pub use elf_execution::{AslrGovernor, NoExecuteManager, DynamicSharedLibraryResolver, ImaSignatureVerifier};
-pub use penetration_assistant::{PenetrationAssistant, DefaultAssistant, Assessment, Severity};
-pub use sssd::{SssdDomain, OfflineCredentialCache, NssUserGroupResolver, HbacPolicyEngine};
+pub use atomic_distribution::{
+    ArmbianImager, AtomicDeployer, DnfHistoryManager, DnfOp, LivepatchGovernor,
+};
+pub use bodhi_moksha::{EflCanvasElement, MokshaDesktopManager, MokshaProfile};
+pub use cachy_os::{
+    AnanicyManager, BoreSchedulerGovernor, CachyInitramfs, SchedPolicy, V4OptimizedPackageManager,
+};
+pub use elf_execution::{
+    AslrGovernor, DynamicSharedLibraryResolver, ImaSignatureVerifier, NoExecuteManager,
+};
+pub use garuda_zen::{
+    NohangOomGuard, TimeshiftBtrfsEngine, ZenInteractivityGovernor, ZramSwapManager,
+};
+pub use kimi_code::{KimiAstEditor, KimiCodeGenerator, KimiContextPruner, KimiLicenseAttributor};
+pub use penetration_assistant::{Assessment, DefaultAssistant, PenetrationAssistant, Severity};
+pub use relay_nexus::{AtifTrajectoryMonitor, RelayNexus, VerifierConsensus, WandrEvent};
+pub use sssd::{HbacPolicyEngine, NssUserGroupResolver, OfflineCredentialCache, SssdDomain};

@@ -18,7 +18,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 use crate::klib::Vec;
 use core::borrow::Borrow;
 use core::hash::Hasher;
@@ -266,7 +265,6 @@ where
         }
     }
 }
-
 
 impl<K, V> Default for HashMap<K, V>
 where

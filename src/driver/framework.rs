@@ -20,11 +20,10 @@ use crate::klib::Vec;
 use core::mem;
 /// OOP-based Driver Framework for SigmaOS
 /// Based on Roadmap Item 1: Driver framework
-
 extern crate alloc;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::boxed::Box;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 

@@ -19,7 +19,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 use super::Vec;
 
 pub struct BTreeMap<K, V>

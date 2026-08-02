@@ -19,8 +19,8 @@ pub use audio::editor::{
 pub mod accessibility;
 pub mod ai;
 pub mod automation;
-pub mod container;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;

@@ -19,7 +19,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 use crate::sigpkg::PackageImporter;
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS

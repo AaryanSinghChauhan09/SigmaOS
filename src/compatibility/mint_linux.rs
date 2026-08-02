@@ -22,12 +22,12 @@
 // PAM security elevation gates, standard shell script utilities, and timeshift restore maps.
 
 extern crate alloc;
+use crate::klib::HashMap;
+use crate::security::CapabilityToken;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec;
 use alloc::vec::Vec;
-use crate::klib::HashMap;
-use crate::security::CapabilityToken;
 
 /// 1. Cinnamon Desktop Engine
 /// Simulates panels, menu structures, applets, themes, MATE/Xfce fallbacks,
@@ -84,11 +84,11 @@ impl Default for CinnamonDesktopEngine {
 /// with automated Timeshift pre-flight checkpoint assertions.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum UpdateRiskLevel {
-    Level1Safe = 1,          // Certified Mint packages
-    Level2Normal = 2,        // Recommended / Tested upstream packages
-    Level3Recommended = 3,   // Safe but unverified upstream packages
-    Level4Sensitive = 4,     // Sensitive packages (e.g. bootloaders, systemd)
-    Level5Dangerous = 5,     // Kernels, graphic drivers (high regression risk)
+    Level1Safe = 1,        // Certified Mint packages
+    Level2Normal = 2,      // Recommended / Tested upstream packages
+    Level3Recommended = 3, // Safe but unverified upstream packages
+    Level4Sensitive = 4,   // Sensitive packages (e.g. bootloaders, systemd)
+    Level5Dangerous = 5,   // Kernels, graphic drivers (high regression risk)
 }
 
 #[derive(Debug, Clone)]
@@ -140,7 +140,10 @@ impl MintUpdateManager {
             .collect()
     }
 
-    pub fn run_preflight_snapshot_assertion(&self, timeshift_active: bool) -> Result<(), &'static str> {
+    pub fn run_preflight_snapshot_assertion(
+        &self,
+        timeshift_active: bool,
+    ) -> Result<(), &'static str> {
         if self.timeshift_preflight && !timeshift_active {
             return Err("Timeshift backup missing! High-risk updates aborted for safety.");
         }
@@ -178,12 +181,18 @@ impl MintInstallSoftwareManager {
 
     pub fn install_package(&mut self, name: &str, format: &str) -> Result<String, &'static str> {
         if format == "snap" && !self.snapcraft_enabled {
-            return Err("Snapcraft is blocked by default on Mint. Enable snaps first or use Flatpak/.deb!");
+            return Err(
+                "Snapcraft is blocked by default on Mint. Enable snaps first or use Flatpak/.deb!",
+            );
         }
 
         let package_key = format!("{}:{}", format, name);
-        self.local_package_cache.insert(package_key.clone(), "installed".to_string());
-        Ok(format!("Successfully installed '{}' via {} manager", name, format))
+        self.local_package_cache
+            .insert(package_key.clone(), "installed".to_string());
+        Ok(format!(
+            "Successfully installed '{}' via {} manager",
+            name, format
+        ))
     }
 
     pub fn enable_snaps(&mut self) {
@@ -219,7 +228,10 @@ impl MintBackupTool {
     pub fn run_user_backup(&self, total_files: usize) -> (String, usize) {
         let size_estimate = total_files * 45; // average 45KB per user config
         (
-            format!("Backup of '{}' generated at '{}'", self.source_home, self.target_device),
+            format!(
+                "Backup of '{}' generated at '{}'",
+                self.source_home, self.target_device
+            ),
             size_estimate,
         )
     }
@@ -547,7 +559,12 @@ mod tests {
     fn test_mint_update_manager() {
         let mut mgr = MintUpdateManager::new();
         mgr.register_update("libreoffice", "7.6.1", UpdateRiskLevel::Level2Normal, 45000);
-        mgr.register_update("linux-kernel", "6.2.0-33", UpdateRiskLevel::Level5Dangerous, 85000);
+        mgr.register_update(
+            "linux-kernel",
+            "6.2.0-33",
+            UpdateRiskLevel::Level5Dangerous,
+            85000,
+        );
 
         // Filter updates (risk levels 4-5 are filtered out by default)
         let filtered = mgr.filter_updates();
@@ -623,7 +640,7 @@ mod tests {
         assert!(!ufw.is_enabled);
 
         ufw.enable_firewall();
-        ufw.add_rule(80, true, false);  // allow HTTP
+        ufw.add_rule(80, true, false); // allow HTTP
         ufw.add_rule(22, false, true); // deny SSH with rate limit
 
         assert!(ufw.evaluate_connection("192.168.1.5", 80));
@@ -635,7 +652,10 @@ mod tests {
 
         let mut interpreter = MintShellScriptInterpreter::new();
         assert_eq!(interpreter.parse_command("ll"), "ls -la");
-        assert_eq!(interpreter.parse_command("export PATH=/bin"), "Set env variable PATH to /bin");
+        assert_eq!(
+            interpreter.parse_command("export PATH=/bin"),
+            "Set env variable PATH to /bin"
+        );
 
         interpreter.spawn_daemon("sshd");
         assert_eq!(interpreter.running_daemons[0], "sshd");

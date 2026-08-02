@@ -19,22 +19,32 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based Language Runtime Management for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 14
 /// Implements unified handling for Python, Node, Java runtimes
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type RuntimeID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum LanguageType { Python = 0, Node = 1, Java = 2, Go = 3, Rust = 4 }
+pub enum LanguageType {
+    Python = 0,
+    Node = 1,
+    Java = 2,
+    Go = 3,
+    Rust = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum RuntimeError { Success = 0, NotFound = 1, InstallFailed = 2, UninstallFailed = 3 }
+pub enum RuntimeError {
+    Success = 0,
+    NotFound = 1,
+    InstallFailed = 2,
+    UninstallFailed = 3,
+}
 
 pub trait LanguageRuntime {
     fn id(&self) -> RuntimeID;
@@ -58,7 +68,11 @@ impl SimpleLanguageRuntime {
         let mut version_array = [0u8; 32];
         let version_len = version.len().min(31);
         unsafe {
-            core::ptr::copy_nonoverlapping(version.as_ptr(), version_array.as_mut_ptr(), version_len);
+            core::ptr::copy_nonoverlapping(
+                version.as_ptr(),
+                version_array.as_mut_ptr(),
+                version_len,
+            );
         }
         SimpleLanguageRuntime {
             id,
@@ -70,7 +84,9 @@ impl SimpleLanguageRuntime {
 }
 
 impl LanguageRuntime for SimpleLanguageRuntime {
-    fn id(&self) -> RuntimeID { self.id }
+    fn id(&self) -> RuntimeID {
+        self.id
+    }
     fn language_type(&self) -> LanguageType {
         let val = self.language_type.load(Ordering::SeqCst);
         match val {
@@ -96,14 +112,23 @@ impl LanguageRuntime for SimpleLanguageRuntime {
         Ok(())
     }
 
-    fn is_installed(&self) -> bool { self.installed.load(Ordering::SeqCst) == 1 }
+    fn is_installed(&self) -> bool {
+        self.installed.load(Ordering::SeqCst) == 1
+    }
 }
 
 pub trait RuntimeManager {
-    fn register_runtime(&mut self, runtime: Box<dyn LanguageRuntime>) -> Result<RuntimeID, RuntimeError>;
+    fn register_runtime(
+        &mut self,
+        runtime: Box<dyn LanguageRuntime>,
+    ) -> Result<RuntimeID, RuntimeError>;
     fn get_runtime(&self, id: RuntimeID) -> Option<&dyn LanguageRuntime>;
     fn list_installed(&self) -> Vec<RuntimeID>;
-    fn set_default(&mut self, language_type: LanguageType, id: RuntimeID) -> Result<(), RuntimeError>;
+    fn set_default(
+        &mut self,
+        language_type: LanguageType,
+        id: RuntimeID,
+    ) -> Result<(), RuntimeError>;
 }
 
 #[repr(C)]
@@ -131,7 +156,10 @@ impl SimpleRuntimeManager {
 }
 
 impl RuntimeManager for SimpleRuntimeManager {
-    fn register_runtime(&mut self, runtime: Box<dyn LanguageRuntime>) -> Result<RuntimeID, RuntimeError> {
+    fn register_runtime(
+        &mut self,
+        runtime: Box<dyn LanguageRuntime>,
+    ) -> Result<RuntimeID, RuntimeError> {
         let id = runtime.id();
         self.runtimes.push(Some(runtime));
         Ok(id)
@@ -140,7 +168,9 @@ impl RuntimeManager for SimpleRuntimeManager {
     fn get_runtime(&self, id: RuntimeID) -> Option<&dyn LanguageRuntime> {
         for runtime_option in &self.runtimes {
             if let Some(ref runtime) = *runtime_option {
-                if runtime.id() == id { return Some(runtime.as_ref()); }
+                if runtime.id() == id {
+                    return Some(runtime.as_ref());
+                }
             }
         }
         None
@@ -158,7 +188,11 @@ impl RuntimeManager for SimpleRuntimeManager {
         ids
     }
 
-    fn set_default(&mut self, language_type: LanguageType, id: RuntimeID) -> Result<(), RuntimeError> {
+    fn set_default(
+        &mut self,
+        language_type: LanguageType,
+        id: RuntimeID,
+    ) -> Result<(), RuntimeError> {
         let idx = language_type as usize;
         if idx < 5 {
             self.defaults[idx].store(id, Ordering::SeqCst);
@@ -170,8 +204,13 @@ impl RuntimeManager for SimpleRuntimeManager {
 }
 
 pub trait PackageDependency {
-    fn add_dependency(&mut self, runtime_id: RuntimeID, package: &[u8]) -> Result<(), RuntimeError>;
-    fn remove_dependency(&mut self, runtime_id: RuntimeID, package: &[u8]) -> Result<(), RuntimeError>;
+    fn add_dependency(&mut self, runtime_id: RuntimeID, package: &[u8])
+        -> Result<(), RuntimeError>;
+    fn remove_dependency(
+        &mut self,
+        runtime_id: RuntimeID,
+        package: &[u8],
+    ) -> Result<(), RuntimeError>;
     fn list_dependencies(&self, runtime_id: RuntimeID) -> Vec<[u8; 128]>;
 }
 
@@ -190,7 +229,11 @@ impl SimplePackageDependency {
 }
 
 impl PackageDependency for SimplePackageDependency {
-    fn add_dependency(&mut self, runtime_id: RuntimeID, package: &[u8]) -> Result<(), RuntimeError> {
+    fn add_dependency(
+        &mut self,
+        runtime_id: RuntimeID,
+        package: &[u8],
+    ) -> Result<(), RuntimeError> {
         let mut package_array = [0u8; 128];
         let package_len = package.len().min(127);
         for i in 0..package_len {
@@ -200,7 +243,11 @@ impl PackageDependency for SimplePackageDependency {
         Ok(())
     }
 
-    fn remove_dependency(&mut self, runtime_id: RuntimeID, package: &[u8]) -> Result<(), RuntimeError> {
+    fn remove_dependency(
+        &mut self,
+        runtime_id: RuntimeID,
+        package: &[u8],
+    ) -> Result<(), RuntimeError> {
         for i in 0..self.dependencies.len() {
             if self.dependencies[i].0 == runtime_id {
                 let dep = &self.dependencies[i].1;
@@ -279,13 +326,25 @@ impl VirtualEnvironment for SimpleVirtualEnvironment {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -303,19 +362,29 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -347,7 +416,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

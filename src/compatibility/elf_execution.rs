@@ -19,7 +19,6 @@
 /// Custom Linux-Style Secure ELF Executable Subsystems for SigmaOS
 /// Implements ASLR (Address Space Layout Randomization) base loader, DEP/NX (No-Execute) page enforcement,
 /// dynamic shared library (.so) symbol resolver, and IMA (Integrity Measurement Architecture) cryptographic signature verifier.
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
@@ -43,7 +42,9 @@ impl AslrGovernor {
     pub fn randomize_load_address(&self, base_address: usize) -> usize {
         let seed = self.entropy_seed.load(Ordering::SeqCst);
         // Simple deterministic LCG to generate shift offsets
-        let next_seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        let next_seed = seed
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         self.entropy_seed.store(next_seed, Ordering::SeqCst);
 
         let offset = ((next_seed & 0xFFF) as usize) << 12; // Page-aligned (4KB) random offset shift
@@ -220,8 +221,14 @@ mod tests {
         assert!(resolver.register_symbol("printf", 0x7FFFF000));
         assert!(resolver.register_symbol("malloc", 0x7FFFF800));
 
-        assert_eq!(resolver.resolve_needed_symbol("printf").unwrap(), 0x7FFFF000);
-        assert_eq!(resolver.resolve_needed_symbol("malloc").unwrap(), 0x7FFFF800);
+        assert_eq!(
+            resolver.resolve_needed_symbol("printf").unwrap(),
+            0x7FFFF000
+        );
+        assert_eq!(
+            resolver.resolve_needed_symbol("malloc").unwrap(),
+            0x7FFFF800
+        );
         assert!(resolver.resolve_needed_symbol("free").is_none());
     }
 

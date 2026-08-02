@@ -20,7 +20,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 extern crate alloc;
 
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
