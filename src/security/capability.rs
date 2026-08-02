@@ -80,12 +80,14 @@ impl CapabilityToken {
         self.bits
     }
 
-    pub fn allow_capability(&mut self, bitmask: u64) {
-        self.bits |= bitmask;
-    }
-
+    /// Check if all bits in bitmask are set
     pub fn contains(&self, bitmask: u64) -> bool {
         (self.bits & bitmask) == bitmask
+    }
+
+    /// Add default instance support
+    pub fn default_instance() -> Self {
+        Self::new()
     }
 }
 
