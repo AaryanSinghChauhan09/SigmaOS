@@ -314,6 +314,7 @@ impl MintHardwareDriverManager {
         }
         false
     }
+}
 
 impl Default for MintHardwareDriverManager {
     fn default() -> Self {
