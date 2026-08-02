@@ -4,7 +4,7 @@
 //! enabling intelligent resource management, predictive maintenance,
 //  and adaptive system behavior.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

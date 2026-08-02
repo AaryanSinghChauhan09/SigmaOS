@@ -1,7 +1,7 @@
 // BusyBox-Style: Multi-Call `sigma-sh` Command Parser
 // Combining utilities into a single executable reduces binary overhead by up to 90%
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

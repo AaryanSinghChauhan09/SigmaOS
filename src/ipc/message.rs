@@ -2,7 +2,7 @@
 // Based on Ideas-999-Structured: Kernel & Hardware Item 131
 // Implements message passing and shared memory IPC
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

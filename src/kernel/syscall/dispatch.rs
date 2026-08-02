@@ -2,7 +2,7 @@
 //! 30+ Essential Syscalls with pledge/unveil and PQC syscalls
 //! Core syscalls: read, write, open, close, mmap, munmap, fork, execve, exit, etc.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

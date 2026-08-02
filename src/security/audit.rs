@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542

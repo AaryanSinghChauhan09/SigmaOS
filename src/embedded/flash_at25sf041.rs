@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 #![no_main]
 
 /// OOP-based AT25SF041 Flash for SigmaOS

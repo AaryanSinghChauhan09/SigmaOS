@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 #![cfg_attr(target_os = "none", no_main)]
 
 /// OOP-based Cloud Sync for SigmaOS

@@ -1,7 +1,7 @@
 // GPU Driver - Linux-style basic GPU acceleration
 // Supports framebuffer management, 2D acceleration, and basic 3D operations
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

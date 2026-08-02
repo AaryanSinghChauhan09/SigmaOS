@@ -1,7 +1,7 @@
 // SELinux-style Security Policy Framework
 // Linux-style mandatory access control with policy enforcement
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

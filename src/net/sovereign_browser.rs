@@ -1,7 +1,7 @@
 // SovereignBrowser - Native browser core for SigmaOS
 // HTML5/CSS3 rendering, adblocking, and container isolation
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

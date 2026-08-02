@@ -1,7 +1,7 @@
 // SigmaOS Complete Filesystems Suite
 // High-fidelity implementation of FAT (12, 16, 32), NTFS, exFAT, Btrfs, HFS+, and ext (2, 3, 4) filesystems
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

@@ -1,7 +1,7 @@
 // SigmaOS Custom String Library
 // Reduces dependency on predefined functions by implementing custom string operations
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// Custom string length calculation
 pub fn strlen(s: &str) -> usize {

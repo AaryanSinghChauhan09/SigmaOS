@@ -1,7 +1,7 @@
 //! SigmaOS Kernel Personality Lattice & Lattice-and-Grid Architecture
 //! Provides multi-directional traversal of kernel personas, codex grids, and simulation nexuses.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

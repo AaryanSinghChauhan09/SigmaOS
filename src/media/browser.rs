@@ -2,7 +2,7 @@
 //! Natively implements concepts, telemetry blockers, and multi-threaded sandboxes
 //! inspired by Firefox, LibreWolf, Waterfox, Zen Browser, Chromium, Brave, and DuckDuckGo.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

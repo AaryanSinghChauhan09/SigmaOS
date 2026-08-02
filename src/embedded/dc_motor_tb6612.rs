@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 #![no_main]
 
 /// OOP-based TB6612 DC Motor for SigmaOS

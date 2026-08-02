@@ -1,7 +1,7 @@
 // OOP-based IPC Mechanism for SigmaOS
 // Based on Roadmap Item 9: IPC mechanism
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

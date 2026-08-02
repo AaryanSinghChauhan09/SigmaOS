@@ -1,7 +1,7 @@
 // TLS/SSL Implementation - Linux-style secure socket layer
 // Supports TLS 1.3 with modern cryptography
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

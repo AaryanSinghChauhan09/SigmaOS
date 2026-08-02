@@ -1,7 +1,7 @@
 // Android-Style: Runtime Capability Token Guard and Security Delegate
 // Android isolates resources via runtime permissions. SigmaOS enforces this natively using isolated `CapabilityTokens` checked directly in the microkernel's transaction bus.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 pub const PORT_ALLOW_TCP: u16 = 80;
 pub const PORT_ALLOW_SSL: u16 = 443;

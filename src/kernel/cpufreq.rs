@@ -1,7 +1,7 @@
 // CPUFreq - Linux-style CPU frequency scaling governor
 // Supports performance, powersave, ondemand, conservative, and schedutil governors
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

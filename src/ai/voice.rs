@@ -3,7 +3,7 @@
 //! This module provides voice recognition (speech-to-text) and synthesis (text-to-speech)
 //! capabilities for the SigmaOS AI ecosystem, including local inference and AI integration.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

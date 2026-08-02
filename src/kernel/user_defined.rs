@@ -4,7 +4,7 @@
 //! page replacement, and syscall security filters dynamically at runtime
 //! using polymorphic interface contracts without kernel recompilation.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

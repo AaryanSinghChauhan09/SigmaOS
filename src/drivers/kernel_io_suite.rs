@@ -2,7 +2,7 @@
 // Comprehensive #![no_std]-compatible driver suite implementing Linux kernel heritage patterns
 // Heritage: Linux v0.01 (1991) through Linux 6.x (2026)
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 

@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 #![no_main]
 
 /// OOP-based BMP280 Barometer for SigmaOS

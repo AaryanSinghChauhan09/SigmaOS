@@ -1,7 +1,7 @@
 // Audio Systems - Basic Audio Codec Support
 // Supports FLAC, MP3, and other common audio formats
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

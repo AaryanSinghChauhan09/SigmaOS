@@ -3,7 +3,7 @@
 //! This module provides kernel profiling capabilities for performance analysis,
 //! including function call tracing, timing statistics, and hot path identification.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

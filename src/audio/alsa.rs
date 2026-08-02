@@ -1,7 +1,7 @@
 // ALSA-style Audio Stack - Linux-style Advanced Linux Sound Architecture
 // Supports PCM devices, mixers, and audio stream management
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

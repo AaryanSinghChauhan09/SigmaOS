@@ -1,7 +1,7 @@
 // Cgroups - Linux-style Control Groups for resource management
 // Supports CPU, memory, I/O, and device controller subsystems
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

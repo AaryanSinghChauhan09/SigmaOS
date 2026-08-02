@@ -1,7 +1,7 @@
 // S-PAC Package Manager - Arch-style rolling upgrades
 // Package transaction manager with DPLL SAT solver integration
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

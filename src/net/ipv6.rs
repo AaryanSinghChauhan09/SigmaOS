@@ -1,7 +1,7 @@
 // IPv6 Stack - Linux-style IPv6 protocol implementation
 // Supports IPv6 addressing, packet handling, and neighbor discovery
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

@@ -1,7 +1,7 @@
 // India Stack - TDS Engine
 // Tax Deducted at Source calculation for Indian regulatory compliance
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

@@ -1,7 +1,7 @@
 // Raster Imagery Engine - Basic Image Format Support
 // Supports PNG, JPEG, and other common image formats
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

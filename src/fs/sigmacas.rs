@@ -1,7 +1,7 @@
 // SigmaFS CAS + PQC Engine
 // Content-Addressed Storage & Post-Quantum Cryptography
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

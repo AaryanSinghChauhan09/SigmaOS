@@ -1,7 +1,7 @@
 // SQL Engine - ACID-compliant SQL database engine
 // Supports cost-based query optimizer, MVCC, WAL, B-Trees, and SQL-2016 syntax
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

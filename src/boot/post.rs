@@ -1,7 +1,7 @@
 // POST (Power-On Self-Test) Diagnostics
 // BIOS/UEFI firmware POST implementation
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

@@ -1,7 +1,7 @@
 // SigmaOS Custom Math Library
 // Reduces dependency on predefined math functions
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// Custom absolute value function
 pub fn abs(x: i32) -> i32 {

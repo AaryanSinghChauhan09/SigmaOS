@@ -2,7 +2,7 @@
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 /// All types hand-defined. OOP via struct + impl + trait patterns.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::ptr;
 

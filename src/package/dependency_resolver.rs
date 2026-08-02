@@ -1,7 +1,7 @@
 // Arch-Style: Zero-Allocation SAT Solver and Package Parser
 // Handles multiple version constraints without dynamic memory overhead
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

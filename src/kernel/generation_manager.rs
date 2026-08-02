@@ -2,7 +2,7 @@
 // In monolithic systems, updates copy gigabytes of files, leading to fragmentation and potential boot failures.
 // SigmaOS achieves sub-millisecond, zero-copy system rollbacks by storing configurations as content-addressed nodes and swapping directory inodes.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

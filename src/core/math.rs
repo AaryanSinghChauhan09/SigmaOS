@@ -2,7 +2,7 @@
 //! Zero-dependency mathematical functions
 //! Reduces dependency on standard library math functions
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// Custom absolute value for integers
 pub fn abs_i32(x: i32) -> i32 {

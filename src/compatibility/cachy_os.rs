@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// Custom CachyOS Optimization Subsystems for SigmaOS
 /// Implements BORE (Burst-Oriented Response Enhancer) Scheduler, Ananicy-cpp rules manager,

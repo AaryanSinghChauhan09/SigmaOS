@@ -1,7 +1,7 @@
 // India Stack - GST Engine
 // Goods and Services Tax calculation for Indian regulatory compliance
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

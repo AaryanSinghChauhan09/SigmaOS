@@ -2,7 +2,7 @@
 //! APIC (x86), GIC (ARM), PLIC (RISC-V) support
 //! Target: <1µs IRQ dispatch overhead
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicUsize, AtomicPtr, Ordering};
 

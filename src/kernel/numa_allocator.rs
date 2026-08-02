@@ -1,7 +1,7 @@
 // NUMA (Non-Uniform Memory Access) Allocator
 // Linux-style NUMA-aware memory allocation for multi-socket systems
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

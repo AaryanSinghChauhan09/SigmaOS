@@ -3,7 +3,7 @@
 //! Supports Secure Boot with PQC/Dilithium-5 certificates
 //! Multi-arch: x86_64, ARM64, RISC-V
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 #![no_main]
 
 use core::panic::PanicInfo;

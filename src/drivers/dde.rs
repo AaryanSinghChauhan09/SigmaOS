@@ -1,7 +1,7 @@
 // Device Driver Environment (DDE) Translation Layer
 // Universal driver support for Linux, Windows NDIS, and Wasm drivers
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

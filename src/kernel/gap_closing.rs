@@ -1,7 +1,7 @@
 // Gap-Closing System Engines
 // Implementation of core infrastructure components to bridge gaps with Linux/BSD distributions
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

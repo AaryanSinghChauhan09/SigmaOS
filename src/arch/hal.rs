@@ -2,7 +2,7 @@
 //! Unified driver interface abstraction
 //! Platform-specific shims: x86_64, ARM64, RISC-V
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

@@ -1,7 +1,7 @@
 // Automated Runtime Problem Fixer and Self-Healing Daemon for SigmaOS
 // Implements continuous monitoring and correction of system crashes, leaks, and deadlocks
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 #![allow(warnings)]
 #![allow(clippy::all)]
 

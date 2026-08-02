@@ -1,7 +1,7 @@
 // S-COSMOS - Cross-Platform Universal Compatibility Shard
 // S-WINE, S-COCOA, S-ANDROID binary translation layers
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

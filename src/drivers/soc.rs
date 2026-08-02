@@ -2,7 +2,7 @@
 // Unified Pin/GPIO and Clock Controller Framework
 // Absorbs clk-meson, MTK, Snapdragon, and other SoC-specific drivers
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

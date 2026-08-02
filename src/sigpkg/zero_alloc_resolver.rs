@@ -1,7 +1,7 @@
 // Arch-Style: Zero-Allocation SAT Solver and Package Parser
 // Our packaging engine (`sigpkg`) must handle multiple version constraints without invoking complex dynamic memory overhead or risking heap-allocation panics in critical kernel pipelines.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 pub const MAX_RECIPE_DEPENDENCIES: usize = 8;
 

@@ -1,7 +1,7 @@
 // SigmaOS Custom Time Library
 // Reduces dependency on predefined time functions
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// Simple time structure
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

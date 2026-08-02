@@ -3,7 +3,7 @@
 //! HKDF-SHA3-256 key derivation
 //! Integration with FDE, TLS, code signing
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

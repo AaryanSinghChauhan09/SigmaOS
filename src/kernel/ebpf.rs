@@ -1,7 +1,7 @@
 //! eBPF (Extended Berkeley Packet Filter) Virtual Machine, Hook Engine, & Map Registry
 //! Provides safe, sandboxed bytecode execution and Linux-parity State-Sharing Maps inside microkernel hooks.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

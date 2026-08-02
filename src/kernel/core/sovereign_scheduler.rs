@@ -3,7 +3,7 @@
 //! Target: 64 concurrent tasks with <50ns context switch
 //! Lock-free runqueues using compare-and-swap
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicUsize, AtomicPtr, Ordering};
 use core::ptr::null_mut;

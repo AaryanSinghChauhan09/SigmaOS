@@ -3,7 +3,7 @@
 //! This module provides optimized local large language model inference,
 //! including quantization, batching, and hardware acceleration.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

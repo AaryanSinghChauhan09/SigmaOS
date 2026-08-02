@@ -2,7 +2,7 @@
 //! Implements a layered OOP design enabling complete backward compatibility
 //! alongside modular modern abstractions.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

@@ -1,7 +1,7 @@
 // XFS - Linux-style high-performance journaling filesystem
 // Supports allocation groups, extent-based allocation, and journaling
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

@@ -1,7 +1,7 @@
 // S-AI - Local AI engine and multi-agent automation
 // SovereignML tensor core, agent orchestrator, and local inference
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

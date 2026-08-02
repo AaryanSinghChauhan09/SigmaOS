@@ -1,7 +1,7 @@
 // Zenith Compositor - Direct-to-hardware framebuffer splicing
 // Native compositor with GNOME/KDE/COSMIC feature absorption
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

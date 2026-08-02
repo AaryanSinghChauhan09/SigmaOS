@@ -1,7 +1,7 @@
 // Advanced Routing - Linux-style routing table management
 // Supports multiple routing tables, route caching, and policy routing
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

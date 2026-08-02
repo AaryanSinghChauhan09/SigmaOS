@@ -1,7 +1,7 @@
 //! SigmaOS SOLID Principles, Neuro-Adaptive Kernel, and Next-Gen Innovations
 //! High-performance subsystems implementing SRP, OCP, LSP, ISP, and DIP.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

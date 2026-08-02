@@ -1,7 +1,7 @@
 // ZenithNet - Zero-copy networking stack
 // Polymorphic network driver interface and zero-copy packet processing
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

@@ -1,7 +1,7 @@
 // Hardware Watchdog - Linux-style watchdog timer for system monitoring
 // Supports hardware watchdog timers and system health monitoring
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

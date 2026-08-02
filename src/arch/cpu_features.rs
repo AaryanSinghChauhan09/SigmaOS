@@ -2,7 +2,7 @@
 //! Implements Gentoo-like compiler-assisted target optimizations
 //! Zero-dependency CPU capability detection for bare-metal
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

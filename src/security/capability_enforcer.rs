@@ -1,7 +1,7 @@
 // Android-Style: Runtime Capability Token Guard and Security Delegate
 // Enforces runtime permissions using isolated CapabilityTokens
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 pub const PORT_ALLOW_TCP: u16 = 80;
 pub const PORT_ALLOW_SSL: u16 = 443;

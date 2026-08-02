@@ -1,7 +1,7 @@
 // Kali-Style: Isolated Dynamic System Tracing Sandbox Hook
 // Hooks trace handlers directly inside the kernel transaction bus using isolated spans
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 pub const TRACE_BUFFER_SIZE: usize = 16;
 

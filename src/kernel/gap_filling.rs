@@ -1,7 +1,7 @@
 // Gap Filling Implementation
 // S-IPC, S-Signal, and S-MM implementations from GAP_FILLING_STRATEGIC_PLAN.md
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

@@ -3,7 +3,7 @@
 //! Implements strongly-typed message routing, shared-memory window backing stores,
 //! and capability-gated security gates inspired by SerenityOS LibIPC and WindowServer.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

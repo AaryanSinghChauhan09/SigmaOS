@@ -3,7 +3,7 @@
 //! This module provides debugging tools for the SigmaOS kernel and userland applications,
 //! including breakpoints, watchpoints, stack tracing, and memory inspection.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

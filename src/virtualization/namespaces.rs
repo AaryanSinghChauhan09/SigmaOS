@@ -1,7 +1,7 @@
 // Namespaces - Linux-style process isolation
 // Supports mount, UTS, IPC, network, PID, user, and cgroup namespaces
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

@@ -1,7 +1,7 @@
 // CPU Feature Detection - Gentoo-style compiler-assisted target optimizations
 // Dynamic CPU feature detection and JIT optimization selector
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

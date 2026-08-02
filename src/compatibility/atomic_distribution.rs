@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// Custom Enterprise & Embedded Linux Distribution Compatibility Subsystems for SigmaOS
 /// Implements Armbian Imager 2.0 block burning, Fedora Atomic OS-tree deployment manager,

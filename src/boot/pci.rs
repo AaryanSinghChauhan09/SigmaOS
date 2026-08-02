@@ -1,7 +1,7 @@
 // S-Boot Firmware - PCI Bus Scanning
 // BIOS & UEFI Specification Implementation
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::vec::Vec;

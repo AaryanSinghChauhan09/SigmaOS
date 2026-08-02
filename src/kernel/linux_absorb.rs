@@ -2,7 +2,7 @@
 // Systematic absorption of Linux kernel drivers with OOP encapsulation and security hardening
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 

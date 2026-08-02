@@ -1,7 +1,7 @@
 // SigmaOS Custom UUID Generator
 // Reduces dependency on predefined libraries by implementing custom UUID generation
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicU64, Ordering};
 

@@ -1,7 +1,7 @@
 // SigmaOS Custom Conversion Library
 // Reduces dependency on predefined conversion functions
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// Custom hexadecimal string to bytes conversion
 pub fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, ()> {

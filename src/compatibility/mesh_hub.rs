@@ -1,7 +1,7 @@
 //! SigmaOS Kernel Personality Relay Mesh & Mesh-and-Hub Architecture
 //! High-performance legacy compatibility layers supporting ancient hardware/software.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

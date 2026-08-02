@@ -1,7 +1,7 @@
 // Btrfs - Linux-style Copy-on-Write filesystem
 // Supports snapshots, subvolumes, compression, and checksums
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

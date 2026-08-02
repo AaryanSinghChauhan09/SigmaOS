@@ -1,7 +1,7 @@
 // EEVDF Scheduler - Earliest Eligible Virtual Deadline First
 // Asymmetric Multi-Processing scheduler for SigmaOS
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

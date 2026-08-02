@@ -1,7 +1,7 @@
 // Browser Core - High-performance, memory-safe browser implementation
 // Parses HTML5, CSS3, ES2022+, and SVG with integrated security
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::string::String;

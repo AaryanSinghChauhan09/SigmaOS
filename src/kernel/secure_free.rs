@@ -1,7 +1,7 @@
 // Secure Free Detection - Linux-style memory sanitization
 // Prevents information disclosure by clearing freed memory
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::collections::BTreeMap;

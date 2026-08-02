@@ -1,7 +1,7 @@
 //! Sovereign Sovereign VLC-Equivalent Video Player and Gap-Closure Subsystems
 //! Natively optimized for SigmaOS content-addressed and virtual memory architectures.
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 extern crate alloc;
 use alloc::boxed::Box;

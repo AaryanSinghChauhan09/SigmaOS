@@ -2,7 +2,7 @@
 //! Zero-dependency string manipulation functions
 //! Reduces dependency on standard library string functions
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 /// Custom string builder for zero-dependency string operations
 pub struct StringBuilder {

@@ -2,7 +2,7 @@
 //! Implements NixOS-like pure functional declarative state graphs
 //! Zero-dependency immutable state management for perfect reproducibility
 
-#![no_std]
+// (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 

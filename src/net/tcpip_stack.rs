@@ -1,4 +1,4 @@
-#![no_std]
+// (no_std only applicable at crate root - removed)
 #![no_main]
 
 /// Custom Production-Grade TCP/IP Stack for SigmaOS
