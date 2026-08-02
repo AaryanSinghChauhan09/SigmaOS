@@ -68,7 +68,7 @@ impl SigmaSoftwareStore {
         for (name, app) in &self.catalog {
             if app.is_installed && app.version != "1.5.0" {
                 // Assume latest stable is 1.5.0
-                self.pending_updates.push(name.clone());
+                self.pending_updates.push((*name).clone());
             }
         }
         self.pending_updates.len()
