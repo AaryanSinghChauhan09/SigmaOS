@@ -2,7 +2,7 @@
 // Allows parallel execution of legacy kernel personas (2.x -> 6.x) alongside modern ABIs.
 
 use crate::security::CapabilityToken;
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// 1. Meta-Kernel Orchestration
 /// Supervisory kernel managing multiple kernel personas simultaneously.
@@ -10,7 +10,6 @@ pub struct MetaKernel {
     personas: Vec<KernelPersona>,
 }
 
-#[derive(Debug, Clone, Copy)]
 pub struct KernelPersona {
     pub name: &'static str,
     pub api_version: &'static str,
@@ -293,86 +292,6 @@ impl LegacyScheduler {
     }
 }
 
-// =========================================================================
-// LINUX-INSPIRED DYNAMIC KERNEL MODULE LOADER & GPL TAINT VERIFIER
-// =========================================================================
-
-/// Status state of a dynamic kernel module
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModuleStatus {
-    Unloaded,
-    Loaded,
-    Active,
-}
-
-/// Structure representing a Dynamic Linux-parity Kernel Module
-pub struct KernelModule {
-    pub name: &'static str,
-    pub license: &'static str, // GPL, Dual MIT/GPL, Proprietary
-    pub version: &'static str,
-    pub status: ModuleStatus,
-}
-
-/// LKM Loader & Kernel Taint Manager (Linux Parity)
-pub struct LkmLoader {
-    pub modules: Vec<KernelModule>,
-    pub is_kernel_tainted: AtomicBool,
-}
-
-impl LkmLoader {
-    pub fn new() -> Self {
-        Self {
-            modules: Vec::new(),
-            is_kernel_tainted: AtomicBool::new(false),
-        }
-    }
-
-    /// Load a new kernel module, taining the kernel if license is non-GPL compatible (Linux Parity)
-    pub fn load_module(&mut self, mut module: KernelModule) -> Result<(), &'static str> {
-        for m in self.modules.iter() {
-            if m.name == module.name {
-                return Err("Module already loaded");
-            }
-        }
-
-        let is_gpl = module.license == "GPL" || module.license == "Dual MIT/GPL";
-        if !is_gpl {
-            self.is_kernel_tainted.store(true, Ordering::SeqCst);
-            // Linux-style console notice
-            // "SYS: TAINT: Loading proprietary module. Kernel state tained!"
-        }
-
-        module.status = ModuleStatus::Active;
-        self.modules.push(module);
-        Ok(())
-    }
-
-    /// Unload an active kernel module
-    pub fn unload_module(&mut self, name: &str) -> Result<(), &'static str> {
-        for i in 0..self.modules.len() {
-            if self.modules[i].name == name {
-                self.modules.remove(i);
-                return Ok(());
-            }
-        }
-        Err("Module not found")
-    }
-
-    pub fn is_tainted(&self) -> bool {
-        self.is_kernel_tainted.load(Ordering::SeqCst)
-    }
-}
-
-impl Default for LkmLoader {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// CUSTOM VECTOR IMPLEMENTATION
-// =========================================================================
-
 // Simple Vec implementation for Meta module
 pub struct Vec<T> {
     data: *mut T,
@@ -401,19 +320,6 @@ impl<T> Vec<T> {
     }
     pub fn len(&self) -> usize {
         self.len
-    }
-    pub fn remove(&mut self, index: usize) -> T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
     }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
@@ -593,35 +499,5 @@ mod tests {
 
         let sched = LegacyScheduler::new("CFS");
         assert_eq!(sched.calculate_priority_heuristic(0, 100), 20);
-    }
-
-    #[test]
-    fn test_lkm_loader_and_gpl_verification() {
-        let mut loader = LkmLoader::new();
-        assert!(!loader.is_tainted());
-
-        // GPL compliant module
-        let gpl_module = KernelModule {
-            name: "ext4",
-            license: "GPL",
-            version: "1.0",
-            status: ModuleStatus::Unloaded,
-        };
-        assert!(loader.load_module(gpl_module).is_ok());
-        assert!(!loader.is_tainted());
-
-        // Proprietary LKM -> Taints kernel state!
-        let proprietary_module = KernelModule {
-            name: "nvidia_gfx",
-            license: "Proprietary",
-            version: "535.10",
-            status: ModuleStatus::Unloaded,
-        };
-        assert!(loader.load_module(proprietary_module).is_ok());
-        assert!(loader.is_tainted()); // TAINTED!
-
-        // Unload ext4 module
-        assert!(loader.unload_module("ext4").is_ok());
-        assert_eq!(loader.modules.len(), 1);
     }
 }

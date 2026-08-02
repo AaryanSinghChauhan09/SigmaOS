@@ -2,7 +2,6 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
-pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -12,16 +11,11 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod gpu;
-pub mod graphics;
 pub mod kernel;
-pub mod klib;
-pub mod media;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
-pub mod performance;
 pub mod productivity;
 pub mod remote;
 pub mod resilience;
@@ -30,19 +24,9 @@ pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
 
-pub use media::{
-    CaptureSource, GpuEncoderType, RecorderState, RecordingStats, SovereignScreenRecorder,
-};
-
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
-};
-pub use ai::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, ApmDependency,
-    ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, Intent, IntentType,
-    ManagerCapability as AiManagerCapability, McpServer, Pattern, SimpleAIAgent,
-    SimpleAIAgentManager, SovereignApmEngine, SovereignWikiEngine, WikiArticle,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -50,26 +34,18 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BodhiProfileSelector, BudgieAppletManager,
-    BudgieLayoutSwitcher, BudgieShuffler, BuildCodexGrid, CoasAdminSuite, CompatibilityError,
+    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
     CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
-    CorebootGatewayMesh, CosmicDesktopEngine, DACConstellation, DotMatrixMesh, DrakxtoolsSuite,
-    DriverArchiveGridV2, ElementaryAppCenter, EosLogTool, EosMirrorReflector, EosUpdateNotifier,
-    EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh,
-    GraniteHigLibrary, GraphicsArchiveGridV2, HarddrakeDetector, JujuOrchestrator,
-    KernelConstellationGrid, LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LizardInstaller, LsbProfile,
-    MaasProvisioner, Mirror as EosMirror, MokshaDesktopEngine, MokshaGadgetManager,
-    MultipassVmlight, NetworkAlmanacHub, NetworkArchiveGridV2, PacstallAur,
-    PantheonGalaWindowManager, PeripheralArchiveMesh, PopShellTiling, PosixComplianceLevel,
-    ProcessAlmanacHub, RhinoPkgUnified, SELinuxConstellation, SecurityConstellation,
-    SnapcraftRuntime, StandardsComplianceManager, StarlingCompositor, StarlingTilingEngine,
-    StarlingWidgetTree, StarlingX11Server, StorageArchiveGridV2, SyscallAlmanacHub,
-    System76PowerSwitcher, System76Scheduler, TapeMesh, TargetPlatform, TranslationLayer,
-    UEFIGatewayMesh, UbuntuDockManager, UbuntuProEsm, UnicornDesktopShell, UrpmiPackageResolver,
-    WelcomeTab as EosWelcomeTab, YayAurHelper, ZeroTrustConstellation, ZorinConnectBridge,
-    ZorinLookChanger, ZorinWinePreflight,
+    CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
+    EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub,
+    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
+    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, LsbProfile, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation,
+    SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
+    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
+    YayAurHelper, ZeroTrustConstellation,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -115,11 +91,8 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DebPackageDriverTranslator, DependencyResolver, GenericLinuxTranslationUdf,
-    LinuxDriverPackageTranslator, LinuxTranslationService, PackageAdapter, PackageError,
-    PackageFormat, PackageSource, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, UnifiedPackage, UniversalPackageManager,
-    GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
     Achievement, AchievementType, AegisubEngine, GamifiedProductivity, Goal, PomodoroState,
@@ -136,14 +109,13 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    secure_zeroize, AppArmorManager, AppArmorProfile, AuditLogEntry, CapabilityGate,
-    CapabilityToken, DefensiveAuditSystem, DomainID, DomainOrchestrator, DomainType, ForensicBlock,
-    HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, IsolatedDomain, IsolationError,
-    MaliciousSignature, ObjectType, Permission, PledgeManager, PledgePromise, SecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule, SelinuxPermission,
+    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
+    IsolationError, Permission, PledgeManager, PledgePromise,
 };
 pub use shell::{
-    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
+    CommandError as ShellCommandError, CronJob, LogEntry, LogLevel, Privilege, Service,
+    ShellCommand, ShellRepl, ShellSession, SigmaCoreUtils, SigmaCron, SigmaDoc, SigmaInit,
+    SigmaLog, SigmaPriv, SimpleShellSession,
 };
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, DebPackageImporter, PackageImporter,

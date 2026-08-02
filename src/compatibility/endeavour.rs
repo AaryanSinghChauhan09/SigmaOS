@@ -3,7 +3,11 @@
 // such as the Welcome assistant, Reflector mirror ranking, update notifier daemon,
 // log sharing tool with sanitization, and the Yay AUR helper translator.
 
+<<<<<<< HEAD
 use crate::klib::HashMap;
+=======
+use std::collections::HashMap;
+>>>>>>> origin/jules-sigmaos-linux-parity-3007230036885566362
 
 /// Represents a package mirror in the SigmaOS network.
 #[derive(Debug, Clone, PartialEq)]
