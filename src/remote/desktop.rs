@@ -3,8 +3,8 @@
 // ciphering, zero-trust input authorization checking, and full screen-sharing.
 
 use crate::security::CapabilityToken;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SessionID = usize;
 
@@ -84,7 +84,9 @@ impl SigmaRendezvous {
         for i in 0..len {
             server_array[i] = server_ip[i];
         }
-        Self { rendezvous_server: server_array }
+        Self {
+            rendezvous_server: server_array,
+        }
     }
 
     /// Negotiates P2P NAT Traversal hole-punching safely without central proxy hbbs/hbbr servers
@@ -103,7 +105,9 @@ pub struct InputAuthGate {
 
 impl InputAuthGate {
     pub const fn new(token_mask: u64) -> Self {
-        Self { required_token_bits: token_mask }
+        Self {
+            required_token_bits: token_mask,
+        }
     }
 
     /// Verifies if the remote input operator carries secure authorization before injecting keystrokes
@@ -119,7 +123,9 @@ pub struct PqcVideoCipher {
 
 impl PqcVideoCipher {
     pub const fn new() -> Self {
-        Self { handshake_verified: true }
+        Self {
+            handshake_verified: true,
+        }
     }
 
     /// Encrypts screen frame buffers natively in user-space before transmission

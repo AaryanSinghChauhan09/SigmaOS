@@ -1,9 +1,10 @@
-//! eBPF (Extended Berkeley Packet Filter) Virtual Machine and Hook Engine
-//! Provides safe, sandboxeduserspace-defined bytecode execution within microkernel hooks.
+//! eBPF (Extended Berkeley Packet Filter) Virtual Machine, Hook Engine, & Map Registry
+//! Provides safe, sandboxed bytecode execution and Linux-parity State-Sharing Maps inside microkernel hooks.
 
 #![no_std]
 
 extern crate alloc;
+use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -27,6 +28,117 @@ pub struct EbpfInstruction {
     pub offset: i16,
     pub imm: i32,
 }
+
+// =========================================================================
+// EBPF MAP REGISTRY (Linux Parity State-Sharing)
+// =========================================================================
+
+/// eBPF Map Types (Linux Parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EbpfMapType {
+    Hash,
+    Array,
+    RingBuffer,
+}
+
+/// Represents an individual eBPF Map (Linux Parity)
+#[derive(Debug, Clone)]
+pub struct EbpfMap {
+    pub map_id: usize,
+    pub map_type: EbpfMapType,
+    pub key_size: usize,
+    pub value_size: usize,
+    pub max_entries: usize,
+    pub storage: BTreeMap<Vec<u8>, Vec<u8>>,
+}
+
+impl EbpfMap {
+    pub fn new(
+        id: usize,
+        map_type: EbpfMapType,
+        key_size: usize,
+        value_size: usize,
+        max_entries: usize,
+    ) -> Self {
+        Self {
+            map_id: id,
+            map_type,
+            key_size,
+            value_size,
+            max_entries,
+            storage: BTreeMap::new(),
+        }
+    }
+
+    pub fn lookup_elem(&self, key: &[u8]) -> Option<&Vec<u8>> {
+        self.storage.get(key)
+    }
+
+    pub fn update_elem(&mut self, key: Vec<u8>, value: Vec<u8>) -> Result<(), &'static str> {
+        if key.len() != self.key_size || value.len() != self.value_size {
+            return Err("eBPF Map: Element size mismatch constraint");
+        }
+        if self.storage.len() >= self.max_entries && !self.storage.contains_key(&key) {
+            return Err("eBPF Map: Maximum entry bounds exceeded");
+        }
+        self.storage.insert(key, value);
+        Ok(())
+    }
+
+    pub fn delete_elem(&mut self, key: &[u8]) -> Result<(), &'static str> {
+        self.storage
+            .remove(key)
+            .ok_or("eBPF Map: Element not found")
+            .map(|_| ())
+    }
+}
+
+/// Global eBPF Map Registry (Linux Parity)
+pub struct EbpfMapRegistry {
+    pub maps: BTreeMap<usize, EbpfMap>,
+}
+
+impl EbpfMapRegistry {
+    pub fn new() -> Self {
+        Self {
+            maps: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_map(
+        &mut self,
+        id: usize,
+        map_type: EbpfMapType,
+        key_size: usize,
+        value_size: usize,
+        max_entries: usize,
+    ) -> Result<(), &'static str> {
+        if self.maps.contains_key(&id) {
+            return Err("eBPF Map: Map ID already registered");
+        }
+        let map = EbpfMap::new(id, map_type, key_size, value_size, max_entries);
+        self.maps.insert(id, map);
+        Ok(())
+    }
+
+    pub fn get_map(&self, id: usize) -> Option<&EbpfMap> {
+        self.maps.get(&id)
+    }
+
+    pub fn get_map_mut(&mut self, id: usize) -> Option<&mut EbpfMap> {
+        self.maps.get_mut(&id)
+    }
+}
+
+impl Default for EbpfMapRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// EBPF VIRTUAL MACHINE EXECUTION
+// =========================================================================
 
 pub struct EbpfVm {
     pub registers: [u64; 11], // R0 (return) to R10 (frame pointer)
@@ -243,5 +355,31 @@ mod tests {
         let mut vm = EbpfVm::new(bytecode);
         let res = vm.run(&[]).unwrap();
         assert_eq!(res, 42);
+    }
+
+    #[test]
+    fn test_ebpf_map_lifecycle() {
+        let mut registry = EbpfMapRegistry::new();
+        assert!(registry.create_map(1, EbpfMapType::Hash, 4, 8, 10).is_ok());
+        // duplicate map
+        assert!(registry.create_map(1, EbpfMapType::Hash, 4, 8, 10).is_err());
+
+        {
+            let map = registry.get_map_mut(1).unwrap();
+            let key = vec![1, 2, 3, 4];
+            let val = vec![10, 20, 30, 40, 50, 60, 70, 80];
+
+            // Success update
+            assert!(map.update_elem(key.clone(), val.clone()).is_ok());
+            // Lookup success
+            assert_eq!(map.lookup_elem(&key).unwrap(), &val);
+
+            // Size mismatch check
+            assert!(map.update_elem(vec![1, 2], val.clone()).is_err());
+
+            // Delete success
+            assert!(map.delete_elem(&key).is_ok());
+            assert!(map.lookup_elem(&key).is_none());
+        }
     }
 }

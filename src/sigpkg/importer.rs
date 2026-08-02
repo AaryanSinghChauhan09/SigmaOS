@@ -63,7 +63,10 @@ impl PackageImporter for DebPackageImporter {
         let mut recipe = PackageRecipe::new(name, parsed_version)
             .with_description(description)
             .with_build_system(BuildSystem::Make)
-            .with_source("https://deb.debian.org/pool/main/".to_string(), "deb-sha256-placeholder".to_string())
+            .with_source(
+                "https://deb.debian.org/pool/main/".to_string(),
+                "deb-sha256-placeholder".to_string(),
+            )
             .with_build_command("make".to_string());
 
         // We can add translated dependencies to build commands for verification
@@ -125,7 +128,10 @@ impl PackageImporter for RpmPackageImporter {
         let mut recipe = PackageRecipe::new(name, parsed_version)
             .with_description(summary)
             .with_build_system(BuildSystem::CMake)
-            .with_source("https://mirrors.fedoraproject.org/".to_string(), "rpm-sha256-placeholder".to_string())
+            .with_source(
+                "https://mirrors.fedoraproject.org/".to_string(),
+                "rpm-sha256-placeholder".to_string(),
+            )
             .with_build_command("cmake . && make".to_string());
 
         for req in requires {
@@ -189,7 +195,10 @@ impl PackageImporter for PacmanPackageImporter {
         let recipe = PackageRecipe::new(name, parsed_version)
             .with_description(description)
             .with_build_system(BuildSystem::Cargo)
-            .with_source("https://sources.archlinux.org/".to_string(), "pacman-sha256-placeholder".to_string())
+            .with_source(
+                "https://sources.archlinux.org/".to_string(),
+                "pacman-sha256-placeholder".to_string(),
+            )
             .with_build_command("cargo build --release".to_string())
             .with_pkgrel(pkgrel);
 

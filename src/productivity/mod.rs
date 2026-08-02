@@ -6,6 +6,4 @@ pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
-pub use subtitle_editor::{
-    SubtitleFormat, SubtitleEntry, AegisubEngine, SubtitleEditEngine,
-};
+pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};

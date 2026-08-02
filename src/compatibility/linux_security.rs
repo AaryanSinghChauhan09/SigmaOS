@@ -53,7 +53,7 @@ impl SecurityContext {
             level: level.to_string(),
         }
     }
-    
+
     pub fn to_string(&self) -> String {
         format!("{}:{}:{}:{}", self.user, self.role, self.type_, self.level)
     }
@@ -79,15 +79,15 @@ impl AppArmorProfile {
             capabilities: Vec::new(),
         }
     }
-    
+
     pub fn allow_path(&mut self, path: String) {
         self.allow_paths.push(path);
     }
-    
+
     pub fn deny_path(&mut self, path: String) {
         self.deny_paths.push(path);
     }
-    
+
     pub fn add_capability(&mut self, cap: LinuxCapability) {
         self.capabilities.push(cap);
     }
@@ -110,23 +110,23 @@ impl SecurityModuleManager {
             apparmor_profiles: Vec::new(),
         }
     }
-    
+
     pub fn enable_selinux(&mut self) {
         self.selinux_enabled = true;
     }
-    
+
     pub fn enable_apparmor(&mut self) {
         self.apparmor_enabled = true;
     }
-    
+
     pub fn add_security_context(&mut self, context: SecurityContext) {
         self.security_contexts.push(context);
     }
-    
+
     pub fn add_apparmor_profile(&mut self, profile: AppArmorProfile) {
         self.apparmor_profiles.push(profile);
     }
-    
+
     pub fn check_access(&self, path: &str, operation: &str) -> bool {
         // Simplified access check
         true
@@ -146,11 +146,11 @@ impl UserNamespace {
             gid_map: Vec::new(),
         }
     }
-    
+
     pub fn add_uid_mapping(&mut self, host_uid: u32, container_uid: u32, count: u32) {
         self.uid_map.push((host_uid, container_uid, count));
     }
-    
+
     pub fn add_gid_mapping(&mut self, host_gid: u32, container_gid: u32, count: u32) {
         self.gid_map.push((host_gid, container_gid, count));
     }
@@ -179,13 +179,13 @@ impl NamespaceManager {
             namespaces: Vec::new(),
         }
     }
-    
+
     pub fn create_namespace(&mut self, ns_type: NamespaceType) -> u32 {
         let ns_id = self.namespaces.len() as u32;
         self.namespaces.push((ns_type, ns_id));
         ns_id
     }
-    
+
     pub fn has_namespace(&self, ns_type: NamespaceType) -> bool {
         self.namespaces.iter().any(|(t, _)| *t == ns_type)
     }
@@ -206,7 +206,7 @@ impl SecurityPolicy {
             audit_failures: true,
         }
     }
-    
+
     pub fn enforce(&self, action: &str) -> bool {
         if self.enforce_mandatory_access {
             // In a real implementation, this would check MAC policies

@@ -4,11 +4,11 @@
 
 extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 use core::time::Duration;
 
 /// Supported subtitle formats.
@@ -48,7 +48,10 @@ impl SubtitleEntry {
             self.start_time += offset;
             self.end_time += offset;
         } else {
-            self.start_time = self.start_time.checked_sub(offset).unwrap_or(Duration::ZERO);
+            self.start_time = self
+                .start_time
+                .checked_sub(offset)
+                .unwrap_or(Duration::ZERO);
             self.end_time = self.end_time.checked_sub(offset).unwrap_or(Duration::ZERO);
         }
     }
@@ -74,7 +77,11 @@ impl AegisubEngine {
     }
 
     /// Apply advanced ASS-style parameters to a specific subtitle entry.
-    pub fn apply_ass_style(&mut self, entry_id: usize, style_params: &str) -> Result<(), &'static str> {
+    pub fn apply_ass_style(
+        &mut self,
+        entry_id: usize,
+        style_params: &str,
+    ) -> Result<(), &'static str> {
         if let Some(entry) = self.entries.iter_mut().find(|e| e.id == entry_id) {
             entry.style = style_params.to_string();
             Ok(())
@@ -84,7 +91,11 @@ impl AegisubEngine {
     }
 
     /// Segment an entry's text into Karaoke timing chunks (e.g. {\k50}Word).
-    pub fn apply_karaoke_timing(&mut self, entry_id: usize, word_durations: &[Duration]) -> Result<String, &'static str> {
+    pub fn apply_karaoke_timing(
+        &mut self,
+        entry_id: usize,
+        word_durations: &[Duration],
+    ) -> Result<String, &'static str> {
         if let Some(entry) = self.entries.iter_mut().find(|e| e.id == entry_id) {
             let mut karaoke_text = String::new();
             let words: Vec<&str> = entry.text.split_whitespace().collect();
@@ -202,7 +213,8 @@ impl SubtitleEditEngine {
             }
             SubtitleFormat::SubStationAlpha => {
                 buffer.push_str("[Script Info]\nTitle: SigmaOS Subtitle\nScriptType: v4.00+\n\n");
-                buffer.push_str("[Events]\nFormat: Layer, Start, End, Style, Actor, Effect, Text\n");
+                buffer
+                    .push_str("[Events]\nFormat: Layer, Start, End, Style, Actor, Effect, Text\n");
                 for entry in &self.entries {
                     buffer.push_str(&format!(
                         "Dialogue: 0,{:02}:{:02}:{:02}.{:02},{:02}:{:02}:{:02}.{:02},{},{},,,\n",
@@ -259,9 +271,16 @@ mod tests {
         assert!(aegisub.apply_ass_style(1, "BoldStyle").is_ok());
         assert_eq!(aegisub.entries[0].style, "BoldStyle");
 
-        let words_duration = [Duration::from_millis(500), Duration::from_millis(600), Duration::from_millis(700)];
+        let words_duration = [
+            Duration::from_millis(500),
+            Duration::from_millis(600),
+            Duration::from_millis(700),
+        ];
         let karaoke_text = aegisub.apply_karaoke_timing(1, &words_duration).unwrap();
-        assert_eq!(karaoke_text, "{\\k50}Sovereign {\\k60}Operating {\\k70}System");
+        assert_eq!(
+            karaoke_text,
+            "{\\k50}Sovereign {\\k60}Operating {\\k70}System"
+        );
     }
 
     #[test]

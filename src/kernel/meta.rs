@@ -2,7 +2,7 @@
 // Allows parallel execution of legacy kernel personas (2.x -> 6.x) alongside modern ABIs.
 
 use crate::security::CapabilityToken;
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 /// 1. Meta-Kernel Orchestration
 /// Supervisory kernel managing multiple kernel personas simultaneously.
@@ -18,14 +18,20 @@ pub struct KernelPersona {
 
 impl MetaKernel {
     pub fn new() -> Self {
-        Self { personas: Vec::new() }
+        Self {
+            personas: Vec::new(),
+        }
     }
 
     pub fn register_persona(&mut self, persona: KernelPersona) {
         self.personas.push(persona);
     }
 
-    pub fn execute_workload(&self, persona_name: &str, task_cost: usize) -> Result<usize, &'static str> {
+    pub fn execute_workload(
+        &self,
+        persona_name: &str,
+        task_cost: usize,
+    ) -> Result<usize, &'static str> {
         for p in self.personas.iter() {
             if p.name == persona_name {
                 // Return processed cycle cost simulated under correct persona orchestration
@@ -52,27 +58,45 @@ pub struct SchedulerPlugin {
     pub name: &'static str,
 }
 impl KernelPlugin for SchedulerPlugin {
-    fn name(&self) -> &'static str { self.name }
-    fn plugin_type(&self) -> &'static str { "Scheduler" }
-    fn execute(&self) -> Result<(), &'static str> { Ok(()) }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn plugin_type(&self) -> &'static str {
+        "Scheduler"
+    }
+    fn execute(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
 }
 
 pub struct MemoryPlugin {
     pub name: &'static str,
 }
 impl KernelPlugin for MemoryPlugin {
-    fn name(&self) -> &'static str { self.name }
-    fn plugin_type(&self) -> &'static str { "Memory" }
-    fn execute(&self) -> Result<(), &'static str> { Ok(()) }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn plugin_type(&self) -> &'static str {
+        "Memory"
+    }
+    fn execute(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
 }
 
 pub struct SecurityPlugin {
     pub name: &'static str,
 }
 impl KernelPlugin for SecurityPlugin {
-    fn name(&self) -> &'static str { self.name }
-    fn plugin_type(&self) -> &'static str { "Security" }
-    fn execute(&self) -> Result<(), &'static str> { Ok(()) }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn plugin_type(&self) -> &'static str {
+        "Security"
+    }
+    fn execute(&self) -> Result<(), &'static str> {
+        Ok(())
+    }
 }
 
 pub struct KernelPluginManager {
@@ -81,7 +105,9 @@ pub struct KernelPluginManager {
 
 impl KernelPluginManager {
     pub fn new() -> Self {
-        Self { plugins: Vec::new() }
+        Self {
+            plugins: Vec::new(),
+        }
     }
 
     pub fn load_plugin(&mut self, plugin: Box<dyn KernelPlugin>) {
@@ -112,24 +138,36 @@ pub struct FloppyMicroDriver {
     pub io_base: u16,
 }
 impl MicroDriver for FloppyMicroDriver {
-    fn hardware_id(&self) -> u32 { 0x82077AA }
-    fn read_register(&self, _offset: u16) -> u8 { 0xE5 } // Floppy default status
+    fn hardware_id(&self) -> u32 {
+        0x82077AA
+    }
+    fn read_register(&self, _offset: u16) -> u8 {
+        0xE5
+    } // Floppy default status
 }
 
 pub struct ISASoundMicroDriver {
     pub io_base: u16,
 }
 impl MicroDriver for ISASoundMicroDriver {
-    fn hardware_id(&self) -> u32 { 0x1600 }
-    fn read_register(&self, _offset: u16) -> u8 { 0xAA } // SoundBlaster response
+    fn hardware_id(&self) -> u32 {
+        0x1600
+    }
+    fn read_register(&self, _offset: u16) -> u8 {
+        0xAA
+    } // SoundBlaster response
 }
 
 pub struct AGPMicroDriver {
     pub io_base: u16,
 }
 impl MicroDriver for AGPMicroDriver {
-    fn hardware_id(&self) -> u32 { 0x4000 }
-    fn read_register(&self, _offset: u16) -> u8 { 0xFF } // Graphics active
+    fn hardware_id(&self) -> u32 {
+        0x4000
+    }
+    fn read_register(&self, _offset: u16) -> u8 {
+        0xFF
+    } // Graphics active
 }
 
 /// 4. Cross-Kernel ABI Layer 2.0
@@ -144,7 +182,11 @@ impl ABIManager {
     }
 
     /// Emulates stack alignment and instruction mapping differences for older ABIs
-    pub fn translate_stack_frame(&self, target_abi: &str, raw_stack: &mut [u64]) -> Result<(), &'static str> {
+    pub fn translate_stack_frame(
+        &self,
+        target_abi: &str,
+        raw_stack: &mut [u64],
+    ) -> Result<(), &'static str> {
         if target_abi == "x86LegacyABI" && self.current_abi == "x86_64" {
             // Emulate 32-bit stack translation (collapsing 64-bit bounds)
             for val in raw_stack.iter_mut() {
@@ -173,14 +215,22 @@ impl NetPod {
     }
 
     /// Wraps classic protocol packets inside standard contemporary UDP/IP tunnels
-    pub fn encapsulate_legacy_frame(&self, raw_frame: &[u8], bridged_out: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn encapsulate_legacy_frame(
+        &self,
+        raw_frame: &[u8],
+        bridged_out: &mut [u8],
+    ) -> Result<usize, &'static str> {
         if bridged_out.len() < raw_frame.len() + 4 {
             return Err("Bridge packet size constraints exceeded");
         }
         // Inject IPX/NetBEUI signature header
         bridged_out[0] = 0xAA;
         bridged_out[1] = 0xBB;
-        bridged_out[2] = if self.protocol_type == "IPX/SPX" { 1 } else { 2 };
+        bridged_out[2] = if self.protocol_type == "IPX/SPX" {
+            1
+        } else {
+            2
+        };
         bridged_out[3] = raw_frame.len() as u8;
 
         for i in 0..raw_frame.len() {
@@ -242,6 +292,86 @@ impl LegacyScheduler {
     }
 }
 
+// =========================================================================
+// LINUX-INSPIRED DYNAMIC KERNEL MODULE LOADER & GPL TAINT VERIFIER
+// =========================================================================
+
+/// Status state of a dynamic kernel module
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModuleStatus {
+    Unloaded,
+    Loaded,
+    Active,
+}
+
+/// Structure representing a Dynamic Linux-parity Kernel Module
+pub struct KernelModule {
+    pub name: &'static str,
+    pub license: &'static str, // GPL, Dual MIT/GPL, Proprietary
+    pub version: &'static str,
+    pub status: ModuleStatus,
+}
+
+/// LKM Loader & Kernel Taint Manager (Linux Parity)
+pub struct LkmLoader {
+    pub modules: Vec<KernelModule>,
+    pub is_kernel_tainted: AtomicBool,
+}
+
+impl LkmLoader {
+    pub fn new() -> Self {
+        Self {
+            modules: Vec::new(),
+            is_kernel_tainted: AtomicBool::new(false),
+        }
+    }
+
+    /// Load a new kernel module, taining the kernel if license is non-GPL compatible (Linux Parity)
+    pub fn load_module(&mut self, mut module: KernelModule) -> Result<(), &'static str> {
+        for m in self.modules.iter() {
+            if m.name == module.name {
+                return Err("Module already loaded");
+            }
+        }
+
+        let is_gpl = module.license == "GPL" || module.license == "Dual MIT/GPL";
+        if !is_gpl {
+            self.is_kernel_tainted.store(true, Ordering::SeqCst);
+            // Linux-style console notice
+            // "SYS: TAINT: Loading proprietary module. Kernel state tained!"
+        }
+
+        module.status = ModuleStatus::Active;
+        self.modules.push(module);
+        Ok(())
+    }
+
+    /// Unload an active kernel module
+    pub fn unload_module(&mut self, name: &str) -> Result<(), &'static str> {
+        for i in 0..self.modules.len() {
+            if self.modules[i].name == name {
+                self.modules.remove(i);
+                return Ok(());
+            }
+        }
+        Err("Module not found")
+    }
+
+    pub fn is_tainted(&self) -> bool {
+        self.is_kernel_tainted.load(Ordering::SeqCst)
+    }
+}
+
+impl Default for LkmLoader {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// CUSTOM VECTOR IMPLEMENTATION
+// =========================================================================
+
 // Simple Vec implementation for Meta module
 pub struct Vec<T> {
     data: *mut T,
@@ -270,6 +400,19 @@ impl<T> Vec<T> {
     }
     pub fn len(&self) -> usize {
         self.len
+    }
+    pub fn remove(&mut self, index: usize) -> T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
     }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
@@ -388,8 +531,16 @@ mod tests {
     #[test]
     fn test_metakernel_persona_orchestration() {
         let mut meta = MetaKernel::new();
-        meta.register_persona(KernelPersona { name: "linux_2_6", api_version: "2.6.32", active_processes: 5 });
-        meta.register_persona(KernelPersona { name: "linux_6_x", api_version: "6.1.0", active_processes: 10 });
+        meta.register_persona(KernelPersona {
+            name: "linux_2_6",
+            api_version: "2.6.32",
+            active_processes: 5,
+        });
+        meta.register_persona(KernelPersona {
+            name: "linux_6_x",
+            api_version: "6.1.0",
+            active_processes: 10,
+        });
 
         assert_eq!(meta.active_personas_count(), 2);
         assert_eq!(meta.execute_workload("linux_2_6", 50).unwrap(), 100);
@@ -420,7 +571,9 @@ mod tests {
     fn test_abi_and_networking_pods() {
         let abi = ABIManager::new("x86_64");
         let mut stack = [10, 20, 30];
-        assert!(abi.translate_stack_frame("x86LegacyABI", &mut stack).is_ok());
+        assert!(abi
+            .translate_stack_frame("x86LegacyABI", &mut stack)
+            .is_ok());
         assert_eq!(stack[0], 10);
 
         let pod = NetPod::new("IPX/SPX");
@@ -439,5 +592,35 @@ mod tests {
 
         let sched = LegacyScheduler::new("CFS");
         assert_eq!(sched.calculate_priority_heuristic(0, 100), 20);
+    }
+
+    #[test]
+    fn test_lkm_loader_and_gpl_verification() {
+        let mut loader = LkmLoader::new();
+        assert!(!loader.is_tainted());
+
+        // GPL compliant module
+        let gpl_module = KernelModule {
+            name: "ext4",
+            license: "GPL",
+            version: "1.0",
+            status: ModuleStatus::Unloaded,
+        };
+        assert!(loader.load_module(gpl_module).is_ok());
+        assert!(!loader.is_tainted());
+
+        // Proprietary LKM -> Taints kernel state!
+        let proprietary_module = KernelModule {
+            name: "nvidia_gfx",
+            license: "Proprietary",
+            version: "535.10",
+            status: ModuleStatus::Unloaded,
+        };
+        assert!(loader.load_module(proprietary_module).is_ok());
+        assert!(loader.is_tainted()); // TAINTED!
+
+        // Unload ext4 module
+        assert!(loader.unload_module("ext4").is_ok());
+        assert_eq!(loader.modules.len(), 1);
     }
 }
