@@ -238,3 +238,4 @@ Copyright © 2024–2026 Aaryan Singh Chauhan and the SigmaOS contributors.
 - **Discussions**: [GitHub Discussions](https://github.com/AaryanSinghChauhan09/SigmaOS/discussions)
 - **Wiki**: [SigmaOS Wiki](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki)
 - **Security**: See [docs/SECURITY.md](docs/SECURITY.md) for responsible disclosure
+Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.

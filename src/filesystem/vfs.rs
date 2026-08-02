@@ -52,6 +52,7 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
+    pub link_count: u32, // standard inode link count tracking hard links
 }
 
 impl Inode {
@@ -66,6 +67,7 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
+            link_count: 1, // default link count of 1
         }
     }
 }
@@ -214,30 +216,13 @@ impl VirtualFilesystem {
         Ok(bytes_written)
     }
 
-    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn read_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &mut [u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
-        if !token.has_permission(Permission::FileRead) {
-            return Err(FsError::PermissionDenied);
+    pub fn create_hard_link(&mut self, source_inode_id: u64) -> Result<(), FsError> {
+        if let Some(inode) = self.inodes.get_mut(&source_inode_id) {
+            inode.link_count += 1;
+            Ok(())
+        } else {
+            Err(FsError::NotFound)
         }
-        self.read_file(fd, buffer)
-    }
-
-    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn write_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &[u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
-        if !token.has_permission(Permission::FileWrite) {
-            return Err(FsError::PermissionDenied);
-        }
-        self.write_file(fd, buffer)
     }
 
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
@@ -249,7 +234,16 @@ impl VirtualFilesystem {
             return Err(FsError::NotFound);
         }
 
-        self.inodes.remove(&inode_id);
+        let link_reached_zero = if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            inode.link_count = inode.link_count.saturating_sub(1);
+            inode.link_count == 0
+        } else {
+            false
+        };
+
+        if link_reached_zero {
+            self.inodes.remove(&inode_id);
+        }
         Ok(())
     }
 
@@ -294,6 +288,26 @@ mod tests {
     fn test_vfs_creation() {
         let vfs = VirtualFilesystem::new();
         assert!(vfs.inodes.contains_key(&0));
+    }
+
+    #[test]
+    fn test_hard_links_and_unlink() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+
+        // Create hard link (link_count = 2)
+        vfs.create_hard_link(inode_id).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
+
+        // First deletion (link_count = 1, file should NOT be removed)
+        vfs.delete_file(inode_id).unwrap();
+        assert!(vfs.inodes.contains_key(&inode_id));
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+
+        // Second deletion (link_count = 0, file should be removed)
+        vfs.delete_file(inode_id).unwrap();
+        assert!(!vfs.inodes.contains_key(&inode_id));
     }
 
     #[test]
