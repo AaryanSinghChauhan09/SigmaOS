@@ -28,8 +28,6 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
-    pub pkgrel: u32,
-    pub prepare_commands: Vec<String>,
 }
 
 impl PackageRecipe {
@@ -45,8 +43,6 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
-            pkgrel: 1,
-            prepare_commands: Vec::new(),
         }
     }
 
@@ -82,12 +78,11 @@ impl PackageRecipe {
     }
 
     pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.prepare_commands.push(command);
+        self.build_commands.push(command);
         self
     }
 
-    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
-        self.pkgrel = pkgrel;
+    pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
         self
     }
 
