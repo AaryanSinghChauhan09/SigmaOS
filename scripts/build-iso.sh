@@ -177,13 +177,11 @@ else
     echo "MOCK SIGMAOS KERNEL MODULE FOR $ARCH (PROFILE: $PROFILE)" > "$ISO_ROOT/boot/sigmaos.bin"
 fi
 
-# ==============================================================================
-# DYNAMIC CONFIGURATION & INCLUSIONS INJECTION
-# ==============================================================================
-# 1. Custom or default grub configuration
-if [ -n "$CONFIG_FILE" ] && [ -f "$CONFIG_FILE" ]; then
-    log_info "Injecting custom bootloader configuration: $CONFIG_FILE"
-    cp "$CONFIG_FILE" "$ISO_ROOT/boot/grub/grub.cfg"
+# 3. Build ISO using grub-mkrescue if available, otherwise generate simulated bootable ISO container
+if command -v grub-mkrescue >/dev/null 2>&1 && grub-mkrescue -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT" >/dev/null 2>&1; then
+    echo "[BUILD-ISO] Success! Bootable ISO created at $BUILD_DIR/sigmaos.iso"
+elif command -v xorriso >/dev/null 2>&1 && xorriso -as mkisofs -R -b boot/grub/stage2_eltorito -no-emul-boot -boot-load-size 4 -boot-info-table -o "$BUILD_DIR/sigmaos.iso" "$ISO_ROOT" >/dev/null 2>&1; then
+    echo "[BUILD-ISO] Success! ISO created at $BUILD_DIR/sigmaos.iso"
 else
     if [ ! -f "$ISO_ROOT/boot/grub/grub.cfg" ]; then
         log_info "Generating fallback GRUB multiboot2 menu entry config..."

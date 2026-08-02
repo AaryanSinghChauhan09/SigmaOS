@@ -542,20 +542,8 @@ impl LocalLlmEngine {
         // For now, return a placeholder response
         let start_time = 0; // Would use actual timing
 
-        let mut response =
+        let response =
             InferenceResponse::new("Generated response placeholder".to_string(), 10, 100);
-
-        if !request.tools.is_empty() {
-            let mut calls = Vec::new();
-            for tool in &request.tools {
-                calls.push(ToolCall {
-                    id: "call_0".to_string(),
-                    name: tool.name.clone(),
-                    arguments_json: "{}".to_string(),
-                });
-            }
-            response = response.with_tool_calls(calls);
-        }
 
         Ok(response)
     }

@@ -1,19 +1,18 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::HashMap;
-use crate::klib::hashmap::HashMapIter;
+use super::{hashmap::HashMapIter, HashMap};
 
 pub struct HashSet<T>
 where
-    T: Eq + PartialEq + Clone + core::hash::Hash,
+    T: PartialEq + Clone + core::hash::Hash,
 {
     map: HashMap<T, ()>,
 }
 
 impl<T> HashSet<T>
 where
-    T: Eq + PartialEq + Clone + core::hash::Hash,
+    T: PartialEq + Clone + core::hash::Hash,
 {
     pub fn new() -> Self {
         HashSet {
@@ -58,7 +57,7 @@ where
 
 impl<T> Default for HashSet<T>
 where
-    T: Eq + PartialEq + Clone + core::hash::Hash,
+    T: PartialEq + Clone + core::hash::Hash,
 {
     fn default() -> Self {
         Self::new()
@@ -74,7 +73,7 @@ where
 
 impl<'a, T> Iterator for HashSetIter<'a, T>
 where
-    T: Eq + PartialEq + Clone + core::hash::Hash,
+    T: PartialEq + Clone + core::hash::Hash + 'a,
 {
     type Item = &'a T;
 
@@ -112,10 +111,7 @@ mod tests {
         set.insert(1);
         set.insert(2);
 
-        let mut count = 0;
-        for _ in set.iter() {
-            count += 1;
-        }
-        assert_eq!(count, 2);
+        let items: Vec<i32> = set.iter().cloned().collect();
+        assert_eq!(items.len(), 2);
     }
 }

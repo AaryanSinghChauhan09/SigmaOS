@@ -1,6 +1,10 @@
 use core::mem;
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
 
 impl<T: PartialEq> Vec<T> {
     pub fn contains(&self, item: &T) -> bool {
@@ -27,11 +31,13 @@ impl<T> Default for Vec<T> {
 
 impl<T> Vec<T> {
     pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        <Self as core::ops::Deref>::deref(self).iter()
+        use core::ops::Deref;
+        self.deref().iter()
     }
 
     pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        <Self as core::ops::DerefMut>::deref_mut(self).iter_mut()
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 
     pub fn new() -> Self {
@@ -149,7 +155,27 @@ impl<T> Vec<T> {
             item
         }
     }
-    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
+
+    pub fn insert(&mut self, index: usize, item: T) {
+        if index > self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            for i in (index..self.len).rev() {
+                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+            }
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
+    pub fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
         let mut write_idx = 0;
         for i in 0..self.len {
             unsafe {
@@ -461,4 +487,20 @@ unsafe fn free(ptr: *mut u8, size: usize) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            new_vec.push(self[i].clone());
+        }
+        new_vec
+    }
+}
+
+impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Debug::fmt(&**self, f)
+    }
 }
