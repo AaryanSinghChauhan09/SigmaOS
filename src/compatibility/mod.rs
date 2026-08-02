@@ -1,38 +1,28 @@
 // SigmaOS Compatibility Module
-pub mod chimera_linux;
+pub mod antix;
+pub mod chakra;
 pub mod cross_platform;
-pub mod mint_linux;
-pub mod relay_nexus;
-pub mod bodhi_moksha;
-pub mod garuda_zen;
-pub mod kimi_code;
-pub mod atomic_distribution;
-pub mod cachy_os;
-pub mod elf_execution;
+pub mod legacy_adapters;
 
-pub use endeavour::{
-    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
-    Mirror, WelcomeTab,
-};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
-pub use reactos::{
-    NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
-    RegistryHive,
+
+pub use legacy_adapters::{
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+pub use chakra::{
+    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
+    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
 
-pub use relay_nexus::{WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus};
-pub use bodhi_moksha::{EflCanvasElement, MokshaProfile, MokshaDesktopManager};
-pub use garuda_zen::{ZenInteractivityGovernor, TimeshiftBtrfsEngine, ZramSwapManager, NohangOomGuard};
-pub use kimi_code::{KimiCodeGenerator, KimiContextPruner, KimiAstEditor, KimiLicenseAttributor};
-pub use atomic_distribution::{ArmbianImager, AtomicDeployer, DnfHistoryManager, LivepatchGovernor, DnfOp};
-pub use cachy_os::{BoreSchedulerGovernor, SchedPolicy, AnanicyManager, V4OptimizedPackageManager, CachyInitramfs};
-pub use elf_execution::{AslrGovernor, NoExecuteManager, DynamicSharedLibraryResolver, ImaSignatureVerifier};
+pub use antix::{
+    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
+    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
+};

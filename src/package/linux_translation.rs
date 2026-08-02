@@ -50,76 +50,6 @@ pub trait LinuxDriverPackageTranslator {
     fn translate_to_driver(&self) -> SimpleDriver;
 }
 
-/// Polymorphic driver package translator that maps package installation to driver lifecycles
-pub struct PolymorphicDriverPackageAdapter {
-    pub name: &'static str,
-    pub format: PackageFormat,
-    pub driver_id: DriverID,
-    pub driver_type: DriverType,
-}
-
-impl PolymorphicDriverPackageAdapter {
-    pub fn new(
-        name: &'static str,
-        format: PackageFormat,
-        driver_id: DriverID,
-        driver_type: DriverType,
-    ) -> Self {
-        Self {
-            name,
-            format,
-            driver_id,
-            driver_type,
-        }
-    }
-
-    /// Simulate dynamic installation mapping package action to load native driver API
-    pub fn install_and_load_driver(&self) -> Result<SimpleDriver, DriverError> {
-        let mut driver = self.translate_to_driver();
-        println!(
-            "PolymorphicDriverPackageAdapter: Installing package {} and dynamically registering native driver ID {}.",
-            self.name, self.driver_id
-        );
-        driver.init()?;
-        if driver.probe()? {
-            driver.load()?;
-            println!("PolymorphicDriverPackageAdapter: Driver successfully transitioned state to Active.");
-            Ok(driver)
-        } else {
-            Err(DriverError::ProbeFailed)
-        }
-    }
-
-    /// Simulate dynamic uninstallation mapping package action to unload native driver API
-    pub fn unload_and_uninstall_driver(
-        &self,
-        driver: &mut SimpleDriver,
-    ) -> Result<(), DriverError> {
-        println!(
-            "PolymorphicDriverPackageAdapter: Uninstalling package {} and unloading driver ID {}.",
-            self.name, self.driver_id
-        );
-        driver.shutdown()?;
-        driver.unload()?;
-        println!("PolymorphicDriverPackageAdapter: Driver transitioned to Unloaded successfully.");
-        Ok(())
-    }
-}
-
-impl LinuxDriverPackageTranslator for PolymorphicDriverPackageAdapter {
-    fn source_format(&self) -> PackageFormat {
-        self.format
-    }
-
-    fn package_name(&self) -> &'static str {
-        self.name
-    }
-
-    fn translate_to_driver(&self) -> SimpleDriver {
-        SimpleDriver::new(self.driver_id, self.driver_type)
-    }
-}
-
 /// Concrete .deb (Debian/Ubuntu/Parrot/Mint) package translator
 pub struct DebPackageDriverTranslator {
     pub name: &'static str,
@@ -142,9 +72,9 @@ impl LinuxDriverPackageTranslator for DebPackageDriverTranslator {
             self.name, self.payload_size
         );
         let driver_type = if self.is_kernel_module {
-            DriverType::Storage
+            DriverType::Block
         } else {
-            DriverType::Input
+            DriverType::Char
         };
         SimpleDriver::new(9901, driver_type)
     }
@@ -175,7 +105,7 @@ impl LinuxDriverPackageTranslator for RpmPackageDriverTranslator {
                 "PackageTranslator: RPM signature is valid. Provisioning micro-driver bridge."
             );
         }
-        SimpleDriver::new(9902, DriverType::Input)
+        SimpleDriver::new(9902, DriverType::Char)
     }
 }
 

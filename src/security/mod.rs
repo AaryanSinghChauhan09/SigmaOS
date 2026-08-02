@@ -1,28 +1,18 @@
-// SigmaOS Security Subsystem
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
+
 pub mod capability;
-pub mod hardening;
+pub mod defensive_audit;
+pub mod parrot;
 pub mod pledge;
-pub mod vulnerability;
-pub mod qubes_isolation;
-pub mod selinux;
-pub mod root_improvement;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
 };
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+pub use parrot::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-    SecurityContext, SecurityLabel, SecurityPolicy, SecurityRule,
-};
-pub use selinux::{
-    SelinuxPermission, DefensiveAuditSystem, ForensicBlock, MaliciousSignature, ObjectType,
-};
-pub use root_improvement::{
-    SudoDoasElevator, SudoToken, PolkitEnforcer, PolkitAuthorization, PolkitRule,
-    CapSplitter, LinuxCap, RootlessNamespaceManager, UidMapEntry, PamMfaAuthenticator,
-};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
