@@ -383,8 +383,54 @@ impl Keyring for SimpleKeyring {
     }
 }
 
+/// SecretManager provides high-level secret management operations
 pub struct SecretManager;
+
+/// SecretStorage provides persistent storage for secrets
 pub struct SecretStorage;
+
+impl SimpleKeyring {
+    /// Alias for add_secret - stores a secret in the keyring.
+    /// Provides compatibility with code expecting `store_secret` method name.
+    pub fn store_secret(&mut self, secret: Box<dyn Secret>) -> Result<SecretID, SecretError> {
+        self.add_secret(secret)
+    }
+
+    /// Retrieve a secret by name (linear search).
+    pub fn find_by_name(&self, name: &[u8]) -> Option<&dyn Secret> {
+        for i in 0..self.secrets.len() {
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
+                if secret.name() == name {
+                    return Some(secret.as_ref());
+                }
+            }
+        }
+        None
+    }
+
+    /// Returns the number of secrets stored.
+    pub fn len(&self) -> usize {
+        self.stats.total_secrets
+    }
+
+    /// Returns true if no secrets are stored.
+    pub fn is_empty(&self) -> bool {
+        self.stats.total_secrets == 0
+    }
+
+    /// Clear all secrets from the keyring (requires can_remove capability).
+    pub fn clear(&mut self) -> Result<(), SecretError> {
+        if !self.capability.can_remove {
+            return Err(SecretError::PermissionDenied);
+        }
+        for slot in &mut self.secrets {
+            *slot = None;
+        }
+        self.stats.total_secrets = 0;
+        self.stats.by_type = [0; 5];
+        Ok(())
+    }
+}
 
 #[cfg(test)]
 mod tests {

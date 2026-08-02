@@ -195,6 +195,13 @@ impl PrivacyFirstSandbox {
     pub const fn new() -> Self {
         Self { is_sandboxed: true }
     }
+}
+
+impl Default for PrivacyFirstSandbox {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
     /// Secure capability check and post-quantum handshake logic validation
     pub fn validate_and_execute_secure_call(
@@ -239,6 +246,9 @@ impl<T> Vec<T> {
     }
     pub fn len(&self) -> usize {
         self.len
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
