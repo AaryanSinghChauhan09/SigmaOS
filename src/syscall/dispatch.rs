@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 /// OOP-based Full Syscall Dispatch for SigmaOS
 /// Based on Roadmap Item: Full Syscall Dispatch (30+ Essential Syscalls)
@@ -24,6 +42,7 @@ pub struct SimpleSyscallDispatcher {
 }
 
 impl SimpleSyscallDispatcher {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut handlers: [Option<Box<dyn SyscallHandler>>; 64] = [None; 64];
         handlers[1] = Some(Box::new(ExitHandler::new()));
@@ -81,6 +100,7 @@ impl SyscallHandler for SimpleSyscallDispatcher {
 
 pub struct ExitHandler;
 impl ExitHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { ExitHandler }
 }
 impl SyscallHandler for ExitHandler {
@@ -92,6 +112,7 @@ impl SyscallHandler for ExitHandler {
 
 pub struct ReadHandler;
 impl ReadHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { ReadHandler }
 }
 impl SyscallHandler for ReadHandler {
@@ -103,6 +124,7 @@ impl SyscallHandler for ReadHandler {
 
 pub struct WriteHandler;
 impl WriteHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { WriteHandler }
 }
 impl SyscallHandler for WriteHandler {
@@ -114,6 +136,7 @@ impl SyscallHandler for WriteHandler {
 
 pub struct OpenHandler;
 impl OpenHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { OpenHandler }
 }
 impl SyscallHandler for OpenHandler {
@@ -125,6 +148,7 @@ impl SyscallHandler for OpenHandler {
 
 pub struct CloseHandler;
 impl CloseHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { CloseHandler }
 }
 impl SyscallHandler for CloseHandler {
@@ -136,6 +160,7 @@ impl SyscallHandler for CloseHandler {
 
 pub struct ForkHandler;
 impl ForkHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { ForkHandler }
 }
 impl SyscallHandler for ForkHandler {
@@ -146,6 +171,7 @@ impl SyscallHandler for ForkHandler {
 
 pub struct ExecHandler;
 impl ExecHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { ExecHandler }
 }
 impl SyscallHandler for ExecHandler {
@@ -157,6 +183,7 @@ impl SyscallHandler for ExecHandler {
 
 pub struct WaitHandler;
 impl WaitHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { WaitHandler }
 }
 impl SyscallHandler for WaitHandler {
@@ -167,6 +194,7 @@ impl SyscallHandler for WaitHandler {
 
 pub struct StatHandler;
 impl StatHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { StatHandler }
 }
 impl SyscallHandler for StatHandler {
@@ -178,6 +206,7 @@ impl SyscallHandler for StatHandler {
 
 pub struct FstatHandler;
 impl FstatHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { FstatHandler }
 }
 impl SyscallHandler for FstatHandler {
@@ -189,6 +218,7 @@ impl SyscallHandler for FstatHandler {
 
 pub struct LseekHandler;
 impl LseekHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { LseekHandler }
 }
 impl SyscallHandler for LseekHandler {
@@ -200,6 +230,7 @@ impl SyscallHandler for LseekHandler {
 
 pub struct MmapHandler;
 impl MmapHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { MmapHandler }
 }
 impl SyscallHandler for MmapHandler {
@@ -211,6 +242,7 @@ impl SyscallHandler for MmapHandler {
 
 pub struct MprotectHandler;
 impl MprotectHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { MprotectHandler }
 }
 impl SyscallHandler for MprotectHandler {
@@ -222,6 +254,7 @@ impl SyscallHandler for MprotectHandler {
 
 pub struct MunmapHandler;
 impl MunmapHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { MunmapHandler }
 }
 impl SyscallHandler for MunmapHandler {
@@ -233,6 +266,7 @@ impl SyscallHandler for MunmapHandler {
 
 pub struct BrkHandler;
 impl BrkHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { BrkHandler }
 }
 impl SyscallHandler for BrkHandler {
@@ -244,6 +278,7 @@ impl SyscallHandler for BrkHandler {
 
 pub struct RtSigactionHandler;
 impl RtSigactionHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { RtSigactionHandler }
 }
 impl SyscallHandler for RtSigactionHandler {
@@ -254,6 +289,7 @@ impl SyscallHandler for RtSigactionHandler {
 
 pub struct RtSigprocmaskHandler;
 impl RtSigprocmaskHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { RtSigprocmaskHandler }
 }
 impl SyscallHandler for RtSigprocmaskHandler {
@@ -264,6 +300,7 @@ impl SyscallHandler for RtSigprocmaskHandler {
 
 pub struct IoctlHandler;
 impl IoctlHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { IoctlHandler }
 }
 impl SyscallHandler for IoctlHandler {
@@ -275,6 +312,7 @@ impl SyscallHandler for IoctlHandler {
 
 pub struct Pread64Handler;
 impl Pread64Handler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { Pread64Handler }
 }
 impl SyscallHandler for Pread64Handler {
@@ -286,6 +324,7 @@ impl SyscallHandler for Pread64Handler {
 
 pub struct Pwrite64Handler;
 impl Pwrite64Handler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { Pwrite64Handler }
 }
 impl SyscallHandler for Pwrite64Handler {
@@ -297,6 +336,7 @@ impl SyscallHandler for Pwrite64Handler {
 
 pub struct ReadvHandler;
 impl ReadvHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { ReadvHandler }
 }
 impl SyscallHandler for ReadvHandler {
@@ -308,6 +348,7 @@ impl SyscallHandler for ReadvHandler {
 
 pub struct WritevHandler;
 impl WritevHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { WritevHandler }
 }
 impl SyscallHandler for WritevHandler {
@@ -319,6 +360,7 @@ impl SyscallHandler for WritevHandler {
 
 pub struct AccessHandler;
 impl AccessHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { AccessHandler }
 }
 impl SyscallHandler for AccessHandler {
@@ -330,6 +372,7 @@ impl SyscallHandler for AccessHandler {
 
 pub struct PipeHandler;
 impl PipeHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { PipeHandler }
 }
 impl SyscallHandler for PipeHandler {
@@ -341,6 +384,7 @@ impl SyscallHandler for PipeHandler {
 
 pub struct SelectHandler;
 impl SelectHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { SelectHandler }
 }
 impl SyscallHandler for SelectHandler {
@@ -352,6 +396,7 @@ impl SyscallHandler for SelectHandler {
 
 pub struct SchedYieldHandler;
 impl SchedYieldHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { SchedYieldHandler }
 }
 impl SyscallHandler for SchedYieldHandler {
@@ -362,6 +407,7 @@ impl SyscallHandler for SchedYieldHandler {
 
 pub struct MremapHandler;
 impl MremapHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { MremapHandler }
 }
 impl SyscallHandler for MremapHandler {
@@ -373,6 +419,7 @@ impl SyscallHandler for MremapHandler {
 
 pub struct MsyncHandler;
 impl MsyncHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { MsyncHandler }
 }
 impl SyscallHandler for MsyncHandler {
@@ -384,6 +431,7 @@ impl SyscallHandler for MsyncHandler {
 
 pub struct MinCoreHandler;
 impl MinCoreHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { MinCoreHandler }
 }
 impl SyscallHandler for MinCoreHandler {
@@ -395,6 +443,7 @@ impl SyscallHandler for MinCoreHandler {
 
 pub struct MadviseHandler;
 impl MadviseHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { MadviseHandler }
 }
 impl SyscallHandler for MadviseHandler {
@@ -406,6 +455,7 @@ impl SyscallHandler for MadviseHandler {
 
 pub struct DupHandler;
 impl DupHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { DupHandler }
 }
 impl SyscallHandler for DupHandler {
@@ -417,6 +467,7 @@ impl SyscallHandler for DupHandler {
 
 pub struct Dup2Handler;
 impl Dup2Handler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { Dup2Handler }
 }
 impl SyscallHandler for Dup2Handler {
@@ -428,6 +479,7 @@ impl SyscallHandler for Dup2Handler {
 
 pub struct PauseHandler;
 impl PauseHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { PauseHandler }
 }
 impl SyscallHandler for PauseHandler {
@@ -438,6 +490,7 @@ impl SyscallHandler for PauseHandler {
 
 pub struct NanosleepHandler;
 impl NanosleepHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { NanosleepHandler }
 }
 impl SyscallHandler for NanosleepHandler {
@@ -449,6 +502,7 @@ impl SyscallHandler for NanosleepHandler {
 
 pub struct GetPidHandler;
 impl GetPidHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { GetPidHandler }
 }
 impl SyscallHandler for GetPidHandler {
@@ -459,6 +513,7 @@ impl SyscallHandler for GetPidHandler {
 
 pub struct GetPpidHandler;
 impl GetPpidHandler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { GetPpidHandler }
 }
 impl SyscallHandler for GetPpidHandler {

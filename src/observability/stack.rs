@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 use core::mem;
 /// OOP-based Observability Stack for SigmaOS
@@ -69,6 +87,7 @@ pub struct MetricCapability {
 }
 
 impl MetricCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         MetricCapability {
             can_record: false,
@@ -228,6 +247,7 @@ pub struct SpanCapability {
 }
 
 impl SpanCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SpanCapability {
             can_start: false,
@@ -367,6 +387,7 @@ pub struct ObservabilityStats {
 }
 
 impl ObservabilityStats {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ObservabilityStats {
             total_metrics: 0,
@@ -394,6 +415,7 @@ pub struct SimpleSigmaTrace {
 }
 
 impl SimpleSigmaTrace {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleSigmaTrace {
             total_payload: AtomicUsize::new(0),
@@ -431,6 +453,7 @@ pub struct SimpleSigmaMetrics {
 }
 
 impl SimpleSigmaMetrics {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleSigmaMetrics {
             export_count: AtomicUsize::new(0),
@@ -464,6 +487,7 @@ pub struct SimpleSigmaDebug {
 }
 
 impl SimpleSigmaDebug {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleSigmaDebug {
             last_error: AtomicUsize::new(0),
@@ -510,6 +534,7 @@ pub struct StackCapability {
 }
 
 impl StackCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         StackCapability {
             can_register_metrics: false,

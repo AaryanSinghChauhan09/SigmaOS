@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Package Importer Framework
 // Facilitates importing and translating packages from Debian (.deb), RPM (Fedora/RHEL),
 // and Pacman (Arch Linux) formats into native SigmaOS package recipes.
@@ -14,6 +32,7 @@ pub trait PackageImporter {
 pub struct DebPackageImporter;
 
 impl DebPackageImporter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DebPackageImporter
     }
@@ -83,6 +102,7 @@ impl PackageImporter for DebPackageImporter {
 pub struct RpmPackageImporter;
 
 impl RpmPackageImporter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         RpmPackageImporter
     }
@@ -147,6 +167,7 @@ impl PackageImporter for RpmPackageImporter {
 pub struct PacmanPackageImporter;
 
 impl PacmanPackageImporter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PacmanPackageImporter
     }

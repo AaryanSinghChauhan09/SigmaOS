@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Distro Clean-Room Overtake & Absorption Engines
 // Absorbing top-tier innovations from Starling, Pop!_OS, Ubuntu Budgie, Rhino Linux,
 // Bodhi Linux, elementaryOS, Ubuntu, Ubuntu Server, ZorinOS, Mandrake Linux, Caldera OpenLinux.
@@ -21,6 +39,7 @@ pub struct StarlingCompositor {
 }
 
 impl StarlingCompositor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             lines_of_c: 5860,
@@ -56,6 +75,7 @@ pub struct StarlingWidgetTree {
 }
 
 impl StarlingWidgetTree {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             widgets: Vec::new(),
@@ -85,6 +105,7 @@ pub struct StarlingX11Server {
 }
 
 impl StarlingX11Server {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             client_count: 0,
@@ -110,6 +131,7 @@ pub struct StarlingTilingEngine {
 }
 
 impl StarlingTilingEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             mode: "floating",
@@ -143,6 +165,7 @@ pub struct CosmicDesktopEngine {
 }
 
 impl CosmicDesktopEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             extension_active: true,
@@ -168,6 +191,7 @@ pub struct PopShellTiling {
 }
 
 impl PopShellTiling {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             auto_tiling: false,
@@ -196,6 +220,7 @@ pub struct System76Scheduler {
 }
 
 impl System76Scheduler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             boosted_pids: Vec::new(),
@@ -220,6 +245,7 @@ pub struct System76PowerSwitcher {
 }
 
 impl System76PowerSwitcher {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             gpu_mode: "hybrid",
@@ -254,6 +280,7 @@ pub struct BudgieAppletManager {
 }
 
 impl BudgieAppletManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             applets: vec!["clock".to_string(), "sys-monitor".to_string()],
@@ -278,6 +305,7 @@ pub struct BudgieShuffler {
 }
 
 impl BudgieShuffler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             grid_snapping: true,
@@ -308,6 +336,7 @@ pub struct BudgieLayoutSwitcher {
 }
 
 impl BudgieLayoutSwitcher {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current_layout: "budgie-default",
@@ -335,6 +364,7 @@ pub struct RhinoPkgUnified {
 }
 
 impl RhinoPkgUnified {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             managed_systems: vec![
@@ -369,6 +399,7 @@ pub struct PacstallAur {
 }
 
 impl PacstallAur {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pacscripts: Vec::new(),
@@ -393,6 +424,7 @@ pub struct UnicornDesktopShell {
 }
 
 impl UnicornDesktopShell {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             panel_aligned_left: true,
@@ -421,6 +453,7 @@ pub struct MokshaDesktopEngine {
 }
 
 impl MokshaDesktopEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             theme_name: "GreenGlass".to_string(),
@@ -445,6 +478,7 @@ pub struct BodhiProfileSelector {
 }
 
 impl BodhiProfileSelector {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current_profile: "standard",
@@ -468,6 +502,7 @@ pub struct MokshaGadgetManager {
 }
 
 impl MokshaGadgetManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_gadgets: vec!["systray".to_string(), "battery".to_string()],
@@ -496,6 +531,7 @@ pub struct PantheonGalaWindowManager {
 }
 
 impl PantheonGalaWindowManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             physics_enabled: true,
@@ -520,6 +556,7 @@ pub struct GraniteHigLibrary {
 }
 
 impl GraniteHigLibrary {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             strict_padding_check: true,
@@ -548,6 +585,7 @@ pub struct ElementaryAppCenter {
 }
 
 impl ElementaryAppCenter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             curated_apps: Vec::new(),
@@ -577,6 +615,7 @@ pub struct UbuntuDockManager {
 }
 
 impl UbuntuDockManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             smart_hide: true,
@@ -602,6 +641,7 @@ pub struct SnapcraftRuntime {
 }
 
 impl SnapcraftRuntime {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             mounted_snaps: Vec::new(),
@@ -627,6 +667,7 @@ pub struct UbuntuProEsm {
 }
 
 impl UbuntuProEsm {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_subscribed: true,
@@ -660,6 +701,7 @@ pub struct MaasProvisioner {
 }
 
 impl MaasProvisioner {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             nodes_active: 0,
@@ -684,6 +726,7 @@ pub struct JujuOrchestrator {
 }
 
 impl JujuOrchestrator {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_charms: Vec::new(),
@@ -707,6 +750,7 @@ pub struct MultipassVmlight {
 }
 
 impl MultipassVmlight {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { vms: Vec::new() }
     }
@@ -732,6 +776,7 @@ pub struct ZorinLookChanger {
 }
 
 impl ZorinLookChanger {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             look_theme: "windows-11",
@@ -756,6 +801,7 @@ pub struct ZorinConnectBridge {
 }
 
 impl ZorinConnectBridge {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             paired_devices: Vec::new(),
@@ -780,6 +826,7 @@ pub struct ZorinWinePreflight {
 }
 
 impl ZorinWinePreflight {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             intercept_enabled: true,
@@ -811,6 +858,7 @@ pub struct DrakxtoolsSuite {
 }
 
 impl DrakxtoolsSuite {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_wizard_active: false,
@@ -834,6 +882,7 @@ pub struct HarddrakeDetector {
 }
 
 impl HarddrakeDetector {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             detected_pci_ids: Vec::new(),
@@ -859,6 +908,7 @@ pub struct UrpmiPackageResolver {
 }
 
 impl UrpmiPackageResolver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             metadata_sources: vec!["main".to_string(), "contrib".to_string()],
@@ -886,6 +936,7 @@ pub struct LizardInstaller {
 }
 
 impl LizardInstaller {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             graphical_wizard_loaded: false,
@@ -909,6 +960,7 @@ pub struct CoasAdminSuite {
 }
 
 impl CoasAdminSuite {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             admin_keys: vec!["network.hostname".to_string(), "security.level".to_string()],

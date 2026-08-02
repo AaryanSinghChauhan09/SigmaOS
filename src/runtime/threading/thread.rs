@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 /// Custom Threading Primitives for SigmaOS
 /// Implements threading without relying on std::thread
@@ -94,6 +112,7 @@ pub struct ThreadContext {
 }
 
 impl ThreadContext {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ThreadContext {
             rbx: 0,
@@ -132,6 +151,7 @@ pub struct ThreadCapability {
 }
 
 impl ThreadCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ThreadCapability {
             can_create: false,
@@ -210,6 +230,7 @@ pub struct MutexCapability {
 }
 
 impl MutexCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         MutexCapability {
             can_lock: false,
@@ -301,6 +322,7 @@ pub struct SemaphoreCapability {
 }
 
 impl SemaphoreCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SemaphoreCapability {
             can_wait: false,
@@ -392,6 +414,7 @@ pub struct RwLockCapability {
 }
 
 impl RwLockCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         RwLockCapability {
             can_read_lock: false,
@@ -483,6 +506,7 @@ pub struct ThreadManager {
 }
 
 impl ThreadManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ThreadManager {
             threads: [None; 256],

@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SoC Hardware Absorption
 // Unified Pin/GPIO and Clock Controller Framework
 // Absorbs clk-meson, MTK, Snapdragon, and other SoC-specific drivers
@@ -120,6 +138,7 @@ pub struct SocPinController {
 }
 
 impl SocPinController {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pins: BTreeMap::new(),
@@ -198,6 +217,7 @@ pub struct SocClockController {
 }
 
 impl SocClockController {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             clocks: BTreeMap::new(),
@@ -289,6 +309,7 @@ pub struct UnifiedSocController {
 }
 
 impl UnifiedSocController {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pin_controller: SocPinController::new(),

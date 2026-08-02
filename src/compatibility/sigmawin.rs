@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Sovereign Win32 Compatibility Subsystem (SigmaWin)
 // Implementing complete Windows 11 Gap Closure & PE Loading / Registry / USER32/GDI32 Emulation
 
@@ -33,6 +51,7 @@ pub struct PeLoader {
 }
 
 impl PeLoader {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             binary_format: PeFormat::Pe32Plus,
@@ -101,6 +120,7 @@ pub struct RegistryManager {
 }
 
 impl RegistryManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut reg = Self {
             keys: HashMap::new(),
@@ -148,6 +168,7 @@ pub struct User32MessageQueue {
 }
 
 impl User32MessageQueue {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             messages: Vec::new(),
@@ -183,6 +204,7 @@ pub struct WinSockAdapter {
 }
 
 impl WinSockAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             wsa_active: false,

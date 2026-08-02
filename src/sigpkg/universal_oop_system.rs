@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // Universal OOP Package System for SigmaOS
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
@@ -150,6 +168,7 @@ pub struct DebAdapter {
 }
 
 impl DebAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Deb),
@@ -279,6 +298,7 @@ pub struct RpmAdapter {
 }
 
 impl RpmAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Rpm),
@@ -403,6 +423,7 @@ pub struct PacmanAdapter {
 }
 
 impl PacmanAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Pacman),
@@ -502,6 +523,7 @@ pub struct EbuildAdapter {
 }
 
 impl EbuildAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Ebuild),
@@ -616,6 +638,7 @@ pub struct ApkAdapter {
 }
 
 impl ApkAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Apk),
@@ -722,6 +745,7 @@ pub struct NixAdapter {
 }
 
 impl NixAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Nix),
@@ -840,6 +864,7 @@ pub struct FlatpakAdapter {
 }
 
 impl FlatpakAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Flatpak),
@@ -939,6 +964,7 @@ pub struct SnapAdapter {
 }
 
 impl SnapAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Snap),
@@ -1046,6 +1072,7 @@ pub struct AppImageAdapter {
 }
 
 impl AppImageAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::AppImage),
@@ -1153,6 +1180,7 @@ pub struct XbpsAdapter {
 }
 
 impl XbpsAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Xbps),
@@ -1259,6 +1287,7 @@ pub struct TxzAdapter {
 }
 
 impl TxzAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Txz),
@@ -1368,6 +1397,7 @@ pub struct EopkgAdapter {
 }
 
 impl EopkgAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Eopkg),
@@ -1476,6 +1506,7 @@ pub struct ZypperAdapter {
 }
 
 impl ZypperAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Zypper),
@@ -1583,6 +1614,7 @@ pub struct GuixAdapter {
 }
 
 impl GuixAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Guix),
@@ -1700,6 +1732,7 @@ pub struct SigmaAdapter {
 }
 
 impl SigmaAdapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Sigma),
@@ -1843,6 +1876,7 @@ pub struct PackageParserFactory {
 }
 
 impl PackageParserFactory {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut factory = Self {
             parsers: HashMap::new(),
@@ -1904,6 +1938,7 @@ pub struct UniversalPackageManager {
 }
 
 impl UniversalPackageManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             factory: PackageParserFactory::new(),

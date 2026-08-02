@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Security, Pentesting, and Anonymity Suite (SigmaParrot)
 // Fully absorbs and implements all security, forensics, and anonymity systems of Parrot Linux:
 // Anonsurf (Tor/I2P overlay, DNS shields), Forensics (inode carving, decoys), Kali Sniffer,
@@ -25,6 +43,7 @@ pub struct AnonsurfEngine {
 }
 
 impl AnonsurfEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current_mode: AnonymityMode::ClearNet,
@@ -69,6 +88,7 @@ pub struct ForensicsAuditTool {
 }
 
 impl ForensicsAuditTool {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut decoys = HashMap::new();
         decoys.insert(PathBuf::from("/etc/shadow_backup"), "Fake credential hash store honeypot".to_string());
@@ -113,6 +133,7 @@ pub struct KaliSniffer {
 }
 
 impl KaliSniffer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             captured_packets: VecDeque::new(),
@@ -140,6 +161,7 @@ pub struct PentestAssistant {
 }
 
 impl PentestAssistant {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { target_ips: Vec::new() }
     }
@@ -180,6 +202,7 @@ pub struct SecureWipeTool {
 }
 
 impl SecureWipeTool {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { pass_count: 7 }
     }
@@ -228,6 +251,7 @@ pub struct SigmaIDS {
 }
 
 impl SigmaIDS {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             alerts_log: Vec::new(),

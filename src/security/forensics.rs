@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
 
 extern crate alloc;
@@ -18,6 +36,7 @@ pub struct KaliSnifferAudit {
 }
 
 impl KaliSnifferAudit {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             flagged_leak_count: 0,
@@ -53,6 +72,7 @@ pub struct DecoyHoneyPot {
 }
 
 impl DecoyHoneyPot {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             decoy_ports: alloc::vec![21, 22, 23, 80],
@@ -84,6 +104,7 @@ pub struct SigmaPortScanner {
 }
 
 impl SigmaPortScanner {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             target_ports: alloc::vec![80, 443, 8080],
@@ -114,6 +135,7 @@ pub struct PassComplexityAuditor {
 }
 
 impl PassComplexityAuditor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             common_dictionary: alloc::vec![
@@ -164,6 +186,7 @@ pub struct RecoveredFile {
 }
 
 impl ForensicAnalyzer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self
     }

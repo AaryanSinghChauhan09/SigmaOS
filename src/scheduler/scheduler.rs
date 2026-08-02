@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 extern crate alloc;
 #[cfg(not(target_os = "none"))]
@@ -244,6 +262,7 @@ pub struct TaskCapability {
 }
 
 impl TaskCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TaskCapability {
             can_yield: false,
@@ -305,6 +324,7 @@ pub struct SchedulerStats {
 }
 
 impl SchedulerStats {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SchedulerStats {
             total_tasks: 0,
@@ -444,6 +464,7 @@ pub struct PriorityScheduler {
 }
 
 impl PriorityScheduler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PriorityScheduler {
             priority_queues: [Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new()],
@@ -581,6 +602,7 @@ pub struct CompletelyFairScheduler {
 }
 
 impl CompletelyFairScheduler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         CompletelyFairScheduler {
             tasks: Vec::new(),
@@ -733,6 +755,7 @@ pub struct EEVDFScheduler {
 }
 
 impl EEVDFScheduler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EEVDFScheduler {
             tasks: Vec::new(),

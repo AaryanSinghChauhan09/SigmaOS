@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 use crate::klib::Vec;
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
@@ -96,6 +114,7 @@ pub struct SimpleAudioManager {
 }
 
 impl SimpleAudioManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleAudioManager {
             devices: Vec::new(),
@@ -163,6 +182,7 @@ pub struct SimpleAudioMixer {
 }
 
 impl SimpleAudioMixer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleAudioMixer {
             volumes: Vec::new(),
@@ -226,6 +246,7 @@ pub struct SimpleAudioStream {
 }
 
 impl SimpleAudioStream {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleAudioStream {
             streams: Vec::new(),

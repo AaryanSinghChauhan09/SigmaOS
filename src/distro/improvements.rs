@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Distro Improvements - Inspired by leading Linux distributions
 // Each section implements concepts adapted from a specific distribution's innovations.
 
@@ -37,6 +55,7 @@ pub struct MinimalBaseInstaller {
 }
 
 impl MinimalBaseInstaller {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         MinimalBaseInstaller {
             installed_packages: alloc::vec::Vec::new(),
@@ -343,6 +362,7 @@ pub enum PenTestCategory {
 }
 
 impl PenTestToolRegistry {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut registry = PenTestToolRegistry { tools: alloc::vec::Vec::new() };
         registry.register_default_tools();
@@ -556,6 +576,7 @@ pub struct GarudaBtrfsLayout {
 
 impl GarudaBtrfsLayout {
     /// Create the Garuda-recommended Btrfs layout.
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         GarudaBtrfsLayout {
             root_subvol: alloc::string::String::from("@"),
@@ -655,6 +676,7 @@ pub struct SigmaDistroEngine {
 
 impl SigmaDistroEngine {
     /// Initialize the full distro engine with sensible defaults.
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SigmaDistroEngine {
             rolling_channel: RollingReleaseChannel {

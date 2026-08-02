@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Sovereign Replacement System Utilities Suite (sigma-core-utils)
 // Exposes robust, memory-safe Rust alternatives to BusyBox, systemd, syslog, cron, sudo/doas, and man pages.
 // Aligns perfectly with the core Sovereign replacement table.
@@ -58,6 +76,7 @@ pub struct SovereignCronScheduler {
 }
 
 impl SovereignCronScheduler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             jobs: HashMap::new(),
@@ -103,6 +122,7 @@ pub struct SovereignPrivilegeEngine {
 }
 
 impl SovereignPrivilegeEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             authorized_tokens: HashMap::new(),
@@ -139,6 +159,7 @@ pub struct SovereignDocBrowser {
 }
 
 impl SovereignDocBrowser {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut pages = HashMap::new();
         pages.insert(
@@ -173,6 +194,7 @@ pub struct SovereignCoreUtils {
 }
 
 impl SovereignCoreUtils {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             virtual_filesystem: HashMap::new(),

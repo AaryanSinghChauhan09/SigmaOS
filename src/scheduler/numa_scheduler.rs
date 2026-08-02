@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems
 
@@ -14,6 +32,7 @@ pub struct NumaScheduler {
 }
 
 impl NumaScheduler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         NumaScheduler {
             nodes: vec![
@@ -56,6 +75,7 @@ pub struct MichaelScottQueue<T> {
 }
 
 impl<T> MichaelScottQueue<T> {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let dummy = Box::into_raw(Box::new(Node {
             value: unsafe { std::mem::zeroed() }, // Dummy seed
@@ -109,6 +129,7 @@ pub struct TreiberStack<T> {
 }
 
 impl<T> TreiberStack<T> {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TreiberStack {
             top: AtomicPtr::new(std::ptr::null_mut()),

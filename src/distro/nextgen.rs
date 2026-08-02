@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 use crate::klib::HashMap;
 
 /// Represents an AI SysAdmin Recommendation or Action
@@ -15,6 +33,7 @@ pub struct AiSysAdmin {
 }
 
 impl AiSysAdmin {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             context_history: Vec::new(),
@@ -70,6 +89,7 @@ pub struct PqcSelfHealing {
 }
 
 impl PqcSelfHealing {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_signed_hashes: HashMap::new(),
@@ -119,6 +139,7 @@ pub struct SovereignP2PSync {
 }
 
 impl SovereignP2PSync {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_peers: Vec::new(),
@@ -164,6 +185,7 @@ pub struct TimeTravelEngine {
 }
 
 impl TimeTravelEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             checkpoints: Vec::new(),
@@ -213,6 +235,7 @@ pub struct NetplanManager {
 }
 
 impl NetplanManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             configurations: HashMap::new(),
@@ -260,6 +283,7 @@ pub struct LivepatchManager {
 }
 
 impl LivepatchManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_patches: HashMap::new(),

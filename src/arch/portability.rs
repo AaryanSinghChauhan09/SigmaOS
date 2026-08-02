@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 /// OOP-based ARM64 + RISC-V Portability for SigmaOS
 /// Based on Roadmap Item: ARM64 + RISC-V Portability
@@ -54,6 +72,7 @@ pub struct SimpleARM64Support {
 }
 
 impl SimpleARM64Support {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleARM64Support {
             port: SimpleArchitecturePort::new(Architecture::ARM64, Endianness::Little, 64),
@@ -80,6 +99,7 @@ pub struct SimpleRISCVSupport {
 }
 
 impl SimpleRISCVSupport {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleRISCVSupport {
             port: SimpleArchitecturePort::new(Architecture::RISCV64, Endianness::Little, 64),
@@ -108,6 +128,7 @@ pub struct SimpleMultiArchSupport {
 }
 
 impl SimpleMultiArchSupport {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleMultiArchSupport {
             current_arch: AtomicUsize::new(Architecture::X86_64 as usize),

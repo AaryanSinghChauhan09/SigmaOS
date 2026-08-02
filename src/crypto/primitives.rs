@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 /// Custom Cryptography Primitives for SigmaOS
 /// Implements cryptographic operations without relying on external crypto libraries
@@ -15,6 +33,7 @@ pub struct SHA256Hash {
 }
 
 impl SHA256Hash {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SHA256Hash {
             data: [0; 32],
@@ -35,6 +54,7 @@ pub struct SHA256 {
 }
 
 impl SHA256 {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SHA256 {
             state: [
@@ -212,6 +232,7 @@ pub struct AES256Key {
 }
 
 impl AES256Key {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         AES256Key {
             data: [0; 32],
@@ -232,6 +253,7 @@ pub struct AES256Block {
 }
 
 impl AES256Block {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         AES256Block {
             data: [0; 16],

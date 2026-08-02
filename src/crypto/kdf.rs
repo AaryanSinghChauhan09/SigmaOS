@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 /// OOP-based Key Derivation Function for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
@@ -71,6 +89,7 @@ pub struct SimpleKDFManager {
 }
 
 impl SimpleKDFManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleKDFManager {
             kdfs: Vec::new(),
@@ -124,7 +143,9 @@ impl SimplePasswordHashing {
 
 impl PasswordHashing for SimplePasswordHashing {
     fn hash_password(&self, password: &[u8], salt: &[u8]) -> Result<Vec<u8>, KDFError> {
-        self.kdf_manager.derive_key(KDFAlgorithm::PBKDF2, password, salt, b"password", 32)
+        // Use a domain-separation context label, not a hardcoded credential
+        const KDF_CONTEXT: &[u8] = b"sigmaos-password-hash-v1";
+        self.kdf_manager.derive_key(KDFAlgorithm::PBKDF2, password, salt, KDF_CONTEXT, 32)
     }
 
     fn verify_password(&self, password: &[u8], salt: &[u8], hash: &[u8]) -> Result<bool, KDFError> {

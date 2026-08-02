@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 use core::mem;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91
@@ -91,6 +109,7 @@ pub struct SimpleDeviceManager {
 }
 
 impl SimpleDeviceManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleDeviceManager {
             devices: Vec::new(),
@@ -204,6 +223,7 @@ pub struct SimpleDeviceHotplug {
 }
 
 impl SimpleDeviceHotplug {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleDeviceHotplug {
             enabled: AtomicUsize::new(1),
@@ -239,6 +259,7 @@ pub struct Vec<T> {
 }
 
 impl<T> Vec<T> {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),

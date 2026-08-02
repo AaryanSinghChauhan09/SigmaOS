@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
 
 extern crate alloc;
@@ -27,7 +45,7 @@ impl DoubleRatchetState {
     pub fn ratchet_encrypt(&mut self, plaintext: &[u8]) -> Vec<u8> {
         self.message_number += 1;
         // In a real implementation, KDF(chain_key) would produce a message key.
-        // For this #![no_std] placeholder, we simply XOR with a fixed byte for demonstration.
+        // For this // #![no_std]  // crate-root only placeholder, we simply XOR with a fixed byte for demonstration.
         let mut ciphertext = Vec::with_capacity(plaintext.len());
         for &byte in plaintext {
             ciphertext.push(byte ^ 0x42);

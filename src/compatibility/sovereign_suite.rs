@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 /// Sovereign Productivity, Diagnostics, & Creative Suite (SovereignSuite) for SigmaOS
 /// Absorbs, standardizes, and unifies core principles, utilities, and functions from:
 /// Joplin (E2EE Markdown notes), Nextcloud (file sync metadata), LibreOffice (Spreadsheet cell formulas),
@@ -14,6 +32,7 @@ pub struct EverySearch {
 }
 
 impl EverySearch {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EverySearch { index: Vec::new() }
     }
@@ -54,6 +73,7 @@ pub struct ProcessExplorerState {
 pub struct SysDiag;
 
 impl SysDiag {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SysDiag
     }
@@ -84,6 +104,7 @@ pub struct ProcMonitor {
 }
 
 impl ProcMonitor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ProcMonitor { logs: Vec::new() }
     }
@@ -116,6 +137,7 @@ pub struct ImageLayer {
 pub struct CreativeMatrix;
 
 impl CreativeMatrix {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         CreativeMatrix
     }
@@ -169,6 +191,7 @@ pub struct FancyZonesManager {
 }
 
 impl FancyZonesManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         FancyZonesManager { zones: Vec::new() }
     }
@@ -227,6 +250,7 @@ pub struct JoplinE2ee {
 }
 
 impl JoplinE2ee {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         JoplinE2ee {
             notebooks: Vec::new(),

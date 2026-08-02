@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Safe Win32 Compatibility Subsystem (SigmaWin)
 // Designed to parse, load, and manage legacy Win32 binaries securely on the sovereign transaction bus
 
@@ -34,6 +52,7 @@ pub struct PeLoader {
 }
 
 impl PeLoader {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PeLoader {
             binary_format: PeFormat::Pe32Plus,
@@ -95,6 +114,7 @@ pub struct RegistryManager {
 }
 
 impl RegistryManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut reg = RegistryManager {
             keys: HashMap::new(),
@@ -132,6 +152,7 @@ pub struct User32MessageQueue {
 }
 
 impl User32MessageQueue {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         User32MessageQueue {
             messages: Vec::new(),

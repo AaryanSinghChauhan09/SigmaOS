@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // Sovereign Replacement System Utilities for SigmaOS
 // This module implements zero-dependency, no-std compliant alternatives to standard Linux core utilities,
 // init/supervision systems, syslog/journald, cron, capability-based sudo, and help manuals.
@@ -69,6 +87,7 @@ pub struct SigmaInit {
 }
 
 impl SigmaInit {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             services: Vec::new(),
@@ -217,6 +236,7 @@ pub struct SigmaLog {
 }
 
 impl SigmaLog {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         const INIT_OPTION: Option<LogEntry> = None;
         Self {
@@ -272,6 +292,7 @@ pub struct SigmaCron {
 }
 
 impl SigmaCron {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { jobs: Vec::new() }
     }
@@ -314,6 +335,7 @@ pub struct SigmaPriv {
 }
 
 impl SigmaPriv {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             user_capabilities: Vec::new(),

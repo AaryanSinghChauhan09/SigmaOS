@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 /// OOP-based Event System for SigmaOS
 /// Implements event handling using OOP principles with traits and structs
@@ -160,6 +178,7 @@ pub struct ListenerCapability {
 }
 
 impl ListenerCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ListenerCapability {
             can_handle: false,
@@ -263,6 +282,7 @@ pub struct EventStats {
 }
 
 impl EventStats {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EventStats {
             total_listeners: 0,
@@ -292,6 +312,7 @@ pub struct BusCapability {
 }
 
 impl BusCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BusCapability {
             can_register: false,

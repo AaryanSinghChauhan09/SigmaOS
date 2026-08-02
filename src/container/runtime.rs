@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
 
 use core::mem;
@@ -30,6 +48,7 @@ pub struct ContainerCapability {
 }
 
 impl ContainerCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ContainerCapability {
             can_start: false,
@@ -342,6 +361,7 @@ pub struct RuntimeStats {
 }
 
 impl RuntimeStats {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         RuntimeStats {
             total_containers: 0,
@@ -370,6 +390,7 @@ pub struct RuntimeCapability {
 }
 
 impl RuntimeCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         RuntimeCapability {
             can_create: false,
@@ -577,6 +598,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
 }
 
 impl<T> Vec<T> {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),

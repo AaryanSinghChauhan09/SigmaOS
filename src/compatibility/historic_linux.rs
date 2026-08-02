@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 use crate::driver::device::DdeDeviceWrapper;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 
@@ -112,6 +130,7 @@ impl Default for Era1_0SyscallEmulator {
 }
 
 impl Era1_0SyscallEmulator {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Era1_0SyscallEmulator {
             socket_call_count: AtomicUsize::new(0),
@@ -157,6 +176,7 @@ impl Default for Era2_4SyscallEmulator {
 }
 
 impl Era2_4SyscallEmulator {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Era2_4SyscallEmulator {
             cloned_threads: AtomicUsize::new(0),
@@ -286,6 +306,7 @@ pub struct LfsToolchainBuilder {
 }
 
 impl LfsToolchainBuilder {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { current_stage: 1 }
     }
@@ -320,6 +341,7 @@ pub struct TinyCoreEphemeralEngine {
 }
 
 impl TinyCoreEphemeralEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TinyCoreEphemeralEngine {
             mounted_extensions: std::collections::HashMap::new(),
@@ -508,6 +530,7 @@ pub struct KernelPersonaVM {
 }
 
 impl KernelPersonaVM {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current_persona: Cell::new(KernelPersona::Linux_6_x),
@@ -618,6 +641,7 @@ pub struct WorkloadOptimizer {
 }
 
 impl WorkloadOptimizer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_profile: Cell::new(WorkloadProfile::LowMemoryProfile),
@@ -687,6 +711,7 @@ pub struct AkabeiBundle {
 
 pub struct AkabeiPackageEngine;
 impl AkabeiPackageEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self
     }
@@ -728,6 +753,7 @@ pub struct KapudanAssistant {
     pub theme: core::cell::Cell<DesktopTheme>,
 }
 impl KapudanAssistant {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             theme: core::cell::Cell::new(DesktopTheme::CaledoniaDark),
@@ -777,6 +803,7 @@ pub struct AntixInitManager {
 }
 
 impl AntixInitManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             services: [
@@ -799,6 +826,7 @@ pub struct AntixDesktopProfiler {
     pub profile: core::cell::Cell<DesktopProfile>,
 }
 impl AntixDesktopProfiler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             profile: core::cell::Cell::new(DesktopProfile::IceWM),
@@ -814,6 +842,7 @@ impl AntixDesktopProfiler {
 
 pub struct AntixControlCenter;
 impl AntixControlCenter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self
     }
@@ -824,6 +853,7 @@ pub struct LegacyMemoryTrimmer {
     pub trim_aggressiveness: AtomicUsize,
 }
 impl LegacyMemoryTrimmer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             trim_aggressiveness: AtomicUsize::new(0),

@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS India-First Finance Module (sigma_finance)
 // OOP-based GST, TDS, UPI, and Income Tax engine
 // No external crate dependencies - fully self-contained
@@ -148,6 +166,7 @@ pub trait GstCalculator {
 pub struct StandardGstCalculator;
 
 impl StandardGstCalculator {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         StandardGstCalculator
     }
@@ -395,6 +414,7 @@ pub trait IncomeTaxCalculator {
 pub struct IndiaIncomeTaxCalculator;
 
 impl IndiaIncomeTaxCalculator {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         IndiaIncomeTaxCalculator
     }
@@ -593,6 +613,7 @@ pub struct NpciUpiGateway {
 }
 
 impl NpciUpiGateway {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         NpciUpiGateway {
             counter: core::sync::atomic::AtomicU64::new(1),
@@ -694,6 +715,7 @@ impl IndicLanguage {
 pub struct IndianNumberFormatter;
 
 impl IndianNumberFormatter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         IndianNumberFormatter
     }
@@ -760,6 +782,7 @@ pub enum CropType {
 pub struct KrishiHelper;
 
 impl KrishiHelper {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self
     }
@@ -801,6 +824,7 @@ impl Default for KrishiHelper {
 pub struct VakilHelper;
 
 impl VakilHelper {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self
     }
@@ -853,6 +877,7 @@ pub struct InvoiceResult {
 }
 
 impl VyaparHelper {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self
     }

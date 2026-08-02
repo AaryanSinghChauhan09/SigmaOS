@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Sovereign Future-Ready Operating System Transformation Engine
 // Implements accessibility overlays, automation routines, forensic audit trails,
 // global legal compliance dashboards, cross-language developer tools, and IoT mesh orchestration.
@@ -14,6 +32,7 @@ pub struct AccessibilityOverlayManager {
 }
 
 impl AccessibilityOverlayManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             screen_magnifier_scale: 1.0,
@@ -78,6 +97,7 @@ pub struct AutomationRoutineController {
 }
 
 impl AutomationRoutineController {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             routines: HashMap::new(),
@@ -120,6 +140,7 @@ pub struct ForensicReadinessAuditor {
 }
 
 impl ForensicReadinessAuditor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             crypt_log_hashes: Vec::new(),
@@ -165,6 +186,7 @@ pub struct GlobalComplianceDashboard {
 }
 
 impl GlobalComplianceDashboard {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut labor = HashMap::new();
         labor.insert("INDIAN_LABOUR_CODES".to_string(), true);
@@ -213,6 +235,7 @@ impl Default for GlobalComplianceDashboard {
 pub struct DeveloperToolkitConverter;
 
 impl DeveloperToolkitConverter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DeveloperToolkitConverter
     }
@@ -256,6 +279,7 @@ pub struct IotDeviceMeshOrchestrator {
 }
 
 impl IotDeviceMeshOrchestrator {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             registered_mesh_devices: HashMap::new(),

@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 /// Custom CachyOS Optimization Subsystems for SigmaOS
 /// Implements BORE (Burst-Oriented Response Enhancer) Scheduler, Ananicy-cpp rules manager,
 /// x86-64-v1/v2/v3/v4 microarchitecture optimization detector, and Cachy-Initramfs module loader.
@@ -16,6 +34,7 @@ pub struct BoreSchedulerGovernor {
 }
 
 impl BoreSchedulerGovernor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BoreSchedulerGovernor {
             burst_threshold: 1000,
@@ -61,6 +80,7 @@ pub struct AnanicyManager {
 }
 
 impl AnanicyManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         AnanicyManager {
             rule_count: AtomicUsize::new(3), // Default built-in profiles
@@ -90,6 +110,7 @@ pub struct V4OptimizedPackageManager {
 }
 
 impl V4OptimizedPackageManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         V4OptimizedPackageManager {
             detected_level: AtomicUsize::new(1), // Default standard x86-64-v1

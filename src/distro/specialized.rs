@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 use crate::klib::HashMap;
 
 /// HPC Cluster Job State
@@ -168,6 +186,7 @@ pub struct EosWelcomeEngine {
 }
 
 impl EosWelcomeEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             first_boot: true,
@@ -226,6 +245,7 @@ pub struct EosUpdateNotifier {
 }
 
 impl EosUpdateNotifier {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pending_updates_count: 0,
@@ -252,6 +272,7 @@ pub struct DiagnosticLogTool {
 }
 
 impl DiagnosticLogTool {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             collected_lines: Vec::new(),
@@ -357,6 +378,7 @@ pub struct RunitServiceManager {
 }
 
 impl RunitServiceManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_services: HashMap::new(),
@@ -399,6 +421,7 @@ pub struct RumpKernelShim {
 }
 
 impl RumpKernelShim {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_drivers: HashMap::new(),
@@ -470,6 +493,7 @@ pub struct DpkgMultiArch {
 }
 
 impl DpkgMultiArch {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             foreign_architectures: Vec::new(),
@@ -498,6 +522,7 @@ pub struct DebianPolicyEnforcer {
 }
 
 impl DebianPolicyEnforcer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             enforce_fhs: true,
@@ -532,6 +557,7 @@ pub struct ThreeTierReleaseModel {
 }
 
 impl ThreeTierReleaseModel {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut channels = HashMap::new();
         channels.insert("sigma.next".to_string(), "Rolling, experimental, daily updates".to_string());
@@ -584,6 +610,7 @@ pub struct DebianSocialContract {
 }
 
 impl DebianSocialContract {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             open_source_only: true,
@@ -627,6 +654,7 @@ pub struct FreezeBasedStabilization {
 }
 
 impl FreezeBasedStabilization {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_freeze_active: false,

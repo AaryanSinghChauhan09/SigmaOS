@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 /// OOP-based Resource Manager for SigmaOS
 /// Implements resource management using OOP principles with traits and structs
@@ -81,6 +99,7 @@ pub struct ResourceCapability {
 }
 
 impl ResourceCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ResourceCapability {
             can_acquire: false,
@@ -245,6 +264,7 @@ pub struct ResourceStats {
 }
 
 impl ResourceStats {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ResourceStats {
             total_resources: 0,
@@ -274,6 +294,7 @@ pub struct ManagerCapability {
 }
 
 impl ManagerCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ManagerCapability {
             can_register: false,

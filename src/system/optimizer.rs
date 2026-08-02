@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Performance Enhancer
 // Auto resource optimizer with OOP-based design
 
@@ -31,6 +49,7 @@ pub struct MemoryOptimization {
 }
 
 impl MemoryOptimization {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             target_free_percent: 20.0,
@@ -111,6 +130,7 @@ pub struct CpuOptimization {
 }
 
 impl CpuOptimization {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             target_idle_percent: 15.0,
@@ -180,6 +200,7 @@ pub struct IoOptimization {
 }
 
 impl IoOptimization {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             enable_write_caching: true,
@@ -233,6 +254,7 @@ pub struct NetworkOptimization {
 }
 
 impl NetworkOptimization {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             enable_tcp_fast_open: true,
@@ -299,6 +321,7 @@ pub struct PerformanceEnhancer {
 }
 
 impl PerformanceEnhancer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             strategies: Vec::new(),

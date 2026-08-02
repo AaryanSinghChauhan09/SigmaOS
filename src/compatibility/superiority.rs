@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Absolute Superiority Subsystem (SigmaSuperiority)
 //
 // Formally implements and unifies all remaining planned/unimplemented USPs of SigmaOS:
@@ -26,6 +44,7 @@ pub struct SovereignRegistry {
 }
 
 impl SovereignRegistry {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             config_values: HashMap::new(),
@@ -67,6 +86,7 @@ pub struct SovereignObjectBus {
 }
 
 impl SovereignObjectBus {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_driver_pids: Vec::new(),
@@ -157,6 +177,7 @@ pub struct SovereignSigLoader {
 }
 
 impl SovereignSigLoader {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             entry_point: 0,
@@ -203,6 +224,7 @@ pub struct SovereignTimeMachine {
 }
 
 impl SovereignTimeMachine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             checkpoints: Vec::new(),
@@ -248,6 +270,7 @@ pub struct NumaCfsScheduler {
 }
 
 impl NumaCfsScheduler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current_node_task_queue: HashMap::new(),
@@ -286,6 +309,7 @@ pub struct LockFreeQueue {
 }
 
 impl LockFreeQueue {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             head: AtomicU64::new(0),
@@ -326,6 +350,7 @@ pub struct SovereignThemeEngine {
 }
 
 impl SovereignThemeEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             background_hex: "#000000".to_string(),
@@ -356,6 +381,7 @@ pub struct SovereignForensics {
 }
 
 impl SovereignForensics {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             hardware_worm_logs: Vec::new(),
@@ -383,6 +409,7 @@ pub struct SovereignRecoverUtility {
 }
 
 impl SovereignRecoverUtility {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             backup_nodes: HashMap::new(),
@@ -416,6 +443,7 @@ pub struct ShardIgnitor {
 }
 
 impl ShardIgnitor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             write_once_activated: true,

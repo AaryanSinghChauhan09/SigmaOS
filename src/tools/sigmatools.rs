@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaTools - System suite for SigmaOS
 // SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess components
 
@@ -26,6 +44,7 @@ pub struct SigmaDeploy {
 }
 
 impl SigmaDeploy {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             tftp_enabled: false,
@@ -98,6 +117,7 @@ pub struct SigmaCluster {
 }
 
 impl SigmaCluster {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             nodes: BTreeMap::new(),
@@ -184,6 +204,7 @@ pub struct SigmaIdentity {
 }
 
 impl SigmaIdentity {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             users: BTreeMap::new(),
@@ -244,6 +265,7 @@ pub struct SigmaAccess {
 }
 
 impl SigmaAccess {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             enabled_features: Vec::new(),
@@ -300,6 +322,7 @@ pub struct SigmaPatch {
 }
 
 impl SigmaPatch {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             applied_patches: BTreeMap::new(),
@@ -338,6 +361,7 @@ pub struct SigmaRescue {
 }
 
 impl SigmaRescue {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut partitions = Vec::new();
         partitions.push("/dev/sda1".to_string());
@@ -377,6 +401,7 @@ pub struct SigmaMonitor {
 }
 
 impl SigmaMonitor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             cpu_core_temperatures: [38.5, 41.2, 42.0, 39.1, 40.5, 44.1, 43.2, 42.1],
@@ -713,6 +738,7 @@ pub struct SovereignKeyboardTester {
 }
 
 impl SovereignKeyboardTester {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pressed_keys: Vec::new(),

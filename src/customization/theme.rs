@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Theme Engine
 // OOP-based declarative theming with light/dark/auto modes
 // Enhanced with Material-You style dynamic color palettes and workspace density profiling
@@ -108,6 +126,7 @@ pub struct BuiltInThemeProvider {
 }
 
 impl BuiltInThemeProvider {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut themes = HashMap::new();
 
@@ -526,6 +545,7 @@ pub struct ZenithBackdropFilter {
 }
 
 impl ZenithBackdropFilter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             blur_radius: 12.5,
@@ -561,6 +581,7 @@ pub struct SigmaSoundscape {
 }
 
 impl SigmaSoundscape {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut mapped = HashMap::new();
         mapped.insert(

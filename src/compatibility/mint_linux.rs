@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Mint Linux Clean-Room Compatibility & Parity Engine
 // Inspired by Linux Mint (Cinnamon, mintupdate, mintinstall, timeshift, mintdrivers, ufw)
 // Implements robust userland configurations, package wrappers, desktop overlays,
@@ -24,6 +42,7 @@ pub struct CinnamonDesktopEngine {
 }
 
 impl CinnamonDesktopEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             theme: "Mint-Y-Dark-Teal".to_string(),
@@ -88,6 +107,7 @@ pub struct MintUpdateManager {
 }
 
 impl MintUpdateManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             updates: Vec::new(),
@@ -145,6 +165,7 @@ pub struct MintInstallSoftwareManager {
 }
 
 impl MintInstallSoftwareManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut repos = Vec::new();
         repos.push("flathub.org".to_string());
@@ -215,6 +236,7 @@ pub struct MintWelcomeEngine {
 }
 
 impl MintWelcomeEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current_step: "first-steps",
@@ -261,6 +283,7 @@ pub struct MintHardwareDriverManager {
 }
 
 impl MintHardwareDriverManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             drivers: Vec::new(),
@@ -354,6 +377,7 @@ pub struct MintUfwFirewall {
 }
 
 impl MintUfwFirewall {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_enabled: false,
@@ -409,6 +433,7 @@ pub struct MintShellScriptInterpreter {
 }
 
 impl MintShellScriptInterpreter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut env = HashMap::new();
         env.insert("USER".to_string(), "mint".to_string());

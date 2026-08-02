@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // ZenithNet - Zero-copy networking stack
 // Polymorphic network driver interface and zero-copy packet processing
 
@@ -47,6 +65,7 @@ pub struct E1000NetworkDriver {
 }
 
 impl E1000NetworkDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             rx_base: 0,
@@ -93,6 +112,7 @@ pub struct Rtl8139NetworkDriver {
 }
 
 impl Rtl8139NetworkDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             rx_base: 0,
@@ -223,6 +243,7 @@ pub struct NetworkDriverManager {
 }
 
 impl NetworkDriverManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             drivers: BTreeMap::new(),

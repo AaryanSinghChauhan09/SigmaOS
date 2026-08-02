@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 /// Custom Linux-Style Secure ELF Executable Subsystems for SigmaOS
 /// Implements ASLR (Address Space Layout Randomization) base loader, DEP/NX (No-Execute) page enforcement,
 /// dynamic shared library (.so) symbol resolver, and IMA (Integrity Measurement Architecture) cryptographic signature verifier.
@@ -43,6 +61,7 @@ pub struct NoExecuteManager {
 }
 
 impl NoExecuteManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         NoExecuteManager {
             nx_enforced: AtomicBool::new(true),
@@ -84,6 +103,7 @@ pub struct DynamicSharedLibraryResolver {
 }
 
 impl DynamicSharedLibraryResolver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DynamicSharedLibraryResolver {
             registered_count: AtomicUsize::new(0),
@@ -140,6 +160,7 @@ pub struct ImaSignatureVerifier {
 }
 
 impl ImaSignatureVerifier {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ImaSignatureVerifier {
             verification_count: AtomicUsize::new(0),

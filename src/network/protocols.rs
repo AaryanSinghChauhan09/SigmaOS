@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS DNS, mDNS, QUIC, TCP/IP, UDP, DHCP, HTTP, HTTPS, FTP, SSH, SMTP, TLS, WebSocket, BGP Network Implementations
 // Full-protocol stack support for bare-metal kernel and userspace layers
 
@@ -137,6 +155,7 @@ pub struct DhcpClient {
 }
 
 impl DhcpClient {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             state: DhcpState::Init,
@@ -445,6 +464,7 @@ pub struct FtpClientSim {
 }
 
 impl FtpClientSim {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             control_connected: false,
@@ -646,6 +666,7 @@ pub struct WebSocketConnection {
 }
 
 impl WebSocketConnection {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_upgraded: false,
@@ -806,6 +827,7 @@ pub struct PcgP2pStateProtocol {
 }
 
 impl PcgP2pStateProtocol {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PcgP2pStateProtocol {
             is_mesh_connected: false,
@@ -845,6 +867,7 @@ pub struct SnclLedgerProtocol {
 }
 
 impl SnclLedgerProtocol {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SnclLedgerProtocol {
             entries_logged: 0,

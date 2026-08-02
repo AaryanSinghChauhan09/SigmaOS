@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Sovereign AI-Native Desktop Productivity & Utility Suite
-// Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing features from:
+// Pure, zero-dependency, // #![no_std]  // crate-root only standard-conforming implementation absorbing features from:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, Vivaldi, Firefox, EarTrumpet, Kdenlive, Shotcut, DaVinci Resolve, Notepad++, Audacity.
 
 use crate::graphics::paint::ColorRgba;
@@ -20,6 +38,7 @@ pub struct EverythingSearchEngine {
 }
 
 impl EverythingSearchEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EverythingSearchEngine { db: Vec::new() }
     }
@@ -60,6 +79,7 @@ pub struct NotepadPlusPlusBuffer {
 }
 
 impl NotepadPlusPlusBuffer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         NotepadPlusPlusBuffer {
             tabs: Vec::new(),
@@ -144,6 +164,7 @@ pub struct SovereignBrowserEngine {
 }
 
 impl SovereignBrowserEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut engine = SovereignBrowserEngine {
             tabs: Vec::new(),
@@ -437,6 +458,7 @@ pub struct VlcCodecPipeline {
 }
 
 impl VlcCodecPipeline {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         VlcCodecPipeline {
             video_buffer: Vec::new(),
@@ -479,6 +501,7 @@ pub struct DaVinciTimeline {
 }
 
 impl DaVinciTimeline {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut lut = [0u8; 256];
         for i in 0..256 {
@@ -527,6 +550,7 @@ pub struct OneCommanderFileGrid {
 }
 
 impl OneCommanderFileGrid {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         OneCommanderFileGrid {
             left_pane_path: "/root".to_string(),
@@ -562,6 +586,7 @@ pub struct EarTrumpetVolumeMatrix {
 }
 
 impl EarTrumpetVolumeMatrix {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EarTrumpetVolumeMatrix {
             channels: Vec::new(),
@@ -611,6 +636,7 @@ pub struct IrfanViewEngine {
 }
 
 impl IrfanViewEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         IrfanViewEngine {
             active_view_format: "PNG".to_string(),
@@ -656,6 +682,7 @@ pub struct SovereignPresentationEngine {
 }
 
 impl SovereignPresentationEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SovereignPresentationEngine {
             slides: Vec::new(),

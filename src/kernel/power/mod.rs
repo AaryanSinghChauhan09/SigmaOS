@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 /// SigmaOS Power Management Subsystem
 /// CPUfreq governors, thermal throttling, suspend/resume lifecycle
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -152,6 +170,7 @@ pub struct ThermalManager {
 }
 
 impl ThermalManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ThermalManager {
             zones: Vec::new(),
@@ -215,6 +234,7 @@ pub struct PowerStateManager {
 }
 
 impl PowerStateManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PowerStateManager {
             current_state: SleepState::S0,

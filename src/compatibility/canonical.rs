@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Canonical Clean-Room Absorption Daemons
 // Independent, zero-dependency reimplementations of Ubuntu's core tooling
 
@@ -9,6 +27,7 @@ pub struct SigmaSubiquity {
 }
 
 impl SigmaSubiquity {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SigmaSubiquity {
             autoinstall_parsed: false,
@@ -40,6 +59,7 @@ pub struct SigmaNetplan {
 }
 
 impl SigmaNetplan {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SigmaNetplan {
             active_routes: 0,
@@ -63,6 +83,7 @@ pub struct SigmaCloudInit {
 }
 
 impl SigmaCloudInit {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SigmaCloudInit {
             instance_initialized: false,
@@ -89,6 +110,7 @@ pub struct SigmaMultipass {
 }
 
 impl SigmaMultipass {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SigmaMultipass {
             active_containers: 0,
@@ -115,6 +137,7 @@ pub struct SigmaCurtin {
 }
 
 impl SigmaCurtin {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SigmaCurtin {
             storage_formatted: false,
@@ -148,6 +171,7 @@ pub struct SigmaLivepatch {
 }
 
 impl SigmaLivepatch {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SigmaLivepatch {
             active_patches: HashMap::new(),

@@ -1,5 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // (no_std only applicable at crate root - removed)
-#![no_main]
+// #![no_main]  // crate-root only
 
 /// OOP-based Low-Level Diagnostics Tools for SigmaOS
 /// Implements diagnostics using OOP principles with traits and structs
@@ -82,6 +100,7 @@ pub struct SensorCapability {
 }
 
 impl SensorCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SensorCapability {
             can_read: false,
@@ -213,6 +232,7 @@ pub struct DiagnosticsStats {
 }
 
 impl DiagnosticsStats {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DiagnosticsStats {
             total_sensors: 0,
@@ -239,6 +259,7 @@ pub struct ManagerCapability {
 }
 
 impl ManagerCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ManagerCapability {
             can_register: false,

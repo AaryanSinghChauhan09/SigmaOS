@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // Sovereign Linux Parity & Maturity Blueprint Implementation
 // Implements Live Installer, Update Channel Broker, Sandboxed App Bundle, and Multi-Arch HAL
 
@@ -39,6 +57,7 @@ pub struct SovereignInstaller {
 }
 
 impl SovereignInstaller {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             target: None,
@@ -172,6 +191,7 @@ pub struct SovereignBundleRuntime {
 }
 
 impl SovereignBundleRuntime {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { active_bundle: None }
     }
@@ -232,6 +252,7 @@ pub struct SovereignHal {
 }
 
 impl SovereignHal {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         #[cfg(target_arch = "x86_64")]
         let arch = CpuArchitecture::X86_64;

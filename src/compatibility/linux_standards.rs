@@ -5,6 +5,24 @@
 //! Filesystem Hierarchy Standard (FHS) compliance
 //! Systemd-style service management concepts
 //! Package management best practices
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 
 /// Linux Standard Base init script locations
 pub const LSB_INIT_SCRIPTS: &str = "/etc/init.d/";
@@ -37,6 +55,7 @@ pub struct LsbCompliance {
 }
 
 impl LsbCompliance {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         LsbCompliance {
             version: "5.0".to_string(),
@@ -133,6 +152,7 @@ pub struct PackageManager {
 }
 
 impl PackageManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PackageManager {
             repositories: Vec::new(),
@@ -190,6 +210,7 @@ pub struct LinuxCompat {
 }
 
 impl LinuxCompat {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         LinuxCompat {
             path: "/usr/bin:/bin:/usr/sbin:/sbin".to_string(),

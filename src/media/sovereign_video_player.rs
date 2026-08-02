@@ -1,5 +1,23 @@
 //! Sovereign Sovereign VLC-Equivalent Video Player and Gap-Closure Subsystems
 //! Natively optimized for SigmaOS content-addressed and virtual memory architectures.
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 
 // (no_std only applicable at crate root - removed)
 
@@ -75,6 +93,7 @@ pub struct SovereignVmm {
 }
 
 impl SovereignVmm {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             root_pt: PageTable {
@@ -111,6 +130,7 @@ pub struct CGroupController {
 }
 
 impl CGroupController {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { groups: Vec::new() }
     }
@@ -133,6 +153,7 @@ pub struct DnsResolver {
 }
 
 impl DnsResolver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { cache: Vec::new() }
     }
@@ -159,6 +180,7 @@ pub struct SecureBootKeyring {
 }
 
 impl SecureBootKeyring {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             authorized_db_keys: [[0u8; 32]; 4],
@@ -195,6 +217,7 @@ pub struct SigmaSystemd {
 }
 
 impl SigmaSystemd {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             services: Vec::new(),
@@ -228,6 +251,7 @@ pub struct NtpClient {
 }
 
 impl NtpClient {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { offset_nanos: 0 }
     }

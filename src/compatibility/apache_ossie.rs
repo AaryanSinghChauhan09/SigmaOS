@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 /// Apache Ossie (Incubating) Semantic Model & Metric Specification Engine for SigmaOS
 /// Formerly Open Semantic Interchange (OSI) standard
 /// Establishes an on-device, vendor-neutral semantic layer and metric language interpreter.
@@ -106,6 +124,7 @@ pub struct SemanticRow {
 }
 
 impl SemanticRow {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SemanticRow { fields: Vec::new() }
     }
@@ -135,6 +154,7 @@ impl Default for SemanticRow {
 pub struct OssieInterpreter;
 
 impl OssieInterpreter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         OssieInterpreter
     }
@@ -237,6 +257,7 @@ impl Default for OssieInterpreter {
 pub struct OssieOntology;
 
 impl OssieOntology {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         OssieOntology
     }

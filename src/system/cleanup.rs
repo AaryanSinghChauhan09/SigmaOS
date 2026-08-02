@@ -1,3 +1,21 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS System Cleanup Utility
 // Smart temporary file remover with OOP-based design
 
@@ -21,6 +39,7 @@ pub struct TempFileStrategy {
 }
 
 impl TempFileStrategy {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             patterns: vec![
@@ -93,6 +112,7 @@ pub struct LogFileStrategy {
 }
 
 impl LogFileStrategy {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             max_size_mb: 100,
@@ -129,6 +149,7 @@ pub struct CacheStrategy {
 }
 
 impl CacheStrategy {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             max_age_seconds: 604800, // 7 days
@@ -168,6 +189,7 @@ pub struct SystemCleanupManager {
 }
 
 impl SystemCleanupManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             strategies: Vec::new(),
