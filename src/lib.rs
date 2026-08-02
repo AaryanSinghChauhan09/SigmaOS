@@ -25,6 +25,8 @@ pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
+pub mod legal;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -49,7 +51,6 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-<<<<<<< HEAD
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer, WasmState, WasmModule, WasmSandboxEngine,
     PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
@@ -84,16 +85,6 @@ pub use compatibility::{
     PowerToysRunEngine, FileLocksmith, AwakeService, ColorPickerUtility, ScreenZone,
     MftEverythingIndexer, EverythingQueryCache, MftRecord,
     AutorunsDetector, TcpView, ProcessTreeNode, ProcMonEvent,
-=======
-    ApplicationBinary, BinaryFormat, CasObject, Clause, CompatibilityError, CompatibilityManager,
-    CompatibilityMode, ContainerRuntime, ContentAddressedStorage, CreativeMatrix, DpllSatSolver,
-    EverySearch, FancyZonesManager, FiletoolOverlay, FrugalLoader, ImageLayer, JoplinE2ee,
-    LayoutZone, Literal, MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter,
-    OssieMetric, OssieOntology, OssieRelationship, PledgePermission, PledgeUnveilSandbox,
-    PqcSecureChannel, ProcMonitor, ProcessExplorerState, SemanticRow, SpreadsheetCore, SysDiag,
-    TargetPlatform, TceLoader, TczExtension, TinyCoreBootConfig, TranslationLayer, WasmModule,
-    WasmSandboxEngine, WasmState,
->>>>>>> origin/improve-sshd-4453662879443076923
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -127,6 +118,12 @@ pub use package::{
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+};
+pub use legal::{
+    ComplianceCert as LegalComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+    GlobalStandard, ComplianceStatus as LegalComplianceStatus, RegulatoryControl, InternationalComplianceTracker,
+    LabourLawConfig, StatutoryPayrollBreakdown, LabourLawCompliance, StatutoryFiling,
+    StatutoryFilingDashboard,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,

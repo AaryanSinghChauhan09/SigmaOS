@@ -2,6 +2,7 @@
 pub mod control_center;
 pub mod monitor;
 pub mod process;
+pub mod accessibility_gamification;
 
 pub use control_center::{
     ControlCenterError, ControlPanel, ControlPanelImpl, DashboardWidget as ControlWidget,
@@ -11,6 +12,9 @@ pub use control_center::{
 };
 pub use monitor::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use accessibility_gamification::{
+    ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
 };
 pub use process::{
     ProcessAction, ProcessError, ProcessFilter, ProcessInfo, ProcessManager,
