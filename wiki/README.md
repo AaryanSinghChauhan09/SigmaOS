@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
 > **"Sovereignty is the ultimate efficiency."**
@@ -218,3 +219,13 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 ## 📄 License
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
+=======
+# SigmaOS Documentation Wiki
+
+Welcome to the SigmaOS development wiki. This directory contains detailed architectural resources and specifications for our sovereign operating system.
+
+## Table of Contents
+1. [Core Microkernel Specification](../FUTURE-DEVELOPMENT-ROADMAP.md)
+2. [Driver Subsystem and Hardware Integration](../FUTURE-DEVELOPMENT-ROADMAP.md)
+3. [Zenith Desktop and Compositor Architecture](../FUTURE-DEVELOPMENT-ROADMAP.md)
+>>>>>>> origin/jules-driver-improvements-linux-inspired-5291856075380713095
