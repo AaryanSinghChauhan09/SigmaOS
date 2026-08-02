@@ -262,9 +262,9 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 }
 
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
-    len: usize,
+    pub len: usize,
     capacity: usize,
 }
 
@@ -388,6 +388,19 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
