@@ -91,7 +91,7 @@ mod tests {
         
         assert!(set.contains(&1));
         assert!(set.contains(&2));
-        assert!set.contains(&3));
+        assert!(!set.contains(&3));
     }
 
     #[test]
@@ -99,7 +99,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         assert!(set.remove(&1));
-        assert!set.contains(&1));
+        assert!(!set.contains(&1));
     }
 
     #[test]

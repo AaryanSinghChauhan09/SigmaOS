@@ -114,7 +114,6 @@ impl SimpleAgentOrchestrator {
             response_timeout_secs: 30,
         }
     }
-}
 
     pub fn set_model_temperature(&mut self, temp: f32) {
         self.model_temperature = temp;
@@ -170,13 +169,6 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     fn list_agents(&self) -> Vec<AgentID> {
         self.agents.iter().map(|a| a.id()).collect()
     }
-}
-
-pub trait TaskQueue {
-    fn enqueue(&mut self, task: &[u8], priority: u8);
-    fn dequeue(&mut self) -> Option<[u8; 256]>;
-    fn peek(&self) -> Option<&[u8]>;
-    fn size(&self) -> usize;
 }
 
 pub trait TaskQueue {

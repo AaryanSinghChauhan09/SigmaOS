@@ -61,6 +61,23 @@ pub use compatibility::{
     SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
     TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
     YayAurHelper, ZeroTrustConstellation,
+    StarlingCompositor, StarlingWidgetTree, StarlingX11Server, StarlingTilingEngine,
+    CosmicDesktopEngine, PopShellTiling, System76Scheduler, System76PowerSwitcher,
+    BudgieAppletManager, BudgieShuffler, BudgieLayoutSwitcher,
+    RhinoPkgUnified, PacstallAur, UnicornDesktopShell,
+    MokshaDesktopEngine, BodhiProfileSelector, MokshaGadgetManager,
+    PantheonGalaWindowManager, GraniteHigLibrary, ElementaryAppCenter,
+    UbuntuDockManager, SnapcraftRuntime, UbuntuProEsm,
+    MaasProvisioner, JujuOrchestrator, MultipassVmlight,
+    ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
+    DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
+    LizardInstaller, CoasAdminSuite,
+    PledgeUnveilSandbox, PledgePermission, PqcSecureChannel, DpllSatSolver, Literal, Clause,
+    ContentAddressedStorage, CasObject,
+    HermesEngineSandbox, V8RuntimeContext, JscEngineRuntime, ReactNativeBridge,
+    FancyZonesManager, PowerToysRunEngine, FileLocksmith, AwakeService, ColorPickerUtility, ScreenZone,
+    MftEverythingIndexer, EverythingQueryCache, MftRecord,
+    ProcessExplorer, ProcessMonitor, AutorunsDetector, TcpView, ProcessTreeNode, ProcMonEvent, TcpConnection,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -132,6 +149,8 @@ pub use security::{
     HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, IsolatedDomain, IsolationError,
     MaliciousSignature, ObjectType, Permission, PledgeManager, PledgePromise, SecurityContext,
     SecurityLabel, SecurityPolicy, SecurityRule, SelinuxPermission,
+    SudoDoasElevator, SudoToken, PolkitEnforcer, PolkitAuthorization, PolkitRule,
+    CapSplitter, LinuxCap, RootlessNamespaceManager, UidMapEntry, PamMfaAuthenticator,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,

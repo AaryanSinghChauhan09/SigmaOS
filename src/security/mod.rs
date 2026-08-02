@@ -7,6 +7,7 @@ pub mod hardening;
 pub mod pledge;
 pub mod qubes_isolation;
 pub mod selinux;
+pub mod root_improvement;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
@@ -20,4 +21,8 @@ pub use qubes_isolation::{
 pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
+};
+pub use root_improvement::{
+    SudoDoasElevator, SudoToken, PolkitEnforcer, PolkitAuthorization, PolkitRule,
+    CapSplitter, LinuxCap, RootlessNamespaceManager, UidMapEntry, PamMfaAuthenticator,
 };
