@@ -5,8 +5,13 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
+<<<<<<< HEAD
 use alloc::vec;
 use alloc::vec::Vec;
+=======
+use alloc::vec::Vec;
+use alloc::vec;
+>>>>>>> origin/feature/distro-overtake-absorption-8807165055210636662
 
 // ==========================================
 // 1. Starling Build (Starling Desktop) Features
@@ -1046,10 +1051,14 @@ mod tests {
     fn test_elementary_os_simulation() {
         let gala = PantheonGalaWindowManager::new();
         assert!(gala.physics_enabled);
+<<<<<<< HEAD
         assert_eq!(
             gala.trigger_workspace_switch(),
             "mutter-physics-slide-completed"
         );
+=======
+        assert_eq!(gala.trigger_workspace_switch(), "mutter-physics-slide-completed");
+>>>>>>> origin/feature/distro-overtake-absorption-8807165055210636662
 
         let granite = GraniteHigLibrary::new();
         assert!(granite.validate_widget_margins(12));
@@ -1108,10 +1117,14 @@ mod tests {
         assert_eq!(bridge.paired_devices[0], "Pixel-8");
 
         let wine = ZorinWinePreflight::new();
+<<<<<<< HEAD
         assert_eq!(
             wine.intercept_exe("winrar.exe"),
             "launch-wine-bottles-helper"
         );
+=======
+        assert_eq!(wine.intercept_exe("winrar.exe"), "launch-wine-bottles-helper");
+>>>>>>> origin/feature/distro-overtake-absorption-8807165055210636662
         assert_eq!(wine.intercept_exe("winrar.dmg"), "pass-through-native");
     }
 

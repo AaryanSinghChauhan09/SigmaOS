@@ -10,6 +10,11 @@ pub mod absorb_tools;
 pub mod tiny_core;
 pub mod apache_ossie;
 pub mod sovereign_suite;
+pub mod endeavour;
+pub mod legacy_adapters;
+pub mod linux_security;
+pub mod standards;
+pub mod overtake;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -70,4 +75,27 @@ pub use apache_ossie::{
 pub use sovereign_suite::{
     EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
+};
+
+pub use overtake::{
+    StarlingCompositor, StarlingWidgetTree, StarlingX11Server, StarlingTilingEngine,
+    CosmicDesktopEngine, PopShellTiling, System76Scheduler, System76PowerSwitcher,
+    BudgieAppletManager, BudgieShuffler, BudgieLayoutSwitcher,
+    RhinoPkgUnified, PacstallAur, UnicornDesktopShell,
+    MokshaDesktopEngine, BodhiProfileSelector, MokshaGadgetManager,
+    PantheonGalaWindowManager, GraniteHigLibrary, ElementaryAppCenter,
+    UbuntuDockManager, SnapcraftRuntime, UbuntuProEsm,
+    MaasProvisioner, JujuOrchestrator, MultipassVmlight,
+    ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
+    DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
+    LizardInstaller, CoasAdminSuite,
+};
+
+pub use absorb_tools::{
+    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
+    DpllSatSolver, CasObject, ContentAddressedStorage,
+    HermesEngineSandbox, V8RuntimeContext, JscEngineRuntime, ReactNativeBridge,
+    FancyZonesManager, PowerToysRunEngine, FileLocksmith, AwakeService, ColorPickerUtility, ScreenZone,
+    MftEverythingIndexer, EverythingQueryCache, MftRecord,
+    ProcessExplorer, ProcessMonitor, AutorunsDetector, TcpView, ProcessTreeNode, ProcMonEvent, TcpConnection,
 };
