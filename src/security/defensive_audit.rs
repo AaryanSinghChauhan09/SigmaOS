@@ -112,12 +112,10 @@ impl DefensiveAuditSystem {
         // Find previous block hash
         let prev_hash = if next_id > 1 {
             let mut found_prev = 0;
-            for slot in ring.iter() {
-                if let Some(ref block) = slot {
-                    if block.id == next_id - 1 {
-                        found_prev = block.current_hash;
-                        break;
-                    }
+            for block in ring.iter().flatten() {
+                if block.id == next_id - 1 {
+                    found_prev = block.current_hash;
+                    break;
                 }
             }
             found_prev
@@ -150,21 +148,19 @@ impl DefensiveAuditSystem {
     pub fn evaluate_anomaly_score(&self, payload_data: &[u8]) -> u32 {
         let mut threat_score = 0;
 
-        for sig_slot in &self.signatures {
-            if let Some(ref sig) = sig_slot {
-                if sig.pattern_len > 0 && payload_data.len() >= sig.pattern_len {
-                    // Check if malicious signature pattern is present in input payload
-                    let mut matched = false;
-                    for window in payload_data.windows(sig.pattern_len) {
-                        if window == &sig.pattern[..sig.pattern_len] {
-                            matched = true;
-                            break;
-                        }
+        for sig in self.signatures.iter().flatten() {
+            if sig.pattern_len > 0 && payload_data.len() >= sig.pattern_len {
+                // Check if malicious signature pattern is present in input payload
+                let mut matched = false;
+                for window in payload_data.windows(sig.pattern_len) {
+                    if window == &sig.pattern[..sig.pattern_len] {
+                        matched = true;
+                        break;
                     }
+                }
 
-                    if matched {
-                        threat_score += sig.weight_score;
-                    }
+                if matched {
+                    threat_score += sig.weight_score;
                 }
             }
         }
