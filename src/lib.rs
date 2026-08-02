@@ -1,5 +1,3 @@
-#![allow(clippy::all)]
-#![allow(warnings)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -53,10 +51,6 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BodhiProfileSelector, BudgieAppletManager,
-    CinnamonDesktopEngine, MintUpdateManager, MintUpdateItem, UpdateRiskLevel,
-    MintInstallSoftwareManager, MintBackupTool, MintWelcomeEngine, MintDriverItem,
-    MintHardwareDriverManager, MintSystemAdminPAM, UfwRule, MintUfwFirewall,
-    MintShellScriptInterpreter, TimeshiftSnapshot, MintTimeshiftBackup,
     BudgieLayoutSwitcher, BudgieShuffler, BuildCodexGrid, CoasAdminSuite, CompatibilityError,
     CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
     CorebootGatewayMesh, CosmicDesktopEngine, DACConstellation, DotMatrixMesh, DrakxtoolsSuite,

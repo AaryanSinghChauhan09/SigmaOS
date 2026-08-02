@@ -107,19 +107,6 @@ impl Default for LlmConfig {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Tool {
-    pub name: String,
-    pub description: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct ToolCall {
-    pub id: String,
-    pub name: String,
-    pub arguments_json: String,
-}
-
 /// Inference request
 #[derive(Debug, Clone)]
 pub struct InferenceRequest {
@@ -127,7 +114,6 @@ pub struct InferenceRequest {
     pub max_tokens: usize,
     pub stop_sequences: Vec<String>,
     pub temperature: Option<f32>,
-    pub tools: Vec<Tool>,
 }
 
 impl InferenceRequest {
@@ -137,7 +123,6 @@ impl InferenceRequest {
             max_tokens: 256,
             stop_sequences: Vec::new(),
             temperature: None,
-            tools: Vec::new(),
         }
     }
 
@@ -150,11 +135,6 @@ impl InferenceRequest {
         self.stop_sequences.push(sequence);
         self
     }
-
-    pub fn with_tool(mut self, tool: Tool) -> Self {
-        self.tools.push(tool);
-        self
-    }
 }
 
 /// Inference response
@@ -164,7 +144,6 @@ pub struct InferenceResponse {
     pub tokens_generated: usize,
     pub inference_time_ms: u32,
     pub tokens_per_second: f32,
-    pub tool_calls: Vec<ToolCall>,
 }
 
 impl InferenceResponse {
@@ -180,13 +159,7 @@ impl InferenceResponse {
             tokens_generated,
             inference_time_ms,
             tokens_per_second,
-            tool_calls: Vec::new(),
         }
-    }
-
-    pub fn with_tool_calls(mut self, tool_calls: Vec<ToolCall>) -> Self {
-        self.tool_calls = tool_calls;
-        self
     }
 }
 
@@ -556,20 +529,8 @@ impl LocalLlmEngine {
         assert_eq!(experts.len(), 4);
         assert!(aux_loss >= 0.0);
 
-        let mut response =
+        let response =
             InferenceResponse::new("Generated response placeholder".to_string(), 10, 100);
-
-        if !request.tools.is_empty() {
-            let mut calls = Vec::new();
-            for tool in &request.tools {
-                calls.push(ToolCall {
-                    id: "call_0".to_string(),
-                    name: tool.name.clone(),
-                    arguments_json: "{}".to_string(),
-                });
-            }
-            response = response.with_tool_calls(calls);
-        }
 
         Ok(response)
     }
