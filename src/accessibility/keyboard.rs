@@ -111,9 +111,15 @@ impl SimpleOnScreenKeyboard {
 impl OnScreenKeyboard for SimpleOnScreenKeyboard {
     fn press_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError> {
         for key_option in &mut self.keys {
+<<<<<<< HEAD
             if let Some(ref mut key_box) = *key_option {
                 let key: &mut dyn VirtualKey = &mut **key_box;
                 if key.id() == key_id {
+=======
+            if let Some(ref mut key) = *key_option {
+                let k: &dyn VirtualKey = &**key;
+                if k.id() == key_id {
+>>>>>>> origin/feature/screen-recorder-and-security-hardening-8875301983285008408
                     key.set_pressed(true);
                     return Ok(());
                 }
@@ -124,9 +130,15 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
 
     fn release_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError> {
         for key_option in &mut self.keys {
+<<<<<<< HEAD
             if let Some(ref mut key_box) = *key_option {
                 let key: &mut dyn VirtualKey = &mut **key_box;
                 if key.id() == key_id {
+=======
+            if let Some(ref mut key) = *key_option {
+                let k: &dyn VirtualKey = &**key;
+                if k.id() == key_id {
+>>>>>>> origin/feature/screen-recorder-and-security-hardening-8875301983285008408
                     key.set_pressed(false);
                     return Ok(());
                 }
@@ -137,10 +149,17 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
 
     fn get_key(&self, id: KeyID) -> Option<&dyn VirtualKey> {
         for key_option in &self.keys {
+<<<<<<< HEAD
             if let Some(ref key_box) = *key_option {
                 let key: &dyn VirtualKey = &**key_box;
                 if key.id() == id {
                     return Some(key);
+=======
+            if let Some(ref key) = *key_option {
+                let k: &dyn VirtualKey = &**key;
+                if k.id() == id {
+                    return Some(k);
+>>>>>>> origin/feature/screen-recorder-and-security-hardening-8875301983285008408
                 }
             }
         }

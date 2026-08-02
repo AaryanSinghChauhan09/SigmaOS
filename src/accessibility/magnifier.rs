@@ -94,9 +94,15 @@ impl MagnifierManager for SimpleMagnifierManager {
 
     fn destroy_magnifier(&mut self, id: MagnifierID) -> Result<(), MagnifierError> {
         for magnifier_option in &mut self.magnifiers {
+<<<<<<< HEAD
             if let Some(ref magnifier_box) = *magnifier_option {
                 let magnifier: &dyn Magnifier = &**magnifier_box;
                 if magnifier.id() == id {
+=======
+            if let Some(ref magnifier) = *magnifier_option {
+                let m: &dyn Magnifier = &**magnifier;
+                if m.id() == id {
+>>>>>>> origin/feature/screen-recorder-and-security-hardening-8875301983285008408
                     *magnifier_option = None;
                     return Ok(());
                 }
@@ -107,10 +113,17 @@ impl MagnifierManager for SimpleMagnifierManager {
 
     fn get_magnifier(&self, id: MagnifierID) -> Option<&dyn Magnifier> {
         for magnifier_option in &self.magnifiers {
+<<<<<<< HEAD
             if let Some(ref magnifier_box) = *magnifier_option {
                 let magnifier: &dyn Magnifier = &**magnifier_box;
                 if magnifier.id() == id {
                     return Some(magnifier);
+=======
+            if let Some(ref magnifier) = *magnifier_option {
+                let m: &dyn Magnifier = &**magnifier;
+                if m.id() == id {
+                    return Some(m);
+>>>>>>> origin/feature/screen-recorder-and-security-hardening-8875301983285008408
                 }
             }
         }

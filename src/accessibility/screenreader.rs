@@ -128,10 +128,17 @@ impl ScreenReader for SimpleScreenReader {
 impl SimpleScreenReader {
     pub fn get_voice(&self, id: VoiceID) -> Option<&dyn Voice> {
         for voice_option in &self.voices {
+<<<<<<< HEAD
             if let Some(ref voice_box) = *voice_option {
                 let voice: &dyn Voice = &**voice_box;
                 if voice.id() == id {
                     return Some(voice);
+=======
+            if let Some(ref voice) = *voice_option {
+                let v: &dyn Voice = &**voice;
+                if v.id() == id {
+                    return Some(v);
+>>>>>>> origin/feature/screen-recorder-and-security-hardening-8875301983285008408
                 }
             }
         }

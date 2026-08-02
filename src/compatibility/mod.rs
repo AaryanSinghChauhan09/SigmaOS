@@ -35,6 +35,7 @@ pub use standards::{
 pub use linux_security::{
     AppArmorProfile, LinuxCapability, NamespaceManager, NamespaceType, SecurityContext,
     SecurityModuleManager, SecurityPolicy, UserNamespace,
+<<<<<<< HEAD
 };
 
 pub use overtake::{
@@ -65,4 +66,6 @@ pub use historic_linux::{
     TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
     GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
     GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+=======
+>>>>>>> origin/feature/screen-recorder-and-security-hardening-8875301983285008408
 };
