@@ -3,12 +3,15 @@ pub mod constellation_mesh;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
-pub mod chimera_linux;
 pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod india_professional_tools;
+pub mod bodhi_moksha;
+pub mod garuda_zen;
+pub mod kimi_code;
+pub mod atomic_distribution;
+pub mod cachy_os;
+pub mod elf_execution;
+pub mod penetration_assistant;
+pub mod sssd;
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -68,3 +71,13 @@ pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
 };
+
+pub use relay_nexus::{WandrEvent, AtifTrajectoryMonitor, VerifierConsensus, RelayNexus};
+pub use bodhi_moksha::{EflCanvasElement, MokshaProfile, MokshaDesktopManager};
+pub use garuda_zen::{ZenInteractivityGovernor, TimeshiftBtrfsEngine, ZramSwapManager, NohangOomGuard};
+pub use kimi_code::{KimiCodeGenerator, KimiContextPruner, KimiAstEditor, KimiLicenseAttributor};
+pub use atomic_distribution::{ArmbianImager, AtomicDeployer, DnfHistoryManager, LivepatchGovernor, DnfOp};
+pub use cachy_os::{BoreSchedulerGovernor, SchedPolicy, AnanicyManager, V4OptimizedPackageManager, CachyInitramfs};
+pub use elf_execution::{AslrGovernor, NoExecuteManager, DynamicSharedLibraryResolver, ImaSignatureVerifier};
+pub use penetration_assistant::{PenetrationAssistant, DefaultAssistant, Assessment, Severity};
+pub use sssd::{SssdDomain, OfflineCredentialCache, NssUserGroupResolver, HbacPolicyEngine};

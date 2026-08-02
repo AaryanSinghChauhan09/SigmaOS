@@ -1,5 +1,3 @@
-// (no_std only applicable at crate root - removed)
-
 /// Custom Moonshot AI Kimi-Code Code Generation Subsystems for SigmaOS
 /// Implements Self-Healing Code Generator, Context Pruner, AST-Aware Structural Editor, and License Attribution Guards
 

@@ -1,6 +1,3 @@
-// (no_std only applicable at crate root - removed)
-#![no_main]
-
 /// Custom Production-Grade TCP/IP Stack for SigmaOS
 /// Implements full TCP/IP and UDP networking without relying on external stack
 /// Supports internet checksum computation, full TCP state machine, and UDP parsing
@@ -227,6 +224,7 @@ impl TCPSegment {
 
     pub fn calculate_checksum(&mut self, src_ip: IPAddress, dest_ip: IPAddress, payload_len: usize) -> u16 {
         self.checksum = 0;
+        let payload_len = payload_len.min(1460); // Safety: bounds-checked to prevent out-of-bounds slicing
 
         // Build pseudo header
         let mut pseudo_header = [0u8; 12];
@@ -282,6 +280,7 @@ impl UDPSegment {
 
     pub fn calculate_checksum(&mut self, src_ip: IPAddress, dest_ip: IPAddress, payload_len: usize) -> u16 {
         self.checksum = 0;
+        let payload_len = payload_len.min(1472); // Safety: bounds-checked to prevent out-of-bounds slicing
 
         // Build pseudo header
         let mut pseudo_header = [0u8; 12];
@@ -568,7 +567,12 @@ impl TCPIPStack {
         let src_ip = IPAddress::new(src_ip_bytes[0], src_ip_bytes[1], src_ip_bytes[2], src_ip_bytes[3]);
         let dest_ip = IPAddress::new(dest_ip_bytes[0], dest_ip_bytes[1], dest_ip_bytes[2], dest_ip_bytes[3]);
 
-        let proto_payload = &ip_payload[20..];
+        // Dynamically parse IHL (Internet Header Length) from first byte
+        let ihl = (ip_payload[0] & 0x0F) as usize * 4;
+        if ip_payload.len() < ihl {
+            return;
+        }
+        let proto_payload = &ip_payload[ihl..];
 
         if protocol == 6 { // TCP Protocol
             if proto_payload.len() < 20 {
@@ -793,7 +797,8 @@ mod tests {
             // Ethernet header: ethertype = 0x0800
             packet[12] = 0x08;
             packet[13] = 0x00;
-            // IP header: Protocol = 6, dest ip = 192.168.1.100
+            // IP header: Protocol = 6, dest ip = 192.168.1.100, IHL = 5 (20 bytes)
+            packet[14] = 0x45;
             packet[14 + 9] = 6;
             packet[14 + 16] = 192; packet[14 + 17] = 168; packet[14 + 18] = 1; packet[14 + 19] = 100;
             // TCP header: dest port = 80, flags = 0x02 (SYN)
@@ -834,6 +839,7 @@ mod tests {
             packet[12] = 0x08;
             packet[13] = 0x00;
             // IP
+            packet[14] = 0x45; // IHL = 5
             packet[14 + 9] = 17; // UDP Protocol
             packet[14 + 16] = 192; packet[14 + 17] = 168; packet[14 + 18] = 1; packet[14 + 19] = 100;
             // UDP Header

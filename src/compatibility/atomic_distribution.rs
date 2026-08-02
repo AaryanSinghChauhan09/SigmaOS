@@ -1,5 +1,3 @@
-// (no_std only applicable at crate root - removed)
-
 /// Custom Enterprise & Embedded Linux Distribution Compatibility Subsystems for SigmaOS
 /// Implements Armbian Imager 2.0 block burning, Fedora Atomic OS-tree deployment manager,
 /// RHEL/CentOS DNF history rollbacks, and Ubuntu Livepatching dynamic function hooks.
@@ -128,7 +126,7 @@ impl DnfHistoryManager {
     }
 
     pub fn record_transaction(&mut self, operation: DnfOp, package_id: usize) -> Option<usize> {
-        let count = self.transaction_count.fetch_add(1, Ordering::SeqCst);
+        let count = self.transaction_count.load(Ordering::SeqCst);
         if count >= 16 {
             return None;
         }

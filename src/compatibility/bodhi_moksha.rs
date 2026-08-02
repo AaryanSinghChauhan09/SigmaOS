@@ -1,5 +1,3 @@
-// (no_std only applicable at crate root - removed)
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

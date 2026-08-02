@@ -1,5 +1,3 @@
-// (no_std only applicable at crate root - removed)
-
 /// Custom Garuda Linux and Zen Kernel Optimization Subsystems for SigmaOS
 /// Implements Zen Interactivity Governor, Timeshift Btrfs snapshotting, Zram Memory Swap, and Nohang OOM Guards
 
