@@ -3,16 +3,21 @@
 
 pub mod capability;
 pub mod defensive_audit;
-pub mod parrot;
+pub mod hardening;
 pub mod pledge;
+pub mod qubes_isolation;
+pub mod selinux;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
-pub use parrot::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+pub use defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
+pub use hardening::{
+    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+};
+pub use selinux::{
+    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
+    SecurityRule, SelinuxPermission,
+};

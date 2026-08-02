@@ -3,16 +3,12 @@ pub mod buddy_allocator;
 pub mod conversion;
 pub mod error;
 pub mod hash;
-pub mod hashmap;
-pub mod hashset;
-pub mod btreemap;
 pub mod math;
 pub mod paging;
 pub mod string;
 pub mod time;
 pub mod uuid;
 pub mod vec;
-pub mod vecdeque;
 
 pub use conversion::{
     base64_encode, base_to_dec, binary_to_bytes, bytes_to_binary, bytes_to_hex, dec_to_base,
@@ -28,7 +24,3 @@ pub use string::{
 pub use time::{monotonic_ms, sleep_ms, uptime_ms, Date, Time, Timestamp};
 pub use uuid::Uuid;
 pub use vec::Vec;
-pub use hashmap::HashMap;
-pub use vecdeque::VecDeque;
-pub use hashset::HashSet;
-pub use btreemap::BTreeMap;

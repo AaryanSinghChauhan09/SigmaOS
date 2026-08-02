@@ -1,28 +1,36 @@
-#![allow(warnings)]
-#![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod gpu;
+pub mod graphics;
 pub mod kernel;
+pub mod klib;
+pub mod media;
 pub mod network;
+pub mod observability;
 pub mod orchestration;
 pub mod package;
-pub mod performance;
 pub mod productivity;
+pub mod remote;
 pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+
+pub use media::{
+    CaptureSource, GpuEncoderType, RecorderState, RecordingStats, SovereignScreenRecorder,
+};
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -34,16 +42,23 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
-    AntixDesktopProfiler, AntixInitManager, ApplicationBinary, BinaryCompatMatrix, BinaryFormat,
-    BundleType, CompatibilityError, CompatibilityManager, CompatibilityMode, ContainerRuntime,
-    DesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival, GraphicsBridge,
-    InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
-    LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService, MicroServiceState,
-    NetworkBridge, StorageBridge, SyscallAbi, TargetPlatform, TranslationLayer, TribeInstaller,
-    WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP,
-    GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM,
-    GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
+    CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
+    EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub,
+    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
+    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, LsbProfile, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation,
+    SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
+    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
+    YayAurHelper, ZeroTrustConstellation,
+};
+pub use container::{
+    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
+    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
+    SimpleContainer, SimpleContainerRuntime,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -58,14 +73,27 @@ pub use drivers::{
     VesaModeInfo,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
-    SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
-    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EbpfInstruction, EbpfMap,
+    EbpfMapRegistry, EbpfMapType, EbpfVm, EnergyAwareScheduler, FastPathIpc, InterruptMechanism,
+    IpcError, IpcManager, KernelGraph, KernelModule, KernelPersona, KernelPlugin,
+    KernelPluginManager, LegacyScheduler, LkmLoader, MemoryBlock, Message, MetaKernel, MicroDriver,
+    ModuleStatus, NetPod, PolicyError, PolicyManager, Priority, PrivacyFirstSandbox,
+    PrivilegeLevel, Process, ProcessState, ProtectionDomain, ResourceBroker, RoundRobinConfig,
+    RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions, PAGE_SIZE,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use network::{
+    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
+    RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
+    ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
+};
+pub use observability::{
+    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
+    SimpleObservabilityStack,
+};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -75,33 +103,37 @@ pub use package::{
     ConflictResolution, DebPackageDriverTranslator, DependencyResolver, GenericLinuxTranslationUdf,
     LinuxDriverPackageTranslator, LinuxTranslationService, PackageAdapter, PackageError,
     PackageFormat, PackageSource, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, SigmaSoftwareStore, SoftwareRegistryEntry, UnifiedPackage,
-    UniversalPackageManager, GLOBAL_SOFTWARE_STORE, GLOBAL_TRANSLATION_SERVICE,
-    GLOBAL_TRANSLATION_UDF,
-};
-pub use performance::{
-    CallGraph, CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
-    PerformanceProfileRule, Profile, ProfileType, Profiler, ProfilerError, RamDefragmenter,
-    SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
-    SmartResourceOptimizer, GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+    RpmPackageDriverTranslator, UnifiedPackage, UniversalPackageManager,
+    GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
 pub use productivity::{
-    Achievement, AchievementType, AudioChannel, GamifiedProductivity, Goal, PomodoroState,
-    PomodoroTimer, ProductivityScore, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE,
+    Achievement, AchievementType, AegisubEngine, GamifiedProductivity, Goal, PomodoroState,
+    PomodoroTimer, ProductivityScore, SubtitleEditEngine, SubtitleEntry, SubtitleFormat,
+};
+pub use remote::{
+    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
+    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    SimpleShellManager,
 };
 pub use resilience::{
-    FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
-    SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
+    RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
+    SystemSnapshot,
 };
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    secure_zeroize, AppArmorManager, AppArmorProfile, AuditLogEntry, CapabilityGate,
+    CapabilityToken, DefensiveAuditSystem, DomainID, DomainOrchestrator, DomainType, ForensicBlock,
+    HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, IsolatedDomain, IsolationError,
+    MaliciousSignature, ObjectType, Permission, PledgeManager, PledgePromise, SecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule, SelinuxPermission,
 };
-pub use shell::{ShellCommand, ShellRepl};
+pub use shell::{
+    AcpMessage, AgentState, CommandError as ShellCommandError, KimiCodeAgent, LifecycleHook,
+    McpTool, ShellCommand, ShellRepl, ShellSession, SimpleShellSession, SubagentTask, SubagentType,
+};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, DebPackageImporter, PackageImporter,
+    PackageRecipe, PacmanPackageImporter, RecipeError, RecipeManager, RpmPackageImporter,
     SatSolver, Transaction,
 };
 pub use virtualization::{
