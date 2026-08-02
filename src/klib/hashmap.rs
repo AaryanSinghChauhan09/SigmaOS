@@ -52,19 +52,19 @@ where
     K: Eq + Hash,
 {
     pub fn new() -> Self {
-        let mut map = HashMap {
+        HashMap {
             buckets: Vec::new(),
-            capacity: 16,
+            capacity: 0,
             len: 0,
-        };
-        map.resize_buckets();
-        map
+        }
     }
 
     pub fn with_capacity(capacity: usize) -> Self {
         let mut map = HashMap::new();
-        map.capacity = capacity.next_power_of_two();
-        map.resize_buckets();
+        if capacity > 0 {
+            map.capacity = capacity.next_power_of_two();
+            map.resize_buckets();
+        }
         map
     }
 

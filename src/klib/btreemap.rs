@@ -151,10 +151,7 @@ mod tests {
         map.insert(1, "a");
         map.insert(2, "b");
         
-        let mut items = std::vec::Vec::new();
-        for (&k, &v) in map.iter() {
-            items.push((k, v));
-        }
+        let items: Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
         assert_eq!(items, vec![(1, "a"), (2, "b"), (3, "c")]);
     }
 }
