@@ -52,11 +52,13 @@ where
     K: Eq + Hash,
 {
     pub fn new() -> Self {
-        HashMap {
+        let mut map = HashMap {
             buckets: Vec::new(),
             capacity: 16,
             len: 0,
-        }
+        };
+        map.resize_buckets();
+        map
     }
 
     pub fn with_capacity(capacity: usize) -> Self {

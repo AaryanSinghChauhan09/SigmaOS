@@ -3,8 +3,11 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> origin/jules-4213023701309535613-b11406ba
+=======
+>>>>>>> origin/jules-4256353901936270903-d30fe5d7
 #include <cstddef>
 
 typedef unsigned char      sigma_u8;
@@ -28,6 +31,7 @@ typedef int                sigma_status;
 
 #endif // SIGMA_KERNEL_TYPES_H
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 typedef unsigned int sigma_u32;
 typedef int sigma_i32;
@@ -47,3 +51,5 @@ typedef enum {
 >>>>>>> origin/improve-installer-script-9830616872725964915
 =======
 >>>>>>> origin/jules-4213023701309535613-b11406ba
+=======
+>>>>>>> origin/jules-4256353901936270903-d30fe5d7
