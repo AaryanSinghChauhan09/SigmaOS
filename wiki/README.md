@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# SigmaOS Wiki
-=======
 # 🛡️ SigmaOS — Sovereign, AI-Native Operating System
 
 > **"Sovereignty is the ultimate efficiency."**
@@ -122,7 +119,53 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Ext4 + FAT32 filesystems
 - ✅ NVMe + USB xHCI drivers
 - ✅ Zenith Desktop prototype
+<<<<<<< HEAD:wiki/README.md
 - ✅ sigma-pkg CLI
+=======
+- 🔄 Screen recorder with GPU acceleration
+- 🔄 Screenshot tool with annotation
+- 🔄 Calendar + task manager
+- 🔄 Email client with IMAP/SMTP
+- 🔄 Note-taking app with Markdown
+- 🔄 Code editor with LSP support
+- ✅ Integrated terminal
+- ✅ Clipboard manager with history
+- 🔄 Task manager
+
+**Security:**
+- ✅ Encrypted file vault
+- 🔄 Password manager with biometric unlock
+- ✅ Intrusion detection system
+- 🔄 Secure VPN client
+- ✅ Capability-based security framework
+
+**System Tools:**
+- ✅ File manager
+- ✅ Archive manager
+- ✅ Disk usage analyzer
+- ✅ System monitor
+- ✅ Process manager
+- 🔄 Virtual machine manager (QEMU/KVM)
+- 🔄 Container manager (Docker/Podman)
+
+**Package Management:**
+- ✅ sigma-pkg CLI
+- 🔄 Universal package manager
+- 🔄 Rollback package snapshots
+
+**Networking:**
+- 🔄 Cloud sync engine
+- 🔄 Built-in torrent client
+- 🔄 Network traffic analyzer
+
+**AI & Automation:**
+- 🔄 AI orchestrator for system optimization
+
+**Customization:**
+- 🔄 Unified control center
+- ✅ Declarative theming engine
+
+**Boot & Deployment:**
 - ⬜ Bootable ISO (Phase G)
 
 
@@ -148,6 +191,8 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Repository Documentation
 
+- [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
+- [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
 - [Roadmap](Roadmap.md) — Development plan
 - [INSTALL.md](INSTALL.md) — Build instructions
@@ -173,4 +218,3 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 ## 📄 License
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.
->>>>>>> origin/jules-14101877193021869698-2d1e023c
