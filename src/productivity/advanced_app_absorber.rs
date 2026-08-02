@@ -2,8 +2,11 @@
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use crate::klib::HashMap;
-use crate::klib::VecDeque;
+use std::collections::{HashMap, VecDeque};
+use std::path::{Path, PathBuf};
+
+// =========================================================================
+// 1. FLAMESHOT & SHAREX PARITY: ADVANCED SCREENSHOT ENGINE
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

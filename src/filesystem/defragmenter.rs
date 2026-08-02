@@ -3,7 +3,7 @@
 // File fragmentation analysis, contiguous cluster relocation, free space consolidation,
 // S.M.A.R.T. thermal validation, and an interactive colored-block cluster map representation.
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// Represents the state of a single sector/cluster on disk (Defraggler standard)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -124,9 +124,7 @@ impl DiskDefragmenter {
     pub fn defragment_files(&mut self) -> Result<usize, &'static str> {
         // S.M.A.R.T. safety guard: prevent defragmentation if disk is running too hot (above 55C)
         if self.temperature_c > 55.0 {
-            return Err(
-                "Defragmentation aborted: Disk temperature is too high for safe write cycles!",
-            );
+            return Err("Defragmentation aborted: Disk temperature is too high for safe write cycles!");
         }
 
         let mut relocated_files_count = 0;

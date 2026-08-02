@@ -2,7 +2,7 @@
 // Enables on-kernel compiler and toolchain bootstrapping to build/link
 // native development tooling, making the operating system fully self-hosting.
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Error types thrown during compilation and toolchain initialization

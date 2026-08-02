@@ -2,28 +2,17 @@
 // S-AI engine, agents, orchestrator, and local inference
 
 pub mod agent;
-pub mod apm;
 pub mod autogen;
-pub mod lift_engine;
 pub mod llm;
 pub mod orchestrator;
 pub mod sai;
 pub mod system;
 pub mod voice;
-pub mod wiki;
+pub mod lift_engine;
 
-pub use lift_engine::{
-    Citation, DocumentExtractor, ExtractionResult, ExtractionSchema, FieldType, LiftError,
-};
+pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
 
-pub use agent::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
-    ManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
-};
-pub use apm::{
-    ApmDependency, ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, McpServer,
-    SovereignApmEngine,
-};
+pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,
@@ -47,4 +36,3 @@ pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
 };
-pub use wiki::{SovereignWikiEngine, WikiArticle};
