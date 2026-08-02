@@ -53,16 +53,16 @@ impl PackageDependencyResolver {
         visited: &mut [&'static str; 16],
         idx: &mut usize,
     ) -> bool {
-        // Cycle detected
-        if visited[..*idx].contains(&name) {
-            return false;
-        }
-
         // Add to visited
         if *idx < 16 {
             visited[*idx] = name;
             *idx += 1;
         } else {
+            return false;
+        }
+
+        // Cycle detected
+        if visited[..*idx].contains(&name) {
             return false;
         }
 

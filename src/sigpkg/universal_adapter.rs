@@ -299,14 +299,14 @@ impl PackageFormatAdapter for ApkAdapter {
         let mut dependencies = Vec::new();
 
         for line in content.lines() {
-            if line.starts_with("P:") {
-                name = line[2..].to_string();
-            } else if line.starts_with("V:") {
-                version_str = line[2..].to_string();
-            } else if line.starts_with("T:") {
-                description = line[2..].to_string();
-            } else if line.starts_with("D:") {
-                let deps_str = line[2..].to_string();
+            if let Some(rest) = line.strip_prefix("P:") {
+                name = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("V:") {
+                version_str = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("T:") {
+                description = rest.to_string();
+            } else if let Some(rest) = line.strip_prefix("D:") {
+                let deps_str = rest.to_string();
                 for dep in deps_str.split_whitespace() {
                     dependencies.push(Dependency { name: dep.to_string(), version_constraint: VersionConstraint::Any });
                 }
