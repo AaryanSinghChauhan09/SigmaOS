@@ -11,12 +11,15 @@ pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
 pub mod breakthroughs;
+pub mod ipc;
+pub mod linux_absorb;
+pub mod subsystem;
 
-pub use boot::firmware::{
+pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
 };
 pub use bus::{Bus, PciBus, UsableBus};
-pub use container::runtime::{
+pub use crate::container::runtime::oci::{
     Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
     ResourceConfig, Runtime,
 };
@@ -27,7 +30,7 @@ pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
     AbsorbedTcpStack, AbsorbedUsbHidDriver, AbsorptionError, AbsorptionStatus, ConversionRule,
     ConversionRuleType, LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy,
-    SecurityRestriction,
+    SecurityRestriction, ModuleLoadError, KernelModule, LkmLoader, KpatchPatch, KpatchManager,
 };
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};

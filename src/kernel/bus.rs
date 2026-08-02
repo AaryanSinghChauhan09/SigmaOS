@@ -5,7 +5,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-use crate::kernel::object::{KRef, KernelObject};
+use crate::kernel::object::{KRef, KernelObject, KObject};
 use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,7 +55,7 @@ pub trait Bus: KernelObject + Send + Sync {
 }
 
 pub struct PciBus {
-    base: super::KObject,
+    base: KObject,
     devices: Vec<Box<dyn DeviceDriver>>,
     drivers: Vec<Box<dyn DeviceDriver>>,
     capability: CapabilityToken,
@@ -64,7 +64,7 @@ pub struct PciBus {
 impl PciBus {
     pub fn new() -> Self {
         PciBus {
-            base: super::KObject::new("pci"),
+            base: KObject::new("pci"),
             devices: Vec::new(),
             drivers: Vec::new(),
             capability: CapabilityToken::new(),
