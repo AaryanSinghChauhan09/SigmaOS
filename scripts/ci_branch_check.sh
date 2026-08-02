@@ -19,9 +19,9 @@ echo "Active target branch: ${BRANCH:-unknown}"
 
 # Verify presence of core strategic files
 REQUIRED_FILES=(
-    "FUTURE-DEVELOPMENT-ROADMAP.md"
-    "wiki/README.md"
-    "wiki/CHANGELOG.md"
+    "FUTURE-DEVELOPMENT-ROADMAP-origin.txt"
+    "Cargo.toml"
+    "Makefile"
 )
 
 for file in "${REQUIRED_FILES[@]}"; do
