@@ -62,7 +62,7 @@ impl PackageDependencyResolver {
         }
 
         // Cycle detected
-        if visited[..*idx].contains(&name) {
+        if visited.iter().take(*idx).any(|&n| n == name) {
             return false;
         }
 
@@ -78,7 +78,7 @@ impl PackageDependencyResolver {
     }
 
     fn find_recipe(&self, name: &'static str) -> Option<&PackageRecipe> {
-        self.registry.iter().find_map(|opt| opt.as_ref()).find(|r| r.name == name)
+        self.registry.iter().flatten().find(|r| r.name == name)
     }
 }
 
