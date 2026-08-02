@@ -106,12 +106,10 @@ impl AppSandboxEngine {
     /// Verifies socket creation requests
     pub fn validate_network_socket(&self, is_raw: bool) -> bool {
         let policy = self.current_policy.get();
-        if is_raw && !policy.allow_raw_sockets {
-            false
-        } else if !is_raw && !policy.allow_network {
-            false
+        if is_raw {
+            policy.allow_raw_sockets
         } else {
-            true
+            policy.allow_network
         }
     }
 

@@ -96,8 +96,8 @@ impl DocumentExtractor {
             return Err(LiftError::ExtractionFailed);
         }
 
-        let mut extracted_values = HashMap::new();
-        let mut list_values = HashMap::new();
+        let mut extracted_values: HashMap<String, String> = HashMap::new();
+        let mut list_values: HashMap<String, Vec<String>> = HashMap::new();
         let mut citations = Vec::new();
 
         // Simulated high-performance OCR / Vision parsing
