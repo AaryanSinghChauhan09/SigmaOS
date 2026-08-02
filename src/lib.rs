@@ -1,6 +1,8 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+extern crate alloc;
+
 pub mod klib;
 pub mod accessibility;
 pub mod ai;
@@ -15,8 +17,8 @@ pub mod drivers;
 pub mod filesystem;
 pub mod gpu;
 pub mod graphics;
+pub mod init;
 pub mod kernel;
-pub mod klib;
 pub mod media;
 pub mod network;
 pub mod observability;
@@ -41,7 +43,7 @@ pub use accessibility::{
 };
 pub use ai::{
     AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
-    ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    Pattern, SimpleAIAgent, SimpleAIAgentManager,
     SovereignWikiEngine, WikiArticle, ApmDependency, ApmLockfile, ApmManifest, ApmPolicy,
     ApmStatus, DependencySource, McpServer, SovereignApmEngine,
 };
@@ -51,6 +53,9 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
+    ArchInitSystem, ArchFirewall, LsmSentinel, PamGate, TmuxMultiplexer,
+    ProcFile, ProcFileType, DevFile, DevFileType, PacmanEngine, ArchPackage,
+    SovereignEnvRegistry,
     ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
     CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
     CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
@@ -95,6 +100,11 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+pub use init::{
+    InitError as InitSystemError, Service as InitService, ServiceState as InitServiceState,
+    SigmaInit, SimpleService as InitSimpleService, SystemdEngine, SystemdUnit,
+    UnitState as SystemdUnitState, UnitType as SystemdUnitType,
+};
 pub use kernel::{
     ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
     InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
@@ -113,6 +123,7 @@ pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
 };
+pub use core::ops::Deref;
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -131,8 +142,8 @@ pub use productivity::{
 };
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    RemoteSession as _, RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
+    SigmaRendezvous, SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
 };
 pub use resilience::{

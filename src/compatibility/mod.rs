@@ -7,6 +7,7 @@ pub mod legacy_adapters;
 pub mod linux_security;
 pub mod standards;
 pub mod overtake;
+pub mod arch_linux;
 
 pub use constellation_mesh::{
     BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
@@ -49,6 +50,12 @@ pub use overtake::{
     ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
     DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
     LizardInstaller, CoasAdminSuite,
+};
+
+pub use arch_linux::{
+    ArchInitSystem, ArchFirewall, LsmSentinel, PamGate, TmuxMultiplexer,
+    ProcFile, ProcFileType, DevFile, DevFileType, PacmanEngine, ArchPackage,
+    SovereignEnvRegistry,
 };
 
 pub use historic_linux::{
