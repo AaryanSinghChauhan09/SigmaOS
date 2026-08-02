@@ -11,5 +11,6 @@ pub use linux_translation::{
 pub use store::{SigmaSoftwareStore, StoreApp, StoreError};
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    PackageSource, UnifiedPackage, UniversalPackageManager, SovereignTabFm, TabularSchema,
+    TabularRow, TabularDataset, FeatureType,
 };
