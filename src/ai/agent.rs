@@ -4,10 +4,10 @@
 // Based on Roadmap Item 81: SigmaAI core agent
 
 extern crate alloc;
-use alloc::vec::Vec;
+use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
@@ -82,6 +82,26 @@ impl AgentCapability {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct AgentInfo {
+    pub name: String,
+    pub capabilities: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ManagerCapability {
+    pub value: u64,
+}
+
+impl ManagerCapability {
+    pub fn full() -> Self {
+        ManagerCapability { value: !0 }
+    }
+    pub fn none() -> Self {
+        ManagerCapability { value: 0 }
+    }
+}
+
 /// Simple AI agent (OOP: Concrete agent class)
 pub struct SimpleAIAgent {
     pub name: String,
@@ -135,7 +155,9 @@ impl SimpleAIAgent {
     pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
         let mut name_str = String::new();
         for &byte in name {
-            if byte == 0 { break; }
+            if byte == 0 {
+                break;
+            }
             let c: char = byte as char;
             name_str.push(c);
         }
@@ -218,7 +240,9 @@ impl SimpleAIAgent {
         }
 
         // WiFi connection checks
-        if self.contains_bytes(input, b"connect") && (self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi")) {
+        if self.contains_bytes(input, b"connect")
+            && (self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi"))
+        {
             let mut out = Vec::new();
             for &b in b"sigma-wifi connect --ssid Home" {
                 out.push(b);
@@ -398,7 +422,10 @@ mod tests {
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
         let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        agent.register_mcp_tool("fetch_weather".to_string(), "MCP weather fetcher".to_string());
+        agent.register_mcp_tool(
+            "fetch_weather".to_string(),
+            "MCP weather fetcher".to_string(),
+        );
         assert_eq!(agent.mcp_tools.len(), 1);
 
         let opt_score = agent.optimize_prompt_weights();

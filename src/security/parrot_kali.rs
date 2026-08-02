@@ -155,7 +155,9 @@ impl ForensicStorageFilter {
     pub fn secure_memory_wipe(&self, target_buffer: &mut [u8]) {
         for byte in target_buffer.iter_mut() {
             // Write volatile zero states safely
-            unsafe { core::ptr::write_volatile(byte, 0x00); }
+            unsafe {
+                core::ptr::write_volatile(byte, 0x00);
+            }
         }
     }
 }
@@ -214,7 +216,7 @@ mod tests {
 
         // Validate standard and raw network sockets
         assert!(!engine.validate_network_socket(false)); // Standard socket is disabled
-        assert!(!engine.validate_network_socket(true));  // Raw socket is disabled
+        assert!(!engine.validate_network_socket(true)); // Raw socket is disabled
 
         // Update policy to allow standard network access
         engine.current_policy.set(SandboxPolicy {
