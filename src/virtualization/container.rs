@@ -137,6 +137,7 @@ pub struct DockerRuntime {
 }
 
 impl DockerRuntime {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             containers: HashMap::new(),
@@ -306,6 +307,7 @@ pub struct PodmanRuntime {
 }
 
 impl PodmanRuntime {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             containers: HashMap::new(),
