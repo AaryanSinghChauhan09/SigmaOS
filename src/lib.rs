@@ -85,7 +85,8 @@ pub use orchestration::{
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    PackageSource, UnifiedPackage, UniversalPackageManager, SovereignTabFm, TabularSchema,
+    TabularRow, TabularDataset, FeatureType,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,

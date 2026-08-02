@@ -130,7 +130,7 @@ mod tests {
         map.insert(1, "a");
         map.insert(3, "c");
         map.insert(2, "b");
-
+        
         assert_eq!(map.get(&1), Some(&"a"));
         assert_eq!(map.get(&2), Some(&"b"));
         assert_eq!(map.get(&3), Some(&"c"));
@@ -150,8 +150,11 @@ mod tests {
         map.insert(3, "c");
         map.insert(1, "a");
         map.insert(2, "b");
-
-        let items: std::vec::Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
+        
+        let mut items = std::vec::Vec::new();
+        for (&k, &v) in map.iter() {
+            items.push((k, v));
+        }
         assert_eq!(items, vec![(1, "a"), (2, "b"), (3, "c")]);
     }
 }
