@@ -8,6 +8,7 @@ pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
 pub mod verifier;
+pub mod importer;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
@@ -18,6 +19,7 @@ pub use universal_adapter::{
     AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
 };
 pub use verifier::CryptoVerifier;
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

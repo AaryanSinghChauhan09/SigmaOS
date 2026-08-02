@@ -72,6 +72,7 @@ log_info "Active target branch: ${BRANCH:-unknown}"
 # (Local wiki/ directory has been migrated to GitHub wiki; roadmap exists as -origin.txt)
 REQUIRED_FILES=(
     "FUTURE-DEVELOPMENT-ROADMAP-origin.txt"
+    "FUTURE-DEVELOPMENT-ROADMAP.md"
     "Cargo.toml"
     "Makefile"
 )

@@ -6,7 +6,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type DriverID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DriverType {
     Block = 0,
     Char = 1,
@@ -154,12 +154,6 @@ impl DriverFramework for SimpleDriverFramework {
             }
         }
         None
-    }
-}
-
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
