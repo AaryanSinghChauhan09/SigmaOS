@@ -191,7 +191,7 @@ mod tests {
         deque.push_back(2);
         deque.push_front(0);
 
-        let items: std::vec::Vec<i32> = deque.iter().cloned().collect();
+        let items: Vec<i32> = deque.iter().cloned().collect();
         assert_eq!(items, vec![0, 1, 2]);
     }
 }

@@ -23,7 +23,7 @@ Welcome to the definitive status, diagnostics, and algorithmic remediation guide
    - [Gap B: ACPI/MADT Parser & APIC Multicore Redirection](#gap-b-acpimadt-parser--apic-multicore-redirection)
    - [Gap C: PCI/USB Hotplug & Dynamic Driver Registries](#gap-c-pciusb-hotplug--dynamic-driver-registries)
 5. [Mint Linux Parity Subsystems & Emulation Architectures](#5-mint-linux-parity-subsystems--emulation-architectures)
-6. [Advanced Process Lifecycle and Virtual `/proc` Filesystems](#6-advanced-process-lifecycle-and-virtual-proc-filesystems)
+6. [Advanced Process Lifecycle, Virtual `/proc` FS, and SIGTERM Escalations](#6-advanced-process-lifecycle-virtual-proc-fs-and-sigterm-escalations)
 7. [AI Agent Verification & Diagnostic Execution Pipeline](#7-ai-agent-verification--diagnostic-execution-pipeline)
 
 ---
@@ -153,12 +153,15 @@ To deliver an incredibly polished user interface alongside friendly system manag
 
 ---
 
-## 6. Advanced Process Lifecycle and Virtual `/proc` Filesystems
+## 6. Advanced Process Lifecycle, Virtual `/proc` FS, and SIGTERM Escalations
 
 SigmaOS implements highly robust process lifecycles and virtual memory queries, absorbing the standards of modern Linux distributions:
 
 1. **Enhanced `Process` PCBs**: Emulates key distro fields (parent process ID, session ID, process group ID, active threads count, and virtual/resident memory sizing metrics).
 2. **Virtual `/proc` Telemetry**: Supports on-demand queries of dynamic in-memory files at `/proc/[pid]/status`, `/proc/[pid]/cmdline`, and `/proc/[pid]/stat`. This lets local diagnostic utilities (like `ps`, `top`, and `htop` wrappers) natively inspect running processes warning-free.
+3. **Upgraded `SIGTERM` & Group Signal Propagation**:
+   - Implements PGID-based (Process Group ID) signal propagation so that executing `propagate_group_signal` dispatches `SIGTERM` gracefully to all processes in a pipeline/session group, preventing orphan leaks.
+   - Embeds an active `escalate_sigterm_to_sigkill` watchdog inside `SignalManager`. If a process remains active after receiving a graceful `SIGTERM` request, the watchdog escalates the action to `SIGKILL`, matching the exact behaviour of Linux systemd/sysvinit processes reaping.
 
 ---
 
