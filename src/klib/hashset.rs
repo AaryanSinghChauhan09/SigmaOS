@@ -1,18 +1,18 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::HashMap;
+use super::{hashmap::HashMapIter, HashMap};
 
 pub struct HashSet<T>
 where
-    T: PartialEq + Clone,
+    T: PartialEq + Clone + core::hash::Hash,
 {
     map: HashMap<T, ()>,
 }
 
 impl<T> HashSet<T>
 where
-    T: PartialEq + Clone,
+    T: PartialEq + Clone + core::hash::Hash,
 {
     pub fn new() -> Self {
         HashSet {
@@ -57,20 +57,23 @@ where
 
 impl<T> Default for HashSet<T>
 where
-    T: PartialEq + Clone,
+    T: PartialEq + Clone + core::hash::Hash,
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-pub struct HashSetIter<'a, T> {
+pub struct HashSetIter<'a, T>
+where
+    T: PartialEq + Clone + core::hash::Hash + 'a,
+{
     map_iter: HashMapIter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>
 where
-    T: PartialEq + Clone,
+    T: PartialEq + Clone + core::hash::Hash + 'a,
 {
     type Item = &'a T;
 
@@ -88,7 +91,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         set.insert(2);
-        
+
         assert!(set.contains(&1));
         assert!(set.contains(&2));
         assert!(!set.contains(&3));
@@ -107,7 +110,7 @@ mod tests {
         let mut set = HashSet::new();
         set.insert(1);
         set.insert(2);
-        
+
         let items: Vec<i32> = set.iter().cloned().collect();
         assert_eq!(items.len(), 2);
     }

@@ -776,10 +776,30 @@ impl AkabeiPackageEngine {
     pub fn register_bundle(&self, _bundle: AkabeiBundle) {}
     pub fn get_registered_bundles(&self) -> [AkabeiBundle; 4] {
         [
-            AkabeiBundle { name: "test", version: "1.0", bundle_type: BundleType::CoreQt, is_isolated: false },
-            AkabeiBundle { name: "test2", version: "2.0", bundle_type: BundleType::ExtraGtkBundle, is_isolated: false },
-            AkabeiBundle { name: "test3", version: "3.0", bundle_type: BundleType::CoreQt, is_isolated: false },
-            AkabeiBundle { name: "test4", version: "4.0", bundle_type: BundleType::CoreQt, is_isolated: false },
+            AkabeiBundle {
+                name: "test",
+                version: "1.0",
+                bundle_type: BundleType::CoreQt,
+                is_isolated: false,
+            },
+            AkabeiBundle {
+                name: "test2",
+                version: "2.0",
+                bundle_type: BundleType::ExtraGtkBundle,
+                is_isolated: false,
+            },
+            AkabeiBundle {
+                name: "test3",
+                version: "3.0",
+                bundle_type: BundleType::CoreQt,
+                is_isolated: false,
+            },
+            AkabeiBundle {
+                name: "test4",
+                version: "4.0",
+                bundle_type: BundleType::CoreQt,
+                is_isolated: false,
+            },
         ]
     }
     pub fn resolve_and_sandbox(&self, name: &str) -> bool {
@@ -843,8 +863,12 @@ impl AntixInitManager {
     pub fn new() -> Self {
         Self {
             services: [
-                MicroService { state: core::cell::Cell::new(MicroServiceState::Stopped) },
-                MicroService { state: core::cell::Cell::new(MicroServiceState::Stopped) },
+                MicroService {
+                    state: core::cell::Cell::new(MicroServiceState::Stopped),
+                },
+                MicroService {
+                    state: core::cell::Cell::new(MicroServiceState::Stopped),
+                },
             ],
         }
     }
