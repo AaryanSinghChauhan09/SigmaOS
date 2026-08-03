@@ -103,6 +103,16 @@ impl ProcessMemoryMap {
     }
 }
 
+/// Process signals (standard Linux-style asynchronous notifications)
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessSignal {
+    SigKill = 9,
+    SigTerm = 15,
+    SigStop = 19,
+    SigCont = 18,
+}
+
 /// Process control block
 #[repr(C)]
 pub struct Process {
@@ -114,6 +124,7 @@ pub struct Process {
     pub memory_map: ProcessMemoryMap,
     pub capability: ProcessCapability,
     pub thread_count: AtomicUsize,
+    pub pending_signals: AtomicUsize, // bitmask representation of pending signals
 }
 
 impl Process {
@@ -127,6 +138,7 @@ impl Process {
             memory_map: ProcessMemoryMap::new(),
             capability,
             thread_count: AtomicUsize::new(0),
+            pending_signals: AtomicUsize::new(0),
         }
     }
 
@@ -158,6 +170,62 @@ impl Process {
 
     pub fn get_thread_count(&self) -> usize {
         self.thread_count.load(Ordering::SeqCst)
+    }
+
+    /// Queues an asynchronous signal to this process
+    pub fn send_signal(&self, signal: ProcessSignal) {
+        let bit = 1 << (signal as usize);
+        self.pending_signals.fetch_or(bit, Ordering::SeqCst);
+    }
+
+    /// Checks if a signal is pending, and clears it if found (simulated dequeue)
+    pub fn consume_pending_signal(&self, signal: ProcessSignal) -> bool {
+        let bit = 1 << (signal as usize);
+        let mask = self.pending_signals.load(Ordering::SeqCst);
+        if (mask & bit) != 0 {
+            self.pending_signals.fetch_and(!bit, Ordering::SeqCst);
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// Supervised Service Target (runit/dinit style)
+/// Keeps processes grouped under auto-respawning system supervision
+pub struct SupervisedServiceTarget {
+    pub target_pid: ProcessID,
+    pub is_enabled: bool,
+    pub auto_respawn_triggered: bool,
+    pub restart_count: usize,
+}
+
+impl SupervisedServiceTarget {
+    pub fn new(pid: ProcessID) -> Self {
+        SupervisedServiceTarget {
+            target_pid: pid,
+            is_enabled: true,
+            auto_respawn_triggered: false,
+            restart_count: 0,
+        }
+    }
+
+    /// Verifies running state of process, and auto-respawns (cloning process) if Zombie/Terminated
+    pub unsafe fn monitor_and_supervise(&mut self, process: &Process) -> bool {
+        if !self.is_enabled {
+            return false;
+        }
+        let state = process.get_state();
+        match state {
+            ProcessState::Terminated | ProcessState::Zombie => {
+                // Auto-respawn trigger
+                process.set_state(ProcessState::Running);
+                self.auto_respawn_triggered = true;
+                self.restart_count += 1;
+                true
+            }
+            _ => false,
+        }
     }
 }
 
