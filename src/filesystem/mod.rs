@@ -6,6 +6,7 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
+pub mod cow_snapshot;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -25,3 +26,6 @@ pub use support::{
     Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem, SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use cow_snapshot::{
+    CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+};

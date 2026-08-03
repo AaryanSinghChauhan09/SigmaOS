@@ -1,6 +1,7 @@
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
 /// MintBackup, MintUpdate, MintInstall, and MintReport.
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -78,7 +79,7 @@ impl MintUpdateManager {
         self.pending_updates.push(update);
     }
 
-    pub fn auto_select_fastest_mirror(&mut self, mirrors: &[(&[u8], usize)]) {
+    pub fn auto_select_fastest_mirror(&mut self, mirrors: &[( &[u8], usize )]) {
         let mut best_speed = 9999;
         for &(_, speed) in mirrors {
             if speed < best_speed {
@@ -237,6 +238,7 @@ impl MintReportSystem {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -244,15 +246,17 @@ mod tests {
     #[test]
     fn test_mint_update_manager() {
         let mut manager = MintUpdateManager::new();
-        let pkg =
-            MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe);
+        let pkg = MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe);
         manager.add_update(pkg);
 
         assert_eq!(manager.pending_updates.len(), 1);
         assert_eq!(manager.pending_updates[0].safety_score, 99);
 
         // Fast mirror selection
-        manager.auto_select_fastest_mirror(&[(b"us-mirror", 45), (b"eu-mirror", 120)]);
+        manager.auto_select_fastest_mirror(&[
+            (b"us-mirror", 45),
+            (b"eu-mirror", 120),
+        ]);
         assert_eq!(manager.selected_mirror_speed_ms, 45);
 
         // Hot swap active kernel version
@@ -281,9 +285,6 @@ mod tests {
         let mut report = MintReportSystem::new();
         report.register_crash_alert(b"launcher");
         assert_eq!(report.active_alerts.len(), 1);
-        assert_eq!(
-            report.active_alerts[0].severity,
-            MintReportAlertSeverity::Critical
-        );
+        assert_eq!(report.active_alerts[0].severity, MintReportAlertSeverity::Critical);
     }
 }

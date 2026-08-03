@@ -1,24 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
+
 use crate::klib::Vec;
 
 #[derive(Debug, Clone)]
@@ -175,10 +158,7 @@ pub struct EchoEffect {
 
 impl EchoEffect {
     pub fn new(delay_samples: usize, decay: f32) -> Self {
-        EchoEffect {
-            delay_samples,
-            decay,
-        }
+        EchoEffect { delay_samples, decay }
     }
 }
 
@@ -204,9 +184,7 @@ pub struct LowPassFilter {
 
 impl LowPassFilter {
     pub fn new(cutoff_factor: f32) -> Self {
-        LowPassFilter {
-            cutoff_factor: cutoff_factor.clamp(0.0, 1.0),
-        }
+        LowPassFilter { cutoff_factor: cutoff_factor.clamp(0.0, 1.0) }
     }
 }
 
@@ -353,7 +331,8 @@ mod tests {
             .with_samples(&[0.5, 0.5, 0.5])
             .with_volume(1.2); // linear amplification
 
-        let track2 = AudioTrack::new(2, "Backing").with_samples(&[0.2, -0.2, 0.2]);
+        let track2 = AudioTrack::new(2, "Backing")
+            .with_samples(&[0.2, -0.2, 0.2]);
 
         session.add_track(track1);
         session.add_track(track2);

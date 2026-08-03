@@ -1,25 +1,19 @@
-use crate::klib::Vec;
 /// OOP-based Screen Reader for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 816
 /// Implements text-to-speech and accessibility
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type VoiceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VoiceGender {
-    Male = 0,
-    Female = 1,
-    Neutral = 2,
-}
+pub enum VoiceGender { Male = 0, Female = 1, Neutral = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AccessibilityError {
-    Success = 0,
-    NotFound = 1,
-}
+pub enum AccessibilityError { Success = 0, NotFound = 1 }
 
 pub trait Voice {
     fn id(&self) -> VoiceID;
@@ -54,9 +48,7 @@ impl SimpleVoice {
 }
 
 impl Voice for SimpleVoice {
-    fn id(&self) -> VoiceID {
-        self.id
-    }
+    fn id(&self) -> VoiceID { self.id }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -68,10 +60,8 @@ impl Voice for SimpleVoice {
             _ => VoiceGender::Neutral,
         }
     }
-    fn rate(&self) -> f32 {
-        (self.rate.load(Ordering::SeqCst) as f32) / 100.0
-    }
-
+    fn rate(&self) -> f32 { (self.rate.load(Ordering::SeqCst) as f32) / 100.0 }
+    
     fn set_rate(&mut self, rate: f32) {
         self.rate.store((rate * 100.0) as usize, Ordering::SeqCst);
     }
@@ -109,15 +99,15 @@ impl ScreenReader for SimpleScreenReader {
             Err(AccessibilityError::NotFound)
         }
     }
-
+    
     fn stop(&mut self) {
         self.speaking.store(0, Ordering::SeqCst);
     }
-
+    
     fn pause(&mut self) {
         self.speaking.store(2, Ordering::SeqCst);
     }
-
+    
     fn resume(&mut self) {
         self.speaking.store(1, Ordering::SeqCst);
     }
@@ -127,9 +117,7 @@ impl SimpleScreenReader {
     pub fn get_voice(&self, id: VoiceID) -> Option<&dyn Voice> {
         for voice_option in &self.voices {
             if let Some(ref voice) = *voice_option {
-                if voice.id() == id {
-                    return Some(voice.as_ref());
-                }
+                if voice.id() == id { return Some(voice.as_ref()); }
             }
         }
         None
@@ -152,7 +140,9 @@ pub struct SimpleBrailleDisplay {
 
 impl SimpleBrailleDisplay {
     pub fn new() -> Self {
-        SimpleBrailleDisplay { cells: [0u8; 40] }
+        SimpleBrailleDisplay {
+            cells: [0u8; 40],
+        }
     }
 }
 
@@ -162,10 +152,8 @@ impl BrailleDisplay for SimpleBrailleDisplay {
             self.cells[i] = cells[i];
         }
     }
-
-    fn get_cells(&self) -> &[u8] {
-        &self.cells
-    }
+    
+    fn get_cells(&self) -> &[u8] { &self.cells }
 }
 
 #[cfg(test)]
@@ -181,10 +169,7 @@ mod tests {
         assert!(reader.get_voice(42).is_some());
         assert_eq!(reader.get_voice(42).unwrap().gender(), VoiceGender::Female);
         assert_eq!(reader.speak(b"Hello", 42), Ok(()));
-        assert_eq!(
-            reader.speak(b"Hello", 999),
-            Err(AccessibilityError::NotFound)
-        );
+        assert_eq!(reader.speak(b"Hello", 999), Err(AccessibilityError::NotFound));
     }
 
     #[test]

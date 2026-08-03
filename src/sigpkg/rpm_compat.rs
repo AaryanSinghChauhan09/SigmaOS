@@ -1,24 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 /// RedHat/Fedora SPEC & RPM Compatibility Translation Engine
 /// Translates .spec dependencies, validates GPG package provenance,
 /// and converts RPM archives to natively installable sigpkgs.
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type PackageID = usize;
@@ -88,12 +71,7 @@ impl RpmPackageTranslator {
         }
 
         let mut output_pkg = [0u8; 64];
-        let name_len = self
-            .spec_meta
-            .name
-            .iter()
-            .position(|&b| b == 0)
-            .unwrap_or(32);
+        let name_len = self.spec_meta.name.iter().position(|&b| b == 0).unwrap_or(32);
         output_pkg[..name_len].copy_from_slice(&self.spec_meta.name[..name_len]);
 
         let compat_suffix = b"-converted-sigpkg";
@@ -105,14 +83,14 @@ impl RpmPackageTranslator {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_rpm_spec_translation() {
-        let mut translator =
-            RpmPackageTranslator::new(b"kernel-core", b"6.5.6", PackageSourceFormat::Rpm);
+        let mut translator = RpmPackageTranslator::new(b"kernel-core", b"6.5.6", PackageSourceFormat::Rpm);
 
         // Assert unsigned fails translation
         assert!(translator.translate_to_sigpkg().is_err());

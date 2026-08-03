@@ -1,27 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 /// Sovereign Productivity, Diagnostics, & Creative Suite (SovereignSuite) for SigmaOS
 /// Absorbs, standardizes, and unifies core principles, utilities, and functions from:
 /// Joplin (E2EE Markdown notes), Nextcloud (file sync metadata), LibreOffice (Spreadsheet cell formulas),
 /// Darktable & GIMP (layer composition, non-destructive exposure filters), Kdenlive (timeline slice),
 /// Jellyfin (metadata streaming), PowerToys (FancyZones tiling), Everything (instant path indexer),
 /// and the Sysinternals Suite (Procexp handle tracking, Procmon transaction sniffer).
+
 use crate::klib::Vec;
 
 // =========================================================================
@@ -32,7 +15,6 @@ pub struct EverySearch {
 }
 
 impl EverySearch {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EverySearch { index: Vec::new() }
     }
@@ -73,7 +55,6 @@ pub struct ProcessExplorerState {
 pub struct SysDiag;
 
 impl SysDiag {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SysDiag
     }
@@ -104,17 +85,13 @@ pub struct ProcMonitor {
 }
 
 impl ProcMonitor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ProcMonitor { logs: Vec::new() }
     }
 
     /// Sniffs and logs raw files/registry/socket transactions in real-time (Procmon-grade)
     pub fn log_transaction(&mut self, event_type: &str, target: &str, value: &str) {
-        self.logs.push(format!(
-            "[PROCMON] [{}] Target: '{}' -> Value: '{}'",
-            event_type, target, value
-        ));
+        self.logs.push(format!("[PROCMON] [{}] Target: '{}' -> Value: '{}'", event_type, target, value));
     }
 }
 
@@ -137,7 +114,6 @@ pub struct ImageLayer {
 pub struct CreativeMatrix;
 
 impl CreativeMatrix {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         CreativeMatrix
     }
@@ -191,7 +167,6 @@ pub struct FancyZonesManager {
 }
 
 impl FancyZonesManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         FancyZonesManager { zones: Vec::new() }
     }
@@ -200,35 +175,15 @@ impl FancyZonesManager {
     pub fn setup_vertical_split_layout(&mut self, screen_width: u32, screen_height: u32) {
         self.zones = Vec::new();
         let col_width = screen_width / 3;
-        self.zones.push(LayoutZone {
-            x: 0,
-            y: 0,
-            width: col_width,
-            height: screen_height,
-        });
-        self.zones.push(LayoutZone {
-            x: col_width,
-            y: 0,
-            width: col_width,
-            height: screen_height,
-        });
-        self.zones.push(LayoutZone {
-            x: col_width * 2,
-            y: 0,
-            width: col_width,
-            height: screen_height,
-        });
+        self.zones.push(LayoutZone { x: 0, y: 0, width: col_width, height: screen_height });
+        self.zones.push(LayoutZone { x: col_width, y: 0, width: col_width, height: screen_height });
+        self.zones.push(LayoutZone { x: col_width * 2, y: 0, width: col_width, height: screen_height });
     }
 
     /// Snaps a window into the nearest FancyZone boundary
     pub fn snap_window(&self, window_width: u32, window_height: u32) -> LayoutZone {
         if self.zones.is_empty() {
-            return LayoutZone {
-                x: 0,
-                y: 0,
-                width: window_width,
-                height: window_height,
-            };
+            return LayoutZone { x: 0, y: 0, width: window_width, height: window_height };
         }
         // Snap to middle zone
         let mid_idx = self.zones.len() / 2;
@@ -250,11 +205,8 @@ pub struct JoplinE2ee {
 }
 
 impl JoplinE2ee {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        JoplinE2ee {
-            notebooks: Vec::new(),
-        }
+        JoplinE2ee { notebooks: Vec::new() }
     }
 
     /// Client-side secure E2EE note packaging using XOR encryption stream masking

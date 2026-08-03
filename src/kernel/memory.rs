@@ -9,7 +9,7 @@ use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 pub const PAGE_SIZE: usize = 4096;
 
 /// Memory block
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
@@ -63,6 +63,22 @@ impl BuddyAllocator {
                 self.free_lists[order].push(block);
             }
         }
+    }
+
+    /// Create a checkpoint of the allocator's current free list state (Phase 1.1)
+    pub fn create_checkpoint(&self) -> [Vec<MemoryBlock>; 12] {
+        let mut checkpoint: [Vec<MemoryBlock>; 12] = Default::default();
+        for order in 0..12 {
+            for block in &self.free_lists[order] {
+                checkpoint[order].push(*block);
+            }
+        }
+        checkpoint
+    }
+
+    /// Restore the allocator to a previously checkpointed state to recover from crash exceptions (Phase 1.1)
+    pub fn restore_checkpoint(&mut self, checkpoint: [Vec<MemoryBlock>; 12]) {
+        self.free_lists = checkpoint;
     }
 
     pub fn get_free_memory(&self) -> usize {
@@ -385,5 +401,31 @@ mod tests {
         // For now, just test the interface
         let _result = allocator.allocate(4096);
         // Will fail without actual memory, but tests the flow
+    }
+
+    #[test]
+    fn test_checkpoint_and_state_recovery() {
+        let mut allocator = BuddyAllocator::new();
+        allocator.initialize_memory(0x1000, 4096); // 1 page (order 0)
+        allocator.initialize_memory(0x3000, 8192); // 2 pages (order 1)
+        assert_eq!(allocator.get_free_memory(), 12288);
+
+        // Checkpoint original state
+        let checkpoint = allocator.create_checkpoint();
+
+        // Perform mock allocations which modify state
+        let _block1 = allocator.allocate(4096).unwrap();
+        let _block2 = allocator.allocate(8192).unwrap();
+        assert_eq!(allocator.get_free_memory(), 0);
+
+        // Simulated crash/unwinding: Restore from checkpoint to recover state
+        allocator.restore_checkpoint(checkpoint);
+
+        // State is perfectly restored
+        assert_eq!(allocator.get_free_memory(), 12288);
+
+        // Verify we can allocate the same blocks again successfully
+        let block_retry = allocator.allocate(4096).unwrap();
+        assert_eq!(block_retry.size, 4096);
     }
 }

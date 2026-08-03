@@ -1,7 +1,6 @@
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,
-/// parallel topological service startup, restart policies, environment files,
-/// and instance templates to match modern Linux distributions.
+/// and target states to defeat Fedora's Systemd initialization.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -22,13 +21,6 @@ pub enum UnitState {
     Failed,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RestartPolicy {
-    No,
-    Always,
-    OnFailure,
-}
-
 #[derive(Debug, Clone)]
 pub struct SystemdUnit {
     pub id: UnitID,
@@ -39,15 +31,6 @@ pub struct SystemdUnit {
     pub wants: Vec<UnitID>,
     pub before: Vec<UnitID>,
     pub after: Vec<UnitID>,
-
-    // Linux-inspired additions
-    pub restart_policy: RestartPolicy,
-    pub restart_sec_ms: u64,
-    pub restart_count: usize,
-    pub max_restarts: usize,
-    pub is_template: bool,
-    pub instance_name: [u8; 16],
-    pub env_vars: Vec<([u8; 16], [u8; 32])>, // simulated key-value environment file
 }
 
 impl SystemdUnit {
@@ -64,84 +47,7 @@ impl SystemdUnit {
             wants: Vec::new(),
             before: Vec::new(),
             after: Vec::new(),
-            restart_policy: RestartPolicy::No,
-            restart_sec_ms: 100,
-            restart_count: 0,
-            max_restarts: 3,
-            is_template: false,
-            instance_name: [0u8; 16],
-            env_vars: Vec::new(),
         }
-    }
-
-    /// Instantiate a templated unit (getty@.service -> getty@tty1.service)
-    pub fn instantiate(&self, id: UnitID, instance: &[u8]) -> Self {
-        let mut inst = self.clone();
-        inst.id = id;
-        inst.is_template = false;
-
-        let inst_len = instance.len().min(15);
-        inst.instance_name[..inst_len].copy_from_slice(&instance[..inst_len]);
-
-        // Find index of '@' and build new name
-        let name_len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
-        let mut at_pos = name_len;
-        for i in 0..name_len {
-            if self.name[i] == b'@' {
-                at_pos = i;
-                break;
-            }
-        }
-
-        let mut new_name = [0u8; 32];
-        let mut cursor = 0;
-
-        // Copy before '@' (e.g. "getty")
-        for i in 0..at_pos {
-            new_name[cursor] = self.name[i];
-            cursor += 1;
-        }
-
-        // Copy '@' and instance (e.g. "@tty1")
-        new_name[cursor] = b'@';
-        cursor += 1;
-        for i in 0..inst_len {
-            if cursor < 31 {
-                new_name[cursor] = instance[i];
-                cursor += 1;
-            }
-        }
-
-        // Copy rest after '@' if any in template (e.g. ".service")
-        let ext_start = at_pos + 1;
-        if ext_start < name_len {
-            for i in ext_start..name_len {
-                if cursor < 31 {
-                    new_name[cursor] = self.name[i];
-                    cursor += 1;
-                }
-            }
-        }
-
-        inst.name = new_name;
-        inst
-    }
-
-    /// Set restart policy (systemd Restart=)
-    pub fn with_restart_policy(mut self, policy: RestartPolicy, delay_ms: u64, max_attempts: usize) -> Self {
-        self.restart_policy = policy;
-        self.restart_sec_ms = delay_ms;
-        self.max_restarts = max_attempts;
-        self
-    }
-
-    /// Set environment variable (systemd Environment= or EnvironmentFile=)
-    pub fn with_env_var(&mut self, key: &[u8], val: &[u8]) {
-        let mut key_arr = [0u8; 16];
-        let mut val_arr = [0u8; 32];
-        key_arr[..key.len().min(15)].copy_from_slice(&key[..key.len().min(15)]);
-        val_arr[..val.len().min(31)].copy_from_slice(&val[..val.len().min(31)]);
-        self.env_vars.push((key_arr, val_arr));
     }
 }
 
@@ -168,33 +74,6 @@ impl SystemdEngine {
         self.units.push(unit);
     }
 
-    /// Simulates running the systemd recovery manager on service failure
-    pub fn handle_service_failure(&mut self, id: UnitID) -> Result<UnitState, &'static str> {
-        let mut unit_idx = None;
-        for (i, unit) in self.units.iter().enumerate() {
-            if unit.id == id && unit.unit_type == UnitType::Service {
-                unit_idx = Some(i);
-                break;
-            }
-        }
-
-        let idx = unit_idx.ok_or("Service unit not found")?;
-        self.units[idx].state = UnitState::Failed;
-
-        let policy = self.units[idx].restart_policy;
-        if policy == RestartPolicy::Always || policy == RestartPolicy::OnFailure {
-            if self.units[idx].restart_count < self.units[idx].max_restarts {
-                self.units[idx].restart_count += 1;
-                self.units[idx].state = UnitState::Activating;
-                self.units[idx].state = UnitState::Active;
-                return Ok(UnitState::Active);
-            }
-        }
-
-        Ok(UnitState::Failed)
-    }
-
-    /// Isolates a target: stops unneeded units, activates dependencies
     pub fn isolate_target(&mut self, target_id: UnitID) -> Result<(), &'static str> {
         let mut target_idx = None;
         for (i, unit) in self.units.iter().enumerate() {
@@ -226,67 +105,6 @@ impl SystemdEngine {
         self.units[_idx].state = UnitState::Active;
         self.current_target.store(target_id, Ordering::SeqCst);
         Ok(())
-    }
-
-    /// Parallel startup order: returns chronological execution blocks (topological ordering)
-    /// respects 'Before=' and 'After=' systemd dependency specifications
-    pub fn resolve_parallel_startup_blocks(&self) -> Vec<Vec<UnitID>> {
-        let mut dependency_levels = Vec::new();
-        let mut resolved = Vec::new();
-
-        // Standard Kahn's topological sort level-by-level
-        loop {
-            let mut current_level = Vec::new();
-            for unit in &self.units {
-                if resolved.contains(&unit.id) {
-                    continue;
-                }
-
-                // Check if all units this must run After (after dependency) are resolved
-                let mut can_resolve = true;
-                for &after_id in &unit.after {
-                    if !resolved.contains(&after_id) {
-                        // Check if after_id actually exists in our engine
-                        let mut exists = false;
-                        for u in &self.units {
-                            if u.id == after_id {
-                                exists = true;
-                                break;
-                            }
-                        }
-                        if exists {
-                            can_resolve = false;
-                            break;
-                        }
-                    }
-                }
-
-                // Check if any unresolved unit must run Before this (before dependency)
-                if can_resolve {
-                    for other in &self.units {
-                        if !resolved.contains(&other.id) && other.before.contains(&unit.id) {
-                            can_resolve = false;
-                            break;
-                        }
-                    }
-                }
-
-                if can_resolve {
-                    current_level.push(unit.id);
-                }
-            }
-
-            if current_level.is_empty() {
-                break;
-            }
-
-            for &id in &current_level {
-                resolved.push(id);
-            }
-            dependency_levels.push(current_level);
-        }
-
-        dependency_levels
     }
 
     fn collect_dependencies(&self, unit_id: UnitID, set: &mut Vec<UnitID>) {
@@ -512,78 +330,5 @@ mod tests {
                 assert_eq!(unit.state, UnitState::Inactive);
             }
         }
-    }
-
-    #[test]
-    fn test_systemd_parallel_startup_with_ordering() {
-        let mut engine = SystemdEngine::new();
-
-        // Setup typical systemd dependencies:
-        // network.service -> db.service -> web.service
-        // db.service and logging.service can run in parallel (no order between them)
-        let mut logging = SystemdUnit::new(1, b"logging.service", UnitType::Service);
-
-        let mut network = SystemdUnit::new(2, b"network.service", UnitType::Service);
-
-        let mut db = SystemdUnit::new(3, b"db.service", UnitType::Service);
-        db.after.push(2); // Runs after network
-
-        let mut web = SystemdUnit::new(4, b"web.service", UnitType::Service);
-        web.after.push(3); // Runs after db
-        web.after.push(1); // Runs after logging
-
-        engine.register_unit(logging);
-        engine.register_unit(network);
-        engine.register_unit(db);
-        engine.register_unit(web);
-
-        let levels = engine.resolve_parallel_startup_blocks();
-
-        // Assertions checking level execution hierarchy
-        assert_eq!(levels.len(), 3);
-
-        // Level 1: logging.service (1) and network.service (2) can run in parallel
-        assert!(levels[0].contains(&1));
-        assert!(levels[0].contains(&2));
-
-        // Level 2: db.service (3) runs after network is resolved
-        assert!(levels[1].contains(&3));
-
-        // Level 3: web.service (4) runs after both db and logging are resolved
-        assert_eq!(levels[2][0], 4);
-    }
-
-    #[test]
-    fn test_systemd_restart_policies() {
-        let mut engine = SystemdEngine::new();
-        let service = SystemdUnit::new(1, b"failing.service", UnitType::Service)
-            .with_restart_policy(RestartPolicy::OnFailure, 50, 2);
-        engine.register_unit(service);
-
-        // First failure triggers automatic restart
-        let state1 = engine.handle_service_failure(1).unwrap();
-        assert_eq!(state1, UnitState::Active);
-        assert_eq!(engine.units[0].restart_count, 1);
-
-        // Second failure triggers automatic restart
-        let state2 = engine.handle_service_failure(1).unwrap();
-        assert_eq!(state2, UnitState::Active);
-        assert_eq!(engine.units[0].restart_count, 2);
-
-        // Third failure exceeds max_restarts -> remains Failed
-        let state3 = engine.handle_service_failure(1).unwrap();
-        assert_eq!(state3, UnitState::Failed);
-    }
-
-    #[test]
-    fn test_systemd_template_instantiation() {
-        let template = SystemdUnit::new(10, b"getty@.service", UnitType::Service);
-        assert_eq!(template.id, 10);
-
-        let instance = template.instantiate(11, b"tty1");
-        assert_eq!(instance.id, 11);
-
-        let name_str = std::str::from_utf8(&instance.name).unwrap().trim_end_matches('\0');
-        assert_eq!(name_str, "getty@tty1.service");
     }
 }
