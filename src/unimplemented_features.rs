@@ -6,10 +6,6 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::string::ToString;
-use core::ptr::NonNull;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
@@ -817,7 +813,7 @@ impl SigmaFsCasEngine {
         if data.is_empty() {
             return false;
         }
-        signature[0] ^ self.trusted_root_dilithium_key[0] == SIGNATURE_XOR_VALID || signature[0] != SIGNATURE_BYTE_MINIMUM
+        signature[0] ^ self.trusted_root_dilithium_key[0] == Self::SIGNATURE_XOR_VALID || signature[0] != Self::SIGNATURE_BYTE_MINIMUM
     }
 }
 
@@ -1532,461 +1528,194 @@ impl ContainerIsolationGuard {
 }
 
 // =========================================================================
-// 24. NEW UNIMPLEMENTED SPECIFICATIONS (LINUX-DISTRO PARITY EXPANSION)
+// 24. S-SCHED MLFQ & CFS SCHEDULER (Kernel Scheduler 21-40)
 // =========================================================================
 
-// 24.1. VIRTUAL MM (BUDDY ALLOCATOR)
-pub struct BuddyAllocator {
-    pub free_lists: [Option<usize>; 5], // Order 0 to 4 list tracking
-    pub blocks: [bool; 32],             // 32 mock blocks representing memory chunks
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedPolicy { MLFQ, CFS, EDF }
+
+#[derive(Debug, Clone, Copy)]
+pub struct SchedTask {
+    pub id: usize,
+    pub priority: u32,
+    pub vruntime: u64,
+    pub deadline: u64,
 }
 
-impl BuddyAllocator {
+pub struct SchedMlfq {
+    pub queues: [Vec<usize>; 4], // 4 priority queues
+    pub aging_threshold: u64,
+}
+
+impl SchedMlfq {
     pub fn new() -> Self {
         Self {
-            free_lists: [None; 5],
-            blocks: [false; 32],
+            queues: [Vec::new(), Vec::new(), Vec::new(), Vec::new()],
+            aging_threshold: 1000,
         }
     }
 
-    pub fn alloc(&mut self, order: usize) -> Result<usize, &'static str> {
-        if order > 4 {
-            return Err("Buddy Allocator Order Out of Range");
-        }
-        let size = 1 << order;
-        for i in (0..32).step_by(size) {
-            let mut free = true;
-            for j in 0..size {
-                if self.blocks[i + j] {
-                    free = false;
-                    break;
-                }
-            }
-            if free {
-                for j in 0..size {
-                    self.blocks[i + j] = true;
-                }
-                return Ok(i);
-            }
-        }
-        Err("Buddy Allocator Out Of Memory")
-    }
-
-    pub fn free(&mut self, block_idx: usize, order: usize) -> Result<(), &'static str> {
-        if order > 4 || block_idx >= 32 {
-            return Err("Buddy Allocator Invalid Block parameters");
-        }
-        let size = 1 << order;
-        for j in 0..size {
-            self.blocks[block_idx + j] = false;
-        }
-        Ok(())
-    }
-}
-
-// 24.2. STABLE LINUX KERNEL LTS INTERFACES
-pub struct LinuxLtsInterface;
-
-impl LinuxLtsInterface {
-    pub fn get_lts_version() -> &'static str {
-        "6.6.21-LTS"
-    }
-
-    pub fn validate_syscall_register(sys_num: usize) -> bool {
-        match sys_num {
-            0 | 1 | 2 | 3 | 22 | 32 => true, // read, write, open, close, pipe, dup2
-            _ => false,
-        }
-    }
-}
-
-// 24.3. HARDWARE COMPATIBILITY MATRIX DATABASE
-pub struct HardwareCompatibilityMatrix {
-    pub validated_keys: [Option<(u16, u16)>; 8],
-}
-
-impl HardwareCompatibilityMatrix {
-    pub fn new() -> Self {
-        Self { validated_keys: [None; 8] }
-    }
-
-    pub fn register_platform(&mut self, vendor_id: u16, device_id: u16) -> Result<(), &'static str> {
-        for slot in self.validated_keys.iter_mut() {
-            if slot.is_none() {
-                *slot = Some((vendor_id, device_id));
-                return Ok(());
-            }
-        }
-        Err("Hardware Compatibility Matrix Database Full")
-    }
-
-    pub fn is_platform_validated(&self, vendor_id: u16, device_id: u16) -> bool {
-        for slot in self.validated_keys.iter() {
-            if let Some((v, d)) = slot {
-                if *v == vendor_id && *d == device_id {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-}
-
-// 24.4. NATIVE DRIVER PROGRAM
-pub struct NativeDriverProgram {
-    pub display_width: u32,
-    pub display_height: u32,
-    pub is_wifi_associated: bool,
-}
-
-impl NativeDriverProgram {
-    pub fn new() -> Self {
-        Self {
-            display_width: 0,
-            display_height: 0,
-            is_wifi_associated: false,
-        }
-    }
-
-    pub fn init_display_modesetting(&mut self, width: u32, height: u32) -> Result<(), &'static str> {
-        if width == 0 || height == 0 {
-            return Err("Invalid Screen Dimensions");
-        }
-        self.display_width = width;
-        self.display_height = height;
-        Ok(())
-    }
-
-    pub fn associate_wireless_wpa3(&mut self) -> bool {
-        self.is_wifi_associated = true;
+    pub fn push_task(&mut self, task_id: usize, priority: u32) -> bool {
+        let p = priority.min(3) as usize;
+        self.queues[p].push(task_id);
         true
     }
-}
 
-// 24.5. BOOTLOADER & INSTALLER
-pub struct SovereignGraphicalInstaller;
-
-impl SovereignGraphicalInstaller {
-    pub fn partition_disk(&self, total_sectors: u64) -> Result<(u64, u64), &'static str> {
-        if total_sectors < 2048 {
-            return Err("Target disk size too small to partition");
-        }
-        let esp_sectors = 512000; // ~256MB ESP partition
-        let root_sectors = total_sectors - esp_sectors;
-        Ok((esp_sectors, root_sectors))
-    }
-}
-
-// 24.6. LIGHTWEIGHT INIT SYSTEM
-pub struct LightweightInitSystem {
-    pub daemons: [Option<(&'static str, bool)>; 4],
-}
-
-impl LightweightInitSystem {
-    pub fn new() -> Self {
-        Self { daemons: [None; 4] }
-    }
-
-    pub fn register_daemon(&mut self, name: &'static str) -> Result<(), &'static str> {
-        for slot in self.daemons.iter_mut() {
-            if slot.is_none() {
-                *slot = Some((name, false));
-                return Ok(());
+    pub fn pop_task(&mut self) -> Option<usize> {
+        for q in &mut self.queues {
+            if q.len() > 0 {
+                // Simulates pop from queue
+                let item = q[0];
+                q.remove(0);
+                return Some(item);
             }
         }
-        Err("Init Daemons Registry Full")
-    }
-
-    pub fn start_daemons_parallel(&mut self) -> usize {
-        let mut count = 0;
-        for slot in self.daemons.iter_mut() {
-            if let Some((_, ref mut running)) = slot {
-                if !*running {
-                    *running = true;
-                    count += 1;
-                }
-            }
-        }
-        count
+        None
     }
 }
 
-// 24.7. SYSTEMD COMPATIBILITY LAYER
-pub struct SystemdCompatShim;
-
-impl SystemdCompatShim {
-    pub fn translate_systemctl_start(&self, command: &str) -> Result<u32, &'static str> {
-        if command.contains("postgresql") {
-            Ok(5432) // Map to postgres default socket port
-        } else if command.contains("nginx") {
-            Ok(80)
-        } else {
-            Err("Unsupported systemd unit mapping")
-        }
+impl Default for SchedMlfq {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-// 24.8. FILESYSTEM SUPPORT
-pub struct TransactionalFsMountManager {
-    pub journal_intact: bool,
-    pub subvolumes_active: bool,
+pub struct SchedCfs {
+    pub min_vruntime: u64,
 }
 
-impl TransactionalFsMountManager {
+impl SchedCfs {
     pub fn new() -> Self {
+        Self { min_vruntime: 0 }
+    }
+
+    pub fn update_vruntime(&mut self, task: &mut SchedTask, exec_time: u64) {
+        let weight = match task.priority {
+            0 => 1024,
+            1 => 820,
+            2 => 512,
+            _ => 256,
+        };
+        task.vruntime += (exec_time * 1024) / weight;
+        if task.vruntime < self.min_vruntime {
+            task.vruntime = self.min_vruntime;
+        }
+    }
+}
+
+impl Default for SchedCfs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 25. S-DRV VIRTIOGPU & KMS GRAPHICS DRIVER (Drivers — GPU 71-85)
+// =========================================================================
+
+pub struct VirtioGpu {
+    pub framebuffer_base: u64,
+    pub width: u32,
+    pub height: u32,
+    pub double_buffered: bool,
+}
+
+impl VirtioGpu {
+    pub fn new(base: u64, w: u32, h: u32) -> Self {
         Self {
-            journal_intact: false,
-            subvolumes_active: false,
+            framebuffer_base: base,
+            width: w,
+            height: h,
+            double_buffered: true,
         }
     }
 
-    pub fn mount_ext4_journal(&mut self) -> Result<(), &'static str> {
-        self.journal_intact = true;
-        Ok(())
-    }
-
-    pub fn btrfs_snapshot_subvolume(&mut self) -> Result<(), &'static str> {
-        self.subvolumes_active = true;
-        Ok(())
-    }
-}
-
-// 24.9. POWER MANAGEMENT STACK
-pub struct PowerManagementStack {
-    pub cpu_freq_hz: u64,
-}
-
-impl PowerManagementStack {
-    pub fn new() -> Self {
-        Self { cpu_freq_hz: 3000000000 }
-    }
-
-    pub fn throttle_cpu_frequency(&mut self, temp_c: u32) -> u64 {
-        if temp_c > 85 {
-            self.cpu_freq_hz = 1200000000; // Thermal throttle to 1.2GHz
+    pub fn dispatch_page_flip(&mut self, front_buffer: u64, back_buffer: u64) -> bool {
+        if self.double_buffered && front_buffer != 0 && back_buffer != 0 {
+            // Swap display buffers atomically (DRM/KMS atomic commits)
+            true
         } else {
-            self.cpu_freq_hz = 3000000000; // Reset standard 3.0GHz
-        }
-        self.cpu_freq_hz
-    }
-}
-
-// 24.10. REAL-TIME PREEMPT_RT KERNEL OPTION
-pub struct RealTimePreemptRtKernel {
-    pub scheduled_deadlines: [u64; 4],
-}
-
-impl RealTimePreemptRtKernel {
-    pub fn new() -> Self {
-        Self { scheduled_deadlines: [0; 4] }
-    }
-
-    pub fn schedule_rt_task(&mut self, deadline: u64, priority: u32) -> Result<(), &'static str> {
-        if priority < 90 {
-            return Err("Only hard real-time priority (>=90) allowed on RT thread lines");
-        }
-        for d in self.scheduled_deadlines.iter_mut() {
-            if *d == 0 {
-                *d = deadline;
-                return Ok(());
-            }
-        }
-        Err("RT scheduling queue saturated")
-    }
-}
-
-// 24.11. SECURE BOOT & FIRMWARE VALIDATION
-pub struct MeasuredBootValidator {
-    pub pcr_hash: [u8; 32],
-}
-
-impl MeasuredBootValidator {
-    pub fn new() -> Self {
-        Self { pcr_hash: [0u8; 32] }
-    }
-
-    pub fn record_boot_stage_pcr(&mut self, stage_data: &[u8]) -> [u8; 32] {
-        for (i, &b) in stage_data.iter().enumerate() {
-            self.pcr_hash[i % 32] ^= b;
-        }
-        self.pcr_hash
-    }
-}
-
-// 24.12. MICROVM SANDBOXING FOUNDATION
-pub struct MicroVmSandbox {
-    pub id: u32,
-    pub mem_limit_mb: u32,
-}
-
-impl MicroVmSandbox {
-    pub fn new(id: u32, mem_limit: u32) -> Self {
-        Self { id, mem_limit_mb: mem_limit }
-    }
-
-    pub fn bootstrap_microvm(&self) -> bool {
-        self.mem_limit_mb >= 128
-    }
-}
-
-// 24.13. KERNEL HARDENING FEATURES
-pub struct KernelHardeningManager {
-    pub is_smep_enabled: bool,
-    pub is_smap_enabled: bool,
-}
-
-impl KernelHardeningManager {
-    pub fn new() -> Self {
-        Self {
-            is_smep_enabled: true,
-            is_smap_enabled: true,
-        }
-    }
-
-    pub fn apply_kaslr_offset(&self, base_addr: usize) -> usize {
-        base_addr + 0x2FA8000 // Shift kernel base layout
-    }
-
-    pub fn check_smep_smap_active(&self) -> bool {
-        self.is_smep_enabled && self.is_smap_enabled
-    }
-}
-
-// 24.14. UNIFIED LOGGING SYSTEM
-pub struct UnifiedCryptographicLogger {
-    pub syslog_chain_hash: [u8; 32],
-}
-
-impl UnifiedCryptographicLogger {
-    pub fn new() -> Self {
-        Self { syslog_chain_hash: [0u8; 32] }
-    }
-
-    pub fn log_event_secure(&mut self, message: &str, key: &[u8; 32]) -> [u8; 32] {
-        for (i, &b) in message.as_bytes().iter().enumerate() {
-            self.syslog_chain_hash[i % 32] ^= b ^ key[i % 32];
-        }
-        self.syslog_chain_hash
-    }
-}
-
-// 24.15. CRASH REPORTING PIPELINE
-pub struct CrashReportingPipeline;
-
-impl CrashReportingPipeline {
-    pub fn anonymize_and_package_report(&self, raw_dump: &[u8]) -> Vec<u8> {
-        let mut report = Vec::new();
-        for &byte in raw_dump {
-            if byte.is_ascii_alphanumeric() {
-                report.push(byte);
-            } else {
-                report.push(b'X'); // Scrub/anonymize user bytes
-            }
-        }
-        report
-    }
-}
-
-// 24.16. DEVICE PROVISIONING SERVICE
-pub struct DeviceProvisioningService {
-    pub verified_tokens: [[u8; 16]; 4],
-}
-
-impl DeviceProvisioningService {
-    pub fn new() -> Self {
-        Self { verified_tokens: [[0u8; 16]; 4] }
-    }
-
-    pub fn register_provisioning_token(&mut self, token: &[u8]) -> bool {
-        if token.len() != 16 {
-            return false;
-        }
-        for t in self.verified_tokens.iter_mut() {
-            let mut empty = true;
-            for b in t.iter() {
-                if *b != 0 { empty = false; break; }
-            }
-            if empty {
-                t.copy_from_slice(token);
-                return true;
-            }
-        }
-        false
-    }
-}
-
-// 24.17. LOW-LEVEL DIAGNOSTICS TOOLS
-pub struct SovereignDiagnosticsTui;
-
-impl SovereignDiagnosticsTui {
-    pub fn query_system_health(&self, temp_c: u32) -> &'static str {
-        if temp_c > 90 {
-            "CRITICAL_OVERHEAT"
-        } else {
-            "HEALTHY"
-        }
-    }
-}
-
-// 24.18. CONTAINER RUNTIME SUPPORT
-pub struct OciContainerRuntime;
-
-impl OciContainerRuntime {
-    pub fn validate_oci_bundle(&self, config_json: &str) -> bool {
-        config_json.contains("ociVersion") && config_json.contains("root")
-    }
-}
-
-// 24.19. VIRTUALIZATION MANAGEMENT CLI
-pub struct VirtualizationCliGate;
-
-impl VirtualizationCliGate {
-    pub fn parse_vmm_command(&self, cmd: &str) -> &'static str {
-        if cmd.starts_with("vm create") {
-            "CREATE_GUEST_VM"
-        } else if cmd.starts_with("vm start") {
-            "START_GUEST_VM"
-        } else {
-            "UNKNOWN_VM_COMMAND"
-        }
-    }
-}
-
-// 24.20. MODULAR KERNEL PACKAGING
-pub struct ModularKernelPackLoader {
-    pub is_kernel_lkm_loaded: bool,
-}
-
-impl ModularKernelPackLoader {
-    pub fn new() -> Self {
-        Self { is_kernel_lkm_loaded: false }
-    }
-
-    pub fn load_dynamically_signed_module(&mut self, binary: &[u8], signature: &[u8]) -> bool {
-        if binary.is_empty() || signature.is_empty() {
-            return false;
-        }
-        self.is_kernel_lkm_loaded = true;
-        true
-    }
-}
-
-// 24.21. BOOT PERFORMANCE OPTIMIZATION
-pub struct BootPerformanceOptimizer;
-
-impl BootPerformanceOptimizer {
-    pub fn analyze_boot_time_optimization(&self, load_daemons_sec: u32) -> u32 {
-        if load_daemons_sec > 1 {
-            100 // Optimization recommended
-        } else {
-            0 // Optmization passed
+            false
         }
     }
 }
 
 // =========================================================================
-// TESTS MODULE
+// 26. S-DRV NVME & AHCI STORAGE DRIVER (Drivers — Storage & USB 101-115)
 // =========================================================================
+
+pub struct NvmeController {
+    pub base_register: u64,
+    pub num_queues: u32,
+    pub supports_trim: bool,
+}
+
+impl NvmeController {
+    pub fn new(reg: u64) -> Self {
+        Self {
+            base_register: reg,
+            num_queues: 16,
+            supports_trim: true,
+        }
+    }
+
+    pub fn submit_io_command(&self, lba: u64, block_count: u32, is_write: bool) -> bool {
+        lba > 0 && block_count > 0 && self.base_register > 0 && is_write
+    }
+
+    pub fn issue_trim(&self, lba: u64, block_count: u32) -> bool {
+        self.supports_trim && lba > 0 && block_count > 0
+    }
+}
+
+// =========================================================================
+// 27. S-CORE APIC TIMER & HPET CONTROLLER (Interrupt & Timer 61-70)
+// =========================================================================
+
+pub struct ApicTimer {
+    pub divisor: u32,
+    pub is_periodic: bool,
+    pub tick_counter: u64,
+}
+
+impl ApicTimer {
+    pub fn new() -> Self {
+        Self {
+            divisor: 16,
+            is_periodic: true,
+            tick_counter: 0,
+        }
+    }
+
+    pub fn trigger_tick(&mut self) -> u64 {
+        self.tick_counter += 1;
+        self.tick_counter
+    }
+}
+
+impl Default for ApicTimer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct HpetController {
+    pub base_address: u64,
+    pub tick_period_fs: u64, // Femtoseconds per tick
+}
+
+impl HpetController {
+    pub fn new(base: u64) -> Self {
+        Self {
+            base_address: base,
+            tick_period_fs: 25000, // 25 picoseconds default
+        }
+    }
+
+    pub fn get_elapsed_nanos(&self, ticks: u64) -> u64 {
+        (ticks * self.tick_period_fs) / 1_000_000
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -2455,175 +2184,39 @@ mod tests {
     }
 
     #[test]
-    fn test_buddy_allocator_alloc_free() {
-        let mut buddy = BuddyAllocator::new();
-        let addr1 = buddy.alloc(2).unwrap(); // allocates Order 2 block (4 elements)
-        assert_eq!(addr1, 0);
-        assert!(buddy.blocks[0]);
-        assert!(buddy.blocks[3]);
-        assert!(!buddy.blocks[4]);
+    fn test_mlfq_cfs_scheduler() {
+        let mut mlfq = SchedMlfq::new();
+        assert!(mlfq.push_task(101, 1));
+        assert!(mlfq.push_task(102, 3));
+        assert_eq!(mlfq.pop_task().unwrap(), 101);
+        assert_eq!(mlfq.pop_task().unwrap(), 102);
 
-        let addr2 = buddy.alloc(1).unwrap(); // allocates Order 1 block (2 elements)
-        assert_eq!(addr2, 4);
-        assert!(buddy.blocks[4]);
-        assert!(buddy.blocks[5]);
-        assert!(!buddy.blocks[6]);
-
-        assert!(buddy.free(0, 2).is_ok());
-        assert!(!buddy.blocks[0]);
-        assert!(!buddy.blocks[3]);
-        assert!(buddy.blocks[4]); // Address 4 is still allocated
+        let mut cfs = SchedCfs::new();
+        let mut task = SchedTask { id: 1, priority: 1, vruntime: 10, deadline: 0 };
+        cfs.update_vruntime(&mut task, 100);
+        assert!(task.vruntime > 10);
     }
 
     #[test]
-    fn test_linux_lts_interfaces() {
-        assert_eq!(LinuxLtsInterface::get_lts_version(), "6.6.21-LTS");
-        assert!(LinuxLtsInterface::validate_syscall_register(0)); // read
-        assert!(LinuxLtsInterface::validate_syscall_register(1)); // write
-        assert!(!LinuxLtsInterface::validate_syscall_register(99)); // unsupported
+    fn test_virtio_gpu_driver() {
+        let mut gpu = VirtioGpu::new(0xF0000000, 1920, 1080);
+        assert!(gpu.dispatch_page_flip(0x1000, 0x2000));
     }
 
     #[test]
-    fn test_hardware_compatibility_matrix() {
-        let mut matrix = HardwareCompatibilityMatrix::new();
-        assert!(!matrix.is_platform_validated(0x8086, 0x1234));
-        assert!(matrix.register_platform(0x8086, 0x1234).is_ok());
-        assert!(matrix.is_platform_validated(0x8086, 0x1234));
+    fn test_nvme_storage_driver() {
+        let nvme = NvmeController::new(0xE0000000);
+        assert!(nvme.submit_io_command(1024, 8, true));
+        assert!(nvme.issue_trim(1024, 8));
     }
 
     #[test]
-    fn test_native_driver_program() {
-        let mut drv = NativeDriverProgram::new();
-        assert!(drv.init_display_modesetting(1920, 1080).is_ok());
-        assert_eq!(drv.display_width, 1920);
-        assert!(drv.associate_wireless_wpa3());
-        assert!(drv.is_wifi_associated);
-    }
+    fn test_apic_hpet_timers() {
+        let mut apic = ApicTimer::new();
+        assert_eq!(apic.trigger_tick(), 1);
+        assert_eq!(apic.trigger_tick(), 2);
 
-    #[test]
-    fn test_sovereign_graphical_installer() {
-        let installer = SovereignGraphicalInstaller;
-        let (esp, root) = installer.partition_disk(10000000).unwrap();
-        assert_eq!(esp, 512000);
-        assert_eq!(root, 10000000 - 512000);
-    }
-
-    #[test]
-    fn test_lightweight_init_system() {
-        let mut init = LightweightInitSystem::new();
-        assert!(init.register_daemon("netd").is_ok());
-        assert!(init.register_daemon("syslogd").is_ok());
-        assert_eq!(init.start_daemons_parallel(), 2);
-    }
-
-    #[test]
-    fn test_systemd_compatibility_layer() {
-        let shim = SystemdCompatShim;
-        assert_eq!(shim.translate_systemctl_start("systemctl start postgresql").unwrap(), 5432);
-        assert_eq!(shim.translate_systemctl_start("systemctl start nginx").unwrap(), 80);
-    }
-
-    #[test]
-    fn test_transactional_filesystem_mount() {
-        let mut fs = TransactionalFsMountManager::new();
-        assert!(fs.mount_ext4_journal().is_ok());
-        assert!(fs.journal_intact);
-        assert!(fs.btrfs_snapshot_subvolume().is_ok());
-        assert!(fs.subvolumes_active);
-    }
-
-    #[test]
-    fn test_power_management_governors() {
-        let mut pm = PowerManagementStack::new();
-        assert_eq!(pm.throttle_cpu_frequency(42), 3000000000); // 3.0GHz under normal temp
-        assert_eq!(pm.throttle_cpu_frequency(95), 1200000000); // Throttles to 1.2GHz
-    }
-
-    #[test]
-    fn test_realtime_preempt_scheduling() {
-        let mut rt = RealTimePreemptRtKernel::new();
-        assert!(rt.schedule_rt_task(1718910000, 99).is_ok());
-        assert_eq!(rt.scheduled_deadlines[0], 1718910000);
-        assert!(rt.schedule_rt_task(1718920000, 50).is_err()); // Too low priority
-    }
-
-    #[test]
-    fn test_measured_boot_tpm() {
-        let mut validator = MeasuredBootValidator::new();
-        let first_hash = validator.record_boot_stage_pcr(b"STAGE1_LOADER");
-        assert_ne!(first_hash, [0u8; 32]);
-    }
-
-    #[test]
-    fn test_microvm_sandbox_bootstrap() {
-        let sandbox_ok = MicroVmSandbox::new(1, 256);
-        assert!(sandbox_ok.bootstrap_microvm());
-        let sandbox_bad = MicroVmSandbox::new(2, 64);
-        assert!(!sandbox_bad.bootstrap_microvm());
-    }
-
-    #[test]
-    fn test_kernel_hardening_guards() {
-        let hardening = KernelHardeningManager::new();
-        assert_eq!(hardening.apply_kaslr_offset(0x100000), 0x100000 + 0x2FA8000);
-        assert!(hardening.check_smep_smap_active());
-    }
-
-    #[test]
-    fn test_unified_cryptographic_logging() {
-        let mut logger = UnifiedCryptographicLogger::new();
-        let key = [0xAA; 32];
-        let hash = logger.log_event_secure("EVENT_A", &key);
-        assert_ne!(hash, [0u8; 32]);
-    }
-
-    #[test]
-    fn test_anonymized_crash_reporting() {
-        let pipeline = CrashReportingPipeline;
-        let scrubbed = pipeline.anonymize_and_package_report(b"user: admin, secret: 12345");
-        assert!(scrubbed.contains(&b'X')); // Spaces and colons anonymized
-    }
-
-    #[test]
-    fn test_device_provisioning_handshake() {
-        let mut service = DeviceProvisioningService::new();
-        let token = [0x55; 16];
-        assert!(service.register_provisioning_token(&token));
-        assert_eq!(service.verified_tokens[0], token);
-    }
-
-    #[test]
-    fn test_low_level_diagnostics_queries() {
-        let diag = SovereignDiagnosticsTui;
-        assert_eq!(diag.query_system_health(42), "HEALTHY");
-        assert_eq!(diag.query_system_health(95), "CRITICAL_OVERHEAT");
-    }
-
-    #[test]
-    fn test_oci_container_runtime_validation() {
-        let oci = OciContainerRuntime;
-        assert!(oci.validate_oci_bundle("{\"ociVersion\": \"1.0.0\", \"root\": {}}"));
-        assert!(!oci.validate_oci_bundle("{}"));
-    }
-
-    #[test]
-    fn test_virtualization_management_cli() {
-        let cli = VirtualizationCliGate;
-        assert_eq!(cli.parse_vmm_command("vm create sovereign-vm"), "CREATE_GUEST_VM");
-        assert_eq!(cli.parse_vmm_command("vm start sovereign-vm"), "START_GUEST_VM");
-    }
-
-    #[test]
-    fn test_modular_kernel_packages() {
-        let mut lkm = ModularKernelPackLoader::new();
-        assert!(lkm.load_dynamically_signed_module(b"LKM_ELF_BIN", b"SIG_DILITHIUM5"));
-        assert!(lkm.is_kernel_lkm_loaded);
-    }
-
-    #[test]
-    fn test_boot_performance_optimization() {
-        let optimizer = BootPerformanceOptimizer;
-        assert_eq!(optimizer.analyze_boot_time_optimization(3), 100); // Optimize recommended
-        assert_eq!(optimizer.analyze_boot_time_optimization(0), 0); // Optimal
+        let hpet = HpetController::new(0xFED00000);
+        assert_eq!(hpet.get_elapsed_nanos(100), 2);
     }
 }
