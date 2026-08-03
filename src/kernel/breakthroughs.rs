@@ -211,12 +211,6 @@ impl PrivacyFirstSandbox {
     }
 }
 
-impl Default for PrivacyFirstSandbox {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // Simple Vec implementation for breakthroughs module
 pub struct Vec<T> {
     data: *mut T,
