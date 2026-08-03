@@ -16,6 +16,7 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **Shard Architecture**: 600+ hot-swappable kernel modules with zero-latency IPC.
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
+- **Cross-Platform Compatibility**: ReactOS-inspired Windows NT layer and extensive Linux/BSD compatibility.
 
 
 ---
@@ -40,6 +41,7 @@ graph TD
 - **S-FS**: Sovereign Distributed Filesystem (VFS + SigmaFS).
 - **S-SEC**: Security Framework (PQC + MAC + Sandbox).
 - **S-AI**: AI Task Orchestrator (Local LLM routing).
+- **S-COMPAT**: Cross-Platform Compatibility Layer (Windows NT, Linux, macOS, BSD).
 
 
 ---
