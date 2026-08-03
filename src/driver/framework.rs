@@ -6,11 +6,13 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type DriverID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
+    Storage = 3,
+    Input = 4,
 }
 
 #[repr(usize)]
@@ -35,6 +37,7 @@ pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
     UnloadFailed = 2,
+    ProbeFailed = 3,
 }
 
 #[repr(C)]
@@ -51,6 +54,18 @@ impl SimpleDriver {
             driver_type,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
+    }
+
+    pub fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+
+    pub fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+
+    pub fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
     }
 }
 
