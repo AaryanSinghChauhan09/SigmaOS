@@ -1,23 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Defensive Audit & Anomaly Detection Shunts
-// Zero-dependency, // #![no_std]  // crate-root only compliant, OOP-centric
+// Zero-dependency, #![no_std] compliant, OOP-centric
 
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicU32, Ordering};
@@ -130,10 +112,12 @@ impl DefensiveAuditSystem {
         // Find previous block hash
         let prev_hash = if next_id > 1 {
             let mut found_prev = 0;
-            for block in ring.iter().flatten() {
-                if block.id == next_id - 1 {
-                    found_prev = block.current_hash;
-                    break;
+            for slot in ring.iter() {
+                if let Some(ref block) = slot {
+                    if block.id == next_id - 1 {
+                        found_prev = block.current_hash;
+                        break;
+                    }
                 }
             }
             found_prev
@@ -166,19 +150,21 @@ impl DefensiveAuditSystem {
     pub fn evaluate_anomaly_score(&self, payload_data: &[u8]) -> u32 {
         let mut threat_score = 0;
 
-        for sig in self.signatures.iter().flatten() {
-            if sig.pattern_len > 0 && payload_data.len() >= sig.pattern_len {
-                // Check if malicious signature pattern is present in input payload
-                let mut matched = false;
-                for window in payload_data.windows(sig.pattern_len) {
-                    if window == &sig.pattern[..sig.pattern_len] {
-                        matched = true;
-                        break;
+        for sig_slot in &self.signatures {
+            if let Some(ref sig) = sig_slot {
+                if sig.pattern_len > 0 && payload_data.len() >= sig.pattern_len {
+                    // Check if malicious signature pattern is present in input payload
+                    let mut matched = false;
+                    for window in payload_data.windows(sig.pattern_len) {
+                        if window == &sig.pattern[..sig.pattern_len] {
+                            matched = true;
+                            break;
+                        }
                     }
-                }
 
-                if matched {
-                    threat_score += sig.weight_score;
+                    if matched {
+                        threat_score += sig.weight_score;
+                    }
                 }
             }
         }
