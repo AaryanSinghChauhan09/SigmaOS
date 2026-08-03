@@ -22,6 +22,7 @@ pub mod init;
 pub mod interrupt;
 pub mod kernel;
 pub mod klib;
+pub mod logging;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -100,6 +101,11 @@ pub use kernel::{
     RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
 pub use klib::{AsyncExecutor, CpuIsaAssessor, IsaLevel, Reducer, Store, Subscriber, Task};
+pub use logging::{
+    ConsoleLogTarget, FileLogTarget, LogError, LogLevel, LogTarget, LoggerCapability,
+    MemoryLogTarget, NetworkLogTarget, SimpleUnifiedLogger, TargetCapability, TargetInfo,
+    TargetType, UnifiedLogEntry, UnifiedLogStats, UnifiedLogger,
+};
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
