@@ -33,6 +33,7 @@ SigmaOS absorbs the greatest strengths of major traditional Linux distributions 
 | **Paging & Swap Space** | Dual-Tier Zswap Cache + Zram Pool (Zstd, LZ4, LZO) + Swap Disk | Zram (since Ubuntu 22.04) | Zram (default since F33) | Configurable manually | Configurable manually |
 | **Control Flow & Sandboxing** | Epoll/Kqueue Loop (`SovereignKqueue`) + OpenBSD Pledge | Epoll (no native Pledge sandboxing) | Epoll (no native Pledge) | Epoll | Epoll |
 | **Stateful Firewall & NAT** | Stateful Netfilter (`SovereignConntrack`) + SimpleNAT | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables |
+| **Boot Loader & Secure Boot** | Raw Memory Copy + Cryptographic Hash Verification | GRUB / systemd-boot | GRUB / systemd-boot | GRUB / systemd-boot | GRUB |
 
 ---
 
@@ -206,7 +207,49 @@ To prevent network penetration and implement stateful inspection of active strea
 
 ---
 
-## 8. Modular Workflows & Community-Driven Innovation
+## 8. Sovereign UEFI Boot Loader & Cryptographic Secure Boot Chain
+
+To perform bulletproof bootstrap handoffs, SigmaOS implements an authentic, low-level UEFI boot chain conforming to x86/ARM specification standards:
+
+```
+                           Sovereign UEFI Handoff Flow
+
+            +-------------------------------------------------+
+            |             Raw UEFI Entry Point                |
+            +-------------------------------------------------+
+                                     |
+                                     v
+                     [ Verify Cryptographic Signature ]
+                                     |
+                      +--------------+--------------+
+                      | Success                     | Failure (Abort)
+                      v                             v
+           +--------------------+         +--------------------+
+           | Parse Memory Map   |         | Halt Handoff       |
+           | (Conventional RAM) |         | (Security Breach)  |
+           +---------+----------+         +--------------------+
+                     |
+                     v
+           +--------------------+
+           | Non-Overlapping    |
+           | Memory Copy to     |
+           | Target Destination |
+           +---------+----------+
+                     |
+                     v
+           +--------------------+
+           | Transition and     |
+           | Handoff to Kernel  |
+           +--------------------+
+```
+
+1. **Cryptographic Secure Boot Verification**: Performs full verification of kernel binaries before copying them to memory. It matches wrapping checksums against a pre-signed payload signature to guarantee binary integrity and prevent rootkits.
+2. **Raw Memory Map Parsing**: Standard UEFI Memory Descriptors (`UefiMemoryDescriptor`) are parsed via raw pointers (`*const UefiMemoryDescriptor`) to identify and sum conventional RAM sections, bypassing corrupted firmware reports.
+3. **Non-Overlapping Kernel Payload Loading**: Uses standard system copy operations (`core::ptr::copy_nonoverlapping`) to load kernel code from raw boot memory directly to specified bare-metal physical addresses, initializing PID 1 cleanly.
+
+---
+
+## 9. Modular Workflows & Community-Driven Innovation
 
 To maintain publisher-grade quality, the SigmaOS project employs standardized workflows for code contribution and validation.
 

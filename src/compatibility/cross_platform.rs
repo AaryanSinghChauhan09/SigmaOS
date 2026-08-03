@@ -733,7 +733,7 @@ pub enum SysctlValue {
 
 #[derive(Debug, Clone)]
 pub struct SysctlParameter {
-    pub name: String, // Dot-separated path, e.g. "kern.maxproc"
+    pub name: String,         // Dot-separated path, e.g. "kern.maxproc"
     pub value: SysctlValue,
     pub writable: bool,
 }
@@ -754,19 +754,11 @@ impl SovereignSysctlManager {
 
     fn register_defaults(&mut self) {
         self.register_param("kern.maxproc".to_string(), SysctlValue::Integer(1024), true);
-        self.register_param(
-            "net.inet.tcp.sendspace".to_string(),
-            SysctlValue::Integer(32768),
-            true,
-        );
+        self.register_param("net.inet.tcp.sendspace".to_string(), SysctlValue::Integer(32768), true);
         self.register_param("hw.ncpu".to_string(), SysctlValue::Integer(16), false); // Read-only
         let mut os_release = [0u8; 64];
         os_release[..15].copy_from_slice(b"6.24.0-mainline");
-        self.register_param(
-            "kern.osrelease".to_string(),
-            SysctlValue::String(os_release),
-            false,
-        );
+        self.register_param("kern.osrelease".to_string(), SysctlValue::String(os_release), false);
     }
 
     pub fn register_param(&mut self, path: String, value: SysctlValue, writable: bool) {
@@ -789,9 +781,9 @@ impl SovereignSysctlManager {
             }
             // Ensure type matches
             match (&param.value, &new_value) {
-                (SysctlValue::Integer(_), SysctlValue::Integer(_))
-                | (SysctlValue::Boolean(_), SysctlValue::Boolean(_))
-                | (SysctlValue::String(_), SysctlValue::String(_)) => {
+                (SysctlValue::Integer(_), SysctlValue::Integer(_)) |
+                (SysctlValue::Boolean(_), SysctlValue::Boolean(_)) |
+                (SysctlValue::String(_), SysctlValue::String(_)) => {
                     param.value = new_value;
                     Ok(())
                 }
@@ -1094,37 +1086,20 @@ mod tests {
         let mut manager = SovereignSysctlManager::new();
 
         // 1. Query Default Parameters
-        assert_eq!(
-            manager.query_param("kern.maxproc").unwrap(),
-            &SysctlValue::Integer(1024)
-        );
-        assert_eq!(
-            manager.query_param("hw.ncpu").unwrap(),
-            &SysctlValue::Integer(16)
-        );
+        assert_eq!(manager.query_param("kern.maxproc").unwrap(), &SysctlValue::Integer(1024));
+        assert_eq!(manager.query_param("hw.ncpu").unwrap(), &SysctlValue::Integer(16));
 
         // 2. Command Parsing Read Query
-        let out_read = manager
-            .parse_and_execute_command("sysctl kern.maxproc")
-            .unwrap();
+        let out_read = manager.parse_and_execute_command("sysctl kern.maxproc").unwrap();
         assert_eq!(out_read, "kern.maxproc = 1024");
 
         // 3. Command Parsing Write Update
-        let out_write = manager
-            .parse_and_execute_command("sysctl -w kern.maxproc=2048")
-            .unwrap();
+        let out_write = manager.parse_and_execute_command("sysctl -w kern.maxproc=2048").unwrap();
         assert_eq!(out_write, "kern.maxproc = 2048");
-        assert_eq!(
-            manager.query_param("kern.maxproc").unwrap(),
-            &SysctlValue::Integer(2048)
-        );
+        assert_eq!(manager.query_param("kern.maxproc").unwrap(), &SysctlValue::Integer(2048));
 
         // 4. Try updating read-only parameter (hw.ncpu) -> should fail
-        assert!(manager
-            .update_param("hw.ncpu", SysctlValue::Integer(32))
-            .is_err());
-        assert!(manager
-            .parse_and_execute_command("sysctl -w hw.ncpu=32")
-            .is_err());
+        assert!(manager.update_param("hw.ncpu", SysctlValue::Integer(32)).is_err());
+        assert!(manager.parse_and_execute_command("sysctl -w hw.ncpu=32").is_err());
     }
 }
