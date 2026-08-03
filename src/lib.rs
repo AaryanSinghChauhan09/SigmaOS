@@ -16,10 +16,6 @@ pub use audio::editor::{
     MultiTrackSession, NoiseGateEffect,
 };
 
-||||||| 52d783ca0
-pub mod klib;
-||||||| 52d783ca0
-pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;

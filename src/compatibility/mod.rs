@@ -23,10 +23,20 @@ pub mod historic_linux;
 pub mod legacy_adapters;
 pub mod linux_security;
 pub mod mint_linux;
-||||||| 52d783ca0
 pub mod standards;
 pub mod overtake;
-pub mod standards;
+pub mod endeavour;
+pub mod chimera_linux;
+pub mod india_professional_tools;
+pub mod relay_nexus;
+pub mod bodhi_moksha;
+pub mod garuda_zen;
+pub mod kimi_code;
+pub mod atomic_distribution;
+pub mod cachy_os;
+pub mod elf_execution;
+pub mod penetration_assistant;
+pub mod sssd;
 
 pub use constellation_mesh::{
     BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
