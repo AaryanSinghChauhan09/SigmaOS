@@ -492,7 +492,7 @@ impl SigmaOffice {
     }
 
     /// Load document from SigmaFS
-    pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
+    pub fn load_document(&mut self, _path: &str) -> Result<SigmaDocument> {
         // In real implementation, this would load from SigmaFS with capability checks
         // Load logic here
         Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Not implemented").into())
