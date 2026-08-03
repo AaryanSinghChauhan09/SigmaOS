@@ -18,7 +18,7 @@ pub use conversion::{
     base64_encode, base_to_dec, binary_to_bytes, bytes_to_binary, bytes_to_hex, dec_to_base,
     hex_to_bytes,
 };
-pub use hash::{combine_hashes, djb2_hash, fnv1a_hash, simple_hash, xor_hash, fnv1a_hash, SimpleHasher};
+pub use hash::{combine_hashes, djb2_hash, fnv1a_hash, simple_hash, xor_hash, SimpleHasher};
 pub use math::{
     abs, ceil, clamp, floor, gcd, is_prime, lcm, log10, log2, max, min, pow, round, sqrt,
 };
