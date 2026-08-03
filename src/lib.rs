@@ -135,8 +135,8 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise, UnveilManager,
-    UnveilPermission, UnveilRestriction,
+    CapabilityGate, CapabilityToken, LinuxCapability, Permission, PledgeManager, PledgePromise,
+    Securelevel, SovereignSecurelevelManager, UnveilManager, UnveilPermission, UnveilRestriction,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
