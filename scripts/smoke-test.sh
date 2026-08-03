@@ -43,4 +43,24 @@ echo "Running cargo fmt check..."
 cargo fmt -- --check
 echo "PASS: Cargo fmt check successful"
 
+# Test 7: Run shell builtins compliance check
+echo "Running shell builtins compliance check..."
+if [ -f "scripts/sigma_builtins_test.sh" ]; then
+    bash scripts/sigma_builtins_test.sh --all
+    echo "PASS: Shell builtins compliance check successful"
+else
+    echo "FAIL: sigma_builtins_test.sh not found"
+    exit 1
+fi
+
+# Test 8: Run next-generation accelerators diagnostics check
+echo "Running next-generation accelerators diagnostics check..."
+if [ -f "scripts/accelerators_diagnostics.sh" ]; then
+    bash scripts/accelerators_diagnostics.sh --all
+    echo "PASS: Accelerators diagnostics check successful"
+else
+    echo "FAIL: accelerators_diagnostics.sh not found"
+    exit 1
+fi
+
 echo "All smoke tests passed!"
