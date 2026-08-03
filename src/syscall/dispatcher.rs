@@ -1,27 +1,15 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![cfg_attr(not(test), no_main)]
 
 /// Custom Syscall Dispatcher for SigmaOS
 /// Implements syscall handling without relying on Linux kernel syscalls
 /// Uses capability-based access control
+
+extern crate alloc;
+
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
 
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -123,7 +111,6 @@ pub struct Capability {
 }
 
 impl Capability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Capability {
             read: false,
@@ -163,11 +150,10 @@ pub struct SyscallDispatcher {
 }
 
 impl SyscallDispatcher {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut dispatcher = SyscallDispatcher {
-            syscall_table: [None; 256],
-            call_count: [AtomicUsize::new(0); 256],
+            syscall_table: core::array::from_fn(|_| None),
+            call_count: core::array::from_fn(|_| AtomicUsize::new(0)),
         };
 
         // Register syscall handlers
@@ -220,12 +206,13 @@ impl SyscallDispatcher {
         (entry.handler)(args, caller_capability)
     }
 
+    /// Verifies that caller possesses all required capabilities (corrected security logic)
     fn check_capability(&self, required: &Capability, caller: Capability) -> bool {
-        (required.read || !caller.read) &&
-        (required.write || !caller.write) &&
-        (required.execute || !caller.execute) &&
-        (required.network || !caller.network) &&
-        (required.ipc || !caller.ipc)
+        (!required.read || caller.read) &&
+        (!required.write || caller.write) &&
+        (!required.execute || caller.execute) &&
+        (!required.network || caller.network) &&
+        (!required.ipc || caller.ipc)
     }
 
     /// Get syscall statistics
@@ -345,5 +332,157 @@ pub unsafe fn get_syscall_stats(number: SyscallNumber) -> usize {
         dispatcher.get_stats(number)
     } else {
         0
+    }
+}
+
+// =========================================================================
+// BSD-STYLE KQUEUE HIGH-PERFORMANCE MULTIPLEXED EVENT LOOP
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KqueueFilter {
+    Read,
+    Write,
+    Signal,
+}
+
+#[derive(Debug, Clone)]
+pub struct KqueueEvent {
+    pub ident: usize,
+    pub filter: KqueueFilter,
+    pub flags: u32,
+    pub data: isize,
+    pub udata: usize,
+}
+
+pub struct SovereignKqueue {
+    pub events: Vec<KqueueEvent>,
+}
+
+impl SovereignKqueue {
+    pub fn new() -> Self {
+        Self { events: Vec::new() }
+    }
+
+    pub fn register_event(&mut self, event: KqueueEvent) {
+        if let Some(existing) = self.events.iter_mut().find(|e| e.ident == event.ident && e.filter == event.filter) {
+            existing.flags = event.flags;
+            existing.data = event.data;
+            existing.udata = event.udata;
+        } else {
+            self.events.push(event);
+        }
+    }
+
+    pub fn poll_events(&self, min_data_threshold: isize) -> Vec<KqueueEvent> {
+        self.events
+            .iter()
+            .filter(|e| e.data >= min_data_threshold)
+            .cloned()
+            .collect()
+    }
+}
+
+// =========================================================================
+// OPENBSD-STYLE PLEDGE SECURITY SANDBOXING
+// =========================================================================
+
+pub struct SovereignPledgeManager {
+    pub active_promises: String,
+}
+
+impl SovereignPledgeManager {
+    pub fn new(promises: &str) -> Self {
+        Self {
+            active_promises: promises.to_string(),
+        }
+    }
+
+    pub fn is_syscall_permitted(&self, number: SyscallNumber) -> bool {
+        let promises = &self.active_promises;
+
+        if promises.contains("stdio") && matches!(number, SyscallNumber::Read | SyscallNumber::Write | SyscallNumber::Exit) {
+            return true;
+        }
+
+        if promises.contains("rpath") && matches!(number, SyscallNumber::Open | SyscallNumber::Read | SyscallNumber::Stat) {
+            return true;
+        }
+
+        if promises.contains("wpath") && matches!(number, SyscallNumber::Open | SyscallNumber::Write | SyscallNumber::Stat) {
+            return true;
+        }
+
+        if promises.contains("proc") && matches!(number, SyscallNumber::Fork | SyscallNumber::Execve) {
+            return true;
+        }
+
+        if promises.contains("inet") && matches!(number, SyscallNumber::Socket | SyscallNumber::Connect) {
+            return true;
+        }
+
+        false
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_corrected_capability_check() {
+        let dispatcher = SyscallDispatcher::new();
+        let required = Capability {
+            read: true,
+            write: false,
+            execute: false,
+            network: false,
+            ipc: false,
+        };
+
+        assert!(!dispatcher.check_capability(&required, Capability::new()));
+
+        let caller_read = Capability {
+            read: true,
+            write: false,
+            execute: false,
+            network: false,
+            ipc: false,
+        };
+        assert!(dispatcher.check_capability(&required, caller_read));
+        assert!(dispatcher.check_capability(&required, Capability::full()));
+    }
+
+    #[test]
+    fn test_sovereign_kqueue_event_loop() {
+        let mut kqueue = SovereignKqueue::new();
+        kqueue.register_event(KqueueEvent {
+            ident: 1,
+            filter: KqueueFilter::Read,
+            flags: 1,
+            data: 5,
+            udata: 0xDEADBEEF,
+        });
+        kqueue.register_event(KqueueEvent {
+            ident: 2,
+            filter: KqueueFilter::Write,
+            flags: 1,
+            data: 0,
+            udata: 0,
+        });
+
+        let active = kqueue.poll_events(1);
+        assert_eq!(active.len(), 1);
+        assert_eq!(active[0].ident, 1);
+        assert_eq!(active[0].udata, 0xDEADBEEF);
+    }
+
+    #[test]
+    fn test_sovereign_pledge_sandbox() {
+        let pledge = SovereignPledgeManager::new("stdio rpath");
+
+        assert!(pledge.is_syscall_permitted(SyscallNumber::Write));
+        assert!(pledge.is_syscall_permitted(SyscallNumber::Open));
+        assert!(!pledge.is_syscall_permitted(SyscallNumber::Socket));
     }
 }

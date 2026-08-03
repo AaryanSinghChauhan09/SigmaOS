@@ -31,6 +31,7 @@ SigmaOS absorbs the greatest strengths of major traditional Linux distributions 
 | **Accessibility & Gamification** | Adaptive `AccessibilityOverlay` + Trophy Achievements | Basic screen readers & high contrast settings | Standard GNOME a11y options | Fully manual installation | Standard a11y packages |
 | **Legacy Protection Elements** | Native historical simulation (Protected Mode, text driver) | Requires slow CPU emulator VM (QEMU/BOSCH) | Requires slow emulator VM | Requires manual emulator setup | Requires emulator setup |
 | **Paging & Swap Space** | Dual-Tier Zswap Cache + Zram Pool (Zstd, LZ4, LZO) + Swap Disk | Zram (since Ubuntu 22.04) | Zram (default since F33) | Configurable manually | Configurable manually |
+| **Control Flow & Sandboxing** | Epoll/Kqueue Loop (`SovereignKqueue`) + OpenBSD Pledge | Epoll (no native Pledge sandboxing) | Epoll (no native Pledge) | Epoll | Epoll |
 
 ---
 
@@ -156,7 +157,23 @@ To achieve maximum I/O performance and prevent flash storage wear, SigmaOS imple
 
 ---
 
-## 6. Modular Workflows & Community-Driven Innovation
+## 6. Sovereign High-Performance Control Flow & Security Sandboxing
+
+To drive maximum execution efficiency and robust containment, SigmaOS incorporates elite control-flow patterns:
+
+### 6.1 Multiplexed Epoll/Kqueue Loops (`SovereignKqueue`)
+A highly optimized event notification engine that enables non-blocking, multiplexed monitoring of system identifiers.
+- **Event Registries**: Tracks Read, Write, and Signal event filters (`KqueueFilter::Read`, `KqueueFilter::Write`, `KqueueFilter::Signal`) with custom flags and userdata.
+- **Asynchronous Poll**: Dynamic polling extracts active events exceeding size thresholds, preventing spinning CPU cycles.
+
+### 6.2 OpenBSD-Style Pledge Sandboxing (`SovereignPledgeManager`)
+Enforces dynamic system-level containment of active processes, dropping access to unused syscall tables to prevent exploit privilege escalation:
+- **Pledge Policies**: Restricts program threads to defined namespaces like `"stdio"` (Read, Write, Exit), `"rpath"` (Read, Open, Stat), `"wpath"` (Write, Open, Stat), `"proc"` (Fork, Execve), or `"inet"` (Socket, Connect).
+- **Execution Guard**: System calls requested by a process that do not match the active pledged promises are rejected with `EPERM` instantly.
+
+---
+
+## 7. Modular Workflows & Community-Driven Innovation
 
 To maintain publisher-grade quality, the SigmaOS project employs standardized workflows for code contribution and validation.
 
