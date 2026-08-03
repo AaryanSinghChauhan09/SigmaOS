@@ -150,6 +150,11 @@ impl RoundRobinScheduler {
             return;
         }
 
+        // Safeguard current_index boundaries to prevent any out of bounds panic
+        if self.current_index >= self.processes.len() {
+            self.current_index = 0;
+        }
+
         let needs_switch = {
             let entry = &mut self.processes[self.current_index];
             entry.cpu_time_used += 1;
@@ -325,8 +330,14 @@ mod tests {
         };
         let mut scheduler = RoundRobinScheduler::with_config(config);
 
-        assert!(scheduler.add_process(Process::new(1, "test1".to_string(), Priority::Normal)).is_ok());
-        assert!(scheduler.add_process(Process::new(2, "test2".to_string(), Priority::Normal)).is_ok());
-        assert!(scheduler.add_process(Process::new(3, "test3".to_string(), Priority::Normal)).is_err());
+        assert!(scheduler
+            .add_process(Process::new(1, "test1".to_string(), Priority::Normal))
+            .is_ok());
+        assert!(scheduler
+            .add_process(Process::new(2, "test2".to_string(), Priority::Normal))
+            .is_ok());
+        assert!(scheduler
+            .add_process(Process::new(3, "test3".to_string(), Priority::Normal))
+            .is_err());
     }
 }
