@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - USB HID keyboard driver with event handling
 - VESA framebuffer driver with mode switching
 - Package recipe system for build automation
+- Network traffic analyzer with Linux distro-inspired Wireshark parity features
+- Kernel modules and networking improvements with NFS, rsync, samba, SCP, SSH, tcpdump compatibility
+- Process lifecycle with nice priority, WNOHANG waitpid options, process group signaling
+- AppArmor security with advanced modes, glob path matching, capabilities, network restrictions
+- Linux-kernel inspired build system with configuration files
+- Universal package system improvements with PAM stack integration
+- Comprehensive network compatibility tools for enterprise environments
 
 ### Changed
 - Enhanced buddy allocator with memory initialization and statistics
