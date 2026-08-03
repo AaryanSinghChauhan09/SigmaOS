@@ -5,8 +5,6 @@
 //! - Init targets, firewalls, LSM, PAM, and Tmux terminal multiplexers
 //! - Sovereign Environment Variables Registry supporting Linux default configurations
 
-#![no_std]
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
