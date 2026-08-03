@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+#![allow(clippy::manual_flatten)]
 
 // Arch-Style: Zero-Allocation SAT Solver and Package Parser
 // Our packaging engine (`sigpkg`) must handle multiple version constraints without invoking complex dynamic memory overhead or risking heap-allocation panics in critical kernel pipelines.
@@ -97,7 +98,7 @@ impl PackageDependencyResolver {
     }
 
     fn find_recipe(&self, name: &'static str) -> Option<&PackageRecipe> {
-        self.registry.iter().flatten().find(|r| r.name == name)
+        self.registry.iter().filter_map(|r| r.as_ref()).find(|r| r.name == name)
     }
 }
 
