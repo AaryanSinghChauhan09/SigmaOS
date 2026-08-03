@@ -1,28 +1,6 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-use crate::klib::Vec;
 use core::mem;
 /// OOP-based Driver Framework for SigmaOS
-/// Based on Roadmap Item 1: Driver framework
-extern crate alloc;
-
-use alloc::boxed::Box;
+/// Based on Driver Management Roadmap (OOP-based)
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
@@ -30,11 +8,12 @@ pub type DriverID = usize;
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverType {
-    Block = 0,
-    Char = 1,
-    Network = 2,
-    Storage = 3,
-    Input = 4,
+    Storage = 0,
+    Network = 1,
+    Graphics = 2,
+    Input = 3,
+    Block = 4,
+    Char = 5,
 }
 
 #[repr(usize)]
@@ -43,6 +22,7 @@ pub enum DriverState {
     Unloaded = 0,
     Loaded = 1,
     Active = 2,
+    Error = 3,
 }
 
 #[repr(C)]
@@ -80,57 +60,6 @@ pub trait Driver {
 
     /// Returns driver dependencies
     fn dependencies(&self) -> &'static [DriverType];
-}
-
-pub struct SimpleDriver {
-    pub id: DriverID,
-    pub driver_type: DriverType,
-    pub state: AtomicUsize,
-}
-
-impl SimpleDriver {
-    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        Self {
-            id,
-            driver_type,
-            state: AtomicUsize::new(DriverState::Unloaded as usize),
-        }
-    }
-}
-
-impl Driver for SimpleDriver {
-    fn id(&self) -> DriverID {
-        self.id
-    }
-    fn driver_type(&self) -> DriverType {
-        self.driver_type
-    }
-    fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-    }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
-    fn load(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Active);
-        Ok(())
-    }
-    fn unload(&mut self) -> Result<(), DriverError> {
-        self.set_state(DriverState::Unloaded);
-        Ok(())
-    }
-    fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn dependencies(&self) -> &'static [DriverType] {
-        &[]
-    }
 }
 
 // Specialized Polymorphic Subclasses (Traits)
@@ -326,6 +255,57 @@ impl Bus for UsbBus {
     }
 }
 
+pub struct SimpleDriver {
+    pub id: DriverID,
+    pub driver_type: DriverType,
+    pub state: AtomicUsize,
+}
+
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        Self {
+            id,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
+    }
+}
+
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Active);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Unloaded);
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        &[]
+    }
+}
+
 // Factory Pattern (Dynamic Driver Factory Instantiation)
 
 pub struct DriverFactory;
@@ -349,25 +329,37 @@ pub trait DriverFramework {
     fn query_by_type(&self, driver_type: DriverType) -> Vec<DriverID>;
 }
 
-#[allow(dead_code)]
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
     next_id: AtomicUsize,
 }
 
-impl Default for SimpleDriverFramework {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl SimpleDriverFramework {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleDriverFramework {
             drivers: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+
+    /// Verifies if all declared dependencies for a driver are active in the system
+    fn verify_dependencies(&self, driver: &dyn Driver) -> bool {
+        let deps = driver.dependencies();
+        for &dep in deps {
+            let mut found = false;
+            for driver_option in self.drivers.iter() {
+                if let Some(ref d) = *driver_option {
+                    if d.driver_type() == dep && d.state() == DriverState::Active {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if !found {
+                return false;
+            }
+        }
+        true
     }
 }
 
@@ -377,52 +369,53 @@ impl DriverFramework for SimpleDriverFramework {
         self.drivers.push(Some(driver));
         Ok(id)
     }
+
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        let mut target_idx = None;
+        // Find if any driver matches ID and check dependencies first
+        let mut dep_ok = false;
         for i in 0..self.drivers.len() {
-            if let Some(ref driver) = self.drivers[i] {
-                if driver.id() == id {
-                    target_idx = Some(i);
+            if let Some(ref d) = self.drivers[i] {
+                if d.id() == id {
+                    dep_ok = self.verify_dependencies(d.as_ref());
                     break;
                 }
             }
         }
 
-        if let Some(idx) = target_idx {
-            let deps = self.drivers[idx].as_ref().unwrap().dependencies();
-            for &dep_type in deps {
-                let mut dep_satisfied = false;
-                for other_option in &self.drivers {
-                    if let Some(ref other) = *other_option {
-                        if other.driver_type() == dep_type && other.state() == DriverState::Active {
-                            dep_satisfied = true;
-                            break;
-                        }
-                    }
-                }
-                if !dep_satisfied {
-                    return Err(DriverError::DependencyMissing);
-                }
-            }
-
-            return self.drivers[idx].as_mut().unwrap().load();
+        if !dep_ok {
+            return Err(DriverError::DependencyMissing);
         }
 
+        for driver_option in self.drivers.iter_mut() {
+            if let Some(ref mut driver) = *driver_option {
+                if driver.id() == id {
+                    driver.init()?;
+                    if driver.probe()? {
+                        return driver.load();
+                    } else {
+                        return Err(DriverError::ProbeFailed);
+                    }
+                }
+            }
+        }
         Err(DriverError::LoadFailed)
     }
+
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for i in 0..self.drivers.len() {
-            if let Some(ref mut driver) = self.drivers[i] {
+        for driver_option in self.drivers.iter_mut() {
+            if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id {
+                    driver.shutdown()?;
                     return driver.unload();
                 }
             }
         }
         Err(DriverError::UnloadFailed)
     }
+
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver> {
-        for i in 0..self.drivers.len() {
-            if let Some(ref driver) = self.drivers[i] {
+        for driver_option in self.drivers.iter() {
+            if let Some(ref driver) = *driver_option {
                 if driver.id() == id {
                     return Some(driver.as_ref());
                 }
@@ -442,6 +435,144 @@ impl DriverFramework for SimpleDriverFramework {
         }
         ids
     }
+}
+
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]

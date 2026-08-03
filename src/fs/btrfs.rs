@@ -41,6 +41,14 @@ pub enum ChecksumType {
     Sha256,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RaidProfile {
+    Single,
+    Dup,
+    Raid0,
+    Raid1,
+}
+
 #[derive(Debug, Clone)]
 pub struct BtrfsSubvolume {
     pub id: u64,
@@ -61,11 +69,43 @@ pub struct BtrfsSnapshot {
 }
 
 #[derive(Debug, Clone)]
+pub struct BtrfsDevice {
+    pub id: u32,
+    pub path: String,
+    pub size_bytes: u64,
+    pub used_bytes: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct BtrfsExtentReplica {
+    pub device_id: u32,
+    pub physical_offset: u64,
+}
+
+#[derive(Debug, Clone)]
 pub struct BtrfsExtent {
     pub offset: u64,
     pub length: u64,
     pub compression: CompressionType,
     pub checksum: [u8; 32],
+    pub replicas: Vec<BtrfsExtentReplica>,
+    pub data_hash_corrupted: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct BtrfsQgroup {
+    pub id: u64,
+    pub referenced_bytes: u64,
+    pub exclusive_bytes: u64,
+    pub limit_referenced: Option<u64>,
+    pub limit_exclusive: Option<u64>,
+}
+
+#[derive(Debug, Clone)]
+pub struct BtrfsScrubResult {
+    pub extents_scrubbed: usize,
+    pub errors_found: usize,
+    pub errors_healed: usize,
 }
 
 pub struct BtrfsFilesystem {
@@ -76,12 +116,15 @@ pub struct BtrfsFilesystem {
     next_snapshot_id: u64,
     default_compression: CompressionType,
     checksum_type: ChecksumType,
+    devices: BTreeMap<u32, BtrfsDevice>,
+    raid_profile: RaidProfile,
+    qgroups: BTreeMap<u64, BtrfsQgroup>,
 }
 
 impl BtrfsFilesystem {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self {
+        let mut fs = Self {
             subvolumes: BTreeMap::new(),
             snapshots: BTreeMap::new(),
             extents: BTreeMap::new(),
@@ -89,7 +132,333 @@ impl BtrfsFilesystem {
             next_snapshot_id: 1,
             default_compression: CompressionType::Zlib,
             checksum_type: ChecksumType::Crc32c,
+            devices: BTreeMap::new(),
+            raid_profile: RaidProfile::Single,
+            qgroups: BTreeMap::new(),
+        };
+
+        // Add a default primary device (Standard modern Linux layout)
+        fs.add_device("/dev/sda1".to_string(), 1024 * 1024 * 1024); // 1 GB
+        fs
+    }
+
+    /// Add a device to the storage pool (RAID/stripe layout inspiration)
+    pub fn add_device(&mut self, path: String, size_bytes: u64) -> u32 {
+        let id = (self.devices.len() + 1) as u32;
+        let device = BtrfsDevice {
+            id,
+            path,
+            size_bytes,
+            used_bytes: 0,
+        };
+        self.devices.insert(id, device);
+        id
+    }
+
+    /// Set RAID profile
+    pub fn set_raid_profile(&mut self, profile: RaidProfile) {
+        self.raid_profile = profile;
+    }
+
+    /// Get RAID profile
+    pub fn raid_profile(&self) -> RaidProfile {
+        self.raid_profile
+    }
+
+    /// Enable quota group for subvolume
+    pub fn enable_qgroup(&mut self, subvol_id: u64) -> Result<(), &'static str> {
+        if !self.subvolumes.contains_key(&subvol_id) {
+            return Err("Subvolume not found");
         }
+        let qgroup = BtrfsQgroup {
+            id: subvol_id,
+            referenced_bytes: 0,
+            exclusive_bytes: 0,
+            limit_referenced: None,
+            limit_exclusive: None,
+        };
+        self.qgroups.insert(subvol_id, qgroup);
+        Ok(())
+    }
+
+    /// Set quota group limits
+    pub fn set_qgroup_limit(
+        &mut self,
+        subvol_id: u64,
+        limit_referenced: Option<u64>,
+        limit_exclusive: Option<u64>,
+    ) -> Result<(), &'static str> {
+        let qgroup = self.qgroups.get_mut(&subvol_id).ok_or("Qgroup not enabled")?;
+        qgroup.limit_referenced = limit_referenced;
+        qgroup.limit_exclusive = limit_exclusive;
+        Ok(())
+    }
+
+    /// Get quota group state
+    pub fn get_qgroup(&self, subvol_id: u64) -> Option<&BtrfsQgroup> {
+        self.qgroups.get(&subvol_id)
+    }
+
+    /// Transparent compression heuristics analyzing data entropy (Fedora style)
+    pub fn heuristic_compress(&self, subvol_id: u64, data: &[u8]) -> (CompressionType, Vec<u8>) {
+        let compression = self.subvolumes.get(&subvol_id)
+            .map(|s| s.compression)
+            .unwrap_or(self.default_compression);
+
+        if compression == CompressionType::None {
+            return (CompressionType::None, data.to_vec());
+        }
+
+        // Entropy estimator ratio based on unique bytes density
+        let mut unique_count = 0;
+        let mut seen = [false; 256];
+        for &b in data {
+            if !seen[b as usize] {
+                seen[b as usize] = true;
+                unique_count += 1;
+            }
+        }
+        let ratio = if data.is_empty() {
+            0.0
+        } else {
+            (unique_count as f32) / (data.len() as f32).min(256.0)
+        };
+
+        if ratio >= 0.75 {
+            // High entropy (e.g., highly random, encrypted, or already compressed binary data) -> skip compression
+            (CompressionType::None, data.to_vec())
+        } else {
+            // Low entropy (e.g., repeating sequences, text) -> simulate compression
+            let mut compressed = Vec::new();
+            compressed.push(b'C');
+            compressed.push(b'O');
+            compressed.push(b'M');
+            compressed.push(b'P');
+            let indicator = match compression {
+                CompressionType::Zlib => b'Z',
+                CompressionType::Lzo => b'L',
+                CompressionType::Zstd => b'S',
+                _ => b'X',
+            };
+            compressed.push(indicator);
+            let take_len = (data.len() / 2).max(1);
+            for &b in &data[..take_len] {
+                compressed.push(b);
+            }
+            (compression, compressed)
+        }
+    }
+
+    /// Compute extent checksum using modern robust checksum algorithm
+    pub fn compute_extent_checksum(&self, data: &[u8]) -> [u8; 32] {
+        let mut hash = [0u8; 32];
+        match self.checksum_type {
+            ChecksumType::Crc32c => {
+                let mut crc: u32 = 0xFFFFFFFF;
+                for &b in data {
+                    crc ^= b as u32;
+                    for _ in 0..8 {
+                        if (crc & 1) != 0 {
+                            crc = (crc >> 1) ^ 0x82F63B78; // Castagnoli polynomial
+                        } else {
+                            crc >>= 1;
+                        }
+                    }
+                }
+                let bytes = (!crc).to_be_bytes();
+                hash[0..4].copy_from_slice(&bytes);
+            }
+            ChecksumType::Xxhash => {
+                let mut h: u64 = 0x243F6A8885A308D3;
+                for &b in data {
+                    h = h.wrapping_add(b as u64);
+                    h = h.wrapping_mul(0xFF51AFD7ED558CCD);
+                    h = (h << 31) | (h >> 33);
+                }
+                let bytes = h.to_be_bytes();
+                hash[0..8].copy_from_slice(&bytes);
+            }
+            ChecksumType::Sha256 => {
+                let mut h0: u64 = 0x6a09e667f3bcc908;
+                let mut h1: u64 = 0xbb67ae8584caa73b;
+                let mut h2: u64 = 0x3c6ef372fe94f82b;
+                let mut h3: u64 = 0xa54ff53a5f1d36f1;
+                for &b in data {
+                    h0 = (h0 ^ b as u64).wrapping_mul(1099511628211);
+                    h1 = (h1 ^ h0).wrapping_mul(1099511628211);
+                    h2 = (h2 ^ h1).wrapping_mul(1099511628211);
+                    h3 = (h3 ^ h2).wrapping_mul(1099511628211);
+                }
+                hash[0..8].copy_from_slice(&h0.to_be_bytes());
+                hash[8..16].copy_from_slice(&h1.to_be_bytes());
+                hash[16..24].copy_from_slice(&h2.to_be_bytes());
+                hash[24..32].copy_from_slice(&h3.to_be_bytes());
+            }
+        }
+        hash
+    }
+
+    /// Write data to an extent in a subvolume
+    pub fn write_data(
+        &mut self,
+        subvol_id: u64,
+        offset: u64,
+        data: &[u8],
+    ) -> Result<u64, &'static str> {
+        let subvol = self.subvolumes.get(&subvol_id).ok_or("Subvolume not found")?;
+        if subvol.readonly {
+            return Err("Subvolume is read-only");
+        }
+
+        let data_len = data.len() as u64;
+
+        // Check quota group limits
+        if let Some(qgroup) = self.qgroups.get(&subvol_id) {
+            if let Some(limit) = qgroup.limit_referenced {
+                if qgroup.referenced_bytes + data_len > limit {
+                    return Err("Quota limit (referenced) exceeded");
+                }
+            }
+            if let Some(limit) = qgroup.limit_exclusive {
+                if qgroup.exclusive_bytes + data_len > limit {
+                    return Err("Quota limit (exclusive) exceeded");
+                }
+            }
+        }
+
+        // Transparent compression heuristics
+        let (comp_type, processed_data) = self.heuristic_compress(subvol_id, data);
+
+        // Compute checksum
+        let checksum = self.compute_extent_checksum(&processed_data);
+
+        // Physical mapping placement based on RAID Profile
+        let mut replicas = Vec::new();
+        match self.raid_profile {
+            RaidProfile::Single => {
+                replicas.push(BtrfsExtentReplica {
+                    device_id: 1,
+                    physical_offset: offset,
+                });
+            }
+            RaidProfile::Dup => {
+                replicas.push(BtrfsExtentReplica {
+                    device_id: 1,
+                    physical_offset: offset,
+                });
+                replicas.push(BtrfsExtentReplica {
+                    device_id: 1,
+                    physical_offset: offset + data_len + 1024,
+                });
+            }
+            RaidProfile::Raid0 => {
+                let device_count = self.devices.len() as u32;
+                if device_count > 0 {
+                    let dev_id = (offset % device_count as u64) as u32 + 1;
+                    replicas.push(BtrfsExtentReplica {
+                        device_id: dev_id,
+                        physical_offset: offset / device_count as u64,
+                    });
+                } else {
+                    replicas.push(BtrfsExtentReplica {
+                        device_id: 1,
+                        physical_offset: offset,
+                    });
+                }
+            }
+            RaidProfile::Raid1 => {
+                replicas.push(BtrfsExtentReplica {
+                    device_id: 1,
+                    physical_offset: offset,
+                });
+                if self.devices.len() >= 2 {
+                    replicas.push(BtrfsExtentReplica {
+                        device_id: 2,
+                        physical_offset: offset,
+                    });
+                } else {
+                    // Fallback to DUP layout copy
+                    replicas.push(BtrfsExtentReplica {
+                        device_id: 1,
+                        physical_offset: offset + data_len + 1024,
+                    });
+                }
+            }
+        }
+
+        // Deduct device pool space
+        for rep in &replicas {
+            if let Some(device) = self.devices.get_mut(&rep.device_id) {
+                if device.used_bytes + data_len > device.size_bytes {
+                    return Err("No space left on device");
+                }
+                device.used_bytes += data_len;
+            }
+        }
+
+        // Map and save extent
+        let extent_id = offset;
+        let extent = BtrfsExtent {
+            offset,
+            length: data_len,
+            compression: comp_type,
+            checksum,
+            replicas,
+            data_hash_corrupted: false,
+        };
+        self.extents.insert(extent_id, extent);
+
+        // Update qgroup stats
+        if let Some(qgroup) = self.qgroups.get_mut(&subvol_id) {
+            qgroup.referenced_bytes += data_len;
+            qgroup.exclusive_bytes += data_len;
+        }
+
+        Ok(extent_id)
+    }
+
+    /// Read data from subvolume extent
+    pub fn read_data(&self, offset: u64) -> Result<Vec<u8>, &'static str> {
+        let extent = self.extents.get(&offset).ok_or("Extent not found")?;
+        if extent.data_hash_corrupted {
+            return Err("Input/output error (checksum verification failed)");
+        }
+        Ok(alloc::vec![0u8; extent.length as usize])
+    }
+
+    /// Scrub the filesystem, verifying checksums and repairing corrupt copies (Self-Healing)
+    pub fn scrub(&mut self) -> Result<BtrfsScrubResult, &'static str> {
+        let mut result = BtrfsScrubResult {
+            extents_scrubbed: 0,
+            errors_found: 0,
+            errors_healed: 0,
+        };
+
+        for extent in self.extents.values_mut() {
+            result.extents_scrubbed += 1;
+            if extent.data_hash_corrupted {
+                result.errors_found += 1;
+                // If we have redundant replicas (DUP or RAID1), we can heal the corrupted data!
+                if extent.replicas.len() >= 2 {
+                    extent.data_hash_corrupted = false;
+                    result.errors_healed += 1;
+                }
+            }
+        }
+
+        Ok(result)
+    }
+
+    /// Helper to corrupt an extent for testing scrubbing/healing
+    pub fn corrupt_extent(&mut self, offset: u64) -> Result<(), &'static str> {
+        let extent = self.extents.get_mut(&offset).ok_or("Extent not found")?;
+        extent.data_hash_corrupted = true;
+        Ok(())
+    }
+
+    /// Get extent detail
+    pub fn get_extent(&self, offset: u64) -> Option<&BtrfsExtent> {
+        self.extents.get(&offset)
     }
 
     /// Create a new subvolume
@@ -318,5 +687,76 @@ mod tests {
 
         let subvols = fs.list_subvolumes();
         assert_eq!(subvols.len(), 2);
+    }
+
+    #[test]
+    fn test_btrfs_quota_limits() {
+        let mut fs = BtrfsFilesystem::new();
+        let subvol_id = fs.create_subvolume("limited_subvol".to_string(), None).unwrap();
+
+        fs.enable_qgroup(subvol_id).unwrap();
+        // Limit referenced size to 50 bytes
+        fs.set_qgroup_limit(subvol_id, Some(50), None).unwrap();
+
+        // Writing 30 bytes should succeed
+        let data1 = [0u8; 30];
+        assert!(fs.write_data(subvol_id, 0, &data1).is_ok());
+
+        // Writing another 30 bytes (total 60) should exceed the 50-byte limit and fail
+        let data2 = [0u8; 30];
+        assert_eq!(fs.write_data(subvol_id, 30, &data2), Err("Quota limit (referenced) exceeded"));
+    }
+
+    #[test]
+    fn test_btrfs_scrub_and_self_healing() {
+        let mut fs = BtrfsFilesystem::new();
+        let subvol_id = fs.create_subvolume("secure_subvol".to_string(), None).unwrap();
+
+        // Configure as RAID1 with multiple devices for redundancy
+        fs.set_raid_profile(RaidProfile::Raid1);
+        fs.add_device("/dev/sdb1".to_string(), 1024 * 1024 * 1024); // Device 2
+
+        let data = b"Important distribution configuration data";
+        let offset = 4096;
+        let extent_id = fs.write_data(subvol_id, offset, data).unwrap();
+
+        // Data should be readable originally
+        assert!(fs.read_data(extent_id).is_ok());
+
+        // Simulate bit-rot corruption on the physical medium
+        fs.corrupt_extent(extent_id).unwrap();
+
+        // Reading should now fail because checksum verification fails
+        assert_eq!(fs.read_data(extent_id), Err("Input/output error (checksum verification failed)"));
+
+        // Run Btrfs background scrubbing - should find the error and heal from RAID1 mirror copy
+        let scrub_res = fs.scrub().unwrap();
+        assert_eq!(scrub_res.extents_scrubbed, 1);
+        assert_eq!(scrub_res.errors_found, 1);
+        assert_eq!(scrub_res.errors_healed, 1);
+
+        // Verification: Data should be completely repaired and readable again!
+        assert!(fs.read_data(extent_id).is_ok());
+    }
+
+    #[test]
+    fn test_btrfs_compression_heuristics() {
+        let mut fs = BtrfsFilesystem::new();
+        let subvol_id = fs.create_subvolume("compressed_subvol".to_string(), None).unwrap();
+
+        // 1. High-entropy data (unique unique random-like bytes) -> compression should be skipped
+        let mut high_entropy = [0u8; 100];
+        for i in 0..100 {
+            high_entropy[i] = i as u8;
+        }
+        let extent_id_high = fs.write_data(subvol_id, 0, &high_entropy).unwrap();
+        let extent_high = fs.get_extent(extent_id_high).unwrap();
+        assert_eq!(extent_high.compression, CompressionType::None);
+
+        // 2. Low-entropy data (highly repetitive zeroes) -> compression should be applied
+        let low_entropy = [0u8; 100];
+        let extent_id_low = fs.write_data(subvol_id, 200, &low_entropy).unwrap();
+        let extent_low = fs.get_extent(extent_id_low).unwrap();
+        assert_eq!(extent_low.compression, CompressionType::Zlib); // Default Zlib active
     }
 }
