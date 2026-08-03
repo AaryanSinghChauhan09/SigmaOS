@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 /// Custom Garuda Linux and Zen Kernel Optimization Subsystems for SigmaOS
 /// Implements Zen Interactivity Governor, Timeshift Btrfs snapshotting, Zram Memory Swap, and Nohang OOM Guards
 
@@ -35,7 +17,6 @@ pub struct ZenInteractivityGovernor {
 }
 
 impl ZenInteractivityGovernor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ZenInteractivityGovernor {
             latency_ns: AtomicU64::new(2_000_000),      // 2ms low-latency default
@@ -69,7 +50,6 @@ pub struct TimeshiftBtrfsEngine {
 }
 
 impl TimeshiftBtrfsEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TimeshiftBtrfsEngine {
             snapshots_count: AtomicUsize::new(0),

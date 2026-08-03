@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 /// Custom Enterprise & Embedded Linux Distribution Compatibility Subsystems for SigmaOS
 /// Implements Armbian Imager 2.0 block burning, Fedora Atomic OS-tree deployment manager,
 /// RHEL/CentOS DNF history rollbacks, and Ubuntu Livepatching dynamic function hooks.
@@ -36,7 +18,6 @@ pub struct ArmbianImager {
 }
 
 impl ArmbianImager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ArmbianImager {
             block_size: 512, // 512 byte standard sector blocks
@@ -72,7 +53,6 @@ pub struct AtomicDeployer {
 }
 
 impl AtomicDeployer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         AtomicDeployer {
             active_deployment_id: AtomicUsize::new(1),
@@ -138,7 +118,6 @@ pub struct DnfHistoryManager {
 }
 
 impl DnfHistoryManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DnfHistoryManager {
             transaction_count: AtomicUsize::new(0),
@@ -192,7 +171,6 @@ pub struct LivepatchGovernor {
 }
 
 impl LivepatchGovernor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         LivepatchGovernor {
             active_patches_count: AtomicUsize::new(0),

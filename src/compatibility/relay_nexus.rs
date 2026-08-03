@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 use crate::klib::Vec;
 /// Relay-and-Nexus Subsystems for SigmaOS
 /// Implements KernelRelay, SyscallEncyclopedia, DriverVaultV2, FirmwareNexus,
@@ -45,7 +27,6 @@ impl Default for KernelRelay {
 }
 
 impl KernelRelay {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         KernelRelay {
             active_personas: Vec::new(),
@@ -156,7 +137,6 @@ impl Default for SyscallEncyclopedia {
 }
 
 impl SyscallEncyclopedia {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SyscallEncyclopedia {
             entries: Vec::new(),
@@ -255,7 +235,6 @@ impl Default for DriverVaultV2Manager {
 }
 
 impl DriverVaultV2Manager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DriverVaultV2Manager {
             registered_drivers: Vec::new(),
@@ -343,7 +322,6 @@ impl Default for FirmwareNexusManager {
 }
 
 impl FirmwareNexusManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         FirmwareNexusManager {
             boot_handshake_done: false,
@@ -419,7 +397,6 @@ impl Default for BuildChronicleManager {
 }
 
 impl BuildChronicleManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BuildChronicleManager {
             chronicle_runs: AtomicUsize::new(0),
@@ -497,7 +474,6 @@ impl Default for SecurityNexusManager {
 }
 
 impl SecurityNexusManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SecurityNexusManager {
             checks_performed: AtomicUsize::new(0),
@@ -592,7 +568,6 @@ impl Default for PeripheralArchiveV2Manager {
 }
 
 impl PeripheralArchiveV2Manager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PeripheralArchiveV2Manager {
             active_simulations: AtomicUsize::new(0),
@@ -720,7 +695,6 @@ pub struct AtifTrajectoryMonitor {
 }
 
 impl AtifTrajectoryMonitor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             steps_recorded: 0,
@@ -747,7 +721,6 @@ pub struct VerifierConsensus {
 }
 
 impl VerifierConsensus {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             entities_matched: 0,
@@ -775,7 +748,6 @@ pub struct RelayNexus {
 }
 
 impl RelayNexus {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current_task_id: 0,

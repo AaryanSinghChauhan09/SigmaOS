@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 /// Custom Production-Grade TCP/IP Stack for SigmaOS
 /// Implements full TCP/IP and UDP networking without relying on external stack
 /// Supports internet checksum computation, full TCP state machine, and UDP parsing
@@ -108,7 +90,6 @@ pub struct EthernetFrame {
 }
 
 impl EthernetFrame {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EthernetFrame {
             dest_mac: MACAddress::broadcast(),
@@ -136,7 +117,6 @@ pub struct IPPacket {
 }
 
 impl IPPacket {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         IPPacket {
             version_ihl: 0x45, // IPv4, 5 words
@@ -193,7 +173,6 @@ pub struct TCPSegment {
 }
 
 impl TCPSegment {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TCPSegment {
             src_port: 0,
@@ -280,7 +259,6 @@ pub struct UDPSegment {
 }
 
 impl UDPSegment {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         UDPSegment {
             src_port: 0,
@@ -401,7 +379,6 @@ pub struct TCPIPStack {
 }
 
 impl TCPIPStack {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TCPIPStack {
             sockets: [None; 1024],

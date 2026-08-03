@@ -1,28 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-use core::mem;
 /// ReactOS-inspired Windows NT Subsystem Compatibility Layer for SigmaOS
 /// Provides Portable Executable (PE) parsing, NT Registry Hive management,
 /// and NT Object Manager handle tables.
+
+extern crate alloc;
+use core::ptr::{self, NonNull};
+use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[repr(usize)]
@@ -77,7 +59,6 @@ pub struct NtObjectManager {
 }
 
 impl NtObjectManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         NtObjectManager {
             handles: Vec::new(),
@@ -95,7 +76,7 @@ impl NtObjectManager {
 
     /// Retrieve an object entry from a handle (NtQueryObject equivalent)
     pub fn lookup_object(&self, handle: NtHandle) -> Result<&NtHandleEntry, NtStatus> {
-        for i in 0..self.handles.len {
+        for i in 0..self.handles.len() {
             if let Some(ref entry) = self.handles[i] {
                 if entry.handle == handle {
                     return Ok(entry);
@@ -107,7 +88,7 @@ impl NtObjectManager {
 
     /// Close handle (NtClose equivalent)
     pub fn close_handle(&mut self, handle: NtHandle) -> Result<(), NtStatus> {
-        for i in 0..self.handles.len {
+        for i in 0..self.handles.len() {
             if let Some(ref entry) = self.handles[i] {
                 if entry.handle == handle {
                     self.handles[i] = None;
@@ -153,7 +134,6 @@ pub struct RegistryHive {
 }
 
 impl RegistryHive {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         RegistryHive {
             keys: Vec::new(),
@@ -179,7 +159,7 @@ impl RegistryHive {
 
     /// Retrieve registry value (NtQueryValueKey equivalent)
     pub fn query_value(&self, name: &[u8]) -> Result<&RegistryValue, NtStatus> {
-        for i in 0..self.values.len {
+        for i in 0..self.values.len() {
             if let Some(ref val) = self.values[i] {
                 let val_name_len = val.name.iter().position(|&b| b == 0).unwrap_or(32);
                 if &val.name[..val_name_len] == name {
@@ -260,7 +240,7 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = extern_alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
@@ -306,21 +286,9 @@ impl<T> Drop for Vec<T> {
     }
 }
 
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
 extern "C" {
-    fn alloc(size: usize) -> *mut u8;
+    #[link_name = "alloc"]
+    fn extern_alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
 
