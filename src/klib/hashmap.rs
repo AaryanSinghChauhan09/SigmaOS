@@ -83,8 +83,10 @@ where
     }
 
     pub fn insert(&mut self, key: K, value: V) {
-        if self.capacity == 0 {
-            self.capacity = 16;
+        if self.capacity == 0 || self.buckets.is_empty() {
+            if self.capacity == 0 {
+                self.capacity = 16;
+            }
             self.resize_buckets();
         }
         if self.len >= self.capacity * 2 {
@@ -207,8 +209,10 @@ where
     }
 
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
-        if self.capacity == 0 {
-            self.capacity = 16;
+        if self.capacity == 0 || self.buckets.is_empty() {
+            if self.capacity == 0 {
+                self.capacity = 16;
+            }
             self.resize_buckets();
         }
         let hash = self.hash_key(&key);
