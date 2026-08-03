@@ -1,24 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Virtualization Module
 pub mod oci_pod;
 pub mod orchestration;
+pub mod container;
+pub mod namespaces;
 
 pub use orchestration::{
     Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,
@@ -26,4 +10,12 @@ pub use orchestration::{
     VirtualizationStrategy, VirtualizationStrategyFactory, VirtualizationTech, VmState,
 };
 
-pub use oci_pod::{ContainerConfig, OciPod, OciPodManager, PodState};
+pub use oci_pod::{
+    ContainerConfig, OciPod, OciPodManager, PodState,
+};
+pub use container::{
+    ContainerConfig as VirtContainerConfig, ContainerError, ContainerInfo, ContainerRuntime, ContainerRuntimeManager,
+    ContainerState as VirtContainerState, ContainerStats, DockerRuntime, NetworkMode, PodmanRuntime, PortMapping,
+    PortProtocol, ResourceLimits, RestartPolicy, VolumeMapping,
+};
+pub use namespaces::{Namespace, NamespaceData, NamespaceManager, NamespaceType};

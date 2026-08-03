@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Multi-Application Parity Integration Layer (advanced_app_absorber)
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
@@ -58,7 +40,6 @@ pub struct ShareXFlameshotEngine {
 }
 
 impl ShareXFlameshotEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             screenshot_history: VecDeque::new(),
@@ -113,7 +94,6 @@ pub struct PotPlayerVlcEngine {
 }
 
 impl PotPlayerVlcEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut eq = HashMap::new();
         eq.insert("BassBoost".to_string(), vec![6.0, 4.0, 2.0, 0.0, 0.0, 0.0]);
@@ -158,7 +138,6 @@ pub struct EverythingSearchEngine {
 }
 
 impl EverythingSearchEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             index: HashMap::new(),
@@ -192,7 +171,6 @@ pub struct SevenZipCompressor {
 }
 
 impl SevenZipCompressor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             compression_level: 9, // Defaut to Ultra compression level
@@ -230,7 +208,6 @@ pub struct EarTrumpetAudioRouter {
 }
 
 impl EarTrumpetAudioRouter {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             sessions: vec![
@@ -278,7 +255,6 @@ pub struct BraveBrowserEngine {
 }
 
 impl BraveBrowserEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             tabs: Vec::new(),
@@ -361,7 +337,6 @@ pub struct NotepadPlusWorkspace {
 }
 
 impl NotepadPlusWorkspace {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             tabs: vec![("untitled.txt".to_string(), "".to_string())],
@@ -399,7 +374,6 @@ pub struct OneCommanderDualPane {
 }
 
 impl OneCommanderDualPane {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             left_pane: OneCommanderPane { current_directory: PathBuf::from("/"), selected_files: Vec::new() },
@@ -431,7 +405,6 @@ pub struct ObsStudioMixer {
 }
 
 impl ObsStudioMixer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             sources: vec![

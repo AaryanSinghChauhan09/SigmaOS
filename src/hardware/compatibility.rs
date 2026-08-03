@@ -180,7 +180,7 @@ impl CompatibilityCheck for SimpleDiagnostics {
     }
 
     fn run_full_scan(&self) -> CompatibilityReport {
-        let mut results = Vec::new();
+        let mut results: std::vec::Vec<(DeviceID, CompatibilityResult)> = std::vec::Vec::new();
         for device in &self.matrix.devices {
             let result = self.check_device(device.id());
             results.push((device.id(), result));

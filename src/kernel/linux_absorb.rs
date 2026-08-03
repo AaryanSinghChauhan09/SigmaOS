@@ -1,26 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Linux Driver Absorption Framework
 // Systematic absorption of Linux kernel drivers with OOP encapsulation and security hardening
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 
@@ -121,7 +103,6 @@ pub enum SecurityRestriction {
 
 impl LinuxAbsorptionEngine {
     /// Create a new absorption engine
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             absorbed_drivers: Vec::new(),
@@ -373,7 +354,6 @@ pub struct AbsorbedExt4Driver {
 }
 
 impl AbsorbedExt4Driver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             metadata: DriverMetadata {
@@ -487,7 +467,6 @@ pub struct AbsorbedTcpStack {
 }
 
 impl AbsorbedTcpStack {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             metadata: crate::kernel::subsystem::NetworkStackMetadata {
@@ -570,7 +549,6 @@ pub struct AbsorbedBuddyAllocator {
 }
 
 impl AbsorbedBuddyAllocator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             metadata: crate::kernel::subsystem::MemoryManagerMetadata {
@@ -660,7 +638,6 @@ pub struct AbsorbedCfsScheduler {
 }
 
 impl AbsorbedCfsScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             metadata: crate::kernel::subsystem::SchedulerMetadata {
@@ -745,7 +722,6 @@ pub struct SovereignEbpfEngine {
 }
 
 impl SovereignEbpfEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             registers: [0; 10],
@@ -830,7 +806,6 @@ impl SovereignCapsicum {
     pub const CAP_SEEK: u64 = 0x04;
     pub const CAP_IOCTL: u64 = 0x08;
 
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             capability_mask: 0xFFFF_FFFF_FFFF_FFFF,
@@ -883,7 +858,6 @@ pub enum NinePMessage {
 }
 
 impl Plan9Server {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             max_message_size: 8192,
@@ -1017,7 +991,6 @@ pub struct KpatchManager {
 }
 
 impl KpatchManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_patches: HashMap::new(),

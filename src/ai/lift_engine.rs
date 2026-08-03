@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS AI-Native Structured Document Extraction Engine (SigmaLift)
 // Fully absorbs and implements all design philosophies of datalab-to/lift:
 // JSON schemas, deterministic exact-match structured extraction, multi-source aggregation,
@@ -48,7 +30,6 @@ pub struct ExtractionSchema {
 }
 
 impl ExtractionSchema {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { fields: Vec::new() }
     }
@@ -115,8 +96,8 @@ impl DocumentExtractor {
             return Err(LiftError::ExtractionFailed);
         }
 
-        let mut extracted_values: HashMap<String, String> = HashMap::new();
-        let mut list_values: HashMap<String, Vec<String>> = HashMap::new();
+        let mut extracted_values = HashMap::new();
+        let mut list_values = HashMap::new();
         let mut citations = Vec::new();
 
         // Simulated high-performance OCR / Vision parsing
@@ -132,16 +113,8 @@ impl DocumentExtractor {
 
                 // Simulate extracting values with high precision and citations
                 let (val, text_ref, score) = match field.name.as_str() {
-                    "document_id" => (
-                        "INV-2026-999".to_string(),
-                        "Invoice Number: INV-2026-999".to_string(),
-                        0.98,
-                    ),
-                    "total_amount" => (
-                        "1450.75".to_string(),
-                        "Grand Total: $1450.75".to_string(),
-                        0.95,
-                    ),
+                    "document_id" => ("INV-2026-999".to_string(), "Invoice Number: INV-2026-999".to_string(), 0.98),
+                    "total_amount" => ("1450.75".to_string(), "Grand Total: $1450.75".to_string(), 0.95),
                     "is_tax_exempt" => ("false".to_string(), "Tax Exempt: No".to_string(), 0.90),
                     "line_items" => {
                         // Multi-source lists aggregation
@@ -158,10 +131,7 @@ impl DocumentExtractor {
                                 confidence_score: 0.94,
                             });
                         }
-                        list_values
-                            .entry(field.name.clone())
-                            .or_insert_with(Vec::new)
-                            .extend(items);
+                        list_values.entry(field.name.clone()).or_insert_with(Vec::new).extend(items);
                         continue;
                     }
                     _ => {
@@ -191,10 +161,7 @@ impl DocumentExtractor {
                 if !field.is_list && !extracted_values.contains_key(&field.name) {
                     return Err(LiftError::NullRequiredField);
                 }
-                if field.is_list
-                    && (!list_values.contains_key(&field.name)
-                        || list_values.get(&field.name).unwrap().is_empty())
-                {
+                if field.is_list && (!list_values.contains_key(&field.name) || list_values.get(&field.name).unwrap().is_empty()) {
                     return Err(LiftError::NullRequiredField);
                 }
             }
@@ -242,14 +209,8 @@ mod tests {
         let result = extractor.extract_structured_data(&pages, &schema).unwrap();
 
         // Exact-match verification
-        assert_eq!(
-            result.extracted_values.get("document_id"),
-            Some(&"INV-2026-999".to_string())
-        );
-        assert_eq!(
-            result.extracted_values.get("total_amount"),
-            Some(&"1450.75".to_string())
-        );
+        assert_eq!(result.extracted_values.get("document_id"), Some(&"INV-2026-999".to_string()));
+        assert_eq!(result.extracted_values.get("total_amount"), Some(&"1450.75".to_string()));
 
         // Multi-source lists aggregation verification
         let items = result.list_values.get("line_items").unwrap();
@@ -258,26 +219,15 @@ mod tests {
         assert_eq!(items[2], "Item C ($1100)");
 
         // Verification of citations
-        assert!(result
-            .citations
-            .iter()
-            .any(|c| c.field_name == "document_id" && c.page_number == 1));
-        assert!(result
-            .citations
-            .iter()
-            .any(|c| c.field_name == "line_items" && c.page_number == 2));
+        assert!(result.citations.iter().any(|c| c.field_name == "document_id" && c.page_number == 1));
+        assert!(result.citations.iter().any(|c| c.field_name == "line_items" && c.page_number == 2));
     }
 
     #[test]
     fn test_missing_required_field_fails() {
         let mut extractor = DocumentExtractor::new("HuggingFace");
         let mut schema = ExtractionSchema::new();
-        schema.add_field(
-            "unobtainable_required_field",
-            FieldType::String,
-            true,
-            false,
-        );
+        schema.add_field("unobtainable_required_field", FieldType::String, true, false);
 
         let pages = vec![vec![1, 2, 3]];
         let result = extractor.extract_structured_data(&pages, &schema);
