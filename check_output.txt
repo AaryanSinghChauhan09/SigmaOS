@@ -1,812 +1,602 @@
     Checking sigmaos v0.1.0 (/app)
-error[E0428]: the name `orchestrator` is defined multiple times
- --> src/automation/mod.rs:5:1
-  |
-3 | pub mod orchestrator;
-  | --------------------- previous definition of the module `orchestrator` here
-4 | pub mod system_level;
-5 | pub mod orchestrator;
-  | ^^^^^^^^^^^^^^^^^^^^^ `orchestrator` redefined here
-  |
-  = note: `orchestrator` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `cow_snapshot` is defined multiple times
- --> src/filesystem/mod.rs:9:1
-  |
-3 | pub mod cow_snapshot;
-  | --------------------- previous definition of the module `cow_snapshot` here
-...
-9 | pub mod cow_snapshot;
-  | ^^^^^^^^^^^^^^^^^^^^^ `cow_snapshot` redefined here
-  |
-  = note: `cow_snapshot` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `backup` is defined multiple times
- --> src/resilience/mod.rs:4:1
-  |
-2 | pub mod backup;
-  | --------------- previous definition of the module `backup` here
-3 | pub mod self_healing;
-4 | pub mod backup;
-  | ^^^^^^^^^^^^^^^ `backup` redefined here
-  |
-  = note: `backup` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `command` is defined multiple times
- --> src/shell/mod.rs:4:1
-  |
-2 | pub mod command;
-  | ---------------- previous definition of the module `command` here
-3 | pub mod repl;
-4 | pub mod command;
-  | ^^^^^^^^^^^^^^^^ `command` redefined here
-  |
-  = note: `command` must be defined only once in the type namespace of this module
-
-error[E0252]: the name `CowSnapshotManager` is defined multiple times
-  --> src/filesystem/mod.rs:33:18
-   |
-15 | ...use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, ...
-   |                                    ------------------ previous import of the type `CowSnapshotManager` here
-...
-33 | ...CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
-   |                 ^^^^^^^^^^^^^^^^^^--
-   |                 |
-   |                 `CowSnapshotManager` reimported here
-   |                 help: remove unnecessary import
-   |
-   = note: `CowSnapshotManager` must be defined only once in the type namespace of this module
-
-error[E0252]: the name `BackupSnapshot` is defined multiple times
-  --> src/resilience/mod.rs:12:18
-   |
- 6 | pub use backup::{BackupError, BackupSnapshot, SigmaTimeshift};
-   |                               -------------- previous import of the type `BackupSnapshot` here
-...
-12 |     BackupError, BackupSnapshot, SigmaTimeshift,
-   |                  ^^^^^^^^^^^^^^--
-   |                  |
-   |                  `BackupSnapshot` reimported here
-   |                  help: remove unnecessary import
-   |
-   = note: `BackupSnapshot` must be defined only once in the type namespace of this module
-
-error[E0252]: the name `SigmaTimeshift` is defined multiple times
-  --> src/resilience/mod.rs:12:34
-   |
- 6 | pub use backup::{BackupError, BackupSnapshot, SigmaTimeshift};
-   |                                               -------------- previous import of the type `SigmaTimeshift` here
-...
-12 |     BackupError, BackupSnapshot, SigmaTimeshift,
-   |                                  ^^^^^^^^^^^^^^-
-   |                                  |
-   |                                  `SigmaTimeshift` reimported here
-   |                                  help: remove unnecessary import
-   |
-   = note: `SigmaTimeshift` must be defined only once in the type namespace of this module
-
-error[E0252]: the name `UniversalPackageManager` is defined multiple times
-   --> src/lib.rs:121:85
+error: visibility `pub` is not followed by an item
+   --> src/shell/command.rs:745:1
     |
- 95 | ...e, UniversalPackageManager,
-    |       ----------------------- previous import of the type `UniversalPackageManager` here
-...
-121 | ...ion, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, A...
-    |                                                        ^^^^^^^^^^^^^^^^^^^^^^^ `UniversalPackageManager` reimported here
+745 | pub #[cfg(target_os = "none")]
+    | ^^^ the visibility
     |
-    = note: `UniversalPackageManager` must be defined only once in the type namespace of this module
-help: you can use `as` to change the binding name of the import
-    |
-121 |     SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager as OtherUniversalPackageManager, AdapterError,
-    |                                                                                                             +++++++++++++++++++++++++++++++
+    = help: you likely meant to define an item, e.g., `pub fn foo() {}`
 
-error[E0252]: the name `CowSnapshot` is defined multiple times
-  --> src/filesystem/mod.rs:33:5
+error: expected item after attributes
+   --> src/shell/command.rs:744:1
+    |
+744 | #[derive(Debug, Clone, PartialEq, Eq)]
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0428]: the name `Driver` is defined multiple times
+  --> src/driver/framework.rs:70:1
    |
-15 | pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction,...
-   |                        ----------- previous import of the type `CowSnapshot` here
+50 | pub trait Driver {
+   | ---------------- previous definition of the trait `Driver` here
 ...
-33 |     CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
-   |     ^^^^^^^^^^^--
+70 | pub trait Driver {
+   | ^^^^^^^^^^^^^^^^ `Driver` redefined here
+   |
+   = note: `Driver` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `Entry` is defined multiple times
+   --> src/klib/hashmap.rs:488:1
+    |
+275 | pub enum Entry<'a, K, V> {
+    | ------------------------ previous definition of the type `Entry` here
+...
+488 | pub enum Entry<'a, K, V> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^ `Entry` redefined here
+    |
+    = note: `Entry` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `OccupiedEntry` is defined multiple times
+   --> src/klib/hashmap.rs:493:1
+    |
+280 | pub struct OccupiedEntry<'a, K, V> {
+    | ---------------------------------- previous definition of the type `OccupiedEntry` here
+...
+493 | pub struct OccupiedEntry<'a, K, V> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `OccupiedEntry` redefined here
+    |
+    = note: `OccupiedEntry` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `VacantEntry` is defined multiple times
+   --> src/klib/hashmap.rs:498:1
+    |
+286 | pub struct VacantEntry<'a, K, V> {
+    | -------------------------------- previous definition of the type `VacantEntry` here
+...
+498 | pub struct VacantEntry<'a, K, V> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `VacantEntry` redefined here
+    |
+    = note: `VacantEntry` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `paging` is defined multiple times
+  --> src/klib/mod.rs:26:1
+   |
+22 | pub mod paging;
+   | --------------- previous definition of the module `paging` here
+...
+26 | pub mod paging;
+   | ^^^^^^^^^^^^^^^ `paging` redefined here
+   |
+   = note: `paging` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `string` is defined multiple times
+  --> src/klib/mod.rs:32:1
+   |
+27 | pub mod string;
+   | --------------- previous definition of the module `string` here
+...
+32 | pub mod string;
+   | ^^^^^^^^^^^^^^^ `string` redefined here
+   |
+   = note: `string` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `time` is defined multiple times
+  --> src/klib/mod.rs:34:1
+   |
+28 | pub mod time;
+   | ------------- previous definition of the module `time` here
+...
+34 | pub mod time;
+   | ^^^^^^^^^^^^^ `time` redefined here
+   |
+   = note: `time` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `math` is defined multiple times
+  --> src/klib/mod.rs:35:1
+   |
+25 | pub mod math;
+   | ------------- previous definition of the module `math` here
+...
+35 | pub mod math;
+   | ^^^^^^^^^^^^^ `math` redefined here
+   |
+   = note: `math` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `uuid` is defined multiple times
+  --> src/klib/mod.rs:36:1
+   |
+29 | pub mod uuid;
+   | ------------- previous definition of the module `uuid` here
+...
+36 | pub mod uuid;
+   | ^^^^^^^^^^^^^ `uuid` redefined here
+   |
+   = note: `uuid` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `PledgeManager` is defined multiple times
+  --> src/security/mod.rs:36:41
+   |
+27 | pub use pledge::{PledgeError, PledgeManager, PledgePromise};
+   |                               ------------- previous import of the type `PledgeManager` here
+...
+36 | pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+   |                                         ^^^^^^^^^^^^^--
+   |                                         |
+   |                                         `PledgeManager` reimported here
+   |                                         help: remove unnecessary import
+   |
+   = note: `PledgeManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `Vec` is defined multiple times
+  --> src/driver/framework.rs:27:5
+   |
+19 | use crate::klib::Vec;
+   |     ---------------- previous import of the type `Vec` here
+...
+27 | use crate::klib::Vec;
+   |     ^^^^^^^^^^^^^^^^ `Vec` reimported here
+   |
+   = note: `Vec` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `PledgeError` is defined multiple times
+  --> src/security/mod.rs:36:28
+   |
+27 | pub use pledge::{PledgeError, PledgeManager, PledgePromise};
+   |                  ----------- previous import of the type `PledgeError` here
+...
+36 | pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+   |                            ^^^^^^^^^^^--
+   |                            |
+   |                            `PledgeError` reimported here
+   |                            help: remove unnecessary import
+   |
+   = note: `PledgeError` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `PledgePromise` is defined multiple times
+  --> src/security/mod.rs:36:56
+   |
+27 | pub use pledge::{PledgeError, PledgeManager, PledgePromise};
+   |                                              ------------- previous import of the type `PledgePromise` here
+...
+36 | pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+   |                                                        ^^^^^^^^^^^^^ `PledgePromise` reimported here
+   |
+   = note: `PledgePromise` must be defined only once in the type namespace of this module
+
+error[E0432]: unresolved import `parrot_kali`
+  --> src/security/mod.rs:32:9
+   |
+32 | pub use parrot_kali::{
+   |         ^^^^^^^^^^^ use of unresolved module or unlinked crate `parrot_kali`
+   |
+help: to make use of source file src/security/parrot_kali.rs, use `mod parrot_kali` in this file to declare the module
+  --> src/lib.rs:6:1
+   |
+ 6 + mod parrot_kali;
+   |
+
+error[E0432]: unresolved import `qubes_isolation`
+  --> src/security/mod.rs:37:9
+   |
+37 | pub use qubes_isolation::{
+   |         ^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `qubes_isolation`
+   |
+help: to make use of source file src/security/qubes_isolation.rs, use `mod qubes_isolation` in this file to declare the module
+  --> src/lib.rs:6:1
+   |
+ 6 + mod qubes_isolation;
+   |
+
+error[E0432]: unresolved import `selinux`
+  --> src/security/mod.rs:40:9
+   |
+40 | pub use selinux::{
+   |         ^^^^^^^ use of unresolved module or unlinked crate `selinux`
+   |
+help: to make use of source file src/security/selinux.rs, use `mod selinux` in this file to declare the module
+  --> src/lib.rs:6:1
+   |
+ 6 + mod selinux;
+   |
+
+error[E0432]: unresolved imports `ai::AIAgent`, `ai::AIAgentManager`, `ai::AIError`, `ai::AIStats`, `ai::AgentCapability`, `ai::AgentInfo`, `ai::ApmDependency`, `ai::ApmLockfile`, `ai::ApmManifest`, `ai::ApmPolicy`, `ai::ApmStatus`, `ai::DependencySource`, `ai::Intent`, `ai::IntentType`, `ai::ManagerCapability`, `ai::McpServer`, `ai::Pattern`, `ai::SimpleAIAgent`, `ai::SimpleAIAgentManager`, `ai::SovereignApmEngine`, `ai::SovereignWikiEngine`, `ai::WikiArticle`
+  --> src/lib.rs:45:5
+   |
+45 |     AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, ApmDependency,
+   |     ^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^  ^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^^^^ no `ApmDependency` in `ai`
+   |     |        |               |        |        |                |
+   |     |        |               |        |        |                no `AgentInfo` in `ai`
+   |     |        |               |        |        no `AgentCapability` in `ai`
+   |     |        |               |        no `AIStats` in `ai`
+   |     |        |               no `AIError` in `ai`
+   |     |        no `AIAgentManager` in `ai`
+   |     no `AIAgent` in `ai`
+46 |     ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, Intent, IntentType,
+   |     ^^^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^  ^^^^^^^^^^
+   |     |            |            |
+   |     |            |            no `ApmPolicy` in `ai`
+   |     |            no `ApmManifest` in `ai`
+   |     no `ApmLockfile` in `ai`
+47 |     ManagerCapability as AiManagerCapability, McpServer, Pattern, SimpleAIAgent,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^  ^^^^^^^^^^^^^
+48 |     SimpleAIAgentManager, SovereignApmEngine, SovereignWikiEngine, WikiArticle,
+   |     ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^
+
+error[E0432]: unresolved imports `compatibility::FhsConventionStatus`, `compatibility::LegacyDriverAdapter`, `compatibility::LegacyFSAdapter`, `compatibility::LegacyKernelAdapter`, `compatibility::LegacyPackageAdapter`, `compatibility::LegacyProtocolAdapter`, `compatibility::LegacySecurityAdapter`, `compatibility::LegacyUIAdapter`, `compatibility::LsbProfile`, `compatibility::PosixComplianceLevel`, `compatibility::StandardsComplianceManager`
+  --> src/lib.rs:61:23
+   |
+61 |     EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh,
+   |                       ^^^^^^^^^^^^^^^^^^^ no `FhsConventionStatus` in `compatibility`
+...
+64 |     LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+   |     ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^ no `LegacyPackageAdapter` in `compatibility`
+   |     |                    |                |
+   |     |                    |                no `LegacyKernelAdapter` in `compatibility`
+   |     |                    no `LegacyFSAdapter` in `compatibility`
+   |     no `LegacyDriverAdapter` in `compatibility`
+65 |     LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LizardInstaller, LsbProfile,
+   |     ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^                   ^^^^^^^^^^ no `LsbProfile` in `compatibility`
+   |     |                      |                      |
+   |     |                      |                      no `LegacyUIAdapter` in `compatibility`
+   |     |                      no `LegacySecurityAdapter` in `compatibility`
+   |     no `LegacyProtocolAdapter` in `compatibility`
+...
+68 |     PantheonGalaWindowManager, PeripheralArchiveMesh, PopShellTiling, PosixComplianceLevel,
+   |                                                                       ^^^^^^^^^^^^^^^^^^^^ no `PosixComplianceLevel` in `compatibility`
+69 |     ProcessAlmanacHub, RhinoPkgUnified, SELinuxConstellation, SecurityConstellation,
+70 |     SnapcraftRuntime, StandardsComplianceManager, StarlingCompositor, StarlingTilingEngine,
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: consider importing this enum instead:
+           crate::compatibility::standards::FhsConventionStatus
+   = help: consider importing this enum instead:
+           crate::compatibility::standards::LsbProfile
+   = help: consider importing this enum instead:
+           crate::compatibility::standards::PosixComplianceLevel
+help: a similar name exists in the module
+   |
+64 -     LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+64 +     LegacyDriverAdapter, legacy_adapters, LegacyKernelAdapter, LegacyPackageAdapter,
+   |
+help: a similar name exists in the module
+   |
+65 -     LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LizardInstaller, LsbProfile,
+65 +     LegacyProtocolAdapter, LegacySecurityAdapter, legacy_adapters, LizardInstaller, LsbProfile,
+   |
+
+error[E0432]: unresolved import `container`
+  --> src/lib.rs:77:9
+   |
+77 | pub use container::{
+   |         ^^^^^^^^^ use of unresolved module or unlinked crate `container`
+   |
+help: to make use of source file src/container/mod.rs, use `mod container` in this file to declare the module
+   |
+ 6 + mod container;
+   |
+
+error[E0432]: unresolved import `kernel::SchedulerError`
+  --> src/lib.rs:99:69
+   |
+99 | ...Scheduler, SchedulerError, PAGE_SIZE,
+   |               ^^^^^^^^^^^^^^ no `SchedulerError` in `kernel`
+   |
+   = help: consider importing one of these items instead:
+           crate::kernel::roundrobin::SchedulerError
+           crate::klib::error::KernelError::SchedulerError
+
+error[E0432]: unresolved import `crate::driver::device::DdeDeviceWrapper`
+  --> src/compatibility/historic_linux.rs:19:5
+   |
+19 | use crate::driver::device::DdeDeviceWrapper;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `DdeDeviceWrapper` in `driver::device`
+
+error[E0432]: unresolved imports `mint_linux::MintUpdateLevel`, `mint_linux::MintUpdatePackage`, `mint_linux::MintAppMetadata`, `mint_linux::MintSoftwareManager`, `mint_linux::MintReportAlertSeverity`, `mint_linux::MintReportAlert`, `mint_linux::MintReportSystem`
+  --> src/compatibility/mod.rs:61:5
+   |
+61 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+   |     ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^ no `MintUpdatePackage` in `compatibility::mint_linux`
    |     |
-   |     `CowSnapshot` reimported here
-   |     help: remove unnecessary import
+   |     no `MintUpdateLevel` in `compatibility::mint_linux`
+62 |     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
+   |     ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^ no `MintReportAlert` in `compatibility::mint_linux`
+   |     |                |                    |
+   |     |                |                    no `MintReportAlertSeverity` in `compatibility::mint_linux`
+   |     |                no `MintSoftwareManager` in `compatibility::mint_linux`
+   |     no `MintAppMetadata` in `compatibility::mint_linux`
+63 |     MintReportSystem,
+   |     ^^^^^^^^^^^^^^^^ no `MintReportSystem` in `compatibility::mint_linux`
    |
-   = note: `CowSnapshot` must be defined only once in the type namespace of this module
+help: a similar name exists in the module
+   |
+61 -     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+61 +     MintUpdateItem, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+   |
+help: a similar name exists in the module
+   |
+61 -     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+61 +     MintUpdateLevel, MintUpdateManager, MintUpdateManager, MintBackupTool,
+   |
+help: a similar name exists in the module
+   |
+62 -     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
+62 +     MintAppMetadata, MintUpdateManager, MintReportAlertSeverity, MintReportAlert,
+   |
 
-error[E0252]: the name `FileTransaction` is defined multiple times
-  --> src/filesystem/mod.rs:33:38
+error[E0432]: unresolved imports `historic_linux::PicKeyboardController`, `historic_linux::ProtectedModeSwitchSimulator`, `historic_linux::VgaTextModeDriverSimulator`
+  --> src/compatibility/mod.rs:89:63
    |
-15 | ...owSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
-   |                                    --------------- previous import of the type `FileTransaction` here
+89 |     LinuxEra, MicroService, MicroServiceState, NetworkBridge, PicKeyboardController,
+   |                                                               ^^^^^^^^^^^^^^^^^^^^^ no `PicKeyboardController` in `compatibility::historic_linux`
+90 |     ProtectedModeSwitchSimulator, StorageBridge, SyscallAbi, TribeInstaller,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `ProtectedModeSwitchSimulator` in `compatibility::historic_linux`
+91 |     VgaTextModeDriverSimulator, VintageDriverTranslator, VintagePackageConverter,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^ no `VgaTextModeDriverSimulator` in `compatibility::historic_linux`
+
+error[E0432]: unresolved import `support::SymlinkResolverRule`
+  --> src/filesystem/mod.rs:44:80
+   |
+44 | ...ger, SmartSymlink, SymlinkResolverRule,
+   |                       ^^^^^^^^^^^^^^^^^^^ no `SymlinkResolverRule` in `filesystem::support`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `alloc`
+  --> src/security/vulnerability.rs:24:5
+   |
+24 | use alloc::boxed::Box;
+   |     ^^^^^ use of unresolved module or unlinked crate `alloc`
+   |
+   = help: add `extern crate alloc` to use the `alloc` crate
+
+error[E0432]: unresolved imports `store::SoftwareRegistryEntry`, `store::GLOBAL_SOFTWARE_STORE`
+  --> src/package/mod.rs:29:37
+   |
+29 | ...reStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE};
+   |             ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^ no `GLOBAL_SOFTWARE_STORE` in `package::store`
+   |             |
+   |             no `SoftwareRegistryEntry` in `package::store`
+
+error[E0432]: unresolved imports `vulnerability::SecurityScanner`, `vulnerability::VulnerabilityClass`, `vulnerability::VulnerabilityReport`
+  --> src/security/mod.rs:28:25
+   |
+28 | ...ty::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, Exploi...
+   |         ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^ no `VulnerabilityReport` in `security::vulnerability`
+   |         |                |
+   |         |                no `VulnerabilityClass` in `security::vulnerability`
+   |         no `SecurityScanner` in `security::vulnerability`
+   |
+help: a similar name exists in the module
+   |
+28 - pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
+28 + pub use vulnerability::{SecurityScanner, VulnerabilityID, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
+   |
+help: a similar name exists in the module
+   |
+28 - pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
+28 + pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityID, ExploitPayload, PenetrationAssistant};
+   |
+
+error[E0432]: unresolved imports `universal_adapter::AptDebManifest`, `universal_adapter::PacmanPkgbuild`, `universal_adapter::SnapcraftManifest`, `universal_adapter::FlatpakManifest`, `universal_adapter::UniversalPackageAdapter`
+  --> src/sigpkg/mod.rs:38:5
+   |
+38 |     AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
+   |     ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^
+   |     |               |               |                  |                |
+   |     |               |               |                  |                no `UniversalPackageAdapter` in `sigpkg::universal_adapter`
+   |     |               |               |                  |                help: a similar name exists in the module: `UniversalPackageManager`
+   |     |               |               |                  no `FlatpakManifest` in `sigpkg::universal_adapter`
+   |     |               |               no `SnapcraftManifest` in `sigpkg::universal_adapter`
+   |     |               no `PacmanPkgbuild` in `sigpkg::universal_adapter`
+   |     no `AptDebManifest` in `sigpkg::universal_adapter`
+
+error[E0407]: method `set_state` is not a member of trait `Driver`
+   --> src/driver/framework.rs:121:5
+    |
+121 | /     fn set_state(&self, state: DriverState) {
+122 | |         self.state.store(state as usize, Ordering::SeqCst);
+123 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `init` is not a member of trait `Driver`
+   --> src/driver/framework.rs:124:5
+    |
+124 | /     fn init(&mut self) -> Result<(), DriverError> {
+125 | |         Ok(())
+126 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `probe` is not a member of trait `Driver`
+   --> src/driver/framework.rs:127:5
+    |
+127 | /     fn probe(&mut self) -> Result<bool, DriverError> {
+128 | |         Ok(true)
+129 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `shutdown` is not a member of trait `Driver`
+   --> src/driver/framework.rs:138:5
+    |
+138 | /     fn shutdown(&mut self) -> Result<(), DriverError> {
+139 | |         Ok(())
+140 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `dependencies` is not a member of trait `Driver`
+   --> src/driver/framework.rs:141:5
+    |
+141 | /     fn dependencies(&self) -> &'static [DriverType] {
+142 | |         &[]
+143 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `set_state` is not a member of trait `Driver`
+   --> src/driver/framework.rs:193:5
+    |
+193 | /     fn set_state(&self, state: DriverState) {
+194 | |         self.state.store(state as usize, Ordering::SeqCst);
+195 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `init` is not a member of trait `Driver`
+   --> src/driver/framework.rs:196:5
+    |
+196 | /     fn init(&mut self) -> Result<(), DriverError> {
+197 | |         Ok(())
+198 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `probe` is not a member of trait `Driver`
+   --> src/driver/framework.rs:199:5
+    |
+199 | /     fn probe(&mut self) -> Result<bool, DriverError> {
+200 | |         Ok(true)
+201 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `shutdown` is not a member of trait `Driver`
+   --> src/driver/framework.rs:210:5
+    |
+210 | /     fn shutdown(&mut self) -> Result<(), DriverError> {
+211 | |         Ok(())
+212 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `dependencies` is not a member of trait `Driver`
+   --> src/driver/framework.rs:213:5
+    |
+213 | /     fn dependencies(&self) -> &'static [DriverType] {
+214 | |         &[]
+215 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `set_state` is not a member of trait `Driver`
+   --> src/driver/framework.rs:262:5
+    |
+262 | /     fn set_state(&self, state: DriverState) {
+263 | |         self.state.store(state as usize, Ordering::SeqCst);
+264 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `init` is not a member of trait `Driver`
+   --> src/driver/framework.rs:265:5
+    |
+265 | /     fn init(&mut self) -> Result<(), DriverError> {
+266 | |         Ok(())
+267 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `probe` is not a member of trait `Driver`
+   --> src/driver/framework.rs:268:5
+    |
+268 | /     fn probe(&mut self) -> Result<bool, DriverError> {
+269 | |         Ok(true)
+270 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `shutdown` is not a member of trait `Driver`
+   --> src/driver/framework.rs:279:5
+    |
+279 | /     fn shutdown(&mut self) -> Result<(), DriverError> {
+280 | |         Ok(())
+281 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `dependencies` is not a member of trait `Driver`
+   --> src/driver/framework.rs:282:5
+    |
+282 | /     fn dependencies(&self) -> &'static [DriverType] {
+283 | |         self.deps
+284 | |     }
+    | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `query_by_type` is not a member of trait `DriverFramework`
+   --> src/driver/framework.rs:420:5
+    |
+420 | /     fn query_by_type(&self, driver_type: DriverType) -> Vec<DriverID> {
+421 | |         let mut ids = Vec::new();
+422 | |         for driver_option in self.drivers.iter() {
+423 | |             if let Some(ref d) = *driver_option {
+...   |
+429 | |         ids
+430 | |     }
+    | |_____^ not a member of trait `DriverFramework`
+
+error[E0405]: cannot find trait `SymlinkResolverRule` in this scope
+   --> src/filesystem/support.rs:287:6
+    |
+287 | impl SymlinkResolverRule for LinuxPersonaRule {
+    |      ^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0405]: cannot find trait `SymlinkResolverRule` in this scope
+   --> src/filesystem/support.rs:313:31
+    |
+313 |     pub fn resolve_symlink<R: SymlinkResolverRule>(
+    |                               ^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find value `new_vec` in this scope
+  --> src/klib/vec.rs:31:17
+   |
+31 |                 new_vec.push((*self.data.add(i)).clone());
+   |                 ^^^^^^^ not found in this scope
+
+error[E0425]: cannot find value `new_vec` in this scope
+  --> src/klib/vec.rs:34:9
+   |
+34 |         new_vec
+   |         ^^^^^^^ not found in this scope
+
+error[E0119]: conflicting implementations of trait `Debug` for type `klib::vec::Vec<_>`
+   --> src/klib/vec.rs:234:1
+    |
+ 38 | impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    | ----------------------------------------------------- first implementation here
 ...
-33 | ...shotManager, FileTransaction, SnapshotState,
-   |                 ^^^^^^^^^^^^^^^--
-   |                 |
-   |                 `FileTransaction` reimported here
-   |                 help: remove unnecessary import
-   |
-   = note: `FileTransaction` must be defined only once in the type namespace of this module
+234 | impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `klib::vec::Vec<_>`
 
-error[E0252]: the name `SnapshotState` is defined multiple times
-  --> src/filesystem/mod.rs:33:55
-   |
-15 | ...SnapshotManager, FileTransaction, SnapshotState};
-   |                                      ------------- previous import of the type `SnapshotState` here
+error[E0119]: conflicting implementations of trait `Debug` for type `klib::vec::Vec<_>`
+   --> src/klib/vec.rs:521:1
+    |
+ 38 | impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    | ----------------------------------------------------- first implementation here
 ...
-33 | ...leTransaction, SnapshotState,
-   |                   ^^^^^^^^^^^^^-
-   |                   |
-   |                   `SnapshotState` reimported here
-   |                   help: remove unnecessary import
-   |
-   = note: `SnapshotState` must be defined only once in the type namespace of this module
+521 | impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `klib::vec::Vec<_>`
 
-error[E0252]: the name `BackupError` is defined multiple times
-  --> src/resilience/mod.rs:12:5
-   |
- 6 | pub use backup::{BackupError, BackupSnapshot, SigmaTimeshift};
-   |                  ----------- previous import of the type `BackupError` here
+error[E0119]: conflicting implementations of trait `Clone` for type `klib::vec::Vec<_>`
+   --> src/klib/vec.rs:511:1
+    |
+224 | impl<T: Clone> Clone for Vec<T> {
+    | ------------------------------- first implementation here
 ...
-12 |     BackupError, BackupSnapshot, SigmaTimeshift,
-   |     ^^^^^^^^^^^--
-   |     |
-   |     `BackupError` reimported here
-   |     help: remove unnecessary import
-   |
-   = note: `BackupError` must be defined only once in the type namespace of this module
+511 | impl<T: Clone> Clone for Vec<T> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `klib::vec::Vec<_>`
 
-error[E0252]: the name `SecurityContext` is defined multiple times
-  --> src/security/mod.rs:66:5
-   |
-42 |     AppArmorManager, AppArmorProfile, ObjectType, Permission as SelinuxPermission, SecurityContext,
-   |                                                                                    --------------- previous import of the type `SecurityContext` here
+error[E0119]: conflicting implementations of trait `IntoIterator` for type `&klib::vec::Vec<_>`
+   --> src/klib/vec.rs:407:1
+    |
+320 | impl<'a, T> IntoIterator for &'a Vec<T> {
+    | --------------------------------------- first implementation here
 ...
-66 |     SecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
-   |     ^^^^^^^^^^^^^^^ `SecurityContext` reimported here
-   |
-   = note: `SecurityContext` must be defined only once in the type namespace of this module
-help: you can use `as` to change the binding name of the import
-   |
-66 |     SecurityContext as OtherSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
-   |                     +++++++++++++++++++++++
+407 | impl<'a, T> IntoIterator for &'a Vec<T> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `&klib::vec::Vec<_>`
 
-error[E0432]: unresolved import `sigma_pledge`
-  --> src/security/mod.rs:45:9
-   |
-45 | pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgeProm...
-   |         ^^^^^^^^^^^^ use of unresolved module or unlinked crate `sigma_pledge`
-   |
-help: to make use of source file src/security/sigma_pledge.rs, use `mod sigma_pledge` in this file to declare the module
-  --> src/lib.rs:4:1
-   |
- 4 + mod sigma_pledge;
-   |
-
-error[E0432]: unresolved import `sigma_unveil`
-  --> src/security/mod.rs:46:9
-   |
-46 | pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, Un...
-   |         ^^^^^^^^^^^^ use of unresolved module or unlinked crate `sigma_unveil`
-   |
-help: to make use of source file src/security/sigma_unveil.rs, use `mod sigma_unveil` in this file to declare the module
-  --> src/lib.rs:4:1
-   |
- 4 + mod sigma_unveil;
-   |
-
-error[E0432]: unresolved import `package::PackageAdapter`
-  --> src/lib.rs:94:45
-   |
-94 | ...yResolver, PackageAdapter, PackageError, PackageFormat,
-   |               ^^^^^^^^^^^^^^ no `PackageAdapter` in `package`
-
-error[E0432]: unresolved imports `security::DomainID`, `security::DomainOrchestrator`, `security::DomainType`, `security::IsolatedDomain`, `security::IsolationError`
-   --> src/lib.rs:112:38
+error[E0119]: conflicting implementations of trait `IntoIterator` for type `&mut klib::vec::Vec<_>`
+   --> src/klib/vec.rs:416:1
     |
-112 |     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
-    |                                      ^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^^^^^ no `IsolatedDomain` in `security`
-    |                                      |         |                   |
-    |                                      |         |                   no `DomainType` in `security`
-    |                                      |         no `DomainOrchestrator` in `security`
-    |                                      no `DomainID` in `security`
-113 |     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSe...
-    |     ^^^^^^^^^^^^^^ no `IsolationError` in `security`
+328 | impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    | ------------------------------------------- first implementation here
+...
+416 | impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `&mut klib::vec::Vec<_>`
 
-error[E0432]: unresolved imports `stack::SigmaDebug`, `stack::SigmaMetrics`, `stack::SigmaTrace`, `stack::SimpleSigmaDebug`, `stack::SimpleSigmaMetrics`, `stack::SimpleSigmaTrace`
- --> src/observability/mod.rs:6:45
-  |
-6 | ... ObservabilityStats, SigmaDebug, SigmaMetrics, SigmaTrace, SimpleMetric,
-  |                         ^^^^^^^^^^  ^^^^^^^^^^^^  ^^^^^^^^^^ no `SigmaTrace` in `observability::stack`
-  |                         |           |
-  |                         |           no `SigmaMetrics` in `observability::stack`
-  |                         no `SigmaDebug` in `observability::stack`
-7 | ...Stack, SimpleSigmaDebug, SimpleSigmaMetrics, SimpleSigmaTrace, SimpleS...
-  |           ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^ no `SimpleSigmaTrace` in `observability::stack`
-  |           |                 |
-  |           |                 no `SimpleSigmaMetrics` in `observability::stack`
-  |           |                 help: a similar name exists in the module: `SimpleMetric`
-  |           no `SimpleSigmaDebug` in `observability::stack`
-
-error[E0432]: unresolved imports `desktop::InputAuthGate`, `desktop::PqcVideoCipher`, `desktop::SigmaRendezvous`
- --> src/remote/mod.rs:6:5
-  |
-6 |     InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSess...
-  |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^ no `PqcVideoCipher` in `remote::desktop`
-  |     |
-  |     no `InputAuthGate` in `remote::desktop`
-7 |     SessionState, SigmaRendezvous, SimpleRemoteDesktop, SimpleRemoteSessi...
-  |                   ^^^^^^^^^^^^^^^ no `SigmaRendezvous` in `remote::desktop`
-
-error[E0432]: unresolved import `audit::LogFormat`
-  --> src/security/mod.rs:24:43
-   |
-24 | pub use audit::{AuditLogger, AuditPolicy, LogFormat};
-   |                                           ^^^^^^^^^ no `LogFormat` in `security::audit`
-
-error[E0432]: unresolved import `selinux::Permission`
-  --> src/security/mod.rs:42:51
-   |
-42 | ...e, ObjectType, Permission as SelinuxPermission, SecurityContext,
-   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `Permission` in `security::selinux`
-   |
-   = help: consider importing this enum through its public re-export instead:
-           crate::Permission
-
-error[E0432]: unresolved imports `spec::AptPackageAdapter`, `spec::PackageAdapterFactory`, `spec::PacmanPackageAdapter`, `spec::SnapPackageAdapter`, `spec::NixPackageAdapter`, `spec::EbuildPackageAdapter`, `spec::ApkPackageAdapter`, `spec::FlatpakPackageAdapter`, `spec::TxzPackageAdapter`, `spec::XbpsPackageAdapter`, `spec::CachyCpuDetector`, `spec::CachyosPackageAdapter`, `spec::CpuArchLevel`, `spec::UniversalPackage`, `spec::UniversalPackageType`, `spec::UserDefinedPackageHook`
-  --> src/sigpkg/mod.rs:17:5
-   |
-17 |     AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
-   |     ^^^^^^^^^^^^^^^^^                     ^^^^^^^^^^^^^^^^^^^^^ no `PackageAdapterFactory` in `sigpkg::spec`
-   |     |
-   |     no `AptPackageAdapter` in `sigpkg::spec`
-18 |     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as ...
-19 |     PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
-   |     ^^^^^^^^^^^^^^^^^^^^                                       ^^^^^^^^^^^^^^^^^^ no `SnapPackageAdapter` in `sigpkg::spec`
-   |     |
-   |     no `PacmanPackageAdapter` in `sigpkg::spec`
-20 |     NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
-   |     ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^ no `FlatpakPackageAdapter` in `sigpkg::spec`
-   |     |                  |                     |
-   |     |                  |                     no `ApkPackageAdapter` in `sigpkg::spec`
-   |     |                  no `EbuildPackageAdapter` in `sigpkg::spec`
-   |     no `NixPackageAdapter` in `sigpkg::spec`
-21 |     TxzPackageAdapter, XbpsPackageAdapter,
-   |     ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^ no `XbpsPackageAdapter` in `sigpkg::spec`
-   |     |
-   |     no `TxzPackageAdapter` in `sigpkg::spec`
-22 |     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-   |     ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
-23 |     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
-   |     ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^
-
-warning: unused import: `std::collections::HashMap`
- --> src/automation/ai_optimizer.rs:4:5
-  |
-4 | use std::collections::HashMap;
-  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
-  |
-  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
-
-warning: unused import: `crate::security::CapabilityToken`
- --> src/compatibility/constellation_mesh.rs:5:5
-  |
-5 | use crate::security::CapabilityToken;
-  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-warning: unused imports: `AtomicUsize` and `Ordering`
- --> src/compatibility/constellation_mesh.rs:6:26
-  |
-6 | use core::sync::atomic::{AtomicUsize, Ordering};
-  |                          ^^^^^^^^^^^  ^^^^^^^^
-
-warning: unused imports: `NonNull` and `self`
- --> src/container/runtime.rs:9:17
-  |
-9 | use core::ptr::{self, NonNull};
-  |                 ^^^^  ^^^^^^^
-
-warning: unused import: `self`
- --> src/driver/device.rs:8:17
-  |
-8 | use core::ptr::{self, NonNull};
-  |                 ^^^^
-
-warning: unused imports: `CowSnapshotManager`, `CowSnapshot`, `FileTransaction`, and `SnapshotState`
-  --> src/filesystem/mod.rs:33:5
-   |
-33 |     CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
-   |     ^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^
-
-warning: unused import: `AtomicU32`
- --> src/kernel/memory.rs:6:26
-  |
-6 | use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
-  |                          ^^^^^^^^^
-
-warning: unused import: `crate::security::CapabilityToken`
- --> src/kernel/meta.rs:4:5
-  |
-4 | use crate::security::CapabilityToken;
-  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-warning: unused imports: `AtomicUsize` and `Ordering`
- --> src/kernel/meta.rs:5:26
-  |
-5 | use core::sync::atomic::{AtomicUsize, Ordering};
-  |                          ^^^^^^^^^^^  ^^^^^^^^
-
-warning: unused imports: `NonNull` and `self`
- --> src/observability/stack.rs:9:17
-  |
-9 | use core::ptr::{self, NonNull};
-  |                 ^^^^  ^^^^^^^
-
-warning: unused import: `std::path::PathBuf`
- --> src/productivity/notes.rs:5:5
-  |
-5 | use std::path::PathBuf;
-  |     ^^^^^^^^^^^^^^^^^^
-
-warning: unused import: `Duration`
- --> src/productivity/screen_recorder.rs:5:17
-  |
-5 | use std::time::{Duration, Instant};
-  |                 ^^^^^^^^
-
-warning: unused import: `std::sync::Arc`
-  --> src/productivity/sigma_office.rs:17:5
-   |
-17 | use std::sync::Arc;
-   |     ^^^^^^^^^^^^^^
-
-warning: unused imports: `Duration` and `Instant`
- --> src/productivity/tasks.rs:5:17
-  |
-5 | use std::time::{Duration, Instant};
-  |                 ^^^^^^^^  ^^^^^^^
-
-warning: unused imports: `BackupError`, `BackupSnapshot`, and `SigmaTimeshift`
-  --> src/resilience/mod.rs:12:5
-   |
-12 |     BackupError, BackupSnapshot, SigmaTimeshift,
-   |     ^^^^^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^
-
-warning: unused import: `alloc::vec::Vec`
- --> src/security/cleaner.rs:4:5
-  |
-4 | use alloc::vec::Vec;
-  |     ^^^^^^^^^^^^^^^
-
-warning: unused imports: `NonNull` and `self`
- --> src/security/integrity.rs:9:17
-  |
-9 | use core::ptr::{self, NonNull};
-  |                 ^^^^  ^^^^^^^
-
-warning: unused imports: `NonNull` and `self`
- --> src/security/mac.rs:9:17
-  |
-9 | use core::ptr::{self, NonNull};
-  |                 ^^^^  ^^^^^^^
-
-warning: unused imports: `NonNull` and `self`
- --> src/security/secrets.rs:9:17
-  |
-9 | use core::ptr::{self, NonNull};
-  |                 ^^^^  ^^^^^^^
-
-warning: unused import: `SecurityContext`
-  --> src/security/mod.rs:42:84
-   |
-42 | ...sion as SelinuxPermission, SecurityContext,
-   |                               ^^^^^^^^^^^^^^^
-
-warning: unused imports: `NonNull` and `self`
- --> src/sigpkg/spec.rs:9:17
-  |
-9 | use core::ptr::{self, NonNull};
-  |                 ^^^^  ^^^^^^^
-
-warning: unused imports: `AtomicUsize` and `Ordering`
-  --> src/sigpkg/spec.rs:10:26
-   |
-10 | use core::sync::atomic::{AtomicUsize, Ordering};
-   |                          ^^^^^^^^^^^  ^^^^^^^^
-
-warning: unused import: `ParseError`
- --> src/sigpkg/universal_adapter.rs:4:70
-  |
-4 | ...ersionConstraint, Dependency, ParseError};
-  |                                  ^^^^^^^^^^
-
-warning: unused import: `UniversalPackageManager`
-   --> src/lib.rs:121:85
+error[E0119]: conflicting implementations of trait `FromIterator<_>` for type `klib::vec::Vec<_>`
+   --> src/klib/vec.rs:478:1
     |
-121 | ...PackageFormatAdapter, UniversalPackageManager, AdapterError,
-    |                          ^^^^^^^^^^^^^^^^^^^^^^^
+275 | impl<T> core::iter::FromIterator<T> for Vec<T> {
+    | ---------------------------------------------- first implementation here
+...
+478 | impl<T> core::iter::FromIterator<T> for Vec<T> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `klib::vec::Vec<_>`
 
-warning: crate-level attribute should be in the root module
- --> src/container/oci_runtime.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-  |
-  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
-
-warning: crate-level attribute should be in the root module
- --> src/container/runtime.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/device/manager.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/driver/device.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/driver/framework.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/filesystem/support.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/observability/stack.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/remote/desktop.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/remote/shell.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/security/audit.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/security/integrity.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/security/mac.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/security/pki.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/security/secrets.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/security/vulnerability.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/shell/command.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: crate-level attribute should be in the root module
- --> src/sigpkg/spec.rs:2:1
-  |
-2 | #![no_main]
-  | ^^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/container/oci_runtime.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/container/runtime.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/device/manager.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/driver/device.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/driver/framework.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/filesystem/complete_filesystems.rs:4:1
-  |
-4 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/filesystem/support.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/kernel/generation_manager.rs:5:1
-  |
-5 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/kernel/gap_closing.rs:4:1
-  |
-4 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/observability/stack.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/remote/desktop.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/remote/shell.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/audit.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/capability_enforcer.rs:4:1
-  |
-4 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/capability_token.rs:4:1
-  |
-4 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/cleaner.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/forensics.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/integrity.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/mac.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/pki.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/scanner.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/secrets.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/selinux.rs:4:1
-  |
-4 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/security/vulnerability.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/shell/command.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/sigpkg/spec.rs:1:1
-  |
-1 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/sigpkg/zero_alloc_resolver.rs:4:1
-  |
-4 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: the `#![no_std]` attribute can only be used at the crate root
- --> src/virtualization/namespaces.rs:4:1
-  |
-4 | #![no_std]
-  | ^^^^^^^^^^
-
-warning: unused variable: `action`
-   --> src/automation/orchestrator.rs:327:27
-    |
-327 |     fn execute(&mut self, action: &SystemAction) -> Result<(), Optimiza...
-    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_action`
-    |
-    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
-
-warning: unused variable: `action`
-   --> src/automation/orchestrator.rs:327:27
-    |
-327 |     fn execute(&mut self, action: &SystemAction) -> Result<(), Optimiza...
-    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_action`
-
-warning: variable does not need to be mutable
-   --> src/compatibility/endeavour.rs:158:13
-    |
-158 |         let mut words: Vec<String> = sanitized
-    |             ----^^^^^
-    |             |
-    |             help: remove this `mut`
-    |
-    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
-
-warning: unused variable: `pid`
-   --> src/dashboard/process.rs:288:38
-    |
-288 | ...xecute_action(&mut self, pid: u32, action: ProcessAction) -> Result<...
-    |                             ^^^ help: if this is intentional, prefix it with an underscore: `_pid`
-
-warning: unused variable: `data`
-  --> src/drivers/usb_hid.rs:64:63
-   |
-64 | ...ort_type: HidReportType, data: &[u8]) -> Result<(), HidError> {
-   |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_data`
-
-warning: unused variable: `path`
-   --> src/filesystem/disk_usage.rs:211:36
-    |
-211 |     pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
-    |                                    ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
-
-warning: unused variable: `new_offset`
-   --> src/filesystem/vfs.rs:168:13
-    |
-168 |         let new_offset = file_descriptor
-    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_new_offset`
-
-warning: unused variable: `arguments`
-   --> src/orchestration/cross_device.rs:392:17
-    |
-392 |                 arguments,
-    |                 ^^^^^^^^^ help: try ignoring the field: `arguments: _`
-
-warning: unused variable: `font_size`
-   --> src/productivity/sigma_office.rs:405:43
-    |
-405 | ...ext(&self, text: &str, font_size: u32, position: (f32, f32)) -> Resu...
-    |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_font_size`
-
-warning: unused variable: `position`
-   --> src/productivity/sigma_office.rs:405:59
-    |
-405 | ... &str, font_size: u32, position: (f32, f32)) -> Result<Vec<u8>> {
-    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_position`
-
-warning: unused variable: `path`
-   --> src/productivity/sigma_office.rs:485:49
-    |
-485 | ...t(&self, doc_idx: usize, path: &str) -> Result<()> {
-    |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
-
-warning: unused variable: `path`
-   --> src/productivity/sigma_office.rs:495:37
-    |
-495 |     pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
-    |                                     ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
-
-warning: unused variable: `context`
-   --> src/resilience/self_healing.rs:101:9
-    |
-101 |         context: &HashMap<String, String>,
-    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context`
-
-warning: unused variable: `config`
-   --> src/security/vpn.rs:109:27
-    |
-109 |     fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionRe...
-    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
-
-warning: unused variable: `config`
-   --> src/security/vpn.rs:218:27
-    |
-218 |     fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionRe...
-    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
-
-warning: unused variable: `meta`
-   --> src/sigpkg/rpm_compat.rs:114:46
-    |
-114 | ...roducible_package(&self, meta: &SpecMetadata) -> Result<[u8; 32], &'...
-    |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_meta`
-
-warning: unused variable: `format_name`
-   --> src/sigpkg/universal_adapter.rs:376:14
-    |
-376 |         for (format_name, adapter) in &self.adapters {
-    |              ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_format_name`
-
-Some errors have detailed explanations: E0252, E0428, E0432.
-For more information about an error, try `rustc --explain E0252`.
-warning: `sigmaos` (lib) generated 88 warnings (2 duplicates)
-error: could not compile `sigmaos` (lib) due to 22 previous errors; 88 warnings emitted
+Some errors have detailed explanations: E0119, E0252, E0405, E0407, E0425, E0428, E0432, E0433.
+For more information about an error, try `rustc --explain E0119`.
+error: could not compile `sigmaos` (lib) due to 56 previous errors
