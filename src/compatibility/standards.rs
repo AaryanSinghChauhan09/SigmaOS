@@ -24,6 +24,37 @@ pub enum LsbProfile {
     None,
 }
 
+// POSIX-compliant IOCTL identifiers for hardware peripherals control
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceIoctlCommand {
+    GetKeyboardLayout = 0x40044B01,
+    SetKeyboardLeds = 0x40044B02,
+    GetMouseSensitivity = 0x40044D01,
+    SetSpeakerSampleRate = 0x40045301,
+    PrinterStartJob = 0x40045001,
+    PrinterFeedLine = 0x40045002,
+}
+
+// Representing standard metadata for device node queries
+#[derive(Debug, Clone)]
+pub struct DeviceNodeInfo {
+    pub path: &'static str,
+    pub major_number: u32,
+    pub minor_number: u32,
+    pub major_device_class: &'static str,
+}
+
+pub fn get_standard_device_node(path: &str) -> Option<DeviceNodeInfo> {
+    match path {
+        "/dev/input/keyboard" => Some(DeviceNodeInfo { path: "/dev/input/keyboard", major_number: 13, minor_number: 0, major_device_class: "input" }),
+        "/dev/input/mouse" => Some(DeviceNodeInfo { path: "/dev/input/mouse", major_number: 13, minor_number: 32, major_device_class: "input" }),
+        "/dev/sound/mic" => Some(DeviceNodeInfo { path: "/dev/sound/mic", major_number: 14, minor_number: 4, major_device_class: "sound" }),
+        "/dev/sound/speaker" => Some(DeviceNodeInfo { path: "/dev/sound/speaker", major_number: 14, minor_number: 3, major_device_class: "sound" }),
+        "/dev/printer" => Some(DeviceNodeInfo { path: "/dev/printer", major_number: 6, minor_number: 0, major_device_class: "printer" }),
+        _ => None,
+    }
+}
+
 pub struct StandardsComplianceManager {
     pub posix_level: PosixComplianceLevel,
     pub fhs_status: FhsConventionStatus,
@@ -125,5 +156,31 @@ mod tests {
 
         assert!(manager.get_lsb_compatibility(LsbProfile::Runtime));
         assert!(!manager.get_lsb_compatibility(LsbProfile::Desktop));
+    }
+
+    #[test]
+    fn test_device_ioctl_commands() {
+        let cmd = DeviceIoctlCommand::GetKeyboardLayout;
+        assert_eq!(cmd as u32, 0x40044B01);
+
+        let set_speaker = DeviceIoctlCommand::SetSpeakerSampleRate;
+        assert_eq!(set_speaker as u32, 0x40045301);
+    }
+
+    #[test]
+    fn test_get_standard_device_node() {
+        let node_option = get_standard_device_node("/dev/input/keyboard");
+        assert!(node_option.is_some());
+        let node = node_option.unwrap();
+        assert_eq!(node.major_number, 13);
+        assert_eq!(node.minor_number, 0);
+        assert_eq!(node.major_device_class, "input");
+
+        let printer_node = get_standard_device_node("/dev/printer").unwrap();
+        assert_eq!(printer_node.major_number, 6);
+        assert_eq!(printer_node.minor_number, 0);
+        assert_eq!(printer_node.major_device_class, "printer");
+
+        assert!(get_standard_device_node("/dev/invalid_device").is_none());
     }
 }
