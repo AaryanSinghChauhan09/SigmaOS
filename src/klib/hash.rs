@@ -1,34 +1,13 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Custom Hash Library
 // Reduces dependency on predefined hashing functions
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 /// Simple hash function for strings (DJB2 algorithm)
 pub fn djb2_hash(s: &str) -> u64 {
     let mut hash: u64 = 5381;
     for byte in s.bytes() {
-        hash = hash
-            .wrapping_shl(5)
-            .wrapping_add(hash)
-            .wrapping_add(byte as u64);
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
     }
     hash
 }
@@ -37,10 +16,7 @@ pub fn djb2_hash(s: &str) -> u64 {
 pub fn simple_hash(data: &[u8]) -> u64 {
     let mut hash: u64 = 5381;
     for &byte in data {
-        hash = hash
-            .wrapping_shl(5)
-            .wrapping_add(hash)
-            .wrapping_add(byte as u64);
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
     }
     hash
 }
@@ -69,17 +45,12 @@ pub struct SimpleHasher {
 }
 
 impl SimpleHasher {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleHasher { state: 5381 }
     }
 
     pub fn write(&mut self, byte: u8) {
-        self.state = self
-            .state
-            .wrapping_shl(5)
-            .wrapping_add(self.state)
-            .wrapping_add(byte as u64);
+        self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
     }
 
     pub fn finish(&self) -> u64 {
@@ -100,11 +71,7 @@ impl core::hash::Hasher for SimpleHasher {
 
     fn write(&mut self, bytes: &[u8]) {
         for &byte in bytes {
-            self.state = self
-                .state
-                .wrapping_shl(5)
-                .wrapping_add(self.state)
-                .wrapping_add(byte as u64);
+            self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
         }
     }
 }

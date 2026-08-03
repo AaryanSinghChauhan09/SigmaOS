@@ -254,9 +254,203 @@ pub fn get_cpu_optimizer() -> &'static SovereignCompilerOptimizer {
     }
 }
 
+/// Complete, production-grade advanced CPU Register Set representation.
+/// Directly inspired by Linux's struct user_regs_struct (sys/user.h)
+/// and FreeBSD's struct reg (machine/reg.h) for context switching & ptrace debugging.
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SovereignRegisterSet {
+    // General Purpose Registers (GPRs)
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64,
+    pub rdi: u64,
+    pub rbp: u64,
+    pub rsp: u64,
+    pub r8:  u64,
+    pub r9:  u64,
+    pub r10: u64,
+    pub r11: u64,
+    pub r12: u64,
+    pub r13: u64,
+    pub r14: u64,
+    pub r15: u64,
+
+    // Instruction & Flag Registers
+    pub rip: u64,
+    pub rflags: u64,
+
+    // Segment Registers
+    pub cs: u64,
+    pub ss: u64,
+    pub ds: u64,
+    pub es: u64,
+    pub fs: u64,
+    pub gs: u64,
+
+    // Base registers (Linux/BSD specific thread-local pointers)
+    pub fs_base: u64,
+    pub gs_base: u64,
+}
+
+impl SovereignRegisterSet {
+    pub const fn new() -> Self {
+        SovereignRegisterSet {
+            rax: 0, rbx: 0, rcx: 0, rdx: 0,
+            rsi: 0, rdi: 0, rbp: 0, rsp: 0,
+            r8: 0,  r9: 0,  r10: 0, r11: 0,
+            r12: 0, r13: 0, r14: 0, r15: 0,
+            rip: 0, rflags: 0,
+            cs: 0,  ss: 0,  ds: 0,  es: 0,
+            fs: 0,  gs: 0,
+            fs_base: 0, gs_base: 0,
+        }
+    }
+
+    pub fn get_by_index(&self, index: usize) -> Option<u64> {
+        match index {
+            0 => Some(self.rax),
+            1 => Some(self.rbx),
+            2 => Some(self.rcx),
+            3 => Some(self.rdx),
+            4 => Some(self.rsi),
+            5 => Some(self.rdi),
+            6 => Some(self.rbp),
+            7 => Some(self.rsp),
+            8 => Some(self.r8),
+            9 => Some(self.r9),
+            10 => Some(self.r10),
+            11 => Some(self.r11),
+            12 => Some(self.r12),
+            13 => Some(self.r13),
+            14 => Some(self.r14),
+            15 => Some(self.r15),
+            16 => Some(self.rip),
+            17 => Some(self.rflags),
+            18 => Some(self.cs),
+            19 => Some(self.ss),
+            20 => Some(self.ds),
+            21 => Some(self.es),
+            22 => Some(self.fs),
+            23 => Some(self.gs),
+            24 => Some(self.fs_base),
+            25 => Some(self.gs_base),
+            _ => None,
+        }
+    }
+
+    pub fn set_by_index(&mut self, index: usize, value: u64) -> Result<(), &'static str> {
+        match index {
+            0 => self.rax = value,
+            1 => self.rbx = value,
+            2 => self.rcx = value,
+            3 => self.rdx = value,
+            4 => self.rsi = value,
+            5 => self.rdi = value,
+            6 => self.rbp = value,
+            7 => self.rsp = value,
+            8 => self.r8 = value,
+            9 => self.r9 = value,
+            10 => self.r10 = value,
+            11 => self.r11 = value,
+            12 => self.r12 = value,
+            13 => self.r13 = value,
+            14 => self.r14 = value,
+            15 => self.r15 = value,
+            16 => self.rip = value,
+            17 => self.rflags = value,
+            18 => self.cs = value,
+            19 => self.ss = value,
+            20 => self.ds = value,
+            21 => self.es = value,
+            22 => self.fs = value,
+            23 => self.gs = value,
+            24 => self.fs_base = value,
+            25 => self.gs_base = value,
+            _ => return Err("Index out of register set bounds"),
+        }
+        Ok(())
+    }
+
+    pub fn get_by_name(&self, name: &str) -> Option<u64> {
+        match name {
+            "rax" => Some(self.rax),
+            "rbx" => Some(self.rbx),
+            "rcx" => Some(self.rcx),
+            "rdx" => Some(self.rdx),
+            "rsi" => Some(self.rsi),
+            "rdi" => Some(self.rdi),
+            "rbp" => Some(self.rbp),
+            "rsp" => Some(self.rsp),
+            "r8"  => Some(self.r8),
+            "r9"  => Some(self.r9),
+            "r10" => Some(self.r10),
+            "r11" => Some(self.r11),
+            "r12" => Some(self.r12),
+            "r13" => Some(self.r13),
+            "r14" => Some(self.r14),
+            "r15" => Some(self.r15),
+            "rip" => Some(self.rip),
+            "rflags" => Some(self.rflags),
+            "cs" => Some(self.cs),
+            "ss" => Some(self.ss),
+            "ds" => Some(self.ds),
+            "es" => Some(self.es),
+            "fs" => Some(self.fs),
+            "gs" => Some(self.gs),
+            "fs_base" => Some(self.fs_base),
+            "gs_base" => Some(self.gs_base),
+            _ => None,
+        }
+    }
+
+    pub fn set_by_name(&mut self, name: &str, value: u64) -> Result<(), &'static str> {
+        match name {
+            "rax" => self.rax = value,
+            "rbx" => self.rbx = value,
+            "rcx" => self.rcx = value,
+            "rdx" => self.rdx = value,
+            "rsi" => self.rsi = value,
+            "rdi" => self.rdi = value,
+            "rbp" => self.rbp = value,
+            "rsp" => self.rsp = value,
+            "r8"  => self.r8 = value,
+            "r9"  => self.r9 = value,
+            "r10" => self.r10 = value,
+            "r11" => self.r11 = value,
+            "r12" => self.r12 = value,
+            "r13" => self.r13 = value,
+            "r14" => self.r14 = value,
+            "r15" => self.r15 = value,
+            "rip" => self.rip = value,
+            "rflags" => self.rflags = value,
+            "cs" => self.cs = value,
+            "ss" => self.ss = value,
+            "ds" => self.ds = value,
+            "es" => self.es = value,
+            "fs" => self.fs = value,
+            "gs" => self.gs = value,
+            "fs_base" => self.fs_base = value,
+            "gs_base" => self.gs_base = value,
+            _ => return Err("Register name not found"),
+        }
+        Ok(())
+    }
+}
+
+impl Default for SovereignRegisterSet {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    extern crate alloc;
+    use alloc::vec;
 
     #[test]
     fn test_cpu_optimizer_creation() {
@@ -288,5 +482,26 @@ mod tests {
         optimizer.optimize_memory_copy(&src, &mut dst);
         
         assert_eq!(dst, src);
+    }
+
+    #[test]
+    fn test_sovereign_register_set() {
+        let mut regs = SovereignRegisterSet::new();
+        assert_eq!(regs.rax, 0);
+        assert_eq!(regs.get_by_index(0), Some(0));
+
+        regs.set_by_index(0, 0xABC).unwrap();
+        assert_eq!(regs.rax, 0xABC);
+        assert_eq!(regs.get_by_index(0), Some(0xABC));
+
+        regs.set_by_name("rip", 0x1000).unwrap();
+        assert_eq!(regs.rip, 0x1000);
+        assert_eq!(regs.get_by_name("rip"), Some(0x1000));
+
+        assert!(regs.set_by_index(99, 0).is_err());
+        assert!(regs.get_by_index(99).is_none());
+
+        assert!(regs.set_by_name("invalid_reg", 0).is_err());
+        assert!(regs.get_by_name("invalid_reg").is_none());
     }
 }

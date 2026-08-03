@@ -1,8 +1,9 @@
-/// Systemd-Grade Init and Target State Engine for SigmaOS
-/// Provides robust target dependency graphs, wants/requires properties,
-/// topological execution sorting, service automatic restarts, and systemd-analyze metric summaries.
+//! Systemd-Grade Init and Target State Engine for SigmaOS
+//! Provides robust target dependency graphs, wants/requires properties,
+//! and target states to defeat Fedora's Systemd initialization.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type UnitID = usize;
 
@@ -38,12 +39,10 @@ pub struct SystemdUnit {
     pub wants: Vec<UnitID>,
     pub before: Vec<UnitID>,
     pub after: Vec<UnitID>,
-
-    // Advanced Systemd Parity Fields
     pub restart_policy: RestartPolicy,
-    pub restart_count: usize,
     pub start_time_ms: u64,
-    pub elapsed_time_ms: u64,
+    pub end_time_ms: u64,
+    pub restart_count: usize,
 }
 
 impl SystemdUnit {
@@ -61,9 +60,9 @@ impl SystemdUnit {
             before: Vec::new(),
             after: Vec::new(),
             restart_policy: RestartPolicy::No,
-            restart_count: 0,
             start_time_ms: 0,
-            elapsed_time_ms: 0,
+            end_time_ms: 0,
+            restart_count: 0,
         }
     }
 }
@@ -71,8 +70,7 @@ impl SystemdUnit {
 pub struct SystemdEngine {
     pub units: Vec<SystemdUnit>,
     pub current_target: AtomicUsize, // stores UnitID of active target
-    pub journals: [[u8; 128]; 8],   // Mini circular log buffer for debug diagnostics
-    pub journal_index: usize,
+    pub journals: Vec<[u8; 64]>,     // custom journald logging circular buffer representation
 }
 
 impl Default for SystemdEngine {
@@ -86,13 +84,37 @@ impl SystemdEngine {
         SystemdEngine {
             units: Vec::new(),
             current_target: AtomicUsize::new(0),
-            journals: [[0u8; 128]; 8],
-            journal_index: 0,
+            journals: Vec::new(),
         }
     }
 
     pub fn register_unit(&mut self, unit: SystemdUnit) {
         self.units.push(unit);
+    }
+
+    pub fn log_journal(&mut self, msg: &[u8]) {
+        let mut entry = [0u8; 64];
+        let len = msg.len().min(63);
+        entry[..len].copy_from_slice(&msg[..len]);
+        self.journals.push(entry);
+    }
+
+    pub fn get_unit(&self, id: UnitID) -> Option<&SystemdUnit> {
+        for unit in &self.units {
+            if unit.id == id {
+                return Some(unit);
+            }
+        }
+        None
+    }
+
+    pub fn get_unit_mut(&mut self, id: UnitID) -> Option<&mut SystemdUnit> {
+        for unit in &mut self.units {
+            if unit.id == id {
+                return Some(unit);
+            }
+        }
+        None
     }
 
     pub fn isolate_target(&mut self, target_id: UnitID) -> Result<(), &'static str> {
@@ -105,6 +127,30 @@ impl SystemdEngine {
         }
 
         let _idx = target_idx.ok_or("Target unit not found")?;
+
+        // Log to journald representation
+        let mut msg = [0u8; 64];
+        let prefix = b"Isolating target ID: ";
+        msg[..prefix.len()].copy_from_slice(prefix);
+        let mut id_tmp = target_id;
+        let mut idx = prefix.len();
+        if id_tmp == 0 {
+            if idx < 64 { msg[idx] = b'0'; idx += 1; }
+        } else {
+            let mut digits = [0u8; 10];
+            let mut d_idx = 0;
+            while id_tmp > 0 && d_idx < 10 {
+                digits[d_idx] = (id_tmp % 10) as u8 + b'0';
+                id_tmp /= 10;
+                d_idx += 1;
+            }
+            while d_idx > 0 && idx < 64 {
+                d_idx -= 1;
+                msg[idx] = digits[d_idx];
+                idx += 1;
+            }
+        }
+        self.log_journal(&msg[..idx]);
 
         // In Systemd, isolating a target starts that target and all its dependencies,
         // and deactivates units not required/wanted by it.
@@ -119,9 +165,14 @@ impl SystemdEngine {
             if !active_set.contains(&unit.id) && unit.id != target_id {
                 unit.state = UnitState::Inactive;
             } else if active_set.contains(&unit.id) {
-                unit.state = UnitState::Active;
-                unit.start_time_ms = 100 * (unit.id as u64); // Mock start stamp
-                unit.elapsed_time_ms = 25;                  // Mock elapsed boot time
+                // Track start & end times when activating
+                if unit.state != UnitState::Active {
+                    unit.state = UnitState::Active;
+                    if unit.start_time_ms == 0 {
+                        unit.start_time_ms = 10; // simulated start timestamp
+                        unit.end_time_ms = 120; // simulated end timestamp (110ms duration)
+                    }
+                }
             }
         }
 
@@ -137,11 +188,13 @@ impl SystemdEngine {
 
         for unit in &self.units {
             if unit.id == unit_id {
-                for &req in &unit.requires {
+                for i in 0..unit.requires.len() {
+                    let req = unit.requires[i];
                     set.push(req);
                     self.collect_dependencies(req, set);
                 }
-                for &want in &unit.wants {
+                for i in 0..unit.wants.len() {
+                    let want = unit.wants[i];
                     set.push(want);
                     self.collect_dependencies(want, set);
                 }
@@ -153,242 +206,140 @@ impl SystemdEngine {
         self.current_target.load(Ordering::SeqCst)
     }
 
-    // ==========================================
-    // Advanced Systemd-inspired Services Features
-    // ==========================================
-
-    /// Emulates topological sorting to resolve the correct initialization sequence based on before/after constraints
-    pub fn resolve_unit_order(&self) -> Vec<UnitID> {
+    /// Resolves topological ordering for starting units considering before & after relationships
+    pub fn resolve_unit_order(&self, unit_ids: &[UnitID]) -> Result<Vec<UnitID>, &'static str> {
         let mut order = Vec::new();
-        // Simplified topological alignment: active target dependencies aligned sequentially
+        let mut visited = Vec::new();
+        let mut rec_stack = Vec::new();
+
+        for i in 0..unit_ids.len() {
+            let id = unit_ids[i];
+            if !visited.contains(&id) {
+                self.topo_visit(id, unit_ids, &mut order, &mut visited, &mut rec_stack)?;
+            }
+        }
+        Ok(order)
+    }
+
+    fn topo_visit(
+        &self,
+        id: UnitID,
+        all_ids: &[UnitID],
+        order: &mut Vec<UnitID>,
+        visited: &mut Vec<UnitID>,
+        rec_stack: &mut Vec<UnitID>,
+    ) -> Result<(), &'static str> {
+        if rec_stack.contains(&id) {
+            return Err("Dependency cycle detected");
+        }
+        if visited.contains(&id) {
+            return Ok(());
+        }
+
+        rec_stack.push(id);
+
+        let mut deps = Vec::new();
+        if let Some(unit) = self.get_unit(id) {
+            for i in 0..unit.after.len() {
+                let after_id = unit.after[i];
+                if all_ids.contains(&after_id) && !deps.contains(&after_id) {
+                    deps.push(after_id);
+                }
+            }
+        }
+        for other in &self.units {
+            if all_ids.contains(&other.id) && other.before.contains(&id) && !deps.contains(&other.id) {
+                deps.push(other.id);
+            }
+        }
+
+        for i in 0..deps.len() {
+            let dep_id = deps[i];
+            self.topo_visit(dep_id, all_ids, order, visited, rec_stack)?;
+        }
+
+        rec_stack.pop();
+        visited.push(id);
+        order.push(id);
+        Ok(())
+    }
+
+    /// systemd-analyze blame: returns units and their startup duration, sorted descending.
+    pub fn get_analyze_blame(&self) -> Vec<(UnitID, u64)> {
+        let mut blame = Vec::new();
         for unit in &self.units {
-            if !order.contains(&unit.id) {
-                // If has 'after' constraints, place them first
-                for &after_id in &unit.after {
-                    if !order.contains(&after_id) {
-                        order.push(after_id);
+            if unit.start_time_ms > 0 && unit.end_time_ms >= unit.start_time_ms {
+                let duration = unit.end_time_ms - unit.start_time_ms;
+                blame.push((unit.id, duration));
+            }
+        }
+
+        // Sort by duration descending
+        for i in 0..blame.len() {
+            for j in (i + 1)..blame.len() {
+                if blame[j].1 > blame[i].1 {
+                    let temp = blame[i];
+                    blame[i] = blame[j];
+                    blame[j] = temp;
+                }
+            }
+        }
+
+        blame
+    }
+
+    /// Polled state monitor tick checking failed services and triggering auto-restarts.
+    pub fn monitor_tick(&mut self) {
+        let mut restart_list = Vec::new();
+
+        for unit in &self.units {
+            if unit.unit_type == UnitType::Service && unit.state == UnitState::Failed {
+                let trigger = match unit.restart_policy {
+                    RestartPolicy::Always => true,
+                    RestartPolicy::OnFailure => true,
+                    RestartPolicy::No => false,
+                };
+                if trigger {
+                    restart_list.push(unit.id);
+                }
+            }
+        }
+
+        for i in 0..restart_list.len() {
+            let id = restart_list[i];
+            if let Some(unit) = self.get_unit_mut(id) {
+                unit.state = UnitState::Activating;
+                unit.start_time_ms = 200; // simulated restart start
+                unit.end_time_ms = 450;   // simulated restart end
+                unit.restart_count += 1;
+                unit.state = UnitState::Active;
+
+                // Log auto-restart
+                let mut msg = [0u8; 64];
+                let prefix = b"Auto-restarting failed service: ";
+                msg[..prefix.len()].copy_from_slice(prefix);
+                let mut idx = prefix.len();
+                let mut id_tmp = id;
+                if id_tmp == 0 {
+                    if idx < 64 { msg[idx] = b'0'; idx += 1; }
+                } else {
+                    let mut digits = [0u8; 10];
+                    let mut d_idx = 0;
+                    while id_tmp > 0 && d_idx < 10 {
+                        digits[d_idx] = (id_tmp % 10) as u8 + b'0';
+                        id_tmp /= 10;
+                        d_idx += 1;
+                    }
+                    while d_idx > 0 && idx < 64 {
+                        d_idx -= 1;
+                        msg[idx] = digits[d_idx];
+                        idx += 1;
                     }
                 }
-                order.push(unit.id);
-            }
-        }
-        order
-    }
-
-    /// Systemd-analyze blame metric reporting: returns ID and elapsed startup times
-    pub fn get_analyze_blame(&self) -> Vec<(UnitID, u64)> {
-        let mut metrics = Vec::new();
-        for unit in &self.units {
-            if unit.state == UnitState::Active {
-                metrics.push((unit.id, unit.elapsed_time_ms));
-            }
-        }
-        metrics
-    }
-
-    /// Service monitor loop checking failed states and applying RestartPolicy auto-restarts
-    pub fn monitor_tick(&mut self) {
-        for unit in &mut self.units {
-            if unit.state == UnitState::Failed {
-                let policy = unit.restart_policy;
-                if policy == RestartPolicy::Always || policy == RestartPolicy::OnFailure {
-                    // Trigger automatic service recovery restart
-                    unit.state = UnitState::Active;
-                    unit.restart_count += 1;
-
-                    // Log action to journal buffer
-                    let idx = self.journal_index % 8;
-                    self.journals[idx][0] = unit.id as u8;
-                    self.journals[idx][1] = 0xFF; // Recovered indicator
-                    self.journal_index += 1;
-                }
+                self.journals.push(msg);
             }
         }
     }
-}
-
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_list().entries(self.iter()).finish()
-    }
-}
-
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
-    }
-    pub fn contains(&self, item: &T) -> bool
-    where
-        T: PartialEq,
-    {
-        for i in 0..self.len {
-            unsafe {
-                if &*self.data.add(i) == item {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = extern_alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-extern "C" {
-    #[link_name = "alloc"]
-    fn extern_alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]
@@ -402,7 +353,7 @@ mod tests {
         // 1. Create graphical.target
         let mut graphical = SystemdUnit::new(100, b"graphical.target", UnitType::Target);
         graphical.requires.push(200); // requires multi-user.target
-        graphical.wants.push(300); // wants network.target
+        graphical.wants.push(300);    // wants network.target
 
         // 2. Create multi-user.target
         let multi_user = SystemdUnit::new(200, b"multi-user.target", UnitType::Target);
@@ -434,61 +385,72 @@ mod tests {
     }
 
     #[test]
-    fn test_systemd_restarts_and_blame() {
+    fn test_systemd_engine_topological_sorting() {
         let mut engine = SystemdEngine::new();
 
-        let mut s1 = SystemdUnit::new(500, b"mysql.service", UnitType::Service);
-        s1.restart_policy = RestartPolicy::Always;
-        s1.state = UnitState::Failed;
+        let mut u1 = SystemdUnit::new(1, b"u1.service", UnitType::Service);
+        u1.after.push(2); // 1 starts after 2 (i.e., 2 -> 1)
 
-        let mut s2 = SystemdUnit::new(600, b"nginx.service", UnitType::Service);
-        s2.restart_policy = RestartPolicy::OnFailure;
-        s2.state = UnitState::Failed;
+        let mut u2 = SystemdUnit::new(2, b"u2.service", UnitType::Service);
+        u2.before.push(3); // 2 starts before 3 (i.e., 2 -> 3)
 
-        engine.register_unit(s1);
-        engine.register_unit(s2);
+        let u3 = SystemdUnit::new(3, b"u3.service", UnitType::Service);
 
-        // Run monitor tick to trigger automatic recovery restarts
+        engine.register_unit(u1);
+        engine.register_unit(u2);
+        engine.register_unit(u3);
+
+        let list = [1, 2, 3];
+        let ordered = engine.resolve_unit_order(&list).unwrap();
+
+        // 2 has 1 after it, and 3 before it. So 2 must start before 1 and 3.
+        assert_eq!(ordered[0], 2);
+    }
+
+    #[test]
+    fn test_systemd_analyze_blame() {
+        let mut engine = SystemdEngine::new();
+
+        let mut u1 = SystemdUnit::new(1, b"u1.service", UnitType::Service);
+        u1.start_time_ms = 100;
+        u1.end_time_ms = 150; // duration 50ms
+
+        let mut u2 = SystemdUnit::new(2, b"u2.service", UnitType::Service);
+        u2.start_time_ms = 200;
+        u2.end_time_ms = 400; // duration 200ms
+
+        let mut u3 = SystemdUnit::new(3, b"u3.service", UnitType::Service);
+        u3.start_time_ms = 50;
+        u3.end_time_ms = 60; // duration 10ms
+
+        engine.register_unit(u1);
+        engine.register_unit(u2);
+        engine.register_unit(u3);
+
+        let blame = engine.get_analyze_blame();
+        assert_eq!(blame.len(), 3);
+        assert_eq!(blame[0].0, 2); // 200ms is largest duration
+        assert_eq!(blame[1].0, 1); // 50ms
+        assert_eq!(blame[2].0, 3); // 10ms
+    }
+
+    #[test]
+    fn test_systemd_journal_logging_and_restart_policy() {
+        let mut engine = SystemdEngine::new();
+
+        let mut u1 = SystemdUnit::new(1, b"u1.service", UnitType::Service);
+        u1.state = UnitState::Failed;
+        u1.restart_policy = RestartPolicy::Always;
+
+        engine.register_unit(u1);
+
+        assert_eq!(engine.journals.len(), 0);
+
         engine.monitor_tick();
 
-        assert_eq!(engine.units[0].state, UnitState::Active);
-        assert_eq!(engine.units[0].restart_count, 1);
-        assert_eq!(engine.units[1].state, UnitState::Active);
-        assert_eq!(engine.units[1].restart_count, 1);
-
-        // Verify journal logging
-        assert_eq!(engine.journals[0][0], 50); // mysql.service id (500 % 256 = 50)
-        assert_eq!(engine.journals[0][1], 0xFF);
-        assert_eq!(engine.journals[1][0], 88); // nginx.service id (600 % 256 = 88)
-
-        // Verify topological sorting ordering
-        let order = engine.resolve_unit_order();
-        assert_eq!(order.len(), 2);
-
-        // Verify analyze blame reporting
-        let blame = engine.get_analyze_blame();
-        assert_eq!(blame.len(), 2);
-    }
-}
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
+        assert_eq!(engine.journals.len(), 1);
+        let u1_after = engine.get_unit(1).unwrap();
+        assert_eq!(u1_after.state, UnitState::Active);
+        assert_eq!(u1_after.restart_count, 1);
     }
 }
