@@ -14,7 +14,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntentType {
     SystemCommand = 0,
     FileOperation = 1,

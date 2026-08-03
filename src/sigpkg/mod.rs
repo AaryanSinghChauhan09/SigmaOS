@@ -8,10 +8,14 @@ pub mod resolver;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod importer;
 
 pub use linux_compat::{
     DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
     TranslatedMetadata, TranslatorError,
+};
+pub use importer::{
+    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
 };
 pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
@@ -23,9 +27,9 @@ pub use verifier::CryptoVerifier;
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
-    major: u64,
-    minor: u64,
-    patch: u64,
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
 }
 
 impl Version {
@@ -77,6 +81,24 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
 }
 
 /// Package dependency

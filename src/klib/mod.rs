@@ -1,4 +1,26 @@
 pub mod vec;
+pub mod vecdeque;
+pub mod hashmap;
+pub mod hashset;
+pub mod btreemap;
+pub mod string;
+pub mod custom_string;
 pub mod paging;
 pub mod buddy_allocator;
 pub mod uvm;
+pub mod hash;
+pub mod error;
+pub mod conversion;
+pub mod math;
+pub mod uuid;
+pub mod async_runtime;
+pub mod time;
+pub mod store;
+pub mod isa;
+pub mod custom_allocator;
+
+pub use vec::Vec;
+pub use vecdeque::VecDeque;
+pub use hashmap::HashMap;
+pub use hashset::HashSet;
+pub use btreemap::BTreeMap;
