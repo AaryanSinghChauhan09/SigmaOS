@@ -1,12 +1,12 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
 
 use core::mem;
-use crate::filesystem::smart_symlink::{SmartSymlink, SymlinkResolverRule};
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
+use alloc::boxed::Box;
 
 pub type FilesystemID = usize;
 
@@ -60,11 +60,7 @@ impl Filesystem for SimpleFilesystem {
         self.id
     }
     fn fs_type(&self) -> FilesystemType {
-        match self.fs_type.load(Ordering::SeqCst) {
-            0 => FilesystemType::Ext4,
-            1 => FilesystemType::Btrfs,
-            _ => FilesystemType::ZFS,
-        }
+        unsafe { core::mem::transmute(self.fs_type.load(Ordering::SeqCst)) }
     }
 
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {
@@ -246,8 +242,8 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
-        for fs_option in &self.filesystems {
-            if let Some(ref fs) = *fs_option {
+        for i in 0..self.filesystems.len() {
+            if let Some(ref fs) = self.filesystems[i] {
                 if fs.id() == id {
                     return Some(fs.as_ref());
                 }
@@ -258,8 +254,8 @@ impl FilesystemManager for SimpleFilesystemManager {
 
     fn list_filesystems(&self) -> Vec<FilesystemID> {
         let mut ids = Vec::new();
-        for fs_option in &self.filesystems {
-            if let Some(ref fs) = *fs_option {
+        for i in 0..self.filesystems.len() {
+            if let Some(ref fs) = self.filesystems[i] {
                 ids.push(fs.id());
             }
         }
@@ -267,3 +263,7 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 }
 
+pub struct LegacyLinuxRule;
+pub struct LinuxPersonaRule;
+pub struct SmartSymlink;
+pub struct SymlinkResolverRule;
