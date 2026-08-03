@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Screen Recorder
 // OOP-based screen recording with multiple formats and quality settings
 
@@ -114,7 +96,6 @@ pub struct FfmpegBackend {
 }
 
 impl FfmpegBackend {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             state: RecordingState::Idle,
@@ -185,7 +166,6 @@ pub struct GStreamerBackend {
 }
 
 impl GStreamerBackend {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             state: RecordingState::Idle,
@@ -259,7 +239,6 @@ pub struct GpuAcceleratedBackend {
 }
 
 impl GpuAcceleratedBackend {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             state: RecordingState::Idle,
@@ -323,8 +302,8 @@ impl RecordingBackend for GpuAcceleratedBackend {
 
         RecordingProgress {
             duration_seconds: duration,
-            frames_captured: duration * 60, // 60 FPS under GPU speed
-            file_size_bytes: duration * 512 * 1024, // High compression size reduction under GPU codec
+            frames_captured: duration * 60,          // 60 FPS under GPU speed
+            file_size_bytes: duration * 512 * 1024,  // High compression size reduction under GPU codec
             current_bitrate_mbps: 12.0,
         }
     }
@@ -435,7 +414,6 @@ pub struct ScreenToGifRecorder {
 }
 
 impl ScreenToGifRecorder {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_recording: false,
@@ -483,7 +461,6 @@ pub struct EzgifOptimizer {
 }
 
 impl EzgifOptimizer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             max_colors: 256,
