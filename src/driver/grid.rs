@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Peripheral Archive Grid (PeripheralArchiveGrid)
 // Provides simulated grid layouts for legacy hardware components with absolute zero overhead
 
@@ -35,28 +17,18 @@ pub struct PeripheralArchiveGrid {
 impl PeripheralArchiveGrid {
     pub fn new(slot: GridSlotType) -> Self {
         match slot {
-            GridSlotType::FloppyDisk => PeripheralArchiveGrid {
-                slot_type: slot,
-                sector_capacity: 2880,
-                tape_reel_feet: 0,
-            },
-            GridSlotType::TapeDrive => PeripheralArchiveGrid {
-                slot_type: slot,
-                sector_capacity: 0,
-                tape_reel_feet: 1200,
-            },
-            GridSlotType::CrtDisplay => {
-                PeripheralArchiveGrid {
-                    slot_type: slot,
-                    sector_capacity: 64000,
-                    tape_reel_feet: 0,
-                } // 320x200 8bpp
+            GridSlotType::FloppyDisk => {
+                PeripheralArchiveGrid { slot_type: slot, sector_capacity: 2880, tape_reel_feet: 0 }
             }
-            GridSlotType::DotMatrixPrinter => PeripheralArchiveGrid {
-                slot_type: slot,
-                sector_capacity: 0,
-                tape_reel_feet: 0,
-            },
+            GridSlotType::TapeDrive => {
+                PeripheralArchiveGrid { slot_type: slot, sector_capacity: 0, tape_reel_feet: 1200 }
+            }
+            GridSlotType::CrtDisplay => {
+                PeripheralArchiveGrid { slot_type: slot, sector_capacity: 64000, tape_reel_feet: 0 } // 320x200 8bpp
+            }
+            GridSlotType::DotMatrixPrinter => {
+                PeripheralArchiveGrid { slot_type: slot, sector_capacity: 0, tape_reel_feet: 0 }
+            }
         }
     }
 

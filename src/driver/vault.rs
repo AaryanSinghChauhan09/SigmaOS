@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)
 // Stores legacy drivers in secure vault entries with lineage metadata and dependency chains
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 pub struct VaultEntry {
     pub id: usize,
@@ -33,37 +15,23 @@ pub struct DriverArchiveVault {
 }
 
 impl DriverArchiveVault {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut archive = DriverArchiveVault {
             vault: HashMap::new(),
         };
         // Seed default driver vault entries
-        archive.register_driver(
-            10,
-            "ne2000_isa_nic".to_string(),
-            "Linux 2.2 NIC".to_string(),
-            vec!["isa_bus_device".to_string()],
-        );
-        archive.register_driver(
-            11,
-            "ide_piix4_controller".to_string(),
-            "Linux 2.4 IDE".to_string(),
-            vec!["pci_express_bus".to_string()],
-        );
+        archive.register_driver(10, "ne2000_isa_nic".to_string(), "Linux 2.2 NIC".to_string(), vec!["isa_bus_device".to_string()]);
+        archive.register_driver(11, "ide_piix4_controller".to_string(), "Linux 2.4 IDE".to_string(), vec!["pci_express_bus".to_string()]);
         archive
     }
 
     pub fn register_driver(&mut self, id: usize, name: String, lineage: String, deps: Vec<String>) {
-        self.vault.insert(
+        self.vault.insert(id, VaultEntry {
             id,
-            VaultEntry {
-                id,
-                name,
-                lineage_version: lineage,
-                dependencies: deps,
-            },
-        );
+            name,
+            lineage_version: lineage,
+            dependencies: deps,
+        });
     }
 
     pub fn query_driver(&self, id: usize) -> Option<&VaultEntry> {

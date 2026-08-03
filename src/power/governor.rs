@@ -1,29 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Dynamic CPU Performance & Power Governor (SigmaGovernor)
 // Designed for real-time task scaling, thermal bursts, and CPU cycle optimization
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GovernorMode {
-    Performance, // Keep high frequency for gaming/computation
-    Powersave,   // Minimize frequency for battery saving
-    Schedutil,   // Dynamic frequency scaling based on scheduler utilization
+    Performance,     // Keep high frequency for gaming/computation
+    Powersave,       // Minimize frequency for battery saving
+    Schedutil,       // Dynamic frequency scaling based on scheduler utilization
 }
 
 pub struct CPUState {
@@ -95,13 +77,110 @@ impl SigmaGovernor {
                 GovernorMode::Schedutil => {
                     // Dynamically scale between min and max based on utilization
                     let delta = (core.max_frequency_mhz - core.min_frequency_mhz) as f32;
-                    let calculated =
-                        core.min_frequency_mhz + (delta * core.core_utilization) as u32;
-                    core.current_frequency_mhz =
-                        calculated.clamp(core.min_frequency_mhz, core.max_frequency_mhz);
+                    let calculated = core.min_frequency_mhz + (delta * core.core_utilization) as u32;
+                    core.current_frequency_mhz = calculated.clamp(core.min_frequency_mhz, core.max_frequency_mhz);
                 }
             }
         }
+    }
+}
+
+// =========================================================================
+// 1. SigmaSupportResourceOptimizer (Glary/Advanced SystemCare RAM Defrag Parity)
+// =========================================================================
+
+pub struct MemoryPageBlock {
+    pub page_id: u64,
+    pub is_fragmented: bool,
+    pub data_size: usize,
+}
+
+pub struct SigmaSupportResourceOptimizer {
+    pub managed_pages: Vec<MemoryPageBlock>,
+    pub total_defragmentations_completed: u64,
+}
+
+impl SigmaSupportResourceOptimizer {
+    pub fn new() -> Self {
+        SigmaSupportResourceOptimizer {
+            managed_pages: Vec::new(),
+            total_defragmentations_completed: 0,
+        }
+    }
+
+    pub fn register_page_block(&mut self, id: u64, fragmented: bool, size: usize) {
+        self.managed_pages.push(MemoryPageBlock {
+            page_id: id,
+            is_fragmented: fragmented,
+            data_size: size,
+        });
+    }
+
+    /// Emulates Glary Utilities RAM defragger: compacts page frames to reclaim system RAM
+    pub fn execute_ram_defragmentation(&mut self) -> usize {
+        let mut pages_compacted = 0;
+        for page in &mut self.managed_pages {
+            if page.is_fragmented {
+                page.is_fragmented = false; // compacted
+                pages_compacted += 1;
+            }
+        }
+        if pages_compacted > 0 {
+            self.total_defragmentations_completed += 1;
+        }
+        pages_compacted
+    }
+}
+
+// =========================================================================
+// 2. SigmaSupportPriorityOptimizer (Glary/Advanced SystemCare CPU Priority Parity)
+// =========================================================================
+
+pub struct RunningProcessTask {
+    pub process_id: u32,
+    pub process_name: String,
+    pub priority_niceness: i32, // standard niceness (-20 to 19)
+    pub current_cpu_usage: f32,
+}
+
+pub struct SigmaSupportPriorityOptimizer {
+    pub running_processes: Vec<RunningProcessTask>,
+}
+
+impl SigmaSupportPriorityOptimizer {
+    pub fn new() -> Self {
+        SigmaSupportPriorityOptimizer {
+            running_processes: Vec::new(),
+        }
+    }
+
+    pub fn register_running_process(&mut self, pid: u32, name: &str, priority: i32) {
+        self.running_processes.push(RunningProcessTask {
+            process_id: pid,
+            process_name: name.to_string(),
+            priority_niceness: priority,
+            current_cpu_usage: 0.0,
+        });
+    }
+
+    /// Dynamically optimizes CPU priority by renicing low-priority apps when critical apps spike
+    pub fn optimize_cpu_priorities(&mut self, critical_app_pid: u32) -> usize {
+        let mut reniced_count = 0;
+
+        let critical_spiking = self.running_processes
+            .iter()
+            .any(|p| p.process_id == critical_app_pid && p.current_cpu_usage >= 0.80);
+
+        if critical_spiking {
+            for proc in &mut self.running_processes {
+                if proc.process_id != critical_app_pid && proc.priority_niceness < 10 {
+                    proc.priority_niceness = 15; // lower priority (higher niceness)
+                    reniced_count += 1;
+                }
+            }
+        }
+
+        reniced_count
     }
 }
 
@@ -125,5 +204,31 @@ mod tests {
         governor.record_utilization(0, 0.5).unwrap();
         // Delta = 4200 - 800 = 3400. 3400 * 0.5 = 1700. 800 + 1700 = 2500MHz.
         assert_eq!(governor.cores[0].current_frequency_mhz, 2500);
+    }
+
+    #[test]
+    fn test_sigma_support_resource_optimizer() {
+        let mut opt = SigmaSupportResourceOptimizer::new();
+        opt.register_page_block(1001, true, 4096);
+        opt.register_page_block(1002, false, 4096);
+
+        let compacted = opt.execute_ram_defragmentation();
+        assert_eq!(compacted, 1);
+        assert_eq!(opt.total_defragmentations_completed, 1);
+        assert!(!opt.managed_pages[0].is_fragmented);
+    }
+
+    #[test]
+    fn test_sigma_support_priority_optimizer() {
+        let mut opt = SigmaSupportPriorityOptimizer::new();
+        opt.register_running_process(101, "zenith_desktop", -5);
+        opt.register_running_process(102, "background_indexer", 0);
+
+        // Simulate desktop application CPU spike (85% usage)
+        opt.running_processes[0].current_cpu_usage = 0.85;
+
+        let reniced = opt.optimize_cpu_priorities(101);
+        assert_eq!(reniced, 1);
+        assert_eq!(opt.running_processes[1].priority_niceness, 15); // background_indexer reniced to lower priority
     }
 }

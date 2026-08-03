@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Polish-Parity Software Store & Update Manager (SigmaStore)
 // Designed for software installation, package upgrades, and security auditing
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StoreError {
@@ -43,7 +25,6 @@ pub struct SigmaSoftwareStore {
 }
 
 impl SigmaSoftwareStore {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut store = SigmaSoftwareStore {
             catalog: HashMap::new(),
@@ -85,9 +66,8 @@ impl SigmaSoftwareStore {
     pub fn check_for_updates(&mut self) -> usize {
         self.pending_updates.clear();
         for (name, app) in &self.catalog {
-            if app.is_installed && app.version != "1.5.0" {
-                // Assume latest stable is 1.5.0
-                self.pending_updates.push((*name).clone());
+            if app.is_installed && app.version != "1.5.0" { // Assume latest stable is 1.5.0
+                self.pending_updates.push(name.clone());
             }
         }
         self.pending_updates.len()

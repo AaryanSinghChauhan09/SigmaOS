@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Kernel Personality Prism & Syscall Ledgerbook
 // Refracts workloads into different kernel behaviors and maintains historical syscall fallbacks
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PrismFacet {
@@ -33,7 +15,6 @@ pub struct KernelPrism {
 }
 
 impl KernelPrism {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut prism = KernelPrism {
             active_facets: HashMap::new(),
@@ -68,7 +49,6 @@ pub struct SyscallLedgerbook {
 }
 
 impl SyscallLedgerbook {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut book = SyscallLedgerbook {
             entries: HashMap::new(),

@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Polish-Parity System Backup (SigmaTimeshift)
 // Designed for automated, transaction-safe snapshots and system recovery
 
@@ -44,7 +26,6 @@ pub struct SigmaTimeshift {
 }
 
 impl SigmaTimeshift {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SigmaTimeshift {
             snapshots: Vec::new(),
@@ -53,11 +34,7 @@ impl SigmaTimeshift {
         }
     }
 
-    pub fn create_snapshot(
-        &mut self,
-        label: String,
-        system_files: HashMap<String, String>,
-    ) -> Result<String, BackupError> {
+    pub fn create_snapshot(&mut self, label: String, system_files: HashMap<String, String>) -> Result<String, BackupError> {
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
@@ -104,9 +81,7 @@ mod tests {
         files.insert("/etc/hosts".to_string(), "hash123".to_string());
         files.insert("/bin/sigma-sh".to_string(), "hash456".to_string());
 
-        let id = timeshift
-            .create_snapshot("Initial Clean Install".to_string(), files)
-            .unwrap();
+        let id = timeshift.create_snapshot("Initial Clean Install".to_string(), files).unwrap();
         assert_eq!(timeshift.snapshots.len(), 1);
 
         let restored = timeshift.restore_snapshot(&id).unwrap();

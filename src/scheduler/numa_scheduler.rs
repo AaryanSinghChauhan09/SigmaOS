@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems
 
@@ -32,18 +14,11 @@ pub struct NumaScheduler {
 }
 
 impl NumaScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         NumaScheduler {
             nodes: vec![
-                NumaNode {
-                    node_id: 0,
-                    latency_weight: 10,
-                },
-                NumaNode {
-                    node_id: 1,
-                    latency_weight: 20,
-                },
+                NumaNode { node_id: 0, latency_weight: 10 },
+                NumaNode { node_id: 1, latency_weight: 20 },
             ],
             active_thread_affinity_node: 0,
         }
@@ -75,7 +50,6 @@ pub struct MichaelScottQueue<T> {
 }
 
 impl<T> MichaelScottQueue<T> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let dummy = Box::into_raw(Box::new(Node {
             value: unsafe { std::mem::zeroed() }, // Dummy seed
@@ -96,29 +70,12 @@ impl<T> MichaelScottQueue<T> {
             let tail = self.tail.load(Ordering::Acquire);
             let next = unsafe { (*tail).next.load(Ordering::Acquire) };
             if next.is_null() {
-                if unsafe {
-                    (*tail)
-                        .next
-                        .compare_exchange(
-                            std::ptr::null_mut(),
-                            new_node,
-                            Ordering::Release,
-                            Ordering::Relaxed,
-                        )
-                        .is_ok()
-                } {
-                    let _ = self.tail.compare_exchange(
-                        tail,
-                        new_node,
-                        Ordering::Release,
-                        Ordering::Relaxed,
-                    );
+                if unsafe { (*tail).next.compare_exchange(std::ptr::null_mut(), new_node, Ordering::Release, Ordering::Relaxed).is_ok() } {
+                    let _ = self.tail.compare_exchange(tail, new_node, Ordering::Release, Ordering::Relaxed);
                     break;
                 }
             } else {
-                let _ =
-                    self.tail
-                        .compare_exchange(tail, next, Ordering::Release, Ordering::Relaxed);
+                let _ = self.tail.compare_exchange(tail, next, Ordering::Release, Ordering::Relaxed);
             }
         }
     }
@@ -129,7 +86,6 @@ pub struct TreiberStack<T> {
 }
 
 impl<T> TreiberStack<T> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TreiberStack {
             top: AtomicPtr::new(std::ptr::null_mut()),
@@ -143,14 +99,8 @@ impl<T> TreiberStack<T> {
         }));
         loop {
             let top = self.top.load(Ordering::Acquire);
-            unsafe {
-                (*new_node).next.store(top, Ordering::Release);
-            }
-            if self
-                .top
-                .compare_exchange(top, new_node, Ordering::Release, Ordering::Relaxed)
-                .is_ok()
-            {
+            unsafe { (*new_node).next.store(top, Ordering::Release); }
+            if self.top.compare_exchange(top, new_node, Ordering::Release, Ordering::Relaxed).is_ok() {
                 break;
             }
         }

@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
@@ -31,7 +13,6 @@ pub struct DnfPackageResolver {
 }
 
 impl DnfPackageResolver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DnfPackageResolver {
             packages: HashMap::new(),
@@ -176,7 +157,6 @@ pub struct KojiBuildServer {
 }
 
 impl KojiBuildServer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         KojiBuildServer {
             build_queue: Vec::new(),
@@ -211,7 +191,6 @@ pub struct BodhiUpdateTriage {
 }
 
 impl BodhiUpdateTriage {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BodhiUpdateTriage {
             updates: HashMap::new(),
@@ -240,81 +219,6 @@ impl BodhiUpdateTriage {
 
     pub fn is_promoted_to_stable(&self, update_id: &str) -> bool {
         *self.stable_gated.get(update_id).unwrap_or(&false)
-    }
-}
-
-/// Represents a single Sigma Change Proposal (SCP) tracking technology additions.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SigmaChangeProposal {
-    pub id: String,
-    pub owner: String,
-    pub status: String,
-    pub self_contained: bool,
-    pub summary: String,
-    pub benefit: String,
-}
-
-/// Tracks, gates, and updates technological transitions within SigmaOS, inspired by Fedora's Change Process.
-pub struct SigmaChangeProcessEngine {
-    pub proposals: HashMap<String, SigmaChangeProposal>,
-}
-
-impl SigmaChangeProcessEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        SigmaChangeProcessEngine {
-            proposals: HashMap::new(),
-        }
-    }
-
-    pub fn submit_proposal(&mut self, proposal: SigmaChangeProposal) {
-        self.proposals.insert(proposal.id.clone(), proposal);
-    }
-
-    pub fn update_proposal_status(&mut self, id: &str, status: &str) -> Result<String, String> {
-        if let Some(prop) = self.proposals.get_mut(id) {
-            prop.status = status.to_string();
-            Ok(prop.status.clone())
-        } else {
-            Err("Proposal not found".to_string())
-        }
-    }
-
-    pub fn get_proposals(&self) -> &HashMap<String, SigmaChangeProposal> {
-        &self.proposals
-    }
-}
-
-/// Handles release channels, Rawhide rolling transitions, and updates mimicking Fedora Rawhide fast-track.
-pub struct SigmaNextChannel {
-    pub active_channel: String,
-    pub rollback_snapshots: Vec<String>,
-    pub package_version: String,
-}
-
-impl SigmaNextChannel {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        SigmaNextChannel {
-            active_channel: "stable".to_string(),
-            rollback_snapshots: Vec::new(),
-            package_version: "1.0.0".to_string(),
-        }
-    }
-
-    pub fn set_channel(&mut self, channel: &str) {
-        self.active_channel = channel.to_string();
-    }
-
-    pub fn trigger_update(&mut self) -> Result<(usize, String), String> {
-        if self.active_channel == "sigma.next" {
-            // Save rollback snapshot
-            self.rollback_snapshots.push(self.package_version.clone());
-            self.package_version = "1.1.0-rawhide".to_string();
-            Ok((87, "sigma.next rolling Rawhide update complete".to_string()))
-        } else {
-            Ok((0, "No rolling updates available for stable channel".to_string()))
-        }
     }
 }
 
@@ -379,50 +283,5 @@ mod tests {
         // Direct promotion
         bodhi.submit_feedback("FEDORA-2023-A8F8", 2).unwrap();
         assert!(bodhi.is_promoted_to_stable("FEDORA-2023-A8F8"));
-    }
-
-    #[test]
-    fn test_sigma_change_process() {
-        let mut engine = SigmaChangeProcessEngine::new();
-        let proposal = SigmaChangeProposal {
-            id: "SCP-001".to_string(),
-            owner: "@kernel-team".to_string(),
-            status: "FinalBeta".to_string(),
-            self_contained: true,
-            summary: "Enable THP for all anonymous mappings >1MB".to_string(),
-            benefit: "8-15% speedup in compilation and database workloads".to_string(),
-        };
-
-        engine.submit_proposal(proposal.clone());
-        assert_eq!(engine.get_proposals().len(), 1);
-        assert_eq!(engine.get_proposals().get("SCP-001").unwrap(), &proposal);
-
-        let new_status = engine.update_proposal_status("SCP-001", "Completed").unwrap();
-        assert_eq!(new_status, "Completed");
-        assert_eq!(engine.get_proposals().get("SCP-001").unwrap().status, "Completed");
-
-        assert!(engine.update_proposal_status("SCP-002", "Completed").is_err());
-    }
-
-    #[test]
-    fn test_sigma_next_channel() {
-        let mut channel = SigmaNextChannel::new();
-        assert_eq!(channel.active_channel, "stable");
-        assert_eq!(channel.package_version, "1.0.0");
-
-        // stable channel should not trigger rolling rawhide updates
-        let (updated, msg) = channel.trigger_update().unwrap();
-        assert_eq!(updated, 0);
-        assert_eq!(msg, "No rolling updates available for stable channel");
-
-        // switch to rawhide fast-track (sigma.next)
-        channel.set_channel("sigma.next");
-        assert_eq!(channel.active_channel, "sigma.next");
-
-        let (updated_next, msg_next) = channel.trigger_update().unwrap();
-        assert_eq!(updated_next, 87);
-        assert_eq!(msg_next, "sigma.next rolling Rawhide update complete");
-        assert_eq!(channel.package_version, "1.1.0-rawhide");
-        assert_eq!(channel.rollback_snapshots, vec!["1.0.0".to_string()]);
     }
 }

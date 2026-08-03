@@ -2,24 +2,6 @@
 // This file implements 9 concrete drivers aligned with active Linux kernel releases on kernel.org.
 
 #![allow(clippy::all, warnings)]
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 
 extern crate alloc;
 
@@ -71,7 +53,6 @@ pub struct MainlineGpuDriver {
 }
 
 impl MainlineGpuDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {
@@ -534,7 +515,6 @@ pub struct Longterm6_18_StorageDriver {
 }
 
 impl Longterm6_18_StorageDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {
@@ -662,7 +642,6 @@ pub struct Longterm6_12_NetworkDriver {
 }
 
 impl Longterm6_12_NetworkDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {
@@ -775,7 +754,6 @@ pub struct Longterm6_6_AudioDriver {
 }
 
 impl Longterm6_6_AudioDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {
@@ -888,7 +866,6 @@ pub struct Longterm6_1_InputDriver {
 }
 
 impl Longterm6_1_InputDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {
@@ -1002,7 +979,6 @@ pub struct Longterm5_15_SerialDriver {
 }
 
 impl Longterm5_15_SerialDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {
@@ -1109,7 +1085,6 @@ pub struct Longterm5_10_TpmDriver {
 }
 
 impl Longterm5_10_TpmDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {
@@ -1232,7 +1207,6 @@ pub struct Stable6_22_SensorDriver {
 }
 
 impl Stable6_22_SensorDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {
@@ -1349,7 +1323,6 @@ pub struct Prepatch6_23_Rc1_AiDriver {
 }
 
 impl Prepatch6_23_Rc1_AiDriver {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             info: KernelReleaseInfo {

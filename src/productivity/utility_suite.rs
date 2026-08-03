@@ -1,23 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Sovereign AI-Native Desktop Productivity & Utility Suite
-// Pure, zero-dependency, // #![no_std]  // crate-root only standard-conforming implementation absorbing features from:
+// Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing features from:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, Vivaldi, Firefox, EarTrumpet, Kdenlive, Shotcut, DaVinci Resolve, Notepad++, Audacity.
 
 use crate::graphics::paint::ColorRgba;
@@ -38,7 +20,6 @@ pub struct EverythingSearchEngine {
 }
 
 impl EverythingSearchEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EverythingSearchEngine { db: Vec::new() }
     }
@@ -79,7 +60,6 @@ pub struct NotepadPlusPlusBuffer {
 }
 
 impl NotepadPlusPlusBuffer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         NotepadPlusPlusBuffer {
             tabs: Vec::new(),
@@ -164,7 +144,6 @@ pub struct SovereignBrowserEngine {
 }
 
 impl SovereignBrowserEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut engine = SovereignBrowserEngine {
             tabs: Vec::new(),
@@ -458,7 +437,6 @@ pub struct VlcCodecPipeline {
 }
 
 impl VlcCodecPipeline {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         VlcCodecPipeline {
             video_buffer: Vec::new(),
@@ -501,7 +479,6 @@ pub struct DaVinciTimeline {
 }
 
 impl DaVinciTimeline {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut lut = [0u8; 256];
         for i in 0..256 {
@@ -550,7 +527,6 @@ pub struct OneCommanderFileGrid {
 }
 
 impl OneCommanderFileGrid {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         OneCommanderFileGrid {
             left_pane_path: "/root".to_string(),
@@ -586,7 +562,6 @@ pub struct EarTrumpetVolumeMatrix {
 }
 
 impl EarTrumpetVolumeMatrix {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EarTrumpetVolumeMatrix {
             channels: Vec::new(),
@@ -636,7 +611,6 @@ pub struct IrfanViewEngine {
 }
 
 impl IrfanViewEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         IrfanViewEngine {
             active_view_format: "PNG".to_string(),
@@ -664,87 +638,9 @@ impl IrfanViewEngine {
     }
 }
 
-/// Represents an interactive slide for real-time presentation engines (Bolt-Slides parity).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InteractiveSlide {
-    pub slide_index: usize,
-    pub markdown_content: String,
-    pub interactive_component_code: String,
-}
-
-/// Sovereign In-Browser Presentation & Hot-Reload Engine (StackBlitz Bolt-Slides parity).
-/// Provides live-reloading interactive slide presentations in sovereign microkernel web contexts
-/// with near-zero latency updates and Web-container component compilation.
-pub struct SovereignPresentationEngine {
-    pub slides: Vec<InteractiveSlide>,
-    pub current_slide_index: usize,
-    pub hot_reload_version: u32,
-}
-
-impl SovereignPresentationEngine {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        SovereignPresentationEngine {
-            slides: Vec::new(),
-            current_slide_index: 0,
-            hot_reload_version: 1,
-        }
-    }
-
-    pub fn add_slide(&mut self, content: &str, component_code: &str) {
-        let idx = self.slides.len();
-        self.slides.push(InteractiveSlide {
-            slide_index: idx,
-            markdown_content: content.to_string(),
-            interactive_component_code: component_code.to_string(),
-        });
-    }
-
-    pub fn trigger_component_hot_reload(&mut self, slide_idx: usize, updated_code: &str) -> Result<u32, &'static str> {
-        if slide_idx >= self.slides.len() {
-            return Err("PresentationError: Target slide index out of range");
-        }
-        self.slides[slide_idx].interactive_component_code = updated_code.to_string();
-        self.hot_reload_version += 1;
-        Ok(self.hot_reload_version)
-    }
-
-    pub fn advance_slide(&mut self) -> bool {
-        if self.current_slide_index + 1 < self.slides.len() {
-            self.current_slide_index += 1;
-            true
-        } else {
-            false
-        }
-    }
-}
-
-impl Default for SovereignPresentationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_sovereign_presentation_engine() {
-        let mut engine = SovereignPresentationEngine::new();
-        assert_eq!(engine.current_slide_index, 0);
-
-        engine.add_slide("# Slide 1", "export default () => <div>Hello</div>");
-        engine.add_slide("# Slide 2", "export default () => <div>World</div>");
-        assert_eq!(engine.slides.len(), 2);
-
-        assert!(engine.advance_slide());
-        assert_eq!(engine.current_slide_index, 1);
-
-        let new_ver = engine.trigger_component_hot_reload(1, "export default () => <div>Hot Reloaded!</div>").unwrap();
-        assert_eq!(new_ver, 2);
-        assert_eq!(engine.slides[1].interactive_component_code, "export default () => <div>Hot Reloaded!</div>");
-    }
 
     #[test]
     fn test_everything_search() {

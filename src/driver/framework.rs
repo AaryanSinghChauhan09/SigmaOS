@@ -11,8 +11,6 @@ pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
-    Storage = 3,
-    Input = 4,
 }
 
 #[repr(usize)]
@@ -37,7 +35,6 @@ pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
     UnloadFailed = 2,
-    ProbeFailed = 3,
 }
 
 #[repr(C)]
@@ -55,18 +52,6 @@ impl SimpleDriver {
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
-
-    pub fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-
-    pub fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
-
-    pub fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
 }
 
 impl Driver for SimpleDriver {
@@ -81,7 +66,7 @@ impl Driver for SimpleDriver {
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state
-            .store(DriverState::Active as usize, Ordering::SeqCst);
+            .store(DriverState::Loaded as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
@@ -269,19 +254,6 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
     }
 }
 
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

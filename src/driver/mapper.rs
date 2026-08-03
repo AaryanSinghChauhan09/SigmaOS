@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Legacy Driver API Mapper (DriverMapper)
 // Maps legacy driver APIs directly to modern equivalents to bypass heavy emulation overhead
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MapperCategory {
@@ -39,22 +21,13 @@ impl DriverMapper {
         match cat {
             MapperCategory::Storage => {
                 translations.insert("ide_read_sector".to_string(), "nvme_read_block".to_string());
-                translations.insert(
-                    "ide_write_sector".to_string(),
-                    "nvme_write_block".to_string(),
-                );
+                translations.insert("ide_write_sector".to_string(), "nvme_write_block".to_string());
             }
             MapperCategory::Network => {
-                translations.insert(
-                    "slip_tx_packet".to_string(),
-                    "ethernet_tx_packet".to_string(),
-                );
+                translations.insert("slip_tx_packet".to_string(), "ethernet_tx_packet".to_string());
             }
             MapperCategory::Graphics => {
-                translations.insert(
-                    "vga_set_mode_13h".to_string(),
-                    "vesa_set_linear_modebar".to_string(),
-                );
+                translations.insert("vga_set_mode_13h".to_string(), "vesa_set_linear_modebar".to_string());
             }
         }
         DriverMapper {
