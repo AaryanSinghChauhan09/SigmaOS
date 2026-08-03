@@ -1,9 +1,8 @@
+use crate::klib::Vec;
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS
 /// Replicates adaptive personas, predictive syscall pre-fetching,
 /// AI scheduling, and local multi-model orchestrations.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 // ==========================================
 // 1. Adaptive Kernel Personas
@@ -148,7 +147,9 @@ impl AiScheduler {
 
     pub fn schedule_task_to_device(&mut self, task: &AiTask) -> DeviceTargetType {
         // Automatically balances and channels workloads across heterogeneous cores
-        let target = if task.tpu_tensor_operations > task.cpu_instructions && task.tpu_tensor_operations > task.gpu_shading_load {
+        let target = if task.tpu_tensor_operations > task.cpu_instructions
+            && task.tpu_tensor_operations > task.gpu_shading_load
+        {
             DeviceTargetType::TPU
         } else if task.gpu_shading_load > task.cpu_instructions {
             DeviceTargetType::GPU
@@ -268,9 +269,14 @@ impl MultiModelOrchestrator {
         self.active_models.push(model);
     }
 
-    pub fn execute_local_inference(&self, model_name: &[u8], _input_tokens_len: usize) -> Result<usize, &'static str> {
+    pub fn execute_local_inference(
+        &self,
+        model_name: &[u8],
+        _input_tokens_len: usize,
+    ) -> Result<usize, &'static str> {
         let mut name_arr = [0u8; 32];
-        name_arr[..model_name.len().min(31)].copy_from_slice(&model_name[..model_name.len().min(31)]);
+        name_arr[..model_name.len().min(31)]
+            .copy_from_slice(&model_name[..model_name.len().min(31)]);
 
         let mut found = false;
         for model in &self.active_models {
