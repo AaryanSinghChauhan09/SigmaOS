@@ -341,7 +341,7 @@ impl SigmaFsJournal {
 // 7. SigmaFsCow (Support & Services - btrfs/ZFS-parity CoW snapshotting)
 // =========================================================================
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CowBlockPointer {
     pub logical_addr: u64,
     pub physical_addr: u64,
