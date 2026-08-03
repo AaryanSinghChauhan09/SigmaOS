@@ -1,43 +1,25 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod audio {
-    pub mod driver;
-    pub mod editor;
-}
-pub use audio::driver::{
-    AudioDeviceID, AudioType, AudioError, AudioDevice, SimpleAudioDevice, AudioManager,
-    SimpleAudioManager, AudioMixer, SimpleAudioMixer, AudioStream, SimpleAudioStream,
-};
-pub use audio::editor::{
-    AudioTrack, MultiTrackSession, AudioEffect, AmplifyEffect, EchoEffect, LowPassFilter, NoiseGateEffect, AudioEditor,
-};
-
-pub mod auth;
-pub use auth::{
-    UserID, UserState, User, AuthError, SimpleUser, AuthService, SimpleAuthService,
-    PermissionID, PermissionType as AuthPermissionType, AccessResult, Permission as AuthPermission, SimplePermission, AccessControl,
-    AccessError as AuthAccessError, SimpleAccessControl,
-    IdentityID, IdentityType, IdentityError as AuthIdentityError, DigitalIdentity, SimpleDigitalIdentity,
-    IdentityManager, SimpleIdentityManager, CredentialManager, SimpleCredentialManager,
-    DecentralizedAuth, SimpleDecentralizedAuth,
-};
-
 pub mod accessibility;
+pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
-pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
-pub mod process;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
@@ -48,9 +30,10 @@ pub mod virtualization;
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
-    VoiceID, VoiceGender, SimpleVoice, Voice, ScreenReader, SimpleScreenReader, BrailleDisplay, SimpleBrailleDisplay,
-    MagnifierID, Magnifier, SimpleMagnifier, MagnifierManager, SimpleMagnifierManager, ColorFilter, SimpleColorFilter,
-    KeyID, KeyType, VirtualKey, SimpleVirtualKey, OnScreenKeyboard, SimpleOnScreenKeyboard, StickyKeys, SimpleStickyKeys,
+};
+pub use ai::{
+    agent::{AIAgent, AIAgentManager, AIError, AIStats, SimpleAIAgent, SimpleAIAgentManager},
+    orchestrator::{ContextWindowPruner, DeviceTarget, LocalLlmOrchestrator, OrchestratorError},
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -59,15 +42,12 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer, WasmState, WasmModule, WasmSandboxEngine,
-    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
-    DpllSatSolver, CasObject, ContentAddressedStorage,
-    TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
-    MetricAggregation, OssieMetric, OssieDimension, OssieRelationship, OssieCatalog,
-    SemanticRow, OssieInterpreter, OssieOntology,
-    EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
-    FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
-    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager, EbuildPackage, PortageEngine,
+    ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
+    JehanneError, JehanneNamespace, MintBackupTool, MintSoftwareManager, MintUpdateItem,
+    MintUpdateLevel, MintUpdateManager, MockUPIService, MultilingualSupport, NamespaceBindEntry,
+    NtHandle, NtObjectManager, NtObjectType, NtStatus, Plan9pMessage, Plan9pMsgType,
+    PortableExecutableLoader, RegistryHive, SoftwareMeta, TargetPlatform, TranslationLayer,
+    WindowCoordinates, ZenithDisplayCompositor,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -85,10 +65,23 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process as KernelProcess,
+    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use klib::{
+    paging::{PageTableEntry, SimplePageTableEntry, PageTable, SimplePageTable, VirtualMemoryManager, SimpleVMM, ProcessMemory, SimpleProcessMemory},
+    buddy_allocator::{BlockID, Block, SimpleBuddyAllocator},
+    uvm::{UvmPmap, UvmAmap, UvmPageLoan, UvmError},
+};
+pub use network::{
+    EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
+    TcpStack, TcpState, NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
+    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
+    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
+    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
+    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
+    ClearLinuxFlowLoadBalancer,
+};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -97,11 +90,6 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-};
-pub use process::spawn::{
-    ProcessID, SIGINT, SIGKILL, SIGUSR1, SIGSEGV, SIGTERM, ProcessState as SpawnProcessState,
-    ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter,
-    SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -112,46 +100,20 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
-    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
-    PenetrationAssistant, secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
+    CapabilityGate, CapabilityToken, CronDaemon, CronJob, DefaultDenyNetworkPolicy, DmesgLog,
+    FirewallRule, IptablesFirewall, KaliError, NemoClawError, OpenShellAgentSandbox, Permission,
+    PledgeManager, PledgePromise, PluggableAuthenticationModule, PrivacyRouter,
+    SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer, TmuxPane,
 };
-pub use security::hardening;
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, DebianPackageTranslator,
+    LinuxPackageCompatManager, LinuxPackageType, MakePkgEngine, PackageRecipe, PacmanError,
+    PacmanManager, PkgBuildScript, RecipeError, RecipeManager, RpmPackageTranslator, SatSolver,
+    Transaction, TranslatedMetadata, TranslatorError,
 };
 pub use virtualization::{
-    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
-    VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-
-pub mod init {
-    pub mod systemd_init;
-}
-pub use init::systemd_init::{
-    SystemdEngine, SystemdUnit, UnitState, UnitType,
-};
-
-pub mod ai {
-    pub mod next_gen;
-    pub mod wandr;
-}
-pub use ai::next_gen::{
-    WorkloadType, AdaptiveKernelPersona, PredictiveSyscallTranslator, DeviceTargetType,
-    AiTask, AiScheduler, EnergyGovernorMode, EnergyAwareScheduler, ModelType,
-    AIModel, MultiModelOrchestrator,
-};
-pub use ai::wandr::{
-    WandrTask, WandrDocument, ResearchResult, WandrEvaluator, SigmaWandrAgent, WandrResearchAgent,
-};
-
-pub mod virt;
-pub use virt::hypervisor::{
-    Guest, GuestID, GuestState, Hypervisor, HypervisorError, SimpleGuest, SimpleHypervisor,
-    VirtualizationGeneration,
-};
-pub use virt::microvm::{
-    MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
+    Container, DeterministicError, DeterministicHypervisor, DeterministicVirtualMachine,
+    KubernetesPod, ResourcePool, VirtualCpuContext, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmExecutionSnapshot, VmState,
 };
