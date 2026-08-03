@@ -18,7 +18,6 @@
 
 /// Custom Garuda Linux and Zen Kernel Optimization Subsystems for SigmaOS
 /// Implements Zen Interactivity Governor, Timeshift Btrfs snapshotting, Zram Memory Swap, and Nohang OOM Guards
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
@@ -38,22 +37,22 @@ impl ZenInteractivityGovernor {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ZenInteractivityGovernor {
-            latency_ns: AtomicU64::new(2_000_000),      // 2ms low-latency default
-            preempt_lag_ns: AtomicU64::new(100_000),    // 100us preemption lag
+            latency_ns: AtomicU64::new(2_000_000), // 2ms low-latency default
+            preempt_lag_ns: AtomicU64::new(100_000), // 100us preemption lag
             dynamic_tick: AtomicBool::new(true),
             interactive_boost: AtomicBool::new(true),
         }
     }
 
     pub fn tune_for_low_latency(&self) {
-        self.latency_ns.store(1_000_000, Ordering::SeqCst);     // 1ms hyper-responsive
-        self.preempt_lag_ns.store(50_000, Ordering::SeqCst);    // 50us lag
+        self.latency_ns.store(1_000_000, Ordering::SeqCst); // 1ms hyper-responsive
+        self.preempt_lag_ns.store(50_000, Ordering::SeqCst); // 50us lag
         self.interactive_boost.store(true, Ordering::SeqCst);
     }
 
     pub fn tune_for_throughput(&self) {
-        self.latency_ns.store(10_000_000, Ordering::SeqCst);   // 10ms high-throughput
-        self.preempt_lag_ns.store(500_000, Ordering::SeqCst);  // 500us lag
+        self.latency_ns.store(10_000_000, Ordering::SeqCst); // 10ms high-throughput
+        self.preempt_lag_ns.store(500_000, Ordering::SeqCst); // 500us lag
         self.interactive_boost.store(false, Ordering::SeqCst);
     }
 }
@@ -121,7 +120,8 @@ impl ZramSwapManager {
             return false; // Out of swap space
         }
 
-        self.compressed_size_bytes.fetch_add(compressed_size, Ordering::SeqCst);
+        self.compressed_size_bytes
+            .fetch_add(compressed_size, Ordering::SeqCst);
         true
     }
 
@@ -206,7 +206,7 @@ mod tests {
     fn test_nohang_oom_guard() {
         let guard = NohangOomGuard::new(1000);
         assert!(!guard.check_pressure(800)); // 80% is okay
-        assert!(guard.check_pressure(950));  // 95% triggers protection!
+        assert!(guard.check_pressure(950)); // 95% triggers protection!
 
         assert!(guard.kill_hung_process(1234));
         assert_eq!(guard.oom_count.load(Ordering::SeqCst), 1);

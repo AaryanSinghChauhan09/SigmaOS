@@ -18,7 +18,6 @@
 
 /// Custom Moonshot AI Kimi-Code Code Generation Subsystems for SigmaOS
 /// Implements Self-Healing Code Generator, Context Pruner, AST-Aware Structural Editor, and License Attribution Guards
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -43,7 +42,11 @@ impl KimiCodeGenerator {
     }
 
     /// Simulates generating code and recursively healing syntax/compilation issues
-    pub fn generate_and_heal(&self, prompt: &str, compiles_successfully: bool) -> Result<Vec<u8>, &'static str> {
+    pub fn generate_and_heal(
+        &self,
+        prompt: &str,
+        compiles_successfully: bool,
+    ) -> Result<Vec<u8>, &'static str> {
         self.generation_count.fetch_add(1, Ordering::SeqCst);
 
         let mut attempts = 0;
@@ -118,7 +121,12 @@ impl KimiAstEditor {
     }
 
     /// Performs syntax-safe AST-level edits rather than simple regex, avoiding trailing delimiter issues
-    pub fn apply_structural_patch(&self, target_code: &mut String, pattern: &str, replacement: &str) -> bool {
+    pub fn apply_structural_patch(
+        &self,
+        target_code: &mut String,
+        pattern: &str,
+        replacement: &str,
+    ) -> bool {
         self.structural_edits.fetch_add(1, Ordering::SeqCst);
 
         // Emulate finding target AST node/block (e.g. fn body) and safely substituting it

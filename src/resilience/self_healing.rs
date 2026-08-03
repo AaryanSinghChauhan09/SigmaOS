@@ -394,11 +394,15 @@ impl SystemStabilityMonitor {
         };
         self.heartbeats.insert(shard_name.to_string(), heartbeat);
         // Default guard rule: max 3 crashes within 10 seconds before isolating
-        self.fault_guards.insert(shard_name.to_string(), DoubleFaultGuard::new(3, 10));
+        self.fault_guards
+            .insert(shard_name.to_string(), DoubleFaultGuard::new(3, 10));
     }
 
     pub fn send_heartbeat(&mut self, shard_name: &str, timestamp: u64) -> Result<(), &'static str> {
-        let heartbeat = self.heartbeats.get_mut(shard_name).ok_or("Shard not registered")?;
+        let heartbeat = self
+            .heartbeats
+            .get_mut(shard_name)
+            .ok_or("Shard not registered")?;
         heartbeat.last_heartbeat_timestamp = timestamp;
         Ok(())
     }
@@ -432,8 +436,15 @@ impl SystemStabilityMonitor {
     }
 
     /// Tracks recovery crashes. Prevents endless restart cascades.
-    pub fn record_recovery_attempt(&mut self, shard_name: &str, timestamp: u64) -> Result<(), &'static str> {
-        let guard = self.fault_guards.get_mut(shard_name).ok_or("Fault guard not registered for shard")?;
+    pub fn record_recovery_attempt(
+        &mut self,
+        shard_name: &str,
+        timestamp: u64,
+    ) -> Result<(), &'static str> {
+        let guard = self
+            .fault_guards
+            .get_mut(shard_name)
+            .ok_or("Fault guard not registered for shard")?;
         guard.record_attempt(timestamp)
     }
 }

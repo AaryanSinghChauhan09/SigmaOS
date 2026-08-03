@@ -19,7 +19,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 /// OOP-based Network Stack for SigmaOS
 /// Implements networking using OOP principles with traits and structs
 /// No dependency on external network frameworks

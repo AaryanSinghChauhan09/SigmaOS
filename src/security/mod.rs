@@ -18,14 +18,15 @@
 
 // SigmaOS Security Subsystem
 pub mod capability;
-pub mod pledge;
-pub mod vulnerability;
-pub mod hardening;
 pub mod defensive_audit;
+pub mod hardening;
+pub mod parrot_kali;
+pub mod pledge;
+pub mod qubes_isolation;
+pub mod selinux;
+pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };
@@ -40,4 +41,7 @@ pub use qubes_isolation::{
 pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
+};
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
 };

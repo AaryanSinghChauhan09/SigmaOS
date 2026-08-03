@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <new> // Necessary for placement new operator
+#include "sigma_libc.h"
 
 // Mock implementations of sovereign libc primitives for tests
 extern "C" {
@@ -42,15 +43,15 @@ extern "C" {
         std::free(ptr);
     }
 
-    void* sigma_memcpy(void* dest, const void* src, unsigned long long n) {
+    void* sigma_memcpy(void* dest, const void* src, sigma_size_t n) {
         return std::memcpy(dest, src, n);
     }
 
-    void* sigma_memset(void* s, int c, unsigned long long n) {
+    void* sigma_memset(void* s, int c, sigma_size_t n) {
         return std::memset(s, c, n);
     }
 
-    unsigned long long sigma_strlen(const char* s) {
+    sigma_size_t sigma_strlen(const char* s) {
         return std::strlen(s);
     }
 
@@ -63,7 +64,7 @@ extern "C" {
         (void)code; (void)comp; (void)desc; (void)cid;
     }
 
-    int sigma_package_verify(const unsigned char* data, unsigned long long size) {
+    sigma_status sigma_package_verify(const sigma_u8* data, sigma_size_t size) {
         (void)data; (void)size;
         return 0; // success
     }

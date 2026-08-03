@@ -20,12 +20,10 @@ use crate::klib::Vec;
 use core::mem;
 /// OOP-based Driver Framework for SigmaOS
 /// Based on Roadmap Item 1: Driver framework
-
 extern crate alloc;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 use alloc::boxed::Box;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
@@ -47,16 +45,8 @@ pub enum DriverState {
     Active = 2,
 }
 
-pub trait Driver {
-    fn id(&self) -> DriverID;
-    fn driver_type(&self) -> DriverType;
-    fn state(&self) -> DriverState;
-    fn load(&mut self) -> Result<(), DriverError>;
-    fn unload(&mut self) -> Result<(), DriverError>;
-}
-
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
@@ -356,6 +346,7 @@ pub trait DriverFramework {
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
+    fn query_by_type(&self, driver_type: DriverType) -> Vec<DriverID>;
 }
 
 #[allow(dead_code)]
@@ -387,13 +378,36 @@ impl DriverFramework for SimpleDriverFramework {
         Ok(id)
     }
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
+        let mut target_idx = None;
         for i in 0..self.drivers.len() {
-            if let Some(ref mut driver) = self.drivers[i] {
+            if let Some(ref driver) = self.drivers[i] {
                 if driver.id() == id {
-                    return driver.load();
+                    target_idx = Some(i);
+                    break;
                 }
             }
         }
+
+        if let Some(idx) = target_idx {
+            let deps = self.drivers[idx].as_ref().unwrap().dependencies();
+            for &dep_type in deps {
+                let mut dep_satisfied = false;
+                for other_option in &self.drivers {
+                    if let Some(ref other) = *other_option {
+                        if other.driver_type() == dep_type && other.state() == DriverState::Active {
+                            dep_satisfied = true;
+                            break;
+                        }
+                    }
+                }
+                if !dep_satisfied {
+                    return Err(DriverError::DependencyMissing);
+                }
+            }
+
+            return self.drivers[idx].as_mut().unwrap().load();
+        }
+
         Err(DriverError::LoadFailed)
     }
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {

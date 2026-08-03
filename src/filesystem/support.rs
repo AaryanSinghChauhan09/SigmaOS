@@ -18,13 +18,13 @@
 
 extern crate alloc;
 
+use crate::klib::Vec;
+use alloc::boxed::Box;
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
-use alloc::boxed::Box;
 
 pub type FilesystemID = usize;
 
@@ -280,6 +280,10 @@ impl FilesystemManager for SimpleFilesystemManager {
         }
         ids
     }
+}
+
+pub trait SymlinkResolverRule {
+    fn is_legacy(&self) -> bool;
 }
 
 pub struct LegacyLinuxRule;

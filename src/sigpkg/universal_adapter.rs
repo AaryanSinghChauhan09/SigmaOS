@@ -151,7 +151,7 @@ impl PackageFormatAdapter for DebAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("Package:") || content.contains("Version:"))
+        Ok(content.contains("Package:") && content.contains("Version:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -267,7 +267,7 @@ impl PackageFormatAdapter for RpmAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("Name") || content.contains("Version"))
+        Ok(content.contains("Name:") && content.contains("Version:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -372,7 +372,7 @@ impl PackageFormatAdapter for PacmanAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("pkgname") || content.contains("pkgver"))
+        Ok(content.contains("pkgname =") && content.contains("pkgver ="))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -402,17 +402,25 @@ pub struct ApkAdapter {
 impl ApkAdapter {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { user_hooks: Vec::new() }
+        Self {
+            user_hooks: Vec::new(),
+        }
     }
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
 
 impl PackageFormatAdapter for ApkAdapter {
-    fn format_name(&self) -> &str { "apk" }
+    fn format_name(&self) -> &str {
+        "apk"
+    }
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
@@ -428,42 +436,63 @@ impl PackageFormatAdapter for ApkAdapter {
             } else if line.starts_with("D:") {
                 let deps_str = line[2..].to_string();
                 for dep in deps_str.split_whitespace() {
-                    dependencies.push(Dependency { name: dep.to_string(), version_constraint: VersionConstraint::Any });
+                    dependencies.push(Dependency {
+                        name: dep.to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    });
                 }
             }
         }
         let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str(&format!("P:{}\n", package.name));
-        output.push_str(&format!("V:{}.{}.{}\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!(
+            "V:{}.{}.{}\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
         output.push_str(&format!("T:{}\n", package.description));
         if !package.dependencies.is_empty() {
             output.push_str("D:");
-            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(" "));
             output.push('\n');
         }
         Ok(output.into_bytes())
     }
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("P:") || content.contains("V:"))
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("P:") && content.contains("V:"))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;
         Ok(package.dependencies)
     }
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
-        for hook in &self.user_hooks { hook(package)?; }
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
         Ok(())
     }
 }
 
 impl Default for ApkAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// NixOS derivation package adapter
@@ -474,17 +503,25 @@ pub struct NixAdapter {
 impl NixAdapter {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { user_hooks: Vec::new() }
+        Self {
+            user_hooks: Vec::new(),
+        }
     }
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
 
 impl PackageFormatAdapter for NixAdapter {
-    fn format_name(&self) -> &str { "nix" }
+    fn format_name(&self) -> &str {
+        "nix"
+    }
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
@@ -493,35 +530,68 @@ impl PackageFormatAdapter for NixAdapter {
         for line in content.lines() {
             if line.contains("pname =") {
                 let parts: Vec<&str> = line.split('"').collect();
-                if parts.len() >= 2 { name = parts[1].to_string(); }
+                if parts.len() >= 2 {
+                    name = parts[1].to_string();
+                }
             } else if line.contains("version =") {
                 let parts: Vec<&str> = line.split('"').collect();
-                if parts.len() >= 2 { version_str = parts[1].to_string(); }
+                if parts.len() >= 2 {
+                    version_str = parts[1].to_string();
+                }
             } else if line.contains("description =") {
                 let parts: Vec<&str> = line.split('"').collect();
-                if parts.len() >= 2 { description = parts[1].to_string(); }
+                if parts.len() >= 2 {
+                    description = parts[1].to_string();
+                }
             } else if line.contains("buildInputs =") {
                 // extract dependencies simply
-                let parts: Vec<&str> = line.split('[').nth(1).unwrap_or("").split(']').next().unwrap_or("").split_whitespace().collect();
+                let parts: Vec<&str> = line
+                    .split('[')
+                    .nth(1)
+                    .unwrap_or("")
+                    .split(']')
+                    .next()
+                    .unwrap_or("")
+                    .split_whitespace()
+                    .collect();
                 for dep in parts {
                     if !dep.is_empty() {
-                        dependencies.push(Dependency { name: dep.to_string(), version_constraint: VersionConstraint::Any });
+                        dependencies.push(Dependency {
+                            name: dep.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
                     }
                 }
             }
         }
         let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str("{\n");
         output.push_str(&format!("  pname = \"{}\";\n", package.name));
-        output.push_str(&format!("  version = \"{}.{}.{}\";\n", package.version.major, package.version.minor, package.version.patch));
-        output.push_str(&format!("  meta.description = \"{}\";\n", package.description));
+        output.push_str(&format!(
+            "  version = \"{}.{}.{}\";\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
+        output.push_str(&format!(
+            "  meta.description = \"{}\";\n",
+            package.description
+        ));
         if !package.dependencies.is_empty() {
             output.push_str("  buildInputs = [ ");
-            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(" "));
             output.push_str(" ];\n");
         }
@@ -529,21 +599,26 @@ impl PackageFormatAdapter for NixAdapter {
         Ok(output.into_bytes())
     }
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("pname =") || content.contains("buildInputs"))
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("pname =") && content.contains("version ="))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;
         Ok(package.dependencies)
     }
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
-        for hook in &self.user_hooks { hook(package)?; }
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
         Ok(())
     }
 }
 
 impl Default for NixAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Gentoo Portage Ebuild package adapter
@@ -554,17 +629,25 @@ pub struct EbuildAdapter {
 impl EbuildAdapter {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { user_hooks: Vec::new() }
+        Self {
+            user_hooks: Vec::new(),
+        }
     }
-    pub fn add_hook<F>(&mut self, hook: F) where F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static {
+    pub fn add_hook<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut Package) -> Result<(), AdapterError> + Send + Sync + 'static,
+    {
         self.user_hooks.push(Box::new(hook));
     }
 }
 
 impl PackageFormatAdapter for EbuildAdapter {
-    fn format_name(&self) -> &str { "ebuild" }
+    fn format_name(&self) -> &str {
+        "ebuild"
+    }
     fn parse_package(&self, data: &[u8]) -> Result<Package, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|e| AdapterError::ParseError(e.to_string()))?;
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|e| AdapterError::ParseError(e.to_string()))?;
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
@@ -578,46 +661,71 @@ impl PackageFormatAdapter for EbuildAdapter {
             } else if line.starts_with("DESCRIPTION=") {
                 description = line[12..].replace('"', "").replace('\'', "");
             } else if line.starts_with("DEPEND=") {
-                let deps_str = line[7..].replace('"', "").replace('\'', "").replace('(', "").replace(')', "");
+                let deps_str = line[7..]
+                    .replace('"', "")
+                    .replace('\'', "")
+                    .replace('(', "")
+                    .replace(')', "");
                 for dep in deps_str.split_whitespace() {
                     if !dep.is_empty() {
-                        dependencies.push(Dependency { name: dep.to_string(), version_constraint: VersionConstraint::Any });
+                        dependencies.push(Dependency {
+                            name: dep.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
                     }
                 }
             }
         }
         let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
-        Ok(Package::new(name, version, description, dependencies, String::new()))
+        Ok(Package::new(
+            name,
+            version,
+            description,
+            dependencies,
+            String::new(),
+        ))
     }
     fn serialize_package(&self, package: &Package) -> Result<Vec<u8>, AdapterError> {
         let mut output = String::new();
         output.push_str(&format!("PN=\"{}\"\n", package.name));
-        output.push_str(&format!("PV=\"{}.{}.{}\"\n", package.version.major, package.version.minor, package.version.patch));
+        output.push_str(&format!(
+            "PV=\"{}.{}.{}\"\n",
+            package.version.major, package.version.minor, package.version.patch
+        ));
         output.push_str(&format!("DESCRIPTION=\"{}\"\n", package.description));
         if !package.dependencies.is_empty() {
             output.push_str("DEPEND=\"");
-            let dep_names: Vec<&str> = package.dependencies.iter().map(|d| d.name.as_str()).collect();
+            let dep_names: Vec<&str> = package
+                .dependencies
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect();
             output.push_str(&dep_names.join(" "));
             output.push_str("\"\n");
         }
         Ok(output.into_bytes())
     }
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
-        let content = String::from_utf8(data.to_vec()).map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("PN=") || content.contains("PV="))
+        let content = String::from_utf8(data.to_vec())
+            .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
+        Ok(content.contains("PN=") && content.contains("PV="))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;
         Ok(package.dependencies)
     }
     fn process_hook(&self, package: &mut Package) -> Result<(), AdapterError> {
-        for hook in &self.user_hooks { hook(package)?; }
+        for hook in &self.user_hooks {
+            hook(package)?;
+        }
         Ok(())
     }
 }
 
 impl Default for EbuildAdapter {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Universal Package Manager (OOPS Facade Pattern)
@@ -641,7 +749,7 @@ impl UniversalPackageManager {
         manager.register_adapter(Box::new(ApkAdapter::new()));
         manager.register_adapter(Box::new(NixAdapter::new()));
         manager.register_adapter(Box::new(EbuildAdapter::new()));
-        
+
         manager
     }
 
@@ -795,13 +903,14 @@ depend = openssl";
     #[test]
     fn test_ebuild_adapter_parsing() {
         let adapter = EbuildAdapter::new();
-        let ebuild_data = b"PN=\"test-ebuild\"\nPV=\"6.2.3\"\nDESCRIPTION=\"Gentoo test\"\nDEPEND=\"gcc clang\"";
+        let ebuild_data =
+            b"PN=\"test-ebuild\"\nPV=\"6.2.3\"\nDESCRIPTION=\"Gentoo test\"\nDEPEND=\"gcc clang\"";
         let pkg = adapter.parse_package(ebuild_data).unwrap();
         assert_eq!(pkg.name, "test-ebuild");
         assert_eq!(pkg.version.major, 6);
         assert_eq!(pkg.dependencies.len(), 2);
     }
-    
+
     #[test]
     fn test_universal_manager_auto_parse() {
         let manager = UniversalPackageManager::new();
@@ -850,4 +959,31 @@ Description: Hook test";
         assert!(rpm_str.contains("Name: convert-test"));
         assert!(rpm_str.contains("Version: 1.0.0"));
     }
+}
+
+// Compatibility Shims & Types
+pub type UniversalPackageAdapter = UniversalPackageManager;
+
+#[derive(Debug, Clone)]
+pub struct AptDebManifest {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacmanPkgbuild {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SnapcraftManifest {
+    pub name: String,
+    pub version: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FlatpakManifest {
+    pub name: String,
+    pub version: String,
 }

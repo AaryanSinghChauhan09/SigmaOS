@@ -627,7 +627,9 @@ impl SovereignTabFm {
         query: &TabularRow,
     ) -> Result<TabularRow, PackageError> {
         if context.rows.is_empty() {
-            return Err(PackageError::InstallationFailed("Context dataset is empty".to_string()));
+            return Err(PackageError::InstallationFailed(
+                "Context dataset is empty".to_string(),
+            ));
         }
 
         // 1. Hybrid row-column attention mapping: compute similarity weights between query and context rows
@@ -637,13 +639,21 @@ impl SovereignTabFm {
         for row in &context.rows {
             // Compute similarity based on both numerical and categorical feature spaces
             let mut num_dist = 0.0;
-            for i in 0..row.numerical_features.len().min(query.numerical_features.len()) {
+            for i in 0..row
+                .numerical_features
+                .len()
+                .min(query.numerical_features.len())
+            {
                 let diff = row.numerical_features[i] - query.numerical_features[i];
                 num_dist += diff * diff;
             }
 
             let mut cat_match = 0.0;
-            for i in 0..row.categorical_features.len().min(query.categorical_features.len()) {
+            for i in 0..row
+                .categorical_features
+                .len()
+                .min(query.categorical_features.len())
+            {
                 if row.categorical_features[i] == query.categorical_features[i] {
                     cat_match += 1.0;
                 }
@@ -677,17 +687,21 @@ impl SovereignTabFm {
                 pred_val += row.target_numerical * weights[i];
             }
             // Tree-routing local gradient adjustment
-            let routing_adjustment = if query.numerical_features.first().copied().unwrap_or(0.0) > 0.5 {
-                0.05
-            } else {
-                -0.05
-            };
+            let routing_adjustment =
+                if query.numerical_features.first().copied().unwrap_or(0.0) > 0.5 {
+                    0.05
+                } else {
+                    -0.05
+                };
             pred_row.target_numerical = pred_val + routing_adjustment;
         } else {
             // Categorical classification: find weighted majority vote
             let mut class_scores = HashMap::new();
             for (i, row) in context.rows.iter().enumerate() {
-                let current_score = class_scores.get::<str>(row.target_categorical.as_str()).cloned().unwrap_or(0.0);
+                let current_score = class_scores
+                    .get::<str>(row.target_categorical.as_str())
+                    .cloned()
+                    .unwrap_or(0.0);
                 class_scores.insert(row.target_categorical.clone(), current_score + weights[i]);
             }
 
@@ -714,7 +728,9 @@ impl SovereignTabFm {
     ) -> Result<String, PackageError> {
         // Parse simple BigQuery SQL command: "SELECT AI_PREDICT(features) FROM input_table"
         if !sql_query.contains("AI_PREDICT") {
-            return Err(PackageError::InstallationFailed("Invalid SQL command: missing AI_PREDICT".to_string()));
+            return Err(PackageError::InstallationFailed(
+                "Invalid SQL command: missing AI_PREDICT".to_string(),
+            ));
         }
 
         println!("SovereignTabFm SQL Engine: Parsing and executing BigQuery-style tabular foundation model prediction...");
@@ -937,7 +953,9 @@ mod tests {
         };
 
         let model = SovereignTabFm::new("TabFM-Base-64".to_string());
-        let sql_res = model.execute_ai_predict_sql(&dataset, "SELECT AI_PREDICT(features) FROM base_table").unwrap();
+        let sql_res = model
+            .execute_ai_predict_sql(&dataset, "SELECT AI_PREDICT(features) FROM base_table")
+            .unwrap();
         assert!(sql_res.contains("predicted_class"));
     }
 }

@@ -16,13 +16,11 @@ pub use audio::editor::{
     MultiTrackSession, NoiseGateEffect,
 };
 
-||||||| 52d783ca0
-pub mod klib;
-||||||| 52d783ca0
-pub mod klib;
 pub mod accessibility;
+pub mod ai;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
@@ -36,10 +34,12 @@ pub mod orchestration;
 pub mod package;
 pub mod productivity;
 pub mod resilience;
+pub mod runtime;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod memory;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -145,10 +145,6 @@ pub mod init {
 }
 pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
-pub mod ai {
-    pub mod next_gen;
-    pub mod wandr;
-}
 pub use ai::next_gen::{
     AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType, EnergyAwareScheduler,
     EnergyGovernorMode, ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator,

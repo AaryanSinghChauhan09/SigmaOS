@@ -19,7 +19,6 @@
 /// Custom CachyOS Optimization Subsystems for SigmaOS
 /// Implements BORE (Burst-Oriented Response Enhancer) Scheduler, Ananicy-cpp rules manager,
 /// x86-64-v1/v2/v3/v4 microarchitecture optimization detector, and Cachy-Initramfs module loader.
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
@@ -117,7 +116,12 @@ impl V4OptimizedPackageManager {
         }
     }
 
-    pub fn detect_microarchitecture_level(&self, has_avx: bool, has_avx2: bool, has_avx512: bool) -> usize {
+    pub fn detect_microarchitecture_level(
+        &self,
+        has_avx: bool,
+        has_avx2: bool,
+        has_avx512: bool,
+    ) -> usize {
         let mut level = 1;
         if has_avx {
             level = 2; // x86-64-v2

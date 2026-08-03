@@ -26,7 +26,7 @@ use sigmaos::package::{
     LinuxTranslationService, PackageFormat, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
-use sigmaos::security::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
+use sigmaos::security::defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};
 
 #[cfg(test)]
 mod tests {
@@ -180,7 +180,7 @@ mod tests {
 
     #[test]
     fn test_process_signals_integration() {
-        use sigmaos::runtime::process::{Process, ProcessSignal, ProcessCapability};
+        use sigmaos::runtime::process::{Process, ProcessCapability, ProcessSignal};
 
         let cap = ProcessCapability::full();
         let process = unsafe { Process::new(10, 1, cap) };
@@ -193,7 +193,9 @@ mod tests {
 
     #[test]
     fn test_supervised_service_targets() {
-        use sigmaos::runtime::process::{Process, ProcessState, ProcessCapability, SupervisedServiceTarget};
+        use sigmaos::runtime::process::{
+            Process, ProcessCapability, ProcessState, SupervisedServiceTarget,
+        };
 
         let cap = ProcessCapability::full();
         let process = unsafe { Process::new(11, 1, cap) };
@@ -210,7 +212,9 @@ mod tests {
 
     #[test]
     fn test_multi_distro_packaging_compatibility() {
-        use sigmaos::sigpkg::universal_adapter::{ApkAdapter, NixAdapter, EbuildAdapter, PackageFormatAdapter};
+        use sigmaos::sigpkg::universal_adapter::{
+            ApkAdapter, EbuildAdapter, NixAdapter, PackageFormatAdapter,
+        };
 
         let apk = ApkAdapter::new();
         assert_eq!(apk.format_name(), "apk");

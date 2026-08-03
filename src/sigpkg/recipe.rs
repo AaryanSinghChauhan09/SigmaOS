@@ -17,7 +17,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 

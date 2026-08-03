@@ -152,15 +152,23 @@ impl ClawChatIntegrator {
         self.webhook_endpoints.insert(platform, url);
     }
 
-    pub fn transmit_alert(&mut self, platform: AlertPlatform, message: &str) -> Result<String, &'static str> {
+    pub fn transmit_alert(
+        &mut self,
+        platform: AlertPlatform,
+        message: &str,
+    ) -> Result<String, &'static str> {
         if !self.webhook_endpoints.contains_key(&platform) {
             return Err("No registered webhook for alert platform target");
         }
-        self.transmitted_alerts.push((platform, message.to_string()));
+        self.transmitted_alerts
+            .push((platform, message.to_string()));
         Ok(format!("Alert sent successfully to {:?}", platform))
     }
 
-    pub fn triage_github_ci_failure(&mut self, job_name: &str) -> Result<&'static str, &'static str> {
+    pub fn triage_github_ci_failure(
+        &mut self,
+        job_name: &str,
+    ) -> Result<&'static str, &'static str> {
         self.transmit_alert(AlertPlatform::GitHub, &format!("CI FAIL: {}", job_name))?;
         Ok("Triage complete: Incident report generated and webhook dispatched")
     }
@@ -203,7 +211,9 @@ mod tests {
 
         assert!(transcriber.transcribe_audio_frame(&[]).is_err());
 
-        let cmd1 = transcriber.transcribe_audio_frame(&[0.6, 0.7, 0.8]).unwrap();
+        let cmd1 = transcriber
+            .transcribe_audio_frame(&[0.6, 0.7, 0.8])
+            .unwrap();
         assert_eq!(cmd1, "systemctl status vfs_shard");
 
         let cmd2 = transcriber.transcribe_audio_frame(&[0.1, 0.2]).unwrap();
@@ -214,13 +224,25 @@ mod tests {
     #[test]
     fn test_claw_chat_integrator() {
         let mut integrator = ClawChatIntegrator::new();
-        assert!(integrator.transmit_alert(AlertPlatform::Telegram, "microkernel_panicked").is_err());
+        assert!(integrator
+            .transmit_alert(AlertPlatform::Telegram, "microkernel_panicked")
+            .is_err());
 
-        integrator.register_webhook(AlertPlatform::Telegram, "https://api.telegram.org/bot_mock".to_string());
-        assert!(integrator.transmit_alert(AlertPlatform::Telegram, "microkernel_panicked").is_ok());
+        integrator.register_webhook(
+            AlertPlatform::Telegram,
+            "https://api.telegram.org/bot_mock".to_string(),
+        );
+        assert!(integrator
+            .transmit_alert(AlertPlatform::Telegram, "microkernel_panicked")
+            .is_ok());
 
-        integrator.register_webhook(AlertPlatform::GitHub, "https://github.com/webhook_mock".to_string());
-        let triage = integrator.triage_github_ci_failure("clippy_validation").unwrap();
+        integrator.register_webhook(
+            AlertPlatform::GitHub,
+            "https://github.com/webhook_mock".to_string(),
+        );
+        let triage = integrator
+            .triage_github_ci_failure("clippy_validation")
+            .unwrap();
         assert!(triage.contains("Triage complete"));
         assert_eq!(integrator.transmitted_alerts.len(), 2);
     }

@@ -414,7 +414,9 @@ impl SovereignResearchLattice {
 
         let mut output = Vec::new();
         let header = b"SYNTHESIZED ANSWER (Evidence-Backed):\n";
-        for &byte in header { output.push(byte); }
+        for &byte in header {
+            output.push(byte);
+        }
 
         for idx in 0..doc_ids.len() {
             if let Some(&id) = doc_ids.get(idx) {
@@ -430,19 +432,29 @@ impl SovereignResearchLattice {
 
                 if let Some(doc) = found_doc {
                     let cite_prefix = b" - Claim supported by citation: [";
-                    for &byte in cite_prefix { output.push(byte); }
+                    for &byte in cite_prefix {
+                        output.push(byte);
+                    }
 
                     let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
-                    for &byte in &doc.title[..title_len] { output.push(byte); }
+                    for &byte in &doc.title[..title_len] {
+                        output.push(byte);
+                    }
 
                     let url_prefix = b"] (Source: ";
-                    for &byte in url_prefix { output.push(byte); }
+                    for &byte in url_prefix {
+                        output.push(byte);
+                    }
 
                     let url_len = doc.source_url.iter().position(|&b| b == 0).unwrap_or(128);
-                    for &byte in &doc.source_url[..url_len] { output.push(byte); }
+                    for &byte in &doc.source_url[..url_len] {
+                        output.push(byte);
+                    }
 
                     let end_bracket = b")\n";
-                    for &byte in end_bracket { output.push(byte); }
+                    for &byte in end_bracket {
+                        output.push(byte);
+                    }
                 }
             }
         }
@@ -536,7 +548,7 @@ mod tests {
             1,
             b"WANDR Wide and Deep Research",
             b"Perplexity WANDR is a deep research framework for high-volume entity disambiguation.",
-            b"https://github.com/perplexityai/wandr"
+            b"https://github.com/perplexityai/wandr",
         );
         lattice.ingest_source(doc1);
         assert_eq!(lattice.corpus.len(), 1);

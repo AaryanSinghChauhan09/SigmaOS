@@ -94,7 +94,10 @@ mod tests {
     #[test]
     fn test_moksha_desktop_profiles() {
         let mut manager = MokshaDesktopManager::new();
-        assert_eq!(manager.active_profile, MokshaProfile::MinimalDistractionFree);
+        assert_eq!(
+            manager.active_profile,
+            MokshaProfile::MinimalDistractionFree
+        );
 
         manager.switch_profile(MokshaProfile::StandardComposite);
         assert_eq!(manager.active_profile, MokshaProfile::StandardComposite);

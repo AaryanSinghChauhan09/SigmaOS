@@ -19,6 +19,7 @@
 // SigmaOS Productivity Module
 pub mod gamification;
 pub mod media;
+pub mod mind_map;
 pub mod notes;
 pub mod screen_recorder;
 pub mod screenshot;
@@ -26,11 +27,13 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod tmux;
-pub mod mind_map;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+};
+pub use mind_map::{
+    MindMapCreator, MindMapLayout, MindMapNode, NodeShape, NodeStyle, RelationshipConnection,
 };
 pub use notes::{
     ContentType, Folder, InMemoryNoteStorage, Note, NoteError, NoteSearchResult, NoteStorage,
@@ -59,8 +62,5 @@ pub use terminal::{
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
 pub use tmux::{
-    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
-};
-pub use mind_map::{
-    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
+    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };

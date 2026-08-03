@@ -17,7 +17,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 // Transaction Manager for SigmaPkg
 // Atomic package installation and rollback
 
