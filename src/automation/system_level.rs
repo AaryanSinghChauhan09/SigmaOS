@@ -165,7 +165,7 @@ impl SystemAutomationRule {
         self
     }
 
-    pub fn matches(&self, event: SystemEventType, context: &HashMap<String, f64>) -> bool {
+    pub fn matches(&self, event: SystemEventType, _context: &HashMap<String, f64>) -> bool {
         if self.trigger_event != event {
             return false;
         }
@@ -399,7 +399,7 @@ impl SystemAutomationManager {
         prediction
     }
 
-    pub fn get_smart_scheduling(&self, task_duration: Duration) -> u64 {
+    pub fn get_smart_scheduling(&self, _task_duration: Duration) -> u64 {
         let current_time = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
@@ -407,7 +407,7 @@ impl SystemAutomationManager {
 
         // Simple smart scheduling: avoid peak hours (9-17)
         let hour = (current_time % 86400) / 3600;
-        if hour >= 9 && hour < 17 {
+        if (9..17).contains(&hour) {
             // Schedule for evening
             current_time + (17 - hour) * 3600
         } else {
