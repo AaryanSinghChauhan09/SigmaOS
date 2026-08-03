@@ -1,11 +1,7 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-extern crate alloc;
-
-pub mod klib;
 pub mod accessibility;
-pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -15,16 +11,13 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod gpu;
-pub mod graphics;
-pub mod init;
+pub mod fs;
 pub mod kernel;
-pub mod media;
+pub mod klib;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
-pub mod performance;
 pub mod productivity;
 pub mod remote;
 pub mod resilience;
@@ -33,19 +26,9 @@ pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
 
-pub use media::{
-    CaptureSource, GpuEncoderType, RecorderState, RecordingStats, SovereignScreenRecorder,
-};
-
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
-};
-pub use ai::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
-    Pattern, SimpleAIAgent, SimpleAIAgentManager,
-    SovereignWikiEngine, WikiArticle, ApmDependency, ApmLockfile, ApmManifest, ApmPolicy,
-    ApmStatus, DependencySource, McpServer, SovereignApmEngine,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -53,9 +36,6 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ArchInitSystem, ArchFirewall, LsmSentinel, PamGate, TmuxMultiplexer,
-    ProcFile, ProcFileType, DevFile, DevFileType, PacmanEngine, ArchPackage,
-    SovereignEnvRegistry,
     ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
     CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
     CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
@@ -68,17 +48,6 @@ pub use compatibility::{
     SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
     TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
     YayAurHelper, ZeroTrustConstellation,
-    StarlingCompositor, StarlingWidgetTree, StarlingX11Server, StarlingTilingEngine,
-    CosmicDesktopEngine, PopShellTiling, System76Scheduler, System76PowerSwitcher,
-    BudgieAppletManager, BudgieShuffler, BudgieLayoutSwitcher,
-    RhinoPkgUnified, PacstallAur, UnicornDesktopShell,
-    MokshaDesktopEngine, BodhiProfileSelector, MokshaGadgetManager,
-    PantheonGalaWindowManager, GraniteHigLibrary, ElementaryAppCenter,
-    UbuntuDockManager, SnapcraftRuntime, UbuntuProEsm,
-    MaasProvisioner, JujuOrchestrator, MultipassVmlight,
-    ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
-    DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
-    LizardInstaller, CoasAdminSuite,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -100,11 +69,6 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
-pub use init::{
-    InitError as InitSystemError, Service as InitService, ServiceState as InitServiceState,
-    SigmaInit, SimpleService as InitSimpleService, SystemdEngine, SystemdUnit,
-    UnitState as SystemdUnitState, UnitType as SystemdUnitType,
-};
 pub use kernel::{
     ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
     InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
@@ -123,7 +87,6 @@ pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
 };
-pub use core::ops::Deref;
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -132,9 +95,6 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-    DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
-    LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
 pub use productivity::{
     Achievement, AchievementType, AegisubEngine, GamifiedProductivity, Goal, PomodoroState,
@@ -142,8 +102,8 @@ pub use productivity::{
 };
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteSession as _, RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
-    SigmaRendezvous, SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
+    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
     SimpleShellManager,
 };
 pub use resilience::{
@@ -151,14 +111,13 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
-    secure_zeroize, AppArmorManager, AppArmorProfile, AuditLogEntry, CapabilityGate,
-    CapabilityToken, DefensiveAuditSystem, DomainID, DomainOrchestrator, DomainType, ForensicBlock,
-    HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, IsolatedDomain, IsolationError,
-    MaliciousSignature, ObjectType, Permission, PledgeManager, PledgePromise, SecurityContext,
-    SecurityLabel, SecurityPolicy, SecurityRule, SelinuxPermission,
+    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
+    IsolationError, Permission, PledgeManager, PledgePromise,
 };
 pub use shell::{
-    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
+    CommandError as ShellCommandError, CronJob, LogEntry, LogLevel, Privilege, Service,
+    ShellCommand, ShellRepl, ShellSession, SigmaCoreUtils, SigmaCron, SigmaDoc, SigmaInit,
+    SigmaLog, SigmaPriv, SimpleShellSession,
 };
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, DebPackageImporter, PackageImporter,
