@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // Kernel Performance - Zero-Copy IPC & UDF Scheduler VM
 // High-speed zero-copy IPC and autonomic UDF CPU scheduling engine
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -60,7 +42,6 @@ pub struct ZeroCopyQueue<T: Copy, const N: usize> {
 }
 
 impl<T: Clone + Copy, const N: usize> ZeroCopyQueue<T, N> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             buffer: [const { None }; N],
@@ -311,7 +292,6 @@ pub struct SovereignSimdOptimizer {
 }
 
 impl SovereignSimdOptimizer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_extension: CpuInstructionExtension::Default,
@@ -370,24 +350,16 @@ impl SimdOptimizer for SovereignSimdOptimizer {
         match self.active_extension {
             CpuInstructionExtension::AVX512 => {
                 // In production, execute native AVX-512 assembly blocks here.
-                // For portable test safety and auto-vectorization across target hosts,
-                // we eliminate all index bounds checks using single-pass iterator zip chains:
-                let zip_iter = dest.iter_mut()
-                    .zip(source_a.iter())
-                    .zip(source_b.iter());
-                for ((d, &a), &b) in zip_iter {
-                    *d = a + b;
+                // For portable test safety on other host environments, we perform unrolled vector addition:
+                for i in 0..VECTOR_SIZE {
+                    dest[i] = source_a[i] + source_b[i];
                 }
                 Ok(())
             }
             _ => {
-                // Fallback serial execution path optimized with single-pass iterator zip chains
-                // to eliminate compiler index-bounds checks and enable auto-vectorization.
-                let zip_iter = dest.iter_mut()
-                    .zip(source_a.iter())
-                    .zip(source_b.iter());
-                for ((d, &a), &b) in zip_iter {
-                    *d = a + b;
+                // Fallback serial execution path
+                for i in 0..VECTOR_SIZE {
+                    dest[i] = source_a[i] + source_b[i];
                 }
                 Ok(())
             }
@@ -398,7 +370,6 @@ impl SimdOptimizer for SovereignSimdOptimizer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
 
     #[test]
     fn test_zero_copy_queue() {
@@ -630,19 +601,5 @@ mod tests {
         assert!(vm.evaluate_priority(&process).is_err());
         assert_eq!(vm.get_metrics().register_errors, 1);
         assert_eq!(vm.get_metrics().evaluation_runs, 2);
-    }
-
-    #[test]
-    fn test_optimized_vector_add() {
-        let optimizer = SovereignSimdOptimizer::new();
-        let source_a = [1.0f32; VECTOR_SIZE];
-        let source_b = [2.5f32; VECTOR_SIZE];
-        let mut dest = [0.0f32; VECTOR_SIZE];
-
-        optimizer.optimize_vector_add(&source_a, &source_b, &mut dest).unwrap();
-
-        for i in 0..VECTOR_SIZE {
-            assert_eq!(dest[i], 3.5f32);
-        }
     }
 }

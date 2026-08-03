@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 use core::mem;
 /// OOP-based Virtualization Management CLI for SigmaOS
 /// Implements virtualization CLI using OOP principles with traits and structs
@@ -82,22 +64,6 @@ impl SimpleCommand {
             name: name_array,
             description: desc_array,
         }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
     }
 }
 
@@ -179,7 +145,6 @@ impl Default for VMCapability {
 }
 
 impl VMCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         VMCapability {
             can_start: false,
@@ -333,7 +298,6 @@ impl Default for CLIStats {
 }
 
 impl CLIStats {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         CLIStats {
             total_commands: 0,
@@ -367,7 +331,6 @@ impl Default for CLICapability {
 }
 
 impl CLICapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         CLICapability {
             can_register_commands: false,
@@ -520,7 +483,6 @@ pub struct Vec<T> {
 }
 
 impl<T> Vec<T> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
@@ -608,6 +570,24 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
 pub struct VecIter<'a, T> {
     vec: &'a Vec<T>,
     index: usize,
@@ -683,5 +663,25 @@ impl<T> core::ops::DerefMut for Vec<T> {
         } else {
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }

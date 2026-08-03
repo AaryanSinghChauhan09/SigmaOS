@@ -31,7 +31,7 @@ pub enum TCPState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum NetworkError {
     Success = 0,
     InvalidSocket = 1,
@@ -61,6 +61,7 @@ pub enum SocketOption {
     SndBuf,
 }
 
+#[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
@@ -229,9 +230,16 @@ pub trait CongestionControl {
     fn get_cwnd(&self) -> usize;
 }
 
+#[repr(C)]
 pub struct RenoCongestionControl {
     pub cwnd: AtomicUsize,
     pub ssthresh: AtomicUsize,
+}
+
+impl Default for RenoCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl RenoCongestionControl {
@@ -240,12 +248,6 @@ impl RenoCongestionControl {
             cwnd: AtomicUsize::new(10),
             ssthresh: AtomicUsize::new(65535),
         }
-    }
-}
-
-impl Default for RenoCongestionControl {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -268,10 +270,17 @@ impl CongestionControl for RenoCongestionControl {
     }
 }
 
+#[repr(C)]
 pub struct BBRCongestionControl {
     pub cwnd: AtomicUsize,
     pub bw_estimate: AtomicUsize,
     pub rtt_min: AtomicUsize,
+}
+
+impl Default for BBRCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl BBRCongestionControl {
@@ -281,12 +290,6 @@ impl BBRCongestionControl {
             bw_estimate: AtomicUsize::new(1000),
             rtt_min: AtomicUsize::new(10),
         }
-    }
-}
-
-impl Default for BBRCongestionControl {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -415,6 +418,7 @@ pub trait ZeroCopy {
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError>;
 }
 
+#[repr(C)]
 pub struct ZeroCopyNetwork {
     pub dma_buffer: AtomicUsize,
 }
@@ -619,6 +623,12 @@ pub struct SimpleNetworkStack {
     pub interfaces: Vec<NetworkInterface>,
 }
 
+impl Default for SimpleNetworkStack {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleNetworkStack {
     pub fn new() -> Self {
         SimpleNetworkStack {
@@ -633,19 +643,8 @@ impl SimpleNetworkStack {
     }
 }
 
-impl Default for SimpleNetworkStack {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
-        // Zero-trust check: restrict privileged ports (< 1024) unless authorized by the firewall
-        if port < 1024 && !self.firewall.is_allowed(port) {
-            return Err(NetworkError::InvalidParameter);
-        }
-
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let socket = SimpleSocket::new(id, protocol, port);
         self.sockets.push(Some(Box::new(socket)));
@@ -655,7 +654,6 @@ impl NetworkStack for SimpleNetworkStack {
         for socket_option in &mut self.sockets {
             if let Some(ref socket) = *socket_option {
                 if socket.id() == id {
-                    *socket_option = None;
                     return Ok(());
                 }
             }

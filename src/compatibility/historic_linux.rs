@@ -1,3 +1,4 @@
+use crate::driver::device::DdeDeviceWrapper;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
