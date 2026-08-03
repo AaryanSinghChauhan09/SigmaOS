@@ -17,7 +17,8 @@ Welcome to the ultimate status, diagnostics, and remediation guide for **SigmaOS
    - [Blocker 7: Trailing pub Attributes in shell/command.rs](#blocker-7-trailing-pub-attributes-in-shellcommandrs)
 4. [Long-Term Subsystem Gaps (Physical Deployment Roadmap)](#4-long-term-subsystem-gaps-physical-deployment-roadmap)
 5. [Linux-Inspired Multi-User Subsystem Improvements Blueprint](#5-linux-inspired-multi-user-subsystem-improvements-blueprint)
-6. [AI Agent Verification & Actionable Pipeline](#6-ai-agent-verification--actionable-pipeline)
+6. [Linux-Inspired XFS (High-Performance Journaling Filesystem) Improvements Blueprint](#6-linux-inspired-xfs-high-performance-journaling-filesystem-improvements-blueprint)
+7. [AI Agent Verification & Actionable Pipeline](#7-ai-agent-verification--actionable-pipeline)
 
 ---
 
@@ -481,7 +482,151 @@ pub fn elevate_via_wheel_group(
 
 ---
 
-## 6. AI Agent Verification & Actionable Pipeline
+## 6. Linux-Inspired XFS (High-Performance Journaling Filesystem) Improvements Blueprint
+
+To elevate the XFS journaling filesystem of SigmaOS to Linux enterprise distribution parity (resembling Red Hat Enterprise Linux and SUSE's optimized setups), developers should implement the following enhancements in `src/fs/xfs.rs`:
+
+### A. Extended Allocation Group Allocation Strategies (Near & Best-Fit Parity)
+The current block allocator performs a simple fallback first-fit check across all allocation groups. We should upgrade this to support the full suite of XFS strategies:
+1. **`AllocationStrategy::BestFit`**: Scans all allocation groups to locate the group whose remaining free block count is closest to the requested block count, minimizing fragmentation.
+2. **`AllocationStrategy::Near`**: Leverages spatial proximity to place new file extents as close as possible to the parent directory's allocation group or the file's previous extents, maximizing read throughput on sequential disk reads.
+
+### B. High-Performance Metadata B+ Tree Indexes
+Rather than maintaining block states and inode mappings in flat lists, real XFS employs B+ trees:
+- **`XfsBTree`**: A self-balancing index tracking free and used extents within each Allocation Group. This shifts block allocation searches from linear $O(N)$ scan bottlenecks to highly efficient $O(\log N)$ parallel tree lookups.
+
+### C. Intent Logging & Journal Transactions (WAL Parity)
+Upgrade metadata integrity with transactional write-ahead logging (WAL). Any write operation (such as `create_inode` or `allocate_blocks`) should first register intent records in the log, transitioning cleanly through checkpoint milestones:
+1. **`XfsTransactionStart`**: Registers metadata alteration intent.
+2. **`XfsTransactionCommit`**: Securely commits logs before writing to disk block buffers.
+3. **`XfsTransactionRollback / Recover`**: Replays or rolls back unmatched active changes during file-system mount recovery checks.
+
+### D. Compile-Ready Safe-Rust Implementation
+To implement these distro-grade XFS features, the following upgraded structure can be safely integrated into `src/fs/xfs.rs`:
+
+```rust
+// ==========================================
+// Upgraded Linux-Inspired XFS Filesystem
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct XfsTransactionLogEntry {
+    pub lsn: u64,                     // Log Sequence Number
+    pub transaction_id: u64,
+    pub inode_id: u64,
+    pub state_change: String,
+    pub timestamp: u64,
+}
+
+pub struct UpgradedXfsFilesystem {
+    pub inner: XfsFilesystem,
+    pub transaction_log: Vec<XfsTransactionLogEntry>,
+    pub active_tx_id: u64,
+}
+
+impl UpgradedXfsFilesystem {
+    pub fn new(total_blocks: u64, block_size: u32, ag_count: u32) -> Self {
+        Self {
+            inner: XfsFilesystem::new(total_blocks, block_size, ag_count),
+            transaction_log: Vec::new(),
+            active_tx_id: 1,
+        }
+    }
+
+    /// Select optimal Allocation Group using Best-Fit Strategy
+    pub fn find_best_fit_ag(&self, block_count: u64) -> Option<u32> {
+        let mut best_ag_id = None;
+        let mut min_excess_blocks = u64::MAX;
+
+        for (id, ag) in &self.inner.allocation_groups {
+            if ag.free_blocks >= block_count {
+                let excess = ag.free_blocks - block_count;
+                if excess < min_excess_blocks {
+                    min_excess_blocks = excess;
+                    best_ag_id = Some(*id);
+                }
+            }
+        }
+        best_ag_id
+    }
+
+    /// Start a transaction (Write-Ahead-Log Intent Parity)
+    pub fn start_transaction(&mut self, inode_id: u64, change: &str, current_time: u64) -> u64 {
+        let tx_id = self.active_tx_id;
+        self.active_tx_id += 1;
+
+        self.transaction_log.push(XfsTransactionLogEntry {
+            lsn: self.transaction_log.len() as u64 + 1,
+            transaction_id: tx_id,
+            inode_id,
+            state_change: format!("START: {}", change),
+            timestamp: current_time,
+        });
+        tx_id
+    }
+
+    /// Commit transaction
+    pub fn commit_transaction(&mut self, tx_id: u64, inode_id: u64, current_time: u64) {
+        self.transaction_log.push(XfsTransactionLogEntry {
+            lsn: self.transaction_log.len() as u64 + 1,
+            transaction_id: tx_id,
+            inode_id,
+            state_change: "COMMIT".to_string(),
+            timestamp: current_time,
+        });
+    }
+
+    /// Allocate blocks leveraging advanced Best-Fit AG finding and transactional logging
+    pub fn allocate_blocks_optimized(
+        &mut self,
+        inode_id: u64,
+        block_count: u64,
+        strategy: AllocationStrategy,
+        current_time: u64,
+    ) -> Result<Vec<XfsExtent>, &'static str> {
+        // 1. Begin metadata write intent transaction
+        let tx_id = self.start_transaction(inode_id, "ALLOCATE_BLOCKS", current_time);
+
+        // 2. Locate AG using strategy
+        let target_ag_id = match strategy {
+            AllocationStrategy::BestFit => self.find_best_fit_ag(block_count),
+            _ => None, // Fall back to default first-fit iteration
+        };
+
+        let result = if let Some(ag_id) = target_ag_id {
+            // Allocate directly from the Best-Fit AG
+            let ag = self.inner.allocation_groups.get_mut(&ag_id).unwrap();
+            let extent = XfsExtent {
+                start_block: ag.start_block + (ag.block_count - ag.free_blocks),
+                block_count,
+                offset: 0,
+            };
+            ag.free_blocks -= block_count;
+            ag.used_blocks += block_count;
+
+            if let Some(inode) = self.inner.inodes.get_mut(&inode_id) {
+                inode.blocks += block_count;
+            }
+            self.inner.extents.insert(inode_id, vec![extent.clone()]);
+            self.inner.state = XfsState::Dirty;
+            Ok(vec![extent])
+        } else {
+            // Fall back to original sequentially aggregated allocation
+            self.inner.allocate_blocks(inode_id, block_count, strategy)
+        };
+
+        if result.is_ok() {
+            // 3. Commit transaction on success
+            self.commit_transaction(tx_id, inode_id, current_time);
+        }
+        result
+    }
+}
+```
+
+---
+
+## 7. AI Agent Verification & Actionable Pipeline
 
 To guarantee flawless code integration, always execute the following testing pipeline:
 
