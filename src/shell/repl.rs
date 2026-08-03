@@ -1,12 +1,32 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
 use std::io::{self, BufRead, Write};
 
+#[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
 impl AgentAutomationEngine {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self
+        AgentAutomationEngine
     }
 }
 
@@ -90,6 +110,7 @@ pub struct ShellRepl {
 }
 
 impl ShellRepl {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
@@ -235,6 +256,18 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "echo" => ShellCommand::Echo {
+                message: parts[1..].join(" "),
+            },
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {

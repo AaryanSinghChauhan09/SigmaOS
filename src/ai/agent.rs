@@ -3,8 +3,6 @@
 // No dependency on external AI frameworks
 // Based on Roadmap Item 81: SigmaAI core agent
 
-#![no_std]
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
@@ -13,8 +11,7 @@ use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IntentType {
     SystemCommand = 0,
     FileOperation = 1,
@@ -25,36 +22,25 @@ pub enum IntentType {
 }
 
 /// Intent (OOP: Intent object)
-#[repr(C)]
 pub struct Intent {
     pub intent_type: IntentType,
     pub confidence: f32,
-    pub command: [u8; 256],
-    pub parameters: [u8; 512],
+    pub command: String,
+    pub parameters: String,
 }
 
 impl Intent {
-    pub fn new(intent_type: IntentType, command: &[u8]) -> Self {
-        let mut command_array = [0u8; 256];
-        let cmd_len = command.len().min(255);
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(command.as_ptr(), command_array.as_mut_ptr(), cmd_len);
-        }
-
+    pub fn new(intent_type: IntentType, command: &str) -> Self {
         Intent {
             intent_type,
             confidence: 0.0,
-            command: command_array,
-            parameters: [0; 512],
+            command: command.to_string(),
+            parameters: String::new(),
         }
     }
 
-    pub fn with_parameters(mut self, params: &[u8]) -> Self {
-        let param_len = params.len().min(511);
-        unsafe {
-            core::ptr::copy_nonoverlapping(params.as_ptr(), self.parameters.as_mut_ptr(), param_len);
-        }
+    pub fn with_parameters(mut self, params: &str) -> Self {
+        self.parameters = params.to_string();
         self
     }
 }
@@ -73,11 +59,11 @@ pub enum AIError {
 /// AI agent trait (OOP interface)
 pub trait AIAgent {
     /// Parse natural language input
-    fn parse(&mut self, input: &[u8]) -> Result<Intent, AIError>;
+    fn parse(&mut self, input: &str) -> Result<Intent, AIError>;
     /// Execute intent and return the results of agent planning
     fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError>;
     /// Register custom MCP/A2A tooling
-    fn register_mcp_tool(&mut self, name: &[u8], desc: &[u8]);
+    fn register_mcp_tool(&mut self, name: String, desc: String);
     /// Run automated prompt tuning optimization loops (like DSPy)
     fn optimize_prompt_weights(&mut self) -> f32;
 }
@@ -107,23 +93,14 @@ pub struct ManagerCapability {
     pub value: u64,
 }
 
-impl ManagerCapability {
-    pub fn full() -> Self {
-        ManagerCapability { value: !0 }
-    }
-    pub fn none() -> Self {
-        ManagerCapability { value: 0 }
-    }
-}
-
 /// Simple AI agent (OOP: Concrete agent class)
 pub struct SimpleAIAgent {
-    pub name: [u8; 128],
+    pub name: String,
     pub version: (u32, u32, u32),
     pub execution_count: AtomicUsize,
     pub capability: AgentCapability,
     pub patterns: Vec<Pattern>,
-    pub mcp_tools: Vec<([u8; 128], [u8; 256])>,
+    pub mcp_tools: Vec<(String, String)>,
     pub prompt_optim_weight: f32,
 }
 
@@ -167,13 +144,16 @@ impl Pattern {
 
 impl SimpleAIAgent {
     pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
-        let mut name_array = [0u8; 128];
-        let name_len = name.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        let mut name_str = String::new();
+        for &byte in name {
+            if byte == 0 {
+                break;
+            }
+            let c: char = byte as char;
+            name_str.push(c);
         }
         SimpleAIAgent {
-            name: name_array,
+            name: name_str,
             version,
             execution_count: AtomicUsize::new(0),
             capability,
@@ -188,8 +168,7 @@ impl SimpleAIAgent {
     }
 
     unsafe fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
-        for i in 0..self.patterns.len() {
-            let pattern = &self.patterns[i];
+        for pattern in &self.patterns {
             let pattern_len = pattern.pattern.iter().position(|&b| b == 0).unwrap_or(128);
             let pattern_str = &pattern.pattern[..pattern_len];
 
@@ -230,7 +209,7 @@ impl SimpleAIAgent {
         let has_libreoffice = self.contains_bytes(input, b"libreoffice") || self.contains_bytes(input, b"\xE0\xAE\xB2\xE0\xAE\xBF\xE0\xAE\xAA\xE0\xAF\x8D\xE0\xAE\xB0\xE0\xAF\x87\xE0\xAE\x86\xE0\xAE\xAA\xE0\xAE\xBF\xE0\xAE\xB8\xAF");
         let has_install = self.contains_bytes(input, b"install")
             || self.contains_bytes(input, b"karo")
-            || self.contains_bytes(input, b"\xE0\xAE\xA0\xE0\xAE\xBF\xE0\xAE\xB1\xE0\xAF\x81\xE0\xAE\xB5\xE0\xAE\xB5\xE0\xAF\x81\xE0\xAE\xAE\xE0\xAF\x8D");
+            || self.contains_bytes(input, b"\xE0\xAE\xA0\xE0\xAE\xBF\xE0\xAE\xB1\xE0\xAF\x81\xE0\xAE\xB5\xE0\xAE\xB5\xE0\xAF\x81\xE0\xAE\xAE\xAF");
 
         if has_libreoffice && has_install {
             let mut out = Vec::new();
@@ -318,21 +297,20 @@ impl SimpleAIAgent {
 }
 
 impl AIAgent for SimpleAIAgent {
-    fn parse(&mut self, input: &[u8]) -> Result<Intent, AIError> {
+    fn parse(&mut self, input: &str) -> Result<Intent, AIError> {
         if input.is_empty() {
             return Err(AIError::InvalidInput);
         }
 
         // Search for intent trigger terms
-        let input_str = unsafe { core::str::from_utf8_unchecked(input) };
-        if input_str.contains("run") || input_str.contains("exec") {
-            Ok(Intent::new(IntentType::SystemCommand, b"sys_exec").with_parameters(input))
-        } else if input_str.contains("read") || input_str.contains("write") || input_str.contains("file") {
-            Ok(Intent::new(IntentType::FileOperation, b"file_io").with_parameters(input))
-        } else if input_str.contains("get") || input_str.contains("network") {
-            Ok(Intent::new(IntentType::NetworkRequest, b"net_req").with_parameters(input))
+        if input.contains("run") || input.contains("exec") {
+            Ok(Intent::new(IntentType::SystemCommand, "sys_exec").with_parameters(input))
+        } else if input.contains("read") || input.contains("write") || input.contains("file") {
+            Ok(Intent::new(IntentType::FileOperation, "file_io").with_parameters(input))
+        } else if input.contains("get") || input.contains("network") {
+            Ok(Intent::new(IntentType::NetworkRequest, "net_req").with_parameters(input))
         } else {
-            Ok(Intent::new(IntentType::InformationQuery, b"query").with_parameters(input))
+            Ok(Intent::new(IntentType::InformationQuery, "query").with_parameters(input))
         }
     }
 
@@ -348,16 +326,8 @@ impl AIAgent for SimpleAIAgent {
         Ok(response)
     }
 
-    fn register_mcp_tool(&mut self, name: &[u8], desc: &[u8]) {
-        let mut name_array = [0u8; 128];
-        let mut desc_array = [0u8; 256];
-        let name_len = name.len().min(127);
-        let desc_len = desc.len().min(255);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(desc.as_ptr(), desc_array.as_mut_ptr(), desc_len);
-        }
-        self.mcp_tools.push((name_array, desc_array));
+    fn register_mcp_tool(&mut self, name: String, desc: String) {
+        self.mcp_tools.push((name, desc));
     }
 
     fn optimize_prompt_weights(&mut self) -> f32 {
@@ -368,84 +338,56 @@ impl AIAgent for SimpleAIAgent {
     }
 }
 
-/// AI statistics
-#[repr(C)]
+/// AI agent manager trait (OOP interface)
+pub trait AIAgentManager {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError>;
+    fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
+    fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError>;
+    fn stats(&self) -> AIStats;
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct AIStats {
-    pub total_agents: usize,
-    pub total_requests: u64,
-    pub successful_requests: u64,
-    pub failed_requests: u64,
+    pub failed_requests: usize,
 }
 
-impl AIStats {
-    pub fn new() -> Self {
-        AIStats {
-            total_agents: 0,
-            total_requests: 0,
-            successful_requests: 0,
-            failed_requests: 0,
-        }
-    }
-}
-
-/// Simple AI agent manager (OOP: Concrete manager class)
 pub struct SimpleAIAgentManager {
-    agents: Vec<Option<Box<dyn AIAgent>>>,
-    active_agent: AtomicUsize,
-    stats: AIStats,
-    capability: ManagerCapability,
+    pub agents: Vec<Box<dyn AIAgent>>,
+    pub stats: AIStats,
 }
 
 impl SimpleAIAgentManager {
-    pub fn new(capability: ManagerCapability) -> Self {
+    pub fn new() -> Self {
         SimpleAIAgentManager {
             agents: Vec::new(),
-            active_agent: AtomicUsize::new(0),
-            stats: AIStats::new(),
-            capability,
+            stats: AIStats { failed_requests: 0 },
         }
     }
 }
 
 impl Default for SimpleAIAgentManager {
     fn default() -> Self {
-        Self::new(ManagerCapability::full())
+        Self::new()
     }
-}
-
-/// AI agent manager trait (OOP interface)
-pub trait AIAgentManager {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError>;
-    fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
-    fn process_request(&mut self, id: usize, input: &[u8]) -> Result<Vec<u8>, AIError>;
-    fn stats(&self) -> AIStats;
 }
 
 impl AIAgentManager for SimpleAIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError> {
         let id = self.agents.len();
-        self.agents.push(Some(agent));
-        self.stats.total_agents += 1;
+        self.agents.push(agent);
         Ok(id)
     }
 
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent> {
-        if id < self.agents.len() {
-            if let Some(ref agent) = self.agents[id] {
-                let r: &dyn AIAgent = agent.as_ref();
-                return Some(r);
-            }
-        }
-        None
+        self.agents.get(id).map(|a| a.as_ref())
     }
 
-    fn process_request(&mut self, id: usize, input: &[u8]) -> Result<Vec<u8>, AIError> {
-        if let Some(ref mut agent) = self.agents[id] {
-            let agent_mut: &mut dyn AIAgent = agent.as_mut();
-            let intent = agent_mut.parse(input)?;
-            agent_mut.execute(&intent)
+    fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError> {
+        if let Some(agent) = self.agents.get_mut(id) {
+            let intent = agent.parse(input)?;
+            agent.execute(&intent)
         } else {
+            self.stats.failed_requests += 1;
             Err(AIError::InvalidInput)
         }
     }
@@ -455,14 +397,6 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 }
 
-/// AI Agent metadata info
-#[derive(Debug, Clone)]
-pub struct AgentInfo {
-    pub name: String,
-    pub description: String,
-    pub capabilities: Vec<String>,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -470,17 +404,18 @@ mod tests {
     #[test]
     fn test_ai_agent_parsing() {
         let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        let intent = agent.parse(b"run diagnostic check").unwrap();
+        let intent = agent.parse("run diagnostic check").unwrap();
         assert_eq!(intent.intent_type, IntentType::SystemCommand);
-        assert_eq!(&intent.command[..8], b"sys_exec");
+        assert_eq!(intent.command, "sys_exec");
+        assert_eq!(intent.parameters, "run diagnostic check");
     }
 
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
         let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         agent.register_mcp_tool(
-            b"fetch_weather",
-            b"MCP weather fetcher",
+            "fetch_weather".to_string(),
+            "MCP weather fetcher".to_string(),
         );
         assert_eq!(agent.mcp_tools.len(), 1);
 
@@ -490,12 +425,12 @@ mod tests {
 
     #[test]
     fn test_ai_agent_manager_process() {
-        let mut manager = SimpleAIAgentManager::new(ManagerCapability::full());
+        let mut manager = SimpleAIAgentManager::new();
         let agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         let id = manager.register_agent(Box::new(agent)).unwrap();
 
-        let response = manager.process_request(id, b"read file /etc/hosts").unwrap();
-        let response_str = unsafe { core::str::from_utf8_unchecked(&response) };
+        let response = manager.process_request(id, "read file /etc/hosts").unwrap();
+        let response_str = std::str::from_utf8(&response).unwrap();
         assert_eq!(response_str, "Command executed successfully");
     }
 
