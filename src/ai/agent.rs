@@ -9,6 +9,7 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::sigpkg::ManagerCapability;
 
 /// Intent type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -74,6 +75,9 @@ pub struct AgentCapability {
 }
 
 impl AgentCapability {
+    pub fn new() -> Self {
+        Self::none()
+    }
     pub fn full() -> Self {
         AgentCapability { value: !0 }
     }
