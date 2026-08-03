@@ -659,7 +659,7 @@ impl ExtFileSystem {
     }
 
     /// Emulates JBD2 (Journaling Block Device) ordered metadata commit transactions
-    pub fn commit_journal_transaction(&mut self, _tx_id: u32) -> bool {
+    pub fn commit_journal_transaction(&mut self, __tx_id: u32) -> bool {
         if !self.has_journal {
             return false;
         }

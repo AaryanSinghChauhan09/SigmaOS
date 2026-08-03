@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - USB HID keyboard driver with event handling
 - VESA framebuffer driver with mode switching
 - Package recipe system for build automation
+- India Stack integration with mock UPI payments and GST tax calculation
+- ReactOS-inspired Windows NT compatibility layer with PE parsing
+- Local LLM orchestrator with device-aware model scheduling
+- Context window pruner for sliding dialogue history
+- Security enhancements with Kali Stack and Nemoclaw frameworks
+- Multilingual support for Hindi, Tamil, and Sanskrit languages
+- Memory leak fixes in custom Vec implementation with proper Drop trait
 
 ### Changed
 - Enhanced buddy allocator with memory initialization and statistics

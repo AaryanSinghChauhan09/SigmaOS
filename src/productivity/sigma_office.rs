@@ -500,7 +500,7 @@ impl SigmaOffice {
     }
 
     /// Save document to SigmaFS
-    pub fn save_document(&self, doc_idx: usize, _path: &str) -> Result<()> {
+    pub fn save_document(&self, doc_idx: usize, __path: &str) -> Result<()> {
         // In real implementation, this would save to SigmaFS with capability checks
         let _doc = self.documents.get(doc_idx).ok_or_else(|| {
             std::io::Error::new(std::io::ErrorKind::NotFound, "Document not found")
