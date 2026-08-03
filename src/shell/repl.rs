@@ -256,11 +256,9 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "echo" => {
-                ShellCommand::Echo {
-                    message: parts[1..].join(" "),
-                }
-            }
+            "echo" => ShellCommand::Echo {
+                message: parts[1..].join(" "),
+            },
             "rm" => {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {

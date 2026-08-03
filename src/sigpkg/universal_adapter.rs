@@ -267,7 +267,9 @@ impl PackageFormatAdapter for RpmAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("Name:") && content.contains("Version:") && content.contains("Summary:"))
+        Ok(content.contains("Name:")
+            && content.contains("Version:")
+            && content.contains("Summary:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {

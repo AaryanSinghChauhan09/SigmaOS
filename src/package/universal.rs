@@ -556,15 +556,16 @@ impl UniversalPackageManager {
         }
 
         // Selection of fastest/best mirror
-        let _mirror = self.mirror_selector.select_best_mirror().unwrap_or_else(|_| {
-            MirrorInfo {
+        let _mirror = self
+            .mirror_selector
+            .select_best_mirror()
+            .unwrap_or_else(|_| MirrorInfo {
                 name: "default-offline-mirror".to_string(),
                 url: "http://offline/".to_string(),
                 latency_ms: 10,
                 priority: 10,
                 is_active: true,
-            }
-        });
+            });
 
         // Install packages
         for dep_name in dependencies {
@@ -575,15 +576,22 @@ impl UniversalPackageManager {
                 self.sandbox_enforcer.enforce(&package, "")?;
 
                 // 2. Multi-arch routing check
-                let _route = self.arch_engine.route_package_linking(&package, "x86_64-v3").unwrap_or_default();
+                let _route = self
+                    .arch_engine
+                    .route_package_linking(&package, "x86_64-v3")
+                    .unwrap_or_default();
 
                 // 3. Life cycle state transitions: Uninstalled -> PreInstall
-                package.state_machine.transition_to(PackageState::PreInstall)?;
+                package
+                    .state_machine
+                    .transition_to(PackageState::PreInstall)?;
 
                 // Find appropriate adapter & transition to Unpacking
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get::<PackageFormat>(format) {
-                        package.state_machine.transition_to(PackageState::Unpacking)?;
+                        package
+                            .state_machine
+                            .transition_to(PackageState::Unpacking)?;
                         let adapter: &PackageAdapter = adapter;
                         adapter.install(&package)?;
                         break;
@@ -591,13 +599,17 @@ impl UniversalPackageManager {
                 }
 
                 // Transition to PostInstall
-                package.state_machine.transition_to(PackageState::PostInstall)?;
+                package
+                    .state_machine
+                    .transition_to(PackageState::PostInstall)?;
 
                 // 4. Fire dynamic user-defined triggers in the trigger registry
                 self.trigger_registry.process_install_triggers(&package)?;
 
                 // Transition to Installed
-                package.state_machine.transition_to(PackageState::Installed)?;
+                package
+                    .state_machine
+                    .transition_to(PackageState::Installed)?;
 
                 let mut installed = package.clone();
                 installed.installed = true;
@@ -707,7 +719,12 @@ impl PackageTriggerRegistry {
         }
     }
 
-    pub fn register_trigger(&mut self, name: &str, condition: TriggerCondition, callback: std::sync::Arc<dyn TriggerCallback>) {
+    pub fn register_trigger(
+        &mut self,
+        name: &str,
+        condition: TriggerCondition,
+        callback: std::sync::Arc<dyn TriggerCallback>,
+    ) {
         self.triggers.push(PackageTrigger {
             name: name.to_string(),
             condition,
@@ -715,14 +732,15 @@ impl PackageTriggerRegistry {
         });
     }
 
-    pub fn process_install_triggers(&mut self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    pub fn process_install_triggers(
+        &mut self,
+        package: &UnifiedPackage,
+    ) -> Result<(), PackageError> {
         for trigger in &self.triggers {
             let fire = match &trigger.condition {
                 TriggerCondition::OnFormatInstalled(fmt) => package.formats.contains(fmt),
                 TriggerCondition::OnPackageNameInstalled(name) => &package.name == name,
-                TriggerCondition::OnFileNameModified(file) => {
-                    package.name.contains(file)
-                }
+                TriggerCondition::OnFileNameModified(file) => package.name.contains(file),
             };
 
             if fire {
@@ -783,9 +801,12 @@ impl MirrorSelector {
     }
 
     pub fn select_best_mirror(&self) -> Result<MirrorInfo, PackageError> {
-        let mut active_mirrors: Vec<&MirrorInfo> = self.mirrors.iter().filter(|m| m.is_active).collect();
+        let mut active_mirrors: Vec<&MirrorInfo> =
+            self.mirrors.iter().filter(|m| m.is_active).collect();
         if active_mirrors.is_empty() {
-            return Err(PackageError::PackageNotFound("No active mirrors available".to_string()));
+            return Err(PackageError::PackageNotFound(
+                "No active mirrors available".to_string(),
+            ));
         }
 
         match self.policy {
@@ -847,12 +868,17 @@ impl SandboxPolicyEnforcer {
         self.policies.insert(package_name.to_string(), policy);
     }
 
-    pub fn enforce(&self, package: &UnifiedPackage, path_to_write: &str) -> Result<(), PackageError> {
+    pub fn enforce(
+        &self,
+        package: &UnifiedPackage,
+        path_to_write: &str,
+    ) -> Result<(), PackageError> {
         if let Some(policy) = self.policies.get(&package.name) {
             if !path_to_write.is_empty() {
-                let allowed = policy.writable_filesystem_paths.iter().any(|allowed_path| {
-                    path_to_write.starts_with(allowed_path)
-                });
+                let allowed = policy
+                    .writable_filesystem_paths
+                    .iter()
+                    .any(|allowed_path| path_to_write.starts_with(allowed_path));
                 if !allowed {
                     return Err(PackageError::InstallationFailed(format!(
                         "Sandbox violation: package '{}' attempted to write to unauthorized path '{}'",
@@ -899,7 +925,11 @@ impl MultiArchRoutingEngine {
         }
     }
 
-    pub fn route_package_linking(&self, package: &UnifiedPackage, package_arch_req: &str) -> Result<String, PackageError> {
+    pub fn route_package_linking(
+        &self,
+        package: &UnifiedPackage,
+        package_arch_req: &str,
+    ) -> Result<String, PackageError> {
         if !self.check_compatibility(package_arch_req) {
             return Err(PackageError::InstallationFailed(format!(
                 "Incompatible package CPU architecture requirement: required '{}', native level is {:?}",
