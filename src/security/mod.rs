@@ -3,18 +3,10 @@
 
 pub mod capability;
 pub mod pledge;
-pub mod bridge;
-pub mod prism;
-pub mod sandbox;
+pub mod qubes_isolation;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use bridge::{
-    LegacySecurityType, SecurityBridge,
-};
-pub use prism::{
-    SecurityFacet, SecurityPrism,
-};
-pub use sandbox::{
-    SandboxRule, PrivacyFirstSandbox,
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
 };

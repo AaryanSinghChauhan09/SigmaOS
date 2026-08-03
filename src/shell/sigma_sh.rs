@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // Sovereign Replacement System Utilities for SigmaOS
 // This module implements zero-dependency, no-std compliant alternatives to standard Linux core utilities,
 // init/supervision systems, syslog/journald, cron, capability-based sudo, and help manuals.
@@ -87,7 +69,6 @@ pub struct SigmaInit {
 }
 
 impl SigmaInit {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             services: Vec::new(),
@@ -133,11 +114,7 @@ impl SigmaInit {
 
     /// Simulate a connection attempt triggering standard socket activation for a service.
     pub fn socket_trigger(&mut self, service_name: &str) -> bool {
-        if let Some(service) = self
-            .services
-            .iter_mut()
-            .find(|s| e_eq(&s.name, service_name))
-        {
+        if let Some(service) = self.services.iter_mut().find(|s| e_eq(&s.name, service_name)) {
             if service.socket_activated && !service.running {
                 service.running = true;
                 return true;
@@ -236,7 +213,6 @@ pub struct SigmaLog {
 }
 
 impl SigmaLog {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         const INIT_OPTION: Option<LogEntry> = None;
         Self {
@@ -280,11 +256,24 @@ impl SigmaLog {
 // ==========================================
 // 4. CRON SYSTEM (sigma-cron)
 // ==========================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CronScheduleType {
+    Interval(Duration),
+    Hourly,
+    Daily,
+    Weekly,
+    Reboot,
+}
+
 pub struct CronJob {
     pub job_id: usize,
+    pub schedule_type: CronScheduleType,
     pub interval: Duration,
     pub last_run: Duration,
     pub command: String,
+    pub enabled: bool,
+    pub last_run_success: bool,
+    pub output_log: String,
 }
 
 pub struct SigmaCron {
@@ -292,7 +281,6 @@ pub struct SigmaCron {
 }
 
 impl SigmaCron {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { jobs: Vec::new() }
     }
@@ -300,18 +288,67 @@ impl SigmaCron {
     pub fn schedule_job(&mut self, id: usize, interval: Duration, command: &str) {
         self.jobs.push(CronJob {
             job_id: id,
+            schedule_type: CronScheduleType::Interval(interval),
             interval,
             last_run: Duration::ZERO,
             command: command.to_string(),
+            enabled: true,
+            last_run_success: false,
+            output_log: String::new(),
         });
     }
 
-    /// Trigger jobs whose timing parameters have elapsed.
+    pub fn schedule_profile_job(&mut self, id: usize, profile: CronScheduleType, command: &str) {
+        let interval = match profile {
+            CronScheduleType::Interval(d) => d,
+            CronScheduleType::Hourly => Duration::from_secs(3600),
+            CronScheduleType::Daily => Duration::from_secs(86400),
+            CronScheduleType::Weekly => Duration::from_secs(604800),
+            CronScheduleType::Reboot => Duration::ZERO,
+        };
+        self.jobs.push(CronJob {
+            job_id: id,
+            schedule_type: profile,
+            interval,
+            last_run: Duration::ZERO,
+            command: command.to_string(),
+            enabled: true,
+            last_run_success: false,
+            output_log: String::new(),
+        });
+    }
+
+    /// Suspend or resume a specific cron job dynamically at runtime.
+    pub fn toggle_job(&mut self, id: usize, enabled: bool) -> bool {
+        if let Some(job) = self.jobs.iter_mut().find(|j| j.job_id == id) {
+            job.enabled = enabled;
+            return true;
+        }
+        false
+    }
+
+    /// Anacron-like Catch-up: identify and run jobs that missed their schedule.
+    pub fn check_catchup_jobs(&mut self, current_time: Duration) -> Vec<String> {
+        let mut catchup_commands = Vec::new();
+        for job in &mut self.jobs {
+            if job.enabled && job.last_run == Duration::ZERO && current_time > job.interval {
+                job.last_run = current_time;
+                job.last_run_success = true;
+                job.output_log = "Anacron catch-up run successful".to_string();
+                catchup_commands.push(job.command.clone());
+            }
+        }
+        catchup_commands
+    }
+
+    /// Trigger enabled jobs whose timing parameters have elapsed.
     pub fn tick_jobs(&mut self, current_time: Duration) -> Vec<String> {
         let mut triggered_commands = Vec::new();
         for job in &mut self.jobs {
-            if current_time >= job.last_run + job.interval {
+            if job.enabled && current_time >= job.last_run + job.interval {
                 job.last_run = current_time;
+                job.last_run_success = true;
+                job.output_log = "Scheduled cron execution successful".to_string();
                 triggered_commands.push(job.command.clone());
             }
         }
@@ -335,7 +372,6 @@ pub struct SigmaPriv {
 }
 
 impl SigmaPriv {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             user_capabilities: Vec::new(),
@@ -489,6 +525,43 @@ mod tests {
         let trig_70 = cron.tick_jobs(Duration::from_secs(70));
         assert_eq!(trig_70.len(), 1);
         assert_eq!(trig_70[0], "backup-db");
+    }
+
+    #[test]
+    fn test_cron_toggle() {
+        let mut cron = SigmaCron::new();
+        cron.schedule_job(1, Duration::from_secs(60), "backup-db");
+
+        // Suspend job 1
+        assert!(cron.toggle_job(1, false));
+        assert!(!cron.jobs[0].enabled);
+
+        // Tick at 70 seconds -> should not trigger because it is suspended
+        let triggered = cron.tick_jobs(Duration::from_secs(70));
+        assert!(triggered.is_empty());
+    }
+
+    #[test]
+    fn test_anacron_catchup() {
+        let mut cron = SigmaCron::new();
+        cron.schedule_job(1, Duration::from_secs(60), "backup-db");
+
+        // Simulate reboot catch-up check: system was offline, last_run is ZERO, and current time > interval (100 > 60)
+        let catchup = cron.check_catchup_jobs(Duration::from_secs(100));
+        assert_eq!(catchup.len(), 1);
+        assert_eq!(catchup[0], "backup-db");
+        assert!(cron.jobs[0].last_run_success);
+        assert_eq!(cron.jobs[0].output_log, "Anacron catch-up run successful");
+    }
+
+    #[test]
+    fn test_cron_profile_scheduling() {
+        let mut cron = SigmaCron::new();
+        cron.schedule_profile_job(1, CronScheduleType::Hourly, "hourly-clean");
+        cron.schedule_profile_job(2, CronScheduleType::Daily, "daily-backup");
+
+        assert_eq!(cron.jobs[0].interval, Duration::from_secs(3600));
+        assert_eq!(cron.jobs[1].interval, Duration::from_secs(86400));
     }
 
     #[test]

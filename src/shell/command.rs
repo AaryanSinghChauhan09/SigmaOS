@@ -1,24 +1,5 @@
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-#![allow(clippy::all, warnings)]
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
+#![no_std]
+#![no_main]
 
 use crate::sigpkg::PackageImporter;
 use core::mem;
@@ -196,7 +177,6 @@ pub trait CommandParser {
 pub struct SimpleCommandParser;
 
 impl SimpleCommandParser {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleCommandParser
     }
@@ -261,7 +241,6 @@ pub struct SimpleCommandRegistry {
 }
 
 impl SimpleCommandRegistry {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleCommandRegistry {
             commands: Vec::new(),
@@ -371,7 +350,6 @@ pub struct ShellAliasManager {
 }
 
 impl ShellAliasManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             aliases: Vec::new(),
@@ -439,7 +417,6 @@ pub struct UserDefinedFunctionManager {
 }
 
 impl UserDefinedFunctionManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             functions: Vec::new(),
@@ -486,7 +463,6 @@ pub struct AutocompleteEngine {
 }
 
 impl AutocompleteEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             search_index: Vec::new(),
@@ -522,7 +498,6 @@ pub struct ShellOptimizer {
 }
 
 impl ShellOptimizer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             total_execution_ticks: AtomicUsize::new(0),
@@ -561,7 +536,6 @@ pub struct SimpleShellSession {
 }
 
 impl SimpleShellSession {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut registry = SimpleCommandRegistry::new();
         registry.register_builtins();
@@ -684,7 +658,6 @@ pub struct SimpleCommandHistory {
 }
 
 impl SimpleCommandHistory {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleCommandHistory {
             history: Vec::new(),
@@ -742,10 +715,7 @@ impl CommandHistory for SimpleCommandHistory {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
@@ -772,11 +742,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),

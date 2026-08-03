@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Package Importer Framework
 // Facilitates importing and translating packages from Debian (.deb), RPM (Fedora/RHEL),
 // and Pacman (Arch Linux) formats into native SigmaOS package recipes.
@@ -32,7 +14,6 @@ pub trait PackageImporter {
 pub struct DebPackageImporter;
 
 impl DebPackageImporter {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DebPackageImporter
     }
@@ -91,7 +72,7 @@ impl PackageImporter for DebPackageImporter {
         // We can add translated dependencies to build commands for verification
         for dep in depends {
             let cmd = format!("# depends: {}", dep);
-            recipe = recipe.with_install_command(cmd);
+            recipe = recipe.with_prepare_command(cmd);
         }
 
         Ok(recipe)
@@ -102,7 +83,6 @@ impl PackageImporter for DebPackageImporter {
 pub struct RpmPackageImporter;
 
 impl RpmPackageImporter {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         RpmPackageImporter
     }
@@ -156,7 +136,7 @@ impl PackageImporter for RpmPackageImporter {
 
         for req in requires {
             let cmd = format!("# requires: {}", req);
-            recipe = recipe.with_install_command(cmd);
+            recipe = recipe.with_prepare_command(cmd);
         }
 
         Ok(recipe)
@@ -167,7 +147,6 @@ impl PackageImporter for RpmPackageImporter {
 pub struct PacmanPackageImporter;
 
 impl PacmanPackageImporter {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PacmanPackageImporter
     }
@@ -182,7 +161,7 @@ impl PackageImporter for PacmanPackageImporter {
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
-        let mut _pkgrel = 1;
+        let mut pkgrel = 1;
 
         for line in raw_metadata.lines() {
             let trimmed = line.trim();
@@ -202,7 +181,7 @@ impl PackageImporter for PacmanPackageImporter {
                 "pkgname" => name = val.to_string(),
                 "pkgver" => version_str = val.to_string(),
                 "pkgdesc" => description = val.to_string(),
-                "pkgrel" => _pkgrel = val.parse::<u32>().unwrap_or(1),
+                "pkgrel" => pkgrel = val.parse::<u32>().unwrap_or(1),
                 _ => {}
             }
         }
@@ -220,7 +199,8 @@ impl PackageImporter for PacmanPackageImporter {
                 "https://sources.archlinux.org/".to_string(),
                 "pacman-sha256-placeholder".to_string(),
             )
-            .with_build_command("cargo build --release".to_string());
+            .with_build_command("cargo build --release".to_string())
+            .with_pkgrel(pkgrel);
 
         Ok(recipe)
     }

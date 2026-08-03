@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // OOP-based Remote Desktop & RustDesk Parity System for SigmaOS
 // Implements secure P2P signaling (SigmaRendezvous), post-quantum video frame
 // ciphering, zero-trust input authorization checking, and full screen-sharing.
@@ -171,7 +153,6 @@ pub struct SimpleRemoteDesktop {
 }
 
 impl SimpleRemoteDesktop {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleRemoteDesktop {
             sessions: Vec::new(),
@@ -247,7 +228,6 @@ pub struct SimpleScreenSharing {
 }
 
 impl SimpleScreenSharing {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleScreenSharing {
             sharing: AtomicUsize::new(0),
@@ -291,7 +271,6 @@ impl<T> Drop for Vec<T> {
 }
 
 impl<T> Vec<T> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),

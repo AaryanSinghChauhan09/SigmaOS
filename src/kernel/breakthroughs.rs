@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Breakthrough Operating System Tools & Engines
 // Implements the seven advanced developer-friendly and sovereign OS engines:
 // Universal ABI Translator, SigmaFS++, Self-Healing Kernel, AI-Native Runtime,
@@ -213,13 +195,6 @@ impl PrivacyFirstSandbox {
     pub const fn new() -> Self {
         Self { is_sandboxed: true }
     }
-}
-
-impl Default for PrivacyFirstSandbox {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
     /// Secure capability check and post-quantum handshake logic validation
     pub fn validate_and_execute_secure_call(
@@ -244,7 +219,6 @@ pub struct Vec<T> {
 }
 
 impl<T> Vec<T> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
@@ -265,9 +239,6 @@ impl<T> Vec<T> {
     }
     pub fn len(&self) -> usize {
         self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {

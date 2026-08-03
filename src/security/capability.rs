@@ -1,27 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Capability-Based Security System
 // Implements 64-bit hardware-enforced capability model
 
-use std::string::String;
-use std::vec::Vec;
-use std::sync::atomic::{AtomicU64, Ordering};
+use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,17 +12,13 @@ pub struct CapabilityToken {
 
 impl CapabilityToken {
     /// Create a new capability token with no permissions
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { bits: 0 }
     }
 
+    /// Create capability token from raw bits
     pub fn from_bits(bits: u64) -> Self {
         Self { bits }
-    }
-
-    pub fn allow_capability(&mut self, bit: u64) {
-        self.bits |= bit;
     }
 
     /// Allow network access
@@ -58,7 +34,7 @@ impl CapabilityToken {
 
     /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") || path == "/" {
+        if path.starts_with("/var/www") {
             self.bits |= 1 << 2;
         }
         self
@@ -98,22 +74,6 @@ impl CapabilityToken {
     pub fn bits(&self) -> u64 {
         self.bits
     }
-
-    /// Check if all bits in bitmask are set
-    pub fn contains(&self, bitmask: u64) -> bool {
-        (self.bits & bitmask) == bitmask
-    }
-
-    /// Add default instance support
-    pub fn default_instance() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// Permission types
@@ -135,7 +95,6 @@ pub struct CapabilityGate {
 
 impl CapabilityGate {
     /// Create new capability gate
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current: AtomicU64::new(0),
@@ -158,6 +117,12 @@ impl CapabilityGate {
         CapabilityToken {
             bits: self.current.load(Ordering::SeqCst),
         }
+    }
+}
+
+impl Default for CapabilityGate {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
