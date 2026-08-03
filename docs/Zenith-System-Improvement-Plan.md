@@ -74,18 +74,146 @@ To maintain undisputed superiority over monolithic operating systems, SigmaOS mu
 - Pre-allocated circular rings for PQC key exchanges, removing heap allocation overhead in networking tools.
 - Zero-copy key material via DMA-BUF sharing.
 
-## 6. Unified API Expansion Roadmap
-- **Phase I**: SovereignBoot — Async concurrent shard ignition (Boot time < 400ms)
-- **Phase II**: SovereignVideo — SIMD-accelerated non-linear edits (4x faster HEVC transcode)
-- **Phase III**: SovereignCloudFS — Encrypted multi-node block syncing (Zero-overhead distributed replication)
-- **Phase IV**: S-ERA / S-CCF — High-performance batch auditing (Real-time analysis for corporate registers)
+## 6. Detailed Phase-by-Phase Deliverables Roadmap
 
-## 7. Quality Assurance & Fuzzing Strategies
+### 🏁 Phase 1: Core System & Hardware Parity (Month 0–4)
+*Goal: Boot on real hardware; achieve driver, filesystem, and installer parity with Ubuntu LTS.*
+
+#### Deliverables
+- **Kernel**:
+  - UEFI boot and verified boot integration (`sigma-boot`)
+  - Multi-arch CI images: `x86_64`, `aarch64`, `riscv64`
+  - ACPI hardware discovery implemented (RSDP/RSDT/XSDT/MADT) (`kernel/drivers/acpi.rs`)
+  - ACPI power management and suspend/resume
+  - SMP scheduling with per-CPU runqueues
+- **Storage & Filesystem**:
+  - OpenZFS / Btrfs CoW extent mapping → `sigmafs.rs`
+  - `ext4` read-only compatibility mount
+  - `dm-verity` root partition integrity checks
+- **Drivers**:
+  - `VirtIO-net`, `VirtIO-blk`, `VirtIO-gpu`
+  - NVMe driver implemented (`kernel/drivers/nvme.rs`)
+  - `e1000` network, USB `xHCI`
+  - Basic Intel / AMD GPU KMS support
+- **Security**:
+  - Intel SGX secure enclave initialization
+  - Firecracker microVM VMM integration
+
+*Exit Criteria: Boot to Zenith Desktop in QEMU with VirtIO-GPU; NVMe validated; UEFI secure boot enabled.*
+
+---
+
+### 📦 Phase 2: Unified Packaging & Advanced UI/UX (Month 4–8)
+*Goal: Application ecosystem, modern compositor effects, and universal package delivery.*
+
+#### Deliverables
+- **Package Ecosystem**:
+  - `sigpkg` signed package registry with rollback and mirrors
+  - Flatpak XDG portal integration (sandboxed app delivery)
+  - WASM / WASI runtime with capability-limited execution
+  - Unified absorption of `.deb`, `.rpm`, Flatpak, Snap formats
+- **Desktop & Compositor**:
+  - `i3` / `AwesomeWM`-style dynamic tiling layout engine in Zenith
+  - `picom`-style Kawase blur, window shadows, and inactive opacity
+  - `rofi`-inspired semantic AI launcher (integrating `local_llm.rs`)
+  - `polybar`-style system status bars with live telemetry widgets
+  - Multi-monitor support and dynamic workspace tiling
+- **Accessibility**:
+  - Screen reader integration
+  - High-contrast and magnification themes
+  - Voice command input (Whisper model bridge)
+
+*Exit Criteria: Install 100+ packages via `sigpkg`; tiling layouts and blur compositing running on real GPU.*
+
+---
+
+### 🛡️ Phase 3: Security Hardening & Observability (Month 8–12)
+*Goal: Meet or exceed enterprise-grade Linux security posture.*
+
+#### Deliverables
+- **Cybersecurity**:
+  - Zeek network traffic profiling → Security Center integration
+  - GnuPG signature enforcement in `sigpkg` pipeline
+  - `fail2ban`-equivalent auto-IP-blocklist from IPC anomaly logs
+  - Lynis system audit rules embedded in Security Center Daemon
+  - QubesOS-style per-app hardware-capability compartmentalization
+- **Cryptography & Identity**:
+  - WireGuard-native VPN tunnel via `sigma_networkmanager.rs`
+  - TPM2 measured boot attestation
+  - `sigma-vault` (HashiCorp Vault-inspired secrets store)
+- **Observability**:
+  - OpenTelemetry trace export from kernel IPC spans
+  - Live CPU/Memory dashboard widget in Zenith Dock
+  - Crash dump analysis via `systemd-coredump` equivalent
+
+*Exit Criteria: All Lynis audit checks pass; GnuPG-signed rolling updates with automatic rollback verified.*
+
+---
+
+### 🧠 Phase 4: Embedded AI, Automation & Data Science (Month 12–16)
+*Goal: Make AI a first-class, always-available OS primitive — not an add-on.*
+
+#### Deliverables
+- **AI Runtime**:
+  - Quantized `llama.cpp` / `whisper.cpp` local inference via `local_llm.rs`
+  - Natural language → CLI translation (SigmaAI Agent shell)
+  - OpenCog AtomSpace semantic network integration
+  - `mlpack` C++ linear algebra acceleration bridging `sigma_math.rs`
+- **Data Science**:
+  - DVC-backed automatic telemetry snapshot via SovereignFS CoW
+  - MLflow experiment tagging bound to `sigpkg` artifact deployments
+  - Apache Spark-style distributed aggregation using shard IPC
+  - Jupyter kernel stub for interactive `sigma-notebook` sessions
+- **Automation**:
+  - `sigma_logic.rs` node expansion: HTTP trigger, file-watch, webhook
+  - `n8n`-style visual workflow editor in Zenith apps
+  - AI-powered bug explainer: translate kernel panics to plain language
+
+*Exit Criteria: Natural language CLI demo working offline; 5+ data science algorithms benchmarked.*
+
+---
+
+### 🇮🇳 Phase 5: Regional Localization, Education & Professional Modules (Month 16–20)
+*Goal: Become the premier sovereign OS for Indian institutions, students, and professionals.*
+
+#### Deliverables
+- **Indian Localization**:
+  - `indic-transliteration` engine in `sigma_i18n.rs` (Devanagari, Tamil, Bengali, Telugu, Gujarati)
+  - Bharat-FOSS community module packaging
+  - OpenForge e-Gov SDK pre-installed
+  - BOSS Linux regional language UI profiles import
+- **Education**:
+  - GeoGebra math visualization wrapper → Zenith Apps
+  - Scilab / GNU Octave scientific computing CLI
+  - OpenBoard digital whiteboard app
+  - Offline freeCodeCamp + Exercism curriculum server (`sigma_academy.rs`)
+- **Professional Suites**:
+  - QGIS agriculture yield prediction → `sigma_agriculture.rs`
+  - OpenMRS healthcare record system → `sigma_healthcare.rs`
+  - GST / TDS calculator embedded in `sigma_finance.rs`
+  - ERPNext one-click deployment via `sigpkg`
+  - KeePassXC-equivalent `sigma-vault` credential manager
+
+*Exit Criteria: Full Hindi UI; CBSE curriculum running offline; GST tools deployed in 1 command.*
+
+---
+
+## 🏛️ 7. Governance & Community
+- **Public RFC Process**: Active community designs driven via `docs/rfcs/`.
+- **Contributor Onboarding**: Clear guides and standard "good-first-bug" tags on issues.
+- **Transparent Feature Priorities**: Transparent, phase-wise community voting on feature priorities.
+- **Contributor Recognition**: Direct recognition of contributors via badges, credits, and sponsorship profiles.
+
+---
+
+## 8. Quality Assurance & Fuzzing Strategies
 - **Lattice Fuzzing Pools**: Continuous input fuzzing across all 256 syscall vectors using AFL++ + libFuzzer hybrid to detect edge cases before production.
 - **Deterministic Regression Sweeps**: Strict structural validations after every branch merge (`make check-regressions` must pass on every PR).
 - **PQC Cryptographic Verification**: Verifies Dilithium signatures across all active userland binaries, integrated into the `sigma-pkg` install pipeline.
 
-## 8. Performance Benchmark Targets
+---
+
+## 9. Performance Benchmark Targets
 | Metric | Ubuntu 24.04 | Fedora 41 | SigmaOS Target |
 | --- | --- | --- | --- |
 | Boot time (NVMe SSD) | 43s | 9s | < 2s |
@@ -95,7 +223,9 @@ To maintain undisputed superiority over monolithic operating systems, SigmaOS mu
 | Kernel CVE patch | Reboot | Reboot | No reboot (kpatch) |
 | App launch (cold) | 1.5s | 1.2s | < 0.5s |
 
-## 9. Hardware Abstraction Layer (HAL) Expansion
+---
+
+## 10. Hardware Abstraction Layer (HAL) Expansion
 Broadening hardware support is the fastest way to grow SigmaOS adoption. The SDF (Sovereign Driver Framework) runs all drivers in Ring-3 userspace — a crashing driver cannot panic the kernel:
 - Traditional Linux driver: crash → kernel panic → data loss
 - SigmaOS SDF driver: crash → sigma-heal restarts it → zero data loss
@@ -110,7 +240,9 @@ Broadening hardware support is the fastest way to grow SigmaOS adoption. The SDF
 
 *Note: `sigma-dna` reads CPUID, DMI, ACPI, and PCI topology at boot to auto-select the right driver set and scheduler tuning for detected silicon.*
 
-## 10. Security Enhancements
+---
+
+## 11. Security Enhancements
 Security is the default execution environment — not a mode you enable.
 
 ### Sandboxing by Default
@@ -134,7 +266,7 @@ Security is the default execution environment — not a mode you enable.
 
 ---
 
-## 11. Modular Design & Live Patching
+## 12. Modular Design & Live Patching
 Loose coupling ensures any subsystem can be updated without destabilizing the system.
 
 ### Shard Properties
@@ -159,7 +291,9 @@ sigma-pkg install sigma-kpatch-CVE-2026-XXXX
 - `sigma-svc profile switch --to developer` — debug symbols + relaxed MAC
 - `sigma-svc profile switch --to container-host` — max cgroup + no GUI
 
-## 12. Ecosystem, UX & Future Features
+---
+
+## 13. Ecosystem, UX & Future Features
 ### Application Layer
 - **Direct syscall interface** — C/C++/Rust ABI.
 - **`sigma-sdk`** — High-level C++ SDK with India Stack + profession bindings.
