@@ -23,8 +23,15 @@ pub mod hardening;
 pub mod parrot_kali;
 pub mod pledge;
 pub mod qubes_isolation;
+pub mod root_improvement;
 pub mod selinux;
 pub mod vulnerability;
+
+pub use root_improvement::{
+    CapSplitter, PamContext, PamControlFlag, PamEngine, PamFaillockModule, PamGroup,
+    PamLimitsModule, PamMfaAuthenticator, PamMfaPluggableModule, PamModule, PamResult, PamRule,
+    PamTimeModule, PamUnixModule, PolkitEnforcer, RootlessNamespaceManager, SudoDoasElevator,
+};
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use hardening::{

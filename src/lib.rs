@@ -124,9 +124,12 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-    secure_zeroize, AuditLogEntry, CapabilityGate, CapabilityToken, ExploitPayload,
-    HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, PenetrationAssistant, Permission,
-    PledgeManager, PledgePromise, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    secure_zeroize, AuditLogEntry, CapSplitter, CapabilityGate, CapabilityToken, ExploitPayload,
+    HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, PamContext, PamControlFlag, PamEngine,
+    PamFaillockModule, PamGroup, PamLimitsModule, PamMfaAuthenticator, PamMfaPluggableModule,
+    PamModule, PamResult, PamRule, PamTimeModule, PamUnixModule, PenetrationAssistant, Permission,
+    PledgeManager, PledgePromise, PolkitEnforcer, RootlessNamespaceManager, SecurityScanner,
+    SudoDoasElevator, VulnerabilityClass, VulnerabilityReport,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{

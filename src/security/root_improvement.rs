@@ -23,8 +23,8 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 // ==========================================
@@ -159,13 +159,16 @@ impl PolkitEnforcer {
     ) -> PolkitAuthorization {
         for rule in &self.rules {
             if rule.action_id == action_id {
+                if uid == 0 {
+                    return PolkitAuthorization::Authorized;
+                }
                 if rule.allow_any && uid >= rule.min_uid {
                     return PolkitAuthorization::Authorized;
                 }
                 if rule.requires_active_session && !has_active_sudo {
                     return PolkitAuthorization::ChallengeMfa;
                 }
-                if uid == 0 || (uid >= rule.min_uid && has_active_sudo) {
+                if uid >= rule.min_uid && has_active_sudo {
                     return PolkitAuthorization::Authorized;
                 }
             }
@@ -272,7 +275,8 @@ impl RootlessNamespaceManager {
 
     pub fn translate_inside_to_outside_uid(&self, inside_uid: u32) -> u32 {
         for entry in &self.uid_maps {
-            if inside_uid >= entry.inside_uid && inside_uid < entry.inside_uid + entry.range_length {
+            if inside_uid >= entry.inside_uid && inside_uid < entry.inside_uid + entry.range_length
+            {
                 let offset = inside_uid - entry.inside_uid;
                 return entry.outside_uid + offset;
             }
@@ -282,7 +286,9 @@ impl RootlessNamespaceManager {
 
     pub fn translate_outside_to_inside_uid(&self, outside_uid: u32) -> u32 {
         for entry in &self.uid_maps {
-            if outside_uid >= entry.outside_uid && outside_uid < entry.outside_uid + entry.range_length {
+            if outside_uid >= entry.outside_uid
+                && outside_uid < entry.outside_uid + entry.range_length
+            {
                 let offset = outside_uid - entry.outside_uid;
                 return entry.inside_uid + offset;
             }
@@ -316,6 +322,353 @@ impl PamMfaAuthenticator {
 }
 
 // ==========================================
+// 6. Linux-Inspired Stackable PAM Subsystem
+// ==========================================
+
+/// Standard PAM service types (management groups)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PamGroup {
+    Auth,
+    Account,
+    Session,
+    Password,
+}
+
+/// Standard PAM module control flags
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PamControlFlag {
+    Required,
+    Requisite,
+    Sufficient,
+    Optional,
+}
+
+/// Structured PAM execution result codes
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PamResult {
+    Success,
+    AuthError,
+    CredExpired,
+    AcctExpired,
+    MaxTries,
+    UserUnknown,
+    SessionErr,
+    PermissionDenied,
+    Ignore,
+}
+
+/// Execution Context passed through the PAM stack
+#[derive(Debug, Clone)]
+pub struct PamContext {
+    pub current_time_hour: u32,
+    pub failed_attempts: u32,
+    pub max_failed_allowed: u32,
+    pub mfa_provided: Option<u32>,
+    pub correct_mfa_code: Option<u32>,
+    pub account_expired: bool,
+    pub session_opened: bool,
+}
+
+impl PamContext {
+    pub fn new() -> Self {
+        Self {
+            current_time_hour: 12,
+            failed_attempts: 0,
+            max_failed_allowed: 3,
+            mfa_provided: None,
+            correct_mfa_code: None,
+            account_expired: false,
+            session_opened: false,
+        }
+    }
+}
+
+impl Default for PamContext {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Pluggable Authentication Module interface (Polymorphic OOP design)
+pub trait PamModule: Send + Sync {
+    fn name(&self) -> &str;
+
+    fn authenticate(
+        &self,
+        username: &str,
+        password_hash: &str,
+        context: &mut PamContext,
+    ) -> PamResult {
+        PamResult::Ignore
+    }
+
+    fn validate_account(&self, username: &str, context: &mut PamContext) -> PamResult {
+        PamResult::Ignore
+    }
+
+    fn open_session(&self, username: &str, context: &mut PamContext) -> PamResult {
+        PamResult::Ignore
+    }
+
+    fn close_session(&self, username: &str, context: &mut PamContext) -> PamResult {
+        PamResult::Ignore
+    }
+
+    fn change_password(
+        &self,
+        username: &str,
+        old_hash: &str,
+        new_hash: &str,
+        context: &mut PamContext,
+    ) -> PamResult {
+        PamResult::Ignore
+    }
+}
+
+/// Concrete PAM Module: Unix authentication module (pam_unix)
+pub struct PamUnixModule {
+    pub password_database: Vec<(String, String)>,
+}
+
+impl PamUnixModule {
+    pub fn new(db: Vec<(String, String)>) -> Self {
+        Self {
+            password_database: db,
+        }
+    }
+}
+
+impl PamModule for PamUnixModule {
+    fn name(&self) -> &str {
+        "pam_unix"
+    }
+
+    fn authenticate(
+        &self,
+        username: &str,
+        password_hash: &str,
+        context: &mut PamContext,
+    ) -> PamResult {
+        for (user, hash) in &self.password_database {
+            if user == username {
+                if hash == password_hash {
+                    return PamResult::Success;
+                } else {
+                    return PamResult::AuthError;
+                }
+            }
+        }
+        PamResult::UserUnknown
+    }
+
+    fn validate_account(&self, username: &str, context: &mut PamContext) -> PamResult {
+        if context.account_expired {
+            PamResult::AcctExpired
+        } else {
+            PamResult::Success
+        }
+    }
+}
+
+/// Concrete PAM Module: Account failure lockout (pam_faillock / pam_tally2)
+pub struct PamFaillockModule;
+
+impl PamModule for PamFaillockModule {
+    fn name(&self) -> &str {
+        "pam_faillock"
+    }
+
+    fn authenticate(
+        &self,
+        username: &str,
+        password_hash: &str,
+        context: &mut PamContext,
+    ) -> PamResult {
+        if context.failed_attempts >= context.max_failed_allowed {
+            PamResult::MaxTries
+        } else {
+            PamResult::Success
+        }
+    }
+}
+
+/// Concrete PAM Module: Time restriction module (pam_time)
+pub struct PamTimeModule {
+    pub allowed_start_hour: u32,
+    pub allowed_end_hour: u32,
+}
+
+impl PamTimeModule {
+    pub fn new(start: u32, end: u32) -> Self {
+        Self {
+            allowed_start_hour: start,
+            allowed_end_hour: end,
+        }
+    }
+}
+
+impl PamModule for PamTimeModule {
+    fn name(&self) -> &str {
+        "pam_time"
+    }
+
+    fn validate_account(&self, username: &str, context: &mut PamContext) -> PamResult {
+        if context.current_time_hour >= self.allowed_start_hour
+            && context.current_time_hour <= self.allowed_end_hour
+        {
+            PamResult::Success
+        } else {
+            PamResult::PermissionDenied
+        }
+    }
+}
+
+/// Concrete PAM Module: Session management module (pam_limits)
+pub struct PamLimitsModule;
+
+impl PamModule for PamLimitsModule {
+    fn name(&self) -> &str {
+        "pam_limits"
+    }
+
+    fn open_session(&self, username: &str, context: &mut PamContext) -> PamResult {
+        context.session_opened = true;
+        PamResult::Success
+    }
+
+    fn close_session(&self, username: &str, context: &mut PamContext) -> PamResult {
+        context.session_opened = false;
+        PamResult::Success
+    }
+}
+
+/// Concrete PAM Module: Multi-factor Authentication module (pam_mfa)
+pub struct PamMfaPluggableModule;
+
+impl PamModule for PamMfaPluggableModule {
+    fn name(&self) -> &str {
+        "pam_mfa"
+    }
+
+    fn authenticate(
+        &self,
+        username: &str,
+        password_hash: &str,
+        context: &mut PamContext,
+    ) -> PamResult {
+        match (context.mfa_provided, context.correct_mfa_code) {
+            (Some(prov), Some(corr)) => {
+                if prov == corr {
+                    PamResult::Success
+                } else {
+                    PamResult::AuthError
+                }
+            }
+            _ => PamResult::Ignore,
+        }
+    }
+}
+
+/// A single rule in a PAM configuration chain
+pub struct PamRule {
+    pub control_flag: PamControlFlag,
+    pub module: std::sync::Arc<dyn PamModule>,
+}
+
+/// Central Pluggable Authentication Modules manager
+pub struct PamEngine {
+    pub chains: crate::klib::HashMap<PamGroup, Vec<PamRule>>,
+    pub context: PamContext,
+}
+
+impl PamEngine {
+    pub fn new() -> Self {
+        Self {
+            chains: crate::klib::HashMap::new(),
+            context: PamContext::new(),
+        }
+    }
+
+    pub fn add_rule(&mut self, group: PamGroup, rule: PamRule) {
+        let chain = self.chains.entry(group).or_insert(Vec::new());
+        chain.push(rule);
+    }
+
+    /// Evaluates the complete PAM configuration stack for a specific management group.
+    /// Follows the standard Linux PAM specification.
+    pub fn execute_group(
+        &mut self,
+        group: PamGroup,
+        username: &str,
+        password_hash: &str,
+    ) -> PamResult {
+        let rules = match self.chains.get(&group) {
+            Some(r) => r,
+            None => return PamResult::Success,
+        };
+
+        let mut required_failed = false;
+        let mut failure_status = PamResult::AuthError;
+        let mut sufficient_passed = false;
+        let mut optional_passed = false;
+
+        for rule in rules {
+            let res = match group {
+                PamGroup::Auth => {
+                    rule.module
+                        .authenticate(username, password_hash, &mut self.context)
+                }
+                PamGroup::Account => rule.module.validate_account(username, &mut self.context),
+                PamGroup::Session => rule.module.open_session(username, &mut self.context),
+                PamGroup::Password => {
+                    rule.module
+                        .change_password(username, password_hash, "", &mut self.context)
+                }
+            };
+
+            match (rule.control_flag, res) {
+                (PamControlFlag::Required, PamResult::Success) => {}
+                (PamControlFlag::Required, failed_res) => {
+                    required_failed = true;
+                    if failure_status == PamResult::AuthError {
+                        failure_status = failed_res;
+                    }
+                }
+                (PamControlFlag::Requisite, PamResult::Success) => {}
+                (PamControlFlag::Requisite, failed_res) => {
+                    return failed_res;
+                }
+                (PamControlFlag::Sufficient, PamResult::Success) => {
+                    if !required_failed {
+                        return PamResult::Success;
+                    }
+                    sufficient_passed = true;
+                }
+                (PamControlFlag::Sufficient, _) => {}
+                (PamControlFlag::Optional, PamResult::Success) => {
+                    optional_passed = true;
+                }
+                (PamControlFlag::Optional, _) => {}
+            }
+        }
+
+        if required_failed {
+            failure_status
+        } else if sufficient_passed || optional_passed {
+            PamResult::Success
+        } else {
+            PamResult::Success
+        }
+    }
+}
+
+impl Default for PamEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
 // Unit Tests for Root Privilege improvements
 // ==========================================
 
@@ -327,10 +680,14 @@ mod tests {
     fn test_sudo_doas_privilege_elevation() {
         let mut elevator = SudoDoasElevator::new();
         // Failed attempt with incorrect password hash
-        assert!(elevator.elevate_via_doas("admin", "invalid_pass", 10000).is_err());
+        assert!(elevator
+            .elevate_via_doas("admin", "invalid_pass", 10000)
+            .is_err());
 
         // Correct elevation attempt creates active token session
-        let uid = elevator.elevate_via_doas("admin", "hash_sec_admin_99", 10000).unwrap();
+        let uid = elevator
+            .elevate_via_doas("admin", "hash_sec_admin_99", 10000)
+            .unwrap();
         assert_eq!(uid, 0);
 
         // Verification must confirm active session under TTL
@@ -396,5 +753,85 @@ mod tests {
         let auth = PamMfaAuthenticator::new(123456);
         assert!(auth.verify_mfa_code(123456));
         assert!(!auth.verify_mfa_code(999999));
+    }
+
+    #[test]
+    fn test_linux_inspired_pam_stack() {
+        let mut engine = PamEngine::new();
+
+        let unix_db = vec![
+            ("alice".to_string(), "correct_hash".to_string()),
+            ("bob".to_string(), "bob_hash".to_string()),
+        ];
+        let pam_unix = std::sync::Arc::new(PamUnixModule::new(unix_db));
+        let pam_faillock = std::sync::Arc::new(PamFaillockModule);
+        let pam_time = std::sync::Arc::new(PamTimeModule::new(9, 17)); // 9 AM to 5 PM
+        let pam_mfa = std::sync::Arc::new(PamMfaPluggableModule);
+
+        // Scenario 1: Configure stack: Required pam_faillock + Required pam_unix + Optional pam_mfa
+        engine.add_rule(
+            PamGroup::Auth,
+            PamRule {
+                control_flag: PamControlFlag::Required,
+                module: pam_faillock.clone(),
+            },
+        );
+        engine.add_rule(
+            PamGroup::Auth,
+            PamRule {
+                control_flag: PamControlFlag::Required,
+                module: pam_unix.clone(),
+            },
+        );
+        engine.add_rule(
+            PamGroup::Auth,
+            PamRule {
+                control_flag: PamControlFlag::Optional,
+                module: pam_mfa.clone(),
+            },
+        );
+
+        // Test normal successful authentication
+        assert_eq!(
+            engine.execute_group(PamGroup::Auth, "alice", "correct_hash"),
+            PamResult::Success
+        );
+
+        // Test wrong credentials
+        assert_eq!(
+            engine.execute_group(PamGroup::Auth, "alice", "wrong_hash"),
+            PamResult::AuthError
+        );
+
+        // Scenario 2: Test account lockout with pam_faillock
+        engine.context.failed_attempts = 4; // Locked out!
+        assert_eq!(
+            engine.execute_group(PamGroup::Auth, "alice", "correct_hash"),
+            PamResult::MaxTries
+        );
+
+        // Scenario 3: Test pam_time access restriction (outside allowed hours)
+        let mut engine_acct = PamEngine::new();
+        engine_acct.add_rule(
+            PamGroup::Account,
+            PamRule {
+                control_flag: PamControlFlag::Required,
+                module: pam_time.clone(),
+            },
+        );
+
+        // Current time: 20:00 (8 PM), outside 9 AM - 5 PM window
+        engine_acct.context.current_time_hour = 20;
+        assert_eq!(
+            engine_acct.execute_group(PamGroup::Account, "alice", ""),
+            PamResult::PermissionDenied
+        );
+
+        // Current time: 10:00 (10 AM), within window
+        engine_acct.context.current_time_hour = 10;
+        assert_eq!(
+            engine_acct.execute_group(PamGroup::Account, "alice", ""),
+            PamResult::Success
+        );
     }
 }
