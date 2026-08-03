@@ -68,6 +68,11 @@ pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
+pub use klib::{
+    paging::{PageTableEntry, SimplePageTableEntry, PageTable, SimplePageTable, VirtualMemoryManager, SimpleVMM, ProcessMemory, SimpleProcessMemory},
+    buddy_allocator::{BlockID, Block, SimpleBuddyAllocator},
+    uvm::{UvmPmap, UvmAmap, UvmPageLoan, UvmError},
+};
 pub use network::{
     EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
     TcpStack, TcpState,
