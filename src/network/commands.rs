@@ -1,9 +1,12 @@
 // SigmaOS Linux-Parity Composable Networking Commands Engine
-// Zero-dependency, #![no_std] compliant, zero-allocation
-// Integrates iproute2 (ip link/addr/route), ss/netstat (socket stats), ICMP ping, and stateful ufw/iptables firewalls.
+// Zero-dependency, #![no_std] compliant, stateful iptables/netfilter, iproute2, ss, ping implementation
 
 use crate::network::TcpState;
-use core::sync::atomic::{AtomicBool, AtomicU16, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU16, AtomicU32, AtomicU8, Ordering};
+
+extern crate alloc;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 // ==========================================
 // 1. iproute2 Parity Command Engine
@@ -20,8 +23,6 @@ pub struct IpRoute2Command {
     pub active_state: AtomicU8,
     pub assigned_ip: AtomicU32, // IPv4 representation
 }
-
-use core::sync::atomic::AtomicU8;
 
 impl IpRoute2Command {
     pub const fn new(interface_name: &'static str) -> Self {
@@ -154,7 +155,317 @@ impl PingCommand {
 }
 
 // ==========================================
-// 4. ufw / iptables Stateful Firewall Filters (UDF Rules)
+// 4. Linux-Parity Stateful Iptables & Netfilter Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IptablesTable {
+    Filter,
+    Nat,
+    Mangle,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IptablesChain {
+    Input,
+    Output,
+    Forward,
+    Prerouting,
+    Postrouting,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetworkProtocol {
+    Tcp,
+    Udp,
+    Icmp,
+    Any,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IptablesAction {
+    Accept,
+    Drop,
+    Reject,
+    Log,
+    Masquerade,
+    Redirect { to_port: u16 },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConnectionState {
+    New,
+    Established,
+    Related,
+    Invalid,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ConntrackEntry {
+    pub src_ip: u32,
+    pub src_port: u16,
+    pub dest_ip: u32,
+    pub dest_port: u16,
+    pub protocol: NetworkProtocol,
+    pub state: ConnectionState,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct IpMatch {
+    pub ip: u32,
+    pub mask: u32,
+}
+
+impl IpMatch {
+    pub fn new(ip: u32, prefix: u8) -> Self {
+        let mask = if prefix >= 32 {
+            0xFFFFFFFFu32
+        } else {
+            !((1u64 << (32 - prefix)) - 1) as u32
+        };
+        Self { ip, mask }
+    }
+
+    pub fn matches(&self, target: u32) -> bool {
+        (target & self.mask) == (self.ip & self.mask)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct IptablesRule {
+    pub table: IptablesTable,
+    pub chain: IptablesChain,
+    pub protocol: NetworkProtocol,
+    pub src_ip: Option<IpMatch>,
+    pub dest_ip: Option<IpMatch>,
+    pub dest_port_start: Option<u16>,
+    pub dest_port_end: Option<u16>,
+    pub match_state: Option<ConnectionState>,
+    pub action: IptablesAction,
+}
+
+pub struct IptablesEngine {
+    pub rules: Vec<IptablesRule>,
+    pub conntrack: Vec<ConntrackEntry>,
+    pub public_ip: u32, // Outgoing public IP for SNAT/Masquerade
+}
+
+impl IptablesEngine {
+    pub fn new(public_ip: u32) -> Self {
+        Self {
+            rules: Vec::new(),
+            conntrack: Vec::new(),
+            public_ip,
+        }
+    }
+
+    pub fn add_rule(&mut self, rule: IptablesRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn clear_rules(&mut self) {
+        self.rules.clear();
+    }
+
+    /// Evaluates a packet against stateful rules, connection tracking, and NAT dynamic transformations.
+    /// Returns the final action, mapped packet source IP, and mapped destination port (supporting NAT/Redirect).
+    pub fn evaluate_packet(
+        &mut self,
+        source_ip: u32,
+        source_port: u16,
+        dest_ip: u32,
+        dest_port: u16,
+        protocol: NetworkProtocol,
+        chain: IptablesChain,
+    ) -> (IptablesAction, u32, u16) {
+        // 1. Connection Tracking (conntrack) Lookup
+        let mut pkt_state = ConnectionState::New;
+        for entry in &self.conntrack {
+            if entry.src_ip == source_ip
+                && entry.src_port == source_port
+                && entry.dest_ip == dest_ip
+                && entry.dest_port == dest_port
+                && entry.protocol == protocol
+            {
+                pkt_state = entry.state;
+                break;
+            }
+        }
+
+        let mut final_action =
+            if chain == IptablesChain::Output || chain == IptablesChain::Postrouting {
+                IptablesAction::Accept
+            } else {
+                IptablesAction::Drop
+            };
+        let mut current_src_ip = source_ip;
+        let mut current_dest_port = dest_port;
+
+        // 2. Process PREROUTING chain (Destination NAT/Redirect)
+        if chain == IptablesChain::Prerouting {
+            for rule in &self.rules {
+                if rule.table == IptablesTable::Nat && rule.chain == IptablesChain::Prerouting {
+                    if self.matches_rule(
+                        rule,
+                        source_ip,
+                        source_port,
+                        dest_ip,
+                        dest_port,
+                        protocol,
+                        pkt_state,
+                    ) {
+                        if let IptablesAction::Redirect { to_port } = rule.action {
+                            println!(
+                                "[iptables-nat] REDIRECT DNAT rule match: port {} -> {}",
+                                dest_port, to_port
+                            );
+                            current_dest_port = to_port;
+                            final_action = IptablesAction::Accept;
+                            break;
+                        }
+                    }
+                }
+            }
+            if final_action == IptablesAction::Accept {
+                return (final_action, current_src_ip, current_dest_port);
+            }
+        }
+
+        // 3. Process FILTER tables (INPUT / FORWARD / OUTPUT)
+        let mut matched_rule = false;
+        for rule in &self.rules {
+            if rule.table == IptablesTable::Filter && rule.chain == chain {
+                if self.matches_rule(
+                    rule,
+                    source_ip,
+                    source_port,
+                    dest_ip,
+                    dest_port,
+                    protocol,
+                    pkt_state,
+                ) {
+                    matched_rule = true;
+                    match rule.action {
+                        IptablesAction::Log => {
+                            println!(
+                                "[iptables-LOG] IN=eth0 OUT= SRC={}.{}.{}.{} DST={}.{}.{}.{} PROTO={:?} SPT={} DPT={} STATE={:?}",
+                                (source_ip >> 24) & 0xFF,
+                                (source_ip >> 16) & 0xFF,
+                                (source_ip >> 8) & 0xFF,
+                                source_ip & 0xFF,
+                                (dest_ip >> 24) & 0xFF,
+                                (dest_ip >> 16) & 0xFF,
+                                (dest_ip >> 8) & 0xFF,
+                                dest_ip & 0xFF,
+                                protocol,
+                                source_port,
+                                dest_port,
+                                pkt_state
+                            );
+                            // LOG is non-terminating, continue evaluation
+                        }
+                        action => {
+                            final_action = action;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // If no filter rules match, allow existing established connections automatically (standard Linux behavior)
+        if !matched_rule && pkt_state == ConnectionState::Established {
+            final_action = IptablesAction::Accept;
+        }
+
+        // 4. Process POSTROUTING chain (Source NAT / Masquerade)
+        if final_action == IptablesAction::Accept && chain == IptablesChain::Output {
+            for rule in &self.rules {
+                if rule.table == IptablesTable::Nat && rule.chain == IptablesChain::Postrouting {
+                    if self.matches_rule(
+                        rule,
+                        source_ip,
+                        source_port,
+                        dest_ip,
+                        dest_port,
+                        protocol,
+                        pkt_state,
+                    ) {
+                        if rule.action == IptablesAction::Masquerade {
+                            println!(
+                                "[iptables-nat] MASQUERADE SNAT rule match: remapping local IP {}.{}.{}.{} to public IP",
+                                (source_ip >> 24) & 0xFF,
+                                (source_ip >> 16) & 0xFF,
+                                (source_ip >> 8) & 0xFF,
+                                source_ip & 0xFF
+                            );
+                            current_src_ip = self.public_ip;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 5. Update Connection Tracking table if accepted
+        if final_action == IptablesAction::Accept && pkt_state == ConnectionState::New {
+            self.conntrack.push(ConntrackEntry {
+                src_ip: source_ip,
+                src_port: source_port,
+                dest_ip: dest_ip,
+                dest_port: dest_port,
+                protocol,
+                state: ConnectionState::Established,
+            });
+        }
+
+        (final_action, current_src_ip, current_dest_port)
+    }
+
+    fn matches_rule(
+        &self,
+        rule: &IptablesRule,
+        src_ip: u32,
+        src_port: u16,
+        dest_ip: u32,
+        dest_port: u16,
+        protocol: NetworkProtocol,
+        state: ConnectionState,
+    ) -> bool {
+        if rule.protocol != NetworkProtocol::Any && rule.protocol != protocol {
+            return false;
+        }
+        if let Some(ref match_src) = rule.src_ip {
+            if !match_src.matches(src_ip) {
+                return false;
+            }
+        }
+        if let Some(ref match_dst) = rule.dest_ip {
+            if !match_dst.matches(dest_ip) {
+                return false;
+            }
+        }
+        if let Some(port_start) = rule.dest_port_start {
+            if dest_port < port_start {
+                return false;
+            }
+        }
+        if let Some(port_end) = rule.dest_port_end {
+            if dest_port > port_end {
+                return false;
+            }
+        }
+        if let Some(match_st) = rule.match_state {
+            if match_st != state {
+                return false;
+            }
+        }
+        true
+    }
+}
+
+// ==========================================
+// 5. ufw / iptables Stateful Firewall Filters (UDF Rules)
 // ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
