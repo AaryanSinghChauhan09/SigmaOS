@@ -2,9 +2,15 @@
 // System suite for SigmaOS - SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess
 
 pub mod sigmatools;
+pub mod sigma_core_utils;
 
 pub use sigmatools::{
     AccessibilityFeature, ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,
     SigmaIdentity, SigmaToolError, UserIdentity,
     TerminalError, AnsiColor, CliCommandTool, TerminalLineBuffer, AnsiTextCompositor,
+};
+pub use sigma_core_utils::{
+    SovereignLogger, SovereignLogLevel, SovereignCronScheduler, CronJob,
+    SovereignPrivilegeEngine, SovereignDocBrowser, SovereignCoreUtils,
+    SovereignShell, SovereignInitSystem, InitSupervisorType,
 };

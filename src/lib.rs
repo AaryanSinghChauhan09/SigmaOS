@@ -19,6 +19,7 @@ pub mod observability;
 pub mod orchestration;
 pub mod distro;
 pub mod package;
+pub mod performance;
 pub mod productivity;
 pub mod remote;
 pub mod resilience;
