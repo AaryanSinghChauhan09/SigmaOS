@@ -98,31 +98,59 @@ impl Drop for ThreadStack {
     }
 }
 
-/// Thread context (registers)
+/// Thread context (registers) - Highly comprehensive, enterprise‑grade processor register set
+/// inspired by Linux (pt_regs) and FreeBSD (trapframe) standards.
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct ThreadContext {
+    // 1. General Purpose Registers (GPRs)
+    pub rax: usize,
     pub rbx: usize,
-    pub rsp: usize,
+    pub rcx: usize,
+    pub rdx: usize,
+    pub rsi: usize,
+    pub rdi: usize,
     pub rbp: usize,
+    pub rsp: usize,
+    pub r8:  usize,
+    pub r9:  usize,
+    pub r10: usize,
+    pub r11: usize,
     pub r12: usize,
     pub r13: usize,
     pub r14: usize,
     pub r15: usize,
-    pub rip: usize,
+
+    // 2. Control, Flags & Status Registers
+    pub rip: usize,    // Instruction Pointer
+    pub rflags: usize, // Processor Status Flags (e.g. alignment, trap, interrupt enable)
+
+    // 3. Segment Selector Registers (privileged segment management)
+    pub cs: u16,       // Code Segment
+    pub ss: u16,       // Stack Segment
+    pub ds: u16,       // Data Segment
+    pub es: u16,       // Extra Segment
+    pub fs: u16,       // FS Segment (Thread-Local Storage)
+    pub gs: u16,       // GS Segment (Kernel/User context boundary)
+
+    // 4. Advanced FPU/SSE/AVX Floating Point Control (lazy saving indicators)
+    pub mxcsr: u32,    // SIMD Control and Status
+    pub fcw: u16,      // FPU Control Word
+    pub fsw: u16,      // FPU Status Word
 }
 
 impl ThreadContext {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ThreadContext {
-            rbx: 0,
-            rsp: 0,
-            rbp: 0,
-            r12: 0,
-            r13: 0,
-            r14: 0,
-            r15: 0,
+            rax: 0, rbx: 0, rcx: 0, rdx: 0, rsi: 0, rdi: 0, rbp: 0, rsp: 0,
+            r8: 0, r9: 0, r10: 0, r11: 0, r12: 0, r13: 0, r14: 0, r15: 0,
             rip: 0,
+            rflags: 0x202, // Standard Interrupt Enable flag set (IF = 1)
+            cs: 0, ss: 0, ds: 0, es: 0, fs: 0, gs: 0,
+            mxcsr: 0x1F80, // SSE default control state (all exceptions masked)
+            fcw: 0x037F,   // FPU default control state
+            fsw: 0,
         }
     }
 }
@@ -634,4 +662,55 @@ pub unsafe fn set_thread_priority(id: ThreadID, priority: ThreadPriority) -> boo
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_thread_context_comprehensive_registers() {
+        let ctx = ThreadContext::new();
+        // GPRs should default to 0
+        assert_eq!(ctx.rax, 0);
+        assert_eq!(ctx.rbx, 0);
+        assert_eq!(ctx.rcx, 0);
+        assert_eq!(ctx.rdx, 0);
+
+        // RIP and RSP should start at 0
+        assert_eq!(ctx.rip, 0);
+        assert_eq!(ctx.rsp, 0);
+
+        // Control flags and segment defaults
+        assert_eq!(ctx.rflags, 0x202); // Interrupt Enable active
+        assert_eq!(ctx.cs, 0);
+        assert_eq!(ctx.mxcsr, 0x1F80); // Default SSE masked state
+        assert_eq!(ctx.fcw, 0x037F);   // Default FPU control state
+    }
+
+    #[test]
+    fn test_thread_state_transitions() {
+        unsafe {
+            init_thread_manager();
+            let tid = create_thread(mock_thread_entry, 4096, ThreadCapability::full()).unwrap();
+            let thread = get_thread_by_id(tid).unwrap();
+
+            assert_eq!(thread.id, tid);
+            assert_eq!(thread.context.rflags, 0x202);
+            assert!(thread.stack.is_some());
+
+            // Check registers are initialized properly
+            assert_eq!(thread.context.rip, mock_thread_entry as usize);
+        }
+    }
+
+    extern "C" fn mock_thread_entry() {}
+
+    unsafe fn get_thread_by_id(id: ThreadID) -> Option<&'static Thread> {
+        if let Some(ref manager) = GLOBAL_THREAD_MANAGER {
+            manager.get_thread(id)
+        } else {
+            None
+        }
+    }
 }

@@ -23,27 +23,13 @@ impl<T: PartialEq> Vec<T> {
 
 impl<T> Vec<T> {
     pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        self.as_slice().iter()
+        use core::ops::Deref;
+        self.deref().iter()
     }
 
     pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        self.as_mut_slice().iter_mut()
-    }
-
-    pub fn as_slice(&self) -> &[T] {
-        if self.len == 0 {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-
-    pub fn as_mut_slice(&mut self) -> &mut [T] {
-        if self.len == 0 {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 
     pub fn new() -> Self {
@@ -160,61 +146,24 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for item in self.iter() {
-            new_vec.push(item.clone());
-        }
-        new_vec
-    }
-}
-
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        self.as_slice().fmt(f)
-    }
-}
-
-impl<T: PartialEq> PartialEq for Vec<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.as_slice() == other.as_slice()
-    }
-}
-
-impl<T: PartialEq<U>, U> PartialEq<[U]> for Vec<T> {
-    fn eq(&self, other: &[U]) -> bool {
-        self.as_slice() == other
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-impl<T: PartialEq<U>, U> PartialEq<std::vec::Vec<U>> for Vec<T> {
-    fn eq(&self, other: &std::vec::Vec<U>) -> bool {
-        self.as_slice() == other.as_slice()
-    }
-}
-
-impl<T> core::iter::FromIterator<T> for Vec<T> {
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut vec = Vec::new();
-        for item in iter {
-            vec.push(item);
-        }
-        vec
-    }
-}
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
-        self.as_slice()
+        if self.len == 0 {
+            &[] as &[T]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
     }
 }
 
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_mut_slice()
+        if self.len == 0 {
+            &mut [] as &mut [T]
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
     }
 }
 
@@ -222,7 +171,8 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+        use core::ops::Deref;
+        self.deref().iter()
     }
 }
 
@@ -230,7 +180,8 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -282,4 +233,20 @@ unsafe fn free(ptr: *mut u8) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            new_vec.push(self[i].clone());
+        }
+        new_vec
+    }
+}
+
+impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Debug::fmt(&**self, f)
+    }
 }

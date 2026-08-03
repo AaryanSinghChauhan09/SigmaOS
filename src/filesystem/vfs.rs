@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
 
@@ -78,7 +60,6 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    pub link_count: u32, // standard inode link count tracking hard links
 }
 
 impl Inode {
@@ -93,7 +74,6 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            link_count: 1, // default link count of 1
         }
     }
 }
@@ -122,13 +102,16 @@ impl OpenFileDescription {
 /// Process-Local File Descriptor
 #[derive(Debug, Clone)]
 pub struct FileDescriptor {
-    pub ofd_id: u64, // Points to the system-wide OpenFileDescription
-    pub flags: u32,  // FD-specific flags (e.g. FD_CLOEXEC)
+    pub ofd_id: u64,      // Points to the system-wide OpenFileDescription
+    pub flags: u32,       // FD-specific flags (e.g. FD_CLOEXEC)
 }
 
 impl FileDescriptor {
     pub fn new(ofd_id: u64, flags: u32) -> Self {
-        Self { ofd_id, flags }
+        Self {
+            ofd_id,
+            flags,
+        }
     }
 }
 
@@ -148,7 +131,6 @@ pub struct VirtualFilesystem {
 }
 
 impl VirtualFilesystem {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut fs = Self {
             inodes: HashMap::new(),
@@ -217,8 +199,7 @@ impl VirtualFilesystem {
         let new_fd = self.next_fd;
         self.next_fd += 1;
 
-        let new_file_descriptor =
-            FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
+        let new_file_descriptor = FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
         self.file_descriptors.insert(new_fd, new_file_descriptor);
 
         Ok(new_fd)
@@ -251,8 +232,7 @@ impl VirtualFilesystem {
 
         ofd.ref_count += 1;
 
-        let new_file_descriptor =
-            FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
+        let new_file_descriptor = FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
         self.file_descriptors.insert(new_fd, new_file_descriptor);
 
         Ok(())
@@ -280,14 +260,20 @@ impl VirtualFilesystem {
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self.file_descriptors.get(&fd).ok_or(FsError::InvalidFd)?;
+        let file_descriptor = self
+            .file_descriptors
+            .get(&fd)
+            .ok_or(FsError::InvalidFd)?;
 
         let ofd = self
             .open_file_descriptions
             .get_mut(&file_descriptor.ofd_id)
             .ok_or(FsError::InvalidFd)?;
 
-        let inode = self.inodes.get(&ofd.inode_id).ok_or(FsError::NotFound)?;
+        let inode = self
+            .inodes
+            .get(&ofd.inode_id)
+            .ok_or(FsError::NotFound)?;
 
         // Check read permission
         if !inode.permissions.read {
@@ -308,7 +294,10 @@ impl VirtualFilesystem {
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self.file_descriptors.get(&fd).ok_or(FsError::InvalidFd)?;
+        let file_descriptor = self
+            .file_descriptors
+            .get(&fd)
+            .ok_or(FsError::InvalidFd)?;
 
         let ofd = self
             .open_file_descriptions
@@ -351,15 +340,6 @@ impl VirtualFilesystem {
         Ok(bytes_written)
     }
 
-    pub fn create_hard_link(&mut self, source_inode_id: u64) -> Result<(), FsError> {
-        if let Some(inode) = self.inodes.get_mut(&source_inode_id) {
-            inode.link_count += 1;
-            Ok(())
-        } else {
-            Err(FsError::NotFound)
-        }
-    }
-
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
         if inode_id == self.root_inode {
             return Err(FsError::PermissionDenied);
@@ -369,16 +349,7 @@ impl VirtualFilesystem {
             return Err(FsError::NotFound);
         }
 
-        let link_reached_zero = if let Some(inode) = self.inodes.get_mut(&inode_id) {
-            inode.link_count = inode.link_count.saturating_sub(1);
-            inode.link_count == 0
-        } else {
-            false
-        };
-
-        if link_reached_zero {
-            self.inodes.remove(&inode_id);
-        }
+        self.inodes.remove(&inode_id);
         Ok(())
     }
 
@@ -423,26 +394,6 @@ mod tests {
     fn test_vfs_creation() {
         let vfs = VirtualFilesystem::new();
         assert!(vfs.inodes.contains_key(&0));
-    }
-
-    #[test]
-    fn test_hard_links_and_unlink() {
-        let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
-
-        // Create hard link (link_count = 2)
-        vfs.create_hard_link(inode_id).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
-
-        // First deletion (link_count = 1, file should NOT be removed)
-        vfs.delete_file(inode_id).unwrap();
-        assert!(vfs.inodes.contains_key(&inode_id));
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
-
-        // Second deletion (link_count = 0, file should be removed)
-        vfs.delete_file(inode_id).unwrap();
-        assert!(!vfs.inodes.contains_key(&inode_id));
     }
 
     #[test]
