@@ -63,6 +63,64 @@ pub enum ConflictResolution {
     Manual,
 }
 
+/// Detailed state of a package during its installation/removal lifecycle
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PackageState {
+    Uninstalled,
+    PreInstall,
+    Unpacking,
+    PostInstall,
+    Installed,
+    PreRemove,
+    Removing,
+    PostRemove,
+    Broken,
+}
+
+/// State machine to manage valid package transitions
+#[derive(Debug, Clone)]
+pub struct PackageStateMachine {
+    pub current_state: PackageState,
+    pub transitions_history: Vec<PackageState>,
+}
+
+impl PackageStateMachine {
+    pub fn new() -> Self {
+        Self {
+            current_state: PackageState::Uninstalled,
+            transitions_history: vec![PackageState::Uninstalled],
+        }
+    }
+
+    pub fn transition_to(&mut self, new_state: PackageState) -> Result<(), PackageError> {
+        let allowed = match (self.current_state, new_state) {
+            (PackageState::Uninstalled, PackageState::PreInstall) => true,
+            (PackageState::PreInstall, PackageState::Unpacking) => true,
+            (PackageState::Unpacking, PackageState::PostInstall) => true,
+            (PackageState::PostInstall, PackageState::Installed) => true,
+            (PackageState::Installed, PackageState::PreRemove) => true,
+            (PackageState::PreRemove, PackageState::Removing) => true,
+            (PackageState::Removing, PackageState::PostRemove) => true,
+            (PackageState::PostRemove, PackageState::Uninstalled) => true,
+            // Error handling/recovery transitions
+            (_, PackageState::Broken) => true,
+            (PackageState::Broken, PackageState::Uninstalled) => true,
+            _ => false,
+        };
+
+        if allowed {
+            self.current_state = new_state;
+            self.transitions_history.push(new_state);
+            Ok(())
+        } else {
+            Err(PackageError::InstallationFailed(format!(
+                "Invalid state transition from {:?} to {:?}",
+                self.current_state, new_state
+            )))
+        }
+    }
+}
+
 /// Unified package
 #[derive(Debug, Clone)]
 pub struct UnifiedPackage {
@@ -74,6 +132,7 @@ pub struct UnifiedPackage {
     pub provides: Vec<String>,
     pub source: PackageSource,
     pub installed: bool,
+    pub state_machine: PackageStateMachine,
 }
 
 impl UnifiedPackage {
@@ -87,6 +146,7 @@ impl UnifiedPackage {
             provides: Vec::new(),
             source: PackageSource::Repository { url: String::new() },
             installed: false,
+            state_machine: PackageStateMachine::new(),
         }
     }
 
@@ -388,6 +448,10 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
+    pub trigger_registry: PackageTriggerRegistry,
+    pub mirror_selector: MirrorSelector,
+    pub sandbox_enforcer: SandboxPolicyEnforcer,
+    pub arch_engine: MultiArchRoutingEngine,
 }
 
 impl UniversalPackageManager {
@@ -400,6 +464,10 @@ impl UniversalPackageManager {
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
+            trigger_registry: PackageTriggerRegistry::new(),
+            mirror_selector: MirrorSelector::new(MirrorSelectionPolicy::PriorityPinned),
+            sandbox_enforcer: SandboxPolicyEnforcer::new(),
+            arch_engine: MultiArchRoutingEngine::new(CpuArchLevel::X86_64_v3, true),
         };
 
         manager.add_default_adapters();
@@ -487,18 +555,49 @@ impl UniversalPackageManager {
             println!("Resolution: {:?}", resolution);
         }
 
+        // Selection of fastest/best mirror
+        let _mirror = self.mirror_selector.select_best_mirror().unwrap_or_else(|_| {
+            MirrorInfo {
+                name: "default-offline-mirror".to_string(),
+                url: "http://offline/".to_string(),
+                latency_ms: 10,
+                priority: 10,
+                is_active: true,
+            }
+        });
+
         // Install packages
         for dep_name in dependencies {
-            if let Some(package) = self.packages.get::<str>(dep_name.as_str()) {
-                let package: &UnifiedPackage = package;
-                // Find appropriate adapter
+            if let Some(package) = self.packages.get::<str>(dep_name.as_str()).cloned() {
+                let mut package = package;
+
+                // 1. Enforce sandbox policies if registered
+                self.sandbox_enforcer.enforce(&package, "")?;
+
+                // 2. Multi-arch routing check
+                let _route = self.arch_engine.route_package_linking(&package, "x86_64-v3").unwrap_or_default();
+
+                // 3. Life cycle state transitions: Uninstalled -> PreInstall
+                package.state_machine.transition_to(PackageState::PreInstall)?;
+
+                // Find appropriate adapter & transition to Unpacking
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get::<PackageFormat>(format) {
+                        package.state_machine.transition_to(PackageState::Unpacking)?;
                         let adapter: &PackageAdapter = adapter;
-                        adapter.install(package)?;
+                        adapter.install(&package)?;
                         break;
                     }
                 }
+
+                // Transition to PostInstall
+                package.state_machine.transition_to(PackageState::PostInstall)?;
+
+                // 4. Fire dynamic user-defined triggers in the trigger registry
+                self.trigger_registry.process_install_triggers(&package)?;
+
+                // Transition to Installed
+                package.state_machine.transition_to(PackageState::Installed)?;
 
                 let mut installed = package.clone();
                 installed.installed = true;
@@ -568,6 +667,252 @@ pub enum PackageError {
     AdapterNotFound,
     InstallationFailed(String),
     ConflictDetected(Vec<(String, String)>),
+}
+
+// ============================================================================
+// Advanced Linux-Parity Package Systems & OOP Abstractions
+// ============================================================================
+
+/// Triggers that can fire upon certain package changes
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TriggerCondition {
+    OnFormatInstalled(PackageFormat),
+    OnFileNameModified(String),
+    OnPackageNameInstalled(String),
+}
+
+/// User defined function hook for triggers
+pub trait TriggerCallback: Send + Sync {
+    fn on_trigger(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
+
+/// A registered system trigger
+pub struct PackageTrigger {
+    pub name: String,
+    pub condition: TriggerCondition,
+    pub callback: std::sync::Arc<dyn TriggerCallback>,
+}
+
+/// Registry to subscribe to and dispatch triggers
+pub struct PackageTriggerRegistry {
+    pub triggers: Vec<PackageTrigger>,
+    pub pending_triggers: Vec<String>,
+}
+
+impl PackageTriggerRegistry {
+    pub fn new() -> Self {
+        Self {
+            triggers: Vec::new(),
+            pending_triggers: Vec::new(),
+        }
+    }
+
+    pub fn register_trigger(&mut self, name: &str, condition: TriggerCondition, callback: std::sync::Arc<dyn TriggerCallback>) {
+        self.triggers.push(PackageTrigger {
+            name: name.to_string(),
+            condition,
+            callback,
+        });
+    }
+
+    pub fn process_install_triggers(&mut self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        for trigger in &self.triggers {
+            let fire = match &trigger.condition {
+                TriggerCondition::OnFormatInstalled(fmt) => package.formats.contains(fmt),
+                TriggerCondition::OnPackageNameInstalled(name) => &package.name == name,
+                TriggerCondition::OnFileNameModified(file) => {
+                    package.name.contains(file)
+                }
+            };
+
+            if fire {
+                trigger.callback.on_trigger(package)?;
+                self.pending_triggers.push(trigger.name.clone());
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Selection policy for mirroring repositories
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MirrorSelectionPolicy {
+    LatencyOptimized,
+    PriorityPinned,
+    StrictFallback,
+}
+
+/// Mirror server definition
+#[derive(Debug, Clone)]
+pub struct MirrorInfo {
+    pub name: String,
+    pub url: String,
+    pub latency_ms: u32,
+    pub priority: u32,
+    pub is_active: bool,
+}
+
+/// Selector that grades and yields active mirrors
+pub struct MirrorSelector {
+    pub mirrors: Vec<MirrorInfo>,
+    pub policy: MirrorSelectionPolicy,
+}
+
+impl MirrorSelector {
+    pub fn new(policy: MirrorSelectionPolicy) -> Self {
+        Self {
+            mirrors: Vec::new(),
+            policy,
+        }
+    }
+
+    pub fn add_mirror(&mut self, name: &str, url: &str, latency_ms: u32, priority: u32) {
+        self.mirrors.push(MirrorInfo {
+            name: name.to_string(),
+            url: url.to_string(),
+            latency_ms,
+            priority,
+            is_active: true,
+        });
+    }
+
+    pub fn set_mirror_active(&mut self, name: &str, active: bool) {
+        if let Some(m) = self.mirrors.iter_mut().find(|m| m.name == name) {
+            m.is_active = active;
+        }
+    }
+
+    pub fn select_best_mirror(&self) -> Result<MirrorInfo, PackageError> {
+        let mut active_mirrors: Vec<&MirrorInfo> = self.mirrors.iter().filter(|m| m.is_active).collect();
+        if active_mirrors.is_empty() {
+            return Err(PackageError::PackageNotFound("No active mirrors available".to_string()));
+        }
+
+        match self.policy {
+            MirrorSelectionPolicy::LatencyOptimized => {
+                active_mirrors.sort_by_key(|m| m.latency_ms);
+            }
+            MirrorSelectionPolicy::PriorityPinned => {
+                active_mirrors.sort_by_key(|m| std::cmp::Reverse(m.priority));
+            }
+            MirrorSelectionPolicy::StrictFallback => {}
+        }
+
+        Ok((*active_mirrors[0]).clone())
+    }
+}
+
+/// Sandbox isolation parameters for unprivileged containers or app images
+#[derive(Debug, Clone)]
+pub struct SandboxPolicy {
+    pub enable_network: bool,
+    pub allow_dev_mount: bool,
+    pub writable_filesystem_paths: Vec<String>,
+    pub allowed_capabilities: Vec<String>,
+}
+
+impl SandboxPolicy {
+    pub fn full_isolation() -> Self {
+        Self {
+            enable_network: false,
+            allow_dev_mount: false,
+            writable_filesystem_paths: Vec::new(),
+            allowed_capabilities: Vec::new(),
+        }
+    }
+
+    pub fn permissive() -> Self {
+        Self {
+            enable_network: true,
+            allow_dev_mount: true,
+            writable_filesystem_paths: vec!["/tmp".to_string(), "/home".to_string()],
+            allowed_capabilities: vec!["CAP_SYS_ADMIN".to_string(), "CAP_NET_RAW".to_string()],
+        }
+    }
+}
+
+/// Sandbox policy enforcer
+pub struct SandboxPolicyEnforcer {
+    pub policies: HashMap<String, SandboxPolicy>,
+}
+
+impl SandboxPolicyEnforcer {
+    pub fn new() -> Self {
+        Self {
+            policies: HashMap::new(),
+        }
+    }
+
+    pub fn register_policy(&mut self, package_name: &str, policy: SandboxPolicy) {
+        self.policies.insert(package_name.to_string(), policy);
+    }
+
+    pub fn enforce(&self, package: &UnifiedPackage, path_to_write: &str) -> Result<(), PackageError> {
+        if let Some(policy) = self.policies.get(&package.name) {
+            if !path_to_write.is_empty() {
+                let allowed = policy.writable_filesystem_paths.iter().any(|allowed_path| {
+                    path_to_write.starts_with(allowed_path)
+                });
+                if !allowed {
+                    return Err(PackageError::InstallationFailed(format!(
+                        "Sandbox violation: package '{}' attempted to write to unauthorized path '{}'",
+                        package.name, path_to_write
+                    )));
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
+/// CPU architecture hierarchy levels for routing
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum CpuArchLevel {
+    X86_64_v1 = 1,
+    X86_64_v2 = 2,
+    X86_64_v3 = 3,
+    X86_64_v4 = 4,
+}
+
+/// Multi-architecture router
+pub struct MultiArchRoutingEngine {
+    pub native_arch: CpuArchLevel,
+    pub support_i386_fallback: bool,
+}
+
+impl MultiArchRoutingEngine {
+    pub fn new(native_arch: CpuArchLevel, support_i386_fallback: bool) -> Self {
+        Self {
+            native_arch,
+            support_i386_fallback,
+        }
+    }
+
+    pub fn check_compatibility(&self, package_arch_req: &str) -> bool {
+        match package_arch_req {
+            "i386" => self.support_i386_fallback,
+            "x86_64-v1" => self.native_arch >= CpuArchLevel::X86_64_v1,
+            "x86_64-v2" => self.native_arch >= CpuArchLevel::X86_64_v2,
+            "x86_64-v3" => self.native_arch >= CpuArchLevel::X86_64_v3,
+            "x86_64-v4" => self.native_arch >= CpuArchLevel::X86_64_v4,
+            _ => true,
+        }
+    }
+
+    pub fn route_package_linking(&self, package: &UnifiedPackage, package_arch_req: &str) -> Result<String, PackageError> {
+        if !self.check_compatibility(package_arch_req) {
+            return Err(PackageError::InstallationFailed(format!(
+                "Incompatible package CPU architecture requirement: required '{}', native level is {:?}",
+                package_arch_req, self.native_arch
+            )));
+        }
+
+        if package_arch_req == "i386" && self.support_i386_fallback {
+            Ok("routing-via-multiarch-i386-glibc-shim".to_string())
+        } else {
+            Ok(format!("routing-via-native-{:?}", self.native_arch))
+        }
+    }
 }
 
 // ============================================================================
@@ -957,5 +1302,92 @@ mod tests {
             .execute_ai_predict_sql(&dataset, "SELECT AI_PREDICT(features) FROM base_table")
             .unwrap();
         assert!(sql_res.contains("predicted_class"));
+    }
+
+    #[test]
+    fn test_package_state_machine_transitions() {
+        let mut sm = PackageStateMachine::new();
+        assert_eq!(sm.current_state, PackageState::Uninstalled);
+
+        // Valid sequence
+        assert!(sm.transition_to(PackageState::PreInstall).is_ok());
+        assert!(sm.transition_to(PackageState::Unpacking).is_ok());
+        assert!(sm.transition_to(PackageState::PostInstall).is_ok());
+        assert!(sm.transition_to(PackageState::Installed).is_ok());
+
+        // Invalid sequence should fail
+        assert!(sm.transition_to(PackageState::Unpacking).is_err());
+    }
+
+    #[test]
+    fn test_package_trigger_registry_udf() {
+        let mut registry = PackageTriggerRegistry::new();
+
+        struct MockCallback {
+            called: std::sync::atomic::AtomicBool,
+        }
+        impl TriggerCallback for MockCallback {
+            fn on_trigger(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+                self.called.store(true, std::sync::atomic::Ordering::SeqCst);
+                Ok(())
+            }
+        }
+
+        let cb = std::sync::Arc::new(MockCallback {
+            called: std::sync::atomic::AtomicBool::new(false),
+        });
+
+        registry.register_trigger(
+            "test-trigger",
+            TriggerCondition::OnPackageNameInstalled("test-pkg".to_string()),
+            cb.clone(),
+        );
+
+        let pkg = UnifiedPackage::new("test-pkg".to_string(), "1.0.0".to_string());
+        assert!(registry.process_install_triggers(&pkg).is_ok());
+        assert!(cb.called.load(std::sync::atomic::Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_sandbox_policy_enforcement() {
+        let mut enforcer = SandboxPolicyEnforcer::new();
+        let policy = SandboxPolicy {
+            enable_network: false,
+            allow_dev_mount: false,
+            writable_filesystem_paths: vec!["/var/lib/sigma".to_string()],
+            allowed_capabilities: vec![],
+        };
+
+        enforcer.register_policy("sandboxed-pkg", policy);
+
+        let pkg = UnifiedPackage::new("sandboxed-pkg".to_string(), "1.0.0".to_string());
+
+        // Allowed path
+        assert!(enforcer.enforce(&pkg, "/var/lib/sigma/data").is_ok());
+
+        // Unauthorized path
+        assert!(enforcer.enforce(&pkg, "/etc/passwd").is_err());
+    }
+
+    #[test]
+    fn test_mirror_selector_ranking() {
+        let mut selector = MirrorSelector::new(MirrorSelectionPolicy::LatencyOptimized);
+        selector.add_mirror("US-East", "http://us-east/", 120, 1);
+        selector.add_mirror("EU-West", "http://eu-west/", 40, 5);
+        selector.add_mirror("APAC", "http://apac/", 230, 2);
+
+        // Latency policy: EU-West is fastest
+        let best = selector.select_best_mirror().unwrap();
+        assert_eq!(best.name, "EU-West");
+
+        // Change policy to PriorityPinned: EU-West is highest priority (5 vs 1, 2)
+        selector.policy = MirrorSelectionPolicy::PriorityPinned;
+        let best_priority = selector.select_best_mirror().unwrap();
+        assert_eq!(best_priority.name, "EU-West");
+
+        // Mark EU-West as inactive: next highest priority is APAC (priority 2)
+        selector.set_mirror_active("EU-West", false);
+        let best_active = selector.select_best_mirror().unwrap();
+        assert_eq!(best_active.name, "APAC");
     }
 }

@@ -82,6 +82,17 @@ impl AgentCapability {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct AgentInfo {
+    pub name: String,
+    pub capability: AgentCapability,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ManagerCapability {
+    pub value: u64,
+}
+
 /// Simple AI agent (OOP: Concrete agent class)
 pub struct SimpleAIAgent {
     pub name: String,
