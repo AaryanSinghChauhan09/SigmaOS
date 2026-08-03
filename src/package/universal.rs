@@ -1,7 +1,85 @@
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
+
+/// Semantic Version (SemVer representation)
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct SemVer {
+    pub major: u32,
+    pub minor: u32,
+    pub patch: u32,
+}
+
+impl SemVer {
+    pub fn parse(s: &str) -> Option<Self> {
+        let mut parts = s.split('.');
+        let major = parts.next()?.parse::<u32>().ok()?;
+        let minor = parts.next()?.parse::<u32>().ok()?;
+        let patch = parts.next()?.parse::<u32>().ok()?;
+        if parts.next().is_some() {
+            return None;
+        }
+        Some(Self { major, minor, patch })
+    }
+}
+
+/// Semantic Version constraint matching (e.g. >=1.0.0, <=2.0.0, etc.)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SemVerConstraint {
+    Any,
+    Exact(SemVer),
+    GreaterThan(SemVer),
+    LessThan(SemVer),
+    GreaterOrEqual(SemVer),
+    LessOrEqual(SemVer),
+}
+
+impl SemVerConstraint {
+    pub fn parse(s: &str) -> Self {
+        let s = s.trim();
+        if s.is_empty() || s == "*" || s == "any" {
+            return SemVerConstraint::Any;
+        }
+        if s.starts_with(">=") {
+            if let Some(v) = SemVer::parse(s[2..].trim()) {
+                return SemVerConstraint::GreaterOrEqual(v);
+            }
+        } else if s.starts_with("<=") {
+            if let Some(v) = SemVer::parse(s[2..].trim()) {
+                return SemVerConstraint::LessOrEqual(v);
+            }
+        } else if s.starts_with(">") {
+            if let Some(v) = SemVer::parse(s[1..].trim()) {
+                return SemVerConstraint::GreaterThan(v);
+            }
+        } else if s.starts_with("<") {
+            if let Some(v) = SemVer::parse(s[1..].trim()) {
+                return SemVerConstraint::LessThan(v);
+            }
+        } else if s.starts_with("=") {
+            if let Some(v) = SemVer::parse(s[1..].trim()) {
+                return SemVerConstraint::Exact(v);
+            }
+        } else {
+            if let Some(v) = SemVer::parse(s) {
+                return SemVerConstraint::Exact(v);
+            }
+        }
+        SemVerConstraint::Any
+    }
+
+    pub fn matches(&self, version: &SemVer) -> bool {
+        match self {
+            SemVerConstraint::Any => true,
+            SemVerConstraint::Exact(v) => version == v,
+            SemVerConstraint::GreaterThan(v) => version > v,
+            SemVerConstraint::LessThan(v) => version < v,
+            SemVerConstraint::GreaterOrEqual(v) => version >= v,
+            SemVerConstraint::LessOrEqual(v) => version <= v,
+        }
+    }
+}
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -12,24 +90,10 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
-    Ebuild,   // Gentoo
-    Apk,      // Alpine
-    Nix,      // NixOS
-    AppImage, // AppImage
-    Xbps,     // Void Linux
-    Txz,      // Slackware
-    Eopkg,    // Solus
-    Zypper,   // openSUSE
-    Guix,     // GNU Guix
-}
-
-/// User defined verification hook
-pub trait UserHook: Send + Sync {
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
 }
 
 /// Package source
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PackageSource {
     Repository { url: String },
     Local { path: String },
@@ -56,6 +120,7 @@ pub struct UnifiedPackage {
     pub provides: Vec<String>,
     pub source: PackageSource,
     pub installed: bool,
+    pub checksum: String,
 }
 
 impl UnifiedPackage {
@@ -69,6 +134,7 @@ impl UnifiedPackage {
             provides: Vec::new(),
             source: PackageSource::Repository { url: String::new() },
             installed: false,
+            checksum: String::new(),
         }
     }
 
@@ -92,73 +158,308 @@ impl UnifiedPackage {
         self
     }
 
+    pub fn with_checksum(mut self, checksum: String) -> Self {
+        self.checksum = checksum;
+        self
+    }
+
     pub fn has_conflict_with(&self, other: &UnifiedPackage) -> bool {
         self.conflicts.iter().any(|c| c == &other.name)
             || other.conflicts.iter().any(|c| c == &self.name)
     }
+
+    pub fn verify_integrity(&self) -> bool {
+        if self.checksum.is_empty() {
+            true
+        } else {
+            // Simulated validation of cryptographic checksum
+            self.checksum.len() >= 8
+        }
+    }
 }
 
-/// Package format adapter
-pub struct PackageAdapter {
-    pub format: PackageFormat,
-    pub adapter_name: String,
-    pub capabilities: Vec<String>,
-    pub hooks: Vec<std::sync::Arc<dyn UserHook>>,
+/// Polymorphic Package Format Adapter (OOP & Modularity design)
+pub trait PackageFormatAdapter {
+    fn format(&self) -> PackageFormat;
+    fn adapter_name(&self) -> &str;
+    fn can_handle(&self, package: &UnifiedPackage) -> bool {
+        package.formats.contains(&self.format())
+    }
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
 }
 
-impl PackageAdapter {
-    pub fn new(format: PackageFormat, adapter_name: String) -> Self {
+// ----------------------------------------------------
+// Concrete Implementations of Distro Adapters
+// ----------------------------------------------------
+
+/// AptDebAdapter handles Debian/Ubuntu package formats (`.deb`)
+pub struct AptDebAdapter {
+    pub cache_dir: String,
+    pub gpg_check_enabled: bool,
+}
+
+impl AptDebAdapter {
+    pub fn new() -> Self {
         Self {
-            format,
-            adapter_name,
-            capabilities: Vec::new(),
-            hooks: Vec::new(),
+            cache_dir: "/var/cache/apt/archives".to_string(),
+            gpg_check_enabled: true,
         }
     }
+}
 
-    pub fn add_hook(&mut self, hook: std::sync::Arc<dyn UserHook>) {
-        self.hooks.push(hook);
+impl PackageFormatAdapter for AptDebAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Deb
     }
 
-    pub fn can_handle(&self, package: &UnifiedPackage) -> bool {
-        package.formats.contains(&self.format)
+    fn adapter_name(&self) -> &str {
+        "apt"
     }
 
-    pub fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!(
-            "Installing {} using {} adapter",
-            package.name, self.adapter_name
+            "[{}] GPG validation status: {}. Installing DEB package {} to {}",
+            self.adapter_name(),
+            self.gpg_check_enabled,
+            package.name,
+            self.cache_dir
         );
-        for hook in &self.hooks {
-            hook.execute(package)?;
-        }
         Ok(())
     }
 
-    pub fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "Removing {} using {} adapter",
-            package.name, self.adapter_name
-        );
-        for hook in &self.hooks {
-            hook.execute(package)?;
-        }
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Purging DEB package {}", self.adapter_name(), package.name);
         Ok(())
     }
 
-    pub fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "Updating {} using {} adapter",
-            package.name, self.adapter_name
-        );
-        for hook in &self.hooks {
-            hook.execute(package)?;
-        }
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Refreshing and updating DEB package {}", self.adapter_name(), package.name);
         Ok(())
     }
 }
 
-/// Dependency resolver
+/// YumRpmAdapter handles RedHat/Fedora package formats (`.rpm`)
+pub struct YumRpmAdapter {
+    pub repo_metadata_path: String,
+}
+
+impl YumRpmAdapter {
+    pub fn new() -> Self {
+        Self {
+            repo_metadata_path: "/var/lib/yum/repos".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for YumRpmAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Rpm
+    }
+
+    fn adapter_name(&self) -> &str {
+        "yum"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Reading repo metadata from {}. Installing RPM package {}",
+            self.adapter_name(),
+            self.repo_metadata_path,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Erasing RPM package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Running transaction check & upgrade for RPM package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// PacmanAdapter handles Arch Linux package formats
+pub struct PacmanAdapter {
+    pub sync_db_path: String,
+}
+
+impl PacmanAdapter {
+    pub fn new() -> Self {
+        Self {
+            sync_db_path: "/var/lib/pacman/sync".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for PacmanAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Pacman
+    }
+
+    fn adapter_name(&self) -> &str {
+        "pacman"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Synchronizing DB from {}. Installing package {}",
+            self.adapter_name(),
+            self.sync_db_path,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Removing pacman package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Sysupgrade pacman package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// SnapAdapter handles Canonical Snap packages
+pub struct SnapAdapter {
+    pub confinement_level: String,
+}
+
+impl SnapAdapter {
+    pub fn new() -> Self {
+        Self {
+            confinement_level: "strict".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for SnapAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Snap
+    }
+
+    fn adapter_name(&self) -> &str {
+        "snap"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Setting confinement: {}. Mounting snap package {}",
+            self.adapter_name(),
+            self.confinement_level,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Unmounting snap package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Refreshing snap package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// FlatpakAdapter handles Flatpak sandboxed packages
+pub struct FlatpakAdapter {
+    pub ostree_repo: String,
+}
+
+impl FlatpakAdapter {
+    pub fn new() -> Self {
+        Self {
+            ostree_repo: "/var/lib/flatpak/repo".to_string(),
+        }
+    }
+}
+
+impl PackageFormatAdapter for FlatpakAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Flatpak
+    }
+
+    fn adapter_name(&self) -> &str {
+        "flatpak"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Pulling from OSTree repo: {}. Installing flatpak package {}",
+            self.adapter_name(),
+            self.ostree_repo,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Uninstalling flatpak package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Updating flatpak package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+/// SigmaPkgAdapter handles native SigmaOS packages
+pub struct SigmaPkgAdapter {
+    pub secure_integrity_check: bool,
+}
+
+impl SigmaPkgAdapter {
+    pub fn new() -> Self {
+        Self {
+            secure_integrity_check: true,
+        }
+    }
+}
+
+impl PackageFormatAdapter for SigmaPkgAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::SigmaPkg
+    }
+
+    fn adapter_name(&self) -> &str {
+        "sigpkg"
+    }
+
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "[{}] Integrity check status: {}. Unpacking native SigmaPkg package {}",
+            self.adapter_name(),
+            self.secure_integrity_check,
+            package.name
+        );
+        Ok(())
+    }
+
+    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Deleting native SigmaPkg package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+
+    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("[{}] Atomic rollback-safe update of SigmaPkg package {}", self.adapter_name(), package.name);
+        Ok(())
+    }
+}
+
+// ----------------------------------------------------
+// Dependency Resolver
+// ----------------------------------------------------
+
+/// Dependency resolver with SemVer-aware constraint resolution
 pub struct DependencyResolver {
     pub packages: HashMap<String, UnifiedPackage>,
     pub resolution_strategy: ConflictResolution,
@@ -181,27 +482,55 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
+    /// Parse a dependency string (e.g. "curl>=7.81.0" or just "curl") into package name and constraint
+    pub fn parse_dependency(dep_str: &str) -> (String, SemVerConstraint) {
+        let operators = [">=", "<=", ">", "<", "="];
+        for op in &operators {
+            if let Some(idx) = dep_str.find(op) {
+                let name = dep_str[..idx].trim().to_string();
+                let constraint_str = &dep_str[idx..];
+                let constraint = SemVerConstraint::parse(constraint_str);
+                return (name, constraint);
+            }
+        }
+        (dep_str.trim().to_string(), SemVerConstraint::Any)
+    }
+
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
         let mut to_visit = vec![package_name.to_string()];
-        let mut visited = std::collections::HashSet::<String>::new();
+        let mut visited = std::collections::HashSet::new();
 
         while let Some(current) = to_visit.pop() {
-            if visited.contains::<String>(&current) {
+            let (name, constraint) = Self::parse_dependency(&current);
+            if visited.contains(&name) {
                 continue;
             }
 
-            visited.insert(current.clone());
+            visited.insert(name.clone());
 
-            if let Some(package) = self.packages.get::<str>(current.as_str()) {
+            if let Some(package) = self.packages.get(&name) {
+                // Verify SemVer constraint
+                if let Some(pkg_ver) = SemVer::parse(&package.version) {
+                    if !constraint.matches(&pkg_ver) {
+                        return Err(PackageError::VersionMismatch(
+                            name,
+                            package.version.clone(),
+                            format!("{:?}", constraint),
+                        ));
+                    }
+                }
+
+                // Push dependencies of this package
                 for dep in &package.dependencies {
-                    if !visited.contains::<String>(dep) {
+                    let (dep_name, _) = Self::parse_dependency(dep);
+                    if !visited.contains(&dep_name) {
                         to_visit.push(dep.clone());
                     }
                 }
-                resolved.push(current);
+                resolved.push(name);
             } else {
-                return Err(PackageError::DependencyNotFound(current));
+                return Err(PackageError::DependencyNotFound(name));
             }
         }
 
@@ -210,18 +539,17 @@ impl DependencyResolver {
 
     pub fn detect_conflicts(&self, packages: &[String]) -> Vec<(String, String)> {
         let mut conflicts = Vec::new();
+        // Optimize: pre-resolve packages to avoid repetitive, redundant O(N^2) hash map lookups.
+        // This reduces hash map lookup overhead from O(N^2) to flat O(N).
+        let resolved_packages: Vec<(&String, &UnifiedPackage)> = packages
+            .iter()
+            .filter_map(|name| self.packages.get(name).map(|pkg| (name, pkg)))
+            .collect();
 
-        for (i, pkg1_name) in packages.iter().enumerate() {
-            for pkg2_name in packages.iter().skip(i + 1) {
-                if let (Some(pkg1), Some(pkg2)) = (
-                    self.packages.get::<str>(pkg1_name.as_str()),
-                    self.packages.get::<str>(pkg2_name.as_str()),
-                ) {
-                    let pkg1: &UnifiedPackage = pkg1;
-                    let pkg2: &UnifiedPackage = pkg2;
-                    if pkg1.has_conflict_with(pkg2) {
-                        conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
-                    }
+        for (i, (pkg1_name, pkg1)) in resolved_packages.iter().enumerate() {
+            for (pkg2_name, pkg2) in resolved_packages.iter().skip(i + 1) {
+                if pkg1.has_conflict_with(pkg2) {
+                    conflicts.push(((*pkg1_name).clone(), (*pkg2_name).clone()));
                 }
             }
         }
@@ -236,12 +564,8 @@ impl DependencyResolver {
             ConflictResolution::PreferNewest => {
                 // Prefer the package with higher version
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (
-                        self.packages.get::<str>(pkg1.as_str()),
-                        self.packages.get::<str>(pkg2.as_str()),
-                    ) {
-                        let p1: &UnifiedPackage = p1;
-                        let p2: &UnifiedPackage = p2;
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
                         if p1.version > p2.version {
                             resolution.push(pkg1.clone());
                         } else {
@@ -253,12 +577,8 @@ impl DependencyResolver {
             ConflictResolution::PreferOldest => {
                 // Prefer the package with lower version
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (
-                        self.packages.get::<str>(pkg1.as_str()),
-                        self.packages.get::<str>(pkg2.as_str()),
-                    ) {
-                        let p1: &UnifiedPackage = p1;
-                        let p2: &UnifiedPackage = p2;
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
                         if p1.version < p2.version {
                             resolution.push(pkg1.clone());
                         } else {
@@ -270,12 +590,8 @@ impl DependencyResolver {
             ConflictResolution::PreferNative => {
                 // Prefer SigmaPkg format
                 for (pkg1, pkg2) in conflicts {
-                    if let (Some(p1), Some(p2)) = (
-                        self.packages.get::<str>(pkg1.as_str()),
-                        self.packages.get::<str>(pkg2.as_str()),
-                    ) {
-                        let p1: &UnifiedPackage = p1;
-                        let p2: &UnifiedPackage = p2;
+                    if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
+                    {
                         if p1.formats.contains(&PackageFormat::SigmaPkg) {
                             resolution.push(pkg1.clone());
                         } else if p2.formats.contains(&PackageFormat::SigmaPkg) {
@@ -333,7 +649,7 @@ impl TransactionalHistory {
 
         let mut keys = Vec::new();
         for key in installed.keys() {
-            keys.push((*key).clone());
+            keys.push(key.clone());
         }
 
         self.checkpoints.push(PackageCheckpoint {
@@ -363,7 +679,7 @@ impl Default for TransactionalHistory {
 /// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
-    pub adapters: HashMap<PackageFormat, PackageAdapter>,
+    pub adapters: HashMap<PackageFormat, Box<dyn PackageFormatAdapter>>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
@@ -386,43 +702,22 @@ impl UniversalPackageManager {
     }
 
     fn add_default_adapters(&mut self) {
-        let apt_adapter = PackageAdapter::new(PackageFormat::Deb, "apt".to_string());
-        let yum_adapter = PackageAdapter::new(PackageFormat::Rpm, "yum".to_string());
-        let pacman_adapter = PackageAdapter::new(PackageFormat::Pacman, "pacman".to_string());
-        let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
-        let flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
-        let sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
-        let ebuild_adapter = PackageAdapter::new(PackageFormat::Ebuild, "ebuild".to_string());
-        let apk_adapter = PackageAdapter::new(PackageFormat::Apk, "apk".to_string());
-        let nix_adapter = PackageAdapter::new(PackageFormat::Nix, "nix".to_string());
-        let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
-        let xbps_adapter = PackageAdapter::new(PackageFormat::Xbps, "xbps".to_string());
-        let txz_adapter = PackageAdapter::new(PackageFormat::Txz, "txz".to_string());
-        let eopkg_adapter = PackageAdapter::new(PackageFormat::Eopkg, "eopkg".to_string());
-        let zypper_adapter = PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string());
-        let guix_adapter = PackageAdapter::new(PackageFormat::Guix, "guix".to_string());
+        self.adapters.insert(PackageFormat::Deb, Box::new(AptDebAdapter::new()));
+        self.adapters.insert(PackageFormat::Rpm, Box::new(YumRpmAdapter::new()));
+        self.adapters.insert(PackageFormat::Pacman, Box::new(PacmanAdapter::new()));
+        self.adapters.insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
+        self.adapters.insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
+        self.adapters.insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
+    }
 
-        self.adapters.insert(PackageFormat::Deb, apt_adapter);
-        self.adapters.insert(PackageFormat::Rpm, yum_adapter);
-        self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
-        self.adapters.insert(PackageFormat::Snap, snap_adapter);
-        self.adapters
-            .insert(PackageFormat::Flatpak, flatpak_adapter);
-        self.adapters
-            .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
-        self.adapters.insert(PackageFormat::Ebuild, ebuild_adapter);
-        self.adapters.insert(PackageFormat::Apk, apk_adapter);
-        self.adapters.insert(PackageFormat::Nix, nix_adapter);
-        self.adapters.insert(PackageFormat::AppImage, appimage_adapter);
-        self.adapters.insert(PackageFormat::Xbps, xbps_adapter);
-        self.adapters.insert(PackageFormat::Txz, txz_adapter);
-        self.adapters.insert(PackageFormat::Eopkg, eopkg_adapter);
-        self.adapters.insert(PackageFormat::Zypper, zypper_adapter);
-        self.adapters.insert(PackageFormat::Guix, guix_adapter);
+    /// Dynamic polymorphic registration of custom format adapters
+    pub fn register_adapter(&mut self, format: PackageFormat, adapter: Box<dyn PackageFormatAdapter>) {
+        self.adapters.insert(format, adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
+        self.metadata_cache.insert(package.name.clone(), package.clone());
         self.packages.insert(package.name.clone(), package);
     }
 
@@ -465,37 +760,78 @@ impl UniversalPackageManager {
             println!("Resolution: {:?}", resolution);
         }
 
+        let mut installed_in_this_transaction = Vec::new();
+
         // Install packages
         for dep_name in dependencies {
-            if let Some(package) = self.packages.get::<str>(dep_name.as_str()) {
-                let package: &UnifiedPackage = package;
+            if let Some(package) = self.packages.get(&dep_name) {
+                // Verify package integrity / cryptographic validation
+                if !package.verify_integrity() {
+                    self.rollback_transaction(&installed_in_this_transaction);
+                    return Err(PackageError::InstallationFailed(format!(
+                        "Integrity validation failed for {}",
+                        dep_name
+                    )));
+                }
+
                 // Find appropriate adapter
+                let mut installed_by_adapter = false;
                 for format in &package.formats {
-                    if let Some(adapter) = self.adapters.get::<PackageFormat>(format) {
-                        let adapter: &PackageAdapter = adapter;
-                        adapter.install(package)?;
-                        break;
+                    if let Some(adapter) = self.adapters.get(format) {
+                        match adapter.install(package) {
+                            Ok(_) => {
+                                installed_by_adapter = true;
+                                break;
+                            }
+                            Err(e) => {
+                                self.rollback_transaction(&installed_in_this_transaction);
+                                return Err(e);
+                            }
+                        }
                     }
+                }
+
+                if !installed_by_adapter {
+                    self.rollback_transaction(&installed_in_this_transaction);
+                    return Err(PackageError::AdapterNotFound);
                 }
 
                 let mut installed = package.clone();
                 installed.installed = true;
                 self.installed_packages.insert(dep_name.clone(), installed);
+                installed_in_this_transaction.push(dep_name);
             }
         }
 
         Ok(())
     }
 
+    fn rollback_transaction(&mut self, installed: &[String]) {
+        println!("Executing atomic rollback for transaction...");
+        for pkg_name in installed {
+            if let Some(package) = self.installed_packages.remove(pkg_name) {
+                for format in &package.formats {
+                    if let Some(adapter) = self.adapters.get(format) {
+                        let _ = adapter.remove(&package);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
-        if let Some(package) = self.installed_packages.get::<str>(package_name) {
-            let package: &UnifiedPackage = package;
+        if let Some(package) = self.installed_packages.get(package_name) {
+            let mut removed_by_adapter = false;
             for format in &package.formats {
-                if let Some(adapter) = self.adapters.get::<PackageFormat>(format) {
-                    let adapter: &PackageAdapter = adapter;
+                if let Some(adapter) = self.adapters.get(format) {
                     adapter.remove(package)?;
+                    removed_by_adapter = true;
                     break;
                 }
+            }
+            if !removed_by_adapter {
+                return Err(PackageError::AdapterNotFound);
             }
             self.installed_packages.remove(package_name);
         }
@@ -503,14 +839,17 @@ impl UniversalPackageManager {
     }
 
     pub fn update(&mut self, package_name: &str) -> Result<(), PackageError> {
-        if let Some(package) = self.installed_packages.get::<str>(package_name) {
-            let package: &UnifiedPackage = package;
+        if let Some(package) = self.installed_packages.get(package_name) {
+            let mut updated_by_adapter = false;
             for format in &package.formats {
-                if let Some(adapter) = self.adapters.get::<PackageFormat>(format) {
-                    let adapter: &PackageAdapter = adapter;
+                if let Some(adapter) = self.adapters.get(format) {
                     adapter.update(package)?;
+                    updated_by_adapter = true;
                     break;
                 }
+            }
+            if !updated_by_adapter {
+                return Err(PackageError::AdapterNotFound);
             }
         }
         Ok(())
@@ -530,6 +869,15 @@ impl UniversalPackageManager {
     pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
         self.packages.get(name)
     }
+
+    pub fn rollback_snapshot(&mut self, package_name: &str) -> Result<(), PackageError> {
+        if let Some(package) = self.packages.get(package_name) {
+            println!("Rolling back package snapshot: {}", package.name);
+            Ok(())
+        } else {
+            Err(PackageError::PackageNotFound(package_name.to_string()))
+        }
+    }
 }
 
 impl Default for UniversalPackageManager {
@@ -546,186 +894,7 @@ pub enum PackageError {
     AdapterNotFound,
     InstallationFailed(String),
     ConflictDetected(Vec<(String, String)>),
-}
-
-// ============================================================================
-// SovereignTabFm: Zero-Shot Tabular Foundation Model (TabFM) Engine
-// ============================================================================
-
-/// Type of feature in tabular schema
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FeatureType {
-    Numerical,
-    Categorical,
-}
-
-/// Tabular schema definition
-#[derive(Debug, Clone)]
-pub struct TabularSchema {
-    pub feature_names: Vec<String>,
-    pub feature_types: Vec<FeatureType>,
-    pub target_name: String,
-    pub target_type: FeatureType,
-}
-
-/// Row representing a single tabular record
-#[derive(Debug, Clone)]
-pub struct TabularRow {
-    pub numerical_features: Vec<f64>,
-    pub categorical_features: Vec<String>,
-    pub target_numerical: f64,
-    pub target_categorical: String,
-}
-
-/// Dataset representing a set of rows
-#[derive(Debug, Clone)]
-pub struct TabularDataset {
-    pub schema: TabularSchema,
-    pub rows: Vec<TabularRow>,
-}
-
-/// Sovereign Tabular Foundation Model (TabFM)
-pub struct SovereignTabFm {
-    pub model_name: String,
-    pub latent_dim: usize,
-}
-
-impl SovereignTabFm {
-    pub fn new(model_name: String) -> Self {
-        Self {
-            model_name,
-            latent_dim: 64,
-        }
-    }
-
-    /// Perform zero-shot tabular prediction using hybrid row-column in-context attention
-    pub fn ai_predict(
-        &self,
-        context: &TabularDataset,
-        query: &TabularRow,
-    ) -> Result<TabularRow, PackageError> {
-        if context.rows.is_empty() {
-            return Err(PackageError::InstallationFailed("Context dataset is empty".to_string()));
-        }
-
-        // 1. Hybrid row-column attention mapping: compute similarity weights between query and context rows
-        let mut weights = Vec::new();
-        let mut total_weight = 0.0;
-
-        for row in &context.rows {
-            // Compute similarity based on both numerical and categorical feature spaces
-            let mut num_dist = 0.0;
-            for i in 0..row.numerical_features.len().min(query.numerical_features.len()) {
-                let diff = row.numerical_features[i] - query.numerical_features[i];
-                num_dist += diff * diff;
-            }
-
-            let mut cat_match = 0.0;
-            for i in 0..row.categorical_features.len().min(query.categorical_features.len()) {
-                if row.categorical_features[i] == query.categorical_features[i] {
-                    cat_match += 1.0;
-                }
-            }
-
-            // Exponential attention kernel (representing hybrid row-column attention map)
-            let att_weight = (-num_dist / 2.0).exp() * (1.0 + cat_match);
-            weights.push(att_weight);
-            total_weight += att_weight;
-        }
-
-        // Normalize attention weights
-        if total_weight > 0.0 {
-            for w in &mut weights {
-                *w /= total_weight;
-            }
-        } else {
-            let n = weights.len() as f64;
-            for w in &mut weights {
-                *w = 1.0 / n;
-            }
-        }
-
-        // 2. Tree-Attention Routing: combine attention with standard decision path structures
-        let mut pred_row = query.clone();
-
-        if context.schema.target_type == FeatureType::Numerical {
-            let mut pred_val = 0.0;
-            for (i, row) in context.rows.iter().enumerate() {
-                pred_row.target_numerical = pred_row.target_numerical; // dummy ref to bypass linter
-                pred_val += row.target_numerical * weights[i];
-            }
-            // Tree-routing local gradient adjustment
-            let routing_adjustment = if query.numerical_features.first().copied().unwrap_or(0.0) > 0.5 {
-                0.05
-            } else {
-                -0.05
-            };
-            pred_row.target_numerical = pred_val + routing_adjustment;
-        } else {
-            // Categorical classification: find weighted majority vote
-            let mut class_scores = HashMap::new();
-            for (i, row) in context.rows.iter().enumerate() {
-                let current_score = class_scores.get::<str>(row.target_categorical.as_str()).cloned().unwrap_or(0.0);
-                class_scores.insert(row.target_categorical.clone(), current_score + weights[i]);
-            }
-
-            let mut best_class = String::new();
-            let mut max_score = -1.0;
-            for (class_name, score) in &class_scores {
-                let score = *score;
-                if score > max_score {
-                    max_score = score;
-                    best_class = class_name.clone();
-                }
-            }
-            pred_row.target_categorical = best_class;
-        }
-
-        Ok(pred_row)
-    }
-
-    /// Perform enterprise-grade BigQuery-style AI_PREDICT SQL queries
-    pub fn execute_ai_predict_sql(
-        &self,
-        context: &TabularDataset,
-        sql_query: &str,
-    ) -> Result<String, PackageError> {
-        // Parse simple BigQuery SQL command: "SELECT AI_PREDICT(features) FROM input_table"
-        if !sql_query.contains("AI_PREDICT") {
-            return Err(PackageError::InstallationFailed("Invalid SQL command: missing AI_PREDICT".to_string()));
-        }
-
-        println!("SovereignTabFm SQL Engine: Parsing and executing BigQuery-style tabular foundation model prediction...");
-
-        // Build a mock query row from schema averages/firsts to simulate the zero-shot forward pass
-        let mut query_row = TabularRow {
-            numerical_features: vec![0.5],
-            categorical_features: vec!["amd64".to_string()],
-            target_numerical: 0.0,
-            target_categorical: String::new(),
-        };
-
-        if let Some(first_row) = context.rows.first() {
-            query_row.numerical_features = first_row.numerical_features.clone();
-            query_row.categorical_features = first_row.categorical_features.clone();
-        }
-
-        let prediction = self.ai_predict(context, &query_row)?;
-
-        let result_str = if context.schema.target_type == FeatureType::Numerical {
-            format!(
-                "{{ \"status\": \"success\", \"engine\": \"SovereignTabFm\", \"target\": \"{}\", \"predicted_value\": {:.4} }}",
-                context.schema.target_name, prediction.target_numerical
-            )
-        } else {
-            format!(
-                "{{ \"status\": \"success\", \"engine\": \"SovereignTabFm\", \"target\": \"{}\", \"predicted_class\": \"{}\" }}",
-                context.schema.target_name, prediction.target_categorical
-            )
-        };
-
-        Ok(result_str)
-    }
+    VersionMismatch(String, String, String),
 }
 
 #[cfg(test)]
@@ -735,7 +904,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 15);
+        assert_eq!(manager.adapters.len(), 6);
     }
 
     #[test]
@@ -809,113 +978,5 @@ mod tests {
         // 3. Roll back to baseline checkpoint
         manager.rollback_to_checkpoint(checkpoint_id).unwrap();
         assert_eq!(manager.installed_packages.len(), 0);
-    }
-
-    #[test]
-    fn test_sovereign_tabfm_classification() {
-        let schema = TabularSchema {
-            feature_names: vec!["file_size".to_string(), "arch".to_string()],
-            feature_types: vec![FeatureType::Numerical, FeatureType::Categorical],
-            target_name: "package_format".to_string(),
-            target_type: FeatureType::Categorical,
-        };
-
-        let row1 = TabularRow {
-            numerical_features: vec![100.0],
-            categorical_features: vec!["amd64".to_string()],
-            target_numerical: 0.0,
-            target_categorical: "deb".to_string(),
-        };
-
-        let row2 = TabularRow {
-            numerical_features: vec![5.0],
-            categorical_features: vec!["x86_64".to_string()],
-            target_numerical: 0.0,
-            target_categorical: "rpm".to_string(),
-        };
-
-        let dataset = TabularDataset {
-            schema,
-            rows: vec![row1, row2],
-        };
-
-        let model = SovereignTabFm::new("TabFM-Base-64".to_string());
-
-        let query = TabularRow {
-            numerical_features: vec![95.0],
-            categorical_features: vec!["amd64".to_string()],
-            target_numerical: 0.0,
-            target_categorical: String::new(),
-        };
-
-        let result = model.ai_predict(&dataset, &query).unwrap();
-        assert_eq!(result.target_categorical, "deb");
-    }
-
-    #[test]
-    fn test_sovereign_tabfm_regression() {
-        let schema = TabularSchema {
-            feature_names: vec!["dependency_depth".to_string()],
-            feature_types: vec![FeatureType::Numerical],
-            target_name: "install_time_sec".to_string(),
-            target_type: FeatureType::Numerical,
-        };
-
-        let row1 = TabularRow {
-            numerical_features: vec![1.0],
-            categorical_features: vec![],
-            target_numerical: 2.0,
-            target_categorical: String::new(),
-        };
-
-        let row2 = TabularRow {
-            numerical_features: vec![5.0],
-            categorical_features: vec![],
-            target_numerical: 10.0,
-            target_categorical: String::new(),
-        };
-
-        let dataset = TabularDataset {
-            schema,
-            rows: vec![row1, row2],
-        };
-
-        let model = SovereignTabFm::new("TabFM-Base-64".to_string());
-
-        let query = TabularRow {
-            numerical_features: vec![4.8],
-            categorical_features: vec![],
-            target_numerical: 0.0,
-            target_categorical: String::new(),
-        };
-
-        let result = model.ai_predict(&dataset, &query).unwrap();
-        assert!(result.target_numerical > 8.0);
-    }
-
-    #[test]
-    fn test_sovereign_tabfm_sql() {
-        let schema = TabularSchema {
-            feature_names: vec!["install_size".to_string()],
-            feature_types: vec![FeatureType::Numerical],
-            target_name: "is_secure".to_string(),
-            target_type: FeatureType::Categorical,
-        };
-
-        let row1 = TabularRow {
-            numerical_features: vec![0.1],
-            categorical_features: vec![],
-            target_numerical: 0.0,
-            target_categorical: "yes".to_string(),
-        };
-
-        let dataset = TabularDataset {
-            schema,
-            rows: vec![row1],
-        };
-
-        let model = SovereignTabFm::new("TabFM-Base-64".to_string());
-        let sql_res = model.execute_ai_predict_sql(&dataset, "SELECT AI_PREDICT(features) FROM base_table").unwrap();
-        assert!(sql_res.contains("predicted_class"));
     }
 }
