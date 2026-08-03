@@ -96,3 +96,10 @@ mod tests {
         assert_eq!(store.pending_updates[0], "sigma-browse");
     }
 }
+
+pub struct SoftwareRegistryEntry {
+    pub name: String,
+    pub version: String,
+}
+
+pub static mut GLOBAL_SOFTWARE_STORE: Option<SigmaSoftwareStore> = None;

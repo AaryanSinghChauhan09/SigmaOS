@@ -452,7 +452,7 @@ impl SmartSymlink {
 
     pub fn resolve_symlink<R: SymlinkResolverRule>(
         &self,
-        _persona: crate::compatibility::KernelPersona,
+        _persona: crate::kernel::KernelPersona,
         primary_exists: bool,
         fallback_existence: &[bool],
         rule: &R,

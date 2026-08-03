@@ -114,7 +114,11 @@ impl SigmaInit {
 
     /// Simulate a connection attempt triggering standard socket activation for a service.
     pub fn socket_trigger(&mut self, service_name: &str) -> bool {
-        if let Some(service) = self.services.iter_mut().find(|s| e_eq(&s.name, service_name)) {
+        if let Some(service) = self
+            .services
+            .iter_mut()
+            .find(|s| e_eq(&s.name, service_name))
+        {
             if service.socket_activated && !service.running {
                 service.running = true;
                 return true;
