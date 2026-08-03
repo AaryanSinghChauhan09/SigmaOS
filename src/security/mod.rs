@@ -1,47 +1,20 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
 
-// SigmaOS Security Subsystem
+pub mod audit;
 pub mod capability;
-pub mod defensive_audit;
-pub mod hardening;
-pub mod parrot_kali;
+pub mod integrity;
+pub mod mac;
+pub mod phantom;
+pub mod pki;
 pub mod pledge;
-pub mod qubes_isolation;
-pub mod selinux;
+pub mod secrets;
+pub mod securelevels;
+pub mod unveil;
 pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
-};
-pub use parrot_kali::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-};
+pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
-pub use selinux::{
-    AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
-    SecurityRule, SelinuxPermission,
-};
-pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
-};
+pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};

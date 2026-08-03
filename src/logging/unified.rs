@@ -1,35 +1,14 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+// OOP-based Unified Logging System and Diverse Targets for SigmaOS
+// Inspired by Linux systemd-journald and rsyslog, providing Console, File, Network, and Memory logging targets.
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+extern crate alloc;
 
-/// OOP-based Unified Logging System for SigmaOS
-/// Implements unified logging using OOP principles with traits and structs
-/// No dependency on external logging frameworks
-/// Based on Roadmap Item 13: Unified logging system
-
-use core::ptr::{self, NonNull};
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Log level
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum LogLevel {
     Trace = 0,
@@ -41,7 +20,6 @@ pub enum LogLevel {
 }
 
 /// Log entry (OOP: Log entry object)
-#[repr(C)]
 pub struct UnifiedLogEntry {
     pub timestamp: u64,
     pub level: LogLevel,
@@ -52,7 +30,13 @@ pub struct UnifiedLogEntry {
 }
 
 impl UnifiedLogEntry {
-    pub fn new(level: LogLevel, component: &[u8], message: &[u8], module: &[u8], line: u32) -> Self {
+    pub fn new(
+        level: LogLevel,
+        component: &[u8],
+        message: &[u8],
+        module: &[u8],
+        line: u32,
+    ) -> Self {
         let mut component_array = [0u8; 64];
         let mut message_array = [0u8; 512];
         let mut module_array = [0u8; 128];
@@ -61,11 +45,9 @@ impl UnifiedLogEntry {
         let message_len = message.len().min(511);
         let module_len = module.len().min(127);
 
-        unsafe {
-            core::ptr::copy_nonoverlapping(component.as_ptr(), component_array.as_mut_ptr(), component_len);
-            core::ptr::copy_nonoverlapping(message.as_ptr(), message_array.as_mut_ptr(), message_len);
-            core::ptr::copy_nonoverlapping(module.as_ptr(), module_array.as_mut_ptr(), module_len);
-        }
+        component_array[..component_len].copy_from_slice(&component[..component_len]);
+        message_array[..message_len].copy_from_slice(&message[..message_len]);
+        module_array[..module_len].copy_from_slice(&module[..module_len]);
 
         UnifiedLogEntry {
             timestamp: get_current_time(),
@@ -90,7 +72,7 @@ pub trait LogTarget {
 
 /// Log error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogError {
     Success = 0,
     BufferFull = 1,
@@ -100,12 +82,11 @@ pub enum LogError {
 }
 
 /// Target info
-#[repr(C)]
 pub struct TargetInfo {
-    target_type: TargetType,
-    buffer_size: usize,
-    entries_written: u64,
-    capability: TargetCapability,
+    pub target_type: TargetType,
+    pub buffer_size: usize,
+    pub entries_written: u64,
+    pub capability: TargetCapability,
 }
 
 impl TargetInfo {
@@ -120,8 +101,7 @@ impl TargetInfo {
 }
 
 /// Target type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetType {
     Console = 0,
     File = 1,
@@ -131,8 +111,7 @@ pub enum TargetType {
 }
 
 /// Target capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TargetCapability {
     pub can_write: bool,
     pub can_flush: bool,
@@ -140,16 +119,15 @@ pub struct TargetCapability {
 }
 
 impl TargetCapability {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         TargetCapability {
             can_write: false,
             can_flush: false,
-            pub can_rotate: false,
+            can_rotate: false,
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         TargetCapability {
             can_write: true,
             can_flush: true,
@@ -158,8 +136,16 @@ impl TargetCapability {
     }
 }
 
-/// Memory target (OOP: Concrete target class)
-#[repr(C)]
+impl Default for TargetCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 1. MEMORY LOG TARGET
+// ==========================================
+
 pub struct MemoryLogTarget {
     pub entries: Vec<Option<UnifiedLogEntry>>,
     pub max_entries: usize,
@@ -229,6 +215,168 @@ impl LogTarget for MemoryLogTarget {
     }
 }
 
+// ==========================================
+// 2. FILE LOG TARGET (/var/log/syslog)
+// ==========================================
+
+pub struct FileLogTarget {
+    pub file_path: String,
+    pub file_buffer: Vec<String>,
+    pub entries_written: AtomicUsize,
+    pub capability: TargetCapability,
+}
+
+impl FileLogTarget {
+    pub fn new(path: &str, capability: TargetCapability) -> Self {
+        Self {
+            file_path: String::from(path),
+            file_buffer: Vec::new(),
+            entries_written: AtomicUsize::new(0),
+            capability,
+        }
+    }
+}
+
+impl LogTarget for FileLogTarget {
+    fn write(&mut self, entry: &UnifiedLogEntry) -> Result<(), LogError> {
+        if !self.capability.can_write {
+            return Err(LogError::PermissionDenied);
+        }
+
+        let msg_len = entry.message.iter().position(|&b| b == 0).unwrap_or(512);
+        let msg_str = String::from_utf8_lossy(&entry.message[..msg_len]);
+
+        let formatted = alloc::format!("[FILE][{:?}]: {}", entry.level, msg_str);
+        self.file_buffer.push(formatted);
+        self.entries_written.fetch_add(1, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn flush(&mut self) -> Result<(), LogError> {
+        Ok(())
+    }
+
+    fn info(&self) -> TargetInfo {
+        TargetInfo {
+            target_type: TargetType::File,
+            buffer_size: 10000,
+            entries_written: self.entries_written.load(Ordering::SeqCst) as u64,
+            capability: self.capability,
+        }
+    }
+}
+
+// ==========================================
+// 3. CONSOLE LOG TARGET (/dev/console)
+// ==========================================
+
+pub struct ConsoleLogTarget {
+    pub output_history: Vec<String>,
+    pub entries_written: AtomicUsize,
+    pub capability: TargetCapability,
+}
+
+impl ConsoleLogTarget {
+    pub fn new(capability: TargetCapability) -> Self {
+        Self {
+            output_history: Vec::new(),
+            entries_written: AtomicUsize::new(0),
+            capability,
+        }
+    }
+}
+
+impl LogTarget for ConsoleLogTarget {
+    fn write(&mut self, entry: &UnifiedLogEntry) -> Result<(), LogError> {
+        if !self.capability.can_write {
+            return Err(LogError::PermissionDenied);
+        }
+
+        let msg_len = entry.message.iter().position(|&b| b == 0).unwrap_or(512);
+        let msg_str = String::from_utf8_lossy(&entry.message[..msg_len]);
+
+        let formatted = alloc::format!("[STDOUT][{:?}]: {}", entry.level, msg_str);
+        self.output_history.push(formatted);
+        self.entries_written.fetch_add(1, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn flush(&mut self) -> Result<(), LogError> {
+        Ok(())
+    }
+
+    fn info(&self) -> TargetInfo {
+        TargetInfo {
+            target_type: TargetType::Console,
+            buffer_size: 5000,
+            entries_written: self.entries_written.load(Ordering::SeqCst) as u64,
+            capability: self.capability,
+        }
+    }
+}
+
+// ==========================================
+// 4. NETWORK LOG TARGET (rsyslog udp:514)
+// ==========================================
+
+pub struct NetworkLogTarget {
+    pub server_ip: String,
+    pub server_port: u16,
+    pub forwarded_packets: Vec<String>,
+    pub entries_written: AtomicUsize,
+    pub capability: TargetCapability,
+}
+
+impl NetworkLogTarget {
+    pub fn new(server_ip: &str, server_port: u16, capability: TargetCapability) -> Self {
+        Self {
+            server_ip: String::from(server_ip),
+            server_port,
+            forwarded_packets: Vec::new(),
+            entries_written: AtomicUsize::new(0),
+            capability,
+        }
+    }
+}
+
+impl LogTarget for NetworkLogTarget {
+    fn write(&mut self, entry: &UnifiedLogEntry) -> Result<(), LogError> {
+        if !self.capability.can_write {
+            return Err(LogError::PermissionDenied);
+        }
+
+        let msg_len = entry.message.iter().position(|&b| b == 0).unwrap_or(512);
+        let msg_str = String::from_utf8_lossy(&entry.message[..msg_len]);
+
+        let sys_packet = alloc::format!(
+            "<34>[FORWARDED TO {}:{}]: {}",
+            self.server_ip,
+            self.server_port,
+            msg_str
+        );
+        self.forwarded_packets.push(sys_packet);
+        self.entries_written.fetch_add(1, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn flush(&mut self) -> Result<(), LogError> {
+        Ok(())
+    }
+
+    fn info(&self) -> TargetInfo {
+        TargetInfo {
+            target_type: TargetType::Network,
+            buffer_size: 2000,
+            entries_written: self.entries_written.load(Ordering::SeqCst) as u64,
+            capability: self.capability,
+        }
+    }
+}
+
+// ==========================================
+// LOGGER MANAGER & IMPLEMENTATION
+// ==========================================
+
 /// Unified logger trait (OOP interface)
 pub trait UnifiedLogger {
     /// Log message at level
@@ -249,6 +397,7 @@ pub trait UnifiedLogger {
 
 /// Unified log statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct UnifiedLogStats {
     pub total_entries: u64,
     pub entries_by_level: [u64; 6],
@@ -257,14 +406,19 @@ pub struct UnifiedLogStats {
 }
 
 impl UnifiedLogStats {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         UnifiedLogStats {
             total_entries: 0,
             entries_by_level: [0; 6],
             entries_by_component: [0; 16],
             targets: 0,
         }
+    }
+}
+
+impl Default for UnifiedLogStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -278,7 +432,7 @@ pub struct SimpleUnifiedLogger {
 
 /// Logger capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LoggerCapability {
     pub can_log: bool,
     pub can_set_level: bool,
@@ -286,8 +440,7 @@ pub struct LoggerCapability {
 }
 
 impl LoggerCapability {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         LoggerCapability {
             can_log: false,
             can_set_level: false,
@@ -295,12 +448,18 @@ impl LoggerCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         LoggerCapability {
             can_log: true,
             can_set_level: true,
             can_manage_targets: true,
         }
+    }
+}
+
+impl Default for LoggerCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -314,8 +473,7 @@ impl SimpleUnifiedLogger {
         }
     }
 
-    unsafe fn get_component_index(&self, component: &[u8]) -> usize {
-        // Simple hash to map component to index
+    fn get_component_index(&self, component: &[u8]) -> usize {
         let mut hash: usize = 0;
         for (i, &byte) in component.iter().enumerate() {
             hash = hash.wrapping_add((byte as usize) * (i + 1));
@@ -330,7 +488,15 @@ impl UnifiedLogger for SimpleUnifiedLogger {
             return;
         }
 
-        let current_level = unsafe { core::mem::transmute(self.level.load(Ordering::SeqCst)) };
+        let current_level = match self.level.load(Ordering::SeqCst) {
+            0 => LogLevel::Trace,
+            1 => LogLevel::Debug,
+            2 => LogLevel::Info,
+            3 => LogLevel::Warning,
+            4 => LogLevel::Error,
+            _ => LogLevel::Fatal,
+        };
+
         if level < current_level {
             return;
         }
@@ -346,10 +512,8 @@ impl UnifiedLogger for SimpleUnifiedLogger {
         self.stats.total_entries += 1;
         self.stats.entries_by_level[level as usize] += 1;
 
-        unsafe {
-            let component_index = self.get_component_index(component);
-            self.stats.entries_by_component[component_index] += 1;
-        }
+        let component_index = self.get_component_index(component);
+        self.stats.entries_by_component[component_index] += 1;
     }
 
     fn set_level(&mut self, level: LogLevel) {
@@ -360,8 +524,13 @@ impl UnifiedLogger for SimpleUnifiedLogger {
     }
 
     fn level(&self) -> LogLevel {
-        unsafe {
-            core::mem::transmute(self.level.load(Ordering::SeqCst))
+        match self.level.load(Ordering::SeqCst) {
+            0 => LogLevel::Trace,
+            1 => LogLevel::Debug,
+            2 => LogLevel::Info,
+            3 => LogLevel::Warning,
+            4 => LogLevel::Error,
+            _ => LogLevel::Fatal,
         }
     }
 
@@ -403,7 +572,7 @@ impl UnifiedLogger for SimpleUnifiedLogger {
     }
 }
 
-/// Get current time (nanoseconds)
+/// Get current simulated time (nanoseconds)
 fn get_current_time() -> u64 {
     static mut COUNTER: u64 = 0;
     unsafe {
@@ -412,103 +581,40 @@ fn get_current_time() -> u64 {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
+    #[test]
+    fn test_logger_routing_to_multiple_targets() {
+        let mut logger = SimpleUnifiedLogger::new(LogLevel::Debug, LoggerCapability::full());
 
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+        let mem_target = MemoryLogTarget::new(5, TargetCapability::full());
+        let file_target = FileLogTarget::new("/var/log/syslog", TargetCapability::full());
+        let console_target = ConsoleLogTarget::new(TargetCapability::full());
+        let net_target = NetworkLogTarget::new("192.168.1.50", 514, TargetCapability::full());
 
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
+        logger.add_target(Box::new(mem_target)).unwrap();
+        logger.add_target(Box::new(file_target)).unwrap();
+        logger.add_target(Box::new(console_target)).unwrap();
+        logger.add_target(Box::new(net_target)).unwrap();
 
-    fn len(&self) -> usize {
-        self.len
-    }
+        assert_eq!(logger.stats().targets, 4);
 
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        // Dispatch log entry
+        logger.log(
+            LogLevel::Warning,
+            b"SYS",
+            b"Kernel panic averted",
+            b"main.rs",
+            42,
+        );
 
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        // Verify statistics
+        assert_eq!(logger.stats().total_entries, 1);
+        assert_eq!(
+            logger.stats().entries_by_level[LogLevel::Warning as usize],
+            1
+        );
     }
 }
