@@ -32,6 +32,7 @@ pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod package;
+pub mod performance;
 pub mod productivity;
 pub mod resilience;
 pub mod runtime;

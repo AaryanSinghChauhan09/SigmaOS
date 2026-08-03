@@ -24,7 +24,6 @@ use std::io::{self, BufRead, Write};
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
 impl AgentAutomationEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         AgentAutomationEngine
     }
