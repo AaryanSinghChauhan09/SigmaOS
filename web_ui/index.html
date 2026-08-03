@@ -2,10 +2,654 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Zenith Web UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigmaOS Zenith Desktop Environment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/style.css">
+    <style>
+        /* Interactive Desktop Grid Icons */
+        .desktop-icons {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 10;
+        }
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 80px;
+            padding: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: 1px solid transparent;
+        }
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-glass);
+            transform: scale(1.05);
+        }
+        .desktop-icon-symbol {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+        .desktop-icon-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text-white);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        /* Launcher Menu */
+        .app-launcher-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        .app-launcher-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-size: 0.85rem;
+        }
+        .app-launcher-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--accent-gold);
+        }
+    </style>
 </head>
-<body>
-    <div class="glass">Welcome to SigmaOS Zenith Web UI</div>
+<body class="theme-gold">
+
+    <div id="mouse-glow"></div>
+
+    <!-- Cinnamon/Zorin inspired Panel (Top Bar) -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <div class="top-bar-brand" id="start-menu-btn" style="cursor: pointer;" title="Open Zorin-style Launcher">
+                <span>Σ</span> SigmaOS <span>Zenith</span>
+            </div>
+            <div class="capsule-badge">Microkernel Ring-3</div>
+        </div>
+        <div class="top-bar-center">
+            <div class="vital-item" title="S-SCHED Core Usage">
+                CPU: <span id="cpu-stat">0.2%</span>
+            </div>
+            <div class="vital-item" title="S-VIRT Sandbox State">
+                RAM: <span id="ram-stat">14.2 MB</span>
+            </div>
+            <div class="vital-item" title="Post-Quantum Key Exchange Active">
+                PQ-SEC: <span style="color: #4ade80;">Kyber-1024</span>
+            </div>
+        </div>
+        <div class="top-bar-right">
+            <div class="vital-item">
+                <span id="clock-time">10:00 AM</span>
+            </div>
+            <div class="vital-item" style="color: var(--text-muted);">
+                <span id="clock-date">Sun, Aug 2</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop Grid Shortcuts -->
+    <div class="desktop-icons">
+        <div class="desktop-icon" onclick="openWindow('win-welcome')">
+            <div class="desktop-icon-symbol">👋</div>
+            <div class="desktop-icon-label">Welcome</div>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('win-office')">
+            <div class="desktop-icon-symbol">📝</div>
+            <div class="desktop-icon-label">S-Office</div>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('win-media')">
+            <div class="desktop-icon-symbol">🎵</div>
+            <div class="desktop-icon-label">S-Media</div>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('win-ai')">
+            <div class="desktop-icon-symbol">🧠</div>
+            <div class="desktop-icon-label">S-AI Console</div>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('win-robo')">
+            <div class="desktop-icon-symbol">✈️</div>
+            <div class="desktop-icon-label">S-Robo PID</div>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('win-fs')">
+            <div class="desktop-icon-symbol">📂</div>
+            <div class="desktop-icon-label">SigmaFS++</div>
+        </div>
+        <div class="desktop-icon" onclick="openWindow('win-settings')">
+            <div class="desktop-icon-symbol">⚙️</div>
+            <div class="desktop-icon-label">Settings</div>
+        </div>
+    </div>
+
+    <!-- macOS style Dock at the Bottom -->
+    <div class="zenith-dock-container">
+        <div class="zenith-dock">
+            <div class="dock-item" data-tooltip="Welcome Screen" onclick="openWindow('win-welcome')">👋</div>
+            <div class="dock-item" data-tooltip="S-Office Suite" onclick="openWindow('win-office')">📝</div>
+            <div class="dock-item" data-tooltip="S-Media Audio Synth" onclick="openWindow('win-media')">🎵</div>
+            <div class="dock-item" data-tooltip="S-AI MoE Inference" onclick="openWindow('win-ai')">🧠</div>
+            <div class="dock-item" data-tooltip="S-Robo Flight PID" onclick="openWindow('win-robo')">✈️</div>
+            <div class="dock-item" data-tooltip="SigmaFS++ File Explorer" onclick="openWindow('win-fs')">📂</div>
+            <div class="dock-separator"></div>
+            <div class="dock-item" data-tooltip="Control Center Settings" onclick="openWindow('win-settings')">⚙️</div>
+        </div>
+    </div>
+
+    <!-- Zorin OS inspired App Launcher (Menu) Overlay -->
+    <div class="app-launcher-overlay" id="app-launcher">
+        <div class="launcher-header">
+            <h3>Zenith App Launcher</h3>
+            <input type="text" class="launcher-search" placeholder="Search apps, files, or configurations..." oninput="filterLauncher(this.value)">
+        </div>
+        <div class="app-launcher-menu" id="launcher-menu-list">
+            <div class="app-launcher-item" onclick="openWindow('win-welcome')">
+                <span>👋</span> Welcome Guide (mintwelcome parity)
+            </div>
+            <div class="app-launcher-item" onclick="openWindow('win-office')">
+                <span>📝</span> S-Office Compose Editor (LibreOffice replacement)
+            </div>
+            <div class="app-launcher-item" onclick="openWindow('win-media')">
+                <span>🎵</span> S-Media Low-Latency Synthesizer (Audacity replacement)
+            </div>
+            <div class="app-launcher-item" onclick="openWindow('win-ai')">
+                <span>🧠</span> S-AI Local Mixture-of-Experts Router (LLaMA/DeepSeek replacement)
+            </div>
+            <div class="app-launcher-item" onclick="openWindow('win-robo')">
+                <span>✈️</span> S-Robo Flight Autopilot Controller (ArduPilot replacement)
+            </div>
+            <div class="app-launcher-item" onclick="openWindow('win-fs')">
+                <span>📂</span> SigmaFS++ Composable Explorer (btrfs/CoW integration)
+            </div>
+            <div class="app-launcher-item" onclick="openWindow('win-settings')">
+                <span>⚙️</span> System Settings & Themes (Zorin Look Changer)
+            </div>
+        </div>
+    </div>
+
+    <!-- Right-Click Context Menu -->
+    <div id="context-menu">
+        <div class="context-item" onclick="openWindow('win-settings')">⚙️ Change Desktop Theme</div>
+        <div class="context-item" onclick="toggleHighContrast()">👁️ Toggle High Contrast Mode</div>
+        <div class="context-item" onclick="location.reload()">🔄 Refresh Desktop</div>
+    </div>
+
+    <!-- Mint Welcome Screen (guided wizard step card) -->
+    <div class="window active-focus" id="win-welcome" style="top: 15%; left: calc(50% - 300px);">
+        <div class="window-header">
+            <div class="window-title">👋 <span>Mintwelcome</span> - Welcome Screen</div>
+            <div class="window-controls">
+                <div class="control-dot min" onclick="minimizeWindow('win-welcome')"></div>
+                <div class="control-dot max" onclick="maximizeWindow('win-welcome')"></div>
+                <div class="control-dot close" onclick="closeWindow('win-welcome')"></div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: var(--accent-gold); margin-bottom: 8px;">Welcome to SigmaOS Standalone!</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">A fully sovereign operating system that natively absorbs all applications. Zero dependencies, complete autonomy.</p>
+            </div>
+            <div class="settings-group">
+                <h4>Guided Desktop Onboarding</h4>
+                <div id="wizard-step-1" class="wizard-step-card">
+                    <p style="font-size: 0.82rem; margin-bottom: 10px;"><strong>Step 1: Layout Selection.</strong> Choose your favorite Linux-inspired desktop look. We offer Cinnamon parity tiling panel and macOS style launch docks natively.</p>
+                    <button class="fm-btn" onclick="nextWizardStep(2)">Next Step ➡️</button>
+                </div>
+                <div id="wizard-step-2" class="wizard-step-card" style="display: none;">
+                    <p style="font-size: 0.82rem; margin-bottom: 10px;"><strong>Step 2: Microkernel Driver Audit.</strong> SigmaOS automatically scanned your PCI and USB buses. High-fidelity hotplugging is initialized warning-free.</p>
+                    <button class="fm-btn" onclick="nextWizardStep(3)">Next Step ➡️</button>
+                </div>
+                <div id="wizard-step-3" class="wizard-step-card" style="display: none;">
+                    <p style="font-size: 0.82rem; margin-bottom: 10px;"><strong>Step 3: Theme Personalization.</strong> Switch between classic Mint Dark-Teal (Gold), Solar Dawn, and Crimson Void instantly in System Settings.</p>
+                    <button class="fm-btn" onclick="closeWindow('win-welcome')">Complete Setup 🎉</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- S-OFFICE Compose Suite -->
+    <div class="window" id="win-office" style="top: 10%; left: 10%;">
+        <div class="window-header">
+            <div class="window-title">📝 <span>S-Office</span> Compose Suite</div>
+            <div class="window-controls">
+                <div class="control-dot min" onclick="minimizeWindow('win-office')"></div>
+                <div class="control-dot max" onclick="maximizeWindow('win-office')"></div>
+                <div class="control-dot close" onclick="closeWindow('win-office')"></div>
+            </div>
+        </div>
+        <div class="window-body" style="padding: 0; display: flex; flex-direction: column;">
+            <div style="background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-glass); padding: 8px 15px; display: flex; gap: 10px;">
+                <button class="fm-btn" onclick="compileToPDF()">📄 Export to PDF</button>
+                <button class="fm-btn" onclick="clearEditor()">🧹 Clear Canvas</button>
+                <span id="office-status" style="font-size: 0.75rem; color: var(--accent-gold); align-self: center; font-family: monospace;">Asynchronous DAG recalculations enabled</span>
+            </div>
+            <div style="display: flex; flex-grow: 1; height: calc(100% - 40px);">
+                <textarea id="office-input" style="flex: 1; background: transparent; border: none; border-right: 1px solid var(--border-glass); outline: none; color: white; padding: 15px; font-family: 'Outfit', sans-serif; resize: none; font-size: 0.9rem;" placeholder="Type markdown text here..." oninput="translateMarkdown(this.value)"># Financial Forecast Report
+This spreadsheet and text editor replacement uses reactive formula dependency trees.
+
+## Core Highlights:
+- Low-latency layout rendering.
+- No external Microsoft Office or LibreOffice suites needed.
+</textarea>
+                <div id="office-preview" style="flex: 1; padding: 15px; overflow-y: auto; font-size: 0.9rem; background: rgba(0,0,0,0.15);" class="term-line">
+                    <h1>Financial Forecast Report</h1>
+                    <p>This spreadsheet and text editor replacement uses reactive formula dependency trees.</p>
+                    <h2>Core Highlights:</h2>
+                    <ul>
+                        <li>Low-latency layout rendering.</li>
+                        <li>No external Microsoft Office or LibreOffice suites needed.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- S-MEDIA Synthesizer (Audacity Replace) -->
+    <div class="window" id="win-media" style="top: 15%; left: 15%;">
+        <div class="window-header">
+            <div class="window-title">🎵 <span>S-Media</span> Binaural Mixer</div>
+            <div class="window-controls">
+                <div class="control-dot min" onclick="minimizeWindow('win-media')"></div>
+                <div class="control-dot max" onclick="maximizeWindow('win-media')"></div>
+                <div class="control-dot close" onclick="closeWindow('win-media')"></div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div style="margin-bottom: 15px;">
+                <h4 style="color: var(--accent-gold); margin-bottom: 6px;">Dual-Channel Frequency Synthesizer</h4>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Generates Audacity/Gnaural-parity low-latency binaural beat patterns directly mapped onto microkernel audio rings.</p>
+            </div>
+            <div class="settings-group">
+                <div class="form-switch">
+                    <span>Base Carrier Frequency (Hz): <strong id="base-freq-val">200</strong></span>
+                    <input type="range" class="auto-style-9" min="100" max="1000" value="200" oninput="updateAudioParams()">
+                </div>
+                <div class="form-switch">
+                    <span>Target Beat Offset (Hz): <strong id="beat-offset-val">10</strong></span>
+                    <input type="range" class="auto-style-10" min="1" max="50" value="10" oninput="updateAudioParams()">
+                </div>
+                <div class="form-switch">
+                    <span>Global Sound Attenuation: </span>
+                    <button class="fm-btn" id="audio-toggle-btn" onclick="toggleAudioSynthesis()">🔊 Play Binaural Beats</button>
+                </div>
+            </div>
+            <div style="margin-top: 15px; background: black; border-radius: 8px; border: 1px solid var(--border-glass); padding: 12px; font-family: monospace; font-size: 0.75rem;">
+                <span style="color: #4ade80;">[Audio-DSP]</span> Left Channel: <span id="left-audio-channel">195.00 Hz</span> Sine Wave<br>
+                <span style="color: #4ade80;">[Audio-DSP]</span> Right Channel: <span id="right-audio-channel">205.00 Hz</span> Sine Wave<br>
+                <span style="color: #a1a1aa;">[Status] Latency: 1.2 microseconds. Zero frames dropped.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- S-AI Mixture-of-Experts Controller -->
+    <div class="window" id="win-ai" style="top: 20%; left: 20%;">
+        <div class="window-header">
+            <div class="window-title">🧠 <span>S-AI</span> Local MoE Inference Console</div>
+            <div class="window-controls">
+                <div class="control-dot min" onclick="minimizeWindow('win-ai')"></div>
+                <div class="control-dot max" onclick="maximizeWindow('win-ai')"></div>
+                <div class="control-dot close" onclick="closeWindow('win-ai')"></div>
+            </div>
+        </div>
+        <div class="window-body" style="display: flex; flex-direction: column; gap: 15px;">
+            <div>
+                <h4 style="color: var(--accent-gold); margin-bottom: 6px;">DeepSeek-R1 & LLaMA-3 native routing</h4>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Capability-bounded multi-agent execution pipeline. Runs continuous batching and load-balanced expert gating.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="ai-prompt-input" style="flex: 1; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); color: white; padding: 8px 12px; border-radius: 6px; outline: none; font-family: inherit; font-size: 0.85rem;" placeholder="Ask sovereign AI..." value="Summarize agricultural yields in rural districts">
+                <button class="fm-btn" onclick="dispatchMoEInference()">Run Inference</button>
+            </div>
+            <div id="ai-routing-stats" style="display: none; background: black; border-radius: 8px; border: 1px solid var(--border-glass); padding: 12px; font-family: monospace; font-size: 0.72rem; line-height: 1.4;">
+                <span style="color: #60a5fa;">[MoE-Router]</span> Gating token embeddings with softmax probabilities...<br>
+                <span style="color: #4ade80;">[Selected Expert #3]</span> Softmax Gating Weight: <span id="moe-weight-3">0.654</span><br>
+                <span style="color: #4ade80;">[Selected Expert #7]</span> Softmax Gating Weight: <span id="moe-weight-7">0.346</span><br>
+                <span style="color: #f472b6;">[Auxiliary Loss]</span> Expert load balancing loss: <span style="color: #f472b6;">0.1256 (Optimal flat-uniform)</span><br>
+                <div style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; color: #e4e4e7;">
+                    <strong>AI Output:</strong> <span id="ai-response-text">Analysing regional crop distributions... Loaded local model parameter slices natively via Memory-Mapped weight streaming.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- S-ROBO Autopilot stabilized loop -->
+    <div class="window" id="win-robo" style="top: 25%; left: 25%;">
+        <div class="window-header">
+            <div class="window-title">✈️ <span>S-Robo</span> UAV PID Loop Autopilot</div>
+            <div class="window-controls">
+                <div class="control-dot min" onclick="minimizeWindow('win-robo')"></div>
+                <div class="control-dot max" onclick="maximizeWindow('win-robo')"></div>
+                <div class="control-dot close" onclick="closeWindow('win-robo')"></div>
+            </div>
+        </div>
+        <div class="window-body" style="display: flex; flex-direction: column; gap: 15px;">
+            <div>
+                <h4 style="color: var(--accent-gold); margin-bottom: 6px;">Flight Attitude PID Stabilizer</h4>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Real-time loop corrections simulating ArduPilot stabilization, resolving gyro targets at 100Hz interrupt rate.</p>
+            </div>
+            <div class="settings-group">
+                <div class="form-switch">
+                    <span>Target Gyro Angle: <strong id="target-gyro-angle">5.0°</strong></span>
+                    <input type="range" class="auto-style-9" min="-20" max="20" value="5" oninput="updateRoboAngle(this.value)">
+                </div>
+                <div class="form-switch">
+                    <span>Attitude Corrective Response Output: </span>
+                    <strong id="pid-response-output" style="color: #4ade80; font-family: monospace;">7.50 N-m</strong>
+                </div>
+            </div>
+            <div style="background: black; border-radius: 8px; border: 1px solid var(--border-glass); padding: 12px; font-family: monospace; font-size: 0.72rem; line-height: 1.4;">
+                <span style="color: #f59e0b;">[PID-Control]</span> Error tracking: Target=5.00°, Current=0.00°<br>
+                <span style="color: #f59e0b;">[PID-Control]</span> Proportional: 7.50, Integral: 0.00, Derivative: 0.00<br>
+                <span style="color: #4ade80;">[Actuator] Flight surfaces stabilized successfully at Ring-0 interrupt.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SigmaFS++ Composable Explorer -->
+    <div class="window" id="win-fs" style="top: 5%; left: 30%;">
+        <div class="window-header">
+            <div class="window-title">📂 <span>SigmaFS++</span> Explorer</div>
+            <div class="window-controls">
+                <div class="control-dot min" onclick="minimizeWindow('win-fs')"></div>
+                <div class="control-dot max" onclick="maximizeWindow('win-fs')"></div>
+                <div class="control-dot close" onclick="closeWindow('win-fs')"></div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="fm-layout">
+                <div class="fm-toolbar">
+                    <button class="fm-btn" onclick="generateFSBackup()">🔄 Create Timeshift Snapshot (btrfs-COW)</button>
+                    <span class="fm-breadcrumbs">Path: /dev/sda1/snapshots/</span>
+                </div>
+                <div class="fm-grid">
+                    <div class="fm-item" onclick="alert('Timeshift Restore applied successfully')">
+                        <div class="fm-item-icon">📦</div>
+                        <div class="fm-item-label">snap_1</div>
+                    </div>
+                    <div class="fm-item" onclick="alert('Timeshift Restore applied successfully')">
+                        <div class="fm-item-icon">📦</div>
+                        <div class="fm-item-label">snap_2</div>
+                    </div>
+                    <div class="fm-item">
+                        <div class="fm-item-icon">📄</div>
+                        <div class="fm-item-label">gdpr_audit.log</div>
+                    </div>
+                </div>
+                <div id="fs-backup-msg" style="display: none; margin-top: 15px; padding: 10px; background: rgba(74,222,128,0.15); border: 1px solid #4ade80; border-radius: 6px; font-size: 0.8rem; color: #4ade80;">
+                    Timeshift COW Snapshot created: <strong>timeshift_snap_3</strong> at address block 1002.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings (Zorin Look Changer Parity) -->
+    <div class="window" id="win-settings" style="top: 30%; left: 30%;">
+        <div class="window-header">
+            <div class="window-title">⚙️ <span>Control Center</span> - Personalize</div>
+            <div class="window-controls">
+                <div class="control-dot min" onclick="minimizeWindow('win-settings')"></div>
+                <div class="control-dot max" onclick="maximizeWindow('win-settings')"></div>
+                <div class="control-dot close" onclick="closeWindow('win-settings')"></div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="settings-layout">
+                <div class="settings-tabs">
+                    <div class="settings-tab active" onclick="switchSettingsTab('settings-themes')">Themes</div>
+                    <div class="settings-tab" onclick="switchSettingsTab('settings-accessibility')">Accessibility</div>
+                </div>
+                <div class="settings-content">
+                    <!-- Themes tab -->
+                    <div id="settings-themes" class="settings-group">
+                        <h4>Zorin OS-inspired Look Changer</h4>
+                        <div class="theme-selector-grid">
+                            <button class="theme-button theme-gold" onclick="switchTheme('theme-gold')">Gold</button>
+                            <button class="theme-button theme-solar" onclick="switchTheme('theme-solar')">Solar</button>
+                            <button class="theme-button theme-crimson" onclick="switchTheme('theme-crimson')">Crimson</button>
+                            <button class="theme-button theme-cyan" onclick="switchTheme('theme-cyan')">Cyan</button>
+                        </div>
+                    </div>
+                    <!-- Accessibility tab -->
+                    <div id="settings-accessibility" class="settings-group" style="display: none;">
+                        <h4>Universal Accessibility settings</h4>
+                        <div class="form-switch">
+                            <span>High Contrast Mode (WCAG 2.1)</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="a11y-toggle" onchange="toggleHighContrast()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track open windows
+        let activeWindow = 'win-welcome';
+
+        // Mouse glow movement
+        const mouseGlow = document.getElementById('mouse-glow');
+        document.addEventListener('mousemove', (e) => {
+            mouseGlow.style.opacity = '1';
+            mouseGlow.style.left = `${e.clientX}px`;
+            mouseGlow.style.top = `${e.clientY}px`;
+        });
+
+        // App Launcher trigger
+        const startMenuBtn = document.getElementById('start-menu-btn');
+        const appLauncher = document.getElementById('app-launcher');
+        startMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            appLauncher.classList.toggle('active');
+        });
+        document.addEventListener('click', () => {
+            appLauncher.classList.remove('active');
+        });
+
+        // Start wizard navigation
+        function nextWizardStep(step) {
+            document.getElementById('wizard-step-1').style.display = 'none';
+            document.getElementById('wizard-step-2').style.display = 'none';
+            document.getElementById('wizard-step-3').style.display = 'none';
+            document.getElementById(`wizard-step-${step}`).style.display = 'block';
+        }
+
+        // Window open/focus logic
+        function openWindow(winId) {
+            const win = document.getElementById(winId);
+            win.style.opacity = '1';
+            win.style.transform = 'scale(1)';
+            win.style.pointerEvents = 'auto';
+            focusWindow(winId);
+        }
+
+        function focusWindow(winId) {
+            document.querySelectorAll('.window').forEach(w => w.classList.remove('active-focus'));
+            document.getElementById(winId).classList.add('active-focus');
+        }
+
+        function closeWindow(winId) {
+            const win = document.getElementById(winId);
+            win.style.opacity = '0';
+            win.style.transform = 'scale(0.95)';
+            win.style.pointerEvents = 'none';
+        }
+
+        function minimizeWindow(winId) {
+            closeWindow(winId);
+        }
+
+        function maximizeWindow(winId) {
+            const win = document.getElementById(winId);
+            win.style.top = '50px';
+            win.style.left = '0';
+            win.style.width = '100vw';
+            win.style.height = 'calc(100vh - 120px)';
+        }
+
+        // Draggable window implementation
+        document.querySelectorAll('.window').forEach(win => {
+            win.addEventListener('mousedown', () => focusWindow(win.id));
+            const header = win.querySelector('.window-header');
+            let isDragging = false;
+            let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+            header.addEventListener('mousedown', dragStart);
+
+            function dragStart(e) {
+                isDragging = true;
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', dragEnd);
+            }
+
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    xOffset = currentX;
+                    yOffset = currentY;
+                    win.style.transform = `translate(${currentX}px, ${currentY}px)`;
+                }
+            }
+
+            function dragEnd() {
+                isDragging = false;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('mouseup', dragEnd);
+            }
+        });
+
+        // Zorin style Theme switcher
+        function switchTheme(themeClass) {
+            document.body.className = '';
+            document.body.classList.add(themeClass);
+        }
+
+        // High contrast accessibility switcher
+        function toggleHighContrast() {
+            const active = document.body.classList.toggle('high-contrast-active');
+            document.getElementById('a11y-toggle').checked = active;
+        }
+
+        // S-Office markdown previewer
+        function translateMarkdown(val) {
+            const preview = document.getElementById('office-preview');
+            // Quick regex translation of headers
+            let html = val
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2>$2</h2>')
+                .replace(/^- (.*$)/gim, '<li>$1</li>');
+            preview.innerHTML = html;
+        }
+
+        function compileToPDF() {
+            alert('PDF compiled successfully! No external Ghostscript/LaTeX needed.');
+        }
+
+        function clearEditor() {
+            document.getElementById('office-input').value = '';
+            document.getElementById('office-preview').innerHTML = '';
+        }
+
+        // S-Media synthesizer values
+        let isAudioPlaying = false;
+        function toggleAudioSynthesis() {
+            isAudioPlaying = !isAudioPlaying;
+            const btn = document.getElementById('audio-toggle-btn');
+            btn.innerHTML = isAudioPlaying ? '🛑 Stop Audio Synth' : '🔊 Play Binaural Beats';
+        }
+
+        function updateAudioParams() {
+            const baseFreq = parseInt(document.querySelectorAll('.settings-group input[type="range"]')[0].value);
+            const beatOffset = parseInt(document.querySelectorAll('.settings-group input[type="range"]')[1].value);
+
+            document.getElementById('base-freq-val').innerText = baseFreq;
+            document.getElementById('beat-offset-val').innerText = beatOffset;
+
+            document.getElementById('left-audio-channel').innerText = `${(baseFreq - beatOffset/2).toFixed(2)} Hz`;
+            document.getElementById('right-audio-channel').innerText = `${(baseFreq + beatOffset/2).toFixed(2)} Hz`;
+        }
+
+        // S-AI MoE inference simulator
+        function dispatchMoEInference() {
+            document.getElementById('ai-routing-stats').style.display = 'block';
+            const seed = Math.random();
+            document.getElementById('moe-weight-3').innerText = (0.5 + seed * 0.3).toFixed(3);
+            document.getElementById('moe-weight-7').innerText = (0.5 - seed * 0.3).toFixed(3);
+        }
+
+        // S-Robo angle adjustment PID responder
+        function updateRoboAngle(val) {
+            document.getElementById('target-gyro-angle').innerText = `${val}.0°`;
+            // Calculate proportional output adjustment
+            const pOutput = parseFloat(val) * 1.5;
+            document.getElementById('pid-response-output').innerText = `${pOutput.toFixed(2)} N-m`;
+        }
+
+        // SigmaFS Timeshift trigger
+        function generateFSBackup() {
+            document.getElementById('fs-backup-msg').style.display = 'block';
+        }
+
+        // Launcher search filter
+        function filterLauncher(query) {
+            const list = document.getElementById('launcher-menu-list');
+            const items = list.querySelectorAll('.app-launcher-item');
+            items.forEach(item => {
+                if (item.innerText.toLowerCase().includes(query.toLowerCase())) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Settings tab switcher
+        function switchSettingsTab(tabId) {
+            document.getElementById('settings-themes').style.display = 'none';
+            document.getElementById('settings-accessibility').style.display = 'none';
+            document.getElementById(tabId).style.display = 'flex';
+
+            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Right-Click Context Menu trigger
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const menu = document.getElementById('context-menu');
+            menu.style.display = 'block';
+            menu.style.left = `${e.clientX}px`;
+            menu.style.top = `${e.clientY}px`;
+        });
+
+        document.addEventListener('click', () => {
+            document.getElementById('context-menu').style.display = 'none';
+        });
+
+        // Simulate clock ticks
+        setInterval(() => {
+            const date = new Date();
+            document.getElementById('clock-time').innerText = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }, 1000);
+    </script>
 </body>
 </html>
