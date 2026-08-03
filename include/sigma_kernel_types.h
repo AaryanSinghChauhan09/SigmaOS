@@ -6,14 +6,16 @@ typedef unsigned short     sigma_u16;
 typedef unsigned int       sigma_u32;
 typedef unsigned long long sigma_u64;
 
-typedef unsigned long long sigma_size_t;
-typedef unsigned long long sigma_uptr;
+typedef signed char        sigma_s8;
+typedef signed short       sigma_s16;
+typedef signed int         sigma_s32;
+typedef signed long long   sigma_s64;
 
-typedef bool               sigma_bool;
-typedef int                sigma_status;
+typedef unsigned long      sigma_size_t;
+typedef unsigned long      sigma_uintptr_t;
 
-#define SIGMA_TRUE         true
-#define SIGMA_FALSE        false
-#define SIGMA_NULL         nullptr
+typedef int                sigma_bool;
+#define SIGMA_TRUE         1
+#define SIGMA_FALSE        0
 
 #endif // SIGMA_KERNEL_TYPES_H
