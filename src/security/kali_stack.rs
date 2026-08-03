@@ -159,6 +159,7 @@ impl SudoPrivilegeEscalation {
 }
 
 /// Tmux-inspired terminal pane session multiplexer
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TmuxPane {
     pub id: usize,
     pub width: usize,
@@ -167,15 +168,49 @@ pub struct TmuxPane {
 
 pub struct TmuxMultiplexer {
     pub panes: Vec<Option<TmuxPane>>,
+    pub session_name: [u8; 32],
+    pub is_attached: bool,
 }
 
 impl TmuxMultiplexer {
-    pub fn new() -> Self {
-        TmuxMultiplexer { panes: Vec::new() }
+    pub fn new(name: &[u8]) -> Self {
+        let mut name_arr = [0u8; 32];
+        let len = name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), len);
+        }
+        TmuxMultiplexer {
+            panes: Vec::new(),
+            session_name: name_arr,
+            is_attached: true,
+        }
     }
 
     pub fn split_window(&mut self, id: usize, width: usize, height: usize) {
         self.panes.push(Some(TmuxPane { id, width, height }));
+    }
+
+    /// Detach current tmux multiplexer session (tmux detach-client equivalent)
+    pub fn detach_session(&mut self) {
+        self.is_attached = false;
+    }
+
+    /// Attach a terminal to the session (tmux attach-session equivalent)
+    pub fn attach_session(&mut self) {
+        self.is_attached = true;
+    }
+
+    /// Swap two terminal pane layouts dynamically (tmux swap-pane equivalent)
+    pub fn swap_panes(&mut self, pane_a_idx: usize, pane_b_idx: usize) -> Result<(), KaliError> {
+        if pane_a_idx >= self.panes.len || pane_b_idx >= self.panes.len {
+            return Err(KaliError::SwapFailed);
+        }
+
+        let temp = self.panes[pane_a_idx];
+        self.panes[pane_a_idx] = self.panes[pane_b_idx];
+        self.panes[pane_b_idx] = temp;
+
+        Ok(())
     }
 }
 
@@ -380,9 +415,22 @@ mod tests {
 
     #[test]
     fn test_tmux_split() {
-        let mut tmux = TmuxMultiplexer::new();
+        let mut tmux = TmuxMultiplexer::new(b"admin-session");
         tmux.split_window(1, 100, 50);
         assert_eq!(tmux.panes.len, 1);
+
+        // Test attaching/detaching client terminal
+        assert!(tmux.is_attached);
+        tmux.detach_session();
+        assert!(!tmux.is_attached);
+        tmux.attach_session();
+        assert!(tmux.is_attached);
+
+        // Test swapping active panes
+        tmux.split_window(2, 200, 100);
+        assert!(tmux.swap_panes(0, 1).is_ok());
+        assert_eq!(tmux.panes[0].unwrap().id, 2);
+        assert_eq!(tmux.panes[1].unwrap().id, 1);
     }
 
     #[test]
