@@ -11,6 +11,7 @@ pub mod cachy_os;
 pub mod elf_execution;
 pub mod penetration_assistant;
 pub mod sssd;
+pub mod register_set;
 
 pub use endeavour::{
     EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
@@ -40,3 +41,4 @@ pub use cachy_os::{BoreSchedulerGovernor, SchedPolicy, AnanicyManager, V4Optimiz
 pub use elf_execution::{AslrGovernor, NoExecuteManager, DynamicSharedLibraryResolver, ImaSignatureVerifier};
 pub use penetration_assistant::{PenetrationAssistant, DefaultAssistant, Assessment, Severity};
 pub use sssd::{SssdDomain, OfflineCredentialCache, NssUserGroupResolver, HbacPolicyEngine};
+pub use register_set::{X86RegisterSet, FpuContextManager, DebugRegisterSet, ContextSwitchGovernor};
