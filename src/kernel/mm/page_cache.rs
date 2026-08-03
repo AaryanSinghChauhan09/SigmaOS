@@ -16,10 +16,10 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Page Cache — absorbs Linux mm/filemap.c and mm/page-writeback.c
 /// Caches file data in memory pages, tracks dirty pages, writeback pressure
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use std::vec::Vec;
 
 pub const PAGE_SIZE: usize = 4096;
@@ -32,6 +32,126 @@ pub enum PageStatus {
     Evicted,
 }
 
+/// Debian-inspired: Cache page priority tiers
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum PagePriority {
+    Low = 0,
+    Standard = 1,
+    High = 2,
+    Required = 3, // Sticky - protected from standard evictions
+}
+
+/// Clear Linux-inspired: Aggressive sequential read-ahead engine for high-throughput buffering
+#[derive(Debug, Clone)]
+pub struct ClearLinuxReadAheadEngine {
+    last_accessed_page: Option<u64>,
+    sequential_streak: usize,
+    pub prefetch_window: usize,
+}
+
+impl ClearLinuxReadAheadEngine {
+    pub fn new() -> Self {
+        Self {
+            last_accessed_page: None,
+            sequential_streak: 0,
+            prefetch_window: 2,
+        }
+    }
+
+    /// Updates sequential access tracking and returns desired prefetch count
+    pub fn on_access(&mut self, page_idx: u64) -> usize {
+        if let Some(last) = self.last_accessed_page {
+            if page_idx == last + 1 {
+                self.sequential_streak += 1;
+                // Scale prefetch aggressively for long sequential streaks
+                if self.sequential_streak > 5 {
+                    self.prefetch_window = 8;
+                } else if self.sequential_streak > 2 {
+                    self.prefetch_window = 4;
+                }
+            } else {
+                self.sequential_streak = 0;
+                self.prefetch_window = 2;
+            }
+        }
+        self.last_accessed_page = Some(page_idx);
+        self.prefetch_window
+    }
+}
+
+/// NixOS-inspired: Immutable hash-addressed page content deduplicator
+#[derive(Debug, Clone)]
+pub struct NixOSPageDeduplicator {
+    // Content hash -> list of (inode_id, page_idx)
+    hash_index: HashMap<u64, Vec<(u64, u64)>>,
+}
+
+impl NixOSPageDeduplicator {
+    pub fn new() -> Self {
+        Self {
+            hash_index: HashMap::new(),
+        }
+    }
+
+    /// Computes a fast FNV-1a hash of the page data
+    pub fn hash_page(data: &[u8; PAGE_SIZE]) -> u64 {
+        let mut hash: u64 = 14695981039346656037;
+        for &b in data {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(1099511628211);
+        }
+        hash
+    }
+
+    /// Registers a page in the index, returning true if a duplicate exists
+    pub fn register_page(&mut self, inode_id: u64, page_idx: u64, data: &[u8; PAGE_SIZE]) -> bool {
+        let h = Self::hash_page(data);
+        let entries = self.hash_index.entry(h).or_insert_with(Vec::new);
+        let exists = !entries.is_empty();
+        if !entries.contains(&(inode_id, page_idx)) {
+            entries.push((inode_id, page_idx));
+        }
+        exists
+    }
+
+    pub fn unregister_page(&mut self, inode_id: u64, page_idx: u64) {
+        for entries in self.hash_index.values_mut() {
+            entries.retain(|&k| k != (inode_id, page_idx));
+        }
+    }
+
+    pub fn deduplicated_pages_count(&self) -> usize {
+        let mut total = 0;
+        for entries in self.hash_index.values() {
+            if entries.len() > 1 {
+                total += entries.len() - 1;
+            }
+        }
+        total
+    }
+}
+
+/// SteamOS-inspired: Dynamic background write-buffering throttle to safeguard interactive latency
+#[derive(Debug, Clone)]
+pub struct SteamOSWritebackThrottle {
+    pub high_watermark: usize,
+    pub low_watermark: usize,
+}
+
+impl SteamOSWritebackThrottle {
+    pub fn new(high_watermark: usize, low_watermark: usize) -> Self {
+        Self {
+            high_watermark,
+            low_watermark,
+        }
+    }
+
+    /// Returns true if writeback is actively requested due to dirty page accumulation
+    pub fn should_throttle(&self, dirty_pages_count: usize) -> bool {
+        dirty_pages_count >= self.high_watermark
+    }
+}
+
 /// A single page in the cache
 #[derive(Debug)]
 pub struct CachedPage {
@@ -41,6 +161,7 @@ pub struct CachedPage {
     pub data: [u8; PAGE_SIZE],
     pub access_count: u32,
     pub pin_count: u32, // PTE references — cannot evict if > 0
+    pub priority: PagePriority, // Debian-inspired sticky priority pinning
 }
 
 impl CachedPage {
@@ -52,6 +173,7 @@ impl CachedPage {
             data: [0u8; PAGE_SIZE],
             access_count: 0,
             pin_count: 0,
+            priority: PagePriority::Standard,
         }
     }
 
@@ -72,7 +194,7 @@ impl CachedPage {
         }
     }
     pub fn can_evict(&self) -> bool {
-        self.pin_count == 0 && self.status != PageStatus::Writeback
+        self.pin_count == 0 && self.status != PageStatus::Writeback && self.priority != PagePriority::Required
     }
 }
 
@@ -85,6 +207,9 @@ pub struct PageCache {
     dirty_count: AtomicUsize,
     evictions: AtomicUsize,
     writeback_ops: AtomicUsize,
+    pub read_ahead: ClearLinuxReadAheadEngine,
+    pub deduplicator: NixOSPageDeduplicator,
+    pub throttle: SteamOSWritebackThrottle,
 }
 
 impl PageCache {
@@ -97,11 +222,17 @@ impl PageCache {
             dirty_count: AtomicUsize::new(0),
             evictions: AtomicUsize::new(0),
             writeback_ops: AtomicUsize::new(0),
+            read_ahead: ClearLinuxReadAheadEngine::new(),
+            deduplicator: NixOSPageDeduplicator::new(),
+            throttle: SteamOSWritebackThrottle::new(8, 2), // High watermark 8 dirty pages, low 2
         }
     }
 
     /// Look up a page in the cache
     pub fn lookup(&mut self, inode_id: u64, page_idx: u64) -> Option<&mut CachedPage> {
+        // Trigger Clear Linux prefetching heuristic on lookup
+        self.read_ahead.on_access(page_idx);
+
         if self.pages.contains_key(&(inode_id, page_idx)) {
             self.hits.fetch_add(1, Ordering::Relaxed);
             let p = self.pages.get_mut(&(inode_id, page_idx)).unwrap();
@@ -142,6 +273,14 @@ impl PageCache {
         page.mark_dirty();
         if was_clean {
             self.dirty_count.fetch_add(1, Ordering::Relaxed);
+        }
+
+        // NixOS-inspired hash-addressed deduplication registration
+        self.deduplicator.register_page(inode_id, page_idx, &page.data);
+
+        // SteamOS-inspired dynamic writeback throttle check
+        if self.throttle.should_throttle(self.dirty_pages()) {
+            self.writeback_all();
         }
     }
 
@@ -286,5 +425,81 @@ mod tests {
         assert_eq!(cache.hits(), 1);
         assert_eq!(cache.misses(), 1);
         assert!((cache.hit_rate() - 0.5).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_clear_linux_read_ahead() {
+        let mut engine = ClearLinuxReadAheadEngine::new();
+        // Default prefetch size on first access is 2
+        assert_eq!(engine.prefetch_window, 2);
+
+        // Access sequentially: page 0, then 1, 2, 3, 4, 5...
+        engine.on_access(0);
+        assert_eq!(engine.on_access(1), 2);
+        assert_eq!(engine.on_access(2), 2);
+
+        // High sequential streak should expand the window (Clear Linux prefetch heuristics)
+        engine.on_access(3); // streak = 3
+        assert_eq!(engine.prefetch_window, 4);
+
+        engine.on_access(4);
+        engine.on_access(5);
+        engine.on_access(6); // streak > 5
+        assert_eq!(engine.prefetch_window, 8);
+
+        // Mismatched access breaks sequential streak
+        assert_eq!(engine.on_access(100), 2);
+    }
+
+    #[test]
+    fn test_debian_priority_pinning() {
+        let mut cache = PageCache::new(2);
+
+        // Insert two pages, marking page 1 as PagePriority::Required (mission-critical)
+        cache.write_page(1, 0, 0, b"normal data");
+        cache.writeback_all();
+
+        cache.write_page(1, 1, 0, b"mission critical");
+        if let Some(page) = cache.lookup(1, 1) {
+            page.priority = PagePriority::Required;
+        }
+        cache.writeback_all();
+
+        // Since normal data has lower priority, inserting new data should evict page 0 (normal data) rather than page 1 (sticky critical)
+        cache.write_page(1, 2, 0, b"newer data");
+        cache.writeback_all();
+
+        // Page 1 must still exist in cache due to Required priority sticky pinning
+        assert!(cache.lookup(1, 1).is_some());
+    }
+
+    #[test]
+    fn test_nixos_page_deduplication() {
+        let mut dedup = NixOSPageDeduplicator::new();
+        let page_data1 = [0xAAu8; PAGE_SIZE];
+        let page_data2 = [0xAAu8; PAGE_SIZE]; // Identical page data
+        let page_data3 = [0x55u8; PAGE_SIZE]; // Distinct page data
+
+        // Register first page
+        let dup1 = dedup.register_page(1, 100, &page_data1);
+        assert!(!dup1);
+
+        // Register second page with identical content - NixOS deduplication should spot it!
+        let dup2 = dedup.register_page(1, 101, &page_data2);
+        assert!(dup2);
+        assert_eq!(dedup.deduplicated_pages_count(), 1);
+
+        // Register distinct third page
+        let dup3 = dedup.register_page(1, 102, &page_data3);
+        assert!(!dup3);
+        assert_eq!(dedup.deduplicated_pages_count(), 1);
+    }
+
+    #[test]
+    fn test_steamos_writeback_throttle() {
+        let throttle = SteamOSWritebackThrottle::new(4, 1);
+        assert!(!throttle.should_throttle(2));
+        assert!(throttle.should_throttle(4));
+        assert!(throttle.should_throttle(5));
     }
 }
