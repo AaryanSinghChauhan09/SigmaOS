@@ -57,6 +57,7 @@ The following matrix showcases the operational status and code files for every s
 | **Secure ELF Execution**| 🟢 **100% Working**| `src/compatibility/elf_execution.rs`      | ASLR base loader, DEP No-Execute page policies, dynamic shared library .so resolver, IMA signatures. |
 | **Penetration Assistant**| 🟢 **100% Working**| `src/compatibility/penetration_assistant.rs`| Minimal, safe, and deterministic default no-op assessment and remediation manager. |
 | **SSSD Identity Services**| 🟢 **100% Working**| `src/compatibility/sssd.rs`                 | Multi-domain AD/LDAP failover, offline credential hash caching, NSS UID/GID resolver, HBAC engine. |
+| **Systemd-Grade Init**  | 🟢 **100% Working**| `src/init/systemd_init.rs`                  | Wants/Requires dependencies, topological boot ordering, RestartPolicy auto-recovery, analyze blame. |
 
 ---
 
