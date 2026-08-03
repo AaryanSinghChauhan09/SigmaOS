@@ -213,13 +213,6 @@ impl PrivacyFirstSandbox {
     pub const fn new() -> Self {
         Self { is_sandboxed: true }
     }
-}
-
-impl Default for PrivacyFirstSandbox {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
     /// Secure capability check and post-quantum handshake logic validation
     pub fn validate_and_execute_secure_call(
@@ -233,6 +226,12 @@ impl Default for PrivacyFirstSandbox {
 
         // Post-Quantum Kyber-1024 token bitmask validation
         (token.bits() & required_mask) == required_mask
+    }
+}
+
+impl Default for PrivacyFirstSandbox {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
