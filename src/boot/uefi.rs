@@ -1,23 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
@@ -49,7 +31,6 @@ pub struct SimpleUEFIBootloader {
 }
 
 impl SimpleUEFIBootloader {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleUEFIBootloader {
             phase: AtomicUsize::new(BootPhase::Init as usize),
@@ -103,7 +84,6 @@ pub struct SimpleSecureBoot {
 }
 
 impl SimpleSecureBoot {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let default_cert = UefiCertificate {
             key_id: 1001,
@@ -200,7 +180,6 @@ impl SecureBoot for SimpleSecureBoot {
 pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     pub fn push(&mut self, item: T) {
         unsafe {
@@ -310,7 +289,6 @@ pub struct MultiKernelBootSelector {
 }
 
 impl MultiKernelBootSelector {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current_profile: MicrokernelProfile::Performance,
@@ -347,7 +325,6 @@ pub struct SovereignBootWatchdog {
 }
 
 impl SovereignBootWatchdog {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             counter: AtomicUsize::new(0),
