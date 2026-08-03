@@ -1,41 +1,20 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+#![no_std]
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
-use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 62: Mandatory access control
-use core::ptr::{self, NonNull};
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Security context ID
 pub type ContextID = usize;
 
 /// Security level
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SecurityLevel {
     Low = 0,
@@ -45,8 +24,8 @@ pub enum SecurityLevel {
 }
 
 /// Security domain
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityDomain {
     System = 0,
     User = 1,
@@ -57,6 +36,7 @@ pub enum SecurityDomain {
 
 /// Security context (OOP: Context object)
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SecurityContext {
     pub id: ContextID,
     pub level: SecurityLevel,
@@ -66,7 +46,7 @@ pub struct SecurityContext {
 
 /// Context capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContextCapability {
     pub can_read: bool,
     pub can_write: bool,
@@ -74,7 +54,6 @@ pub struct ContextCapability {
 }
 
 impl ContextCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ContextCapability {
             can_read: false,
@@ -89,6 +68,12 @@ impl ContextCapability {
             can_write: true,
             can_execute: true,
         }
+    }
+}
+
+impl Default for ContextCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -117,8 +102,8 @@ pub trait MACPolicy {
 }
 
 /// Security operation
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityOperation {
     Read = 0,
     Write = 1,
@@ -130,10 +115,11 @@ pub enum SecurityOperation {
 
 /// Policy info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PolicyInfo {
-    policy_type: PolicyType,
-    strictness: SecurityLevel,
-    capability: PolicyCapability,
+    pub policy_type: PolicyType,
+    pub strictness: SecurityLevel,
+    pub capability: PolicyCapability,
 }
 
 impl PolicyInfo {
@@ -147,8 +133,8 @@ impl PolicyInfo {
 }
 
 /// Policy type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PolicyType {
     MLS = 0,  // Multi-Level Security
     Biba = 1, // Integrity
@@ -158,14 +144,13 @@ pub enum PolicyType {
 
 /// Policy capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PolicyCapability {
     pub can_enforce: bool,
     pub can_modify: bool,
 }
 
 impl PolicyCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PolicyCapability {
             can_enforce: false,
@@ -181,8 +166,13 @@ impl PolicyCapability {
     }
 }
 
+impl Default for PolicyCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// MLS policy (OOP: Concrete policy class)
-#[repr(C)]
 pub struct MLSPolicy {
     pub policy_type: PolicyType,
     pub strictness: SecurityLevel,
@@ -253,8 +243,8 @@ pub trait MACEngine {
 }
 
 /// MAC error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MACError {
     Success = 0,
     PolicyNotFound = 1,
@@ -265,7 +255,7 @@ pub enum MACError {
 
 /// MAC statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -274,7 +264,6 @@ pub struct MACStats {
 }
 
 impl MACStats {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         MACStats {
             total_policies: 0,
@@ -285,21 +274,24 @@ impl MACStats {
     }
 }
 
+impl Default for MACStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple MAC engine (OOP: Concrete engine class)
 pub struct SimpleMACEngine {
-    policies: Vec<Option<Box<dyn MACPolicy>>>,
-    contexts: Vec<Option<SecurityContext>>,
-    next_context_id: AtomicUsize,
-    total_policies: AtomicUsize,
-    total_contexts: AtomicUsize,
-    access_checks: AtomicUsize,
-    access_denied: AtomicUsize,
-    capability: EngineCapability,
+    pub policies: Vec<Option<Box<dyn MACPolicy>>>,
+    pub contexts: Vec<Option<SecurityContext>>,
+    pub next_context_id: AtomicUsize,
+    pub stats: core::cell::RefCell<MACStats>,
+    pub capability: EngineCapability,
 }
 
 /// Engine capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct EngineCapability {
     pub can_register_policies: bool,
     pub can_create_contexts: bool,
@@ -307,7 +299,6 @@ pub struct EngineCapability {
 }
 
 impl EngineCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EngineCapability {
             can_register_policies: false,
@@ -331,17 +322,14 @@ impl SimpleMACEngine {
             policies: Vec::new(),
             contexts: Vec::new(),
             next_context_id: AtomicUsize::new(1),
-            total_policies: AtomicUsize::new(0),
-            total_contexts: AtomicUsize::new(0),
-            access_checks: AtomicUsize::new(0),
-            access_denied: AtomicUsize::new(0),
+            stats: core::cell::RefCell::new(MACStats::new()),
             capability,
         }
     }
 
-    unsafe fn get_context(&self, id: ContextID) -> Option<&SecurityContext> {
-        for i in 0..self.contexts.len() {
-            if let Some(Some(ref context)) = self.contexts.get(i) {
+    pub fn get_context(&self, id: ContextID) -> Option<&SecurityContext> {
+        for context_option in &self.contexts {
+            if let Some(ref context) = *context_option {
                 if context.id == id {
                     return Some(context);
                 }
@@ -359,7 +347,9 @@ impl MACEngine for SimpleMACEngine {
 
         let id = self.policies.len();
         self.policies.push(Some(policy));
-        self.total_policies.fetch_add(1, Ordering::SeqCst);
+        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+            stats.total_policies += 1;
+        }
         Ok(id)
     }
 
@@ -369,10 +359,10 @@ impl MACEngine for SimpleMACEngine {
         }
 
         if id < self.policies.len() {
-            if let Some(slot) = self.policies.get_mut(id) {
-                *slot = None;
+            self.policies[id] = None;
+            if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                stats.total_policies -= 1;
             }
-            self.total_policies.fetch_sub(1, Ordering::SeqCst);
             Ok(())
         } else {
             Err(MACError::PolicyNotFound)
@@ -392,7 +382,9 @@ impl MACEngine for SimpleMACEngine {
         let id = self.next_context_id.fetch_add(1, Ordering::SeqCst);
         let context = SecurityContext::new(id, level, domain, capability);
         self.contexts.push(Some(context));
-        self.total_contexts.fetch_add(1, Ordering::SeqCst);
+        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+            stats.total_contexts += 1;
+        }
         Ok(id)
     }
 
@@ -402,8 +394,8 @@ impl MACEngine for SimpleMACEngine {
         }
 
         let mut index = None;
-        for i in 0..self.contexts.len() {
-            if let Some(Some(ref context)) = self.contexts.get(i) {
+        for (i, context_option) in self.contexts.iter().enumerate() {
+            if let Some(ref context) = *context_option {
                 if context.id == id {
                     index = Some(i);
                     break;
@@ -412,10 +404,10 @@ impl MACEngine for SimpleMACEngine {
         }
 
         if let Some(i) = index {
-            if let Some(slot) = self.contexts.get_mut(i) {
-                *slot = None;
+            self.contexts[i] = None;
+            if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                stats.total_contexts -= 1;
             }
-            self.total_contexts.fetch_sub(1, Ordering::SeqCst);
             Ok(())
         } else {
             Err(MACError::ContextNotFound)
@@ -423,61 +415,82 @@ impl MACEngine for SimpleMACEngine {
     }
 
     fn check_access(&self, context_id: ContextID, operation: SecurityOperation) -> bool {
-        self.access_checks.fetch_add(1, Ordering::SeqCst);
+        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+            stats.access_checks += 1;
+        }
 
         if !self.capability.can_enforce {
             return true;
         }
 
-        unsafe {
-            if let Some(context) = self.get_context(context_id) {
-                for i in 0..self.policies.len() {
-                    if let Some(Some(ref policy)) = self.policies.get(i) {
-                        if !policy.check(context, operation) {
-                            self.access_denied.fetch_add(1, Ordering::SeqCst);
-                            return false;
+        if let Some(context) = self.get_context(context_id) {
+            for policy_option in &self.policies {
+                if let Some(ref policy) = *policy_option {
+                    if !policy.check(context, operation) {
+                        if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                            stats.access_denied += 1;
                         }
+                        return false;
                     }
                 }
-                true
-            } else {
-                self.access_denied.fetch_add(1, Ordering::SeqCst);
-                false
             }
+            true
+        } else {
+            if let Ok(mut stats) = self.stats.try_borrow_mut() {
+                stats.access_denied += 1;
+            }
+            false
         }
     }
 
     fn stats(&self) -> MACStats {
-        MACStats {
-            total_policies: self.total_policies.load(Ordering::SeqCst),
-            total_contexts: self.total_contexts.load(Ordering::SeqCst),
-            access_checks: self.access_checks.load(Ordering::SeqCst) as u64,
-            access_denied: self.access_denied.load(Ordering::SeqCst) as u64,
-        }
+        *self.stats.borrow()
     }
 }
-
-pub use MACPolicy as MacPolicy;
-pub struct MacRule;
-pub struct MacSecurity;
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_simple_mac_engine() {
-        let cap = EngineCapability::full();
-        let mut engine = SimpleMACEngine::new(cap);
-        let ctx_id = engine.create_context(
-            SecurityLevel::Medium,
-            SecurityDomain::System,
-            ContextCapability::full(),
-        ).unwrap();
+    fn test_security_context_and_mls_policy() {
+        let capability = ContextCapability::full();
+        let context =
+            SecurityContext::new(1, SecurityLevel::Medium, SecurityDomain::User, capability);
+
+        assert_eq!(context.id, 1);
+        assert_eq!(context.level, SecurityLevel::Medium);
+        assert!(context.capability.can_read);
+
         let policy_cap = PolicyCapability::full();
         let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
+        assert!(policy.check(&context, SecurityOperation::Read));
+
+        let high_policy = MLSPolicy::new(SecurityLevel::High, policy_cap);
+        assert!(!high_policy.check(&context, SecurityOperation::Read));
+    }
+
+    #[test]
+    fn test_simple_mac_engine() {
+        let engine_cap = EngineCapability::full();
+        let mut engine = SimpleMACEngine::new(engine_cap);
+
+        let context_cap = ContextCapability::full();
+        let context_id = engine
+            .create_context(SecurityLevel::Medium, SecurityDomain::User, context_cap)
+            .unwrap();
+        assert_eq!(context_id, 1);
+
+        let policy_cap = PolicyCapability::full();
+        let policy = MLSPolicy::new(SecurityLevel::High, policy_cap);
         engine.register_policy(Box::new(policy)).unwrap();
 
-        assert!(engine.check_access(ctx_id, SecurityOperation::Read));
+        assert!(!engine.check_access(1, SecurityOperation::Read));
+
+        let stats = engine.stats();
+        assert_eq!(stats.total_contexts, 1);
+        assert_eq!(stats.total_policies, 1);
+        assert_eq!(stats.access_checks, 1);
+        assert_eq!(stats.access_denied, 1);
     }
 }

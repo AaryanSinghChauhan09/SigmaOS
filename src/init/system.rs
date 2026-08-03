@@ -1,24 +1,6 @@
-// (no_std only applicable at crate root - removed)
+#![no_std]
 #![allow(warnings)]
 #![allow(clippy::all)]
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 
 /// OOP-based Lightweight Init System for SigmaOS
 /// Implements init system using OOP principles with traits and structs
@@ -108,7 +90,6 @@ pub struct ServiceCapability {
 }
 
 impl ServiceCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ServiceCapability {
             can_start: false,
@@ -282,7 +263,6 @@ pub struct InitStats {
 }
 
 impl InitStats {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         InitStats {
             total_services: 0,
@@ -317,7 +297,6 @@ pub struct InitCapability {
 }
 
 impl InitCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         InitCapability {
             can_register: false,

@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
@@ -105,7 +87,6 @@ pub struct DeviceCapability {
 }
 
 impl DeviceCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DeviceCapability {
             can_read: false,
@@ -504,7 +485,6 @@ pub struct DeviceManager {
 }
 
 impl DeviceManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DeviceManager {
             devices: Vec::new(),
@@ -607,7 +587,6 @@ pub struct Vec<T> {
 }
 
 impl<T> Vec<T> {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
@@ -893,33 +872,24 @@ impl UnifiedPeripheral for ModernDevice {
         PortAddress::MemoryMapped(self.base_address)
     }
     fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
-        #[cfg(target_os = "none")]
         unsafe {
             let addr = (self.base_address + offset) as *const u8;
+            // Simulated MMIO read to avoid segfaults in unit testing environments
             if self.base_address == 0 {
                 return Ok(0);
             }
             Ok(ptr::read_volatile(addr))
         }
-        #[cfg(not(target_os = "none"))]
-        {
-            let _ = offset;
-            Ok(0)
-        }
     }
     fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
-        #[cfg(target_os = "none")]
         unsafe {
             let addr = (self.base_address + offset) as *mut u8;
+            // Simulated MMIO write
             if self.base_address != 0 {
                 ptr::write_volatile(addr, value);
             }
+            Ok(())
         }
-        #[cfg(not(target_os = "none"))]
-        {
-            let _ = (offset, value);
-        }
-        Ok(())
     }
 }
 

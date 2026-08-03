@@ -1,23 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // GDT, IDT, and VGA Text Buffer architectures for SigmaOS
-// Integrates core bare-metal concepts from phil-opp/blog_os under `// #![no_std]  // crate-root only`.
+// Integrates core bare-metal concepts from phil-opp/blog_os under `#![no_std]`.
 
 extern crate alloc;
 
@@ -35,7 +17,6 @@ pub struct TaskStateSegment {
 }
 
 impl TaskStateSegment {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             interrupt_stack_table: [0; 7],
@@ -50,7 +31,6 @@ pub struct GDT {
 }
 
 impl GDT {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             code_selector: 8,
@@ -86,7 +66,6 @@ pub struct IDT {
 }
 
 impl IDT {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             divide_by_zero_handler: None,
@@ -163,7 +142,6 @@ pub struct VGATextBuffer {
 }
 
 impl VGATextBuffer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             buffer: [[ScreenChar {
