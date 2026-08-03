@@ -459,7 +459,9 @@ impl SmartSymlink {
         time_manager: Option<&SmartSymlink>,
     ) -> Result<&'static str, &'static str> {
         if time_manager.is_some() {
-            return Err("ELOOP: Infinite loop or excessive recursion detected in symlink path resolution.");
+            return Err(
+                "ELOOP: Infinite loop or excessive recursion detected in symlink path resolution.",
+            );
         }
         if rule.is_legacy() {
             return Ok("/usr/lib/legacy/libc.so");

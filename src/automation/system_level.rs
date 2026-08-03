@@ -501,7 +501,8 @@ mod tests {
     #[test]
     fn test_prediction_generation() {
         let mut manager = SystemAutomationManager::new();
-        let context = HashMap::from([("cpu_usage".to_string(), 75.0)]);
+        let mut context = HashMap::new();
+        context.insert("cpu_usage".to_string(), 75.0);
         let prediction = manager.generate_prediction(PredictiveModel::UsagePattern, &context);
         assert_eq!(prediction.model_type, PredictiveModel::UsagePattern);
     }

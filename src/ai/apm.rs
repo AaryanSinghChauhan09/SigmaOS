@@ -90,7 +90,8 @@ impl ApmLockfile {
     }
 
     pub fn pin_dependency(&mut self, name: &str, hash: &str) {
-        self.pinned_dependencies.insert(name.to_string(), hash.to_string());
+        self.pinned_dependencies
+            .insert(name.to_string(), hash.to_string());
     }
 }
 
@@ -104,7 +105,10 @@ pub struct ApmPolicy {
 impl ApmPolicy {
     pub fn enterprise_default() -> Self {
         Self {
-            allowed_sources: vec![DependencySource::GitHub, DependencySource::SovereignRegistry],
+            allowed_sources: vec![
+                DependencySource::GitHub,
+                DependencySource::SovereignRegistry,
+            ],
             allow_transitive_mcp: false,
             trusted_mcp_servers: vec![
                 "io.github.microsoft/playwright-mcp".to_string(),
@@ -239,13 +243,25 @@ mod tests {
         engine.lockfile = Some(lockfile);
 
         let mut actual_hashes = HashMap::new();
-        actual_hashes.insert("frontend-design".to_string(), "sha256_hash_123456".to_string());
+        actual_hashes.insert(
+            "frontend-design".to_string(),
+            "sha256_hash_123456".to_string(),
+        );
 
-        assert_eq!(engine.verify_reproducibility(&actual_hashes), ApmStatus::Success);
+        assert_eq!(
+            engine.verify_reproducibility(&actual_hashes),
+            ApmStatus::Success
+        );
 
         // Mismatched hash simulation
-        actual_hashes.insert("frontend-design".to_string(), "sha256_hash_forged".to_string());
-        assert_eq!(engine.verify_reproducibility(&actual_hashes), ApmStatus::LockMismatch);
+        actual_hashes.insert(
+            "frontend-design".to_string(),
+            "sha256_hash_forged".to_string(),
+        );
+        assert_eq!(
+            engine.verify_reproducibility(&actual_hashes),
+            ApmStatus::LockMismatch
+        );
     }
 
     #[test]
@@ -253,11 +269,18 @@ mod tests {
         let engine = SovereignApmEngine::new(ApmPolicy::enterprise_default());
 
         // Safe prompt
-        let safe_prompt = "Act as an expert Rust systems programmer and compile the modular VFS layer.";
-        assert_eq!(engine.scan_unicode_vulnerability(safe_prompt), ApmStatus::Success);
+        let safe_prompt =
+            "Act as an expert Rust systems programmer and compile the modular VFS layer.";
+        assert_eq!(
+            engine.scan_unicode_vulnerability(safe_prompt),
+            ApmStatus::Success
+        );
 
         // Unsafe prompt with hidden RTL override character (U+202E) used to trick coding models
         let unsafe_prompt = "Act as an expert \u{202E} systems programmer.";
-        assert_eq!(engine.scan_unicode_vulnerability(unsafe_prompt), ApmStatus::UnsafeUnicodeDetected);
+        assert_eq!(
+            engine.scan_unicode_vulnerability(unsafe_prompt),
+            ApmStatus::UnsafeUnicodeDetected
+        );
     }
 }
