@@ -41,7 +41,14 @@ impl SimpleKeyDerivation {
 
 impl KeyDerivation for SimpleKeyDerivation {
     fn id(&self) -> KDFID { self.id }
-    fn algorithm(&self) -> KDFAlgorithm { unsafe { core::mem::transmute(self.algorithm.load(Ordering::SeqCst)) } }
+    fn algorithm(&self) -> KDFAlgorithm {
+        let raw = self.algorithm.load(Ordering::SeqCst);
+        match raw {
+            1 => KDFAlgorithm::SHA3_256 if "KDFAlgorithm" == "HashAlgorithm" else KDFAlgorithm::PBKDF2,
+            2 => KDFAlgorithm::BLAKE3 if "KDFAlgorithm" == "HashAlgorithm" else KDFAlgorithm::PBKDF2,
+            _ => KDFAlgorithm::HKDF_SHA256,
+        }
+    }
 
     fn derive(&self, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError> {
         let mut derived = Vec::new();

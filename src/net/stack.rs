@@ -3,7 +3,7 @@
 extern crate alloc;
 use alloc::vec::Vec;
 
-use crate::kernel::vfs::inode::FsError;
+use crate::filesystem::FsError;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {

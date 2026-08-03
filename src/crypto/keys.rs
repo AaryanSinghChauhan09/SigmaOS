@@ -51,7 +51,14 @@ impl SimpleKey {
 impl Key for SimpleKey {
     fn id(&self) -> KeyID { self.id }
     fn key_type(&self) -> KeyType { self.key_type }
-    fn state(&self) -> KeyState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> KeyState {
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
+            1 => KeyState::Revoked,
+            2 => KeyState::Expired,
+            _ => KeyState::Active,
+        }
+    }
     fn revoke(&mut self) { self.state.store(KeyState::Revoked as usize, Ordering::SeqCst); }
 }
 

@@ -69,12 +69,12 @@ impl WindowNode {
     }
 }
 
-pub struct ZenithCompositor {
+pub struct WaylandZenithCompositor {
     pub windows: Vec<Option<WindowNode>>,
     pub active_window_id: Option<u32>,
 }
 
-impl ZenithCompositor {
+impl WaylandZenithCompositor {
     pub fn new() -> Self {
         Self {
             windows: Vec::new(),
@@ -179,7 +179,7 @@ impl ZenithCompositor {
     }
 }
 
-impl Default for ZenithCompositor {
+impl Default for WaylandZenithCompositor {
     fn default() -> Self {
         Self::new()
     }
@@ -223,7 +223,7 @@ mod tests {
 
     #[test]
     fn test_compositor_register() {
-        let mut compositor = ZenithCompositor::new();
+        let mut compositor = WaylandZenithCompositor::new();
         let window = WindowNode::new(1, "Test".to_string(), 0, 0, 800, 600);
 
         compositor.register_window(window).unwrap();
@@ -232,7 +232,7 @@ mod tests {
 
     #[test]
     fn test_compositor_activate() {
-        let mut compositor = ZenithCompositor::new();
+        let mut compositor = WaylandZenithCompositor::new();
         let window1 = WindowNode::new(1, "Test1".to_string(), 0, 0, 800, 600);
         let window2 = WindowNode::new(2, "Test2".to_string(), 100, 100, 800, 600);
 
@@ -250,7 +250,7 @@ mod tests {
 
     #[test]
     fn test_compositor_minimize() {
-        let mut compositor = ZenithCompositor::new();
+        let mut compositor = WaylandZenithCompositor::new();
         let window = WindowNode::new(1, "Test".to_string(), 0, 0, 800, 600);
 
         compositor.register_window(window).unwrap();
@@ -266,7 +266,7 @@ mod tests {
 
     #[test]
     fn test_compositor_remove() {
-        let mut compositor = ZenithCompositor::new();
+        let mut compositor = WaylandZenithCompositor::new();
         let window = WindowNode::new(1, "Test".to_string(), 0, 0, 800, 600);
 
         compositor.register_window(window).unwrap();
@@ -279,7 +279,7 @@ mod tests {
 
     #[test]
     fn test_get_window_at_point() {
-        let mut compositor = ZenithCompositor::new();
+        let mut compositor = WaylandZenithCompositor::new();
         let window1 = WindowNode::new(1, "Test1".to_string(), 0, 0, 800, 600);
         let window2 = WindowNode::new(2, "Test2".to_string(), 400, 300, 800, 600);
 
@@ -293,7 +293,7 @@ mod tests {
 
     #[test]
     fn test_window_limit() {
-        let mut compositor = ZenithCompositor::new();
+        let mut compositor = WaylandZenithCompositor::new();
 
         for i in 0..32 {
             let window = WindowNode::new(i, format!("Window {}", i), 0, 0, 800, 600);

@@ -527,4 +527,35 @@ impl ObservabilityStack for SimpleObservabilityStack {
     }
 }
 
-/// Simple Vec implementation for no_std
+// Simple Vec implementation for no_std
+
+pub trait SigmaDebug {
+    fn debug_dump(&self) -> alloc::string::String;
+}
+
+pub trait SigmaMetrics {
+    fn collect_metrics(&self) -> ObservabilityStats;
+}
+
+pub trait SigmaTrace {
+    fn trace_event(&self, event: &str);
+}
+
+pub struct SimpleSigmaDebug;
+impl SigmaDebug for SimpleSigmaDebug {
+    fn debug_dump(&self) -> alloc::string::String {
+        alloc::string::String::from("SimpleSigmaDebug dump")
+    }
+}
+
+pub struct SimpleSigmaMetrics;
+impl SigmaMetrics for SimpleSigmaMetrics {
+    fn collect_metrics(&self) -> ObservabilityStats {
+        ObservabilityStats::new()
+    }
+}
+
+pub struct SimpleSigmaTrace;
+impl SigmaTrace for SimpleSigmaTrace {
+    fn trace_event(&self, _event: &str) {}
+}

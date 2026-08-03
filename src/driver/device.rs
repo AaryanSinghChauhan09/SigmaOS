@@ -146,9 +146,6 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-<<<<<<< HEAD
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-=======
         {
             let raw = self.state.load(Ordering::SeqCst) as u32;
             match raw {
@@ -160,7 +157,6 @@ impl DeviceDescriptor {
                 _ => DeviceState::Uninitialized,
             }
         }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     }
 
     pub fn set_state(&self, state: DeviceState) {
@@ -549,12 +545,14 @@ impl DeviceManager {
 }
 
 /// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -605,6 +603,7 @@ impl<T> Vec<T> {
 }
 
 // External allocator functions
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
@@ -636,4 +635,16 @@ impl DdeDeviceWrapper {
             simulated_pci_bar: [0u8; 256],
         }
     }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
 }

@@ -17,6 +17,12 @@ pub enum HidTokenType { Keyboard, Mouse, Joystick }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrinterFormat { Text, PostScript, Pdf }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HidTokenType { Keyboard, Mouse, Joystick }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrinterFormat { Text, PostScript, Pdf }
+
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 // ============================================================================

@@ -2,14 +2,13 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
-<<<<<<< HEAD
-=======
 pub mod audio;
-pub mod ai;
 pub mod fs;
 pub mod net;
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub mod automation;
+pub mod finance;
+pub mod governance;
+pub mod iso;
 pub mod compatibility;
 pub mod container;
 pub mod customization;
@@ -37,6 +36,20 @@ pub mod graphics {
     pub mod compositor;
     pub mod paint;
     pub mod video;
+    pub mod zenith;
+    pub mod zenith_compositor;
+    pub mod image_decoder;
+    pub mod gpu_driver;
+
+    pub use compositor::{
+        BitmapSurface, Color, Compositor, CompositorResult, CompositorStrategy, FramebufferCompositor,
+        LayerBlendMode, Position, Rectangle, RenderLayer, SigmaCompositor, SimpleCompositor,
+        SimpleWindow, Size, Surface, Window,
+    };
+    pub use zenith::*;
+    pub use zenith_compositor::*;
+    pub use image_decoder::*;
+    pub use gpu_driver::*;
 }
 pub mod hardware {
     pub mod compatibility;
@@ -56,12 +69,8 @@ pub mod toolchain {
     pub mod codex;
     pub mod bootstrap;
 }
-pub mod scheduler {
-    pub mod numa_scheduler;
-}
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
+pub mod scheduler;
+pub mod crypto;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -104,19 +113,6 @@ pub use drivers::{
     VesaModeInfo,
 };
 pub use filesystem::{
-<<<<<<< HEAD
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
-};
-pub use kernel::{
-    ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
-    Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
-    KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver, NetPod,
-    PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
-    ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
-    Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
-    UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
-    IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
-=======
     DagNode, FileDescriptor, FilePermissions, FileType, FsError, HashId, Inode, SigmaFS,
     VirtualFilesystem,
 };
@@ -142,7 +138,7 @@ pub use graphics::{
     FramebufferCompositor, Geometry, GpuDevice, GpuDriver as GraphicsGpuDriver, GpuState, GpuVendor, HighContrastMode,
     ImageDecoder, ImageFormat, ImageMetadata, LayerBlendMode, LayoutStyle, Magnifier, Panel,
     PanelOrientation, PixelFormat, RenderLayer, ScreenReader, SigmaCompositor, Widget, WindowNode,
-    WindowState, ZenithCompositor, ZenithCompositor as WaylandZenithCompositor, SCREEN_HEIGHT,
+    WindowState, ZenithCompositor, WaylandZenithCompositor, SCREEN_HEIGHT,
     SCREEN_WIDTH,
 };
 pub use iso::builder::{
@@ -166,14 +162,8 @@ pub use kernel::{
     SlabCacheStats, SlabState, SocketDomain, SocketHandle, SocketProtocol, SocketType,
     SovereignCompilerOptimizer, SovereignIpcBus, SovereignSignal, UdfSchedVm, WatchdogAction,
     WatchdogDevice, WatchdogManager, WatchdogState, ZeroCopyQueue, PAGE_SIZE,
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 };
 pub use network::{
-<<<<<<< HEAD
-    compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
-    RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
-    ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
-=======
     DnsError, DnsResolver, MDnsDiscovery,
     QuicConnection, QuicError,
     TcpConnection, TcpError, TcpSegment, TcpStack, TcpState, ZeroCopyPacketRing,
@@ -183,7 +173,6 @@ pub use net::{
     BrowserTab, BrowserTabState, CipherSuite, SovereignBrowser, TabCapabilities, TabContainer, TabState, TrackingProtection,
     NetworkDriverDevice, NetworkDriverManager, NetworkDriverType, NetworkError as ZenithNetworkError, NetworkPacketFrame, RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable, Rtl8139NetworkDriver, SecurityLevel, SecurityProfile,
     TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion,
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
@@ -197,7 +186,7 @@ pub use distro::{
     ForumChannel, ForumPost, HelpSystem, HowToGuide, ManPage, WikiPage,
     DllLoader, DllModule, GdiObjectType, LinuxSyscall, PosixTranslation, RegistryType,
     RegistryValue, Win32Gdi, WindowsRegistry,
-    BuildJob, BuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
+    BuildJob, BuildStatus as DistroBuildStatus, CrossBuildPipeline, DevTool, DeveloperToolkit, PackageBuildService,
     TargetArch,
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
     ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings,
@@ -233,14 +222,11 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-<<<<<<< HEAD
-=======
 pub use scheduler::{
     ComputeUnit, EevdfScheduler, Priority as ShellPriority,
     SInitSupervisor, Scheduler as ShellScheduler,
     SchedulerError as ShellSchedulerError, Service, ServiceState, SimpleThread, Task, TaskState, Thread, ThreadID, ThreadState,
 };
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
