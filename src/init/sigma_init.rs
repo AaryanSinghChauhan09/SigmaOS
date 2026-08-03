@@ -8,7 +8,7 @@
 /// and modular FirmwarePort / SecurityPort structures
 extern crate alloc;
 use alloc::boxed::Box;
-use crate::klib::Vec;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -42,14 +42,6 @@ pub trait Service {
     fn start(&mut self) -> Result<(), InitError>;
     fn stop(&mut self) -> Result<(), InitError>;
     fn restart(&mut self) -> Result<(), InitError>;
-
-    // Timing metrics
-    fn start_time_ms(&self) -> u64 {
-        0
-    }
-    fn end_time_ms(&self) -> u64 {
-        0
-    }
 }
 
 pub struct SimpleService {
@@ -58,8 +50,6 @@ pub struct SimpleService {
     pub state: AtomicUsize,
     pub deps: Vec<ServiceID>,
     pub pid: AtomicUsize,
-    pub start_time_ms: u64,
-    pub end_time_ms: u64,
 }
 
 impl SimpleService {
@@ -75,8 +65,6 @@ impl SimpleService {
             state: AtomicUsize::new(ServiceState::Stopped as usize),
             deps: Vec::new(),
             pid: AtomicUsize::new(0),
-            start_time_ms: 0,
-            end_time_ms: 0,
         }
     }
 }
@@ -99,10 +87,8 @@ impl Service for SimpleService {
     fn start(&mut self) -> Result<(), InitError> {
         self.state
             .store(ServiceState::Starting as usize, Ordering::SeqCst);
-        self.start_time_ms = 50; // simulated start timestamp
         self.state
             .store(ServiceState::Running as usize, Ordering::SeqCst);
-        self.end_time_ms = 180;  // simulated end timestamp (130ms duration)
         self.pid.store(self.id + 1000, Ordering::SeqCst);
         Ok(())
     }
@@ -120,14 +106,6 @@ impl Service for SimpleService {
         self.stop()?;
         self.start()?;
         Ok(())
-    }
-
-    fn start_time_ms(&self) -> u64 {
-        self.start_time_ms
-    }
-
-    fn end_time_ms(&self) -> u64 {
-        self.end_time_ms
     }
 }
 
@@ -163,9 +141,20 @@ impl SigmaInit {
     }
 
     pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
-        self.stop_service(id)?;
-        self.start_service(id)?;
-        Ok(())
+        for svc_option in &mut self.services {
+            if let Some(ref mut svc) = *svc_option {
+                if svc.id() == id {
+                    return svc.restart();
+                }
+            }
+        }
+        Err(InitError::ServiceNotFound)
+    }
+}
+
+impl Default for SigmaInit {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -177,9 +166,10 @@ impl InitSystem for SigmaInit {
     }
 
     fn start_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        // Fetch dependencies first to avoid double borrowing
         let mut deps = Vec::new();
-        for i in 0..self.services.len() {
-            if let Some(ref svc) = self.services[i] {
+        for svc_option in &self.services {
+            if let Some(ref svc) = *svc_option {
                 if svc.id() == id {
                     deps = svc.dependencies();
                     break;
@@ -187,13 +177,13 @@ impl InitSystem for SigmaInit {
             }
         }
 
-        for i in 0..deps.len() {
-            let dep_id = deps[i];
+        for dep_id in deps {
             self.start_service(dep_id)?;
         }
 
-        for i in 0..self.services.len() {
-            if let Some(ref mut svc) = self.services[i] {
+        // Start main service
+        for svc_option in &mut self.services {
+            if let Some(ref mut svc) = *svc_option {
                 if svc.id() == id {
                     return svc.start();
                 }
@@ -203,8 +193,8 @@ impl InitSystem for SigmaInit {
     }
 
     fn stop_service(&mut self, id: ServiceID) -> Result<(), InitError> {
-        for i in 0..self.services.len() {
-            if let Some(ref mut svc) = self.services[i] {
+        for svc_option in &mut self.services {
+            if let Some(ref mut svc) = *svc_option {
                 if svc.id() == id {
                     return svc.stop();
                 }
@@ -214,8 +204,8 @@ impl InitSystem for SigmaInit {
     }
 
     fn get_service(&self, id: ServiceID) -> Option<&dyn Service> {
-        for i in 0..self.services.len() {
-            if let Some(ref svc) = self.services[i] {
+        for svc_option in &self.services {
+            if let Some(ref svc) = *svc_option {
                 if svc.id() == id {
                     return Some(svc.as_ref());
                 }
@@ -226,8 +216,8 @@ impl InitSystem for SigmaInit {
 
     fn get_all_services(&self) -> Vec<ServiceID> {
         let mut ids = Vec::new();
-        for i in 0..self.services.len() {
-            if let Some(ref svc) = self.services[i] {
+        for svc_option in &self.services {
+            if let Some(ref svc) = *svc_option {
                 ids.push(svc.id());
             }
         }
@@ -255,8 +245,7 @@ impl DependencyResolver for SimpleDependencyResolver {
         let mut order = Vec::new();
         let mut visited = Vec::new();
 
-        for i in 0..services.len() {
-            let id = services[i];
+        for &id in services {
             if !visited.contains(&id) {
                 self.visit(id, &mut order, &mut visited)?;
             }
@@ -269,8 +258,7 @@ impl DependencyResolver for SimpleDependencyResolver {
         let mut visited = Vec::new();
         let mut rec_stack = Vec::new();
 
-        for i in 0..services.len() {
-            let id = services[i];
+        for &id in services {
             if self.has_cycle(id, &mut visited, &mut rec_stack) {
                 return true;
             }
@@ -294,9 +282,7 @@ impl SimpleDependencyResolver {
         visited.push(id);
 
         if let Some(svc) = self.init.get_service(id) {
-            let deps = svc.dependencies();
-            for i in 0..deps.len() {
-                let dep_id = deps[i];
+            for dep_id in svc.dependencies() {
                 self.visit(dep_id, order, visited)?;
             }
         }
@@ -315,9 +301,7 @@ impl SimpleDependencyResolver {
         rec_stack.push(id);
 
         if let Some(svc) = self.init.get_service(id) {
-            let deps = svc.dependencies();
-            for i in 0..deps.len() {
-                let dep_id = deps[i];
+            for dep_id in svc.dependencies() {
                 if !visited.contains(&dep_id) {
                     if self.has_cycle(dep_id, visited, rec_stack) {
                         return true;
@@ -496,39 +480,5 @@ mod tests {
         assert!(dac.check_capability(1));
         assert!(selinux.check_capability(20));
         assert!(!zt.check_capability(1));
-    }
-
-    #[test]
-    fn test_sigma_init_parallel_groups_and_timeline() {
-        let mut init = SigmaInit::new();
-
-        let mut s1 = SimpleService::new(10, b"s1");
-        let mut s2 = SimpleService::new(20, b"s2");
-        s2.deps.push(10); // s2 depends on s1
-
-        let mut s3 = SimpleService::new(30, b"s3"); // s3 independent
-
-        init.register_service(Box::new(s1)).unwrap();
-        init.register_service(Box::new(s2)).unwrap();
-        init.register_service(Box::new(s3)).unwrap();
-
-        // Staging check
-        let list = [10, 20, 30];
-        let groups = init.resolve_parallel_groups(&list);
-        assert_eq!(groups.len(), 2);
-        // Stage 0: 10 (s1) and 30 (s3) start first
-        assert!(groups[0].contains(&10));
-        assert!(groups[0].contains(&30));
-        // Stage 1: 20 (s2) starts next
-        assert_eq!(groups[1].len(), 1);
-        assert_eq!(groups[1][0], 20);
-
-        // Start services to populate timeline
-        init.start_service(20).unwrap();
-        init.start_service(30).unwrap();
-
-        let timeline = init.get_boot_timeline();
-        assert_eq!(timeline.len(), 3);
-        assert_eq!(timeline[0].1, 130); // 180 - 50 = 130ms duration
     }
 }

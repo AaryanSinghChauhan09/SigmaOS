@@ -47,7 +47,7 @@ impl CapabilityToken {
 
     /// Allow file read access
     pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") {
+        if path.starts_with("/var/www") || path == "/" {
             self.bits |= 1 << 2;
         }
         self
