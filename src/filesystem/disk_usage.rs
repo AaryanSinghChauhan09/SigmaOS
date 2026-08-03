@@ -283,6 +283,11 @@ pub struct DiskPartition {
     pub start_sector: u64,
     pub end_sector: u64,
     pub fs_type: FsType,
+    pub uuid: String,
+    pub boot: bool,
+    pub lvm: bool,
+    pub esp: bool,
+    pub raid: bool,
 }
 
 /// Sovereign Disk Partition Editor Shard (GNU Parted Parity)
@@ -328,9 +333,89 @@ impl SovereignParted {
             start_sector,
             end_sector,
             fs_type,
+            uuid: format!("part-uuid-{}", index),
+            boot: false,
+            lvm: false,
+            esp: false,
+            raid: false,
         });
 
         Ok(index)
+    }
+
+    /// Delete a partition by index
+    pub fn delete_partition(&mut self, index: u32) -> Result<(), &'static str> {
+        let before_len = self.partitions.len();
+        self.partitions.retain(|part| part.index != index);
+        if self.partitions.len() == before_len {
+            return Err("Partition not found");
+        }
+        // Normalize/re-index partitions sequentially (GNU Parted / sfdisk behavior)
+        for (i, part) in self.partitions.iter_mut().enumerate() {
+            part.index = (i + 1) as u32;
+        }
+        Ok(())
+    }
+
+    /// Resize an existing partition's end sector offline
+    pub fn resize_partition(&mut self, index: u32, new_end_sector: u64) -> Result<(), &'static str> {
+        let mut target_idx = None;
+        for (i, part) in self.partitions.iter().enumerate() {
+            if part.index == index {
+                target_idx = Some(i);
+                break;
+            }
+        }
+
+        let i = target_idx.ok_or("Partition not found")?;
+        let start_sector = self.partitions[i].start_sector;
+
+        if start_sector >= new_end_sector || new_end_sector > self.disk_size_sectors {
+            return Err("Invalid new end sector boundaries");
+        }
+
+        // Check for overlaps with other partitions
+        for (idx, part) in self.partitions.iter().enumerate() {
+            if idx == i {
+                continue;
+            }
+            if !(new_end_sector <= part.start_sector || start_sector >= part.end_sector) {
+                return Err("Resized boundaries overlap with another partition");
+            }
+        }
+
+        self.partitions[i].end_sector = new_end_sector;
+        Ok(())
+    }
+
+    /// Set advanced Linux distro/GNU Parted flags (e.g. boot, lvm, esp, raid) on a partition
+    pub fn set_partition_flag(&mut self, index: u32, flag: &str, value: bool) -> Result<(), &'static str> {
+        for part in &mut self.partitions {
+            if part.index == index {
+                match flag {
+                    "boot" => part.boot = value,
+                    "lvm" => part.lvm = value,
+                    "esp" => part.esp = value,
+                    "raid" => part.raid = value,
+                    _ => return Err("Unknown flag name. Supported: boot, lvm, esp, raid"),
+                }
+                return Ok(());
+            }
+        }
+        Err("Partition not found")
+    }
+
+    /// Suggest the next optimal aligned sector based on standard modern OS patterns.
+    /// Standard alignment for modern high-performance block/SSD devices is 1MiB (2048 sectors of 512 bytes).
+    /// If not divisible, returns the nearest starting sector that is perfectly aligned to a 2048-sector boundary.
+    pub fn suggest_optimal_alignment(&self, requested_start: u64) -> u64 {
+        const OPTIMAL_ALIGNMENT: u64 = 2048; // 1MiB boundary
+        let remainder = requested_start % OPTIMAL_ALIGNMENT;
+        if remainder == 0 {
+            requested_start
+        } else {
+            requested_start + (OPTIMAL_ALIGNMENT - remainder)
+        }
     }
 
     /// User-defined physical alignment validation function
@@ -425,5 +510,31 @@ mod tests {
 
         let res2 = parted.verify_alignment(idx2, align_checker).unwrap();
         assert!(!res2); // Misaligned!
+
+        // Linux Distro Parity: 1. Test Flags Manipulation
+        assert!(parted.set_partition_flag(idx1, "boot", true).is_ok());
+        assert!(parted.set_partition_flag(idx1, "esp", true).is_ok());
+        assert!(parted.set_partition_flag(idx1, "invalid", true).is_err());
+        assert!(parted.partitions[0].boot);
+        assert!(parted.partitions[0].esp);
+        assert!(!parted.partitions[0].lvm);
+
+        // Linux Distro Parity: 2. Test Auto-Alignment Suggestions (1MiB / 2048-sector boundary)
+        let suggestion1 = parted.suggest_optimal_alignment(2000);
+        assert_eq!(suggestion1, 2048); // Rounded up to nearest 1MiB
+        let suggestion2 = parted.suggest_optimal_alignment(2048);
+        assert_eq!(suggestion2, 2048); // Already aligned
+
+        // Linux Distro Parity: 3. Test Partition Resizing
+        assert!(parted.resize_partition(idx1, 100002).is_ok());
+        assert_eq!(parted.partitions[0].end_sector, 100002);
+        // Resizing causing overlap with idx2 starts at 100003
+        assert!(parted.resize_partition(idx1, 105000).is_err());
+
+        // Linux Distro Parity: 4. Test Partition Deletion and seq index re-numbering
+        assert!(parted.delete_partition(idx1).is_ok());
+        assert_eq!(parted.partitions.len(), 1);
+        assert_eq!(parted.partitions[0].index, 1); // Index normalized to 1
+        assert_eq!(parted.partitions[0].name, "UnstructuredData");
     }
 }
