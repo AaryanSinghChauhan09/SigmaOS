@@ -14,6 +14,9 @@ use sigmaos::compatibility::{
     GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
     GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
+use sigmaos::drivers::{
+    Ch340Driver, E1000Driver, IntelHdaDriver, NvmeDriver, PeripheralDevice, PowerState,
+};
 use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 use sigmaos::network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
@@ -34,9 +37,10 @@ use sigmaos::performance::{
 use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
 use sigmaos::resilience::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
 use sigmaos::security::{
-    AnonSurfShunt, AppSandboxEngine, DefensiveAuditSystem, ForensicBlock, ForensicStorageFilter,
-    MaliciousSignature, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC,
-    GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    AnonSurfShunt, AppSandboxEngine, CapabilityToken, DefensiveAuditSystem, ForensicBlock,
+    ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode, SandboxPolicy,
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
 };
 
 use sigmaos::kernel::{Priority, Process, ProcessState};
@@ -477,5 +481,38 @@ mod tests {
         assert!(firewall.filter_incoming_packet(0xC0A80102, 80)); // allow HTTP
         assert!(!firewall.filter_incoming_packet(0xC0A80102, 23)); // reject Telnet
         assert!(!firewall.filter_incoming_packet(0xC0A80102, 443)); // deny HTTPS by default
+    }
+
+    #[test]
+    fn test_unimplemented_hardware_drivers() {
+        let caps = CapabilityToken::new(); // empty capabilities -> denied
+        let mut ch340 = Ch340Driver::new(1, caps);
+        assert!(ch340.initialize().is_err()); // fails initialized due to missing caps
+
+        let block_caps = CapabilityToken::new().allow_network("tcp", 80); // sets 0th bit
+        let mut ch340_authorized = Ch340Driver::new(1, block_caps);
+        assert!(ch340_authorized.initialize().is_ok());
+
+        let nvme_caps = CapabilityToken::new().allow_read("/var/www"); // sets 2nd bit
+        let mut nvme = unsafe { NvmeDriver::new(0xE0000000, nvme_caps) };
+        assert!(nvme.initialize().is_ok());
+
+        let e1000_caps = CapabilityToken::new().allow_network("udp", 80); // sets 1st bit
+        let mut e1000 = unsafe { E1000Driver::new(0xE1000000, e1000_caps) };
+        assert!(e1000.initialize().is_ok());
+
+        let hda_caps = CapabilityToken::new().allow_network("tcp", 80); // sets 0th bit
+        let mut hda = unsafe { IntelHdaDriver::new(0xE2000000, hda_caps) };
+        assert!(hda.initialize().is_ok());
+
+        // Verify read/write/shutdown lifecycle operations
+        let mut rx_buf = [0u8; 1024];
+        assert_eq!(ch340_authorized.read(&mut rx_buf), Ok(1));
+        assert_eq!(ch340_authorized.write(b"serial"), Ok(6));
+        assert!(ch340_authorized.shutdown().is_ok());
+
+        // Verify power state toggles
+        assert!(nvme.set_power_state(PowerState::Sleep).is_ok());
+        assert!(nvme.shutdown().is_ok());
     }
 }
