@@ -1,22 +1,4 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// HPC Cluster Job State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -186,7 +168,6 @@ pub struct EosWelcomeEngine {
 }
 
 impl EosWelcomeEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             first_boot: true,
@@ -245,7 +226,6 @@ pub struct EosUpdateNotifier {
 }
 
 impl EosUpdateNotifier {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pending_updates_count: 0,
@@ -272,7 +252,6 @@ pub struct DiagnosticLogTool {
 }
 
 impl DiagnosticLogTool {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             collected_lines: Vec::new(),
@@ -378,7 +357,6 @@ pub struct RunitServiceManager {
 }
 
 impl RunitServiceManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_services: HashMap::new(),
@@ -421,7 +399,6 @@ pub struct RumpKernelShim {
 }
 
 impl RumpKernelShim {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_drivers: HashMap::new(),
@@ -470,15 +447,11 @@ impl AptCacheSimulator {
         }
     }
 
-    pub fn cache_package_metadata(
-        &mut self,
-        manifest: AptPackageManifest,
-    ) -> Result<&'static str, &'static str> {
+    pub fn cache_package_metadata(&mut self, manifest: AptPackageManifest) -> Result<&'static str, &'static str> {
         if self.cached_manifests.len() >= self.max_cache_size {
             return Err("APT Cache is full, trigger cache pruning");
         }
-        self.cached_manifests
-            .insert(manifest.name.clone(), manifest);
+        self.cached_manifests.insert(manifest.name.clone(), manifest);
         Ok("Package metadata stored in offline APT cache")
     }
 
@@ -493,7 +466,6 @@ pub struct DpkgMultiArch {
 }
 
 impl DpkgMultiArch {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             foreign_architectures: Vec::new(),
@@ -522,7 +494,6 @@ pub struct DebianPolicyEnforcer {
 }
 
 impl DebianPolicyEnforcer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             enforce_fhs: true,
@@ -536,9 +507,7 @@ impl DebianPolicyEnforcer {
         }
         if self.enforce_fhs {
             // FHS conventions require standard starting blocks
-            return path.starts_with("/usr/")
-                || path.starts_with("/bin/")
-                || path.starts_with("/etc/");
+            return path.starts_with("/usr/") || path.starts_with("/bin/") || path.starts_with("/etc/");
         }
         true
     }
@@ -557,7 +526,6 @@ pub struct ThreeTierReleaseModel {
 }
 
 impl ThreeTierReleaseModel {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut channels = HashMap::new();
         channels.insert("sigma.next".to_string(), "Rolling, experimental, daily updates".to_string());
@@ -610,7 +578,6 @@ pub struct DebianSocialContract {
 }
 
 impl DebianSocialContract {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             open_source_only: true,
@@ -654,7 +621,6 @@ pub struct FreezeBasedStabilization {
 }
 
 impl FreezeBasedStabilization {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_freeze_active: false,
@@ -823,28 +789,15 @@ mod tests {
     fn test_runit_service_manager() {
         let mut manager = RunitServiceManager::new();
         manager.register_and_start_service("vfs_shard");
-        assert_eq!(
-            manager.active_services.get("vfs_shard").unwrap().status,
-            ServiceStatus::Up
-        );
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
 
         // Manually panic the service
         manager.active_services.get_mut("vfs_shard").unwrap().status = ServiceStatus::Panicked;
 
         let recovered = manager.supervise_and_recover_services();
         assert_eq!(recovered, 1);
-        assert_eq!(
-            manager.active_services.get("vfs_shard").unwrap().status,
-            ServiceStatus::Up
-        );
-        assert_eq!(
-            manager
-                .active_services
-                .get("vfs_shard")
-                .unwrap()
-                .restart_count,
-            1
-        );
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().restart_count, 1);
     }
 
     #[test]
@@ -866,10 +819,7 @@ mod tests {
             sha256: "sha256_mock_manifest_bytes".to_string(),
         };
         assert!(cache.cache_package_metadata(m1).is_ok());
-        assert_eq!(
-            cache.query_cached_package("libreoffice").unwrap().version,
-            "1.0.0"
-        );
+        assert_eq!(cache.query_cached_package("libreoffice").unwrap().version, "1.0.0");
 
         let m2 = AptPackageManifest {
             name: "vim".to_string(),

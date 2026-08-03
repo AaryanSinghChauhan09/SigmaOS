@@ -22,6 +22,9 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
+extern crate alloc;
+use alloc::boxed::Box;
+
 /// OOP-based Encryption Service for SigmaOS
 /// Based on Roadmap Item 15: Encryption service
 

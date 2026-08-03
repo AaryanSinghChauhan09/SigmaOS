@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
@@ -24,7 +6,6 @@ use std::io::{self, BufRead, Write};
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
 impl AgentAutomationEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         AgentAutomationEngine
     }
@@ -75,6 +56,23 @@ pub enum ShellCommand {
     Rm {
         filename: String,
     },
+    Pwd,
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
     Theme {
         theme_name: String,
     },
@@ -84,10 +82,6 @@ pub enum ShellCommand {
     A11y {
         feature: String,
         state: String,
-    },
-    Alias {
-        shorthand: String,
-        statement: String,
     },
     Unknown(String),
 }
@@ -106,11 +100,9 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
-    pub command_history: Vec<String>,
 }
 
 impl ShellRepl {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
@@ -120,17 +112,11 @@ impl ShellRepl {
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
-            agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
             services,
             installed_packages: std::collections::HashSet::new(),
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
-            command_history: Vec::new(),
         }
     }
 
@@ -153,7 +139,6 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            command_history: Vec::new(),
         }
     }
 
@@ -180,52 +165,8 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
-        let mut suggestions = Vec::new();
-        let commands = [
-            "help", "ps", "ls", "pwd", "whoami", "uname", "clear", "touch", "mkdir", "theme",
-            "profile", "a11y", "set", "get", "alias",
-        ];
-        for cmd in &commands {
-            if cmd.starts_with(prefix) {
-                suggestions.push(cmd.to_string());
-            }
-        }
-        suggestions
-    }
-
-    pub fn history_suggest_fish(&self, partial: &str) -> Option<String> {
-        if partial.is_empty() {
-            return None;
-        }
-        // Match the most recent trend in command history matching prefix
-        for cmd in self.command_history.iter().rev() {
-            if cmd.starts_with(partial) {
-                return Some(cmd.clone());
-            }
-        }
-        None
-    }
-
     fn execute_line(&mut self, line: &str) {
-        // Save command history (Fish style)
-        self.command_history.push(line.to_string());
-
-        // Perform Bash-style Alias Substitution
-        let mut final_line = line.to_string();
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if !parts.is_empty() {
-            if let Some(aliased) = self.aliases.get(parts[0]) {
-                let mut statement = aliased.clone();
-                if parts.len() > 1 {
-                    statement.push(' ');
-                    statement.push_str(&parts[1..].join(" "));
-                }
-                final_line = statement;
-            }
-        }
-
-        let command = self.parse_command(&final_line);
+        let command = self.parse_command(line);
         let result = self.execute_command(command);
 
         match result {
@@ -256,18 +197,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "echo" => ShellCommand::Echo {
-                message: parts[1..].join(" "),
-            },
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -328,16 +257,6 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Get {
                         variable: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "alias" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Alias {
-                        shorthand: parts[1].to_string(),
-                        statement: parts[2..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -515,10 +434,6 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Alias { shorthand, statement } => {
-                self.aliases.insert(shorthand.clone(), statement.clone());
-                Ok(format!("Alias defined: {} -> {}", shorthand, statement))
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -563,43 +478,6 @@ mod tests {
         };
         let result = repl.execute_command(command);
         assert_eq!(result.unwrap(), "test");
-    }
-
-    #[test]
-    fn test_bash_alias_substitution() {
-        let mut repl = ShellRepl::new();
-        let alias_cmd = ShellCommand::Alias {
-            shorthand: "ll".to_string(),
-            statement: "ls -la".to_string(),
-        };
-        repl.execute_command(alias_cmd).unwrap();
-        assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
-
-        // Execute line with alias substitution
-        repl.execute_line("ll");
-        assert_eq!(repl.command_history[0], "ll");
-    }
-
-    #[test]
-    fn test_zsh_tab_completion() {
-        let repl = ShellRepl::new();
-        let suggestions = repl.complete_tab("cl");
-        assert_eq!(suggestions, vec!["clear".to_string()]);
-
-        let suggestions_all = repl.complete_tab("pwd");
-        assert_eq!(suggestions_all, vec!["pwd".to_string()]);
-    }
-
-    #[test]
-    fn test_fish_history_suggestions() {
-        let mut repl = ShellRepl::new();
-        repl.execute_line("clear");
-        repl.execute_line("systemctl list");
-
-        let suggestion = repl.history_suggest_fish("sys").unwrap();
-        assert_eq!(suggestion, "systemctl list");
-
-        assert!(repl.history_suggest_fish("invalid").is_none());
     }
 
     #[test]

@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
@@ -137,7 +119,6 @@ pub struct SelfHealingModule {
 }
 
 impl SelfHealingModule {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut module = Self {
             snapshots: Vec::new(),
@@ -376,7 +357,6 @@ pub struct SystemStabilityMonitor {
 }
 
 impl SystemStabilityMonitor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             heartbeats: HashMap::new(),
@@ -394,15 +374,11 @@ impl SystemStabilityMonitor {
         };
         self.heartbeats.insert(shard_name.to_string(), heartbeat);
         // Default guard rule: max 3 crashes within 10 seconds before isolating
-        self.fault_guards
-            .insert(shard_name.to_string(), DoubleFaultGuard::new(3, 10));
+        self.fault_guards.insert(shard_name.to_string(), DoubleFaultGuard::new(3, 10));
     }
 
     pub fn send_heartbeat(&mut self, shard_name: &str, timestamp: u64) -> Result<(), &'static str> {
-        let heartbeat = self
-            .heartbeats
-            .get_mut(shard_name)
-            .ok_or("Shard not registered")?;
+        let heartbeat = self.heartbeats.get_mut(shard_name).ok_or("Shard not registered")?;
         heartbeat.last_heartbeat_timestamp = timestamp;
         Ok(())
     }
@@ -436,15 +412,8 @@ impl SystemStabilityMonitor {
     }
 
     /// Tracks recovery crashes. Prevents endless restart cascades.
-    pub fn record_recovery_attempt(
-        &mut self,
-        shard_name: &str,
-        timestamp: u64,
-    ) -> Result<(), &'static str> {
-        let guard = self
-            .fault_guards
-            .get_mut(shard_name)
-            .ok_or("Fault guard not registered for shard")?;
+    pub fn record_recovery_attempt(&mut self, shard_name: &str, timestamp: u64) -> Result<(), &'static str> {
+        let guard = self.fault_guards.get_mut(shard_name).ok_or("Fault guard not registered for shard")?;
         guard.record_attempt(timestamp)
     }
 }

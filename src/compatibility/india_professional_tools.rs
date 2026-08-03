@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS India Professional Tools
 // Localized, high-performance, OOP-compliant tools for Indian Professionals.
 // Refers to India-Apps-Overview.md and India-first architecture.
@@ -30,7 +12,6 @@ pub struct JudicialTimelinePlanner {
 }
 
 impl JudicialTimelinePlanner {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_cases: HashMap::new(),
@@ -48,11 +29,7 @@ impl JudicialTimelinePlanner {
     }
 
     /// Evaluates if an accused is ready for default bail under Section 480 of BNSS
-    pub fn calculate_bail_readiness(
-        &self,
-        offense_gravity: &str,
-        days_in_custody: u32,
-    ) -> Result<bool, &'static str> {
+    pub fn calculate_bail_readiness(&self, offense_gravity: &str, days_in_custody: u32) -> Result<bool, &'static str> {
         match offense_gravity {
             "LIFE_IMPRISONMENT" | "DEATH_PENALTY" => {
                 // Default bail limit is usually 90 days under BNSS
@@ -84,7 +61,6 @@ pub struct MsmeComplianceEngine {
 }
 
 impl MsmeComplianceEngine {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             registered_udyam_ids: HashMap::new(),
@@ -106,12 +82,7 @@ impl MsmeComplianceEngine {
 
     /// Calculates delayed payment interest under Section 16 of the MSMED Act
     /// Interest is compound interest with monthly rests at three times the bank rate
-    pub fn calculate_delayed_payment_interest(
-        &self,
-        principal_amount: f64,
-        bank_rate: f64,
-        delay_days: u32,
-    ) -> f64 {
+    pub fn calculate_delayed_payment_interest(&self, principal_amount: f64, bank_rate: f64, delay_days: u32) -> f64 {
         if delay_days == 0 {
             return 0.0;
         }
@@ -139,24 +110,15 @@ pub struct AyushFormularyHelper {
 }
 
 impl AyushFormularyHelper {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut formulary = HashMap::new();
         formulary.insert(
             "Chyawanprash".to_string(),
-            vec![
-                "Amla".to_string(),
-                "Ashwagandha".to_string(),
-                "Guduchi".to_string(),
-            ],
+            vec!["Amla".to_string(), "Ashwagandha".to_string(), "Guduchi".to_string()],
         );
         formulary.insert(
             "Triphala".to_string(),
-            vec![
-                "Amalaki".to_string(),
-                "Bibhitaki".to_string(),
-                "Haritaki".to_string(),
-            ],
+            vec!["Amalaki".to_string(), "Bibhitaki".to_string(), "Haritaki".to_string()],
         );
 
         Self {
@@ -169,15 +131,8 @@ impl AyushFormularyHelper {
         self.verified_practitioners.contains_key(registration_id)
     }
 
-    pub fn verify_ayurvedic_formulation(
-        &self,
-        product: &str,
-        ingredient: &str,
-    ) -> Result<bool, &'static str> {
-        let ingredients = self
-            .formulary_registry
-            .get(product)
-            .ok_or("Product not found in Ayurvedic Formulary")?;
+    pub fn verify_ayurvedic_formulation(&self, product: &str, ingredient: &str) -> Result<bool, &'static str> {
+        let ingredients = self.formulary_registry.get(product).ok_or("Product not found in Ayurvedic Formulary")?;
         Ok(ingredients.iter().any(|ing| ing == ingredient))
     }
 }
@@ -195,7 +150,6 @@ pub struct PMWaniHotspotController {
 }
 
 impl PMWaniHotspotController {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             registered_pdos: HashMap::new(),
@@ -203,9 +157,7 @@ impl PMWaniHotspotController {
     }
 
     pub fn register_pdo(&mut self, pdo_id: &str, location: &str) -> bool {
-        self.registered_pdos
-            .insert(pdo_id.to_string(), location.to_string())
-            .is_none()
+        self.registered_pdos.insert(pdo_id.to_string(), location.to_string()).is_none()
     }
 
     pub fn get_trai_bandwidth_profile(&self, active_users: u32) -> &'static str {
@@ -232,7 +184,6 @@ pub struct DigiYatraPassScanner {
 }
 
 impl DigiYatraPassScanner {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             passenger_faces: HashMap::new(),
@@ -240,9 +191,7 @@ impl DigiYatraPassScanner {
     }
 
     pub fn enroll_passenger(&mut self, passenger_id: &str, face_signature: &[u8]) -> bool {
-        self.passenger_faces
-            .insert(passenger_id.to_string(), face_signature.to_vec())
-            .is_none()
+        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec()).is_none()
     }
 
     pub fn verify_passenger_boarding(&self, passenger_id: &str, scan_signature: &[u8]) -> bool {
@@ -267,7 +216,6 @@ pub struct IrctcPnrTracker {
 }
 
 impl IrctcPnrTracker {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pnr_statuses: HashMap::new(),
@@ -295,8 +243,7 @@ impl IrctcPnrTracker {
     }
 
     pub fn update_pnr_status(&mut self, pnr: &str, status: &str) {
-        self.pnr_statuses
-            .insert(pnr.to_string(), status.to_string());
+        self.pnr_statuses.insert(pnr.to_string(), status.to_string());
     }
 
     pub fn get_pnr_status(&self, pnr: &str) -> Option<&str> {
@@ -322,14 +269,8 @@ mod tests {
         assert_eq!(deadline, 1000 + (60 * 24 * 60 * 60));
 
         // Bail readiness under BNSS
-        assert_eq!(
-            planner.calculate_bail_readiness("LIFE_IMPRISONMENT", 95),
-            Ok(true)
-        );
-        assert_eq!(
-            planner.calculate_bail_readiness("LIFE_IMPRISONMENT", 80),
-            Ok(false)
-        );
+        assert_eq!(planner.calculate_bail_readiness("LIFE_IMPRISONMENT", 95), Ok(true));
+        assert_eq!(planner.calculate_bail_readiness("LIFE_IMPRISONMENT", 80), Ok(false));
     }
 
     #[test]
@@ -353,60 +294,36 @@ mod tests {
     #[test]
     fn test_ayush_formulary_helper() {
         let mut helper = AyushFormularyHelper::new();
-        helper
-            .verified_practitioners
-            .insert("REG-AYUSH-1234".to_string(), "Dr. Aaryan".to_string());
+        helper.verified_practitioners.insert("REG-AYUSH-1234".to_string(), "Dr. Aaryan".to_string());
 
         assert!(helper.verify_practitioner("REG-AYUSH-1234"));
         assert!(!helper.verify_practitioner("REG-AYUSH-9999"));
 
-        assert_eq!(
-            helper.verify_ayurvedic_formulation("Chyawanprash", "Amla"),
-            Ok(true)
-        );
-        assert_eq!(
-            helper.verify_ayurvedic_formulation("Chyawanprash", "Pipali"),
-            Ok(false)
-        );
+        assert_eq!(helper.verify_ayurvedic_formulation("Chyawanprash", "Amla"), Ok(true));
+        assert_eq!(helper.verify_ayurvedic_formulation("Chyawanprash", "Pipali"), Ok(false));
     }
 
     #[test]
     fn test_pm_wani_hotspot_controller() {
         let mut controller = PMWaniHotspotController::new();
         assert!(controller.register_pdo("PDO-MUMBAI-01", "Dharavi Hotspot"));
-        assert_eq!(
-            controller.get_trai_bandwidth_profile(5),
-            "Ultra-High-Speed (Unlimited)"
-        );
-        assert_eq!(
-            controller.get_trai_bandwidth_profile(25),
-            "Balanced Quality-of-Service"
-        );
-        assert_eq!(
-            controller.get_trai_bandwidth_profile(100),
-            "TRAI FUP Bandwidth Throttle"
-        );
+        assert_eq!(controller.get_trai_bandwidth_profile(5), "Ultra-High-Speed (Unlimited)");
+        assert_eq!(controller.get_trai_bandwidth_profile(25), "Balanced Quality-of-Service");
+        assert_eq!(controller.get_trai_bandwidth_profile(100), "TRAI FUP Bandwidth Throttle");
     }
 
     #[test]
     fn test_digiyatra_pass_scanner() {
         let mut scanner = DigiYatraPassScanner::new();
         assert!(scanner.enroll_passenger("DY-PASS-789", b"face_descriptor_vector_bytes_789"));
-        assert!(
-            scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_vector_bytes_789")
-        );
-        assert!(
-            !scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_mismatch_bytes")
-        );
+        assert!(scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_vector_bytes_789"));
+        assert!(!scanner.verify_passenger_boarding("DY-PASS-789", b"face_descriptor_mismatch_bytes"));
     }
 
     #[test]
     fn test_irctc_pnr_tracker() {
         let mut tracker = IrctcPnrTracker::new();
-        assert_eq!(
-            tracker.check_tatkal_window(10, "AC"),
-            "TATKAL_WINDOW_OPEN (AC Class)"
-        );
+        assert_eq!(tracker.check_tatkal_window(10, "AC"), "TATKAL_WINDOW_OPEN (AC Class)");
         assert_eq!(tracker.check_tatkal_window(9, "AC"), "TATKAL_WINDOW_CLOSED");
 
         tracker.update_pnr_status("2748927491", "CONFIRMED");

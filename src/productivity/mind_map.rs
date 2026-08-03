@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Sovereign Mind Map Creator (SigmaMind)
 // Purpose-built, highly interactive hierarchical visualization tool inspired by XMind, MindMeister, and NiceMind.
 // Exposes rich styling, relationship boundaries, task progress tracking, and layouts.
@@ -66,9 +48,9 @@ pub struct MindMapNode {
     pub parent_id: Option<String>,
     pub children_ids: Vec<String>,
     pub style: NodeStyle,
-    pub progress_percent: u32, // XMind-style progress task tracking (e.g., 25%, 50%, 100%)
-    pub priority: u32,         // Priority flags (1 to 5)
-    pub notes: String,         // Detailed note-taking text
+    pub progress_percent: u32,  // XMind-style progress task tracking (e.g., 25%, 50%, 100%)
+    pub priority: u32,          // Priority flags (1 to 5)
+    pub notes: String,          // Detailed note-taking text
 }
 
 impl MindMapNode {
@@ -121,12 +103,7 @@ impl MindMapCreator {
     }
 
     /// Appends a new sub-idea to a parent node
-    pub fn add_node(
-        &mut self,
-        node_id: &str,
-        parent_id: &str,
-        topic: &str,
-    ) -> Result<(), &'static str> {
+    pub fn add_node(&mut self, node_id: &str, parent_id: &str, topic: &str) -> Result<(), &'static str> {
         if self.nodes.contains_key(node_id) {
             return Err("Node ID already exists in the mind map");
         }
@@ -155,9 +132,7 @@ impl MindMapCreator {
 
         let old_parent_id = {
             let node = self.nodes.get(node_id).ok_or("Node not found")?;
-            node.parent_id
-                .clone()
-                .ok_or("Root node re-parent blocked")?
+            node.parent_id.clone().ok_or("Root node re-parent blocked")?
         };
 
         // Remove from old parent's child list
@@ -185,10 +160,7 @@ impl MindMapCreator {
         }
 
         // Remove from parent child references
-        let parent_id = self
-            .nodes
-            .get(node_id)
-            .and_then(|node| node.parent_id.clone());
+        let parent_id = self.nodes.get(node_id).and_then(|node| node.parent_id.clone());
         if let Some(ref p_id) = parent_id {
             if let Some(parent) = self.nodes.get_mut(p_id) {
                 parent.children_ids.retain(|id| id != node_id);
@@ -206,18 +178,11 @@ impl MindMapCreator {
             }
         }
         // Remove active cross-relationships involving the deleted node
-        self.relationships
-            .retain(|rel| rel.source_id != node_id && rel.target_id != node_id);
+        self.relationships.retain(|rel| rel.source_id != node_id && rel.target_id != node_id);
     }
 
     /// Connects arbitrary cross-branch ideas with a customized relationship line
-    pub fn add_relationship(
-        &mut self,
-        source_id: &str,
-        target_id: &str,
-        label: &str,
-        line_style: &str,
-    ) -> Result<(), &'static str> {
+    pub fn add_relationship(&mut self, source_id: &str, target_id: &str, label: &str, line_style: &str) -> Result<(), &'static str> {
         if !self.nodes.contains_key(source_id) || !self.nodes.contains_key(target_id) {
             return Err("Source or target node not found in map");
         }
@@ -231,13 +196,7 @@ impl MindMapCreator {
     }
 
     /// Sets custom styles and metadata markers (XMind-style priority and progress)
-    pub fn update_node_metadata(
-        &mut self,
-        node_id: &str,
-        priority: u32,
-        progress: u32,
-        notes: &str,
-    ) -> Result<(), &'static str> {
+    pub fn update_node_metadata(&mut self, node_id: &str, priority: u32, progress: u32, notes: &str) -> Result<(), &'static str> {
         let node = self.nodes.get_mut(node_id).ok_or("Node not found")?;
         node.priority = priority.clamp(1, 5);
         node.progress_percent = progress.clamp(0, 100);
@@ -283,12 +242,8 @@ mod tests {
         assert_eq!(map.nodes.len(), 1);
 
         // Add sub-nodes
-        assert!(map
-            .add_node("idea_1", "root_node", "Technical Setup")
-            .is_ok());
-        assert!(map
-            .add_node("idea_2", "root_node", "Marketing Strategy")
-            .is_ok());
+        assert!(map.add_node("idea_1", "root_node", "Technical Setup").is_ok());
+        assert!(map.add_node("idea_2", "root_node", "Marketing Strategy").is_ok());
         assert_eq!(map.nodes.len(), 3);
 
         // Verify root node child indices
@@ -318,10 +273,8 @@ mod tests {
     fn test_delete_node_recursive() {
         let mut map = MindMapCreator::new("Business Plan", "HQ");
         map.add_node("marketing", "root_node", "Marketing").unwrap();
-        map.add_node("social_media", "marketing", "Social Media Campaign")
-            .unwrap();
-        map.add_node("seo", "marketing", "Search Engine Optimization")
-            .unwrap();
+        map.add_node("social_media", "marketing", "Social Media Campaign").unwrap();
+        map.add_node("seo", "marketing", "Search Engine Optimization").unwrap();
 
         assert_eq!(map.nodes.len(), 4);
 
@@ -338,17 +291,13 @@ mod tests {
         map.add_node("debian", "root_node", "Debian").unwrap();
 
         // Update markers
-        assert!(map
-            .update_node_metadata("nix", 1, 75, "High priority sandboxing research")
-            .is_ok());
+        assert!(map.update_node_metadata("nix", 1, 75, "High priority sandboxing research").is_ok());
         let nix_node = map.nodes.get("nix").unwrap();
         assert_eq!(nix_node.priority, 1);
         assert_eq!(nix_node.progress_percent, 75);
 
         // Add custom connection boundary
-        assert!(map
-            .add_relationship("nix", "debian", "Sync release model structure", "dashed")
-            .is_ok());
+        assert!(map.add_relationship("nix", "debian", "Sync release model structure", "dashed").is_ok());
         assert_eq!(map.relationships.len(), 1);
         assert_eq!(map.relationships[0].label, "Sync release model structure");
     }
