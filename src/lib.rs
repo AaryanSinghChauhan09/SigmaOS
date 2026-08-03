@@ -107,6 +107,10 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
     LegacyFsType, LegacyFSAdapter,
     FileBlock, SigmaFS,
+    SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+    SigmaDisasterRecoveryCleaner,
+    SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio,
+    SymlinkError, SmartSymlink,
 };
 pub use governance::{
     DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
