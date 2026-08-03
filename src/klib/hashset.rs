@@ -2,17 +2,18 @@
 //! Reduces dependency on std::collections::HashSet
 
 use super::HashMap;
+use super::hashmap::HashMapIter;
 
 pub struct HashSet<T>
 where
-    T: PartialEq + Clone,
+    T: Eq + core::hash::Hash + Clone,
 {
     map: HashMap<T, ()>,
 }
 
 impl<T> HashSet<T>
 where
-    T: PartialEq + Clone,
+    T: Eq + core::hash::Hash + Clone,
 {
     pub fn new() -> Self {
         HashSet {
@@ -57,7 +58,7 @@ where
 
 impl<T> Default for HashSet<T>
 where
-    T: PartialEq + Clone,
+    T: Eq + core::hash::Hash + Clone,
 {
     fn default() -> Self {
         Self::new()
@@ -70,7 +71,7 @@ pub struct HashSetIter<'a, T> {
 
 impl<'a, T> Iterator for HashSetIter<'a, T>
 where
-    T: PartialEq + Clone,
+    T: Eq + core::hash::Hash + Clone,
 {
     type Item = &'a T;
 
