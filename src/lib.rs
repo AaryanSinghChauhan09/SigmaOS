@@ -3,49 +3,60 @@
 
 // SigmaOS Library
 // Core library for SigmaOS operating system
+#![allow(clippy::all, unused)]
 
 pub mod accessibility;
-pub mod ai;
-pub mod audio;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
+pub mod init;
 pub mod customization;
 pub mod dashboard;
-pub mod desktop;
 pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod graphics;
-pub mod init;
-pub mod interrupt;
 pub mod kernel;
 pub mod klib;
-pub mod logging;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
-pub mod plugin;
-pub mod process;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai;
+pub mod arch;
+pub mod boot;
+pub mod toolchain;
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
-};
-pub use ai::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
-    ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
-    SovereignWikiEngine, WikiArticle,
-};
-pub use audio::{
-    AudioClip, AudioMasteringEffect, AudioTrack, PodcastEpisode, PodcastFeed, PodcastRecorder,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -54,26 +65,14 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime as CompatibilityContainerRuntime, CpuGovernor, InterimLispVM, LispVal,
-    LubuntuHealthReport, LubuntuSystemManager, MntReformLpcDriver, ReformPowerStats,
-    SystemPressure, TargetPlatform, TranslationLayer,
-};
-pub use container::{
-    Container, ContainerCapability, ContainerError, ContainerID, ContainerInfo, ContainerRuntime,
-    ContainerState, Namespace, OciContainer, OciContainerError, OciContainerID,
-    OciContainerRuntime, OciContainerState, RuntimeCapability, RuntimeStats, Sandbox,
-    SimpleContainer, SimpleContainerRuntime, SimpleOciContainer, SimpleOciContainerRuntime,
-    SimpleSandbox,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
-};
-pub use desktop::{
-    ShellIntegration, SimpleShellIntegration, SimpleTerminal, SimpleTerminalManager, Terminal,
-    TerminalError, TerminalID, TerminalManager,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
@@ -83,28 +82,12 @@ pub use drivers::{
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
-};
-pub use graphics::{
-    BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,
-    Surface, VideoClip, VideoEffect, VideoTimeline, VideoTrack, Window,
-};
-pub use interrupt::{
-    ColorCode, ExceptionType, InterruptDescriptor as HardwareInterruptDescriptor,
-    InterruptError as HardwareInterruptError, InterruptHandler as HardwareInterruptHandler,
-    InterruptManager as HardwareInterruptManager, ScreenChar,
-    SimpleInterruptHandler as SimpleHardwareInterruptHandler, TaskStateSegment, VGAColor,
-    VGATextBuffer, GDT, IDT, PIC,
+    ClusterState as DefragClusterState, FragmentedFile, DefragStats, DiskDefragmenter,
 };
 pub use kernel::{
-    BoreScheduler, BoreTask, BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message,
-    Priority, Process as KernelProcess, ProcessState as KernelProcessState, RoundRobinConfig,
-    RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
-};
-pub use klib::{AsyncExecutor, CpuIsaAssessor, IsaLevel, Reducer, Store, Subscriber, Task};
-pub use logging::{
-    ConsoleLogTarget, FileLogTarget, LogError, LogLevel, LogTarget, LoggerCapability,
-    MemoryLogTarget, NetworkLogTarget, SimpleUnifiedLogger, TargetCapability, TargetInfo,
-    TargetType, UnifiedLogEntry, UnifiedLogStats, UnifiedLogger,
+    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
+    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    ModuleLoadError as LkmLoadError, KernelModule as LkmModule, LkmLoader, KpatchPatch, KpatchManager,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
@@ -113,30 +96,28 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-};
-pub use plugin::{
-    ManagerCapability, Plugin, PluginCapability, PluginError, PluginID, PluginInfo, PluginManager,
-    PluginState, PluginStats, SimplePlugin, SimplePluginManager,
-};
-pub use process::{
-    Process as UserspaceProcess, ProcessError as UserspaceProcessError, ProcessGroup,
-    ProcessID as UserspaceProcessID, ProcessSpawner, ProcessState as UserspaceProcessState,
-    ProcessWaiter, SimpleProcess, SimpleProcessGroup, SimpleProcessSpawner, SimpleProcessWaiter,
-    SIGINT, SIGKILL, SIGTERM, SIGUSR1,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+    SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
+    TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, LinuxCapability, Permission, PledgeManager, PledgePromise,
-    Securelevel, SovereignSecurelevelManager, UnveilManager, UnveilPermission, UnveilRestriction,
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
+    KaliSniffer, PentestAssistant, SecureWipeTool, IntrusionSeverity, IntrusionAlert, SigmaIDS,
+};
+pub use init::{
+    Runlevel, ServiceState as InitServiceState, InitError, Service as InitService, SimpleService as InitSimpleService,
+    InitSystem, SigmaInit, DependencyResolver as InitDependencyResolver, SimpleDependencyResolver, ServiceMonitor, SimpleServiceMonitor,
+    FirmwarePort, BIOSPort, UEFIPort, CorebootPort, SecurityPort, DACPort, SELinuxPort, ZeroTrustPort,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
@@ -144,6 +125,12 @@ pub use sigpkg::{
     SatSolver, Transaction,
 };
 pub use virtualization::{
-    Container as VirtualContainer, KubernetesPod, ResourcePool, VirtualMachine,
-    VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use toolchain::self_host::{ToolchainError, CompilerConfig, SelfHostingManager};
+pub use arch::cpu_sys::{
+    SegmentType as CpuSegmentType, GdtDescriptor as CpuGdtDescriptor, IdtGate as CpuIdtGate,
+    VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
+    FastSyscallDispatcher as CpuFastSyscallDispatcher,
 };
