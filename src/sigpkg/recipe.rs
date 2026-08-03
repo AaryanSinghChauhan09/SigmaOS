@@ -1,28 +1,8 @@
-#![allow(clippy::useless_format)]
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
-use crate::klib::HashMap;
-use crate::sigpkg::{Dependency, Version, VersionConstraint};
+use crate::sigpkg::{Dependency, Version};
+use std::collections::HashMap;
 
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,6 +28,8 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
+    pub pkgrel: u32,
+    pub prepare_commands: Vec<String>,
 }
 
 impl PackageRecipe {
@@ -63,6 +45,8 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
+            pkgrel: 1,
+            prepare_commands: Vec::new(),
         }
     }
 
@@ -98,11 +82,12 @@ impl PackageRecipe {
     }
 
     pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.build_commands.push(command);
+        self.prepare_commands.push(command);
         self
     }
 
-    pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
         self
     }
 
@@ -160,7 +145,6 @@ pub struct RecipeManager {
 }
 
 impl RecipeManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             recipes: HashMap::new(),
