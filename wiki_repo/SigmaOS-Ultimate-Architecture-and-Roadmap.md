@@ -32,6 +32,7 @@ SigmaOS absorbs the greatest strengths of major traditional Linux distributions 
 | **Legacy Protection Elements** | Native historical simulation (Protected Mode, text driver) | Requires slow CPU emulator VM (QEMU/BOSCH) | Requires slow emulator VM | Requires manual emulator setup | Requires emulator setup |
 | **Paging & Swap Space** | Dual-Tier Zswap Cache + Zram Pool (Zstd, LZ4, LZO) + Swap Disk | Zram (since Ubuntu 22.04) | Zram (default since F33) | Configurable manually | Configurable manually |
 | **Control Flow & Sandboxing** | Epoll/Kqueue Loop (`SovereignKqueue`) + OpenBSD Pledge | Epoll (no native Pledge sandboxing) | Epoll (no native Pledge) | Epoll | Epoll |
+| **Stateful Firewall & NAT** | Stateful Netfilter (`SovereignConntrack`) + SimpleNAT | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables |
 
 ---
 
@@ -173,7 +174,39 @@ Enforces dynamic system-level containment of active processes, dropping access t
 
 ---
 
-## 7. Modular Workflows & Community-Driven Innovation
+## 7. Netfilter-Style Stateful Firewall & Connection Tracker (`SovereignConntrack`)
+
+To prevent network penetration and implement stateful inspection of active streams, SigmaOS replicates Linux Netfilter's robust connection tracking:
+
+```
+                            Stateful Packet Filtering
+
+            +-------------------------------------------------+
+            |               Incoming Packet IP/Port           |
+            +-------------------------------------------------+
+                                     |
+                                     v
+                       [ Is Flow already in conntrack? ]
+                                     |
+                      +--------------+--------------+
+                      | Yes (ESTABLISHED)           | No (NEW)
+                      v                             v
+           +--------------------+         +--------------------+
+           |  Auto-Accept       |         |  Match Netfilter   |
+           |  (Fast Path)       |         |  Chain Hook Rules  |
+           +--------------------+         +---------+----------+
+                                                    |
+                                                    v
+                                          [ Drop, Reject, or Log ]
+```
+
+1. **Stateful Inspection (`SovereignConntrack`)**: Intercepts packets and matches them against active bidirectional conversation streams. If a match is found, the connection state is evaluated as `Established`, allowing it to bypass the computationally expensive rules table (Fast Path).
+2. **Netfilter Hook Chains**: Evaluates rules aligned to specific chain hooks: `Prerouting`, `Input`, `Forward`, `Output`, and `Postrouting`, identical to Linux netfilter architectures.
+3. **NAT Support**: Direct translation registries map internal IP structures to designated external sockets seamlessly.
+
+---
+
+## 8. Modular Workflows & Community-Driven Innovation
 
 To maintain publisher-grade quality, the SigmaOS project employs standardized workflows for code contribution and validation.
 
