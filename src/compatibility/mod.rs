@@ -28,3 +28,9 @@ pub use legacy_adapters::{
 pub use standards::{
     FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };
+
+pub mod debian;
+pub use debian::{
+    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
+    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
+};
