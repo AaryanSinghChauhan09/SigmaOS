@@ -92,6 +92,9 @@ impl PageTableEntry {
 #[derive(Clone)]
 #[derive(Clone)]
 #[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }

@@ -215,7 +215,12 @@ impl VirtualFilesystem {
     }
 
     /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn read_file_gated(&mut self, fd: u64, buffer: &mut [u8], token: &CapabilityToken) -> Result<usize, FsError> {
+    pub fn read_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &mut [u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
         if !token.has_permission(Permission::FileRead) {
             return Err(FsError::PermissionDenied);
         }
@@ -223,7 +228,12 @@ impl VirtualFilesystem {
     }
 
     /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn write_file_gated(&mut self, fd: u64, buffer: &[u8], token: &CapabilityToken) -> Result<usize, FsError> {
+    pub fn write_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &[u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
         if !token.has_permission(Permission::FileWrite) {
             return Err(FsError::PermissionDenied);
         }
@@ -321,18 +331,32 @@ mod tests {
         let bad_token = CapabilityToken::new(); // no read or write permissions
         let read_token = CapabilityToken::new().allow_read("/var/www");
         let write_token = CapabilityToken::new().allow_write("/tmp");
-        let _all_token = CapabilityToken::new().allow_read("/var/www").allow_write("/tmp");
+        let _all_token = CapabilityToken::new()
+            .allow_read("/var/www")
+            .allow_write("/tmp");
 
         let mut buf = [0u8; 10];
 
         // Write should fail with bad_token and read_token, but succeed with write_token or all_token
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
+        assert_eq!(
+            vfs.write_file_gated(fd, b"gated", &bad_token),
+            Err(FsError::PermissionDenied)
+        );
+        assert_eq!(
+            vfs.write_file_gated(fd, b"gated", &read_token),
+            Err(FsError::PermissionDenied)
+        );
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+        assert_eq!(
+            vfs.read_file_gated(fd, &mut buf, &bad_token),
+            Err(FsError::PermissionDenied)
+        );
+        assert_eq!(
+            vfs.read_file_gated(fd, &mut buf, &write_token),
+            Err(FsError::PermissionDenied)
+        );
         assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
     }
 }
