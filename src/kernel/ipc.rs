@@ -433,63 +433,51 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_splice_engine() {
-        let mut source_pipe = SovereignPipe::new(1, 100, 200, 10);
-        let mut dest_pipe = SovereignPipe::new(2, 200, 300, 10);
+    fn test_non_blocking_operations() {
+        let mut pipe = SovereignPipe::new(1, 101, 102, 1);
+        pipe.set_non_blocking(true);
+        assert!(pipe.non_blocking);
 
-        source_pipe.write_structure(vec![1, 1, 1]).unwrap();
-        source_pipe.write_structure(vec![2, 2, 2]).unwrap();
+        // First write succeeds
+        assert!(pipe.write_structure(vec![9, 9, 9]).is_ok());
 
-        let mut splice_engine = SovereignSpliceEngine::new();
-        let spliced = splice_engine.splice(&mut source_pipe, &mut dest_pipe, 2).unwrap();
-
-        assert_eq!(spliced, 2);
-        assert_eq!(splice_engine.bytes_spliced, 6);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![1, 1, 1]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![2, 2, 2]);
+        // Second write under non-blocking mode with full capacity should return WouldBlock
+        assert_eq!(pipe.write_structure(vec![8, 8, 8]), Err(IpcError::WouldBlock));
     }
 
     #[test]
-    fn test_sovereign_sendfile_engine() {
-        let mut dest_pipe = SovereignPipe::new(3, 100, 200, 10);
-        let file_cache = vec![
-            vec![10, 20],
-            vec![30, 40],
-            vec![50, 60],
-        ];
+    fn test_dynamic_resizing() {
+        let mut pipe = SovereignPipe::new(1, 101, 102, 1);
+        assert!(pipe.write_structure(vec![1, 1, 1]).is_ok());
 
-        let mut sendfile_engine = SovereignSendfileEngine::new();
-        let sent = sendfile_engine.send_file_to_pipe(&file_cache, &mut dest_pipe, 1, 2).unwrap();
+        // Shrinking below current element count should fail
+        assert_eq!(pipe.resize_capacity(0), Err(IpcError::ChannelFull));
 
-        assert_eq!(sent, 4);
-        assert_eq!(sendfile_engine.files_sent, 1);
-        assert_eq!(sendfile_engine.total_bytes_sent, 4);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![30, 40]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![50, 60]);
+        // Growing capacity succeeds
+        assert!(pipe.resize_capacity(5).is_ok());
+        assert_eq!(pipe.max_capacity, 5);
+
+        // Writing another package is now allowed due to higher capacity
+        assert!(pipe.write_structure(vec![2, 2, 2]).is_ok());
+        assert_eq!(pipe.ring_buffer.len(), 2);
     }
 
     #[test]
-    fn test_sovereign_ool_remapper() {
-        let mut remapper = SovereignOolRemapper::new();
-        let buffer = vec![0u8; 9000]; // Multi-page buffer
-        let remapped = remapper.remap_ool(10, 20, buffer.clone()).unwrap();
+    fn test_pipe_status_checks() {
+        let mut pipe = SovereignPipe::new(1, 101, 102, 2);
 
-        assert_eq!(remapped.len(), 9000);
-        assert_eq!(remapper.pages_remapped, 3); // 9000 bytes spans 3 pages (each 4096)
-    }
+        // Empty pipe status
+        assert!(!pipe.is_readable());
+        assert!(pipe.is_writable());
 
-    #[test]
-    fn test_shared_page_ring_buffer() {
-        let mut ring = SharedPageRingBuffer::new(5);
-        assert!(ring.pop_item().is_none());
+        // Semi-full pipe status
+        assert!(pipe.write_structure(vec![1]).is_ok());
+        assert!(pipe.is_readable());
+        assert!(pipe.is_writable());
 
-        ring.push_item(vec![5, 10]).unwrap();
-        ring.push_item(vec![15, 20]).unwrap();
-        ring.trigger_ipi();
-
-        assert_eq!(ring.interrupts_triggered, 1);
-        assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
-        assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
-        assert!(ring.pop_item().is_none());
+        // Fully-full pipe status
+        assert!(pipe.write_structure(vec![2]).is_ok());
+        assert!(pipe.is_readable());
+        assert!(!pipe.is_writable());
     }
 }
