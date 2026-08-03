@@ -89,10 +89,11 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    Bdle, Ch340Driver, DeviceGeneration, E1000Driver, GpuCommand, GpuDriver, GpuError, HidError,
+    HidKeyboardEvent, HidReportType, InputDriver, InputEvent, InputType, IntelHdaDriver,
+    NetworkCommand, NetworkDriver, NetworkError, NetworkType, NvmeCmd, NvmeCqe, NvmeDriver,
+    PeripheralDevice, PeripheralManager, PowerState, RxDescriptor, StorageCommand, StorageDriver,
+    StorageError, StorageType, TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
