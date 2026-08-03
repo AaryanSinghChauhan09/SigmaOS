@@ -3,6 +3,13 @@
 
 use std::io::{self, BufRead, Write};
 
+pub struct AgentAutomationEngine;
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -47,23 +54,6 @@ pub enum ShellCommand {
     },
     Rm {
         filename: String,
-    },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
     },
     Theme {
         theme_name: String,
@@ -172,8 +162,8 @@ impl ShellRepl {
     pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
         let mut suggestions = Vec::new();
         let commands = [
-            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
-            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+            "help", "ps", "ls", "pwd", "whoami", "uname", "clear", "touch", "mkdir", "theme",
+            "profile", "a11y", "set", "get", "alias",
         ];
         for cmd in &commands {
             if cmd.starts_with(prefix) {

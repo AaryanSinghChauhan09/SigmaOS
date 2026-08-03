@@ -411,7 +411,8 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Ebuild, ebuild_adapter);
         self.adapters.insert(PackageFormat::Apk, apk_adapter);
         self.adapters.insert(PackageFormat::Nix, nix_adapter);
-        self.adapters.insert(PackageFormat::AppImage, appimage_adapter);
+        self.adapters
+            .insert(PackageFormat::AppImage, appimage_adapter);
         self.adapters.insert(PackageFormat::Xbps, xbps_adapter);
         self.adapters.insert(PackageFormat::Txz, txz_adapter);
         self.adapters.insert(PackageFormat::Eopkg, eopkg_adapter);
