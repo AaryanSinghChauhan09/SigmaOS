@@ -44,6 +44,7 @@ pub mod observability {
     pub mod profiler;
 }
 pub mod ai;
+pub mod arch;
 pub mod boot;
 pub mod toolchain;
 pub mod scheduler {
@@ -128,3 +129,8 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 pub use toolchain::self_host::{ToolchainError, CompilerConfig, SelfHostingManager};
+pub use arch::cpu_sys::{
+    SegmentType as CpuSegmentType, GdtDescriptor as CpuGdtDescriptor, IdtGate as CpuIdtGate,
+    VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
+    FastSyscallDispatcher as CpuFastSyscallDispatcher,
+};
