@@ -1,4 +1,5 @@
 #!/bin/bash
+# SPDX-License-Identifier: MIT
 # SigmaOS Smoke Test Script
 # Basic smoke tests for SigmaOS build
 

@@ -62,6 +62,7 @@ pub struct SovereignPipe {
     pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
     pub max_capacity: usize,
     pub bytes_transferred: u64,
+    pub non_blocking: bool,        // Non-blocking mode flag (Linux inspired)
 }
 
 impl SovereignPipe {
@@ -73,13 +74,42 @@ impl SovereignPipe {
             ring_buffer: Vec::new(),
             max_capacity: capacity,
             bytes_transferred: 0,
+            non_blocking: false,
         }
+    }
+
+    /// Sets the non-blocking status of the pipe
+    pub fn set_non_blocking(&mut self, non_blocking: bool) {
+        self.non_blocking = non_blocking;
+    }
+
+    /// Resizes the pipe buffer capacity dynamically (inspired by Linux F_SETPIPE_SZ fcntl controls)
+    pub fn resize_capacity(&mut self, new_capacity: usize) -> Result<(), IpcError> {
+        if self.ring_buffer.len() > new_capacity {
+            return Err(IpcError::ChannelFull);
+        }
+        self.max_capacity = new_capacity;
+        Ok(())
+    }
+
+    /// Readability state indicator for event multiplexing / polling (epoll equivalent)
+    pub fn is_readable(&self) -> bool {
+        !self.ring_buffer.is_empty()
+    }
+
+    /// Writability state indicator for event multiplexing / polling (epoll equivalent)
+    pub fn is_writable(&self) -> bool {
+        self.ring_buffer.len() < self.max_capacity
     }
 
     /// Structured write operation with dynamic backpressure (returns Err if capacity reached)
     pub fn write_structure(&mut self, payload: Vec<u8>) -> Result<(), IpcError> {
         if self.ring_buffer.len() >= self.max_capacity {
-            return Err(IpcError::ChannelFull);
+            if self.non_blocking {
+                return Err(IpcError::WouldBlock);
+            } else {
+                return Err(IpcError::ChannelFull);
+            }
         }
         self.bytes_transferred += payload.len() as u64;
         self.ring_buffer.push(payload);
@@ -177,6 +207,8 @@ pub enum IpcError {
     ChannelFull,
     PermissionDenied,
     InvalidMessage,
+    WouldBlock,   // Non-blocking write target is full / read target empty
+    BrokenPipe,   // Attempted pipe write after reader disconnected
 }
 
 #[cfg(test)]
@@ -241,5 +273,54 @@ mod tests {
 
         let r3 = pipe.read_structure();
         assert!(r3.is_none());
+    }
+
+    #[test]
+    fn test_non_blocking_operations() {
+        let mut pipe = SovereignPipe::new(1, 101, 102, 1);
+        pipe.set_non_blocking(true);
+        assert!(pipe.non_blocking);
+
+        // First write succeeds
+        assert!(pipe.write_structure(vec![9, 9, 9]).is_ok());
+
+        // Second write under non-blocking mode with full capacity should return WouldBlock
+        assert_eq!(pipe.write_structure(vec![8, 8, 8]), Err(IpcError::WouldBlock));
+    }
+
+    #[test]
+    fn test_dynamic_resizing() {
+        let mut pipe = SovereignPipe::new(1, 101, 102, 1);
+        assert!(pipe.write_structure(vec![1, 1, 1]).is_ok());
+
+        // Shrinking below current element count should fail
+        assert_eq!(pipe.resize_capacity(0), Err(IpcError::ChannelFull));
+
+        // Growing capacity succeeds
+        assert!(pipe.resize_capacity(5).is_ok());
+        assert_eq!(pipe.max_capacity, 5);
+
+        // Writing another package is now allowed due to higher capacity
+        assert!(pipe.write_structure(vec![2, 2, 2]).is_ok());
+        assert_eq!(pipe.ring_buffer.len(), 2);
+    }
+
+    #[test]
+    fn test_pipe_status_checks() {
+        let mut pipe = SovereignPipe::new(1, 101, 102, 2);
+
+        // Empty pipe status
+        assert!(!pipe.is_readable());
+        assert!(pipe.is_writable());
+
+        // Semi-full pipe status
+        assert!(pipe.write_structure(vec![1]).is_ok());
+        assert!(pipe.is_readable());
+        assert!(pipe.is_writable());
+
+        // Fully-full pipe status
+        assert!(pipe.write_structure(vec![2]).is_ok());
+        assert!(pipe.is_readable());
+        assert!(!pipe.is_writable());
     }
 }
