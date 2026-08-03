@@ -2,6 +2,23 @@
 // This file implements 12 additional drivers spanning ancient/legacy era to state-of-the-art modern hardware.
 
 #![allow(clippy::all, warnings)]
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
 
 extern crate alloc;
 
@@ -24,6 +41,7 @@ pub struct AdLibSynthDriver {
 }
 
 impl AdLibSynthDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -379,6 +397,7 @@ pub struct PciIdeBridge {
 }
 
 impl PciIdeBridge {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -455,6 +474,7 @@ pub struct Ps2MouseDriver {
 }
 
 impl Ps2MouseDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -541,6 +561,7 @@ pub struct VgaTextModeDriver {
 }
 
 impl VgaTextModeDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -621,6 +642,7 @@ pub struct SerialMouseDriver {
 }
 
 impl SerialMouseDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -699,6 +721,7 @@ pub struct Ne2000NetworkDriver {
 }
 
 impl Ne2000NetworkDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -773,6 +796,7 @@ pub struct Usb4HostController {
 }
 
 impl Usb4HostController {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -852,6 +876,7 @@ pub struct NvlinkBusDriver {
 }
 
 impl NvlinkBusDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -929,6 +954,7 @@ pub struct Bluetooth5_4_Adapter {
 }
 
 impl Bluetooth5_4_Adapter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -1005,6 +1031,7 @@ pub struct PcieGen6Bridge {
 }
 
 impl PcieGen6Bridge {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -1082,6 +1109,7 @@ pub struct Sata3Controller {
 }
 
 impl Sata3Controller {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,
@@ -1168,6 +1196,7 @@ pub struct Ufs4StorageDriver {
 }
 
 impl Ufs4StorageDriver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_initialized: false,

@@ -1,6 +1,5 @@
 /// Custom SSSD (System Security Services Daemon) Compatibility Subsystem for SigmaOS
 /// Implements offline credentials caching, NSS user/group resolution, multi-domain failover, and HBAC policy engine.
-
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -142,13 +141,13 @@ impl HbacPolicyEngine {
             return true; // Root is always allowed
         }
 
+        if host == "secure_vault_server" {
+            return user == "jules" && service == "audit";
+        }
+
         if service == "ssh" || service == "sshd" {
             // Enforce that only "jules" can access sshd on any host
             return user == "jules";
-        }
-
-        if host == "secure_vault_server" {
-            return user == "jules" && service == "audit";
         }
 
         true // Accept other service requests by default

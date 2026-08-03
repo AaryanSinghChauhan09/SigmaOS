@@ -23,7 +23,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 /// Linux capability (capability-based security)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxCapability {

@@ -698,7 +698,11 @@ impl AtifTrajectoryMonitor {
     pub fn new() -> Self {
         Self {
             steps_recorded: 0,
-            active_trail: [WandrEvent { timestamp: 0, step_id: 0, status: 0 }; 32],
+            active_trail: [WandrEvent {
+                timestamp: 0,
+                step_id: 0,
+                status: 0,
+            }; 32],
         }
     }
 
@@ -732,9 +736,14 @@ impl VerifierConsensus {
         self.entities_matched += 1;
         let _id = entity_id;
         if score_modifier < 0 {
-            self.consensus_score = self.consensus_score.saturating_sub((-score_modifier) as u32);
+            self.consensus_score = self
+                .consensus_score
+                .saturating_sub((-score_modifier) as u32);
         } else {
-            self.consensus_score = self.consensus_score.saturating_add(score_modifier as u32).min(100);
+            self.consensus_score = self
+                .consensus_score
+                .saturating_add(score_modifier as u32)
+                .min(100);
         }
         self.consensus_score >= 50
     }

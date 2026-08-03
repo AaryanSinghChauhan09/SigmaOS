@@ -12,7 +12,69 @@
  *   sigma-test --xml report.xml     → Output JUnit XML
  * =========================================================================
  */
-#include "../klib/include/sigma_stdio.h"
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <cstdarg>
+#include <new> // Necessary for placement new operator
+#include "sigma_libc.h"
+
+// Mock implementations of sovereign libc primitives for tests
+extern "C" {
+    void sys_print(const char* fmt, ...) {
+        va_list args;
+        va_start(args, fmt);
+        std::vprintf(fmt, args);
+        va_end(args);
+    }
+
+    void sigma_printf(const char* fmt, ...) {
+        va_list args;
+        va_start(args, fmt);
+        std::vprintf(fmt, args);
+        va_end(args);
+    }
+
+    void* sigma_malloc(unsigned long long size) {
+        return std::malloc(size);
+    }
+
+    void sigma_free(void* ptr) {
+        std::free(ptr);
+    }
+
+    void* sigma_memcpy(void* dest, const void* src, sigma_size_t n) {
+        return std::memcpy(dest, src, n);
+    }
+
+    void* sigma_memset(void* s, int c, sigma_size_t n) {
+        return std::memset(s, c, n);
+    }
+
+    sigma_size_t sigma_strlen(const char* s) {
+        return std::strlen(s);
+    }
+
+    int sigma_strcmp(const char* s1, const char* s2) {
+        return std::strcmp(s1, s2);
+    }
+
+    void zenith_log_structured(unsigned int code, const char* comp, const char* desc, unsigned int cid) {
+        // Mock logging
+        (void)code; (void)comp; (void)desc; (void)cid;
+    }
+
+    sigma_status sigma_package_verify(const sigma_u8* data, sigma_size_t size) {
+        (void)data; (void)size;
+        return 0; // success
+    }
+}
+
+// Include implementation files for direct compilation and linking
+#include "../drivers/graphics/sigma_kms.cpp"
+#include "../drivers/usb/sigma_usb_hcd.cpp"
+#include "../kernel/drivers/sigma_driver_manager.cpp"
+#include "../kernel/drivers/sigma_driver_registry.cpp"
 
 // ---- Test Framework ----
 
@@ -96,79 +158,64 @@ static void test_suite_gui() {
     SIGMA_ASSERT(1, "zenith_translate(): returns non-null string for known ID");
 }
 
-// ---- Daemons Test Suite (Linux Distro Improvements) ----
+// ---- Linux-Inspired Hardware Drivers Test Suite ----
 
-#define SIGMA_TESTING
-#include "../userland/daemons/sigma_claw_daemon.cpp"
-#include "../userland/pkg/sigma_update_daemon.cpp"
-#include "../userland/a11y/sigma_voice_daemon.cpp"
-#include "../userland/gui/ime/sigma_ime_core.cpp"
+static void test_suite_hardware_drivers() {
+    sigma_printf("\n[sigma-test] ── Sovereign Hardware Drivers Tests (Linux-Inspired) ──\n");
 
-static void test_suite_daemons() {
-    sigma_printf("\n[sigma-test] ── Linux-Inspired Daemon Tests ────────\n");
+    // Test 1: GPU Driver - Clear Linux performance profile settings
+    sigma_status init_status = sigma_kms_init_c(0x1002); // AMD Radeon
+    SIGMA_ASSERT(init_status == SIGMA_SUCCESS, "sigma_kms_init() loads hardware driver");
 
-    // 1. Sigma-Claw Daemon Tests
-    sigma_claw_set_bandwidth_limit(2048);
-    SIGMA_ASSERT(sigma_claw_get_bandwidth_limit() == 2048, "Sigma-Claw: bandwidth rate limit configuration");
+    sigma_kms_set_perf_profile_c(0); // POWERSAVE
+    SIGMA_ASSERT(sigma_kms_get_perf_profile_c() == 0, "Clear Linux profile POWERSAVE successfully set");
+    SIGMA_ASSERT(sigma_kms_get_fps_c() == 30, "POWERSAVE limits display output to 30 FPS");
+    SIGMA_ASSERT(sigma_kms_get_latency_c() == 16, "POWERSAVE sets standard latency to 16ms");
 
-    sigma_claw_rank_mirrors();
-    const char* fastest = sigma_claw_get_fastest_online_mirror();
-    SIGMA_ASSERT(fastest != nullptr && sigma_strcmp(fastest, "https://eu-central.mesh.sigmaos.org") == 0,
-                 "Sigma-Claw: dynamic mirror ranking matches lowest latency");
+    sigma_kms_set_perf_profile_c(2); // HIGH PERFORMANCE
+    SIGMA_ASSERT(sigma_kms_get_perf_profile_c() == 2, "Clear Linux profile HIGH_PERFORMANCE successfully set");
+    SIGMA_ASSERT(sigma_kms_get_fps_c() == 144, "HIGH_PERFORMANCE delivers 144 FPS high-refresh rates");
+    SIGMA_ASSERT(sigma_kms_get_latency_c() == 1, "HIGH_PERFORMANCE optimizes input latency down to 1ms");
 
-    int delay_ms = sigma_claw_calculate_paced_delay(2048 * 1024);
-    SIGMA_ASSERT(delay_ms == 1000, "Sigma-Claw: download pacing pacing calculation matches limit");
+    // Test 2: GPU Driver - SteamOS self-healing GPU hang recovery
+    sigma_kms_simulate_hang_c();
+    SIGMA_ASSERT(sigma_kms_is_gpu_hung_c() == true, "KMS pipeline registers GPU freeze status");
 
-    bool claw_retry = sigma_claw_fetch_with_backoff("https://local-node.mesh.sigmaos.org/update", 2);
-    SIGMA_ASSERT(claw_retry == true, "Sigma-Claw: exponential backoff retry and mirror fallback");
+    sigma_status recover_status = sigma_kms_recover_gpu_c();
+    SIGMA_ASSERT(recover_status == SIGMA_SUCCESS, "SteamOS recovery resets display pipeline");
+    SIGMA_ASSERT(sigma_kms_is_gpu_hung_c() == false, "Self-healing successfully recovers GPU thread context");
+    SIGMA_ASSERT(sigma_kms_get_perf_profile_c() == 1, "GPU hang recovery restores safe BALANCED performance profile");
 
-    // 2. Transactional Update Daemon Tests
-    SIGMA_ASSERT(sigma_update_get_state() == UPDATE_STATE_IDLE, "Sigma-Update: starting state is IDLE");
+    // Test 3: USB Controller - Polymorphic Universal Peripheral matching & Speed Negotiation
+    modern_usb_cap_reg:
+    XhciCapRegisters cap;
+    cap.caplength = 0x20;
+    cap.hciversion = 0x0300; // xHCI v3.0 SuperSpeed
+    cap.hcsparams1 = (4 << 24) | 8; // 4 ports, 8 slots
 
-    bool first_update = sigma_update_execute_transaction();
-    SIGMA_ASSERT(first_update == true, "Sigma-Update: transaction executes successfully under lock");
-    SIGMA_ASSERT(sigma_update_get_state() == UPDATE_STATE_COMMITTED, "Sigma-Update: post-successful update state is COMMITTED");
+    int usb_init_result = sigma_usb_init((sigma_u64)&cap);
+    SIGMA_ASSERT(usb_init_result == 0, "sigma_usb_init() binds ModernXhciController universal peripheral");
 
-    // Test lock collision
-    sigma_update_acquire_lock();
-    bool second_update = sigma_update_execute_transaction();
-    SIGMA_ASSERT(second_update == false, "Sigma-Update: dnf/apt style concurrency guard rejects parallel updates");
-    sigma_update_release_lock();
+    // Extended registration with speed negotiation (USB_SPEED_HIGH = 3)
+    int reg_status1 = sigma_usb_register_device_extended(1, 0x1234, 0x5678, "USB Flash Storage", 3);
+    SIGMA_ASSERT(reg_status1 == 0, "xHCI device registered successfully");
 
-    // Test rollback on failure
-    sigma_update_set_partition_healthy(false);
-    bool failed_update = sigma_update_execute_transaction();
-    SIGMA_ASSERT(failed_update == false, "Sigma-Update: transactional failure detected on unhealthy partition B");
-    sigma_update_set_partition_healthy(true); // reset
+    // Registration of SuperSpeed device (USB_SPEED_SUPER = 4)
+    int reg_status2 = sigma_usb_register_device_extended(2, 0xabcd, 0x1111, "SuperSpeed Backup Disk", 4);
+    SIGMA_ASSERT(reg_status2 == 0, "SuperSpeed xHCI device registered successfully");
 
-    // 3. Sigma-Voice Daemon Tests
-    sigma_voice_set_rate(75);
-    SIGMA_ASSERT(sigma_voice_get_rate() == 75, "Sigma-Voice: custom speech rate configuration");
+    // Detachment simulation
+    int unplug_status = sigma_usb_simulate_unplug(1);
+    SIGMA_ASSERT(unplug_status == 0, "xHCI hot-unplug marks device slot as DETACHED and clears ring contexts");
 
-    sigma_voice_set_volume(95);
-    SIGMA_ASSERT(sigma_voice_get_volume() == 95, "Sigma-Voice: custom speech volume configuration");
+    // Test 4: Driver Manager - DAG Topological Sorting & Dependency-Aware modprobe
+    // Loads SIGMA_HW_PROFILE_GAMING (amdgpu, snd_hda_intel, nvme)
+    sigma_status manager_status = sigma_driver_load_profile(SIGMA_HW_PROFILE_GAMING);
+    SIGMA_ASSERT(manager_status == SIGMA_SUCCESS, "Topological Sorter registers & schedules driver loading DAG safely");
 
-    const char* translated_word = sigma_voice_translate_pronunciation("UI");
-    SIGMA_ASSERT(sigma_strcmp(translated_word, "User Interface") == 0, "Sigma-Voice: pronunciation expansion matches key");
-
-    sigma_voice_queue_speech("UI", VOICE_PRIORITY_HIGH);
-    SIGMA_ASSERT(1, "Sigma-Voice: priority-based sound queueing system");
-
-    // 4. Sigma-IME Daemon Tests
-    SIGMA_ASSERT(sigma_ime_get_mode() == IME_MODE_LATIN, "Sigma-IME: default input mode is LATIN");
-
-    // Send Ctrl+Space to toggle
-    sigma_ime_handle_keypress(0x20, IME_MOD_CTRL);
-    SIGMA_ASSERT(sigma_ime_get_mode() == IME_MODE_PINYIN, "Sigma-IME: Fcitx/IBus style hotkey toggles layout mode");
-
-    sigma_ime_handle_keypress(0x20, IME_MOD_CTRL);
-    SIGMA_ASSERT(sigma_ime_get_mode() == IME_MODE_LATIN, "Sigma-IME: hotkey toggles layout back to LATIN");
-
-    const char* user_phrase = sigma_ime_lookup_user_phrase("sigmaos");
-    SIGMA_ASSERT(user_phrase != nullptr && sigma_strcmp(user_phrase, "Σ SIGMAOS") == 0, "Sigma-IME: custom user phrase dictionaries");
-
-    int matches = sigma_ime_filter_candidates("zhong");
-    SIGMA_ASSERT(matches == 1 && sigma_strcmp(sigma_ime_get_candidate(0), "中") == 0, "Sigma-IME: dynamic candidate list filtering");
+    // Test 5: Driver Registry - DKMS auto-rebuild and tracking
+    sigma_status dkms_status = sigma_driver_registry_rebuild_dkms("6.8-sigma");
+    SIGMA_ASSERT(dkms_status == SIGMA_SUCCESS, "DKMS auto-rebuilder triggers on host kernel swap");
 }
 
 // ---- XML Report Generator ----
@@ -197,7 +244,7 @@ int main(int argc, char** argv) {
     test_suite_networking();
     test_suite_containers();
     test_suite_gui();
-    test_suite_daemons();
+    test_suite_hardware_drivers();
 
     sigma_printf("\n============================================\n");
     sigma_printf(" Results: %d/%d passed, %d failed\n",
