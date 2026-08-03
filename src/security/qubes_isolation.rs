@@ -135,12 +135,6 @@ pub struct DomainOrchestrator {
     pub qrexec_policy: QrexecPolicyEngine,
 }
 
-impl Default for DomainOrchestrator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl DomainOrchestrator {
     pub fn new() -> Self {
         Self {
