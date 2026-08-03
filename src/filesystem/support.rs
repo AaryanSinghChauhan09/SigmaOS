@@ -1,6 +1,10 @@
 #![no_std]
 #![no_main]
 
+#[cfg(not(target_os = "none"))]
+extern crate alloc;
+#[cfg(not(target_os = "none"))]
+use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
@@ -543,12 +547,14 @@ impl FilesystemManager for SimpleFilesystemManager {
 }
 
 /// Simple Vec implementation for no_std execution
+#[cfg(target_os = "none")]
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {
@@ -556,12 +562,14 @@ impl<T> core::ops::Index<usize> for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::IndexMut<usize> for Vec<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         unsafe { &mut *self.data.add(index) }
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -637,6 +645,7 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);

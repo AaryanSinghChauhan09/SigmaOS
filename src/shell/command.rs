@@ -411,7 +411,6 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
-<<<<<<< HEAD
 pub struct ShellVec<T> {
     pub data: *mut T,
     pub len: usize,
@@ -421,26 +420,12 @@ pub struct ShellVec<T> {
 impl<T> ShellVec<T> {
     pub fn new() -> Self {
         ShellVec {
-=======
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
+
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -452,13 +437,35 @@ impl<T> Vec<T> {
             }
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn remove(&mut self, index: usize) -> Option<T> {
+        if index >= self.len {
+            return None;
+        }
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            Some(item)
+        }
+    }
+
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index >= self.len {
+            return None;
+        }
+        unsafe { Some(&*self.data.add(index)) }
+    }
+
     pub unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
@@ -472,7 +479,6 @@ impl<T> Vec<T> {
     }
 }
 
-<<<<<<< HEAD
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
@@ -486,8 +492,6 @@ unsafe fn free(ptr: *mut u8) {
     let _ = ptr;
 }
 
-=======
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;

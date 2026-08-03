@@ -104,19 +104,6 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-<<<<<<< HEAD
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-    }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
-=======
         {
             let raw = self.state.load(Ordering::SeqCst) as u32;
             match raw {
@@ -126,7 +113,6 @@ impl Driver for SimpleDriver {
             }
         }
     }
->>>>>>> origin/digital-sovereignty-blueprint-15586244732432424045
     fn load(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Active);
         Ok(())
@@ -511,12 +497,14 @@ impl DriverFramework for SimpleDriverFramework {
     }
 }
 
+#[cfg(target_os = "none")]
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -573,6 +561,7 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if self.capacity > 0 {
@@ -586,6 +575,7 @@ impl<T> Drop for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {
@@ -596,6 +586,7 @@ impl<T> core::ops::Index<usize> for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::IndexMut<usize> for Vec<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         if index >= self.len {
@@ -643,6 +634,7 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
     }
 }
 
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
@@ -692,4 +684,16 @@ mod tests {
         assert!(shim.unload().is_ok());
         unsafe { assert_eq!(RELEASE_CALLED, 1); }
     }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
 }

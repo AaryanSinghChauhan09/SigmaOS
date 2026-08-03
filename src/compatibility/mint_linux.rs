@@ -165,3 +165,34 @@ mod tests {
         assert_eq!(sys.active_alerts, 2);
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintUpdateLevel {
+    Safe,
+    Normal,
+    Untested,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintUpdatePackage {
+    pub name: String,
+    pub level: MintUpdateLevel,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintAppMetadata {
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintReportAlertSeverity {
+    Info,
+    Warning,
+    Critical,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintReportAlert {
+    pub message: String,
+    pub severity: MintReportAlertSeverity,
+}

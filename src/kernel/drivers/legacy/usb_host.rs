@@ -126,11 +126,165 @@ pub struct UsbControlRequest {
     pub length: u16,
 }
 
+/// EHCI Queue Head (QH) - Linux drivers/usb/host/ehci.h inspired
+#[derive(Debug, Clone)]
+pub struct EhciQueueHead {
+    pub horizontal_link: u32,
+    pub endpoint_char: u32,
+    pub endpoint_caps: u32,
+    pub current_qtd: u32,
+    pub next_qtd: u32,
+    pub alternate_next_qtd: u32,
+    pub token: u32,
+    pub buffer_pointers: [u32; 5],
+}
+
+/// EHCI Queue Transfer Descriptor (qTD) - Linux drivers/usb/host/ehci.h inspired
+#[derive(Debug, Clone)]
+pub struct EhciTransferDescriptor {
+    pub next_qtd: u32,
+    pub alternate_next_qtd: u32,
+    pub token: u32,
+    pub buffer_pointers: [u32; 5],
+}
+
+/// EHCI — Enhanced Host Controller Interface (USB 2.0)
+pub struct EhciController {
+    pub base_mmio: u64,
+    pub port_count: u8,
+    pub caps_length: u8,
+    pub async_schedule_enabled: bool,
+    pub periodic_schedule_enabled: bool,
+    pub queue_heads: Vec<EhciQueueHead>,
+    transfer_count: AtomicUsize,
+    initialized: bool,
+}
+
+impl EhciController {
+    pub fn new(base_mmio: u64, ports: u8) -> Self {
+        EhciController {
+            base_mmio,
+            port_count: ports,
+            caps_length: 0x20, // Typical EHCI CAPLENGTH is 0x20
+            async_schedule_enabled: false,
+            periodic_schedule_enabled: false,
+            queue_heads: Vec::new(),
+            transfer_count: AtomicUsize::new(0),
+            initialized: false,
+        }
+    }
+
+    pub fn enable_async_schedule(&mut self, enabled: bool) {
+        self.async_schedule_enabled = enabled;
+    }
+
+    pub fn enable_periodic_schedule(&mut self, enabled: bool) {
+        self.periodic_schedule_enabled = enabled;
+    }
+}
+
+impl UsbHostController for EhciController {
+    fn hci_type(&self) -> HciType {
+        HciType::Ehci
+    }
+    fn speed(&self) -> UsbSpeed {
+        UsbSpeed::High
+    }
+    fn port_count(&self) -> u8 {
+        self.port_count
+    }
+
+    fn enumerate(&mut self) -> Vec<UsbDevice> {
+        Vec::new()
+    }
+
+    fn submit_bulk(&mut self, _dev: u8, _ep: u8, data: &[u8]) -> Result<usize, &'static str> {
+        self.transfer_count.fetch_add(1, Ordering::Relaxed);
+        let qtd = EhciTransferDescriptor {
+            next_qtd: 1,
+            alternate_next_qtd: 1,
+            token: (data.len() as u32) << 16 | 0x80,
+            buffer_pointers: [0; 5],
+        };
+        let qh = EhciQueueHead {
+            horizontal_link: 1,
+            endpoint_char: 0x00020000,
+            endpoint_caps: 0x40000000,
+            current_qtd: 0,
+            next_qtd: 0,
+            alternate_next_qtd: 1,
+            token: 0,
+            buffer_pointers: [0; 5],
+        };
+        self.queue_heads.push(qh);
+        Ok(data.len())
+    }
+
+    fn submit_control(
+        &mut self,
+        _dev: u8,
+        _req: UsbControlRequest,
+    ) -> Result<Vec<u8>, &'static str> {
+        self.transfer_count.fetch_add(1, Ordering::Relaxed);
+        Ok(vec![0u8; 18])
+    }
+}
+
+impl KernelSubsystem for EhciController {
+    fn name(&self) -> &str {
+        "ehci"
+    }
+    fn version(&self) -> &str {
+        "2.0.0"
+    }
+    fn init_order(&self) -> InitOrder {
+        InitOrder::Device
+    }
+    fn priority(&self) -> SubsystemPriority {
+        SubsystemPriority::High
+    }
+    fn dependencies(&self) -> Vec<&'static str> {
+        vec![]
+    }
+    fn initialize(&mut self) -> Result<(), SubsystemError> {
+        self.initialized = true;
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), SubsystemError> {
+        Ok(())
+    }
+}
+
+/// xHCI Transfer Request Block (TRB) - Linux drivers/usb/host/xhci.h inspired
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct XhciTrb {
+    pub parameter: u64,
+    pub status: u32,
+    pub control: u32,
+}
+
+impl XhciTrb {
+    pub fn new(parameter: u64, status: u32, control: u32) -> Self {
+        XhciTrb {
+            parameter,
+            status,
+            control,
+        }
+    }
+
+    pub fn trb_type(&self) -> u32 {
+        (self.control >> 10) & 0x3F
+    }
+}
+
 /// xHCI — eXtensible Host Controller Interface (USB 3.0/3.1/3.2/4.0)
 pub struct XhciController {
     pub base_mmio: u64,
     pub port_count: u8,
     pub max_slots: u8,
+    pub command_ring: Vec<XhciTrb>,
+    pub event_ring: Vec<XhciTrb>,
+    pub device_contexts: Vec<u64>,
     devices: Vec<UsbDevice>,
     transfer_count: AtomicUsize,
     initialized: bool,
@@ -142,10 +296,18 @@ impl XhciController {
             base_mmio,
             port_count: ports,
             max_slots: 64,
+            command_ring: Vec::new(),
+            event_ring: Vec::new(),
+            device_contexts: Vec::new(),
             devices: Vec::new(),
             transfer_count: AtomicUsize::new(0),
             initialized: false,
         }
+    }
+
+    pub fn queue_command(&mut self, trb: XhciTrb) {
+        self.command_ring.push(trb);
+        self.transfer_count.fetch_add(1, Ordering::Relaxed);
     }
 }
 
@@ -167,6 +329,8 @@ impl UsbHostController for XhciController {
 
     fn submit_bulk(&mut self, _dev: u8, _ep: u8, data: &[u8]) -> Result<usize, &'static str> {
         self.transfer_count.fetch_add(1, Ordering::Relaxed);
+        let trb = XhciTrb::new(data.as_ptr() as u64, data.len() as u32, (2 << 10) | 1); // 2: Normal TRB type
+        self.command_ring.push(trb);
         Ok(data.len())
     }
 
@@ -404,5 +568,33 @@ mod tests {
         msc.scsi_read(0, 1, &mut read_buf).unwrap();
         assert_eq!(read_buf[0], write_data[0]);
         assert_eq!(msc.capacity_sectors(), 2048);
+    }
+
+    #[test]
+    fn test_ehci_schedule() {
+        let mut ehci = EhciController::new(0xE000_0000, 4);
+        ehci.initialize().unwrap();
+        assert_eq!(ehci.hci_type(), HciType::Ehci);
+        assert_eq!(ehci.speed(), UsbSpeed::High);
+        assert_eq!(ehci.port_count(), 4);
+
+        ehci.enable_async_schedule(true);
+        assert!(ehci.async_schedule_enabled);
+
+        ehci.enable_periodic_schedule(true);
+        assert!(ehci.periodic_schedule_enabled);
+
+        let result = ehci.submit_bulk(2, 2, &[1, 2, 3]);
+        assert_eq!(result.unwrap(), 3);
+        assert_eq!(ehci.queue_heads.len(), 1);
+    }
+
+    #[test]
+    fn test_xhci_trb_queue() {
+        let mut xhci = XhciController::new(0xF000_0000, 8);
+        let command_trb = XhciTrb::new(0x1000, 0, (11 << 10) | 1); // 11: Address Device Command
+        xhci.queue_command(command_trb);
+        assert_eq!(xhci.command_ring.len(), 1);
+        assert_eq!(xhci.command_ring[0].trb_type(), 11);
     }
 }
