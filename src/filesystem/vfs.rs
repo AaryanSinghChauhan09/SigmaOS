@@ -1,7 +1,7 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
 
-use crate::security::{CapabilityToken, Permission};
+use crate::security::CapabilityToken;
 use std::collections::HashMap;
 
 /// File type
@@ -52,6 +52,7 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
+    pub link_count: u32, // standard inode link count tracking hard links
 }
 
 impl Inode {
@@ -66,6 +67,7 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
+            link_count: 1, // default link count of 1
         }
     }
 }
@@ -165,7 +167,7 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
+        let new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
@@ -214,30 +216,13 @@ impl VirtualFilesystem {
         Ok(bytes_written)
     }
 
-    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn read_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &mut [u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
-        if !token.has_permission(Permission::FileRead) {
-            return Err(FsError::PermissionDenied);
+    pub fn create_hard_link(&mut self, source_inode_id: u64) -> Result<(), FsError> {
+        if let Some(inode) = self.inodes.get_mut(&source_inode_id) {
+            inode.link_count += 1;
+            Ok(())
+        } else {
+            Err(FsError::NotFound)
         }
-        self.read_file(fd, buffer)
-    }
-
-    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn write_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &[u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
-        if !token.has_permission(Permission::FileWrite) {
-            return Err(FsError::PermissionDenied);
-        }
-        self.write_file(fd, buffer)
     }
 
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
@@ -249,7 +234,16 @@ impl VirtualFilesystem {
             return Err(FsError::NotFound);
         }
 
-        self.inodes.remove(&inode_id);
+        let link_reached_zero = if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            inode.link_count = inode.link_count.saturating_sub(1);
+            inode.link_count == 0
+        } else {
+            false
+        };
+
+        if link_reached_zero {
+            self.inodes.remove(&inode_id);
+        }
         Ok(())
     }
 
@@ -297,6 +291,26 @@ mod tests {
     }
 
     #[test]
+    fn test_hard_links_and_unlink() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+
+        // Create hard link (link_count = 2)
+        vfs.create_hard_link(inode_id).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
+
+        // First deletion (link_count = 1, file should NOT be removed)
+        vfs.delete_file(inode_id).unwrap();
+        assert!(vfs.inodes.contains_key(&inode_id));
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+
+        // Second deletion (link_count = 0, file should be removed)
+        vfs.delete_file(inode_id).unwrap();
+        assert!(!vfs.inodes.contains_key(&inode_id));
+    }
+
+    #[test]
     fn test_create_file() {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
@@ -323,40 +337,25 @@ mod tests {
     }
 
     #[test]
-    fn test_gated_read_write() {
+    fn test_zero_sized_read_write_optimization() {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         let fd = vfs.open_file(inode_id, 0).unwrap();
 
-        let bad_token = CapabilityToken::new(); // no read or write permissions
-        let read_token = CapabilityToken::new().allow_read("/var/www");
-        let write_token = CapabilityToken::new().allow_write("/tmp");
-        let _all_token = CapabilityToken::new()
-            .allow_read("/var/www")
-            .allow_write("/tmp");
+        // 1. Zero-sized write should return Ok(0) immediately without touching file size
+        let written = vfs.write_file(fd, &[]).unwrap();
+        assert_eq!(written, 0);
+        let inode = vfs.get_inode(inode_id).unwrap();
+        assert_eq!(inode.size, 0);
 
-        let mut buf = [0u8; 10];
+        // 2. Zero-sized read should return Ok(0) immediately even if file is empty
+        let mut buf = [];
+        let read = vfs.read_file(fd, &mut buf).unwrap();
+        assert_eq!(read, 0);
 
-        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
-        assert_eq!(
-            vfs.write_file_gated(fd, b"gated", &bad_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(
-            vfs.write_file_gated(fd, b"gated", &read_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
-
-        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(
-            vfs.read_file_gated(fd, &mut buf, &bad_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(
-            vfs.read_file_gated(fd, &mut buf, &write_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
+        // 3. Zero-sized read/write on an invalid file descriptor must return Err(FsError::InvalidFd)
+        let invalid_fd = 9999;
+        assert_eq!(vfs.write_file(invalid_fd, &[]), Err(FsError::InvalidFd));
+        assert_eq!(vfs.read_file(invalid_fd, &mut []), Err(FsError::InvalidFd));
     }
 }

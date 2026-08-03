@@ -1,5 +1,6 @@
-#![no_std]
-#![no_main]
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
