@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 use crate::klib::Vec;
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS
 /// Replicates adaptive personas, predictive syscall pre-fetching,
@@ -47,7 +29,6 @@ impl Default for AdaptiveKernelPersona {
 }
 
 impl AdaptiveKernelPersona {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         AdaptiveKernelPersona {
             current_workload: WorkloadType::Standard,
@@ -94,7 +75,6 @@ impl Default for PredictiveSyscallTranslator {
 }
 
 impl PredictiveSyscallTranslator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PredictiveSyscallTranslator {
             history_sequence: Vec::new(),
@@ -159,7 +139,6 @@ impl Default for AiScheduler {
 }
 
 impl AiScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         AiScheduler {
             dispatched_tasks: Vec::new(),
@@ -206,7 +185,6 @@ impl Default for EnergyAwareScheduler {
 }
 
 impl EnergyAwareScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         EnergyAwareScheduler {
             current_mode: EnergyGovernorMode::GreenMode,
@@ -280,7 +258,6 @@ impl Default for MultiModelOrchestrator {
 }
 
 impl MultiModelOrchestrator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         MultiModelOrchestrator {
             active_models: Vec::new(),
@@ -355,7 +332,6 @@ pub struct SovereignResearchLattice {
 }
 
 impl SovereignResearchLattice {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             corpus: Vec::new(),

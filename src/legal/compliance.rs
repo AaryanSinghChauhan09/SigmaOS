@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Unified Statutory Compliance & Labour Integration Engine
 // Natively tracks global standards (GDPR, ISO-27001, SOC-2) and automates national statutory calculations (EPF, ESI, Payroll Auditing)
 
@@ -56,7 +38,6 @@ pub struct InternationalComplianceTracker {
 }
 
 impl InternationalComplianceTracker {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             controls: HashMap::new(),
@@ -214,7 +195,6 @@ pub struct StatutoryFilingDashboard {
 }
 
 impl StatutoryFilingDashboard {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { filings: Vec::new() }
     }

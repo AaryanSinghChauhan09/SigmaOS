@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {
@@ -35,7 +17,6 @@ pub struct MediaDecoderCapability {
 }
 
 impl MediaDecoderCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             supported_formats: vec!["mp4", "mkv", "avi", "mp3", "aac", "wav", "flac"],
@@ -59,7 +40,6 @@ pub struct HtmlRendererCapability {
 }
 
 impl HtmlRendererCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             features: vec!["html5", "css3", "javascript", "webgl", "wasm", "v8"],
@@ -86,7 +66,6 @@ pub struct SovereignVideoPlayerCapability {
 }
 
 impl SovereignVideoPlayerCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             supported_formats: vec![
@@ -136,7 +115,6 @@ pub struct SovereignCapabilityRegistry {
 }
 
 impl SovereignCapabilityRegistry {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             capabilities: HashMap::new(),
@@ -478,7 +456,6 @@ pub struct CompatibilityManager {
 }
 
 impl CompatibilityManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut manager = Self {
             translation_layers: HashMap::new(),
@@ -724,7 +701,6 @@ pub struct KqueueEventNotifier {
 }
 
 impl KqueueEventNotifier {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             fd_list: Vec::new(),
@@ -757,7 +733,7 @@ pub enum SysctlValue {
 
 #[derive(Debug, Clone)]
 pub struct SysctlParameter {
-    pub name: String, // Dot-separated path, e.g. "kern.maxproc"
+    pub name: String,         // Dot-separated path, e.g. "kern.maxproc"
     pub value: SysctlValue,
     pub writable: bool,
 }
@@ -768,7 +744,6 @@ pub struct SovereignSysctlManager {
 }
 
 impl SovereignSysctlManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut manager = Self {
             parameters: HashMap::new(),
@@ -779,19 +754,11 @@ impl SovereignSysctlManager {
 
     fn register_defaults(&mut self) {
         self.register_param("kern.maxproc".to_string(), SysctlValue::Integer(1024), true);
-        self.register_param(
-            "net.inet.tcp.sendspace".to_string(),
-            SysctlValue::Integer(32768),
-            true,
-        );
+        self.register_param("net.inet.tcp.sendspace".to_string(), SysctlValue::Integer(32768), true);
         self.register_param("hw.ncpu".to_string(), SysctlValue::Integer(16), false); // Read-only
         let mut os_release = [0u8; 64];
         os_release[..15].copy_from_slice(b"6.24.0-mainline");
-        self.register_param(
-            "kern.osrelease".to_string(),
-            SysctlValue::String(os_release),
-            false,
-        );
+        self.register_param("kern.osrelease".to_string(), SysctlValue::String(os_release), false);
     }
 
     pub fn register_param(&mut self, path: String, value: SysctlValue, writable: bool) {
@@ -814,9 +781,9 @@ impl SovereignSysctlManager {
             }
             // Ensure type matches
             match (&param.value, &new_value) {
-                (SysctlValue::Integer(_), SysctlValue::Integer(_))
-                | (SysctlValue::Boolean(_), SysctlValue::Boolean(_))
-                | (SysctlValue::String(_), SysctlValue::String(_)) => {
+                (SysctlValue::Integer(_), SysctlValue::Integer(_)) |
+                (SysctlValue::Boolean(_), SysctlValue::Boolean(_)) |
+                (SysctlValue::String(_), SysctlValue::String(_)) => {
                     param.value = new_value;
                     Ok(())
                 }
@@ -908,7 +875,6 @@ pub struct OpenSourceOsGapBridge {
 }
 
 impl OpenSourceOsGapBridge {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_filters_count: 0,
@@ -938,7 +904,6 @@ pub struct OpenSourceToolsBridge {
 }
 
 impl OpenSourceToolsBridge {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             simulated_gdb_registers: HashMap::new(),
@@ -967,7 +932,6 @@ pub struct OpenSourceAiModelBridge {
 }
 
 impl OpenSourceAiModelBridge {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             loaded_models: Vec::new(),
@@ -1122,37 +1086,20 @@ mod tests {
         let mut manager = SovereignSysctlManager::new();
 
         // 1. Query Default Parameters
-        assert_eq!(
-            manager.query_param("kern.maxproc").unwrap(),
-            &SysctlValue::Integer(1024)
-        );
-        assert_eq!(
-            manager.query_param("hw.ncpu").unwrap(),
-            &SysctlValue::Integer(16)
-        );
+        assert_eq!(manager.query_param("kern.maxproc").unwrap(), &SysctlValue::Integer(1024));
+        assert_eq!(manager.query_param("hw.ncpu").unwrap(), &SysctlValue::Integer(16));
 
         // 2. Command Parsing Read Query
-        let out_read = manager
-            .parse_and_execute_command("sysctl kern.maxproc")
-            .unwrap();
+        let out_read = manager.parse_and_execute_command("sysctl kern.maxproc").unwrap();
         assert_eq!(out_read, "kern.maxproc = 1024");
 
         // 3. Command Parsing Write Update
-        let out_write = manager
-            .parse_and_execute_command("sysctl -w kern.maxproc=2048")
-            .unwrap();
+        let out_write = manager.parse_and_execute_command("sysctl -w kern.maxproc=2048").unwrap();
         assert_eq!(out_write, "kern.maxproc = 2048");
-        assert_eq!(
-            manager.query_param("kern.maxproc").unwrap(),
-            &SysctlValue::Integer(2048)
-        );
+        assert_eq!(manager.query_param("kern.maxproc").unwrap(), &SysctlValue::Integer(2048));
 
         // 4. Try updating read-only parameter (hw.ncpu) -> should fail
-        assert!(manager
-            .update_param("hw.ncpu", SysctlValue::Integer(32))
-            .is_err());
-        assert!(manager
-            .parse_and_execute_command("sysctl -w hw.ncpu=32")
-            .is_err());
+        assert!(manager.update_param("hw.ncpu", SysctlValue::Integer(32)).is_err());
+        assert!(manager.parse_and_execute_command("sysctl -w hw.ncpu=32").is_err());
     }
 }

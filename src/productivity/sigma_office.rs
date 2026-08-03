@@ -11,27 +11,9 @@
 //! - **Native Rendering**: Direct GPU-accelerated typography via Zenith compositor
 //! - **Local-First**: All documents stored in SigmaFS with capability-gated access
 //! - **Zero-Dependency**: No external libraries, pure Rust implementation
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 
 use sigma_types::{CapabilityToken, Result};
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use std::sync::Arc;
 
 /// Document type enumeration
@@ -413,7 +395,6 @@ pub struct TypographyRenderer {
 
 impl TypographyRenderer {
     /// Create new typography renderer
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TypographyRenderer {
             font_cache: HashMap::new(),
@@ -524,7 +505,6 @@ pub struct LiveCoAuthoringManager {
 }
 
 impl LiveCoAuthoringManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             locked_ranges: HashMap::new(),
@@ -562,7 +542,6 @@ pub struct MacroExecutor {
 }
 
 impl MacroExecutor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             registered_macros: HashMap::new(),
@@ -609,7 +588,6 @@ pub struct SovereignCrmPipeline {
 }
 
 impl SovereignCrmPipeline {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             leads: Vec::new(),
@@ -657,7 +635,6 @@ pub struct VersionHistoryManager {
 }
 
 impl VersionHistoryManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             checkpoints: Vec::new(),

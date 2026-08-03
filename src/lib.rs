@@ -18,6 +18,7 @@ pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
+pub mod legal;
 pub mod ml;
 pub mod network;
 pub mod orchestration;
@@ -103,6 +104,12 @@ pub use productivity::{
     ProductivityScore,
     SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
     TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+};
+pub use legal::{
+    ComplianceCert as LegalComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+    GlobalStandard, ComplianceStatus as LegalComplianceStatus, RegulatoryControl, InternationalComplianceTracker,
+    LabourLawConfig, StatutoryPayrollBreakdown, LabourLawCompliance, StatutoryFiling,
+    StatutoryFilingDashboard,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
