@@ -12,6 +12,11 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
+    AppImage, // appimage
+    Guix,     // guix
+    Nix,      // nix
+    Portage,  // portage
+    Zypper,   // zypper
 }
 
 /// Package source
@@ -351,6 +356,11 @@ impl UniversalPackageManager {
         let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
         let flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
         let sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
+        let appimage_adapter = PackageAdapter::new(PackageFormat::AppImage, "appimage".to_string());
+        let guix_adapter = PackageAdapter::new(PackageFormat::Guix, "guix".to_string());
+        let nix_adapter = PackageAdapter::new(PackageFormat::Nix, "nix".to_string());
+        let portage_adapter = PackageAdapter::new(PackageFormat::Portage, "portage".to_string());
+        let zypper_adapter = PackageAdapter::new(PackageFormat::Zypper, "zypper".to_string());
 
         self.adapters.insert(PackageFormat::Deb, apt_adapter);
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
@@ -360,6 +370,16 @@ impl UniversalPackageManager {
             .insert(PackageFormat::Flatpak, flatpak_adapter);
         self.adapters
             .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
+        self.adapters
+            .insert(PackageFormat::AppImage, appimage_adapter);
+        self.adapters
+            .insert(PackageFormat::Guix, guix_adapter);
+        self.adapters
+            .insert(PackageFormat::Nix, nix_adapter);
+        self.adapters
+            .insert(PackageFormat::Portage, portage_adapter);
+        self.adapters
+            .insert(PackageFormat::Zypper, zypper_adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -564,5 +584,29 @@ mod tests {
         // 3. Roll back to baseline checkpoint
         manager.rollback_to_checkpoint(checkpoint_id).unwrap();
         assert_eq!(manager.installed_packages.len(), 0);
+    }
+
+    #[test]
+    fn test_all_package_managers_adapters() {
+        let manager = UniversalPackageManager::new();
+
+        // Assert all 11 package formats are registered as adapters
+        assert!(manager.adapters.contains_key(&PackageFormat::Deb));
+        assert!(manager.adapters.contains_key(&PackageFormat::Rpm));
+        assert!(manager.adapters.contains_key(&PackageFormat::Pacman));
+        assert!(manager.adapters.contains_key(&PackageFormat::Snap));
+        assert!(manager.adapters.contains_key(&PackageFormat::Flatpak));
+        assert!(manager.adapters.contains_key(&PackageFormat::SigmaPkg));
+        assert!(manager.adapters.contains_key(&PackageFormat::AppImage));
+        assert!(manager.adapters.contains_key(&PackageFormat::Guix));
+        assert!(manager.adapters.contains_key(&PackageFormat::Nix));
+        assert!(manager.adapters.contains_key(&PackageFormat::Portage));
+        assert!(manager.adapters.contains_key(&PackageFormat::Zypper));
+
+        // Test installation with newly added format (e.g. Nix)
+        let package = UnifiedPackage::new("nix-test-package".to_string(), "2.11.0".to_string())
+            .with_format(PackageFormat::Nix);
+        assert!(manager.adapters.get(&PackageFormat::Nix).unwrap().can_handle(&package));
+        assert!(manager.adapters.get(&PackageFormat::Nix).unwrap().install(&package).is_ok());
     }
 }
