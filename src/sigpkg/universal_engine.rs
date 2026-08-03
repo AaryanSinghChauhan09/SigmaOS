@@ -20,7 +20,7 @@
 // Zero-dependency, safe, robust package adapter and transaction orchestrator
 // Integrates User-Defined Functions (UDF) and instant O(1) transaction rollbacks
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
