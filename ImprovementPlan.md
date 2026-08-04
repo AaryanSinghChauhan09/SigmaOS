@@ -186,3 +186,24 @@ To accelerate onboarding, we establish the following pairings of maintainers wit
 *   *Security Target:* Protect the application from regular expression DoS attacks.
 *   *Implementation Details:* Audited npm dependencies and updated `brace-expansion` to patch the CVE vulnerability.
 *   *Risk Level:* Down from High-Risk Vulnerability to Zero Identified External Risk Vectors.
+
+---
+
+## 🏛️ 10. Architectural Evolution: Multi-Processor & Hybrid Kernel Synthesis
+
+SigmaOS implements a unified, polymorphic cross-architecture abstraction engine reflecting CPU and kernel design patterns from several industry-standard architectures and platforms:
+
+### A. Processor Architecture Abstractions
+1. **Intel/AMD x86_64 4-Level Paging:** Models virtual-to-physical translation tables (`PageTableEntry`, `MultiLevelPaging`) encapsulating PML4, PDPT, PD, and PT structures with permissions (present, writable, user, NX) enabling fine-grained memory protection.
+2. **ARMv8 Translation & Exceptions:** Models exception levels (EL0 User, EL1 Kernel, EL2 Hypervisor, EL3 Secure Monitor) alongside Translation Table Base Registers (`ttbr0_el1`, `ttbr1_el1`) to control privilege level transitions and secure state machine routing.
+
+### B. Operating System Kernel Synthesis
+1. **Windows NT Kernel Paradigms (IRPs & Object Manager):**
+   * *IoRequestPacket (IRP):* Models asynchronous, packet-driven I/O utilizing Major/Minor function codes (Create, Write, DeviceControl) and status block completions.
+   * *Object Manager:* Exposes hierarchical directory namespaces mapping device paths (e.g. `\Device\Harddisk0`) under discretionary security descriptors.
+2. **Linux Kernel Paradigms (task_struct & RCU):**
+   * *TaskStruct:* Models standard task lists, UID/GID credentials, and scheduling priorities.
+   * *Read-Copy-Update (RCU):* Encapsulates a lock-free synchronization engine with global generation epochs and safe barrier synchronizations.
+3. **FreeBSD/BSD Kernel Paradigms (kqueues & sysctl):**
+   * *Kqueue Multiplexer:* Supports high-performance event notification queues checking multiple filters (Read, Write, Signal) and posting kevent structures.
+   * *Sysctl Registry:* Implements dynamic kernel configuration hierarchical lookups and modifications (e.g., `kern.maxproc`, `kern.securelevel`) mapped directly inside kernel space.

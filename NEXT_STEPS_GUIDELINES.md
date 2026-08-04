@@ -193,3 +193,24 @@ To implement these Fedora Linux capabilities seamlessly, SigmaOS requires robust
 3.  **Design Patterns:**
     *   *Factory Pattern:* Use factories to dynamically spawn specific standard streams, process structures, or container sandbox runtimes based on system configs.
     *   *Observer Pattern:* Implement an observer pattern inside the process scheduler, allowing system watchdogs and logging daemons to receive notifications of high CPU usage or process state transitions on-the-fly.
+
+---
+
+## 🏛️ 7. Architectural Evolution: Multi-Processor & Hybrid Kernel Synthesis
+
+SigmaOS implements a unified, polymorphic cross-architecture abstraction engine reflecting CPU and kernel design patterns from several industry-standard architectures and platforms:
+
+### A. Processor Architecture Abstractions
+1. **Intel/AMD x86_64 4-Level Paging:** Models virtual-to-physical translation tables (`PageTableEntry`, `MultiLevelPaging`) encapsulating PML4, PDPT, PD, and PT structures with permissions (present, writable, user, NX) enabling fine-grained memory protection.
+2. **ARMv8 Translation & Exceptions:** Models exception levels (EL0 User, EL1 Kernel, EL2 Hypervisor, EL3 Secure Monitor) alongside Translation Table Base Registers (`ttbr0_el1`, `ttbr1_el1`) to control privilege level transitions and secure state machine routing.
+
+### B. Operating System Kernel Synthesis
+1. **Windows NT Kernel Paradigms (IRPs & Object Manager):**
+   * *IoRequestPacket (IRP):* Models asynchronous, packet-driven I/O utilizing Major/Minor function codes (Create, Write, DeviceControl) and status block completions.
+   * *Object Manager:* Exposes hierarchical directory namespaces mapping device paths (e.g. `\Device\Harddisk0`) under discretionary security descriptors.
+2. **Linux Kernel Paradigms (task_struct & RCU):**
+   * *TaskStruct:* Models standard task lists, UID/GID credentials, and scheduling priorities.
+   * *Read-Copy-Update (RCU):* Encapsulates a lock-free synchronization engine with global generation epochs and safe barrier synchronizations.
+3. **FreeBSD/BSD Kernel Paradigms (kqueues & sysctl):**
+   * *Kqueue Multiplexer:* Supports high-performance event notification queues checking multiple filters (Read, Write, Signal) and posting kevent structures.
+   * *Sysctl Registry:* Implements dynamic kernel configuration hierarchical lookups and modifications (e.g., `kern.maxproc`, `kern.securelevel`) mapped directly inside kernel space.
