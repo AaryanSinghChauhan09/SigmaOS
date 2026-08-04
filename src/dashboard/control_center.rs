@@ -269,6 +269,15 @@ impl UnifiedControlCenter {
         }
     }
 
+||||||| 984d1301f
+    pub fn apply_accessibility_overlay(&mut self, overlay: &super::accessibility_gamification::AccessibilityOverlay) {
+        if overlay.high_contrast {
+            self.contrast_setting = 2.0;
+        } else {
+            self.contrast_setting = 1.0;
+        }
+    }
+
     pub fn set_volume_limit(&mut self, limit: u32) {
         self.sound_volume_limit = limit;
     }

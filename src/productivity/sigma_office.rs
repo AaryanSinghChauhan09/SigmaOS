@@ -681,6 +681,173 @@ impl Default for VersionHistoryManager {
     }
 }
 
+||||||| 984d1301f
+/// Microsoft-style Collaborative Co-authoring Session & Real-time Paragraph Locks
+pub struct LiveCoAuthoringManager {
+    pub locked_ranges: HashMap<String, String>, // resource_key -> active_username
+}
+
+impl LiveCoAuthoringManager {
+    pub fn new() -> Self {
+        Self {
+            locked_ranges: HashMap::new(),
+        }
+    }
+
+    /// Acquires an edit lock on a specific paragraph, slide element, or cell
+    pub fn acquire_lock(&mut self, resource_key: String, username: String) -> Result<bool> {
+        if let Some(active_user) = self.locked_ranges.get(&resource_key) {
+            if active_user == &username {
+                Ok(true) // already locked by this user
+            } else {
+                Ok(false) // locked by another user -> block edits
+            }
+        } else {
+            self.locked_ranges.insert(resource_key, username);
+            Ok(true)
+        }
+    }
+
+    pub fn release_lock(&mut self, resource_key: &str) {
+        self.locked_ranges.remove(resource_key);
+    }
+}
+
+impl Default for LiveCoAuthoringManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Apache/LibreOffice-style Extensible Macro Interpreter
+pub struct MacroExecutor {
+    pub registered_macros: HashMap<String, String>, // macro_name -> raw_script
+}
+
+impl MacroExecutor {
+    pub fn new() -> Self {
+        Self {
+            registered_macros: HashMap::new(),
+        }
+    }
+
+    pub fn register_macro(&mut self, name: String, script: String) {
+        self.registered_macros.insert(name, script);
+    }
+
+    /// Executes a registered document macro script (simplified AST/string evaluator)
+    pub fn execute_macro(&self, name: &str, processor: &mut TextProcessor) -> Result<bool> {
+        if let Some(script) = self.registered_macros.get(name) {
+            if script.contains("insert_header") {
+                processor.add_heading(1, "Automated Report Header").unwrap();
+            }
+            if script.contains("insert_footer") {
+                processor.add_text("Confidential Sovereign Document", false, true).unwrap();
+            }
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+}
+
+impl Default for MacroExecutor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Lead {
+    pub id: u32,
+    pub company_name: String,
+    pub estimated_revenue: f64,
+    pub status: String,
+}
+
+/// Odoo/Salesforce/Zoho-style Sovereign CRM Sales Pipeline & Lead Generation
+pub struct SovereignCrmPipeline {
+    pub leads: Vec<Lead>,
+}
+
+impl SovereignCrmPipeline {
+    pub fn new() -> Self {
+        Self {
+            leads: Vec::new(),
+        }
+    }
+
+    pub fn add_lead(&mut self, lead: Lead) {
+        self.leads.push(lead);
+    }
+
+    /// Auto-compiles active sales leads directly into a formatted SigmaOffice Spreadsheet
+    pub fn compile_leads_to_spreadsheet(&self, processor: &mut SpreadsheetProcessor) -> Result<()> {
+        processor.set_cell(0, 0, CellValue::Text("Lead ID".to_string())).unwrap();
+        processor.set_cell(0, 1, CellValue::Text("Company Name".to_string())).unwrap();
+        processor.set_cell(0, 2, CellValue::Text("Est. Revenue".to_string())).unwrap();
+        processor.set_cell(0, 3, CellValue::Text("Status".to_string())).unwrap();
+
+        for (idx, lead) in self.leads.iter().enumerate() {
+            let row = (idx + 1) as u32;
+            processor.set_cell(row, 0, CellValue::Number(lead.id as f64)).unwrap();
+            processor.set_cell(row, 1, CellValue::Text(lead.company_name.clone())).unwrap();
+            processor.set_cell(row, 2, CellValue::Number(lead.estimated_revenue)).unwrap();
+            processor.set_cell(row, 3, CellValue::Text(lead.status.clone())).unwrap();
+        }
+        Ok(())
+    }
+}
+
+impl Default for SovereignCrmPipeline {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DocumentCheckpoint {
+    pub timestamp_ns: u64,
+    pub name: String,
+    pub title: String,
+}
+
+/// Google Workspace style named document version history checkpoints
+pub struct VersionHistoryManager {
+    pub checkpoints: Vec<DocumentCheckpoint>,
+}
+
+impl VersionHistoryManager {
+    pub fn new() -> Self {
+        Self {
+            checkpoints: Vec::new(),
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, ns: u64, name: String, title: String) {
+        self.checkpoints.push(DocumentCheckpoint {
+            timestamp_ns: ns,
+            name,
+            title,
+        });
+    }
+
+    pub fn rollback_to_checkpoint(&self, ns: u64) -> Option<&DocumentCheckpoint> {
+        for checkpoint in &self.checkpoints {
+            if checkpoint.timestamp_ns == ns {
+                return Some(checkpoint);
+            }
+        }
+        None
+    }
+}
+
+impl Default for VersionHistoryManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Placeholder types for compilation
 mod sigma_types {
     use std::io;
@@ -782,6 +949,44 @@ mod tests {
             sheet_proc.get_cell(1, 1),
             Some(&CellValue::Text("Antigravity AI".to_string()))
         );
+
+        // 4. VersionHistoryManager Test
+        let mut history = VersionHistoryManager::new();
+        history.create_checkpoint(1000, "Initial Draft".to_string(), "Budget v1".to_string());
+        let checkpoint = history.rollback_to_checkpoint(1000).unwrap();
+        assert_eq!(checkpoint.name, "Initial Draft");
+    }
+||||||| 984d1301f
+
+    #[test]
+    fn test_enterprise_office_suite() {
+        let capability = sigma_types::CapabilityToken { id: 1 };
+
+        // 1. LiveCoAuthoringManager Test
+        let mut coauth = LiveCoAuthoringManager::new();
+        assert!(coauth.acquire_lock("p_1".to_string(), "alice".to_string()).unwrap());
+        assert!(!coauth.acquire_lock("p_1".to_string(), "bob".to_string()).unwrap()); // blocked by alice
+        coauth.release_lock("p_1");
+        assert!(coauth.acquire_lock("p_1".to_string(), "bob".to_string()).unwrap()); // allowed now
+
+        // 2. MacroExecutor Test
+        let mut text_proc = TextProcessor::new("Report".to_string(), capability.clone());
+        let mut macro_exec = MacroExecutor::new();
+        macro_exec.register_macro("setup_report".to_string(), "insert_header; insert_footer;".to_string());
+        assert!(macro_exec.execute_macro("setup_report", &mut text_proc).unwrap());
+        assert_eq!(text_proc.document().tree().len(), 2);
+
+        // 3. SovereignCrmPipeline Test
+        let mut crm = SovereignCrmPipeline::new();
+        crm.add_lead(Lead {
+            id: 101,
+            company_name: "Antigravity AI".to_string(),
+            estimated_revenue: 150000.0,
+            status: "Qualified".to_string(),
+        });
+        let mut sheet_proc = SpreadsheetProcessor::new("CRM Pipeline".to_string(), capability);
+        crm.compile_leads_to_spreadsheet(&mut sheet_proc).unwrap();
+        assert_eq!(sheet_proc.get_cell(1, 1), Some(&CellValue::Text("Antigravity AI".to_string())));
 
         // 4. VersionHistoryManager Test
         let mut history = VersionHistoryManager::new();

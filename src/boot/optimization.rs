@@ -4,10 +4,27 @@
 /// Sovereign Dependency-Aware Parallel Service Activation & Boot Optimizer for SigmaOS
 /// Replaces traditional linear initialization with a topological-sort dependency scheduler, drastically improving boot speed (defeating systemd).
 extern crate alloc;
+||||||| 984d1301f
+/// OOP-based Boot Performance Optimization for SigmaOS
+/// Implements boot optimization using OOP principles with traits and structs
+/// No dependency on external optimization frameworks
+/// Based on Roadmap Item 20: Boot performance optimization
+/// Sovereign Dependency-Aware Parallel Service Activation & Boot Optimizer for SigmaOS
+/// Replaces traditional linear initialization with a topological-sort dependency scheduler, drastically improving boot speed (defeating systemd).
 
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, Ordering};
+||||||| 984d1301f
+use core::ptr::{self, NonNull};
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
+extern crate alloc;
+
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+use alloc::string::String;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type ServiceID = usize;
@@ -110,6 +127,25 @@ impl BootService for SimpleBootService {
         // Simulate successful activation
         self.status
             .store(ServiceStatus::Active as u32, Ordering::SeqCst);
+        true
+||||||| 984d1301f
+    fn info(&self) -> BootServiceInfo {
+        BootServiceInfo {
+            id: self.id,
+            name: self.name,
+            priority: self.priority,
+            startup_time: self.startup_time,
+            status: self.get_status(),
+            capability: self.capability,
+        }
+    fn dependencies(&self) -> &[ServiceID] {
+        &self.dependencies
+    }
+
+    fn activate(&mut self) -> bool {
+        self.status.store(ServiceStatus::Activating as u32, Ordering::SeqCst);
+        // Simulate successful activation
+        self.status.store(ServiceStatus::Active as u32, Ordering::SeqCst);
         true
     }
 }
@@ -274,6 +310,20 @@ mod tests {
         assert_eq!(service.status(), ServiceStatus::Inactive);
         assert!(service.activate());
         assert_eq!(service.status(), ServiceStatus::Active);
+||||||| 984d1301f
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    #[test]
+    fn test_boot_service_activation() {
+        let mut service = SimpleBootService::new(1, "syslog", ServicePriority::Critical, ServiceCategory::System, Vec::new());
+        assert_eq!(service.status(), ServiceStatus::Inactive);
+        assert!(service.activate());
+        assert_eq!(service.status(), ServiceStatus::Active);
     }
 
     #[test]
@@ -311,6 +361,25 @@ mod tests {
 
         let order = optimizer.optimize_and_schedule_boot().unwrap();
         assert_eq!(order, alloc::vec![1, 2, 3]); // Must resolve dependencies sequentially: 1 -> 2 -> 3
+||||||| 984d1301f
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+        // 1. syslog (no dependencies)
+        let s1 = SimpleBootService::new(1, "syslog", ServicePriority::Critical, ServiceCategory::System, Vec::new());
+        // 2. udev (depends on syslog)
+        let s2 = SimpleBootService::new(2, "udev", ServicePriority::High, ServiceCategory::System, alloc::vec![1]);
+        // 3. network (depends on udev)
+        let s3 = SimpleBootService::new(3, "network", ServicePriority::Normal, ServiceCategory::Network, alloc::vec![2]);
+
+        optimizer.add_service(Box::new(s3));
+        optimizer.add_service(Box::new(s1));
+        optimizer.add_service(Box::new(s2));
+
+        let order = optimizer.optimize_and_schedule_boot().unwrap();
+        assert_eq!(order, alloc::vec![1, 2, 3]); // Must resolve dependencies sequentially: 1 -> 2 -> 3
     }
 
     #[test]
@@ -338,6 +407,22 @@ mod tests {
 
         let result = optimizer.optimize_and_schedule_boot();
         assert!(result.is_err()); // Must fail with Cycle error
+||||||| 984d1301f
+    fn len(&self) -> usize {
+        self.len
+    #[test]
+    fn test_dependency_cycle_detection() {
+        let mut optimizer = BootOptimizer::new();
+
+        // A depends on B, B depends on A
+        let s1 = SimpleBootService::new(1, "serviceA", ServicePriority::Normal, ServiceCategory::Userland, alloc::vec![2]);
+        let s2 = SimpleBootService::new(2, "serviceB", ServicePriority::Normal, ServiceCategory::Userland, alloc::vec![1]);
+
+        optimizer.add_service(Box::new(s1));
+        optimizer.add_service(Box::new(s2));
+
+        let result = optimizer.optimize_and_schedule_boot();
+        assert!(result.is_err()); // Must fail with Cycle error
     }
 
     #[test]
@@ -357,6 +442,15 @@ mod tests {
             ServiceCategory::Network,
             Vec::new(),
         );
+||||||| 984d1301f
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+    #[test]
+    fn test_boot_telemetry_aggregation() {
+        let mut optimizer = BootOptimizer::new();
+        let s1 = SimpleBootService::new(1, "syslog", ServicePriority::Critical, ServiceCategory::System, Vec::new());
+        let s2 = SimpleBootService::new(2, "network", ServicePriority::Normal, ServiceCategory::Network, Vec::new());
 
         optimizer.add_service(Box::new(s1));
         optimizer.add_service(Box::new(s2));
