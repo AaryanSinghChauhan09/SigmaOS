@@ -6,6 +6,25 @@ extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
+// Standard Status and Control Flags Constants (x86/x64 rflags & ARM CPSR)
+// Inspired directly by Linux pt_regs, FreeBSD trapframe, and Windows NT _KTRAP_FRAME
+pub const X86_RFLAGS_CF: u64 = 1 << 0;   // Carry Flag
+pub const X86_RFLAGS_PF: u64 = 1 << 2;   // Parity Flag
+pub const X86_RFLAGS_AF: u64 = 1 << 4;   // Auxiliary Carry Flag
+pub const X86_RFLAGS_ZF: u64 = 1 << 6;   // Zero Flag
+pub const X86_RFLAGS_SF: u64 = 1 << 7;   // Sign Flag
+pub const X86_RFLAGS_TF: u64 = 1 << 8;   // Trap Flag (Hardware Single-Step)
+pub const X86_RFLAGS_IF: u64 = 1 << 9;   // Interrupt Enable Flag
+pub const X86_RFLAGS_DF: u64 = 1 << 10;  // Direction Flag
+pub const X86_RFLAGS_OF: u64 = 1 << 11;  // Overflow Flag
+
+pub const ARM_CPSR_N: u64 = 1 << 31;     // Negative Flag
+pub const ARM_CPSR_Z: u64 = 1 << 30;     // Zero Flag
+pub const ARM_CPSR_C: u64 = 1 << 29;     // Carry Flag
+pub const ARM_CPSR_V: u64 = 1 << 28;     // Overflow Flag
+pub const ARM_CPSR_I: u64 = 1 << 7;      // IRQ Disable Flag
+pub const ARM_CPSR_F: u64 = 1 << 6;      // FIQ Disable Flag
+
 // ==========================================
 // 1. General Purpose & Segment Register Set
 // ==========================================
@@ -49,6 +68,63 @@ impl X86RegisterSet {
         self.rax = 0; self.rbx = 0; self.rcx = 0; self.rdx = 0;
         self.rsi = 0; self.rdi = 0; self.rbp = 0; self.rsp = 0;
         self.rip = 0; self.rflags = 0x202;
+    }
+
+    pub fn set_flag(&mut self, flag: u64, enabled: bool) {
+        if enabled {
+            self.rflags |= flag;
+        } else {
+            self.rflags &= !flag;
+        }
+    }
+
+    pub fn check_flag(&self, flag: u64) -> bool {
+        (self.rflags & flag) != 0
+    }
+}
+
+// ==========================================
+// 1b. ARM / AArch64 Register Set Representation
+// ==========================================
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ArmRegisterSet {
+    // 31 General-Purpose Registers (x0-x30)
+    pub x: [u64; 31],
+    // Stack Pointer, Program Counter, and Processor State
+    pub sp: u64,
+    pub pc: u64,
+    pub pstate: u64, // Current Processor State (CPSR / SPSR parity)
+}
+
+impl ArmRegisterSet {
+    pub fn new() -> Self {
+        ArmRegisterSet {
+            x: [0u64; 31],
+            sp: 0,
+            pc: 0,
+            pstate: 0x3C0, // Default mask (Interrupt/Debug masks set)
+        }
+    }
+
+    pub fn reset(&mut self) {
+        self.x = [0u64; 31];
+        self.sp = 0;
+        self.pc = 0;
+        self.pstate = 0x3C0;
+    }
+
+    pub fn set_flag(&mut self, flag: u64, enabled: bool) {
+        if enabled {
+            self.pstate |= flag;
+        } else {
+            self.pstate &= !flag;
+        }
+    }
+
+    pub fn check_flag(&self, flag: u64) -> bool {
+        (self.pstate & flag) != 0
     }
 }
 
@@ -199,6 +275,32 @@ mod tests {
         regs.reset();
         assert_eq!(regs.rax, 0);
         assert_eq!(regs.rip, 0);
+    }
+
+    #[test]
+    fn test_register_flags_manipulation() {
+        let mut regs = X86RegisterSet::new();
+        assert!(regs.check_flag(X86_RFLAGS_IF)); // default set (0x202)
+        assert!(!regs.check_flag(X86_RFLAGS_CF));
+
+        regs.set_flag(X86_RFLAGS_CF, true);
+        assert!(regs.check_flag(X86_RFLAGS_CF));
+
+        regs.set_flag(X86_RFLAGS_CF, false);
+        assert!(!regs.check_flag(X86_RFLAGS_CF));
+    }
+
+    #[test]
+    fn test_arm_register_set() {
+        let mut arm_regs = ArmRegisterSet::new();
+        assert_eq!(arm_regs.x[0], 0);
+        assert!(!arm_regs.check_flag(ARM_CPSR_N));
+
+        arm_regs.set_flag(ARM_CPSR_N, true);
+        assert!(arm_regs.check_flag(ARM_CPSR_N));
+
+        arm_regs.reset();
+        assert!(!arm_regs.check_flag(ARM_CPSR_N));
     }
 
     #[test]
