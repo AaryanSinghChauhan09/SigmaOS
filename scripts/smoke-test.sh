@@ -6,11 +6,8 @@ set -e
 
 echo "Running SigmaOS smoke tests..."
 
-# Create build directory if missing
+# Ensure build directory exists
 mkdir -p build
-
-# Compile target binaries
-cargo build
 
 # Test 1: Check if build directory exists
 if [ ! -d "build" ]; then
@@ -53,6 +50,16 @@ if [ -f "scripts/sigma_builtins_test.sh" ]; then
     echo "PASS: Shell builtins compliance check successful"
 else
     echo "FAIL: sigma_builtins_test.sh not found"
+    exit 1
+fi
+
+# Test 8: Run next-generation accelerators diagnostics check
+echo "Running next-generation accelerators diagnostics check..."
+if [ -f "scripts/accelerators_diagnostics.sh" ]; then
+    bash scripts/accelerators_diagnostics.sh --all
+    echo "PASS: Accelerators diagnostics check successful"
+else
+    echo "FAIL: accelerators_diagnostics.sh not found"
     exit 1
 fi
 

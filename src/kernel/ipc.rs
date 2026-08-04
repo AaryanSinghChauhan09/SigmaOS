@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Kernel IPC (Inter-Process Communication)
 // Zero-latency capability-based IPC
 
@@ -80,7 +62,7 @@ pub struct SovereignPipe {
     pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
     pub max_capacity: usize,
     pub bytes_transferred: u64,
-    pub non_blocking: bool, // Non-blocking mode flag (Linux inspired)
+    pub non_blocking: bool,        // Non-blocking mode flag (Linux inspired)
 }
 
 impl SovereignPipe {
@@ -161,7 +143,6 @@ pub struct IpcManager {
 }
 
 impl IpcManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             channels: Vec::new(),
@@ -226,8 +207,8 @@ pub enum IpcError {
     ChannelFull,
     PermissionDenied,
     InvalidMessage,
-    WouldBlock, // Non-blocking write target is full / read target empty
-    BrokenPipe, // Attempted pipe write after reader disconnected
+    WouldBlock,   // Non-blocking write target is full / read target empty
+    BrokenPipe,   // Attempted pipe write after reader disconnected
 }
 
 #[cfg(test)]
@@ -304,10 +285,7 @@ mod tests {
         assert!(pipe.write_structure(vec![9, 9, 9]).is_ok());
 
         // Second write under non-blocking mode with full capacity should return WouldBlock
-        assert_eq!(
-            pipe.write_structure(vec![8, 8, 8]),
-            Err(IpcError::WouldBlock)
-        );
+        assert_eq!(pipe.write_structure(vec![8, 8, 8]), Err(IpcError::WouldBlock));
     }
 
     #[test]
