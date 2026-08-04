@@ -334,6 +334,8 @@ impl SovereignSimdOptimizer {
 
 impl SimdOptimizer for SovereignSimdOptimizer {
     /// High-performance SIMD vector additions bypassing standard loop iterations
+    /// Optimised by Bolt ⚡: replaces raw indexing with zero-bounds-checked single-pass zip iterators,
+    /// enabling compiler auto-vectorization and avoiding CPU boundary check cycles.
     fn optimize_vector_add(
         &self,
         source_a: &[f32],
@@ -351,15 +353,15 @@ impl SimdOptimizer for SovereignSimdOptimizer {
             CpuInstructionExtension::AVX512 => {
                 // In production, execute native AVX-512 assembly blocks here.
                 // For portable test safety on other host environments, we perform unrolled vector addition:
-                for i in 0..VECTOR_SIZE {
-                    dest[i] = source_a[i] + source_b[i];
+                for ((d, &sa), &sb) in dest.iter_mut().zip(source_a.iter()).zip(source_b.iter()) {
+                    *d = sa + sb;
                 }
                 Ok(())
             }
             _ => {
                 // Fallback serial execution path
-                for i in 0..VECTOR_SIZE {
-                    dest[i] = source_a[i] + source_b[i];
+                for ((d, &sa), &sb) in dest.iter_mut().zip(source_a.iter()).zip(source_b.iter()) {
+                    *d = sa + sb;
                 }
                 Ok(())
             }
@@ -370,6 +372,7 @@ impl SimdOptimizer for SovereignSimdOptimizer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_zero_copy_queue() {
@@ -626,5 +629,28 @@ mod tests {
         assert!(vm.evaluate_priority(&process).is_err());
         assert_eq!(vm.get_metrics().register_errors, 1);
         assert_eq!(vm.get_metrics().evaluation_runs, 2);
+    }
+
+    #[test]
+    fn test_optimized_vector_add_benchmark() {
+        let optimizer = SovereignSimdOptimizer::new();
+        let source_a = [1.0f32; 16];
+        let source_b = [2.0f32; 16];
+        let mut dest = [0.0f32; 16];
+
+        optimizer.optimize_vector_add(&source_a, &source_b, &mut dest).unwrap();
+
+        for i in 0..16 {
+            assert_eq!(dest[i], 3.0f32);
+        }
+
+        // Simulating the AVX512 path as well
+        let avx_optimizer = SovereignSimdOptimizer::with_extension(CpuInstructionExtension::AVX512);
+        let mut dest_avx = [0.0f32; 16];
+        avx_optimizer.optimize_vector_add(&source_a, &source_b, &mut dest_avx).unwrap();
+
+        for i in 0..16 {
+            assert_eq!(dest_avx[i], 3.0f32);
+        }
     }
 }
