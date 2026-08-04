@@ -54,7 +54,8 @@ impl LfsBootstrapEngine {
         match self.current_stage {
             BootstrapStage::Stage1TempToolchain => {
                 self.compiled_binaries.push("gcc-bootstrap".to_string());
-                self.compiled_binaries.push("binutils-bootstrap".to_string());
+                self.compiled_binaries
+                    .push("binutils-bootstrap".to_string());
                 self.current_stage = BootstrapStage::Stage2SysrootSetup;
                 Ok("Stage 1 complete: Temp toolchain built successfully".to_string())
             }
@@ -92,10 +93,15 @@ mod tests {
         let step1 = engine.execute_next_bootstrap_step().unwrap();
         assert_eq!(step1, "Stage 1 complete: Temp toolchain built successfully");
         assert_eq!(engine.current_stage, BootstrapStage::Stage2SysrootSetup);
-        assert!(engine.compiled_binaries.contains(&"gcc-bootstrap".to_string()));
+        assert!(engine
+            .compiled_binaries
+            .contains(&"gcc-bootstrap".to_string()));
 
         let step2 = engine.execute_next_bootstrap_step().unwrap();
-        assert_eq!(step2, "Stage 2 complete: Sysroot target headers established");
+        assert_eq!(
+            step2,
+            "Stage 2 complete: Sysroot target headers established"
+        );
         assert_eq!(engine.current_stage, BootstrapStage::Stage3FinalBuild);
     }
 

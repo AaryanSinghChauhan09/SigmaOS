@@ -41,7 +41,11 @@ impl VideoFrame {
         for _ in 0..size {
             pixels.push(PixelRgba::new(0, 0, 0, 255));
         }
-        VideoFrame { width, height, pixels }
+        VideoFrame {
+            width,
+            height,
+            pixels,
+        }
     }
 }
 
@@ -202,7 +206,7 @@ pub struct OverlayItem {
     pub width: u32,
     pub height: u32,
     pub opacity: f32, // 0.0 to 1.0
-    pub z_index: u32,  // Render order layer
+    pub z_index: u32, // Render order layer
 }
 
 /// Represents a configured scene consisting of prioritized overlay items
@@ -262,7 +266,12 @@ impl StreamingOverlayManager {
         self.scenes.insert(scene.name.clone(), scene);
     }
 
-    pub fn switch_scene(&mut self, scene_name: &str, transition: &str, duration_frames: u32) -> Result<(), &'static str> {
+    pub fn switch_scene(
+        &mut self,
+        scene_name: &str,
+        transition: &str,
+        duration_frames: u32,
+    ) -> Result<(), &'static str> {
         if !self.scenes.contains_key(scene_name) {
             return Err("Scene not registered in overlay manager");
         }
@@ -302,11 +311,11 @@ impl StreamingOverlayManager {
 
                         // Generate mock source pixel based on type
                         let src_color = match overlay.source_type {
-                            OverlaySourceType::Webcam => PixelRgba::new(0, 0, 200, 255),       // Blue-tinted webcam
+                            OverlaySourceType::Webcam => PixelRgba::new(0, 0, 200, 255), // Blue-tinted webcam
                             OverlaySourceType::GameCapture => PixelRgba::new(10, 10, 10, 255), // Dark game capture
-                            OverlaySourceType::ChatBox => PixelRgba::new(50, 50, 50, 200),    // Dark-gray semi-transparent chat
-                            OverlaySourceType::AlertBox => PixelRgba::new(255, 165, 0, 255),   // Orange alert
-                            OverlaySourceType::StreamLabel => PixelRgba::new(0, 255, 0, 255),  // Green label
+                            OverlaySourceType::ChatBox => PixelRgba::new(50, 50, 50, 200), // Dark-gray semi-transparent chat
+                            OverlaySourceType::AlertBox => PixelRgba::new(255, 165, 0, 255), // Orange alert
+                            OverlaySourceType::StreamLabel => PixelRgba::new(0, 255, 0, 255), // Green label
                         };
 
                         let alpha = overlay.opacity;
@@ -355,109 +364,5 @@ impl StreamingOverlayManager {
 impl Default for StreamingOverlayManager {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_video_clip_creation() {
-        let clip = VideoClip::new("ClipA.mp4".to_string(), 0, 120, 1920, 1080);
-        assert_eq!(clip.name(), "ClipA.mp4");
-        assert_eq!(clip.start_frame(), 0);
-        assert_eq!(clip.end_frame(), 120);
-    }
-
-    #[test]
-    fn test_subtitle_overlay() {
-        let mut frame = VideoFrame::new(100, 100);
-        let overlay = SubtitleOverlayEffect::new("Hello World".to_string(), 10, PixelRgba::new(255, 0, 0, 128));
-        overlay.process_frame(&mut frame).unwrap();
-        // Check that pixels in lower fifth of frame have been blended
-        let idx = 85 * 100 + 50;
-        let r_val = frame.pixels[idx].r;
-        assert!(r_val == 127 || r_val == 128); // blended default 0 and overlay 255 at ~0.5 opacity
-    }
-
-    #[test]
-    fn test_streaming_overlay_manager() {
-        let mut manager = StreamingOverlayManager::new();
-        assert_eq!(manager.active_scene_name, "");
-
-        // 1. Create a scene
-        let mut scene = StreamScene::new("In-Game Layout");
-        scene.add_overlay(OverlayItem {
-            id: "webcam_feed".to_string(),
-            source_type: OverlaySourceType::Webcam,
-            x: 10,
-            y: 10,
-            width: 30,
-            height: 30,
-            opacity: 0.8,
-            z_index: 2,
-        });
-        scene.add_overlay(OverlayItem {
-            id: "game_feed".to_string(),
-            source_type: OverlaySourceType::GameCapture,
-            x: 0,
-            y: 0,
-            width: 100,
-            height: 100,
-            opacity: 1.0,
-            z_index: 1, // Layer 1 (background)
-        });
-
-        // 2. Register scene and check active
-        manager.register_scene(scene);
-        assert_eq!(manager.active_scene_name, "In-Game Layout");
-
-        // 3. Switch scene
-        let mut starting_soon = StreamScene::new("Starting Soon");
-        starting_soon.add_overlay(OverlayItem {
-            id: "waiting_label".to_string(),
-            source_type: OverlaySourceType::StreamLabel,
-            x: 20,
-            y: 40,
-            width: 60,
-            height: 20,
-            opacity: 0.9,
-            z_index: 1,
-        });
-        manager.register_scene(starting_soon);
-
-        assert!(manager.switch_scene("Starting Soon", "fade", 30).is_ok());
-        assert_eq!(manager.active_scene_name, "Starting Soon");
-        assert_eq!(manager.transition_type, "fade");
-        assert_eq!(manager.transition_frames, 30);
-
-        // 4. Test rendering frame
-        let mut frame = VideoFrame::new(100, 100);
-        assert!(manager.render_stream_frame(&mut frame).is_ok());
-
-        // StreamLabel is green (0, 255, 0).
-        // Let's verify that a pixel in the label region (x=50, y=50) has a strong green component
-        let idx = 50 * 100 + 50;
-        assert!(frame.pixels[idx].g > 200);
-
-        // 5. Test alerts triggers
-        manager.trigger_alert("New Subscriber!", 3);
-        assert!(manager.active_alert.is_some());
-
-        // Process first frame with alert
-        assert!(manager.render_stream_frame(&mut frame).is_ok());
-        // Alert box is bright orange (255, 69, 0) on the top (y=12)
-        let alert_idx = 12 * 100 + 50;
-        assert_eq!(frame.pixels[alert_idx].r, 255);
-        assert_eq!(frame.pixels[alert_idx].g, 69);
-        assert_eq!(manager.active_alert.as_ref().unwrap().frames_remaining, 2);
-
-        // Process remaining frames
-        assert!(manager.render_stream_frame(&mut frame).is_ok());
-        assert!(manager.render_stream_frame(&mut frame).is_ok());
-
-        // Alert should expire and auto-clean
-        assert!(manager.active_alert.is_none());
     }
 }

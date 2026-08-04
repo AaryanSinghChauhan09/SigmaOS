@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
@@ -39,8 +36,8 @@ pub enum DeviceError {
 }
 
 /// Device type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceType {
     Block = 0,
     Character = 1,
@@ -146,17 +143,7 @@ impl DeviceDescriptor {
     }
 
     pub fn get_state(&self) -> DeviceState {
-        {
-            let raw = self.state.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => DeviceState::Initializing,
-                2 => DeviceState::Ready,
-                3 => DeviceState::Busy,
-                4 => DeviceState::Error,
-                5 => DeviceState::Shutdown,
-                _ => DeviceState::Uninitialized,
-            }
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state(&self, state: DeviceState) {
@@ -173,8 +160,8 @@ impl DeviceDescriptor {
 }
 
 /// Device state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeviceState {
     Uninitialized = 0,
     Initializing = 1,
@@ -228,7 +215,10 @@ impl SimpleBlockDevice {
         let mut blocks = Vec::new();
 
         for _ in 0..num_blocks {
-            let block_data = vec![0u8; block_size];
+            let mut block_data = Vec::new();
+            for _ in 0..block_size {
+                block_data.push(0u8);
+            }
             blocks.push(block_data);
         }
 
@@ -286,6 +276,47 @@ impl Device for SimpleBlockDevice {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_legacy_device_oop() {
+        let mut legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
+        assert_eq!(legacy.query_channel(), PortAddress::PortIO(0x3F8));
+        assert_eq!(legacy.read_byte(0).unwrap(), 0);
+        assert!(legacy.write_byte(0, 0xAA).is_ok());
+    }
+
+    #[test]
+    fn test_modern_device_oop() {
+        let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
+        assert_eq!(
+            modern.query_channel(),
+            PortAddress::MemoryMapped(0xFE000000)
+        );
+        let mut test_device = ModernDevice::new(102, b"test_mmio", 0);
+        assert_eq!(test_device.read_byte(4).unwrap(), 0);
+        assert!(test_device.write_byte(4, 0xFF).is_ok());
+    }
+
+    #[test]
+    fn test_udf_interpreter_bytecode() {
+        let mut legacy = LegacyDevice::new(42, b"legacy_serial", 0x3F8);
+        // Bytecode instructions:
+        // 0x01, 0x00, 0x04 (Read offset 4 to reg 0)
+        // 0x03, 0x00, 0x02 (Multiply reg 0 by 2)
+        // 0x02, 0x08, 0x00 (Write reg 0 to offset 8)
+        // 0x04             (Halt)
+        let bytecode = [0x01, 0x00, 0x04, 0x03, 0x00, 0x02, 0x02, 0x08, 0x00, 0x04];
+        let interpreter = UdfInterpreter::new(&bytecode);
+        let mut regs = [5, 0, 0, 0];
+        let res = interpreter.execute(&mut legacy, &mut regs);
+        assert!(res.is_ok());
+        assert_eq!(regs[0], 0);
+    }
+}
+
 impl BlockDevice for SimpleBlockDevice {
     fn read_block(&mut self, block: u64, buffer: &mut [u8]) -> Result<(), DeviceError> {
         let block_index = block as usize;
@@ -295,7 +326,7 @@ impl BlockDevice for SimpleBlockDevice {
 
         let block_data = &self.blocks[block_index];
         let len = buffer.len().min(block_data.len());
-        buffer[..len].copy_from_slice(&block_data[..len]);
+        buffer[..len].copy_from_slice(&block_data.as_slice()[..len]);
 
         Ok(())
     }
@@ -308,7 +339,7 @@ impl BlockDevice for SimpleBlockDevice {
 
         let block_data = &mut self.blocks[block_index];
         let len = buffer.len().min(block_data.len());
-        block_data[..len].copy_from_slice(&buffer[..len]);
+        block_data.as_mut_slice()[..len].copy_from_slice(&buffer[..len]);
 
         Ok(())
     }
@@ -341,10 +372,14 @@ impl SimpleCharacterDevice {
         };
 
         let descriptor = DeviceDescriptor::new(id, name, DeviceType::Character, capability);
+        let mut buffer = Vec::new();
+        for _ in 0..buffer_size {
+            buffer.push(0u8);
+        }
 
         SimpleCharacterDevice {
             descriptor,
-            buffer: vec![0u8; buffer_size],
+            buffer,
             read_pos: 0,
             write_pos: 0,
         }
@@ -510,7 +545,7 @@ impl DeviceManager {
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id < self.departors.len() {
+        if id < self.descriptors.len() {
             self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
@@ -545,16 +580,14 @@ impl DeviceManager {
 }
 
 /// Simple Vec implementation for no_std
-#[cfg(target_os = "none")]
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-#[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
@@ -562,7 +595,7 @@ impl<T> Vec<T> {
         }
     }
 
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -575,8 +608,40 @@ impl<T> Vec<T> {
         }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.len
+    }
+
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            vec: self,
+            index: 0,
+        }
+    }
+
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
     }
 
     unsafe fn grow(&mut self) {
@@ -602,41 +667,64 @@ impl<T> Vec<T> {
     }
 }
 
-// External allocator functions
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-pub struct DdeDeviceWrapper {
-    pub id: usize,
-    pub name: [u8; 32],
-    pub io_port: u16,
-    pub proto: [u8; 8],
-    pub simulated_pci_bar: [u8; 256],
-}
-
-impl DdeDeviceWrapper {
-    pub fn new(id: usize, name: &[u8], io_port: u16, proto: &[u8]) -> Self {
-        let mut name_arr = [0u8; 32];
-        let mut proto_arr = [0u8; 8];
-        let name_len = name.len().min(31);
-        let proto_len = proto.len().min(7);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_arr.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(proto.as_ptr(), proto_arr.as_mut_ptr(), proto_len);
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
         }
-        Self {
-            id,
-            name: name_arr,
-            io_port,
-            proto: proto_arr,
-            simulated_pci_bar: [0u8; 256],
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
         }
     }
 }
 
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
@@ -646,5 +734,241 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn free(ptr: *mut u8) {
+    // We don't track sizes here; for the custom Vec this is a best-effort stub.
+    // A real implementation would need to pass layout. This is safe for tests.
     let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+/// Unified representation of communication channels (OOP Abstraction)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PortAddress {
+    PortIO(u16),       // Legacy 16-bit Port I/O (older generations)
+    MemoryMapped(u32), // Modern 32/64-bit Memory Mapped I/O (newer generations)
+}
+
+/// Unified Peripheral Object-Oriented Interface (OOP Principle)
+pub trait UnifiedPeripheral: Device {
+    fn query_channel(&self) -> PortAddress;
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError>;
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError>;
+}
+
+/// Legacy implementation of a peripheral using Port I/O
+pub struct LegacyDevice {
+    pub base_port: u16,
+    pub id: usize,
+    pub name: [u8; 64],
+}
+
+impl LegacyDevice {
+    pub fn new(id: usize, name: &[u8], base_port: u16) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+        LegacyDevice {
+            base_port,
+            id,
+            name: name_array,
+        }
+    }
+}
+
+impl Device for LegacyDevice {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        // Simulate reading from legacy Port I/O
+        for b in buffer.iter_mut() {
+            *b = 0; // Stub reading legacy port
+        }
+        Ok(buffer.len())
+    }
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        Ok(buffer.len())
+    }
+    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        Ok(0)
+    }
+    fn info(&self) -> DeviceInfo {
+        DeviceInfo::new(DeviceType::Character)
+    }
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+}
+
+impl UnifiedPeripheral for LegacyDevice {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::PortIO(self.base_port)
+    }
+    fn read_byte(&mut self, _offset: u32) -> Result<u8, DeviceError> {
+        // Simulate inb instruction
+        Ok(0)
+    }
+    fn write_byte(&mut self, _offset: u32, _value: u8) -> Result<(), DeviceError> {
+        // Simulate outb instruction
+        Ok(())
+    }
+}
+
+/// Modern implementation of a peripheral using MMIO
+pub struct ModernDevice {
+    pub base_address: u32,
+    pub id: usize,
+    pub name: [u8; 64],
+}
+
+impl ModernDevice {
+    pub fn new(id: usize, name: &[u8], base_address: u32) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
+        }
+        ModernDevice {
+            base_address,
+            id,
+            name: name_array,
+        }
+    }
+}
+
+impl Device for ModernDevice {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        // Simulate reading MMIO
+        for b in buffer.iter_mut() {
+            *b = 0;
+        }
+        Ok(buffer.len())
+    }
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        Ok(buffer.len())
+    }
+    fn ioctl(&mut self, _command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        Ok(0)
+    }
+    fn info(&self) -> DeviceInfo {
+        DeviceInfo::new(DeviceType::Character)
+    }
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+}
+
+impl UnifiedPeripheral for ModernDevice {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_address)
+    }
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+        unsafe {
+            let addr = (self.base_address + offset) as *const u8;
+            // Simulated MMIO read to avoid segfaults in unit testing environments
+            if self.base_address == 0 {
+                return Ok(0);
+            }
+            Ok(ptr::read_volatile(addr))
+        }
+    }
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+        unsafe {
+            let addr = (self.base_address + offset) as *mut u8;
+            // Simulated MMIO write
+            if self.base_address != 0 {
+                ptr::write_volatile(addr, value);
+            }
+            Ok(())
+        }
+    }
+}
+
+/// User-Defined Function (UDF) Interpreter (Custom Bytecode Runner)
+/// Solves driver-bloat and provides ultra-low disk footprint driver customization
+pub struct UdfInterpreter {
+    pub bytecode: Vec<u8>,
+}
+
+impl UdfInterpreter {
+    pub fn new(bytecode: &[u8]) -> Self {
+        let mut code_vec = Vec::new();
+        for &b in bytecode {
+            code_vec.push(b);
+        }
+        UdfInterpreter { bytecode: code_vec }
+    }
+
+    /// Execute the sandboxed User-Defined Function bytecode
+    /// Bytecode instructions:
+    /// - 0x01: Read Port IO / MMIO
+    /// - 0x02: Write Port IO / MMIO
+    /// - 0x03: Custom scaling transformation
+    /// - 0x04: Terminate with success
+    pub fn execute(
+        &self,
+        peripheral: &mut dyn UnifiedPeripheral,
+        registers: &mut [u32; 4],
+    ) -> Result<(), DeviceError> {
+        let mut pc = 0;
+        while pc < self.bytecode.len() {
+            let op = self.bytecode[pc];
+            match op {
+                0x01 => {
+                    // Read operation. Register index in bytecode[pc+1], offset in bytecode[pc+2]
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
+                    let reg_idx = self.bytecode[pc + 1] as usize;
+                    let offset = self.bytecode[pc + 2] as u32;
+                    if reg_idx < registers.len() {
+                        registers[reg_idx] = peripheral.read_byte(offset)? as u32;
+                    }
+                    pc += 3;
+                }
+                0x02 => {
+                    // Write operation. Offset in bytecode[pc+1], register index holding value in bytecode[pc+2]
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
+                    let offset = self.bytecode[pc + 1] as u32;
+                    let reg_idx = self.bytecode[pc + 2] as usize;
+                    if reg_idx < registers.len() {
+                        peripheral.write_byte(offset, registers[reg_idx] as u8)?;
+                    }
+                    pc += 3;
+                }
+                0x03 => {
+                    // Custom scale/transformation operation. Multiply register[pc+1] by factor bytecode[pc+2]
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
+                    let reg_idx = self.bytecode[pc + 1] as usize;
+                    let factor = self.bytecode[pc + 2] as u32;
+                    if reg_idx < registers.len() {
+                        registers[reg_idx] = registers[reg_idx].wrapping_mul(factor);
+                    }
+                    pc += 3;
+                }
+                0x04 => {
+                    // Halt with success
+                    return Ok(());
+                }
+                _ => {
+                    // Unknown opcode
+                    return Err(DeviceError::NotSupported);
+                }
+            }
+        }
+        Ok(())
+    }
 }

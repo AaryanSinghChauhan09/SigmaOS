@@ -1,19 +1,25 @@
+use crate::klib::Vec;
 /// OOP-based Accessibility Keyboard for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 836
 /// Implements on-screen keyboard and accessibility input
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 pub type KeyID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KeyType { Character = 0, Modifier = 1, Function = 2 }
+pub enum KeyType {
+    Character = 0,
+    Modifier = 1,
+    Function = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KeyboardError { Success = 0, NotFound = 1 }
+pub enum KeyboardError {
+    Success = 0,
+    NotFound = 1,
+}
 
 pub trait VirtualKey {
     fn id(&self) -> KeyID;
@@ -48,7 +54,9 @@ impl SimpleVirtualKey {
 }
 
 impl VirtualKey for SimpleVirtualKey {
-    fn id(&self) -> KeyID { self.id }
+    fn id(&self) -> KeyID {
+        self.id
+    }
     fn label(&self) -> &[u8] {
         let len = self.label.iter().position(|&b| b == 0).unwrap_or(8);
         &self.label[..len]
@@ -60,9 +68,12 @@ impl VirtualKey for SimpleVirtualKey {
             _ => KeyType::Function,
         }
     }
-    fn is_pressed(&self) -> bool { self.pressed.load(Ordering::SeqCst) == 1 }
+    fn is_pressed(&self) -> bool {
+        self.pressed.load(Ordering::SeqCst) == 1
+    }
     fn set_pressed(&self, pressed: bool) {
-        self.pressed.store(if pressed { 1 } else { 0 }, Ordering::SeqCst);
+        self.pressed
+            .store(if pressed { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 
@@ -107,7 +118,7 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
         }
         Err(KeyboardError::NotFound)
     }
-    
+
     fn release_key(&mut self, key_id: KeyID) -> Result<(), KeyboardError> {
         for key_option in &mut self.keys {
             if let Some(ref mut key) = *key_option {
@@ -119,16 +130,18 @@ impl OnScreenKeyboard for SimpleOnScreenKeyboard {
         }
         Err(KeyboardError::NotFound)
     }
-    
+
     fn get_key(&self, id: KeyID) -> Option<&dyn VirtualKey> {
         for key_option in &self.keys {
             if let Some(ref key) = *key_option {
-                if key.id() == id { return Some(key.as_ref()); }
+                if key.id() == id {
+                    return Some(key.as_ref());
+                }
             }
         }
         None
     }
-    
+
     fn set_layout(&mut self, layout: &[u8]) {
         let layout_len = layout.len().min(31);
         for i in 0..layout_len {
@@ -162,7 +175,7 @@ impl StickyKeys for SimpleStickyKeys {
             self.sticky_keys.push(key_id);
         }
     }
-    
+
     fn disable_sticky(&mut self, key_id: KeyID) {
         for i in 0..self.sticky_keys.len() {
             if self.sticky_keys[i] == key_id {
@@ -171,7 +184,7 @@ impl StickyKeys for SimpleStickyKeys {
             }
         }
     }
-    
+
     fn is_sticky(&self, key_id: KeyID) -> bool {
         self.sticky_keys.contains(&key_id)
     }
@@ -208,4 +221,3 @@ mod tests {
         assert!(!sticky.is_sticky(5));
     }
 }
-

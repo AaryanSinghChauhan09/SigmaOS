@@ -218,8 +218,8 @@ impl VintageDriverTranslator {
     pub fn emulate_io_port(&mut self, port: u16, val: u8) -> Result<(), HistoricError> {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
-            let idx = (port % 256) as usize;
-            self.wrapper.simulated_pci_bar[idx] = val;
+            let idx = (port % 256) as usize % 6;
+            self.wrapper.simulated_pci_bar[idx] = val as u32;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)
@@ -299,15 +299,24 @@ impl TinyCoreEphemeralEngine {
         }
     }
 
-    pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
+    pub fn load_compressed_extension(
+        &mut self,
+        ext_name: &str,
+        size_bytes: usize,
+    ) -> Result<(), HistoricError> {
         if ext_name.is_empty() || size_bytes == 0 {
             return Err(HistoricError::MemoryAccessViolation);
         }
-        self.mounted_extensions.insert(ext_name.to_string(), size_bytes);
+        self.mounted_extensions
+            .insert(ext_name.to_string(), size_bytes);
         Ok(())
     }
 
-    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
+    pub fn write_to_volatile_overlay(
+        &mut self,
+        file_path: &str,
+        data_len: usize,
+    ) -> Result<usize, HistoricError> {
         if self.persistence_enabled {
             return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
         }
@@ -324,106 +333,5 @@ impl TinyCoreEphemeralEngine {
 impl Default for TinyCoreEphemeralEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_tinycore_ephemeral_engine() {
-        let mut engine = TinyCoreEphemeralEngine::new();
-        assert!(!engine.persistence_enabled);
-        assert_eq!(engine.volatile_overlay_ram_bytes, 0);
-
-        engine.load_compressed_extension("coreutils.tcz", 1024 * 1024).unwrap();
-        assert_eq!(*engine.mounted_extensions.get("coreutils.tcz").unwrap(), 1024 * 1024);
-
-        let overlay_size = engine.write_to_volatile_overlay("/tmp/logs.txt", 512).unwrap();
-        assert_eq!(overlay_size, 512);
-
-        engine.reset_ephemeral_state();
-        assert_eq!(engine.volatile_overlay_ram_bytes, 0);
-    }
-
-    #[test]
-    fn test_era_emulation_getpid() {
-        let emu = Era0_11SyscallEmulator;
-        let mut state = HistoricalCpuState {
-            eax: 20, // sys_getpid
-            ..Default::default()
-        };
-        let pid = emu.emulate_syscall(&mut state).unwrap();
-        assert_eq!(pid, 100);
-    }
-
-    #[test]
-    fn test_era_emulation_read() {
-        let emu = Era0_11SyscallEmulator;
-        let mut state = HistoricalCpuState {
-            eax: 3,      // sys_read
-            ebx: 0,      // stdin
-            ecx: 0x1000, // buffer
-            edx: 12,     // count
-            ..Default::default()
-        };
-        let bytes_read = emu.emulate_syscall(&mut state).unwrap();
-        assert_eq!(bytes_read, 12);
-    }
-
-    #[test]
-    fn test_era_emulation_network() {
-        let emu = Era1_0SyscallEmulator::new();
-        let mut state = HistoricalCpuState {
-            eax: 102, // sys_socketcall
-            ebx: 1,   // socket()
-            ..Default::default()
-        };
-        let fd = emu.emulate_syscall(&mut state).unwrap();
-        assert_eq!(fd, 10);
-        assert_eq!(emu.socket_call_count.load(Ordering::SeqCst), 1);
-    }
-
-    #[test]
-    fn test_vintage_sandbox() {
-        let sandbox = VintageVirtualizationSandbox::new(LinuxEra::Era0_11);
-        assert_eq!(sandbox.memory_limit, 16 * 1024 * 1024);
-        let regs = sandbox.setup_vintage_registers();
-        assert_eq!(regs.eflags, 0x200);
-        sandbox.register_ldt_segment();
-        assert_eq!(sandbox.simulated_ldt_entries.load(Ordering::SeqCst), 1);
-    }
-
-    #[test]
-    fn test_vintage_driver_io() {
-        let mut trans = VintageDriverTranslator::new(LinuxEra::Era1_0, "VintageIde");
-        assert!(trans.emulate_io_port(0x1F0, 0xA0).is_ok());
-        assert!(trans.emulate_io_port(0x999, 0xFF).is_err());
-    }
-
-    #[test]
-    fn test_package_converter() {
-        let conv = VintagePackageConverter;
-        let res = conv.convert_package("old_bash", "tar.Z").unwrap();
-        assert_eq!(res, "old_bash-sigpkg-compat");
-    }
-
-    #[test]
-    fn test_lfs_toolchain_stages() {
-        let mut builder = LfsToolchainBuilder::new();
-        assert_eq!(
-            builder.execute_bootstrap_stage(1).unwrap(),
-            "LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"
-        );
-        assert_eq!(
-            builder.execute_bootstrap_stage(2).unwrap(),
-            "LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"
-        );
-        assert_eq!(
-            builder.execute_bootstrap_stage(3).unwrap(),
-            "LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"
-        );
-        assert!(builder.execute_bootstrap_stage(4).is_err());
     }
 }

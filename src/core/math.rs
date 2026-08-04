@@ -243,12 +243,80 @@ pub fn cos_f64(x: f64) -> f64 {
     let mut term = 1.0;
     let mut x_squared = x * x;
 
-    for n in (2..=:10).step_by(2) {
+    for n in (2..=10).step_by(2) {
         term *= -x_squared / (n * (n + 1)) as f64;
         result += term;
     }
 
     result
+}
+
+/// Saturating addition inspired by Linux kernel integer overflow handlers.
+/// Avoids panic-on-overflow by clamping to min/max bounds.
+pub fn saturating_add_i32(a: i32, b: i32) -> i32 {
+    match a.checked_add(b) {
+        Some(val) => val,
+        None => {
+            if b > 0 {
+                i32::MAX
+            } else {
+                i32::MIN
+            }
+        }
+    }
+}
+
+/// Saturating subtraction inspired by BSD libc implementations.
+pub fn saturating_sub_i32(a: i32, b: i32) -> i32 {
+    match a.checked_sub(b) {
+        Some(val) => val,
+        None => {
+            if b < 0 {
+                i32::MAX
+            } else {
+                i32::MIN
+            }
+        }
+    }
+}
+
+/// Checked multiplication with overflow detection, inspired by Windows NT memory layout managers.
+pub fn checked_mul_i32(a: i32, b: i32) -> Option<i32> {
+    a.checked_mul(b)
+}
+
+/// Representation of a calling convention stack frame.
+/// Inspired by Windows x64 FastCall and BSD stack frames.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct InvocationFrame {
+    pub rip: u64,
+    pub rsp: u64,
+    pub rbp: u64,
+    pub parameters: [u64; 4], // FastCall passing (rcx, rdx, r8, r9)
+}
+
+impl InvocationFrame {
+    pub fn new(rip: u64, rsp: u64, rbp: u64, params: [u64; 4]) -> Self {
+        Self { rip, rsp, rbp, parameters: params }
+    }
+
+    /// Verifies the stack frame alignment and boundary sanity (BSD-inspired security rule)
+    pub fn verify_alignment(&self) -> bool {
+        self.rsp % 8 == 0 && self.rsp >= self.rbp
+    }
+}
+
+/// Simulated secure dynamic function invocation wrapper.
+/// Prevents unsafe stack-smashing via boundary sanity assertions (OpenBSD style).
+pub fn secure_invoke_sim(frame: &InvocationFrame, entry_point: u64) -> Result<u64, &'static str> {
+    if !frame.verify_alignment() {
+        return Err("Stack alignment violation: Potential buffer override detected (SIGSEGV Parity)");
+    }
+    if frame.rip != entry_point {
+        return Err("Function invocation hijack attempt blocked (Control Flow Guard Parity)");
+    }
+    // Simulate successful secure function execution
+    Ok(frame.parameters[0] + frame.parameters[1])
 }
 
 #[cfg(test)]
@@ -316,5 +384,26 @@ mod tests {
         assert!((lerp(0.0, 10.0, 0.5) - 5.0).abs() < 0.001);
         assert!((lerp(0.0, 10.0, 0.0) - 0.0).abs() < 0.001);
         assert!((lerp(0.0, 10.0, 1.0) - 10.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_saturating_and_checked_arithmetic() {
+        assert_eq!(saturating_add_i32(i32::MAX, 10), i32::MAX);
+        assert_eq!(saturating_add_i32(i32::MIN, -10), i32::MIN);
+        assert_eq!(saturating_sub_i32(i32::MIN, 10), i32::MIN);
+        assert_eq!(checked_mul_i32(100, 20), Some(2000));
+        assert_eq!(checked_mul_i32(i32::MAX, 2), None);
+    }
+
+    #[test]
+    fn test_secure_stack_and_invocation_frames() {
+        let frame = InvocationFrame::new(0x1000, 0x7FFF0000, 0x7FFF0000, [5, 10, 0, 0]);
+        assert!(frame.verify_alignment());
+        assert_eq!(secure_invoke_sim(&frame, 0x1000).unwrap(), 15);
+
+        // Fail align test
+        let bad_frame = InvocationFrame::new(0x1000, 0x7FFF0003, 0x7FFF0000, [5, 10, 0, 0]);
+        assert!(!bad_frame.verify_alignment());
+        assert!(secure_invoke_sim(&bad_frame, 0x1000).is_err());
     }
 }

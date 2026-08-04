@@ -64,7 +64,12 @@ impl SecurityLabel {
             "s0".to_string()
         };
 
-        Ok(Self { user, role, type_, level })
+        Ok(Self {
+            user,
+            role,
+            type_,
+            level,
+        })
     }
 
     /// Convert security label to standard context string representation
@@ -106,7 +111,9 @@ impl SecurityLabel {
                     if range_parts.len() == 2 {
                         let start_str = range_parts[0].trim_start_matches('c');
                         let end_str = range_parts[1].trim_start_matches('c');
-                        if let (Ok(start), Ok(end)) = (start_str.parse::<u16>(), end_str.parse::<u16>()) {
+                        if let (Ok(start), Ok(end)) =
+                            (start_str.parse::<u16>(), end_str.parse::<u16>())
+                        {
                             for cat in start..=end {
                                 categories.insert(cat);
                             }
@@ -266,13 +273,17 @@ impl SecurityPolicy {
         boolean_name: &str,
         expected_value: bool,
     ) -> Result<(), &'static str> {
-        self.conditional_rules.push((rule, boolean_name.to_string(), expected_value));
+        self.conditional_rules
+            .push((rule, boolean_name.to_string(), expected_value));
         self.avc.clear();
         Ok(())
     }
 
     /// Add a domain type transition rule
-    pub fn add_type_transition(&mut self, transition: TypeTransitionRule) -> Result<(), &'static str> {
+    pub fn add_type_transition(
+        &mut self,
+        transition: TypeTransitionRule,
+    ) -> Result<(), &'static str> {
         self.type_transitions.push(transition);
         Ok(())
     }
@@ -514,7 +525,9 @@ impl SecurityPolicy {
                         return Err("Malformed bool statement. Expected: bool <name> <value>");
                     }
                     let name = parts[1].to_string();
-                    let value = parts[2].parse::<bool>().map_err(|_| "Invalid boolean value")?;
+                    let value = parts[2]
+                        .parse::<bool>()
+                        .map_err(|_| "Invalid boolean value")?;
                     self.set_boolean(&name, value);
                 }
                 "type_transition" => {
@@ -583,7 +596,9 @@ impl SecurityPolicy {
                     if op != "==" {
                         return Err("Unsupported operator in allowif. Only '==' is supported");
                     }
-                    let expected_val = parts[3].parse::<bool>().map_err(|_| "Invalid boolean in allowif")?;
+                    let expected_val = parts[3]
+                        .parse::<bool>()
+                        .map_err(|_| "Invalid boolean in allowif")?;
 
                     if parts[4] != "allow" {
                         return Err("Expected 'allow' keyword after condition in allowif");
@@ -700,7 +715,7 @@ pub struct AppArmorCapabilityRule {
 
 #[derive(Debug, Clone)]
 pub struct AppArmorNetworkRule {
-    pub domain: String, // e.g. "inet", "inet6"
+    pub domain: String,   // e.g. "inet", "inet6"
     pub protocol: String, // e.g. "tcp", "udp"
 }
 
@@ -718,13 +733,22 @@ pub struct AppArmorProfile {
 
 impl AppArmorProfile {
     /// Create new backward-compatible profile (legacy)
-    pub fn new_legacy(name: String, path: String, permissions: Vec<SelinuxPermission>, enabled: bool) -> Self {
+    pub fn new_legacy(
+        name: String,
+        path: String,
+        permissions: Vec<SelinuxPermission>,
+        enabled: bool,
+    ) -> Self {
         Self {
             name,
             path,
             permissions,
             enabled,
-            mode: if enabled { AppArmorMode::Enforce } else { AppArmorMode::Disabled },
+            mode: if enabled {
+                AppArmorMode::Enforce
+            } else {
+                AppArmorMode::Disabled
+            },
             path_rules: Vec::new(),
             capability_rules: Vec::new(),
             network_rules: Vec::new(),
@@ -754,12 +778,14 @@ impl AppArmorProfile {
     }
 
     pub fn with_capability_rule(mut self, capability: String) -> Self {
-        self.capability_rules.push(AppArmorCapabilityRule { capability });
+        self.capability_rules
+            .push(AppArmorCapabilityRule { capability });
         self
     }
 
     pub fn with_network_rule(mut self, domain: String, protocol: String) -> Self {
-        self.network_rules.push(AppArmorNetworkRule { domain, protocol });
+        self.network_rules
+            .push(AppArmorNetworkRule { domain, protocol });
         self
     }
 }
@@ -795,9 +821,7 @@ pub fn match_path_pattern(pattern: &str, requested: &str) -> bool {
                 }
                 false
             }
-            ([p, p_tail @ ..], [r, r_tail @ ..]) if *p == *r => {
-                glob_match(p_tail, r_tail)
-            }
+            ([p, p_tail @ ..], [r, r_tail @ ..]) if *p == *r => glob_match(p_tail, r_tail),
             _ => false,
         }
     }
@@ -856,7 +880,12 @@ impl AppArmorManager {
     }
 
     /// Check file path access under a specific profile with globbing support (Ubuntu style)
-    pub fn check_file_access(&mut self, profile_name: &str, requested_path: &str, requested_perm: char) -> bool {
+    pub fn check_file_access(
+        &mut self,
+        profile_name: &str,
+        requested_path: &str,
+        requested_perm: char,
+    ) -> bool {
         let profile = match self.profiles.get(profile_name) {
             Some(p) => p,
             None => return !self.enforcing_mode,
@@ -877,7 +906,8 @@ impl AppArmorManager {
         }
 
         // Log to audit if Complain, Audit, or Enforce fails
-        if profile.mode == AppArmorMode::Audit || !allowed || profile.mode == AppArmorMode::Complain {
+        if profile.mode == AppArmorMode::Audit || !allowed || profile.mode == AppArmorMode::Complain
+        {
             let log = AppArmorAuditLog {
                 profile_name: profile_name.to_string(),
                 mode: profile.mode,
@@ -906,9 +936,13 @@ impl AppArmorManager {
             return true;
         }
 
-        let allowed = profile.capability_rules.iter().any(|r| r.capability == capability);
+        let allowed = profile
+            .capability_rules
+            .iter()
+            .any(|r| r.capability == capability);
 
-        if profile.mode == AppArmorMode::Audit || !allowed || profile.mode == AppArmorMode::Complain {
+        if profile.mode == AppArmorMode::Audit || !allowed || profile.mode == AppArmorMode::Complain
+        {
             let log = AppArmorAuditLog {
                 profile_name: profile_name.to_string(),
                 mode: profile.mode,
@@ -937,9 +971,13 @@ impl AppArmorManager {
             return true;
         }
 
-        let allowed = profile.network_rules.iter().any(|r| r.domain == domain && r.protocol == protocol);
+        let allowed = profile
+            .network_rules
+            .iter()
+            .any(|r| r.domain == domain && r.protocol == protocol);
 
-        if profile.mode == AppArmorMode::Audit || !allowed || profile.mode == AppArmorMode::Complain {
+        if profile.mode == AppArmorMode::Audit || !allowed || profile.mode == AppArmorMode::Complain
+        {
             let log = AppArmorAuditLog {
                 profile_name: profile_name.to_string(),
                 mode: profile.mode,
@@ -1042,14 +1080,16 @@ mod tests {
         policy.add_rule(rule).unwrap();
 
         // First check: miss
-        let allowed1 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed1 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed1);
         let (hits1, misses1) = policy.avc_stats();
         assert_eq!(hits1, 0);
         assert_eq!(misses1, 1);
 
         // Second check: hit
-        let allowed2 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed2 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed2);
         let (hits2, misses2) = policy.avc_stats();
         assert_eq!(hits2, 1);
@@ -1059,7 +1099,8 @@ mod tests {
         policy.set_boolean("any_bool", true);
         let (hits3, misses3) = policy.avc_stats();
         // Stats are retained, but cache is cleared. Next check will miss.
-        let allowed3 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed3 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed3);
         let (hits4, misses4) = policy.avc_stats();
         assert_eq!(hits4, 1);
@@ -1080,27 +1121,33 @@ mod tests {
             enabled: true,
         };
 
-        policy.add_conditional_rule(rule, "httpd_enable_homedirs", true).unwrap();
+        policy
+            .add_conditional_rule(rule, "httpd_enable_homedirs", true)
+            .unwrap();
 
         // Boolean is not registered/false by default
-        let allowed1 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed1 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(!allowed1);
 
         // Toggle boolean
         policy.set_boolean("httpd_enable_homedirs", true);
-        let allowed2 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed2 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed2);
     }
 
     #[test]
     fn test_type_transitions() {
         let mut policy = SecurityPolicy::new();
-        policy.add_type_transition(TypeTransitionRule {
-            source_type: "init_t".to_string(),
-            target_type: "apache_exec_t".to_string(),
-            object_type: ObjectType::Process,
-            new_type: "apache_t".to_string(),
-        }).unwrap();
+        policy
+            .add_type_transition(TypeTransitionRule {
+                source_type: "init_t".to_string(),
+                target_type: "apache_exec_t".to_string(),
+                object_type: ObjectType::Process,
+                new_type: "apache_t".to_string(),
+            })
+            .unwrap();
 
         let new_domain = policy.find_transition("init_t", "apache_exec_t", ObjectType::Process);
         assert_eq!(new_domain, Some("apache_t".to_string()));
@@ -1137,7 +1184,12 @@ mod tests {
         // Check rule evaluation
         let source = SecurityLabel::parse("system_u:system_r:init_t:s0").unwrap();
         let target = SecurityLabel::parse("system_u:object_r:etc_t:s0").unwrap();
-        assert!(policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read));
+        assert!(policy.check_permission(
+            &source,
+            &target,
+            ObjectType::File,
+            SelinuxPermission::Read
+        ));
     }
 
     #[test]
@@ -1147,7 +1199,8 @@ mod tests {
         let target = SecurityLabel::parse("system_u:object_r:shadow_t:s0").unwrap();
 
         // Enforcing: denied
-        let allowed1 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed1 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(!allowed1);
         assert_eq!(policy.get_audit_logs().len(), 1);
         assert!(policy.get_audit_logs()[0].contains("denied"));
@@ -1156,7 +1209,8 @@ mod tests {
         // Permissive: allowed but logged
         policy.set_enforcing(false);
         policy.clear_audit_logs();
-        let allowed2 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed2 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed2);
         assert_eq!(policy.get_audit_logs().len(), 1);
         assert!(policy.get_audit_logs()[0].contains("denied"));
@@ -1233,12 +1287,24 @@ mod tests {
         // Test single asterisk '*' wildcard (matches within directories)
         assert!(match_path_pattern("/var/log/*", "/var/log/syslog"));
         assert!(match_path_pattern("/var/log/*", "/var/log/auth.log"));
-        assert!(!match_path_pattern("/var/log/*", "/var/log/nginx/access.log")); // should fail (recursive path)
+        assert!(!match_path_pattern(
+            "/var/log/*",
+            "/var/log/nginx/access.log"
+        )); // should fail (recursive path)
 
         // Test double asterisk '**' wildcard (matches recursively)
-        assert!(match_path_pattern("/home/**/*.txt", "/home/ubuntu/notes.txt"));
-        assert!(match_path_pattern("/home/**/*.txt", "/home/guest/documents/secret.txt"));
-        assert!(!match_path_pattern("/home/**/*.txt", "/home/ubuntu/notes.pdf")); // wrong extension
+        assert!(match_path_pattern(
+            "/home/**/*.txt",
+            "/home/ubuntu/notes.txt"
+        ));
+        assert!(match_path_pattern(
+            "/home/**/*.txt",
+            "/home/guest/documents/secret.txt"
+        ));
+        assert!(!match_path_pattern(
+            "/home/**/*.txt",
+            "/home/ubuntu/notes.pdf"
+        )); // wrong extension
     }
 
     #[test]
@@ -1246,16 +1312,18 @@ mod tests {
         let mut manager = AppArmorManager::new();
 
         // 1. Enforce mode - strictly denies access if no rule matches
-        let profile_enforce = AppArmorProfile::new("restricted_bin".to_string(), AppArmorMode::Enforce)
-            .with_path_rule("/var/log/*.log".to_string(), "r".to_string());
+        let profile_enforce =
+            AppArmorProfile::new("restricted_bin".to_string(), AppArmorMode::Enforce)
+                .with_path_rule("/var/log/*.log".to_string(), "r".to_string());
         manager.add_profile(profile_enforce).unwrap();
 
         assert!(manager.check_file_access("restricted_bin", "/var/log/syslog.log", 'r'));
         assert!(!manager.check_file_access("restricted_bin", "/etc/shadow", 'r')); // denied
 
         // 2. Complain mode - allows access but logs a warning
-        let profile_complain = AppArmorProfile::new("complain_bin".to_string(), AppArmorMode::Complain)
-            .with_path_rule("/var/log/*.log".to_string(), "r".to_string());
+        let profile_complain =
+            AppArmorProfile::new("complain_bin".to_string(), AppArmorMode::Complain)
+                .with_path_rule("/var/log/*.log".to_string(), "r".to_string());
         manager.add_profile(profile_complain).unwrap();
 
         // Should be allowed and audited

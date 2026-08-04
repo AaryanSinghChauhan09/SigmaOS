@@ -1,22 +1,31 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Cross-compile Toolchain for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 9
 /// Implements reproducible cross builds for multiple architectures
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ToolchainID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Architecture { X86_64 = 0, ARM64 = 1, RISCV64 = 2, PPC64 = 3 }
+pub enum Architecture {
+    X86_64 = 0,
+    ARM64 = 1,
+    RISCV64 = 2,
+    PPC64 = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ToolchainError { Success = 0, NotFound = 1, CompileFailed = 2, InvalidTarget = 3 }
+pub enum ToolchainError {
+    Success = 0,
+    NotFound = 1,
+    CompileFailed = 2,
+    InvalidTarget = 3,
+}
 
 pub trait Toolchain {
     fn id(&self) -> ToolchainID;
@@ -42,7 +51,11 @@ impl SimpleToolchain {
         let version_len = version.len().min(31);
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(version.as_ptr(), version_array.as_mut_ptr(), version_len);
+            core::ptr::copy_nonoverlapping(
+                version.as_ptr(),
+                version_array.as_mut_ptr(),
+                version_len,
+            );
         }
         SimpleToolchain {
             id,
@@ -54,16 +67,20 @@ impl SimpleToolchain {
 }
 
 impl Toolchain for SimpleToolchain {
-    fn id(&self) -> ToolchainID { self.id }
-    fn target_arch(&self) -> Architecture { {
-        let raw = self.target_arch.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => Architecture::ARM64,
-            2 => Architecture::RISCV64,
-            3 => Architecture::PPC64,
-            _ => Architecture::X86_64,
+    fn id(&self) -> ToolchainID {
+        self.id
+    }
+    fn target_arch(&self) -> Architecture {
+        {
+            let raw = self.target_arch.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => Architecture::ARM64,
+                2 => Architecture::RISCV64,
+                3 => Architecture::PPC64,
+                _ => Architecture::X86_64,
+            }
         }
-    } }
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -76,15 +93,26 @@ impl Toolchain for SimpleToolchain {
     fn compile(&mut self, source: &[u8]) -> Result<Vec<u8>, ToolchainError> {
         let mut binary = Vec::new();
         let header = [0x7F, 0x45, 0x4C, 0x46];
-        for &byte in &header { binary.push(byte); }
-        for &byte in source { binary.push(byte); }
+        for &byte in &header {
+            binary.push(byte);
+        }
+        for &byte in source {
+            binary.push(byte);
+        }
         Ok(binary)
     }
 }
 
 pub trait CrossCompiler {
-    fn register_toolchain(&mut self, toolchain: Box<dyn Toolchain>) -> Result<ToolchainID, ToolchainError>;
-    fn compile_for_target(&mut self, source: &[u8], target: Architecture) -> Result<Vec<u8>, ToolchainError>;
+    fn register_toolchain(
+        &mut self,
+        toolchain: Box<dyn Toolchain>,
+    ) -> Result<ToolchainID, ToolchainError>;
+    fn compile_for_target(
+        &mut self,
+        source: &[u8],
+        target: Architecture,
+    ) -> Result<Vec<u8>, ToolchainError>;
     fn get_toolchain(&self, id: ToolchainID) -> Option<&dyn Toolchain>;
 }
 
@@ -103,25 +131,47 @@ impl SimpleCrossCompiler {
     }
 
     pub fn seed_with_defaults(&mut self) {
-        let tc1 = SimpleToolchain::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::X86_64, b"x86_64-linux-gnu-gcc", b"12.2");
+        let tc1 = SimpleToolchain::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            Architecture::X86_64,
+            b"x86_64-linux-gnu-gcc",
+            b"12.2",
+        );
         self.toolchains.push(Some(Box::new(tc1)));
 
-        let tc2 = SimpleToolchain::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::ARM64, b"aarch64-linux-gnu-gcc", b"12.2");
+        let tc2 = SimpleToolchain::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            Architecture::ARM64,
+            b"aarch64-linux-gnu-gcc",
+            b"12.2",
+        );
         self.toolchains.push(Some(Box::new(tc2)));
 
-        let tc3 = SimpleToolchain::new(self.next_id.fetch_add(1, Ordering::SeqCst), Architecture::RISCV64, b"riscv64-linux-gnu-gcc", b"12.2");
+        let tc3 = SimpleToolchain::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            Architecture::RISCV64,
+            b"riscv64-linux-gnu-gcc",
+            b"12.2",
+        );
         self.toolchains.push(Some(Box::new(tc3)));
     }
 }
 
 impl CrossCompiler for SimpleCrossCompiler {
-    fn register_toolchain(&mut self, toolchain: Box<dyn Toolchain>) -> Result<ToolchainID, ToolchainError> {
+    fn register_toolchain(
+        &mut self,
+        toolchain: Box<dyn Toolchain>,
+    ) -> Result<ToolchainID, ToolchainError> {
         let id = toolchain.id();
         self.toolchains.push(Some(toolchain));
         Ok(id)
     }
 
-    fn compile_for_target(&mut self, source: &[u8], target: Architecture) -> Result<Vec<u8>, ToolchainError> {
+    fn compile_for_target(
+        &mut self,
+        source: &[u8],
+        target: Architecture,
+    ) -> Result<Vec<u8>, ToolchainError> {
         for toolchain_option in self.toolchains.iter_mut() {
             if let Some(ref mut toolchain) = *toolchain_option {
                 if toolchain.target_arch() == target {
@@ -135,7 +185,9 @@ impl CrossCompiler for SimpleCrossCompiler {
     fn get_toolchain(&self, id: ToolchainID) -> Option<&dyn Toolchain> {
         for toolchain_option in self.toolchains.iter() {
             if let Some(ref toolchain) = *toolchain_option {
-                if toolchain.id() == id { return Some(toolchain.as_ref()); }
+                if toolchain.id() == id {
+                    return Some(toolchain.as_ref());
+                }
             }
         }
         None
@@ -235,7 +287,9 @@ impl BuildConfiguration for SimpleBuildConfiguration {
         }
     }
 
-    fn get_config(&self) -> BuildConfig { self.config }
+    fn get_config(&self) -> BuildConfig {
+        self.config
+    }
 }
 
 pub trait ReproducibleBuild {
@@ -243,10 +297,28 @@ pub trait ReproducibleBuild {
     fn enable_deterministic_mode(&mut self, enabled: bool);
     fn verify_reproducibility(&self, binary1: &[u8], binary2: &[u8]) -> bool;
 
-    fn scrub_environment(&self, _raw_env: &mut [u8]) -> usize { 0 }
-    fn map_paths(&self, _raw_paths: &mut [u8], _actual_prefix: &[u8], _canon_prefix: &[u8]) -> usize { 0 }
-    fn stabilize_archive_metadata(&self, _archive_data: &mut [u8], _timestamp: u64) -> usize { 0 }
-    fn audit_reproducibility(&self, _binary1: &[u8], _binary2: &[u8], _out_report: &mut [u8]) -> usize { 0 }
+    fn scrub_environment(&self, _raw_env: &mut [u8]) -> usize {
+        0
+    }
+    fn map_paths(
+        &self,
+        _raw_paths: &mut [u8],
+        _actual_prefix: &[u8],
+        _canon_prefix: &[u8],
+    ) -> usize {
+        0
+    }
+    fn stabilize_archive_metadata(&self, _archive_data: &mut [u8], _timestamp: u64) -> usize {
+        0
+    }
+    fn audit_reproducibility(
+        &self,
+        _binary1: &[u8],
+        _binary2: &[u8],
+        _out_report: &mut [u8],
+    ) -> usize {
+        0
+    }
 }
 
 #[repr(C)]
@@ -266,11 +338,13 @@ impl SimpleReproducibleBuild {
 
 impl ReproducibleBuild for SimpleReproducibleBuild {
     fn set_source_date_epoch(&mut self, epoch: u64) {
-        self.source_date_epoch.store(epoch as usize, Ordering::SeqCst);
+        self.source_date_epoch
+            .store(epoch as usize, Ordering::SeqCst);
     }
 
     fn enable_deterministic_mode(&mut self, enabled: bool) {
-        self.deterministic_mode.store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
+        self.deterministic_mode
+            .store(if enabled { 1 } else { 0 }, Ordering::SeqCst);
     }
 
     fn verify_reproducibility(&self, binary1: &[u8], binary2: &[u8]) -> bool {
@@ -293,10 +367,22 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
         let len = raw_env.len();
 
         let keys: [&[u8]; 7] = [
-            b"USER=", b"HOSTNAME=", b"TZ=", b"PWD=", b"LANG=", b"LC_ALL=", b"HOME="
+            b"USER=",
+            b"HOSTNAME=",
+            b"TZ=",
+            b"PWD=",
+            b"LANG=",
+            b"LC_ALL=",
+            b"HOME=",
         ];
         let vals: [&[u8]; 7] = [
-            b"sigma", b"reproducible-build-host", b"UTC", b"/usr/src/build", b"C.UTF-8", b"C.UTF-8", b"/home/sigma"
+            b"sigma",
+            b"reproducible-build-host",
+            b"UTC",
+            b"/usr/src/build",
+            b"C.UTF-8",
+            b"C.UTF-8",
+            b"/home/sigma",
         ];
 
         while read_idx < len {
@@ -379,7 +465,9 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
         let temp_len = temp.len();
 
         while read_idx < len && write_idx < temp_len {
-            if read_idx + actual_prefix.len() <= len && &raw_paths[read_idx..read_idx + actual_prefix.len()] == actual_prefix {
+            if read_idx + actual_prefix.len() <= len
+                && &raw_paths[read_idx..read_idx + actual_prefix.len()] == actual_prefix
+            {
                 for &b in canon_prefix {
                     if write_idx < temp_len {
                         temp[write_idx] = b;
@@ -482,7 +570,12 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
     }
 
     /// Detailed diffoscope-style byte diagnostic audit of reproducibility discrepancies
-    fn audit_reproducibility(&self, binary1: &[u8], binary2: &[u8], out_report: &mut [u8]) -> usize {
+    fn audit_reproducibility(
+        &self,
+        binary1: &[u8],
+        binary2: &[u8],
+        out_report: &mut [u8],
+    ) -> usize {
         let mut idx = 0;
 
         fn write_b(buf: &mut [u8], idx: &mut usize, bytes: &[u8]) {
@@ -524,7 +617,11 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
             }
             while val > 0 {
                 let rem = val % 16;
-                hex_chars[len] = if rem < 10 { b'0' + rem as u8 } else { b'a' + (rem - 10) as u8 };
+                hex_chars[len] = if rem < 10 {
+                    b'0' + rem as u8
+                } else {
+                    b'a' + (rem - 10) as u8
+                };
                 len += 1;
                 val /= 16;
             }
@@ -536,10 +633,18 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
             }
         }
 
-        write_b(out_report, &mut idx, b"REPRODUCIBILITY AUDIT REPORT:\n-----------------------------\n");
+        write_b(
+            out_report,
+            &mut idx,
+            b"REPRODUCIBILITY AUDIT REPORT:\n-----------------------------\n",
+        );
 
         if binary1.len() != binary2.len() {
-            write_b(out_report, &mut idx, b"Status: NON-REPRODUCIBLE (Size Mismatch)\n");
+            write_b(
+                out_report,
+                &mut idx,
+                b"Status: NON-REPRODUCIBLE (Size Mismatch)\n",
+            );
             write_b(out_report, &mut idx, b"Size 1: ");
             write_d(out_report, &mut idx, binary1.len());
             write_b(out_report, &mut idx, b" bytes\n");
@@ -574,7 +679,11 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
             write_b(out_report, &mut idx, b"Size: ");
             write_d(out_report, &mut idx, len);
             write_b(out_report, &mut idx, b" bytes\n");
-            write_b(out_report, &mut idx, b"No discrepancies detected. Bit-identical match.\n");
+            write_b(
+                out_report,
+                &mut idx,
+                b"No discrepancies detected. Bit-identical match.\n",
+            );
         } else {
             write_b(out_report, &mut idx, b"Status: NON-REPRODUCIBLE\n");
             write_b(out_report, &mut idx, b"Size: ");
@@ -589,20 +698,30 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
-        if self.data.is_null() { &[] }
-        else { unsafe { core::slice::from_raw_parts(self.data, self.len) } }
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
     }
 }
 
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() { &mut [] }
-        else { unsafe { core::slice::from_raw_parts_mut(self.data, self.len) } }
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
     }
 }
 
@@ -616,10 +735,18 @@ impl<T> Vec<T> {
         let slice: &mut [T] = self;
         slice.iter_mut()
     }
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -627,11 +754,19 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -651,7 +786,10 @@ impl<T> Drop for Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 #[cfg(test)]
 mod tests {
@@ -660,7 +798,8 @@ mod tests {
     #[test]
     fn test_scrub_environment() {
         let mut env = [0u8; 256];
-        let raw = b"USER=jules\0HOSTNAME=my-laptop\0TZ=EST\0LANG=en_US.UTF-8\0PWD=/home/jules/app\0";
+        let raw =
+            b"USER=jules\0HOSTNAME=my-laptop\0TZ=EST\0LANG=en_US.UTF-8\0PWD=/home/jules/app\0";
         env[..raw.len()].copy_from_slice(raw);
 
         let builder = SimpleReproducibleBuild::new();
@@ -677,7 +816,8 @@ mod tests {
 
     #[test]
     fn test_map_paths() {
-        let mut paths = *b"/home/jules/app/src/main.rs                                              ";
+        let mut paths =
+            *b"/home/jules/app/src/main.rs                                              ";
         let builder = SimpleReproducibleBuild::new();
         let actual = b"/home/jules/app";
         let canon = b"/usr/src/app";
