@@ -251,72 +251,85 @@ pub fn cos_f64(x: f64) -> f64 {
     result
 }
 
-/// Saturating addition inspired by Linux kernel integer overflow handlers.
-/// Avoids panic-on-overflow by clamping to min/max bounds.
+// ==========================================
+// Kernel-style checked arithmetic primitives
+// ==========================================
+
 pub fn saturating_add_i32(a: i32, b: i32) -> i32 {
     match a.checked_add(b) {
         Some(val) => val,
-        None => {
-            if b > 0 {
-                i32::MAX
-            } else {
-                i32::MIN
-            }
-        }
+        None => if b > 0 { i32::MAX } else { i32::MIN },
     }
 }
 
-/// Saturating subtraction inspired by BSD libc implementations.
 pub fn saturating_sub_i32(a: i32, b: i32) -> i32 {
     match a.checked_sub(b) {
         Some(val) => val,
-        None => {
-            if b < 0 {
-                i32::MAX
-            } else {
-                i32::MIN
-            }
-        }
+        None => if b > 0 { i32::MIN } else { i32::MAX },
     }
 }
 
-/// Checked multiplication with overflow detection, inspired by Windows NT memory layout managers.
 pub fn checked_mul_i32(a: i32, b: i32) -> Option<i32> {
     a.checked_mul(b)
 }
 
-/// Representation of a calling convention stack frame.
-/// Inspired by Windows x64 FastCall and BSD stack frames.
+// =======================================================
+// Invocation Frame and Stack Frame Alignment Verification
+// =======================================================
+
+#[repr(C, align(16))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InvocationFrame {
-    pub rip: u64,
-    pub rsp: u64,
-    pub rbp: u64,
-    pub parameters: [u64; 4], // FastCall passing (rcx, rdx, r8, r9)
+    pub rip: u64, // Instruction pointer
+    pub rsp: u64, // Stack pointer
+    pub rbp: u64, // Base pointer
+    pub arg_count: u32,
+    pub stack_canary: u64, // Buffer overflow protection canary
 }
 
 impl InvocationFrame {
-    pub fn new(rip: u64, rsp: u64, rbp: u64, params: [u64; 4]) -> Self {
-        Self { rip, rsp, rbp, parameters: params }
+    /// Validates System V x86_64 ABI 16-byte stack frame alignment
+    pub fn is_x64_aligned(&self) -> bool {
+        (self.rsp & 15) == 0
     }
 
-    /// Verifies the stack frame alignment and boundary sanity (BSD-inspired security rule)
-    pub fn verify_alignment(&self) -> bool {
-        self.rsp % 8 == 0 && self.rsp >= self.rbp
+    /// Validates ARM AAPCS 8-byte stack frame alignment
+    pub fn is_arm_aligned(&self) -> bool {
+        (self.rsp & 7) == 0
     }
 }
 
-/// Simulated secure dynamic function invocation wrapper.
-/// Prevents unsafe stack-smashing via boundary sanity assertions (OpenBSD style).
-pub fn secure_invoke_sim(frame: &InvocationFrame, entry_point: u64) -> Result<u64, &'static str> {
-    if !frame.verify_alignment() {
-        return Err("Stack alignment violation: Potential buffer override detected (SIGSEGV Parity)");
+pub struct FunctionInvocationManager {
+    global_canary: u64,
+}
+
+impl FunctionInvocationManager {
+    pub fn new(canary: u64) -> Self {
+        Self { global_canary: canary }
     }
-    if frame.rip != entry_point {
-        return Err("Function invocation hijack attempt blocked (Control Flow Guard Parity)");
+
+    /// Simulates a secure function invocation with stack canary verification
+    pub fn secure_invoke_sim<F, R>(
+        &self,
+        frame: &InvocationFrame,
+        f: F,
+    ) -> Result<R, &'static str>
+    where
+        F: FnOnce() -> R,
+    {
+        // 1. Stack canary integrity verification (buffer overflow check)
+        if frame.stack_canary != self.global_canary {
+            return Err("Stack smash detected! Corrupted stack canary.");
+        }
+
+        // 2. Alignment boundary check (Ensure 16-byte aligned before calling on x86_64)
+        if !frame.is_x64_aligned() {
+            return Err("Alignment fault! Stack pointer is not 16-byte aligned.");
+        }
+
+        // 3. Execution under safe context
+        Ok(f())
     }
-    // Simulate successful secure function execution
-    Ok(frame.parameters[0] + frame.parameters[1])
 }
 
 #[cfg(test)]
@@ -387,23 +400,72 @@ mod tests {
     }
 
     #[test]
-    fn test_saturating_and_checked_arithmetic() {
-        assert_eq!(saturating_add_i32(i32::MAX, 10), i32::MAX);
-        assert_eq!(saturating_add_i32(i32::MIN, -10), i32::MIN);
-        assert_eq!(saturating_sub_i32(i32::MIN, 10), i32::MIN);
-        assert_eq!(checked_mul_i32(100, 20), Some(2000));
+    fn test_checked_arithmetic_overflows() {
+        assert_eq!(saturating_add_i32(i32::MAX, 1), i32::MAX);
+        assert_eq!(saturating_add_i32(i32::MIN, -1), i32::MIN);
+        assert_eq!(saturating_sub_i32(i32::MIN, 1), i32::MIN);
+        assert_eq!(saturating_sub_i32(i32::MAX, -1), i32::MAX);
         assert_eq!(checked_mul_i32(i32::MAX, 2), None);
     }
 
     #[test]
-    fn test_secure_stack_and_invocation_frames() {
-        let frame = InvocationFrame::new(0x1000, 0x7FFF0000, 0x7FFF0000, [5, 10, 0, 0]);
-        assert!(frame.verify_alignment());
-        assert_eq!(secure_invoke_sim(&frame, 0x1000).unwrap(), 15);
+    fn test_invocation_frame_alignment() {
+        let frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF000, // 16-byte aligned
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0xABCDEF,
+        };
+        assert!(frame.is_x64_aligned());
+        assert!(frame.is_arm_aligned());
 
-        // Fail align test
-        let bad_frame = InvocationFrame::new(0x1000, 0x7FFF0003, 0x7FFF0000, [5, 10, 0, 0]);
-        assert!(!bad_frame.verify_alignment());
-        assert!(secure_invoke_sim(&bad_frame, 0x1000).is_err());
+        let unaligned_frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF004, // Not aligned to 16-byte boundary
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0xABCDEF,
+        };
+        assert!(!unaligned_frame.is_x64_aligned());
+        assert!(!unaligned_frame.is_arm_aligned()); // 7FFFF004 is not 8-byte aligned (0x7FFFF004 & 7 == 4)
+    }
+
+    #[test]
+    fn test_secure_invocation_sim() {
+        let manager = FunctionInvocationManager::new(0xABCDEF);
+
+        let frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF000, // Aligned
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0xABCDEF, // Valid canary
+        };
+
+        let result = manager.secure_invoke_sim(&frame, || 42);
+        assert_eq!(result, Ok(42));
+
+        // Bad canary (stack smash)
+        let corrupt_canary_frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF000,
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0x000000, // Corrupted canary
+        };
+        let result = manager.secure_invoke_sim(&corrupt_canary_frame, || 42);
+        assert!(result.is_err());
+
+        // Unaligned frame
+        let unaligned_frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF008, // 8-byte but not 16-byte aligned
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0xABCDEF,
+        };
+        let result = manager.secure_invoke_sim(&unaligned_frame, || 42);
+        assert!(result.is_err());
     }
 }
