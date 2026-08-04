@@ -507,9 +507,77 @@ pub struct ShellVec<T> {
     pub data: *mut T,
     pub len: usize,
     pub capacity: usize,
+||||||| 2139cb2f8
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg(target_os = "none")]
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
 }
 
 impl<T> ShellVec<T> {
+||||||| 2139cb2f8
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+impl<T> Vec<T> {
+#[cfg(target_os = "none")]
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+impl<T> Vec<T> {
     pub fn new() -> Self {
         ShellVec {
             data: core::ptr::null_mut(),
@@ -571,6 +639,50 @@ impl<T> ShellVec<T> {
             }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+||||||| 2139cb2f8
+    pub fn len(&self) -> usize {
+        self.len
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                if self.capacity > 0 {
+                    free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                }
+            }
+            self.data = core::ptr::null_mut();
+            self.len = 0;
+            self.capacity = 0;
+        }
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                if self.capacity > 0 {
+                    free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                }
+            }
+            self.data = core::ptr::null_mut();
+            self.len = 0;
+            self.capacity = 0;
         }
     }
 }

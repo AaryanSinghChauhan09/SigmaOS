@@ -3,6 +3,28 @@
 // init/supervision systems, syslog/journald, cron, capability-based sudo, and help manuals.
 
 extern crate alloc;
+||||||| 2139cb2f8
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+#[cfg(not(target_os = "none"))]
+use std_alloc::boxed::Box;
+
+#![no_std]
+#![no_main]
+
+/// OOP-based Sigma Shell for SigmaOS
+/// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
+/// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+#[cfg(not(target_os = "none"))]
+use std_alloc::boxed::Box;
+#[cfg(not(target_os = "none"))]
+use std_alloc::vec::Vec;
+
+/// OOP-based Sigma Shell for SigmaOS
+/// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
+/// Implements interactive shell with command parsing, echo, environment variables, aliases, and basic utilities
 
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -317,6 +339,44 @@ impl SigmaCron {
             output_log: String::new(),
         });
     }
+||||||| 2139cb2f8
+        
+        if in_arg {
+            args.push(&line[start..line.len()]);
+        }
+        
+        if args.is_empty() {
+            return Ok(());
+        }
+        
+        // 1. Resolve Command Aliases (udev/bash inspiration)
+        let resolved_cmd_name = if let Some(alias_target) = self.get_alias(args[0]) {
+            alias_target
+        } else {
+            args[0]
+        };
+        
+        if in_arg {
+            args.push(&line[start..line.len()]);
+        }
+        
+        if args.is_empty() {
+            return Ok(());
+        }
+        
+        // 1. Resolve Command Aliases (udev/bash inspiration)
+        let mut resolved_buf = [0u8; 64];
+        let mut resolved_len = 0;
+        {
+            let resolved_cmd_ref = if let Some(alias_target) = self.get_alias(args[0]) {
+                alias_target
+            } else {
+                args[0]
+            };
+            resolved_len = resolved_cmd_ref.len().min(64);
+            resolved_buf[..resolved_len].copy_from_slice(&resolved_cmd_ref[..resolved_len]);
+        }
+        let resolved_cmd_name = &resolved_buf[..resolved_len];
 
     /// Suspend or resume a specific cron job dynamically at runtime.
     pub fn toggle_job(&mut self, id: usize, enabled: bool) -> bool {
@@ -350,6 +410,21 @@ impl SigmaCron {
                 job.last_run_success = true;
                 job.output_log = "Scheduled cron execution successful".to_string();
                 triggered_commands.push(job.command.clone());
+||||||| 2139cb2f8
+        let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
+        
+        for cmd_option in &mut self.commands {
+            if let Some(ref mut cmd) = *cmd_option {
+                if cmd.name() == resolved_cmd_name {
+                    return cmd.execute(&cmd_args);
+                }
+        let cmd_args = expanded_args;
+        
+        for cmd_option in &mut self.commands {
+            if let Some(ref mut cmd) = *cmd_option {
+                if cmd.name() == resolved_cmd_name {
+                    return cmd.execute(&cmd_args);
+                }
             }
         }
         triggered_commands
@@ -382,12 +457,212 @@ impl SigmaPriv {
         self.user_capabilities
             .push((username.to_string(), privilege));
     }
+||||||| 2139cb2f8
+    
+    fn get(&self, index: usize) -> Option<&[u8]> {
+        if index >= self.history.len() {
+            return None;
+        }
+        let len = self.lengths[index];
+        Some(&self.history[index][..len])
+    }
+    
+    fn get_last(&self) -> Option<&[u8]>;
+}
+    
+    fn get(&self, index: usize) -> Option<&[u8]> {
+        if index >= self.history.len() {
+            return None;
+        }
+        let len = self.lengths[index];
+        Some(&self.history[index][..len])
+    }
+    
+    fn get_last(&self) -> Option<&[u8]> {
+        self.get_last_impl()
+    }
+}
 
     /// Authorize a command delegate strictly based on capability matrices.
     pub fn check_authority(&self, username: &str, required: Privilege) -> bool {
         for (user, priv_item) in &self.user_capabilities {
             if user == username && *priv_item == required {
                 return true;
+||||||| 2139cb2f8
+impl SimpleShellHistory {
+    fn get_last_impl(&self) -> Option<&[u8]> {
+        if self.history.is_empty() {
+            return None;
+        }
+        let index = self.history.len() - 1;
+        self.get(index)
+    }
+}
+
+impl ShellHistory for SimpleShellHistory {
+    fn get_last(&self) -> Option<&[u8]> {
+        self.get_last_impl()
+    }
+}
+
+pub trait ShellEnvironment {
+    fn set(&mut self, key: &[u8], value: &[u8]);
+    fn get(&self, key: &[u8]) -> Option<&[u8]>;
+    fn unset(&mut self, key: &[u8]);
+}
+
+#[repr(C)]
+pub struct SimpleShellEnvironment {
+    pub keys: Vec<[u8; 64]>,
+    pub values: Vec<[u8; 256]>,
+    pub key_lengths: Vec<usize>,
+    pub value_lengths: Vec<usize>,
+}
+
+impl SimpleShellEnvironment {
+    pub fn new() -> Self {
+        SimpleShellEnvironment {
+            keys: Vec::new(),
+            values: Vec::new(),
+            key_lengths: Vec::new(),
+            value_lengths: Vec::new(),
+        }
+    }
+}
+
+impl ShellEnvironment for SimpleShellEnvironment {
+    fn set(&mut self, key: &[u8], value: &[u8]) {
+        let key_len = key.len().min(63);
+        let value_len = value.len().min(255);
+        
+        let mut key_entry = [0u8; 64];
+        let mut value_entry = [0u8; 256];
+        
+        for i in 0..key_len {
+            key_entry[i] = key[i];
+        }
+        for i in 0..value_len {
+            value_entry[i] = value[i];
+        }
+        
+        for i in 0..self.keys.len() {
+            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
+                self.values[i] = value_entry;
+                self.value_lengths[i] = value_len;
+                return;
+            }
+        }
+        
+        self.keys.push(key_entry);
+        self.values.push(value_entry);
+        self.key_lengths.push(key_len);
+        self.value_lengths.push(value_len);
+    }
+    
+    fn get(&self, key: &[u8]) -> Option<&[u8]> {
+        let key_len = key.len();
+        for i in 0..self.keys.len() {
+            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
+                let value_len = self.value_lengths[i];
+                return Some(&self.values[i][..value_len]);
+            }
+        }
+        None
+    }
+    
+    fn unset(&mut self, key: &[u8]) {
+        let key_len = key.len();
+        for i in 0..self.keys.len() {
+            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
+                self.keys.remove(i);
+                self.values.remove(i);
+                self.key_lengths.remove(i);
+                self.value_lengths.remove(i);
+                return;
+impl SimpleShellHistory {
+    fn get_last_impl(&self) -> Option<&[u8]> {
+        if self.history.is_empty() {
+            return None;
+        }
+        let index = self.history.len() - 1;
+        self.get(index)
+    }
+}
+
+pub trait ShellEnvironment {
+    fn set(&mut self, key: &[u8], value: &[u8]);
+    fn get(&self, key: &[u8]) -> Option<&[u8]>;
+    fn unset(&mut self, key: &[u8]);
+}
+
+#[repr(C)]
+pub struct SimpleShellEnvironment {
+    pub keys: Vec<[u8; 64]>,
+    pub values: Vec<[u8; 256]>,
+    pub key_lengths: Vec<usize>,
+    pub value_lengths: Vec<usize>,
+}
+
+impl SimpleShellEnvironment {
+    pub fn new() -> Self {
+        SimpleShellEnvironment {
+            keys: Vec::new(),
+            values: Vec::new(),
+            key_lengths: Vec::new(),
+            value_lengths: Vec::new(),
+        }
+    }
+}
+
+impl ShellEnvironment for SimpleShellEnvironment {
+    fn set(&mut self, key: &[u8], value: &[u8]) {
+        let key_len = key.len().min(63);
+        let value_len = value.len().min(255);
+        
+        let mut key_entry = [0u8; 64];
+        let mut value_entry = [0u8; 256];
+        
+        for i in 0..key_len {
+            key_entry[i] = key[i];
+        }
+        for i in 0..value_len {
+            value_entry[i] = value[i];
+        }
+        
+        for i in 0..self.keys.len() {
+            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
+                self.values[i] = value_entry;
+                self.value_lengths[i] = value_len;
+                return;
+            }
+        }
+        
+        self.keys.push(key_entry);
+        self.values.push(value_entry);
+        self.key_lengths.push(key_len);
+        self.value_lengths.push(value_len);
+    }
+    
+    fn get(&self, key: &[u8]) -> Option<&[u8]> {
+        let key_len = key.len();
+        for i in 0..self.keys.len() {
+            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
+                let value_len = self.value_lengths[i];
+                return Some(&self.values[i][..value_len]);
+            }
+        }
+        None
+    }
+    
+    fn unset(&mut self, key: &[u8]) {
+        let key_len = key.len();
+        for i in 0..self.keys.len() {
+            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
+                self.keys.remove(i);
+                self.values.remove(i);
+                self.key_lengths.remove(i);
+                self.value_lengths.remove(i);
+                return;
             }
         }
         false
@@ -402,6 +677,10 @@ pub struct SigmaDoc {
     pub description: String,
     pub examples: Vec<String>,
 }
+||||||| 2139cb2f8
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(target_os = "none")]
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl SigmaDoc {
     pub fn new(topic: &str, description: &str) -> Self {
@@ -409,6 +688,22 @@ impl SigmaDoc {
             topic: topic.to_string(),
             description: description.to_string(),
             examples: Vec::new(),
+||||||| 2139cb2f8
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                new_vec.push((*self.data.add(i)).clone());
+            }
+#[cfg(target_os = "none")]
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                new_vec.push((*self.data.add(i)).clone());
+            }
         }
     }
 
@@ -422,6 +717,173 @@ impl SigmaDoc {
             output.push_str(&format!("- {}\n", ex));
         }
         output
+||||||| 2139cb2f8
+        new_vec
+    }
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn is_empty(&self) -> bool { self.len == 0 }
+    fn len(&self) -> usize { self.len }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+        new_vec
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn is_empty(&self) -> bool { self.len == 0 }
+    fn len(&self) -> usize { self.len }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+#[cfg(target_os = "none")]
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+#[cfg(target_os = "none")]
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -482,6 +944,25 @@ mod tests {
         assert_eq!(init.services[0].restart_count, 1);
         assert!(init.services[0].running);
     }
+||||||| 2139cb2f8
+        // Inspect captured variable inside spy command
+        if let Some(ref cmd_box) = shell.commands[0] {
+            // Unsafe cast to access captured properties (since we can't downcast Box<dyn ShellCommand>)
+            let spy_ptr = cmd_box as *const Box<dyn ShellCommand> as *const SpyCommand;
+            unsafe {
+                let captured = &(*spy_ptr).captured_arg[..(*spy_ptr).captured_len];
+                assert_eq!(captured, b"sovereign_pass_123");
+            }
+        }
+        // Inspect captured variable inside spy command
+        if let Some(ref cmd_box) = shell.commands[0] {
+            // Unsafe cast to access captured properties (since we can't downcast Box<dyn ShellCommand>)
+            let spy_ptr = &**cmd_box as *const dyn ShellCommand as *const SpyCommand;
+            unsafe {
+                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
+                assert_eq!(captured, b"sovereign_pass_123");
+            }
+        }
 
     #[test]
     fn test_systemd_analyze() {
@@ -498,6 +979,21 @@ mod tests {
         assert_eq!(analyze[0].0, "network"); // network should be first (slowest, 250ms)
         assert_eq!(analyze[1].0, "db");
     }
+||||||| 2139cb2f8
+        if let Some(ref cmd_box) = shell.commands[0] {
+            let spy_ptr = cmd_box as *const Box<dyn ShellCommand> as *const SpyCommand;
+            unsafe {
+                let captured = &(*spy_ptr).captured_arg[..(*spy_ptr).captured_len];
+                assert_eq!(captured, b"sovereign");
+            }
+        }
+        if let Some(ref cmd_box) = shell.commands[0] {
+            let spy_ptr = &**cmd_box as *const dyn ShellCommand as *const SpyCommand;
+            unsafe {
+                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
+                assert_eq!(captured, b"sovereign");
+            }
+        }
 
     #[test]
     fn test_sigma_log() {

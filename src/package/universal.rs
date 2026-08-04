@@ -1039,6 +1039,9 @@ mod tests {
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
         assert_eq!(manager.adapters.len(), 18);
+||||||| 2139cb2f8
+        assert_eq!(manager.adapters.len(), 6);
+        assert_eq!(manager.adapters.len(), 11);
     }
 
     #[test]

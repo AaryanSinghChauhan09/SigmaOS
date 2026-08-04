@@ -254,6 +254,11 @@ impl PackageFormatAdapter for RpmAdapter {
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
         Ok(content.contains("Name") || content.contains("Version"))
+||||||| 2139cb2f8
+        
+        Ok(content.contains("Name") || content.contains("Version"))
+        
+        Ok(content.contains("Name:") || content.contains("Summary:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {

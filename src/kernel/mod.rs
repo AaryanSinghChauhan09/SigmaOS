@@ -43,6 +43,8 @@ pub mod virtual_cpu;
 pub mod ipc;
 pub mod linux_absorb;
 pub mod subsystem;
+||||||| 2139cb2f8
+pub mod traits;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
@@ -112,3 +114,5 @@ pub use breakthroughs::{
     UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
     EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
 };
+||||||| 2139cb2f8
+pub use traits::SchedulerError;
