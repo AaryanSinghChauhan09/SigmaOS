@@ -9,17 +9,6 @@ echo "Running SigmaOS smoke tests..."
 # Ensure build directory exists
 mkdir -p build
 
-||||||| 43be3a7e8
-# Create build directory if missing
-mkdir -p build
-
-# Compile target binaries
-cargo build
-
-||||||| 43be3a7e8
-# Ensure build directory exists
-mkdir -p build
-
 # Test 1: Check if build directory exists
 if [ ! -d "build" ]; then
     echo "FAIL: Build directory does not exist"

@@ -1,9 +1,4 @@
 // SigmaOS Drivers Module
-pub mod ancient_devices;
-pub mod boot_init;
-pub mod dde;
-pub mod even_more_devices;
-pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
 pub mod legacy_keyboard;
@@ -13,26 +8,7 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
-pub mod boot_init;
-pub mod dde;
-pub mod even_more_devices;
-pub mod flipper_gpio_sensor;
 
-pub use ancient_devices::{
-    create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
-    UdfAncientDevice,
-};
-pub use boot_init::{AcpiTableParser, UefiGopDriver, XhciHostController};
-pub use dde::{
-    BusType, DeviceError, DeviceId, DriverType, GenericDriver, HardwareBroker, LinuxDdeShim,
-    UdfInterpreter, UnifiedPeripheral, WasmDriverVm, WindowsNdisWrapper,
-};
-pub use even_more_devices::{
-    AdLibSynthDriver, Bluetooth5_4_Adapter, Ne2000NetworkDriver, NvlinkBusDriver, PciIdeBridge,
-    PcieGen6Bridge, Ps2MouseDriver, Sata3Controller, SerialMouseDriver, Ufs4StorageDriver,
-    Usb4HostController, VgaTextModeDriver,
-};
-pub use flipper_gpio_sensor::FlipperGpioSensor;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_keyboard::LegacyKeyboard;

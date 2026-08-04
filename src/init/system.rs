@@ -8,7 +8,7 @@
 /// Based on Roadmap Item 5: Lightweight init system
 extern crate alloc;
 use alloc::boxed::Box;
-use crate::klib::Vec;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -42,16 +42,6 @@ pub trait Service {
     fn state(&self) -> ServiceState;
     /// Get service info
     fn info(&self) -> ServiceInfo;
-
-    /// Get runlevel bitmask
-    fn runlevel_mask(&self) -> u8 {
-        0xFF // Default: matches all runlevels
-    }
-
-    /// Get dependencies list
-    fn dependencies(&self) -> Vec<ServiceID> {
-        Vec::new()
-    }
 }
 
 /// Init error types
@@ -132,7 +122,6 @@ pub struct SimpleService {
     pub pid: AtomicUsize,
     pub capability: ServiceCapability,
     pub dependencies: Vec<ServiceID>,
-    pub runlevel_mask: u8,
 }
 
 impl SimpleService {
@@ -156,14 +145,7 @@ impl SimpleService {
             pid: AtomicUsize::new(0),
             capability,
             dependencies: Vec::new(),
-            runlevel_mask: 0xFF, // runs in all runlevels by default
         }
-    }
-
-    pub fn new_with_runlevel(id: ServiceID, name: &[u8], command: &[u8], capability: ServiceCapability, runlevel_mask: u8) -> Self {
-        let mut s = SimpleService::new(id, name, command, capability);
-        s.runlevel_mask = runlevel_mask;
-        s
     }
 
     pub fn add_dependency(&mut self, dependency: ServiceID) {
@@ -236,14 +218,6 @@ impl Service for SimpleService {
         self.get_state()
     }
 
-    fn runlevel_mask(&self) -> u8 {
-        self.runlevel_mask
-    }
-
-    fn dependencies(&self) -> Vec<ServiceID> {
-        self.dependencies.clone()
-    }
-
     fn info(&self) -> ServiceInfo {
         let pid = self.pid.load(Ordering::SeqCst);
         ServiceInfo {
@@ -311,8 +285,6 @@ pub struct SimpleInitSystem {
     pub next_id: AtomicUsize,
     pub stats: InitStats,
     pub capability: InitCapability,
-    pub current_runlevel: u8,
-    pub logs: Vec<[u8; 64]>,
 }
 
 /// Init capability
@@ -355,8 +327,6 @@ impl SimpleInitSystem {
             next_id: AtomicUsize::new(1),
             stats: InitStats::new(),
             capability,
-            current_runlevel: 3, // Default Linux multi-user text runlevel
-            logs: Vec::new(),
         }
     }
 
@@ -369,97 +339,6 @@ impl SimpleInitSystem {
             }
         }
         None
-    }
-
-    pub fn log_event(&mut self, msg: &[u8]) {
-        let mut buf = [0u8; 64];
-        let len = msg.len().min(63);
-        buf[..len].copy_from_slice(&msg[..len]);
-        self.logs.push(buf);
-    }
-
-    /// Transitions SimpleInitSystem into target runlevel (e.g. 1, 3, 5, 6)
-    pub fn set_runlevel(&mut self, runlevel: u8) -> Result<(), InitError> {
-        self.current_runlevel = runlevel;
-
-        let mut log_msg = [0u8; 64];
-        let prefix = b"Transitioning to Runlevel: ";
-        log_msg[..prefix.len()].copy_from_slice(prefix);
-        write_int(runlevel as usize, &mut log_msg, prefix.len());
-        self.log_event(&log_msg);
-
-        let mut services_to_stop = Vec::new();
-        let mut services_to_start = Vec::new();
-
-        for i in 0..self.services.len() {
-            if let Some(ref svc) = self.services[i] {
-                let mask = svc.runlevel_mask();
-                let belongs = (mask & (1 << runlevel)) != 0;
-                let is_running = svc.state() == ServiceState::Running;
-
-                if is_running && !belongs {
-                    services_to_stop.push(svc.id());
-                } else if !is_running && belongs {
-                    services_to_start.push(svc.id());
-                }
-            }
-        }
-
-        for i in 0..services_to_stop.len() {
-            let id = services_to_stop[i];
-            let _ = self.stop_service(id);
-        }
-
-        for i in 0..services_to_start.len() {
-            let id = services_to_start[i];
-            let _ = self.start_service(id);
-        }
-
-        Ok(())
-    }
-
-    fn start_service_recursive(&mut self, id: ServiceID, visited: &mut Vec<ServiceID>) -> Result<(), InitError> {
-        if visited.contains(&id) {
-            return Err(InitError::DependencyFailed); // cycle detected
-        }
-        visited.push(id);
-
-        let mut deps = Vec::new();
-        if let Some(service) = self.get_service(id) {
-            deps = service.dependencies();
-        } else {
-            return Err(InitError::DependencyFailed);
-        }
-
-        // Start dependencies first
-        for i in 0..deps.len() {
-            let dep_id = deps[i];
-            let dep_state = self.get_service(dep_id).map(|s| s.state()).unwrap_or(ServiceState::Failed);
-            if dep_state != ServiceState::Running {
-                self.start_service_recursive(dep_id, visited)?;
-            }
-        }
-
-        // Start service itself
-        if let Some(ref mut service) = self.get_service_mut(id) {
-            let result = service.start();
-            if result.is_ok() {
-                let state = service.state();
-                if state == ServiceState::Running {
-                    self.stats.running_services += 1;
-                    self.stats.stopped_services -= 1;
-
-                    let mut msg = [0u8; 64];
-                    let prefix = b"Started service ID: ";
-                    msg[..prefix.len()].copy_from_slice(prefix);
-                    write_int(id, &mut msg, prefix.len());
-                    self.log_event(&msg);
-                }
-            }
-            result
-        } else {
-            Err(InitError::PermissionDenied)
-        }
     }
 }
 
@@ -505,8 +384,19 @@ impl InitSystem for SimpleInitSystem {
             return Err(InitError::PermissionDenied);
         }
 
-        let mut visited = Vec::new();
-        self.start_service_recursive(id, &mut visited)
+        if let Some(ref mut service) = self.get_service_mut(id) {
+            let result = service.start();
+            if result.is_ok() {
+                let state = service.state();
+                if state == ServiceState::Running {
+                    self.stats.running_services += 1;
+                    self.stats.stopped_services -= 1;
+                }
+            }
+            result
+        } else {
+            Err(InitError::PermissionDenied)
+        }
     }
 
     fn stop_service(&mut self, id: ServiceID) -> Result<(), InitError> {
@@ -521,12 +411,6 @@ impl InitSystem for SimpleInitSystem {
                 if state == ServiceState::Stopped {
                     self.stats.running_services -= 1;
                     self.stats.stopped_services += 1;
-
-                    let mut msg = [0u8; 64];
-                    let prefix = b"Stopped service ID: ";
-                    msg[..prefix.len()].copy_from_slice(prefix);
-                    write_int(id, &mut msg, prefix.len());
-                    self.log_event(&msg);
                 }
             }
             result
@@ -559,8 +443,8 @@ impl InitSystem for SimpleInitSystem {
     }
 
     fn start_all(&mut self) -> Result<(), InitError> {
-        for i in 0..self.services.len() {
-            if let Some(ref mut service) = self.services[i] {
+        for service_option in &mut self.services {
+            if let Some(ref mut service) = *service_option {
                 let _ = service.start();
             }
         }
@@ -568,8 +452,8 @@ impl InitSystem for SimpleInitSystem {
     }
 
     fn stop_all(&mut self) -> Result<(), InitError> {
-        for i in 0..self.services.len() {
-            if let Some(ref mut service) = self.services[i] {
+        for service_option in &mut self.services {
+            if let Some(ref mut service) = *service_option {
                 let _ = service.stop();
             }
         }
@@ -579,29 +463,6 @@ impl InitSystem for SimpleInitSystem {
     fn stats(&self) -> InitStats {
         self.stats
     }
-}
-
-fn write_int(mut val: usize, buf: &mut [u8], mut idx: usize) -> usize {
-    if val == 0 {
-        if idx < buf.len() {
-            buf[idx] = b'0';
-            idx += 1;
-        }
-        return idx;
-    }
-    let mut digits = [0u8; 12];
-    let mut d_idx = 0;
-    while val > 0 && d_idx < 12 {
-        digits[d_idx] = (val % 10) as u8 + b'0';
-        val /= 10;
-        d_idx += 1;
-    }
-    while d_idx > 0 && idx < buf.len() {
-        d_idx -= 1;
-        buf[idx] = digits[d_idx];
-        idx += 1;
-    }
-    idx
 }
 
 #[cfg(test)]
@@ -641,39 +502,5 @@ mod tests {
         assert_eq!(init.stats().running_services, 0);
 
         init.unregister_service(101).unwrap();
-    }
-
-    #[test]
-    fn test_init_runlevel_switching_and_recursive_dependencies() {
-        let cap = InitCapability::full();
-        let mut init = SimpleInitSystem::new(cap);
-
-        let svc_cap = ServiceCapability::full();
-        // Service 10: multi-user text & graphical runlevels (Runlevel 3 and 5)
-        let mut s1 = SimpleService::new_with_runlevel(10, b"dbus", b"dbus-daemon", svc_cap, (1 << 3) | (1 << 5));
-
-        // Service 20: graphical runlevel only (Runlevel 5), requires dbus (10)
-        let mut s2 = SimpleService::new_with_runlevel(20, b"gdm", b"gdm", svc_cap, 1 << 5);
-        s2.add_dependency(10);
-
-        init.register_service(Box::new(s1)).unwrap();
-        init.register_service(Box::new(s2)).unwrap();
-
-        // Transition to runlevel 3: only s1 should start
-        init.set_runlevel(3).unwrap();
-        assert_eq!(init.get_service(10).unwrap().state(), ServiceState::Running);
-        assert_eq!(init.get_service(20).unwrap().state(), ServiceState::Stopped);
-
-        // Transition to runlevel 1 (single-user): s1 should stop
-        init.set_runlevel(1).unwrap();
-        assert_eq!(init.get_service(10).unwrap().state(), ServiceState::Stopped);
-
-        // Transition to runlevel 5: s2 should start, and recursively start s1 first!
-        init.set_runlevel(5).unwrap();
-        assert_eq!(init.get_service(10).unwrap().state(), ServiceState::Running);
-        assert_eq!(init.get_service(20).unwrap().state(), ServiceState::Running);
-
-        // Assert log circular buffer recorded events
-        assert!(init.logs.len() > 0);
     }
 }
