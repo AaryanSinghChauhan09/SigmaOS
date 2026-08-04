@@ -26,6 +26,7 @@ pub mod productivity;
 pub mod resilience;
 pub mod security;
 pub mod shell;
+pub mod debugger;
 pub mod sigpkg;
 pub mod virtualization;
 
@@ -118,8 +119,21 @@ pub use sigpkg::{
     PacmanManager, PkgBuildScript, RecipeError, RecipeManager, RpmPackageTranslator, SatSolver,
     Transaction, TranslatedMetadata, TranslatorError,
 };
+pub use debugger::{
+    Breakpoint, Debugger, DebuggerState, StackFrame, MemoryRegion,
+    DebugWindowType, DebugWindow, DebugWindowManager, ExpressionNode, EvaluationEngine,
+    DebugExecutionState, ThreadDebugState, ProcessDebugContainer, TraceExceptionType,
+    ExceptionResolution, DebugEvent, DebugEventMonitor,
+};
 pub use virtualization::{
     Container, DeterministicError, DeterministicHypervisor, DeterministicVirtualMachine,
     KubernetesPod, ResourcePool, VirtualCpuContext, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmExecutionSnapshot, VmState,
+};
+pub use arch::comprehensive::{
+    PageTableEntry as CpuPageTableEntry, MultiLevelPaging as CpuMultiLevelPaging,
+    ArmExceptionLevel, ArmV8ProcessorState, NtMajorFunction, IoStatusBlock as NtIoStatusBlock,
+    IoRequestPacket as NtIoRequestPacket, NtObjectType, NtObjectHeader, NtObjectManager,
+    LinuxTaskState, LinuxTaskStruct, LinuxRcuSynchronizer, BsdKqueueFilter, BsdKevent,
+    BsdKqueueMultiplexer, BsdSysctlNode, BsdSysctlRegistry,
 };

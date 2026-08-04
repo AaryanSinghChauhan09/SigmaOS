@@ -214,3 +214,24 @@ SigmaOS implements a unified, polymorphic cross-architecture abstraction engine 
 3. **FreeBSD/BSD Kernel Paradigms (kqueues & sysctl):**
    * *Kqueue Multiplexer:* Supports high-performance event notification queues checking multiple filters (Read, Write, Signal) and posting kevent structures.
    * *Sysctl Registry:* Implements dynamic kernel configuration hierarchical lookups and modifications (e.g., `kern.maxproc`, `kern.securelevel`) mapped directly inside kernel space.
+
+---
+
+## 🏛️ 8. Architectural Evolution: Advanced Debugging Subsystem
+
+SigmaOS implements a unified, polymorphic low-overhead debugger subsystem reflecting designs from Low-level Trace Controllers (x86 debug registers, ARM EL vectors) and production debug engines (WinDbg, Linux ptrace):
+
+### A. Debugger Window Layout Manager
+* *Multi-Panel Console:* Implements a terminal layout manager (`DebugWindow`, `DebugWindowManager`) separating Registers, Disassembly, Watch Expressions, Call Stack, and Debug Console windows.
+
+### B. Logical & Bitwise Expression Evaluation
+* *Evaluation Engine:* Parses complex mathematical and bitwise expression trees supporting:
+  * **Useful Operators:** Wrapping Addition, Subtraction, Multiplication, Division (with divide-by-zero checks), Bitwise AND, OR, XOR, NOT, register loading, and recursive raw memory pointer dereferencing (`*ptr`).
+
+### C. Process & Thread Control State Machine
+* *Execution Suspension:* Models ptrace/NtSuspendProcess mechanics (`ProcessDebugContainer`, `ThreadDebugState`) to freeze threads, resume threads, and execute single-instruction stepping (`SingleStepping`).
+
+### D. Trace Events & Exception Resolution
+* *Handled vs. Not Handled:* Implements WinDbg/NT exception routing (`TraceExceptionType`, `DebugEventMonitor`, `ExceptionResolution`):
+  * **Handled Exceptions:** The debugger automatically repairs registers/memory pointers and continues execution safely.
+  * **Unhandled Exceptions:** Bubbles exception interrupts up to trigger kernel panics or thread terminations.
