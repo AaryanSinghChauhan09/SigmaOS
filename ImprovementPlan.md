@@ -17,23 +17,30 @@ To maintain extreme security, high performance, and bare-metal compilation compl
 
 ## 🔍 1. Code Quality & Testing
 
-### A. Syntax Errors, Compile Blockers, and Resolution Actions
-*   **Residual Conflict Base-Markers:** Identified base conflict lines containing `||||||| 52d783ca0` inside `src/lib.rs` and `src/compatibility/mod.rs` left behind by uncompleted automatic merge actions.
-    *   *Resolution:* Cleansed the source code of both files, leaving a clean module declaration hierarchy and avoiding compilation failures.
-*   **Delimiter Mismatches & Scoping Blockers:**
-    *   *Mint Hardware Driver Manager (src/compatibility/mint_linux.rs):* The `impl MintHardwareDriverManager` block was never closed before the `impl Default for MintHardwareDriverManager` declaration began, causing cascading unclosed delimiter parser failures.
-    *   *Privacy-First Sandbox (src/kernel/breakthroughs.rs):* Method `validate_and_execute_secure_call` was positioned outside the `impl PrivacyFirstSandbox` boundaries, resulting in an unexpected closing delimiter error.
-    *   *Resolution:* Rewrote blocks to cleanly encompass respective method signatures, restoring compiler sanity.
-*   **Duplicate and Conflicting Implementations:**
-    *   *Custom klib Vec (src/klib/vec.rs):* Widespread duplication of trait implementations (e.g., multiple conflicting `impl<T: Debug> Debug for Vec<T>`, `impl<T: Clone> Clone`, and multiple `IntoIterator`/`FromIterator` implementations) created over 60 compile errors.
-    *   *Driver Trait Method Overrides (src/driver/framework.rs):* Several methods implemented on target drivers (e.g., `set_state`, `init`, `probe`, `shutdown`, `dependencies`) were not recognized members of the defined `Driver` or `DriverFramework` traits, causing `E0407` mismatch failures.
-    *   *Resolution:* Harmonized trait definitions under `src/driver/framework.rs` to include these methods, and removed redundant trait implementations from `src/klib/vec.rs`.
+### A. Resolved Compilation Blockers (Implemented on Active Branch)
+*   **Duplicate Module Exports inside `src/dashboard/mod.rs`:**
+    *   *Issue:* Redefined `pub mod accessibility_gamification;` on lines 20 and 24, along with duplicate `pub use` statements of its inner types, causing compiler E0428 (name defined multiple times).
+    *   *Resolution:* Successfully removed redundant module declarations and unified use imports into a single, clean declaration block.
+*   **Duplicate Module Exports inside `src/security/mod.rs`:**
+    *   *Issue:* Redefined `clipboard`, `intrusion`, `password`, and `selinux` modules on lines 24-28, causing multiple compiler E0428 duplicates.
+    *   *Resolution:* Successfully purged duplicate imports, leaving the primary clean module declarations on lines 7-23.
 
-### B. Linting and Style Checks
+### B. Remaining Code Quality & Compile-Time Blockers
+*   **Duplicate Structure `ShellVec` (`src/shell/command.rs`):**
+    *   *Issue:* The file declares `pub struct ShellVec<T>` on line 89 and again on line 504, causing standard duplicate symbol compiler errors.
+    *   *Resolution:* Consolidate `ShellVec` declarations into a single structure inside `src/shell/command.rs` or move it to a dedicated collection utility module inside `src/klib/vec.rs`.
+*   **Type Inference Failures (`E0282`):**
+    *   *Issue:* Incomplete type signatures inside asynchronous and nested blocks (such as `src/ai/autogen.rs:124`, `src/ai/orchestrator.rs:226`, `src/graphics/video.rs:126`, and `src/boot/optimization.rs:160`), preventing compiler type inference under standard target compilations.
+    *   *Resolution:* Introduce explicit type annotations for collections, Option wrapping patterns, and reference lifetimes on variables.
+*   **Size Mismatches under Transmutes (`E0512`):**
+    *   *Issue:* Transmuting atomic integer stores (`AtomicUsize` loads) to 32-bit architecture enums directly in `src/arch/portability.rs:143` causes compile-time size mismatches on 64-bit systems.
+    *   *Resolution:* Cast `usize` atomic values to `u32` explicitly before transmuting, or enforce unified layout alignment structures using `#[repr(usize)]` annotations.
+
+### C. Linting and Style Checks
 *   **Clippy Warning Abatement:** Enforce workspace-wide rules via standard `#![deny(clippy::all)]` or target-gated lint overrides to suppress performance bottlenecks such as needless variable cloning (`clone_on_copy`) or unnecessary vector allocation in loops.
 *   **Format Conformity:** Maintain a strict `rustfmt.toml` setup with `max_width = 100` and `use_small_heuristics = "Max"` to guarantee readable layout uniformity across all modules.
 
-### C. Unit Test Coverage & Untested Functions
+### D. Unit Test Coverage & Untested Functions
 While `tests/integration_test.rs` provides baseline verification of accessibility subsystems, file-systems (Btrfs, ZFS), and package translation lifecycles, core modules remain under-tested:
 *   **Untested Functions List:**
     *   `src/ai/llm.rs`: Local model weight quantization helpers and forward-pass layer execution.
@@ -41,7 +48,7 @@ While `tests/integration_test.rs` provides baseline verification of accessibilit
     *   `src/net/dns.rs`: systemd-resolved Split DNS query parallelization paths.
 *   **Improvement Path:** Write mocking harnesses using native Rust unit tests (`#[cfg(test)]`) inside each source file to validate isolated state transitions.
 
-### D. Algorithm Correctness, Edge Cases, and Error Handling
+### E. Algorithm Correctness, Edge Cases, and Error Handling
 *   **Validation of Schedulers:** Ensure MLFQ feedback decays are monotonic. Validate that the CFS scheduler handles task priority weight overflows under maximum input load.
 *   **Input Handling Edge Cases:** Ensure standard system tools (e.g., shell parameter expansion) do not panic when receiving null bytes (`\0`) or malformed UTF-8 characters. Use safe boundaries and strict error mapping rather than `.unwrap()`.
 
@@ -77,7 +84,7 @@ While `tests/integration_test.rs` provides baseline verification of accessibilit
 *   **Secrets Exposure Prevention:** Add pre-commit hooks that scan files for raw cryptoseeds, private keys, or credentials. Use the multi-source high-entropy RDTSC/ASLR dynamic generator implemented in `src/crypto/random.rs` for cryptographic values.
 
 ### C. Regulatory & Standards Compliance
-*   **GDPR / HIPAA:** Secure kernel-to-userland IPC with post-quantum Kyber cryptography. Ensure all user credential storage uses slow-hash mechanisms (e.g., Argon2id) mapped inside `src/security/password.rs`.
+*   **GDPR / Privacy:** Secure kernel-to-userland IPC with post-quantum Kyber cryptography. Ensure all user credential storage uses slow-hash mechanisms (e.g., Argon2id) mapped inside `src/security/password.rs`.
 *   **WCAG 2.1 AA / Accessibility:** Ensure virtual keyboard focus indicators are clearly visible and provide ARIA-labels for icon-only inputs on screen widgets.
 *   **ISO 27001:** Enforce a strict hardening checklist with hard-sandboxed syscall validation.
 
@@ -154,11 +161,12 @@ To accelerate onboarding, we establish the following pairings of maintainers wit
 
 | Task ID | Domain | Detailed Description | Priority | Target Milestone |
 | :--- | :--- | :--- | :--- | :--- |
-| **ACT-01** | Code Quality | Fix compilation errors resulting from duplicate Vec trait implementations in `src/klib/vec.rs` and update associated methods in `src/driver/framework.rs`. | **High** | Stable v0.2.0 |
-| **ACT-02** | Security | Upgrade npm dependency `brace-expansion` to `v2.0.1` to resolve the ReDoS vulnerability (GHSA-mh99-v99m-4gvg). | **High** | Hotfix Release |
-| **ACT-03** | OOP / Patterns | Refactor procedural package translation logic into an abstract `PackageTranslator` factory pattern. | **Medium** | Stable v0.2.0 |
-| **ACT-04** | Performance | Transition logging from dynamic format strings to pre-allocated circular ring buffers in hotpaths. | **Medium** | Perf Sprint 1 |
-| **ACT-05** | Documentation | Document RISC-V and ARM64 cross-compilation target setups in `CONTRIBUTING.md`. | **Low** | Docs Overhaul |
+| **ACT-01** | Code Quality | Fix duplicate module declarations inside `src/dashboard/mod.rs` and `src/security/mod.rs` (COMPLETED). | **High** | Stable v0.2.0 |
+| **ACT-02** | Code Quality | Fix duplicate `ShellVec` declaration inside `src/shell/command.rs`. | **High** | Stable v0.2.0 |
+| **ACT-03** | Security | Upgrade npm dependency `brace-expansion` to `v2.0.1` to resolve the ReDoS vulnerability (GHSA-mh99-v99m-4gvg). | **High** | Hotfix Release |
+| **ACT-04** | OOP / Patterns | Refactor procedural package translation logic into an abstract `PackageTranslator` factory pattern. | **Medium** | Stable v0.2.0 |
+| **ACT-05** | Performance | Transition logging from dynamic format strings to pre-allocated circular ring buffers in hotpaths. | **Medium** | Perf Sprint 1 |
+| **ACT-06** | Documentation | Document RISC-V and ARM64 cross-compilation target setups in `CONTRIBUTING.md`. | **Low** | Docs Overhaul |
 
 ---
 
@@ -178,3 +186,45 @@ To accelerate onboarding, we establish the following pairings of maintainers wit
 *   *Security Target:* Protect the application from regular expression DoS attacks.
 *   *Implementation Details:* Audited npm dependencies and updated `brace-expansion` to patch the CVE vulnerability.
 *   *Risk Level:* Down from High-Risk Vulnerability to Zero Identified External Risk Vectors.
+
+---
+
+## 🏛️ 10. Architectural Evolution: Multi-Processor & Hybrid Kernel Synthesis
+
+SigmaOS implements a unified, polymorphic cross-architecture abstraction engine reflecting CPU and kernel design patterns from several industry-standard architectures and platforms:
+
+### A. Processor Architecture Abstractions
+1. **Intel/AMD x86_64 4-Level Paging:** Models virtual-to-physical translation tables (`PageTableEntry`, `MultiLevelPaging`) encapsulating PML4, PDPT, PD, and PT structures with permissions (present, writable, user, NX) enabling fine-grained memory protection.
+2. **ARMv8 Translation & Exceptions:** Models exception levels (EL0 User, EL1 Kernel, EL2 Hypervisor, EL3 Secure Monitor) alongside Translation Table Base Registers (`ttbr0_el1`, `ttbr1_el1`) to control privilege level transitions and secure state machine routing.
+
+### B. Operating System Kernel Synthesis
+1. **Windows NT Kernel Paradigms (IRPs & Object Manager):**
+   * *IoRequestPacket (IRP):* Models asynchronous, packet-driven I/O utilizing Major/Minor function codes (Create, Write, DeviceControl) and status block completions.
+   * *Object Manager:* Exposes hierarchical directory namespaces mapping device paths (e.g. `\Device\Harddisk0`) under discretionary security descriptors.
+2. **Linux Kernel Paradigms (task_struct & RCU):**
+   * *TaskStruct:* Models standard task lists, UID/GID credentials, and scheduling priorities.
+   * *Read-Copy-Update (RCU):* Encapsulates a lock-free synchronization engine with global generation epochs and safe barrier synchronizations.
+3. **FreeBSD/BSD Kernel Paradigms (kqueues & sysctl):**
+   * *Kqueue Multiplexer:* Supports high-performance event notification queues checking multiple filters (Read, Write, Signal) and posting kevent structures.
+   * *Sysctl Registry:* Implements dynamic kernel configuration hierarchical lookups and modifications (e.g., `kern.maxproc`, `kern.securelevel`) mapped directly inside kernel space.
+
+---
+
+## 🏛️ 11. Architectural Evolution: Advanced Debugging Subsystem
+
+SigmaOS implements a unified, polymorphic low-overhead debugger subsystem reflecting designs from Low-level Trace Controllers (x86 debug registers, ARM EL vectors) and production debug engines (WinDbg, Linux ptrace):
+
+### A. Debugger Window Layout Manager
+* *Multi-Panel Console:* Implements a terminal layout manager (`DebugWindow`, `DebugWindowManager`) separating Registers, Disassembly, Watch Expressions, Call Stack, and Debug Console windows.
+
+### B. Logical & Bitwise Expression Evaluation
+* *Evaluation Engine:* Parses complex mathematical and bitwise expression trees supporting:
+  * **Useful Operators:** Wrapping Addition, Subtraction, Multiplication, Division (with divide-by-zero checks), Bitwise AND, OR, XOR, NOT, register loading, and recursive raw memory pointer dereferencing (`*ptr`).
+
+### C. Process & Thread Control State Machine
+* *Execution Suspension:* Models ptrace/NtSuspendProcess mechanics (`ProcessDebugContainer`, `ThreadDebugState`) to freeze threads, resume threads, and execute single-instruction stepping (`SingleStepping`).
+
+### D. Trace Events & Exception Resolution
+* *Handled vs. Not Handled:* Implements WinDbg/NT exception routing (`TraceExceptionType`, `DebugEventMonitor`, `ExceptionResolution`):
+  * **Handled Exceptions:** The debugger automatically repairs registers/memory pointers and continues execution safely.
+  * **Unhandled Exceptions:** Bubbles exception interrupts up to trigger kernel panics or thread terminations.

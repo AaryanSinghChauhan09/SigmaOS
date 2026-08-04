@@ -10,8 +10,14 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 pub mod breakpoint;
+pub mod advanced;
 
 pub use breakpoint::{BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
+pub use advanced::{
+    DebugWindowType, DebugWindow, DebugWindowManager, ExpressionNode, EvaluationEngine,
+    DebugExecutionState, ThreadDebugState, ProcessDebugContainer, TraceExceptionType,
+    ExceptionResolution, DebugEvent, DebugEventMonitor,
+};
 
 
 

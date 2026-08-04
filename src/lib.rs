@@ -26,6 +26,7 @@ pub mod productivity;
 pub mod resilience;
 pub mod security;
 pub mod shell;
+pub mod debugger;
 pub mod sigpkg;
 pub mod virtualization;
 pub mod graphics {
@@ -124,6 +125,12 @@ pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
 };
+pub use debugger::{
+    Breakpoint, Debugger, DebuggerState, StackFrame, MemoryRegion,
+    DebugWindowType, DebugWindow, DebugWindowManager, ExpressionNode, EvaluationEngine,
+    DebugExecutionState, ThreadDebugState, ProcessDebugContainer, TraceExceptionType,
+    ExceptionResolution, DebugEvent, DebugEventMonitor,
+};
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
@@ -133,4 +140,11 @@ pub use arch::cpu_sys::{
     SegmentType as CpuSegmentType, GdtDescriptor as CpuGdtDescriptor, IdtGate as CpuIdtGate,
     VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
     FastSyscallDispatcher as CpuFastSyscallDispatcher,
+};
+pub use arch::comprehensive::{
+    PageTableEntry as CpuPageTableEntry, MultiLevelPaging as CpuMultiLevelPaging,
+    ArmExceptionLevel, ArmV8ProcessorState, NtMajorFunction, IoStatusBlock as NtIoStatusBlock,
+    IoRequestPacket as NtIoRequestPacket, NtObjectType, NtObjectHeader, NtObjectManager,
+    LinuxTaskState, LinuxTaskStruct, LinuxRcuSynchronizer, BsdKqueueFilter, BsdKevent,
+    BsdKqueueMultiplexer, BsdSysctlNode, BsdSysctlRegistry,
 };

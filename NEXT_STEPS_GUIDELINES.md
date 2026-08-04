@@ -7,7 +7,7 @@ This comprehensive document serves as the master blueprint for system modificati
 
 ## 📋 1. Code Quality & Testing
 
-### A. Completed Compilation Fixes
+### A. Completed Compilation Fixes (Active Branch Validation)
 *   **Custom HashMap (`src/klib/hashmap.rs`):** We have fully resolved the 460+ compiler failures caused by the custom `HashMap`.
     *   Implemented `Borrow<Q>` and updated `.get()`, `.get_mut()`, `.contains_key()`, and `.remove()` signatures to support generic borrowed keys (such as checking `&str` against a `String` key).
     *   Integrated a standard FNV1a-based `core::hash::Hash` helper using a custom `Hasher` implementation to align key types safely in `no_std`.
@@ -16,6 +16,7 @@ This comprehensive document serves as the master blueprint for system modificati
 *   **BTreeMap (`src/klib/btreemap.rs`):** Added a bounds-checked `.insert()` shifted slice algorithm directly to `src/klib/vec.rs` to allow BTreeMap ordering without external dependency.
 *   **xAI Grok Parity (`src/ai/llm.rs`):** Re-integrated the missing `tools` and `with_tool_calls` fields and structs to bring absolute compiler conformity to the local inference routing engine.
 *   **Workspace Parity (`src/lib.rs` and `src/ai/mod.rs`):** Cleaned up duplicate `klib` module exports and declared unresolved imports like `AIAgentManager`, `SimpleAIAgentManager`, `Intent`, and `AIError` correctly.
+*   **Resolved Module Declarations (`src/dashboard/mod.rs` and `src/security/mod.rs`):** Cleaned up duplicate definitions of `pub mod accessibility_gamification;`, `clipboard`, `intrusion`, `password`, and `selinux` that caused redundant name E0428 compiler errors.
 
 ### B. Linting and Static Code Quality Checks
 *   **Guideline:** Run `cargo fix --allow-dirty` regularly to eliminate unused variables (e.g. `half` in `vecdeque.rs`, `intent` in `agent.rs`) and enforce a zero-warning CI check suite.
@@ -192,3 +193,45 @@ To implement these Fedora Linux capabilities seamlessly, SigmaOS requires robust
 3.  **Design Patterns:**
     *   *Factory Pattern:* Use factories to dynamically spawn specific standard streams, process structures, or container sandbox runtimes based on system configs.
     *   *Observer Pattern:* Implement an observer pattern inside the process scheduler, allowing system watchdogs and logging daemons to receive notifications of high CPU usage or process state transitions on-the-fly.
+
+---
+
+## 🏛️ 7. Architectural Evolution: Multi-Processor & Hybrid Kernel Synthesis
+
+SigmaOS implements a unified, polymorphic cross-architecture abstraction engine reflecting CPU and kernel design patterns from several industry-standard architectures and platforms:
+
+### A. Processor Architecture Abstractions
+1. **Intel/AMD x86_64 4-Level Paging:** Models virtual-to-physical translation tables (`PageTableEntry`, `MultiLevelPaging`) encapsulating PML4, PDPT, PD, and PT structures with permissions (present, writable, user, NX) enabling fine-grained memory protection.
+2. **ARMv8 Translation & Exceptions:** Models exception levels (EL0 User, EL1 Kernel, EL2 Hypervisor, EL3 Secure Monitor) alongside Translation Table Base Registers (`ttbr0_el1`, `ttbr1_el1`) to control privilege level transitions and secure state machine routing.
+
+### B. Operating System Kernel Synthesis
+1. **Windows NT Kernel Paradigms (IRPs & Object Manager):**
+   * *IoRequestPacket (IRP):* Models asynchronous, packet-driven I/O utilizing Major/Minor function codes (Create, Write, DeviceControl) and status block completions.
+   * *Object Manager:* Exposes hierarchical directory namespaces mapping device paths (e.g. `\Device\Harddisk0`) under discretionary security descriptors.
+2. **Linux Kernel Paradigms (task_struct & RCU):**
+   * *TaskStruct:* Models standard task lists, UID/GID credentials, and scheduling priorities.
+   * *Read-Copy-Update (RCU):* Encapsulates a lock-free synchronization engine with global generation epochs and safe barrier synchronizations.
+3. **FreeBSD/BSD Kernel Paradigms (kqueues & sysctl):**
+   * *Kqueue Multiplexer:* Supports high-performance event notification queues checking multiple filters (Read, Write, Signal) and posting kevent structures.
+   * *Sysctl Registry:* Implements dynamic kernel configuration hierarchical lookups and modifications (e.g., `kern.maxproc`, `kern.securelevel`) mapped directly inside kernel space.
+
+---
+
+## 🏛️ 8. Architectural Evolution: Advanced Debugging Subsystem
+
+SigmaOS implements a unified, polymorphic low-overhead debugger subsystem reflecting designs from Low-level Trace Controllers (x86 debug registers, ARM EL vectors) and production debug engines (WinDbg, Linux ptrace):
+
+### A. Debugger Window Layout Manager
+* *Multi-Panel Console:* Implements a terminal layout manager (`DebugWindow`, `DebugWindowManager`) separating Registers, Disassembly, Watch Expressions, Call Stack, and Debug Console windows.
+
+### B. Logical & Bitwise Expression Evaluation
+* *Evaluation Engine:* Parses complex mathematical and bitwise expression trees supporting:
+  * **Useful Operators:** Wrapping Addition, Subtraction, Multiplication, Division (with divide-by-zero checks), Bitwise AND, OR, XOR, NOT, register loading, and recursive raw memory pointer dereferencing (`*ptr`).
+
+### C. Process & Thread Control State Machine
+* *Execution Suspension:* Models ptrace/NtSuspendProcess mechanics (`ProcessDebugContainer`, `ThreadDebugState`) to freeze threads, resume threads, and execute single-instruction stepping (`SingleStepping`).
+
+### D. Trace Events & Exception Resolution
+* *Handled vs. Not Handled:* Implements WinDbg/NT exception routing (`TraceExceptionType`, `DebugEventMonitor`, `ExceptionResolution`):
+  * **Handled Exceptions:** The debugger automatically repairs registers/memory pointers and continues execution safely.
+  * **Unhandled Exceptions:** Bubbles exception interrupts up to trigger kernel panics or thread terminations.
