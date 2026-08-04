@@ -4,6 +4,8 @@ pub mod cow_snapshot;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
+||||||| 43be3a7e8
+pub mod smart_symlink;
 pub mod vfs;
 pub mod defragmenter;
 
@@ -26,3 +28,10 @@ pub use support::{
     SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+||||||| 43be3a7e8
+pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+pub use vfs::{
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, O_APPEND,
+    O_CREAT, O_EXCL, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY,
+};

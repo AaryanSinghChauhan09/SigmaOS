@@ -1,10 +1,17 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
 #![cfg_attr(target_os = "none", no_std)]
+||||||| 43be3a7e8
+// SigmaOS Userspace Main Entry Point
+#![no_std]
+// SigmaOS Userspace Main Entry Point
+#![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 
 // SigmaOS Userspace Main Entry Point
 
+#[cfg(target_os = "none")]
+||||||| 43be3a7e8
 #[cfg(target_os = "none")]
 use core::panic::PanicInfo;
 

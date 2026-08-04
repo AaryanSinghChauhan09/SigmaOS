@@ -9,6 +9,8 @@ pub mod tasks;
 pub mod terminal;
 pub mod advanced_app_absorber;
 pub mod tmux;
+||||||| 43be3a7e8
+pub mod media;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -43,3 +45,5 @@ pub use terminal::{
 pub use tmux::{
     SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
+||||||| 43be3a7e8
+pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};

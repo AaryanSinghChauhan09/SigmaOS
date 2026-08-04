@@ -1,5 +1,15 @@
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+||||||| 43be3a7e8
+/// OOP-based Driver Framework for SigmaOS
+/// Based on Roadmap Item 1: Driver framework
+
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
+use core::mem;
+/// OOP-based Driver Framework for SigmaOS
+/// Based on Roadmap Item 1: Driver framework
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
@@ -10,6 +20,15 @@ pub enum DriverType {
     Char = 1,
     Network = 2,
     Storage = 3,
+}
+||||||| 43be3a7e8
+#[derive(Debug, Clone, Copy)]
+pub enum DriverType { Block = 0, Char = 1, Network = 2 }
+#[derive(Debug, Clone, Copy)]
+pub enum DriverType {
+    Block = 0,
+    Char = 1,
+    Network = 2,
 }
 
 #[repr(usize)]
@@ -61,6 +80,17 @@ pub trait StorageDriver: Driver {
     fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
 }
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum DriverError { Success = 0, LoadFailed = 1, UnloadFailed = 2 }
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum DriverError {
+    Success = 0,
+    LoadFailed = 1,
+    UnloadFailed = 2,
+}
 
 pub trait NetworkDriver: Driver {
     fn send_packet(&mut self, packet: &[u8]) -> Result<(), DriverError>;
@@ -89,6 +119,17 @@ impl SimpleStorageDriver {
             id,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
+||||||| 43be3a7e8
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver { id, driver_type, state: AtomicUsize::new(DriverState::Unloaded as usize) }
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver {
+            id,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
     }
 }
 
@@ -111,12 +152,35 @@ impl Driver for SimpleStorageDriver {
     fn probe(&mut self) -> Result<bool, DriverError> {
         Ok(true)
     }
+||||||| 43be3a7e8
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID { self.id }
+    fn driver_type(&self) -> DriverType { self.driver_type }
+    fn state(&self) -> DriverState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
     fn load(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Active);
+||||||| 43be3a7e8
+        self.state.store(DriverState::Loaded as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Loaded as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Unloaded);
+||||||| 43be3a7e8
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.state
+            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
     }
     fn shutdown(&mut self) -> Result<(), DriverError> {
@@ -310,6 +374,14 @@ impl SimpleDriverFramework {
             }
         }
         true
+    }
+||||||| 43be3a7e8
+    pub fn new() -> Self { SimpleDriverFramework { drivers: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleDriverFramework {
+            drivers: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
     }
 }
 

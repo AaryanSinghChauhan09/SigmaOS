@@ -1,5 +1,8 @@
 // SigmaOS Compatibility Module
 pub mod constellation;
+||||||| 43be3a7e8
+pub mod antix;
+pub mod chakra;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
@@ -18,6 +21,8 @@ pub use legacy_adapters::{
     GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
+||||||| 43be3a7e8
+pub mod legacy_adapters;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat,
@@ -58,4 +63,22 @@ pub use relay_nexus::{
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+};
+
+pub use legacy_adapters::{
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
+};
+
+pub use chakra::{
+    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
+    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
+};
+
+pub use antix::{
+    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
+    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
 };

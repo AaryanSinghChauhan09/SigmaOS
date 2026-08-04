@@ -7,6 +7,8 @@
 // SigmaOS Kernel Main Entry Point
 
 #[cfg(target_os = "none")]
+||||||| 43be3a7e8
+#[cfg(target_os = "none")]
 use core::panic::PanicInfo;
 
 #[cfg(target_os = "none")]

@@ -13,6 +13,9 @@ pub mod mac;
 pub mod password;
 pub mod phantom;
 pub mod pki;
+||||||| 43be3a7e8
+pub mod defensive_audit;
+pub mod parrot;
 pub mod pledge;
 pub mod qubes_isolation;
 pub mod scanner;
@@ -57,6 +60,15 @@ pub use intrusion::{
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
+};
+||||||| 43be3a7e8
+pub use defensive_audit::{
+    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
+    SIGNATURE_LEN,
+};
+pub use parrot::{
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
+    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use vault::{

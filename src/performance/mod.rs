@@ -13,3 +13,18 @@ pub use io_scheduler::{AdaptiveIOScheduler, DeviceType, IOSchedulerPolicy, IOReq
 pub use network_bbr::{BbrEngine, BbrState};
 pub use eevdf::{EevdfScheduler, EevdfTask, MAX_SCHED_TASKS};
 pub use zero_copy_ipc::{ZeroCopyQueue, IPCError, QUEUE_SIZE};
+||||||| 43be3a7e8
+// SigmaOS Performance Module
+pub mod profiler;
+pub mod smart_optimizer;
+
+pub use profiler::{
+    CallGraph, Profile, ProfileType, Profiler, ProfilerError, SimpleCallGraph, SimpleProfile,
+    SimpleProfiler,
+};
+
+pub use smart_optimizer::{
+    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
+    PerformanceProfileRule, RamDefragmenter, SmartPerformanceProfile, SmartResourceOptimizer,
+    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+};
