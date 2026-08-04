@@ -678,7 +678,70 @@ pub struct ThreadControlBlock {
 
 ---
 
-## 9. ORGANIZATIONAL ROLES & STRATEGIC MILESTONES
+## 9. REACT LINUX-INSPIRED PARITY SPECIFICATION MATRIX
+
+To completely "sigmate" and supersede ReactOS, modern Linux distributions, and standard BSD environments, SigmaOS defines a comprehensive operating system parity specification. This ensures seamless interoperability while keeping the system lightweight, zero-dependency, and incredibly fast.
+
+```
+       +--------------------------------------------------------------+
+       |                  Sovereign Parity Layers                     |
+       +--------------------------------------------------------------+
+            |                          |                          |
+            v                          v                          v
+   +------------------+       +------------------+       +------------------+
+   |  Virtual FS      |       |  Security Gates  |       |  Init & Daemons  |
+   | (/proc, /dev)    |       | (PAM, LSM, UFW)  |       | (systemd-analyze)|
+   +------------------+       +------------------+       +------------------+
+```
+
+### 9.1 File System Hierarchy & Virtual Directories
+SigmaOS structures its storage layout using standard Linux/BSD file hierarchy semantics while isolating filesystems via security wrappers.
+- **`/proc` Filesystem (Process Status):** Emulates live, runtime kernel and process status indicators. Reading `/proc/[pid]/status` returns formatted process parameters, active threads count, and memory mapped allocations on the fly without hitting disk blocks.
+- **`/dev` Filesystem (Device Mapping):** Standard mounting points for character and block hardware interfaces (e.g., `/dev/nvme0n1`, `/dev/urandom`, `/dev/null`).
+- **`/sys` Filesystem (System Parameters):** Exposes system-wide hardware configurations, energy scaling governors, and active driver trees.
+- **`/etc` Filesystem (Declarative Overlays):** Holds standard, read-only system configurations and local permission parameters represented as static JSON schemas.
+
+### 9.2 POSIX-style Access Control & Identity (PAM)
+- **Root User vs. Capability Boundaries:** Establishes a standard superuser (`uid: 0`) for terminal authorization compatibility, but restricts operational abilities via microkernel-level `CapabilityTokens`. Even the root user cannot modify write-protected core kernel memory blocks or bypass post-quantum cryptographic signature validation hooks.
+- **Pluggable Authentication Modules (PAM) Gate:** Establishes customizable gates to authorize users, terminals, and API connections dynamically based on cryptographic zero-knowledge protocols.
+
+### 9.3 System Init & Daemon Engine
+SigmaOS integrates an elegant, dependency-aware Init System capable of concurrent services boot staging and real-time performance reporting.
+- **Targets and Runlevels:** Replaces standard Linux runlevels with declarative unit dependency targets:
+  - `single-user.target`: Restricts execution to bare-metal terminal console lines with paged memory pools turned off.
+  - `multi-user.target`: Activates TCP/IP networking stack blocks, secure logger daemons, and storage controllers.
+  - `graphical.target`: Boots the direct-framebuffer Zenith Desktop compositor.
+- **SSHD and Cron Daemons:** Native, secure daemon shunts executed within sandboxed userspace domains:
+  - `sshd-daemon`: Integrates native Dilithium-5 key exchanges to authorize fully encrypted remote console logins.
+  - `cron-daemon`: A lock-free, timer-driven task queue executing background jobs at scheduled times.
+- **Systemd-Analyze Metrics:** Generates boot telemetry reports, reporting the exact load duration of each active driver and service to identify bottlenecks.
+
+### 9.4 Shell, Redirection, & Multiplexing
+- **Built-in Shell Commands:** Provides zero-allocation, lightweight versions of standard utilities (`ls`, `cd`, `cat`, `echo`, `grep`, `sudo`, `top`, `df`, `du`).
+- **Standard Streams, Redirection, & Pipes:** Fully supports POSIX redirection (`>`, `>>`, `2>&1`) and multi-stage process piping (`|`) routing byte streams between independent capability-gated tasks without memory copies.
+- **Terminal Multiplexer (Tmux-style):** Allows managing multiple virtual screen buffers over a single bare-metal serial port, enabling tabbed consoles and window pane splits natively.
+
+### 9.5 Storage & Partitioning (LVM, Ext4, Btrfs)
+- **Advanced Disk Partitioning:** Direct support for reading and writing GUID Partition Tables (GPT) and Master Boot Record (MBR) maps, compatible with standard `fdisk` and `parted` partition boundary definitions.
+- **Logical Volume Manager (LVM):** Groups disjoint physical disks into contiguous virtual volume groups, allowing on-demand resizing and dynamic subvolume allocations at runtime.
+- **Filesystem Adapters:** Zero-dependency driver wrappers to mount and write to `ext4`, `xfs`, and `btrfs` partitions safely, complete with crash-replay journal verifications.
+
+### 9.6 Security, Firewalls, & Sandboxing (SELinux / UFW)
+- **Linux Security Modules (LSM) Sentinel:** Implements mandatory access control layers matching SELinux and AppArmor. Process executions are continuously validated against declarative access policies, trapping illegal operations (e.g., path traversals, direct memory disclosure) before they occur.
+- **Uncomplicated Firewall (UFW) Filter:** An eBPF-inspired fast packet-filter engine executing inside the TCP/IP stack, allowing/blocking connections based on port, IP, and cryptographic protocol signatures.
+
+### 9.7 Advanced Network Suite (SSH, tcpdump)
+- **Network Interface Configuration:** Virtual interface controller (mimicking standard `ip` utility) manipulating routing tables, MTU bounds, and gateway interfaces.
+- **Sovereign Ping Subsystem:** Replicates Linux `iputils-ping` capabilities. Sends zero-allocation ICMP Echo Requests and calculates min/max/average RTT statistics.
+- **tcpdump / Wireshark Parity Engine:** Implements a direct, near-zero-overhead network tap allowing developers to safely trace and log raw network frame packets into standard PCAP files for diagnostic review.
+
+### 9.8 Virtualization & Container Engines
+- **MicroVM Hypervisor:** Direct integration with CPU virtualization extensions (Intel VT-x, AMD-V, ARM EL2) to launch isolated guest OS instances on the bare-metal microkernel.
+- **OCI Container Engine:** A completely zero-dependency, safe container runtime that parses OCI bundle directories and executes sandboxed, namespaces-isolated processes.
+
+---
+
+## 10. ORGANIZATIONAL ROLES & STRATEGIC MILESTONES
 
 To coordinate professional development and ensure optimal project orchestration, we formally map roles to specialized domains:
 
