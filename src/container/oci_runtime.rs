@@ -5,6 +5,15 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+||||||| 43be3a7e8
+/// OOP-based Container Runtime Support for SigmaOS
+/// Based on Ideas-999-Structured: Core System Item 17
+/// Implements OCI runtime and sandboxed container primitives
+
+use core::mem;
+/// OOP-based Container Runtime Support for SigmaOS
+/// Based on Ideas-999-Structured: Core System Item 17
+/// Implements OCI runtime and sandboxed container primitives
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ContainerID = usize;
@@ -66,11 +75,27 @@ impl Container for SimpleContainer {
         self.id
     }
 
+||||||| 43be3a7e8
+    fn id(&self) -> ContainerID { self.id }
+    fn id(&self) -> ContainerID {
+        self.id
+    }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
 
+    fn state(&self) -> ContainerState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => ContainerState::Created,
+            1 => ContainerState::Running,
+            2 => ContainerState::Paused,
+            3 => ContainerState::Stopped,
+            _ => ContainerState::Deleting,
+        }
+    }
+||||||| 43be3a7e8
+    fn state(&self) -> ContainerState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn state(&self) -> ContainerState {
         match self.state.load(Ordering::SeqCst) {
             0 => ContainerState::Created,
@@ -181,6 +206,20 @@ pub enum Namespace {
     UTS = 4,
     User = 5,
 }
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum Namespace { PID = 0, Network = 1, Mount = 2, IPC = 3, UTS = 4, User = 5 }
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum Namespace {
+    PID = 0,
+    Network = 1,
+    Mount = 2,
+    IPC = 3,
+    UTS = 4,
+    User = 5,
+}
 
 pub struct SimpleSandbox {
     pub namespaces: Vec<(ContainerID, Namespace)>,
@@ -256,6 +295,11 @@ impl SimpleImageManager {
 impl Default for SimpleImageManager {
     fn default() -> Self {
         Self::new()
+||||||| 43be3a7e8
+        SimpleImageManager {
+            images: Vec::new(),
+        }
+        SimpleImageManager { images: Vec::new() }
     }
 }
 
@@ -341,8 +385,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn start_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut self.oci_spec.containers {
-            if let Some(ref mut container) = *container_option {
+        for container_option in &mut *self.oci_spec.containers {
+            if let Some(ref mut container) = container_option {
                 if container.id() == id {
                     return container.start();
                 }
@@ -352,8 +396,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn stop_container(&mut self, id: ContainerID) -> Result<(), ContainerError> {
-        for container_option in &mut self.oci_spec.containers {
-            if let Some(ref mut container) = *container_option {
+        for container_option in &mut *self.oci_spec.containers {
+            if let Some(ref mut container) = container_option {
                 if container.id() == id {
                     return container.stop();
                 }
@@ -377,8 +421,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
     fn list_containers(&self) -> Vec<ContainerID> {
         let mut ids = Vec::new();
-        for container_option in &self.oci_spec.containers {
-            if let Some(ref container) = *container_option {
+        for container_option in &*self.oci_spec.containers {
+            if let Some(ref container) = container_option {
                 ids.push(container.id());
             }
         }
@@ -389,6 +433,34 @@ impl ContainerRuntime for SimpleContainerRuntime {
 #[cfg(test)]
 mod tests {
     use super::*;
+||||||| 43be3a7e8
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
 
     #[test]
     fn test_oci_container_and_sandbox_namespaces() {
@@ -408,5 +480,124 @@ mod tests {
         // Remove container
         runtime.remove_container(id).unwrap();
         assert_eq!(runtime.list_containers().len(), 0);
+||||||| 43be3a7e8
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
     }
+    fn clone(&self) -> Vec<T> {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                let item = core::ptr::read(self.data.add(i));
+                new_vec.push(item);
+            }
+        }
+        new_vec
+    }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn clone(&self) -> Vec<T> {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                let item = core::ptr::read(self.data.add(i));
+                new_vec.push(item);
+            }
+        }
+        new_vec
+    }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+||||||| 43be3a7e8
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

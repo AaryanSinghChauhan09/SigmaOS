@@ -145,6 +145,9 @@ impl VirtualFilesystem {
 ||||||| 43be3a7e8
         
 
+||||||| 43be3a7e8
+        
+
         fs
     }
 
@@ -226,6 +229,9 @@ impl VirtualFilesystem {
 ||||||| 43be3a7e8
         
 
+||||||| 43be3a7e8
+        
+
         // Prevent integer overflow in offset calculation
         let new_offset = file_descriptor
             .offset
@@ -235,6 +241,11 @@ impl VirtualFilesystem {
         let _new_offset = file_descriptor
             .offset
             .checked_add(bytes_to_read as u64)
+||||||| 43be3a7e8
+        let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+        let new_offset = file_descriptor
+            .offset
+            .checked_add(buffer.len() as u64)
 ||||||| 43be3a7e8
         let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
         let new_offset = file_descriptor
@@ -304,6 +315,11 @@ impl VirtualFilesystem {
         let _new_size = inode
             .size
             .checked_add(buffer.len() as u64)
+||||||| 43be3a7e8
+        let _new_size = inode.size.checked_add(buffer.len() as u64)
+        let _new_size = inode
+            .size
+            .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
         // Prevent integer overflow in offset calculation
@@ -314,6 +330,11 @@ impl VirtualFilesystem {
         // Prevent integer overflow in offset calculation
         let _new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
         let new_offset = file_descriptor
+            .offset
+            .checked_add(buffer.len() as u64)
+||||||| 43be3a7e8
+        let _new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+        let _new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
 ||||||| 43be3a7e8
@@ -414,6 +435,9 @@ impl VirtualFilesystem {
         }
 ||||||| 43be3a7e8
         
+||||||| 43be3a7e8
+        
+
 ||||||| 43be3a7e8
         
 

@@ -97,6 +97,12 @@ impl PackageRecipe {
             license_spdx: String::new(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
+||||||| 43be3a7e8
+            pkgrel: 1,
+            arch: "x86_64".to_string(),
+            license_spdx: "GPL".to_string(),
+            prepare_commands: Vec::new(),
+            package_commands: Vec::new(),
         }
     }
 

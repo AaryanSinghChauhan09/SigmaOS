@@ -6,6 +6,8 @@ use core::mem;
 use core::mem;
 ||||||| 43be3a7e8
 use core::mem;
+||||||| 43be3a7e8
+use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs
 /// No dependency on external driver frameworks
@@ -161,6 +163,11 @@ impl DeviceDescriptor {
                 _ => DeviceState::Uninitialized,
             }
         }
+||||||| 43be3a7e8
+        unsafe {
+            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
 ||||||| 43be3a7e8
         unsafe {
             core::mem::transmute(self.state.load(Ordering::SeqCst))
@@ -4187,6 +4194,14 @@ mod tests {
         // 0x02, 0x08, 0x00 (Write reg 0 to offset 8)
         // 0x04             (Halt)
         let bytecode = [0x01, 0x00, 0x04, 0x03, 0x00, 0x02, 0x02, 0x08, 0x00, 0x04];
+||||||| 43be3a7e8
+        let bytecode = [
+            0x01, 0x00, 0x04,
+            0x03, 0x00, 0x02,
+            0x02, 0x08, 0x00,
+            0x04
+        ];
+        let bytecode = [0x01, 0x00, 0x04, 0x03, 0x00, 0x02, 0x02, 0x08, 0x00, 0x04];
         let interpreter = UdfInterpreter::new(&bytecode);
         let mut regs = [5, 0, 0, 0];
         let res = interpreter.execute(&mut legacy, &mut regs);
@@ -4535,6 +4550,14 @@ impl<T> Vec<T> {
             index: 0,
             _marker: core::marker::PhantomData,
         }
+||||||| 43be3a7e8
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
 
     pub fn as_slice(&self) -> &[T] {
@@ -4757,24 +4780,33 @@ impl UnifiedPeripheral for ModernDevice {
         PortAddress::MemoryMapped(self.base_address)
     }
     fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+        #[cfg(target_os = "none")]
         unsafe {
             let addr = (self.base_address + offset) as *const u8;
-            // Simulated MMIO read to avoid segfaults in unit testing environments
             if self.base_address == 0 {
                 return Ok(0);
             }
             Ok(ptr::read_volatile(addr))
         }
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = offset;
+            Ok(0)
+        }
     }
     fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+        #[cfg(target_os = "none")]
         unsafe {
             let addr = (self.base_address + offset) as *mut u8;
-            // Simulated MMIO write
             if self.base_address != 0 {
                 ptr::write_volatile(addr, value);
             }
-            Ok(())
         }
+        #[cfg(not(target_os = "none"))]
+        {
+            let _ = (offset, value);
+        }
+        Ok(())
     }
 }
 
@@ -5068,6 +5100,11 @@ impl UdfInterpreter {
                 }
                 0x03 => {
                     // Custom scale/transformation operation. Multiply register[pc+1] by factor bytecode[pc+2]
+                    if pc + 2 >= self.bytecode.len() {
+                        return Err(DeviceError::InvalidParameter);
+                    }
+||||||| 43be3a7e8
+                    if pc + 2 >= self.bytecode.len() { return Err(DeviceError::InvalidParameter); }
                     if pc + 2 >= self.bytecode.len() {
                         return Err(DeviceError::InvalidParameter);
                     }

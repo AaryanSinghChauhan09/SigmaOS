@@ -3,6 +3,7 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
@@ -35,6 +36,13 @@ use core::mem;
 ||||||| 0ddf2eac7
 extern crate alloc;
 use alloc::boxed::Box;
+||||||| 43be3a7e8
+
+use core::ptr::{self, NonNull};
+use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
+use core::ptr::{self, NonNull};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
 pub type ContainerID = usize;
@@ -74,7 +82,7 @@ pub trait Container {
 
 /// Container error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
     Success = 0,
     AlreadyStarted = 1,
@@ -281,6 +289,40 @@ pub trait Container {
 }
 
 /// Container error types
+||||||| 43be3a7e8
+/// Simple container (OOP: Concrete container class)
+/// Container network configuration type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerNetworkType {
+    None,
+    Bridge,
+    Overlay,
+}
+
+/// Container volume configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerVolume {
+    pub is_bind_mount: bool,
+    pub is_tmpfs: bool,
+    pub read_only: bool,
+}
+
+/// Container user namespaces mapping
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerNamespace {
+    pub uid_mapping: u32,
+    pub gid_mapping: u32,
+    pub rootless: bool,
+}
+
+/// Container seccomp profiles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
+}
+
+/// Simple container (OOP: Concrete container class)
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
@@ -537,6 +579,8 @@ pub trait ContainerRuntime {
 #[derive(Debug, Clone, Copy)]
 ||||||| 43be3a7e8
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+||||||| 43be3a7e8
+#[derive(Debug, Clone, Copy)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,
@@ -804,6 +848,27 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -888,7 +953,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 ||||||| 0ddf2eac7
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -1164,7 +1233,81 @@ mod tests {
 ||||||| 43be3a7e8
 
 // External allocator functions
+||||||| 43be3a7e8
+// External allocator functions
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_container_creation() {
+        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
+        let id = runtime
+            .create_container(
+                b"sovereign_container",
+                b"ubuntu-pqc",
+                ContainerCapability::full(),
+            )
+            .unwrap();
+        assert_eq!(id, 1);
+    }
+
+    #[test]
+    fn test_container_oci_networking_and_volumes() {
+        let mut container = SimpleContainer::new(
+            1,
+            b"web_app",
+            b"nginx-dilithium",
+            ContainerCapability::full(),
+        );
+
+        // Assert network parity bridge setting
+        assert_eq!(container.network_type, ContainerNetworkType::None);
+        container.network_type = ContainerNetworkType::Bridge;
+        assert_eq!(container.network_type, ContainerNetworkType::Bridge);
+
+        // Assert volume mounts setting
+        assert!(!container.volume.is_bind_mount);
+        container.volume.is_bind_mount = true;
+        assert!(container.volume.is_bind_mount);
+    }
+
+    #[test]
+    fn test_container_namespaces_and_seccomp() {
+        let mut container = SimpleContainer::new(
+            1,
+            b"secure_sandbox",
+            b"alpine-kyber",
+            ContainerCapability::full(),
+        );
+
+        // Assert namespace uid mappings
+        assert_eq!(container.namespace.uid_mapping, 0);
+        container.namespace.uid_mapping = 1000;
+        assert_eq!(container.namespace.uid_mapping, 1000);
+
+        // Assert seccomp profile hardening
+        assert!(!container.seccomp.hardened);
+        container.seccomp.hardened = true;
+        assert!(container.seccomp.hardened);
+    }
 }

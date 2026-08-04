@@ -11,6 +11,9 @@
 #[cfg(target_os = "none")]
 use core::panic::PanicInfo;
 
+||||||| 43be3a7e8
+use core::panic::PanicInfo;
+
 #[cfg(target_os = "none")]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -23,6 +26,6 @@ fn main() {}
 
 #[cfg(target_os = "none")]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }

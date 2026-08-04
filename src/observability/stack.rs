@@ -4,6 +4,8 @@
 extern crate alloc;
 
 use core::mem;
+||||||| 43be3a7e8
+use core::mem;
 /// OOP-based Observability Stack for SigmaOS
 /// Implements observability using OOP principles with traits and structs
 /// No dependency on external observability frameworks
@@ -12,6 +14,8 @@ use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::vec::Vec;
 use alloc::boxed::Box;
+||||||| 43be3a7e8
+use core::mem;
 
 /// Metric ID
 pub type MetricID = usize;
@@ -300,6 +304,10 @@ impl Span for SimpleSpan {
         }
         self.start_time
             .store(Self::get_current_time(), Ordering::SeqCst);
+||||||| 43be3a7e8
+        self.start_time.store(Self::get_current_time(), Ordering::SeqCst);
+        self.start_time
+            .store(Self::get_current_time() as usize, Ordering::SeqCst);
     }
 
     fn stop(&mut self) {
@@ -308,6 +316,10 @@ impl Span for SimpleSpan {
         }
         self.end_time
             .store(Self::get_current_time(), Ordering::SeqCst);
+||||||| 43be3a7e8
+        self.end_time.store(Self::get_current_time(), Ordering::SeqCst);
+        self.end_time
+            .store(Self::get_current_time() as usize, Ordering::SeqCst);
     }
 
     fn duration(&self) -> u64 {
@@ -363,6 +375,8 @@ pub enum ObservabilityError {
 /// Observability statistics
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+||||||| 43be3a7e8
+#[derive(Debug, Clone, Copy)]
 pub struct ObservabilityStats {
     pub total_metrics: usize,
     pub total_spans: usize,
@@ -381,6 +395,117 @@ impl ObservabilityStats {
     }
 }
 
+/// SigmaTrace dynamic span profiling trait
+pub trait SigmaTrace {
+    fn trace_event(
+        &mut self,
+        event_name: &[u8],
+        payload_size: usize,
+    ) -> Result<(), ObservabilityError>;
+    fn get_total_payload_traced(&self) -> usize;
+}
+
+/// Simple implementation of SigmaTrace
+pub struct SimpleSigmaTrace {
+    pub total_payload: AtomicUsize,
+    pub event_count: AtomicUsize,
+}
+
+impl SimpleSigmaTrace {
+    pub fn new() -> Self {
+        SimpleSigmaTrace {
+            total_payload: AtomicUsize::new(0),
+            event_count: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl SigmaTrace for SimpleSigmaTrace {
+    fn trace_event(
+        &mut self,
+        _event_name: &[u8],
+        payload_size: usize,
+    ) -> Result<(), ObservabilityError> {
+        self.total_payload.fetch_add(payload_size, Ordering::SeqCst);
+        self.event_count.fetch_add(1, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn get_total_payload_traced(&self) -> usize {
+        self.total_payload.load(Ordering::SeqCst)
+    }
+}
+
+/// SigmaMetrics telemetry metrics export trait
+pub trait SigmaMetrics {
+    fn export_metrics_prometheus(&self) -> Result<f64, ObservabilityError>;
+    fn increment_export_count(&mut self);
+}
+
+/// Simple implementation of SigmaMetrics
+pub struct SimpleSigmaMetrics {
+    pub export_count: AtomicUsize,
+    pub last_exported_value: AtomicUsize,
+}
+
+impl SimpleSigmaMetrics {
+    pub fn new() -> Self {
+        SimpleSigmaMetrics {
+            export_count: AtomicUsize::new(0),
+            last_exported_value: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl SigmaMetrics for SimpleSigmaMetrics {
+    fn export_metrics_prometheus(&self) -> Result<f64, ObservabilityError> {
+        let val = self.last_exported_value.load(Ordering::SeqCst) as f64;
+        Ok(val)
+    }
+
+    fn increment_export_count(&mut self) {
+        self.export_count.fetch_add(1, Ordering::SeqCst);
+    }
+}
+
+/// SigmaDebug crash dump & debugger observability integration trait
+pub trait SigmaDebug {
+    fn capture_core_dump(&mut self, error_code: u32) -> Result<(), ObservabilityError>;
+    fn load_symbols(&mut self, symbol_count: usize) -> Result<(), ObservabilityError>;
+    fn get_last_error(&self) -> u32;
+}
+
+/// Simple implementation of SigmaDebug
+pub struct SimpleSigmaDebug {
+    pub last_error: AtomicUsize,
+    pub symbols_loaded: AtomicUsize,
+}
+
+impl SimpleSigmaDebug {
+    pub fn new() -> Self {
+        SimpleSigmaDebug {
+            last_error: AtomicUsize::new(0),
+            symbols_loaded: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl SigmaDebug for SimpleSigmaDebug {
+    fn capture_core_dump(&mut self, error_code: u32) -> Result<(), ObservabilityError> {
+        self.last_error.store(error_code as usize, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn load_symbols(&mut self, symbol_count: usize) -> Result<(), ObservabilityError> {
+        self.symbols_loaded.store(symbol_count, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn get_last_error(&self) -> u32 {
+        self.last_error.load(Ordering::SeqCst) as u32
+    }
+}
+
 /// Simple observability stack (OOP: Concrete stack class)
 pub struct SimpleObservabilityStack {
     metrics: Vec<Option<Box<dyn Metric>>>,
@@ -389,6 +514,9 @@ pub struct SimpleObservabilityStack {
     next_span_id: AtomicUsize,
     stats: ObservabilityStats,
     capability: StackCapability,
+    pub trace: SimpleSigmaTrace,
+    pub metrics_exporter: SimpleSigmaMetrics,
+    pub debug_helper: SimpleSigmaDebug,
 }
 
 /// Stack capability
@@ -424,6 +552,9 @@ impl SimpleObservabilityStack {
             next_span_id: AtomicUsize::new(1),
             stats: ObservabilityStats::new(),
             capability,
+            trace: SimpleSigmaTrace::new(),
+            metrics_exporter: SimpleSigmaMetrics::new(),
+            debug_helper: SimpleSigmaDebug::new(),
         }
     }
 }
@@ -451,7 +582,7 @@ impl ObservabilityStack for SimpleObservabilityStack {
         let mut metric_type = MetricType::Counter;
 
         for (i, metric_option) in self.metrics.iter().enumerate() {
-            if let Some(ref metric) = *metric_option {
+            if let Some(ref metric) = metric_option {
                 if metric.id() == id {
                     index = Some(i);
                     metric_type = metric.metric_type();
@@ -471,8 +602,8 @@ impl ObservabilityStack for SimpleObservabilityStack {
     }
 
     fn get_metric(&self, id: MetricID) -> Option<&dyn Metric> {
-        for metric_option in &self.metrics {
-            if let Some(ref metric) = *metric_option {
+        for metric_option in &*self.metrics {
+            if let Some(ref metric) = metric_option {
                 if metric.id() == id {
                     return Some(metric.as_ref());
                 }
@@ -499,8 +630,8 @@ impl ObservabilityStack for SimpleObservabilityStack {
             return Err(ObservabilityError::PermissionDenied);
         }
 
-        for span_option in &mut self.spans {
-            if let Some(ref mut span) = *span_option {
+        for span_option in &mut *self.spans {
+            if let Some(ref mut span) = span_option {
                 if span.id() == id {
                     span.stop();
                     self.stats.active_spans -= 1;
@@ -512,8 +643,8 @@ impl ObservabilityStack for SimpleObservabilityStack {
     }
 
     fn get_span(&self, id: TraceID) -> Option<&dyn Span> {
-        for span_option in &self.spans {
-            if let Some(ref span) = *span_option {
+        for span_option in &*self.spans {
+            if let Some(ref span) = span_option {
                 if span.id() == id {
                     return Some(span.as_ref());
                 }
@@ -536,6 +667,44 @@ pub trait SigmaDebug {
 pub trait SigmaMetrics {
     fn collect_metrics(&self) -> ObservabilityStats;
 }
+||||||| 43be3a7e8
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
 
 pub trait SigmaTrace {
     fn trace_event(&self, event: &str);
@@ -545,6 +714,65 @@ pub struct SimpleSigmaDebug;
 impl SigmaDebug for SimpleSigmaDebug {
     fn debug_dump(&self) -> alloc::string::String {
         alloc::string::String::from("SimpleSigmaDebug dump")
+||||||| 43be3a7e8
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
     }
 }
 
@@ -558,4 +786,60 @@ impl SigmaMetrics for SimpleSigmaMetrics {
 pub struct SimpleSigmaTrace;
 impl SigmaTrace for SimpleSigmaTrace {
     fn trace_event(&self, _event: &str) {}
+||||||| 43be3a7e8
+// External allocator functions
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sigmatrace_dynamic_span_profiling() {
+        let mut trace = SimpleSigmaTrace::new();
+        assert_eq!(trace.get_total_payload_traced(), 0);
+        assert!(trace.trace_event(b"syscall_read", 256).is_ok());
+        assert_eq!(trace.get_total_payload_traced(), 256);
+        assert_eq!(trace.event_count.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_sigmametrics_telemetry() {
+        let mut metrics = SimpleSigmaMetrics::new();
+        metrics.last_exported_value.store(42, Ordering::SeqCst);
+        let val = metrics.export_metrics_prometheus().unwrap();
+        assert_eq!(val, 42.0);
+        metrics.increment_export_count();
+        assert_eq!(metrics.export_count.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_sigmadebug_dump_and_symbols() {
+        let mut dbg = SimpleSigmaDebug::new();
+        assert_eq!(dbg.get_last_error(), 0);
+        assert!(dbg.capture_core_dump(0xDEADBEEF).is_ok());
+        assert_eq!(dbg.get_last_error(), 0xDEADBEEF);
+        assert!(dbg.load_symbols(1500).is_ok());
+        assert_eq!(dbg.symbols_loaded.load(Ordering::SeqCst), 1500);
+    }
 }

@@ -23,6 +23,8 @@ pub mod advanced_app_absorber;
 pub mod advanced_app_absorber;
 pub mod tmux;
 pub mod mind_map;
+||||||| 43be3a7e8
+pub mod subtitle_editor;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -66,3 +68,5 @@ pub use tmux::{
 pub use mind_map::{
     MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
 };
+||||||| 43be3a7e8
+pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};

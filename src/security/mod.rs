@@ -57,6 +57,8 @@ pub mod intrusion;
 pub mod password;
 pub mod parrot_linux;
 pub mod selinux;
+||||||| 43be3a7e8
+pub mod qubes_isolation;
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -144,3 +146,7 @@ pub use vulnerability::{
 ||||||| 43be3a7e8
 pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+||||||| 43be3a7e8
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+};

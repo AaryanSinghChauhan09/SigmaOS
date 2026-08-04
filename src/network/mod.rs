@@ -5,6 +5,8 @@ pub mod stack;
 pub mod commands;
 ||||||| 43be3a7e8
 pub mod stack;
+||||||| 43be3a7e8
+pub mod ring_buffer_stack;
 pub mod tcp;
 pub mod tcp_udp;
 pub mod ring_buffer_stack;
@@ -16,11 +18,18 @@ pub mod zero_trust;
 pub mod ring_buffer_stack;
 ||||||| 165ded71c
 pub mod ring_buffer_stack;
+||||||| 43be3a7e8
+pub mod tcp_udp;
 
 pub use commands::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
     SocketStatsCommand, SocketStatsEntry, UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND,
     GLOBAL_UFW_RULE,
+};
+||||||| 43be3a7e8
+pub use ring_buffer_stack::{
+    compute_checksum, IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket,
+    TcpState as RingTcpState, ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
 };
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 ||||||| 165ded71c
@@ -41,5 +50,12 @@ pub use tcp_udp::{
     Protocol, TCPState as UdpTcpState, NetworkError as UdpNetworkError, Socket, SimpleSocket,
     TCPConnection as UdpTCPConnection, UDPSocket, RenoCongestionControl, BBRCongestionControl,
     Firewall, NetfilterFirewall,
+    SimpleFirewall, ZeroCopy, ZeroCopyNetwork, NetworkStack as CoreNetworkStack, SimpleNetworkStack,
+};
+||||||| 43be3a7e8
+pub use tcp_udp::{
+    Protocol, TCPState as UdpTcpState, NetworkError as UdpNetworkError, Socket, SimpleSocket,
+    TCPConnection as UdpTCPConnection, UDPSocket, RenoCongestionControl, BBRCongestionControl,
+    FirewallTarget, FirewallChain, ConntrackState, FirewallRule, Firewall as IptablesFirewall,
     SimpleFirewall, ZeroCopy, ZeroCopyNetwork, NetworkStack as CoreNetworkStack, SimpleNetworkStack,
 };

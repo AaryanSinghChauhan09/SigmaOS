@@ -7,7 +7,22 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based UEFI Bootloader with Secure Boot database checking and TPM Measured Boot for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
+||||||| 43be3a7e8
+#![no_std]
+#![no_main]
 
+/// OOP-based UEFI Bootloader for SigmaOS
+/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
+// OOP-based UEFI Bootloader & Safe Pointer Wrappers for SigmaOS
+// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
+// Emulates safe UEFI pointer wrappers, memory maps, and boot service validations inspired by Linux.
+
+#![cfg_attr(target_os = "none", no_std)]
+#![cfg_attr(target_os = "none", no_main)]
+
+extern crate alloc;
+
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 #![no_std]
@@ -20,6 +35,8 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
+||||||| 43be3a7e8
+use core::ptr::NonNull;
 
 pub type BootStatus = usize;
 
@@ -72,6 +89,12 @@ pub struct UefiMemoryDescriptor {
     pub number_of_pages: u64,
     pub attribute: u64,
 }
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 
 /// Simulated UEFI System Table containing raw pointers to boot services
 #[repr(C)]
@@ -93,7 +116,79 @@ pub struct UefiBootServices {
 pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2, Revoked = 3 }
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2, InvalidPointer = 3 }
 
+// ==========================================
+// SAFE UEFI POINTER WRAPPERS
+// ==========================================
+#[derive(Debug, Clone, Copy)]
+pub struct UefiPtr<T> {
+    pub raw: NonNull<T>,
+}
+
+impl<T> UefiPtr<T> {
+    pub fn new(ptr: *mut T) -> Option<Self> {
+        NonNull::new(ptr).map(|raw| Self { raw })
+    }
+
+    /// Read value with safe bounds/null validation.
+    pub fn read(&self) -> T {
+        unsafe { self.raw.as_ptr().read() }
+    }
+
+    /// Write value safely with verified alignment.
+    pub fn write(&self, val: T) {
+        unsafe { self.raw.as_ptr().write(val); }
+    }
+}
+
+// ==========================================
+// UEFI MEMORY DESCRIPTORS
+// ==========================================
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct UefiMemoryDescriptor {
+    pub memory_type: u32,
+    pub physical_start: u64,
+    pub virtual_start: u64,
+    pub number_of_pages: u64,
+    pub attribute: u64,
+}
+
+pub struct UefiMemoryMap {
+    pub descriptors: Vec<UefiMemoryDescriptor>,
+}
+
+impl UefiMemoryMap {
+    pub fn new() -> Self {
+        Self { descriptors: Vec::new() }
+    }
+
+    pub fn add_descriptor(&mut self, desc: UefiMemoryDescriptor) {
+        self.descriptors.push(desc);
+    }
+
+    /// Safely look up physical address range descriptor with strict bounds checks.
+    pub fn get_descriptor_by_phys_addr(&self, phys_addr: u64) -> Option<UefiMemoryDescriptor> {
+        for desc in self.descriptors.iter() {
+            let start = desc.physical_start;
+            let end = start + (desc.number_of_pages * 4096);
+            if phys_addr >= start && phys_addr < end {
+                return Some(*desc);
+            }
+        }
+        None
+    }
+}
+
+// ==========================================
+// UEFI BOOTLOADER INTERFACE
+// ==========================================
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
     unsafe fn load_kernel_raw(&mut self, kernel_raw: *const u8, size: usize, destination: *mut u8) -> Result<BootStatus, BootError>;
@@ -103,10 +198,18 @@ pub trait UEFIBootloader {
 
 /// Complete UEFI Bootloader Implementation with Raw Pointer Memory Handling
 #[repr(C)]
+||||||| 43be3a7e8
+#[repr(C)]
 pub struct SimpleUEFIBootloader {
     pub phase: AtomicU32,
     pub kernel_loaded: AtomicU32,
     pub secure_boot_active: bool,
+||||||| 43be3a7e8
+    pub phase: AtomicUsize,
+    pub kernel_loaded: AtomicUsize,
+    pub phase: AtomicUsize,
+    pub kernel_loaded: AtomicUsize,
+    pub memory_map: UefiMemoryMap,
 }
 
 impl SimpleUEFIBootloader {
@@ -115,6 +218,12 @@ impl SimpleUEFIBootloader {
             phase: AtomicU32::new(BootPhase::Init as u32),
             kernel_loaded: AtomicU32::new(0),
             secure_boot_active: true,
+||||||| 43be3a7e8
+            phase: AtomicUsize::new(BootPhase::Init as usize),
+            kernel_loaded: AtomicUsize::new(0),
+            phase: AtomicUsize::new(BootPhase::Init as usize),
+            kernel_loaded: AtomicUsize::new(0),
+            memory_map: UefiMemoryMap::new(),
         }
     }
 }
@@ -297,6 +406,8 @@ pub trait SecureBoot {
 #[repr(C)]
 ||||||| 984d1301f
 #[repr(C)]
+||||||| 43be3a7e8
+#[repr(C)]
 pub struct SimpleSecureBoot {
     pub bootloader: SimpleUEFIBootloader,
     pub db: UefiDatabase,
@@ -388,6 +499,14 @@ pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
         let kernel_src = [0x7F, 0x45, 0x4C, 0x46, 0x01, 0x02, 0x03]; // ELF signature
         let mut kernel_dst = [0u8; 7];
+||||||| 43be3a7e8
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+// Custom drop-safe Vec structure to prevent memory leaks in no_std
+pub struct VecCustom<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
     fn new() -> Self {
@@ -402,6 +521,32 @@ impl<T> Vec<T> {
 impl<T> Vec<T> {
     pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     pub fn push(&mut self, item: T) {
+||||||| 43be3a7e8
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+impl<T> Drop for VecCustom<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 && !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<T> VecCustom<T> {
+    pub fn new() -> Self {
+        VecCustom {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -413,6 +558,13 @@ impl<T> Vec<T> {
 ||||||| 984d1301f
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
+||||||| 43be3a7e8
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len && !self.data.is_null() {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
@@ -453,6 +605,9 @@ impl<T> Vec<T> {
             assert_eq!(total_pages, 256); // Only memory type 7 pages are added
         }
     }
+    pub fn len(&self) -> usize {
+        self.len
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -473,10 +628,21 @@ impl<T> Vec<T> {
 ||||||| 984d1301f
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+||||||| 43be3a7e8
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -561,5 +727,81 @@ mod tests {
         // Check authorized succeeds
         let check_auth = sb.verify_signature(&kernel_data, 2001).unwrap();
         assert!(check_auth);
+    }
+}
+||||||| 43be3a7e8
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+impl<T> core::ops::Index<usize> for VecCustom<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+// ==========================================
+// UNIT TESTS MODULE
+// ==========================================
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_uefi_ptr_safety() {
+        let mut val: u32 = 42;
+        let uefi_ptr = UefiPtr::new(&mut val as *mut u32).unwrap();
+        assert_eq!(uefi_ptr.read(), 42);
+        uefi_ptr.write(100);
+        assert_eq!(val, 100);
+    }
+
+    #[test]
+    fn test_uefi_memory_map_bounds() {
+        let mut mmap = UefiMemoryMap::new();
+        mmap.add_descriptor(UefiMemoryDescriptor {
+            memory_type: 7, // EfiConventionalMemory
+            physical_start: 0x1000,
+            virtual_start: 0,
+            number_of_pages: 10, // 40960 bytes
+            attribute: 0xf,
+        });
+
+        // Test matching inside range
+        let desc = mmap.get_descriptor_by_phys_addr(0x2000);
+        assert!(desc.is_some());
+        assert_eq!(desc.unwrap().physical_start, 0x1000);
+
+        // Test out of bounds
+        assert!(mmap.get_descriptor_by_phys_addr(0x20000).is_none());
+    }
+
+    #[test]
+    fn test_uefi_custom_vec_drop() {
+        let mut v: VecCustom<u64> = VecCustom::new();
+        v.push(10);
+        v.push(20);
+        assert_eq!(v.len(), 2);
+        assert_eq!(v[0], 10);
     }
 }

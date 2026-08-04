@@ -6,10 +6,16 @@ pub mod driver;
 ||||||| 43be3a7e8
 pub mod ipc;
 pub mod bore;
+||||||| 43be3a7e8
+pub mod breakthroughs;
 pub mod ipc;
 pub mod memory;
 pub mod object;
 pub mod performance;
+||||||| 43be3a7e8
+pub mod meta;
+pub mod paging;
+pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod meta;
@@ -62,6 +68,11 @@ pub use device::{Device, DeviceBinding, DeviceManager, DeviceType, DriverError, 
 pub use driver::{Driver, DriverRegistration, DriverRegistry};
 ||||||| 43be3a7e8
 pub use bore::{BoreScheduler, BoreTask};
+||||||| 43be3a7e8
+pub use breakthroughs::{
+    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions,
+};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,

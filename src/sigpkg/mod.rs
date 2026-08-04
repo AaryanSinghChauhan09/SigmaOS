@@ -2,6 +2,8 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+||||||| 43be3a7e8
+pub mod importer;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
@@ -14,6 +16,9 @@ pub mod universal_adapter;
 pub mod universal_oop_system;
 pub mod importer;
 
+pub use importer::{
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
+};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};

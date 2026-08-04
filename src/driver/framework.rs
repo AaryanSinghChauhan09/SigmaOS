@@ -16,6 +16,11 @@ use core::mem;
 
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+||||||| 43be3a7e8
+/// OOP-based Driver Framework for SigmaOS
+/// Based on Roadmap Item 1: Driver framework
+
+use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 use core::mem;
 /// OOP-based Driver Framework for SigmaOS
@@ -25,6 +30,10 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 ||||||| 52d783ca0
 use crate::klib::Vec;
+||||||| 43be3a7e8
+/// OOP-based Driver Framework for SigmaOS
+/// Based on Driver Management Roadmap (OOP-based)
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
@@ -56,6 +65,16 @@ pub enum DriverType {
     Network = 2,
     Storage = 3,
 }
+||||||| 43be3a7e8
+#[derive(Debug, Clone, Copy)]
+pub enum DriverType { Block = 0, Char = 1, Network = 2 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverType {
+    Storage = 0,
+    Network = 1,
+    Graphics = 2,
+    Input = 3,
+}
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -63,6 +82,14 @@ pub enum DriverState {
     Unloaded = 0,
     Loaded = 1,
     Active = 2,
+}
+||||||| 43be3a7e8
+pub enum DriverState { Unloaded = 0, Loaded = 1, Active = 2 }
+pub enum DriverState {
+    Unloaded = 0,
+    Loaded = 1,
+    Active = 2,
+    Error = 3,
 }
 
 #[repr(C)]
@@ -117,6 +144,13 @@ pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
     UnloadFailed = 2,
+||||||| 43be3a7e8
+
+    /// Gracefully powers down hardware resources
+    fn shutdown(&mut self) -> Result<(), DriverError>;
+
+    /// Returns driver dependencies
+    fn dependencies(&self) -> &'static [DriverType];
 }
 
 #[repr(C)]
@@ -162,8 +196,38 @@ pub trait InputDriver: Driver {
 // Concrete Driver Classes (OOP Implementation)
 
 pub struct SimpleDriver {
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum DriverError { Success = 0, LoadFailed = 1, UnloadFailed = 2 }
+
+#[repr(C)]
+pub struct SimpleDriver {
+// Specialized Polymorphic Subclasses (Traits)
+
+pub trait StorageDriver: Driver {
+    fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
+    fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
+}
+
+pub trait NetworkDriver: Driver {
+    fn send_packet(&mut self, packet: &[u8]) -> Result<(), DriverError>;
+    fn receive_packet(&mut self, buf: &mut [u8]) -> Result<usize, DriverError>;
+}
+
+pub trait GraphicsDriver: Driver {
+    fn set_resolution(&mut self, width: u32, height: u32) -> Result<(), DriverError>;
+    fn flip_buffers(&mut self) -> Result<(), DriverError>;
+}
+
+pub trait InputDriver: Driver {
+    fn poll_events(&mut self) -> Result<usize, DriverError>;
+}
+
+// Concrete Driver Classes (OOP Implementation)
+
+pub struct SimpleStorageDriver {
     pub id: DriverID,
-    pub driver_type: DriverType,
     pub state: AtomicUsize,
 }
 
@@ -172,6 +236,16 @@ impl SimpleDriver {
         Self {
             id,
             driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
+||||||| 43be3a7e8
+impl SimpleDriver {
+    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
+        SimpleDriver { id, driver_type, state: AtomicUsize::new(DriverState::Unloaded as usize) }
+impl SimpleStorageDriver {
+    pub fn new(id: DriverID) -> Self {
+        Self {
+            id,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
@@ -183,6 +257,30 @@ impl Driver for SimpleDriver {
     }
     fn driver_type(&self) -> DriverType {
         self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+||||||| 43be3a7e8
+impl Driver for SimpleDriver {
+    fn id(&self) -> DriverID { self.id }
+    fn driver_type(&self) -> DriverType { self.driver_type }
+    fn state(&self) -> DriverState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+impl Driver for SimpleStorageDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        DriverType::Storage
     }
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
@@ -487,6 +585,143 @@ impl DriverFactory {
 
 // Core OOP Driver Framework with Dependency Resolution & Hot-Swapping
 
+||||||| 43be3a7e8
+impl StorageDriver for SimpleStorageDriver {
+    fn read_blocks(&mut self, _block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError> {
+        if self.state() != DriverState::Active {
+            return Err(DriverError::LoadFailed);
+        }
+        for byte in buf.iter_mut() {
+            *byte = 0xAA;
+        }
+        Ok(buf.len())
+    }
+    fn write_blocks(&mut self, _block_idx: u64, buf: &[u8]) -> Result<usize, DriverError> {
+        if self.state() != DriverState::Active {
+            return Err(DriverError::LoadFailed);
+        }
+        Ok(buf.len())
+    }
+}
+
+pub struct SimpleNetworkDriver {
+    pub id: DriverID,
+    pub state: AtomicUsize,
+    pub deps: &'static [DriverType],
+}
+
+impl SimpleNetworkDriver {
+    pub fn new(id: DriverID, deps: &'static [DriverType]) -> Self {
+        Self {
+            id,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+            deps,
+        }
+    }
+}
+
+impl Driver for SimpleNetworkDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        DriverType::Network
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Active);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Unloaded);
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        self.deps
+    }
+}
+
+impl NetworkDriver for SimpleNetworkDriver {
+    fn send_packet(&mut self, _packet: &[u8]) -> Result<(), DriverError> {
+        if self.state() != DriverState::Active {
+            return Err(DriverError::LoadFailed);
+        }
+        Ok(())
+    }
+    fn receive_packet(&mut self, buf: &mut [u8]) -> Result<usize, DriverError> {
+        if self.state() != DriverState::Active {
+            return Err(DriverError::LoadFailed);
+        }
+        if !buf.is_empty() {
+            buf[0] = 0xFF;
+            Ok(1)
+        } else {
+            Ok(0)
+        }
+    }
+}
+
+// Hardware Abstraction (Bus Abstraction Classes)
+
+pub trait Bus {
+    fn name(&self) -> &'static str;
+    fn discover_devices(&self) -> Vec<u32>;
+}
+
+pub struct PciBus;
+impl Bus for PciBus {
+    fn name(&self) -> &'static str {
+        "PCI Bus"
+    }
+    fn discover_devices(&self) -> Vec<u32> {
+        let mut dev = Vec::new();
+        dev.push(0x10DE); // Simulated GPU Vendor ID
+        dev.push(0x1AF4); // Simulated VirtIO Storage
+        dev
+    }
+}
+
+pub struct UsbBus;
+impl Bus for UsbBus {
+    fn name(&self) -> &'static str {
+        "USB Bus"
+    }
+    fn discover_devices(&self) -> Vec<u32> {
+        let mut dev = Vec::new();
+        dev.push(0x046D); // Simulated Logitech Mouse
+        dev
+    }
+}
+
+// Factory Pattern (Dynamic Driver Factory Instantiation)
+
+pub struct DriverFactory;
+impl DriverFactory {
+    pub fn create_driver(id: DriverID, driver_type: DriverType) -> Box<dyn Driver> {
+        match driver_type {
+            DriverType::Storage => Box::new(SimpleStorageDriver::new(id)),
+            DriverType::Network => Box::new(SimpleNetworkDriver::new(id, &[])),
+            _ => Box::new(SimpleStorageDriver::new(id)), // Fallback
+        }
+    }
+}
+
+// Core OOP Driver Framework with Dependency Resolution & Hot-Swapping
+
 pub trait DriverFramework {
     fn register_driver(&mut self, driver: alloc::boxed::Box<dyn Driver>) -> Result<DriverID, DriverError>;
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
@@ -589,6 +824,34 @@ impl SimpleDriverFramework {
         }
         true
     }
+||||||| 43be3a7e8
+    pub fn new() -> Self { SimpleDriverFramework { drivers: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self {
+        SimpleDriverFramework {
+            drivers: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+
+    /// Verifies if all declared dependencies for a driver are active in the system
+    fn verify_dependencies(&self, driver: &dyn Driver) -> bool {
+        let deps = driver.dependencies();
+        for &dep in deps {
+            let mut found = false;
+            for driver_option in self.drivers.iter() {
+                if let Some(ref d) = *driver_option {
+                    if d.driver_type() == dep && d.state() == DriverState::Active {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if !found {
+                return false;
+            }
+        }
+        true
+    }
 }
 
 impl DriverFramework for SimpleDriverFramework {
@@ -621,11 +884,37 @@ impl DriverFramework for SimpleDriverFramework {
             return Err(DriverError::DependencyMissing);
         }
 
+||||||| 43be3a7e8
+        // Find if any driver matches ID and check dependencies first
+        let mut dep_ok = false;
+        for i in 0..self.drivers.len() {
+            if let Some(ref d) = self.drivers[i] {
+                if d.id() == id {
+                    dep_ok = self.verify_dependencies(d.as_ref());
+                    break;
+                }
+            }
+        }
+
+        if !dep_ok {
+            return Err(DriverError::DependencyMissing);
+        }
+
         for driver_option in self.drivers.iter_mut() {
             if let Some(ref mut driver) = *driver_option {
                 let driver: &mut dyn Driver = &mut **driver;
                 if driver.id() == id {
                     return driver.load();
+                }
+||||||| 43be3a7e8
+                if driver.id() == id { return driver.load(); }
+                if driver.id() == id {
+                    driver.init()?;
+                    if driver.probe()? {
+                        return driver.load();
+                    } else {
+                        return Err(DriverError::ProbeFailed);
+                    }
                 }
             }
         }
@@ -637,6 +926,12 @@ impl DriverFramework for SimpleDriverFramework {
             if let Some(ref mut driver) = *driver_option {
                 let driver: &mut dyn Driver = &mut **driver;
                 if driver.id() == id {
+                    return driver.unload();
+                }
+||||||| 43be3a7e8
+                if driver.id() == id { return driver.unload(); }
+                if driver.id() == id {
+                    driver.shutdown()?;
                     return driver.unload();
                 }
             }
@@ -651,6 +946,11 @@ impl DriverFramework for SimpleDriverFramework {
                 if driver.id() == id {
                     return Some(driver);
                 }
+||||||| 43be3a7e8
+                if driver.id() == id { return Some(driver.as_ref()); }
+                if driver.id() == id {
+                    return Some(driver.as_ref());
+                }
             }
         }
         None
@@ -661,6 +961,19 @@ impl DriverFramework for SimpleDriverFramework {
         for driver_option in self.drivers.iter() {
             if let Some(ref d) = *driver_option {
                 let d: &dyn Driver = &**d;
+                if d.driver_type() == driver_type {
+                    ids.push(d.id());
+                }
+            }
+        }
+        ids
+    }
+||||||| 43be3a7e8
+
+    fn query_by_type(&self, driver_type: DriverType) -> Vec<DriverID> {
+        let mut ids = Vec::new();
+        for driver_option in self.drivers.iter() {
+            if let Some(ref d) = *driver_option {
                 if d.driver_type() == driver_type {
                     ids.push(d.id());
                 }
@@ -863,6 +1176,15 @@ impl<T> Vec<T> {
             if self.capacity > 0 {
                 free(self.data as *mut u8);
             }
+||||||| 43be3a7e8
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -1056,6 +1378,99 @@ mod tests {
         let static_deps: &'static [DriverType] = &[DriverType::Storage];
         let network_dep = alloc::boxed::Box::new(SimpleNetworkDriver::new(100, static_deps));
         let storage = alloc::boxed::Box::new(SimpleStorageDriver::new(200));
+
+        assert!(framework.register_driver(network_dep).is_ok());
+        assert!(framework.register_driver(storage).is_ok());
+
+        // Try to load network_dep -> should fail since Storage isn't loaded/Active
+        assert_eq!(
+            framework.load_driver(100),
+            Err(DriverError::DependencyMissing)
+        );
+
+        // Load storage first
+        assert!(framework.load_driver(200).is_ok());
+
+        // Now load network_dep -> should succeed as dependencies are satisfied
+        assert!(framework.load_driver(100).is_ok());
+    }
+
+    #[test]
+    fn test_hardware_bus_classes() {
+        let pci = PciBus;
+        let usb = UsbBus;
+
+        assert_eq!(pci.name(), "PCI Bus");
+        assert_eq!(usb.name(), "USB Bus");
+
+        let pci_devices = pci.discover_devices();
+        assert_eq!(pci_devices.len(), 2);
+        assert_eq!(pci_devices[0], 0x10DE);
+
+        let usb_devices = usb.discover_devices();
+        assert_eq!(usb_devices.len(), 1);
+    }
+}
+||||||| 43be3a7e8
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_driver_framework_lifecycle_and_oop() {
+        let mut framework = SimpleDriverFramework::new();
+
+        // 1. Create drivers using Factory Pattern
+        let storage = DriverFactory::create_driver(10, DriverType::Storage);
+        let network = DriverFactory::create_driver(20, DriverType::Network);
+
+        // 2. Register both drivers
+        assert!(framework.register_driver(storage).is_ok());
+        assert!(framework.register_driver(network).is_ok());
+
+        // 3. Load first driver (Storage, has zero dependencies)
+        assert!(framework.load_driver(10).is_ok());
+        assert_eq!(
+            framework.get_driver(10).unwrap().state(),
+            DriverState::Active
+        );
+
+        // 4. Hot-swap / Unload Storage driver
+        assert!(framework.unload_driver(10).is_ok());
+        assert_eq!(
+            framework.get_driver(10).unwrap().state(),
+            DriverState::Unloaded
+        );
+    }
+
+    #[test]
+    fn test_driver_dependency_injection() {
+        let mut framework = SimpleDriverFramework::new();
+
+        // Declare a network driver that relies on Storage being Active
+        let static_deps: &'static [DriverType] = &[DriverType::Storage];
+        let network_dep = Box::new(SimpleNetworkDriver::new(100, static_deps));
+        let storage = Box::new(SimpleStorageDriver::new(200));
 
         assert!(framework.register_driver(network_dep).is_ok());
         assert!(framework.register_driver(storage).is_ok());
