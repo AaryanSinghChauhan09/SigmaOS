@@ -145,7 +145,11 @@ pub use dashboard::{
 
 pub use productivity::{
     GamifiedProductivity, Achievement, Goal, PomodoroTimer, ProductivityScore, AchievementType,
-    PomodoroState,
+    PomodoroState, CalendarApp, CalendarEvent, CalendarView, EventStatus, EventType,
+    RecurrencePattern, CodeEditor, CursorPosition, Document, Language, Selection, TextSelection,
+    NoteTakingApp, Note, ContentType, Notebook, Folder, NoteStorage, InMemoryNoteStorage,
+    EmailClient, EmailAddress, EmailMessage, EmailFolder, EmailAttachment, EmailAccountConfig,
+    ScreenshotTool, ScreenshotConfig, ScreenshotMode, ImageFormat, CaptureRegion,
 };
 
 pub use accessibility::{
