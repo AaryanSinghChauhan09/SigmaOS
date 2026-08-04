@@ -58,7 +58,7 @@ The following comprehensive registry details the native SigmaOS equivalent, arch
 | **MySQL / PostgreSQL / MariaDB / PostGIS** | `S-DATA` | Multi-threaded lock-free transactional database engine with spatial R-tree indices and ACID compliance. |
 | **Apache Cassandra / Apache CouchDB** | `S-DATA` | Decentralized LSM-tree ring database with peer-to-peer eventual consistency protocols. |
 | **Lucene / Solr / Nutch / Xapian** | `S-DATA` | Incremental inverted index text-search engine running directly over memory-mapped block ranges. |
-| **ELKI / KNIME / Orange / RapidMiner / Weka** | `S-SCIENCE` | In-memory data mining workbench compiling raw data pipelines into optimized machine code DAGs. |
+| **ELKI / KNIME / Orange / RapidMiner / Weka** | `S-SCIENCE` | In-memory data mining workbench compiling data pipelines into optimized machine code DAGs. |
 | **Scriptella ETL** | `S-SCIENCE` | Declarative safe-Rust XML-to-data stream transformer pipelines without external JVM requirements. |
 | **Jaspersoft / Paraview / VTK** | `S-SCIENCE` | Hardware-accelerated 3D vector and scientific visualization engine rendering direct simulation outputs. |
 | **Libxml2** | `S-CODEC` | Zero-copy streaming XML parser utilizing memory-safe slice reference tokenization. |
@@ -459,6 +459,32 @@ mod sovereign_tests {
     }
 }
 ```
+
+---
+
+## 🌌 SECTION VI: August 2026 Sovereign OS Roadmap Priorities
+
+To secure computational supremacy and preserve total digital independence, SigmaOS actively focuses its engineering resources on five key strategic priority areas aligned directly with the August 2026 roadmap specifications:
+
+### 1. Sovereign APM (Agent Package Manager) Sandboxing & Dependency Isolation
+*   **Design & Architecture:** The package management layers are sandboxed to prohibit package builders and runtime installers from accessing un-isolated segments of the storage volume. Dynamic dependency maps strictly enforce immutable store pathways (`/store/...`), preventing standard library dilution or un-pinning attacks.
+*   **Compliance & Reproducibility:** Every package artifact guarantees declaratively reproducible builds by hashing the entire compiler state input tree and sandboxing system call execution vectors.
+
+### 2. GPU Screen Recorder Security Hardening
+*   **Design & Architecture:** Enabling high-frequency hardware-accelerated screen recording (QuickSync/NVENC/AMF) introduces severe display-capture attack vectors if un-sandboxed. SigmaOS bridges this gap by locking framebuffer stream channels tightly behind hardware-enforced `CapabilityToken` and process-affinity gates.
+*   **Telemetry & Performance:** Developer HUD modules include non-intrusive benchmarking, monitoring frame loss metrics, and GPU clock frequency curves under high workloads.
+
+### 3. NUMA-Aware Scheduler Lock-Free Optimization
+*   **Design & Architecture:** High-throughput parallel task orchestration across multi-socket processor structures relies on non-blocking task transitions. Standard Treiber stack and Michael-Scott Queue operations are optimized to align on 64-byte boundaries, eliminating "false sharing" cache line invalidation loops.
+*   **High Scalability:** Tasks maintain hard processor socket affinity, completely decoupling cross-socket memory lock contentions during intensive computational loads.
+
+### 4. Windows NT Subsystem Legacy Workload Compatibility
+*   **Design & Architecture:** Seamlessly supports legacy enterprise software without relying on external virtualization overhead. The native NT translation layer emulates Win32 subsystem layers (`kernel32`, `user32`), processes Portable Executable (PE) headers, and maps NT system calls directly onto microkernel capability rings.
+*   **API Coverage expansion:** Steadily maps synchronization mutants, semaphores, and structured exception handling blocks natively, ensuring flawless load stability.
+
+### 5. Documentation and Compliance Expansion
+*   **Unsupported APIs Matrix:** Clearly catalogs API constraints (such as explicit blockades on proprietary snapcraft and un-isolated binary structures) to maintain system-wide digital sovereignty.
+*   **Contribution Playbook:** Sets unified debian/fedora-inspired contribution policies, enabling open-source development loops without diluting sovereign security properties.
 
 ---
 
