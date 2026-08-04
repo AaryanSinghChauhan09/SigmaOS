@@ -17,6 +17,7 @@ pub mod filesystem;
 pub mod gpu;
 pub mod kernel;
 pub mod klib;
+pub mod legal;
 pub mod ml;
 pub mod network;
 pub mod orchestration;
@@ -101,6 +102,12 @@ pub use process::{
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+};
+pub use legal::{
+    ComplianceCert as LegalComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+    GlobalStandard, ComplianceStatus as LegalComplianceStatus, RegulatoryControl, InternationalComplianceTracker,
+    LabourLawConfig, StatutoryPayrollBreakdown, LabourLawCompliance, StatutoryFiling,
+    StatutoryFilingDashboard,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,

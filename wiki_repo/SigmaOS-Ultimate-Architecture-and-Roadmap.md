@@ -38,6 +38,7 @@ SigmaOS absorbs the greatest strengths of major traditional Linux distributions 
 | **TCP Sockets & Congestion** | Stateful RFC-793 + BSD Options + Reno/BBR Congestion | Linux Sockets + Reno/BBR | Linux Sockets + Reno/BBR | Linux Sockets + Reno/BBR | Linux Sockets |
 | **Interrupts & Address Safety** | Canonical Address Check + Fault Registers + ISR Routing | Linux IDT exception handling | Linux IDT | Linux IDT | Linux IDT |
 | **Citizen & Professional Tools** | Krishi, Vyapaar, Kanoon, Chikitshak & Abhiyanta Engines | None | None | None | None |
+| **Multi-Arch IRQ Controller** | x86 APIC + ARM GIC (FIQ) + RISC-V PLIC (Supervisor) | APIC (x86) / GIC (ARM) | APIC / GIC | APIC / GIC | APIC / GIC |
 
 ---
 
@@ -308,7 +309,34 @@ To drive maximum local productivity and professional utility across civil, comme
 
 ---
 
-## 13. Modular Workflows & Community-Driven Innovation
+## 13. Sovereign Multi-Architecture Interrupt Controller & Priority Dispatcher
+
+To support heterogeneous execution targets dynamically on the microkernel level, SigmaOS implements a multi-architecture interrupt routing matrix:
+
+```
+                            Heterogeneous IRQ Routing
+
+               +-------------------------------------------+
+               |             Hardware Interrupt            |
+               +-------------------------------------------+
+                                     |
+                  +------------------+------------------+
+                  |                  |                  |
+                  v                  v                  v
+          [ Intel/AMD APIC ]    [ ARMv8 GIC ]     [ RISC-V PLIC ]
+                  |                  |                  |
+             (Send IPI           (Evaluate          (Supervisor /
+             Inter-Processor      FIQ vs IRQ         Machine Mode
+             Signaling)           Priorities)        Target routing)
+```
+
+- **x86_64 Local & I/O APIC (`Apic`)**: Implements standard Inter-Processor Interrupt (IPI) signaling (`send_ipi`) to allow symmetric multi-processing (SMP) cores to trigger pending interrupt events across remote CPU threads.
+- **ARM Generic Interrupt Controller (`Gic`)**: Implements strict priority ranking (`evaluate_priority_dispatch`) prioritizing ARM Fast Interrupt Requests (`FIQ`) over standard Interrupt Requests (`IRQ`), Supervisor traps, and Monitor traps.
+- **RISC-V Platform-Level Interrupt Controller (`Plic`)**: Tracks dynamic target privilege levels (User, Supervisor, Monitor, Machine), enabling direct routing of core-local events.
+
+---
+
+## 14. Modular Workflows & Community-Driven Innovation
 
 To maintain publisher-grade quality, the SigmaOS project employs standardized workflows for code contribution and validation.
 
