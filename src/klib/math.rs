@@ -76,7 +76,8 @@ pub fn pow(base: u32, exp: u32) -> u32 {
     result
 }
 
-/// Custom square root approximation using binary search
+/// Custom square root approximation using Newton-Raphson quadratic convergence.
+/// This replaces binary search, achieving higher accuracy in a fraction of the iterations.
 pub fn sqrt(n: f64) -> f64 {
     if n < 0.0 {
         return f64::NAN; // Handle negative numbers
@@ -85,35 +86,30 @@ pub fn sqrt(n: f64) -> f64 {
         return n;
     }
 
-    let mut low = 0.0;
-    let mut high = n;
-    let mut mid = (low + high) / 2.0;
+    // Excellent initial guess for Newton's method.
+    let mut x = if n > 1.0 { n / 2.0 } else { 1.0 };
 
-    while (mid * mid - n).abs() > 0.0001 {
-        if mid * mid > n {
-            high = mid;
-        } else {
-            low = mid;
+    // Convergence loop: limit to 50 iterations to guarantee termination.
+    // Quadratic convergence typically converges to double precision limits within 10 iterations.
+    for _ in 0..50 {
+        let next_x = 0.5 * (x + n / x);
+        let diff = next_x - x;
+        let abs_diff = if diff < 0.0 { -diff } else { diff };
+        if abs_diff < 0.00001 {
+            return next_x;
         }
-        mid = (low + high) / 2.0;
+        x = next_x;
     }
-
-    mid
+    x
 }
 
-/// Custom logarithm base 2 using bit operations
-pub fn log2(mut n: u32) -> u32 {
+/// Custom logarithm base 2 mapped to hardware leading-zeros count (CLZ).
+/// This replaces the iterative bit shift loop with a constant-time O(1) calculation.
+pub fn log2(n: u32) -> u32 {
     if n == 0 {
         return u32::MAX; // Undefined for 0
     }
-
-    let mut log = 0u32;
-    while n > 1 {
-        n >>= 1;
-        log += 1;
-    }
-
-    log
+    31 - n.leading_zeros()
 }
 
 /// Custom logarithm base 10
