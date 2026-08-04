@@ -30,10 +30,10 @@ use core::mem;
 /// Implements sigma-ai core with multi-agent coordination, workflow automation,
 /// and self-diagnosis capabilities for system optimization
 extern crate alloc;
-use alloc::vec::Vec;
+use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
@@ -182,7 +182,8 @@ impl AIAgent for SimpleAIAgent {
     }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
+        self.state
+            .store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
         for &byte in self.name.as_bytes() {
             result.push(byte);
@@ -207,6 +208,10 @@ impl AIAgent for SimpleAIAgent {
         self.state
             .store(AgentState::Idle as usize, Ordering::SeqCst);
         self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
+||||||| 165ded71c
+        self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
+        self.state
+            .store(AgentState::Idle as usize, Ordering::SeqCst);
         Ok(result)
     }
 }
@@ -286,7 +291,11 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                 Err(AgentError::NotFound)
             }
         } else {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+            if let Some(agent) = self
+                .agents
+                .iter_mut()
+                .find(|a| a.state() == AgentState::Idle)
+            {
                 agent.execute(task)
             } else {
                 Err(AgentError::NotFound)

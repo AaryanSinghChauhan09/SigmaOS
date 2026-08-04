@@ -3,14 +3,16 @@
 
 pub mod agent;
 pub mod autogen;
+pub mod lift_engine;
 pub mod llm;
 pub mod orchestrator;
 pub mod sai;
 pub mod system;
 pub mod voice;
-pub mod lift_engine;
 
-pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
+pub use lift_engine::{
+    Citation, DocumentExtractor, ExtractionResult, ExtractionSchema, FieldType, LiftError,
+};
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{

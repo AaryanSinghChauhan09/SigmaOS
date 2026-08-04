@@ -5,7 +5,10 @@ pub mod backup;
 ||||||| 43be3a7e8
 pub mod automated_fixer;
 pub mod self_healing;
+||||||| 165ded71c
+pub mod self_healing;
 pub mod backup;
+pub mod self_healing;
 
 pub use backup::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
 pub use self_healing::{

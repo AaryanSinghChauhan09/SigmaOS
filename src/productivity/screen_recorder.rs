@@ -302,8 +302,8 @@ impl RecordingBackend for GpuAcceleratedBackend {
 
         RecordingProgress {
             duration_seconds: duration,
-            frames_captured: duration * 60,          // 60 FPS under GPU speed
-            file_size_bytes: duration * 512 * 1024,  // High compression size reduction under GPU codec
+            frames_captured: duration * 60, // 60 FPS under GPU speed
+            file_size_bytes: duration * 512 * 1024, // High compression size reduction under GPU codec
             current_bitrate_mbps: 12.0,
         }
     }

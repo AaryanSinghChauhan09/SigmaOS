@@ -441,11 +441,26 @@ pub struct CliTranslator {
 impl CliTranslator {
     pub fn new() -> Self {
         let mut patterns = BTreeMap::new();
-        patterns.insert("clean up temp files".to_string(), "sigma-cleanup --temp".to_string());
-        patterns.insert("free up disk space".to_string(), "sigma-cleanup --all".to_string());
-        patterns.insert("update system packages".to_string(), "sigpkg update".to_string());
-        patterns.insert("run core diagnostic audit".to_string(), "sigma-diagnose --core".to_string());
-        patterns.insert("get kernel system status".to_string(), "sigma-systemd-analyze".to_string());
+        patterns.insert(
+            "clean up temp files".to_string(),
+            "sigma-cleanup --temp".to_string(),
+        );
+        patterns.insert(
+            "free up disk space".to_string(),
+            "sigma-cleanup --all".to_string(),
+        );
+        patterns.insert(
+            "update system packages".to_string(),
+            "sigpkg update".to_string(),
+        );
+        patterns.insert(
+            "run core diagnostic audit".to_string(),
+            "sigma-diagnose --core".to_string(),
+        );
+        patterns.insert(
+            "get kernel system status".to_string(),
+            "sigma-systemd-analyze".to_string(),
+        );
         Self { patterns }
     }
 
@@ -576,18 +591,30 @@ pub struct ErrorExplanationLayer {
 impl ErrorExplanationLayer {
     pub fn new() -> Self {
         let mut errors_map = BTreeMap::new();
-        errors_map.insert(0xD001, (
-            "GPU Initialization Failed".to_string(),
-            "Perform a SteamOS-style dynamic reset and clear the frame buffer cache.".to_string()
-        ));
-        errors_map.insert(0xD101, (
-            "Realtek NIC Initialization Failed".to_string(),
-            "Initialize pci_bus root driver first and retry modprobe reload on r8169.".to_string()
-        ));
-        errors_map.insert(0xD301, (
-            "NVMe Driver Probe Failure".to_string(),
-            "Switch the system to standard AHCI/SATA compatibility mode and retry boot.".to_string()
-        ));
+        errors_map.insert(
+            0xD001,
+            (
+                "GPU Initialization Failed".to_string(),
+                "Perform a SteamOS-style dynamic reset and clear the frame buffer cache."
+                    .to_string(),
+            ),
+        );
+        errors_map.insert(
+            0xD101,
+            (
+                "Realtek NIC Initialization Failed".to_string(),
+                "Initialize pci_bus root driver first and retry modprobe reload on r8169."
+                    .to_string(),
+            ),
+        );
+        errors_map.insert(
+            0xD301,
+            (
+                "NVMe Driver Probe Failure".to_string(),
+                "Switch the system to standard AHCI/SATA compatibility mode and retry boot."
+                    .to_string(),
+            ),
+        );
         Self { errors_map }
     }
 

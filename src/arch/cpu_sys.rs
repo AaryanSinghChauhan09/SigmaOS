@@ -49,7 +49,7 @@ pub struct ProcessorInitSuite {
     pub gdt: Vec<GdtDescriptor>,
     pub idt: HashMap<u8, IdtGate>,
     pub memory_regions: Vec<VirtualMemoryRegion>,
-    pub cr0_wp_enabled: bool,  // Write Protect (prevents kernel writing to read-only pages)
+    pub cr0_wp_enabled: bool, // Write Protect (prevents kernel writing to read-only pages)
     pub cr4_smep_enabled: bool, // Supervisor Mode Execution Prevention (prevents executing user code in ring 0)
     pub cr4_smap_enabled: bool, // Supervisor Mode Access Prevention (prevents accessing user data in ring 0)
     pub ia32_efer_nxe_enabled: bool, // No-Execute Enable (NX page validation)
@@ -141,7 +141,13 @@ impl ProcessorInitSuite {
     }
 
     /// Configures the IDT with standard exception and hardware interrupt gates
-    pub fn register_idt_gate(&mut self, interrupt_num: u8, handler: usize, gate_type: u8, privilege: u8) {
+    pub fn register_idt_gate(
+        &mut self,
+        interrupt_num: u8,
+        handler: usize,
+        gate_type: u8,
+        privilege: u8,
+    ) {
         let gate = IdtGate {
             handler_address: handler,
             selector: 0x08, // Kernel code segment selector
@@ -184,7 +190,12 @@ impl FastSyscallDispatcher {
     }
 
     /// Handles fast system calls without the interrupt overhead of INT 0x80 (FreeBSD/Linux style)
-    pub fn dispatch_syscall(&mut self, rax_syscall_num: u64, rdi_arg1: u64, rsi_arg2: u64) -> Result<u64, &'static str> {
+    pub fn dispatch_syscall(
+        &mut self,
+        rax_syscall_num: u64,
+        rdi_arg1: u64,
+        rsi_arg2: u64,
+    ) -> Result<u64, &'static str> {
         self.call_count += 1;
         match rax_syscall_num {
             1 => {

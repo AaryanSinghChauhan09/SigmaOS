@@ -6,6 +6,8 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
 
+||||||| 165ded71c
+use core::mem;
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
@@ -15,8 +17,9 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+||||||| 165ded71c
+
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -30,6 +33,12 @@ pub enum Protocol { TCP = 0, UDP = 1 }
 pub enum Protocol { TCP = 0, UDP = 1 }
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Protocol {
+    TCP = 0,
+    UDP = 1,
+}
+||||||| 165ded71c
+pub enum Protocol { TCP = 0, UDP = 1 }
 pub enum Protocol {
     TCP = 0,
     UDP = 1,
@@ -563,7 +572,14 @@ impl NetfilterFirewall {
         self.rules.push(rule);
     }
 
-    pub fn match_packet(&self, chain: NetfilterChain, src: [u8; 4], dest: [u8; 4], proto: Protocol, port: Port) -> NetfilterAction {
+    pub fn match_packet(
+        &self,
+        chain: NetfilterChain,
+        src: [u8; 4],
+        dest: [u8; 4],
+        proto: Protocol,
+        port: Port,
+    ) -> NetfilterAction {
         for rule in &self.rules {
             if rule.chain == chain
                 && (rule.source_ip == [0, 0, 0, 0] || rule.source_ip == src)
@@ -637,7 +653,9 @@ impl Default for RoutingTable {
 
 impl RoutingTable {
     pub fn new() -> Self {
-        RoutingTable { entries: Vec::new() }
+        RoutingTable {
+            entries: Vec::new(),
+        }
     }
 
     pub fn add_route(&mut self, entry: RoutingEntry) {
@@ -652,7 +670,9 @@ impl RoutingTable {
             let mut matches = true;
             let mut mask_ones = 0;
             for i in 0..4 {
-                if (dest_ip[i] & entry.subnet_mask[i]) != (entry.dest_network[i] & entry.subnet_mask[i]) {
+                if (dest_ip[i] & entry.subnet_mask[i])
+                    != (entry.dest_network[i] & entry.subnet_mask[i])
+                {
                     matches = false;
                     break;
                 }
@@ -719,7 +739,12 @@ impl EpollInstance {
         }
     }
 
-    pub fn ctl(&mut self, op: EpollOp, fd: SocketID, event: EpollEvent) -> Result<(), NetworkError> {
+    pub fn ctl(
+        &mut self,
+        op: EpollOp,
+        fd: SocketID,
+        event: EpollEvent,
+    ) -> Result<(), NetworkError> {
         match op {
             EpollOp::Add => {
                 self.watched_sockets.push((fd, event));
@@ -840,12 +865,27 @@ struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 #[cfg(test)]
 mod tests {
     use super::*;
+||||||| 165ded71c
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -881,13 +921,25 @@ impl<T> Vec<T> {
         assert!(socket.close().is_ok());
         assert_eq!(socket.get_state(), TCPState::Closed);
     }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
+        VecIter {
+            vec: self,
+            index: 0,
+        }
     }
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
     pub fn remove(&mut self, index: usize) -> T {
         unsafe {
@@ -899,14 +951,21 @@ impl<T> Vec<T> {
             item
         }
     }
-    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
+    pub fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
         let mut write_idx = 0;
         for i in 0..self.len {
             unsafe {
                 let item = &*self.data.add(i);
                 if f(item) {
                     if write_idx != i {
-                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
+                        core::ptr::copy_nonoverlapping(
+                            self.data.add(i),
+                            self.data.add(write_idx),
+                            1,
+                        );
                     }
                     write_idx += 1;
                 }
@@ -915,11 +974,19 @@ impl<T> Vec<T> {
         self.len = write_idx;
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -1025,7 +1092,6 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -1056,7 +1122,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
         self.deref().iter()
     }
 }
-
 
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;

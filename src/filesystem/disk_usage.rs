@@ -358,8 +358,8 @@ impl Default for SovereignDfEngine {
             filesystem: "/dev/sda1".to_string(),
             fs_type: "SigmaFS".to_string(),
             total_bytes: 100 * 1024 * 1024 * 1024, // 100GB
-            used_bytes: 40 * 1024 * 1024 * 1024,  // 40GB
-            free_bytes: 60 * 1024 * 1024 * 1024,  // 60GB
+            used_bytes: 40 * 1024 * 1024 * 1024,   // 40GB
+            free_bytes: 60 * 1024 * 1024 * 1024,   // 60GB
             use_percent: 40.0,
             total_inodes: 10_000_000,
             used_inodes: 1_200_000,
@@ -371,8 +371,8 @@ impl Default for SovereignDfEngine {
             filesystem: "tmpfs".to_string(),
             fs_type: "tmpfs".to_string(),
             total_bytes: 8 * 1024 * 1024 * 1024, // 8GB
-            used_bytes: 512 * 1024 * 1024,      // 512MB
-            free_bytes: 75 * 1024 * 1024 * 1024,  // remaining
+            used_bytes: 512 * 1024 * 1024,       // 512MB
+            free_bytes: 75 * 1024 * 1024 * 1024, // remaining
             use_percent: 6.25,
             total_inodes: 500_000,
             used_inodes: 5_000,
@@ -483,7 +483,11 @@ impl SovereignParted {
     }
 
     /// Resize an existing partition's end sector offline
-    pub fn resize_partition(&mut self, index: u32, new_end_sector: u64) -> Result<(), &'static str> {
+    pub fn resize_partition(
+        &mut self,
+        index: u32,
+        new_end_sector: u64,
+    ) -> Result<(), &'static str> {
         let mut target_idx = None;
         for (i, part) in self.partitions.iter().enumerate() {
             if part.index == index {
@@ -514,7 +518,12 @@ impl SovereignParted {
     }
 
     /// Set advanced Linux distro/GNU Parted flags (e.g. boot, lvm, esp, raid) on a partition
-    pub fn set_partition_flag(&mut self, index: u32, flag: &str, value: bool) -> Result<(), &'static str> {
+    pub fn set_partition_flag(
+        &mut self,
+        index: u32,
+        flag: &str,
+        value: bool,
+    ) -> Result<(), &'static str> {
         for part in &mut self.partitions {
             if part.index == index {
                 match flag {

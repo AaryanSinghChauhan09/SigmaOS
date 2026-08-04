@@ -10,12 +10,15 @@ use alloc::vec::Vec;
 #![no_main]
 #![no_std]
 
+use core::mem;
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+
+||||||| 165ded71c
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -25,6 +28,15 @@ pub type CertificateID = usize;
 #[derive(Debug, Clone, Copy)]
 pub enum CertificateType { Root = 0, Intermediate = 1, EndEntity = 2 }
 ||||||| 43be3a7e8
+||||||| 165ded71c
+pub enum CertificateType { Root = 0, Intermediate = 1, EndEntity = 2 }
+
+pub enum CertificateType {
+    Root = 0,
+    Intermediate = 1,
+    EndEntity = 2,
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum CertificateType { Root = 0, Intermediate = 1, EndEntity = 2 }
@@ -38,6 +50,14 @@ pub enum CertificateType {
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PKIError {
+    Success = 0,
+    NotFound = 1,
+    InvalidCertificate = 2,
+    VerificationFailed = 3,
+}
+||||||| 165ded71c
+pub enum PKIError { Success = 0, NotFound = 1, InvalidCertificate = 2, VerificationFailed = 3 }
 pub enum PKIError {
     Success = 0,
     NotFound = 1,
@@ -184,6 +204,11 @@ impl PKIManager for SimplePKIManager {
                 if cert.id() == id { return Some(cert.as_ref()); }
         for cert_option in &self.certificates {
             if let Some(ref cert) = *cert_option {
+                if cert.id() == id {
+                    return Some(cert.as_ref());
+                }
+||||||| 165ded71c
+                if cert.id() == id { return Some(cert.as_ref()); }
                 if cert.id() == id {
                     return Some(cert.as_ref());
                 }

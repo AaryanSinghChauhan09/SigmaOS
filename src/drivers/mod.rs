@@ -1,5 +1,9 @@
 // SigmaOS Drivers Module
 pub mod ancient_devices;
+pub mod boot_init;
+pub mod dde;
+pub mod even_more_devices;
+pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
 pub mod legacy_keyboard;
@@ -22,6 +26,11 @@ pub mod peripheral;
 pub mod legacy_keyboard;
 pub mod modern_usb;
 ||||||| 0ddf2eac7
+pub mod boot_init;
+pub mod dde;
+pub mod even_more_devices;
+pub mod flipper_gpio_sensor;
+||||||| 165ded71c
 pub mod boot_init;
 pub mod dde;
 pub mod even_more_devices;

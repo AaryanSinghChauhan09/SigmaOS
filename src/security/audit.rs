@@ -2,6 +2,8 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
@@ -17,11 +19,18 @@ use alloc::vec::Vec;
 use alloc::boxed::Box;
 ||||||| 43be3a7e8
 use core::mem;
+||||||| 165ded71c
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 pub type EventID = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogFormat { Json, Text, Binary }
+pub enum LogFormat {
+    Json,
+    Text,
+    Binary,
+}
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -329,3 +338,5 @@ mod tests {
         assert!(!policy.check_compliance(&sys_event));
     }
 }
+||||||| 165ded71c
+

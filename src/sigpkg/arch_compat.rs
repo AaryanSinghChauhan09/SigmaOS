@@ -19,12 +19,12 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
-use std::collections::HashMap;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
-use alloc::format;
+use std::collections::HashMap;
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
@@ -206,7 +206,11 @@ impl AurHelper {
     }
 
     /// Simulates downloading, dependency-resolving, and compiling from the AUR
-    pub fn search_and_install_aur(&self, pkgname: &str, _sync_manager: &RollingSyncManager) -> Result<Package, &'static str> {
+    pub fn search_and_install_aur(
+        &self,
+        pkgname: &str,
+        _sync_manager: &RollingSyncManager,
+    ) -> Result<Package, &'static str> {
         // Mock PKGBUILD recipes database mapping for standard AUR requests
         let pkgbuild = match pkgname {
             "yay" => {
@@ -249,11 +253,19 @@ impl AbsPortsManager {
     }
 
     pub fn register_port(&mut self, name: &str, pkgbuild_content: &str) {
-        self.ports.insert(name.to_string(), pkgbuild_content.to_string());
+        self.ports
+            .insert(name.to_string(), pkgbuild_content.to_string());
     }
 
-    pub fn compile_port(&self, name: &str, compiler: &AurRecipeCompiler) -> Result<Package, &'static str> {
-        let pkgbuild = self.ports.get(name).ok_or("Target port not found in ABS ports tree")?;
+    pub fn compile_port(
+        &self,
+        name: &str,
+        compiler: &AurRecipeCompiler,
+    ) -> Result<Package, &'static str> {
+        let pkgbuild = self
+            .ports
+            .get(name)
+            .ok_or("Target port not found in ABS ports tree")?;
         compiler.compile_pkgbuild(pkgbuild.as_str())
     }
 }

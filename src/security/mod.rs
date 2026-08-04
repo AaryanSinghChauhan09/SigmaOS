@@ -6,10 +6,14 @@ pub mod capability_enforcer;
 pub mod capability_token;
 pub mod cleaner;
 pub mod clipboard;
+pub mod clipboard;
 pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
+pub mod intrusion;
 pub mod mac;
+pub mod parrot_linux;
+pub mod password;
 pub mod password;
 pub mod phantom;
 pub mod pki;
@@ -25,6 +29,7 @@ pub mod pledge;
 pub mod qubes_isolation;
 pub mod scanner;
 pub mod secrets;
+pub mod selinux;
 pub mod selinux;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
@@ -46,31 +51,30 @@ pub mod intrusion;
 pub mod password;
 pub mod parrot_linux;
 pub mod selinux;
+||||||| 165ded71c
+pub mod clipboard;
+pub mod intrusion;
+pub mod password;
+pub mod parrot_linux;
+pub mod selinux;
 
-pub use parrot_linux::{
-    AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
-    KaliSniffer, PentestAssistant, SecureWipeTool, IntrusionSeverity, IntrusionAlert, SigmaIDS,
-};
-pub use selinux::{
-    SecurityPolicy, SecurityLabel, SecurityRule, SecurityContext, SelinuxPermission, ObjectType,
-    AppArmorProfile, AppArmorManager, AccessVectorCache, SelinuxBoolean, TypeTransitionRule,
-};
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use capability_token::{PORT_ALLOW_SSL, PORT_ALLOW_TCP};
 pub use capability_enforcer::SecurityEnforcer;
-pub use qubes_isolation::{DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError};
-pub use sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter as SigmaSyscallFilter};
-pub use sigma_unveil::{UnveilPermissions, UnveilEntry, UnveilState, UnveilManager};
-pub use cleaner::{SecureCleaner, TorAnonymityGate, AmnesiaManager, MetadataScrubber};
-pub use forensics::{ForensicAnalyzer, ExtractedMetadata, RecoveredFile};
+pub use capability_token::{PORT_ALLOW_SSL, PORT_ALLOW_TCP};
+pub use cleaner::{AmnesiaManager, MetadataScrubber, SecureCleaner, TorAnonymityGate};
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel, XorEncryption,
 };
+pub use forensics::{ExtractedMetadata, ForensicAnalyzer, RecoveredFile};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
+};
+pub use parrot_linux::{
+    AnonsurfEngine, AnonymityMode, ForensicsAuditTool, IntrusionAlert, IntrusionSeverity,
+    KaliSniffer, PentestAssistant, RecoveredFile, SecureWipeTool, SigmaIDS, SniffedPacket,
 };
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
@@ -88,6 +92,18 @@ pub use parrot::{
 ||||||| 43be3a7e8
 pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use qubes_isolation::{
+    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+};
+pub use selinux::{
+    AccessVectorCache, AppArmorManager, AppArmorProfile, ObjectType, SecurityContext,
+    SecurityLabel, SecurityPolicy, SecurityRule, SelinuxBoolean, SelinuxPermission,
+    TypeTransitionRule,
+};
+pub use sigma_pledge::{
+    PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter as SigmaSyscallFilter,
+};
+pub use sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
@@ -107,16 +123,18 @@ pub use integrity::{
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACEngine, MACPolicy,
     MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
-    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel, SimpleMACEngine,
+    SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
+    SimpleMACEngine,
 };
 // PKI: export actual types
 pub use pki::{
-    Certificate, PKIManager, PKIError, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
+    Certificate, PKIError, PKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager,
+    CRL as CrlTrait,
 };
 // Secrets: export actual types
 pub use secrets::{
-    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SecretType,
-    SimpleKeyring, SimpleSecret, SecretManager, SecretStorage,
+    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SecretManager,
+    SecretStorage, SecretType, SimpleKeyring, SimpleSecret,
 };
 // Vulnerability: export actual types
 pub use vulnerability::{
