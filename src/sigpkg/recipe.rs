@@ -3,7 +3,7 @@
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use crate::sigpkg::{Dependency, Version, VersionConstraint};
 
 /// Build system type

@@ -19,7 +19,7 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
