@@ -1,602 +1,814 @@
     Checking sigmaos v0.1.0 (/app)
 error: visibility `pub` is not followed by an item
-   --> src/shell/command.rs:745:1
+   --> src/shell/command.rs:718:1
     |
-745 | pub #[cfg(target_os = "none")]
+718 | pub #[cfg(target_os = "none")]
     | ^^^ the visibility
     |
     = help: you likely meant to define an item, e.g., `pub fn foo() {}`
 
 error: expected item after attributes
-   --> src/shell/command.rs:744:1
+   --> src/shell/command.rs:717:1
     |
-744 | #[derive(Debug, Clone, PartialEq, Eq)]
+717 | #[derive(Debug, Clone, PartialEq, Eq)]
     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error[E0428]: the name `Driver` is defined multiple times
-  --> src/driver/framework.rs:70:1
-   |
-50 | pub trait Driver {
-   | ---------------- previous definition of the trait `Driver` here
-...
-70 | pub trait Driver {
-   | ^^^^^^^^^^^^^^^^ `Driver` redefined here
-   |
-   = note: `Driver` must be defined only once in the type namespace of this module
+error: an inner attribute is not permitted in this context
+ --> src/shell/sigma_sh.rs:6:1
+  |
+6 | #![no_std]
+  | ^^^^^^^^^^
+  |
+  = note: inner attributes, like `#![no_std]`, annotate the item enclosing them, and are usually found at the beginning of source files
+  = note: outer attributes, like `#[test]`, annotate the item following them
 
-error[E0428]: the name `Entry` is defined multiple times
-   --> src/klib/hashmap.rs:488:1
+error: an inner attribute is not permitted in this context
+ --> src/shell/sigma_sh.rs:7:1
+  |
+7 | #![no_main]
+  | ^^^^^^^^^^^
+  |
+  = note: inner attributes, like `#![no_std]`, annotate the item enclosing them, and are usually found at the beginning of source files
+  = note: outer attributes, like `#[test]`, annotate the item following them
+
+error[E0428]: the name `accessibility_gamification` is defined multiple times
+  --> src/dashboard/mod.rs:24:1
+   |
+20 | pub mod accessibility_gamification;
+   | ----------------------------------- previous definition of the module `accessibility_gamification` here
+...
+24 | pub mod accessibility_gamification;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `accessibility_gamification` redefined here
+   |
+   = note: `accessibility_gamification` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `GamifiedProductivityTracker` is defined multiple times
+  --> src/dashboard/mod.rs:39:48
+   |
+27 |     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+   |                                        --------------------------- previous import of the type `GamifiedProductivityTracker` here
+...
+39 |     ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
+   |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^-
+   |                                                |
+   |                                                `GamifiedProductivityTracker` reimported here
+   |                                                help: remove unnecessary import
+   |
+   = note: `GamifiedProductivityTracker` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `ColorFilter` is defined multiple times
+  --> src/dashboard/mod.rs:39:5
+   |
+27 |     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+   |                           ----------- previous import of the type `ColorFilter` here
+...
+39 |     ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
+   |     ^^^^^^^^^^^--
+   |     |
+   |     `ColorFilter` reimported here
+   |     help: remove unnecessary import
+   |
+   = note: `ColorFilter` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `AccessibilityOverlay` is defined multiple times
+  --> src/dashboard/mod.rs:39:18
+   |
+27 |     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+   |     -------------------- previous import of the type `AccessibilityOverlay` here
+...
+39 |     ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
+   |                  ^^^^^^^^^^^^^^^^^^^^--
+   |                  |
+   |                  `AccessibilityOverlay` reimported here
+   |                  help: remove unnecessary import
+   |
+   = note: `AccessibilityOverlay` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `Trophy` is defined multiple times
+  --> src/dashboard/mod.rs:39:40
+   |
+27 |     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+   |                                                                     ------ previous import of the type `Trophy` here
+...
+39 |     ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
+   |                                        ^^^^^^--
+   |                                        |
+   |                                        `Trophy` reimported here
+   |                                        help: remove unnecessary import
+   |
+   = note: `Trophy` must be defined only once in the type namespace of this module
+
+error: associated function in `impl` without body
+   --> src/shell/sigma_sh.rs:322:5
     |
-275 | pub enum Entry<'a, K, V> {
-    | ------------------------ previous definition of the type `Entry` here
-...
-488 | pub enum Entry<'a, K, V> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^ `Entry` redefined here
-    |
-    = note: `Entry` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `OccupiedEntry` is defined multiple times
-   --> src/klib/hashmap.rs:493:1
-    |
-280 | pub struct OccupiedEntry<'a, K, V> {
-    | ---------------------------------- previous definition of the type `OccupiedEntry` here
-...
-493 | pub struct OccupiedEntry<'a, K, V> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `OccupiedEntry` redefined here
-    |
-    = note: `OccupiedEntry` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `VacantEntry` is defined multiple times
-   --> src/klib/hashmap.rs:498:1
-    |
-286 | pub struct VacantEntry<'a, K, V> {
-    | -------------------------------- previous definition of the type `VacantEntry` here
-...
-498 | pub struct VacantEntry<'a, K, V> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `VacantEntry` redefined here
-    |
-    = note: `VacantEntry` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `paging` is defined multiple times
-  --> src/klib/mod.rs:26:1
-   |
-22 | pub mod paging;
-   | --------------- previous definition of the module `paging` here
-...
-26 | pub mod paging;
-   | ^^^^^^^^^^^^^^^ `paging` redefined here
-   |
-   = note: `paging` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `string` is defined multiple times
-  --> src/klib/mod.rs:32:1
-   |
-27 | pub mod string;
-   | --------------- previous definition of the module `string` here
-...
-32 | pub mod string;
-   | ^^^^^^^^^^^^^^^ `string` redefined here
-   |
-   = note: `string` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `time` is defined multiple times
-  --> src/klib/mod.rs:34:1
-   |
-28 | pub mod time;
-   | ------------- previous definition of the module `time` here
-...
-34 | pub mod time;
-   | ^^^^^^^^^^^^^ `time` redefined here
-   |
-   = note: `time` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `math` is defined multiple times
-  --> src/klib/mod.rs:35:1
-   |
-25 | pub mod math;
-   | ------------- previous definition of the module `math` here
-...
-35 | pub mod math;
-   | ^^^^^^^^^^^^^ `math` redefined here
-   |
-   = note: `math` must be defined only once in the type namespace of this module
-
-error[E0428]: the name `uuid` is defined multiple times
-  --> src/klib/mod.rs:36:1
-   |
-29 | pub mod uuid;
-   | ------------- previous definition of the module `uuid` here
-...
-36 | pub mod uuid;
-   | ^^^^^^^^^^^^^ `uuid` redefined here
-   |
-   = note: `uuid` must be defined only once in the type namespace of this module
-
-error[E0252]: the name `PledgeManager` is defined multiple times
-  --> src/security/mod.rs:36:41
-   |
-27 | pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-   |                               ------------- previous import of the type `PledgeManager` here
-...
-36 | pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-   |                                         ^^^^^^^^^^^^^--
-   |                                         |
-   |                                         `PledgeManager` reimported here
-   |                                         help: remove unnecessary import
-   |
-   = note: `PledgeManager` must be defined only once in the type namespace of this module
-
-error[E0252]: the name `Vec` is defined multiple times
-  --> src/driver/framework.rs:27:5
-   |
-19 | use crate::klib::Vec;
-   |     ---------------- previous import of the type `Vec` here
-...
-27 | use crate::klib::Vec;
-   |     ^^^^^^^^^^^^^^^^ `Vec` reimported here
-   |
-   = note: `Vec` must be defined only once in the type namespace of this module
-
-error[E0252]: the name `PledgeError` is defined multiple times
-  --> src/security/mod.rs:36:28
-   |
-27 | pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-   |                  ----------- previous import of the type `PledgeError` here
-...
-36 | pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-   |                            ^^^^^^^^^^^--
-   |                            |
-   |                            `PledgeError` reimported here
-   |                            help: remove unnecessary import
-   |
-   = note: `PledgeError` must be defined only once in the type namespace of this module
-
-error[E0252]: the name `PledgePromise` is defined multiple times
-  --> src/security/mod.rs:36:56
-   |
-27 | pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-   |                                              ------------- previous import of the type `PledgePromise` here
-...
-36 | pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-   |                                                        ^^^^^^^^^^^^^ `PledgePromise` reimported here
-   |
-   = note: `PledgePromise` must be defined only once in the type namespace of this module
-
-error[E0432]: unresolved import `parrot_kali`
-  --> src/security/mod.rs:32:9
-   |
-32 | pub use parrot_kali::{
-   |         ^^^^^^^^^^^ use of unresolved module or unlinked crate `parrot_kali`
-   |
-help: to make use of source file src/security/parrot_kali.rs, use `mod parrot_kali` in this file to declare the module
-  --> src/lib.rs:6:1
-   |
- 6 + mod parrot_kali;
-   |
-
-error[E0432]: unresolved import `qubes_isolation`
-  --> src/security/mod.rs:37:9
-   |
-37 | pub use qubes_isolation::{
-   |         ^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `qubes_isolation`
-   |
-help: to make use of source file src/security/qubes_isolation.rs, use `mod qubes_isolation` in this file to declare the module
-  --> src/lib.rs:6:1
-   |
- 6 + mod qubes_isolation;
-   |
-
-error[E0432]: unresolved import `selinux`
-  --> src/security/mod.rs:40:9
-   |
-40 | pub use selinux::{
-   |         ^^^^^^^ use of unresolved module or unlinked crate `selinux`
-   |
-help: to make use of source file src/security/selinux.rs, use `mod selinux` in this file to declare the module
-  --> src/lib.rs:6:1
-   |
- 6 + mod selinux;
-   |
-
-error[E0432]: unresolved imports `ai::AIAgent`, `ai::AIAgentManager`, `ai::AIError`, `ai::AIStats`, `ai::AgentCapability`, `ai::AgentInfo`, `ai::ApmDependency`, `ai::ApmLockfile`, `ai::ApmManifest`, `ai::ApmPolicy`, `ai::ApmStatus`, `ai::DependencySource`, `ai::Intent`, `ai::IntentType`, `ai::ManagerCapability`, `ai::McpServer`, `ai::Pattern`, `ai::SimpleAIAgent`, `ai::SimpleAIAgentManager`, `ai::SovereignApmEngine`, `ai::SovereignWikiEngine`, `ai::WikiArticle`
-  --> src/lib.rs:45:5
-   |
-45 |     AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, ApmDependency,
-   |     ^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^  ^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^^^^ no `ApmDependency` in `ai`
-   |     |        |               |        |        |                |
-   |     |        |               |        |        |                no `AgentInfo` in `ai`
-   |     |        |               |        |        no `AgentCapability` in `ai`
-   |     |        |               |        no `AIStats` in `ai`
-   |     |        |               no `AIError` in `ai`
-   |     |        no `AIAgentManager` in `ai`
-   |     no `AIAgent` in `ai`
-46 |     ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, Intent, IntentType,
-   |     ^^^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^  ^^^^^^^^^^
-   |     |            |            |
-   |     |            |            no `ApmPolicy` in `ai`
-   |     |            no `ApmManifest` in `ai`
-   |     no `ApmLockfile` in `ai`
-47 |     ManagerCapability as AiManagerCapability, McpServer, Pattern, SimpleAIAgent,
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^  ^^^^^^^^^^^^^
-48 |     SimpleAIAgentManager, SovereignApmEngine, SovereignWikiEngine, WikiArticle,
-   |     ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^
-
-error[E0432]: unresolved imports `compatibility::FhsConventionStatus`, `compatibility::LegacyDriverAdapter`, `compatibility::LegacyFSAdapter`, `compatibility::LegacyKernelAdapter`, `compatibility::LegacyPackageAdapter`, `compatibility::LegacyProtocolAdapter`, `compatibility::LegacySecurityAdapter`, `compatibility::LegacyUIAdapter`, `compatibility::LsbProfile`, `compatibility::PosixComplianceLevel`, `compatibility::StandardsComplianceManager`
-  --> src/lib.rs:61:23
-   |
-61 |     EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh,
-   |                       ^^^^^^^^^^^^^^^^^^^ no `FhsConventionStatus` in `compatibility`
-...
-64 |     LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-   |     ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^ no `LegacyPackageAdapter` in `compatibility`
-   |     |                    |                |
-   |     |                    |                no `LegacyKernelAdapter` in `compatibility`
-   |     |                    no `LegacyFSAdapter` in `compatibility`
-   |     no `LegacyDriverAdapter` in `compatibility`
-65 |     LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LizardInstaller, LsbProfile,
-   |     ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^                   ^^^^^^^^^^ no `LsbProfile` in `compatibility`
-   |     |                      |                      |
-   |     |                      |                      no `LegacyUIAdapter` in `compatibility`
-   |     |                      no `LegacySecurityAdapter` in `compatibility`
-   |     no `LegacyProtocolAdapter` in `compatibility`
-...
-68 |     PantheonGalaWindowManager, PeripheralArchiveMesh, PopShellTiling, PosixComplianceLevel,
-   |                                                                       ^^^^^^^^^^^^^^^^^^^^ no `PosixComplianceLevel` in `compatibility`
-69 |     ProcessAlmanacHub, RhinoPkgUnified, SELinuxConstellation, SecurityConstellation,
-70 |     SnapcraftRuntime, StandardsComplianceManager, StarlingCompositor, StarlingTilingEngine,
-   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = help: consider importing this enum instead:
-           crate::compatibility::standards::FhsConventionStatus
-   = help: consider importing this enum instead:
-           crate::compatibility::standards::LsbProfile
-   = help: consider importing this enum instead:
-           crate::compatibility::standards::PosixComplianceLevel
-help: a similar name exists in the module
-   |
-64 -     LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-64 +     LegacyDriverAdapter, legacy_adapters, LegacyKernelAdapter, LegacyPackageAdapter,
-   |
-help: a similar name exists in the module
-   |
-65 -     LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LizardInstaller, LsbProfile,
-65 +     LegacyProtocolAdapter, LegacySecurityAdapter, legacy_adapters, LizardInstaller, LsbProfile,
-   |
-
-error[E0432]: unresolved import `container`
-  --> src/lib.rs:77:9
-   |
-77 | pub use container::{
-   |         ^^^^^^^^^ use of unresolved module or unlinked crate `container`
-   |
-help: to make use of source file src/container/mod.rs, use `mod container` in this file to declare the module
-   |
- 6 + mod container;
-   |
+322 |     fn get_last(&self) -> Option<&[u8]>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^-
+    |                                        |
+    |                                        help: provide a definition for the function: `{ <body> }`
 
 error[E0432]: unresolved import `kernel::SchedulerError`
-  --> src/lib.rs:99:69
+  --> src/lib.rs:78:69
    |
-99 | ...Scheduler, SchedulerError, PAGE_SIZE,
+78 | ...Scheduler, SchedulerError, PAGE_SIZE,
    |               ^^^^^^^^^^^^^^ no `SchedulerError` in `kernel`
    |
-   = help: consider importing one of these items instead:
+   = help: consider importing this enum instead:
            crate::kernel::roundrobin::SchedulerError
-           crate::klib::error::KernelError::SchedulerError
 
 error[E0432]: unresolved import `crate::driver::device::DdeDeviceWrapper`
-  --> src/compatibility/historic_linux.rs:19:5
-   |
-19 | use crate::driver::device::DdeDeviceWrapper;
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `DdeDeviceWrapper` in `driver::device`
+ --> src/compatibility/historic_linux.rs:1:5
+  |
+1 | use crate::driver::device::DdeDeviceWrapper;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `DdeDeviceWrapper` in `driver::device`
 
-error[E0432]: unresolved imports `mint_linux::MintUpdateLevel`, `mint_linux::MintUpdatePackage`, `mint_linux::MintAppMetadata`, `mint_linux::MintSoftwareManager`, `mint_linux::MintReportAlertSeverity`, `mint_linux::MintReportAlert`, `mint_linux::MintReportSystem`
-  --> src/compatibility/mod.rs:61:5
+error[E0432]: unresolved imports `tcp_udp::FirewallTarget`, `tcp_udp::FirewallChain`, `tcp_udp::ConntrackState`, `tcp_udp::FirewallRule`
+  --> src/network/mod.rs:14:5
    |
-61 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-   |     ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^ no `MintUpdatePackage` in `compatibility::mint_linux`
-   |     |
-   |     no `MintUpdateLevel` in `compatibility::mint_linux`
-62 |     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
-   |     ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^ no `MintReportAlert` in `compatibility::mint_linux`
-   |     |                |                    |
-   |     |                |                    no `MintReportAlertSeverity` in `compatibility::mint_linux`
-   |     |                no `MintSoftwareManager` in `compatibility::mint_linux`
-   |     no `MintAppMetadata` in `compatibility::mint_linux`
-63 |     MintReportSystem,
-   |     ^^^^^^^^^^^^^^^^ no `MintReportSystem` in `compatibility::mint_linux`
-   |
-help: a similar name exists in the module
-   |
-61 -     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-61 +     MintUpdateItem, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-   |
-help: a similar name exists in the module
-   |
-61 -     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-61 +     MintUpdateLevel, MintUpdateManager, MintUpdateManager, MintBackupTool,
-   |
-help: a similar name exists in the module
-   |
-62 -     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
-62 +     MintAppMetadata, MintUpdateManager, MintReportAlertSeverity, MintReportAlert,
-   |
-
-error[E0432]: unresolved imports `historic_linux::PicKeyboardController`, `historic_linux::ProtectedModeSwitchSimulator`, `historic_linux::VgaTextModeDriverSimulator`
-  --> src/compatibility/mod.rs:89:63
-   |
-89 |     LinuxEra, MicroService, MicroServiceState, NetworkBridge, PicKeyboardController,
-   |                                                               ^^^^^^^^^^^^^^^^^^^^^ no `PicKeyboardController` in `compatibility::historic_linux`
-90 |     ProtectedModeSwitchSimulator, StorageBridge, SyscallAbi, TribeInstaller,
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `ProtectedModeSwitchSimulator` in `compatibility::historic_linux`
-91 |     VgaTextModeDriverSimulator, VintageDriverTranslator, VintagePackageConverter,
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^ no `VgaTextModeDriverSimulator` in `compatibility::historic_linux`
-
-error[E0432]: unresolved import `support::SymlinkResolverRule`
-  --> src/filesystem/mod.rs:44:80
-   |
-44 | ...ger, SmartSymlink, SymlinkResolverRule,
-   |                       ^^^^^^^^^^^^^^^^^^^ no `SymlinkResolverRule` in `filesystem::support`
+14 |     FirewallTarget, FirewallChain, ConntrackState, FirewallRule, Firewal...
+   |     ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+   |     |               |              |               |
+   |     |               |              |               no `FirewallRule` in `network::tcp_udp`
+   |     |               |              |               help: a similar name exists in the module: `Firewall`
+   |     |               |              no `ConntrackState` in `network::tcp_udp`
+   |     |               no `FirewallChain` in `network::tcp_udp`
+   |     no `FirewallTarget` in `network::tcp_udp`
 
 error[E0433]: failed to resolve: use of unresolved module or unlinked crate `alloc`
-  --> src/security/vulnerability.rs:24:5
+  --> src/sigpkg/arch_compat.rs:24:5
    |
-24 | use alloc::boxed::Box;
+24 | use alloc::string::String;
    |     ^^^^^ use of unresolved module or unlinked crate `alloc`
    |
    = help: add `extern crate alloc` to use the `alloc` crate
 
-error[E0432]: unresolved imports `store::SoftwareRegistryEntry`, `store::GLOBAL_SOFTWARE_STORE`
-  --> src/package/mod.rs:29:37
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `alloc`
+  --> src/sigpkg/arch_compat.rs:25:5
    |
-29 | ...reStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE};
-   |             ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^ no `GLOBAL_SOFTWARE_STORE` in `package::store`
-   |             |
-   |             no `SoftwareRegistryEntry` in `package::store`
-
-error[E0432]: unresolved imports `vulnerability::SecurityScanner`, `vulnerability::VulnerabilityClass`, `vulnerability::VulnerabilityReport`
-  --> src/security/mod.rs:28:25
+25 | use alloc::string::ToString;
+   |     ^^^^^ use of unresolved module or unlinked crate `alloc`
    |
-28 | ...ty::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, Exploi...
-   |         ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^ no `VulnerabilityReport` in `security::vulnerability`
-   |         |                |
-   |         |                no `VulnerabilityClass` in `security::vulnerability`
-   |         no `SecurityScanner` in `security::vulnerability`
+   = help: add `extern crate alloc` to use the `alloc` crate
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `alloc`
+  --> src/sigpkg/arch_compat.rs:26:5
    |
-help: a similar name exists in the module
+26 | use alloc::vec::Vec;
+   |     ^^^^^ use of unresolved module or unlinked crate `alloc`
    |
-28 - pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
-28 + pub use vulnerability::{SecurityScanner, VulnerabilityID, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
+   = help: add `extern crate alloc` to use the `alloc` crate
+
+error[E0432]: unresolved imports `sigma_sh::CronJob`, `sigma_sh::LogEntry`, `sigma_sh::LogLevel`, `sigma_sh::Privilege`, `sigma_sh::Service`, `sigma_sh::SigmaCoreUtils`, `sigma_sh::SigmaCron`, `sigma_sh::SigmaDoc`, `sigma_sh::SigmaInit`, `sigma_sh::SigmaLog`, `sigma_sh::SigmaPriv`
+  --> src/shell/mod.rs:9:5
    |
-help: a similar name exists in the module
+ 9 |     CronJob, LogEntry, LogLevel, Privilege, Service, SigmaCoreUtils, SigmaCron, SigmaDoc,
+   |     ^^^^^^^  ^^^^^^^^  ^^^^^^^^  ^^^^^^^^^  ^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^ no `SigmaDoc` in `shell::sigma_sh`
+   |     |        |         |         |          |        |               |
+   |     |        |         |         |          |        |               no `SigmaCron` in `shell::sigma_sh`
+   |     |        |         |         |          |        no `SigmaCoreUtils` in `shell::sigma_sh`
+   |     |        |         |         |          no `Service` in `shell::sigma_sh`
+   |     |        |         |         no `Privilege` in `shell::sigma_sh`
+   |     |        |         no `LogLevel` in `shell::sigma_sh`
+   |     |        no `LogEntry` in `shell::sigma_sh`
+   |     no `CronJob` in `shell::sigma_sh`
+10 |     SigmaInit, SigmaLog, SigmaPriv,
+   |     ^^^^^^^^^  ^^^^^^^^  ^^^^^^^^^
+   |     |          |
+   |     |          no `SigmaLog` in `shell::sigma_sh`
+   |     no `SigmaInit` in `shell::sigma_sh`
    |
-28 - pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
-28 + pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityID, ExploitPayload, PenetrationAssistant};
+   = help: consider importing this variant instead:
+           crate::UnitType::Service
+
+error[E0432]: unresolved import `alloc`
+  --> src/sigpkg/arch_compat.rs:27:5
+   |
+27 | use alloc::format;
+   |     ^^^^^ help: a similar path exists: `std::alloc`
+
+error[E0432]: unresolved import `spec`
+  --> src/sigpkg/mod.rs:13:9
+   |
+13 | pub use spec::{
+   |         ^^^^ use of unresolved module or unlinked crate `spec`
+   |
+help: to make use of source file src/sigpkg/spec.rs, use `mod spec` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod spec;
    |
 
-error[E0432]: unresolved imports `universal_adapter::AptDebManifest`, `universal_adapter::PacmanPkgbuild`, `universal_adapter::SnapcraftManifest`, `universal_adapter::FlatpakManifest`, `universal_adapter::UniversalPackageAdapter`
-  --> src/sigpkg/mod.rs:38:5
+error[E0432]: unresolved import `zero_alloc_resolver`
+  --> src/sigpkg/mod.rs:27:9
    |
-38 |     AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
-   |     ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^
-   |     |               |               |                  |                |
-   |     |               |               |                  |                no `UniversalPackageAdapter` in `sigpkg::universal_adapter`
-   |     |               |               |                  |                help: a similar name exists in the module: `UniversalPackageManager`
-   |     |               |               |                  no `FlatpakManifest` in `sigpkg::universal_adapter`
-   |     |               |               no `SnapcraftManifest` in `sigpkg::universal_adapter`
-   |     |               no `PacmanPkgbuild` in `sigpkg::universal_adapter`
-   |     no `AptDebManifest` in `sigpkg::universal_adapter`
-
-error[E0407]: method `set_state` is not a member of trait `Driver`
-   --> src/driver/framework.rs:121:5
-    |
-121 | /     fn set_state(&self, state: DriverState) {
-122 | |         self.state.store(state as usize, Ordering::SeqCst);
-123 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `init` is not a member of trait `Driver`
-   --> src/driver/framework.rs:124:5
-    |
-124 | /     fn init(&mut self) -> Result<(), DriverError> {
-125 | |         Ok(())
-126 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `probe` is not a member of trait `Driver`
-   --> src/driver/framework.rs:127:5
-    |
-127 | /     fn probe(&mut self) -> Result<bool, DriverError> {
-128 | |         Ok(true)
-129 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `shutdown` is not a member of trait `Driver`
-   --> src/driver/framework.rs:138:5
-    |
-138 | /     fn shutdown(&mut self) -> Result<(), DriverError> {
-139 | |         Ok(())
-140 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `dependencies` is not a member of trait `Driver`
-   --> src/driver/framework.rs:141:5
-    |
-141 | /     fn dependencies(&self) -> &'static [DriverType] {
-142 | |         &[]
-143 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `set_state` is not a member of trait `Driver`
-   --> src/driver/framework.rs:193:5
-    |
-193 | /     fn set_state(&self, state: DriverState) {
-194 | |         self.state.store(state as usize, Ordering::SeqCst);
-195 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `init` is not a member of trait `Driver`
-   --> src/driver/framework.rs:196:5
-    |
-196 | /     fn init(&mut self) -> Result<(), DriverError> {
-197 | |         Ok(())
-198 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `probe` is not a member of trait `Driver`
-   --> src/driver/framework.rs:199:5
-    |
-199 | /     fn probe(&mut self) -> Result<bool, DriverError> {
-200 | |         Ok(true)
-201 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `shutdown` is not a member of trait `Driver`
-   --> src/driver/framework.rs:210:5
-    |
-210 | /     fn shutdown(&mut self) -> Result<(), DriverError> {
-211 | |         Ok(())
-212 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `dependencies` is not a member of trait `Driver`
-   --> src/driver/framework.rs:213:5
-    |
-213 | /     fn dependencies(&self) -> &'static [DriverType] {
-214 | |         &[]
-215 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `set_state` is not a member of trait `Driver`
-   --> src/driver/framework.rs:262:5
-    |
-262 | /     fn set_state(&self, state: DriverState) {
-263 | |         self.state.store(state as usize, Ordering::SeqCst);
-264 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `init` is not a member of trait `Driver`
-   --> src/driver/framework.rs:265:5
-    |
-265 | /     fn init(&mut self) -> Result<(), DriverError> {
-266 | |         Ok(())
-267 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `probe` is not a member of trait `Driver`
-   --> src/driver/framework.rs:268:5
-    |
-268 | /     fn probe(&mut self) -> Result<bool, DriverError> {
-269 | |         Ok(true)
-270 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `shutdown` is not a member of trait `Driver`
-   --> src/driver/framework.rs:279:5
-    |
-279 | /     fn shutdown(&mut self) -> Result<(), DriverError> {
-280 | |         Ok(())
-281 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `dependencies` is not a member of trait `Driver`
-   --> src/driver/framework.rs:282:5
-    |
-282 | /     fn dependencies(&self) -> &'static [DriverType] {
-283 | |         self.deps
-284 | |     }
-    | |_____^ not a member of trait `Driver`
-
-error[E0407]: method `query_by_type` is not a member of trait `DriverFramework`
-   --> src/driver/framework.rs:420:5
-    |
-420 | /     fn query_by_type(&self, driver_type: DriverType) -> Vec<DriverID> {
-421 | |         let mut ids = Vec::new();
-422 | |         for driver_option in self.drivers.iter() {
-423 | |             if let Some(ref d) = *driver_option {
-...   |
-429 | |         ids
-430 | |     }
-    | |_____^ not a member of trait `DriverFramework`
-
-error[E0405]: cannot find trait `SymlinkResolverRule` in this scope
-   --> src/filesystem/support.rs:287:6
-    |
-287 | impl SymlinkResolverRule for LinuxPersonaRule {
-    |      ^^^^^^^^^^^^^^^^^^^ not found in this scope
-
-error[E0405]: cannot find trait `SymlinkResolverRule` in this scope
-   --> src/filesystem/support.rs:313:31
-    |
-313 |     pub fn resolve_symlink<R: SymlinkResolverRule>(
-    |                               ^^^^^^^^^^^^^^^^^^^ not found in this scope
-
-error[E0425]: cannot find value `new_vec` in this scope
-  --> src/klib/vec.rs:31:17
+27 | pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPE...
+   |         ^^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `zero_alloc_resolver`
    |
-31 |                 new_vec.push((*self.data.add(i)).clone());
-   |                 ^^^^^^^ not found in this scope
-
-error[E0425]: cannot find value `new_vec` in this scope
-  --> src/klib/vec.rs:34:9
+help: to make use of source file src/sigpkg/zero_alloc_resolver.rs, use `mod zero_alloc_resolver` in this file to declare the module
+  --> src/lib.rs:4:1
    |
-34 |         new_vec
-   |         ^^^^^^^ not found in this scope
+ 4 + mod zero_alloc_resolver;
+   |
 
-error[E0119]: conflicting implementations of trait `Debug` for type `klib::vec::Vec<_>`
-   --> src/klib/vec.rs:234:1
+error[E0432]: unresolved import `universal_adapter`
+  --> src/sigpkg/mod.rs:28:9
+   |
+28 | pub use universal_adapter::{
+   |         ^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `universal_adapter`
+   |
+help: to make use of source file src/sigpkg/universal_adapter.rs, use `mod universal_adapter` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod universal_adapter;
+   |
+
+error[E0432]: unresolved import `universal_oop_system`
+  --> src/sigpkg/mod.rs:32:9
+   |
+32 | pub use universal_oop_system::{
+   |         ^^^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `universal_oop_system`
+   |
+help: to make use of source file src/sigpkg/universal_oop_system.rs, use `mod universal_oop_system` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod universal_oop_system;
+   |
+
+error[E0432]: unresolved imports `sigpkg::AptDebManifest`, `sigpkg::FlatpakManifest`, `sigpkg::PacmanPkgbuild`, `sigpkg::SnapcraftManifest`, `sigpkg::UniversalPackageAdapter`
+   --> src/lib.rs:106:5
     |
- 38 | impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    | ----------------------------------------------------- first implementation here
+106 |     AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
+    |     ^^^^^^^^^^^^^^ no `AptDebManifest` in `sigpkg`                      ^^^^^^^^^^^^^^^ no `FlatpakManifest` in `sigpkg`
+107 |     PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
+    |                    ^^^^^^^^^^^^^^ no `PacmanPkgbuild` in `sigpkg`         ^^^^^^^^^^^^^^^^^ no `SnapcraftManifest` in `sigpkg`
+108 |     Transaction, UniversalPackageAdapter,
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^ no `UniversalPackageAdapter` in `sigpkg`
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1326:12
+     |
+1325 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1326 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1325 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1325 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1375:12
+     |
+1374 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1375 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1374 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1374 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1575:12
+     |
+1574 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1575 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1574 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1574 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1624:12
+     |
+1623 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1624 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1623 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1623 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1672:12
+     |
+1671 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1672 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1671 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1671 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1721:12
+     |
+1720 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1721 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1720 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1720 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1770:12
+     |
+1769 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1770 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1769 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1769 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1819:12
+     |
+1818 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1819 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1818 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1818 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1868:12
+     |
+1867 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1868 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1867 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1867 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:1917:12
+     |
+1916 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+1917 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+1916 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+1916 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find value `buffer` in this scope
+    --> src/driver/device.rs:2063:12
+     |
+2062 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ------- `_buffer` defined here
+2063 |         Ok(buffer.len())
+     |            ^^^^^^
+     |
+help: the leading underscore in `_buffer` marks it as unused, consider renaming it to `buffer`
+     |
+2062 -     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+2062 +     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |
+
+error[E0425]: cannot find type `AgentAutomationEngine` in this scope
+  --> src/shell/repl.rs:74:23
+   |
+74 |     pub agent_engine: AgentAutomationEngine,
+   |                       ^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+warning: unused import: `alloc::string::ToString`
+  --> src/compatibility/debian.rs:11:5
+   |
+11 | use alloc::string::ToString;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+  --> src/compatibility/debian.rs:12:26
+   |
+12 | use core::sync::atomic::{AtomicUsize, Ordering};
+   |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `self`
+ --> src/driver/device.rs:5:17
+  |
+5 | use core::ptr::{self, NonNull};
+  |                 ^^^^
+
+warning: unused import: `core::mem`
+ --> src/filesystem/support.rs:3:5
+  |
+3 | use core::mem;
+  |     ^^^^^^^^^
+
+warning: unused import: `AtomicU32`
+ --> src/kernel/memory.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+  |                          ^^^^^^^^^
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/kernel/meta.rs:4:5
+  |
+4 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/kernel/meta.rs:5:26
+  |
+5 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `VersionConstraint`
+ --> src/sigpkg/recipe.rs:4:42
+  |
+4 | use crate::sigpkg::{Dependency, Version, VersionConstraint};
+  |                                          ^^^^^^^^^^^^^^^^^
+
+error[E0119]: conflicting implementations of trait `ShellHistory` for type `SimpleShellHistory`
+   --> src/shell/sigma_sh.rs:335:1
+    |
+302 | impl ShellHistory for SimpleShellHistory {
+    | ---------------------------------------- first implementation here
 ...
-234 | impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `klib::vec::Vec<_>`
+335 | impl ShellHistory for SimpleShellHistory {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SimpleShellHistory`
 
-error[E0119]: conflicting implementations of trait `Debug` for type `klib::vec::Vec<_>`
-   --> src/klib/vec.rs:521:1
+error[E0592]: duplicate definitions with name `with_pkgrel`
+   --> src/sigpkg/recipe.rs:104:5
     |
- 38 | impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    | ----------------------------------------------------- first implementation here
+ 95 |     pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
+    |     ---------------------------------------------- other definition for `with_pkgrel`
 ...
-521 | impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `klib::vec::Vec<_>`
+104 |     pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `with_pkgrel`
 
-error[E0119]: conflicting implementations of trait `Clone` for type `klib::vec::Vec<_>`
-   --> src/klib/vec.rs:511:1
+error[E0592]: duplicate definitions with name `with_prepare_command`
+   --> src/sigpkg/recipe.rs:114:5
     |
-224 | impl<T: Clone> Clone for Vec<T> {
-    | ------------------------------- first implementation here
+ 90 |     pub fn with_prepare_command(mut self, command: String) -> Self {
+    |     -------------------------------------------------------------- other definition for `with_prepare_command`
 ...
-511 | impl<T: Clone> Clone for Vec<T> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `klib::vec::Vec<_>`
+114 |     pub fn with_prepare_command(mut self, command: String) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `with_prepare_command`
 
-error[E0119]: conflicting implementations of trait `IntoIterator` for type `&klib::vec::Vec<_>`
-   --> src/klib/vec.rs:407:1
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/compatibility/debian.rs:5:1
+  |
+5 | #![no_std]
+  | ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+error[E0433]: failed to resolve: use of undeclared type `AgentAutomationEngine`
+  --> src/shell/repl.rs:97:27
+   |
+97 |             agent_engine: AgentAutomationEngine::new(),
+   |                           ^^^^^^^^^^^^^^^^^^^^^ use of undeclared type `AgentAutomationEngine`
+
+error[E0433]: failed to resolve: use of undeclared type `AgentAutomationEngine`
+   --> src/shell/repl.rs:120:27
     |
-320 | impl<'a, T> IntoIterator for &'a Vec<T> {
-    | --------------------------------------- first implementation here
-...
-407 | impl<'a, T> IntoIterator for &'a Vec<T> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `&klib::vec::Vec<_>`
+120 |             agent_engine: AgentAutomationEngine::new(),
+    |                           ^^^^^^^^^^^^^^^^^^^^^ use of undeclared type `AgentAutomationEngine`
 
-error[E0119]: conflicting implementations of trait `IntoIterator` for type `&mut klib::vec::Vec<_>`
-   --> src/klib/vec.rs:416:1
+error[E0308]: mismatched types
+   --> src/shell/sigma_sh.rs:252:36
     |
-328 | impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    | ------------------------------------------- first implementation here
-...
-416 | impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `&mut klib::vec::Vec<_>`
-
-error[E0119]: conflicting implementations of trait `FromIterator<_>` for type `klib::vec::Vec<_>`
-   --> src/klib/vec.rs:478:1
+252 |         let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
+    |                       ----------   ^^^^^^^^^^^^^^^^^^^^^^ expected `sigma_sh::Vec<&[u8]>`, found `std::vec::Vec<&[u8]>`
+    |                       |
+    |                       expected due to this
     |
-275 | impl<T> core::iter::FromIterator<T> for Vec<T> {
-    | ---------------------------------------------- first implementation here
-...
-478 | impl<T> core::iter::FromIterator<T> for Vec<T> {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `klib::vec::Vec<_>`
+    = note: `std::vec::Vec<&[u8]>` and `sigma_sh::Vec<&[u8]>` have similar names, but are actually distinct types
+note: `std::vec::Vec<&[u8]>` is defined in crate `alloc`
+   --> /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/alloc/src/vec/mod.rs:440:0
+note: `sigma_sh::Vec<&[u8]>` is defined in the current crate
+   --> src/shell/sigma_sh.rs:420:1
+    |
+420 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ^^^^^^^^^^^^^
+help: try removing the method call
+    |
+252 -         let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
+252 +         let cmd_args: Vec<&[u8]> = expanded_args;
+    |
 
-Some errors have detailed explanations: E0119, E0252, E0405, E0407, E0425, E0428, E0432, E0433.
+error[E0282]: type annotations needed
+   --> src/sigpkg/arch_compat.rs:121:66
+    |
+121 | ...emote_repository.get(pkg_name.as_str()) {
+    |                         ^^^^^^^^ cannot infer type
+
+error[E0277]: `Version` doesn't implement `std::fmt::Display`
+   --> src/sigpkg/recipe.rs:189:49
+    |
+189 |         let key = format!("{}@{}", recipe.name, recipe.version);
+    |                               --                ^^^^^^^^^^^^^^ `Version` cannot be formatted with the default formatter
+    |                               |
+    |                               required by this formatting parameter
+    |
+help: the trait `std::fmt::Display` is not implemented for `Version`
+   --> src/sigpkg/mod.rs:41:1
+    |
+ 41 | pub struct Version {
+    | ^^^^^^^^^^^^^^^^^^
+    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `Version` doesn't implement `std::fmt::Display`
+   --> src/sigpkg/recipe.rs:195:42
+    |
+195 |         let key = format!("{}@{}", name, version);
+    |                               --         ^^^^^^^ `Version` cannot be formatted with the default formatter
+    |                               |
+    |                               required by this formatting parameter
+    |
+help: the trait `std::fmt::Display` is not implemented for `Version`
+   --> src/sigpkg/mod.rs:41:1
+    |
+ 41 | pub struct Version {
+    | ^^^^^^^^^^^^^^^^^^
+    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+    = note: required for `&Version` to implement `std::fmt::Display`
+    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `Version` doesn't implement `std::fmt::Display`
+   --> src/sigpkg/recipe.rs:208:42
+    |
+208 |         let key = format!("{}@{}", name, version);
+    |                               --         ^^^^^^^ `Version` cannot be formatted with the default formatter
+    |                               |
+    |                               required by this formatting parameter
+    |
+help: the trait `std::fmt::Display` is not implemented for `Version`
+   --> src/sigpkg/mod.rs:41:1
+    |
+ 41 | pub struct Version {
+    | ^^^^^^^^^^^^^^^^^^
+    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+    = note: required for `&Version` to implement `std::fmt::Display`
+    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:136:11
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+135 | pub enum VersionConstraint {
+136 |     Exact(Version),
+    |           ^^^^^^^ the trait `Hash` is not implemented for `Version`
+    |
+help: consider annotating `Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:137:17
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+137 |     GreaterThan(Version),
+    |                 ^^^^^^^ the trait `Hash` is not implemented for `Version`
+    |
+help: consider annotating `Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:138:14
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+138 |     LessThan(Version),
+    |              ^^^^^^^ the trait `Hash` is not implemented for `Version`
+    |
+help: consider annotating `Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:139:20
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+139 |     GreaterOrEqual(Version),
+    |                    ^^^^^^^ the trait `Hash` is not implemented for `Version`
+    |
+help: consider annotating `Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:140:17
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+140 |     LessOrEqual(Version),
+    |                 ^^^^^^^ the trait `Hash` is not implemented for `Version`
+    |
+help: consider annotating `Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0599]: no method named `get` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/ai/next_gen.rs:358:44
+    |
+358 |             if let Some(doc) = self.corpus.get(i) {
+    |                                            ^^^ method not found in `klib::vec::Vec<ResearchDocument>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> {
+    | ----------------- method `get` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `get`, perhaps you need to implement one of them:
+            candidate #1: `ShellEnvironment`
+            candidate #2: `ShellHistory`
+            candidate #3: `SliceIndex`
+
+error[E0599]: no method named `get` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/ai/next_gen.rs:396:40
+    |
+396 |             if let Some(&id) = doc_ids.get(idx) {
+    |                                        ^^^ method not found in `klib::vec::Vec<usize>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> {
+    | ----------------- method `get` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `get`, perhaps you need to implement one of them:
+            candidate #1: `ShellEnvironment`
+            candidate #2: `ShellHistory`
+            candidate #3: `SliceIndex`
+
+error[E0599]: no method named `get` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/ai/next_gen.rs:399:52
+    |
+399 |                     if let Some(doc) = self.corpus.get(c_idx) {
+    |                                                    ^^^ method not found in `klib::vec::Vec<ResearchDocument>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> {
+    | ----------------- method `get` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `get`, perhaps you need to implement one of them:
+            candidate #1: `ShellEnvironment`
+            candidate #2: `ShellHistory`
+            candidate #3: `SliceIndex`
+
+warning: unused variable: `file_path`
+   --> src/compatibility/historic_linux.rs:310:49
+    |
+310 | ...ile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<u...
+    |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_file_path`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `arg`
+   --> src/driver/device.rs:870:39
+    |
+870 | ...&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+    |                             ^^^ help: if this is intentional, prefix it with an underscore: `_arg`
+
+warning: unused variable: `arg`
+    --> src/driver/device.rs:1129:39
+     |
+1129 | ...&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+     |                             ^^^ help: if this is intentional, prefix it with an underscore: `_arg`
+
+warning: unused variable: `packet`
+    --> src/driver/device.rs:1150:31
+     |
+1150 |     fn send_packet(&mut self, packet: &[u8]) -> Result<(), DeviceError> {
+     |                               ^^^^^^ help: if this is intentional, prefix it with an underscore: `_packet`
+
+warning: unused variable: `buffer`
+    --> src/driver/device.rs:1154:34
+     |
+1154 | ...eceive_packet(&mut self, buffer: &mut [u8]) -> Result<usize, Device...
+     |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `packet`
+    --> src/driver/device.rs:1218:31
+     |
+1218 |     fn send_packet(&mut self, packet: &[u8]) -> Result<(), DeviceError> {
+     |                               ^^^^^^ help: if this is intentional, prefix it with an underscore: `_packet`
+
+warning: unused variable: `buffer`
+    --> src/driver/device.rs:1221:34
+     |
+1221 | ...eceive_packet(&mut self, buffer: &mut [u8]) -> Result<usize, Device...
+     |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `packet`
+    --> src/driver/device.rs:1285:31
+     |
+1285 |     fn send_packet(&mut self, packet: &[u8]) -> Result<(), DeviceError> {
+     |                               ^^^^^^ help: if this is intentional, prefix it with an underscore: `_packet`
+
+warning: unused variable: `buffer`
+    --> src/driver/device.rs:1288:34
+     |
+1288 | ...eceive_packet(&mut self, buffer: &mut [u8]) -> Result<usize, Device...
+     |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `buffer`
+    --> src/driver/device.rs:1428:25
+     |
+1428 |     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+     |                         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `arg`
+    --> src/driver/device.rs:1529:39
+     |
+1529 | ...&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+     |                             ^^^ help: if this is intentional, prefix it with an underscore: `_arg`
+
+warning: unused variable: `arg`
+    --> src/driver/device.rs:1577:39
+     |
+1577 | ...&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+     |                             ^^^ help: if this is intentional, prefix it with an underscore: `_arg`
+
+warning: unused variable: `arg`
+    --> src/driver/device.rs:1626:39
+     |
+1626 | ...&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+     |                             ^^^ help: if this is intentional, prefix it with an underscore: `_arg`
+
+warning: unused variable: `arg`
+    --> src/driver/device.rs:1919:39
+     |
+1919 | ...&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+     |                             ^^^ help: if this is intentional, prefix it with an underscore: `_arg`
+
+warning: unused variable: `arg`
+    --> src/driver/device.rs:1968:39
+     |
+1968 | ...&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
+     |                             ^^^ help: if this is intentional, prefix it with an underscore: `_arg`
+
+warning: unused variable: `new_offset`
+   --> src/filesystem/vfs.rs:170:13
+    |
+170 |         let new_offset = file_descriptor
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_new_offset`
+
+warning: unused variable: `context`
+   --> src/resilience/self_healing.rs:101:9
+    |
+101 |         context: &HashMap<String, String>,
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context`
+
+Some errors have detailed explanations: E0119, E0252, E0277, E0282, E0308, E0425, E0428, E0432, E0433...
 For more information about an error, try `rustc --explain E0119`.
-error: could not compile `sigmaos` (lib) due to 56 previous errors
+warning: `sigmaos` (lib) generated 26 warnings
+error: could not compile `sigmaos` (lib) due to 53 previous errors; 26 warnings emitted
