@@ -34,6 +34,7 @@ SigmaOS absorbs the greatest strengths of major traditional Linux distributions 
 | **Control Flow & Sandboxing** | Epoll/Kqueue Loop (`SovereignKqueue`) + OpenBSD Pledge | Epoll (no native Pledge sandboxing) | Epoll (no native Pledge) | Epoll | Epoll |
 | **Stateful Firewall & NAT** | Stateful Netfilter (`SovereignConntrack`) + SimpleNAT | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables |
 | **Boot Loader & Secure Boot** | Raw Memory Copy + Cryptographic Hash Verification | GRUB / systemd-boot | GRUB / systemd-boot | GRUB / systemd-boot | GRUB |
+| **Parallel Boot Activation** | Topological Dependency Sort (`SovereignSort`) | systemd parallelized target units | systemd parallelized | Fully sequential SysV init | systemd parallelized |
 
 ---
 
@@ -43,7 +44,7 @@ The roadmap outlines the evolutionary trajectory of SigmaOS from its present hig
 
 ```
 +---------------------------------------------------------------------------------+
-|                                 SIGMAOS ROADMAP                                 |
+|                                 SIGMAOS roadmap                                 |
 +---------------------------------------------------------------------------------+
 | SHORT-TERM (6 Months)   | MID-TERM (1-2 Years)       | LONG-TERM (3-5 Years)    |
 | - Complete LFS Parity   | - Native Vulkan Compositor | - Adaptive AI Scheduler  |
@@ -249,7 +250,17 @@ To perform bulletproof bootstrap handoffs, SigmaOS implements an authentic, low-
 
 ---
 
-## 9. Modular Workflows & Community-Driven Innovation
+## 9. Sovereign Dependency-Aware Parallel Service Dispatcher & Boot Optimizer
+
+To achieve sub-millisecond, highly parallelized daemon initialization on boot, SigmaOS incorporates an optimized service activation engine:
+
+- **Parallel Activation (`SovereignSort`)**: Instead of linear, blocking init scripts, a mathematical topological sort automatically structures system services (`SimpleBootService`) based on category (`System`, `Network`, `Userland`) and dependency lists.
+- **Deadlock Cycle Prevention**: Detects circular dependencies within registered service trees on the fly, failing safely with a telemetry report instead of halting the system boot.
+- **Boot Telemetry Reporting**: Standard system metrics (`BootStats`) record time, active counts, and overheads, mimicking systemd-analyze reports.
+
+---
+
+## 10. Modular Workflows & Community-Driven Innovation
 
 To maintain publisher-grade quality, the SigmaOS project employs standardized workflows for code contribution and validation.
 

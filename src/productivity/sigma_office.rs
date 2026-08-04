@@ -11,26 +11,9 @@
 //! - **Native Rendering**: Direct GPU-accelerated typography via Zenith compositor
 //! - **Local-First**: All documents stored in SigmaFS with capability-gated access
 //! - **Zero-Dependency**: No external libraries, pure Rust implementation
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashMap;
 use sigma_types::{CapabilityToken, Result};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 /// Document type enumeration
@@ -412,7 +395,6 @@ pub struct TypographyRenderer {
 
 impl TypographyRenderer {
     /// Create new typography renderer
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TypographyRenderer {
             font_cache: HashMap::new(),
@@ -523,7 +505,6 @@ pub struct LiveCoAuthoringManager {
 }
 
 impl LiveCoAuthoringManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             locked_ranges: HashMap::new(),
@@ -561,7 +542,6 @@ pub struct MacroExecutor {
 }
 
 impl MacroExecutor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             registered_macros: HashMap::new(),
@@ -579,9 +559,7 @@ impl MacroExecutor {
                 processor.add_heading(1, "Automated Report Header").unwrap();
             }
             if script.contains("insert_footer") {
-                processor
-                    .add_text("Confidential Sovereign Document", false, true)
-                    .unwrap();
+                processor.add_text("Confidential Sovereign Document", false, true).unwrap();
             }
             Ok(true)
         } else {
@@ -610,9 +588,10 @@ pub struct SovereignCrmPipeline {
 }
 
 impl SovereignCrmPipeline {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { leads: Vec::new() }
+        Self {
+            leads: Vec::new(),
+        }
     }
 
     pub fn add_lead(&mut self, lead: Lead) {
@@ -621,33 +600,17 @@ impl SovereignCrmPipeline {
 
     /// Auto-compiles active sales leads directly into a formatted SigmaOffice Spreadsheet
     pub fn compile_leads_to_spreadsheet(&self, processor: &mut SpreadsheetProcessor) -> Result<()> {
-        processor
-            .set_cell(0, 0, CellValue::Text("Lead ID".to_string()))
-            .unwrap();
-        processor
-            .set_cell(0, 1, CellValue::Text("Company Name".to_string()))
-            .unwrap();
-        processor
-            .set_cell(0, 2, CellValue::Text("Est. Revenue".to_string()))
-            .unwrap();
-        processor
-            .set_cell(0, 3, CellValue::Text("Status".to_string()))
-            .unwrap();
+        processor.set_cell(0, 0, CellValue::Text("Lead ID".to_string())).unwrap();
+        processor.set_cell(0, 1, CellValue::Text("Company Name".to_string())).unwrap();
+        processor.set_cell(0, 2, CellValue::Text("Est. Revenue".to_string())).unwrap();
+        processor.set_cell(0, 3, CellValue::Text("Status".to_string())).unwrap();
 
         for (idx, lead) in self.leads.iter().enumerate() {
             let row = (idx + 1) as u32;
-            processor
-                .set_cell(row, 0, CellValue::Number(lead.id as f64))
-                .unwrap();
-            processor
-                .set_cell(row, 1, CellValue::Text(lead.company_name.clone()))
-                .unwrap();
-            processor
-                .set_cell(row, 2, CellValue::Number(lead.estimated_revenue))
-                .unwrap();
-            processor
-                .set_cell(row, 3, CellValue::Text(lead.status.clone()))
-                .unwrap();
+            processor.set_cell(row, 0, CellValue::Number(lead.id as f64)).unwrap();
+            processor.set_cell(row, 1, CellValue::Text(lead.company_name.clone())).unwrap();
+            processor.set_cell(row, 2, CellValue::Number(lead.estimated_revenue)).unwrap();
+            processor.set_cell(row, 3, CellValue::Text(lead.status.clone())).unwrap();
         }
         Ok(())
     }
@@ -672,7 +635,6 @@ pub struct VersionHistoryManager {
 }
 
 impl VersionHistoryManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             checkpoints: Vec::new(),
@@ -767,27 +729,16 @@ mod tests {
 
         // 1. LiveCoAuthoringManager Test
         let mut coauth = LiveCoAuthoringManager::new();
-        assert!(coauth
-            .acquire_lock("p_1".to_string(), "alice".to_string())
-            .unwrap());
-        assert!(!coauth
-            .acquire_lock("p_1".to_string(), "bob".to_string())
-            .unwrap()); // blocked by alice
+        assert!(coauth.acquire_lock("p_1".to_string(), "alice".to_string()).unwrap());
+        assert!(!coauth.acquire_lock("p_1".to_string(), "bob".to_string()).unwrap()); // blocked by alice
         coauth.release_lock("p_1");
-        assert!(coauth
-            .acquire_lock("p_1".to_string(), "bob".to_string())
-            .unwrap()); // allowed now
+        assert!(coauth.acquire_lock("p_1".to_string(), "bob".to_string()).unwrap()); // allowed now
 
         // 2. MacroExecutor Test
         let mut text_proc = TextProcessor::new("Report".to_string(), capability.clone());
         let mut macro_exec = MacroExecutor::new();
-        macro_exec.register_macro(
-            "setup_report".to_string(),
-            "insert_header; insert_footer;".to_string(),
-        );
-        assert!(macro_exec
-            .execute_macro("setup_report", &mut text_proc)
-            .unwrap());
+        macro_exec.register_macro("setup_report".to_string(), "insert_header; insert_footer;".to_string());
+        assert!(macro_exec.execute_macro("setup_report", &mut text_proc).unwrap());
         assert_eq!(text_proc.document().tree().len(), 2);
 
         // 3. SovereignCrmPipeline Test
@@ -800,10 +751,7 @@ mod tests {
         });
         let mut sheet_proc = SpreadsheetProcessor::new("CRM Pipeline".to_string(), capability);
         crm.compile_leads_to_spreadsheet(&mut sheet_proc).unwrap();
-        assert_eq!(
-            sheet_proc.get_cell(1, 1),
-            Some(&CellValue::Text("Antigravity AI".to_string()))
-        );
+        assert_eq!(sheet_proc.get_cell(1, 1), Some(&CellValue::Text("Antigravity AI".to_string())));
 
         // 4. VersionHistoryManager Test
         let mut history = VersionHistoryManager::new();
