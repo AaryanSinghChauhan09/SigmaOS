@@ -184,21 +184,14 @@ impl CacheLevelModel {
 
         // 1. Search for Hit
         for i in start_line..end_line {
-            let is_match = {
-                let line = &self.lines[i];
-                line.valid && line.tag == tag
-            };
-
-            if is_match {
+            let line = &mut self.lines[i];
+            if line.valid && line.tag == tag {
                 self.hits.fetch_add(1, Ordering::Relaxed);
 
                 // Update replacement metadata
-                {
-                    let line = &mut self.lines[i];
-                    line.lru_counter = system_time;
-                    line.frequency += 1;
-                    line.mru_bit = true;
-                }
+                line.lru_counter = system_time;
+                line.frequency += 1;
+                line.mru_bit = true;
 
                 // MRU bit maintenance: if all MRU bits in set are true, clear others
                 let mut all_mru = true;
@@ -217,26 +210,23 @@ impl CacheLevelModel {
                 }
 
                 // Write policy update
-                {
-                    let line = &mut self.lines[i];
-                    if write {
-                        if let Some(buf) = data {
-                            line.data.copy_from_slice(buf);
-                        }
-                        if self.write_policy == WritePolicy::WriteBack {
-                            line.dirty = true;
-                            line.state = MesiState::Modified;
-                        } else {
-                            // WriteThrough immediately triggers main memory writeback
-                            line.dirty = false;
-                            line.state = MesiState::Exclusive;
-                            self.writebacks.fetch_add(1, Ordering::Relaxed);
-                        }
+                if write {
+                    if let Some(buf) = data {
+                        line.data.copy_from_slice(buf);
+                    }
+                    if self.write_policy == WritePolicy::WriteBack {
+                        line.dirty = true;
+                        line.state = MesiState::Modified;
                     } else {
-                        // Read hit, keep state or promote
-                        if line.state == MesiState::Invalid {
-                            line.state = MesiState::Shared;
-                        }
+                        // WriteThrough immediately triggers main memory writeback
+                        line.dirty = false;
+                        line.state = MesiState::Exclusive;
+                        self.writebacks.fetch_add(1, Ordering::Relaxed);
+                    }
+                } else {
+                    // Read hit, keep state or promote
+                    if line.state == MesiState::Invalid {
+                        line.state = MesiState::Shared;
                     }
                 }
 

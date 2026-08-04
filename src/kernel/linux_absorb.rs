@@ -8,8 +8,8 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::string::String;
-use alloc::string::ToString;
 use alloc::vec::Vec;
+use alloc::string::ToString;
 use core::any::Any;
 use std::collections::HashMap;
 
@@ -730,11 +730,7 @@ impl SovereignEbpfEngine {
     }
 
     /// Executes eBPF instructions on a network packet buffer or kernel probe context
-    pub fn execute_program(
-        &mut self,
-        program: &[u64],
-        context: &mut [u8],
-    ) -> Result<u64, &'static str> {
+    pub fn execute_program(&mut self, program: &[u64], context: &mut [u8]) -> Result<u64, &'static str> {
         self.program_loaded = true;
         self.registers[1] = context.as_ptr() as u64;
         self.registers[2] = context.len() as u64;
@@ -751,47 +747,33 @@ impl SovereignEbpfEngine {
             }
 
             match opcode {
-                0x07 => {
-                    // ADD immediate
+                0x07 => { // ADD immediate
                     self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(imm);
                 }
-                0x0F => {
-                    // ADD register
-                    self.registers[dst_reg] =
-                        self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
+                0x0F => { // ADD register
+                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_add(self.registers[src_reg]);
                 }
-                0x17 => {
-                    // SUB immediate
+                0x17 => { // SUB immediate
                     self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(imm);
                 }
-                0x1F => {
-                    // SUB register
-                    self.registers[dst_reg] =
-                        self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
+                0x1F => { // SUB register
+                    self.registers[dst_reg] = self.registers[dst_reg].wrapping_sub(self.registers[src_reg]);
                 }
-                0x27 => {
-                    // MOV immediate
+                0x27 => { // MOV immediate
                     self.registers[dst_reg] = imm;
                 }
-                0x2F => {
-                    // MOV register
+                0x2F => { // MOV register
                     self.registers[dst_reg] = self.registers[src_reg];
                 }
-                0x35 => {
-                    // LOAD from context with offset (packet parsing helper)
-                    let idx = if offset != 0 {
-                        offset as usize
-                    } else {
-                        imm as usize
-                    };
+                0x35 => { // LOAD from context with offset (packet parsing helper)
+                    let idx = if offset != 0 { offset as usize } else { imm as usize };
                     if idx < context.len() {
                         self.registers[dst_reg] = context[idx] as u64;
                     } else {
                         return Err("Context offset out of bounds");
                     }
                 }
-                0x95 => {
-                    // EXIT
+                0x95 => { // EXIT
                     return Ok(self.registers[0]);
                 }
                 _ => {}
@@ -865,39 +847,14 @@ pub struct Plan9Server {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NinePMessage {
-    Tversion {
-        msize: u32,
-        version: String,
-    },
-    Rversion {
-        msize: u32,
-        version: String,
-    },
-    Tattach {
-        fid: u32,
-        afid: u32,
-        uname: String,
-        aname: String,
-    },
-    Rattach {
-        qid_path: u64,
-    },
-    Twalk {
-        fid: u32,
-        newfid: u32,
-        names: Vec<String>,
-    },
-    Rwalk {
-        qids: Vec<u64>,
-    },
-    Tread {
-        fid: u32,
-        offset: u64,
-        count: u32,
-    },
-    Rread {
-        data: Vec<u8>,
-    },
+    Tversion { msize: u32, version: String },
+    Rversion { msize: u32, version: String },
+    Tattach { fid: u32, afid: u32, uname: String, aname: String },
+    Rattach { qid_path: u64 },
+    Twalk { fid: u32, newfid: u32, names: Vec<String> },
+    Rwalk { qids: Vec<u64> },
+    Tread { fid: u32, offset: u64, count: u32 },
+    Rread { data: Vec<u8> },
 }
 
 impl Plan9Server {
@@ -918,12 +875,7 @@ impl Plan9Server {
                     version: String::from("9P2000"),
                 })
             }
-            NinePMessage::Tattach {
-                fid,
-                afid,
-                uname,
-                aname,
-            } => {
+            NinePMessage::Tattach { fid, afid, uname, aname } => {
                 let _ = afid;
                 let _ = uname;
                 let _ = aname;
@@ -997,12 +949,7 @@ impl LkmLoader {
     }
 
     /// Dynamically loads a signed .ko kernel module into the microkernel address space
-    pub fn load_module(
-        &mut self,
-        name: &str,
-        raw_elf: &[u8],
-        signature: &[u8],
-    ) -> Result<(), ModuleLoadError> {
+    pub fn load_module(&mut self, name: &str, raw_elf: &[u8], signature: &[u8]) -> Result<(), ModuleLoadError> {
         if raw_elf.len() < 4 || raw_elf[..4] != [0x7F, b'E', b'L', b'F'] {
             return Err(ModuleLoadError::InvalidFormat);
         }
@@ -1175,25 +1122,17 @@ mod tests {
     #[test]
     fn test_sovereign_capsicum() {
         let mut sandbox = SovereignCapsicum::new();
-        assert!(sandbox
-            .check_capability(SovereignCapsicum::CAP_READ)
-            .is_ok());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
 
         // Restrict capabilities to READ and SEEK only
         sandbox.enter_capability_mode(SovereignCapsicum::CAP_READ | SovereignCapsicum::CAP_SEEK);
         assert!(sandbox.is_sandboxed);
 
-        assert!(sandbox
-            .check_capability(SovereignCapsicum::CAP_READ)
-            .is_ok());
-        assert!(sandbox
-            .check_capability(SovereignCapsicum::CAP_SEEK)
-            .is_ok());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_READ).is_ok());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_SEEK).is_ok());
 
         // WRITE is not allowed
-        assert!(sandbox
-            .check_capability(SovereignCapsicum::CAP_WRITE)
-            .is_err());
+        assert!(sandbox.check_capability(SovereignCapsicum::CAP_WRITE).is_err());
     }
 
     #[test]
@@ -1201,10 +1140,7 @@ mod tests {
         let mut server = Plan9Server::new();
 
         // 1. Tversion
-        let version_req = NinePMessage::Tversion {
-            msize: 4096,
-            version: String::from("9P2000"),
-        };
+        let version_req = NinePMessage::Tversion { msize: 4096, version: String::from("9P2000") };
         let version_resp = server.handle_request(version_req).unwrap();
         if let NinePMessage::Rversion { msize, ref version } = version_resp {
             assert_eq!(msize, 4096);
@@ -1214,12 +1150,7 @@ mod tests {
         }
 
         // 2. Tattach
-        let attach_req = NinePMessage::Tattach {
-            fid: 10,
-            afid: 0,
-            uname: String::from("root"),
-            aname: String::from("root"),
-        };
+        let attach_req = NinePMessage::Tattach { fid: 10, afid: 0, uname: String::from("root"), aname: String::from("root") };
         let attach_resp = server.handle_request(attach_req).unwrap();
         if let NinePMessage::Rattach { qid_path } = attach_resp {
             assert_eq!(qid_path, 0xFF10);
@@ -1229,11 +1160,7 @@ mod tests {
         assert!(server.active_fids.contains(&10));
 
         // 3. Tread
-        let read_req = NinePMessage::Tread {
-            fid: 10,
-            offset: 0,
-            count: 5,
-        };
+        let read_req = NinePMessage::Tread { fid: 10, offset: 0, count: 5 };
         let read_resp = server.handle_request(read_req).unwrap();
         if let NinePMessage::Rread { ref data } = read_resp {
             assert_eq!(data.len(), 5);
@@ -1256,13 +1183,7 @@ mod tests {
         let success_res = loader.load_module("usb_hid_absorbed", raw_elf, b"valid_sig");
         assert!(success_res.is_ok());
         assert_eq!(loader.loaded_modules.len(), 1);
-        assert!(
-            loader
-                .loaded_modules
-                .get("usb_hid_absorbed")
-                .unwrap()
-                .signature_verified
-        );
+        assert!(loader.loaded_modules.get("usb_hid_absorbed").unwrap().signature_verified);
 
         // Unload verification
         assert!(loader.unload_module("usb_hid_absorbed"));
@@ -1276,14 +1197,7 @@ mod tests {
 
         patcher.apply_patch(0x1000, 0x2000).unwrap();
         assert_eq!(patcher.active_patches.len(), 1);
-        assert_eq!(
-            patcher
-                .active_patches
-                .get(&0x1000)
-                .unwrap()
-                .replacement_function_addr,
-            0x2000
-        );
+        assert_eq!(patcher.active_patches.get(&0x1000).unwrap().replacement_function_addr, 0x2000);
 
         assert!(patcher.revert_patch(0x1000));
         assert_eq!(patcher.active_patches.len(), 0);

@@ -50,25 +50,18 @@ impl SelfHostingManager {
 
     /// Bootstraps native GCC/rustc binary toolchain components inside system sysroot
     pub fn build_toolchain(&mut self) {
-        self.installed_tools
-            .insert("make".to_string(), "4.4.1".to_string());
-        self.installed_tools
-            .insert("git".to_string(), "2.45.0".to_string());
+        self.installed_tools.insert("make".to_string(), "4.4.1".to_string());
+        self.installed_tools.insert("git".to_string(), "2.45.0".to_string());
     }
 
     /// Compiles high-level source code (C/Rust) into optimized machine binaries
-    pub fn compile_source(
-        &self,
-        source_path: &Path,
-        output_binary: &Path,
-    ) -> Result<bool, ToolchainError> {
+    pub fn compile_source(&self, source_path: &Path, output_binary: &Path) -> Result<bool, ToolchainError> {
         if !self.installed_tools.contains_key("rustc") {
             return Err(ToolchainError::CompilerNotFound);
         }
 
-        if source_path.extension().and_then(|s| s.to_str()) != Some("rs")
-            && source_path.extension().and_then(|s| s.to_str()) != Some("c")
-        {
+        if source_path.extension().and_then(|s| s.to_str()) != Some("rs") &&
+           source_path.extension().and_then(|s| s.to_str()) != Some("c") {
             return Err(ToolchainError::InvalidOutput);
         }
 

@@ -4,6 +4,7 @@
 use std::string::String;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::vec::Vec;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

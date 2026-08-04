@@ -2,8 +2,8 @@
 
 extern crate alloc;
 use alloc::string::String;
-use alloc::string::ToString;
 use alloc::vec::Vec;
+use alloc::string::ToString;
 
 #[derive(Debug, Clone)]
 pub struct FirmwareMemoryMapEntry {
@@ -58,8 +58,7 @@ pub enum BootError {
 }
 
 pub trait BootLoader: Send + Sync {
-    fn enter_kernel(&self, kernel_entry: usize, params: *const BootParams)
-        -> Result<(), BootError>;
+    fn enter_kernel(&self, kernel_entry: usize, params: *const BootParams) -> Result<(), BootError>;
     fn load_kernel(&self, source: &str, dest: usize, size: usize) -> Result<usize, BootError>;
     fn load_initrd(&self, source: &str, dest: usize, size: usize) -> Result<usize, BootError>;
     fn parse_cmdline(&self, cmdline: &str) -> Result<BootParams, BootError>;
@@ -190,11 +189,7 @@ impl UefiBootLoader {
 }
 
 impl BootLoader for UefiBootLoader {
-    fn enter_kernel(
-        &self,
-        kernel_entry: usize,
-        _params: *const BootParams,
-    ) -> Result<(), BootError> {
+    fn enter_kernel(&self, kernel_entry: usize, _params: *const BootParams) -> Result<(), BootError> {
         if kernel_entry == 0 {
             return Err(BootError::InvalidConfiguration);
         }
