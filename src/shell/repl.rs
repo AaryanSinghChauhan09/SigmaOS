@@ -3,14 +3,6 @@
 
 use std::io::{self, BufRead, Write};
 
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -58,82 +50,19 @@ pub enum ShellCommand {
         filename: String,
     },
     Theme {
-        theme_name: String,
+        name: String,
     },
     Profile {
-        profile_name: String,
+        name: String,
     },
     A11y {
         feature: String,
-        state: String,
-    },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
-    },
-    Theme {
-        theme_name: String,
-    },
-    Profile {
-        profile_name: String,
-    },
-    A11y {
-        feature: String,
-        state: String,
+        enabled: bool,
     },
     Unknown(String),
 }
 
 /// Represents an automated action task executed by an AI agent
-#[derive(Debug, Clone)]
-pub struct AgentTask {
-    pub task_id: usize,
-    pub description: String,
-    pub commands: Vec<String>,
-}
-
-/// AI Agent Automation Engine inside SigmaOS REPL
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine {
-    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
-    pub next_task_id: usize,
-}
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine {
-            registered_tasks: std::collections::HashMap::new(),
-            next_task_id: 1,
-        }
-    }
-
-    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
-        let id = self.next_task_id;
-        self.next_task_id += 1;
-        self.registered_tasks.insert(
-            id,
-            AgentTask {
-                task_id: id,
-                description,
-                commands,
-            },
-        );
-        id
-    }
-}
 
 impl Default for AgentAutomationEngine {
     fn default() -> Self {
@@ -305,62 +234,6 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Mkdir {
                         dirname: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        theme_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        profile_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        state: parts[2].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        theme_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        profile_name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
-                if parts.len() >= 3 {
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        state: parts[2].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -566,19 +439,6 @@ impl ShellRepl {
                 } else {
                     Err(format!("apt: Unknown command '{}'", subcommand))
                 }
-            }
-            ShellCommand::Theme { theme_name } => {
-                self.current_theme = theme_name.clone();
-                Ok(format!("Theme set to {}", theme_name))
-            }
-            ShellCommand::Profile { profile_name } => {
-                self.current_profile = profile_name.clone();
-                Ok(format!("Profile set to {}", profile_name))
-            }
-            ShellCommand::A11y { feature, state } => {
-                let is_on = state == "on" || state == "true";
-                self.a11y_features.insert(feature.clone(), is_on);
-                Ok(format!("A11y feature {} set to {}", feature, state))
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {

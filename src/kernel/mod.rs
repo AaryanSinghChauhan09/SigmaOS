@@ -4,7 +4,6 @@ pub mod device;
 pub mod driver;
 pub mod memory;
 pub mod object;
-pub mod performance;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod meta;
@@ -15,15 +14,12 @@ pub mod breakthroughs;
 pub mod ipc;
 pub mod linux_absorb;
 pub mod subsystem;
+pub mod generation_manager;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
 };
 pub use bus::{Bus, PciBus, UsableBus};
-pub use crate::container::runtime::oci::{
-    Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
-    ResourceConfig, Runtime,
-};
 pub use device::{Device, DeviceBinding, DeviceManager, DeviceType, DriverError, DriverMetadata};
 pub use driver::{Driver, DriverRegistration, DriverRegistry};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
@@ -51,3 +47,4 @@ pub use breakthroughs::{
     UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
     EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
 };
+pub use generation_manager::{Generation, GenerationManager};

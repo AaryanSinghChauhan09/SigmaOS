@@ -4,10 +4,6 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
 use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
@@ -437,7 +433,6 @@ impl MACEngine for SimpleMACEngine {
                             self.access_denied.fetch_add(1, Ordering::SeqCst);
                             return false;
                         }
-                        return false;
                     }
                 }
                 true
@@ -445,12 +440,6 @@ impl MACEngine for SimpleMACEngine {
                 self.access_denied.fetch_add(1, Ordering::SeqCst);
                 false
             }
-            true
-        } else {
-            if let Ok(mut stats) = self.stats.try_borrow_mut() {
-                stats.access_denied += 1;
-            }
-            false
         }
     }
 

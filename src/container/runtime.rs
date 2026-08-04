@@ -22,45 +22,7 @@ pub enum ContainerState {
     Failed = 4,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
 
-impl ContainerCapability {
-    pub fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
-}
 
 /// Container trait (OOP interface)
 pub trait Container {
@@ -97,6 +59,7 @@ pub enum ContainerError {
 
 /// Container info
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerInfo {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -596,12 +559,12 @@ impl<T> Vec<T> {
             if self.len >= self.capacity {
                 self.grow();
             }
-
-        // Start container
-        runtime.start_container(id).unwrap();
-        let stats_running = runtime.stats();
-        assert_eq!(stats_running.running_containers, 1);
-        assert_eq!(stats_running.stopped_containers, 0);
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
 
     pub fn len(&self) -> usize {
         self.len
