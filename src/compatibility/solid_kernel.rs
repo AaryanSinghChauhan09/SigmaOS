@@ -1,9 +1,8 @@
+use crate::klib::Vec;
 /// SOLID Principles-Driven and Composable Kernel Architecture for SigmaOS
 /// Implements Dependency Inversion, Liskov Substitution, User-Defined Schedulers,
 /// and SigmaFS++ Composable filesystems with Blockchain Audit Trails.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 // ==========================================
 // 1. Dependency Inversion & Interchangeable Subsystems
@@ -17,20 +16,28 @@ pub trait IScheduler {
 pub struct RoundRobinSchedulerPort;
 impl IScheduler for RoundRobinSchedulerPort {
     fn schedule_next_task(&self, active_pids: &[usize]) -> Option<usize> {
-        if active_pids.is_empty() { return None; }
+        if active_pids.is_empty() {
+            return None;
+        }
         Some(active_pids[0]) // Simplistic RR first element
     }
-    fn scheduler_name(&self) -> &'static str { "Round Robin" }
+    fn scheduler_name(&self) -> &'static str {
+        "Round Robin"
+    }
 }
 
 pub struct PrioritySchedulerPort;
 impl IScheduler for PrioritySchedulerPort {
     fn schedule_next_task(&self, active_pids: &[usize]) -> Option<usize> {
-        if active_pids.is_empty() { return None; }
+        if active_pids.is_empty() {
+            return None;
+        }
         // Simplistic Priority: last element gets prioritized
         Some(active_pids[active_pids.len() - 1])
     }
-    fn scheduler_name(&self) -> &'static str { "Priority Queue" }
+    fn scheduler_name(&self) -> &'static str {
+        "Priority Queue"
+    }
 }
 
 pub struct SolidKernelCore {
@@ -83,10 +90,14 @@ impl IScheduler for ComplianceScheduler {
                 return Some(pid);
             }
         }
-        if active_pids.is_empty() { return None; }
+        if active_pids.is_empty() {
+            return None;
+        }
         Some(active_pids[0])
     }
-    fn scheduler_name(&self) -> &'static str { "Compliance Prioritization" }
+    fn scheduler_name(&self) -> &'static str {
+        "Compliance Prioritization"
+    }
 }
 
 // ==========================================
@@ -168,7 +179,11 @@ impl SigmaFSPlusPlus {
                 return false;
             }
 
-            let computed = AuditBlock::calculate_hash(current.index, &current.transaction_payload, current.prev_block_hash);
+            let computed = AuditBlock::calculate_hash(
+                current.index,
+                &current.transaction_payload,
+                current.prev_block_hash,
+            );
             if computed != current.block_hash {
                 return false;
             }
@@ -178,8 +193,11 @@ impl SigmaFSPlusPlus {
 
     pub fn deduplicate_data(&self, incoming: &[u8]) -> bool {
         // Simulates semantic deduplication logic
-        if incoming.is_empty() { return false; }
-        self.total_deduped_bytes.fetch_add(incoming.len(), Ordering::SeqCst);
+        if incoming.is_empty() {
+            return false;
+        }
+        self.total_deduped_bytes
+            .fetch_add(incoming.len(), Ordering::SeqCst);
         true
     }
 }
@@ -218,7 +236,8 @@ mod tests {
         let mut fs = SigmaFSPlusPlus::new();
 
         fs.record_filesystem_action(b"CREATE file_1.txt").unwrap();
-        fs.record_filesystem_action(b"WRITE content_data_stream").unwrap();
+        fs.record_filesystem_action(b"WRITE content_data_stream")
+            .unwrap();
         fs.record_filesystem_action(b"DELETE file_1.txt").unwrap();
 
         assert_eq!(fs.audit_chain.len(), 3);

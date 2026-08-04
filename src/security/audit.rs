@@ -3,18 +3,22 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::mem;
 /// OOP-based Security Audit for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 542
 /// Implements security event logging and audit trails
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 
 pub type EventID = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LogFormat { Json, Text, Binary }
+pub enum LogFormat {
+    Json,
+    Text,
+    Binary,
+}
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -68,10 +72,18 @@ impl SimpleAuditEvent {
 }
 
 impl AuditEvent for SimpleAuditEvent {
-    fn id(&self) -> EventID { self.id }
-    fn event_type(&self) -> EventType { unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) } }
-    fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
-    fn user_id(&self) -> usize { self.user_id.load(Ordering::SeqCst) }
+    fn id(&self) -> EventID {
+        self.id
+    }
+    fn event_type(&self) -> EventType {
+        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
+    }
+    fn timestamp(&self) -> u64 {
+        self.timestamp.load(Ordering::SeqCst) as u64
+    }
+    fn user_id(&self) -> usize {
+        self.user_id.load(Ordering::SeqCst)
+    }
     fn description(&self) -> &[u8] {
         let len = self.description.iter().position(|&b| b == 0).unwrap_or(256);
         &self.description[..len]
@@ -182,4 +194,3 @@ impl AuditPolicy for SimpleAuditPolicy {
         }
     }
 }
-

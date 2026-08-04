@@ -6,24 +6,24 @@ use std::collections::{HashMap, HashSet};
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
-    Deb,       // apt (Debian, Ubuntu, Pop!_OS)
-    Rpm,       // dnf/rpm (Fedora, RHEL, openSUSE)
-    Pacman,    // pacman (Arch Linux, EndeavourOS)
-    Snap,      // snap (Ubuntu Universal)
-    Flatpak,   // flatpak (Universal Sandbox)
-    SigmaPkg,  // native SigmaOS format
-    Ebuild,    // Gentoo Portage
-    Apk,       // Alpine APK
-    Nix,       // NixOS Declarative Nix Expression
-    AppImage,  // AppImage Sandbox
-    Xbps,      // Void Linux XBPS
-    Txz,       // Slackware Package Tool
-    Eopkg,     // Solus Package Manager
-    Zypper,    // openSUSE Zypper Command Tool
-    Guix,      // GNU Guix Functional Package Manager
-    CachyOS,   // CachyOS Performance Optimized (x86_64-v3/v4)
-    Swupd,     // Intel Clear Linux swupd bundles
-    Starling,  // Starling Desktop native packages
+    Deb,      // apt (Debian, Ubuntu, Pop!_OS)
+    Rpm,      // dnf/rpm (Fedora, RHEL, openSUSE)
+    Pacman,   // pacman (Arch Linux, EndeavourOS)
+    Snap,     // snap (Ubuntu Universal)
+    Flatpak,  // flatpak (Universal Sandbox)
+    SigmaPkg, // native SigmaOS format
+    Ebuild,   // Gentoo Portage
+    Apk,      // Alpine APK
+    Nix,      // NixOS Declarative Nix Expression
+    AppImage, // AppImage Sandbox
+    Xbps,     // Void Linux XBPS
+    Txz,      // Slackware Package Tool
+    Eopkg,    // Solus Package Manager
+    Zypper,   // openSUSE Zypper Command Tool
+    Guix,     // GNU Guix Functional Package Manager
+    CachyOS,  // CachyOS Performance Optimized (x86_64-v3/v4)
+    Swupd,    // Intel Clear Linux swupd bundles
+    Starling, // Starling Desktop native packages
 }
 
 /// Package source
@@ -159,15 +159,24 @@ pub trait PackageActionStrategy: Send + Sync {
 pub struct DebianStyleStrategy;
 impl PackageActionStrategy for DebianStyleStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("DebianStyleStrategy: Unpacking control archive, setting up pre-dependencies for {}", package.name);
+        println!(
+            "DebianStyleStrategy: Unpacking control archive, setting up pre-dependencies for {}",
+            package.name
+        );
         Ok(())
     }
     fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
-        println!("DebianStyleStrategy: Verifying md5sums files of {}", package.name);
+        println!(
+            "DebianStyleStrategy: Verifying md5sums files of {}",
+            package.name
+        );
         Ok(true)
     }
     fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("DebianStyleStrategy: Rolling back deb package {}", package.name);
+        println!(
+            "DebianStyleStrategy: Rolling back deb package {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -175,15 +184,24 @@ impl PackageActionStrategy for DebianStyleStrategy {
 pub struct RedHatStyleStrategy;
 impl PackageActionStrategy for RedHatStyleStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("RedHatStyleStrategy: Extracting RPM headers & payloads for {}", package.name);
+        println!(
+            "RedHatStyleStrategy: Extracting RPM headers & payloads for {}",
+            package.name
+        );
         Ok(())
     }
     fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
-        println!("RedHatStyleStrategy: Checking database digest GPG signature for {}", package.name);
+        println!(
+            "RedHatStyleStrategy: Checking database digest GPG signature for {}",
+            package.name
+        );
         Ok(true)
     }
     fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("RedHatStyleStrategy: Restoring RPM rollback checkpoint for {}", package.name);
+        println!(
+            "RedHatStyleStrategy: Restoring RPM rollback checkpoint for {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -191,15 +209,24 @@ impl PackageActionStrategy for RedHatStyleStrategy {
 pub struct ArchStyleStrategy;
 impl PackageActionStrategy for ArchStyleStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("ArchStyleStrategy: Processing pacman transaction hook & ALPM database update for {}", package.name);
+        println!(
+            "ArchStyleStrategy: Processing pacman transaction hook & ALPM database update for {}",
+            package.name
+        );
         Ok(())
     }
     fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
-        println!("ArchStyleStrategy: Performing MTREE validations for {}", package.name);
+        println!(
+            "ArchStyleStrategy: Performing MTREE validations for {}",
+            package.name
+        );
         Ok(true)
     }
     fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("ArchStyleStrategy: Re-registering previous version of pacman archive for {}", package.name);
+        println!(
+            "ArchStyleStrategy: Re-registering previous version of pacman archive for {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -207,15 +234,24 @@ impl PackageActionStrategy for ArchStyleStrategy {
 pub struct SandboxStyleStrategy;
 impl PackageActionStrategy for SandboxStyleStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("SandboxStyleStrategy: Configuring ostree/bubblewrap sandbox boundaries for {}", package.name);
+        println!(
+            "SandboxStyleStrategy: Configuring ostree/bubblewrap sandbox boundaries for {}",
+            package.name
+        );
         Ok(())
     }
     fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
-        println!("SandboxStyleStrategy: Verifying manifest permission overrides for {}", package.name);
+        println!(
+            "SandboxStyleStrategy: Verifying manifest permission overrides for {}",
+            package.name
+        );
         Ok(true)
     }
     fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("SandboxStyleStrategy: Resetting namespace runtime limits for {}", package.name);
+        println!(
+            "SandboxStyleStrategy: Resetting namespace runtime limits for {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -227,11 +263,17 @@ impl PackageActionStrategy for SovereignStyleStrategy {
         Ok(())
     }
     fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
-        println!("SovereignStyleStrategy: High-entropy cryptographic attestation verification for {}", package.name);
+        println!(
+            "SovereignStyleStrategy: High-entropy cryptographic attestation verification for {}",
+            package.name
+        );
         Ok(true)
     }
     fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("SovereignStyleStrategy: Swapping atomic root inodes pointer in zero-latency for {}", package.name);
+        println!(
+            "SovereignStyleStrategy: Swapping atomic root inodes pointer in zero-latency for {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -345,9 +387,15 @@ impl PackageFormatAdapter for StarlingMetadataAdapter {
     }
 
     fn convert_to_raw(&self, package: &UnifiedPackage) -> Result<String, PackageError> {
-        let mut raw = format!("starling.name = \"{}\"\nstarling.version = \"{}\"\n", package.name, package.version);
+        let mut raw = format!(
+            "starling.name = \"{}\"\nstarling.version = \"{}\"\n",
+            package.name, package.version
+        );
         if !package.dependencies.is_empty() {
-            raw.push_str(&format!("starling.depends = [ \"{}\" ]\n", package.dependencies.join("\", \"")));
+            raw.push_str(&format!(
+                "starling.depends = [ \"{}\" ]\n",
+                package.dependencies.join("\", \"")
+            ));
         }
         Ok(raw)
     }
@@ -367,7 +415,10 @@ pub struct SandboxedPackageDecorator {
 impl IPackageDecorator for SandboxedPackageDecorator {
     fn decorate(&self, package: &mut UnifiedPackage) -> Result<(), PackageError> {
         package.is_sandboxed = true;
-        println!("SandboxedPackageDecorator: Sandbox protection applied. Network Restricted: {}", self.network_restricted);
+        println!(
+            "SandboxedPackageDecorator: Sandbox protection applied. Network Restricted: {}",
+            self.network_restricted
+        );
         Ok(())
     }
 }
@@ -378,7 +429,10 @@ pub struct PqcSignedPackageDecorator {
 impl IPackageDecorator for PqcSignedPackageDecorator {
     fn decorate(&self, package: &mut UnifiedPackage) -> Result<(), PackageError> {
         package.pqc_signature = Some(format!("dilithium5:sig:{}", self.key_id));
-        println!("PqcSignedPackageDecorator: Signed with Dilithium-5 key ID: {}", self.key_id);
+        println!(
+            "PqcSignedPackageDecorator: Signed with Dilithium-5 key ID: {}",
+            self.key_id
+        );
         Ok(())
     }
 }
@@ -387,7 +441,9 @@ pub struct TelemetryPackageDecorator;
 impl IPackageDecorator for TelemetryPackageDecorator {
     fn decorate(&self, package: &mut UnifiedPackage) -> Result<(), PackageError> {
         package.telemetry_enabled = true;
-        println!("TelemetryPackageDecorator: Detailed telemetry reporting hooks loaded dynamically.");
+        println!(
+            "TelemetryPackageDecorator: Detailed telemetry reporting hooks loaded dynamically."
+        );
         Ok(())
     }
 }
@@ -396,7 +452,8 @@ impl IPackageDecorator for TelemetryPackageDecorator {
 // 4. OBSERVER PATTERN (Polymorphic User-Defined Hooks & Triggers)
 // =========================================================================
 
-pub type UserDefinedHook = Box<dyn Fn(&mut UnifiedPackage) -> Result<(), PackageError> + Send + Sync>;
+pub type UserDefinedHook =
+    Box<dyn Fn(&mut UnifiedPackage) -> Result<(), PackageError> + Send + Sync>;
 
 pub struct PackageTriggerRegistry {
     pub pre_install_hooks: Vec<UserDefinedHook>,
@@ -479,8 +536,12 @@ pub fn get_strategy_for(format: PackageFormat) -> Box<dyn PackageActionStrategy>
         PackageFormat::Deb => Box::new(DebianStyleStrategy),
         PackageFormat::Rpm => Box::new(RedHatStyleStrategy),
         PackageFormat::Pacman => Box::new(ArchStyleStrategy),
-        PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => Box::new(SandboxStyleStrategy),
-        PackageFormat::SigmaPkg | PackageFormat::CachyOS | PackageFormat::Starling => Box::new(SovereignStyleStrategy),
+        PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => {
+            Box::new(SandboxStyleStrategy)
+        }
+        PackageFormat::SigmaPkg | PackageFormat::CachyOS | PackageFormat::Starling => {
+            Box::new(SovereignStyleStrategy)
+        }
         _ => Box::new(SovereignStyleStrategy),
     }
 }
@@ -650,9 +711,9 @@ impl TransactionalHistory {
     }
 
     pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
-        for i in 0..self.checkpoints.len() {
-            if self.checkpoints[i].checkpoint_id == id {
-                return Some(&self.checkpoints[i]);
+        for checkpoint in &self.checkpoints {
+            if checkpoint.checkpoint_id == id {
+                return Some(checkpoint);
             }
         }
         None
@@ -936,8 +997,12 @@ mod tests {
     fn test_decorators() {
         let mut package = UnifiedPackage::new("decorated-pkg".to_string(), "1.0.0".to_string());
 
-        let sandbox = SandboxedPackageDecorator { network_restricted: true };
-        let signer = PqcSignedPackageDecorator { key_id: "testkey123".to_string() };
+        let sandbox = SandboxedPackageDecorator {
+            network_restricted: true,
+        };
+        let signer = PqcSignedPackageDecorator {
+            key_id: "testkey123".to_string(),
+        };
         let telemetry = TelemetryPackageDecorator;
 
         sandbox.decorate(&mut package).unwrap();

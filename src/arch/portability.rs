@@ -19,19 +19,25 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+use core::mem;
 /// OOP-based ARM64 + RISC-V Portability for SigmaOS
 /// Based on Roadmap Item: ARM64 + RISC-V Portability
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum Architecture { X86_64 = 0, ARM64 = 1, RISCV64 = 2 }
+pub enum Architecture {
+    X86_64 = 0,
+    ARM64 = 1,
+    RISCV64 = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum Endianness { Little = 0, Big = 1 }
+pub enum Endianness {
+    Little = 0,
+    Big = 1,
+}
 
 pub trait ArchitecturePort {
     fn arch(&self) -> Architecture;
@@ -48,14 +54,24 @@ pub struct SimpleArchitecturePort {
 
 impl SimpleArchitecturePort {
     pub fn new(arch: Architecture, endianness: Endianness, word_size: usize) -> Self {
-        SimpleArchitecturePort { arch, endianness, word_size }
+        SimpleArchitecturePort {
+            arch,
+            endianness,
+            word_size,
+        }
     }
 }
 
 impl ArchitecturePort for SimpleArchitecturePort {
-    fn arch(&self) -> Architecture { self.arch }
-    fn endianness(&self) -> Endianness { self.endianness }
-    fn word_size(&self) -> usize { self.word_size }
+    fn arch(&self) -> Architecture {
+        self.arch
+    }
+    fn endianness(&self) -> Endianness {
+        self.endianness
+    }
+    fn word_size(&self) -> usize {
+        self.word_size
+    }
 }
 
 pub trait ARM64Support {
@@ -65,7 +81,11 @@ pub trait ARM64Support {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PortError { Success = 0, UnsupportedArch = 1, InitFailed = 2 }
+pub enum PortError {
+    Success = 0,
+    UnsupportedArch = 1,
+    InitFailed = 2,
+}
 
 pub struct SimpleARM64Support {
     pub port: SimpleArchitecturePort,

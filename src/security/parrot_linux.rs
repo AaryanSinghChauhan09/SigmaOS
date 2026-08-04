@@ -71,8 +71,14 @@ pub struct ForensicsAuditTool {
 impl ForensicsAuditTool {
     pub fn new() -> Self {
         let mut decoys = HashMap::new();
-        decoys.insert(PathBuf::from("/etc/shadow_backup"), "Fake credential hash store honeypot".to_string());
-        decoys.insert(PathBuf::from("/home/admin/wallet.dat"), "Fake Bitcoin wallet decoy".to_string());
+        decoys.insert(
+            PathBuf::from("/etc/shadow_backup"),
+            "Fake credential hash store honeypot".to_string(),
+        );
+        decoys.insert(
+            PathBuf::from("/home/admin/wallet.dat"),
+            "Fake Bitcoin wallet decoy".to_string(),
+        );
 
         Self {
             decoy_honeypots: decoys,
@@ -81,7 +87,11 @@ impl ForensicsAuditTool {
     }
 
     /// Carves deleted file data from disk images via magic bytes
-    pub fn carve_deleted_inode(&mut self, inode: usize, raw_sector: &[u8]) -> Option<RecoveredFile> {
+    pub fn carve_deleted_inode(
+        &mut self,
+        inode: usize,
+        raw_sector: &[u8],
+    ) -> Option<RecoveredFile> {
         if raw_sector.starts_with(b"\x89PNG") {
             let file = RecoveredFile {
                 inode,
@@ -124,8 +134,14 @@ impl KaliSniffer {
     pub fn process_packet(&mut self, packet: SniffedPacket) {
         // Scan payload for plain-text password exposures
         let payload_str = String::from_utf8_lossy(&packet.payload);
-        if payload_str.contains("user=") || payload_str.contains("password=") || payload_str.contains("passwd=") {
-            self.credential_leaks.push(format!("[Leak Alert] Plaintext credentials found in {} payload: {}", packet.protocol, payload_str));
+        if payload_str.contains("user=")
+            || payload_str.contains("password=")
+            || payload_str.contains("passwd=")
+        {
+            self.credential_leaks.push(format!(
+                "[Leak Alert] Plaintext credentials found in {} payload: {}",
+                packet.protocol, payload_str
+            ));
         }
         self.captured_packets.push_back(packet);
     }
@@ -141,15 +157,17 @@ pub struct PentestAssistant {
 
 impl PentestAssistant {
     pub fn new() -> Self {
-        Self { target_ips: Vec::new() }
+        Self {
+            target_ips: Vec::new(),
+        }
     }
 
     /// Performs a simulated port scan looking for vulnerabilities
     pub fn scan_ports(&self, ip: &str) -> Vec<u16> {
         let mut open_ports = Vec::new();
         if ip == "127.0.0.1" {
-            open_ports.push(22);  // SSH (sshd)
-            open_ports.push(80);  // HTTP
+            open_ports.push(22); // SSH (sshd)
+            open_ports.push(80); // HTTP
             open_ports.push(9050); // Tor proxy
         }
         open_ports
@@ -231,7 +249,12 @@ impl SigmaIDS {
     pub fn new() -> Self {
         Self {
             alerts_log: Vec::new(),
-            process_whitelists: vec!["init".to_string(), "sshd".to_string(), "cron".to_string(), "sigma_kernel".to_string()],
+            process_whitelists: vec![
+                "init".to_string(),
+                "sshd".to_string(),
+                "cron".to_string(),
+                "sigma_kernel".to_string(),
+            ],
         }
     }
 
@@ -271,12 +294,17 @@ mod tests {
     #[test]
     fn test_forensics_inode_carving_and_honeypots() {
         let mut forensics = ForensicsAuditTool::new();
-        assert!(forensics.decoy_honeypots.contains_key(&PathBuf::from("/etc/shadow_backup")));
+        assert!(forensics
+            .decoy_honeypots
+            .contains_key(&PathBuf::from("/etc/shadow_backup")));
 
         let raw_png_sector = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR...";
         let carved = forensics.carve_deleted_inode(404, raw_png_sector).unwrap();
         assert_eq!(carved.inode, 404);
-        assert_eq!(carved.original_path, PathBuf::from("recovered_image_404.png"));
+        assert_eq!(
+            carved.original_path,
+            PathBuf::from("recovered_image_404.png")
+        );
     }
 
     #[test]
@@ -310,8 +338,14 @@ mod tests {
         assert!(open_ports.contains(&22));
         assert!(open_ports.contains(&9050));
 
-        assert_eq!(assistant.audit_password_strength("short"), "Weak: Too short");
-        assert_eq!(assistant.audit_password_strength("SigmaOS2026"), "Strong: Excellent complexity");
+        assert_eq!(
+            assistant.audit_password_strength("short"),
+            "Weak: Too short"
+        );
+        assert_eq!(
+            assistant.audit_password_strength("SigmaOS2026"),
+            "Strong: Excellent complexity"
+        );
     }
 
     #[test]

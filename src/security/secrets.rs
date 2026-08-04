@@ -466,7 +466,9 @@ pub trait SecretManager {
 
 pub struct SecretStorage;
 impl SecretStorage {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl SecretManager for SecretStorage {
     fn store_secret(&mut self, _secret: Box<dyn Secret>) -> Result<SecretID, SecretError> {

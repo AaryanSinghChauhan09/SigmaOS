@@ -29,9 +29,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
-use sigma_types::{CapabilityToken, Result};
 use crate::klib::HashMap;
+use sigma_types::{CapabilityToken, Result};
 use std::path::{Path, PathBuf};
 
 /// Access permissions for unveiled paths

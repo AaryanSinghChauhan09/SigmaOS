@@ -126,7 +126,8 @@ impl<T> ShellVec<T> {
             &[]
         } else {
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }.iter()
+        }
+        .iter()
     }
 
     pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
@@ -134,7 +135,8 @@ impl<T> ShellVec<T> {
             &mut []
         } else {
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }.iter_mut()
+        }
+        .iter_mut()
     }
 
     unsafe fn grow(&mut self) {
@@ -554,7 +556,11 @@ impl<T> ShellVec<T> {
     }
 
     pub unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {

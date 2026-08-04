@@ -19,7 +19,6 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 // (no_std only applicable at crate root - removed)
 
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -92,7 +91,11 @@ impl X86_64HAL {
     fn read_pci_config(&self, bus: u8, device: u8, function: u8, offset: u16) -> u16 {
         // In real implementation, would use PCI configuration I/O ports
         // 0xCF8 for address, 0xCFC for data
-        let address = (1u32 << 31) | ((bus as u32) << 16) | ((device as u32) << 11) | ((function as u32) << 8) | ((offset as u32) & 0xFC);
+        let address = (1u32 << 31)
+            | ((bus as u32) << 16)
+            | ((device as u32) << 11)
+            | ((function as u32) << 8)
+            | ((offset as u32) & 0xFC);
         // Write to 0xCF8, read from 0xCFC
         0xFFFF // Stub
     }
