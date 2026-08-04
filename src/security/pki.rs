@@ -6,22 +6,30 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+use core::mem;
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type CertificateID = usize;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy)]
-pub enum CertificateType { Root = 0, Intermediate = 1, EndEntity = 2 }
+pub enum CertificateType {
+    Root = 0,
+    Intermediate = 1,
+    EndEntity = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum PKIError { Success = 0, NotFound = 1, InvalidCertificate = 2, VerificationFailed = 3 }
+pub enum PKIError {
+    Success = 0,
+    NotFound = 1,
+    InvalidCertificate = 2,
+    VerificationFailed = 3,
+}
 
 pub trait Certificate {
     fn id(&self) -> CertificateID;
@@ -44,13 +52,22 @@ pub struct SimpleCertificate {
 }
 
 impl SimpleCertificate {
-    pub fn new(id: CertificateID, cert_type: CertificateType, subject: &[u8], issuer: &[u8]) -> Self {
+    pub fn new(
+        id: CertificateID,
+        cert_type: CertificateType,
+        subject: &[u8],
+        issuer: &[u8],
+    ) -> Self {
         let mut subject_array = [0u8; 256];
         let mut issuer_array = [0u8; 256];
         let subject_len = subject.len().min(255);
         let issuer_len = issuer.len().min(255);
         unsafe {
-            core::ptr::copy_nonoverlapping(subject.as_ptr(), subject_array.as_mut_ptr(), subject_len);
+            core::ptr::copy_nonoverlapping(
+                subject.as_ptr(),
+                subject_array.as_mut_ptr(),
+                subject_len,
+            );
             core::ptr::copy_nonoverlapping(issuer.as_ptr(), issuer_array.as_mut_ptr(), issuer_len);
         }
         SimpleCertificate {
@@ -65,8 +82,12 @@ impl SimpleCertificate {
 }
 
 impl Certificate for SimpleCertificate {
-    fn id(&self) -> CertificateID { self.id }
-    fn certificate_type(&self) -> CertificateType { unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) } }
+    fn id(&self) -> CertificateID {
+        self.id
+    }
+    fn certificate_type(&self) -> CertificateType {
+        unsafe { core::mem::transmute(self.certificate_type.load(Ordering::SeqCst)) }
+    }
     fn subject(&self) -> &[u8] {
         let len = self.subject.iter().position(|&b| b == 0).unwrap_or(256);
         &self.subject[..len]
@@ -75,8 +96,12 @@ impl Certificate for SimpleCertificate {
         let len = self.issuer.iter().position(|&b| b == 0).unwrap_or(256);
         &self.issuer[..len]
     }
-    fn not_before(&self) -> u64 { self.not_before.load(Ordering::SeqCst) as u64 }
-    fn not_after(&self) -> u64 { self.not_after.load(Ordering::SeqCst) as u64 }
+    fn not_before(&self) -> u64 {
+        self.not_before.load(Ordering::SeqCst) as u64
+    }
+    fn not_after(&self) -> u64 {
+        self.not_after.load(Ordering::SeqCst) as u64
+    }
     fn is_valid(&self) -> bool {
         let current = 1000000u64;
         current >= self.not_before() && current <= self.not_after()
@@ -87,7 +112,11 @@ pub trait PKIManager {
     fn issue_certificate(&mut self, cert: Box<dyn Certificate>) -> Result<CertificateID, PKIError>;
     fn revoke_certificate(&mut self, id: CertificateID) -> Result<(), PKIError>;
     fn get_certificate(&self, id: CertificateID) -> Option<&dyn Certificate>;
-    fn verify_certificate(&self, id: CertificateID, issuer_id: CertificateID) -> Result<bool, PKIError>;
+    fn verify_certificate(
+        &self,
+        id: CertificateID,
+        issuer_id: CertificateID,
+    ) -> Result<bool, PKIError>;
 }
 
 #[repr(C)]
@@ -129,13 +158,19 @@ impl PKIManager for SimplePKIManager {
     fn get_certificate(&self, id: CertificateID) -> Option<&dyn Certificate> {
         for i in 0..self.certificates.len() {
             if let Some(Some(ref cert)) = self.certificates.get(i) {
-                if cert.id() == id { return Some(cert.as_ref()); }
+                if cert.id() == id {
+                    return Some(cert.as_ref());
+                }
             }
         }
         None
     }
 
-    fn verify_certificate(&self, id: CertificateID, _issuer_id: CertificateID) -> Result<bool, PKIError> {
+    fn verify_certificate(
+        &self,
+        id: CertificateID,
+        _issuer_id: CertificateID,
+    ) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
             if self.revoked.contains(&id) {
                 return Ok(false);

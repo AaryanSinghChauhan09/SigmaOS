@@ -70,7 +70,12 @@ pub struct AURRecipe {
 }
 
 impl AURRecipe {
-    pub fn new(name: String, version: String, build_command: String, pqc_signature: Vec<u8>) -> Self {
+    pub fn new(
+        name: String,
+        version: String,
+        build_command: String,
+        pqc_signature: Vec<u8>,
+    ) -> Self {
         Self {
             name,
             version,
@@ -171,7 +176,12 @@ impl SpacPackageManager {
         // Extract and clone values early to release the immutable borrow on `self.aur_recipes`
         let (recipe_name, recipe_version, build_command, has_sig) = {
             let recipe = self.aur_recipes.get(name).ok_or("AUR recipe not found")?;
-            (recipe.name.clone(), recipe.version.clone(), recipe.build_command.clone(), !recipe.pqc_signature.is_empty())
+            (
+                recipe.name.clone(),
+                recipe.version.clone(),
+                recipe.build_command.clone(),
+                !recipe.pqc_signature.is_empty(),
+            )
         };
 
         // 1. Authenticate package provenance utilizing Dilithium-5 signatures
@@ -196,7 +206,10 @@ impl SpacPackageManager {
         self.stage_package(built_pkg)?;
         self.activate_staged()?;
 
-        Ok(format!("Successfully built and installed AUR package '{}' v{} inside the security sandbox.", recipe_name, recipe_version))
+        Ok(format!(
+            "Successfully built and installed AUR package '{}' v{} inside the security sandbox.",
+            recipe_name, recipe_version
+        ))
     }
 }
 
@@ -330,7 +343,10 @@ mod tests {
         manager.register_aur_recipe(recipe);
         let res = manager.build_aur_package("unsigned-pkg");
         assert!(res.is_err());
-        assert_eq!(res.unwrap_err(), "Dilithium-5 cryptographic attestation failure: Missing signature");
+        assert_eq!(
+            res.unwrap_err(),
+            "Dilithium-5 cryptographic attestation failure: Missing signature"
+        );
     }
 
     #[test]
@@ -346,6 +362,9 @@ mod tests {
         manager.register_aur_recipe(recipe);
         let res = manager.build_aur_package("malicious-pkg");
         assert!(res.is_err());
-        assert_eq!(res.unwrap_err(), "Secure Build Sandbox: Privilege violation or malicious command detected");
+        assert_eq!(
+            res.unwrap_err(),
+            "Secure Build Sandbox: Privilege violation or malicious command detected"
+        );
     }
 }

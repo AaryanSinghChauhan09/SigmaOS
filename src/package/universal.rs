@@ -1,21 +1,33 @@
 // SigmaOS Universal Package Manager
-// Unified system absorbing apt, yum, pacman, snap, flatpak
+// Unified system absorbing apt, yum, pacman, snap, flatpak, nix, ebuild, etc.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
-    Deb,      // apt
-    Rpm,      // yum
-    Pacman,   // pacman
-    Snap,     // snap
-    Flatpak,  // flatpak
+    Deb,      // apt (Debian, Ubuntu, Pop!_OS)
+    Rpm,      // dnf/rpm (Fedora, RHEL, openSUSE)
+    Pacman,   // pacman (Arch Linux, EndeavourOS)
+    Snap,     // snap (Ubuntu Universal)
+    Flatpak,  // flatpak (Universal Sandbox)
     SigmaPkg, // native SigmaOS format
+    Ebuild,   // Gentoo Portage
+    Apk,      // Alpine APK
+    Nix,      // NixOS Declarative Nix Expression
+    AppImage, // AppImage Sandbox
+    Xbps,     // Void Linux XBPS
+    Txz,      // Slackware Package Tool
+    Eopkg,    // Solus Package Manager
+    Zypper,   // openSUSE Zypper Command Tool
+    Guix,     // GNU Guix Functional Package Manager
+    CachyOS,  // CachyOS Performance Optimized (x86_64-v3/v4)
+    Swupd,    // Intel Clear Linux swupd bundles
+    Starling, // Starling Desktop native packages
 }
 
 /// Package source
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PackageSource {
     Repository { url: String },
     Local { path: String },
@@ -31,7 +43,18 @@ pub enum ConflictResolution {
     Manual,
 }
 
-/// Unified package
+/// Package lifecycle state machine states (State Pattern)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageState {
+    Uninstalled,
+    Staged,
+    Configuring,
+    Installing,
+    Installed,
+    RollbackPending,
+}
+
+/// Unified package representing cross-distro package metadata
 #[derive(Debug, Clone)]
 pub struct UnifiedPackage {
     pub name: String,
@@ -41,6 +64,11 @@ pub struct UnifiedPackage {
     pub conflicts: Vec<String>,
     pub provides: Vec<String>,
     pub source: PackageSource,
+    pub state: PackageState,
+    pub pqc_signature: Option<String>,
+    pub is_sandboxed: bool,
+    pub telemetry_enabled: bool,
+    pub install_duration_ms: u64,
     pub installed: bool,
 }
 
@@ -54,6 +82,11 @@ impl UnifiedPackage {
             conflicts: Vec::new(),
             provides: Vec::new(),
             source: PackageSource::Repository { url: String::new() },
+            state: PackageState::Uninstalled,
+            pqc_signature: None,
+            is_sandboxed: false,
+            telemetry_enabled: false,
+            install_duration_ms: 0,
             installed: false,
         }
     }
@@ -82,9 +115,384 @@ impl UnifiedPackage {
         self.conflicts.iter().any(|c| c == &other.name)
             || other.conflicts.iter().any(|c| c == &self.name)
     }
+
+    /// Transitions package lifecycle state safely (State Pattern)
+    pub fn transition_to(&mut self, next: PackageState) -> Result<(), PackageError> {
+        let is_valid = match (self.state, next) {
+            (PackageState::Uninstalled, PackageState::Staged) => true,
+            (PackageState::Uninstalled, PackageState::Configuring) => true,
+            (PackageState::Uninstalled, PackageState::Installing) => true,
+            (PackageState::Staged, PackageState::Configuring) => true,
+            (PackageState::Configuring, PackageState::Installing) => true,
+            (PackageState::Installing, PackageState::Installed) => true,
+            (PackageState::Installed, PackageState::RollbackPending) => true,
+            (PackageState::RollbackPending, PackageState::Uninstalled) => true,
+            // Fallback transitions
+            (PackageState::Installing, PackageState::RollbackPending) => true,
+            (PackageState::Configuring, PackageState::Uninstalled) => true,
+            (PackageState::Staged, PackageState::Uninstalled) => true,
+            _ => false,
+        };
+
+        if is_valid {
+            self.state = next;
+            Ok(())
+        } else {
+            Err(PackageError::InstallationFailed(format!(
+                "Invalid lifecycle state transition from {:?} to {:?}",
+                self.state, next
+            )))
+        }
+    }
 }
 
-/// Package format adapter
+// =========================================================================
+// 1. STRATEGY PATTERN (Package Action Strategies)
+// =========================================================================
+
+pub trait PackageActionStrategy: Send + Sync {
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError>;
+    fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
+}
+
+pub struct DebianStyleStrategy;
+impl PackageActionStrategy for DebianStyleStrategy {
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "DebianStyleStrategy: Unpacking control archive, setting up pre-dependencies for {}",
+            package.name
+        );
+        Ok(())
+    }
+    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
+        println!(
+            "DebianStyleStrategy: Verifying md5sums files of {}",
+            package.name
+        );
+        Ok(true)
+    }
+    fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "DebianStyleStrategy: Rolling back deb package {}",
+            package.name
+        );
+        Ok(())
+    }
+}
+
+pub struct RedHatStyleStrategy;
+impl PackageActionStrategy for RedHatStyleStrategy {
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "RedHatStyleStrategy: Extracting RPM headers & payloads for {}",
+            package.name
+        );
+        Ok(())
+    }
+    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
+        println!(
+            "RedHatStyleStrategy: Checking database digest GPG signature for {}",
+            package.name
+        );
+        Ok(true)
+    }
+    fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "RedHatStyleStrategy: Restoring RPM rollback checkpoint for {}",
+            package.name
+        );
+        Ok(())
+    }
+}
+
+pub struct ArchStyleStrategy;
+impl PackageActionStrategy for ArchStyleStrategy {
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "ArchStyleStrategy: Processing pacman transaction hook & ALPM database update for {}",
+            package.name
+        );
+        Ok(())
+    }
+    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
+        println!(
+            "ArchStyleStrategy: Performing MTREE validations for {}",
+            package.name
+        );
+        Ok(true)
+    }
+    fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "ArchStyleStrategy: Re-registering previous version of pacman archive for {}",
+            package.name
+        );
+        Ok(())
+    }
+}
+
+pub struct SandboxStyleStrategy;
+impl PackageActionStrategy for SandboxStyleStrategy {
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "SandboxStyleStrategy: Configuring ostree/bubblewrap sandbox boundaries for {}",
+            package.name
+        );
+        Ok(())
+    }
+    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
+        println!(
+            "SandboxStyleStrategy: Verifying manifest permission overrides for {}",
+            package.name
+        );
+        Ok(true)
+    }
+    fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "SandboxStyleStrategy: Resetting namespace runtime limits for {}",
+            package.name
+        );
+        Ok(())
+    }
+}
+
+pub struct SovereignStyleStrategy;
+impl PackageActionStrategy for SovereignStyleStrategy {
+    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!("SovereignStyleStrategy: Direct secure high-speed microkernel mapping of native sigpkg {}", package.name);
+        Ok(())
+    }
+    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
+        println!(
+            "SovereignStyleStrategy: High-entropy cryptographic attestation verification for {}",
+            package.name
+        );
+        Ok(true)
+    }
+    fn rollback(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
+        println!(
+            "SovereignStyleStrategy: Swapping atomic root inodes pointer in zero-latency for {}",
+            package.name
+        );
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 2. ADAPTER PATTERN (Metadata Format Translation Adapters)
+// =========================================================================
+
+pub trait PackageFormatAdapter {
+    fn convert_to_unified(&self, raw_metadata: &str) -> Result<UnifiedPackage, PackageError>;
+    fn convert_to_raw(&self, package: &UnifiedPackage) -> Result<String, PackageError>;
+}
+
+pub struct DebMetadataAdapter;
+impl PackageFormatAdapter for DebMetadataAdapter {
+    fn convert_to_unified(&self, raw: &str) -> Result<UnifiedPackage, PackageError> {
+        let mut name = "deb-package".to_string();
+        let mut version = "1.0.0".to_string();
+        let mut dependencies = Vec::new();
+
+        for line in raw.lines() {
+            if line.starts_with("Package: ") {
+                name = line[9..].trim().to_string();
+            } else if line.starts_with("Version: ") {
+                version = line[9..].trim().to_string();
+            } else if line.starts_with("Depends: ") {
+                for dep in line[9..].split(',') {
+                    dependencies.push(dep.trim().to_string());
+                }
+            }
+        }
+
+        let mut package = UnifiedPackage::new(name, version).with_format(PackageFormat::Deb);
+        for dep in dependencies {
+            package = package.with_dependency(dep);
+        }
+        Ok(package)
+    }
+
+    fn convert_to_raw(&self, package: &UnifiedPackage) -> Result<String, PackageError> {
+        let mut raw = format!("Package: {}\nVersion: {}\n", package.name, package.version);
+        if !package.dependencies.is_empty() {
+            raw.push_str(&format!("Depends: {}\n", package.dependencies.join(", ")));
+        }
+        Ok(raw)
+    }
+}
+
+pub struct RpmMetadataAdapter;
+impl PackageFormatAdapter for RpmMetadataAdapter {
+    fn convert_to_unified(&self, raw: &str) -> Result<UnifiedPackage, PackageError> {
+        let mut name = "rpm-package".to_string();
+        let mut version = "1.0.0".to_string();
+        let mut dependencies = Vec::new();
+
+        for line in raw.lines() {
+            if line.starts_with("Name: ") {
+                name = line[6..].trim().to_string();
+            } else if line.starts_with("Version: ") {
+                version = line[9..].trim().to_string();
+            } else if line.starts_with("Requires: ") {
+                for dep in line[10..].split_whitespace() {
+                    dependencies.push(dep.to_string());
+                }
+            }
+        }
+
+        let mut package = UnifiedPackage::new(name, version).with_format(PackageFormat::Rpm);
+        for dep in dependencies {
+            package = package.with_dependency(dep);
+        }
+        Ok(package)
+    }
+
+    fn convert_to_raw(&self, package: &UnifiedPackage) -> Result<String, PackageError> {
+        let mut raw = format!("Name: {}\nVersion: {}\n", package.name, package.version);
+        if !package.dependencies.is_empty() {
+            raw.push_str(&format!("Requires: {}\n", package.dependencies.join(" ")));
+        }
+        Ok(raw)
+    }
+}
+
+pub struct StarlingMetadataAdapter;
+impl PackageFormatAdapter for StarlingMetadataAdapter {
+    fn convert_to_unified(&self, raw: &str) -> Result<UnifiedPackage, PackageError> {
+        let mut name = "starling-package".to_string();
+        let mut version = "1.0.0".to_string();
+        let mut dependencies = Vec::new();
+
+        for line in raw.lines() {
+            if line.starts_with("starling.name = ") {
+                name = line[16..].trim_matches('"').to_string();
+            } else if line.starts_with("starling.version = ") {
+                version = line[19..].trim_matches('"').to_string();
+            } else if line.starts_with("starling.depends = ") {
+                for dep in line[19..].split_whitespace() {
+                    let clean = dep.trim_matches(|c| c == '[' || c == ']' || c == '"' || c == ',');
+                    if !clean.is_empty() {
+                        dependencies.push(clean.to_string());
+                    }
+                }
+            }
+        }
+
+        let mut package = UnifiedPackage::new(name, version).with_format(PackageFormat::Starling);
+        for dep in dependencies {
+            package = package.with_dependency(dep);
+        }
+        Ok(package)
+    }
+
+    fn convert_to_raw(&self, package: &UnifiedPackage) -> Result<String, PackageError> {
+        let mut raw = format!(
+            "starling.name = \"{}\"\nstarling.version = \"{}\"\n",
+            package.name, package.version
+        );
+        if !package.dependencies.is_empty() {
+            raw.push_str(&format!(
+                "starling.depends = [ \"{}\" ]\n",
+                package.dependencies.join("\", \"")
+            ));
+        }
+        Ok(raw)
+    }
+}
+
+// =========================================================================
+// 3. DECORATOR PATTERN (Dynamic Package Enhancements)
+// =========================================================================
+
+pub trait IPackageDecorator: Send + Sync {
+    fn decorate(&self, package: &mut UnifiedPackage) -> Result<(), PackageError>;
+}
+
+pub struct SandboxedPackageDecorator {
+    pub network_restricted: bool,
+}
+impl IPackageDecorator for SandboxedPackageDecorator {
+    fn decorate(&self, package: &mut UnifiedPackage) -> Result<(), PackageError> {
+        package.is_sandboxed = true;
+        println!(
+            "SandboxedPackageDecorator: Sandbox protection applied. Network Restricted: {}",
+            self.network_restricted
+        );
+        Ok(())
+    }
+}
+
+pub struct PqcSignedPackageDecorator {
+    pub key_id: String,
+}
+impl IPackageDecorator for PqcSignedPackageDecorator {
+    fn decorate(&self, package: &mut UnifiedPackage) -> Result<(), PackageError> {
+        package.pqc_signature = Some(format!("dilithium5:sig:{}", self.key_id));
+        println!(
+            "PqcSignedPackageDecorator: Signed with Dilithium-5 key ID: {}",
+            self.key_id
+        );
+        Ok(())
+    }
+}
+
+pub struct TelemetryPackageDecorator;
+impl IPackageDecorator for TelemetryPackageDecorator {
+    fn decorate(&self, package: &mut UnifiedPackage) -> Result<(), PackageError> {
+        package.telemetry_enabled = true;
+        println!(
+            "TelemetryPackageDecorator: Detailed telemetry reporting hooks loaded dynamically."
+        );
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 4. OBSERVER PATTERN (Polymorphic User-Defined Hooks & Triggers)
+// =========================================================================
+
+pub type UserDefinedHook =
+    Box<dyn Fn(&mut UnifiedPackage) -> Result<(), PackageError> + Send + Sync>;
+
+pub struct PackageTriggerRegistry {
+    pub pre_install_hooks: Vec<UserDefinedHook>,
+    pub post_install_hooks: Vec<UserDefinedHook>,
+}
+
+impl PackageTriggerRegistry {
+    pub fn new() -> Self {
+        Self {
+            pre_install_hooks: Vec::new(),
+            post_install_hooks: Vec::new(),
+        }
+    }
+
+    pub fn register_pre_install<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
+    {
+        self.pre_install_hooks.push(Box::new(hook));
+    }
+
+    pub fn register_post_install<F>(&mut self, hook: F)
+    where
+        F: Fn(&mut UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
+    {
+        self.post_install_hooks.push(Box::new(hook));
+    }
+}
+
+impl Default for PackageTriggerRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// PRE-EXISTING COMPATIBILITY STUBS & FACADE PACKS
+// =========================================================================
+
 pub struct PackageAdapter {
     pub format: PackageFormat,
     pub adapter_name: String,
@@ -105,34 +513,39 @@ impl PackageAdapter {
     }
 
     pub fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "Installing {} using {} adapter",
-            package.name, self.adapter_name
-        );
-        // Simulate installation
+        let strategy = get_strategy_for(self.format);
+        strategy.install(package)?;
         Ok(())
     }
 
     pub fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "Removing {} using {} adapter",
-            package.name, self.adapter_name
-        );
-        // Simulate removal
+        let strategy = get_strategy_for(self.format);
+        strategy.rollback(package)?;
         Ok(())
     }
 
     pub fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "Updating {} using {} adapter",
-            package.name, self.adapter_name
-        );
-        // Simulate update
+        let strategy = get_strategy_for(self.format);
+        strategy.install(package)?;
         Ok(())
     }
 }
 
-/// Dependency resolver
+pub fn get_strategy_for(format: PackageFormat) -> Box<dyn PackageActionStrategy> {
+    match format {
+        PackageFormat::Deb => Box::new(DebianStyleStrategy),
+        PackageFormat::Rpm => Box::new(RedHatStyleStrategy),
+        PackageFormat::Pacman => Box::new(ArchStyleStrategy),
+        PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => {
+            Box::new(SandboxStyleStrategy)
+        }
+        PackageFormat::SigmaPkg | PackageFormat::CachyOS | PackageFormat::Starling => {
+            Box::new(SovereignStyleStrategy)
+        }
+        _ => Box::new(SovereignStyleStrategy),
+    }
+}
+
 pub struct DependencyResolver {
     pub packages: HashMap<String, UnifiedPackage>,
     pub resolution_strategy: ConflictResolution,
@@ -158,7 +571,7 @@ impl DependencyResolver {
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
         let mut to_visit = vec![package_name.to_string()];
-        let mut visited = std::collections::HashSet::new();
+        let mut visited = HashSet::new();
 
         while let Some(current) = to_visit.pop() {
             if visited.contains(&current) {
@@ -205,7 +618,6 @@ impl DependencyResolver {
 
         match self.resolution_strategy {
             ConflictResolution::PreferNewest => {
-                // Prefer the package with higher version
                 for (pkg1, pkg2) in conflicts {
                     if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
                     {
@@ -218,7 +630,6 @@ impl DependencyResolver {
                 }
             }
             ConflictResolution::PreferOldest => {
-                // Prefer the package with lower version
                 for (pkg1, pkg2) in conflicts {
                     if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
                     {
@@ -231,7 +642,6 @@ impl DependencyResolver {
                 }
             }
             ConflictResolution::PreferNative => {
-                // Prefer SigmaPkg format
                 for (pkg1, pkg2) in conflicts {
                     if let (Some(p1), Some(p2)) = (self.packages.get(pkg1), self.packages.get(pkg2))
                     {
@@ -246,7 +656,6 @@ impl DependencyResolver {
                 }
             }
             ConflictResolution::Manual => {
-                // Return conflicts for manual resolution
                 for (pkg1, pkg2) in conflicts {
                     resolution.push(pkg1.clone());
                     resolution.push(pkg2.clone());
@@ -264,14 +673,12 @@ impl Default for DependencyResolver {
     }
 }
 
-/// Transactional package manager checkpoint
 #[derive(Debug, Clone)]
 pub struct PackageCheckpoint {
     pub checkpoint_id: usize,
     pub installed_keys: Vec<String>,
 }
 
-/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
 #[derive(Debug, Clone)]
 pub struct TransactionalHistory {
     pub checkpoints: Vec<PackageCheckpoint>,
@@ -304,9 +711,9 @@ impl TransactionalHistory {
     }
 
     pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
-        for i in 0..self.checkpoints.len() {
-            if self.checkpoints[i].checkpoint_id == id {
-                return Some(&self.checkpoints[i]);
+        for checkpoint in &self.checkpoints {
+            if checkpoint.checkpoint_id == id {
+                return Some(checkpoint);
             }
         }
         None
@@ -319,7 +726,7 @@ impl Default for TransactionalHistory {
     }
 }
 
-/// Universal package manager
+/// Universal package manager - OOP Facade for all package formats & integrations
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, PackageAdapter>,
@@ -327,6 +734,7 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
+    pub trigger_registry: PackageTriggerRegistry,
 }
 
 impl UniversalPackageManager {
@@ -338,6 +746,7 @@ impl UniversalPackageManager {
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
+            trigger_registry: PackageTriggerRegistry::new(),
         };
 
         manager.add_default_adapters();
@@ -345,21 +754,31 @@ impl UniversalPackageManager {
     }
 
     fn add_default_adapters(&mut self) {
-        let apt_adapter = PackageAdapter::new(PackageFormat::Deb, "apt".to_string());
-        let yum_adapter = PackageAdapter::new(PackageFormat::Rpm, "yum".to_string());
-        let pacman_adapter = PackageAdapter::new(PackageFormat::Pacman, "pacman".to_string());
-        let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
-        let flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
-        let sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
+        let formats = vec![
+            (PackageFormat::Deb, "apt"),
+            (PackageFormat::Rpm, "yum"),
+            (PackageFormat::Pacman, "pacman"),
+            (PackageFormat::Snap, "snap"),
+            (PackageFormat::Flatpak, "flatpak"),
+            (PackageFormat::SigmaPkg, "sigpkg"),
+            (PackageFormat::Ebuild, "ebuild"),
+            (PackageFormat::Apk, "apk"),
+            (PackageFormat::Nix, "nix"),
+            (PackageFormat::AppImage, "appimage"),
+            (PackageFormat::Xbps, "xbps"),
+            (PackageFormat::Txz, "txz"),
+            (PackageFormat::Eopkg, "eopkg"),
+            (PackageFormat::Zypper, "zypper"),
+            (PackageFormat::Guix, "guix"),
+            (PackageFormat::CachyOS, "cachyos"),
+            (PackageFormat::Swupd, "swupd"),
+            (PackageFormat::Starling, "starling"),
+        ];
 
-        self.adapters.insert(PackageFormat::Deb, apt_adapter);
-        self.adapters.insert(PackageFormat::Rpm, yum_adapter);
-        self.adapters.insert(PackageFormat::Pacman, pacman_adapter);
-        self.adapters.insert(PackageFormat::Snap, snap_adapter);
-        self.adapters
-            .insert(PackageFormat::Flatpak, flatpak_adapter);
-        self.adapters
-            .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
+        for (format, name) in formats {
+            let adapter = PackageAdapter::new(format, name.to_string());
+            self.adapters.insert(format, adapter);
+        }
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -408,13 +827,39 @@ impl UniversalPackageManager {
 
         // Install packages
         for dep_name in dependencies {
-            if let Some(package) = self.packages.get(&dep_name) {
-                // Find appropriate adapter
+            if let Some(package) = self.packages.get_mut(&dep_name) {
+                // Change lifecycle State: Configuring (State Pattern)
+                package.transition_to(PackageState::Configuring)?;
+
+                // Run pre-install hooks (Observer / UDF triggers)
+                for hook in &self.trigger_registry.pre_install_hooks {
+                    hook(package)?;
+                }
+
+                package.transition_to(PackageState::Installing)?;
+
+                // Find appropriate adapter and execute strategy (Strategy Pattern)
+                let mut installed_successfully = false;
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
                         adapter.install(package)?;
+                        installed_successfully = true;
                         break;
                     }
+                }
+
+                if !installed_successfully {
+                    return Err(PackageError::InstallationFailed(format!(
+                        "No adapter found for package formats: {:?}",
+                        package.formats
+                    )));
+                }
+
+                package.transition_to(PackageState::Installed)?;
+
+                // Run post-install hooks (Observer / UDF triggers)
+                for hook in &self.trigger_registry.post_install_hooks {
+                    hook(package)?;
                 }
 
                 let mut installed = package.clone();
@@ -427,26 +872,30 @@ impl UniversalPackageManager {
     }
 
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
-        if let Some(package) = self.installed_packages.get(package_name) {
+        if let Some(package) = self.installed_packages.get_mut(package_name) {
+            package.transition_to(PackageState::RollbackPending)?;
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     adapter.remove(package)?;
                     break;
                 }
             }
+            package.transition_to(PackageState::Uninstalled)?;
             self.installed_packages.remove(package_name);
         }
         Ok(())
     }
 
     pub fn update(&mut self, package_name: &str) -> Result<(), PackageError> {
-        if let Some(package) = self.installed_packages.get(package_name) {
+        if let Some(package) = self.installed_packages.get_mut(package_name) {
+            package.transition_to(PackageState::Configuring)?;
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
                     adapter.update(package)?;
                     break;
                 }
             }
+            package.transition_to(PackageState::Installed)?;
         }
         Ok(())
     }
@@ -490,7 +939,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 6);
+        assert_eq!(manager.adapters.len(), 18);
     }
 
     #[test]
@@ -500,6 +949,94 @@ mod tests {
             .with_dependency("dep1".to_string());
         assert_eq!(package.formats.len(), 1);
         assert_eq!(package.dependencies.len(), 1);
+        assert_eq!(package.state, PackageState::Uninstalled);
+    }
+
+    #[test]
+    fn test_state_transitions() {
+        let mut package = UnifiedPackage::new("test-state".to_string(), "1.0.0".to_string());
+        assert_eq!(package.state, PackageState::Uninstalled);
+
+        package.transition_to(PackageState::Staged).unwrap();
+        assert_eq!(package.state, PackageState::Staged);
+
+        package.transition_to(PackageState::Configuring).unwrap();
+        package.transition_to(PackageState::Installing).unwrap();
+        package.transition_to(PackageState::Installed).unwrap();
+        assert_eq!(package.state, PackageState::Installed);
+
+        let err = package.transition_to(PackageState::Staged);
+        assert!(err.is_err());
+    }
+
+    #[test]
+    fn test_strategy_and_adapters() {
+        let deb_raw = "Package: curl\nVersion: 8.4.0\nDepends: libcurl4, zlib1g\n";
+        let adapter = DebMetadataAdapter;
+        let package = adapter.convert_to_unified(deb_raw).unwrap();
+        assert_eq!(package.name, "curl");
+        assert_eq!(package.version, "8.4.0");
+        assert_eq!(package.dependencies.len(), 2);
+
+        let serialized = adapter.convert_to_raw(&package).unwrap();
+        assert!(serialized.contains("Package: curl"));
+        assert!(serialized.contains("Depends: libcurl4, zlib1g"));
+    }
+
+    #[test]
+    fn test_starling_adapter() {
+        let starling_raw = "starling.name = \"starling-wm\"\nstarling.version = \"0.9.5\"\nstarling.depends = [ \"x11\", \"glib\" ]\n";
+        let adapter = StarlingMetadataAdapter;
+        let package = adapter.convert_to_unified(starling_raw).unwrap();
+        assert_eq!(package.name, "starling-wm");
+        assert_eq!(package.version, "0.9.5");
+        assert_eq!(package.dependencies.len(), 2);
+    }
+
+    #[test]
+    fn test_decorators() {
+        let mut package = UnifiedPackage::new("decorated-pkg".to_string(), "1.0.0".to_string());
+
+        let sandbox = SandboxedPackageDecorator {
+            network_restricted: true,
+        };
+        let signer = PqcSignedPackageDecorator {
+            key_id: "testkey123".to_string(),
+        };
+        let telemetry = TelemetryPackageDecorator;
+
+        sandbox.decorate(&mut package).unwrap();
+        signer.decorate(&mut package).unwrap();
+        telemetry.decorate(&mut package).unwrap();
+
+        assert!(package.is_sandboxed);
+        assert_eq!(package.pqc_signature.unwrap(), "dilithium5:sig:testkey123");
+        assert!(package.telemetry_enabled);
+    }
+
+    #[test]
+    fn test_udf_triggers_and_hooks() {
+        let mut manager = UniversalPackageManager::new();
+
+        manager.trigger_registry.register_pre_install(|pkg| {
+            pkg.name = format!("{}-prehooked", pkg.name);
+            Ok(())
+        });
+
+        manager.trigger_registry.register_post_install(|pkg| {
+            pkg.version = format!("{}-post", pkg.version);
+            Ok(())
+        });
+
+        let package = UnifiedPackage::new("core-utility".to_string(), "3.2".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+        manager.add_package(package);
+
+        manager.install("core-utility").unwrap();
+
+        let installed = manager.installed_packages.get("core-utility").unwrap();
+        assert_eq!(installed.name, "core-utility-prehooked");
+        assert_eq!(installed.version, "3.2-post");
     }
 
     #[test]
@@ -552,16 +1089,13 @@ mod tests {
         manager.add_package(pkg1);
         manager.add_package(pkg2);
 
-        // 1. Create a baseline checkpoint (empty)
         let checkpoint_id = manager.create_checkpoint();
         assert_eq!(checkpoint_id, 1);
 
-        // 2. Install pkg1 and pkg2
         manager.install("pkg1").unwrap();
         manager.install("pkg2").unwrap();
         assert_eq!(manager.installed_packages.len(), 2);
 
-        // 3. Roll back to baseline checkpoint
         manager.rollback_to_checkpoint(checkpoint_id).unwrap();
         assert_eq!(manager.installed_packages.len(), 0);
     }

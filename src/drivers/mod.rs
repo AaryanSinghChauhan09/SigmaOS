@@ -1,5 +1,9 @@
 // SigmaOS Drivers Module
 pub mod ancient_devices;
+pub mod boot_init;
+pub mod dde;
+pub mod even_more_devices;
+pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
 pub mod legacy_keyboard;
@@ -9,10 +13,6 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
-pub mod boot_init;
-pub mod dde;
-pub mod even_more_devices;
-pub mod flipper_gpio_sensor;
 
 pub use ancient_devices::{
     create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,

@@ -15,8 +15,8 @@ impl PageTableFlags {
     pub const USER_ACCESSIBLE: u64 = 1 << 2;
     pub const WRITE_THROUGH: u64 = 1 << 3;
     pub const NO_CACHE: u64 = 1 << 4;
-    pub const HUGE_PAGE: u64 = 1 << 7;  // Page Size (PS) flag for huge pages
-    pub const COW: u64 = 1 << 9;        // Copy-On-Write flag
+    pub const HUGE_PAGE: u64 = 1 << 7; // Page Size (PS) flag for huge pages
+    pub const COW: u64 = 1 << 9; // Copy-On-Write flag
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -80,12 +80,14 @@ impl VirtualMemoryManagerV2 {
 
     /// Simulate TLB invalidation for a specific virtual page address.
     pub fn invlpg(&self, _virt_addr: u64) {
-        self.tlb_invalidations.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
+        self.tlb_invalidations
+            .fetch_add(1, core::sync::atomic::Ordering::SeqCst);
     }
 
     /// Simulate a complete TLB flush across all mapping caches.
     pub fn flush_tlb_all(&self) {
-        self.tlb_flushes.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
+        self.tlb_flushes
+            .fetch_add(1, core::sync::atomic::Ordering::SeqCst);
     }
 
     /// Translates a virtual address to its corresponding physical address by walking PML4 -> PDPT -> PD -> PT
@@ -143,7 +145,11 @@ impl VirtualMemoryManagerV2 {
 
     /// Simulate a Page Fault resolution trigger. If it encounters a write on a COW-gated page,
     /// it resolves the violation by copying the page frame on-the-fly.
-    pub unsafe fn handle_page_fault(&mut self, fault_addr: u64, is_write: bool) -> Result<u64, &'static str> {
+    pub unsafe fn handle_page_fault(
+        &mut self,
+        fault_addr: u64,
+        is_write: bool,
+    ) -> Result<u64, &'static str> {
         let pml4_index = ((fault_addr >> 39) & 0x1FF) as usize;
         let pdpt_index = ((fault_addr >> 30) & 0x1FF) as usize;
         let pd_index = ((fault_addr >> 21) & 0x1FF) as usize;
@@ -171,8 +177,8 @@ impl VirtualMemoryManagerV2 {
             let new_frame = old_frame + 0x1000_0000; // mock copy reallocation offset
 
             let mut new_flags = flags.0;
-            new_flags &= !PageTableFlags::COW;       // Clear COW flag
-            new_flags |= PageTableFlags::WRITABLE;   // Enable write permission
+            new_flags &= !PageTableFlags::COW; // Clear COW flag
+            new_flags |= PageTableFlags::WRITABLE; // Enable write permission
 
             pt_entry.set_frame(new_frame, PageTableFlags(new_flags));
             self.invlpg(fault_addr);
@@ -307,10 +313,22 @@ mod tests {
         let pml5_ptr = &mut pml5 as *mut PageTable;
 
         // Wire up the 5 levels manually
-        pml5.entries[1].set_frame(&pml4 as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT));
-        pml4.entries[1].set_frame(&pdpt as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT));
-        pdpt.entries[1].set_frame(&pd as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT));
-        pd.entries[1].set_frame(&pt as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT));
+        pml5.entries[1].set_frame(
+            &pml4 as *const PageTable as u64,
+            PageTableFlags(PageTableFlags::PRESENT),
+        );
+        pml4.entries[1].set_frame(
+            &pdpt as *const PageTable as u64,
+            PageTableFlags(PageTableFlags::PRESENT),
+        );
+        pdpt.entries[1].set_frame(
+            &pd as *const PageTable as u64,
+            PageTableFlags(PageTableFlags::PRESENT),
+        );
+        pd.entries[1].set_frame(
+            &pt as *const PageTable as u64,
+            PageTableFlags(PageTableFlags::PRESENT),
+        );
         pt.entries[1].set_frame(0x8000_0000, PageTableFlags(PageTableFlags::PRESENT));
 
         let mut vmm = unsafe { VirtualMemoryManagerV2::new(pml5_ptr as u64) };
@@ -327,13 +345,27 @@ mod tests {
         let pml4 = PageTable::new();
         let vmm = unsafe { VirtualMemoryManagerV2::new(&pml4 as *const PageTable as u64) };
 
-        assert_eq!(vmm.tlb_invalidations.load(core::sync::atomic::Ordering::SeqCst), 0);
+        assert_eq!(
+            vmm.tlb_invalidations
+                .load(core::sync::atomic::Ordering::SeqCst),
+            0
+        );
         vmm.invlpg(0x1000);
-        assert_eq!(vmm.tlb_invalidations.load(core::sync::atomic::Ordering::SeqCst), 1);
+        assert_eq!(
+            vmm.tlb_invalidations
+                .load(core::sync::atomic::Ordering::SeqCst),
+            1
+        );
 
-        assert_eq!(vmm.tlb_flushes.load(core::sync::atomic::Ordering::SeqCst), 0);
+        assert_eq!(
+            vmm.tlb_flushes.load(core::sync::atomic::Ordering::SeqCst),
+            0
+        );
         vmm.flush_tlb_all();
-        assert_eq!(vmm.tlb_flushes.load(core::sync::atomic::Ordering::SeqCst), 1);
+        assert_eq!(
+            vmm.tlb_flushes.load(core::sync::atomic::Ordering::SeqCst),
+            1
+        );
     }
 
     #[test]
@@ -347,16 +379,28 @@ mod tests {
         // 1. Test 1GB Huge Page
         unsafe {
             let pml4_ptr = vmm.pml4_table.as_ptr();
-            (*pml4_ptr).entries[0].set_frame(&pdpt as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT));
+            (*pml4_ptr).entries[0].set_frame(
+                &pdpt as *const PageTable as u64,
+                PageTableFlags(PageTableFlags::PRESENT),
+            );
         }
-        pdpt.entries[0].set_frame(0x4000_0000, PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::HUGE_PAGE));
+        pdpt.entries[0].set_frame(
+            0x4000_0000,
+            PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::HUGE_PAGE),
+        );
 
         let translated_1gb = unsafe { vmm.translate(0x1234).unwrap() };
         assert_eq!(translated_1gb, 0x4000_1234);
 
         // 2. Test 2MB Huge Page
-        pdpt.entries[0].set_frame(&pd as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT)); // Reset to point to PD
-        pd.entries[0].set_frame(0x20_0000, PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::HUGE_PAGE));
+        pdpt.entries[0].set_frame(
+            &pd as *const PageTable as u64,
+            PageTableFlags(PageTableFlags::PRESENT),
+        ); // Reset to point to PD
+        pd.entries[0].set_frame(
+            0x20_0000,
+            PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::HUGE_PAGE),
+        );
 
         let translated_2mb = unsafe { vmm.translate(0x4567).unwrap() };
         assert_eq!(translated_2mb, 0x20_4567);
@@ -369,12 +413,24 @@ mod tests {
         let mut pd = PageTable::new();
         let mut pt = PageTable::new();
 
-        pml4.entries[0].set_frame(&pdpt as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT));
-        pdpt.entries[0].set_frame(&pd as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT));
-        pd.entries[0].set_frame(&pt as *const PageTable as u64, PageTableFlags(PageTableFlags::PRESENT));
+        pml4.entries[0].set_frame(
+            &pdpt as *const PageTable as u64,
+            PageTableFlags(PageTableFlags::PRESENT),
+        );
+        pdpt.entries[0].set_frame(
+            &pd as *const PageTable as u64,
+            PageTableFlags(PageTableFlags::PRESENT),
+        );
+        pd.entries[0].set_frame(
+            &pt as *const PageTable as u64,
+            PageTableFlags(PageTableFlags::PRESENT),
+        );
 
         // Frame starting with Copy-On-Write flag active
-        pt.entries[0].set_frame(0x1000, PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::COW));
+        pt.entries[0].set_frame(
+            0x1000,
+            PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::COW),
+        );
 
         let mut vmm = unsafe { VirtualMemoryManagerV2::new(&pml4 as *const PageTable as u64) };
 

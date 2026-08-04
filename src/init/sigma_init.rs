@@ -6,9 +6,9 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::vec;
 use alloc::string::ToString;
+use alloc::vec;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ServiceID = usize;
@@ -17,10 +17,10 @@ pub type ServiceID = usize;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Runlevel {
     Level0_Halt = 0,
-    Level1_SingleUser = 1,      // Maintenance / Recovery Mode
-    Level2_MultiUser = 2,       // Multi-User Command Line (No Networking)
-    Level3_MultiUserNetwork = 3,// Full Multi-User with Networking (CLI)
-    Level5_Graphical = 5,       // Zenith Desktop GUI Mode
+    Level1_SingleUser = 1,       // Maintenance / Recovery Mode
+    Level2_MultiUser = 2,        // Multi-User Command Line (No Networking)
+    Level3_MultiUserNetwork = 3, // Full Multi-User with Networking (CLI)
+    Level5_Graphical = 5,        // Zenith Desktop GUI Mode
     Level6_Reboot = 6,
 }
 
@@ -120,15 +120,19 @@ impl Service for SimpleService {
     }
 
     fn start(&mut self) -> Result<(), InitError> {
-        self.state.store(ServiceState::Starting as usize, Ordering::SeqCst);
-        self.state.store(ServiceState::Running as usize, Ordering::SeqCst);
+        self.state
+            .store(ServiceState::Starting as usize, Ordering::SeqCst);
+        self.state
+            .store(ServiceState::Running as usize, Ordering::SeqCst);
         self.pid.store(self.id + 1000, Ordering::SeqCst);
         Ok(())
     }
 
     fn stop(&mut self) -> Result<(), InitError> {
-        self.state.store(ServiceState::Stopping as usize, Ordering::SeqCst);
-        self.state.store(ServiceState::Stopped as usize, Ordering::SeqCst);
+        self.state
+            .store(ServiceState::Stopping as usize, Ordering::SeqCst);
+        self.state
+            .store(ServiceState::Stopped as usize, Ordering::SeqCst);
         self.pid.store(0, Ordering::SeqCst);
         Ok(())
     }
@@ -563,15 +567,20 @@ mod tests {
         let mut init = SigmaInit::new();
 
         let udev = SimpleService::new(1, "udev").with_runlevel(Runlevel::Level1_SingleUser);
-        let network = SimpleService::new(2, "network").with_deps(vec![1]).with_runlevel(Runlevel::Level3_MultiUserNetwork);
-        let gdm = SimpleService::new(3, "zenith-gdm").with_deps(vec![2]).with_runlevel(Runlevel::Level5_Graphical);
+        let network = SimpleService::new(2, "network")
+            .with_deps(vec![1])
+            .with_runlevel(Runlevel::Level3_MultiUserNetwork);
+        let gdm = SimpleService::new(3, "zenith-gdm")
+            .with_deps(vec![2])
+            .with_runlevel(Runlevel::Level5_Graphical);
 
         init.register_service(Box::new(udev)).unwrap();
         init.register_service(Box::new(network)).unwrap();
         init.register_service(Box::new(gdm)).unwrap();
 
         // 1. Enter CLI Mode (Runlevel 3)
-        init.switch_runlevel(Runlevel::Level3_MultiUserNetwork).unwrap();
+        init.switch_runlevel(Runlevel::Level3_MultiUserNetwork)
+            .unwrap();
         assert_eq!(init.get_service(1).unwrap().state(), ServiceState::Running); // udev
         assert_eq!(init.get_service(2).unwrap().state(), ServiceState::Running); // network
         assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Stopped); // gdm (too advanced)
@@ -586,7 +595,8 @@ mod tests {
         assert_eq!(init.current_runlevel, Runlevel::Level1_SingleUser);
         assert_eq!(init.get_service(1).unwrap().state(), ServiceState::Running); // udev remains
         assert_eq!(init.get_service(2).unwrap().state(), ServiceState::Stopped); // network stopped
-        assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Stopped); // gdm stopped
+        assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Stopped);
+        // gdm stopped
     }
 
     #[test]
