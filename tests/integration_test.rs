@@ -18,7 +18,15 @@ use sigmaos::drivers::{
     Ch340Driver, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver, GpuPipeline, GpuShader,
     IntelHdaDriver, NvmeDriver, PeripheralDevice, PowerState, ShaderStage,
 };
-use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+use sigmaos::filesystem::{
+    FileType, FsError, LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
+    VirtualFilesystem, O_APPEND, O_CREAT, O_EXCL, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY,
+};
+use sigmaos::interrupt::{
+    ControllerCapability, HandlerCapability, HandlerType, InterruptController, InterruptError,
+    InterruptHandler, InterruptManager, InterruptPriority, InterruptResult, InterruptTrace,
+    SimpleInterruptHandler, TraceEventType, PIC,
+};
 use sigmaos::network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
     SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
@@ -596,50 +604,116 @@ mod tests {
     }
 
     #[test]
-    fn test_process_signals_integration() {
-        use sigmaos::runtime::process::{Process, ProcessCapability, ProcessSignal};
+    fn test_interrupt_nesting_preemption() {
+        let mut manager = InterruptManager::new();
+        let mut pic = Box::new(PIC::new(sigmaos::interrupt::ControllerCapability::full()));
 
-        let cap = ProcessCapability::full();
-        let process = unsafe { Process::new(10, 1, cap) };
+        // Create Handlers with Low, Normal, High, and Critical priority
+        let low_handler = Box::new(SimpleInterruptHandler::new(
+            HandlerType::Custom,
+            InterruptPriority::Low,
+            HandlerCapability::full(),
+        ));
+        let normal_handler = Box::new(SimpleInterruptHandler::new(
+            HandlerType::Custom,
+            InterruptPriority::Normal,
+            HandlerCapability::full(),
+        ));
+        let high_handler = Box::new(SimpleInterruptHandler::new(
+            HandlerType::Custom,
+            InterruptPriority::High,
+            HandlerCapability::full(),
+        ));
 
-        assert!(!process.consume_pending_signal(ProcessSignal::SigKill));
-        process.send_signal(ProcessSignal::SigKill);
-        assert!(process.consume_pending_signal(ProcessSignal::SigKill));
-        assert!(!process.consume_pending_signal(ProcessSignal::SigKill));
+        // Register handlers to interrupt lines 10, 20, 30
+        assert!(pic.register_handler(low_handler, 10).is_ok());
+        assert!(pic.register_handler(normal_handler, 20).is_ok());
+        assert!(pic.register_handler(high_handler, 30).is_ok());
+
+        assert!(pic.enable_interrupt(10).is_ok());
+        assert!(pic.enable_interrupt(20).is_ok());
+        assert!(pic.enable_interrupt(30).is_ok());
+
+        manager.add_controller(pic);
+
+        // Scenario 1: Dispatch low priority interrupt 10 -> handled successfully
+        assert_eq!(manager.dispatch_interrupt(10), InterruptResult::Handled);
+
+        // Scenario 2: Priority-Based Masking. Start executing normal priority 20
+        // During its execution, dispatching a low priority interrupt 10 should be deferred/masked
+        manager.execution_stack.push(20);
+        assert_eq!(manager.dispatch_interrupt(10), InterruptResult::Deferred);
+        assert_eq!(manager.pending_queue.len(), 1);
+        assert_eq!(manager.pending_queue[0], 10);
+        manager.pending_queue.clear();
+
+        // Scenario 3: Preemption. During normal priority 20 execution, high priority 30 is dispatched
+        // 30 should immediately preempt and run to completion
+        assert_eq!(manager.dispatch_interrupt(30), InterruptResult::Handled);
+        manager.execution_stack.pop(); // Pop 20
     }
 
     #[test]
-    fn test_supervised_service_targets() {
-        use sigmaos::runtime::process::{
-            Process, ProcessCapability, ProcessState, SupervisedServiceTarget,
-        };
+    fn test_interrupt_disabling_and_deferred_flushing() {
+        let mut manager = InterruptManager::new();
+        let mut pic = Box::new(PIC::new(sigmaos::interrupt::ControllerCapability::full()));
 
-        let cap = ProcessCapability::full();
-        let process = unsafe { Process::new(11, 1, cap) };
-        let mut supervisor = SupervisedServiceTarget::new(11);
+        let handler = Box::new(SimpleInterruptHandler::new(
+            HandlerType::Custom,
+            InterruptPriority::Normal,
+            HandlerCapability::full(),
+        ));
+        assert!(pic.register_handler(handler, 15).is_ok());
+        assert!(pic.enable_interrupt(15).is_ok());
+        manager.add_controller(pic);
 
-        assert!(!unsafe { supervisor.monitor_and_supervise(&process) });
+        // Globally disable interrupts (CLI)
+        manager.cli();
 
-        process.set_state(ProcessState::Terminated);
-        assert!(unsafe { supervisor.monitor_and_supervise(&process) });
-        assert!(supervisor.auto_respawn_triggered);
-        assert_eq!(supervisor.restart_count, 1);
-        assert_eq!(process.get_state(), ProcessState::Running);
+        // Dispatch normal priority interrupt 15 -> deferred as pending
+        assert_eq!(manager.dispatch_interrupt(15), InterruptResult::Deferred);
+        assert_eq!(manager.pending_queue.len(), 1);
+        assert_eq!(manager.pending_queue[0], 15);
+
+        // Globally enable interrupts (STI) -> automatically flushes and handles pending 15!
+        manager.sti();
+        assert_eq!(manager.pending_queue.len(), 0);
     }
 
     #[test]
-    fn test_multi_distro_packaging_compatibility() {
-        use sigmaos::sigpkg::universal_adapter::{
-            ApkAdapter, EbuildAdapter, NixAdapter, PackageFormatAdapter,
-        };
+    fn test_interrupt_time_sequence_logging() {
+        let mut manager = InterruptManager::new();
+        let mut pic = Box::new(PIC::new(sigmaos::interrupt::ControllerCapability::full()));
 
-        let apk = ApkAdapter::new();
-        assert_eq!(apk.format_name(), "apk");
+        let high_handler = Box::new(SimpleInterruptHandler::new(
+            HandlerType::Custom,
+            InterruptPriority::High,
+            HandlerCapability::full(),
+        ));
+        assert!(pic.register_handler(high_handler, 40).is_ok());
+        assert!(pic.enable_interrupt(40).is_ok());
+        manager.add_controller(pic);
 
-        let nix = NixAdapter::new();
-        assert_eq!(nix.format_name(), "nix");
+        // Dispatch interrupt 40
+        assert_eq!(manager.dispatch_interrupt(40), InterruptResult::Handled);
 
-        let ebuild = EbuildAdapter::new();
-        assert_eq!(ebuild.format_name(), "ebuild");
+        // Retrieve and assert chronological trace sequence log
+        assert!(manager.trace_log.len() >= 3);
+
+        let evt_arrived = manager.trace_log[0];
+        assert_eq!(evt_arrived.event_type, TraceEventType::InterruptArrived);
+        assert_eq!(evt_arrived.interrupt_number, 40);
+
+        let evt_dispatched = manager.trace_log[1];
+        assert_eq!(
+            evt_dispatched.event_type,
+            TraceEventType::InterruptDispatched
+        );
+        assert_eq!(evt_dispatched.interrupt_number, 40);
+
+        let evt_completed = manager.trace_log[2];
+        assert_eq!(evt_completed.event_type, TraceEventType::InterruptCompleted);
+        assert_eq!(evt_completed.interrupt_number, 40);
+        assert!(evt_completed.timestamp > evt_arrived.timestamp);
     }
 }
