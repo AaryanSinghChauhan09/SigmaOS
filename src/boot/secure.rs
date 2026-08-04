@@ -6,15 +6,7 @@ use core::ptr::NonNull;
 /// Implements secure boot using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 10: Secure boot & firmware validation
-||||||| 984d1301f
-
-use core::ptr::{self, NonNull};
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-||||||| 984d1301f
-use core::mem;
-use core::mem;
-use core::ptr::NonNull;
 
 /// Component ID
 pub type ComponentID = usize;
@@ -61,55 +53,6 @@ impl<T: ?Sized> Box<T> {
         Self {
             ptr: NonNull::new_unchecked(ptr),
         }
-    }
-    pub fn as_ref(&self) -> &T {
-        unsafe { self.ptr.as_ref() }
-    }
-    pub fn as_mut(&mut self) -> &mut T {
-        unsafe { self.ptr.as_mut() }
-    }
-}
-
-impl<T: ?Sized> core::ops::Deref for Box<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        self.as_ref()
-    }
-}
-
-impl<T: ?Sized> core::ops::DerefMut for Box<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_mut()
-    }
-}
-
-impl<T: ?Sized> Drop for Box<T> {
-    fn drop(&mut self) {
-        unsafe {
-            free(self.ptr.as_ptr() as *mut u8);
-        }
-    }
-}
-
-||||||| 984d1301f
-/// Custom Box implementation for no_std
-pub struct Box<T: ?Sized> {
-    ptr: NonNull<T>,
-}
-
-impl<T> Box<T> {
-    pub fn new(val: T) -> Self {
-        unsafe {
-            let ptr = alloc(mem::size_of::<T>()) as *mut T;
-            core::ptr::write(ptr, val);
-            Self { ptr: NonNull::new_unchecked(ptr) }
-        }
-    }
-}
-
-impl<T: ?Sized> Box<T> {
-    pub unsafe fn from_raw(ptr: *mut T) -> Self {
-        Self { ptr: NonNull::new_unchecked(ptr) }
     }
     pub fn as_ref(&self) -> &T {
         unsafe { self.ptr.as_ref() }

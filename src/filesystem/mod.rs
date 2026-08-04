@@ -5,15 +5,8 @@ pub mod defragmenter;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
-||||||| 43be3a7e8
-pub mod smart_symlink;
-||||||| 43be3a7e8
-pub mod proc;
-||||||| 984d1301f
-pub mod tmpfs;
 pub mod vfs;
 
-pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
@@ -32,17 +25,4 @@ pub use support::{
     Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
     SimpleFilesystemManager,
 };
-||||||| 43be3a7e8
-pub use proc::SovereignProcFS;
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-||||||| 43be3a7e8
-pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
-pub use vfs::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, O_APPEND,
-    O_CREAT, O_EXCL, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY,
-};
-||||||| 0ddf2eac7
-pub use cow_snapshot::{
-    CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
-};

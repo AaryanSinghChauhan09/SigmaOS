@@ -9,22 +9,6 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod tmux;
-||||||| 43be3a7e8
-pub mod media;
-||||||| 0ddf2eac7
-pub mod notes;
-pub mod screen_recorder;
-pub mod screenshot;
-pub mod sigma_office;
-pub mod tasks;
-pub mod terminal;
-pub mod advanced_app_absorber;
-||||||| 984d1301f
-pub mod advanced_app_absorber;
-pub mod tmux;
-pub mod mind_map;
-||||||| 43be3a7e8
-pub mod subtitle_editor;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -59,14 +43,3 @@ pub use terminal::{
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
-||||||| 43be3a7e8
-pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
-||||||| 0ddf2eac7
-pub use tmux::{
-    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
-};
-pub use mind_map::{
-    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
-};
-||||||| 43be3a7e8
-pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};

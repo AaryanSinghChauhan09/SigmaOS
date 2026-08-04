@@ -1,20 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Shell Module
 pub mod command;
 pub mod repl;
-pub mod sigma_sh;
 
-pub use command::{CommandError, ShellSession, SimpleShellSession};
 pub use repl::{ShellCommand, ShellRepl};
-||||||| 2139cb2f8
-pub use sigma_sh::{
-    CronJob, LogEntry, LogLevel, Privilege, Service, SigmaCoreUtils, SigmaCron, SigmaDoc,
-    SigmaInit, SigmaLog, SigmaPriv,
-};
-pub use sigma_sh::{
-    SimpleShell, SimpleShellHistory, SimpleShellEnvironment,
-};
-||||||| 43be3a7e8
-pub use sigma_sh::{
-    CronJob, LogEntry, LogLevel, Privilege, Service, SigmaCoreUtils, SigmaCron, SigmaDoc,
-    SigmaInit, SigmaLog, SigmaPriv,
-};

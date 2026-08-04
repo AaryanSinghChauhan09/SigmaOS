@@ -1,16 +1,6 @@
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-||||||| 43be3a7e8
-#![no_std]
-#![no_main]
-#![no_std]
-||||||| 984d1301f
-#![no_std]
-#![no_main]
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 
 use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
@@ -18,20 +8,13 @@ use core::mem;
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 62: Mandatory access control
 use core::ptr::{self, NonNull};
-||||||| 43be3a7e8
-
-use core::ptr::{self, NonNull};
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Security context ID
 pub type ContextID = usize;
 
 /// Security level
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SecurityLevel {
     Low = 0,
@@ -41,8 +24,8 @@ pub enum SecurityLevel {
 }
 
 /// Security domain
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum SecurityDomain {
     System = 0,
     User = 1,
@@ -53,7 +36,6 @@ pub enum SecurityDomain {
 
 /// Security context (OOP: Context object)
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct SecurityContext {
     pub id: ContextID,
     pub level: SecurityLevel,
@@ -63,7 +45,7 @@ pub struct SecurityContext {
 
 /// Context capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct ContextCapability {
     pub can_read: bool,
     pub can_write: bool,
@@ -85,12 +67,6 @@ impl ContextCapability {
             can_write: true,
             can_execute: true,
         }
-    }
-}
-
-impl Default for ContextCapability {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -119,8 +95,8 @@ pub trait MACPolicy {
 }
 
 /// Security operation
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum SecurityOperation {
     Read = 0,
     Write = 1,
@@ -132,11 +108,10 @@ pub enum SecurityOperation {
 
 /// Policy info
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct PolicyInfo {
-    pub policy_type: PolicyType,
-    pub strictness: SecurityLevel,
-    pub capability: PolicyCapability,
+    policy_type: PolicyType,
+    strictness: SecurityLevel,
+    capability: PolicyCapability,
 }
 
 impl PolicyInfo {
@@ -150,8 +125,8 @@ impl PolicyInfo {
 }
 
 /// Policy type
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum PolicyType {
     MLS = 0,  // Multi-Level Security
     Biba = 1, // Integrity
@@ -161,7 +136,7 @@ pub enum PolicyType {
 
 /// Policy capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct PolicyCapability {
     pub can_enforce: bool,
     pub can_modify: bool,
@@ -183,13 +158,8 @@ impl PolicyCapability {
     }
 }
 
-impl Default for PolicyCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// MLS policy (OOP: Concrete policy class)
+#[repr(C)]
 pub struct MLSPolicy {
     pub policy_type: PolicyType,
     pub strictness: SecurityLevel,
@@ -260,8 +230,8 @@ pub trait MACEngine {
 }
 
 /// MAC error types
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum MACError {
     Success = 0,
     PolicyNotFound = 1,
@@ -273,8 +243,6 @@ pub enum MACError {
 /// MAC statistics
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-||||||| 43be3a7e8
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MACStats {
     pub total_policies: usize,
     pub total_contexts: usize,
@@ -293,12 +261,6 @@ impl MACStats {
     }
 }
 
-impl Default for MACStats {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Simple MAC engine (OOP: Concrete engine class)
 pub struct SimpleMACEngine {
     policies: Vec<Option<Box<dyn MACPolicy>>>,
@@ -309,22 +271,11 @@ pub struct SimpleMACEngine {
     access_checks: AtomicUsize,
     access_denied: AtomicUsize,
     capability: EngineCapability,
-||||||| 43be3a7e8
-    policies: Vec<Option<Box<dyn MACPolicy>>>,
-    contexts: Vec<Option<SecurityContext>>,
-    next_context_id: AtomicUsize,
-    stats: MACStats,
-    capability: EngineCapability,
-    pub policies: Vec<Option<Box<dyn MACPolicy>>>,
-    pub contexts: Vec<Option<SecurityContext>>,
-    pub next_context_id: AtomicUsize,
-    pub stats: core::cell::RefCell<MACStats>,
-    pub capability: EngineCapability,
 }
 
 /// Engine capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct EngineCapability {
     pub can_register_policies: bool,
     pub can_create_contexts: bool,
@@ -359,9 +310,6 @@ impl SimpleMACEngine {
             total_contexts: AtomicUsize::new(0),
             access_checks: AtomicUsize::new(0),
             access_denied: AtomicUsize::new(0),
-||||||| 43be3a7e8
-            stats: MACStats::new(),
-            stats: core::cell::RefCell::new(MACStats::new()),
             capability,
         }
     }
@@ -369,13 +317,6 @@ impl SimpleMACEngine {
     unsafe fn get_context(&self, id: ContextID) -> Option<&SecurityContext> {
         for i in 0..self.contexts.len() {
             if let Some(Some(ref context)) = self.contexts.get(i) {
-||||||| 43be3a7e8
-    unsafe fn get_context(&self, id: ContextID) -> Option<&SecurityContext> {
-        for context_option in &self.contexts {
-            if let Some(ref context) = *context_option {
-    pub fn get_context(&self, id: ContextID) -> Option<&SecurityContext> {
-        for context_option in &self.contexts {
-            if let Some(ref context) = *context_option {
                 if context.id == id {
                     return Some(context);
                 }
@@ -394,11 +335,6 @@ impl MACEngine for SimpleMACEngine {
         let id = self.policies.len();
         self.policies.push(Some(policy));
         self.total_policies.fetch_add(1, Ordering::SeqCst);
-||||||| 43be3a7e8
-        self.stats.total_policies += 1;
-        if let Ok(mut stats) = self.stats.try_borrow_mut() {
-            stats.total_policies += 1;
-        }
         Ok(id)
     }
 
@@ -412,13 +348,6 @@ impl MACEngine for SimpleMACEngine {
                 *slot = None;
             }
             self.total_policies.fetch_sub(1, Ordering::SeqCst);
-||||||| 43be3a7e8
-            self.policies[id] = None;
-            self.stats.total_policies -= 1;
-            self.policies[id] = None;
-            if let Ok(mut stats) = self.stats.try_borrow_mut() {
-                stats.total_policies -= 1;
-            }
             Ok(())
         } else {
             Err(MACError::PolicyNotFound)
@@ -439,11 +368,6 @@ impl MACEngine for SimpleMACEngine {
         let context = SecurityContext::new(id, level, domain, capability);
         self.contexts.push(Some(context));
         self.total_contexts.fetch_add(1, Ordering::SeqCst);
-||||||| 43be3a7e8
-        self.stats.total_contexts += 1;
-        if let Ok(mut stats) = self.stats.try_borrow_mut() {
-            stats.total_contexts += 1;
-        }
         Ok(id)
     }
 
@@ -467,13 +391,6 @@ impl MACEngine for SimpleMACEngine {
                 *slot = None;
             }
             self.total_contexts.fetch_sub(1, Ordering::SeqCst);
-||||||| 43be3a7e8
-            self.contexts[i] = None;
-            self.stats.total_contexts -= 1;
-            self.contexts[i] = None;
-            if let Ok(mut stats) = self.stats.try_borrow_mut() {
-                stats.total_contexts -= 1;
-            }
             Ok(())
         } else {
             Err(MACError::ContextNotFound)
@@ -482,11 +399,6 @@ impl MACEngine for SimpleMACEngine {
 
     fn check_access(&self, context_id: ContextID, operation: SecurityOperation) -> bool {
         self.access_checks.fetch_add(1, Ordering::SeqCst);
-||||||| 43be3a7e8
-        self.stats.access_checks += 1;
-        if let Ok(mut stats) = self.stats.try_borrow_mut() {
-            stats.access_checks += 1;
-        }
 
         if !self.capability.can_enforce {
             return true;
@@ -499,40 +411,14 @@ impl MACEngine for SimpleMACEngine {
                         if !policy.check(context, operation) {
                             self.access_denied.fetch_add(1, Ordering::SeqCst);
                             return false;
-||||||| 43be3a7e8
-        unsafe {
-            if let Some(context) = self.get_context(context_id) {
-                for policy_option in &self.policies {
-                    if let Some(ref policy) = *policy_option {
-                        if !policy.check(context, operation) {
-                            self.stats.access_denied += 1;
-                            return false;
-        if let Some(context) = self.get_context(context_id) {
-            for policy_option in &self.policies {
-                if let Some(ref policy) = *policy_option {
-                    if !policy.check(context, operation) {
-                        if let Ok(mut stats) = self.stats.try_borrow_mut() {
-                            stats.access_denied += 1;
                         }
-                        return false;
                     }
                 }
                 true
             } else {
                 self.access_denied.fetch_add(1, Ordering::SeqCst);
                 false
-||||||| 43be3a7e8
-                true
-            } else {
-                self.stats.access_denied += 1;
-                false
             }
-            true
-        } else {
-            if let Ok(mut stats) = self.stats.try_borrow_mut() {
-                stats.access_denied += 1;
-            }
-            false
         }
     }
 
@@ -543,319 +429,6 @@ impl MACEngine for SimpleMACEngine {
             access_checks: self.access_checks.load(Ordering::SeqCst) as u64,
             access_denied: self.access_denied.load(Ordering::SeqCst) as u64,
         }
-||||||| 43be3a7e8
-        self.stats
-    }
-}
-
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-    #[test]
-    fn test_simple_mac_engine() {
-        let cap = EngineCapability::full();
-        let mut engine = SimpleMACEngine::new(cap);
-        let ctx_id = engine.create_context(
-            SecurityLevel::Medium,
-            SecurityDomain::System,
-            ContextCapability::full(),
-        ).unwrap();
-        let policy_cap = PolicyCapability::full();
-        let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
-        engine.register_policy(Box::new(policy)).unwrap();
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-||||||| 984d1301f
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    #[test]
-    fn test_simple_mac_engine() {
-        let cap = EngineCapability::full();
-        let mut engine = SimpleMACEngine::new(cap);
-        let ctx_id = engine.create_context(
-            SecurityLevel::Medium,
-            SecurityDomain::System,
-            ContextCapability::full(),
-        ).unwrap();
-        let policy_cap = PolicyCapability::full();
-        let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
-        engine.register_policy(Box::new(policy)).unwrap();
-||||||| 984d1301f
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    #[test]
-    fn test_simple_mac_engine() {
-        let cap = EngineCapability::full();
-        let mut engine = SimpleMACEngine::new(cap);
-        let ctx_id = engine.create_context(
-            SecurityLevel::Medium,
-            SecurityDomain::System,
-            ContextCapability::full(),
-        ).unwrap();
-        let policy_cap = PolicyCapability::full();
-        let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
-        engine.register_policy(Box::new(policy)).unwrap();
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-        *self.stats.borrow()
-||||||| 984d1301f
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    fn get(&self, index: usize) -> Option<&T> {
-        if index < self.len {
-            unsafe { Some(&*self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-        if index < self.len {
-            unsafe { Some(&mut *self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-        assert!(engine.check_access(ctx_id, SecurityOperation::Read));
-||||||| 984d1301f
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    fn get(&self, index: usize) -> Option<&T> {
-        if index < self.len {
-            unsafe { Some(&*self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-        if index < self.len {
-            unsafe { Some(&mut *self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-        assert!(engine.check_access(ctx_id, SecurityOperation::Read));
-||||||| 984d1301f
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    fn get(&self, index: usize) -> Option<&T> {
-        if index < self.len {
-            unsafe { Some(&*self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-        if index < self.len {
-            unsafe { Some(&mut *self.data.add(index)) }
-        } else {
-            None
-        }
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-        assert!(engine.check_access(ctx_id, SecurityOperation::Read));
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_security_context_and_mls_policy() {
-        let capability = ContextCapability::full();
-        let context =
-            SecurityContext::new(1, SecurityLevel::Medium, SecurityDomain::User, capability);
-
-        assert_eq!(context.id, 1);
-        assert_eq!(context.level, SecurityLevel::Medium);
-        assert!(context.capability.can_read);
-
-        let policy_cap = PolicyCapability::full();
-        let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
-        assert!(policy.check(&context, SecurityOperation::Read));
-
-        let high_policy = MLSPolicy::new(SecurityLevel::High, policy_cap);
-        assert!(!high_policy.check(&context, SecurityOperation::Read));
-    }
-
-    #[test]
-    fn test_simple_mac_engine() {
-        let engine_cap = EngineCapability::full();
-        let mut engine = SimpleMACEngine::new(engine_cap);
-
-        let context_cap = ContextCapability::full();
-        let context_id = engine
-            .create_context(SecurityLevel::Medium, SecurityDomain::User, context_cap)
-            .unwrap();
-        assert_eq!(context_id, 1);
-
-        let policy_cap = PolicyCapability::full();
-        let policy = MLSPolicy::new(SecurityLevel::High, policy_cap);
-        engine.register_policy(Box::new(policy)).unwrap();
-
-        assert!(!engine.check_access(1, SecurityOperation::Read));
-
-        let stats = engine.stats();
-        assert_eq!(stats.total_contexts, 1);
-        assert_eq!(stats.total_policies, 1);
-        assert_eq!(stats.access_checks, 1);
-        assert_eq!(stats.access_denied, 1);
     }
 }
 
@@ -885,19 +458,3 @@ mod tests {
         assert!(engine.check_access(ctx_id, SecurityOperation::Read));
     }
 }
-||||||| 43be3a7e8
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-||||||| 0ddf2eac7
-
-pub type MacPolicy = dyn MACPolicy;
-
-#[derive(Debug, Clone)]
-pub struct MacRule;
-
-#[derive(Debug, Clone)]
-pub struct MacSecurity;

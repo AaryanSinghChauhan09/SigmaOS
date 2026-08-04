@@ -1,48 +1,11 @@
 #![no_std]
-||||||| 43be3a7e8
-#![no_std]
-#![no_main]
 
-use core::mem;
-/// OOP-based Container Runtime for SigmaOS
-/// Implements container runtime using OOP principles with traits and structs
-/// No dependency on external container frameworks
-/// Based on Roadmap Item 17: Container runtime support
-// OOP-based Container Runtime for SigmaOS
-// Implements container runtime using OOP principles with traits and structs.
-
-extern crate alloc;
-
-use core::mem;
-||||||| 0ddf2eac7
-use core::mem;
-/// OOP-based Container Runtime for SigmaOS
-/// Implements container runtime using OOP principles with traits and structs
-/// No dependency on external container frameworks
-/// Based on Roadmap Item 17: Container runtime support
 use core::mem;
 use core::ptr::{self, NonNull};
-||||||| 43be3a7e8
-use core::ptr::{self, NonNull};
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 extern crate alloc;
 use alloc::boxed::Box;
-||||||| 43be3a7e8
-use core::mem;
-
-||||||| 0ddf2eac7
-extern crate alloc;
-use alloc::boxed::Box;
-||||||| 43be3a7e8
-
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
 pub type ContainerID = usize;
@@ -58,176 +21,6 @@ pub enum ContainerState {
     Failed = 4,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
-/// Container trait (OOP interface)
-pub trait Container {
-    /// Get container ID
-    fn id(&self) -> ContainerID;
-    /// Get container name
-    fn name(&self) -> &[u8];
-    /// Start container
-    fn start(&mut self) -> Result<(), ContainerError>;
-    /// Stop container
-    fn stop(&mut self) -> Result<(), ContainerError>;
-    /// Pause container
-    fn pause(&mut self) -> Result<(), ContainerError>;
-    /// Resume container
-    fn resume(&mut self) -> Result<(), ContainerError>;
-    /// Get container state
-    fn state(&self) -> ContainerState;
-    /// Get container info
-    fn info(&self) -> ContainerInfo;
-}
-
-/// Container error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ContainerError {
-    Success = 0,
-    AlreadyStarted = 1,
-    AlreadyStopped = 2,
-    StartFailed = 3,
-    StopFailed = 4,
-    PermissionDenied = 5,
-    ResourceLimit = 6,
-}
-
-/// Container info
-#[repr(C)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
-}
-
-impl ContainerInfo {
-    pub fn new(id: ContainerID) -> Self {
-        ContainerInfo {
-            id,
-            name: [0; 64],
-            image: [0; 128],
-            state: ContainerState::Created,
-            pid: None,
-            memory_limit: 0,
-            cpu_limit: 0,
-            capability: ContainerCapability::new(),
-        }
-    }
-}
-
-/// Container capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-/// Container trait (OOP interface)
-pub trait Container {
-    /// Get container ID
-    fn id(&self) -> ContainerID;
-    /// Get container name
-    fn name(&self) -> &[u8];
-    /// Start container
-    fn start(&mut self) -> Result<(), ContainerError>;
-    /// Stop container
-    fn stop(&mut self) -> Result<(), ContainerError>;
-    /// Pause container
-    fn pause(&mut self) -> Result<(), ContainerError>;
-    /// Resume container
-    fn resume(&mut self) -> Result<(), ContainerError>;
-    /// Get container state
-    fn state(&self) -> ContainerState;
-    /// Get container info
-    fn info(&self) -> ContainerInfo;
-}
-
-/// Container error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ContainerError {
-    Success = 0,
-    AlreadyStarted = 1,
-    AlreadyStopped = 2,
-    StartFailed = 3,
-    StopFailed = 4,
-    PermissionDenied = 5,
-    ResourceLimit = 6,
-}
-
-/// Container info
-#[repr(C)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
-}
-
-impl ContainerInfo {
-    pub fn new(id: ContainerID) -> Self {
-        ContainerInfo {
-            id,
-            name: [0; 64],
-            image: [0; 128],
-            state: ContainerState::Created,
-            pid: None,
-            memory_limit: 0,
-            cpu_limit: 0,
-            capability: ContainerCapability::new(),
-        }
-    }
-}
-
-/// Container capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
-impl ContainerCapability {
-    pub const fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub const fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
-}
-
-||||||| 0ddf2eac7
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerCapability {
     pub can_start: bool,
@@ -289,40 +82,6 @@ pub trait Container {
 }
 
 /// Container error types
-||||||| 43be3a7e8
-/// Simple container (OOP: Concrete container class)
-/// Container network configuration type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ContainerNetworkType {
-    None,
-    Bridge,
-    Overlay,
-}
-
-/// Container volume configuration
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerVolume {
-    pub is_bind_mount: bool,
-    pub is_tmpfs: bool,
-    pub read_only: bool,
-}
-
-/// Container user namespaces mapping
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerNamespace {
-    pub uid_mapping: u32,
-    pub gid_mapping: u32,
-    pub rootless: bool,
-}
-
-/// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
-
-/// Simple container (OOP: Concrete container class)
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
@@ -367,14 +126,8 @@ pub struct SeccompProfile {
     pub blocked_syscalls_mask: u32,
 }
 
-||||||| 43be3a7e8
-impl Default for ContainerCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Simple container (OOP: Concrete container class)
+#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -404,8 +157,10 @@ impl SimpleContainer {
         let name_len = name.len().min(63);
         let image_len = image.len().min(127);
 
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-        image_array[..image_len].copy_from_slice(&image[..image_len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+            core::ptr::copy_nonoverlapping(image.as_ptr(), image_array.as_mut_ptr(), image_len);
+        }
 
         SimpleContainer {
             id,
@@ -437,7 +192,9 @@ impl SimpleContainer {
 
     pub fn set_environment(&mut self, env: &[u8]) {
         let len = env.len().min(511);
-        self.environment[..len].copy_from_slice(&env[..len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(env.as_ptr(), self.environment.as_mut_ptr(), len);
+        }
     }
 
     pub fn set_limits(&mut self, memory_limit: u64, cpu_limit: u32) {
@@ -577,10 +334,6 @@ pub trait ContainerRuntime {
 /// Runtime statistics
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-||||||| 43be3a7e8
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
-#[derive(Debug, Clone, Copy)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,
@@ -589,19 +342,13 @@ pub struct RuntimeStats {
 }
 
 impl RuntimeStats {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         RuntimeStats {
             total_containers: 0,
             running_containers: 0,
             paused_containers: 0,
             stopped_containers: 0,
         }
-    }
-}
-
-impl Default for RuntimeStats {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -615,7 +362,7 @@ pub struct SimpleContainerRuntime {
 
 /// Runtime capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,
@@ -623,7 +370,7 @@ pub struct RuntimeCapability {
 }
 
 impl RuntimeCapability {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         RuntimeCapability {
             can_create: false,
             can_remove: false,
@@ -631,18 +378,12 @@ impl RuntimeCapability {
         }
     }
 
-    pub const fn full() -> Self {
+    pub fn full() -> Self {
         RuntimeCapability {
             can_create: true,
             can_remove: true,
             can_manage: true,
         }
-    }
-}
-
-impl Default for RuntimeCapability {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -813,40 +554,6 @@ pub struct Vec<T> {
     len: usize,
     capacity: usize,
 }
-||||||| 43be3a7e8
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-||||||| 0ddf2eac7
-struct Vec<T> {
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
 
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -877,53 +584,19 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
-||||||| 43be3a7e8
-impl<T> Vec<T> {
-    fn new() -> Self {
-||||||| 0ddf2eac7
-    fn new() -> Self {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
+
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
         }
     }
-    #[test]
-    fn test_container_lifecycle_flows() {
-        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
-        let id = runtime
-            .create_container(
-                b"nginx-service",
-                b"nginx:alpine",
-                ContainerCapability::full(),
-            )
-            .unwrap();
-
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-||||||| 43be3a7e8
-    fn push(&mut self, item: T) {
-||||||| 0ddf2eac7
-    fn push(&mut self, item: T) {
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-        let stats_init = runtime.stats();
-        assert_eq!(stats_init.total_containers, 1);
-        assert_eq!(stats_init.stopped_containers, 1);
-        assert_eq!(stats_init.running_containers, 0);
-
-        // Start container
-        runtime.start_container(id).unwrap();
-        let stats_running = runtime.stats();
-        assert_eq!(stats_running.running_containers, 1);
-        assert_eq!(stats_running.stopped_containers, 0);
 
     pub fn len(&self) -> usize {
         self.len
@@ -947,36 +620,6 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
-||||||| 43be3a7e8
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-||||||| 0ddf2eac7
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        let layout = std::alloc::Layout::from_size_align(new_capacity * mem::size_of::<T>(), 8).unwrap();
-        let new_data = std::alloc::alloc(layout) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-        // Pause container
-        runtime.pause_container(id).unwrap();
-        let stats_paused = runtime.stats();
-        assert_eq!(stats_paused.paused_containers, 1);
-        assert_eq!(stats_paused.running_containers, 0);
     }
 }
 
@@ -1171,87 +814,6 @@ pub mod oci {
             ContainerManager
         }
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_container_creation() {
-        let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
-        let id = runtime
-            .create_container(
-                b"sovereign_container",
-                b"ubuntu-pqc",
-                ContainerCapability::full(),
-            )
-            .unwrap();
-        assert_eq!(id, 1);
-    }
-
-    #[test]
-    fn test_container_oci_networking_and_volumes() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"web_app",
-            b"nginx-dilithium",
-            ContainerCapability::full(),
-        );
-
-        // Assert network parity bridge setting
-        assert_eq!(container.network_type, ContainerNetworkType::None);
-        container.network_type = ContainerNetworkType::Bridge;
-        assert_eq!(container.network_type, ContainerNetworkType::Bridge);
-
-        // Assert volume mounts setting
-        assert!(!container.volume.is_bind_mount);
-        container.volume.is_bind_mount = true;
-        assert!(container.volume.is_bind_mount);
-    }
-
-    #[test]
-    fn test_container_namespaces_and_seccomp() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"secure_sandbox",
-            b"alpine-kyber",
-            ContainerCapability::full(),
-        );
-
-        // Assert namespace uid mappings
-        assert_eq!(container.namespace.uid_mapping, 0);
-        container.namespace.uid_mapping = 1000;
-        assert_eq!(container.namespace.uid_mapping, 1000);
-
-        // Assert seccomp profile hardening
-        assert!(!container.seccomp.hardened);
-        container.seccomp.hardened = true;
-        assert!(container.seccomp.hardened);
-    }
-}
-||||||| 43be3a7e8
-
-// External allocator functions
-||||||| 43be3a7e8
-// External allocator functions
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]

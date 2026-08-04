@@ -1,10 +1,6 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-
-use core::mem;
-||||||| 43be3a7e8
 use core::mem;
 /// OOP-based Observability Stack for SigmaOS
 /// Implements observability using OOP principles with traits and structs
@@ -12,10 +8,6 @@ use core::mem;
 /// Based on Roadmap Item 90: Observability stack
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-||||||| 43be3a7e8
-use core::mem;
 
 /// Metric ID
 pub type MetricID = usize;
@@ -303,10 +295,6 @@ impl Span for SimpleSpan {
             return;
         }
         self.start_time
-            .store(Self::get_current_time(), Ordering::SeqCst);
-||||||| 43be3a7e8
-        self.start_time.store(Self::get_current_time(), Ordering::SeqCst);
-        self.start_time
             .store(Self::get_current_time() as usize, Ordering::SeqCst);
     }
 
@@ -314,10 +302,6 @@ impl Span for SimpleSpan {
         if !self.capability.can_stop {
             return;
         }
-        self.end_time
-            .store(Self::get_current_time(), Ordering::SeqCst);
-||||||| 43be3a7e8
-        self.end_time.store(Self::get_current_time(), Ordering::SeqCst);
         self.end_time
             .store(Self::get_current_time() as usize, Ordering::SeqCst);
     }
@@ -374,8 +358,6 @@ pub enum ObservabilityError {
 
 /// Observability statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-||||||| 43be3a7e8
 #[derive(Debug, Clone, Copy)]
 pub struct ObservabilityStats {
     pub total_metrics: usize,
@@ -658,24 +640,13 @@ impl ObservabilityStack for SimpleObservabilityStack {
     }
 }
 
-// Simple Vec implementation for no_std
-
-pub trait SigmaDebug {
-    fn debug_dump(&self) -> alloc::string::String;
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
 }
 
-pub trait SigmaMetrics {
-    fn collect_metrics(&self) -> ObservabilityStats;
-}
-||||||| 43be3a7e8
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -706,42 +677,12 @@ impl<T> Vec<T> {
         }
     }
 
-pub trait SigmaTrace {
-    fn trace_event(&self, event: &str);
-}
-
-pub struct SimpleSigmaDebug;
-impl SigmaDebug for SimpleSigmaDebug {
-    fn debug_dump(&self) -> alloc::string::String {
-        alloc::string::String::from("SimpleSigmaDebug dump")
-||||||| 43be3a7e8
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
             }
 
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -776,21 +717,6 @@ impl SigmaDebug for SimpleSigmaDebug {
     }
 }
 
-pub struct SimpleSigmaMetrics;
-impl SigmaMetrics for SimpleSigmaMetrics {
-    fn collect_metrics(&self) -> ObservabilityStats {
-        ObservabilityStats::new()
-    }
-}
-
-pub struct SimpleSigmaTrace;
-impl SigmaTrace for SimpleSigmaTrace {
-    fn trace_event(&self, _event: &str) {}
-||||||| 43be3a7e8
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {

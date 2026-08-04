@@ -1,20 +1,6 @@
 // OOP-based Audio Driver for SigmaOS
 // Implements audio device management and playback under `#![no_std]`.
 
-#[cfg(not(target_os = "none"))]
-extern crate alloc;
-#[cfg(not(target_os = "none"))]
-use alloc::vec::Vec;
-
-use core::mem;
-/// OOP-based Audio Driver for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 71
-/// Implements audio device management and playback
-||||||| 43be3a7e8
-/// OOP-based Audio Driver for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 71
-/// Implements audio device management and playback
-
 extern crate alloc;
 
 use alloc::boxed::Box;
@@ -23,17 +9,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AudioDeviceID = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AudioType {
-    Playback = 0,
-    Capture = 1,
-    Duplex = 2,
-}
-||||||| 43be3a7e8
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum AudioType { Playback = 0, Capture = 1, Duplex = 2 }
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioType {
@@ -43,16 +18,6 @@ pub enum AudioType {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum AudioError {
-    Success = 0,
-    NotFound = 1,
-    InitFailed = 2,
-    PlaybackFailed = 3,
-}
-||||||| 43be3a7e8
-#[derive(Debug, Clone, Copy)]
-pub enum AudioError { Success = 0, NotFound = 1, InitFailed = 2, PlaybackFailed = 3 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioError {
     Success = 0,
@@ -99,22 +64,6 @@ impl AudioDevice for SimpleAudioDevice {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn audio_type(&self) -> AudioType {
-        {
-            let raw = self.audio_type.load(Ordering::SeqCst) as u32;
-            match raw {
-                1 => AudioType::Capture,
-                2 => AudioType::Duplex,
-                _ => AudioType::Playback,
-            }
-        }
-    }
-    fn sample_rate(&self) -> u32 {
-        self.sample_rate.load(Ordering::SeqCst) as u32
-    }
-||||||| 43be3a7e8
-    fn audio_type(&self) -> AudioType { unsafe { core::mem::transmute(self.audio_type.load(Ordering::SeqCst)) } }
-    fn sample_rate(&self) -> u32 { self.sample_rate.load(Ordering::SeqCst) as u32 }
     fn audio_type(&self) -> AudioType {
         match self.audio_type.load(Ordering::SeqCst) {
             0 => AudioType::Playback,
@@ -322,78 +271,10 @@ impl AudioStream for SimpleAudioStream {
     }
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-||||||| 43be3a7e8
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 #[cfg(test)]
 mod tests {
     use super::*;
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-||||||| 43be3a7e8
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
     #[test]
     fn test_audio_driver_lifecycle() {
         let mut manager = SimpleAudioManager::new();
@@ -408,11 +289,3 @@ impl<T> Vec<T> {
         assert_eq!(default_dev.sample_rate(), 48000);
     }
 }
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-||||||| 43be3a7e8
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

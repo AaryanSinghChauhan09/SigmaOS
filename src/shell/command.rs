@@ -1,8 +1,6 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
-||||||| 43be3a7e8
 use crate::sigpkg::PackageImporter;
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
@@ -13,16 +11,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type CommandID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum CommandError {
-    Success = 0,
-    NotFound = 1,
-    InvalidArgs = 2,
-    ExecutionFailed = 3,
-}
-||||||| 43be3a7e8
-#[derive(Debug, Clone, Copy)]
-pub enum CommandError { Success = 0, NotFound = 1, InvalidArgs = 2, ExecutionFailed = 3 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CommandError {
     Success = 0,
@@ -33,7 +21,7 @@ pub enum CommandError {
 
 pub trait ShellCommand {
     fn name(&self) -> &[u8];
-    fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError>;
+    fn execute(&mut self, args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError>;
     fn help(&self) -> &[u8];
 }
 
@@ -60,158 +48,14 @@ impl SimpleShellCommand {
     }
 }
 
-impl<'a, T> IntoIterator for &'a ShellVec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut ShellVec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}
-
-impl<T> core::ops::Deref for ShellVec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for ShellVec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-pub struct ShellVec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-}
-
-impl<T> ShellVec<T> {
-    pub fn new() -> Self {
-        ShellVec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-        .iter()
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-        .iter_mut()
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for ShellVec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 impl ShellCommand for SimpleShellCommand {
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
         &self.name[..len]
     }
 
-    fn execute(&mut self, _args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError> {
-        let mut output = ShellVec::new();
+    fn execute(&mut self, _args: &[[u8; 64]]) -> Result<Vec<u8>, CommandError> {
+        let mut output = Vec::new();
         let name = self.name();
         for &byte in name {
             output.push(byte);
@@ -325,7 +169,7 @@ impl ShellCommand for ImportPacmanCommand {
 }
 
 pub trait CommandParser {
-    fn parse(&self, input: &[u8]) -> Result<([u8; 32], ShellVec<[u8; 64]>), CommandError>;
+    fn parse(&self, input: &[u8]) -> Result<([u8; 32], Vec<[u8; 64]>), CommandError>;
     fn validate(&self, command: &[u8], args: &[[u8; 64]]) -> Result<(), CommandError>;
 }
 
@@ -339,9 +183,9 @@ impl SimpleCommandParser {
 }
 
 impl CommandParser for SimpleCommandParser {
-    fn parse(&self, input: &[u8]) -> Result<([u8; 32], ShellVec<[u8; 64]>), CommandError> {
+    fn parse(&self, input: &[u8]) -> Result<([u8; 32], Vec<[u8; 64]>), CommandError> {
         let mut command = [0u8; 32];
-        let mut args = ShellVec::new();
+        let mut args = Vec::new();
         let mut current_arg = [0u8; 64];
         let mut arg_index = 0;
         let mut in_command = true;
@@ -387,22 +231,19 @@ pub trait CommandRegistry {
     fn register(&mut self, command: Box<dyn ShellCommand>) -> Result<(), CommandError>;
     fn unregister(&mut self, name: &[u8]) -> Result<(), CommandError>;
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand>;
-    fn list(&self) -> ShellVec<&[u8]>;
-||||||| 43be3a7e8
-    fn list(&self) -> Vec<&[u8]>;
     fn get_mut(&mut self, name: &[u8]) -> Option<&mut dyn ShellCommand>;
     fn list(&self) -> Vec<&[u8]>;
 }
 
 #[repr(C)]
 pub struct SimpleCommandRegistry {
-    pub commands: ShellVec<Option<Box<dyn ShellCommand>>>,
+    pub commands: Vec<Option<Box<dyn ShellCommand>>>,
 }
 
 impl SimpleCommandRegistry {
     pub fn new() -> Self {
         SimpleCommandRegistry {
-            commands: ShellVec::new(),
+            commands: Vec::new(),
         }
     }
 
@@ -418,25 +259,6 @@ impl SimpleCommandRegistry {
 
         let pwd = SimpleShellCommand::new(b"pwd", b"Print working directory");
         self.commands.push(Some(Box::new(pwd)));
-
-        let sigpkg =
-            SimpleShellCommand::new(b"sigpkg", b"Manage packages (install, update, remove)");
-        self.commands.push(Some(Box::new(sigpkg)));
-
-        let sigtrace = SimpleShellCommand::new(b"sigtrace", b"System tracing control");
-        self.commands.push(Some(Box::new(sigtrace)));
-
-        let sigmetrics =
-            SimpleShellCommand::new(b"sigmetrics", b"System metrics telemetry exporter");
-        self.commands.push(Some(Box::new(sigmetrics)));
-
-        let sigstandards =
-            SimpleShellCommand::new(b"sigstandards", b"Verify POSIX and FHS compliance");
-        self.commands.push(Some(Box::new(sigstandards)));
-
-        let sigsched = SimpleShellCommand::new(b"sigsched", b"Set Scheduler RT and HPC profiles");
-        self.commands.push(Some(Box::new(sigsched)));
-||||||| 43be3a7e8
 
         let sigpkg =
             SimpleShellCommand::new(b"sigpkg", b"Manage packages (install, update, remove)");
@@ -498,15 +320,6 @@ impl CommandRegistry for SimpleCommandRegistry {
         None
     }
 
-    fn list(&self) -> ShellVec<&[u8]> {
-        let mut names = ShellVec::new();
-        for command_option in &*self.commands {
-            if let Some(ref command) = command_option {
-||||||| 43be3a7e8
-    fn list(&self) -> Vec<&[u8]> {
-        let mut names = Vec::new();
-        for command_option in &self.commands {
-            if let Some(ref command) = *command_option {
     fn get_mut(&mut self, name: &[u8]) -> Option<&mut dyn ShellCommand> {
         let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
         let trimmed_name = &name[..name_len];
@@ -706,7 +519,7 @@ impl ShellOptimizer {
 }
 
 pub trait ShellSession {
-    fn execute_line(&mut self, input: &[u8]) -> Result<ShellVec<u8>, CommandError>;
+    fn execute_line(&mut self, input: &[u8]) -> Result<Vec<u8>, CommandError>;
     fn set_environment(&mut self, key: &[u8], value: &[u8]);
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]>;
 }
@@ -715,9 +528,6 @@ pub trait ShellSession {
 pub struct SimpleShellSession {
     pub registry: SimpleCommandRegistry,
     pub parser: SimpleCommandParser,
-    pub environment: ShellVec<([u8; 64], [u8; 128])>,
-||||||| 43be3a7e8
-    pub environment: Vec<([u8; 64], [u8; 128])>,
     pub environment: Vec<([u8; 64], [u8; 128])>,
     pub alias_manager: ShellAliasManager,
     pub function_manager: UserDefinedFunctionManager,
@@ -735,9 +545,6 @@ impl SimpleShellSession {
         let mut session = SimpleShellSession {
             registry,
             parser: SimpleCommandParser::new(),
-            environment: ShellVec::new(),
-||||||| 43be3a7e8
-            environment: Vec::new(),
             environment: Vec::new(),
             alias_manager: ShellAliasManager::new(),
             function_manager: UserDefinedFunctionManager::new(),
@@ -764,11 +571,6 @@ impl SimpleShellSession {
 }
 
 impl ShellSession for SimpleShellSession {
-    fn execute_line(&mut self, input: &[u8]) -> Result<ShellVec<u8>, CommandError> {
-        let (command_name, args) = self.parser.parse(input)?;
-||||||| 43be3a7e8
-    fn execute_line(&mut self, input: &[u8]) -> Result<Vec<u8>, CommandError> {
-        let (command_name, args) = self.parser.parse(input)?;
     fn execute_line(&mut self, input: &[u8]) -> Result<Vec<u8>, CommandError> {
         // 1. Expand aliases
         let expanded = self.alias_manager.expand(input);
@@ -846,19 +648,19 @@ pub trait CommandHistory {
     fn add(&mut self, command: &[u8]);
     fn get_previous(&self) -> Option<&[u8]>;
     fn get_next(&self) -> Option<&[u8]>;
-    fn list(&self) -> ShellVec<&[u8]>;
+    fn list(&self) -> Vec<&[u8]>;
 }
 
 #[repr(C)]
 pub struct SimpleCommandHistory {
-    pub history: ShellVec<[u8; 256]>,
+    pub history: Vec<[u8; 256]>,
     pub current_index: AtomicUsize,
 }
 
 impl SimpleCommandHistory {
     pub fn new() -> Self {
         SimpleCommandHistory {
-            history: ShellVec::new(),
+            history: Vec::new(),
             current_index: AtomicUsize::new(0),
         }
     }
@@ -902,13 +704,6 @@ impl CommandHistory for SimpleCommandHistory {
         }
     }
 
-    fn list(&self) -> ShellVec<&[u8]> {
-        let mut commands = ShellVec::new();
-        for cmd in &*self.history {
-||||||| 43be3a7e8
-    fn list(&self) -> Vec<&[u8]> {
-        let mut commands = Vec::new();
-        for cmd in &self.history {
     fn list(&self) -> Vec<&[u8]> {
         let mut commands = Vec::new();
         for cmd in &*self.history {
@@ -919,19 +714,6 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
-pub struct ShellVec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-||||||| 2139cb2f8
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg(target_os = "none")]
 pub struct Vec<T> {
@@ -939,63 +721,7 @@ pub struct Vec<T> {
     len: usize,
     capacity: usize,
 }
-||||||| 43be3a7e8
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> ShellVec<T> {
-||||||| 2139cb2f8
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-impl<T> Vec<T> {
 #[cfg(target_os = "none")]
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
@@ -1023,18 +749,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    pub fn new() -> Self {
-        ShellVec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    pub fn push(&mut self, item: T) {
-||||||| 43be3a7e8
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
@@ -1047,56 +761,12 @@ impl<T> Vec<T> {
             if self.len >= self.capacity {
                 self.grow();
             }
-            if self.capacity > self.len {
-||||||| 43be3a7e8
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-            if self.len >= self.capacity {
-                self.grow();
-            }
             if !self.data.is_null() && self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    pub fn remove(&mut self, index: usize) -> Option<T> {
-        if index >= self.len {
-            return None;
-        }
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            Some(item)
-        }
-    }
-
-    pub fn get(&self, index: usize) -> Option<&T> {
-        if index >= self.len {
-            return None;
-        }
-        unsafe { Some(&*self.data.add(index)) }
-    }
-
-    pub unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
-||||||| 43be3a7e8
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -1110,124 +780,18 @@ impl<T> Vec<T> {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
             if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-||||||| 43be3a7e8
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
                 free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
             }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
-||||||| 2139cb2f8
-    pub fn len(&self) -> usize {
-        self.len
-    }
-||||||| 43be3a7e8
-    pub fn len(&self) -> usize {
-        self.len
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                if self.capacity > 0 {
-                    free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
-                }
-            }
-            self.data = core::ptr::null_mut();
-            self.len = 0;
-            self.capacity = 0;
-        }
-    }
     pub fn len(&self) -> usize {
         self.len
     }
 }
 
 #[cfg(target_os = "none")]
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                if self.capacity > 0 {
-                    free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
-                }
-            }
-            self.data = core::ptr::null_mut();
-            self.len = 0;
-            self.capacity = 0;
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_new_builtins_registration() {
-        let registry = SimpleCommandRegistry::new();
-        let mut session = SimpleShellSession::new();
-
-        // Verify all 5 new built-ins are registered successfully
-        assert!(session.registry.get(b"sigpkg").is_some());
-        assert!(session.registry.get(b"sigtrace").is_some());
-        assert!(session.registry.get(b"sigmetrics").is_some());
-        assert!(session.registry.get(b"sigstandards").is_some());
-        assert!(session.registry.get(b"sigsched").is_some());
-    }
-
-    #[test]
-    fn test_execute_sigpkg() {
-        let mut session = SimpleShellSession::new();
-        let result = session.execute_line(b"sigpkg").unwrap();
-        assert_eq!(&result[..6], b"sigpkg");
-    }
-
-    #[test]
-    fn test_command_history_add_and_list() {
-        let mut history = SimpleCommandHistory::new();
-        history.add(b"sigtrace trace task 256");
-        assert_eq!(history.list().len(), 1);
-        assert_eq!(history.get_previous().unwrap(), b"sigtrace trace task 256");
-    }
-}
-||||||| 43be3a7e8
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if !self.data.is_null() {

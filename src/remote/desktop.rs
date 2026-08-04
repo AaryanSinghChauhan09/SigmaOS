@@ -2,40 +2,12 @@
 // Implements secure P2P signaling (SigmaRendezvous), post-quantum video frame
 // ciphering, zero-trust input authorization checking, and full screen-sharing.
 
-extern crate alloc;
-
-use core::mem;
-/// OOP-based Remote Desktop for SigmaOS
-/// Based on Ideas-999-Structured: Cloud & Remote Item 956
-/// Implements remote desktop access
-use core::sync::atomic::{AtomicUsize, Ordering};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-||||||| 43be3a7e8
-/// OOP-based Remote Desktop for SigmaOS
-/// Based on Ideas-999-Structured: Cloud & Remote Item 956
-/// Implements remote desktop access
-
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 use crate::security::CapabilityToken;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type SessionID = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy)]
-pub enum SessionState {
-    Disconnected = 0,
-    Connecting = 1,
-    Connected = 2,
-    Error = 3,
-}
-||||||| 43be3a7e8
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum SessionState { Disconnected = 0, Connecting = 1, Connected = 2, Error = 3 }
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SessionState {
@@ -46,15 +18,6 @@ pub enum SessionState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum RemoteError {
-    Success = 0,
-    NotFound = 1,
-    ConnectionFailed = 2,
-}
-||||||| 43be3a7e8
-#[derive(Debug, Clone, Copy)]
-pub enum RemoteError { Success = 0, NotFound = 1, ConnectionFailed = 2 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RemoteError {
     Success = 0,
@@ -100,12 +63,6 @@ impl RemoteSession for SimpleRemoteSession {
         let len = self.host.iter().position(|&b| b == 0).unwrap_or(128);
         &self.host[..len]
     }
-    fn state(&self) -> SessionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
-    fn set_state(&self, state: SessionState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-||||||| 43be3a7e8
-    fn state(&self) -> SessionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn state(&self) -> SessionState {
         let val = self.state.load(Ordering::SeqCst) as u32;
         unsafe { core::mem::transmute(val) }
@@ -187,7 +144,6 @@ pub trait RemoteDesktop {
     fn disconnect(&mut self, id: SessionID) -> Result<(), RemoteError>;
     fn send_input(&self, id: SessionID, input: &[u8]) -> Result<(), RemoteError>;
     fn receive_screen(&self, id: SessionID) -> Result<Vec<u8>, RemoteError>;
-    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession>;
 }
 
 #[repr(C)]
@@ -245,13 +201,6 @@ impl RemoteDesktop for SimpleRemoteDesktop {
             Err(RemoteError::NotFound)
         }
     }
-
-    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
-        for session_option in &self.sessions {
-||||||| 43be3a7e8
-    
-    fn get_session(&self, id: SessionID) -> Option<&dyn RemoteSession> {
-        for session_option in &self.sessions {
 }
 
 impl SimpleRemoteDesktop {
@@ -296,41 +245,12 @@ impl ScreenSharing for SimpleScreenSharing {
         self.sharing.store(0, Ordering::SeqCst);
         Ok(())
     }
-||||||| 43be3a7e8
-    
-    fn is_sharing(&self) -> bool { self.sharing.load(Ordering::SeqCst) == 1 }
-}
 
     fn is_sharing(&self) -> bool {
         self.sharing.load(Ordering::SeqCst) == 1
     }
 }
 
-    fn is_sharing(&self) -> bool {
-        self.sharing.load(Ordering::SeqCst) == 1
-||||||| 43be3a7e8
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -406,23 +326,6 @@ impl<T> Vec<T> {
     }
 }
 
-
-pub struct InputAuthGate;
-impl InputAuthGate {
-    pub fn new() -> Self { Self }
-}
-
-pub struct PqcVideoCipher;
-impl PqcVideoCipher {
-    pub fn new() -> Self { Self }
-}
-
-pub struct SigmaRendezvous;
-impl SigmaRendezvous {
-    pub fn new() -> Self { Self }
-}
-||||||| 43be3a7e8
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {

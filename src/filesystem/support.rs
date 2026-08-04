@@ -3,19 +3,6 @@
 // Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs.
 // Features advanced read-only ext4 traversal metadata structures inspired by Linux & BSD.
 
-#[cfg(not(target_os = "none"))]
-extern crate alloc;
-#[cfg(not(target_os = "none"))]
-use alloc::vec::Vec;
-use core::mem;
-/// OOP-based Filesystem Support for SigmaOS
-/// Based on Ideas-999-Structured: Core System Item 7
-/// Implements all old & new technologies (Ext4, Btrfs, ZFS, Fat32, APFS, SovereignP2P, EncryptedFS, CompressedFS) using OOP principles
-||||||| 43be3a7e8
-/// OOP-based Filesystem Support for SigmaOS
-/// Based on Ideas-999-Structured: Core System Item 7
-/// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
-
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 
@@ -23,49 +10,18 @@ extern crate alloc;
 
 use alloc::string::{String, ToString};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type FilesystemID = usize;
 
-/// Standard and advanced Filesystem types (Old & New technologies)
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FilesystemType {
-    Ext4 = 0,
-    Btrfs = 1,
-    ZFS = 2,
-    Fat32 = 3,
-    APFS = 4,
-    SovereignP2P = 5,
-    EncryptedFS = 6,
-    CompressedFS = 7,
-}
-||||||| 43be3a7e8
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FilesystemError {
-    Success = 0,
-    InvalidFS = 1,
-    MountFailed = 2,
-    SnapshotFailed = 3,
-    EncryptionError = 4,
-    CompressionError = 5,
-    SyncFailed = 6,
-}
-||||||| 43be3a7e8
-#[derive(Debug, Clone, Copy)]
-pub enum FilesystemError { Success = 0, InvalidFS = 1, MountFailed = 2, SnapshotFailed = 3 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FilesystemError { Success = 0, InvalidFS = 1, MountFailed = 2, SnapshotFailed = 3 }
 
-/// Base Filesystem Interface (OOP trait)
-||||||| 43be3a7e8
 // ==========================================
 // ADVANCED READ-ONLY EXT4 STRUCTURES
 // ==========================================
@@ -141,7 +97,6 @@ pub trait Filesystem {
     fn rollback(&mut self, snapshot: &[u8]) -> Result<(), FilesystemError>;
 }
 
-/// Base implementation struct for Filesystems
 #[repr(C)]
 pub struct SimpleFilesystem {
     pub id: FilesystemID,
@@ -162,12 +117,8 @@ impl SimpleFilesystem {
 }
 
 impl Filesystem for SimpleFilesystem {
-    fn id(&self) -> FilesystemID {
-        self.id
-    }
-    fn fs_type(&self) -> FilesystemType {
-        unsafe { core::mem::transmute(self.fs_type.load(Ordering::SeqCst)) }
-    }
+    fn id(&self) -> FilesystemID { self.id }
+    fn fs_type(&self) -> FilesystemType { unsafe { core::mem::transmute(self.fs_type.load(Ordering::SeqCst)) } }
 
     fn mount(&mut self, _device: &[u8], mountpoint: &[u8]) -> Result<(), FilesystemError> {
         let len = mountpoint.len().min(255);
@@ -189,21 +140,20 @@ impl Filesystem for SimpleFilesystem {
     fn create_snapshot(&mut self, _name: &[u8]) -> Result<(), FilesystemError> {
         let fs_type = self.fs_type();
         match fs_type {
-            FilesystemType::Btrfs | FilesystemType::ZFS | FilesystemType::APFS => Ok(()),
-            _ => Err(FilesystemError::SnapshotFailed),
+            FilesystemType::Ext4 => Err(FilesystemError::SnapshotFailed),
+            FilesystemType::Btrfs | FilesystemType::ZFS => Ok(()),
         }
     }
 
     fn rollback(&mut self, _snapshot: &[u8]) -> Result<(), FilesystemError> {
         let fs_type = self.fs_type();
         match fs_type {
-            FilesystemType::Btrfs | FilesystemType::ZFS | FilesystemType::APFS => Ok(()),
-            _ => Err(FilesystemError::SnapshotFailed),
+            FilesystemType::Ext4 => Err(FilesystemError::SnapshotFailed),
+            FilesystemType::Btrfs | FilesystemType::ZFS => Ok(()),
         }
     }
 }
 
-/// Btrfs Interface
 pub trait BtrfsFeatures {
     fn create_subvolume(&mut self, path: &[u8]) -> Result<(), FilesystemError>;
     fn delete_subvolume(&mut self, path: &[u8]) -> Result<(), FilesystemError>;
@@ -253,7 +203,6 @@ impl BtrfsFeatures for SimpleBtrfsFS {
     }
 }
 
-/// ZFS Interface
 pub trait ZFSFeatures {
     fn create_dataset(&mut self, path: &[u8]) -> Result<(), FilesystemError>;
     fn create_snapshot(&mut self, dataset: &[u8], snapshot: &[u8]) -> Result<(), FilesystemError>;
@@ -315,278 +264,7 @@ impl ZFSFeatures for SimpleZFS {
     }
 }
 
-/// FAT32 Interface (Legacy filesystem support)
-pub trait Fat32Features {
-    fn format_fat_table(&mut self) -> Result<(), FilesystemError>;
-    fn get_cluster_chain(&self, start_cluster: u32) -> Vec<u32>;
-}
-
-#[repr(C)]
-pub struct SimpleFat32 {
-    pub base: SimpleFilesystem,
-    pub cluster_table: Vec<u32>,
-}
-
-impl SimpleFat32 {
-    pub fn new(id: FilesystemID) -> Self {
-        SimpleFat32 {
-            base: SimpleFilesystem::new(id, FilesystemType::Fat32),
-            cluster_table: Vec::new(),
-        }
-    }
-}
-
-impl Fat32Features for SimpleFat32 {
-    fn format_fat_table(&mut self) -> Result<(), FilesystemError> {
-        self.cluster_table = Vec::new();
-        // Standard initial file allocation entries
-        self.cluster_table.push(0x0FFFFFF8);
-        self.cluster_table.push(0xFFFFFFFF);
-        Ok(())
-    }
-
-    fn get_cluster_chain(&self, start_cluster: u32) -> Vec<u32> {
-        let mut chain = Vec::new();
-        let mut current = start_cluster;
-        while current < 0x0FFFFFF8 && current > 0 {
-            chain.push(current);
-            if (current as usize) < self.cluster_table.len() {
-                current = self.cluster_table.get(current as usize);
-            } else {
-                break;
-            }
-        }
-        chain
-    }
-}
-
-/// APFS Interface (Apple File System space-sharing features)
-pub trait APFSFeatures {
-    fn clone_file(&mut self, source_inode: u64) -> Result<u64, FilesystemError>;
-    fn get_container_size(&self) -> u64;
-}
-
-#[repr(C)]
-pub struct SimpleAPFS {
-    pub base: SimpleFilesystem,
-    pub cloned_inodes: Vec<u64>,
-}
-
-impl SimpleAPFS {
-    pub fn new(id: FilesystemID) -> Self {
-        SimpleAPFS {
-            base: SimpleFilesystem::new(id, FilesystemType::APFS),
-            cloned_inodes: Vec::new(),
-        }
-    }
-}
-
-impl APFSFeatures for SimpleAPFS {
-    fn clone_file(&mut self, source_inode: u64) -> Result<u64, FilesystemError> {
-        // Fast Metadata copy-on-write clone
-        let clone_id = source_inode + 10000;
-        self.cloned_inodes.push(clone_id);
-        Ok(clone_id)
-    }
-
-    fn get_container_size(&self) -> u64 {
-        // Multi-volume shared storage pool simulation
-        1024 * 1024 * 1024 * 512
-    }
-}
-
-/// SovereignP2P Interface (Decentralized networking filesystem support)
-pub trait SovereignP2PFeatures {
-    fn synchronize_block(&mut self, peer_id: u32, block_hash: &[u8])
-        -> Result<(), FilesystemError>;
-    fn list_peer_nodes(&self) -> Vec<u32>;
-}
-
-#[repr(C)]
-pub struct SimpleSovereignP2P {
-    pub base: SimpleFilesystem,
-    pub peers: Vec<u32>,
-}
-
-impl SimpleSovereignP2P {
-    pub fn new(id: FilesystemID) -> Self {
-        SimpleSovereignP2P {
-            base: SimpleFilesystem::new(id, FilesystemType::SovereignP2P),
-            peers: Vec::new(),
-        }
-    }
-}
-
-impl SovereignP2PFeatures for SimpleSovereignP2P {
-    fn synchronize_block(
-        &mut self,
-        peer_id: u32,
-        _block_hash: &[u8],
-    ) -> Result<(), FilesystemError> {
-        let mut peer_found = false;
-        for i in 0..self.peers.len() {
-            if self.peers.get(i) == peer_id {
-                peer_found = true;
-                break;
-            }
-        }
-        if !peer_found {
-            self.peers.push(peer_id);
-        }
-        Ok(())
-    }
-
-    fn list_peer_nodes(&self) -> Vec<u32> {
-        self.peers.clone()
-    }
-}
-
-/// EncryptedFS Interface (Post-quantum folder locking technology)
-pub trait EncryptedFSFeatures {
-    fn lock_path(&mut self, path: &[u8], signature_key: &[u8]) -> Result<(), FilesystemError>;
-    fn unlock_path(&mut self, path: &[u8], verification_key: &[u8]) -> Result<(), FilesystemError>;
-}
-
-#[repr(C)]
-pub struct SimpleEncryptedFS {
-    pub base: SimpleFilesystem,
-    pub locked_folders: Vec<[u8; 128]>,
-    pub keys: Vec<[u8; 32]>,
-}
-
-impl SimpleEncryptedFS {
-    pub fn new(id: FilesystemID) -> Self {
-        SimpleEncryptedFS {
-            base: SimpleFilesystem::new(id, FilesystemType::EncryptedFS),
-            locked_folders: Vec::new(),
-            keys: Vec::new(),
-        }
-    }
-}
-
-impl EncryptedFSFeatures for SimpleEncryptedFS {
-    fn lock_path(&mut self, path: &[u8], signature_key: &[u8]) -> Result<(), FilesystemError> {
-        let mut path_array = [0u8; 128];
-        let len = path.len().min(127);
-        for i in 0..len {
-            path_array[i] = path[i];
-        }
-
-        let mut key_array = [0u8; 32];
-        let key_len = signature_key.len().min(31);
-        for i in 0..key_len {
-            key_array[i] = signature_key[i];
-        }
-
-        self.locked_folders.push(path_array);
-        self.keys.push(key_array);
-        Ok(())
-    }
-
-    fn unlock_path(&mut self, path: &[u8], verification_key: &[u8]) -> Result<(), FilesystemError> {
-        let mut index = None;
-        for i in 0..self.locked_folders.len() {
-            let folder = &self.locked_folders[i];
-            let len = folder.iter().position(|&b| b == 0).unwrap_or(128);
-            if &folder[..len] == path {
-                index = Some(i);
-                break;
-            }
-        }
-
-        if let Some(idx) = index {
-            let key = &self.keys[idx];
-            let verification_len = verification_key.len().min(32);
-            let mut matches = true;
-            for i in 0..verification_len {
-                if key[i] != verification_key[i] {
-                    matches = false;
-                    break;
-                }
-            }
-            if matches {
-                self.locked_folders.remove(idx);
-                self.keys.remove(idx);
-                Ok(())
-            } else {
-                Err(FilesystemError::EncryptionError)
-            }
-        } else {
-            Err(FilesystemError::InvalidFS)
-        }
-    }
-}
-
-/// CompressedFS Interface (Transparent on-the-fly LZW/Zstd block compression)
-pub trait CompressedFSFeatures {
-    fn compress_block(
-        &self,
-        raw_data: &[u8],
-        out_compressed: &mut [u8],
-    ) -> Result<usize, FilesystemError>;
-    fn decompress_block(
-        &self,
-        compressed_data: &[u8],
-        out_raw: &mut [u8],
-    ) -> Result<usize, FilesystemError>;
-}
-
-#[repr(C)]
-pub struct SimpleCompressedFS {
-    pub base: SimpleFilesystem,
-}
-
-impl SimpleCompressedFS {
-    pub fn new(id: FilesystemID) -> Self {
-        SimpleCompressedFS {
-            base: SimpleFilesystem::new(id, FilesystemType::CompressedFS),
-        }
-    }
-}
-
-impl CompressedFSFeatures for SimpleCompressedFS {
-    fn compress_block(
-        &self,
-        raw_data: &[u8],
-        out_compressed: &mut [u8],
-    ) -> Result<usize, FilesystemError> {
-        // Transparent run-length + LZW-inspired compression
-        if out_compressed.len() < raw_data.len() + 1 {
-            return Err(FilesystemError::CompressionError);
-        }
-        let mut count = 0;
-        for i in 0..raw_data.len() {
-            out_compressed[i] = raw_data[i];
-            count += 1;
-        }
-        Ok(count)
-    }
-
-    fn decompress_block(
-        &self,
-        compressed_data: &[u8],
-        out_raw: &mut [u8],
-    ) -> Result<usize, FilesystemError> {
-        if out_raw.len() < compressed_data.len() {
-            return Err(FilesystemError::CompressionError);
-        }
-        let mut count = 0;
-        for i in 0..compressed_data.len() {
-            out_raw[i] = compressed_data[i];
-            count += 1;
-        }
-        Ok(count)
-    }
-}
-
-/// Filesystem Manager Interface (OOP trait)
 pub trait FilesystemManager {
-    fn register_filesystem(
-        &mut self,
-        fs: Box<dyn Filesystem>,
-    ) -> Result<FilesystemID, FilesystemError>;
-||||||| 43be3a7e8
-    fn register_filesystem(&mut self, fs: Box<dyn Filesystem>) -> Result<FilesystemID, FilesystemError>;
     fn register_filesystem(&mut self, fs: alloc::boxed::Box<dyn Filesystem>) -> Result<FilesystemID, FilesystemError>;
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem>;
     fn list_filesystems(&self) -> Vec<FilesystemID>;
@@ -608,12 +286,6 @@ impl SimpleFilesystemManager {
 }
 
 impl FilesystemManager for SimpleFilesystemManager {
-    fn register_filesystem(
-        &mut self,
-        fs: Box<dyn Filesystem>,
-    ) -> Result<FilesystemID, FilesystemError> {
-||||||| 43be3a7e8
-    fn register_filesystem(&mut self, fs: Box<dyn Filesystem>) -> Result<FilesystemID, FilesystemError> {
     fn register_filesystem(&mut self, fs: alloc::boxed::Box<dyn Filesystem>) -> Result<FilesystemID, FilesystemError> {
         let id = fs.id();
         self.filesystems.push(Some(fs));
@@ -621,16 +293,6 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
-        for i in 0..self.filesystems.len() {
-            let fs_option = &self.filesystems[i];
-            if let Some(ref fs) = *fs_option {
-                if fs.id() == id {
-                    return Some(fs.as_ref());
-                }
-||||||| 43be3a7e8
-        for fs_option in &self.filesystems {
-            if let Some(ref fs) = *fs_option {
-                if fs.id() == id { return Some(fs.as_ref()); }
         for i in 0..self.filesystems.len() {
             if let Some(ref fs) = self.filesystems[i] {
                 if fs.id() == id { return Some(fs.as_ref()); }
@@ -642,12 +304,6 @@ impl FilesystemManager for SimpleFilesystemManager {
     fn list_filesystems(&self) -> Vec<FilesystemID> {
         let mut ids = Vec::new();
         for i in 0..self.filesystems.len() {
-            let fs_option = &self.filesystems[i];
-            if let Some(ref fs) = *fs_option {
-||||||| 43be3a7e8
-        for fs_option in &self.filesystems {
-            if let Some(ref fs) = *fs_option {
-        for i in 0..self.filesystems.len() {
             if let Some(ref fs) = self.filesystems[i] {
                 ids.push(fs.id());
             }
@@ -656,15 +312,6 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 }
 
-/// Simple Vec implementation for no_std execution
-#[cfg(target_os = "none")]
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-||||||| 43be3a7e8
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 // Custom drop-safe Vec implementation to prevent memory leaks in no_std
 pub struct Vec<T> {
     data: *mut T,
@@ -685,35 +332,7 @@ impl<T> Drop for Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-#[cfg(target_os = "none")]
 impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    pub fn push(&mut self, item: T) {
-||||||| 43be3a7e8
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
@@ -726,27 +345,12 @@ impl<T> Vec<T> {
             if self.len >= self.capacity {
                 self.grow();
             }
-            if self.capacity > self.len {
-||||||| 43be3a7e8
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-            if self.len >= self.capacity {
-                self.grow();
-            }
             if self.capacity > self.len && !self.data.is_null() {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-
-    pub fn get(&self, index: usize) -> T {
-        unsafe { core::ptr::read(self.data.add(index)) }
-    }
-
-    pub fn clone(&self) -> Vec<T> {
-||||||| 43be3a7e8
-    fn clone(&self) -> Vec<T> {
     pub fn len(&self) -> usize {
         self.len
     }
@@ -760,18 +364,6 @@ impl<T> Vec<T> {
         }
         new_vec
     }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    pub fn remove(&mut self, index: usize) -> T {
-||||||| 43be3a7e8
-    fn remove(&mut self, index: usize) -> T {
     pub fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
@@ -782,28 +374,6 @@ impl<T> Vec<T> {
             item
         }
     }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Vec<T> {
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -824,13 +394,6 @@ impl<T> Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-||||||| 43be3a7e8
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {

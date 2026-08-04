@@ -1,13 +1,6 @@
 // SigmaOS Compatibility Module
 pub mod chimera_linux;
 pub mod constellation;
-||||||| 43be3a7e8
-pub mod antix;
-pub mod chakra;
-||||||| 43be3a7e8
-pub mod chimera_linux;
-||||||| 43be3a7e8
-pub mod constellation_mesh;
 pub mod cross_platform;
 pub mod freedos;
 pub mod historic_linux;
@@ -16,14 +9,6 @@ pub mod legacy_adapters;
 pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-||||||| 52d783ca0
-pub mod linux_security;
-pub mod standards;
-pub mod overtake;
-pub mod linux_security;
-pub mod standards;
-pub mod overtake;
-pub mod arch_linux;
 
 pub use freedos::{ConfigSysSetting, FatDirectoryEntry, FreeDosEmulator, TsrProgram};
 pub use legacy_adapters::{
@@ -32,43 +17,7 @@ pub use legacy_adapters::{
     NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
     GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
-pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
-||||||| 43be3a7e8
-pub mod legacy_adapters;
-||||||| 43be3a7e8
-pub mod interim;
-pub mod lubuntu;
-pub mod mint_linux;
-||||||| 0ddf2eac7
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod freedos;
-||||||| 984d1301f
-pub mod india_professional_tools;
 
-pub use legacy_adapters::{
-    KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
-    APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
-    WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
-    LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
-    GLOBAL_WORKLOAD_OPTIMIZER,
-};
-pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
-||||||| 165ded71c
-pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
-||||||| 43be3a7e8
-pub mod endeavour;
-pub mod legacy_adapters;
-pub mod standards;
-
-pub use constellation_mesh::{
-    BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
-    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
-    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid,
-    LegacyCCodexGrid, LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2,
-    PeripheralArchiveMesh, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
-    StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
-};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat, CompatibilityError,
     CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
@@ -76,12 +25,6 @@ pub use cross_platform::{
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
 pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
-
-pub use arch_linux::{
-    ArchInitSystem, ArchFirewall, LsmSentinel, PamGate, TmuxMultiplexer,
-    ProcFile, ProcFileType, DevFile, DevFileType, PacmanEngine, ArchPackage,
-    SovereignEnvRegistry,
-};
 
 pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
@@ -113,41 +56,4 @@ pub use relay_nexus::{
 pub use solid_kernel::{
     AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
     SigmaFSPlusPlus, SolidKernelCore,
-};
-
-pub use legacy_adapters::{
-    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
-    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
-    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
-    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
-};
-
-pub use chakra::{
-    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
-    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
-};
-
-pub use antix::{
-    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
-    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
-    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
-};
-pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
-pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
-||||||| 984d1301f
-
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
-};
-pub use endeavour::{
-    EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
-    YayAurHelper,
-};
-pub use legacy_adapters::{
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
-};
-pub use standards::{
-    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };

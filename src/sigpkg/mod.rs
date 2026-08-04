@@ -2,53 +2,19 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
-||||||| 43be3a7e8
-pub mod importer;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
-pub mod spec;
-pub mod zero_alloc_resolver;
-pub mod universal_adapter;
-pub mod universal_oop_system;
-pub mod importer;
 
-pub use importer::{
-    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
-};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
-||||||| 2139cb2f8
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
-};
-pub use universal_oop_system::{
-    IPackage, IPackageParser, PackageFormat, PackageMetadata,
-    PackageParserFactory, UniversalPackageManager,
-    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError, InstallError, HookError,
-};
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
-};
-pub use universal_oop_system::{
-    IPackage, IPackageParser, PackageFormat, PackageMetadata,
-    PackageParserFactory, UniversalPackageManager,
-    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError as OopParseError, InstallError, HookError,
-};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -60,13 +26,6 @@ pub struct Version {
 
 impl std::fmt::Display for Version {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
-}
-
-||||||| 2139cb2f8
-impl core::fmt::Display for Version {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
