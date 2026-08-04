@@ -1,37 +1,32 @@
 /// Custom CPU Register Set and Thread Context Subsystems for SigmaOS
 /// Implements standard x86_64 Register Set context, FPU/SSE/AVX XSAVE Area state transitions,
 /// Control and Debug Registers (DR0-DR7) breakpoints, and context-switching governors.
-/// Provides advanced RFLAGS processor status flag bitmask manipulation inspired directly
-/// by Linux kernel (asm/processor.h), FreeBSD, and Windows NT (winnt.h) kernel interfaces.
 
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
-// ==========================================
-// 1. Processor Status Flags (RFLAGS) Bitmasks
-// ==========================================
+// Standard Status and Control Flags Constants (x86/x64 rflags & ARM CPSR)
+// Inspired directly by Linux pt_regs, FreeBSD trapframe, and Windows NT _KTRAP_FRAME
+pub const X86_RFLAGS_CF: u64 = 1 << 0;   // Carry Flag
+pub const X86_RFLAGS_PF: u64 = 1 << 2;   // Parity Flag
+pub const X86_RFLAGS_AF: u64 = 1 << 4;   // Auxiliary Carry Flag
+pub const X86_RFLAGS_ZF: u64 = 1 << 6;   // Zero Flag
+pub const X86_RFLAGS_SF: u64 = 1 << 7;   // Sign Flag
+pub const X86_RFLAGS_TF: u64 = 1 << 8;   // Trap Flag (Hardware Single-Step)
+pub const X86_RFLAGS_IF: u64 = 1 << 9;   // Interrupt Enable Flag
+pub const X86_RFLAGS_DF: u64 = 1 << 10;  // Direction Flag
+pub const X86_RFLAGS_OF: u64 = 1 << 11;  // Overflow Flag
 
-pub const RFLAGS_CF: u64 = 1 << 0;   // Carry Flag
-pub const RFLAGS_PF: u64 = 1 << 2;   // Parity Flag
-pub const RFLAGS_AF: u64 = 1 << 4;   // Auxiliary Carry Flag
-pub const RFLAGS_ZF: u64 = 1 << 6;   // Zero Flag
-pub const RFLAGS_SF: u64 = 1 << 7;   // Sign Flag
-pub const RFLAGS_TF: u64 = 1 << 8;   // Trap Flag
-pub const RFLAGS_IF: u64 = 1 << 9;   // Interrupt Enable Flag
-pub const RFLAGS_DF: u64 = 1 << 10;  // Direction Flag
-pub const RFLAGS_OF: u64 = 1 << 11;  // Overflow Flag
-pub const RFLAGS_IOPL: u64 = 3 << 12; // I/O Privilege Level (2 bits)
-pub const RFLAGS_NT: u64 = 1 << 14;  // Nested Task
-pub const RFLAGS_RF: u64 = 1 << 16;  // Resume Flag
-pub const RFLAGS_VM: u64 = 1 << 17;  // Virtual 8086 Mode
-pub const RFLAGS_AC: u64 = 1 << 18;  // Alignment Check
-pub const RFLAGS_VIF: u64 = 1 << 19; // Virtual Interrupt Flag
-pub const RFLAGS_VIP: u64 = 1 << 20; // Virtual Interrupt Pending
-pub const RFLAGS_ID: u64 = 1 << 21;  // ID Flag
+pub const ARM_CPSR_N: u64 = 1 << 31;     // Negative Flag
+pub const ARM_CPSR_Z: u64 = 1 << 30;     // Zero Flag
+pub const ARM_CPSR_C: u64 = 1 << 29;     // Carry Flag
+pub const ARM_CPSR_V: u64 = 1 << 28;     // Overflow Flag
+pub const ARM_CPSR_I: u64 = 1 << 7;      // IRQ Disable Flag
+pub const ARM_CPSR_F: u64 = 1 << 6;      // FIQ Disable Flag
 
 // ==========================================
-// 2. General Purpose & Segment Register Set
+// 1. General Purpose & Segment Register Set
 // ==========================================
 
 #[repr(C)]
@@ -75,82 +70,66 @@ impl X86RegisterSet {
         self.rip = 0; self.rflags = 0x202;
     }
 
-    // ==========================================
-    // RFLAGS Bitwise Flag Manipulation API
-    // ==========================================
-
-    /// Returns true if a specific flag is set in RFLAGS
-    pub fn get_flag(&self, flag: u64) -> bool {
-        (self.rflags & flag) != 0
-    }
-
-    /// Set or clear a specific flag in RFLAGS
-    pub fn set_flag(&mut self, flag: u64, value: bool) {
-        if value {
+    pub fn set_flag(&mut self, flag: u64, enabled: bool) {
+        if enabled {
             self.rflags |= flag;
         } else {
             self.rflags &= !flag;
         }
     }
 
-    /// Toggle a specific flag in RFLAGS
-    pub fn toggle_flag(&mut self, flag: u64) {
-        self.rflags ^= flag;
-    }
-
-    /// Set the Carry Flag (CF) status
-    pub fn set_carry(&mut self, val: bool) {
-        self.set_flag(RFLAGS_CF, val);
-    }
-
-    /// Checks if the Carry Flag (CF) is active
-    pub fn is_carry(&self) -> bool {
-        self.get_flag(RFLAGS_CF)
-    }
-
-    /// Set the Zero Flag (ZF) status
-    pub fn set_zero(&mut self, val: bool) {
-        self.set_flag(RFLAGS_ZF, val);
-    }
-
-    /// Checks if the Zero Flag (ZF) is active
-    pub fn is_zero(&self) -> bool {
-        self.get_flag(RFLAGS_ZF)
-    }
-
-    /// Set the Sign Flag (SF) status
-    pub fn set_sign(&mut self, val: bool) {
-        self.set_flag(RFLAGS_SF, val);
-    }
-
-    /// Checks if the Sign Flag (SF) is active
-    pub fn is_sign(&self) -> bool {
-        self.get_flag(RFLAGS_SF)
-    }
-
-    /// Set the Overflow Flag (OF) status
-    pub fn set_overflow(&mut self, val: bool) {
-        self.set_flag(RFLAGS_OF, val);
-    }
-
-    /// Checks if the Overflow Flag (OF) is active
-    pub fn is_overflow(&self) -> bool {
-        self.get_flag(RFLAGS_OF)
-    }
-
-    /// Set the Interrupt Enable Flag (IF) status
-    pub fn set_interrupt(&mut self, val: bool) {
-        self.set_flag(RFLAGS_IF, val);
-    }
-
-    /// Checks if the Interrupt Enable Flag (IF) is active
-    pub fn is_interrupt(&self) -> bool {
-        self.get_flag(RFLAGS_IF)
+    pub fn check_flag(&self, flag: u64) -> bool {
+        (self.rflags & flag) != 0
     }
 }
 
 // ==========================================
-// 3. FPU/SSE/AVX XSAVE Area Manager
+// 1b. ARM / AArch64 Register Set Representation
+// ==========================================
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ArmRegisterSet {
+    // 31 General-Purpose Registers (x0-x30)
+    pub x: [u64; 31],
+    // Stack Pointer, Program Counter, and Processor State
+    pub sp: u64,
+    pub pc: u64,
+    pub pstate: u64, // Current Processor State (CPSR / SPSR parity)
+}
+
+impl ArmRegisterSet {
+    pub fn new() -> Self {
+        ArmRegisterSet {
+            x: [0u64; 31],
+            sp: 0,
+            pc: 0,
+            pstate: 0x3C0, // Default mask (Interrupt/Debug masks set)
+        }
+    }
+
+    pub fn reset(&mut self) {
+        self.x = [0u64; 31];
+        self.sp = 0;
+        self.pc = 0;
+        self.pstate = 0x3C0;
+    }
+
+    pub fn set_flag(&mut self, flag: u64, enabled: bool) {
+        if enabled {
+            self.pstate |= flag;
+        } else {
+            self.pstate &= !flag;
+        }
+    }
+
+    pub fn check_flag(&self, flag: u64) -> bool {
+        (self.pstate & flag) != 0
+    }
+}
+
+// ==========================================
+// 2. FPU/SSE/AVX XSAVE Area Manager
 // ==========================================
 
 pub struct FpuContextManager {
@@ -188,7 +167,7 @@ impl FpuContextManager {
 }
 
 // ==========================================
-// 4. Debug Register (DR0-DR7) Breakpoint Set
+// 3. Debug Register (DR0-DR7) Breakpoint Set
 // ==========================================
 
 pub struct DebugRegisterSet {
@@ -251,7 +230,7 @@ impl DebugRegisterSet {
 }
 
 // ==========================================
-// 5. Context Switching Governor
+// 4. Context Switching Governor
 // ==========================================
 
 pub struct ContextSwitchGovernor {
@@ -299,6 +278,32 @@ mod tests {
     }
 
     #[test]
+    fn test_register_flags_manipulation() {
+        let mut regs = X86RegisterSet::new();
+        assert!(regs.check_flag(X86_RFLAGS_IF)); // default set (0x202)
+        assert!(!regs.check_flag(X86_RFLAGS_CF));
+
+        regs.set_flag(X86_RFLAGS_CF, true);
+        assert!(regs.check_flag(X86_RFLAGS_CF));
+
+        regs.set_flag(X86_RFLAGS_CF, false);
+        assert!(!regs.check_flag(X86_RFLAGS_CF));
+    }
+
+    #[test]
+    fn test_arm_register_set() {
+        let mut arm_regs = ArmRegisterSet::new();
+        assert_eq!(arm_regs.x[0], 0);
+        assert!(!arm_regs.check_flag(ARM_CPSR_N));
+
+        arm_regs.set_flag(ARM_CPSR_N, true);
+        assert!(arm_regs.check_flag(ARM_CPSR_N));
+
+        arm_regs.reset();
+        assert!(!arm_regs.check_flag(ARM_CPSR_N));
+    }
+
+    #[test]
     fn test_xsave_fpu_context() {
         let fpu = FpuContextManager::new();
         // Since we cannot force compiler placement, we verify logic state
@@ -336,37 +341,5 @@ mod tests {
         // Switch to invalid RIP fails
         to.rip = 0;
         assert!(!gov.switch_context(&mut from, &to));
-    }
-
-    #[test]
-    fn test_rflags_bitwise_operations() {
-        let mut regs = X86RegisterSet::new();
-        assert_eq!(regs.rflags, 0x202); // Interrupt active by default
-
-        // Test check-flag
-        assert!(regs.is_interrupt());
-        assert!(!regs.is_carry());
-        assert!(!regs.is_zero());
-
-        // Test set-flag
-        regs.set_carry(true);
-        assert!(regs.is_carry());
-        assert_eq!(regs.rflags & RFLAGS_CF, RFLAGS_CF);
-
-        regs.set_zero(true);
-        assert!(regs.is_zero());
-
-        regs.set_sign(true);
-        assert!(regs.is_sign());
-
-        regs.set_overflow(true);
-        assert!(regs.is_overflow());
-
-        regs.set_interrupt(false);
-        assert!(!regs.is_interrupt());
-
-        // Test toggle-flag
-        regs.toggle_flag(RFLAGS_ZF);
-        assert!(!regs.is_zero()); // Toggled from true to false
     }
 }
