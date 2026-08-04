@@ -365,9 +365,320 @@ impl CpuFlags {
 }
 ```
 
+### 4.5 Processor Initialization & Control Registers (x86_64 & ARM64)
+Processor bring-up and CPU execution state are managed directly via software abstraction of hardware registers.
+
+- **CR0 (Control Register 0):** Manages Protected Mode Enable (PE), Paging Enable (PG), and Write Protect (WP) flags.
+- **CR3 (Control Register 3):** Holds the base physical address of the page directory (PML4).
+- **CR4 (Control Register 4):** Enables Page Size Extensions (PSE), Physical Address Extension (PAE), and SMEP/SMAP hardening features.
+- **EFER (Extended Feature Enable Register):** Enables Long Mode (LME) and Long Mode Active (LMA).
+- **STAR & LSTAR MSRs:** High-speed Model Specific Registers that define target CS/SS segments and rip addresses for zero-latency `SYSCALL` transitions, bypassing slow interrupt gates.
+
+```rust
+/// Software abstraction of x86_64 control registers
+pub struct ControlRegisters {
+    pub cr0: u64,
+    pub cr3: u64,
+    pub cr4: u64,
+    pub efer: u64,
+}
+
+impl ControlRegisters {
+    pub const CR0_PE: u64 = 1 << 0;  // Protected Mode Enable
+    pub const CR0_WP: u64 = 1 << 16; // Write Protect
+    pub const CR0_PG: u64 = 1 << 31; // Paging Enable
+
+    pub const CR4_PAE: u64 = 1 << 5;  // Physical Address Extension
+    pub const CR4_SMEP: u64 = 1 << 20; // Supervisor Mode Execution Protection
+    pub const CR4_SMAP: u64 = 1 << 21; // Supervisor Mode Access Prevention
+
+    pub const EFER_LME: u64 = 1 << 8;  // Long Mode Enable
+    pub const EFER_LMA: u64 = 1 << 10; // Long Mode Active
+
+    pub fn new() -> Self {
+        Self { cr0: 0, cr3: 0, cr4: 0, efer: 0 }
+    }
+
+    pub fn enable_paging(&mut self, pml4_physical_address: u64) {
+        self.cr3 = pml4_physical_address;
+        self.cr4 |= Self::CR4_PAE;
+        self.efer |= Self::EFER_LME;
+        self.cr0 |= Self::CR0_PE | Self::CR0_PG | Self::CR0_WP;
+    }
+
+    pub fn enable_hardening(&mut self) {
+        self.cr4 |= Self::CR4_SMEP | Self::CR4_SMAP;
+    }
+}
+```
+
 ---
 
-## 5. ORGANIZATIONAL ROLES & STRATEGIC MILESTONES
+## 5. ADVANCED MEMORY POOLS & DESCRIPTOR LISTS (MDL)
+
+To eliminate heap fragmentation and secure hardware/driver direct-memory data exchange paths, SigmaOS defines isolated memory pools and descriptor mapping structures.
+
+```
++---------------------------------------------------------------------------------+
+|                                 PHYSICAL RAM                                   |
++---------------------------------------------------------------------------------+
+|  [Non-Paged Pool] (Fixed Physical Pages)   |    [Paged Pool] (Demand Paging)    |
++---------------------------------------------------------------------------------+
+                                      |
+                                      v
++---------------------------------------------------------------------------------+
+|                       Memory Descriptor List (MDL)                              |
+|           - Maps arbitrary virtual buffers to locked physical ranges            |
++---------------------------------------------------------------------------------+
+```
+
+### 5.1 Paged & Non-Paged Pools
+- **Non-Paged Pool:** Guarantees block physical pages remain resident in memory forever and are never swapped out or paged to disk. Strictly mandated for interrupt service routines (ISRs) and device drivers execution domains.
+- **Paged Pool:** Standard dynamic memory allocation regions subject to on-demand paging, where unused pages can be swapped out to disk.
+
+### 5.2 Memory Descriptor Lists (MDL)
+MDLs wrap arbitrary virtual memory buffers and map them to standard, safe arrays of locked physical page frames, ensuring safe Direct Memory Access (DMA) transactions without page faults.
+
+```rust
+pub struct MemoryDescriptorList {
+    pub virtual_address: u64,
+    pub byte_count: usize,
+    pub locked_physical_pages: [u64; 16], // Locked physical frames
+    pub page_count: usize,
+}
+
+impl MemoryDescriptorList {
+    pub fn create_from_buffer(virtual_addr: u64, byte_count: usize) -> Result<Self, &'static str> {
+        let page_size = 4096;
+        let start_page = virtual_addr & !0xFFF;
+        let end_page = (virtual_addr + byte_count as u64 + 4095) & !0xFFF;
+        let pages_needed = ((end_page - start_page) / page_size) as usize;
+
+        if pages_needed > 16 {
+            return Err("MDL mapping exceeds pre-allocated static frame array bounds");
+        }
+
+        let mut locked_physical_pages = [0u64; 16];
+        for i in 0..pages_needed {
+            // Emulate locking and translating physical pages
+            locked_physical_pages[i] = 0x100000 + (i as u64 * page_size);
+        }
+
+        Ok(Self {
+            virtual_address: virtual_addr,
+            byte_count,
+            locked_physical_pages,
+            page_count: pages_needed,
+        })
+    }
+}
+```
+
+---
+
+## 6. INTERRUPT REQUEST LEVELS (IRQL) & DEFERRED EXECUTION
+
+SigmaOS implements hierarchical **Interrupt Request Levels (IRQL)** to coordinate thread execution priorities and guarantee deterministic, predictable preemptions.
+
+```
++----------------------------------------------------------------------------+
+|                             IRQL HIERARCHY                                 |
++----------------------------------------------------------------------------+
+|  Level 3: HIGH          - Extreme priorities, clock ticks, hardware halt   |
+|  Level 2: DEVICE (DIRQL)- Hardware device interrupt processing             |
+|  Level 1: DPC / APC     - Deferred Procedure Calls & Async Procedure Calls |
+|  Level 0: PASSIVE       - Standard userspace/scheduler thread execution    |
++----------------------------------------------------------------------------+
+```
+
+### 6.1 IRQL Invariants
+- An execution block running at a higher IRQL can never be preempted by a lower IRQL request.
+- Memory access is strictly gated: running at `Level 2 (DIRQL)` or higher forbids accessing pageable memory (Paged Pools), protecting the system from nested page faults.
+
+### 6.2 Deferred Procedure Calls (DPC) & Async Procedure Calls (APC)
+- **Deferred Procedure Calls (DPC):** Executes hardware device interrupt post-processing tasks. When an interrupt arrives at `DIRQL` level, the fast ISR schedules a DPC and immediately returns to avoid blocking other hardware. The DPC runs once the system descends to `Level 1`.
+- **Async Procedure Calls (APC):** Software interrupts targeted to a specific thread, executed when descending to `Level 0 (PASSIVE)` before transferring control back to userspace.
+
+```rust
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Irql {
+    Passive = 0, // Userspace / standard scheduler
+    DpcApc = 1,  // Deferred Procedure Calls and Async Procedures
+    Dirql = 2,   // Device Interrupts (DIRQL)
+    High = 3,    // Clock timer & system crash panic
+}
+
+pub struct DpcEntry {
+    pub task_id: u64,
+    pub handler_address: u64,
+}
+
+pub struct IrqlGovernor {
+    pub current_irql: Irql,
+    pub dpc_queue: [Option<DpcEntry>; 8],
+    pub write_pointer: usize,
+}
+
+impl IrqlGovernor {
+    pub fn new() -> Self {
+        Self {
+            current_irql: Irql::Passive,
+            dpc_queue: [None; 8],
+            write_pointer: 0,
+        }
+    }
+
+    pub fn raise_irql(&mut self, target_irql: Irql) -> Result<Irql, &'static str> {
+        if target_irql < self.current_irql {
+            return Err("Cannot raise IRQL to a lower level than current");
+        }
+        let old_irql = self.current_irql;
+        self.current_irql = target_irql;
+        Ok(old_irql)
+    }
+
+    pub fn lower_irql(&mut self, target_irql: Irql) -> Result<(), &'static str> {
+        if target_irql > self.current_irql {
+            return Err("Cannot lower IRQL to a higher level than current");
+        }
+        self.current_irql = target_irql;
+
+        // If lowered back to DpcApc level, dispatch queued deferred tasks
+        if self.current_irql == Irql::DpcApc {
+            self.dispatch_deferred_dpcs();
+        }
+        Ok(())
+    }
+
+    pub fn queue_dpc(&mut self, entry: DpcEntry) -> bool {
+        if self.write_pointer < 8 {
+            self.dpc_queue[self.write_pointer] = Some(entry);
+            self.write_pointer += 1;
+            true
+        } else {
+            false
+        }
+    }
+
+    fn dispatch_deferred_dpcs(&mut self) {
+        for slot in self.dpc_queue.iter_mut() {
+            if let Some(ref dpc) = slot {
+                // Emulate executing DPC callback handler
+                *slot = None;
+            }
+        }
+        self.write_pointer = 0;
+    }
+}
+```
+
+---
+
+## 7. SYSTEM CALLS, FAULTS, TRAPS, & INTERRUPTS
+
+SigmaOS uses clean object boundaries to handle execution state transitions and exception vectors.
+
+```
+       +--------------------------------------------------------+
+       |                  Hardware CPU Vector                   |
+       +--------------------------------------------------------+
+            |                        |                        |
+            v                        v                        v
+   +------------------+     +------------------+     +------------------+
+   |  Fault / Trap    |     |   Interrupt      |     |   System Call    |
+   | (e.g. PageFault) |     |  (e.g. APIC IRQ) |     |  (e.g. read/sys) |
+   +------------------+     +------------------+     +------------------+
+```
+
+### 7.1 Dynamic Vector Routing
+- **Faults:** CPU-detected exceptions (e.g., divide-by-zero, Page Fault). The saved instruction pointer (`rip`) points to the instruction that caused the fault, allowing fixing and re-executing (e.g., Demand Paging).
+- **Traps:** Intentional exceptions (e.g., debug breakpoints). The saved instruction pointer points to the *next* instruction.
+- **Interrupts:** Asynchronous hardware notifications (e.g., disk completion, network buffer ready).
+- **System Calls:** Synchronous software-triggered gate transitions executed via the `SYSCALL` instruction.
+
+```rust
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExceptionType {
+    DivideByZero,
+    PageFault,
+    BreakpointTrap,
+    HardwareInterrupt(u8),
+    SystemCall(u32),
+}
+
+pub struct TrapFrame {
+    pub rip: u64,
+    pub rsp: u64,
+    pub rflags: u64,
+    pub errorCode: u64,
+}
+
+pub struct ExceptionDispatcher;
+
+impl ExceptionDispatcher {
+    pub fn dispatch_exception(&self, trap_type: ExceptionType, frame: &TrapFrame) -> &'static str {
+        match trap_type {
+            ExceptionType::DivideByZero => {
+                // Terminate target thread
+                "TERMINATE_THREAD"
+            }
+            ExceptionType::PageFault => {
+                // Allocate demand paging
+                "DEMAND_PAGE_SUCCESS"
+            }
+            ExceptionType::BreakpointTrap => {
+                // Pass control to debugger
+                "TRIGGER_DEBUGGER"
+            }
+            ExceptionType::HardwareInterrupt(irq) => {
+                // Dispatch IRQ handler
+                "DISPATCH_IRQ_HANDLER"
+            }
+            ExceptionType::SystemCall(id) => {
+                // Route system call
+                "ROUTE_SYSCALL_API"
+            }
+        }
+    }
+}
+```
+
+---
+
+## 8. PROCESSES & THREADS ARCHITECTURE
+
+Process and thread abstraction in SigmaOS is built around capability-isolated security contexts and high-performance task execution schedulers.
+
+### 8.1 Process Control Block (PCB)
+Each process encapsulates the security token, virtual memory pagetable root (CR3), active file descriptors, and parent relationships.
+
+```rust
+pub struct ProcessControlBlock {
+    pub pid: u64,
+    pub pml4_root_addr: u64, // CR3 value
+    pub parent_pid: u64,
+    pub capabilities: [u8; 16], // Security capability flags
+}
+```
+
+### 8.2 Thread Control Block (TCB)
+Threads represent the execution contexts inside a process, capturing register states, stack limits, execution priority, and their current IRQL level.
+
+```rust
+pub struct ThreadControlBlock {
+    pub tid: u64,
+    pub parent_pid: u64,
+    pub saved_registers: [u64; 16], // Context save array
+    pub stack_limit_low: u64,
+    pub stack_limit_high: u64,
+    pub current_irql: Irql,
+    pub state: ProcessState,
+}
+```
+
+---
+
+## 9. ORGANIZATIONAL ROLES & STRATEGIC MILESTONES
 
 To coordinate professional development and ensure optimal project orchestration, we formally map roles to specialized domains:
 
