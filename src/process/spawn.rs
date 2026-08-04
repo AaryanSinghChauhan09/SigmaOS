@@ -10,20 +10,28 @@ use core::mem;
 
 pub type ProcessID = usize;
 
+pub const WNOHANG: u32 = 1;
+pub const WUNTRACED: u32 = 2;
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessError { Success = 0, NotFound = 1, InvalidArgs = 2, SpawnFailed = 3 }
 
 pub trait Process {
     fn id(&self) -> ProcessID;
     fn parent_id(&self) -> ProcessID;
+    fn set_parent_id(&mut self, parent_id: ProcessID);
     fn state(&self) -> ProcessState;
     fn set_state(&mut self, state: ProcessState);
     fn exit_code(&self) -> i32;
+
+    // Nice values (-20 to 19) mimicking Linux process scheduling priority
+    fn nice(&self) -> i32 { 0 }
+    fn set_nice(&mut self, nice: i32) {}
 }
 
 #[repr(C)]
@@ -32,6 +40,7 @@ pub struct SimpleProcess {
     pub parent_id: ProcessID,
     pub state: AtomicUsize,
     pub exit_code: AtomicUsize,
+    pub nice: i32,
 }
 
 impl SimpleProcess {
@@ -41,6 +50,7 @@ impl SimpleProcess {
             parent_id,
             state: AtomicUsize::new(ProcessState::Created as usize),
             exit_code: AtomicUsize::new(0),
+            nice: 0,
         }
     }
 }
@@ -48,21 +58,22 @@ impl SimpleProcess {
 impl Process for SimpleProcess {
     fn id(&self) -> ProcessID { self.id }
     fn parent_id(&self) -> ProcessID { self.parent_id }
-    fn state(&self) -> ProcessState {
-        match self.state.load(Ordering::SeqCst) {
-            1 => ProcessState::Running,
-            2 => ProcessState::Sleeping,
-            3 => ProcessState::Zombie,
-            4 => ProcessState::Terminated,
-            _ => ProcessState::Created,
-        }
-    }
+    fn set_parent_id(&mut self, parent_id: ProcessID) { self.parent_id = parent_id; }
+    fn state(&self) -> ProcessState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
 
     fn set_state(&mut self, state: ProcessState) {
         self.state.store(state as usize, Ordering::SeqCst);
     }
 
     fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
+
+    fn nice(&self) -> i32 {
+        self.nice
+    }
+
+    fn set_nice(&mut self, nice: i32) {
+        self.nice = nice.clamp(-20, 19);
+    }
 }
 
 pub trait ProcessSpawner {
@@ -85,6 +96,17 @@ impl SimpleProcessSpawner {
             next_id: AtomicUsize::new(1),
         }
     }
+
+    /// Linux-style reparenting: Orphan children are re-parented to init (PID 1) upon parent exit.
+    pub fn reparent_orphans(&mut self, dead_parent_id: ProcessID) {
+        for i in 0..self.processes.len() {
+            if let Some(ref mut process) = self.processes[i] {
+                if process.parent_id() == dead_parent_id {
+                    process.set_parent_id(1);
+                }
+            }
+        }
+    }
 }
 
 impl ProcessSpawner for SimpleProcessSpawner {
@@ -104,7 +126,7 @@ impl ProcessSpawner for SimpleProcessSpawner {
 
     fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
         for i in 0..self.processes.len() {
-            if let Some(ref mut process) = &mut self.processes.data_mut()[i] {
+            if let Some(ref mut process) = self.processes[i] {
                 if process.id() == process_id {
                     process.set_state(ProcessState::Running);
                     return Ok(());
@@ -116,7 +138,7 @@ impl ProcessSpawner for SimpleProcessSpawner {
 
     fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
         for i in 0..self.processes.len() {
-            if let Some(ref mut process) = &mut self.processes.data_mut()[i] {
+            if let Some(ref mut process) = self.processes[i] {
                 if process.id() == process_id {
                     process.set_state(ProcessState::Terminated);
                     return Ok(());
@@ -145,24 +167,21 @@ impl SimpleProcessWaiter {
 
 impl ProcessWaiter for SimpleProcessWaiter {
     fn wait(&mut self, process_id: ProcessID) -> Result<i32, ProcessError> {
-        for i in 0..self.spawner.processes.len() {
-            if let Some(ref process) = self.spawner.processes.data()[i] {
-                if process.id() == process_id {
-                    if process.state() == ProcessState::Terminated {
-                        return Ok(process.exit_code());
-                    }
-                }
-            }
-        }
-        Err(ProcessError::NotFound)
+        self.waitpid(process_id, 0).map(|(_, code)| code)
     }
 
-    fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
+    fn waitpid(&mut self, process_id: ProcessID, options: u32) -> Result<(ProcessID, i32), ProcessError> {
         for i in 0..self.spawner.processes.len() {
-            if let Some(ref process) = self.spawner.processes.data()[i] {
+            if let Some(ref process) = self.spawner.processes[i] {
                 if process.id() == process_id {
-                    if process.state() == ProcessState::Terminated {
+                    let is_terminated = process.state() == ProcessState::Terminated;
+                    if is_terminated {
                         return Ok((process.id(), process.exit_code()));
+                    } else {
+                        // Standard non-blocking wait (WNOHANG)
+                        if (options & WNOHANG) != 0 {
+                            return Ok((0, 0));
+                        }
                     }
                 }
             }
@@ -174,7 +193,7 @@ impl ProcessWaiter for SimpleProcessWaiter {
 pub trait ProcessGroup {
     fn create_group(&mut self, leader_id: ProcessID) -> Result<usize, ProcessError>;
     fn add_to_group(&mut self, group_id: usize, process_id: ProcessID) -> Result<(), ProcessError>;
-    fn signal_group(&mut self, group_id: usize, signal: u8) -> Result<(), ProcessError>;
+    fn signal_group(&mut self, group_id: usize, signal: u8, spawner: &mut SimpleProcessSpawner) -> Result<(), ProcessError>;
 }
 
 #[repr(C)]
@@ -203,52 +222,48 @@ impl ProcessGroup for SimpleProcessGroup {
 
     fn add_to_group(&mut self, group_id: usize, process_id: ProcessID) -> Result<(), ProcessError> {
         for i in 0..self.groups.len() {
-            let group = &mut self.groups.data_mut()[i];
-            if group.0 == group_id {
-                group.1.push(process_id);
+            if self.groups[i].0 == group_id {
+                self.groups[i].1.push(process_id);
                 return Ok(());
             }
         }
         Err(ProcessError::NotFound)
     }
 
-    fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
+    fn signal_group(&mut self, group_id: usize, signal: u8, spawner: &mut SimpleProcessSpawner) -> Result<(), ProcessError> {
+        let mut members = Vec::new();
         for i in 0..self.groups.len() {
-            let group = &self.groups.data()[i];
-            if group.0 == group_id {
-                return Ok(());
+            if self.groups[i].0 == group_id {
+                for j in 0..self.groups[i].1.len() {
+                    members.push(self.groups[i].1[j]);
+                }
+                break;
             }
         }
-        Err(ProcessError::NotFound)
+
+        if members.is_empty() {
+            return Err(ProcessError::NotFound);
+        }
+
+        for i in 0..members.len() {
+            let pid = members[i];
+            let _ = spawner.kill(pid, signal);
+        }
+        Ok(())
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn len(&self) -> usize { self.len }
-    pub fn push(&mut self, item: T) {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
-        }
-    }
-    pub fn data(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-    pub fn data_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
     unsafe fn grow(&mut self) {
@@ -263,17 +278,108 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_process_lifecycle_spawn_and_kill() {
+        let mut spawner = SimpleProcessSpawner::new();
+        let pid = spawner.spawn(b"/bin/ls", &[]).unwrap();
+        assert_eq!(pid, 1);
+
+        spawner.exec(pid, b"", &[]).unwrap();
+        assert_eq!(spawner.processes[0].as_ref().unwrap().state(), ProcessState::Running);
+
+        spawner.kill(pid, 9).unwrap();
+        assert_eq!(spawner.processes[0].as_ref().unwrap().state(), ProcessState::Terminated);
+    }
+
+    #[test]
+    fn test_linux_process_parity() {
+        let mut spawner = SimpleProcessSpawner::new();
+
+        // Spawn parents & children
+        let parent_id = spawner.spawn(b"parent", &[]).unwrap();
+        let child_id = spawner.fork(parent_id).unwrap();
+
+        let child = spawner.processes[1].as_ref().unwrap();
+        assert_eq!(child.parent_id(), parent_id);
+
+        // Reparent orphans check
+        spawner.reparent_orphans(parent_id);
+        assert_eq!(spawner.processes[1].as_ref().unwrap().parent_id(), 1);
+
+        // Nice value priority tests
+        let mut child_mut = spawner.processes[1].as_mut().unwrap();
+        child_mut.set_nice(10);
+        assert_eq!(child_mut.nice(), 10);
+        child_mut.set_nice(-25); // clamping to -20
+        assert_eq!(child_mut.nice(), -20);
+
+        // Non-blocking WNOHANG waitpid
+        let mut waiter = SimpleProcessWaiter::new(spawner);
+        // child_id is not terminated -> WNOHANG returns (0, 0)
+        let (wait_pid, code) = waiter.waitpid(child_id, WNOHANG).unwrap();
+        assert_eq!(wait_pid, 0);
+        assert_eq!(code, 0);
+
+        // Signal groups testing
+        let mut spawner2 = SimpleProcessSpawner::new();
+        let lead_pid = spawner2.spawn(b"leader", &[]).unwrap();
+        let member_pid = spawner2.spawn(b"member", &[]).unwrap();
+
+        let mut grp = SimpleProcessGroup::new();
+        let gid = grp.create_group(lead_pid).unwrap();
+        grp.add_to_group(gid, member_pid).unwrap();
+
+        grp.signal_group(gid, 15, &mut spawner2).unwrap();
+        assert_eq!(spawner2.processes[0].as_ref().unwrap().state(), ProcessState::Terminated);
+        assert_eq!(spawner2.processes[1].as_ref().unwrap().state(), ProcessState::Terminated);
+    }
+}

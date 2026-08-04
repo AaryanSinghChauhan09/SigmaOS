@@ -54,15 +54,17 @@ where
     pub fn new() -> Self {
         HashMap {
             buckets: Vec::new(),
-            capacity: 16,
+            capacity: 0,
             len: 0,
         }
     }
 
     pub fn with_capacity(capacity: usize) -> Self {
         let mut map = HashMap::new();
-        map.capacity = capacity.next_power_of_two();
-        map.resize_buckets();
+        if capacity > 0 {
+            map.capacity = capacity.next_power_of_two();
+            map.resize_buckets();
+        }
         map
     }
 
@@ -83,10 +85,8 @@ where
     }
 
     pub fn insert(&mut self, key: K, value: V) {
-        if self.capacity == 0 || self.buckets.is_empty() {
-            if self.capacity == 0 {
-                self.capacity = 16;
-            }
+        if self.capacity == 0 {
+            self.capacity = 16;
             self.resize_buckets();
         }
         if self.len >= self.capacity * 2 {
@@ -209,10 +209,8 @@ where
     }
 
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
-        if self.capacity == 0 || self.buckets.is_empty() {
-            if self.capacity == 0 {
-                self.capacity = 16;
-            }
+        if self.capacity == 0 {
+            self.capacity = 16;
             self.resize_buckets();
         }
         let hash = self.hash_key(&key);
