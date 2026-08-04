@@ -19,21 +19,27 @@
 // (no_std only applicable at crate root - removed)
 // #![no_main]  // crate-root only
 
+extern crate alloc;
+
 /// OOP-based Package Signing & Attestation for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
 /// Implements provenance metadata and supply-chain attestations
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use crate::klib::Vec;
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::string::ToString;
 
 pub type KeyID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SignatureAlgorithm { ED25519 = 0, RSA4096 = 1, Dilithium5 = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigningError { Success = 0, KeyNotFound = 1, SignFailed = 2, VerifyFailed = 3 }
 
 pub trait SigningKey {
@@ -141,8 +147,8 @@ impl SimplePackageAttestation {
 
 impl PackageAttestation for SimplePackageAttestation {
     fn create_attestation(&self, package: &[u8], key_id: KeyID) -> Result<Vec<u8>, SigningError> {
-        for key_option in &self.keys {
-            if let Some(ref key) = *key_option {
+        for i in 0..self.keys.len() {
+            if let Some(ref key) = self.keys[i] {
                 if key.id() == key_id {
                     let signature = key.sign(package)?;
                     let mut attestation = Vec::new();
@@ -150,7 +156,7 @@ impl PackageAttestation for SimplePackageAttestation {
                     let header = b"SIGPKG-ATTESTATION";
                     for &byte in header { attestation.push(byte); }
 
-                    for &byte in signature { attestation.push(byte); }
+                    for byte in signature { attestation.push(byte); }
 
                     for &byte in package { attestation.push(byte); }
 
@@ -162,8 +168,8 @@ impl PackageAttestation for SimplePackageAttestation {
     }
 
     fn verify_attestation(&self, attestation: &[u8], key_id: KeyID) -> Result<bool, SigningError> {
-        for key_option in &self.keys {
-            if let Some(ref key) = *key_option {
+        for i in 0..self.keys.len() {
+            if let Some(ref key) = self.keys[i] {
                 if key.id() == key_id {
                     if attestation.len() < 64 {
                         return Ok(false);
@@ -229,8 +235,8 @@ impl KeyManager for SimpleKeyManager {
     }
 
     fn revoke_key(&mut self, id: KeyID) -> Result<(), SigningError> {
-        for key_option in &mut self.keys {
-            if let Some(ref key) = *key_option {
+        for i in 0..self.keys.len() {
+            if let Some(ref key) = self.keys[i] {
                 if key.id() == id {
                     return Ok(());
                 }
@@ -241,8 +247,8 @@ impl KeyManager for SimpleKeyManager {
 
     fn list_keys(&self) -> Vec<KeyID> {
         let mut ids = Vec::new();
-        for key_option in &self.keys {
-            if let Some(ref key) = *key_option {
+        for i in 0..self.keys.len() {
+            if let Some(ref key) = self.keys[i] {
                 ids.push(key.id());
             }
         }
@@ -281,7 +287,8 @@ impl SupplyChainAttestation for SimpleSupplyChainAttestation {
     }
 
     fn verify_builder(&self, _attestation: &[u8], builder: &[u8]) -> bool {
-        for &(ref b, _) in &self.builders {
+        for i in 0..self.builders.len() {
+            let &(ref b, _) = &self.builders[i];
             let len = b.iter().position(|&byte| byte == 0).unwrap_or(64);
             if &b[..len] == builder {
                 return true;
@@ -292,79 +299,122 @@ impl SupplyChainAttestation for SimpleSupplyChainAttestation {
 
     fn get_chain(&self, _package: &[u8]) -> Vec<[u8; 64]> {
         let mut chain = Vec::new();
-        for &(ref builder, _) in &self.builders {
+        for i in 0..self.builders.len() {
+            let &(ref builder, _) = &self.builders[i];
             chain.push(*builder);
         }
         chain
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+// -------------------------------------------------------------------------
+// Advanced Reproducibility & Provenance Structures
+// -------------------------------------------------------------------------
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+#[derive(Debug, Clone)]
+pub struct ExecutableProvenanceChain {
+    pub source_repo_url: String,
+    pub compiler_signature: String,
+    pub linker_hash: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct SbomDetails {
+    pub component_name: String,
+    pub version: String,
+    pub sha256_digest: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct DeliberateCodeReviewAudit {
+    pub reviewers: Vec<String>,
+    pub audit_date: String,
+    pub compliance_score: u32,
+}
+
+pub struct SovereignSupplyChainAuditor {
+    pub pinned_vendor_key_id: KeyID,
+    pub registered_provenances: Vec<ExecutableProvenanceChain>,
+    pub active_boms: Vec<SbomDetails>,
+    pub active_reviews: Vec<DeliberateCodeReviewAudit>,
+}
+
+impl SovereignSupplyChainAuditor {
+    pub fn new(pinned_key: KeyID) -> Self {
+        Self {
+            pinned_vendor_key_id: pinned_key,
+            registered_provenances: Vec::new(),
+            active_boms: Vec::new(),
+            active_reviews: Vec::new(),
+        }
+    }
+
+    pub fn register_provenance(&mut self, chain: ExecutableProvenanceChain) {
+        self.registered_provenances.push(chain);
+    }
+
+    pub fn register_bom(&mut self, bom: SbomDetails) {
+        self.active_boms.push(bom);
+    }
+
+    pub fn register_review_audit(&mut self, audit: DeliberateCodeReviewAudit) {
+        self.active_reviews.push(audit);
+    }
+
+    /// Verifies transitive trust signature chain of dependency tree against the pinned vendor KeyID
+    pub fn verify_transitive_trust(&self, dependencies_keys: &[KeyID]) -> bool {
+        if dependencies_keys.is_empty() {
+            return true;
+        }
+        for &key in dependencies_keys {
+            if key != self.pinned_vendor_key_id {
+                return false; // Trust chain broken!
             }
         }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+        true
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
+    #[test]
+    fn test_provenance_and_reproducible_chains() {
+        let mut auditor = SovereignSupplyChainAuditor::new(101);
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
+        let chain = ExecutableProvenanceChain {
+            source_repo_url: "https://github.com/SigmaOS/kernel".to_string(),
+            compiler_signature: "rustc 1.78.0-sigma1".to_string(),
+            linker_hash: "linker_sha256_hash".to_string(),
+        };
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
+        let bom = SbomDetails {
+            component_name: "libc6".to_string(),
+            version: "2.35".to_string(),
+            sha256_digest: "sha256_digest_xyz".to_string(),
+        };
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+        let mut reviewers = Vec::new();
+        reviewers.push("Aaryan".to_string());
+        reviewers.push("Jules".to_string());
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
+        let audit = DeliberateCodeReviewAudit {
+            reviewers,
+            audit_date: "2026-08-02".to_string(),
+            compliance_score: 100,
+        };
 
+        auditor.register_provenance(chain);
+        auditor.register_bom(bom);
+        auditor.register_review_audit(audit);
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
+        assert_eq!(auditor.registered_provenances.len(), 1);
+        assert_eq!(auditor.active_boms.len(), 1);
+        assert_eq!(auditor.active_reviews.len(), 1);
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        // Verify pinned vendor validation
+        assert!(auditor.verify_transitive_trust(&[101, 101]));
+        assert!(!auditor.verify_transitive_trust(&[101, 999])); // Mismatched vendor KeyID
     }
 }

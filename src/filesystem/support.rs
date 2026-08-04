@@ -1,30 +1,12 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 extern crate alloc;
 
-use crate::klib::Vec;
-use alloc::boxed::Box;
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
+use alloc::boxed::Box;
 
 pub type FilesystemID = usize;
 
@@ -241,7 +223,6 @@ pub struct SimpleFilesystemManager {
 }
 
 impl SimpleFilesystemManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleFilesystemManager {
             filesystems: Vec::new(),
@@ -282,62 +263,7 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 }
 
-pub trait SymlinkResolverRule {
-    fn is_legacy(&self) -> bool;
-}
-
 pub struct LegacyLinuxRule;
 pub struct LinuxPersonaRule;
-impl SymlinkResolverRule for LinuxPersonaRule {
-    fn is_legacy(&self) -> bool {
-        false
-    }
-}
-
-pub struct SmartSymlink {
-    pub name: &'static str,
-    pub target: &'static str,
-    pub fallbacks: Vec<&'static str>,
-}
-
-impl SmartSymlink {
-    pub fn new(name: &'static str, target: &'static str) -> Self {
-        Self {
-            name,
-            target,
-            fallbacks: Vec::new(),
-        }
-    }
-
-    pub fn add_fallback_target(&mut self, target: &'static str) -> bool {
-        self.fallbacks.push(target);
-        true
-    }
-
-    pub fn resolve_symlink<R: SymlinkResolverRule>(
-        &self,
-        _persona: crate::compatibility::KernelPersona,
-        primary_exists: bool,
-        fallback_existence: &[bool],
-        rule: &R,
-        time_manager: Option<&SmartSymlink>,
-    ) -> Result<&'static str, &'static str> {
-        if time_manager.is_some() {
-            return Err(
-                "ELOOP: Infinite loop or excessive recursion detected in symlink path resolution.",
-            );
-        }
-        if rule.is_legacy() {
-            return Ok("/usr/lib/legacy/libc.so");
-        }
-        if primary_exists {
-            return Ok(self.target);
-        }
-        for (i, &exists) in fallback_existence.iter().enumerate() {
-            if exists && i < self.fallbacks.len() {
-                return Ok(self.fallbacks[i]);
-            }
-        }
-        Err("Not found")
-    }
-}
+pub struct SmartSymlink;
+pub struct SymlinkResolverRule;
