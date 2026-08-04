@@ -1,12 +1,13 @@
 #![no_std]
 
-use core::mem;
-use core::ptr::NonNull;
 /// OOP-based Secure Boot Validation for SigmaOS
 /// Implements secure boot using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 10: Secure boot & firmware validation
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
+use core::ptr::NonNull;
 
 /// Component ID
 pub type ComponentID = usize;
@@ -41,18 +42,14 @@ impl<T> Box<T> {
         unsafe {
             let ptr = alloc(mem::size_of::<T>()) as *mut T;
             core::ptr::write(ptr, val);
-            Self {
-                ptr: NonNull::new_unchecked(ptr),
-            }
+            Self { ptr: NonNull::new_unchecked(ptr) }
         }
     }
 }
 
 impl<T: ?Sized> Box<T> {
     pub unsafe fn from_raw(ptr: *mut T) -> Self {
-        Self {
-            ptr: NonNull::new_unchecked(ptr),
-        }
+        Self { ptr: NonNull::new_unchecked(ptr) }
     }
     pub fn as_ref(&self) -> &T {
         unsafe { self.ptr.as_ref() }
@@ -258,12 +255,7 @@ pub struct SimpleComponent {
 }
 
 impl SimpleComponent {
-    pub fn new(
-        id: ComponentID,
-        name: &[u8],
-        component_type: ComponentType,
-        capability: ComponentCapability,
-    ) -> Self {
+    pub fn new(id: ComponentID, name: &[u8], component_type: ComponentType, capability: ComponentCapability) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -367,10 +359,7 @@ impl Component for SimpleComponent {
 /// Secure boot validator trait (OOP interface)
 pub trait SecureBootValidator {
     /// Register component
-    fn register_component(
-        &mut self,
-        component: Box<dyn Component>,
-    ) -> Result<ComponentID, SecureBootError>;
+    fn register_component(&mut self, component: Box<dyn Component>) -> Result<ComponentID, SecureBootError>;
     /// Unregister component
     fn unregister_component(&mut self, id: ComponentID) -> Result<(), SecureBootError>;
     /// Validate component
@@ -450,10 +439,7 @@ impl SimpleSecureBootValidator {
 }
 
 impl SecureBootValidator for SimpleSecureBootValidator {
-    fn register_component(
-        &mut self,
-        component: Box<dyn Component>,
-    ) -> Result<ComponentID, SecureBootError> {
+    fn register_component(&mut self, component: Box<dyn Component>) -> Result<ComponentID, SecureBootError> {
         if !self.capability.can_register {
             return Err(SecureBootError::PermissionDenied);
         }
@@ -633,11 +619,7 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
