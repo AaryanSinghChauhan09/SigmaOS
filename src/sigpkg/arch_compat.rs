@@ -19,13 +19,8 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
-extern crate alloc;
 use std::collections::HashMap;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::format;
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
@@ -119,7 +114,7 @@ impl RollingSyncManager {
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
         let mut updates: Vec<(String, Version, Version)> = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
-            if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
+            if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
                 if remote_ver > installed_ver {
                     updates.push((pkg_name.clone(), *installed_ver, *remote_ver));
                 }
@@ -155,11 +150,10 @@ impl PacmanDbAdapter {
         desc_content: &str,
     ) -> Result<Package, &'static str> {
         let mut name = "";
-        let mut_version = "1.0.0";
+        let mut version = "1.0.0";
         let mut desc = "";
 
         let mut lines = desc_content.lines();
-        let mut version = mut_version;
         while let Some(line) = lines.next() {
             let line = line.trim();
             if line == "%NAME%" {
@@ -187,111 +181,6 @@ impl PacmanDbAdapter {
             Vec::new(),
             "sha256_imported_legacy_hash_value".to_string(),
         ))
-    }
-}
-
-// =========================================================================
-// NEW ARCH PARITY SUB SYSTEMS (AUR HELPERS, ABS PORTS, REFLECTOR MIRRORS)
-// =========================================================================
-
-/// Emulates a complete AUR Helper (e.g. yay / paru equivalent)
-pub struct AurHelper {
-    pub compiler: AurRecipeCompiler,
-}
-
-impl AurHelper {
-    pub fn new() -> Self {
-        Self {
-            compiler: AurRecipeCompiler::new(),
-        }
-    }
-
-    /// Simulates downloading, dependency-resolving, and compiling from the AUR
-    pub fn search_and_install_aur(&self, pkgname: &str, _sync_manager: &RollingSyncManager) -> Result<Package, &'static str> {
-        // Mock PKGBUILD recipes database mapping for standard AUR requests
-        let pkgbuild = match pkgname {
-            "yay" => {
-                r#"
-                    pkgname="yay"
-                    pkgver="12.1.0"
-                    depends=("pacman" "git" "go")
-                "#
-            }
-            "paru" => {
-                r#"
-                    pkgname="paru"
-                    pkgver="2.0.1"
-                    depends=("pacman" "git" "cargo")
-                "#
-            }
-            _ => return Err("Target package not found in AUR repository index"),
-        };
-
-        self.compiler.compile_pkgbuild(pkgbuild)
-    }
-}
-
-impl Default for AurHelper {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Emulates Arch Build System (ABS) Ports Tree
-pub struct AbsPortsManager {
-    pub ports: HashMap<String, String>,
-}
-
-impl AbsPortsManager {
-    pub fn new() -> Self {
-        Self {
-            ports: HashMap::new(),
-        }
-    }
-
-    pub fn register_port(&mut self, name: &str, pkgbuild_content: &str) {
-        self.ports.insert(name.to_string(), pkgbuild_content.to_string());
-    }
-
-    pub fn compile_port(&self, name: &str, compiler: &AurRecipeCompiler) -> Result<Package, &'static str> {
-        let pkgbuild = self.ports.get(name).ok_or("Target port not found in ABS ports tree")?;
-        compiler.compile_pkgbuild(pkgbuild.as_str())
-    }
-}
-
-impl Default for AbsPortsManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Emulates dynamic Arch mirrorlist ranker (e.g. reflector equivalent)
-pub struct MirrorlistRanker {
-    pub mirrors: Vec<(String, u32)>, // Maps mirror URL to measured latency (ms)
-}
-
-impl MirrorlistRanker {
-    pub fn new() -> Self {
-        Self {
-            mirrors: Vec::new(),
-        }
-    }
-
-    pub fn register_mirror(&mut self, url: &str, latency_ms: u32) {
-        self.mirrors.push((url.to_string(), latency_ms));
-    }
-
-    /// Returns ranked mirrorlist URLs sorted by lowest latency first (optimal speed)
-    pub fn rank_mirrors(&self) -> Vec<String> {
-        let mut list = self.mirrors.clone();
-        list.sort_by(|a, b| a.1.cmp(&b.1)); // Sort ascending by latency
-        list.into_iter().map(|item| item.0).collect()
-    }
-}
-
-impl Default for MirrorlistRanker {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -353,52 +242,5 @@ mod tests {
             imported.description,
             "Contrib utilities for pacman package manager"
         );
-    }
-
-    #[test]
-    fn test_aur_helper_dependency_resolution() {
-        let helper = AurHelper::new();
-        let sync = RollingSyncManager::new();
-
-        let pkg = helper.search_and_install_aur("yay", &sync).unwrap();
-        assert_eq!(pkg.name, "yay");
-        assert_eq!(pkg.version, Version::new(12, 1, 0));
-        assert_eq!(pkg.dependencies.len(), 3);
-        assert_eq!(pkg.dependencies[0].name, "pacman");
-
-        let missing_pkg = helper.search_and_install_aur("missing-pkg", &sync);
-        assert!(missing_pkg.is_err());
-    }
-
-    #[test]
-    fn test_abs_ports_compilation() {
-        let mut abs = AbsPortsManager::new();
-        let compiler = AurRecipeCompiler::new();
-
-        let pkgbuild = r#"
-            pkgname="abs-test"
-            pkgver="4.2.0"
-            depends=("glibc")
-        "#;
-        abs.register_port("abs-test", pkgbuild);
-
-        let pkg = abs.compile_port("abs-test", &compiler).unwrap();
-        assert_eq!(pkg.name, "abs-test");
-        assert_eq!(pkg.version, Version::new(4, 2, 0)); // Parsing parses 4.2.0 correctly!
-        assert_eq!(pkg.dependencies[0].name, "glibc");
-    }
-
-    #[test]
-    fn test_mirror_reflector_ranker() {
-        let mut ranker = MirrorlistRanker::new();
-        ranker.register_mirror("https://mirror.slow.org/arch", 350);
-        ranker.register_mirror("https://mirror.fast.org/arch", 15);
-        ranker.register_mirror("https://mirror.medium.org/arch", 120);
-
-        let ranked = ranker.rank_mirrors();
-        assert_eq!(ranked.len(), 3);
-        assert_eq!(ranked[0], "https://mirror.fast.org/arch");
-        assert_eq!(ranked[1], "https://mirror.medium.org/arch");
-        assert_eq!(ranked[2], "https://mirror.slow.org/arch");
     }
 }
