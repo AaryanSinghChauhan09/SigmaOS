@@ -17,6 +17,10 @@ pub mod flipper_gpio_sensor;
 pub mod peripheral;
 pub mod legacy_keyboard;
 pub mod modern_usb;
+||||||| 43be3a7e8
+pub mod peripheral;
+pub mod legacy_keyboard;
+pub mod modern_usb;
 
 pub use ancient_devices::{
     create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,
@@ -61,3 +65,7 @@ pub use ch340_usb::Ch340Driver;
 pub use e1000_nic::{E1000Driver, RxDescriptor, TxDescriptor};
 pub use intel_hda::{Bdle, IntelHdaDriver};
 pub use nvme_storage::{NvmeCmd, NvmeCqe, NvmeDriver};
+||||||| 43be3a7e8
+pub use peripheral::{PeripheralDevice, PeripheralManager, DeviceGeneration, PowerState};
+pub use legacy_keyboard::LegacyKeyboard;
+pub use modern_usb::ModernUsbController;

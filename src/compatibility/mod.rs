@@ -3,6 +3,8 @@ pub mod constellation;
 ||||||| 43be3a7e8
 pub mod antix;
 pub mod chakra;
+||||||| 43be3a7e8
+pub mod chimera_linux;
 pub mod cross_platform;
 pub mod historic_linux;
 pub mod mint_linux;
@@ -23,6 +25,10 @@ pub use legacy_adapters::{
 pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
 ||||||| 43be3a7e8
 pub mod legacy_adapters;
+||||||| 43be3a7e8
+pub mod interim;
+pub mod lubuntu;
+pub mod mint_linux;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat,
@@ -82,3 +88,5 @@ pub use antix::{
     LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
     GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
 };
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
+pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};

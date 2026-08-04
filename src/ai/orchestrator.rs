@@ -1,12 +1,28 @@
 // OOP-based AI Orchestrator for SigmaOS
 // Implements sigma-ai core with multi-agent coordination, workflow automation,
 // and self-diagnosis capabilities for system optimization
+||||||| 43be3a7e8
+#![no_std]
+#![no_main]
+
+/// OOP-based AI Orchestrator for SigmaOS
+/// Based on 100-Improvement-Ideas.md #51: AI orchestrator for system optimization
+/// Implements sigma-ai core with multi-agent coordination, workflow automation,
+/// and self-diagnosis capabilities for system optimization
+// OOP-based AI Orchestrator for SigmaOS
+// Implements sigma-ai core with multi-agent coordination, workflow automation,
+// and self-diagnosis capabilities for system optimization.
+
+extern crate alloc;
 
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::boxed::Box;
+||||||| 43be3a7e8
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
@@ -19,9 +35,33 @@ pub enum AgentState {
     Error = 3,
     Learning = 4,
 }
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum AgentState { Idle = 0, Active = 1, Busy = 2, Error = 3, Learning = 4 }
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AgentState {
+    Idle = 0,
+    Active = 1,
+    Busy = 2,
+    Error = 3,
+    Learning = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
+pub enum AgentError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    Timeout = 3,
+    InvalidInput = 4,
+}
+||||||| 43be3a7e8
+#[derive(Debug, Clone, Copy)]
+pub enum AgentError { Success = 0, NotFound = 1, ExecutionFailed = 2, Timeout = 3, InvalidInput = 4 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentError {
     Success = 0,
     NotFound = 1,
@@ -45,6 +85,18 @@ pub struct SimpleAIAgent {
 
 impl SimpleAIAgent {
     pub fn new(id: AgentID, name: &str) -> Self {
+||||||| 43be3a7e8
+    pub fn new(id: AgentID, name: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let name_len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        }
+    pub fn new(id: AgentID, name: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let name_len = name.len().min(63);
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+
         SimpleAIAgent {
             id,
             name: name.to_string(),
@@ -69,20 +121,55 @@ impl AIAgent for SimpleAIAgent {
             4 => AgentState::Learning,
             _ => AgentState::Idle,
         }
+||||||| 43be3a7e8
+    fn id(&self) -> AgentID { self.id }
+    fn name(&self) -> &[u8] {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.name[..len]
+    fn id(&self) -> AgentID {
+        self.id
+    }
+
+    fn name(&self) -> &[u8] {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.name[..len]
+    }
+||||||| 43be3a7e8
+    fn state(&self) -> AgentState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+
+    fn state(&self) -> AgentState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => AgentState::Idle,
+            1 => AgentState::Active,
+            2 => AgentState::Busy,
+            3 => AgentState::Error,
+            _ => AgentState::Learning,
+        }
     }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
+        self.state
+            .store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
         for &byte in self.name.as_bytes() {
             result.push(byte);
         }
+||||||| 43be3a7e8
+        let name = self.name();
+        for &byte in name { result.push(byte); }
+        result.extend_from_slice(self.name());
         result.push(b':');
         result.push(b' ');
         for &byte in task {
             result.push(byte);
         }
         self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
+||||||| 43be3a7e8
+        for &byte in task { result.push(byte); }
+        self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
+        result.extend_from_slice(task);
+        self.state
+            .store(AgentState::Idle as usize, Ordering::SeqCst);
         Ok(result)
     }
 }
@@ -130,6 +217,12 @@ impl Default for SimpleAgentOrchestrator {
     }
 }
 
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AgentOrchestrator for SimpleAgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
         let id = agent.id();
@@ -161,6 +254,15 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         for agent in &self.agents {
             if agent.id() == id {
                 return Some(agent.as_ref());
+||||||| 43be3a7e8
+        for agent_option in &self.agents {
+            if let Some(ref agent) = *agent_option {
+                if agent.id() == id { return Some(agent.as_ref()); }
+        for agent_option in &self.agents {
+            if let Some(ref agent) = *agent_option {
+                if agent.id() == id {
+                    return Some(agent.as_ref());
+                }
             }
         }
         None
@@ -287,5 +389,66 @@ impl AgentCommunication for SimpleAgentCommunication {
         let msg_len = message.len().min(255);
         msg_array[..msg_len].copy_from_slice(&message[..msg_len]);
         self.messages.push((from, 0, msg_array));
+    }
+}
+||||||| 43be3a7e8
+
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    fn is_empty(&self) -> bool { self.len == 0 }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_agent_orchestrator_flows() {
+        let mut orchestrator = SimpleAgentOrchestrator::new();
+        let agent = SimpleAIAgent::new(99, b"SovereignSchedulerOptimizer");
+        orchestrator.register_agent(Box::new(agent)).unwrap();
+
+        assert_eq!(orchestrator.list_agents().len(), 1);
+
+        let response = orchestrator
+            .dispatch_task(b"optimize core affinity", Some(99))
+            .unwrap();
+        assert_eq!(
+            response,
+            b"SovereignSchedulerOptimizer: optimize core affinity"
+        );
     }
 }

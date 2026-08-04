@@ -1,5 +1,5 @@
-#![no_std]
-#![no_main]
+// OOP-based Audio Driver for SigmaOS
+// Implements audio device management and playback under `#![no_std]`.
 
 #[cfg(not(target_os = "none"))]
 extern crate alloc;
@@ -10,11 +10,31 @@ use core::mem;
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements audio device management and playback
+||||||| 43be3a7e8
+/// OOP-based Audio Driver for SigmaOS
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 71
+/// Implements audio device management and playback
+
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AudioDeviceID = usize;
 
 #[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AudioType {
+    Playback = 0,
+    Capture = 1,
+    Duplex = 2,
+}
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum AudioType { Playback = 0, Capture = 1, Duplex = 2 }
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioType {
     Playback = 0,
@@ -30,6 +50,16 @@ pub enum AudioError {
     InitFailed = 2,
     PlaybackFailed = 3,
 }
+||||||| 43be3a7e8
+#[derive(Debug, Clone, Copy)]
+pub enum AudioError { Success = 0, NotFound = 1, InitFailed = 2, PlaybackFailed = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AudioError {
+    Success = 0,
+    NotFound = 1,
+    InitFailed = 2,
+    PlaybackFailed = 3,
+}
 
 pub trait AudioDevice {
     fn id(&self) -> AudioDeviceID;
@@ -39,7 +69,6 @@ pub trait AudioDevice {
     fn initialize(&mut self) -> Result<(), AudioError>;
 }
 
-#[repr(C)]
 pub struct SimpleAudioDevice {
     pub id: AudioDeviceID,
     pub name: [u8; 64],
@@ -51,9 +80,8 @@ impl SimpleAudioDevice {
     pub fn new(id: AudioDeviceID, name: &[u8], audio_type: AudioType, sample_rate: u32) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+
         SimpleAudioDevice {
             id,
             name: name_array,
@@ -84,6 +112,19 @@ impl AudioDevice for SimpleAudioDevice {
     fn sample_rate(&self) -> u32 {
         self.sample_rate.load(Ordering::SeqCst) as u32
     }
+||||||| 43be3a7e8
+    fn audio_type(&self) -> AudioType { unsafe { core::mem::transmute(self.audio_type.load(Ordering::SeqCst)) } }
+    fn sample_rate(&self) -> u32 { self.sample_rate.load(Ordering::SeqCst) as u32 }
+    fn audio_type(&self) -> AudioType {
+        match self.audio_type.load(Ordering::SeqCst) {
+            0 => AudioType::Playback,
+            1 => AudioType::Capture,
+            _ => AudioType::Duplex,
+        }
+    }
+    fn sample_rate(&self) -> u32 {
+        self.sample_rate.load(Ordering::SeqCst) as u32
+    }
 
     fn initialize(&mut self) -> Result<(), AudioError> {
         Ok(())
@@ -100,7 +141,6 @@ pub trait AudioManager {
     fn list_devices(&self) -> Vec<AudioDeviceID>;
 }
 
-#[repr(C)]
 pub struct SimpleAudioManager {
     pub devices: Vec<Option<Box<dyn AudioDevice>>>,
     pub next_id: AtomicUsize,
@@ -112,6 +152,12 @@ impl SimpleAudioManager {
             devices: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAudioManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -168,7 +214,6 @@ pub trait AudioMixer {
     fn mute(&mut self, device_id: AudioDeviceID, muted: bool) -> Result<(), AudioError>;
 }
 
-#[repr(C)]
 pub struct SimpleAudioMixer {
     pub volumes: Vec<(AudioDeviceID, AtomicUsize, AtomicUsize)>,
 }
@@ -178,6 +223,12 @@ impl SimpleAudioMixer {
         SimpleAudioMixer {
             volumes: Vec::new(),
         }
+    }
+}
+
+impl Default for SimpleAudioMixer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -230,7 +281,6 @@ pub trait AudioStream {
     fn read_samples(&mut self, stream_id: usize, buffer: &mut [u8]) -> Result<usize, AudioError>;
 }
 
-#[repr(C)]
 pub struct SimpleAudioStream {
     pub streams: Vec<(usize, AudioDeviceID, u8, u32)>,
     pub next_id: AtomicUsize,
@@ -242,6 +292,12 @@ impl SimpleAudioStream {
             streams: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAudioStream {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -273,6 +329,11 @@ struct Vec<T> {
     len: usize,
     capacity: usize,
 }
+||||||| 43be3a7e8
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
@@ -312,6 +373,39 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+||||||| 43be3a7e8
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    #[test]
+    fn test_audio_driver_lifecycle() {
+        let mut manager = SimpleAudioManager::new();
+        let device = SimpleAudioDevice::new(12, b"SovereignHeadphones", AudioType::Playback, 48000);
+
+        manager.register_device(Box::new(device)).unwrap();
+        assert_eq!(manager.list_devices().len(), 1);
+
+        let default_dev = manager.get_default_playback().unwrap();
+        assert_eq!(default_dev.id(), 12);
+        assert_eq!(default_dev.name(), b"SovereignHeadphones");
+        assert_eq!(default_dev.sample_rate(), 48000);
     }
 }
 
@@ -319,3 +413,6 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+||||||| 43be3a7e8
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

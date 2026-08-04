@@ -1,14 +1,20 @@
-#![no_std]
-#![no_main]
+// OOP-based Process Spawning and POSIX Signals Framework for SigmaOS
+// Implements process lifecycles, fork, exec, and signals (SIGKILL, SIGTERM, SIGINT) under `#![no_std]`.
 
-/// OOP-based Process Spawning for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 121
-/// Implements process creation, fork, and exec
+extern crate alloc;
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ProcessID = usize;
+pub type SignalHandlerFn = fn(ProcessID, u8);
+
+/// Standard POSIX Signals
+pub const SIGINT: u8 = 2; // Interrupt (graceful / catchable)
+pub const SIGKILL: u8 = 9; // Force Kill (un-catchable, immediate)
+pub const SIGUSR1: u8 = 10; // User defined 1 (catchable)
+pub const SIGTERM: u8 = 15; // Terminate (graceful / catchable)
 
 pub const WNOHANG: u32 = 1;
 pub const WUNTRACED: u32 = 2;
@@ -16,10 +22,31 @@ pub const WUNTRACED: u32 = 2;
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
+||||||| 43be3a7e8
+#[derive(Debug, Clone, Copy)]
+pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessState {
+    Created = 0,
+    Running = 1,
+    Sleeping = 2,
+    Zombie = 3,
+    Terminated = 4,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessError { Success = 0, NotFound = 1, InvalidArgs = 2, SpawnFailed = 3 }
+||||||| 43be3a7e8
+#[derive(Debug, Clone, Copy)]
+pub enum ProcessError { Success = 0, NotFound = 1, InvalidArgs = 2, SpawnFailed = 3 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessError {
+    Success = 0,
+    NotFound = 1,
+    InvalidArgs = 2,
+    SpawnFailed = 3,
+}
 
 pub trait Process {
     fn id(&self) -> ProcessID;
@@ -32,9 +59,10 @@ pub trait Process {
     // Nice values (-20 to 19) mimicking Linux process scheduling priority
     fn nice(&self) -> i32 { 0 }
     fn set_nice(&mut self, nice: i32) {}
+||||||| 43be3a7e8
+    fn set_exit_code(&mut self, code: i32);
 }
 
-#[repr(C)]
 pub struct SimpleProcess {
     pub id: ProcessID,
     pub parent_id: ProcessID,
@@ -60,6 +88,25 @@ impl Process for SimpleProcess {
     fn parent_id(&self) -> ProcessID { self.parent_id }
     fn set_parent_id(&mut self, parent_id: ProcessID) { self.parent_id = parent_id; }
     fn state(&self) -> ProcessState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+||||||| 43be3a7e8
+    fn id(&self) -> ProcessID { self.id }
+    fn parent_id(&self) -> ProcessID { self.parent_id }
+    fn state(&self) -> ProcessState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn id(&self) -> ProcessID {
+        self.id
+    }
+    fn parent_id(&self) -> ProcessID {
+        self.parent_id
+    }
+    fn state(&self) -> ProcessState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => ProcessState::Created,
+            1 => ProcessState::Running,
+            2 => ProcessState::Sleeping,
+            3 => ProcessState::Zombie,
+            _ => ProcessState::Terminated,
+        }
+    }
 
     fn set_state(&mut self, state: ProcessState) {
         self.state.store(state as usize, Ordering::SeqCst);
@@ -74,19 +121,34 @@ impl Process for SimpleProcess {
     fn set_nice(&mut self, nice: i32) {
         self.nice = nice.clamp(-20, 19);
     }
+||||||| 43be3a7e8
+    fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
+    fn exit_code(&self) -> i32 {
+        self.exit_code.load(Ordering::SeqCst) as i32
+    }
+
+    fn set_exit_code(&mut self, code: i32) {
+        self.exit_code.store(code as usize, Ordering::SeqCst);
+    }
 }
 
 pub trait ProcessSpawner {
     fn spawn(&mut self, executable: &[u8], args: &[[u8; 64]]) -> Result<ProcessID, ProcessError>;
     fn fork(&mut self, parent_id: ProcessID) -> Result<ProcessID, ProcessError>;
-    fn exec(&mut self, process_id: ProcessID, executable: &[u8], args: &[[u8; 64]]) -> Result<(), ProcessError>;
+    fn exec(
+        &mut self,
+        process_id: ProcessID,
+        executable: &[u8],
+        args: &[[u8; 64]],
+    ) -> Result<(), ProcessError>;
     fn kill(&mut self, process_id: ProcessID, signal: u8) -> Result<(), ProcessError>;
 }
 
-#[repr(C)]
+/// Simple Process Spawner with custom signal handlers database
 pub struct SimpleProcessSpawner {
     pub processes: Vec<Option<Box<dyn Process>>>,
     pub next_id: AtomicUsize,
+    pub signal_handlers: Vec<(ProcessID, u8, SignalHandlerFn)>,
 }
 
 impl SimpleProcessSpawner {
@@ -94,6 +156,7 @@ impl SimpleProcessSpawner {
         SimpleProcessSpawner {
             processes: Vec::new(),
             next_id: AtomicUsize::new(1),
+            signal_handlers: Vec::new(),
         }
     }
 
@@ -106,6 +169,26 @@ impl SimpleProcessSpawner {
                 }
             }
         }
+    }
+||||||| 43be3a7e8
+
+    /// Register a custom signal handler for a process
+    pub fn register_signal_handler(
+        &mut self,
+        pid: ProcessID,
+        signal: u8,
+        handler: SignalHandlerFn,
+    ) {
+        if signal == SIGKILL {
+            return; // SIGKILL cannot be caught or ignored!
+        }
+        self.signal_handlers.push((pid, signal, handler));
+    }
+}
+
+impl Default for SimpleProcessSpawner {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -127,6 +210,18 @@ impl ProcessSpawner for SimpleProcessSpawner {
     fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
         for i in 0..self.processes.len() {
             if let Some(ref mut process) = self.processes[i] {
+||||||| 43be3a7e8
+    fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
+        for process_option in &mut self.processes {
+            if let Some(ref mut process) = *process_option {
+    fn exec(
+        &mut self,
+        process_id: ProcessID,
+        _executable: &[u8],
+        _args: &[[u8; 64]],
+    ) -> Result<(), ProcessError> {
+        for process_option in &mut self.processes {
+            if let Some(ref mut process) = *process_option {
                 if process.id() == process_id {
                     process.set_state(ProcessState::Running);
                     return Ok(());
@@ -139,22 +234,77 @@ impl ProcessSpawner for SimpleProcessSpawner {
     fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
         for i in 0..self.processes.len() {
             if let Some(ref mut process) = self.processes[i] {
+||||||| 43be3a7e8
+    fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
+        for process_option in &mut self.processes {
+            if let Some(ref mut process) = *process_option {
+    /// Dispatches POSIX signals. SIGKILL forces instant termination. Graceful signals trigger handlers or exit.
+    fn kill(&mut self, process_id: ProcessID, signal: u8) -> Result<(), ProcessError> {
+        let mut process_found = false;
+        let mut exit_code_to_set = 0;
+
+        for process_option in &mut self.processes {
+            if let Some(ref mut process) = *process_option {
                 if process.id() == process_id {
-                    process.set_state(ProcessState::Terminated);
-                    return Ok(());
+                    process_found = true;
+
+                    if signal == SIGKILL {
+                        // SIGKILL (9) is immediate and un-catchable
+                        process.set_state(ProcessState::Terminated);
+                        process.set_exit_code(137); // Standard 128 + 9 exit status for SIGKILL
+                        return Ok(());
+                    }
+
+                    // Check for custom registered catchable signal handler
+                    let mut handler_dispatched = false;
+                    for &(pid, sig, handler) in &self.signal_handlers {
+                        if pid == process_id && sig == signal {
+                            handler(process_id, signal);
+                            handler_dispatched = true;
+                            break;
+                        }
+                    }
+
+                    if !handler_dispatched {
+                        // Default signal action is termination
+                        process.set_state(ProcessState::Terminated);
+                        exit_code_to_set = match signal {
+                            SIGTERM => 143, // 128 + 15
+                            SIGINT => 130,  // 128 + 2
+                            _ => 1,
+                        };
+                    }
+                    break;
                 }
             }
         }
-        Err(ProcessError::NotFound)
+
+        if process_found {
+            if exit_code_to_set > 0 {
+                for process_option in &mut self.processes {
+                    if let Some(ref mut process) = *process_option {
+                        if process.id() == process_id {
+                            process.set_exit_code(exit_code_to_set);
+                        }
+                    }
+                }
+            }
+            Ok(())
+        } else {
+            Err(ProcessError::NotFound)
+        }
     }
 }
 
 pub trait ProcessWaiter {
     fn wait(&mut self, process_id: ProcessID) -> Result<i32, ProcessError>;
-    fn waitpid(&mut self, process_id: ProcessID, options: u32) -> Result<(ProcessID, i32), ProcessError>;
+    fn waitpid(
+        &mut self,
+        process_id: ProcessID,
+        options: u32,
+    ) -> Result<(ProcessID, i32), ProcessError>;
 }
 
-#[repr(C)]
 pub struct SimpleProcessWaiter {
     pub spawner: SimpleProcessSpawner,
 }
@@ -173,6 +323,17 @@ impl ProcessWaiter for SimpleProcessWaiter {
     fn waitpid(&mut self, process_id: ProcessID, options: u32) -> Result<(ProcessID, i32), ProcessError> {
         for i in 0..self.spawner.processes.len() {
             if let Some(ref process) = self.spawner.processes[i] {
+||||||| 43be3a7e8
+    fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
+        for process_option in &self.spawner.processes {
+            if let Some(ref process) = *process_option {
+    fn waitpid(
+        &mut self,
+        process_id: ProcessID,
+        _options: u32,
+    ) -> Result<(ProcessID, i32), ProcessError> {
+        for process_option in &self.spawner.processes {
+            if let Some(ref process) = *process_option {
                 if process.id() == process_id {
                     let is_terminated = process.state() == ProcessState::Terminated;
                     if is_terminated {
@@ -196,7 +357,6 @@ pub trait ProcessGroup {
     fn signal_group(&mut self, group_id: usize, signal: u8, spawner: &mut SimpleProcessSpawner) -> Result<(), ProcessError>;
 }
 
-#[repr(C)]
 pub struct SimpleProcessGroup {
     pub groups: Vec<(usize, Vec<ProcessID>)>,
     pub next_id: AtomicUsize,
@@ -208,6 +368,12 @@ impl SimpleProcessGroup {
             groups: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleProcessGroup {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -238,6 +404,15 @@ impl ProcessGroup for SimpleProcessGroup {
                     members.push(self.groups[i].1[j]);
                 }
                 break;
+||||||| 43be3a7e8
+    fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
+        for group in &mut self.groups {
+            if group.0 == group_id {
+                return Ok(());
+    fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
+        for group in &self.groups {
+            if group.0 == group_id {
+                return Ok(());
             }
         }
 
@@ -253,28 +428,46 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use core::sync::atomic::AtomicUsize;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+    static CUSTOM_SIGNAL_DISPATCH_COUNT: AtomicUsize = AtomicUsize::new(0);
+
+    fn custom_sigterm_handler(_pid: ProcessID, _sig: u8) {
+        CUSTOM_SIGNAL_DISPATCH_COUNT.fetch_add(1, Ordering::SeqCst);
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    #[test]
+    fn test_process_spawning_and_sigkill() {
+        let mut spawner = SimpleProcessSpawner::new();
+        let pid = spawner.spawn(b"/bin/shell", &[]).unwrap();
+
+        // 1. Send un-catchable SIGKILL -> Process should be instantly terminated with exit status 137
+        spawner.kill(pid, SIGKILL).unwrap();
+
+        let mut waiter = SimpleProcessWaiter::new(spawner);
+        let exit_code = waiter.wait(pid).unwrap();
+        assert_eq!(exit_code, 137);
+    }
+
+    #[test]
+    fn test_custom_signal_handler_and_sigterm() {
+        let mut spawner = SimpleProcessSpawner::new();
+        let pid = spawner.spawn(b"/bin/logger", &[]).unwrap();
+        spawner.exec(pid, b"/bin/logger", &[]).unwrap();
+
+        // Register custom SIGTERM (15) handler
+        spawner.register_signal_handler(pid, SIGTERM, custom_sigterm_handler);
+
+        // Send SIGTERM -> Custom handler should be dispatched instead of default termination
+        spawner.kill(pid, SIGTERM).unwrap();
+        assert_eq!(CUSTOM_SIGNAL_DISPATCH_COUNT.load(Ordering::SeqCst), 1);
+
+        // Standard processes state is unchanged since handler didn't call exit
+        let mut waiter = SimpleProcessWaiter::new(spawner);
+        assert!(waiter.wait(pid).is_err()); // Not terminated yet!
     }
 }
 
@@ -383,3 +576,6 @@ mod tests {
         assert_eq!(spawner2.processes[1].as_ref().unwrap().state(), ProcessState::Terminated);
     }
 }
+||||||| 43be3a7e8
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

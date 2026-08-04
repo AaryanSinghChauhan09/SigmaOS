@@ -2,6 +2,10 @@
 pub mod bus;
 pub mod device;
 pub mod driver;
+||||||| 43be3a7e8
+pub mod ipc;
+pub mod bore;
+pub mod ipc;
 pub mod memory;
 pub mod object;
 pub mod performance;
@@ -14,6 +18,8 @@ pub mod breakthroughs;
 pub mod ipc;
 pub mod linux_absorb;
 pub mod subsystem;
+||||||| 43be3a7e8
+pub mod virtual_cpu;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
@@ -25,6 +31,8 @@ pub use crate::container::runtime::oci::{
 };
 pub use device::{Device, DeviceBinding, DeviceManager, DeviceType, DriverError, DriverMetadata};
 pub use driver::{Driver, DriverRegistration, DriverRegistry};
+||||||| 43be3a7e8
+pub use bore::{BoreScheduler, BoreTask};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
@@ -50,3 +58,5 @@ pub use breakthroughs::{
     UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingKernel, AiNativeRuntime,
     EnergyAwareScheduler, UserDefinedKernelFunctions, PrivacyFirstSandbox,
 };
+||||||| 43be3a7e8
+pub use virtual_cpu::{CpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU};

@@ -138,6 +138,9 @@ impl VirtualFilesystem {
 ||||||| 43be3a7e8
         
 
+||||||| 43be3a7e8
+        
+
         fs
     }
 
@@ -216,6 +219,9 @@ impl VirtualFilesystem {
         let remaining = (inode.size - file_descriptor.offset) as usize;
         let bytes_to_read = buffer.len().min(remaining);
 
+||||||| 43be3a7e8
+        
+
         // Prevent integer overflow in offset calculation
         let new_offset = file_descriptor
             .offset
@@ -225,6 +231,11 @@ impl VirtualFilesystem {
         let _new_offset = file_descriptor
             .offset
             .checked_add(bytes_to_read as u64)
+||||||| 43be3a7e8
+        let new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+        let new_offset = file_descriptor
+            .offset
+            .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
 
         // Simulate read (in production, actual file I/O)
@@ -234,10 +245,13 @@ impl VirtualFilesystem {
         Ok(bytes_read)
 ||||||| 43be3a7e8
         
+||||||| 43be3a7e8
+        
+
         // Simulate read (in production, actual file I/O)
         let bytes_read = buffer.len().min(inode.size as usize);
         file_descriptor.offset += bytes_read as u64;
-        
+
         Ok(bytes_read)
 
         // Read the actual bytes from storage data
@@ -281,6 +295,11 @@ impl VirtualFilesystem {
         let _new_size = inode
             .size
             .checked_add(buffer.len() as u64)
+||||||| 43be3a7e8
+        let _new_size = inode.size.checked_add(buffer.len() as u64)
+        let _new_size = inode
+            .size
+            .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
         // Prevent integer overflow in offset calculation
@@ -291,6 +310,11 @@ impl VirtualFilesystem {
         // Prevent integer overflow in offset calculation
         let _new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
         let new_offset = file_descriptor
+            .offset
+            .checked_add(buffer.len() as u64)
+||||||| 43be3a7e8
+        let _new_offset = file_descriptor.offset.checked_add(buffer.len() as u64)
+        let _new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
@@ -304,12 +328,15 @@ impl VirtualFilesystem {
         Ok(bytes_written)
 ||||||| 43be3a7e8
         
+||||||| 43be3a7e8
+        
+
         // Simulate write (in production, actual file I/O)
         let bytes_written = buffer.len();
         inode.size += bytes_written as u64;
         file_descriptor.offset += bytes_written as u64;
         inode.modified = 0; // In production, actual timestamp
-        
+
         Ok(bytes_written)
 
         // Resize storage data buffer if offset + written bytes exceeds size (handling holes)
@@ -346,6 +373,9 @@ impl VirtualFilesystem {
         if !self.inodes.contains_key(&inode_id) {
 ||||||| 43be3a7e8
         
+||||||| 43be3a7e8
+        
+
         if !self.inodes.contains_key(&inode_id) {
 
         let mut should_delete = false;
@@ -371,6 +401,9 @@ impl VirtualFilesystem {
         }
 ||||||| 43be3a7e8
         
+||||||| 43be3a7e8
+        
+
         self.inodes.remove(&inode_id);
 
         if should_delete {
@@ -394,6 +427,9 @@ impl VirtualFilesystem {
         Ok(self.inodes.keys().copied().collect())
 ||||||| 43be3a7e8
         
+||||||| 43be3a7e8
+        
+
         // Return all inodes (in production, actual directory listing)
         Ok(self.inodes.keys().copied().collect())
 

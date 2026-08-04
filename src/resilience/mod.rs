@@ -2,6 +2,8 @@
 pub mod automated_fixer;
 ||||||| 43be3a7e8
 pub mod backup;
+||||||| 43be3a7e8
+pub mod automated_fixer;
 pub mod self_healing;
 pub mod backup;
 

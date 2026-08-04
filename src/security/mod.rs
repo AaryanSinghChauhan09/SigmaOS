@@ -16,6 +16,11 @@ pub mod pki;
 ||||||| 43be3a7e8
 pub mod defensive_audit;
 pub mod parrot;
+||||||| 43be3a7e8
+pub mod integrity;
+pub mod mac;
+pub mod phantom;
+pub mod pki;
 pub mod pledge;
 pub mod qubes_isolation;
 pub mod scanner;
@@ -31,6 +36,11 @@ pub mod intrusion;
 pub mod password;
 pub mod parrot_linux;
 pub mod selinux;
+||||||| 43be3a7e8
+pub mod secrets;
+pub mod securelevels;
+pub mod unveil;
+pub mod vulnerability;
 
 pub use parrot_linux::{
     AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
@@ -70,6 +80,8 @@ pub use parrot::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
+||||||| 43be3a7e8
+pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
@@ -106,3 +118,6 @@ pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
 };
+||||||| 43be3a7e8
+pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};

@@ -82,6 +82,16 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
+||||||| 43be3a7e8
+    Echo { message: String },
+    Set { variable: String, value: String },
+    Get { variable: String },
+    Echo { message: String },
+    Set { variable: String, value: String },
+    Get { variable: String },
+    Theme { name: String },
+    Profile { name: String },
+    A11y { feature: String, enabled: bool },
     Unknown(String),
 }
 
@@ -143,6 +153,16 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
+||||||| 43be3a7e8
+    running: bool,
+    variables: std::collections::HashMap<String, String>,
+    prompt: String,
+    running: bool,
+    variables: std::collections::HashMap<String, String>,
+    prompt: String,
+    pub current_theme: String,
+    pub current_profile: String,
+    pub a11y_features: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
@@ -151,6 +171,12 @@ impl ShellRepl {
         services.insert("cron".to_string(), "Running".to_string());
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
+||||||| 43be3a7e8
+        let mut a11y = std::collections::HashMap::new();
+        a11y.insert("screen_reader".to_string(), false);
+        a11y.insert("high_contrast".to_string(), false);
+        a11y.insert("magnification".to_string(), false);
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
@@ -164,6 +190,12 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+||||||| 43be3a7e8
+            prompt: "sigma-sh> ".to_string(),
+            prompt: "sigma-sh> ".to_string(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: a11y,
         }
     }
 
@@ -171,6 +203,25 @@ impl ShellRepl {
         let mut shell = Self::new();
         shell.prompt = prompt;
         shell
+||||||| 43be3a7e8
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            prompt,
+        }
+        let mut a11y = std::collections::HashMap::new();
+        a11y.insert("screen_reader".to_string(), false);
+        a11y.insert("high_contrast".to_string(), false);
+        a11y.insert("magnification".to_string(), false);
+
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            prompt,
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: a11y,
+        }
     }
 
     pub fn run(&mut self) {
@@ -239,6 +290,11 @@ impl ShellRepl {
         }
 
         let parts: Vec<&str> = expanded_input.split_whitespace().collect();
+||||||| 43be3a7e8
+    fn parse_command(&self, input: &str) -> ShellCommand {
+        let parts: Vec<&str> = input.split_whitespace().collect();
+    pub fn parse_command(&self, input: &str) -> ShellCommand {
+        let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
             return ShellCommand::Unknown(input.to_string());
@@ -419,6 +475,39 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+||||||| 43be3a7e8
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    let enabled = match parts[2] {
+                        "on" | "true" | "enable" => true,
+                        _ => false,
+                    };
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        enabled,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -437,6 +526,24 @@ impl ShellRepl {
                    run     - Execute an automated macro/script variable\n\
                    agent   - Interface for AI Agent Automation tasks (register, list, run)\n\
                    exit    - Exit the shell"
+||||||| 43be3a7e8
+                   help    - Show this help message\n\
+                   ps      - List running processes\n\
+                   ls      - List files\n\
+                   echo    - Print a message\n\
+                   set     - Set a variable\n\
+                   get     - Get a variable\n\
+                   exit    - Exit the shell"
+                   help             - Show this help message\n\
+                   ps               - List running processes\n\
+                   ls               - List files\n\
+                   echo             - Print a message\n\
+                   set              - Set a variable\n\
+                   get              - Get a variable\n\
+                   theme [name]     - Switch Zenith desktop theme\n\
+                   profile [name]   - Switch Zenith user profile\n\
+                   a11y [feat] [on] - Switch Zenith accessibility settings\n\
+                   exit             - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
                    1    sigma-sh    Running\n\
@@ -648,6 +755,23 @@ impl ShellRepl {
                 } else {
                     Err(format!("Agent task #{} not found", task_id))
                 }
+            }
+||||||| 43be3a7e8
+            ShellCommand::Theme { name } => {
+                self.current_theme = name.clone();
+                Ok(format!("Zenith Theme set to: {}", name))
+            }
+            ShellCommand::Profile { name } => {
+                self.current_profile = name.clone();
+                Ok(format!("Zenith Profile set to: {}", name))
+            }
+            ShellCommand::A11y { feature, enabled } => {
+                self.a11y_features.insert(feature.clone(), enabled);
+                Ok(format!(
+                    "Zenith Accessibility [{}] set to: {}",
+                    feature,
+                    if enabled { "on" } else { "off" }
+                ))
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }

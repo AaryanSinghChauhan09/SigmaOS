@@ -6,6 +6,8 @@ pub mod manager;
 pub mod support;
 ||||||| 43be3a7e8
 pub mod smart_symlink;
+||||||| 43be3a7e8
+pub mod proc;
 pub mod vfs;
 pub mod defragmenter;
 
@@ -27,6 +29,8 @@ pub use support::{
     Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
     SimpleFilesystemManager,
 };
+||||||| 43be3a7e8
+pub use proc::SovereignProcFS;
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
 ||||||| 43be3a7e8
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};

@@ -1,10 +1,21 @@
+||||||| 43be3a7e8
+#![no_std]
+#![no_main]
+
+#![no_std]
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 /// OOP-based Networking Stack (TCP/UDP) for SigmaOS
 /// Based on Roadmap Item: Networking Stack (TCP/UDP SYN-Complete)
 /// Implements TCP state machine, UDP, Reno/BBR congestion control, firewall, zero-copy
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
+||||||| 43be3a7e8
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -12,8 +23,36 @@ pub type Port = u16;
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol { TCP = 0, UDP = 1 }
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum Protocol { TCP = 0, UDP = 1 }
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Protocol {
+    TCP = 0,
+    UDP = 1,
+}
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum TCPState { Closed = 0, Listen = 1, SynSent = 2, SynReceived = 3, Established = 4, FinWait1 = 5, FinWait2 = 6, CloseWait = 7, Closing = 8, TimeWait = 9 }
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
@@ -37,6 +76,18 @@ pub enum NetworkError {
     SendFailed = 3,
     InvalidParameter = 4,
 }
+||||||| 43be3a7e8
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum NetworkError { Success = 0, InvalidSocket = 1, ConnectionFailed = 2, SendFailed = 3 }
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetworkError {
+    Success = 0,
+    InvalidSocket = 1,
+    ConnectionFailed = 2,
+    SendFailed = 3,
+}
 
 pub trait Socket {
     fn id(&self) -> SocketID;
@@ -59,6 +110,8 @@ pub enum SocketOption {
     SndBuf,
 }
 
+||||||| 43be3a7e8
+#[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
@@ -129,6 +182,23 @@ impl BsdSocket for SimpleSocket {
             SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
             SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
         }
+    }
+||||||| 43be3a7e8
+    fn id(&self) -> SocketID { self.id }
+    fn protocol(&self) -> Protocol { self.protocol }
+    fn local_port(&self) -> Port { self.local_port.load(Ordering::SeqCst) as Port }
+    fn remote_port(&self) -> Port { self.remote_port.load(Ordering::SeqCst) as Port }
+    fn id(&self) -> SocketID {
+        self.id
+    }
+    fn protocol(&self) -> Protocol {
+        self.protocol
+    }
+    fn local_port(&self) -> Port {
+        self.local_port.load(Ordering::SeqCst) as Port
+    }
+    fn remote_port(&self) -> Port {
+        self.remote_port.load(Ordering::SeqCst) as Port
     }
 }
 
@@ -306,6 +376,9 @@ impl Default for SimpleFirewall {
     fn default() -> Self {
         Self::new()
     }
+||||||| 43be3a7e8
+    pub allowed_ports: [AtomicUsize; 65536],
+    pub allowed_ports: Vec<AtomicUsize>,
 }
 
 impl SimpleFirewall {
@@ -315,6 +388,22 @@ impl SimpleFirewall {
             allowed_ports.push(AtomicUsize::new(0));
         }
         SimpleFirewall { allowed_ports }
+||||||| 43be3a7e8
+        let mut allowed_ports = [AtomicUsize::new(0); 65536];
+        SimpleFirewall { allowed_ports }
+        let mut allowed = Vec::new();
+        for _ in 0..65536 {
+            allowed.push(AtomicUsize::new(0));
+        }
+        SimpleFirewall {
+            allowed_ports: allowed,
+        }
+    }
+}
+
+impl Default for SimpleFirewall {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -646,6 +735,11 @@ impl<T> Default for Vec<T> {
 }
 
 pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+||||||| 43be3a7e8
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
 impl<T> Vec<T> {
     pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
@@ -657,6 +751,35 @@ impl<T> Vec<T> {
                 self.len += 1;
             }
         }
+||||||| 43be3a7e8
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    #[test]
+    fn test_tcp_socket_flow() {
+        let mut socket = SimpleSocket::new(1, Protocol::TCP, 80);
+        assert_eq!(socket.id(), 1);
+        assert_eq!(socket.protocol(), Protocol::TCP);
+        assert!(socket.listen().is_ok());
+        assert!(socket.connect(8080).is_ok());
+        assert_eq!(socket.get_state(), TCPState::Established);
+
+        let data = b"hello";
+        assert_eq!(socket.send(data).unwrap(), 5);
+
+        let mut buf = [0u8; 10];
+        assert_eq!(socket.recv(&mut buf).unwrap(), 10);
+        assert_eq!(buf[0], 13);
+
+        assert!(socket.close().is_ok());
+        assert_eq!(socket.get_state(), TCPState::Closed);
     }
     pub fn is_empty(&self) -> bool { self.len == 0 }
     pub fn len(&self) -> usize { self.len }
@@ -700,6 +823,48 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+||||||| 43be3a7e8
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+
+    #[test]
+    fn test_udp_socket_flow() {
+        let mut socket = SimpleSocket::new(2, Protocol::UDP, 53);
+        assert_eq!(socket.id(), 2);
+        assert_eq!(socket.protocol(), Protocol::UDP);
+
+        let data = b"dnsreq";
+        assert_eq!(socket.sendto(data, 53).unwrap(), 6);
+
+        let mut buf = [0u8; 10];
+        let (len, rport) = socket.recvfrom(&mut buf).unwrap();
+        assert_eq!(len, 10);
+        assert_eq!(rport, 53);
+        assert_eq!(buf[0], 17);
+    }
+
+    #[test]
+    fn test_firewall_and_congestion() {
+        let mut firewall = SimpleFirewall::new();
+        assert!(!firewall.is_allowed(80));
+        firewall.allow_port(80);
+        assert!(firewall.is_allowed(80));
+        firewall.block_port(80);
+        assert!(!firewall.is_allowed(80));
+
+        let mut cc = RenoCongestionControl::new();
+        assert_eq!(cc.get_cwnd(), 10);
+        cc.update_cwnd(2);
+        assert_eq!(cc.get_cwnd(), 12);
+        cc.on_loss();
+        assert_eq!(cc.get_cwnd(), 1);
     }
 }
 
@@ -802,3 +967,6 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
         self.deref_mut().iter_mut()
     }
 }
+||||||| 43be3a7e8
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

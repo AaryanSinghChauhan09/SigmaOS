@@ -2,9 +2,15 @@
 #![allow(clippy::all)]
 #![cfg_attr(target_os = "none", no_std)]
 ||||||| 43be3a7e8
+||||||| 43be3a7e8
+#![allow(warnings)]
+#![allow(clippy::all)]
 // SigmaOS Userspace Main Entry Point
 #![no_std]
 // SigmaOS Userspace Main Entry Point
+#![cfg_attr(target_os = "none", no_std)]
+||||||| 43be3a7e8
+#![no_std]
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
 
