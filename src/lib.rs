@@ -134,3 +134,10 @@ pub use arch::cpu_sys::{
     VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
     FastSyscallDispatcher as CpuFastSyscallDispatcher,
 };
+pub use arch::comprehensive::{
+    PageTableEntry as CpuPageTableEntry, MultiLevelPaging as CpuMultiLevelPaging,
+    ArmExceptionLevel, ArmV8ProcessorState, NtMajorFunction, IoStatusBlock as NtIoStatusBlock,
+    IoRequestPacket as NtIoRequestPacket, NtObjectType, NtObjectHeader, NtObjectManager,
+    LinuxTaskState, LinuxTaskStruct, LinuxRcuSynchronizer, BsdKqueueFilter, BsdKevent,
+    BsdKqueueMultiplexer, BsdSysctlNode, BsdSysctlRegistry,
+};
