@@ -116,12 +116,6 @@ impl SimpleAgentOrchestrator {
     }
 }
 
-impl Default for SimpleAgentOrchestrator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl AgentOrchestrator for SimpleAgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
         let id = agent.id();
@@ -175,6 +169,13 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         }
         ids
     }
+}
+
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn peek(&self) -> Option<&[u8]>;
+    fn size(&self) -> usize;
 }
 
 pub trait TaskQueue {

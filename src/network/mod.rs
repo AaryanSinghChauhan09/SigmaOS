@@ -1,6 +1,7 @@
 // SigmaOS Network Stack Module
 pub mod stack;
 pub mod tcp;
+pub mod enterprise;
 pub mod tcp_udp;
 pub mod wireless;
 pub mod zero_trust;

@@ -159,3 +159,4 @@ mod tests {
         assert!(filter.is_filter_enabled());
     }
 }
+

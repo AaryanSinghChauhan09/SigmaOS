@@ -14,7 +14,6 @@ pub use importer::{
     DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
-pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;

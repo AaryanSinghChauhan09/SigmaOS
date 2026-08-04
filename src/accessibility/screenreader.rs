@@ -179,3 +179,4 @@ mod tests {
         assert_eq!(&display.get_cells()[..12], b"Braille info");
     }
 }
+

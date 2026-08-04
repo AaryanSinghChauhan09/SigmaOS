@@ -83,6 +83,7 @@ impl EncryptionService for SimpleEncryptionService {
                         }
                         return Ok(encrypted);
                     }
+                    return Ok(encrypted);
                 }
             }
         }
@@ -102,6 +103,7 @@ impl EncryptionService for SimpleEncryptionService {
                         }
                         return Ok(decrypted);
                     }
+                    return Ok(decrypted);
                 }
             }
         }

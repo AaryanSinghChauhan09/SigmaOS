@@ -208,3 +208,4 @@ mod tests {
         assert!(!sticky.is_sticky(5));
     }
 }
+

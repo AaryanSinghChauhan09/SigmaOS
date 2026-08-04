@@ -1,19 +1,21 @@
+#![no_std]
+#![no_main]
+
 use core::mem;
-/// OOP-based Driver Framework for SigmaOS
-/// Based on Roadmap Item 1: Driver framework
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
+    Storage = 3,
 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverState {
     Unloaded = 0,
@@ -62,16 +64,51 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
     }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state
-            .store(DriverState::Loaded as usize, Ordering::SeqCst);
+        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state
-            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        Ok(())
+    }
+}
+
+#[repr(C)]
+pub struct SimpleStorageDriver {
+    pub id: DriverID,
+    pub driver_type: DriverType,
+    pub state: AtomicUsize,
+}
+
+impl SimpleStorageDriver {
+    pub fn new(id: DriverID) -> Self {
+        SimpleStorageDriver {
+            id,
+            driver_type: DriverType::Storage,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
+    }
+}
+
+impl Driver for SimpleStorageDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.state.store(DriverState::Active as usize, Ordering::SeqCst);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.state.store(DriverState::Unloaded as usize, Ordering::SeqCst);
         Ok(())
     }
 }
@@ -83,9 +120,16 @@ pub trait DriverFramework {
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
 }
 
+#[allow(dead_code)]
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
     next_id: AtomicUsize,
+}
+
+impl Default for SimpleDriverFramework {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleDriverFramework {
@@ -104,7 +148,7 @@ impl DriverFramework for SimpleDriverFramework {
         Ok(id)
     }
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in self.drivers.iter_mut() {
+        for driver_option in &mut self.drivers {
             if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id {
                     return driver.load();
@@ -114,7 +158,7 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::LoadFailed)
     }
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in self.drivers.iter_mut() {
+        for driver_option in &mut self.drivers {
             if let Some(ref mut driver) = *driver_option {
                 if driver.id() == id {
                     return driver.unload();
@@ -124,7 +168,7 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::UnloadFailed)
     }
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver> {
-        for driver_option in self.drivers.iter() {
+        for driver_option in &self.drivers {
             if let Some(ref driver) = *driver_option {
                 if driver.id() == id {
                     return Some(driver.as_ref());
@@ -135,21 +179,21 @@ impl DriverFramework for SimpleDriverFramework {
     }
 }
 
-pub struct Vec<T> {
+struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
             capacity: 0,
         }
     }
-    pub fn push(&mut self, item: T) {
+    fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -158,23 +202,6 @@ impl<T> Vec<T> {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
-        }
-    }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
         }
     }
     unsafe fn grow(&mut self) {
@@ -197,64 +224,48 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
 }
