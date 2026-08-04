@@ -373,9 +373,6 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
     }
 }
 
-pub struct IntegrityCheck;
-pub struct IntegrityVerifier;
-
 #[cfg(test)]
 mod tests {
     use super::*;
