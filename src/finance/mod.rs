@@ -17,7 +17,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Finance Module
-// India Stack financial calculations (GST, TDS, Income Tax)
+// India Stack financial calculations (GST, TDS, Income Tax) and Professional Utilities
 
 pub mod gst;
 pub mod professions;
@@ -25,6 +25,7 @@ pub mod tds;
 
 pub use gst::{GoodsType, GstCalculator, GstRate, GstRegime, GstResult, GstState};
 pub use professions::{
-    AssetClass, IndianCrop, KanoonCalculator, KrishiCalculator, LimitationType, VyapaarCalculator,
+    EngineeringCalculators, FinancialProfessionCalculators, MedicalDoctorCalculators,
+    DepreciationMethod, TaxRegime,
 };
 pub use tds::{TdsCalculator, TdsResult, TdsSection};

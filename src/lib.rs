@@ -150,6 +150,8 @@ pub use productivity::{
     NoteTakingApp, Note, ContentType, Notebook, Folder, NoteStorage, InMemoryNoteStorage,
     EmailClient, EmailAddress, EmailMessage, EmailFolder, EmailAttachment, EmailAccountConfig,
     ScreenshotTool, ScreenshotConfig, ScreenshotMode, ImageFormat, CaptureRegion,
+    EngineeringCalculators, FinancialProfessionCalculators, MedicalDoctorCalculators,
+    DepreciationMethod, TaxRegime,
 };
 
 pub use accessibility::{

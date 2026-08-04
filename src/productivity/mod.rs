@@ -39,6 +39,8 @@ pub use email::{
 };
 pub use finance::{
     Asset, Budget, Expense, FinancialManager, Income, Transaction as FinancialTransaction,
+    EngineeringCalculators, FinancialProfessionCalculators, MedicalDoctorCalculators,
+    DepreciationMethod, TaxRegime,
 };
 pub use flint_chart::{
     ChartData, ChartEngine, ChartSeries, DataPoint, LegendPosition,
