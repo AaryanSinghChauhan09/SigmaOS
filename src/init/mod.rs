@@ -2,4 +2,9 @@
 pub mod sigma_init;
 pub mod system;
 
-pub use sigma_init::{InitError, Service, ServiceState, SigmaInit, SimpleService};
+pub use sigma_init::{
+    BIOSPort, CorebootPort, DACPort, DependencyResolver, FirmwarePort, InitError, InitSystem,
+    Runlevel, SELinuxPort, SecurityPort, Service, ServiceID, ServiceMonitor, ServiceState,
+    SigmaInit, SimpleDependencyResolver, SimpleService, SimpleServiceMonitor, UEFIPort,
+    ZeroTrustPort,
+};

@@ -2,8 +2,8 @@
 // Implements 64-bit hardware-enforced capability model
 
 use std::string::String;
-use std::vec::Vec;
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::vec::Vec;
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

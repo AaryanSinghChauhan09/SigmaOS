@@ -139,7 +139,10 @@ impl DriverRegistry {
                 if !reg.loaded && reg.driver.probe(device) {
                     if let Some(driver) = reg.driver.as_driver_impl_mut() {
                         driver.init()?;
-                        bindings_to_make.push((device.name().to_string(), reg.driver.driver_name().to_string()));
+                        bindings_to_make.push((
+                            device.name().to_string(),
+                            reg.driver.driver_name().to_string(),
+                        ));
                         reg.loaded = true;
                         break;
                     }
