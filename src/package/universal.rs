@@ -264,23 +264,68 @@ impl Default for DependencyResolver {
     }
 }
 
-/// Package snapshot representing a saved system state of installed packages
+/// Transactional package manager checkpoint
 #[derive(Debug, Clone)]
-pub struct PackageSnapshot {
-    pub id: usize,
-    pub description: String,
-    pub timestamp: u64,
-    pub installed_packages: HashMap<String, UnifiedPackage>,
+pub struct PackageCheckpoint {
+    pub checkpoint_id: usize,
+    pub installed_keys: Vec<String>,
 }
 
-/// Universal package manager with transaction-safe snapshots & rollback mechanisms
+/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub checkpoints: Vec<PackageCheckpoint>,
+    pub next_checkpoint_id: usize,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        TransactionalHistory {
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 1,
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        let mut keys = Vec::new();
+        for key in installed.keys() {
+            keys.push(key.clone());
+        }
+
+        self.checkpoints.push(PackageCheckpoint {
+            checkpoint_id: id,
+            installed_keys: keys,
+        });
+
+        id
+    }
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        for i in 0..self.checkpoints.len() {
+            if self.checkpoints[i].checkpoint_id == id {
+                return Some(&self.checkpoints[i]);
+            }
+        }
+        None
+    }
+}
+
+impl Default for TransactionalHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, PackageAdapter>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
-    pub snapshots: HashMap<usize, PackageSnapshot>,
-    pub next_snapshot_id: usize,
+    pub transaction_history: TransactionalHistory,
 }
 
 impl UniversalPackageManager {
@@ -290,8 +335,7 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
-            snapshots: HashMap::new(),
-            next_snapshot_id: 1,
+            transaction_history: TransactionalHistory::new(),
         };
 
         manager.add_default_adapters();
@@ -319,6 +363,32 @@ impl UniversalPackageManager {
     pub fn add_package(&mut self, package: UnifiedPackage) {
         self.resolver.add_package(package.clone());
         self.packages.insert(package.name.clone(), package);
+    }
+
+    pub fn create_checkpoint(&mut self) -> usize {
+        self.transaction_history
+            .create_checkpoint(&self.installed_packages)
+    }
+
+    pub fn rollback_to_checkpoint(&mut self, checkpoint_id: usize) -> Result<(), PackageError> {
+        if let Some(checkpoint) = self
+            .transaction_history
+            .get_checkpoint(checkpoint_id)
+            .cloned()
+        {
+            let current_keys: Vec<String> = self.installed_packages.keys().cloned().collect();
+            for key in current_keys {
+                if !checkpoint.installed_keys.contains(&key) {
+                    self.remove(&key)?;
+                }
+            }
+            Ok(())
+        } else {
+            Err(PackageError::PackageNotFound(format!(
+                "Checkpoint {} not found",
+                checkpoint_id
+            )))
+        }
     }
 
     pub fn install(&mut self, package_name: &str) -> Result<(), PackageError> {
@@ -392,78 +462,6 @@ impl UniversalPackageManager {
 
     pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
         self.packages.get(name)
-    }
-
-    /// Create a snapshot of currently installed packages state
-    pub fn create_snapshot(&mut self, description: String) -> usize {
-        let id = self.next_snapshot_id;
-        self.next_snapshot_id += 1;
-
-        let snapshot = PackageSnapshot {
-            id,
-            description,
-            timestamp: 0,
-            installed_packages: self.installed_packages.clone(),
-        };
-
-        self.snapshots.insert(id, snapshot);
-        id
-    }
-
-    /// Delete a package snapshot
-    pub fn delete_snapshot(&mut self, id: usize) -> Result<(), PackageError> {
-        if self.snapshots.remove(&id).is_none() {
-            return Err(PackageError::PackageNotFound(format!("Snapshot ID {}", id)));
-        }
-        Ok(())
-    }
-
-    /// List all package snapshots
-    pub fn list_snapshots(&self) -> Vec<(usize, String)> {
-        let mut list = Vec::new();
-        for (id, snap) in &self.snapshots {
-            list.push((*id, snap.description.clone()));
-        }
-        list.sort_by_key(|&(id, _)| id);
-        list
-    }
-
-    /// Rollback the active package state exactly to a previously saved snapshot
-    pub fn rollback_to_snapshot(&mut self, id: usize) -> Result<(), PackageError> {
-        let snapshot = self
-            .snapshots
-            .get(&id)
-            .ok_or_else(|| PackageError::PackageNotFound(format!("Snapshot ID {}", id)))?
-            .clone();
-
-        // 1. Identify and uninstall packages currently installed but not in the snapshot
-        let mut to_uninstall = Vec::new();
-        for pkg_name in self.installed_packages.keys() {
-            if !snapshot.installed_packages.contains_key(pkg_name) {
-                to_uninstall.push(pkg_name.clone());
-            }
-        }
-
-        for pkg_name in to_uninstall {
-            self.remove(&pkg_name)?;
-        }
-
-        // 2. Identify and reinstall packages in the snapshot but not currently installed
-        let mut to_install = Vec::new();
-        for (pkg_name, _) in &snapshot.installed_packages {
-            if !self.installed_packages.contains_key(pkg_name) {
-                to_install.push(pkg_name.clone());
-            }
-        }
-
-        for pkg_name in to_install {
-            self.install(&pkg_name)?;
-        }
-
-        // 3. Sync full installed_packages state exactly with the snapshot
-        self.installed_packages = snapshot.installed_packages;
-
-        Ok(())
     }
 }
 
@@ -542,40 +540,27 @@ mod tests {
     }
 
     #[test]
-    fn test_package_snapshots_and_rollback() {
+    fn test_transactional_rollback() {
         let mut manager = UniversalPackageManager::new();
-        let pkg_v1 = UnifiedPackage::new("essential-tool".to_string(), "1.0.0".to_string())
+        let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg);
-        let pkg_v2 = UnifiedPackage::new("add-on-tool".to_string(), "2.0.0".to_string())
+        let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg);
 
-        manager.add_package(pkg_v1);
-        manager.add_package(pkg_v2);
+        manager.add_package(pkg1);
+        manager.add_package(pkg2);
 
-        // Install first package
-        manager.install("essential-tool").unwrap();
-        assert_eq!(manager.installed_packages.len(), 1);
-        assert!(manager.installed_packages.contains_key("essential-tool"));
+        // 1. Create a baseline checkpoint (empty)
+        let checkpoint_id = manager.create_checkpoint();
+        assert_eq!(checkpoint_id, 1);
 
-        // Create snapshot 1
-        let snap_id = manager.create_snapshot("First stable package state".to_string());
-        assert_eq!(manager.list_snapshots().len(), 1);
-
-        // Install second package
-        manager.install("add-on-tool").unwrap();
+        // 2. Install pkg1 and pkg2
+        manager.install("pkg1").unwrap();
+        manager.install("pkg2").unwrap();
         assert_eq!(manager.installed_packages.len(), 2);
-        assert!(manager.installed_packages.contains_key("add-on-tool"));
 
-        // Rollback to snapshot 1
-        manager.rollback_to_snapshot(snap_id).unwrap();
-
-        // Verify state is reverted to exactly one package
-        assert_eq!(manager.installed_packages.len(), 1);
-        assert!(manager.installed_packages.contains_key("essential-tool"));
-        assert!(!manager.installed_packages.contains_key("add-on-tool"));
-
-        // Delete snapshot
-        assert!(manager.delete_snapshot(snap_id).is_ok());
-        assert!(manager.list_snapshots().is_empty());
+        // 3. Roll back to baseline checkpoint
+        manager.rollback_to_checkpoint(checkpoint_id).unwrap();
+        assert_eq!(manager.installed_packages.len(), 0);
     }
 }

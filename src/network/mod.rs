@@ -1,9 +1,6 @@
 // SigmaOS Network Stack Module
-pub mod stack;
-pub mod tcp;
 pub mod enterprise;
-pub mod tcp_udp;
-pub mod wireless;
-pub mod zero_trust;
+pub mod tcp;
 
+pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};

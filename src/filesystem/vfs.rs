@@ -90,11 +90,12 @@ impl FileDescriptor {
 
 /// Virtual Filesystem
 pub struct VirtualFilesystem {
-    inodes: HashMap<u64, Inode>,
+    pub inodes: HashMap<u64, Inode>,
     next_inode_id: u64,
     root_inode: u64,
     file_descriptors: HashMap<u64, FileDescriptor>,
     next_fd: u64,
+    pub directory_paths: HashMap<String, u64>,
 }
 
 impl VirtualFilesystem {
@@ -105,14 +106,31 @@ impl VirtualFilesystem {
             root_inode: 0,
             file_descriptors: HashMap::new(),
             next_fd: 0,
+            directory_paths: HashMap::new(),
         };
 
         // Create root directory
         let root = Inode::new(0, FileType::Directory, 0);
         fs.inodes.insert(0, root);
         fs.root_inode = 0;
+        fs.directory_paths.insert("/".to_string(), 0);
 
         fs
+    }
+
+    /// Seed the filesystem with standard Linux-inspired directory hierarchies (/bin, /etc, /var, /home, /sys, /proc, /dev, /tmp)
+    pub fn seed_standard_hierarchy(&mut self) -> Result<(), FsError> {
+        let directories = [
+            "/bin", "/etc", "/var", "/home", "/sys", "/proc", "/dev", "/tmp", "/boot", "/root",
+            "/opt",
+        ];
+
+        for &dir in &directories {
+            let inode_id = self.create_file(FileType::Directory, 0)?;
+            self.directory_paths.insert(dir.to_string(), inode_id);
+        }
+
+        Ok(())
     }
 
     pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
@@ -283,6 +301,20 @@ mod tests {
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         let fd = vfs.open_file(inode_id, 0).unwrap();
         assert!(vfs.close_file(fd).is_ok());
+    }
+
+    #[test]
+    fn test_standard_hierarchy_seeding() {
+        let mut vfs = VirtualFilesystem::new();
+        assert!(vfs.seed_standard_hierarchy().is_ok());
+
+        assert!(vfs.directory_paths.contains_key("/bin"));
+        assert!(vfs.directory_paths.contains_key("/etc"));
+        assert!(vfs.directory_paths.contains_key("/home"));
+
+        let bin_inode_id = vfs.directory_paths.get("/bin").unwrap();
+        let bin_inode = vfs.get_inode(*bin_inode_id).unwrap();
+        assert_eq!(bin_inode.file_type, FileType::Directory);
     }
 
     #[test]
