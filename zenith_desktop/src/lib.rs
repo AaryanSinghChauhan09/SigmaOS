@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // Zenith Desktop Compositor Specification
 // Polished compositor with accessibility, adaptive profiles, and declarative theming
 

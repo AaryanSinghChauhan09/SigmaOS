@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Journalctl Compatibility Layer
 //! Journal logging system compatibility (systemd journal)
 //! Zero external dependencies

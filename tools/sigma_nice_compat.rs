@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Nice Compatibility
 //! Process priority management (nice command)
 //! Zero external dependencies

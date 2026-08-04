@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Cat Compatibility
 //! Concatenate and print files (cat command)
 //! Zero external dependencies

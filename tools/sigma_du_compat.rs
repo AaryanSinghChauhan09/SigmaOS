@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Disk Usage Compatibility
 //! Directory space usage (du command)
 //! Zero external dependencies

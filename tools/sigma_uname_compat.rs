@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Uname Compatibility
 //! System information (uname command)
 //! Zero external dependencies

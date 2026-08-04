@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Groupadd Compatibility
 //! Group management (groupadd command)
 //! Zero external dependencies

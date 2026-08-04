@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS RERA Act, 2016 Compatibility
 //! Real Estate Regulatory Authority compliance auditor
 //! Zero external dependencies

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Guix Compatibility Layer
 //! Guix compatibility for GNU Guix
 //! Zero external dependencies

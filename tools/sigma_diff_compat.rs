@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Diff Compatibility
 //! Compare files line by line (diff command)
 //! Zero external dependencies

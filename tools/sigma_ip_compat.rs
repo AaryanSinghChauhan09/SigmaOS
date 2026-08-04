@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS IP Command Compatibility
 //! Network configuration (ip command)
 //! Zero external dependencies

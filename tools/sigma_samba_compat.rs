@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Samba Compatibility
 //! Samba/SMB Protocol client and server utilities
 //! Zero external dependencies

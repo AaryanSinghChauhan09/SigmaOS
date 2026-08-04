@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Flatpak Compatibility Layer
 //! Flatpak compatibility for Linux application distribution
 //! Zero external dependencies

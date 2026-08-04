@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS APK Compatibility Layer
 //! APK compatibility for Alpine Linux
 //! Zero external dependencies

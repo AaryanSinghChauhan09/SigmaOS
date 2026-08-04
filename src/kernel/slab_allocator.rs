@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // Slab Allocator - Linux-style efficient small object allocation
 // Reduces fragmentation by caching freed objects of similar sizes
 

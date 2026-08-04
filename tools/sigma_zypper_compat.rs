@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Zypper Compatibility Layer
 //! Zypper compatibility for openSUSE/SUSE
 //! Zero external dependencies

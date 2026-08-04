@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Fdisk Compatibility
 //! Disk partitioning (fdisk command)
 //! Zero external dependencies

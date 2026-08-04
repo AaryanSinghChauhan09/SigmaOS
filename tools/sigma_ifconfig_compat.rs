@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Ifconfig Compatibility
 //! Network interface configuration (ifconfig command)
 //! Zero external dependencies

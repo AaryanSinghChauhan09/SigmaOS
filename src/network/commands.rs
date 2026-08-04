@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // SigmaOS Linux-Parity Composable Networking Commands Engine
 // Zero-dependency, #![no_std] compliant, stateful iptables/netfilter, iproute2, ss, ping implementation
 

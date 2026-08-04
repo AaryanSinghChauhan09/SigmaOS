@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Awk Compatibility
 //! Pattern scanning and processing language (awk command)
 //! Zero external dependencies

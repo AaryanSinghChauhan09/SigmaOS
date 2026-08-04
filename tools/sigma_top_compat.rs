@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Top Process Monitor Compatibility
 //! Real-time process monitoring (top command)
 //! Zero external dependencies

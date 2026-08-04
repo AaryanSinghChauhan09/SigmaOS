@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Uniq Compatibility
 //! Filter adjacent matching lines (uniq command)
 //! Zero external dependencies

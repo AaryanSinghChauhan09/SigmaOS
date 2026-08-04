@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Wc Compatibility
 //! Word, line, byte, and character count (wc command)
 //! Zero external dependencies

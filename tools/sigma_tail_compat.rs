@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Tail Compatibility
 //! Output end of files (tail command)
 //! Zero external dependencies

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Ping Compatibility
 //! Network connectivity testing (ping command)
 //! Zero external dependencies

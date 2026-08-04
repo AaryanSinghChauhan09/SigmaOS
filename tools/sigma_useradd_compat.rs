@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Useradd Compatibility
 //! User account management (useradd command)
 //! Zero external dependencies

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Local LLM Inference Optimization Module
 //! 
 //! This module provides optimized local large language model inference,

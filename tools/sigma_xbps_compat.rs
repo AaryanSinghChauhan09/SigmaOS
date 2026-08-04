@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS XBPS Compatibility Layer
 //! XBPS compatibility for Void Linux
 //! Zero external dependencies

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! # SigmaOffice - Sovereign Office Suite
 //!
 //! This module implements SigmaOffice, a zero-overhead document suite that replaces

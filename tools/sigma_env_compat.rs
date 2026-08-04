@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Environment Variable Compatibility
 //! Environment variable management (env command)
 //! Zero external dependencies

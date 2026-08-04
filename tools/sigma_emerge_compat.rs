@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Emerge Compatibility Layer
 //! Emerge compatibility for Gentoo Linux
 //! Zero external dependencies

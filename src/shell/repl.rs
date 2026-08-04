@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 

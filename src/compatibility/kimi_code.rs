@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 /// Custom Moonshot AI Kimi-Code Code Generation Subsystems for SigmaOS
 /// Implements Self-Healing Code Generator, Context Pruner, AST-Aware Structural Editor, and License Attribution Guards
 extern crate alloc;

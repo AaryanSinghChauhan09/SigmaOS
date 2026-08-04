@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Kill Compatibility
 //! Process signal sending (kill command)
 //! Zero external dependencies

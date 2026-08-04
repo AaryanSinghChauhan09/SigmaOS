@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Tar Compatibility
 //! Archive creation and extraction (tar command)
 //! Zero external dependencies

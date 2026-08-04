@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS List Block Devices Compatibility
 //! Block device listing (lsblk command)
 //! Zero external dependencies

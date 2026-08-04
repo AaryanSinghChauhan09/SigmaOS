@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Timedatectl Compatibility
 //! System time and date management (timedatectl command)
 //! Zero external dependencies

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 use core::mem;
 /// OOP-based Device Driver Framework for SigmaOS
 /// Implements device drivers using OOP principles with traits and structs

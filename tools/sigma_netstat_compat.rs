@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Network Statistics Compatibility
 //! Network connection monitoring (netstat command)
 //! Zero external dependencies

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS SSH Compatibility
 //! Secure shell client (ssh command)
 //! Zero external dependencies

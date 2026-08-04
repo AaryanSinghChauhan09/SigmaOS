@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Slackpkg Compatibility Layer
 //! Slackpkg compatibility for Slackware Linux
 //! Zero external dependencies

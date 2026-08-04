@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Cut Compatibility
 //! Remove sections from lines (cut command)
 //! Zero external dependencies

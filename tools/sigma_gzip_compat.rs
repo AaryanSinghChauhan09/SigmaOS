@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Gzip Compatibility
 //! Gzip compression/decompression (gzip command)
 //! Zero external dependencies

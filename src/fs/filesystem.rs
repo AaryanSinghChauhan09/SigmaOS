@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 #![no_std]
 #![no_main]
 

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Sort Compatibility
 //! Sort lines of text (sort command)
 //! Zero external dependencies

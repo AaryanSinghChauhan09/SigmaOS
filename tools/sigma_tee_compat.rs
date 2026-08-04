@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Tee Compatibility
 //! Read from stdin and write to stdout and files (tee command)
 //! Zero external dependencies

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Mount Compatibility
 //! Filesystem mounting (mount command)
 //! Zero external dependencies

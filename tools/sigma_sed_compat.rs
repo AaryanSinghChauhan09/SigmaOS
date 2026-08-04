@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Sed Compatibility
 //! Stream editor (sed command)
 //! Zero external dependencies

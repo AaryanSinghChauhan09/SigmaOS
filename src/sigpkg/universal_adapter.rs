@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // Universal Package Adapter System
 // OOPS-based design to support all Linux distro package formats in SigmaOS
 

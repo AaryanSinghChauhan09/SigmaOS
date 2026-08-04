@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Find Compatibility
 //! File search (find command)
 //! Zero external dependencies

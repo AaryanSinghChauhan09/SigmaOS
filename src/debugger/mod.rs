@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Debugger Module
 //!
 //! This module provides debugging tools for the SigmaOS kernel and userland applications,

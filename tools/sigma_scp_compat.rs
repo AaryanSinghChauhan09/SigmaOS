@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS SCP Compatibility
 //! Secure copy (scp command)
 //! Zero external dependencies

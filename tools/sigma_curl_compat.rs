@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Curl Compatibility
 //! Data transfer tool (curl command)
 //! Zero external dependencies

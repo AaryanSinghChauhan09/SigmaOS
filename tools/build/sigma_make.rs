@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // SigmaOS: Σ SigmaOS — sigma_make: Sovereign Build System
 // Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 // All types hand-defined. OOP via struct + impl + trait patterns.

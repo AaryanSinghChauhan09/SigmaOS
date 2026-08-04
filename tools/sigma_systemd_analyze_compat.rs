@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Systemd-Analyze Compatibility
 //! Boot time analysis (systemd-analyze command)
 //! Zero external dependencies

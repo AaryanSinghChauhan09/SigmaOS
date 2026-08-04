@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // Advanced Routing - Linux-style routing table management
 // Supports multiple routing tables, route caching, and policy routing
 

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Grep Compatibility
 //! Text search (grep command)
 //! Zero external dependencies

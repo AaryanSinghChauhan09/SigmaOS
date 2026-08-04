@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Chown Compatibility
 //! File ownership modification (chown command)
 //! Zero external dependencies

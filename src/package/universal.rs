@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak
 

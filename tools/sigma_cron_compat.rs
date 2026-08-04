@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! SigmaOS Cron Compatibility Layer
 //! Cron job scheduling compatibility
 //! Zero external dependencies
