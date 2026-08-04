@@ -14,6 +14,14 @@ pub mod legacy_adapters;
 pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
+||||||| 52d783ca0
+pub mod linux_security;
+pub mod standards;
+pub mod overtake;
+pub mod linux_security;
+pub mod standards;
+pub mod overtake;
+pub mod arch_linux;
 
 pub use freedos::{ConfigSysSetting, FatDirectoryEntry, FreeDosEmulator, TsrProgram};
 pub use legacy_adapters::{
@@ -52,6 +60,12 @@ pub use cross_platform::{
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
 pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
+
+pub use arch_linux::{
+    ArchInitSystem, ArchFirewall, LsmSentinel, PamGate, TmuxMultiplexer,
+    ProcFile, ProcFileType, DevFile, DevFileType, PacmanEngine, ArchPackage,
+    SovereignEnvRegistry,
+};
 
 pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,

@@ -14,7 +14,10 @@ pub use lift_engine::{
     Citation, DocumentExtractor, ExtractionResult, ExtractionSchema, FieldType, LiftError,
 };
 
-pub use agent::{AIAgent, SimpleAIAgent};
+pub use agent::{
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    Pattern, SimpleAIAgent, SimpleAIAgentManager,
+};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,

@@ -810,6 +810,14 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 }
 
+/// AI Agent metadata info
+#[derive(Debug, Clone)]
+pub struct AgentInfo {
+    pub name: String,
+    pub description: String,
+    pub capabilities: Vec<String>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

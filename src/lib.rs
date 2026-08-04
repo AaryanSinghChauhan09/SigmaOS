@@ -14,6 +14,11 @@
 // Core library for SigmaOS operating system
 #![allow(clippy::all, unused)]
 
+||||||| 52d783ca0
+pub mod klib;
+extern crate alloc;
+
+pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -53,6 +58,12 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod init;
+||||||| 52d783ca0
+pub mod gpu;
+pub mod graphics;
+pub mod gpu;
+pub mod graphics;
+pub mod init;
 pub mod kernel;
 pub mod klib;
 pub mod ml;
@@ -86,6 +97,10 @@ pub mod interrupt;
 pub mod kernel;
 pub mod klib;
 pub mod logging;
+||||||| 52d783ca0
+pub mod klib;
+pub mod media;
+pub mod media;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -146,6 +161,17 @@ pub use arch::cpu_sys::{
     FastSyscallDispatcher as CpuFastSyscallDispatcher, GdtDescriptor as CpuGdtDescriptor,
     IdtGate as CpuIdtGate, ProcessorInitSuite as CpuProcessorInitSuite,
     SegmentType as CpuSegmentType, VirtualMemoryRegion as CpuVirtualMemoryRegion,
+||||||| 52d783ca0
+pub use ai::{
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    ManagerCapability as AiManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    SovereignWikiEngine, WikiArticle, ApmDependency, ApmLockfile, ApmManifest, ApmPolicy,
+    ApmStatus, DependencySource, McpServer, SovereignApmEngine,
+pub use ai::{
+    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
+    Pattern, SimpleAIAgent, SimpleAIAgentManager,
+    SovereignWikiEngine, WikiArticle, ApmDependency, ApmLockfile, ApmManifest, ApmPolicy,
+    ApmStatus, DependencySource, McpServer, SovereignApmEngine,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -156,6 +182,66 @@ pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ConfigSysSetting, ContainerRuntime, FatDirectoryEntry, FreeDosEmulator, TargetPlatform,
     TranslationLayer, TsrProgram,
+||||||| 52d783ca0
+    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
+    CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
+    EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub,
+    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
+    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, LsbProfile, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation,
+    SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
+    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
+    YayAurHelper, ZeroTrustConstellation,
+    StarlingCompositor, StarlingWidgetTree, StarlingX11Server, StarlingTilingEngine,
+    CosmicDesktopEngine, PopShellTiling, System76Scheduler, System76PowerSwitcher,
+    BudgieAppletManager, BudgieShuffler, BudgieLayoutSwitcher,
+    RhinoPkgUnified, PacstallAur, UnicornDesktopShell,
+    MokshaDesktopEngine, BodhiProfileSelector, MokshaGadgetManager,
+    PantheonGalaWindowManager, GraniteHigLibrary, ElementaryAppCenter,
+    UbuntuDockManager, SnapcraftRuntime, UbuntuProEsm,
+    MaasProvisioner, JujuOrchestrator, MultipassVmlight,
+    ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
+    DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
+    LizardInstaller, CoasAdminSuite,
+};
+pub use container::{
+    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
+    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
+    SimpleContainer, SimpleContainerRuntime,
+    ArchInitSystem, ArchFirewall, LsmSentinel, PamGate, TmuxMultiplexer,
+    ProcFile, ProcFileType, DevFile, DevFileType, PacmanEngine, ArchPackage,
+    SovereignEnvRegistry,
+    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
+    CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
+    EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub,
+    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
+    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, LsbProfile, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation,
+    SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
+    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
+    YayAurHelper, ZeroTrustConstellation,
+    StarlingCompositor, StarlingWidgetTree, StarlingX11Server, StarlingTilingEngine,
+    CosmicDesktopEngine, PopShellTiling, System76Scheduler, System76PowerSwitcher,
+    BudgieAppletManager, BudgieShuffler, BudgieLayoutSwitcher,
+    RhinoPkgUnified, PacstallAur, UnicornDesktopShell,
+    MokshaDesktopEngine, BodhiProfileSelector, MokshaGadgetManager,
+    PantheonGalaWindowManager, GraniteHigLibrary, ElementaryAppCenter,
+    UbuntuDockManager, SnapcraftRuntime, UbuntuProEsm,
+    MaasProvisioner, JujuOrchestrator, MultipassVmlight,
+    ZorinLookChanger, ZorinConnectBridge, ZorinWinePreflight,
+    DrakxtoolsSuite, HarddrakeDetector, UrpmiPackageResolver,
+    LizardInstaller, CoasAdminSuite,
+};
+pub use container::{
+    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
+    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
+    SimpleContainer, SimpleContainerRuntime,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -178,6 +264,11 @@ pub use init::{
     InitError, InitSystem, Runlevel, SELinuxPort, SecurityPort, Service as InitService,
     ServiceMonitor, ServiceState as InitServiceState, SigmaInit, SimpleDependencyResolver,
     SimpleService as InitSimpleService, SimpleServiceMonitor, UEFIPort, ZeroTrustPort,
+};
+pub use init::{
+    InitError as InitSystemError, Service as InitService, ServiceState as InitServiceState,
+    SigmaInit, SimpleService as InitSimpleService, SystemdEngine, SystemdUnit,
+    UnitState as SystemdUnitState, UnitType as SystemdUnitType,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, KernelModule as LkmModule, KpatchManager,
@@ -292,6 +383,7 @@ pub use network::{
     SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
     UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
 };
+pub use core::ops::Deref;
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -314,6 +406,23 @@ pub use performance::{
 pub use productivity::{
     Achievement, AchievementType, AudioChannel, GamifiedProductivity, Goal, PomodoroState,
     PomodoroTimer, ProductivityScore, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE,
+||||||| 52d783ca0
+    Achievement, AchievementType, AegisubEngine, GamifiedProductivity, Goal, PomodoroState,
+    PomodoroTimer, ProductivityScore, SubtitleEditEngine, SubtitleEntry, SubtitleFormat,
+};
+pub use remote::{
+    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
+    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    SimpleShellManager,
+    Achievement, AchievementType, AegisubEngine, GamifiedProductivity, Goal, PomodoroState,
+    PomodoroTimer, ProductivityScore, SubtitleEditEngine, SubtitleEntry, SubtitleFormat,
+};
+pub use remote::{
+    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
+    RemoteSession as _, RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager,
+    SigmaRendezvous, SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
+    SimpleShellManager,
 };
 pub use resilience::{
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
