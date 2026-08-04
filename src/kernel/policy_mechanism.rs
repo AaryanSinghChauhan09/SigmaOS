@@ -108,16 +108,48 @@ impl ProtectionDomain {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InterruptClass {
+    Program,
+    Timer,
+    IO,
+    HardwareFailure,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InstructionCyclePhase {
+    Fetch,
+    Decode,
+    Execute,
+    Writeback,
+    InterruptCheck,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoWaitProfile {
+    ShortIoWait,
+    LongIoWait,
+    None,
+}
+
 /// 3. Interrupt Handling & Privilege Levels (InterruptMechanism)
 /// Routes interrupts and validates execution privilege modes.
 pub struct InterruptMechanism {
     registered_handlers: [Option<usize>; 256], // Mock function pointer offsets
+    active_interrupts: usize,
+    hardware_failures: usize,
+    short_io_waits: usize,
+    long_io_waits: usize,
 }
 
 impl InterruptMechanism {
     pub const fn new() -> Self {
         Self {
             registered_handlers: [None; 256],
+            active_interrupts: 0,
+            hardware_failures: 0,
+            short_io_waits: 0,
+            long_io_waits: 0,
         }
     }
 
@@ -141,6 +173,58 @@ impl InterruptMechanism {
         } else {
             Ok(PrivilegeLevel::KernelMode)
         }
+    }
+
+    /// Routes specific interrupt classes and profiles I/O latency based on class
+    pub fn dispatch_interrupt_class(
+        &mut self,
+        class: InterruptClass,
+        vector: u8,
+    ) -> Result<IoWaitProfile, PolicyError> {
+        if self.registered_handlers[vector as usize].is_none() {
+            return Err(PolicyError::PermissionDenied);
+        }
+
+        self.active_interrupts += 1;
+
+        match class {
+            InterruptClass::Program => {
+                Ok(IoWaitProfile::None)
+            }
+            InterruptClass::Timer => {
+                Ok(IoWaitProfile::None)
+            }
+            InterruptClass::IO => {
+                let profile = if vector % 2 == 0 {
+                    self.short_io_waits += 1;
+                    IoWaitProfile::ShortIoWait
+                } else {
+                    self.long_io_waits += 1;
+                    IoWaitProfile::LongIoWait
+                };
+                Ok(profile)
+            }
+            InterruptClass::HardwareFailure => {
+                self.hardware_failures += 1;
+                Ok(IoWaitProfile::None)
+            }
+        }
+    }
+
+    pub fn active_interrupts(&self) -> usize {
+        self.active_interrupts
+    }
+
+    pub fn hardware_failures(&self) -> usize {
+        self.hardware_failures
+    }
+
+    pub fn short_io_waits(&self) -> usize {
+        self.short_io_waits
+    }
+
+    pub fn long_io_waits(&self) -> usize {
+        self.long_io_waits
     }
 }
 
@@ -233,5 +317,58 @@ mod tests {
         let prev_ex = ipc.fast_exchange(99);
         assert_eq!(prev_ex, 42);
         assert_eq!(ipc.current_message(), 99);
+    }
+
+    #[test]
+    fn test_interrupt_classes_and_tlb() {
+        let mut interrupts = InterruptMechanism::new();
+        interrupts.register_handler(13, 0x1000); // program handler
+        interrupts.register_handler(18, 0x2000); // hardware failure handler
+
+        // Dispatch a program interrupt
+        let res1 = interrupts.dispatch_interrupt_class(InterruptClass::Program, 13);
+        assert!(res1.is_ok());
+        assert_eq!(res1.unwrap(), IoWaitProfile::None);
+
+        // Dispatch a hardware failure interrupt
+        let res2 = interrupts.dispatch_interrupt_class(InterruptClass::HardwareFailure, 18);
+        assert!(res2.is_ok());
+        assert_eq!(res2.unwrap(), IoWaitProfile::None);
+
+        assert_eq!(interrupts.active_interrupts(), 2);
+        assert_eq!(interrupts.hardware_failures(), 1);
+    }
+
+    #[test]
+    fn test_instruction_cycles_interrupt_check() {
+        let current_phase = InstructionCyclePhase::InterruptCheck;
+        assert_eq!(current_phase, InstructionCyclePhase::InterruptCheck);
+
+        let mut phases = [
+            InstructionCyclePhase::Fetch,
+            InstructionCyclePhase::Decode,
+            InstructionCyclePhase::Execute,
+            InstructionCyclePhase::Writeback,
+            InstructionCyclePhase::InterruptCheck,
+        ];
+        assert_eq!(phases[4], InstructionCyclePhase::InterruptCheck);
+    }
+
+    #[test]
+    fn test_io_wait_latency_profiling() {
+        let mut interrupts = InterruptMechanism::new();
+        interrupts.register_handler(0x20, 0x3000); // Even vector
+        interrupts.register_handler(0x21, 0x4000); // Odd vector
+
+        // Even vector IO -> Short I/O Wait
+        let res1 = interrupts.dispatch_interrupt_class(InterruptClass::IO, 0x20);
+        assert_eq!(res1.unwrap(), IoWaitProfile::ShortIoWait);
+
+        // Odd vector IO -> Long I/O Wait
+        let res2 = interrupts.dispatch_interrupt_class(InterruptClass::IO, 0x21);
+        assert_eq!(res2.unwrap(), IoWaitProfile::LongIoWait);
+
+        assert_eq!(interrupts.short_io_waits(), 1);
+        assert_eq!(interrupts.long_io_waits(), 1);
     }
 }

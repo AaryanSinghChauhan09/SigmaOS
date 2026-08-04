@@ -11,6 +11,6 @@ pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use tcp_udp::{
     Protocol, TCPState as UdpTcpState, NetworkError as UdpNetworkError, Socket, SimpleSocket,
     TCPConnection as UdpTCPConnection, UDPSocket, RenoCongestionControl, BBRCongestionControl,
-    Firewall, NetfilterFirewall,
+    FirewallTarget, FirewallChain, ConntrackState, FirewallRule, Firewall as IptablesFirewall,
     SimpleFirewall, ZeroCopy, ZeroCopyNetwork, NetworkStack as CoreNetworkStack, SimpleNetworkStack,
 };

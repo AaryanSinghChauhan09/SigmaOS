@@ -6,5 +6,6 @@ pub mod sigma_sh;
 pub use command::{CommandError, ShellSession, SimpleShellSession};
 pub use repl::{ShellCommand, ShellRepl};
 pub use sigma_sh::{
-    SimpleShell, SimpleShellHistory, SimpleShellEnvironment,
+    CronJob, LogEntry, LogLevel, Privilege, Service, SigmaCoreUtils, SigmaCron, SigmaDoc,
+    SigmaInit, SigmaLog, SigmaPriv,
 };

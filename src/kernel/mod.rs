@@ -7,7 +7,6 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod traits;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
@@ -24,6 +23,5 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use traits::SchedulerError;
