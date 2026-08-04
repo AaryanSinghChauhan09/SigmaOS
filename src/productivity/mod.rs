@@ -1,5 +1,4 @@
 // SigmaOS Productivity Module
-pub mod advanced_app_absorber;
 pub mod gamification;
 pub mod media;
 pub mod notes;
@@ -8,15 +7,9 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
-#[cfg(any())]
 pub mod advanced_app_absorber;
 pub mod tmux;
 
-pub use advanced_app_absorber::{
-    AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter, EverythingSearchEngine,
-    NotepadPlusWorkspace, ObsStudioMixer, OneCommanderDualPane, PotPlayerVlcEngine,
-    SevenZipCompressor, ShareXFlameshotEngine,
-};
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
@@ -35,9 +28,9 @@ pub use screenshot::{
     ScreenshotMode, ScreenshotResult, ScreenshotTool, WaylandBackend, WindowsBackend, X11Backend,
 };
 pub use sigma_office::{
-    CellValue, ChartType, DocumentMetadata as SigmaDocumentMetadata, DocumentNode, DocumentType, PresentationProcessor,
-    ShapeType, SigmaDocument, SigmaOffice, SlideElementType, SpreadsheetProcessor, TextProcessor,
-    TypographyRenderer,
+    CellValue, ChartType, DocumentMetadata as SigmaOfficeDocumentMetadata, DocumentNode,
+    DocumentType, PresentationProcessor, ShapeType, SigmaDocument, SigmaOffice, SlideElementType,
+    SpreadsheetProcessor, TextProcessor, TypographyRenderer,
 };
 pub use tasks::{
     InMemoryStorage, KanbanBoard, KanbanColumn, Project, Reminder, ReminderType, Subtask, Task,

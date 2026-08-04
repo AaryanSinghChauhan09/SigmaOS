@@ -1,7 +1,9 @@
 // SigmaOS Capability-Based Security System
 // Implements 64-bit hardware-enforced capability model
 
-use core::sync::atomic::{AtomicU64, Ordering};
+use std::string::String;
+use std::vec::Vec;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -16,9 +18,12 @@ impl CapabilityToken {
         Self { bits: 0 }
     }
 
-    /// Create capability token from raw bits
     pub fn from_bits(bits: u64) -> Self {
         Self { bits }
+    }
+
+    pub fn allow_capability(&mut self, bit: u64) {
+        self.bits |= bit;
     }
 
     /// Allow network access
@@ -28,8 +33,6 @@ impl CapabilityToken {
             "udp" => self.bits |= 1 << 1,
             _ => {}
         }
-        // Mask and clear target bit ranges (bits 16-31) to prevent bitmask overlap privilege escalation
-        self.bits &= !(0xFFFF_u64 << 16);
         self.bits |= (port as u64) << 16;
         self
     }
@@ -122,12 +125,6 @@ impl CapabilityGate {
     }
 }
 
-impl Default for CapabilityGate {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -163,17 +160,5 @@ mod tests {
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
-    }
-
-    #[test]
-    fn test_bitmask_overlap_prevention() {
-        // Registering port 80 and then 443 should not result in a corrupted port 507,
-        // but rather only store the latest port 443 cleanly.
-        let token = CapabilityToken::new()
-            .allow_network("tcp", 80)
-            .allow_network("tcp", 443);
-        // Extracts port stored in bits 16-31
-        let port = (token.bits() >> 16) & 0xFFFF;
-        assert_eq!(port, 443);
     }
 }

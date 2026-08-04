@@ -1,17 +1,11 @@
 // SigmaOS Network Stack Module
-pub mod ring_buffer_stack;
+pub mod stack;
 pub mod tcp;
 pub mod tcp_udp;
-pub mod protocols;
+pub mod ring_buffer_stack;
 
-pub use ring_buffer_stack::{
-    compute_checksum, IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket,
-    TcpState as RingTcpState, ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
-};
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-
-pub use protocols::{
-    DnsError, DnsResolver, MDnsDiscovery, QuicConnection, QuicError,
+pub use ring_buffer_stack::{
+    IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket, TcpState as RingTcpState,
+    compute_checksum, ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
 };
-
-pub use crate::net::ZeroCopyPacketRing;

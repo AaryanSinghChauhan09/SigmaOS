@@ -6,19 +6,13 @@ pub mod autogen;
 pub mod llm;
 pub mod orchestrator;
 pub mod sai;
-pub mod openclaw;
 pub mod system;
 pub mod voice;
-pub mod open_computer;
+pub mod lift_engine;
 
-pub use openclaw::{
-    ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
-};
+pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
 
-pub use agent::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
-    Pattern, SimpleAIAgent, SimpleAIAgentManager,
-};
+pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,
@@ -41,8 +35,4 @@ pub use system::{
 pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
-};
-pub use open_computer::{
-    OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
-    AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
 };

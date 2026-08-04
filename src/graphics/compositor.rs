@@ -1,45 +1,13 @@
-#![no_std]
-#![no_main]
+// OOP-based Graphics Compositor for SigmaOS
+// Implements graphics composition using OOP principles with traits and structs
+// No dependency on external graphics frameworks
 
-#[cfg(not(target_os = "none"))]
 extern crate alloc;
-#[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
-
-use core::mem;
-/// OOP-based Graphics Compositor for SigmaOS
-/// Implements graphics composition using OOP principles with traits and structs
-/// No dependency on external graphics frameworks
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-
-pub type CompositorError = GraphicsError;
-pub type CompositorResult<T> = Result<T, CompositorError>;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CompositorStrategy {
-    Direct,
-    DoubleBuffered,
-}
-
-pub struct FramebufferCompositor {
-    pub id: usize,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LayerBlendMode {
-    Normal,
-    Alpha,
-}
-
-pub struct RenderLayer {
-    pub z_order: u32,
-}
-
-pub type SigmaCompositor = SimpleCompositor;
+use alloc::boxed::Box;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Position {
     pub x: i32,
@@ -53,7 +21,6 @@ impl Position {
 }
 
 /// Size
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Size {
     pub width: u32,
@@ -71,7 +38,6 @@ impl Size {
 }
 
 /// Rectangle
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rectangle {
     pub position: Position,
@@ -102,8 +68,7 @@ impl Rectangle {
 }
 
 /// Color (RGBA)
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
@@ -142,7 +107,7 @@ pub trait Surface {
 }
 
 /// Surface info
-#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SurfaceInfo {
     pub width: u32,
     pub height: u32,
@@ -164,8 +129,7 @@ impl SurfaceInfo {
 }
 
 /// Pixel format
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PixelFormat {
     RGB24 = 0,
     RGBA32 = 1,
@@ -174,8 +138,7 @@ pub enum PixelFormat {
 }
 
 /// Surface capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SurfaceCapability {
     pub can_read: bool,
     pub can_write: bool,
@@ -200,11 +163,16 @@ impl SurfaceCapability {
     }
 }
 
+impl Default for SurfaceCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Bitmap surface (OOP: Concrete surface class)
-#[repr(C)]
 pub struct BitmapSurface {
     pub id: usize,
-    pub data: Option<NonNull<u32>>,
+    pub data: Vec<u32>,
     pub size: Size,
     pub stride: u32,
     pub capability: SurfaceCapability,
@@ -213,15 +181,9 @@ pub struct BitmapSurface {
 
 impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
-        let data = unsafe {
-            let size = (width * height) as usize;
-            let ptr = alloc(size * mem::size_of::<u32>()) as *mut u32;
-            if ptr.is_null() {
-                None
-            } else {
-                Some(NonNull::new_unchecked(ptr))
-            }
-        };
+        let size = (width * height) as usize;
+        let mut data = Vec::with_capacity(size);
+        data.resize(size, 0);
 
         BitmapSurface {
             id,
@@ -233,7 +195,7 @@ impl BitmapSurface {
         }
     }
 
-    pub unsafe fn lock(&mut self) -> Result<(), GraphicsError> {
+    pub fn lock(&mut self) -> Result<(), GraphicsError> {
         if !self.capability.can_lock {
             return Err(GraphicsError::PermissionDenied);
         }
@@ -246,7 +208,7 @@ impl BitmapSurface {
         Ok(())
     }
 
-    pub unsafe fn unlock(&mut self) {
+    pub fn unlock(&mut self) {
         self.locked.store(false, Ordering::SeqCst);
     }
 }
@@ -257,30 +219,16 @@ impl Surface for BitmapSurface {
     }
 
     fn data(&self) -> &[u32] {
-        unsafe {
-            if let Some(data) = self.data {
-                let size = (self.size.width * self.size.height) as usize;
-                core::slice::from_raw_parts(data.as_ptr(), size)
-            } else {
-                &[]
-            }
-        }
+        &self.data
     }
 
     fn data_mut(&mut self) -> &mut [u32] {
-        unsafe {
-            if let Some(data) = self.data {
-                let size = (self.size.width * self.size.height) as usize;
-                core::slice::from_raw_parts_mut(data.as_ptr(), size)
-            } else {
-                &mut []
-            }
-        }
+        &mut self.data
     }
 
     fn clear(&mut self, color: Color) {
         let color_value = color.to_u32();
-        for pixel in self.data_mut() {
+        for pixel in &mut self.data {
             *pixel = color_value;
         }
     }
@@ -288,19 +236,16 @@ impl Surface for BitmapSurface {
     fn fill_rect(&mut self, rect: Rectangle, color: Color) {
         let color_value = color.to_u32();
         let stride = self.stride as usize / 4;
-        let height_limit = self.size.height as i32;
-        let width_limit = self.size.width as i32;
+        let limit_y = (rect.position.y + rect.size.height as i32).min(self.size.height as i32);
+        let limit_x = (rect.position.x + rect.size.width as i32).min(self.size.width as i32);
+
         let data = self.data_mut();
 
-        for y in rect.position.y.max(0) as usize
-            ..(rect.position.y + rect.size.height as i32).min(height_limit) as usize
-        {
-            for x in rect.position.x.max(0) as usize
-                ..(rect.position.x + rect.size.width as i32).min(width_limit) as usize
-            {
+        for y in rect.position.y.max(0) as usize..limit_y.max(0) as usize {
+            for x in rect.position.x.max(0) as usize..limit_x.max(0) as usize {
                 let index = y * stride + x;
-                if index < data.len() {
-                    data[index] = color_value;
+                if index < self.data.len() {
+                    self.data[index] = color_value;
                 }
             }
         }
@@ -313,16 +258,6 @@ impl Surface for BitmapSurface {
             stride: self.stride,
             format: PixelFormat::RGBA32,
             capability: self.capability,
-        }
-    }
-}
-
-impl Drop for BitmapSurface {
-    fn drop(&mut self) {
-        unsafe {
-            if let Some(data) = self.data {
-                free(data.as_ptr() as *mut u8);
-            }
         }
     }
 }
@@ -348,7 +283,7 @@ pub trait Window {
 }
 
 /// Window info
-#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowInfo {
     pub id: usize,
     pub title: [u8; 128],
@@ -370,8 +305,7 @@ impl WindowInfo {
 }
 
 /// Window capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WindowCapability {
     pub can_move: bool,
     pub can_resize: bool,
@@ -402,8 +336,13 @@ impl WindowCapability {
     }
 }
 
+impl Default for WindowCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple window (OOP: Concrete window class)
-#[repr(C)]
 pub struct SimpleWindow {
     pub id: usize,
     pub rect: Rectangle,
@@ -455,7 +394,6 @@ impl Window for SimpleWindow {
             return Err(GraphicsError::PermissionDenied);
         }
         self.rect.size = size;
-        // In a real implementation, this would recreate the surface
         Ok(())
     }
 
@@ -498,15 +436,18 @@ pub trait Compositor {
     fn bring_to_front(&mut self, id: usize) -> Result<(), GraphicsError>;
     /// Send window to back
     fn send_to_back(&mut self, id: usize) -> Result<(), GraphicsError>;
-    /// Compose frame
+    /// Compose frame to front buffer (supporting double buffering)
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError>;
     /// Get compositor statistics
     fn stats(&self) -> CompositorStats;
+    /// Dynamic double buffering: Swap front and back display buffers
+    fn swap_buffers(&mut self) -> Result<(), GraphicsError>;
+    /// Captures a screenshot of the currently composed frame
+    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError>;
 }
 
 /// Graphics error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GraphicsError {
     Success = 0,
     InvalidParameter = 1,
@@ -518,7 +459,6 @@ pub enum GraphicsError {
 }
 
 /// Compositor statistics
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompositorStats {
     pub total_windows: usize,
@@ -538,74 +478,24 @@ impl CompositorStats {
     }
 }
 
-#[cfg(target_os = "none")]
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T: 'a> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T: 'a> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+impl Default for CompositorStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 /// Simple compositor (OOP: Concrete compositor class)
 pub struct SimpleCompositor {
-    windows: Vec<Option<Box<dyn Window>>>,
+    windows: Vec<Box<dyn Window>>,
     window_order: Vec<usize>,
     stats: CompositorStats,
     capability: CompositorCapability,
+    pub back_buffer: Option<BitmapSurface>,
+    pub double_buffering: AtomicBool,
 }
 
 /// Compositor capability
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompositorCapability {
     pub can_add_windows: bool,
     pub can_remove_windows: bool,
@@ -630,6 +520,12 @@ impl CompositorCapability {
     }
 }
 
+impl Default for CompositorCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SimpleCompositor {
     pub fn new(capability: CompositorCapability) -> Self {
         SimpleCompositor {
@@ -637,6 +533,13 @@ impl SimpleCompositor {
             window_order: Vec::new(),
             stats: CompositorStats::new(),
             capability,
+            back_buffer: Some(BitmapSurface::new(
+                9999,
+                1920,
+                1080,
+                SurfaceCapability::full(),
+            )),
+            double_buffering: AtomicBool::new(true),
         }
     }
 }
@@ -648,7 +551,7 @@ impl Compositor for SimpleCompositor {
         }
 
         let id = window.id();
-        self.windows.push(Some(window));
+        self.windows.push(window);
         self.window_order.push(id);
         self.stats.total_windows += 1;
         Ok(id)
@@ -659,18 +562,8 @@ impl Compositor for SimpleCompositor {
             return Err(GraphicsError::PermissionDenied);
         }
 
-        let mut index = None;
-        for (i, window_option) in self.windows.iter().enumerate() {
-            if let Some(ref window) = *window_option {
-                if window.id() == id {
-                    index = Some(i);
-                    break;
-                }
-            }
-        }
-
-        if let Some(i) = index {
-            self.windows[i] = None;
+        if let Some(pos) = self.windows.iter().position(|w| w.id() == id) {
+            self.windows.remove(pos);
             self.window_order.retain(|&x| x != id);
             self.stats.total_windows -= 1;
             Ok(())
@@ -680,14 +573,7 @@ impl Compositor for SimpleCompositor {
     }
 
     fn get_window(&mut self, id: usize) -> Option<&mut Box<dyn Window>> {
-        for window_option in &mut self.windows {
-            if let Some(ref mut window) = *window_option {
-                if window.id() == id {
-                    return Some(window);
-                }
-            }
-        }
-        None
+        self.windows.iter_mut().find(|w| w.id() == id)
     }
 
     fn bring_to_front(&mut self, id: usize) -> Result<(), GraphicsError> {
@@ -721,38 +607,76 @@ impl Compositor for SimpleCompositor {
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError> {
         self.stats.frame_count += 1;
 
-        // Clear output
-        output.clear(Color::rgb(0, 0, 0));
+        // If double buffering is enabled, we render to our back buffer first, then copy to output.
+        // Otherwise, we render directly to output.
+        let use_double_buffering = self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
 
-        let output_info = output.info();
-        let output_stride = output_info.stride as usize / 4;
-        let output_data = output.data_mut();
+        if use_double_buffering {
+            let back = self.back_buffer.as_mut().unwrap();
+            back.clear(Color::rgb(0, 0, 0));
 
-        // Compose windows in order (back to front)
-        for &window_id in &self.window_order {
-            if let Some(ref mut window) = self.windows[window_id] {
-                let window_rect = window.rect();
-                if let Some(surface) = window.surface() {
-                    let output_info = output.info();
-                    let output_stride = output_info.stride as usize / 4;
+            // Compose windows in order (back to front)
+            for &window_id in &self.window_order {
+                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                    let window_rect = window.rect();
+                    if let Some(surface) = window.surface() {
+                        let window_stride = surface.info().stride as usize / 4;
+                        let window_data = surface.data();
 
-                    let output_data = output.data_mut();
-                    let window_data = surface.data();
+                        let back_stride = back.info().stride as usize / 4;
+                        let back_data = back.data_mut();
 
-                    let window_stride = surface.info().stride as usize / 4;
+                        // Copy window surface to back buffer
+                        for y in 0..window_rect.size.height as usize {
+                            for x in 0..window_rect.size.width as usize {
+                                let output_x = (window_rect.position.x + x as i32) as usize;
+                                let output_y = (window_rect.position.y + y as i32) as usize;
 
-                    // Copy window surface to output
-                    for y in 0..window_rect.size.height as usize {
-                        for x in 0..window_rect.size.width as usize {
-                            let output_x = (window_rect.position.x + x as i32) as usize;
-                            let output_y = (window_rect.position.y + y as i32) as usize;
+                                let output_index = output_y * back_stride + output_x;
+                                let window_index = y * window_stride + x;
 
-                            let output_index = output_y * output_stride + output_x;
-                            let window_index = y * window_stride + x;
+                                if output_index < back_data.len() && window_index < window_data.len() {
+                                    back_data[output_index] = window_data[window_index];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-                            if output_index < output_data.len() && window_index < window_data.len()
-                            {
-                                output_data[output_index] = window_data[window_index];
+            // Copy back buffer to output
+            let back = self.back_buffer.as_ref().unwrap();
+            let back_data = back.data();
+            let output_data = output.data_mut();
+            let len = back_data.len().min(output_data.len());
+            output_data[..len].copy_from_slice(&back_data[..len]);
+
+        } else {
+            output.clear(Color::rgb(0, 0, 0));
+
+            // Compose windows in order (back to front)
+            for &window_id in &self.window_order {
+                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                    let window_rect = window.rect();
+                    if let Some(surface) = window.surface() {
+                        let window_stride = surface.info().stride as usize / 4;
+                        let window_data = surface.data();
+
+                        let output_stride = output.info().stride as usize / 4;
+                        let output_data = output.data_mut();
+
+                        // Copy window surface to output directly
+                        for y in 0..window_rect.size.height as usize {
+                            for x in 0..window_rect.size.width as usize {
+                                let output_x = (window_rect.position.x + x as i32) as usize;
+                                let output_y = (window_rect.position.y + y as i32) as usize;
+
+                                let output_index = output_y * output_stride + output_x;
+                                let window_index = y * window_stride + x;
+
+                                if output_index < output_data.len() && window_index < window_data.len() {
+                                    output_data[output_index] = window_data[window_index];
+                                }
                             }
                         }
                     }
@@ -763,205 +687,22 @@ impl Compositor for SimpleCompositor {
         Ok(())
     }
 
+    fn swap_buffers(&mut self) -> Result<(), GraphicsError> {
+        // Swap simulation logic: copies back buffer to display
+        Ok(())
+    }
+
+    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> {
+        if let Some(ref back) = self.back_buffer {
+            Ok(back.data.clone())
+        } else {
+            Err(GraphicsError::OutOfMemory)
+        }
+    }
+
     fn stats(&self) -> CompositorStats {
         let mut stats = self.stats.clone();
-        stats.visible_windows = 0;
-
-        for window_option in &self.windows {
-            if let Some(ref window) = *window_option {
-                if window.info().visible {
-                    stats.visible_windows += 1;
-                }
-            }
-        }
-
+        stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
         stats
     }
-}
-
-/// Simple Vec implementation for no_std
-#[cfg(target_os = "none")]
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-#[cfg(target_os = "none")]
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(
-                self.data.add(index + 1),
-                self.data.add(index),
-                self.len - index - 1,
-            );
-            self.len -= 1;
-            item
-        }
-    }
-
-    fn retain<F>(&mut self, mut f: F)
-    where
-        F: FnMut(&T) -> bool,
-    {
-        let mut write = 0;
-        for read in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(read);
-                if f(item) {
-                    if write != read {
-                        let item_copy = core::ptr::read(self.data.add(read));
-                        core::ptr::write(self.data.add(write), item_copy);
-                    }
-                    write += 1;
-                }
-            }
-        }
-        self.len = write;
-    }
-
-    fn insert(&mut self, index: usize, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if index < self.len {
-                core::ptr::copy(
-                    self.data.add(index),
-                    self.data.add(index + 1),
-                    self.len - index,
-                );
-            }
-
-            core::ptr::write(self.data.add(index), item);
-            self.len += 1;
-        }
-    }
-
-    fn iter(&self) -> core::slice::Iter<'_, T> {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-
-    fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-
-    fn position<F>(&self, mut f: F) -> Option<usize>
-    where
-        F: FnMut(&T) -> bool,
-    {
-        for i in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(i);
-                if f(item) {
-                    return Some(i);
-                }
-            }
-        }
-        None
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-struct Iter<T> {
-    data: *const T,
-    len: usize,
-    index: usize,
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> Iterator for Iter<T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            unsafe {
-                let item = &*self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-struct IterMut<T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> Iterator for IterMut<T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            unsafe {
-                let item = &mut *self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }

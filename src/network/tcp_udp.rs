@@ -4,6 +4,7 @@
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;

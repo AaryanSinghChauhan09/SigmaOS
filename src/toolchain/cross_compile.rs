@@ -1,23 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
 /// OOP-based Cross-compile Toolchain for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 9
@@ -73,7 +55,15 @@ impl SimpleToolchain {
 
 impl Toolchain for SimpleToolchain {
     fn id(&self) -> ToolchainID { self.id }
-    fn target_arch(&self) -> Architecture { unsafe { core::mem::transmute(self.target_arch.load(Ordering::SeqCst)) } }
+    fn target_arch(&self) -> Architecture { {
+        let raw = self.target_arch.load(Ordering::SeqCst) as u32;
+        match raw {
+            1 => Architecture::ARM64,
+            2 => Architecture::RISCV64,
+            3 => Architecture::PPC64,
+            _ => Architecture::X86_64,
+        }
+    } }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -105,7 +95,6 @@ pub struct SimpleCrossCompiler {
 }
 
 impl SimpleCrossCompiler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleCrossCompiler {
             toolchains: Vec::new(),
@@ -165,7 +154,6 @@ pub struct SimpleSysrootManager {
 }
 
 impl SimpleSysrootManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleSysrootManager {
             sysroots: Vec::new(),
@@ -214,7 +202,6 @@ pub struct SimpleBuildConfiguration {
 }
 
 impl SimpleBuildConfiguration {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleBuildConfiguration {
             config: BuildConfig {
@@ -255,6 +242,11 @@ pub trait ReproducibleBuild {
     fn set_source_date_epoch(&mut self, epoch: u64);
     fn enable_deterministic_mode(&mut self, enabled: bool);
     fn verify_reproducibility(&self, binary1: &[u8], binary2: &[u8]) -> bool;
+
+    fn scrub_environment(&self, _raw_env: &mut [u8]) -> usize { 0 }
+    fn map_paths(&self, _raw_paths: &mut [u8], _actual_prefix: &[u8], _canon_prefix: &[u8]) -> usize { 0 }
+    fn stabilize_archive_metadata(&self, _archive_data: &mut [u8], _timestamp: u64) -> usize { 0 }
+    fn audit_reproducibility(&self, _binary1: &[u8], _binary2: &[u8], _out_report: &mut [u8]) -> usize { 0 }
 }
 
 #[repr(C)]
@@ -264,7 +256,6 @@ pub struct SimpleReproducibleBuild {
 }
 
 impl SimpleReproducibleBuild {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleReproducibleBuild {
             source_date_epoch: AtomicUsize::new(0),
@@ -292,6 +283,309 @@ impl ReproducibleBuild for SimpleReproducibleBuild {
             }
         }
         true
+    }
+
+    /// Scrub environment variables to remove user/host-leaking information
+    fn scrub_environment(&self, raw_env: &mut [u8]) -> usize {
+        let mut temp = [0u8; 1024];
+        let mut read_idx = 0;
+        let mut write_idx = 0;
+        let len = raw_env.len();
+
+        let keys: [&[u8]; 7] = [
+            b"USER=", b"HOSTNAME=", b"TZ=", b"PWD=", b"LANG=", b"LC_ALL=", b"HOME="
+        ];
+        let vals: [&[u8]; 7] = [
+            b"sigma", b"reproducible-build-host", b"UTC", b"/usr/src/build", b"C.UTF-8", b"C.UTF-8", b"/home/sigma"
+        ];
+
+        while read_idx < len {
+            if raw_env[read_idx] == 0 {
+                if write_idx < temp.len() {
+                    temp[write_idx] = 0;
+                    write_idx += 1;
+                }
+                read_idx += 1;
+                continue;
+            }
+
+            let mut entry_end = read_idx;
+            while entry_end < len && raw_env[entry_end] != 0 {
+                entry_end += 1;
+            }
+
+            let entry = &raw_env[read_idx..entry_end];
+            let mut replaced = false;
+
+            for (idx, &key) in keys.iter().enumerate() {
+                if entry.len() >= key.len() && &entry[..key.len()] == key {
+                    let val = vals[idx];
+                    if write_idx + key.len() + val.len() < temp.len() {
+                        for &kb in key {
+                            temp[write_idx] = kb;
+                            write_idx += 1;
+                        }
+                        for &vb in val {
+                            temp[write_idx] = vb;
+                            write_idx += 1;
+                        }
+                    }
+                    replaced = true;
+                    break;
+                }
+            }
+
+            if !replaced {
+                if write_idx + entry.len() < temp.len() {
+                    for &eb in entry {
+                        temp[write_idx] = eb;
+                        write_idx += 1;
+                    }
+                }
+            }
+
+            if write_idx < temp.len() {
+                temp[write_idx] = 0;
+                write_idx += 1;
+            }
+
+            read_idx = entry_end;
+            if read_idx < len && raw_env[read_idx] == 0 {
+                read_idx += 1;
+            }
+        }
+
+        if write_idx < temp.len() {
+            temp[write_idx] = 0;
+            write_idx += 1;
+        }
+
+        let copy_len = write_idx.min(len);
+        for i in 0..copy_len {
+            raw_env[i] = temp[i];
+        }
+        copy_len
+    }
+
+    /// Map actual absolute build paths to deterministic canonical paths
+    fn map_paths(&self, raw_paths: &mut [u8], actual_prefix: &[u8], canon_prefix: &[u8]) -> usize {
+        if actual_prefix.is_empty() {
+            return raw_paths.len();
+        }
+        let mut read_idx = 0;
+        let mut write_idx = 0;
+        let len = raw_paths.len();
+        let mut temp = [0u8; 1024];
+        let temp_len = temp.len();
+
+        while read_idx < len && write_idx < temp_len {
+            if read_idx + actual_prefix.len() <= len && &raw_paths[read_idx..read_idx + actual_prefix.len()] == actual_prefix {
+                for &b in canon_prefix {
+                    if write_idx < temp_len {
+                        temp[write_idx] = b;
+                        write_idx += 1;
+                    }
+                }
+                read_idx += actual_prefix.len();
+            } else {
+                temp[write_idx] = raw_paths[read_idx];
+                write_idx += 1;
+                read_idx += 1;
+            }
+        }
+
+        let copy_len = write_idx.min(len);
+        for i in 0..copy_len {
+            raw_paths[i] = temp[i];
+        }
+        copy_len
+    }
+
+    /// Normalize tar archive headers (permissions, owners, timestamps to SOURCE_DATE_EPOCH) and recalculate checksums
+    fn stabilize_archive_metadata(&self, archive_data: &mut [u8], timestamp: u64) -> usize {
+        let len = archive_data.len();
+        if len < 512 {
+            return 0;
+        }
+
+        let mut offset = 0;
+        while offset + 512 <= len {
+            let is_header = {
+                let magic = &archive_data[offset + 257..offset + 262];
+                magic == b"ustar"
+            };
+
+            if is_header {
+                // UID = "0000000\0"
+                for i in 0..7 {
+                    archive_data[offset + 108 + i] = b'0';
+                }
+                archive_data[offset + 115] = 0;
+
+                // GID = "0000000\0"
+                for i in 0..7 {
+                    archive_data[offset + 116 + i] = b'0';
+                }
+                archive_data[offset + 123] = 0;
+
+                // Mode = "0000644\0"
+                archive_data[offset + 100] = b'0';
+                archive_data[offset + 101] = b'0';
+                archive_data[offset + 102] = b'0';
+                archive_data[offset + 103] = b'0';
+                archive_data[offset + 104] = b'6';
+                archive_data[offset + 105] = b'4';
+                archive_data[offset + 106] = b'4';
+                archive_data[offset + 107] = 0;
+
+                // Mtime format in octal (11 octal digits + space/null)
+                let mut octal = [b'0'; 11];
+                let mut val = timestamp;
+                for i in (0..11).rev() {
+                    octal[i] = b'0' + (val % 8) as u8;
+                    val /= 8;
+                }
+                for i in 0..11 {
+                    archive_data[offset + 136 + i] = octal[i];
+                }
+                archive_data[offset + 147] = b' ';
+
+                // Clear checksum field with spaces to recalculate
+                for i in 0..8 {
+                    archive_data[offset + 148 + i] = b' ';
+                }
+
+                // Sum all 512 bytes
+                let mut sum = 0u32;
+                for i in 0..512 {
+                    sum += archive_data[offset + i] as u32;
+                }
+
+                // Format sum as a 6-digit octal string + null + space
+                let mut sum_octal = [b'0'; 6];
+                let mut temp_sum = sum;
+                for i in (0..6).rev() {
+                    sum_octal[i] = b'0' + (temp_sum % 8) as u8;
+                    temp_sum /= 8;
+                }
+                for i in 0..6 {
+                    archive_data[offset + 148 + i] = sum_octal[i];
+                }
+                archive_data[offset + 154] = 0;
+                archive_data[offset + 155] = b' ';
+            }
+
+            offset += 512;
+        }
+
+        len
+    }
+
+    /// Detailed diffoscope-style byte diagnostic audit of reproducibility discrepancies
+    fn audit_reproducibility(&self, binary1: &[u8], binary2: &[u8], out_report: &mut [u8]) -> usize {
+        let mut idx = 0;
+
+        fn write_b(buf: &mut [u8], idx: &mut usize, bytes: &[u8]) {
+            for &b in bytes {
+                if *idx < buf.len() {
+                    buf[*idx] = b;
+                    *idx += 1;
+                }
+            }
+        }
+
+        fn write_d(buf: &mut [u8], idx: &mut usize, mut val: usize) {
+            if val == 0 {
+                write_b(buf, idx, b"0");
+                return;
+            }
+            let mut dec_chars = [0u8; 20];
+            let mut len = 0;
+            while val > 0 {
+                dec_chars[len] = b'0' + (val % 10) as u8;
+                len += 1;
+                val /= 10;
+            }
+            for i in (0..len).rev() {
+                if *idx < buf.len() {
+                    buf[*idx] = dec_chars[i];
+                    *idx += 1;
+                }
+            }
+        }
+
+        fn write_h(buf: &mut [u8], idx: &mut usize, mut val: usize) {
+            write_b(buf, idx, b"0x");
+            let mut hex_chars = [0u8; 16];
+            let mut len = 0;
+            if val == 0 {
+                write_b(buf, idx, b"00");
+                return;
+            }
+            while val > 0 {
+                let rem = val % 16;
+                hex_chars[len] = if rem < 10 { b'0' + rem as u8 } else { b'a' + (rem - 10) as u8 };
+                len += 1;
+                val /= 16;
+            }
+            for i in (0..len).rev() {
+                if *idx < buf.len() {
+                    buf[*idx] = hex_chars[i];
+                    *idx += 1;
+                }
+            }
+        }
+
+        write_b(out_report, &mut idx, b"REPRODUCIBILITY AUDIT REPORT:\n-----------------------------\n");
+
+        if binary1.len() != binary2.len() {
+            write_b(out_report, &mut idx, b"Status: NON-REPRODUCIBLE (Size Mismatch)\n");
+            write_b(out_report, &mut idx, b"Size 1: ");
+            write_d(out_report, &mut idx, binary1.len());
+            write_b(out_report, &mut idx, b" bytes\n");
+            write_b(out_report, &mut idx, b"Size 2: ");
+            write_d(out_report, &mut idx, binary2.len());
+            write_b(out_report, &mut idx, b" bytes\n");
+            return idx;
+        }
+
+        let mut diffs = 0;
+        let mut mismatch_reported = 0;
+        let len = binary1.len();
+
+        for i in 0..len {
+            if binary1[i] != binary2[i] {
+                diffs += 1;
+                if mismatch_reported < 5 {
+                    write_b(out_report, &mut idx, b"Difference found at offset ");
+                    write_h(out_report, &mut idx, i);
+                    write_b(out_report, &mut idx, b": binary1=");
+                    write_h(out_report, &mut idx, binary1[i] as usize);
+                    write_b(out_report, &mut idx, b", binary2=");
+                    write_h(out_report, &mut idx, binary2[i] as usize);
+                    write_b(out_report, &mut idx, b"\n");
+                    mismatch_reported += 1;
+                }
+            }
+        }
+
+        if diffs == 0 {
+            write_b(out_report, &mut idx, b"Status: 100% REPRODUCIBLE\n");
+            write_b(out_report, &mut idx, b"Size: ");
+            write_d(out_report, &mut idx, len);
+            write_b(out_report, &mut idx, b" bytes\n");
+            write_b(out_report, &mut idx, b"No discrepancies detected. Bit-identical match.\n");
+        } else {
+            write_b(out_report, &mut idx, b"Status: NON-REPRODUCIBLE\n");
+            write_b(out_report, &mut idx, b"Size: ");
+            write_d(out_report, &mut idx, len);
+            write_b(out_report, &mut idx, b" bytes\n");
+            write_b(out_report, &mut idx, b"Total differences: ");
+            write_d(out_report, &mut idx, diffs);
+            write_b(out_report, &mut idx, b" bytes mismatch.\n");
+        }
+
+        idx
     }
 }
 
@@ -344,47 +638,103 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
+    #[test]
+    fn test_scrub_environment() {
+        let mut env = [0u8; 256];
+        let raw = b"USER=jules\0HOSTNAME=my-laptop\0TZ=EST\0LANG=en_US.UTF-8\0PWD=/home/jules/app\0";
+        env[..raw.len()].copy_from_slice(raw);
+
+        let builder = SimpleReproducibleBuild::new();
+        let len = builder.scrub_environment(&mut env);
+        assert!(len > 0);
+
+        let scrubbed_str = core::str::from_utf8(&env[..len]).unwrap();
+        assert!(scrubbed_str.contains("USER=sigma"));
+        assert!(scrubbed_str.contains("HOSTNAME=reproducible-build-host"));
+        assert!(scrubbed_str.contains("TZ=UTC"));
+        assert!(scrubbed_str.contains("LANG=C.UTF-8"));
+        assert!(scrubbed_str.contains("PWD=/usr/src/build"));
     }
-}
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
+    #[test]
+    fn test_map_paths() {
+        let mut paths = *b"/home/jules/app/src/main.rs                                              ";
+        let builder = SimpleReproducibleBuild::new();
+        let actual = b"/home/jules/app";
+        let canon = b"/usr/src/app";
+        let len = builder.map_paths(&mut paths, actual, canon);
+        assert!(len > 0);
+
+        let mapped_str = core::str::from_utf8(&paths[..len]).unwrap();
+        assert!(mapped_str.starts_with("/usr/src/app/src/main.rs"));
     }
-}
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
+    #[test]
+    fn test_stabilize_archive_metadata() {
+        let mut archive = [0u8; 512];
+        // Write the tar magic "ustar"
+        archive[257..262].copy_from_slice(b"ustar");
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
+        let builder = SimpleReproducibleBuild::new();
+        // 1718900000 = 14635052440 in octal
+        let len = builder.stabilize_archive_metadata(&mut archive, 1718900000);
+        assert_eq!(len, 512);
+
+        // Verify metadata fields normalized
+        assert_eq!(&archive[108..116], b"0000000\0");
+        assert_eq!(&archive[116..124], b"0000000\0");
+        assert_eq!(&archive[100..108], b"0000644\0");
+        assert_eq!(&archive[136..148], b"14635052440 ");
+
+        // Checksum field should not be empty spaces (recalculated sum should be written)
+        assert_ne!(&archive[148..154], b"      ");
     }
-}
 
+    #[test]
+    fn test_audit_reproducibility() {
+        let builder = SimpleReproducibleBuild::new();
+        let bin1 = b"reproducible binary content 123456789";
+        let bin2 = b"reproducible binary content 123456789";
+        let bin3 = b"reproducible binary content mismatch9";
+        let bin4 = b"short binary";
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
+        let mut report = [0u8; 1024];
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        // 1. Identical match
+        let len1 = builder.audit_reproducibility(bin1, bin2, &mut report);
+        let report_str1 = core::str::from_utf8(&report[..len1]).unwrap();
+        assert!(report_str1.contains("Status: 100% REPRODUCIBLE"));
+        assert!(report_str1.contains("No discrepancies detected. Bit-identical match."));
+
+        // 2. Size mismatch
+        let len2 = builder.audit_reproducibility(bin1, bin4, &mut report);
+        let report_str2 = core::str::from_utf8(&report[..len2]).unwrap();
+        assert!(report_str2.contains("Status: NON-REPRODUCIBLE (Size Mismatch)"));
+
+        // 3. Content mismatch
+        let len3 = builder.audit_reproducibility(bin1, bin3, &mut report);
+        let report_str3 = core::str::from_utf8(&report[..len3]).unwrap();
+        assert!(report_str3.contains("Status: NON-REPRODUCIBLE"));
+        assert!(report_str3.contains("Difference found at offset"));
+        assert!(report_str3.contains("Total differences: 8 bytes mismatch."));
     }
 }
