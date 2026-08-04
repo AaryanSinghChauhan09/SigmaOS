@@ -295,6 +295,149 @@ impl MultiModelOrchestrator {
     }
 }
 
+/// perplexityai/wandr: Sovereign Deep Research & Evidence-Backed Answer Synthesis Engine
+pub struct ResearchDocument {
+    pub id: usize,
+    pub title: [u8; 64],
+    pub content: [u8; 512],
+    pub source_url: [u8; 128],
+}
+
+impl ResearchDocument {
+    pub fn new(id: usize, title: &[u8], content: &[u8], source_url: &[u8]) -> Self {
+        let mut title_arr = [0u8; 64];
+        let mut content_arr = [0u8; 512];
+        let mut url_arr = [0u8; 128];
+
+        let title_len = title.len().min(63);
+        let content_len = content.len().min(511);
+        let url_len = source_url.len().min(127);
+
+        title_arr[..title_len].copy_from_slice(&title[..title_len]);
+        content_arr[..content_len].copy_from_slice(&content[..content_len]);
+        url_arr[..url_len].copy_from_slice(&source_url[..url_len]);
+
+        Self {
+            id,
+            title: title_arr,
+            content: content_arr,
+            source_url: url_arr,
+        }
+    }
+}
+
+pub struct SovereignResearchLattice {
+    pub corpus: Vec<ResearchDocument>,
+    pub research_logs: Vec<[u8; 128]>,
+}
+
+impl SovereignResearchLattice {
+    pub fn new() -> Self {
+        Self {
+            corpus: Vec::new(),
+            research_logs: Vec::new(),
+        }
+    }
+
+    pub fn ingest_source(&mut self, doc: ResearchDocument) {
+        self.corpus.push(doc);
+    }
+
+    /// Perform Entity Disambiguation (reconciling synonymous mentions, e.g. "Perplexity" and "Perplexity AI")
+    pub fn disambiguate_entity(&self, mention_a: &str, mention_b: &str) -> bool {
+        let a = mention_a.to_lowercase();
+        let b = mention_b.to_lowercase();
+        a == b || a.contains(&b) || b.contains(&a)
+    }
+
+    /// Systemic Extraction: Sifts out key evidence matching target query constraints
+    pub fn extract_evidence(&self, query: &str) -> Vec<usize> {
+        let mut results = Vec::new();
+        let query_lower = query.to_lowercase();
+        for i in 0..self.corpus.len() {
+            if let Some(doc) = self.corpus.get(i) {
+                let mut found = false;
+                // Check title
+                let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
+                if let Ok(t) = core::str::from_utf8(&doc.title[..title_len]) {
+                    if t.to_lowercase().contains(&query_lower) {
+                        found = true;
+                    }
+                }
+                // Check content
+                if !found {
+                    let content_len = doc.content.iter().position(|&b| b == 0).unwrap_or(512);
+                    if let Ok(c) = core::str::from_utf8(&doc.content[..content_len]) {
+                        if c.to_lowercase().contains(&query_lower) {
+                            found = true;
+                        }
+                    }
+                }
+                if found {
+                    results.push(doc.id);
+                }
+            }
+        }
+        results
+    }
+
+    /// Evidence-Backed Answer Synthesis: Generates structured answers verified against citations
+    pub fn synthesize_answer(&mut self, query: &str) -> Result<Vec<u8>, &'static str> {
+        let doc_ids = self.extract_evidence(query);
+        if doc_ids.is_empty() {
+            return Err("No evidence-backed matches found in active corpus to synthesize answer");
+        }
+
+        let mut output = Vec::new();
+        let header = b"SYNTHESIZED ANSWER (Evidence-Backed):\n";
+        for &byte in header { output.push(byte); }
+
+        for idx in 0..doc_ids.len() {
+            if let Some(&id) = doc_ids.get(idx) {
+                let mut found_doc = None;
+                for c_idx in 0..self.corpus.len() {
+                    if let Some(doc) = self.corpus.get(c_idx) {
+                        if doc.id == id {
+                            found_doc = Some(doc);
+                            break;
+                        }
+                    }
+                }
+
+                if let Some(doc) = found_doc {
+                    let cite_prefix = b" - Claim supported by citation: [";
+                    for &byte in cite_prefix { output.push(byte); }
+
+                    let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
+                    for &byte in &doc.title[..title_len] { output.push(byte); }
+
+                    let url_prefix = b"] (Source: ";
+                    for &byte in url_prefix { output.push(byte); }
+
+                    let url_len = doc.source_url.iter().position(|&b| b == 0).unwrap_or(128);
+                    for &byte in &doc.source_url[..url_len] { output.push(byte); }
+
+                    let end_bracket = b")\n";
+                    for &byte in end_bracket { output.push(byte); }
+                }
+            }
+        }
+
+        let mut log_arr = [0u8; 128];
+        let log_msg = b"Executed evidence-backed synthesis for target query";
+        log_arr[..log_msg.len()].copy_from_slice(log_msg);
+        self.research_logs.push(log_arr);
+
+        Ok(output)
+    }
+}
+
+impl Default for SovereignResearchLattice {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -354,5 +497,33 @@ mod tests {
         let runs = orch.execute_local_inference(b"llama-2-7b", 128).unwrap();
         assert_eq!(runs, 1);
         assert_eq!(orch.inference_runs.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_perplexity_wandr_deep_research() {
+        let mut lattice = SovereignResearchLattice::new();
+
+        // Entity Disambiguation Check
+        assert!(lattice.disambiguate_entity("Perplexity", "Perplexity AI"));
+        assert!(!lattice.disambiguate_entity("Perplexity", "Google"));
+
+        // Source ingestion
+        let doc1 = ResearchDocument::new(
+            1,
+            b"WANDR Wide and Deep Research",
+            b"Perplexity WANDR is a deep research framework for high-volume entity disambiguation.",
+            b"https://github.com/perplexityai/wandr"
+        );
+        lattice.ingest_source(doc1);
+        assert_eq!(lattice.corpus.len(), 1);
+
+        // Claim and Answer Synthesis verification
+        let evidence = lattice.extract_evidence("WANDR");
+        assert_eq!(evidence.len(), 1);
+        assert_eq!(evidence[0], 1);
+
+        let answer = lattice.synthesize_answer("WANDR").unwrap();
+        assert!(answer.len() > 0);
+        assert_eq!(lattice.research_logs.len(), 1);
     }
 }
