@@ -23,11 +23,7 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod clipboard;
-pub mod intrusion;
-pub mod password;
 pub mod parrot_linux;
-pub mod selinux;
 
 pub use parrot_linux::{
     AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
