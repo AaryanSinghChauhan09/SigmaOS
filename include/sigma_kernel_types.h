@@ -22,4 +22,9 @@ typedef int                sigma_status;
 #define SIGMA_ERROR        (-1)
 #define K_ERR_INVAL        (-1)
 
+#define SIGMA_NULL         nullptr
+#define SIGMA_TRUE         true
+#define SIGMA_FALSE        false
+typedef unsigned long long sigma_uptr;
+
 #endif // SIGMA_KERNEL_TYPES_H
