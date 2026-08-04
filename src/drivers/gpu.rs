@@ -1,3 +1,25 @@
+||||||| 2139cb2f8
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
+#![allow(clippy::all)]
+#![allow(warnings)]
+
 // SigmaOS GPU Driver
 // Hardware abstraction for graphics rendering with Vulkan/Mesa-parity pipeline models and self-healing recovery
 
@@ -6,8 +28,14 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
+||||||| 2139cb2f8
+// Hardware abstraction for graphics rendering
+// Hardware abstraction for graphics rendering and advanced DRM/KMS modesetting
 
 use crate::security::CapabilityToken;
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 extern crate alloc;
 use alloc::string::String;
@@ -121,7 +149,8 @@ pub struct GpuResetState {
     pub is_hardware_ready: bool,
 }
 
-#[derive(Debug, Clone)]
+/// Linux/BSD-inspired DRM Mode Settings timing parameters
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DrmModeInfo {
     pub hdisplay: u16,
     pub vdisplay: u16,
@@ -136,6 +165,21 @@ pub enum DrmPlaneType {
     Primary,
     Overlay,
     Cursor,
+||||||| 2139cb2f8
+    pub hdisplay: u16,
+    pub vdisplay: u16,
+    pub name: String,
+    pub clock: u32,       // Pixel clock in kHz
+    pub hdisplay: u16,    // Horizontal active resolution
+    pub hsync_start: u16, // Horizontal sync start timing
+    pub hsync_end: u16,   // Horizontal sync end timing
+    pub htotal: u16,      // Horizontal total timing
+    pub vdisplay: u16,    // Vertical active resolution
+    pub vsync_start: u16, // Vertical sync start timing
+    pub vsync_end: u16,   // Vertical sync end timing
+    pub vtotal: u16,      // Vertical total timing
+    pub vrefresh: u32,    // Vertical refresh rate in Hz
+    pub flags: u32,       // Synchronization and signal flags
 }
 
 #[derive(Debug, Clone)]
@@ -165,6 +209,43 @@ pub struct DrmEncoder {
 
 #[derive(Debug, Clone)]
 pub struct DrmFramebuffer {
+||||||| 2139cb2f8
+#[derive(Debug, Clone)]
+pub struct DrmCrtc {
+impl DrmModeInfo {
+    /// Create a standard mode timing info from display resolution and refresh rate
+    pub fn new_simple(width: u16, height: u16, refresh: u32) -> Self {
+        let hdisplay = width;
+        let hsync_start = hdisplay + 40;
+        let hsync_end = hsync_start + 80;
+        let htotal = hsync_end + 120;
+
+        let vdisplay = height;
+        let vsync_start = vdisplay + 3;
+        let vsync_end = vsync_start + 6;
+        let vtotal = vsync_end + 25;
+
+        let clock = ((htotal as u32 * vtotal as u32 * refresh) as f32 / 1000.0) as u32;
+
+        Self {
+            name: alloc::format!("{}x{}@{}", width, height, refresh),
+            clock,
+            hdisplay,
+            hsync_start,
+            hsync_end,
+            htotal,
+            vdisplay,
+            vsync_start,
+            vsync_end,
+            vtotal,
+            vrefresh: refresh,
+            flags: 0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DrmCrtc {
     pub id: u32,
     pub width: u32,
     pub height: u32,
@@ -172,6 +253,105 @@ pub struct DrmFramebuffer {
     pub bpp: u32,
     pub handle: u32, // GEM handle representation
     pub buffer: Vec<u32>,
+||||||| 2139cb2f8
+    pub active: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct DrmConnector {
+    pub id: u32,
+    pub connected: bool,
+    pub modes: Vec<DrmModeInfo>,
+    pub active: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DrmConnector {
+    pub id: u32,
+    pub connected: bool,
+    pub modes: Vec<DrmModeInfo>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DrmPlaneType {
+    Primary,
+    Overlay,
+    Cursor,
+}
+
+/// DRM Plane representing hardware-supported visual compositing layers
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DrmPlane {
+    pub id: u32,
+    pub plane_type: DrmPlaneType,
+    pub crtc_id: Option<u32>,
+    pub fb_id: Option<u32>,
+    pub src_x: u32,
+    pub src_y: u32,
+    pub src_w: u32,
+    pub src_h: u32,
+    pub crtc_x: i32,
+    pub crtc_y: i32,
+    pub crtc_w: u32,
+    pub crtc_h: u32,
+    pub zpos: i32,
+    pub formats: Vec<String>,
+}
+
+impl DrmPlane {
+    pub fn new(id: u32, plane_type: DrmPlaneType, formats: Vec<String>) -> Self {
+        Self {
+            id,
+            plane_type,
+            crtc_id: None,
+            fb_id: None,
+            src_x: 0,
+            src_y: 0,
+            src_w: 0,
+            src_h: 0,
+            crtc_x: 0,
+            crtc_y: 0,
+            crtc_w: 0,
+            crtc_h: 0,
+            zpos: match plane_type {
+                DrmPlaneType::Primary => 0,
+                DrmPlaneType::Overlay => 1,
+                DrmPlaneType::Cursor => 2,
+            },
+            formats,
+        }
+    }
+}
+
+/// Atomic KMS State Commitment supporting transactional check-only and active updates
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DrmAtomicCommit {
+    pub allow_modeset: bool,
+    pub test_only: bool,
+    pub plane_updates: Vec<PlaneUpdate>,
+    pub crtc_updates: Vec<CrtcUpdate>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PlaneUpdate {
+    pub plane_id: u32,
+    pub crtc_id: Option<u32>,
+    pub fb_id: Option<u32>,
+    pub src_x: u32,
+    pub src_y: u32,
+    pub src_w: u32,
+    pub src_h: u32,
+    pub crtc_x: i32,
+    pub crtc_y: i32,
+    pub crtc_w: u32,
+    pub crtc_h: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CrtcUpdate {
+    pub crtc_id: u32,
+    pub active: bool,
+    pub mode: Option<DrmModeInfo>,
 }
 
 pub struct GpuDriver {
@@ -179,6 +359,7 @@ pub struct GpuDriver {
     pub height: u32,
     pub capabilities: CapabilityToken,
     pub frame_buffer: Vec<u32>,
+    pub back_buffer: Vec<u32>, // Secondary framebuffer supporting double-buffered page-flip
     pub crtc: Option<DrmCrtc>,
     pub connector: Option<DrmConnector>,
 ||||||| 43be3a7e8
@@ -252,6 +433,8 @@ impl Default for AtomicCommit {
     fn default() -> Self {
         Self::new()
     }
+||||||| 2139cb2f8
+    pub planes: Vec<DrmPlane>,
 }
 
 impl GpuDriver {
@@ -262,6 +445,7 @@ impl GpuDriver {
             height,
             capabilities: CapabilityToken::new(),
             frame_buffer: vec![0; size],
+            back_buffer: vec![0; size],
             crtc: None,
             connector: None,
 ||||||| 43be3a7e8
@@ -280,6 +464,8 @@ impl GpuDriver {
             framebuffers: Vec::new(),
             next_object_id: 1,
             vblank_count: 0,
+||||||| 2139cb2f8
+            planes: Vec::new(),
         }
     }
 
@@ -319,6 +505,10 @@ impl GpuDriver {
 ||||||| 0ddf2eac7
                 // In production, this would swap buffers
                 // Buffer swapping simulation
+||||||| 2139cb2f8
+                // In production, this would swap buffers
+                // Swaps buffer on presentation
+                let _ = self.page_flip();
             }
             GpuCommand::DrawText { .. } => {
                 // Text rendering simulation
@@ -430,6 +620,7 @@ impl GpuDriver {
         self.width = mode.hdisplay as u32;
         self.height = mode.vdisplay as u32;
         self.frame_buffer = vec![0; (self.width * self.height) as usize];
+        self.back_buffer = vec![0; (self.width * self.height) as usize];
 
         self.crtc = Some(DrmCrtc {
             id: crtc_id,
@@ -733,10 +924,73 @@ pub fn parse_edid(edid: &[u8]) -> Result<Vec<DrmModeInfo>, &'static str> {
 
     Ok(modes)
 }
+||||||| 2139cb2f8
+}
 
-impl Default for GpuDriver {
-    fn default() -> Self {
-        Self::new(1920, 1080)
+    /// Perform a standard double-buffered page flip operation
+    pub fn page_flip(&mut self) -> Result<(), GpuError> {
+        if self.frame_buffer.len() != self.back_buffer.len() {
+            return Err(GpuError::OutOfBounds);
+        }
+        core::mem::swap(&mut self.frame_buffer, &mut self.back_buffer);
+        Ok(())
+    }
+
+    /// Execute atomic KMS check and commitment updates
+    pub fn atomic_commit(&mut self, commit: &DrmAtomicCommit) -> Result<(), GpuError> {
+        // Validation Stage (Check-Only)
+        for p_up in &commit.plane_updates {
+            let exists = self.planes.iter().any(|p| p.id == p_up.plane_id);
+            if !exists {
+                return Err(GpuError::InvalidCommand);
+            }
+        }
+
+        for c_up in &commit.crtc_updates {
+            if let Some(ref crtc) = self.crtc {
+                if crtc.id != c_up.crtc_id {
+                    return Err(GpuError::InvalidCommand);
+                }
+            } else {
+                return Err(GpuError::InvalidCommand);
+            }
+        }
+
+        if commit.test_only {
+            return Ok(()); // Verified valid check
+        }
+
+        // Execution Stage (Commit Properties)
+        for p_up in &commit.plane_updates {
+            if let Some(plane) = self.planes.iter_mut().find(|p| p.id == p_up.plane_id) {
+                plane.crtc_id = p_up.crtc_id;
+                plane.fb_id = p_up.fb_id;
+                plane.src_x = p_up.src_x;
+                plane.src_y = p_up.src_y;
+                plane.src_w = p_up.src_w;
+                plane.src_h = p_up.src_h;
+                plane.crtc_x = p_up.crtc_x;
+                plane.crtc_y = p_up.crtc_y;
+                plane.crtc_w = p_up.crtc_w;
+                plane.crtc_h = p_up.crtc_h;
+            }
+        }
+
+        for c_up in &commit.crtc_updates {
+            if let Some(ref mut crtc) = self.crtc {
+                crtc.active = c_up.active;
+                if let Some(ref mode) = c_up.mode {
+                    self.width = mode.hdisplay as u32;
+                    self.height = mode.vdisplay as u32;
+                    self.frame_buffer = vec![0; (self.width * self.height) as usize];
+                    self.back_buffer = vec![0; (self.width * self.height) as usize];
+                    crtc.width = self.width;
+                    crtc.height = self.height;
+                }
+            }
+        }
+
+        Ok(())
     }
 }
 
@@ -924,5 +1178,59 @@ mod tests {
         assert_eq!(gpu.vblank_count, 2);
         assert_eq!(gpu.width, 1280);
         assert_eq!(gpu.height, 720);
+    }
+||||||| 2139cb2f8
+
+    #[test]
+    fn test_drm_mode_settings_timings() {
+        let mode = DrmModeInfo::new_simple(1920, 1080, 60);
+        assert_eq!(mode.hdisplay, 1920);
+        assert_eq!(mode.vdisplay, 1080);
+        assert_eq!(mode.vrefresh, 60);
+        assert!(mode.clock > 0);
+    }
+
+    #[test]
+    fn test_drm_planes() {
+        let plane = DrmPlane::new(1, DrmPlaneType::Primary, vec![String::from("ARGB8888")]);
+        assert_eq!(plane.plane_type, DrmPlaneType::Primary);
+        assert_eq!(plane.zpos, 0);
+    }
+
+    #[test]
+    fn test_atomic_modeset_commit() {
+        let mut gpu = GpuDriver::new(800, 600);
+        gpu.set_drm_mode(1, 42, DrmModeInfo::new_simple(800, 600, 60)).unwrap();
+
+        gpu.planes.push(DrmPlane::new(10, DrmPlaneType::Cursor, vec![String::from("ARGB8888")]));
+
+        let commit = DrmAtomicCommit {
+            allow_modeset: true,
+            test_only: false,
+            plane_updates: vec![PlaneUpdate {
+                plane_id: 10,
+                crtc_id: Some(42),
+                fb_id: Some(101),
+                src_x: 0,
+                src_y: 0,
+                src_w: 64,
+                src_h: 64,
+                crtc_x: 10,
+                crtc_y: 10,
+                crtc_w: 64,
+                crtc_h: 64,
+            }],
+            crtc_updates: vec![CrtcUpdate {
+                crtc_id: 42,
+                active: true,
+                mode: Some(DrmModeInfo::new_simple(1024, 768, 60)),
+            }],
+        };
+
+        let result = gpu.atomic_commit(&commit);
+        assert!(result.is_ok());
+        assert_eq!(gpu.width, 1024);
+        assert_eq!(gpu.height, 768);
+        assert_eq!(gpu.planes[0].fb_id, Some(101));
     }
 }
