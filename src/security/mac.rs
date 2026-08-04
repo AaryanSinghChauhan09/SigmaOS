@@ -673,3 +673,12 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
+||||||| 0ddf2eac7
+
+pub type MacPolicy = dyn MACPolicy;
+
+#[derive(Debug, Clone)]
+pub struct MacRule;
+
+#[derive(Debug, Clone)]
+pub struct MacSecurity;

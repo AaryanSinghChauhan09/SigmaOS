@@ -421,6 +421,8 @@ pub use logging::{
     ConsoleLogTarget, FileLogTarget, LogError, LogLevel, LogTarget, LoggerCapability,
     MemoryLogTarget, NetworkLogTarget, SimpleUnifiedLogger, TargetCapability, TargetInfo,
     TargetType, UnifiedLogEntry, UnifiedLogStats, UnifiedLogger,
+||||||| 0ddf2eac7
+    ModuleLoadError as LkmLoadError, KernelModule as LkmModule, LkmLoader, KpatchPatch, KpatchManager,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
@@ -429,7 +431,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use plugin::{
@@ -445,6 +447,8 @@ pub use process::{
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+    SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
+    TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -454,6 +458,18 @@ pub use security::{
     CapabilityGate, CapabilityToken, LinuxCapability, Permission, PledgeManager, PledgePromise,
     Securelevel, SovereignSecurelevelManager, UnveilManager, UnveilPermission, UnveilRestriction,
 };
+||||||| 0ddf2eac7
+pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use security::{
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
+    KaliSniffer, PentestAssistant, SecureWipeTool, IntrusionSeverity, IntrusionAlert, SigmaIDS,
+};
+pub use init::{
+    Runlevel, ServiceState as InitServiceState, InitError, Service as InitService, SimpleService as InitSimpleService,
+    InitSystem, SigmaInit, DependencyResolver as InitDependencyResolver, SimpleDependencyResolver, ServiceMonitor, SimpleServiceMonitor,
+    FirmwarePort, BIOSPort, UEFIPort, CorebootPort, SecurityPort, DACPort, SELinuxPort, ZeroTrustPort,
+};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
@@ -462,4 +478,10 @@ pub use sigpkg::{
 pub use virtualization::{
     Container as VirtualContainer, KubernetesPod, ResourcePool, VirtualMachine,
     VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use toolchain::self_host::{ToolchainError, CompilerConfig, SelfHostingManager};
+pub use arch::cpu_sys::{
+    SegmentType as CpuSegmentType, GdtDescriptor as CpuGdtDescriptor, IdtGate as CpuIdtGate,
+    VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
+    FastSyscallDispatcher as CpuFastSyscallDispatcher,
 };

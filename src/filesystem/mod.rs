@@ -39,3 +39,7 @@ pub use vfs::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem, O_APPEND,
     O_CREAT, O_EXCL, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY,
 };
+||||||| 0ddf2eac7
+pub use cow_snapshot::{
+    CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+};

@@ -41,6 +41,11 @@ pub mod secrets;
 pub mod securelevels;
 pub mod unveil;
 pub mod vulnerability;
+pub mod clipboard;
+pub mod intrusion;
+pub mod password;
+pub mod parrot_linux;
+pub mod selinux;
 
 pub use parrot_linux::{
     AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,

@@ -11,6 +11,15 @@ pub mod advanced_app_absorber;
 pub mod tmux;
 ||||||| 43be3a7e8
 pub mod media;
+||||||| 0ddf2eac7
+pub mod notes;
+pub mod screen_recorder;
+pub mod screenshot;
+pub mod sigma_office;
+pub mod tasks;
+pub mod terminal;
+pub mod advanced_app_absorber;
+pub mod tmux;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -47,3 +56,7 @@ pub use tmux::{
 };
 ||||||| 43be3a7e8
 pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
+||||||| 0ddf2eac7
+pub use tmux::{
+    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+};

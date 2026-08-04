@@ -24,6 +24,18 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+||||||| 0ddf2eac7
+use core::mem;
+/// OOP-based AI Agent Framework for SigmaOS
+/// Implements AI agent using OOP principles with traits and structs
+/// No dependency on external AI frameworks
+/// Based on Roadmap Item 81: SigmaAI core agent
+use core::ptr::{self, NonNull};
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
@@ -219,6 +231,20 @@ impl Default for AgentCapability {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AgentCapability {
+    pub value: u64,
+}
+
+impl AgentCapability {
+    pub fn full() -> Self {
+        AgentCapability { value: !0 }
+    }
+    pub fn none() -> Self {
+        AgentCapability { value: 0 }
+    }
+}
+
 /// Simple AI agent (OOP: Concrete agent class)
 pub struct SimpleAIAgent {
     pub name: String,
@@ -235,6 +261,8 @@ pub struct SimpleAIAgent {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 ||||||| 43be3a7e8
 #[repr(C)]
+||||||| 0ddf2eac7
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Pattern {
     pub pattern: [u8; 128],
     pub intent_type: IntentType,
@@ -297,6 +325,15 @@ impl SimpleAIAgent {
         let name_len = name.len().min(63);
         name_array[..name_len].copy_from_slice(&name[..name_len]);
 
+||||||| 0ddf2eac7
+    pub fn new(name: &str, version: (u32, u32, u32)) -> Self {
+    pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
+        let mut name_str = String::new();
+        for &byte in name {
+            if byte == 0 { break; }
+            let c: char = byte as char;
+            name_str.push(c);
+        }
         SimpleAIAgent {
             name: name_str,
             version,
@@ -628,6 +665,13 @@ pub struct ManagerCapability {
     pub can_register: bool,
     pub can_unregister: bool,
     pub can_process: bool,
+||||||| 0ddf2eac7
+    fn stats(&self) -> AIStats;
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct AIStats {
+    pub failed_requests: usize,
 }
 
 pub struct SimpleAIAgentManager {
@@ -672,6 +716,8 @@ impl Default for ManagerCapability {
     fn default() -> Self {
         Self::new()
     }
+||||||| 0ddf2eac7
+    pub stats: AIStats,
 }
 
 impl SimpleAIAgentManager {
@@ -913,5 +959,332 @@ impl<T> Vec<T> {
         let response = manager.process(b"help set network").unwrap();
         assert_eq!(response, b"Command executed successfully");
         assert_eq!(manager.stats().successful_requests, 1);
+||||||| 0ddf2eac7
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ai_agent_parsing() {
+        let mut agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        let intent = agent.parse("run diagnostic check").unwrap();
+        assert_eq!(intent.intent_type, IntentType::SystemCommand);
+        assert_eq!(intent.command, "sys_exec");
+        assert_eq!(intent.parameters, "run diagnostic check");
+    }
+
+    #[test]
+    fn test_ai_agent_mcp_and_optimization() {
+        let mut agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        agent.register_mcp_tool("fetch_weather".to_string(), "MCP weather fetcher".to_string());
+        assert_eq!(agent.mcp_tools.len(), 1);
+
+        let opt_score = agent.optimize_prompt_weights();
+        assert_eq!(opt_score, 0.95);
+    }
+
+    #[test]
+    fn test_ai_agent_manager_process() {
+        let mut manager = SimpleAIAgentManager::new();
+        let agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        let id = manager.register_agent(Box::new(agent)).unwrap();
+
+        let response = manager.process_request(id, "read file /etc/hosts").unwrap();
+        let response_str = std::str::from_utf8(&response).unwrap();
+        assert!(response_str.contains("file_io"));
+        assert!(response_str.contains("read file /etc/hosts"));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ai_agent_basics() {
+        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
+        assert!(agent.version == (1, 0, 0));
+    }
+
+    #[test]
+    fn test_ai_natural_language_translations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let install_en = agent
+            .translate_natural_command(b"install libreoffice")
+            .unwrap();
+        assert_eq!(install_en, b"sigpkg install libreoffice");
+
+        let install_hi = agent
+            .translate_natural_command(b"libreoffice install karo")
+            .unwrap();
+        assert_eq!(install_hi, b"sigpkg install libreoffice");
+
+        let disk_usage = agent
+            .translate_natural_command(b"show my disk usage")
+            .unwrap();
+        assert_eq!(disk_usage, b"df -h");
+
+        let wifi_connect = agent
+            .translate_natural_command(b"connect to WiFi Home")
+            .unwrap();
+        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
+    }
+
+    #[test]
+    fn test_ai_safety_checks() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let dangerous_res = agent.perform_safety_check(b"rm -rf /");
+        assert!(dangerous_res.is_some());
+        assert!(dangerous_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
+        assert!(account_delete_res.is_some());
+        assert!(account_delete_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let safe_res = agent.perform_safety_check(b"ls -la /var/www");
+        assert!(safe_res.is_none());
+    }
+
+    #[test]
+    fn test_ai_command_explanations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
+        assert!(explanation.windows(8).any(|w| window_eq(w, b"Extracts")));
+    }
+
+    fn window_eq(a: &[u8], b: &[u8]) -> bool {
+        a == b
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ai_agent_basics() {
+        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
+        assert!(agent.version == (1, 0, 0));
+    }
+
+    #[test]
+    fn test_ai_natural_language_translations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let install_en = agent
+            .translate_natural_command(b"install libreoffice")
+            .unwrap();
+        assert_eq!(install_en, b"sigpkg install libreoffice");
+
+        let install_hi = agent
+            .translate_natural_command(b"libreoffice install karo")
+            .unwrap();
+        assert_eq!(install_hi, b"sigpkg install libreoffice");
+
+        let disk_usage = agent
+            .translate_natural_command(b"show my disk usage")
+            .unwrap();
+        assert_eq!(disk_usage, b"df -h");
+
+        let wifi_connect = agent
+            .translate_natural_command(b"connect to WiFi Home")
+            .unwrap();
+        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
+    }
+
+    #[test]
+    fn test_ai_safety_checks() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let dangerous_res = agent.perform_safety_check(b"rm -rf /");
+        assert!(dangerous_res.is_some());
+        assert!(dangerous_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
+        assert!(account_delete_res.is_some());
+        assert!(account_delete_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let safe_res = agent.perform_safety_check(b"ls -la /var/www");
+        assert!(safe_res.is_none());
+    }
+
+    #[test]
+    fn test_ai_command_explanations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
+        assert!(explanation.windows(8).any(|w| window_eq(w, b"Extracts")));
+    }
+
+    fn window_eq(a: &[u8], b: &[u8]) -> bool {
+        a == b
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ai_agent_parsing() {
+        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
+        let intent = agent.parse("run diagnostic check").unwrap();
+        assert_eq!(intent.intent_type, IntentType::SystemCommand);
+        assert_eq!(intent.command, "sys_exec");
+        assert_eq!(intent.parameters, "run diagnostic check");
+    }
+
+    #[test]
+    fn test_ai_agent_mcp_and_optimization() {
+        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
+        agent.register_mcp_tool("fetch_weather".to_string(), "MCP weather fetcher".to_string());
+        assert_eq!(agent.mcp_tools.len(), 1);
+
+        let opt_score = agent.optimize_prompt_weights();
+        assert_eq!(opt_score, 0.95);
+    }
+
+    #[test]
+    fn test_ai_agent_manager_process() {
+        let mut manager = SimpleAIAgentManager::new();
+        let agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
+        let id = manager.register_agent(Box::new(agent)).unwrap();
+
+        let response = manager.process_request(id, "read file /etc/hosts").unwrap();
+        let response_str = std::str::from_utf8(&response).unwrap();
+        assert_eq!(response_str, "Command executed successfully");
+    }
+
+    #[test]
+    fn test_ai_agent_basics() {
+        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
+        assert_eq!(agent.version, (1, 0, 0));
+    }
+
+    #[test]
+    fn test_ai_natural_language_translations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let install_en = agent
+            .translate_natural_command(b"install libreoffice")
+            .unwrap();
+        assert_eq!(install_en, b"sigpkg install libreoffice");
+
+        let install_hi = agent
+            .translate_natural_command(b"libreoffice install karo")
+            .unwrap();
+        assert_eq!(install_hi, b"sigpkg install libreoffice");
+
+        let disk_usage = agent
+            .translate_natural_command(b"show my disk usage")
+            .unwrap();
+        assert_eq!(disk_usage, b"df -h");
+
+        let wifi_connect = agent
+            .translate_natural_command(b"connect to WiFi Home")
+            .unwrap();
+        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
+    }
+
+    #[test]
+    fn test_ai_safety_checks() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let dangerous_res = agent.perform_safety_check(b"rm -rf /");
+        assert!(dangerous_res.is_some());
+        assert!(dangerous_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
+        assert!(account_delete_res.is_some());
+        assert!(account_delete_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let safe_res = agent.perform_safety_check(b"ls -la /var/www");
+        assert!(safe_res.is_none());
+    }
+
+    #[test]
+    fn test_ai_command_explanations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
+        assert!(explanation.windows(8).any(|w| window_eq(w, b"Extracts")));
+    }
+
+    fn window_eq(a: &[u8], b: &[u8]) -> bool {
+        a == b
     }
 }

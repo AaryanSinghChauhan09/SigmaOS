@@ -23,6 +23,17 @@ use alloc::boxed::Box;
 ||||||| 43be3a7e8
 use alloc::boxed::Box;
 use alloc::vec::Vec;
+||||||| 0ddf2eac7
+use core::mem;
+/// OOP-based AI Orchestrator for SigmaOS
+/// Based on 100-Improvement-Ideas.md #51: AI orchestrator for system optimization
+/// Implements sigma-ai core with multi-agent coordination, workflow automation,
+/// and self-diagnosis capabilities for system optimization
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
@@ -133,6 +144,12 @@ impl AIAgent for SimpleAIAgent {
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
+||||||| 0ddf2eac7
+    fn name(&self) -> &[u8] {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.name[..len]
+    fn name(&self) -> &str {
+        &self.name
     }
 ||||||| 43be3a7e8
     fn state(&self) -> AgentState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
@@ -144,12 +161,28 @@ impl AIAgent for SimpleAIAgent {
             2 => AgentState::Busy,
             3 => AgentState::Error,
             _ => AgentState::Learning,
+||||||| 0ddf2eac7
+        {
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => AgentState::Active,
+                2 => AgentState::Busy,
+                3 => AgentState::Error,
+                4 => AgentState::Learning,
+                _ => AgentState::Idle,
+            }
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
+            1 => AgentState::Active,
+            2 => AgentState::Busy,
+            3 => AgentState::Error,
+            4 => AgentState::Learning,
+            _ => AgentState::Idle,
         }
     }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state
-            .store(AgentState::Busy as usize, Ordering::SeqCst);
+        self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
         for &byte in self.name.as_bytes() {
             result.push(byte);
@@ -170,6 +203,10 @@ impl AIAgent for SimpleAIAgent {
         result.extend_from_slice(task);
         self.state
             .store(AgentState::Idle as usize, Ordering::SeqCst);
+||||||| 0ddf2eac7
+        self.state
+            .store(AgentState::Idle as usize, Ordering::SeqCst);
+        self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
         Ok(result)
     }
 }
@@ -223,6 +260,13 @@ impl Default for SimpleAgentOrchestrator {
     }
 }
 
+||||||| 0ddf2eac7
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AgentOrchestrator for SimpleAgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
         let id = agent.id();
@@ -263,6 +307,15 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                 if agent.id() == id {
                     return Some(agent.as_ref());
                 }
+||||||| 0ddf2eac7
+        for agent_option in &self.agents {
+            if let Some(ref agent) = *agent_option {
+                if agent.id() == id {
+                    return Some(agent.as_ref());
+                }
+        for agent in &self.agents {
+            if agent.id() == id {
+                return Some(agent.as_ref());
             }
         }
         None
@@ -451,4 +504,81 @@ mod tests {
             b"SovereignSchedulerOptimizer: optimize core affinity"
         );
     }
+}
+||||||| 0ddf2eac7
+
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }

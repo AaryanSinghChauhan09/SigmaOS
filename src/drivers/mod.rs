@@ -21,6 +21,11 @@ pub mod modern_usb;
 pub mod peripheral;
 pub mod legacy_keyboard;
 pub mod modern_usb;
+||||||| 0ddf2eac7
+pub mod boot_init;
+pub mod dde;
+pub mod even_more_devices;
+pub mod flipper_gpio_sensor;
 
 pub use ancient_devices::{
     create_cga_graphics, create_floppy_disk, create_parallel_printer, create_sound_blaster_16,

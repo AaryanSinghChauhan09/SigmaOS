@@ -29,6 +29,19 @@ pub mod legacy_adapters;
 pub mod interim;
 pub mod lubuntu;
 pub mod mint_linux;
+||||||| 0ddf2eac7
+pub mod india_stack_localization;
+pub mod legacy_adapters;
+pub mod freedos;
+
+pub use legacy_adapters::{
+    KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
+    APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
+    WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
+    LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_WORKLOAD_OPTIMIZER,
+};
+pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat,

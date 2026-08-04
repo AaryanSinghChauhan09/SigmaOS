@@ -92,6 +92,34 @@ pub enum ShellCommand {
     Theme { name: String },
     Profile { name: String },
     A11y { feature: String, enabled: bool },
+||||||| 0ddf2eac7
+    Pwd,
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
+    Theme {
+        theme_name: String,
+    },
+    Profile {
+        profile_name: String,
+    },
+    A11y {
+        feature: String,
+        state: String,
+    },
     Unknown(String),
 }
 
@@ -163,6 +191,24 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
+||||||| 0ddf2eac7
+    running: bool,
+    variables: std::collections::HashMap<String, String>,
+    aliases: std::collections::HashMap<String, String>,
+    prompt: String,
+    agent_engine: AgentAutomationEngine,
+    pub running: bool,
+    pub variables: std::collections::HashMap<String, String>,
+    pub aliases: std::collections::HashMap<String, String>,
+    pub prompt: String,
+    pub agent_engine: AgentAutomationEngine,
+    pub current_user: String,
+    pub current_dir: String,
+    pub services: std::collections::HashMap<String, String>,
+    pub installed_packages: std::collections::HashSet<String>,
+    pub current_theme: String,
+    pub current_profile: String,
+    pub a11y_features: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
@@ -196,6 +242,33 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: a11y,
+||||||| 0ddf2eac7
+            prompt: "sigma-sh> ".to_string(),
+            agent_engine: AgentAutomationEngine::new(),
+        }
+    }
+
+    pub fn with_prompt(prompt: String) -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
+            prompt,
+            agent_engine: AgentAutomationEngine::new(),
+            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            agent_engine: AgentAutomationEngine::new(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: std::collections::HashMap::new(),
         }
     }
 

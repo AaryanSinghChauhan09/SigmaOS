@@ -342,6 +342,8 @@ pub struct UniversalPackageManager {
 ||||||| 43be3a7e8
     pub snapshots: HashMap<usize, PackageSnapshot>,
     pub next_snapshot_id: usize,
+||||||| 0ddf2eac7
+    pub metadata_cache: HashMap<String, UnifiedPackage>,
 }
 
 impl UniversalPackageManager {
@@ -356,6 +358,8 @@ impl UniversalPackageManager {
 ||||||| 43be3a7e8
             snapshots: HashMap::new(),
             next_snapshot_id: 1,
+||||||| 0ddf2eac7
+            metadata_cache: HashMap::new(),
         };
 
         manager.add_default_adapters();

@@ -16,6 +16,7 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -49,6 +50,22 @@ pub enum TCPState {
     TimeWait = 9,
 }
 ||||||| 43be3a7e8
+||||||| 0ddf2eac7
+pub enum TCPState { Closed = 0, Listen = 1, SynSent = 2, SynReceived = 3, Established = 4, FinWait1 = 5, FinWait2 = 6, CloseWait = 7, Closing = 8, TimeWait = 9 }
+
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum TCPState { Closed = 0, Listen = 1, SynSent = 2, SynReceived = 3, Established = 4, FinWait1 = 5, FinWait2 = 6, CloseWait = 7, Closing = 8, TimeWait = 9 }
@@ -88,6 +105,17 @@ pub enum NetworkError {
     ConnectionFailed = 2,
     SendFailed = 3,
 }
+||||||| 0ddf2eac7
+#[derive(Debug, Clone, Copy)]
+pub enum NetworkError { Success = 0, InvalidSocket = 1, ConnectionFailed = 2, SendFailed = 3, InvalidParameter = 4 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetworkError {
+    Success = 0,
+    InvalidSocket = 1,
+    ConnectionFailed = 2,
+    SendFailed = 3,
+    InvalidParameter = 4,
+}
 
 pub trait Socket {
     fn id(&self) -> SocketID;
@@ -112,6 +140,44 @@ pub enum SocketOption {
 
 ||||||| 43be3a7e8
 #[repr(C)]
+||||||| 0ddf2eac7
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum NetworkError {
+    Success = 0,
+    InvalidSocket = 1,
+    ConnectionFailed = 2,
+    SendFailed = 3,
+    InvalidParameter = 4,
+}
+
+pub trait Socket {
+    fn id(&self) -> SocketID;
+    fn protocol(&self) -> Protocol;
+    fn local_port(&self) -> Port;
+    fn remote_port(&self) -> Port;
+}
+
+pub trait BsdSocket: Socket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
+}
+
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
@@ -200,6 +266,40 @@ impl BsdSocket for SimpleSocket {
     fn remote_port(&self) -> Port {
         self.remote_port.load(Ordering::SeqCst) as Port
     }
+}
+
+||||||| 0ddf2eac7
+}
+
+impl BsdSocket for SimpleSocket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => {
+                self.reuse_addr.store(val, Ordering::SeqCst);
+            }
+            SocketOption::TcpNoDelay => {
+                self.tcp_nodelay.store(val, Ordering::SeqCst);
+            }
+            SocketOption::RcvBuf => {
+                self.rcvbuf.store(val, Ordering::SeqCst);
+            }
+            SocketOption::SndBuf => {
+                self.sndbuf.store(val, Ordering::SeqCst);
+            }
+        }
+        Ok(())
+    }
+
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
+            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
+            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
+            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
+        }
+    }
+}
+
 }
 
 pub trait TCPConnection {

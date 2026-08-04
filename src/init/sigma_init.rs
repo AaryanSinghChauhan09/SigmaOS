@@ -10,18 +10,26 @@
 /// Implements minimal init system with service management, dependency resolution, parallel startup
 #![allow(warnings)]
 #![allow(clippy::all)]
+||||||| 0ddf2eac7
+#![allow(warnings)]
+#![allow(clippy::all)]
 
-/// OOP-based Lightweight Init System for SigmaOS
-/// Based on Ideas-999-Structured: Core System Item 5
-/// Implements minimal init system with service management, dependency resolution, parallel startup,
-/// and modular FirmwarePort / SecurityPort structures
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::string::String;
 use alloc::vec::Vec;
 
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::vec;
+use alloc::string::ToString;
+||||||| 0ddf2eac7
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec;
 use alloc::vec::Vec;
 use alloc::vec;
 use alloc::string::ToString;
@@ -43,6 +51,19 @@ pub enum Runlevel {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum ServiceState { Stopped = 0, Starting = 1, Running = 2, Stopping = 3, Failed = 4 }
+||||||| 0ddf2eac7
+/// Standard operating runlevels inspired by SysVInit and Linux distributions
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Runlevel {
+    Level0_Halt = 0,
+    Level1_SingleUser = 1,      // Maintenance / Recovery Mode
+    Level2_MultiUser = 2,       // Multi-User Command Line (No Networking)
+    Level3_MultiUserNetwork = 3,// Full Multi-User with Networking (CLI)
+    Level5_Graphical = 5,       // Zenith Desktop GUI Mode
+    Level6_Reboot = 6,
+}
+
+/// Service states within the supervisor
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState {
@@ -67,6 +88,8 @@ pub enum ServiceState {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum InitError { Success = 0, ServiceNotFound = 1, DependencyFailed = 2, StartFailed = 3, StopFailed = 4 }
+||||||| 0ddf2eac7
+/// Dynamic errors thrown by the init coordinator
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InitError {
@@ -75,6 +98,7 @@ pub enum InitError {
     DependencyFailed = 2,
     StartFailed = 3,
     StopFailed = 4,
+    InvalidTransition = 5,
 }
 
 /// Dynamic errors thrown by the init coordinator
@@ -89,6 +113,8 @@ pub enum InitError {
     InvalidTransition = 5,
 }
 
+/// OOP Service Trait
+||||||| 0ddf2eac7
 /// OOP Service Trait
 pub trait Service {
     fn id(&self) -> ServiceID;
@@ -108,6 +134,8 @@ pub trait Service {
 /// Standard service implementation
 ||||||| 43be3a7e8
 #[repr(C)]
+||||||| 0ddf2eac7
+/// Standard service implementation
 pub struct SimpleService {
     pub id: ServiceID,
     pub name: String,
@@ -172,31 +200,43 @@ impl Service for SimpleService {
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
+||||||| 0ddf2eac7
+    fn name(&self) -> &[u8] {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
+        &self.name[..len]
+
+    fn name(&self) -> &str {
+        &self.name
     }
 ||||||| 43be3a7e8
     fn state(&self) -> ServiceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
+||||||| 0ddf2eac7
+
     fn state(&self) -> ServiceState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+        match self.state.load(Ordering::SeqCst) {
+            0 => ServiceState::Stopped,
+            1 => ServiceState::Starting,
+            2 => ServiceState::Running,
+            3 => ServiceState::Stopping,
+            _ => ServiceState::Failed,
+        }
     }
+
     fn dependencies(&self) -> Vec<ServiceID> {
         self.deps.clone()
     }
 
     fn start(&mut self) -> Result<(), InitError> {
-        self.state
-            .store(ServiceState::Starting as usize, Ordering::SeqCst);
-        self.state
-            .store(ServiceState::Running as usize, Ordering::SeqCst);
+        self.state.store(ServiceState::Starting as usize, Ordering::SeqCst);
+        self.state.store(ServiceState::Running as usize, Ordering::SeqCst);
         self.pid.store(self.id + 1000, Ordering::SeqCst);
         Ok(())
     }
 
     fn stop(&mut self) -> Result<(), InitError> {
-        self.state
-            .store(ServiceState::Stopping as usize, Ordering::SeqCst);
-        self.state
-            .store(ServiceState::Stopped as usize, Ordering::SeqCst);
+        self.state.store(ServiceState::Stopping as usize, Ordering::SeqCst);
+        self.state.store(ServiceState::Stopped as usize, Ordering::SeqCst);
         self.pid.store(0, Ordering::SeqCst);
         Ok(())
     }
@@ -228,6 +268,8 @@ pub trait InitSystem {
 /// Concrete SigmaOS Init implementation (supporting parallel startup, targets, and runlevels)
 ||||||| 43be3a7e8
 #[repr(C)]
+||||||| 0ddf2eac7
+/// Concrete SigmaOS Init implementation (supporting parallel startup, targets, and runlevels)
 pub struct SigmaInit {
     pub services: Vec<Option<Box<dyn Service>>>,
     pub parallel_startup: bool,
@@ -293,6 +335,26 @@ impl Default for SigmaInit {
             }
         }
         Err(InitError::ServiceNotFound)
+||||||| 0ddf2eac7
+        Err(InitError::ServiceNotFound)
+    }
+}
+
+impl Default for SigmaInit {
+    fn default() -> Self {
+        Self::new()
+    }
+
+    pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        for svc_option in &mut self.services {
+            if let Some(ref mut svc) = *svc_option {
+                if svc.id() == id {
+                    return svc.restart();
+                }
+            }
+        }
+        Err(InitError::ServiceNotFound)
+        None
     }
 }
 
@@ -319,14 +381,24 @@ impl InitSystem for SigmaInit {
         for svc_option in &mut self.services {
             if let Some(ref mut svc) = *svc_option {
         // Fetch dependencies first to avoid double borrowing
+||||||| 0ddf2eac7
+        // Fetch dependencies first to avoid double borrowing
+        // Fetch dependencies first
         let mut deps = Vec::new();
+        let mut req_level = Runlevel::Level2_MultiUser;
         for svc_option in &self.services {
             if let Some(ref svc) = *svc_option {
                 if svc.id() == id {
                     deps = svc.dependencies();
+                    req_level = svc.required_runlevel();
                     break;
                 }
             }
+        }
+
+        // Safety check: Don't start service if current runlevel is too low
+        if (self.current_runlevel as usize) < (req_level as usize) {
+            return Err(InitError::DependencyFailed);
         }
 
         for dep_id in deps {
@@ -349,6 +421,15 @@ impl InitSystem for SigmaInit {
                     return svc.start();
                 }
             }
+||||||| 0ddf2eac7
+        for svc_option in &mut self.services {
+            if let Some(ref mut svc) = *svc_option {
+                if svc.id() == id {
+                    return svc.start();
+                }
+            }
+        if let Some(svc) = self.get_service_mut(id) {
+            return svc.start();
         }
 
         // Safety check: Don't start service if current runlevel is too low
@@ -580,6 +661,12 @@ impl ServiceMonitor for SimpleServiceMonitor {
 ||||||| 43be3a7e8
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 /// Advanced OOP-driven Firmware Port Class Hierarchy
+||||||| 0ddf2eac7
+/// Advanced OOP-driven Firmware Port Class Hierarchy
+// ============================================================================
+// Firmware Ports & Security Ports
+// ============================================================================
+
 pub trait FirmwarePort {
     fn boot_type(&self) -> &'static str;
     fn handoff(&self) -> Result<(), &'static str>;
@@ -777,6 +864,8 @@ impl FirmwarePort for CorebootPort {
 }
 
 /// Advanced OOP-driven Security Port Class Hierarchy
+||||||| 0ddf2eac7
+/// Advanced OOP-driven Security Port Class Hierarchy
 pub trait SecurityPort {
     fn policy_name(&self) -> &'static str;
     fn check_capability(&self, cap: u32) -> bool;
@@ -809,8 +898,12 @@ impl SecurityPort for ZeroTrustPort {
     }
     fn check_capability(&self, _cap: u32) -> bool {
         false
-    } // Absolute strict verification
+    }
 }
+
+// ============================================================================
+// Tests
+// ============================================================================
 
 #[cfg(test)]
 mod tests {
@@ -820,9 +913,8 @@ mod tests {
     fn test_service_dependency_resolution() {
         let mut init = SigmaInit::new();
 
-        let mut svc1 = SimpleService::new(1, b"udev");
-        let mut svc2 = SimpleService::new(2, b"display");
-        svc2.deps.push(1);
+        let svc1 = SimpleService::new(1, "udev");
+        let svc2 = SimpleService::new(2, "display").with_deps(vec![1]);
 
         init.register_service(Box::new(svc1)).unwrap();
         init.register_service(Box::new(svc2)).unwrap();
@@ -832,6 +924,37 @@ mod tests {
         assert_eq!(order.len(), 2);
         assert_eq!(order[0], 1); // udev must start first
         assert_eq!(order[1], 2);
+    }
+
+    #[test]
+    fn test_linux_runlevels_and_target_transitions() {
+        let mut init = SigmaInit::new();
+
+        let udev = SimpleService::new(1, "udev").with_runlevel(Runlevel::Level1_SingleUser);
+        let network = SimpleService::new(2, "network").with_deps(vec![1]).with_runlevel(Runlevel::Level3_MultiUserNetwork);
+        let gdm = SimpleService::new(3, "zenith-gdm").with_deps(vec![2]).with_runlevel(Runlevel::Level5_Graphical);
+
+        init.register_service(Box::new(udev)).unwrap();
+        init.register_service(Box::new(network)).unwrap();
+        init.register_service(Box::new(gdm)).unwrap();
+
+        // 1. Enter CLI Mode (Runlevel 3)
+        init.switch_runlevel(Runlevel::Level3_MultiUserNetwork).unwrap();
+        assert_eq!(init.get_service(1).unwrap().state(), ServiceState::Running); // udev
+        assert_eq!(init.get_service(2).unwrap().state(), ServiceState::Running); // network
+        assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Stopped); // gdm (too advanced)
+
+        // 2. Switch to Graphical Target (systemd-style)
+        init.set_active_target("graphical.target").unwrap();
+        assert_eq!(init.current_runlevel, Runlevel::Level5_Graphical);
+        assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Running); // gdm starts
+
+        // 3. Switch to Rescue Target (systemd-style)
+        init.set_active_target("rescue.target").unwrap();
+        assert_eq!(init.current_runlevel, Runlevel::Level1_SingleUser);
+        assert_eq!(init.get_service(1).unwrap().state(), ServiceState::Running); // udev remains
+        assert_eq!(init.get_service(2).unwrap().state(), ServiceState::Stopped); // network stopped
+        assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Stopped); // gdm stopped
     }
 
     #[test]

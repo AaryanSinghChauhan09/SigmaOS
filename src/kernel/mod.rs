@@ -20,6 +20,10 @@ pub mod linux_absorb;
 pub mod subsystem;
 ||||||| 43be3a7e8
 pub mod virtual_cpu;
+||||||| 0ddf2eac7
+pub mod ipc;
+pub mod linux_absorb;
+pub mod subsystem;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
