@@ -276,6 +276,35 @@ impl Device for SimpleBlockDevice {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct DdeDeviceWrapper {
+    pub id: u32,
+    pub name: [u8; 32],
+    pub io_port: u16,
+    pub driver_type: [u8; 16],
+    pub simulated_pci_bar: [u32; 6],
+}
+
+impl DdeDeviceWrapper {
+    pub fn new(id: u32, name: &[u8], io_port: u16, driver_type: &[u8]) -> Self {
+        let mut name_buf = [0u8; 32];
+        let len = name.len().min(32);
+        name_buf[..len].copy_from_slice(&name[..len]);
+
+        let mut driver_buf = [0u8; 16];
+        let d_len = driver_type.len().min(16);
+        driver_buf[..d_len].copy_from_slice(&driver_type[..d_len]);
+
+        Self {
+            id,
+            name: name_buf,
+            io_port,
+            driver_type: driver_buf,
+            simulated_pci_bar: [0; 6],
+        }
+    }
+}
+
 // =========================================================================
 // ANCIENT AND LEGACY DEVICE SUPPORT (OOP-BASED IMPLEMENTATIONS)
 // =========================================================================
@@ -596,7 +625,7 @@ impl Device for IsaBusDevice {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, _arg: usize) -> Result<usize, DeviceError> {
@@ -645,7 +674,7 @@ impl Device for IntelHDGpu {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -698,7 +727,7 @@ impl Device for RadeonGpu {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -750,7 +779,7 @@ impl Device for NvidiaGpu {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -802,7 +831,7 @@ impl Device for VesaFramebufferDevice {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1123,7 +1152,7 @@ impl Device for IntelE1000Network {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1190,7 +1219,7 @@ impl Device for RealtekRtl8139Network {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1257,7 +1286,7 @@ impl Device for VirtioNetDevice {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1322,7 +1351,7 @@ impl Device for IntelHdaAudio {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1371,7 +1400,7 @@ impl Device for Ac97AudioDevice {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1474,7 +1503,7 @@ impl Device for Ps2MouseDevice {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1523,7 +1552,7 @@ impl Device for TouchscreenController {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1571,7 +1600,7 @@ impl Device for BluetoothController {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1620,7 +1649,7 @@ impl Device for WirelessWifiDevice {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1668,7 +1697,7 @@ impl Device for I2cController {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1717,7 +1746,7 @@ impl Device for SpiController {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1766,7 +1795,7 @@ impl Device for GpioController {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1815,7 +1844,7 @@ impl Device for PciExpressBus {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1864,7 +1893,7 @@ impl Device for TpmSecurityModule {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1913,7 +1942,7 @@ impl Device for SecureEnclaveDriver {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -1962,7 +1991,7 @@ impl Device for ImuSensorDriver {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -2010,7 +2039,7 @@ impl Device for ThermalSensorDriver {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
@@ -2059,7 +2088,7 @@ impl Device for LinePrinterDevice {
     fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(buffer.len())
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
