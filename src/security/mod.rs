@@ -1,22 +1,12 @@
-// SigmaOS Security Module
-// Capability-based security, pledge, and access control
-
+// SigmaOS Security Subsystem
 pub mod capability;
-pub mod defensive_audit;
-pub mod parrot;
 pub mod pledge;
-pub mod qubes_isolation;
+pub mod vulnerability;
+pub mod hardening;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
-pub use parrot::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-};
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+pub use pledge::{PledgeError, PledgeManager, PledgePromise};
+pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
+pub use hardening::{
+    secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
 };

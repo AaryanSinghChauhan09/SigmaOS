@@ -1,39 +1,27 @@
-// OOP-based Process Spawning and POSIX Signals Framework for SigmaOS
-// Implements process lifecycles, fork, exec, and signals (SIGKILL, SIGTERM, SIGINT) under `#![no_std]`.
+/// OOP-based Process Spawning & Signal Handling for SigmaOS
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 121
+/// Implements process creation, fork, exec, and Linux-grade signals (SIGINT, SIGKILL, SIGTERM, etc.)
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use crate::klib::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ProcessID = usize;
-pub type SignalHandlerFn = fn(ProcessID, u8);
 
-/// Standard POSIX Signals
-pub const SIGINT: u8 = 2; // Interrupt (graceful / catchable)
-pub const SIGKILL: u8 = 9; // Force Kill (un-catchable, immediate)
-pub const SIGUSR1: u8 = 10; // User defined 1 (catchable)
-pub const SIGTERM: u8 = 15; // Terminate (graceful / catchable)
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProcessState {
-    Created = 0,
-    Running = 1,
-    Sleeping = 2,
-    Zombie = 3,
-    Terminated = 4,
-}
+pub const SIGINT: u8 = 2;
+pub const SIGKILL: u8 = 9;
+pub const SIGUSR1: u8 = 10;
+pub const SIGSEGV: u8 = 11;
+pub const SIGTERM: u8 = 15;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProcessError {
-    Success = 0,
-    NotFound = 1,
-    InvalidArgs = 2,
-    SpawnFailed = 3,
-}
+pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessError { Success = 0, NotFound = 1, InvalidArgs = 2, SpawnFailed = 3 }
+
+pub type SignalHandler = fn(u8);
 
 pub trait Process {
     fn id(&self) -> ProcessID;
@@ -41,7 +29,8 @@ pub trait Process {
     fn state(&self) -> ProcessState;
     fn set_state(&mut self, state: ProcessState);
     fn exit_code(&self) -> i32;
-    fn set_exit_code(&mut self, code: i32);
+    fn register_signal_handler(&mut self, signal: u8, handler: SignalHandler);
+    fn deliver_signal(&mut self, signal: u8) -> bool; // Returns true if custom handler was executed, false otherwise
 }
 
 pub struct SimpleProcess {
@@ -49,6 +38,8 @@ pub struct SimpleProcess {
     pub parent_id: ProcessID,
     pub state: AtomicUsize,
     pub exit_code: AtomicUsize,
+    pub signal_handlers: Vec<(u8, SignalHandler)>,
+    pub pending_signals: Vec<u8>,
 }
 
 impl SimpleProcess {
@@ -58,17 +49,15 @@ impl SimpleProcess {
             parent_id,
             state: AtomicUsize::new(ProcessState::Created as usize),
             exit_code: AtomicUsize::new(0),
+            signal_handlers: Vec::new(),
+            pending_signals: Vec::new(),
         }
     }
 }
 
 impl Process for SimpleProcess {
-    fn id(&self) -> ProcessID {
-        self.id
-    }
-    fn parent_id(&self) -> ProcessID {
-        self.parent_id
-    }
+    fn id(&self) -> ProcessID { self.id }
+    fn parent_id(&self) -> ProcessID { self.parent_id }
     fn state(&self) -> ProcessState {
         match self.state.load(Ordering::SeqCst) {
             0 => ProcessState::Created,
@@ -83,32 +72,59 @@ impl Process for SimpleProcess {
         self.state.store(state as usize, Ordering::SeqCst);
     }
 
-    fn exit_code(&self) -> i32 {
-        self.exit_code.load(Ordering::SeqCst) as i32
+    fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
+
+    fn register_signal_handler(&mut self, signal: u8, handler: SignalHandler) {
+        // SIGKILL cannot be caught or ignored
+        if signal == SIGKILL {
+            return;
+        }
+        self.signal_handlers.push((signal, handler));
     }
 
-    fn set_exit_code(&mut self, code: i32) {
-        self.exit_code.store(code as usize, Ordering::SeqCst);
+    fn deliver_signal(&mut self, signal: u8) -> bool {
+        // Enforce SIGKILL (9) instant kernel termination (cannot be caught)
+        if signal == SIGKILL {
+            self.set_state(ProcessState::Terminated);
+            self.exit_code.store(137, Ordering::SeqCst); // 128 + 9 = 137 standard Linux SIGKILL exit code
+            return false;
+        }
+
+        // Search for registered custom signal handler
+        let mut handler_idx = None;
+        for i in 0..self.signal_handlers.len() {
+            if self.signal_handlers[i].0 == signal {
+                handler_idx = Some(i);
+                break;
+            }
+        }
+
+        if let Some(idx) = handler_idx {
+            let handler_func = self.signal_handlers[idx].1;
+            handler_func(signal);
+            true
+        } else {
+            // Apply default Linux signal behavior (e.g. SIGTERM/SIGINT terminate)
+            if signal == SIGTERM || signal == SIGINT || signal == SIGSEGV {
+                self.set_state(ProcessState::Terminated);
+                self.exit_code.store(128 + signal as usize, Ordering::SeqCst);
+            }
+            false
+        }
     }
 }
 
 pub trait ProcessSpawner {
     fn spawn(&mut self, executable: &[u8], args: &[[u8; 64]]) -> Result<ProcessID, ProcessError>;
     fn fork(&mut self, parent_id: ProcessID) -> Result<ProcessID, ProcessError>;
-    fn exec(
-        &mut self,
-        process_id: ProcessID,
-        executable: &[u8],
-        args: &[[u8; 64]],
-    ) -> Result<(), ProcessError>;
+    fn exec(&mut self, process_id: ProcessID, executable: &[u8], args: &[[u8; 64]]) -> Result<(), ProcessError>;
     fn kill(&mut self, process_id: ProcessID, signal: u8) -> Result<(), ProcessError>;
 }
 
-/// Simple Process Spawner with custom signal handlers database
+#[repr(C)]
 pub struct SimpleProcessSpawner {
     pub processes: Vec<Option<Box<dyn Process>>>,
     pub next_id: AtomicUsize,
-    pub signal_handlers: Vec<(ProcessID, u8, SignalHandlerFn)>,
 }
 
 impl SimpleProcessSpawner {
@@ -116,21 +132,7 @@ impl SimpleProcessSpawner {
         SimpleProcessSpawner {
             processes: Vec::new(),
             next_id: AtomicUsize::new(1),
-            signal_handlers: Vec::new(),
         }
-    }
-
-    /// Register a custom signal handler for a process
-    pub fn register_signal_handler(
-        &mut self,
-        pid: ProcessID,
-        signal: u8,
-        handler: SignalHandlerFn,
-    ) {
-        if signal == SIGKILL {
-            return; // SIGKILL cannot be caught or ignored!
-        }
-        self.signal_handlers.push((pid, signal, handler));
     }
 }
 
@@ -155,12 +157,7 @@ impl ProcessSpawner for SimpleProcessSpawner {
         Ok(id)
     }
 
-    fn exec(
-        &mut self,
-        process_id: ProcessID,
-        _executable: &[u8],
-        _args: &[[u8; 64]],
-    ) -> Result<(), ProcessError> {
+    fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
         for process_option in &mut self.processes {
             if let Some(ref mut process) = *process_option {
                 if process.id() == process_id {
@@ -172,73 +169,25 @@ impl ProcessSpawner for SimpleProcessSpawner {
         Err(ProcessError::NotFound)
     }
 
-    /// Dispatches POSIX signals. SIGKILL forces instant termination. Graceful signals trigger handlers or exit.
     fn kill(&mut self, process_id: ProcessID, signal: u8) -> Result<(), ProcessError> {
-        let mut process_found = false;
-        let mut exit_code_to_set = 0;
-
         for process_option in &mut self.processes {
             if let Some(ref mut process) = *process_option {
                 if process.id() == process_id {
-                    process_found = true;
-
-                    if signal == SIGKILL {
-                        // SIGKILL (9) is immediate and un-catchable
-                        process.set_state(ProcessState::Terminated);
-                        process.set_exit_code(137); // Standard 128 + 9 exit status for SIGKILL
-                        return Ok(());
-                    }
-
-                    // Check for custom registered catchable signal handler
-                    let mut handler_dispatched = false;
-                    for &(pid, sig, handler) in &self.signal_handlers {
-                        if pid == process_id && sig == signal {
-                            handler(process_id, signal);
-                            handler_dispatched = true;
-                            break;
-                        }
-                    }
-
-                    if !handler_dispatched {
-                        // Default signal action is termination
-                        process.set_state(ProcessState::Terminated);
-                        exit_code_to_set = match signal {
-                            SIGTERM => 143, // 128 + 15
-                            SIGINT => 130,  // 128 + 2
-                            _ => 1,
-                        };
-                    }
-                    break;
+                    process.deliver_signal(signal);
+                    return Ok(());
                 }
             }
         }
-
-        if process_found {
-            if exit_code_to_set > 0 {
-                for process_option in &mut self.processes {
-                    if let Some(ref mut process) = *process_option {
-                        if process.id() == process_id {
-                            process.set_exit_code(exit_code_to_set);
-                        }
-                    }
-                }
-            }
-            Ok(())
-        } else {
-            Err(ProcessError::NotFound)
-        }
+        Err(ProcessError::NotFound)
     }
 }
 
 pub trait ProcessWaiter {
     fn wait(&mut self, process_id: ProcessID) -> Result<i32, ProcessError>;
-    fn waitpid(
-        &mut self,
-        process_id: ProcessID,
-        options: u32,
-    ) -> Result<(ProcessID, i32), ProcessError>;
+    fn waitpid(&mut self, process_id: ProcessID, options: u32) -> Result<(ProcessID, i32), ProcessError>;
 }
 
+#[repr(C)]
 pub struct SimpleProcessWaiter {
     pub spawner: SimpleProcessSpawner,
 }
@@ -263,11 +212,7 @@ impl ProcessWaiter for SimpleProcessWaiter {
         Err(ProcessError::NotFound)
     }
 
-    fn waitpid(
-        &mut self,
-        process_id: ProcessID,
-        _options: u32,
-    ) -> Result<(ProcessID, i32), ProcessError> {
+    fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
         for process_option in &self.spawner.processes {
             if let Some(ref process) = *process_option {
                 if process.id() == process_id {
@@ -287,6 +232,7 @@ pub trait ProcessGroup {
     fn signal_group(&mut self, group_id: usize, signal: u8) -> Result<(), ProcessError>;
 }
 
+#[repr(C)]
 pub struct SimpleProcessGroup {
     pub groups: Vec<(usize, Vec<ProcessID>)>,
     pub next_id: AtomicUsize,
@@ -327,7 +273,7 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 
     fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
-        for group in &self.groups {
+        for group in &mut self.groups {
             if group.0 == group_id {
                 return Ok(());
             }
@@ -339,42 +285,59 @@ impl ProcessGroup for SimpleProcessGroup {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use core::sync::atomic::AtomicUsize;
 
-    static CUSTOM_SIGNAL_DISPATCH_COUNT: AtomicUsize = AtomicUsize::new(0);
+    static RECEIVED_SIGNAL: AtomicUsize = AtomicUsize::new(0);
 
-    fn custom_sigterm_handler(_pid: ProcessID, _sig: u8) {
-        CUSTOM_SIGNAL_DISPATCH_COUNT.fetch_add(1, Ordering::SeqCst);
+    fn custom_handler(sig: u8) {
+        RECEIVED_SIGNAL.store(sig as usize, Ordering::SeqCst);
     }
 
     #[test]
-    fn test_process_spawning_and_sigkill() {
-        let mut spawner = SimpleProcessSpawner::new();
-        let pid = spawner.spawn(b"/bin/shell", &[]).unwrap();
+    fn test_process_creation_and_state() {
+        let mut proc = SimpleProcess::new(101, 1);
+        assert_eq!(proc.id(), 101);
+        assert_eq!(proc.state(), ProcessState::Created);
 
-        // 1. Send un-catchable SIGKILL -> Process should be instantly terminated with exit status 137
-        spawner.kill(pid, SIGKILL).unwrap();
-
-        let mut waiter = SimpleProcessWaiter::new(spawner);
-        let exit_code = waiter.wait(pid).unwrap();
-        assert_eq!(exit_code, 137);
+        proc.set_state(ProcessState::Running);
+        assert_eq!(proc.state(), ProcessState::Running);
     }
 
     #[test]
-    fn test_custom_signal_handler_and_sigterm() {
-        let mut spawner = SimpleProcessSpawner::new();
-        let pid = spawner.spawn(b"/bin/logger", &[]).unwrap();
-        spawner.exec(pid, b"/bin/logger", &[]).unwrap();
+    fn test_linux_signals_default_actions() {
+        let mut proc = SimpleProcess::new(202, 1);
 
-        // Register custom SIGTERM (15) handler
-        spawner.register_signal_handler(pid, SIGTERM, custom_sigterm_handler);
+        // Delivering SIGTERM (15) should terminate process with standard exit code 128 + 15 = 143
+        assert!(!proc.deliver_signal(SIGTERM));
+        assert_eq!(proc.state(), ProcessState::Terminated);
+        assert_eq!(proc.exit_code(), 143);
+    }
 
-        // Send SIGTERM -> Custom handler should be dispatched instead of default termination
-        spawner.kill(pid, SIGTERM).unwrap();
-        assert_eq!(CUSTOM_SIGNAL_DISPATCH_COUNT.load(Ordering::SeqCst), 1);
+    #[test]
+    fn test_custom_signal_handlers() {
+        let mut proc = SimpleProcess::new(303, 1);
 
-        // Standard processes state is unchanged since handler didn't call exit
-        let mut waiter = SimpleProcessWaiter::new(spawner);
-        assert!(waiter.wait(pid).is_err()); // Not terminated yet!
+        // Register custom handler for SIGUSR1 (10)
+        proc.register_signal_handler(SIGUSR1, custom_handler);
+
+        // Reset static signal received indicator
+        RECEIVED_SIGNAL.store(0, Ordering::SeqCst);
+
+        // Deliver SIGUSR1 -> should trigger handler instead of default termination
+        assert!(proc.deliver_signal(SIGUSR1));
+        assert_eq!(proc.state(), ProcessState::Created); // Still created (not terminated)
+        assert_eq!(RECEIVED_SIGNAL.load(Ordering::SeqCst), SIGUSR1 as usize);
+    }
+
+    #[test]
+    fn test_sigkill_cannot_be_caught_or_ignored() {
+        let mut proc = SimpleProcess::new(404, 1);
+
+        // Try registering handler for SIGKILL -> should be ignored/blocked by process model
+        proc.register_signal_handler(SIGKILL, custom_handler);
+
+        // Deliver SIGKILL -> must instantly terminate with standard exit code 137, bypassing handler!
+        assert!(!proc.deliver_signal(SIGKILL));
+        assert_eq!(proc.state(), ProcessState::Terminated);
+        assert_eq!(proc.exit_code(), 137);
     }
 }

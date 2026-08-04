@@ -116,7 +116,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        context: &HashMap<String, String>,
+        _context: &HashMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;
