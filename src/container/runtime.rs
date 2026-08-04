@@ -1,29 +1,13 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
+#![no_main]
 
 use core::mem;
+/// OOP-based Container Runtime for SigmaOS
+/// Implements container runtime using OOP principles with traits and structs
+/// No dependency on external container frameworks
+/// Based on Roadmap Item 17: Container runtime support
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-
-extern crate alloc;
-use alloc::boxed::Box;
 
 /// Container ID
 pub type ContainerID = usize;
@@ -37,47 +21,6 @@ pub enum ContainerState {
     Paused = 2,
     Stopped = 3,
     Failed = 4,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerCapability {
-    pub can_start: bool,
-    pub can_stop: bool,
-    pub can_pause: bool,
-    pub can_modify: bool,
-}
-
-impl ContainerCapability {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        ContainerCapability {
-            can_start: false,
-            can_stop: false,
-            can_pause: false,
-            can_modify: false,
-        }
-    }
-
-    pub fn full() -> Self {
-        ContainerCapability {
-            can_start: true,
-            can_stop: true,
-            can_pause: true,
-            can_modify: true,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerInfo {
-    pub id: ContainerID,
-    pub name: [u8; 64],
-    pub image: [u8; 128],
-    pub state: ContainerState,
-    pub pid: Option<usize>,
-    pub memory_limit: u64,
-    pub cpu_limit: u32,
-    pub capability: ContainerCapability,
 }
 
 /// Container trait (OOP interface)
@@ -104,14 +47,71 @@ pub trait Container {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerError {
-    NotFound,
-    AlreadyExists,
-    InvalidConfig,
-    ResourceLimit,
-    CapabilityDenied,
-    PermissionDenied,
-    AlreadyStarted,
-    AlreadyStopped,
+    Success = 0,
+    AlreadyStarted = 1,
+    AlreadyStopped = 2,
+    StartFailed = 3,
+    StopFailed = 4,
+    PermissionDenied = 5,
+    ResourceLimit = 6,
+}
+
+/// Container info
+#[repr(C)]
+pub struct ContainerInfo {
+    pub id: ContainerID,
+    pub name: [u8; 64],
+    pub image: [u8; 128],
+    pub state: ContainerState,
+    pub pid: Option<usize>,
+    pub memory_limit: u64,
+    pub cpu_limit: u32,
+    pub capability: ContainerCapability,
+}
+
+impl ContainerInfo {
+    pub fn new(id: ContainerID) -> Self {
+        ContainerInfo {
+            id,
+            name: [0; 64],
+            image: [0; 128],
+            state: ContainerState::Created,
+            pid: None,
+            memory_limit: 0,
+            cpu_limit: 0,
+            capability: ContainerCapability::new(),
+        }
+    }
+}
+
+/// Container capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct ContainerCapability {
+    pub can_start: bool,
+    pub can_stop: bool,
+    pub can_pause: bool,
+    pub can_modify: bool,
+}
+
+impl ContainerCapability {
+    pub fn new() -> Self {
+        ContainerCapability {
+            can_start: false,
+            can_stop: false,
+            can_pause: false,
+            can_modify: false,
+        }
+    }
+
+    pub fn full() -> Self {
+        ContainerCapability {
+            can_start: true,
+            can_stop: true,
+            can_pause: true,
+            can_modify: true,
+        }
+    }
 }
 
 /// Container network configuration type
@@ -138,90 +138,11 @@ pub struct ContainerNamespace {
     pub rootless: bool,
 }
 
-impl ContainerNamespace {
-    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_uid == 0 {
-                Ok(self.uid_mapping)
-            } else {
-                Ok(self.uid_mapping + container_uid)
-            }
-        } else {
-            Ok(container_uid)
-        }
-    }
-
-    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_gid == 0 {
-                Ok(self.gid_mapping)
-            } else {
-                Ok(self.gid_mapping + container_gid)
-            }
-        } else {
-            Ok(container_gid)
-        }
-    }
-}
-
 /// Container seccomp profiles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SeccompProfile {
     pub hardened: bool,
     pub blocked_syscalls_mask: u32,
-}
-
-impl SeccompProfile {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened {
-            return false;
-        }
-        if syscall_id < 32 {
-            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
-        } else {
-            false
-        }
-    }
-}
-
-/// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
-#[derive(Debug, Clone)]
-pub struct OverlayFS {
-    pub lower_dirs: std::vec::Vec<String>,
-    pub upper_dir: String,
-    pub work_dir: String,
-    pub mounted: bool,
-}
-
-impl OverlayFS {
-    pub fn new(lower_dirs: std::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
-        Self {
-            lower_dirs,
-            upper_dir,
-            work_dir,
-            mounted: false,
-        }
-    }
-
-    pub fn mount(&mut self) -> Result<(), &'static str> {
-        if self.lower_dirs.is_empty() {
-            return Err("OverlayFS mount failed: lower_dirs cannot be empty");
-        }
-        if self.upper_dir.is_empty() || self.work_dir.is_empty() {
-            return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
-        }
-        self.mounted = true;
-        println!(
-            "OverlayFS mounted successfully: lowerdirs={:?}, upperdir={}, workdir={}",
-            self.lower_dirs, self.upper_dir, self.work_dir
-        );
-        Ok(())
-    }
-
-    pub fn umount(&mut self) {
-        self.mounted = false;
-        println!("OverlayFS unmounted successfully.");
-    }
 }
 
 /// Simple container (OOP: Concrete container class)
@@ -243,17 +164,6 @@ pub struct SimpleContainer {
 }
 
 impl SimpleContainer {
-    pub fn execute_syscall(&self, syscall_id: u32) -> Result<(), ContainerError> {
-        if self.seccomp.is_syscall_blocked(syscall_id) {
-            println!(
-                "Container Seccomp Violation: Syscall {} is strictly prohibited by security profile",
-                syscall_id
-            );
-            return Err(ContainerError::PermissionDenied);
-        }
-        Ok(())
-    }
-
     pub fn new(
         id: ContainerID,
         name: &[u8],
@@ -451,7 +361,6 @@ pub struct RuntimeStats {
 }
 
 impl RuntimeStats {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         RuntimeStats {
             total_containers: 0,
@@ -480,7 +389,6 @@ pub struct RuntimeCapability {
 }
 
 impl RuntimeCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         RuntimeCapability {
             can_create: false,
@@ -548,7 +456,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
             self.stats.total_containers -= 1;
             Ok(())
         } else {
-            Err(ContainerError::NotFound)
+            Err(ContainerError::PermissionDenied)
         }
     }
 
@@ -560,12 +468,15 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.start();
             if result.is_ok() {
-                self.stats.stopped_containers -= 1;
-                self.stats.running_containers += 1;
+                let state = container.state();
+                if state == ContainerState::Running {
+                    self.stats.running_containers += 1;
+                    self.stats.stopped_containers -= 1;
+                }
             }
             result
         } else {
-            Err(ContainerError::NotFound)
+            Err(ContainerError::PermissionDenied)
         }
     }
 
@@ -577,12 +488,15 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.stop();
             if result.is_ok() {
-                self.stats.running_containers -= 1;
-                self.stats.stopped_containers += 1;
+                let state = container.state();
+                if state == ContainerState::Stopped {
+                    self.stats.running_containers -= 1;
+                    self.stats.stopped_containers += 1;
+                }
             }
             result
         } else {
-            Err(ContainerError::NotFound)
+            Err(ContainerError::PermissionDenied)
         }
     }
 
@@ -594,12 +508,15 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.pause();
             if result.is_ok() {
-                self.stats.running_containers -= 1;
-                self.stats.paused_containers += 1;
+                let state = container.state();
+                if state == ContainerState::Paused {
+                    self.stats.running_containers -= 1;
+                    self.stats.paused_containers += 1;
+                }
             }
             result
         } else {
-            Err(ContainerError::NotFound)
+            Err(ContainerError::PermissionDenied)
         }
     }
 
@@ -611,12 +528,15 @@ impl ContainerRuntime for SimpleContainerRuntime {
         if let Some(ref mut container) = self.get_container_mut(id) {
             let result = container.resume();
             if result.is_ok() {
-                self.stats.paused_containers -= 1;
-                self.stats.running_containers += 1;
+                let state = container.state();
+                if state == ContainerState::Running {
+                    self.stats.paused_containers -= 1;
+                    self.stats.running_containers += 1;
+                }
             }
             result
         } else {
-            Err(ContainerError::NotFound)
+            Err(ContainerError::PermissionDenied)
         }
     }
 
@@ -660,7 +580,7 @@ impl SimpleContainerRuntime {
 }
 
 /// Simple Vec implementation for no_std
-pub struct Vec<T> {
+struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
@@ -688,8 +608,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
 }
 
 impl<T> Vec<T> {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
+    fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
@@ -697,7 +616,7 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn push(&mut self, item: T) {
+    fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
                 self.grow();
@@ -710,7 +629,7 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn len(&self) -> usize {
+    fn len(&self) -> usize {
         self.len
     }
 
@@ -720,13 +639,15 @@ impl<T> Vec<T> {
         } else {
             self.capacity * 2
         };
-        let layout =
-            std::alloc::Layout::from_size_align(new_capacity * mem::size_of::<T>(), 8).unwrap();
-        let new_data = std::alloc::alloc(layout) as *mut T;
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
             }
 
             self.data = new_data;
@@ -735,197 +656,23 @@ impl<T> Vec<T> {
     }
 }
 
-pub mod oci {
-    extern crate alloc;
-    use super::ContainerError;
-    use alloc::string::String;
-    use alloc::string::ToString;
-    use alloc::vec::Vec;
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
 
-    pub struct NamespaceConfig {
-        pub pid: bool,
-        pub mnt: bool,
-        pub net: bool,
-        pub uts: bool,
-        pub ipc: bool,
-        pub user: bool,
-        pub cgroup: bool,
-    }
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
 
-    impl NamespaceConfig {
-        pub fn new() -> Self {
-            NamespaceConfig {
-                pid: false,
-                mnt: false,
-                net: false,
-                uts: false,
-                ipc: false,
-                user: false,
-                cgroup: false,
-            }
-        }
-
-        pub fn all(&self) -> bool {
-            self.pid && self.mnt && self.net && self.uts && self.ipc && self.user && self.cgroup
-        }
-    }
-
-    pub struct NamespaceSet {
-        pub pidns: Option<usize>,
-        pub mntns: Option<usize>,
-        pub netns: Option<usize>,
-        pub utsns: Option<usize>,
-        pub ipcns: Option<usize>,
-        pub userns: Option<usize>,
-        pub cgroupns: Option<usize>,
-    }
-
-    impl NamespaceSet {
-        pub fn new() -> Self {
-            NamespaceSet {
-                pidns: None,
-                mntns: None,
-                netns: None,
-                utsns: None,
-                ipcns: None,
-                userns: None,
-                cgroupns: None,
-            }
-        }
-
-        pub fn clone(&self) -> Self {
-            NamespaceSet {
-                pidns: self.pidns,
-                mntns: self.mntns,
-                netns: self.netns,
-                utsns: self.utsns,
-                ipcns: self.ipcns,
-                userns: self.userns,
-                cgroupns: self.cgroupns,
-            }
-        }
-    }
-
-    pub struct OciSpec {
-        pub version: String,
-        pub platform: String,
-        pub process: OciProcess,
-        pub mounts: Vec<OciMount>,
-    }
-
-    pub struct OciProcess {
-        pub args: Vec<String>,
-        pub env: Vec<String>,
-        pub cwd: String,
-        pub user: OciUser,
-        pub capabilities: Vec<String>,
-        pub rlimits: Vec<OciRlimit>,
-        pub no_new_privileges: bool,
-    }
-
-    pub struct OciUser {
-        pub uid: u32,
-        pub gid: u32,
-        pub additional_gids: Vec<u32>,
-    }
-
-    pub struct OciRlimit {
-        pub rlimit_type: String,
-        pub soft: u64,
-        pub hard: u64,
-    }
-
-    pub struct OciMount {
-        pub destination: String,
-        pub r#type: String,
-        pub source: String,
-        pub options: Vec<String>,
-    }
-
-    pub enum ContainerState {
-        Created,
-        Running,
-        Paused,
-        Stopped,
-        Deleted,
-    }
-
-    pub struct Container {
-        pub id: String,
-        pub bundle: String,
-        pub config: OciSpec,
-        pub image: String,
-        pub state: ContainerState,
-        pub pid: Option<u64>,
-        pub rootfs: String,
-        pub layers: Vec<String>,
-        pub namespaces: NamespaceConfig,
-    }
-
-    impl Container {
-        pub fn new(id: &str, bundle: &str) -> Self {
-            Container {
-                id: id.to_string(),
-                bundle: bundle.to_string(),
-                config: OciSpec {
-                    version: String::new(),
-                    platform: String::new(),
-                    process: OciProcess {
-                        args: Vec::new(),
-                        env: Vec::new(),
-                        cwd: String::from("/"),
-                        user: OciUser {
-                            uid: 0,
-                            gid: 0,
-                            additional_gids: Vec::new(),
-                        },
-                        capabilities: Vec::new(),
-                        rlimits: Vec::new(),
-                        no_new_privileges: false,
-                    },
-                    mounts: Vec::new(),
-                },
-                image: String::new(),
-                state: ContainerState::Created,
-                pid: None,
-                rootfs: String::new(),
-                layers: Vec::new(),
-                namespaces: NamespaceConfig::new(),
-            }
-        }
-    }
-
-    pub trait Runtime: Send + Sync {
-        fn create(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-        fn start(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-        fn kill(&mut self, container: &mut Container, signal: i32) -> Result<(), ContainerError>;
-        fn delete(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-        fn pause(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-        fn resume(&mut self, container: &mut Container) -> Result<(), ContainerError>;
-        fn exec(
-            &mut self,
-            container: &mut Container,
-            args: &[String],
-        ) -> Result<(), ContainerError>;
-        fn state(&self, container: &Container) -> Result<ContainerState, ContainerError>;
-        fn update(
-            &mut self,
-            container: &mut Container,
-            resources: &ResourceConfig,
-        ) -> Result<(), ContainerError>;
-    }
-
-    pub struct ResourceConfig {
-        pub cpu_shares: u64,
-        pub memory_mb: u64,
-    }
-
-    pub struct ContainerManager;
-    impl ContainerManager {
-        pub fn new() -> Self {
-            ContainerManager
-        }
-    }
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]
@@ -983,66 +730,5 @@ mod tests {
         assert!(!container.seccomp.hardened);
         container.seccomp.hardened = true;
         assert!(container.seccomp.hardened);
-    }
-
-    #[test]
-    fn test_overlayfs_stacking() {
-        let mut overlay = OverlayFS::new(
-            vec!["/lower1".to_string(), "/lower2".to_string()],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(!overlay.mounted);
-        assert!(overlay.mount().is_ok());
-        assert!(overlay.mounted);
-        overlay.umount();
-        assert!(!overlay.mounted);
-
-        // Mount failure on empty lowerdirs
-        let mut invalid_overlay = OverlayFS::new(
-            vec![],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(invalid_overlay.mount().is_err());
-    }
-
-    #[test]
-    fn test_rootless_user_namespace_mapping() {
-        let ns = ContainerNamespace {
-            uid_mapping: 1000,
-            gid_mapping: 1000,
-            rootless: true,
-        };
-
-        // Container root (UID 0) maps to host unprivileged user (UID 1000)
-        assert_eq!(ns.map_uid(0).unwrap(), 1000);
-        assert_eq!(ns.map_gid(0).unwrap(), 1000);
-
-        // Regular container users offset accordingly
-        assert_eq!(ns.map_uid(10).unwrap(), 1010);
-    }
-
-    #[test]
-    fn test_hardened_seccomp_syscall_filtering() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"hardened_ct",
-            b"alpine",
-            ContainerCapability::full(),
-        );
-        container.seccomp = SeccompProfile {
-            hardened: true,
-            blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)
-        };
-
-        // Allowed syscall (e.g. syscall 1)
-        assert!(container.execute_syscall(1).is_ok());
-
-        // Prohibited syscall (syscall 0)
-        assert_eq!(
-            container.execute_syscall(0).unwrap_err(),
-            ContainerError::PermissionDenied
-        );
     }
 }

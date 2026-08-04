@@ -72,7 +72,7 @@ impl PackageImporter for DebPackageImporter {
         // We can add translated dependencies to build commands for verification
         for dep in depends {
             let cmd = format!("# depends: {}", dep);
-            recipe = recipe.with_install_command(cmd);
+            recipe = recipe.with_prepare_command(cmd);
         }
 
         Ok(recipe)
@@ -136,7 +136,7 @@ impl PackageImporter for RpmPackageImporter {
 
         for req in requires {
             let cmd = format!("# requires: {}", req);
-            recipe = recipe.with_install_command(cmd);
+            recipe = recipe.with_prepare_command(cmd);
         }
 
         Ok(recipe)
@@ -161,7 +161,7 @@ impl PackageImporter for PacmanPackageImporter {
         let mut name = String::new();
         let mut version_str = String::new();
         let mut description = String::new();
-        let mut _pkgrel = 1;
+        let mut pkgrel = 1;
 
         for line in raw_metadata.lines() {
             let trimmed = line.trim();
@@ -181,7 +181,7 @@ impl PackageImporter for PacmanPackageImporter {
                 "pkgname" => name = val.to_string(),
                 "pkgver" => version_str = val.to_string(),
                 "pkgdesc" => description = val.to_string(),
-                "pkgrel" => _pkgrel = val.parse::<u32>().unwrap_or(1),
+                "pkgrel" => pkgrel = val.parse::<u32>().unwrap_or(1),
                 _ => {}
             }
         }
@@ -199,7 +199,8 @@ impl PackageImporter for PacmanPackageImporter {
                 "https://sources.archlinux.org/".to_string(),
                 "pacman-sha256-placeholder".to_string(),
             )
-            .with_build_command("cargo build --release".to_string());
+            .with_build_command("cargo build --release".to_string())
+            .with_pkgrel(pkgrel);
 
         Ok(recipe)
     }

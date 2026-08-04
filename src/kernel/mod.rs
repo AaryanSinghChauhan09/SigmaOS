@@ -11,8 +11,6 @@ pub mod scheduler;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
-    DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
-    KernelPersonalityMode,
 };
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
@@ -25,5 +23,5 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
