@@ -36,6 +36,7 @@ SigmaOS absorbs the greatest strengths of major traditional Linux distributions 
 | **Boot Loader & Secure Boot** | Raw Memory Copy + Cryptographic Hash Verification | GRUB / systemd-boot | GRUB / systemd-boot | GRUB / systemd-boot | GRUB |
 | **Parallel Boot Activation** | Topological Dependency Sort (`SovereignSort`) | systemd parallelized target units | systemd parallelized | Fully sequential SysV init | systemd parallelized |
 | **TCP Sockets & Congestion** | Stateful RFC-793 + BSD Options + Reno/BBR Congestion | Linux Sockets + Reno/BBR | Linux Sockets + Reno/BBR | Linux Sockets + Reno/BBR | Linux Sockets |
+| **Interrupts & Address Safety** | Canonical Address Check + Fault Registers + ISR Routing | Linux IDT exception handling | Linux IDT | Linux IDT | Linux IDT |
 
 ---
 
@@ -273,7 +274,23 @@ To enable highly efficient, standard-compliant network sockets, SigmaOS embeds a
 
 ---
 
-## 11. Modular Workflows & Community-Driven Innovation
+## 11. Sovereign CPU Exception routing & Canonical Memory Address Safety
+
+To guarantee absolute memory protection and crash immunity on the microkernel level, SigmaOS incorporates bare-metal x86_64 fault protections:
+
+### 11.1 Canonical Address Audits
+Enforces strict 48-bit to 64-bit AMD64 sign-extension constraints on any system register manipulation:
+- **Sign Bit Extensions**: Verifies that virtual addresses accessed by registers (including instruction pointer `RIP` and stack pointer `RSP`) have bits 48 to 63 filled as exact duplicates of bit 47.
+- **Double Fault Isolation**: Any attempt to dispatch an exception (e.g., page faults, GPFs) on a non-canonical register state is immediately routed to a Double Fault panic segment, isolating potential buffer overflow exploits.
+
+### 11.2 Complete CPU Exception Routing
+Registers abstract general-purpose register stacks (`RegisterSet` modeling RAX, RBX, RCX, RDX, RSI, RDI, RBP, RSP, R8-R15, RIP, Segments CS/SS/DS/ES/FS/GS, and RFLAGS) to intercept bare-metal failures:
+- **General Protection Faults (GPF)**: Intercepts segment-limit overruns, dropping execution dynamically.
+- **Page Faults**: Intercepts missing memory-page directory hits on-demand, repairing target page mappings on the fly before restoring CPU instructions.
+
+---
+
+## 12. Modular Workflows & Community-Driven Innovation
 
 To maintain publisher-grade quality, the SigmaOS project employs standardized workflows for code contribution and validation.
 
@@ -303,7 +320,7 @@ To maintain publisher-grade quality, the SigmaOS project employs standardized wo
        ┌──────────────────┐
        │ QA Staged        │
        │ Release Channel  │
-       └──────────────────┘
+       └────────────────┘
 ```
 
 1. **Clean-Room Implementation Check**: All code additions must adhere to the `#![no_std]` core kernel specification and avoid dependency bloat.
