@@ -9,6 +9,8 @@ pub mod manjaro;
 pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
+pub mod tiny_core;
+pub mod transformation_engine;
 
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
@@ -46,5 +48,14 @@ pub use recovery::{
 };
 pub use specialized::{
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator,
+    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
+    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+};
+pub use tiny_core::{
+    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+};
+pub use transformation_engine::{
+    AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,
+    ForensicReadinessAuditor, GlobalComplianceDashboard, DeveloperToolkitConverter,
+    IotDeviceMeshOrchestrator, IotMeshDevice,
 };
