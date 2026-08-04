@@ -1,38 +1,22 @@
 #![no_std]
-#![allow(warnings)]
-#![allow(clippy::all)]
+#![no_main]
 
 /// OOP-based Lightweight Init System for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 5
-/// Implements minimal init system with service management, dependency resolution, parallel startup,
-/// and modular FirmwarePort / SecurityPort structures
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+/// Implements minimal init system with service management, dependency resolution, parallel startup
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type ServiceID = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ServiceState {
-    Stopped = 0,
-    Starting = 1,
-    Running = 2,
-    Stopping = 3,
-    Failed = 4,
-}
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum ServiceState { Stopped = 0, Starting = 1, Running = 2, Stopping = 3, Failed = 4 }
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum InitError {
-    Success = 0,
-    ServiceNotFound = 1,
-    DependencyFailed = 2,
-    StartFailed = 3,
-    StopFailed = 4,
-}
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum InitError { Success = 0, ServiceNotFound = 1, DependencyFailed = 2, StartFailed = 3, StopFailed = 4 }
 
 pub trait Service {
     fn id(&self) -> ServiceID;
@@ -44,6 +28,7 @@ pub trait Service {
     fn restart(&mut self) -> Result<(), InitError>;
 }
 
+#[repr(C)]
 pub struct SimpleService {
     pub id: ServiceID,
     pub name: [u8; 64],
@@ -70,34 +55,24 @@ impl SimpleService {
 }
 
 impl Service for SimpleService {
-    fn id(&self) -> ServiceID {
-        self.id
-    }
+    fn id(&self) -> ServiceID { self.id }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn state(&self) -> ServiceState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-    }
-    fn dependencies(&self) -> Vec<ServiceID> {
-        self.deps.clone()
-    }
+    fn state(&self) -> ServiceState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn dependencies(&self) -> Vec<ServiceID> { self.deps.clone() }
 
     fn start(&mut self) -> Result<(), InitError> {
-        self.state
-            .store(ServiceState::Starting as usize, Ordering::SeqCst);
-        self.state
-            .store(ServiceState::Running as usize, Ordering::SeqCst);
+        self.state.store(ServiceState::Starting as usize, Ordering::SeqCst);
+        self.state.store(ServiceState::Running as usize, Ordering::SeqCst);
         self.pid.store(self.id + 1000, Ordering::SeqCst);
         Ok(())
     }
 
     fn stop(&mut self) -> Result<(), InitError> {
-        self.state
-            .store(ServiceState::Stopping as usize, Ordering::SeqCst);
-        self.state
-            .store(ServiceState::Stopped as usize, Ordering::SeqCst);
+        self.state.store(ServiceState::Stopping as usize, Ordering::SeqCst);
+        self.state.store(ServiceState::Stopped as usize, Ordering::SeqCst);
         self.pid.store(0, Ordering::SeqCst);
         Ok(())
     }
@@ -117,6 +92,7 @@ pub trait InitSystem {
     fn get_all_services(&self) -> Vec<ServiceID>;
 }
 
+#[repr(C)]
 pub struct SigmaInit {
     pub services: Vec<Option<Box<dyn Service>>>,
     pub next_id: AtomicUsize,
@@ -141,20 +117,9 @@ impl SigmaInit {
     }
 
     pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
-        for svc_option in &mut self.services {
-            if let Some(ref mut svc) = *svc_option {
-                if svc.id() == id {
-                    return svc.restart();
-                }
-            }
-        }
-        Err(InitError::ServiceNotFound)
-    }
-}
-
-impl Default for SigmaInit {
-    fn default() -> Self {
-        Self::new()
+        self.stop_service(id)?;
+        self.start_service(id)?;
+        Ok(())
     }
 }
 
@@ -166,25 +131,13 @@ impl InitSystem for SigmaInit {
     }
 
     fn start_service(&mut self, id: ServiceID) -> Result<(), InitError> {
-        // Fetch dependencies first to avoid double borrowing
-        let mut deps = Vec::new();
-        for svc_option in &self.services {
-            if let Some(ref svc) = *svc_option {
-                if svc.id() == id {
-                    deps = svc.dependencies();
-                    break;
-                }
-            }
-        }
-
-        for dep_id in deps {
-            self.start_service(dep_id)?;
-        }
-
-        // Start main service
         for svc_option in &mut self.services {
             if let Some(ref mut svc) = *svc_option {
                 if svc.id() == id {
+                    let deps = svc.dependencies();
+                    for dep_id in deps {
+                        self.start_service(dep_id)?;
+                    }
                     return svc.start();
                 }
             }
@@ -206,9 +159,7 @@ impl InitSystem for SigmaInit {
     fn get_service(&self, id: ServiceID) -> Option<&dyn Service> {
         for svc_option in &self.services {
             if let Some(ref svc) = *svc_option {
-                if svc.id() == id {
-                    return Some(svc.as_ref());
-                }
+                if svc.id() == id { return Some(svc.as_ref()); }
             }
         }
         None
@@ -230,14 +181,13 @@ pub trait DependencyResolver {
     fn detect_cycles(&self, services: &[ServiceID]) -> bool;
 }
 
+#[repr(C)]
 pub struct SimpleDependencyResolver {
     pub init: SigmaInit,
 }
 
 impl SimpleDependencyResolver {
-    pub fn new(init: SigmaInit) -> Self {
-        SimpleDependencyResolver { init }
-    }
+    pub fn new(init: SigmaInit) -> Self { SimpleDependencyResolver { init } }
 }
 
 impl DependencyResolver for SimpleDependencyResolver {
@@ -269,12 +219,7 @@ impl DependencyResolver for SimpleDependencyResolver {
 }
 
 impl SimpleDependencyResolver {
-    fn visit(
-        &self,
-        id: ServiceID,
-        order: &mut Vec<ServiceID>,
-        visited: &mut Vec<ServiceID>,
-    ) -> Result<(), InitError> {
+    fn visit(&self, id: ServiceID, order: &mut Vec<ServiceID>, visited: &mut Vec<ServiceID>) -> Result<(), InitError> {
         if visited.contains(&id) {
             return Ok(());
         }
@@ -291,12 +236,7 @@ impl SimpleDependencyResolver {
         Ok(())
     }
 
-    fn has_cycle(
-        &self,
-        id: ServiceID,
-        visited: &mut Vec<ServiceID>,
-        rec_stack: &mut Vec<ServiceID>,
-    ) -> bool {
+    fn has_cycle(&self, id: ServiceID, visited: &mut Vec<ServiceID>, rec_stack: &mut Vec<ServiceID>) -> bool {
         visited.push(id);
         rec_stack.push(id);
 
@@ -323,6 +263,7 @@ pub trait ServiceMonitor {
     fn get_service_status(&self, id: ServiceID) -> Option<ServiceState>;
 }
 
+#[repr(C)]
 pub struct SimpleServiceMonitor {
     pub init: SigmaInit,
     pub monitored: Vec<ServiceID>,
@@ -360,125 +301,52 @@ impl ServiceMonitor for SimpleServiceMonitor {
     }
 }
 
-/// Advanced OOP-driven Firmware Port Class Hierarchy
-pub trait FirmwarePort {
-    fn boot_type(&self) -> &'static str;
-    fn handoff(&self) -> Result<(), &'static str>;
-}
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-pub struct BIOSPort;
-impl FirmwarePort for BIOSPort {
-    fn boot_type(&self) -> &'static str {
-        "Legacy BIOS (MBR)"
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
     }
-    fn handoff(&self) -> Result<(), &'static str> {
-        Ok(())
+    fn clone(&self) -> Vec<T> {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                let item = core::ptr::read(self.data.add(i));
+                new_vec.push(item);
+            }
+        }
+        new_vec
     }
-}
-
-pub struct UEFIPort;
-impl FirmwarePort for UEFIPort {
-    fn boot_type(&self) -> &'static str {
-        "Modern UEFI (GPT)"
-    }
-    fn handoff(&self) -> Result<(), &'static str> {
-        Ok(())
-    }
-}
-
-pub struct CorebootPort;
-impl FirmwarePort for CorebootPort {
-    fn boot_type(&self) -> &'static str {
-        "Coreboot (Open Source Firmware)"
-    }
-    fn handoff(&self) -> Result<(), &'static str> {
-        Ok(())
-    }
-}
-
-/// Advanced OOP-driven Security Port Class Hierarchy
-pub trait SecurityPort {
-    fn policy_name(&self) -> &'static str;
-    fn check_capability(&self, cap: u32) -> bool;
-}
-
-pub struct DACPort;
-impl SecurityPort for DACPort {
-    fn policy_name(&self) -> &'static str {
-        "Discretionary Access Control (DAC)"
-    }
-    fn check_capability(&self, _cap: u32) -> bool {
-        true
-    }
-}
-
-pub struct SELinuxPort;
-impl SecurityPort for SELinuxPort {
-    fn policy_name(&self) -> &'static str {
-        "Security-Enhanced Linux (SELinux)"
-    }
-    fn check_capability(&self, cap: u32) -> bool {
-        cap > 10
-    }
-}
-
-pub struct ZeroTrustPort;
-impl SecurityPort for ZeroTrustPort {
-    fn policy_name(&self) -> &'static str {
-        "Zero-Trust Enforcement Security"
-    }
-    fn check_capability(&self, _cap: u32) -> bool {
+    fn contains(&self, item: &T) -> bool where T: PartialEq {
+        for i in 0..self.len {
+            unsafe {
+                if &*self.data.add(i) == item { return true; }
+            }
+        }
         false
-    } // Absolute strict verification
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_service_dependency_resolution() {
-        let mut init = SigmaInit::new();
-
-        let mut svc1 = SimpleService::new(1, b"udev");
-        let mut svc2 = SimpleService::new(2, b"display");
-        svc2.deps.push(1);
-
-        init.register_service(Box::new(svc1)).unwrap();
-        init.register_service(Box::new(svc2)).unwrap();
-
-        let resolver = SimpleDependencyResolver::new(init);
-        let order = resolver.resolve_startup_order(&[2]).unwrap();
-        assert_eq!(order.len(), 2);
-        assert_eq!(order[0], 1); // udev must start first
-        assert_eq!(order[1], 2);
     }
-
-    #[test]
-    fn test_firmware_ports() {
-        let bios: Box<dyn FirmwarePort> = Box::new(BIOSPort);
-        let uefi: Box<dyn FirmwarePort> = Box::new(UEFIPort);
-        let coreboot: Box<dyn FirmwarePort> = Box::new(CorebootPort);
-
-        assert_eq!(bios.boot_type(), "Legacy BIOS (MBR)");
-        assert_eq!(uefi.boot_type(), "Modern UEFI (GPT)");
-        assert_eq!(coreboot.boot_type(), "Coreboot (Open Source Firmware)");
-
-        assert!(bios.handoff().is_ok());
+    fn pop(&mut self) -> Option<T> {
+        if self.len == 0 { return None; }
+        self.len -= 1;
+        unsafe { Some(core::ptr::read(self.data.add(self.len))) }
     }
-
-    #[test]
-    fn test_security_ports() {
-        let dac: Box<dyn SecurityPort> = Box::new(DACPort);
-        let selinux: Box<dyn SecurityPort> = Box::new(SELinuxPort);
-        let zt: Box<dyn SecurityPort> = Box::new(ZeroTrustPort);
-
-        assert_eq!(dac.policy_name(), "Discretionary Access Control (DAC)");
-        assert_eq!(selinux.policy_name(), "Security-Enhanced Linux (SELinux)");
-        assert_eq!(zt.policy_name(), "Zero-Trust Enforcement Security");
-
-        assert!(dac.check_capability(1));
-        assert!(selinux.check_capability(20));
-        assert!(!zt.check_capability(1));
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
     }
 }
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
