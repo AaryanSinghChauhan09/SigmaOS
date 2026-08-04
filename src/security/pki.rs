@@ -9,6 +9,12 @@ use alloc::vec::Vec;
 #![no_std]
 #![no_main]
 #![no_std]
+||||||| 984d1301f
+#![no_std]
+#![no_main]
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 
 use core::mem;
 /// OOP-based PKI System for SigmaOS
@@ -322,6 +328,26 @@ impl<T> Vec<T> {
             }
         }
         false
+||||||| 984d1301f
+impl Vec<CertificateID> {
+    fn contains(&self, item: CertificateID) -> bool {
+        for i in 0..self.len {
+            unsafe {
+                if *self.data.add(i) == item {
+                    return true;
+                }
+            }
+        }
+        false
+    #[test]
+    fn test_simple_pki_manager() {
+        let mut manager = SimplePKIManager::new();
+        let cert = SimpleCertificate::new(1, CertificateType::Root, b"Subject", b"Issuer");
+        let id = manager.issue_certificate(Box::new(cert)).unwrap();
+        assert_eq!(id, 1);
+
+        let retrieved = manager.get_certificate(1).unwrap();
+        assert_eq!(retrieved.subject(), b"Subject");
     }
     fn clone(&self) -> Vec<T> {
         let mut new_vec = Vec::new();

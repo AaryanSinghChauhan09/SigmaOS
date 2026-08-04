@@ -67,6 +67,8 @@ pub struct Inode {
     pub hard_links_count: u32,
     pub data: Vec<u8>,                 // File storage data
     pub entries: HashMap<String, u64>, // Directory entries
+||||||| 984d1301f
+    pub link_count: u32, // standard inode link count tracking hard links
 }
 
 impl Inode {
@@ -86,6 +88,8 @@ impl Inode {
             hard_links_count: 1,
             data: Vec::new(),
             entries: HashMap::new(),
+||||||| 984d1301f
+            link_count: 1, // default link count of 1
         }
     }
 }
@@ -365,6 +369,15 @@ impl VirtualFilesystem {
         }
     }
 
+    pub fn create_hard_link(&mut self, source_inode_id: u64) -> Result<(), FsError> {
+        if let Some(inode) = self.inodes.get_mut(&source_inode_id) {
+            inode.link_count += 1;
+            Ok(())
+        } else {
+            Err(FsError::NotFound)
+        }
+    }
+
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
         if inode_id == self.root_inode {
             return Err(FsError::PermissionDenied);
@@ -407,6 +420,18 @@ impl VirtualFilesystem {
         self.inodes.remove(&inode_id);
 
         if should_delete {
+            self.inodes.remove(&inode_id);
+        }
+||||||| 984d1301f
+        self.inodes.remove(&inode_id);
+        let link_reached_zero = if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            inode.link_count = inode.link_count.saturating_sub(1);
+            inode.link_count == 0
+        } else {
+            false
+        };
+
+        if link_reached_zero {
             self.inodes.remove(&inode_id);
         }
         Ok(())

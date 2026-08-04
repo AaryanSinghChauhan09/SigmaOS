@@ -434,6 +434,133 @@ impl Default for SystemStabilityMonitor {
     }
 }
 
+||||||| 984d1301f
+/// Tracks a registered system shard/component's heartbeat status
+#[derive(Debug, Clone)]
+pub struct ShardHeartbeat {
+    pub name: String,
+    pub last_ping_secs: u64,
+    pub latency_ms: u32,
+    pub is_responsive: bool,
+}
+
+/// Prevents recursive recovery cascades by tracking recovery attempts per resource.
+/// If recovery fails repeatedly within a window, triggers safe mode fallback.
+#[derive(Debug, Clone)]
+pub struct DoubleFaultGuard {
+    pub recovery_counts: HashMap<String, usize>,
+    pub threshold_limit: usize,
+}
+
+impl DoubleFaultGuard {
+    pub fn new(threshold_limit: usize) -> Self {
+        Self {
+            recovery_counts: HashMap::new(),
+            threshold_limit,
+        }
+    }
+
+    /// Increments recovery attempt. Returns true if recursive fault threshold is breached (Double Fault detected)
+    pub fn register_attempt(&mut self, resource: &str) -> bool {
+        let count = self.recovery_counts.entry(resource.to_string()).or_insert(0);
+        *count += 1;
+        *count >= self.threshold_limit
+    }
+
+    /// Reset recovery count for a resource upon successful restoration
+    pub fn reset_attempts(&mut self, resource: &str) {
+        self.recovery_counts.remove(resource);
+    }
+}
+
+/// Comprehensive stability and resilience monitor (Sovereign OS Parity)
+pub struct SystemStabilityMonitor {
+    pub heartbeats: HashMap<String, ShardHeartbeat>,
+    pub double_fault_guard: DoubleFaultGuard,
+    pub system_stability_score: f64, // 0.0 to 100.0
+    pub in_safe_mode: bool,
+}
+
+impl SystemStabilityMonitor {
+    pub fn new() -> Self {
+        let mut heartbeats = HashMap::new();
+        // Register default essential kernel shards
+        for shard in &["kernel", "vfs", "scheduler", "ipc"] {
+            heartbeats.insert(
+                shard.to_string(),
+                ShardHeartbeat {
+                    name: shard.to_string(),
+                    last_ping_secs: 0,
+                    latency_ms: 0,
+                    is_responsive: true,
+                },
+            );
+        }
+        Self {
+            heartbeats,
+            double_fault_guard: DoubleFaultGuard::new(3), // 3 failures triggers double fault
+            system_stability_score: 100.0,
+            in_safe_mode: false,
+        }
+    }
+
+    /// Updates shard ping. Recalculates system stability score based on responsiveness and latencies
+    pub fn ping_shard(&mut self, name: &str, latency_ms: u32, is_responsive: bool) {
+        if let Some(hb) = self.heartbeats.get_mut(name) {
+            hb.latency_ms = latency_ms;
+            hb.is_responsive = is_responsive;
+            hb.last_ping_secs = 123456; // Simulated timestamp
+        }
+
+        // Calculate score
+        let mut responsive_count = 0;
+        let mut total_latency = 0;
+        for hb in self.heartbeats.values() {
+            if hb.is_responsive {
+                responsive_count += 1;
+                total_latency += hb.latency_ms;
+            }
+        }
+
+        let responsiveness_factor = (responsive_count as f64 / self.heartbeats.len() as f64) * 70.0;
+        // Average latency under 50ms is perfect. Penalize overhead.
+        let avg_latency = if responsive_count > 0 {
+            total_latency as f64 / responsive_count as f64
+        } else {
+            0.0
+        };
+        let latency_penalty = (avg_latency / 10.0).min(30.0);
+        let stability = (responsiveness_factor + (30.0 - latency_penalty)).clamp(0.0, 100.0);
+        self.system_stability_score = stability;
+
+        // Auto safe mode degradation if stability score falls below 50%
+        if self.system_stability_score < 50.0 {
+            self.in_safe_mode = true;
+        }
+    }
+
+    /// Registers a fault event for a component. Triggers safe mode if recursive double-fault is caught.
+    pub fn trigger_recovery_for_fault(&mut self, resource: &str) -> &'static str {
+        if self.double_fault_guard.register_attempt(resource) {
+            self.in_safe_mode = true;
+            "DOUBLE_FAULT_DETECTED: DEGRADED_TO_SAFE_MODE"
+        } else {
+            "ATTEMPTING_RECOVERY"
+        }
+    }
+
+    /// Clear fault counts upon successful manual or automated recovery
+    pub fn clear_fault(&mut self, resource: &str) {
+        self.double_fault_guard.reset_attempts(resource);
+    }
+}
+
+impl Default for SystemStabilityMonitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Resilience errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResilienceError {
