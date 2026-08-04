@@ -48,6 +48,7 @@ pub use compatibility::{
     NtHandle, NtObjectManager, NtObjectType, NtStatus, Plan9pMessage, Plan9pMsgType,
     PortableExecutableLoader, RegistryHive, SoftwareMeta, TargetPlatform, TranslationLayer,
     WindowCoordinates, ZenithDisplayCompositor,
+    InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -60,6 +61,11 @@ pub use drivers::{
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+};
+pub use driver::{
+    Irp, IrpManager, DriverObject, DeviceObject, IoStatus, IoStatusBlock, Apc, Dpc, Minifilter,
+    IRP_MJ_CREATE, IRP_MJ_CLOSE, IRP_MJ_READ, IRP_MJ_WRITE, IRP_MJ_DEVICE_CONTROL,
+    METHOD_BUFFERED, METHOD_IN_DIRECT, METHOD_OUT_DIRECT, METHOD_NEITHER,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
