@@ -29,6 +29,38 @@ impl<T> Vec<T> {
     pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
         self.as_mut_slice().iter_mut()
     }
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+    pub fn first(&self) -> Option<&T> {
+        self.get(0)
+    }
+    pub fn last(&self) -> Option<&T> {
+        if self.len > 0 {
+            self.get(self.len - 1)
+        } else {
+            None
+        }
+    }
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            self.len -= 1;
+            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
+        }
+    }
 
     pub fn as_slice(&self) -> &[T] {
         if self.len == 0 {
