@@ -33,6 +33,8 @@ impl CapabilityToken {
             "udp" => self.bits |= 1 << 1,
             _ => {}
         }
+        // Mask and clear target bit ranges (bits 16-31) to prevent bitmask overlap privilege escalation
+        self.bits &= !(0xFFFF_u64 << 16);
         self.bits |= (port as u64) << 16;
         self
     }
@@ -160,5 +162,17 @@ mod tests {
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
+    }
+
+    #[test]
+    fn test_bitmask_overlap_prevention() {
+        // Registering port 80 and then 443 should not result in a corrupted port 507,
+        // but rather only store the latest port 443 cleanly.
+        let token = CapabilityToken::new()
+            .allow_network("tcp", 80)
+            .allow_network("tcp", 443);
+        // Extracts port stored in bits 16-31
+        let port = (token.bits() >> 16) & 0xFFFF;
+        assert_eq!(port, 443);
     }
 }

@@ -1,23 +1,14 @@
-// OOP-based Process Spawning and POSIX Signals Framework for SigmaOS
-// Implements process lifecycles, fork, exec, and signals (SIGKILL, SIGTERM, SIGINT) under `#![no_std]`.
+#![no_std]
+#![no_main]
 
-extern crate alloc;
+/// OOP-based Process Spawning for SigmaOS
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 121
+/// Implements process creation, fork, and exec
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type ProcessID = usize;
-pub type SignalHandlerFn = fn(ProcessID, u8);
-
-/// Standard POSIX Signals
-pub const SIGINT: u8 = 2; // Interrupt (graceful / catchable)
-pub const SIGKILL: u8 = 9; // Force Kill (un-catchable, immediate)
-pub const SIGUSR1: u8 = 10; // User defined 1 (catchable)
-pub const SIGTERM: u8 = 15; // Terminate (graceful / catchable)
-
-pub const WNOHANG: u32 = 1;
-pub const WUNTRACED: u32 = 2;
 
 pub const WNOHANG: u32 = 1;
 pub const WUNTRACED: u32 = 2;
@@ -25,3 +16,370 @@ pub const WUNTRACED: u32 = 2;
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProcessError { Success = 0, NotFound = 1, InvalidArgs = 2, SpawnFailed = 3 }
+
+pub trait Process {
+    fn id(&self) -> ProcessID;
+    fn parent_id(&self) -> ProcessID;
+    fn set_parent_id(&mut self, parent_id: ProcessID);
+    fn state(&self) -> ProcessState;
+    fn set_state(&mut self, state: ProcessState);
+    fn exit_code(&self) -> i32;
+
+    // Nice values (-20 to 19) mimicking Linux process scheduling priority
+    fn nice(&self) -> i32 { 0 }
+    fn set_nice(&mut self, nice: i32) {}
+}
+
+#[repr(C)]
+pub struct SimpleProcess {
+    pub id: ProcessID,
+    pub parent_id: ProcessID,
+    pub state: AtomicUsize,
+    pub exit_code: AtomicUsize,
+    pub nice: i32,
+}
+
+impl SimpleProcess {
+    pub fn new(id: ProcessID, parent_id: ProcessID) -> Self {
+        SimpleProcess {
+            id,
+            parent_id,
+            state: AtomicUsize::new(ProcessState::Created as usize),
+            exit_code: AtomicUsize::new(0),
+            nice: 0,
+        }
+    }
+}
+
+impl Process for SimpleProcess {
+    fn id(&self) -> ProcessID { self.id }
+    fn parent_id(&self) -> ProcessID { self.parent_id }
+    fn set_parent_id(&mut self, parent_id: ProcessID) { self.parent_id = parent_id; }
+    fn state(&self) -> ProcessState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+
+    fn set_state(&mut self, state: ProcessState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+
+    fn exit_code(&self) -> i32 { self.exit_code.load(Ordering::SeqCst) as i32 }
+
+    fn nice(&self) -> i32 {
+        self.nice
+    }
+
+    fn set_nice(&mut self, nice: i32) {
+        self.nice = nice.clamp(-20, 19);
+    }
+}
+
+pub trait ProcessSpawner {
+    fn spawn(&mut self, executable: &[u8], args: &[[u8; 64]]) -> Result<ProcessID, ProcessError>;
+    fn fork(&mut self, parent_id: ProcessID) -> Result<ProcessID, ProcessError>;
+    fn exec(&mut self, process_id: ProcessID, executable: &[u8], args: &[[u8; 64]]) -> Result<(), ProcessError>;
+    fn kill(&mut self, process_id: ProcessID, signal: u8) -> Result<(), ProcessError>;
+}
+
+#[repr(C)]
+pub struct SimpleProcessSpawner {
+    pub processes: Vec<Option<Box<dyn Process>>>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleProcessSpawner {
+    pub fn new() -> Self {
+        SimpleProcessSpawner {
+            processes: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+
+    /// Linux-style reparenting: Orphan children are re-parented to init (PID 1) upon parent exit.
+    pub fn reparent_orphans(&mut self, dead_parent_id: ProcessID) {
+        for i in 0..self.processes.len() {
+            if let Some(ref mut process) = self.processes[i] {
+                if process.parent_id() == dead_parent_id {
+                    process.set_parent_id(1);
+                }
+            }
+        }
+    }
+}
+
+impl ProcessSpawner for SimpleProcessSpawner {
+    fn spawn(&mut self, _executable: &[u8], _args: &[[u8; 64]]) -> Result<ProcessID, ProcessError> {
+        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
+        let process = SimpleProcess::new(id, 0);
+        self.processes.push(Some(Box::new(process)));
+        Ok(id)
+    }
+
+    fn fork(&mut self, parent_id: ProcessID) -> Result<ProcessID, ProcessError> {
+        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
+        let process = SimpleProcess::new(id, parent_id);
+        self.processes.push(Some(Box::new(process)));
+        Ok(id)
+    }
+
+    fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
+        for i in 0..self.processes.len() {
+            if let Some(ref mut process) = self.processes[i] {
+                if process.id() == process_id {
+                    process.set_state(ProcessState::Running);
+                    return Ok(());
+                }
+            }
+        }
+        Err(ProcessError::NotFound)
+    }
+
+    fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
+        for i in 0..self.processes.len() {
+            if let Some(ref mut process) = self.processes[i] {
+                if process.id() == process_id {
+                    process.set_state(ProcessState::Terminated);
+                    return Ok(());
+                }
+            }
+        }
+        Err(ProcessError::NotFound)
+    }
+}
+
+pub trait ProcessWaiter {
+    fn wait(&mut self, process_id: ProcessID) -> Result<i32, ProcessError>;
+    fn waitpid(&mut self, process_id: ProcessID, options: u32) -> Result<(ProcessID, i32), ProcessError>;
+}
+
+#[repr(C)]
+pub struct SimpleProcessWaiter {
+    pub spawner: SimpleProcessSpawner,
+}
+
+impl SimpleProcessWaiter {
+    pub fn new(spawner: SimpleProcessSpawner) -> Self {
+        SimpleProcessWaiter { spawner }
+    }
+}
+
+impl ProcessWaiter for SimpleProcessWaiter {
+    fn wait(&mut self, process_id: ProcessID) -> Result<i32, ProcessError> {
+        self.waitpid(process_id, 0).map(|(_, code)| code)
+    }
+
+    fn waitpid(&mut self, process_id: ProcessID, options: u32) -> Result<(ProcessID, i32), ProcessError> {
+        for i in 0..self.spawner.processes.len() {
+            if let Some(ref process) = self.spawner.processes[i] {
+                if process.id() == process_id {
+                    let is_terminated = process.state() == ProcessState::Terminated;
+                    if is_terminated {
+                        return Ok((process.id(), process.exit_code()));
+                    } else {
+                        // Standard non-blocking wait (WNOHANG)
+                        if (options & WNOHANG) != 0 {
+                            return Ok((0, 0));
+                        }
+                    }
+                }
+            }
+        }
+        Err(ProcessError::NotFound)
+    }
+}
+
+pub trait ProcessGroup {
+    fn create_group(&mut self, leader_id: ProcessID) -> Result<usize, ProcessError>;
+    fn add_to_group(&mut self, group_id: usize, process_id: ProcessID) -> Result<(), ProcessError>;
+    fn signal_group(&mut self, group_id: usize, signal: u8, spawner: &mut SimpleProcessSpawner) -> Result<(), ProcessError>;
+}
+
+#[repr(C)]
+pub struct SimpleProcessGroup {
+    pub groups: Vec<(usize, Vec<ProcessID>)>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleProcessGroup {
+    pub fn new() -> Self {
+        SimpleProcessGroup {
+            groups: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+}
+
+impl ProcessGroup for SimpleProcessGroup {
+    fn create_group(&mut self, leader_id: ProcessID) -> Result<usize, ProcessError> {
+        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
+        let mut processes = Vec::new();
+        processes.push(leader_id);
+        self.groups.push((id, processes));
+        Ok(id)
+    }
+
+    fn add_to_group(&mut self, group_id: usize, process_id: ProcessID) -> Result<(), ProcessError> {
+        for i in 0..self.groups.len() {
+            if self.groups[i].0 == group_id {
+                self.groups[i].1.push(process_id);
+                return Ok(());
+            }
+        }
+        Err(ProcessError::NotFound)
+    }
+
+    fn signal_group(&mut self, group_id: usize, signal: u8, spawner: &mut SimpleProcessSpawner) -> Result<(), ProcessError> {
+        let mut members = Vec::new();
+        for i in 0..self.groups.len() {
+            if self.groups[i].0 == group_id {
+                for j in 0..self.groups[i].1.len() {
+                    members.push(self.groups[i].1[j]);
+                }
+                break;
+            }
+        }
+
+        if members.is_empty() {
+            return Err(ProcessError::NotFound);
+        }
+
+        for i in 0..members.len() {
+            let pid = members[i];
+            let _ = spawner.kill(pid, signal);
+        }
+        Ok(())
+    }
+}
+
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_process_lifecycle_spawn_and_kill() {
+        let mut spawner = SimpleProcessSpawner::new();
+        let pid = spawner.spawn(b"/bin/ls", &[]).unwrap();
+        assert_eq!(pid, 1);
+
+        spawner.exec(pid, b"", &[]).unwrap();
+        assert_eq!(spawner.processes[0].as_ref().unwrap().state(), ProcessState::Running);
+
+        spawner.kill(pid, 9).unwrap();
+        assert_eq!(spawner.processes[0].as_ref().unwrap().state(), ProcessState::Terminated);
+    }
+
+    #[test]
+    fn test_linux_process_parity() {
+        let mut spawner = SimpleProcessSpawner::new();
+
+        // Spawn parents & children
+        let parent_id = spawner.spawn(b"parent", &[]).unwrap();
+        let child_id = spawner.fork(parent_id).unwrap();
+
+        let child = spawner.processes[1].as_ref().unwrap();
+        assert_eq!(child.parent_id(), parent_id);
+
+        // Reparent orphans check
+        spawner.reparent_orphans(parent_id);
+        assert_eq!(spawner.processes[1].as_ref().unwrap().parent_id(), 1);
+
+        // Nice value priority tests
+        let mut child_mut = spawner.processes[1].as_mut().unwrap();
+        child_mut.set_nice(10);
+        assert_eq!(child_mut.nice(), 10);
+        child_mut.set_nice(-25); // clamping to -20
+        assert_eq!(child_mut.nice(), -20);
+
+        // Non-blocking WNOHANG waitpid
+        let mut waiter = SimpleProcessWaiter::new(spawner);
+        // child_id is not terminated -> WNOHANG returns (0, 0)
+        let (wait_pid, code) = waiter.waitpid(child_id, WNOHANG).unwrap();
+        assert_eq!(wait_pid, 0);
+        assert_eq!(code, 0);
+
+        // Signal groups testing
+        let mut spawner2 = SimpleProcessSpawner::new();
+        let lead_pid = spawner2.spawn(b"leader", &[]).unwrap();
+        let member_pid = spawner2.spawn(b"member", &[]).unwrap();
+
+        let mut grp = SimpleProcessGroup::new();
+        let gid = grp.create_group(lead_pid).unwrap();
+        grp.add_to_group(gid, member_pid).unwrap();
+
+        grp.signal_group(gid, 15, &mut spawner2).unwrap();
+        assert_eq!(spawner2.processes[0].as_ref().unwrap().state(), ProcessState::Terminated);
+        assert_eq!(spawner2.processes[1].as_ref().unwrap().state(), ProcessState::Terminated);
+    }
+}
