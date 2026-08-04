@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // Virtual Memory & Paging Implementation
 // 4-level paging architecture (PML4 → PDPT → PD → PT)
 // Enhanced with Huge Pages (2MB/1GB), advanced page protection attributes,
@@ -26,7 +8,7 @@
 // 2. Copy-on-Write (CoW) Fault Handling: Generates a writable clone of a shared/KSM page upon write intents.
 // 3. zram/zswap (Compressed Memory Swap): Automatically compresses page contents when evicted, reducing swap I/O latency.
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -104,32 +86,20 @@ impl PageTableEntry {
             physical_address: phys,
         }
     }
-
-    pub fn validate_access(
-        &self,
-        write_intent: bool,
-        execute_intent: bool,
-    ) -> Result<(), MemoryError> {
-        if !self.present {
-            return Err(MemoryError::PageNotPresent);
-        }
-        if write_intent && !self.writable {
-            return Err(MemoryError::WriteToReadOnly);
-        }
-        if execute_intent && self.execute_disable {
-            return Err(MemoryError::NonExecutablePage);
-        }
-        Ok(())
-    }
 }
 
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
 
 impl PageTable {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             entries: vec![None; PAGE_TABLE_ENTRIES],
@@ -160,13 +130,15 @@ impl Default for PageTable {
 }
 
 #[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
     pub huge_entries: Vec<Option<PageTableEntry>>, // Holds 2MB huge page entries
 }
 
 impl PageDirectory {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             entries: vec![None; PAGE_TABLE_ENTRIES],
@@ -199,10 +171,6 @@ impl PageDirectory {
     pub fn get_table_mut(&mut self, idx: usize) -> Option<&mut PageTable> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
-
-    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
-        self.huge_entries.get(idx).and_then(|e| e.as_ref())
-    }
 }
 
 impl Default for PageDirectory {
@@ -212,13 +180,15 @@ impl Default for PageDirectory {
 }
 
 #[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,
     pub huge_entries: Vec<Option<PageTableEntry>>, // Holds 1GB huge page entries
 }
 
 impl PageDirectoryPointerTable {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             entries: vec![None; PAGE_TABLE_ENTRIES],
@@ -250,10 +220,6 @@ impl PageDirectoryPointerTable {
 
     pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
-    }
-
-    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
-        self.huge_entries.get(idx).and_then(|e| e.as_ref())
     }
 }
 
@@ -294,13 +260,6 @@ pub struct KsmRegistryEntry {
     pub references: Vec<VirtualAddress>,
 }
 
-/// Simulated BSD-style Physical Map (pmap) Entry for reverse translation tracking
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PvEntry {
-    pub phys_addr: PhysicalAddress,
-    pub virt_addr: VirtualAddress,
-}
-
 pub struct SimpleVMM {
     pub pml4_table: Vec<Option<PageDirectoryPointerTable>>,
     pub vmas: Vec<VirtualMemoryArea>, // Virtual memory regions for demand paging
@@ -308,16 +267,9 @@ pub struct SimpleVMM {
     pub clock_hand: usize,
     pub zram_pool: Vec<ZramPage>,       // Swapped compressed pages
     pub ksm_registry: Vec<KsmRegistryEntry>, // Tracked KSM hashes and reference vectors
-    // BSD & Linux inspired advanced translation parameters:
-    pub pv_table: Vec<PvEntry>,         // BSD pmap style Physical-to-Virtual mapping table
-    pub kpti_enabled: bool,             // Linux inspired Kernel Page Table Isolation
-    pub aslr_slide_offset: u64,         // ASLR translation layout slide offset
-    pub tlb_shootdown_log: Vec<(VirtualAddress, Vec<u32>)>, // Tracked active TLB shootdowns
-    pub numa_affinities: Vec<(VirtualAddress, u32)>,        // NUMA node affinities
 }
 
 impl SimpleVMM {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pml4_table: vec![None; PAGE_TABLE_ENTRIES],
@@ -326,11 +278,6 @@ impl SimpleVMM {
             clock_hand: 0,
             zram_pool: Vec::new(),
             ksm_registry: Vec::new(),
-            pv_table: Vec::new(),
-            kpti_enabled: false,
-            aslr_slide_offset: 0,
-            tlb_shootdown_log: Vec::new(),
-            numa_affinities: Vec::new(),
         }
     }
 
@@ -339,220 +286,12 @@ impl SimpleVMM {
         self.vmas.push(vma);
     }
 
-    /// Linux-inspired Transparent Huge Page (THP) Promotion Scanner:
-    /// Coalesces 512 contiguous, identical 4KB pages into a single 2MB huge page mapping.
-    pub fn attempt_thp_promotion(&mut self, base_virt: VirtualAddress) -> Result<bool, MemoryError> {
-        // Alignment verification check (2MB = 0x1F_FFFF mask)
-        if (base_virt.0 & 0x1F_FFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
-
-        let pml4_idx = ((base_virt.0 >> 39) & 0x1FF) as usize;
-        let pdpt_idx = ((base_virt.0 >> 30) & 0x1FF) as usize;
-        let pd_idx = ((base_virt.0 >> 21) & 0x1FF) as usize;
-
-        // Verify that PML4, PDPT, and PD exist
-        let pml4 = self.pml4_table.get_mut(pml4_idx).and_then(|opt| opt.as_mut()).ok_or(MemoryError::PageNotPresent)?;
-        let pdpt = pml4.get_directory_mut(pdpt_idx).ok_or(MemoryError::PageNotPresent)?;
-
-        // Ensure we are not already mapped as huge
-        if pdpt.huge_entries[pd_idx].is_some() {
-            return Ok(false);
-        }
-
-        let pd = pdpt.get_table_mut(pd_idx).ok_or(MemoryError::PageNotPresent)?;
-
-        // Validate that all 512 entries are present, contiguous, and identical in attributes
-        let mut first_phys = None;
-        let mut first_writable = true;
-
-        for i in 0..512 {
-            let entry = pd.entries[i].ok_or(MemoryError::PageNotPresent)?;
-            if !entry.present {
-                return Ok(false);
-            }
-            if i == 0 {
-                first_phys = Some(entry.physical_address.0);
-                first_writable = entry.writable;
-            } else {
-                let expected_phys = first_phys.unwrap() + (i as u64 * 4096);
-                if entry.physical_address.0 != expected_phys {
-                    return Ok(false); // Non-contiguous physical mapping
-                }
-                if entry.writable != first_writable {
-                    return Ok(false); // Attribute divergence
-                }
-            }
-        }
-
-        // Unmap all 512 individual 4KB entries
-        for i in 0..512 {
-            pd.entries[i] = None;
-        }
-
-        // Map unified 2MB huge page entry on PD
-        let base_phys = PhysicalAddress(first_phys.unwrap());
-        let huge_pte = PageTableEntry::with_attributes(base_phys, first_writable, true, false);
-        pdpt.set_huge_entry(pd_idx, huge_pte)?;
-
-        Ok(true)
-    }
-
-    /// Linux-inspired Transparent Huge Page (THP) Demotion / Split:
-    /// Splits a 2MB huge page into 512 individual 4KB page table mappings upon permission changes or splits.
-    pub fn attempt_thp_demotion(&mut self, huge_virt: VirtualAddress) -> Result<bool, MemoryError> {
-        // Alignment verification check (2MB = 0x1F_FFFF mask)
-        if (huge_virt.0 & 0x1F_FFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
-
-        let pml4_idx = ((huge_virt.0 >> 39) & 0x1FF) as usize;
-        let pdpt_idx = ((huge_virt.0 >> 30) & 0x1FF) as usize;
-        let pd_idx = ((huge_virt.0 >> 21) & 0x1FF) as usize;
-
-        // Verify that PML4 and PDPT exist
-        let pml4 = self.pml4_table.get_mut(pml4_idx).and_then(|opt| opt.as_mut()).ok_or(MemoryError::PageNotPresent)?;
-        let pdpt = pml4.get_directory_mut(pdpt_idx).ok_or(MemoryError::PageNotPresent)?;
-
-        // Ensure a huge entry is actually mapped here
-        let huge_pte = match pdpt.get_huge_entry(pd_idx) {
-            Some(pte) => *pte,
-            None => return Ok(false),
-        };
-
-        // Create new PageTable representing 512 4KB entries
-        let mut new_pt = PageTable::new();
-        let base_phys = huge_pte.physical_address.0;
-        let writable = huge_pte.writable;
-
-        for i in 0..512 {
-            let phys_addr = PhysicalAddress(base_phys + (i as u64 * 4096));
-            let entry = PageTableEntry::new(phys_addr);
-            new_pt.entries[i] = Some(entry);
-        }
-
-        // Replace the huge page entry with our newly populated standard PageTable
-        pdpt.huge_entries[pd_idx] = None;
-        pdpt.set_table(pd_idx, new_pt)?;
-
-        Ok(true)
-    }
-
-    /// BSD pmap-style function: enters a physical-to-virtual translation into the page table
-    /// and registers it in the physical-to-virtual PV tracking database.
-    pub fn pmap_enter(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        writable: bool,
-    ) -> Result<(), MemoryError> {
-        // Map page using standard 4KB logic with explicit writable flag
-        self.map_page_with_flags(virt, phys, writable, false)?;
-
-        // Register in the PV (Physical-to-Virtual) table if not already tracked
-        let entry = PvEntry { phys_addr: phys, virt_addr: virt };
-        if !self.pv_table.contains(&entry) {
-            self.pv_table.push(entry);
-        }
-        Ok(())
-    }
-
-    /// BSD pmap-style function: removes all virtual memory mappings pointing to a given physical address.
-    /// Returns the number of invalidations performed.
-    pub fn pmap_remove(&mut self, phys: PhysicalAddress) -> Result<usize, MemoryError> {
-        let mut unmapped_count = 0;
-        let mut active_virts = Vec::new();
-
-        // Find all virtual addresses referencing this physical address
-        for entry in &self.pv_table {
-            if entry.phys_addr.0 == phys.0 {
-                active_virts.push(entry.virt_addr);
-            }
-        }
-
-        // Unmap each virtual page found
-        for virt in &active_virts {
-            let _ = self.unmap_page(*virt);
-            unmapped_count += 1;
-        }
-
-        // Retain only those entries that do not point to this physical address
-        self.pv_table.retain(|entry| entry.phys_addr.0 != phys.0);
-
-        Ok(unmapped_count)
-    }
-
-    /// Linux/BSD-inspired ASLR Translation: translates a user space virtual address
-    /// with an applied ASLR slide offset to retrieve the real translated physical address.
-    pub fn translate_with_aslr(&self, user_virt: VirtualAddress) -> VirtualAddress {
-        // Shift address by the dynamic ASLR slide offset
-        VirtualAddress(user_virt.0.wrapping_add(self.aslr_slide_offset))
-    }
-
-    /// BSD/Linux-inspired Multi-Core TLB Shootdown: records and signals invalidations
-    /// across processor cores to flush local TLB caches upon address translation updates.
-    pub fn shootdown_tlb(&mut self, virt: VirtualAddress, cores: &[u32]) {
-        self.tlb_shootdown_log.push((virt, cores.to_vec()));
-    }
-
-    /// Linux-inspired Kernel Page Table Isolation (KPTI) Switcher:
-    /// Returns the active PML4 control register (CR3 equivalent) address depending on context.
-    pub fn switch_page_tables(&self, user_mode: bool) -> u64 {
-        if self.kpti_enabled {
-            if user_mode {
-                0x1000_1000 // Return User Space Shadow Table address
-            } else {
-                0x1000_0000 // Return Kernel Space Page Table address
-            }
-        } else {
-            0x1000_0000 // Base CR3 equivalent pointer
-        }
-    }
-
-    /// Linux-inspired NUMA-Aware page mapper: maps virtual address with a specific NUMA node affinity binding.
-    pub fn map_page_with_numa(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        numa_node: u32,
-    ) -> Result<(), MemoryError> {
-        self.map_page(virt, phys)?;
-        self.numa_affinities.push((virt, numa_node));
-        Ok(())
-    }
-
-    /// Retrieves registered NUMA affinity node ID for the given virtual page address.
-    pub fn get_numa_affinity(&self, virt: VirtualAddress) -> Option<u32> {
-        for (v, node) in &self.numa_affinities {
-            if v.0 == virt.0 {
-                return Some(*node);
-            }
-        }
-        None
-    }
-
     /// Maps a standard 4KB page
     pub fn map_page(
         &mut self,
         virt: VirtualAddress,
         phys: PhysicalAddress,
     ) -> Result<(), MemoryError> {
-        self.map_page_with_flags(virt, phys, true, false)
-    }
-
-    /// Maps a standard 4KB page with explicit protection and access flags
-    pub fn map_page_with_flags(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        writable: bool,
-        execute_disable: bool,
-    ) -> Result<(), MemoryError> {
-        // Alignment verification check (4KB = 4096 bytes = 0xFFF mask)
-        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
-
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -656,7 +395,7 @@ impl SimpleVMM {
         Ok(())
     }
 
-    /// Resolves virtual address to physical address, handling huge pages and demand paging VMAs directly without on-demand triggers.
+    /// Resolves virtual address to physical address, handling huge pages and demand paging VMAs
     pub fn get_physical_address(
         &mut self,
         virt: VirtualAddress,
@@ -665,27 +404,6 @@ impl SimpleVMM {
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
         let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
-
-        let pml4 = self.pml4_table.get(pml4_idx).and_then(|opt| opt.as_ref()).ok_or(MemoryError::PageNotPresent)?;
-
-        if let Some(huge_pte) = pml4.get_huge_entry(pdpt_idx) {
-            let offset = virt.0 & 0x3FFF_FFFF;
-            return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset));
-        }
-
-        let pdpt = pml4.get_directory(pdpt_idx).ok_or(MemoryError::PageNotPresent)?;
-
-        if let Some(huge_pte) = pdpt.get_huge_entry(pd_idx) {
-            let offset = virt.0 & 0x1F_FFFF;
-            return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x1F_FFFF) + offset));
-        }
-
-        let pd = pdpt.get_table(pd_idx).ok_or(MemoryError::PageNotPresent)?;
-        let pte = pd.get_entry(pt_idx).ok_or(MemoryError::PageNotPresent)?;
-
-        let offset = virt.0 & 0xFFF;
-        Ok(PhysicalAddress((pte.physical_address.0 & !0xFFF) + offset))
-    }
 
     /// Resolves virtual address while validating and recording access permissions (Read/Write/Execute)
     /// Incorporates Copy-on-Write (CoW) page-splitting for KSM merged pages upon write intents.
@@ -709,7 +427,7 @@ impl SimpleVMM {
 
         // 1GB Huge Page Check at PML4 level (points to PDPT huge entry)
         if let Some(huge_pte) = pml4.get_huge_entry(pdpt_idx) {
-            huge_pte.validate_access(write_intent, execute_intent)?;
+            self.validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x3FFF_FFFF; // 1GB offset
             return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset));
         }
@@ -723,7 +441,7 @@ impl SimpleVMM {
 
         // 2MB Huge Page Check at PDPT level (points to PD huge entry)
         if let Some(huge_pte) = pdpt.get_huge_entry(pd_idx) {
-            huge_pte.validate_access(write_intent, execute_intent)?;
+            self.validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x1F_FFFF; // 2MB offset
             return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x1F_FFFF) + offset));
         }
@@ -760,7 +478,7 @@ impl SimpleVMM {
             return Ok(PhysicalAddress(unique_phys.0 + offset));
         }
 
-        pte.validate_access(write_intent, execute_intent)?;
+        self.validate_access(pte, write_intent, execute_intent)?;
 
         // Compute 4KB physical offset
         let offset = virt.0 & 0xFFF;
@@ -799,6 +517,24 @@ impl SimpleVMM {
             }
         }
         Err(MemoryError::PageNotPresent)
+    }
+
+    fn validate_access(
+        &self,
+        pte: &PageTableEntry,
+        write_intent: bool,
+        execute_intent: bool,
+    ) -> Result<(), MemoryError> {
+        if !pte.present {
+            return Err(MemoryError::PageNotPresent);
+        }
+        if write_intent && !pte.writable {
+            return Err(MemoryError::WriteToReadOnly);
+        }
+        if execute_intent && pte.execute_disable {
+            return Err(MemoryError::NonExecutablePage);
+        }
+        Ok(())
     }
 
     /// Simulates page table pointer updates for Clock page-replacement.
@@ -1171,124 +907,8 @@ mod tests {
         assert_eq!(vmm.zram_pool.len(), 1);
 
         // Accessing the page triggers zram decompression restore fault handler
-        let restored_phys = vmm.get_physical_address_with_access(virt, false, false).unwrap();
+        let restored_phys = vmm.get_physical_address(virt).unwrap();
         assert_eq!(restored_phys.0, virt.0);
         assert_eq!(vmm.zram_pool.len(), 0); // removed from zram compressed pool
-    }
-
-    // ==========================================
-    // Advanced Address Translation Tests (BSD & Linux Parity)
-    // ==========================================
-
-    #[test]
-    fn test_bsd_pmap_enter_and_remove() {
-        let mut vmm = SimpleVMM::new();
-        let virt1 = VirtualAddress(0x3000);
-        let virt2 = VirtualAddress(0x4000);
-        let phys = PhysicalAddress(0x50000);
-
-        // Enter pmap entries representing identical physical backing pages (BSD alias mappings)
-        vmm.pmap_enter(virt1, phys, true).unwrap();
-        vmm.pmap_enter(virt2, phys, true).unwrap();
-
-        assert_eq!(vmm.pv_table.len(), 2);
-        assert_eq!(vmm.get_physical_address(virt1).unwrap().0, 0x50000);
-        assert_eq!(vmm.get_physical_address(virt2).unwrap().0, 0x50000);
-
-        // Bulk pmap remove of the physical address invalidates all virtual references
-        let invalidated = vmm.pmap_remove(phys).unwrap();
-        assert_eq!(invalidated, 2);
-        assert_eq!(vmm.pv_table.len(), 0);
-
-        // Verify all referenced virtual pages are unmapped
-        assert!(vmm.get_physical_address(virt1).is_err());
-        assert!(vmm.get_physical_address(virt2).is_err());
-    }
-
-    #[test]
-    fn test_linux_kpti_switching() {
-        let mut vmm = SimpleVMM::new();
-
-        // Disabled by default
-        assert_eq!(vmm.switch_page_tables(false), 0x1000_0000);
-        assert_eq!(vmm.switch_page_tables(true), 0x1000_0000);
-
-        vmm.kpti_enabled = true;
-        // User Mode switches shadow table, Kernel Mode returns root page table
-        assert_eq!(vmm.switch_page_tables(false), 0x1000_0000);
-        assert_eq!(vmm.switch_page_tables(true), 0x1000_1000);
-    }
-
-    #[test]
-    fn test_aslr_translation_slide() {
-        let mut vmm = SimpleVMM::new();
-        vmm.aslr_slide_offset = 0x800_0000;
-
-        let original_virt = VirtualAddress(0x1000_2000);
-        let translated_virt = vmm.translate_with_aslr(original_virt);
-        assert_eq!(translated_virt.0, 0x1000_2000 + 0x800_0000);
-    }
-
-    #[test]
-    fn test_multicore_tlb_shootdown() {
-        let mut vmm = SimpleVMM::new();
-        let target_virt = VirtualAddress(0xF000);
-        let active_cores = vec![1, 3, 5];
-
-        vmm.shootdown_tlb(target_virt, &active_cores);
-        assert_eq!(vmm.tlb_shootdown_log.len(), 1);
-        assert_eq!(vmm.tlb_shootdown_log[0].0.0, target_virt.0);
-        assert_eq!(vmm.tlb_shootdown_log[0].1, active_cores);
-    }
-
-    #[test]
-    fn test_thp_promotion() {
-        let mut vmm = SimpleVMM::new();
-        let base_virt = VirtualAddress(0x200000); // 2MB aligned
-        let base_phys = PhysicalAddress(0x400000); // 2MB aligned
-
-        // Map 512 contiguous standard 4KB pages
-        for i in 0..512 {
-            let virt = VirtualAddress(base_virt.0 + (i as u64 * 4096));
-            let phys = PhysicalAddress(base_phys.0 + (i as u64 * 4096));
-            vmm.map_page(virt, phys).unwrap();
-        }
-
-        // Try to promote the range into a 2MB huge page
-        let promoted = vmm.attempt_thp_promotion(base_virt).unwrap();
-        assert!(promoted);
-
-        // Verify we can resolve an address inside the range via the promoted huge page entry
-        let resolved = vmm.get_physical_address(VirtualAddress(base_virt.0 + 8192)).unwrap();
-        assert_eq!(resolved.0, base_phys.0 + 8192);
-    }
-
-    #[test]
-    fn test_thp_demotion() {
-        let mut vmm = SimpleVMM::new();
-        let base_virt = VirtualAddress(0x200000); // 2MB aligned
-        let base_phys = PhysicalAddress(0x400000); // 2MB aligned
-
-        // Map a unified 2MB huge page
-        vmm.map_huge_2mb(base_virt, base_phys, true).unwrap();
-
-        // Demote (split) the huge page
-        let demoted = vmm.attempt_thp_demotion(base_virt).unwrap();
-        assert!(demoted);
-
-        // Verify we can still resolve standard 4KB subpages
-        let resolved = vmm.get_physical_address(VirtualAddress(base_virt.0 + 4096)).unwrap();
-        assert_eq!(resolved.0, base_phys.0 + 4096);
-    }
-
-    #[test]
-    fn test_numa_affinity() {
-        let mut vmm = SimpleVMM::new();
-        let virt = VirtualAddress(0x1000);
-        let phys = PhysicalAddress(0x20000);
-
-        vmm.map_page_with_numa(virt, phys, 3).unwrap();
-        assert_eq!(vmm.get_numa_affinity(virt), Some(3));
-        assert_eq!(vmm.get_numa_affinity(VirtualAddress(0x9000)), None);
     }
 }

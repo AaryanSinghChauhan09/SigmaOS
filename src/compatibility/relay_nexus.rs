@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 use crate::klib::Vec;
 /// Relay-and-Nexus Subsystems for SigmaOS
 /// Implements KernelRelay, SyscallEncyclopedia, DriverVaultV2, FirmwareNexus,
@@ -45,7 +27,6 @@ impl Default for KernelRelay {
 }
 
 impl KernelRelay {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         KernelRelay {
             active_personas: Vec::new(),
@@ -156,7 +137,6 @@ impl Default for SyscallEncyclopedia {
 }
 
 impl SyscallEncyclopedia {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SyscallEncyclopedia {
             entries: Vec::new(),
@@ -255,7 +235,6 @@ impl Default for DriverVaultV2Manager {
 }
 
 impl DriverVaultV2Manager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DriverVaultV2Manager {
             registered_drivers: Vec::new(),
@@ -343,7 +322,6 @@ impl Default for FirmwareNexusManager {
 }
 
 impl FirmwareNexusManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         FirmwareNexusManager {
             boot_handshake_done: false,
@@ -419,7 +397,6 @@ impl Default for BuildChronicleManager {
 }
 
 impl BuildChronicleManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BuildChronicleManager {
             chronicle_runs: AtomicUsize::new(0),
@@ -497,7 +474,6 @@ impl Default for SecurityNexusManager {
 }
 
 impl SecurityNexusManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SecurityNexusManager {
             checks_performed: AtomicUsize::new(0),
@@ -592,7 +568,6 @@ impl Default for PeripheralArchiveV2Manager {
 }
 
 impl PeripheralArchiveV2Manager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PeripheralArchiveV2Manager {
             active_simulations: AtomicUsize::new(0),
@@ -698,127 +673,5 @@ mod tests {
         assert_eq!(size, 512);
         assert_eq!(buf[0], 0xEB);
         assert_eq!(buf[1], 1);
-    }
-}
-
-// ==========================================
-// WANDR Wide-and-Deep Research Integration
-// ==========================================
-
-/// WANDR wide/deep research event entry
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct WandrEvent {
-    pub timestamp: u64,
-    pub step_id: usize,
-    pub status: u8, // 0 = Idle, 1 = Searching, 2 = Synthesizing, 3 = Completed
-}
-
-/// ATIF Trajectory Monitor logging structured task pathways
-pub struct AtifTrajectoryMonitor {
-    pub steps_recorded: usize,
-    pub active_trail: [WandrEvent; 32],
-}
-
-impl AtifTrajectoryMonitor {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            steps_recorded: 0,
-            active_trail: [WandrEvent {
-                timestamp: 0,
-                step_id: 0,
-                status: 0,
-            }; 32],
-        }
-    }
-
-    pub fn record_transition(&mut self, step_id: usize, status: u8) {
-        if self.steps_recorded < 32 {
-            self.active_trail[self.steps_recorded] = WandrEvent {
-                timestamp: self.steps_recorded as u64 * 10,
-                step_id,
-                status,
-            };
-            self.steps_recorded += 1;
-        }
-    }
-}
-
-/// Verifier consensus engine performing evidence-backed extraction & entity disambiguation
-pub struct VerifierConsensus {
-    pub entities_matched: usize,
-    pub consensus_score: u32,
-}
-
-impl VerifierConsensus {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            entities_matched: 0,
-            consensus_score: 100,
-        }
-    }
-
-    pub fn verify_evidence(&mut self, entity_id: usize, score_modifier: i32) -> bool {
-        self.entities_matched += 1;
-        let _id = entity_id;
-        if score_modifier < 0 {
-            self.consensus_score = self
-                .consensus_score
-                .saturating_sub((-score_modifier) as u32);
-        } else {
-            self.consensus_score = self
-                .consensus_score
-                .saturating_add(score_modifier as u32)
-                .min(100);
-        }
-        self.consensus_score >= 50
-    }
-}
-
-/// Relay Nexus mediating multi-agent execution loops with Harbor task packages
-pub struct RelayNexus {
-    pub current_task_id: usize,
-    pub trajectory_monitor: AtifTrajectoryMonitor,
-    pub verifier: VerifierConsensus,
-}
-
-impl RelayNexus {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            current_task_id: 0,
-            trajectory_monitor: AtifTrajectoryMonitor::new(),
-            verifier: VerifierConsensus::new(),
-        }
-    }
-
-    pub fn execute_deep_research(&mut self, task_id: usize) -> u32 {
-        self.current_task_id = task_id;
-        self.trajectory_monitor.record_transition(task_id, 1); // Searching
-        self.trajectory_monitor.record_transition(task_id, 2); // Synthesizing
-        self.trajectory_monitor.record_transition(task_id, 3); // Completed
-
-        let ok = self.verifier.verify_evidence(101, 10);
-        if ok {
-            self.verifier.consensus_score
-        } else {
-            0
-        }
-    }
-}
-
-#[cfg(test)]
-mod wandr_tests {
-    use super::*;
-
-    #[test]
-    fn test_wandr_research_loop() {
-        let mut relay = RelayNexus::new();
-        let score = relay.execute_deep_research(42);
-        assert_eq!(score, 100);
-        assert_eq!(relay.trajectory_monitor.steps_recorded, 3);
-        assert_eq!(relay.trajectory_monitor.active_trail[0].status, 1);
-        assert_eq!(relay.trajectory_monitor.active_trail[2].status, 3);
     }
 }

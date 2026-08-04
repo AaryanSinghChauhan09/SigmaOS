@@ -1,27 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Capability-Based Security System
 // Implements 64-bit hardware-enforced capability model
 
-use std::string::String;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::vec::Vec;
+use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Capability token representing access rights
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,19 +10,21 @@ pub struct CapabilityToken {
     bits: u64,
 }
 
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CapabilityToken {
     /// Create a new capability token with no permissions
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { bits: 0 }
     }
 
+    /// Create capability token from raw bits
     pub fn from_bits(bits: u64) -> Self {
         Self { bits }
-    }
-
-    pub fn allow_capability(&mut self, bit: u64) {
-        self.bits |= bit;
     }
 
     /// Allow network access
@@ -52,6 +34,8 @@ impl CapabilityToken {
             "udp" => self.bits |= 1 << 1,
             _ => {}
         }
+        // Mask and clear target bit ranges (bits 16-31) to prevent bitmask overlap privilege escalation
+        self.bits &= !(0xFFFF_u64 << 16);
         self.bits |= (port as u64) << 16;
         self
     }
@@ -99,20 +83,12 @@ impl CapabilityToken {
         self.bits
     }
 
-    /// Check if all bits in bitmask are set
+    pub fn allow_capability(&mut self, bitmask: u64) {
+        self.bits |= bitmask;
+    }
+
     pub fn contains(&self, bitmask: u64) -> bool {
         (self.bits & bitmask) == bitmask
-    }
-
-    /// Add default instance support
-    pub fn default_instance() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -135,7 +111,6 @@ pub struct CapabilityGate {
 
 impl CapabilityGate {
     /// Create new capability gate
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             current: AtomicU64::new(0),
@@ -158,6 +133,12 @@ impl CapabilityGate {
         CapabilityToken {
             bits: self.current.load(Ordering::SeqCst),
         }
+    }
+}
+
+impl Default for CapabilityGate {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -196,5 +177,17 @@ mod tests {
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
+    }
+
+    #[test]
+    fn test_bitmask_overlap_prevention() {
+        // Registering port 80 and then 443 should not result in a corrupted port 507,
+        // but rather only store the latest port 443 cleanly.
+        let token = CapabilityToken::new()
+            .allow_network("tcp", 80)
+            .allow_network("tcp", 443);
+        // Extracts port stored in bits 16-31
+        let port = (token.bits() >> 16) & 0xFFFF;
+        assert_eq!(port, 443);
     }
 }

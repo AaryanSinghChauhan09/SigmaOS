@@ -1,13 +1,7 @@
 // SigmaOS Drivers Module
-pub mod boot_init;
-pub mod dde;
-pub mod even_more_devices;
-pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
-pub mod legacy_floppy;
 pub mod legacy_keyboard;
-pub mod legacy_serial;
 pub mod modern_usb;
 pub mod network;
 pub mod peripheral;
@@ -17,16 +11,14 @@ pub mod vesa;
 
 // Exposing additional audio, printer, wifi drivers
 pub mod legacy_audio_ac97;
-pub mod legacy_parallel_printer;
 pub mod modern_audio_intel_hda;
+pub mod legacy_parallel_printer;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
 
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
-pub use legacy_floppy::LegacyFloppyDisk;
 pub use legacy_keyboard::LegacyKeyboard;
-pub use legacy_serial::LegacySerialPort;
 pub use modern_usb::ModernUsbController;
 pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, PowerState};
@@ -35,7 +27,7 @@ pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use legacy_audio_ac97::LegacyAudioAc97;
-pub use legacy_parallel_printer::LegacyParallelPrinter;
 pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use legacy_parallel_printer::LegacyParallelPrinter;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::ModernWifiDriver;

@@ -1,5 +1,3 @@
-#![allow(clippy::all)]
-#![allow(warnings)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -17,10 +15,8 @@ pub use audio::editor::{
 };
 
 pub mod accessibility;
-pub mod ai;
 pub mod automation;
 pub mod compatibility;
-pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
@@ -34,22 +30,18 @@ pub mod orchestration;
 pub mod package;
 pub mod productivity;
 pub mod resilience;
-pub mod runtime;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
-pub mod memory;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
-    AccessibilityProfile, AccessibilitySetting,
-};
-pub use ai::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, ApmDependency,
-    ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, Intent, IntentType,
-    ManagerCapability as AiManagerCapability, McpServer, Pattern, SimpleAIAgent,
-    SimpleAIAgentManager, SovereignApmEngine, SovereignWikiEngine, WikiArticle,
+    AccessibilityProfile, AccessibilitySetting, BrailleDisplay, ColorFilter, KeyID, KeyType,
+    Magnifier, MagnifierID, MagnifierManager, OnScreenKeyboard, ScreenReader, SimpleBrailleDisplay,
+    SimpleColorFilter, SimpleMagnifier, SimpleMagnifierManager, SimpleOnScreenKeyboard,
+    SimpleScreenReader, SimpleStickyKeys, SimpleVirtualKey, SimpleVoice, StickyKeys, VirtualKey,
+    Voice, VoiceGender, VoiceID,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
@@ -57,31 +49,14 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BodhiProfileSelector, BudgieAppletManager,
-    BudgieLayoutSwitcher, BudgieShuffler, BuildCodexGrid, CoasAdminSuite, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
-    CorebootGatewayMesh, CosmicDesktopEngine, DACConstellation, DotMatrixMesh, DrakxtoolsSuite,
-    DriverArchiveGridV2, ElementaryAppCenter, EosLogTool, EosMirrorReflector, EosUpdateNotifier,
-    EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh,
-    GraniteHigLibrary, GraphicsArchiveGridV2, HarddrakeDetector, JujuOrchestrator,
-    KernelConstellationGrid, LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LizardInstaller, LsbProfile,
-    MaasProvisioner, Mirror as EosMirror, MokshaDesktopEngine, MokshaGadgetManager,
-    MultipassVmlight, NetworkAlmanacHub, NetworkArchiveGridV2, PacstallAur,
-    PantheonGalaWindowManager, PeripheralArchiveMesh, PopShellTiling, PosixComplianceLevel,
-    ProcessAlmanacHub, RhinoPkgUnified, SELinuxConstellation, SecurityConstellation,
-    SnapcraftRuntime, StandardsComplianceManager, StarlingCompositor, StarlingTilingEngine,
-    StarlingWidgetTree, StarlingX11Server, StorageArchiveGridV2, SyscallAlmanacHub,
-    System76PowerSwitcher, System76Scheduler, TapeMesh, TargetPlatform, TranslationLayer,
-    UEFIGatewayMesh, UbuntuDockManager, UbuntuProEsm, UnicornDesktopShell, UrpmiPackageResolver,
-    WelcomeTab as EosWelcomeTab, YayAurHelper, ZeroTrustConstellation, ZorinConnectBridge,
-    ZorinLookChanger, ZorinWinePreflight,
-};
-pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+    ApplicationBinary, BinaryFormat, CasObject, Clause, CompatibilityError, CompatibilityManager,
+    CompatibilityMode, ContainerRuntime, ContentAddressedStorage, CreativeMatrix, DpllSatSolver,
+    EverySearch, FancyZonesManager, FiletoolOverlay, FrugalLoader, ImageLayer, JoplinE2ee,
+    LayoutZone, Literal, MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter,
+    OssieMetric, OssieOntology, OssieRelationship, PledgePermission, PledgeUnveilSandbox,
+    PqcSecureChannel, ProcMonitor, ProcessExplorerState, SemanticRow, SpreadsheetCore, SysDiag,
+    TargetPlatform, TceLoader, TczExtension, TinyCoreBootConfig, TranslationLayer, WasmModule,
+    WasmSandboxEngine, WasmState,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -109,11 +84,8 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DebPackageDriverTranslator, DependencyResolver, GenericLinuxTranslationUdf,
-    LinuxDriverPackageTranslator, LinuxTranslationService, PackageAdapter, PackageError,
-    PackageFormat, PackageSource, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, UnifiedPackage, UniversalPackageManager,
-    GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -145,6 +117,10 @@ pub mod init {
 }
 pub use init::systemd_init::{SystemdEngine, SystemdUnit, UnitState, UnitType};
 
+pub mod ai {
+    pub mod next_gen;
+    pub mod wandr;
+}
 pub use ai::next_gen::{
     AIModel, AdaptiveKernelPersona, AiScheduler, AiTask, DeviceTargetType, EnergyAwareScheduler,
     EnergyGovernorMode, ModelType, MultiModelOrchestrator, PredictiveSyscallTranslator,
