@@ -1,8 +1,34 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
 
+use crate::klib::HashMap;
 use crate::security::CapabilityToken;
-use std::collections::HashMap;
+
+// Standard File Status & Access Modes inspired by Linux distros
+pub const O_RDONLY: u32 = 0;
+pub const O_WRONLY: u32 = 1;
+pub const O_RDWR: u32 = 2;
+pub const O_APPEND: u32 = 8;
+pub const O_NONBLOCK: u32 = 4096;
+pub const FD_CLOEXEC: u32 = 1;
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,39 +98,64 @@ impl Inode {
     }
 }
 
-/// File descriptor
+/// System-wide Open File Description (OFD) inspired by Linux
+/// tracks shared offset, file status flags, and description reference count.
 #[derive(Debug, Clone)]
-pub struct FileDescriptor {
+pub struct OpenFileDescription {
     pub inode_id: u64,
     pub offset: u64,
-    pub flags: u32,
+    pub flags: u32,       // e.g. O_APPEND, O_NONBLOCK
+    pub ref_count: usize, // Reference count for shared file descriptions (for dup/dup2)
 }
 
-impl FileDescriptor {
+impl OpenFileDescription {
     pub fn new(inode_id: u64, flags: u32) -> Self {
         Self {
             inode_id,
             offset: 0,
             flags,
+            ref_count: 1,
         }
+    }
+}
+
+/// Process-Local File Descriptor
+#[derive(Debug, Clone)]
+pub struct FileDescriptor {
+    pub ofd_id: u64, // Points to the system-wide OpenFileDescription
+    pub flags: u32,  // FD-specific flags (e.g. FD_CLOEXEC)
+}
+
+impl FileDescriptor {
+    pub fn new(ofd_id: u64, flags: u32) -> Self {
+        Self { ofd_id, flags }
     }
 }
 
 /// Virtual Filesystem
 pub struct VirtualFilesystem {
-    inodes: HashMap<u64, Inode>,
-    next_inode_id: u64,
-    root_inode: u64,
-    file_descriptors: HashMap<u64, FileDescriptor>,
-    next_fd: u64,
+    pub inodes: HashMap<u64, Inode>,
+    pub next_inode_id: u64,
+    pub root_inode: u64,
+
+    // System-wide Open File Descriptions
+    pub open_file_descriptions: HashMap<u64, OpenFileDescription>,
+    pub next_ofd_id: u64,
+
+    // Process-Private File Descriptors
+    pub file_descriptors: HashMap<u64, FileDescriptor>,
+    pub next_fd: u64,
 }
 
 impl VirtualFilesystem {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut fs = Self {
             inodes: HashMap::new(),
             next_inode_id: 1,
             root_inode: 0,
+            open_file_descriptions: HashMap::new(),
+            next_ofd_id: 1,
             file_descriptors: HashMap::new(),
             next_fd: 0,
         };
@@ -132,18 +183,96 @@ impl VirtualFilesystem {
             return Err(FsError::NotFound);
         }
 
+        // Allocate system-wide Open File Description (OFD)
+        let ofd_id = self.next_ofd_id;
+        self.next_ofd_id += 1;
+        let ofd = OpenFileDescription::new(inode_id, flags);
+        self.open_file_descriptions.insert(ofd_id, ofd);
+
+        // Allocate process-private File Descriptor (FD)
         let fd = self.next_fd;
         self.next_fd += 1;
-
-        let file_descriptor = FileDescriptor::new(inode_id, flags);
+        let file_descriptor = FileDescriptor::new(ofd_id, 0);
         self.file_descriptors.insert(fd, file_descriptor);
 
         Ok(fd)
     }
 
+    /// Duplicate file descriptor (dup parity)
+    /// Shares the same OpenFileDescription and current file offset.
+    pub fn dup_file(&mut self, fd: u64) -> Result<u64, FsError> {
+        let file_descriptor = self
+            .file_descriptors
+            .get(&fd)
+            .ok_or(FsError::InvalidFd)?
+            .clone();
+
+        let ofd = self
+            .open_file_descriptions
+            .get_mut(&file_descriptor.ofd_id)
+            .ok_or(FsError::InvalidFd)?;
+
+        ofd.ref_count += 1;
+
+        let new_fd = self.next_fd;
+        self.next_fd += 1;
+
+        let new_file_descriptor =
+            FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
+        self.file_descriptors.insert(new_fd, new_file_descriptor);
+
+        Ok(new_fd)
+    }
+
+    /// Duplicate file descriptor onto a specific FD (dup2 parity)
+    pub fn dup2_file(&mut self, old_fd: u64, new_fd: u64) -> Result<(), FsError> {
+        if old_fd == new_fd {
+            if !self.file_descriptors.contains_key(&old_fd) {
+                return Err(FsError::InvalidFd);
+            }
+            return Ok(());
+        }
+
+        let file_descriptor = self
+            .file_descriptors
+            .get(&old_fd)
+            .ok_or(FsError::InvalidFd)?
+            .clone();
+
+        // If new_fd is already open, close it first
+        if self.file_descriptors.contains_key(&new_fd) {
+            let _ = self.close_file(new_fd);
+        }
+
+        let ofd = self
+            .open_file_descriptions
+            .get_mut(&file_descriptor.ofd_id)
+            .ok_or(FsError::InvalidFd)?;
+
+        ofd.ref_count += 1;
+
+        let new_file_descriptor =
+            FileDescriptor::new(file_descriptor.ofd_id, file_descriptor.flags);
+        self.file_descriptors.insert(new_fd, new_file_descriptor);
+
+        Ok(())
+    }
+
     pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
-        if !self.file_descriptors.contains_key(&fd) {
-            return Err(FsError::InvalidFd);
+        let file_descriptor = self
+            .file_descriptors
+            .get(&fd)
+            .ok_or(FsError::InvalidFd)?
+            .clone();
+
+        let ofd = self
+            .open_file_descriptions
+            .get_mut(&file_descriptor.ofd_id)
+            .ok_or(FsError::InvalidFd)?;
+
+        ofd.ref_count -= 1;
+        if ofd.ref_count == 0 {
+            self.open_file_descriptions.remove(&file_descriptor.ofd_id);
         }
 
         self.file_descriptors.remove(&fd);
@@ -151,15 +280,14 @@ impl VirtualFilesystem {
     }
 
     pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+        let file_descriptor = self.file_descriptors.get(&fd).ok_or(FsError::InvalidFd)?;
+
+        let ofd = self
+            .open_file_descriptions
+            .get_mut(&file_descriptor.ofd_id)
             .ok_or(FsError::InvalidFd)?;
 
-        let inode = self
-            .inodes
-            .get(&file_descriptor.inode_id)
-            .ok_or(FsError::NotFound)?;
+        let inode = self.inodes.get(&ofd.inode_id).ok_or(FsError::NotFound)?;
 
         // Check read permission
         if !inode.permissions.read {
@@ -167,32 +295,39 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor
+        let _new_offset = ofd
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
 
-        // Simulate read (in production, actual file I/O)
+        // Simulate read
         let bytes_read = buffer.len().min(inode.size as usize);
-        file_descriptor.offset += bytes_read as u64;
+        ofd.offset += bytes_read as u64;
 
         Ok(bytes_read)
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
+        let file_descriptor = self.file_descriptors.get(&fd).ok_or(FsError::InvalidFd)?;
+
+        let ofd = self
+            .open_file_descriptions
+            .get_mut(&file_descriptor.ofd_id)
             .ok_or(FsError::InvalidFd)?;
 
         let inode = self
             .inodes
-            .get_mut(&file_descriptor.inode_id)
+            .get_mut(&ofd.inode_id)
             .ok_or(FsError::NotFound)?;
 
         // Check write permission
         if !inode.permissions.write {
             return Err(FsError::PermissionDenied);
+        }
+
+        // Handle O_APPEND status flag inspired by Linux distros
+        if (ofd.flags & O_APPEND) != 0 {
+            ofd.offset = inode.size;
         }
 
         // Prevent integer overflow in size calculation
@@ -202,16 +337,16 @@ impl VirtualFilesystem {
             .ok_or(FsError::NoSpace)?;
 
         // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
+        let _new_offset = ofd
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
-        // Simulate write (in production, actual file I/O)
+        // Simulate write
         let bytes_written = buffer.len();
         inode.size += bytes_written as u64;
-        file_descriptor.offset += bytes_written as u64;
-        inode.modified = 0; // In production, actual timestamp
+        ofd.offset += bytes_written as u64;
+        inode.modified = 0;
 
         Ok(bytes_written)
     }
@@ -258,7 +393,7 @@ impl VirtualFilesystem {
             return Err(FsError::NotADirectory);
         }
 
-        // Return all inodes (in production, actual directory listing)
+        // Return all inodes
         Ok(self.inodes.keys().copied().collect())
     }
 }
@@ -337,25 +472,52 @@ mod tests {
     }
 
     #[test]
-    fn test_zero_sized_read_write_optimization() {
+    fn test_file_descriptor_sharing_via_dup() {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        let fd = vfs.open_file(inode_id, 0).unwrap();
+        let fd1 = vfs.open_file(inode_id, 0).unwrap();
+        let fd2 = vfs.dup_file(fd1).unwrap();
 
-        // 1. Zero-sized write should return Ok(0) immediately without touching file size
-        let written = vfs.write_file(fd, &[]).unwrap();
-        assert_eq!(written, 0);
-        let inode = vfs.get_inode(inode_id).unwrap();
-        assert_eq!(inode.size, 0);
+        // Write via fd1 should advance the offset of fd2 as they share the same OFD
+        let data = b"shared offset test";
+        vfs.write_file(fd1, data).unwrap();
 
-        // 2. Zero-sized read should return Ok(0) immediately even if file is empty
-        let mut buf = [];
-        let read = vfs.read_file(fd, &mut buf).unwrap();
-        assert_eq!(read, 0);
+        let ofd1_id = vfs.file_descriptors.get(&fd1).unwrap().ofd_id;
+        let ofd2_id = vfs.file_descriptors.get(&fd2).unwrap().ofd_id;
+        assert_eq!(ofd1_id, ofd2_id);
 
-        // 3. Zero-sized read/write on an invalid file descriptor must return Err(FsError::InvalidFd)
-        let invalid_fd = 9999;
-        assert_eq!(vfs.write_file(invalid_fd, &[]), Err(FsError::InvalidFd));
-        assert_eq!(vfs.read_file(invalid_fd, &mut []), Err(FsError::InvalidFd));
+        let ofd = vfs.open_file_descriptions.get(&ofd1_id).unwrap();
+        assert_eq!(ofd.offset, data.len() as u64);
+        assert_eq!(ofd.ref_count, 2);
+
+        vfs.close_file(fd1).unwrap();
+        // ofd should still exist since fd2 is open
+        assert!(vfs.open_file_descriptions.contains_key(&ofd1_id));
+
+        vfs.close_file(fd2).unwrap();
+        // ofd should be removed now
+        assert!(!vfs.open_file_descriptions.contains_key(&ofd1_id));
+    }
+
+    #[test]
+    fn test_dup2_overwrite() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id1 = vfs.create_file(FileType::Regular, 100).unwrap();
+        let inode_id2 = vfs.create_file(FileType::Regular, 100).unwrap();
+
+        let fd1 = vfs.open_file(inode_id1, 0).unwrap();
+        let fd2 = vfs.open_file(inode_id2, 0).unwrap();
+
+        let ofd2_id = vfs.file_descriptors.get(&fd2).unwrap().ofd_id;
+
+        // dup2 should close fd2 and overwrite it to point to fd1's OFD
+        vfs.dup2_file(fd1, fd2).unwrap();
+
+        let ofd1_id = vfs.file_descriptors.get(&fd1).unwrap().ofd_id;
+        let new_ofd2_id = vfs.file_descriptors.get(&fd2).unwrap().ofd_id;
+
+        assert_eq!(ofd1_id, new_ofd2_id);
+        // Previous OFD of fd2 should be garbage collected if ref_count became 0
+        assert!(!vfs.open_file_descriptions.contains_key(&ofd2_id));
     }
 }

@@ -83,8 +83,17 @@ impl QrexecPolicyEngine {
         Self { rules: Vec::new() }
     }
 
-    pub fn add_rule(&mut self, source_type: DomainType, dest_type: DomainType, action: QrexecPolicyAction) {
-        self.rules.push(QrexecRule { source_type, dest_type, action });
+    pub fn add_rule(
+        &mut self,
+        source_type: DomainType,
+        dest_type: DomainType,
+        action: QrexecPolicyAction,
+    ) {
+        self.rules.push(QrexecRule {
+            source_type,
+            dest_type,
+            action,
+        });
     }
 
     pub fn check_rpc_policy(&self, src: DomainType, dest: DomainType) -> QrexecPolicyAction {
@@ -130,7 +139,9 @@ impl TemplateVmManager {
     pub fn discard_volatile_overlay(&mut self) {
         if self.app_vm_count > 0 {
             self.app_vm_count -= 1;
-            self.active_overlays_allocated_bytes = self.active_overlays_allocated_bytes.saturating_sub(128 * 1024 * 1024);
+            self.active_overlays_allocated_bytes = self
+                .active_overlays_allocated_bytes
+                .saturating_sub(128 * 1024 * 1024);
         }
     }
 }
@@ -202,7 +213,9 @@ impl DomainOrchestrator {
         let dest = dest_domain.ok_or(IsolationError::DomainNotFound)?;
 
         // Enforce Qrexec policy checks
-        let action = self.qrexec_policy.check_rpc_policy(src.domain_type, dest.domain_type);
+        let action = self
+            .qrexec_policy
+            .check_rpc_policy(src.domain_type, dest.domain_type);
         if action == QrexecPolicyAction::Deny {
             return Err(IsolationError::PermissionDenied);
         }
@@ -420,7 +433,11 @@ mod tests {
     #[test]
     fn test_qubes_domain_compartmentalization() {
         let mut orchestrator = DomainOrchestrator::new();
-        orchestrator.qrexec_policy.add_rule(DomainType::App, DomainType::Net, QrexecPolicyAction::Allow);
+        orchestrator.qrexec_policy.add_rule(
+            DomainType::App,
+            DomainType::Net,
+            QrexecPolicyAction::Allow,
+        );
 
         // 1. Spawn Net domain with full hardware token (0xFFFF)
         let net_id = orchestrator
@@ -458,12 +475,29 @@ mod tests {
     #[test]
     fn test_qrexec_policy_engine() {
         let mut policy = QrexecPolicyEngine::new();
-        policy.add_rule(DomainType::App, DomainType::Storage, QrexecPolicyAction::Allow);
-        policy.add_rule(DomainType::Disposable, DomainType::Net, QrexecPolicyAction::Ask);
+        policy.add_rule(
+            DomainType::App,
+            DomainType::Storage,
+            QrexecPolicyAction::Allow,
+        );
+        policy.add_rule(
+            DomainType::Disposable,
+            DomainType::Net,
+            QrexecPolicyAction::Ask,
+        );
 
-        assert_eq!(policy.check_rpc_policy(DomainType::App, DomainType::Storage), QrexecPolicyAction::Allow);
-        assert_eq!(policy.check_rpc_policy(DomainType::Disposable, DomainType::Net), QrexecPolicyAction::Ask);
-        assert_eq!(policy.check_rpc_policy(DomainType::App, DomainType::Net), QrexecPolicyAction::Deny); // default deny
+        assert_eq!(
+            policy.check_rpc_policy(DomainType::App, DomainType::Storage),
+            QrexecPolicyAction::Allow
+        );
+        assert_eq!(
+            policy.check_rpc_policy(DomainType::Disposable, DomainType::Net),
+            QrexecPolicyAction::Ask
+        );
+        assert_eq!(
+            policy.check_rpc_policy(DomainType::App, DomainType::Net),
+            QrexecPolicyAction::Deny
+        ); // default deny
     }
 
     #[test]
@@ -474,7 +508,10 @@ mod tests {
         let app_id = template_manager.instantiate_app_vm().unwrap();
         assert_eq!(app_id, 501);
         assert_eq!(template_manager.app_vm_count, 1);
-        assert_eq!(template_manager.active_overlays_allocated_bytes, 128 * 1024 * 1024);
+        assert_eq!(
+            template_manager.active_overlays_allocated_bytes,
+            128 * 1024 * 1024
+        );
 
         template_manager.discard_volatile_overlay();
         assert_eq!(template_manager.app_vm_count, 0);

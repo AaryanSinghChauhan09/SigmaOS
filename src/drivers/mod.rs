@@ -1,4 +1,8 @@
 // SigmaOS Drivers Module
+pub mod boot_init;
+pub mod dde;
+pub mod even_more_devices;
+pub mod flipper_gpio_sensor;
 pub mod gpu;
 pub mod input;
 pub mod legacy_floppy;
@@ -13,8 +17,8 @@ pub mod vesa;
 
 // Exposing additional audio, printer, wifi drivers
 pub mod legacy_audio_ac97;
-pub mod modern_audio_intel_hda;
 pub mod legacy_parallel_printer;
+pub mod modern_audio_intel_hda;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
 
@@ -31,7 +35,7 @@ pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 pub use legacy_audio_ac97::LegacyAudioAc97;
-pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use legacy_parallel_printer::LegacyParallelPrinter;
+pub use modern_audio_intel_hda::ModernAudioIntelHda;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::ModernWifiDriver;

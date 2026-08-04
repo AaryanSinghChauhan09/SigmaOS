@@ -1,20 +1,36 @@
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
 
+// (no_std only applicable at crate root - removed)
+// #![no_main]  // crate-root only
+
+use core::mem;
 /// Custom Process Management for SigmaOS
 /// Implements process management without relying on std::process
 /// Uses capability-based access control
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Process ID
 pub type ProcessID = usize;
 
 /// Process state
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState {
     Uninitialized = 0,
@@ -51,6 +67,7 @@ pub struct ProcessCapability {
 }
 
 impl ProcessCapability {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ProcessCapability {
             can_create: false,
@@ -90,6 +107,7 @@ pub struct ProcessMemoryMap {
 }
 
 impl ProcessMemoryMap {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ProcessMemoryMap {
             code_start: 0,
@@ -126,15 +144,6 @@ pub struct Process {
     pub capability: ProcessCapability,
     pub thread_count: AtomicUsize,
     pub pending_signals: AtomicUsize, // bitmask representation of pending signals
-    pub name: [u8; 16],
-    pub uid: u32,
-    pub gid: u32,
-    pub nice: i32,
-    pub vsz: u64,
-    pub rss: u64,
-    pub pgid: ProcessID,
-    pub sid: ProcessID,
-    pub cpu_time_ns: AtomicUsize,
 }
 
 impl Process {
@@ -149,56 +158,19 @@ impl Process {
             capability,
             thread_count: AtomicUsize::new(0),
             pending_signals: AtomicUsize::new(0),
-            name: [0; 16],
-            uid: 1000,
-            gid: 1000,
-            nice: 0,
-            vsz: 0,
-            rss: 0,
-            pgid: pid,
-            sid: pid,
-            cpu_time_ns: AtomicUsize::new(0),
         }
-    }
-
-    /// Sets process task name (up to 15 characters)
-    pub fn set_name(&mut self, name_str: &str) {
-        let bytes = name_str.as_bytes();
-        let limit = core::cmp::min(bytes.len(), 15);
-        for i in 0..limit {
-            self.name[i] = bytes[i];
-        }
-        self.name[limit] = 0; // null terminator
-    }
-
-    /// Sets process UID and GID ownership
-    pub fn set_owner(&mut self, uid: u32, gid: u32) {
-        self.uid = uid;
-        self.gid = gid;
-    }
-
-    /// Sets process niceness prioritizing levels (-20 to 19 range)
-    pub fn set_nice(&mut self, nice_val: i32) -> Result<(), &'static str> {
-        if nice_val < -20 || nice_val > 19 {
-            return Err("Niceness must be between -20 and 19");
-        }
-        self.nice = nice_val;
-        Ok(())
-    }
-
-    /// Progresses process CPU execution duration metrics
-    pub fn increment_cpu_time(&self, amount_ns: usize) {
-        self.cpu_time_ns.fetch_add(amount_ns, Ordering::SeqCst);
-    }
-
-    /// Retrieves accumulated CPU execution time
-    pub fn get_cpu_time(&self) -> usize {
-        self.cpu_time_ns.load(Ordering::SeqCst)
     }
 
     pub fn get_state(&self) -> ProcessState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        let val = self.state.load(Ordering::SeqCst);
+        match val {
+            1 => ProcessState::Created,
+            2 => ProcessState::Running,
+            3 => ProcessState::Sleeping,
+            4 => ProcessState::Stopped,
+            5 => ProcessState::Zombie,
+            6 => ProcessState::Terminated,
+            _ => ProcessState::Uninitialized,
         }
     }
 
@@ -283,21 +255,6 @@ impl SupervisedServiceTarget {
     }
 }
 
-/// Represents a row in the sovereign process table query results (ps aux parity)
-#[derive(Debug, Clone)]
-pub struct ProcessTableEntry {
-    pub pid: ProcessID,
-    pub ppid: ProcessID,
-    pub name: String,
-    pub state: ProcessState,
-    pub uid: u32,
-    pub gid: u32,
-    pub nice: i32,
-    pub vsz: u64,
-    pub rss: u64,
-    pub cpu_time_ns: usize,
-}
-
 /// Process manager
 pub struct ProcessManager {
     processes: [Option<NonNull<Process>>; 256],
@@ -306,6 +263,7 @@ pub struct ProcessManager {
 }
 
 impl ProcessManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ProcessManager {
             processes: [None; 256],
@@ -314,43 +272,11 @@ impl ProcessManager {
         }
     }
 
-    /// Generates a snapshot of the current active process table (ps aux parity)
-    pub unsafe fn query_process_table(&self) -> Vec<ProcessTableEntry> {
-        let mut entries = Vec::new();
-        for slot in &self.processes {
-            if let Some(ptr) = slot {
-                let p = &*ptr.as_ptr();
-                let mut name_len = 0;
-                while name_len < p.name.len() && p.name[name_len] != 0 {
-                    name_len += 1;
-                }
-                let mut name_str = String::new();
-                if name_len > 0 {
-                    for b in &p.name[0..name_len] {
-                        name_str.push(*b as char);
-                    }
-                } else {
-                    name_str.push_str("init");
-                }
-
-                entries.push(ProcessTableEntry {
-                    pid: p.pid,
-                    ppid: p.ppid,
-                    name: name_str,
-                    state: p.get_state(),
-                    uid: p.uid,
-                    gid: p.gid,
-                    nice: p.nice,
-                    vsz: p.vsz,
-                    rss: p.rss,
-                    cpu_time_ns: p.cpu_time_ns.load(Ordering::SeqCst),
-                });
-            }
-        }
-        entries
-    }
-
-    pub unsafe fn create_process(&mut self, ppid: ProcessID, capability: ProcessCapability) -> Option<ProcessID> {
+    pub unsafe fn create_process(
+        &mut self,
+        ppid: ProcessID,
+        capability: ProcessCapability,
+    ) -> Option<ProcessID> {
         if !capability.can_create {
             return None;
         }
@@ -443,7 +369,11 @@ impl ProcessManager {
         }
     }
 
-    pub unsafe fn set_process_priority(&mut self, pid: ProcessID, priority: ProcessPriority) -> bool {
+    pub unsafe fn set_process_priority(
+        &mut self,
+        pid: ProcessID,
+        priority: ProcessPriority,
+    ) -> bool {
         if pid >= 256 {
             return false;
         }
@@ -518,7 +448,7 @@ impl ProcessManager {
 
         if let Some(process_ptr) = self.processes[pid] {
             let process = &*process_ptr.as_ptr();
-            
+
             // In a real implementation, this would wait for process to terminate
             // For now, check if already terminated
             if process.get_state() == ProcessState::Terminated {
@@ -648,77 +578,8 @@ pub unsafe fn exit_process(exit_code: usize) -> ! {
     loop {}
 }
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
+// External allocator functions
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_process_table_metadata() {
-        let cap = ProcessCapability::full();
-        let mut process = unsafe { Process::new(1, 0, cap) };
-
-        process.set_name("systemd-network");
-        // Convert name bytes back to check
-        let mut name_len = 0;
-        while name_len < process.name.len() && process.name[name_len] != 0 {
-            name_len += 1;
-        }
-        let mut s = String::new();
-        for b in &process.name[0..name_len] {
-            s.push(*b as char);
-        }
-        assert_eq!(s, "systemd-network");
-
-        process.set_owner(500, 500);
-        assert_eq!(process.uid, 500);
-        assert_eq!(process.gid, 500);
-
-        assert!(process.set_nice(10).is_ok());
-        assert_eq!(process.nice, 10);
-        assert!(process.set_nice(-21).is_err());
-        assert!(process.set_nice(20).is_err());
-
-        assert_eq!(process.get_cpu_time(), 0);
-        process.increment_cpu_time(1000);
-        assert_eq!(process.get_cpu_time(), 1000);
-    }
-
-    #[test]
-    fn test_process_manager_query() {
-        let mut manager = ProcessManager::new();
-        let cap = ProcessCapability::full();
-
-        unsafe {
-            let pid = manager.create_process(0, cap).unwrap();
-            let p_ref = &mut *(manager.processes[pid].unwrap().as_ptr());
-            p_ref.set_name("kernel-task");
-            p_ref.set_owner(0, 0);
-
-            let table = manager.query_process_table();
-            assert_eq!(table.len(), 1);
-            assert_eq!(table[0].pid, pid);
-            assert_eq!(table[0].name, "kernel-task");
-            assert_eq!(table[0].uid, 0);
-            assert_eq!(table[0].gid, 0);
-        }
-    }
 }

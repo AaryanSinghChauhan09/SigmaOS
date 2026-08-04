@@ -1,10 +1,26 @@
 //! Custom HashMap implementation for SigmaOS
 //! Reduces dependency on std::collections::HashMap
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
 
 use crate::klib::Vec;
 use core::borrow::Borrow;
-use core::hash::{Hash, Hasher};
-use crate::klib::hash::SimpleHasher;
+use core::hash::Hasher;
 
 pub struct HashMap<K, V> {
     buckets: Vec<Option<Vec<(K, V)>>>,
@@ -12,59 +28,43 @@ pub struct HashMap<K, V> {
     len: usize,
 }
 
-pub enum Entry<'a, K, V> {
-    Occupied(OccupiedEntry<'a, K, V>),
-    Vacant(VacantEntry<'a, K, V>),
+struct SimpleHasher {
+    state: u64,
 }
 
-pub struct OccupiedEntry<'a, K, V> {
-    value: &'a mut V,
-    _marker: core::marker::PhantomData<K>,
-}
-
-pub struct VacantEntry<'a, K, V> {
-    map: &'a mut HashMap<K, V>,
-    key: K,
-}
-
-impl<'a, K, V> Entry<'a, K, V>
-where
-    K: Eq + Hash + Clone,
-    V: Clone,
-{
-    pub fn or_insert_with<F>(self, default: F) -> &'a mut V
-    where
-        F: FnOnce() -> V,
-    {
-        match self {
-            Entry::Occupied(entry) => entry.value,
-            Entry::Vacant(entry) => {
-                let val = default();
-                entry.map.insert(entry.key.clone(), val);
-                entry.map.get_mut(&entry.key).unwrap()
-            }
+impl Hasher for SimpleHasher {
+    fn write(&mut self, bytes: &[u8]) {
+        for &byte in bytes {
+            self.state = self.state.wrapping_mul(31).wrapping_add(byte as u64);
         }
+    }
+    fn finish(&self) -> u64 {
+        self.state
     }
 }
 
 impl<K, V> HashMap<K, V>
 where
-    K: Eq + Hash,
+    K: PartialEq + core::hash::Hash,
 {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        HashMap {
+        let mut map = HashMap {
             buckets: Vec::new(),
-            capacity: 0,
+            capacity: 16,
             len: 0,
-        }
+        };
+        map.resize_buckets();
+        map
     }
 
     pub fn with_capacity(capacity: usize) -> Self {
-        let mut map = HashMap::new();
-        if capacity > 0 {
-            map.capacity = capacity.next_power_of_two();
-            map.resize_buckets();
-        }
+        let mut map = HashMap {
+            buckets: Vec::new(),
+            capacity: capacity.next_power_of_two(),
+            len: 0,
+        };
+        map.resize_buckets();
         map
     }
 
@@ -75,11 +75,10 @@ where
         }
     }
 
-    fn hash_key<Q: ?Sized + Hash>(&self, key: &Q) -> usize {
-        if self.capacity == 0 {
-            return 0;
-        }
-        let mut hasher = SimpleHasher::new();
+    fn hash_key(&self, key: &K) -> usize {
+        use core::hash::Hash;
+        use core::hash::Hasher;
+        let mut hasher = crate::klib::hash::SimpleHasher::new();
         key.hash(&mut hasher);
         (hasher.finish() as usize) % self.capacity
     }
@@ -114,13 +113,15 @@ where
 
     pub fn get<Q: ?Sized>(&self, key: &Q) -> Option<&V>
     where
-        K: Borrow<Q>,
-        Q: Hash + Eq,
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq + core::hash::Hash,
     {
-        if self.capacity == 0 || self.buckets.is_empty() {
-            return None;
-        }
-        let hash = self.hash_key(key);
+        use core::hash::Hash;
+        use core::hash::Hasher;
+        let mut hasher = crate::klib::hash::SimpleHasher::new();
+        key.hash(&mut hasher);
+        let hash = (hasher.finish() as usize) % self.capacity;
+
         if let Some(ref bucket) = self.buckets[hash] {
             for item in bucket.iter() {
                 if item.0.borrow() == key {
@@ -133,13 +134,15 @@ where
 
     pub fn get_mut<Q: ?Sized>(&mut self, key: &Q) -> Option<&mut V>
     where
-        K: Borrow<Q>,
-        Q: Hash + Eq,
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq + core::hash::Hash,
     {
-        if self.capacity == 0 || self.buckets.is_empty() {
-            return None;
-        }
-        let hash = self.hash_key(key);
+        use core::hash::Hash;
+        use core::hash::Hasher;
+        let mut hasher = crate::klib::hash::SimpleHasher::new();
+        key.hash(&mut hasher);
+        let hash = (hasher.finish() as usize) % self.capacity;
+
         if let Some(ref mut bucket) = self.buckets[hash] {
             for item in bucket.iter_mut() {
                 if item.0.borrow() == key {
@@ -152,13 +155,15 @@ where
 
     pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
     where
-        K: Borrow<Q>,
-        Q: Hash + Eq,
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq + core::hash::Hash,
     {
-        if self.capacity == 0 || self.buckets.is_empty() {
-            return None;
-        }
-        let hash = self.hash_key(key);
+        use core::hash::Hash;
+        use core::hash::Hasher;
+        let mut hasher = crate::klib::hash::SimpleHasher::new();
+        key.hash(&mut hasher);
+        let hash = (hasher.finish() as usize) % self.capacity;
+
         if let Some(ref mut bucket) = self.buckets[hash] {
             for i in 0..bucket.len() {
                 if bucket[i].0.borrow() == key {
@@ -173,8 +178,8 @@ where
 
     pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
     where
-        K: Borrow<Q>,
-        Q: Hash + Eq,
+        K: core::borrow::Borrow<Q>,
+        Q: PartialEq + core::hash::Hash,
     {
         self.get(key).is_some()
     }
@@ -202,6 +207,14 @@ where
         }
     }
 
+    pub fn values(&self) -> HashMapValues<'_, K, V> {
+        HashMapValues { iter: self.iter() }
+    }
+
+    pub fn keys(&self) -> HashMapKeys<'_, K, V> {
+        HashMapKeys { iter: self.iter() }
+    }
+
     pub fn iter_mut(&mut self) -> HashMapIterMut<'_, K, V> {
         HashMapIterMut {
             map: self,
@@ -210,35 +223,30 @@ where
         }
     }
 
-    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
-        if self.capacity == 0 || self.buckets.is_empty() {
-            if self.capacity == 0 {
-                self.capacity = 16;
-            }
-            self.resize_buckets();
+    pub fn values_mut(&mut self) -> HashMapValuesMut<'_, K, V> {
+        HashMapValuesMut {
+            iter: self.iter_mut(),
         }
-        let hash = self.hash_key(&key);
-        if let Some(ref mut bucket) = self.buckets[hash] {
-            for i in 0..bucket.len() {
-                if bucket[i].0 == key {
-                    let val_ptr = &mut bucket[i].1 as *mut V;
-                    return Entry::Occupied(OccupiedEntry { value: unsafe { &mut *val_ptr }, _marker: core::marker::PhantomData });
-                }
+    }
+
+    pub fn entry(&mut self, key: K) -> Entry<'_, K, V>
+    where
+        K: Clone,
+    {
+        let self_ptr = self as *mut Self;
+        if let Some(value) = self.get_mut(&key) {
+            Entry::Occupied(OccupiedEntry {
+                value,
+                _marker: core::marker::PhantomData,
+            })
+        } else {
+            unsafe {
+                Entry::Vacant(VacantEntry {
+                    map: &mut *self_ptr,
+                    key,
+                })
             }
         }
-        Entry::Vacant(VacantEntry { map: self, key })
-    }
-
-    pub fn keys(&self) -> Keys<'_, K, V> {
-        Keys { iter: self.iter() }
-    }
-
-    pub fn values(&self) -> Values<'_, K, V> {
-        Values { iter: self.iter() }
-    }
-
-    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
-        ValuesMut { iter: self.iter_mut(), _marker: core::marker::PhantomData }
     }
 
     fn grow(&mut self) {
@@ -247,9 +255,10 @@ where
         self.resize_buckets();
         self.len = 0;
 
-        while let Some(opt_bucket) = old_buckets.pop() {
-            if let Some(mut bucket) = opt_bucket {
-                while let Some((key, value)) = bucket.pop() {
+        while !old_buckets.is_empty() {
+            if let Some(mut bucket) = old_buckets.pop().unwrap() {
+                while !bucket.is_empty() {
+                    let (key, value) = bucket.pop().unwrap();
                     self.insert(key, value);
                 }
             }
@@ -259,7 +268,8 @@ where
 
 impl<K, V> Default for HashMap<K, V>
 where
-    K: Eq + Hash,
+    K: PartialEq + Clone + core::hash::Hash,
+    V: Clone,
 {
     fn default() -> Self {
         Self::new()
@@ -268,11 +278,11 @@ where
 
 impl<K, V> Clone for HashMap<K, V>
 where
-    K: Clone,
+    K: PartialEq + Clone + core::hash::Hash,
     V: Clone,
 {
     fn clone(&self) -> Self {
-        Self {
+        HashMap {
             buckets: self.buckets.clone(),
             capacity: self.capacity,
             len: self.len,
@@ -282,15 +292,15 @@ where
 
 impl<K, V> core::fmt::Debug for HashMap<K, V>
 where
-    K: Eq + Hash + core::fmt::Debug,
+    K: core::fmt::Debug + PartialEq + core::hash::Hash,
     V: core::fmt::Debug,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        let mut map = f.debug_map();
+        let mut debug_map = f.debug_map();
         for (k, v) in self.iter() {
-            map.entry(k, v);
+            debug_map.entry(k, v);
         }
-        map.finish()
+        debug_map.finish()
     }
 }
 
@@ -300,7 +310,10 @@ pub struct HashMapIter<'a, K, V> {
     item_idx: usize,
 }
 
-impl<'a, K, V> Iterator for HashMapIter<'a, K, V> {
+impl<'a, K, V> Iterator for HashMapIter<'a, K, V>
+where
+    K: PartialEq,
+{
     type Item = (&'a K, &'a V);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -322,26 +335,59 @@ impl<'a, K, V> Iterator for HashMapIter<'a, K, V> {
     }
 }
 
+pub struct HashMapValues<'a, K, V> {
+    iter: HashMapIter<'a, K, V>,
+}
+
+impl<'a, K, V> Iterator for HashMapValues<'a, K, V>
+where
+    K: PartialEq,
+{
+    type Item = &'a V;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|(_, v)| v)
+    }
+}
+
+pub struct HashMapKeys<'a, K, V> {
+    iter: HashMapIter<'a, K, V>,
+}
+
+impl<'a, K, V> Iterator for HashMapKeys<'a, K, V>
+where
+    K: PartialEq,
+{
+    type Item = &'a K;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|(k, _)| k)
+    }
+}
+
 pub struct HashMapIterMut<'a, K, V> {
     map: &'a mut HashMap<K, V>,
     bucket_idx: usize,
     item_idx: usize,
 }
 
-impl<'a, K, V> Iterator for HashMapIterMut<'a, K, V> {
+impl<'a, K, V> Iterator for HashMapIterMut<'a, K, V>
+where
+    K: PartialEq,
+{
     type Item = (&'a K, &'a mut V);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.map.capacity == 0 || self.map.buckets.is_empty() {
-            return None;
-        }
-        while self.bucket_idx < self.map.capacity {
+        let capacity = self.map.capacity;
+        while self.bucket_idx < capacity {
             if let Some(ref mut bucket) = self.map.buckets[self.bucket_idx] {
                 if self.item_idx < bucket.len() {
+                    let item = &mut bucket[self.item_idx];
+                    let k = &item.0 as *const K;
+                    let v = &mut item.1 as *mut V;
+                    self.item_idx += 1;
                     unsafe {
-                        let item_ptr = &mut bucket[self.item_idx] as *mut (K, V);
-                        self.item_idx += 1;
-                        return Some((&(*item_ptr).0, &mut (*item_ptr).1));
+                        return Some((&*k, &mut *v));
                     }
                 }
             }
@@ -352,9 +398,24 @@ impl<'a, K, V> Iterator for HashMapIterMut<'a, K, V> {
     }
 }
 
+pub struct HashMapValuesMut<'a, K, V> {
+    iter: HashMapIterMut<'a, K, V>,
+}
+
+impl<'a, K, V> Iterator for HashMapValuesMut<'a, K, V>
+where
+    K: PartialEq,
+{
+    type Item = &'a mut V;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|(_, v)| v)
+    }
+}
+
 impl<'a, K, V> IntoIterator for &'a HashMap<K, V>
 where
-    K: Eq + Hash,
+    K: PartialEq + core::hash::Hash,
 {
     type Item = (&'a K, &'a V);
     type IntoIter = HashMapIter<'a, K, V>;
@@ -364,56 +425,52 @@ where
     }
 }
 
-pub struct Keys<'a, K, V> {
-    iter: HashMapIter<'a, K, V>,
+pub enum Entry<'a, K, V> {
+    Occupied(OccupiedEntry<'a, K, V>),
+    Vacant(VacantEntry<'a, K, V>),
 }
 
-impl<'a, K, V> Iterator for Keys<'a, K, V> {
-    type Item = &'a K;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|(k, _)| k)
-    }
+pub struct OccupiedEntry<'a, K, V> {
+    value: &'a mut V,
+    pub _marker: core::marker::PhantomData<K>,
 }
 
-pub struct Values<'a, K, V> {
-    iter: HashMapIter<'a, K, V>,
+pub struct VacantEntry<'a, K, V> {
+    map: &'a mut HashMap<K, V>,
+    key: K,
 }
 
-impl<'a, K, V> Iterator for Values<'a, K, V> {
-    type Item = &'a V;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|(_, v)| v)
-    }
-}
-
-pub struct ValuesMut<'a, K, V> {
-    iter: HashMapIterMut<'a, K, V>,
-    _marker: core::marker::PhantomData<K>,
-}
-
-impl<'a, K, V> Iterator for ValuesMut<'a, K, V> {
-    type Item = &'a mut V;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.iter.next().map(|(_, v)| v)
-    }
-}
-
-impl<K, V, const N: usize> From<[(K, V); N]> for HashMap<K, V>
+impl<'a, K, V> Entry<'a, K, V>
 where
-    K: Eq + Hash + Clone,
-    V: Clone,
+    K: PartialEq + Clone + core::hash::Hash,
 {
-    fn from(arr: [(K, V); N]) -> Self {
-        let mut map = HashMap::with_capacity(N);
-        for (k, v) in arr {
-            map.insert(k, v);
+    pub fn or_insert(self, default: V) -> &'a mut V {
+        match self {
+            Entry::Occupied(entry) => entry.value,
+            Entry::Vacant(entry) => {
+                let key = entry.key;
+                entry.map.insert(key.clone(), default);
+                entry.map.get_mut(&key).unwrap()
+            }
         }
-        map
+    }
+
+    pub fn or_insert_with<F>(self, default_fn: F) -> &'a mut V
+    where
+        F: FnOnce() -> V,
+    {
+        match self {
+            Entry::Occupied(entry) => entry.value,
+            Entry::Vacant(entry) => {
+                let key = entry.key.clone();
+                let default = default_fn();
+                entry.map.insert(key.clone(), default);
+                entry.map.get_mut(&key).unwrap()
+            }
+        }
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -423,7 +480,7 @@ mod tests {
         let mut map = HashMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
-        
+
         assert_eq!(map.get(&"key1"), Some(&"value1"));
         assert_eq!(map.get(&"key2"), Some(&"value2"));
         assert_eq!(map.get(&"key3"), None);
@@ -442,9 +499,9 @@ mod tests {
         let mut map = HashMap::new();
         map.insert("key1", "value1");
         map.insert("key2", "value2");
-        
+
         let mut count = 0;
-        for (_key, _value) in map.iter() {
+        for _ in map.iter() {
             count += 1;
         }
         assert_eq!(count, 2);

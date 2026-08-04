@@ -155,8 +155,8 @@ impl ShellRepl {
     pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
         let mut suggestions = Vec::new();
         let commands = [
-            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
-            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+            "help", "ps", "ls", "pwd", "whoami", "uname", "clear", "touch", "mkdir", "theme",
+            "profile", "a11y", "set", "get", "alias",
         ];
         for cmd in &commands {
             if cmd.starts_with(prefix) {
@@ -228,6 +228,20 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "echo" => {
+                ShellCommand::Echo {
+                    message: parts[1..].join(" "),
+                }
+            }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {

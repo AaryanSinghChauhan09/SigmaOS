@@ -844,7 +844,10 @@ impl AppArmorManager {
         }
 
         for profile in self.profiles.values() {
-            if path.starts_with(&profile.path) && profile.enabled && profile.permissions.contains(&permission) {
+            if path.starts_with(&profile.path)
+                && profile.enabled
+                && profile.permissions.contains(&permission)
+            {
                 return true;
             }
         }
