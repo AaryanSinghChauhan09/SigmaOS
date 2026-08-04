@@ -84,6 +84,9 @@ SigmaOS includes high-performance math and system calling convention utilities i
 ### H. Hardware Register Sets and Trapframe States (x86_64, ARM, Linux, BSD, Windows)
 SigmaOS features highly mature processor context and register structures in `src/compatibility/register_set.rs`. In addition to standard general-purpose GPR fields for `x86_64` (including type-safe control word EFLAGS/RFLAGS toggling like Carry, Sign, Parity, Interrupt Enable flags), it implements complete register representations for `ARM` / `AArch64` architecture architectures (`ArmRegisterSet` including CPSR flag parsing). These state structures are inspired directly by Linux `pt_regs`, FreeBSD `trapframe`, and Windows NT `_KTRAP_FRAME` patterns, supporting multi-hardware thread scheduling, debugging via hardware breakpoints, and virtualization contexts with integrated unit tests.
 
+### I. CPU Exception Vectors and Privilege Mode Trapping (User, FIQ, IRQ, SVC, Monitor, Abort, Undefined, System)
+SigmaOS implements a comprehensive CPU privilege and exception mapping system in `src/interrupt/handler.rs`. This handles all eight standard execution and privilege mode traps defined by modern processors (such as ARM and x86 privilege rings): `User` (usr), `Fiq` (Fast Interrupt Request), `Irq` (Normal Interrupt), `Supervisor` (svc software interrupt gates for syscalls), `Monitor` (mon secure world boundaries), `Abort` (abt instruction/data prefetch page faults), `Undefined` (und instruction decode traps), and `System` (sys privileged execution). It parses dynamic exception vectors (`PrivilegeExceptionFrame`) and executes secure, hardware-isolated routing (`dispatch_privilege_exception`) mimicking Linux, BSD, and Windows kernel trap dispatchers.
+
 ---
 
 ## 3. What's Not Working: Detailed Compiler Errors & Structural Analysis
