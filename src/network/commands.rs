@@ -292,12 +292,7 @@ impl IptablesEngine {
             }
         }
 
-        let mut final_action =
-            if chain == IptablesChain::Output || chain == IptablesChain::Postrouting {
-                IptablesAction::Accept
-            } else {
-                IptablesAction::Drop
-            };
+        let mut final_action = IptablesAction::Drop; // Default policy is DROP
         let mut current_src_ip = source_ip;
         let mut current_dest_port = dest_port;
 

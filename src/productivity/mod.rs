@@ -1,9 +1,9 @@
 // SigmaOS Productivity Module
 pub mod gamification;
-pub mod subtitle_editor;
+pub mod media;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
-pub use subtitle_editor::{AegisubEngine, SubtitleEditEngine, SubtitleEntry, SubtitleFormat};
+pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
