@@ -19,7 +19,7 @@ pub mod verifier;
 pub mod zero_alloc_resolver;
 
 pub use importer::{
-    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };
 pub use linux_compat::{
     DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,

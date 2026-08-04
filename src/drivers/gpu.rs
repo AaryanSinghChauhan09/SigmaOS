@@ -401,9 +401,14 @@ mod tests {
     #[test]
     fn test_atomic_modeset_commit() {
         let mut gpu = GpuDriver::new(800, 600);
-        gpu.set_drm_mode(1, 42, DrmModeInfo::new_simple(800, 600, 60)).unwrap();
+        gpu.set_drm_mode(1, 42, DrmModeInfo::new_simple(800, 600, 60))
+            .unwrap();
 
-        gpu.planes.push(DrmPlane::new(10, DrmPlaneType::Cursor, vec![String::from("ARGB8888")]));
+        gpu.planes.push(DrmPlane::new(
+            10,
+            DrmPlaneType::Cursor,
+            vec![String::from("ARGB8888")],
+        ));
 
         let commit = DrmAtomicCommit {
             allow_modeset: true,

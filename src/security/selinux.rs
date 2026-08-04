@@ -64,7 +64,12 @@ impl SecurityLabel {
             "s0".to_string()
         };
 
-        Ok(Self { user, role, type_, level })
+        Ok(Self {
+            user,
+            role,
+            type_,
+            level,
+        })
     }
 
     /// Convert security label to standard context string representation
@@ -106,7 +111,9 @@ impl SecurityLabel {
                     if range_parts.len() == 2 {
                         let start_str = range_parts[0].trim_start_matches('c');
                         let end_str = range_parts[1].trim_start_matches('c');
-                        if let (Ok(start), Ok(end)) = (start_str.parse::<u16>(), end_str.parse::<u16>()) {
+                        if let (Ok(start), Ok(end)) =
+                            (start_str.parse::<u16>(), end_str.parse::<u16>())
+                        {
                             for cat in start..=end {
                                 categories.insert(cat);
                             }
@@ -266,13 +273,17 @@ impl SecurityPolicy {
         boolean_name: &str,
         expected_value: bool,
     ) -> Result<(), &'static str> {
-        self.conditional_rules.push((rule, boolean_name.to_string(), expected_value));
+        self.conditional_rules
+            .push((rule, boolean_name.to_string(), expected_value));
         self.avc.clear();
         Ok(())
     }
 
     /// Add a domain type transition rule
-    pub fn add_type_transition(&mut self, transition: TypeTransitionRule) -> Result<(), &'static str> {
+    pub fn add_type_transition(
+        &mut self,
+        transition: TypeTransitionRule,
+    ) -> Result<(), &'static str> {
         self.type_transitions.push(transition);
         Ok(())
     }
@@ -514,7 +525,9 @@ impl SecurityPolicy {
                         return Err("Malformed bool statement. Expected: bool <name> <value>");
                     }
                     let name = parts[1].to_string();
-                    let value = parts[2].parse::<bool>().map_err(|_| "Invalid boolean value")?;
+                    let value = parts[2]
+                        .parse::<bool>()
+                        .map_err(|_| "Invalid boolean value")?;
                     self.set_boolean(&name, value);
                 }
                 "type_transition" => {
@@ -583,7 +596,9 @@ impl SecurityPolicy {
                     if op != "==" {
                         return Err("Unsupported operator in allowif. Only '==' is supported");
                     }
-                    let expected_val = parts[3].parse::<bool>().map_err(|_| "Invalid boolean in allowif")?;
+                    let expected_val = parts[3]
+                        .parse::<bool>()
+                        .map_err(|_| "Invalid boolean in allowif")?;
 
                     if parts[4] != "allow" {
                         return Err("Expected 'allow' keyword after condition in allowif");
@@ -808,14 +823,16 @@ mod tests {
         policy.add_rule(rule).unwrap();
 
         // First check: miss
-        let allowed1 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed1 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed1);
         let (hits1, misses1) = policy.avc_stats();
         assert_eq!(hits1, 0);
         assert_eq!(misses1, 1);
 
         // Second check: hit
-        let allowed2 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed2 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed2);
         let (hits2, misses2) = policy.avc_stats();
         assert_eq!(hits2, 1);
@@ -825,7 +842,8 @@ mod tests {
         policy.set_boolean("any_bool", true);
         let (hits3, misses3) = policy.avc_stats();
         // Stats are retained, but cache is cleared. Next check will miss.
-        let allowed3 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed3 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed3);
         let (hits4, misses4) = policy.avc_stats();
         assert_eq!(hits4, 1);
@@ -846,27 +864,33 @@ mod tests {
             enabled: true,
         };
 
-        policy.add_conditional_rule(rule, "httpd_enable_homedirs", true).unwrap();
+        policy
+            .add_conditional_rule(rule, "httpd_enable_homedirs", true)
+            .unwrap();
 
         // Boolean is not registered/false by default
-        let allowed1 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed1 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(!allowed1);
 
         // Toggle boolean
         policy.set_boolean("httpd_enable_homedirs", true);
-        let allowed2 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed2 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed2);
     }
 
     #[test]
     fn test_type_transitions() {
         let mut policy = SecurityPolicy::new();
-        policy.add_type_transition(TypeTransitionRule {
-            source_type: "init_t".to_string(),
-            target_type: "apache_exec_t".to_string(),
-            object_type: ObjectType::Process,
-            new_type: "apache_t".to_string(),
-        }).unwrap();
+        policy
+            .add_type_transition(TypeTransitionRule {
+                source_type: "init_t".to_string(),
+                target_type: "apache_exec_t".to_string(),
+                object_type: ObjectType::Process,
+                new_type: "apache_t".to_string(),
+            })
+            .unwrap();
 
         let new_domain = policy.find_transition("init_t", "apache_exec_t", ObjectType::Process);
         assert_eq!(new_domain, Some("apache_t".to_string()));
@@ -903,7 +927,12 @@ mod tests {
         // Check rule evaluation
         let source = SecurityLabel::parse("system_u:system_r:init_t:s0").unwrap();
         let target = SecurityLabel::parse("system_u:object_r:etc_t:s0").unwrap();
-        assert!(policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read));
+        assert!(policy.check_permission(
+            &source,
+            &target,
+            ObjectType::File,
+            SelinuxPermission::Read
+        ));
     }
 
     #[test]
@@ -913,7 +942,8 @@ mod tests {
         let target = SecurityLabel::parse("system_u:object_r:shadow_t:s0").unwrap();
 
         // Enforcing: denied
-        let allowed1 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed1 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(!allowed1);
         assert_eq!(policy.get_audit_logs().len(), 1);
         assert!(policy.get_audit_logs()[0].contains("denied"));
@@ -922,7 +952,8 @@ mod tests {
         // Permissive: allowed but logged
         policy.set_enforcing(false);
         policy.clear_audit_logs();
-        let allowed2 = policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
+        let allowed2 =
+            policy.check_permission(&source, &target, ObjectType::File, SelinuxPermission::Read);
         assert!(allowed2);
         assert_eq!(policy.get_audit_logs().len(), 1);
         assert!(policy.get_audit_logs()[0].contains("denied"));

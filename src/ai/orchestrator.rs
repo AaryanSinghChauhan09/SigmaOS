@@ -3,10 +3,10 @@
 // and self-diagnosis capabilities for system optimization
 
 extern crate alloc;
-use alloc::vec::Vec;
+use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::string::ToString;
-use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
@@ -83,7 +83,8 @@ impl AIAgent for SimpleAIAgent {
         for &byte in task {
             result.push(byte);
         }
-        self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
+        self.state
+            .store(AgentState::Idle as usize, Ordering::SeqCst);
         Ok(result)
     }
 }
@@ -150,7 +151,11 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                 Err(AgentError::NotFound)
             }
         } else {
-            if let Some(agent) = self.agents.iter_mut().find(|a| a.state() == AgentState::Idle) {
+            if let Some(agent) = self
+                .agents
+                .iter_mut()
+                .find(|a| a.state() == AgentState::Idle)
+            {
                 agent.execute(task)
             } else {
                 Err(AgentError::NotFound)

@@ -30,8 +30,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use std::collections::HashSet;
 use sigma_types::{CapabilityToken, Result};
+use std::collections::HashSet;
 
 /// Pledge namespaces representing different syscall categories
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -317,7 +317,12 @@ impl IPackageParser for RpmAdapter {
 
     fn can_parse(&self, data: &[u8]) -> bool {
         // Check for RPM magic number or header
-        if data.len() >= 4 && data[0] == 0xED && data[1] == 0xAB && data[2] == 0xEE && data[3] == 0xDB {
+        if data.len() >= 4
+            && data[0] == 0xED
+            && data[1] == 0xAB
+            && data[2] == 0xEE
+            && data[3] == 0xDB
+        {
             return true;
         }
         let content = String::from_utf8_lossy(data);
@@ -557,19 +562,19 @@ impl IPackageParser for EbuildAdapter {
             let trimmed = line.trim();
             if trimmed.starts_with("PN=\"") {
                 if let Some(end) = trimmed[4..].find('"') {
-                    name = trimmed[4..4+end].to_string();
+                    name = trimmed[4..4 + end].to_string();
                 }
             } else if trimmed.starts_with("PV=\"") {
                 if let Some(end) = trimmed[4..].find('"') {
-                    version_str = trimmed[4..4+end].to_string();
+                    version_str = trimmed[4..4 + end].to_string();
                 }
             } else if trimmed.starts_with("DESCRIPTION=\"") {
                 if let Some(end) = trimmed[13..].find('"') {
-                    description = trimmed[13..13+end].to_string();
+                    description = trimmed[13..13 + end].to_string();
                 }
             } else if trimmed.starts_with("RDEPEND=\"") {
                 if let Some(end) = trimmed[9..].find('"') {
-                    let deps_part = &trimmed[9..9+end];
+                    let deps_part = &trimmed[9..9 + end];
                     for dep in deps_part.split_whitespace() {
                         dependencies.push(Dependency {
                             name: dep.to_string(),
@@ -779,20 +784,20 @@ impl IPackageParser for NixAdapter {
             let trimmed = line.trim();
             if trimmed.starts_with("pname = \"") {
                 if let Some(end) = trimmed[9..].find('"') {
-                    name = trimmed[9..9+end].to_string();
+                    name = trimmed[9..9 + end].to_string();
                 }
             } else if trimmed.starts_with("version = \"") {
                 if let Some(end) = trimmed[11..].find('"') {
-                    version_str = trimmed[11..11+end].to_string();
+                    version_str = trimmed[11..11 + end].to_string();
                 }
             } else if trimmed.starts_with("meta.description = \"") {
                 if let Some(end) = trimmed[20..].find('"') {
-                    description = trimmed[20..20+end].to_string();
+                    description = trimmed[20..20 + end].to_string();
                 }
             } else if trimmed.contains("buildInputs = [") {
                 if let Some(start_idx) = trimmed.find('[') {
                     if let Some(end_idx) = trimmed.find(']') {
-                        let deps_part = &trimmed[start_idx+1..end_idx];
+                        let deps_part = &trimmed[start_idx + 1..end_idx];
                         for dep in deps_part.split_whitespace() {
                             dependencies.push(Dependency {
                                 name: dep.to_string(),
@@ -990,7 +995,9 @@ impl SnapAdapter {
         let meta = package.metadata();
         // Snaps with 'classic' confinement have full system access
         if meta.description.contains("confinement: classic") {
-            println!("Snap Confinement Warning: Classic confinement allows full host system access.");
+            println!(
+                "Snap Confinement Warning: Classic confinement allows full host system access."
+            );
         }
         Ok(true)
     }
@@ -1461,20 +1468,20 @@ impl IPackageParser for EopkgAdapter {
             let trimmed = line.trim();
             if trimmed.starts_with("<Name>") {
                 if let Some(end) = trimmed[6..].find("</Name>") {
-                    name = trimmed[6..6+end].to_string();
+                    name = trimmed[6..6 + end].to_string();
                 }
             } else if trimmed.starts_with("<Version>") {
                 if let Some(end) = trimmed[9..].find("</Version>") {
-                    version_str = trimmed[9..9+end].to_string();
+                    version_str = trimmed[9..9 + end].to_string();
                 }
             } else if trimmed.starts_with("<Description>") {
                 if let Some(end) = trimmed[13..].find("</Description>") {
-                    description = trimmed[13..13+end].to_string();
+                    description = trimmed[13..13 + end].to_string();
                 }
             } else if trimmed.starts_with("<Dependency>") {
                 if let Some(end) = trimmed[12..].find("</Dependency>") {
                     dependencies.push(Dependency {
-                        name: trimmed[12..12+end].to_string(),
+                        name: trimmed[12..12 + end].to_string(),
                         version_constraint: VersionConstraint::Any,
                     });
                 }
@@ -1520,7 +1527,10 @@ impl IPackageParser for EopkgAdapter {
             "  <Version>{}.{}.{}</Version>\n",
             meta.version.major, meta.version.minor, meta.version.patch
         ));
-        output.push_str(&format!("  <Description>{}</Description>\n", meta.description));
+        output.push_str(&format!(
+            "  <Description>{}</Description>\n",
+            meta.description
+        ));
         for dep in package.dependencies() {
             output.push_str(&format!("  <Dependency>{}</Dependency>\n", dep.name));
         }
@@ -1555,7 +1565,8 @@ impl IPackageParser for ZypperAdapter {
 
     fn can_parse(&self, data: &[u8]) -> bool {
         let content = String::from_utf8_lossy(data);
-        content.contains("Vendor: openSUSE") || (content.contains("Name:") && content.contains("Requires:"))
+        content.contains("Vendor: openSUSE")
+            || (content.contains("Name:") && content.contains("Requires:"))
     }
 
     fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
@@ -1678,18 +1689,23 @@ impl IPackageParser for GuixAdapter {
             let trimmed = line.trim();
             if trimmed.starts_with("(name \"") {
                 if let Some(end) = trimmed[7..].find('"') {
-                    name = trimmed[7..7+end].to_string();
+                    name = trimmed[7..7 + end].to_string();
                 }
             } else if trimmed.starts_with("(version \"") {
                 if let Some(end) = trimmed[10..].find('"') {
-                    version_str = trimmed[10..10+end].to_string();
+                    version_str = trimmed[10..10 + end].to_string();
                 }
             } else if trimmed.starts_with("(description \"") {
                 if let Some(end) = trimmed[14..].find('"') {
-                    description = trimmed[14..14+end].to_string();
+                    description = trimmed[14..14 + end].to_string();
                 }
             } else if trimmed.starts_with("(inputs `(") {
-                let inputs_part = trimmed.split('`').nth(1).unwrap_or("").trim_start_matches('(').trim_end_matches(')');
+                let inputs_part = trimmed
+                    .split('`')
+                    .nth(1)
+                    .unwrap_or("")
+                    .trim_start_matches('(')
+                    .trim_end_matches(')');
                 for input in inputs_part.split_whitespace() {
                     let clean_dep = input.trim_matches(|c| c == '(' || c == ')' || c == '"');
                     if !clean_dep.is_empty() {
@@ -2025,7 +2041,10 @@ impl UniversalPackageManager {
 
         // Execute hook chain before/during install
         if let Err(e) = self.execute_hook_chain(package.as_mut()) {
-            return Err(InstallError::InstallFailed(format!("Hook chain failed: {:?}", e)));
+            return Err(InstallError::InstallFailed(format!(
+                "Hook chain failed: {:?}",
+                e
+            )));
         }
 
         self.installed_packages.insert(name, package);
