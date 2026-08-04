@@ -1,160 +1,136 @@
-// SigmaOS Library
-// Core library for the SigmaOS operating system
-// Zero-dependency, no-std compatible OS kernel and userspace components
-
 #![allow(warnings)]
 #![allow(clippy::all)]
 
-// Core kernel modules
-pub mod klib;
-pub mod kernel;
-pub mod arch;
-pub mod boot;
-pub mod interrupt;
-pub mod init;
-pub mod scheduler;
-pub mod memory;
+// SigmaOS Library
+// Core library for SigmaOS operating system
+#![allow(clippy::all, unused)]
 
-// Hardware & Driver modules
-pub mod driver;
-pub mod drivers;
-pub mod device;
-pub mod hardware;
-pub mod gpu;
-
-// Security & Isolation
-pub mod security;
-pub mod container;
-pub mod virtualization;
-
-// Filesystem & Storage
-pub mod filesystem;
-
-// Networking
-pub mod network;
-
-// Shell & Userspace
-pub mod shell;
-pub mod userspace;
-
-// Package Management
-pub mod package;
-pub mod sigpkg;
-
-// System Services
 pub mod accessibility;
-pub mod ai;
-pub mod audio;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
+pub mod init;
 pub mod customization;
 pub mod dashboard;
-pub mod desktop;
-pub mod diagnostics;
-pub mod graphics;
-pub mod legal;
-pub mod logging;
-pub mod media;
+pub mod device;
+pub mod driver;
+pub mod drivers;
+pub mod filesystem;
+pub mod kernel;
+pub mod klib;
 pub mod ml;
-pub mod observability;
+pub mod network;
 pub mod orchestration;
-pub mod performance;
-pub mod plugin;
-pub mod power;
-pub mod process;
+pub mod package;
 pub mod productivity;
-pub mod remote;
 pub mod resilience;
+pub mod security;
+pub mod shell;
+pub mod sigpkg;
+pub mod virtualization;
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai;
+pub mod arch;
+pub mod boot;
 pub mod toolchain;
-
-// =============================================================
-// Re-exports for commonly used types
-// =============================================================
-
-pub use klib::{AsyncExecutor, CpuIsaAssessor, IsaLevel, Reducer, Store, Subscriber, Task};
-
-pub use kernel::{
-    Scheduler, Process, Priority, ProcessState, BuddyAllocator, MemoryBlock, PAGE_SIZE,
-    IpcManager, Channel, Message, IpcError, RoundRobinScheduler, RoundRobinConfig, SchedulerError,
-};
-
-pub use security::{
-    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
-};
-
-pub use shell::{ShellRepl, ShellCommand};
-
-pub use filesystem::{
-    VirtualFilesystem, Inode, FileDescriptor, FileType, FilePermissions, FsError,
-};
-
-pub use network::{TcpStack, TcpConnection, TcpSegment, TcpState, TcpError};
-
-pub use drivers::{
-    GpuDriver, GpuCommand, GpuError, StorageDriver, StorageCommand, StorageType, StorageError,
-    NetworkDriver, NetworkCommand, NetworkType, NetworkError, InputDriver, InputEvent, InputType,
-    UsbHidDriver, HidKeyboardEvent, HidReportType, HidError, VesaDriver, VesaModeInfo, VesaError,
-};
-
-pub use package::{
-    UniversalPackageManager, UnifiedPackage, PackageFormat, PackageSource, PackageAdapter,
-    DependencyResolver, ConflictResolution, PackageError,
-};
-
-pub use sigpkg::{
-    SatSolver, ContentAddressedStore, CryptoVerifier, Transaction, PackageRecipe,
-    BuildSystem, RecipeManager, RecipeError,
-};
-
-pub use toolchain::self_host::{CompilerConfig, SelfHostingManager, ToolchainError};
-
-pub use virtualization::{
-    VirtualizationOrchestrator, VirtualMachine, Container, KubernetesPod, VirtualizationTech,
-    VmState, ResourcePool, VirtualizationError,
-};
-
-pub use resilience::{
-    SelfHealingModule, RecoveryRule, RecoveryAction, SystemSnapshot, RecoveryEventType,
-    ResilienceError,
-};
-
-pub use orchestration::{
-    CrossDeviceOrchestrator, ConnectedDevice, SmartHomeDevice,
-    AutomationRule as CrossDeviceAutomationRule, DeviceType as CrossDeviceType, ConnectionStatus,
-    DeviceCapability, AutomationTrigger, CrossDeviceAction, OrchestrationError,
-};
-
-pub use compatibility::{
-    CompatibilityManager, ApplicationBinary, TranslationLayer, ContainerRuntime, TargetPlatform,
-    BinaryFormat, CompatibilityMode, CompatibilityError,
-};
-
-pub use automation::{
-    AiOptimizer, OptimizationRecommendation, SystemState, OptimizationCategory, OptimizationError,
-    SystemAutomationManager, SystemAutomationRule, SystemAction, SystemEventType,
-    PerformanceProfile, SystemPrediction, PredictiveModel, AutomationError,
-};
-
-pub use customization::{
-    CustomizationEngine, Routine, Condition, Action, Theme, TriggerType, CustomizationError,
-};
-
-pub use dashboard::{
-    UnifiedDashboard, DashboardWidget, MetricData, MetricType, WidgetType, SystemMonitor,
-};
-
-pub use productivity::{
-    GamifiedProductivity, Achievement, Goal, PomodoroTimer, ProductivityScore, AchievementType,
-    PomodoroState, CalendarApp, CalendarEvent, CalendarView, EventStatus, EventType,
-    RecurrencePattern, CodeEditor, CursorPosition, Document, Language, Selection, TextSelection,
-    NoteTakingApp, Note, ContentType, Notebook, Folder, NoteStorage, InMemoryNoteStorage,
-    EmailClient, EmailAddress, EmailMessage, EmailFolder, EmailAttachment, EmailAccountConfig,
-    ScreenshotTool, ScreenshotConfig, ScreenshotMode, ImageFormat, CaptureRegion,
-    EngineeringCalculators, FinancialProfessionCalculators, MedicalDoctorCalculators,
-    DepreciationMethod, TaxRegime,
-};
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
-    AccessibilityFramework, AccessibilityProfile, AccessibilitySetting, AccessibilityCategory,
-    AccessibilityFeature, AccessibilityError,
+    AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
+    AccessibilityProfile, AccessibilitySetting,
+};
+pub use automation::{
+    AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
+    OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
+    SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
+};
+pub use compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator,
+};
+pub use customization::{
+    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use dashboard::{
+    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use drivers::{
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
+    VesaModeInfo,
+};
+pub use filesystem::{
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    ClusterState as DefragClusterState, FragmentedFile, DefragStats, DiskDefragmenter,
+};
+pub use kernel::{
+    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
+    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    ModuleLoadError as LkmLoadError, KernelModule as LkmModule, LkmLoader, KpatchPatch, KpatchManager,
+};
+pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use orchestration::{
+    AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
+    ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
+    DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
+};
+pub use package::{
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use productivity::{
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore,
+    SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
+    TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+};
+pub use resilience::{
+    RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
+    SystemSnapshot,
+};
+pub use security::{
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
+    KaliSniffer, PentestAssistant, SecureWipeTool, IntrusionSeverity, IntrusionAlert, SigmaIDS,
+};
+pub use init::{
+    Runlevel, ServiceState as InitServiceState, InitError, Service as InitService, SimpleService as InitSimpleService,
+    InitSystem, SigmaInit, DependencyResolver as InitDependencyResolver, SimpleDependencyResolver, ServiceMonitor, SimpleServiceMonitor,
+    FirmwarePort, BIOSPort, UEFIPort, CorebootPort, SecurityPort, DACPort, SELinuxPort, ZeroTrustPort,
+};
+pub use shell::{ShellCommand, ShellRepl};
+pub use sigpkg::{
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction,
+};
+pub use virtualization::{
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use toolchain::self_host::{ToolchainError, CompilerConfig, SelfHostingManager};
+pub use arch::cpu_sys::{
+    SegmentType as CpuSegmentType, GdtDescriptor as CpuGdtDescriptor, IdtGate as CpuIdtGate,
+    VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
+    FastSyscallDispatcher as CpuFastSyscallDispatcher,
 };

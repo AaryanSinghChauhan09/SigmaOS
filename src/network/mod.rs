@@ -21,6 +21,7 @@ pub mod ring_buffer_stack;
 pub mod stack;
 pub mod tcp;
 pub mod tcp_udp;
+pub mod ring_buffer_stack;
 
 pub use ring_buffer_stack::{
     compute_checksum, IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket,

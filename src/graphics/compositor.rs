@@ -3,8 +3,8 @@
 // No dependency on external graphics frameworks
 
 extern crate alloc;
-use alloc::boxed::Box;
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
@@ -609,8 +609,7 @@ impl Compositor for SimpleCompositor {
 
         // If double buffering is enabled, we render to our back buffer first, then copy to output.
         // Otherwise, we render directly to output.
-        let use_double_buffering =
-            self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
+        let use_double_buffering = self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
 
         if use_double_buffering {
             let back = self.back_buffer.as_mut().unwrap();
@@ -636,9 +635,7 @@ impl Compositor for SimpleCompositor {
                                 let output_index = output_y * back_stride + output_x;
                                 let window_index = y * window_stride + x;
 
-                                if output_index < back_data.len()
-                                    && window_index < window_data.len()
-                                {
+                                if output_index < back_data.len() && window_index < window_data.len() {
                                     back_data[output_index] = window_data[window_index];
                                 }
                             }
@@ -653,6 +650,7 @@ impl Compositor for SimpleCompositor {
             let output_data = output.data_mut();
             let len = back_data.len().min(output_data.len());
             output_data[..len].copy_from_slice(&back_data[..len]);
+
         } else {
             output.clear(Color::rgb(0, 0, 0));
 
@@ -676,9 +674,7 @@ impl Compositor for SimpleCompositor {
                                 let output_index = output_y * output_stride + output_x;
                                 let window_index = y * window_stride + x;
 
-                                if output_index < output_data.len()
-                                    && window_index < window_data.len()
-                                {
+                                if output_index < output_data.len() && window_index < window_data.len() {
                                     output_data[output_index] = window_data[window_index];
                                 }
                             }
