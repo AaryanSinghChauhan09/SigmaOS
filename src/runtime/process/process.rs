@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;

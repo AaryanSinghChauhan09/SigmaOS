@@ -218,8 +218,8 @@ impl VintageDriverTranslator {
     pub fn emulate_io_port(&mut self, port: u16, val: u8) -> Result<(), HistoricError> {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
-            let idx = (port % 256) as usize % 6;
-            self.wrapper.simulated_pci_bar[idx] = val as u32;
+            let idx = (port % 256) as usize;
+            self.wrapper.simulated_pci_bar[idx] = val;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)
@@ -299,24 +299,15 @@ impl TinyCoreEphemeralEngine {
         }
     }
 
-    pub fn load_compressed_extension(
-        &mut self,
-        ext_name: &str,
-        size_bytes: usize,
-    ) -> Result<(), HistoricError> {
+    pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
         if ext_name.is_empty() || size_bytes == 0 {
             return Err(HistoricError::MemoryAccessViolation);
         }
-        self.mounted_extensions
-            .insert(ext_name.to_string(), size_bytes);
+        self.mounted_extensions.insert(ext_name.to_string(), size_bytes);
         Ok(())
     }
 
-    pub fn write_to_volatile_overlay(
-        &mut self,
-        file_path: &str,
-        data_len: usize,
-    ) -> Result<usize, HistoricError> {
+    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
         if self.persistence_enabled {
             return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
         }
@@ -346,17 +337,10 @@ mod tests {
         assert!(!engine.persistence_enabled);
         assert_eq!(engine.volatile_overlay_ram_bytes, 0);
 
-        engine
-            .load_compressed_extension("coreutils.tcz", 1024 * 1024)
-            .unwrap();
-        assert_eq!(
-            *engine.mounted_extensions.get("coreutils.tcz").unwrap(),
-            1024 * 1024
-        );
+        engine.load_compressed_extension("coreutils.tcz", 1024 * 1024).unwrap();
+        assert_eq!(*engine.mounted_extensions.get("coreutils.tcz").unwrap(), 1024 * 1024);
 
-        let overlay_size = engine
-            .write_to_volatile_overlay("/tmp/logs.txt", 512)
-            .unwrap();
+        let overlay_size = engine.write_to_volatile_overlay("/tmp/logs.txt", 512).unwrap();
         assert_eq!(overlay_size, 512);
 
         engine.reset_ephemeral_state();
