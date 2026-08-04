@@ -23,6 +23,8 @@ pub mod sigmatools;
 pub mod sigma_core_utils;
 ||||||| 52d783ca0
 pub mod powertoys;
+||||||| 984d1301f
+pub mod sigma_core_utils;
 
 pub use sigmatools::{
     AccessibilityFeature, ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,
@@ -37,4 +39,10 @@ pub use sigma_core_utils::{
 ||||||| 52d783ca0
 pub use powertoys::{
     SovereignPowerToys, ColorPicker, FancyZones, PowerRename, FileLocksmith, HostsEditor,
+};
+||||||| 984d1301f
+pub use sigma_core_utils::{
+    SovereignLogger, SovereignLogLevel, SovereignCronScheduler, CronJob,
+    SovereignPrivilegeEngine, SovereignDocBrowser, SovereignCoreUtils,
+    SovereignShell, SovereignInitSystem, InitSupervisorType,
 };

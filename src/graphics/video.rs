@@ -367,6 +367,189 @@ impl Default for StreamingOverlayManager {
     }
 }
 
+||||||| 984d1301f
+// ==========================================
+// 4. Concrete Streaming Overlay Manager (Streamlabs & XSplit)
+// ==========================================
+
+use std::collections::HashMap;
+
+/// Type of overlay source (Webcam, Game Capture, Chat Box, Alerts, Labels)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OverlaySourceType {
+    Webcam,
+    GameCapture,
+    ChatBox,
+    AlertBox,
+    StreamLabel,
+}
+
+/// Represents an individual overlay item positioned in a scene
+#[derive(Debug, Clone)]
+pub struct OverlayItem {
+    pub id: String,
+    pub source_type: OverlaySourceType,
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
+    pub opacity: f32, // 0.0 to 1.0
+    pub z_index: u32,  // Render order layer
+}
+
+/// Represents a configured scene consisting of prioritized overlay items
+#[derive(Debug, Clone)]
+pub struct StreamScene {
+    pub name: String,
+    pub overlays: Vec<OverlayItem>,
+}
+
+impl StreamScene {
+    pub fn new(name: &str) -> Self {
+        StreamScene {
+            name: name.to_string(),
+            overlays: Vec::new(),
+        }
+    }
+
+    pub fn add_overlay(&mut self, item: OverlayItem) {
+        self.overlays.push(item);
+        // Sort overlays by z_index ascending so higher z-index gets drawn last (on top)
+        self.overlays.sort_by_key(|o| o.z_index);
+    }
+}
+
+/// Dynamic alert trigger state
+#[derive(Debug, Clone)]
+pub struct ActiveAlert {
+    pub message: String,
+    pub duration_frames: u32,
+    pub frames_remaining: u32,
+}
+
+/// High-Performance Streaming Overlay Manager matching Streamlabs & XSplit capabilities
+pub struct StreamingOverlayManager {
+    pub scenes: HashMap<String, StreamScene>,
+    pub active_scene_name: String,
+    pub transition_type: String, // "cut", "fade"
+    pub transition_frames: u32,
+    pub active_alert: Option<ActiveAlert>,
+}
+
+impl StreamingOverlayManager {
+    pub fn new() -> Self {
+        StreamingOverlayManager {
+            scenes: HashMap::new(),
+            active_scene_name: String::new(),
+            transition_type: "cut".to_string(),
+            transition_frames: 0,
+            active_alert: None,
+        }
+    }
+
+    pub fn register_scene(&mut self, scene: StreamScene) {
+        if self.active_scene_name.is_empty() {
+            self.active_scene_name = scene.name.clone();
+        }
+        self.scenes.insert(scene.name.clone(), scene);
+    }
+
+    pub fn switch_scene(&mut self, scene_name: &str, transition: &str, duration_frames: u32) -> Result<(), &'static str> {
+        if !self.scenes.contains_key(scene_name) {
+            return Err("Scene not registered in overlay manager");
+        }
+        self.active_scene_name = scene_name.to_string();
+        self.transition_type = transition.to_string();
+        self.transition_frames = duration_frames;
+        Ok(())
+    }
+
+    pub fn trigger_alert(&mut self, message: &str, duration_frames: u32) {
+        self.active_alert = Some(ActiveAlert {
+            message: message.to_string(),
+            duration_frames,
+            frames_remaining: duration_frames,
+        });
+    }
+
+    /// Renders all active layered scene overlays onto the base video frame
+    pub fn render_stream_frame(&mut self, frame: &mut VideoFrame) -> Result<(), VideoError> {
+        if frame.width == 0 || frame.height == 0 {
+            return Err(VideoError::InvalidFrame);
+        }
+
+        // 1. Render active scene layers
+        if let Some(scene) = self.scenes.get(&self.active_scene_name) {
+            for overlay in &scene.overlays {
+                // Determine bounds
+                let start_y = overlay.y as usize;
+                let end_y = (start_y + overlay.height as usize).min(frame.height as usize);
+                let start_x = overlay.x as usize;
+                let end_x = (start_x + overlay.width as usize).min(frame.width as usize);
+
+                for y in start_y..end_y {
+                    for x in start_x..end_x {
+                        let idx = y * frame.width as usize + x;
+                        let bg = frame.pixels[idx];
+
+                        // Generate mock source pixel based on type
+                        let src_color = match overlay.source_type {
+                            OverlaySourceType::Webcam => PixelRgba::new(0, 0, 200, 255),       // Blue-tinted webcam
+                            OverlaySourceType::GameCapture => PixelRgba::new(10, 10, 10, 255), // Dark game capture
+                            OverlaySourceType::ChatBox => PixelRgba::new(50, 50, 50, 200),    // Dark-gray semi-transparent chat
+                            OverlaySourceType::AlertBox => PixelRgba::new(255, 165, 0, 255),   // Orange alert
+                            OverlaySourceType::StreamLabel => PixelRgba::new(0, 255, 0, 255),  // Green label
+                        };
+
+                        let alpha = overlay.opacity;
+                        frame.pixels[idx] = PixelRgba::new(
+                            ((src_color.r as f32 * alpha) + (bg.r as f32 * (1.0 - alpha))) as u8,
+                            ((src_color.g as f32 * alpha) + (bg.g as f32 * (1.0 - alpha))) as u8,
+                            ((src_color.b as f32 * alpha) + (bg.b as f32 * (1.0 - alpha))) as u8,
+                            255,
+                        );
+                    }
+                }
+            }
+        }
+
+        // 2. Render real-time alert overlay if triggered and active
+        if let Some(ref mut alert) = self.active_alert {
+            if alert.frames_remaining > 0 {
+                // Draw alert banner across the top-center of the stream
+                let start_y = (frame.height / 10) as usize;
+                let end_y = (start_y + 15).min(frame.height as usize);
+                let start_x = (frame.width / 4) as usize;
+                let end_x = (frame.width * 3 / 4) as usize;
+
+                for y in start_y..end_y {
+                    for x in start_x..end_x {
+                        let idx = y * frame.width as usize + x;
+                        // Bright orange overlay representing Streamlabs / XSplit styled Alert Notification
+                        frame.pixels[idx] = PixelRgba::new(255, 69, 0, 255);
+                    }
+                }
+                alert.frames_remaining -= 1;
+            }
+        }
+
+        // Clean up alert if duration expired
+        if let Some(ref alert) = self.active_alert {
+            if alert.frames_remaining == 0 {
+                self.active_alert = None;
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for StreamingOverlayManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -41,6 +41,8 @@ pub mod mint_linux;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
 pub mod freedos;
+||||||| 984d1301f
+pub mod india_professional_tools;
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -118,3 +120,9 @@ pub use antix::{
 };
 pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
 pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
+||||||| 984d1301f
+
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
+    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+};

@@ -19,7 +19,10 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod advanced_app_absorber;
+||||||| 984d1301f
+pub mod advanced_app_absorber;
 pub mod tmux;
+pub mod mind_map;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -59,4 +62,7 @@ pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
 ||||||| 0ddf2eac7
 pub use tmux::{
     SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+};
+pub use mind_map::{
+    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
 };

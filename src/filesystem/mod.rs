@@ -9,8 +9,11 @@ pub mod support;
 pub mod smart_symlink;
 ||||||| 43be3a7e8
 pub mod proc;
+||||||| 984d1301f
+pub mod tmpfs;
 pub mod vfs;
 
+pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,

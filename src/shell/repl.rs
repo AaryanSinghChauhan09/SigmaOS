@@ -40,6 +40,15 @@ impl AgentAutomationEngine {
     }
 }
 
+||||||| 984d1301f
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine;
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine
+    }
+}
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {

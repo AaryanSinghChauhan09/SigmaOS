@@ -476,6 +476,12 @@ impl Default for SigmaInit {
     fn default() -> Self {
         Self::new()
     }
+
+    pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        self.stop_service(id)?;
+        self.start_service(id)?;
+        Ok(())
+    }
 }
 
 impl InitSystem for SigmaInit {

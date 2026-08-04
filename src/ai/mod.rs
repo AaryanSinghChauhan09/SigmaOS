@@ -9,6 +9,7 @@ pub mod orchestrator;
 pub mod sai;
 pub mod system;
 pub mod voice;
+pub mod open_computer;
 
 pub use lift_engine::{
     Citation, DocumentExtractor, ExtractionResult, ExtractionSchema, FieldType, LiftError,
@@ -58,3 +59,8 @@ pub use orchestrator::{
     SimpleAgentCommunication, SimpleAgentOrchestrator, SimpleTaskQueue, TaskQueue,
 };
 pub use wiki::{SovereignWikiEngine, WikiArticle};
+||||||| 984d1301f
+pub use open_computer::{
+    OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
+    AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
+};
