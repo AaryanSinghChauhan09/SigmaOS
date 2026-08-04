@@ -243,12 +243,93 @@ pub fn cos_f64(x: f64) -> f64 {
     let mut term = 1.0;
     let mut x_squared = x * x;
 
-    for n in (2..=:10).step_by(2) {
+    for n in (2..=10).step_by(2) {
         term *= -x_squared / (n * (n + 1)) as f64;
         result += term;
     }
 
     result
+}
+
+// ==========================================
+// Kernel-style checked arithmetic primitives
+// ==========================================
+
+pub fn saturating_add_i32(a: i32, b: i32) -> i32 {
+    match a.checked_add(b) {
+        Some(val) => val,
+        None => if b > 0 { i32::MAX } else { i32::MIN },
+    }
+}
+
+pub fn saturating_sub_i32(a: i32, b: i32) -> i32 {
+    match a.checked_sub(b) {
+        Some(val) => val,
+        None => if b > 0 { i32::MIN } else { i32::MAX },
+    }
+}
+
+pub fn checked_mul_i32(a: i32, b: i32) -> Option<i32> {
+    a.checked_mul(b)
+}
+
+// =======================================================
+// Invocation Frame and Stack Frame Alignment Verification
+// =======================================================
+
+#[repr(C, align(16))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct InvocationFrame {
+    pub rip: u64, // Instruction pointer
+    pub rsp: u64, // Stack pointer
+    pub rbp: u64, // Base pointer
+    pub arg_count: u32,
+    pub stack_canary: u64, // Buffer overflow protection canary
+}
+
+impl InvocationFrame {
+    /// Validates System V x86_64 ABI 16-byte stack frame alignment
+    pub fn is_x64_aligned(&self) -> bool {
+        (self.rsp & 15) == 0
+    }
+
+    /// Validates ARM AAPCS 8-byte stack frame alignment
+    pub fn is_arm_aligned(&self) -> bool {
+        (self.rsp & 7) == 0
+    }
+}
+
+pub struct FunctionInvocationManager {
+    global_canary: u64,
+}
+
+impl FunctionInvocationManager {
+    pub fn new(canary: u64) -> Self {
+        Self { global_canary: canary }
+    }
+
+    /// Simulates a secure function invocation with stack canary verification
+    pub fn secure_invoke_sim<F, R>(
+        &self,
+        frame: &InvocationFrame,
+        f: F,
+    ) -> Result<R, &'static str>
+    where
+        F: FnOnce() -> R,
+    {
+        // 1. Stack canary integrity verification (buffer overflow check)
+        if frame.stack_canary != self.global_canary {
+            return Err("Stack smash detected! Corrupted stack canary.");
+        }
+
+        // 2. Alignment boundary check (Ensure 16-byte aligned before calling on x86_64)
+        if !frame.is_x64_aligned() {
+            return Err("Alignment fault! Stack pointer is not 16-byte aligned.");
+        }
+
+        // 3. Execution under safe context
+        Ok(f())
+    }
 }
 
 #[cfg(test)]
@@ -316,5 +397,75 @@ mod tests {
         assert!((lerp(0.0, 10.0, 0.5) - 5.0).abs() < 0.001);
         assert!((lerp(0.0, 10.0, 0.0) - 0.0).abs() < 0.001);
         assert!((lerp(0.0, 10.0, 1.0) - 10.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_checked_arithmetic_overflows() {
+        assert_eq!(saturating_add_i32(i32::MAX, 1), i32::MAX);
+        assert_eq!(saturating_add_i32(i32::MIN, -1), i32::MIN);
+        assert_eq!(saturating_sub_i32(i32::MIN, 1), i32::MIN);
+        assert_eq!(saturating_sub_i32(i32::MAX, -1), i32::MAX);
+        assert_eq!(checked_mul_i32(i32::MAX, 2), None);
+    }
+
+    #[test]
+    fn test_invocation_frame_alignment() {
+        let frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF000, // 16-byte aligned
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0xABCDEF,
+        };
+        assert!(frame.is_x64_aligned());
+        assert!(frame.is_arm_aligned());
+
+        let unaligned_frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF004, // Not aligned to 16-byte boundary
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0xABCDEF,
+        };
+        assert!(!unaligned_frame.is_x64_aligned());
+        assert!(!unaligned_frame.is_arm_aligned()); // 7FFFF004 is not 8-byte aligned (0x7FFFF004 & 7 == 4)
+    }
+
+    #[test]
+    fn test_secure_invocation_sim() {
+        let manager = FunctionInvocationManager::new(0xABCDEF);
+
+        let frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF000, // Aligned
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0xABCDEF, // Valid canary
+        };
+
+        let result = manager.secure_invoke_sim(&frame, || 42);
+        assert_eq!(result, Ok(42));
+
+        // Bad canary (stack smash)
+        let corrupt_canary_frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF000,
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0x000000, // Corrupted canary
+        };
+        let result = manager.secure_invoke_sim(&corrupt_canary_frame, || 42);
+        assert!(result.is_err());
+
+        // Unaligned frame
+        let unaligned_frame = InvocationFrame {
+            rip: 0x401000,
+            rsp: 0x7FFFF008, // 8-byte but not 16-byte aligned
+            rbp: 0x7FFFF040,
+            arg_count: 0,
+            stack_canary: 0xABCDEF,
+        };
+        let result = manager.secure_invoke_sim(&unaligned_frame, || 42);
+        assert!(result.is_err());
     }
 }
