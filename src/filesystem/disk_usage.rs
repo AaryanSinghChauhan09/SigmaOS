@@ -756,4 +756,51 @@ mod tests {
         assert_eq!(engine.mount_entries[1].fs_type, "tmpfs");
         assert_eq!(engine.get_usage_alert(&engine.mount_entries[0]), "NORMAL");
     }
+
+    #[test]
+    fn test_sovereign_df_engine_basic() {
+        let mut engine = SovereignDfEngine::new();
+        let entry = FilesystemDiskUsage {
+            filesystem: "/dev/sdb1".to_string(),
+            fs_type: "ext4".to_string(),
+            total_bytes: 50 * 1024 * 1024 * 1024,
+            used_bytes: 46 * 1024 * 1024 * 1024, // 92% used
+            free_bytes: 4 * 1024 * 1024 * 1024,
+            use_percent: 92.0,
+            total_inodes: 1_000_000,
+            used_inodes: 200_000,
+            free_inodes: 800_000,
+            inode_use_percent: 20.0,
+            mounted_on: PathBuf::from("/mnt/data"),
+        };
+        engine.add_mount_entry(entry);
+
+        assert_eq!(engine.mount_entries.len(), 1);
+        let entry_ref = &engine.mount_entries[0];
+        assert_eq!(engine.get_usage_alert(entry_ref), "CRITICAL");
+        assert_eq!(engine.format_human_readable(entry_ref.total_bytes), "50.0G");
+        assert_eq!(engine.format_human_readable(0), "0B");
+        assert_eq!(engine.format_human_readable(512), "512B");
+
+        let filtered = engine.filter_by_type("ext4");
+        assert_eq!(filtered.len(), 1);
+
+        let filtered_empty = engine.filter_by_type("btrfs");
+        assert_eq!(filtered_empty.len(), 0);
+
+        let (total, used, free, percent) = engine.total_aggregated_usage();
+        assert_eq!(total, 50 * 1024 * 1024 * 1024);
+        assert_eq!(used, 46 * 1024 * 1024 * 1024);
+        assert_eq!(free, 4 * 1024 * 1024 * 1024);
+        assert_eq!(percent, 92.0);
+    }
+
+    #[test]
+    fn test_sovereign_df_engine_default() {
+        let engine = SovereignDfEngine::default();
+        assert_eq!(engine.mount_entries.len(), 2);
+        assert_eq!(engine.mount_entries[0].fs_type, "SigmaFS");
+        assert_eq!(engine.mount_entries[1].fs_type, "tmpfs");
+        assert_eq!(engine.get_usage_alert(&engine.mount_entries[0]), "NORMAL");
+    }
 }

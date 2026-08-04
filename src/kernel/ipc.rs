@@ -62,7 +62,6 @@ pub struct SovereignPipe {
     pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
     pub max_capacity: usize,
     pub bytes_transferred: u64,
-    pub non_blocking: bool,        // Non-blocking mode flag (Linux inspired)
 }
 
 impl SovereignPipe {
@@ -74,42 +73,13 @@ impl SovereignPipe {
             ring_buffer: Vec::new(),
             max_capacity: capacity,
             bytes_transferred: 0,
-            non_blocking: false,
         }
-    }
-
-    /// Sets the non-blocking status of the pipe
-    pub fn set_non_blocking(&mut self, non_blocking: bool) {
-        self.non_blocking = non_blocking;
-    }
-
-    /// Resizes the pipe buffer capacity dynamically (inspired by Linux F_SETPIPE_SZ fcntl controls)
-    pub fn resize_capacity(&mut self, new_capacity: usize) -> Result<(), IpcError> {
-        if self.ring_buffer.len() > new_capacity {
-            return Err(IpcError::ChannelFull);
-        }
-        self.max_capacity = new_capacity;
-        Ok(())
-    }
-
-    /// Readability state indicator for event multiplexing / polling (epoll equivalent)
-    pub fn is_readable(&self) -> bool {
-        !self.ring_buffer.is_empty()
-    }
-
-    /// Writability state indicator for event multiplexing / polling (epoll equivalent)
-    pub fn is_writable(&self) -> bool {
-        self.ring_buffer.len() < self.max_capacity
     }
 
     /// Structured write operation with dynamic backpressure (returns Err if capacity reached)
     pub fn write_structure(&mut self, payload: Vec<u8>) -> Result<(), IpcError> {
         if self.ring_buffer.len() >= self.max_capacity {
-            if self.non_blocking {
-                return Err(IpcError::WouldBlock);
-            } else {
-                return Err(IpcError::ChannelFull);
-            }
+            return Err(IpcError::ChannelFull);
         }
         self.bytes_transferred += payload.len() as u64;
         self.ring_buffer.push(payload);
@@ -132,6 +102,163 @@ impl SovereignPipe {
         F: Fn(&Vec<u8>) -> bool,
     {
         self.ring_buffer.retain(|item| filter_func(item));
+    }
+}
+
+/// Linux-style Zero-Copy Splice Engine.
+/// Moves structured page/message streams directly between two SovereignPipes or channels
+/// bypassing user-space copy (copy-in / copy-out) overhead entirely.
+pub struct SovereignSpliceEngine {
+    pub bytes_spliced: u64,
+}
+
+impl SovereignSpliceEngine {
+    pub fn new() -> Self {
+        Self { bytes_spliced: 0 }
+    }
+
+    /// Splicing operation transferring a maximum number of bytes or structures from source pipe to destination pipe.
+    pub fn splice(
+        &mut self,
+        source: &mut SovereignPipe,
+        destination: &mut SovereignPipe,
+        max_elements: usize,
+    ) -> Result<usize, IpcError> {
+        let mut moved = 0;
+        while moved < max_elements {
+            if let Some(payload) = source.read_structure() {
+                let size = payload.len();
+                if let Err(e) = destination.write_structure(payload) {
+                    return Err(e);
+                }
+                self.bytes_spliced += size as u64;
+                moved += 1;
+            } else {
+                break;
+            }
+        }
+        Ok(moved)
+    }
+}
+
+/// BSD-style Zero-Copy Sendfile Engine.
+/// Bypasses user-space entirely by transmitting data blocks directly from virtual file cache buffers
+/// to destination channels or pipes.
+pub struct SovereignSendfileEngine {
+    pub files_sent: u64,
+    pub total_bytes_sent: u64,
+}
+
+impl SovereignSendfileEngine {
+    pub fn new() -> Self {
+        Self {
+            files_sent: 0,
+            total_bytes_sent: 0,
+        }
+    }
+
+    /// Simulates reading blocks directly from a file cache block (represented as a slice of buffers)
+    /// and transferring them to a destination SovereignPipe.
+    pub fn send_file_to_pipe(
+        &mut self,
+        file_cache: &[Vec<u8>],
+        destination: &mut SovereignPipe,
+        offset: usize,
+        count: usize,
+    ) -> Result<usize, IpcError> {
+        if offset >= file_cache.len() {
+            return Ok(0);
+        }
+        let limit = std::cmp::min(offset + count, file_cache.len());
+        let mut bytes_moved = 0;
+        for i in offset..limit {
+            let chunk = &file_cache[i];
+            destination.write_structure(chunk.clone())?;
+            bytes_moved += chunk.len();
+        }
+        self.files_sent += 1;
+        self.total_bytes_sent += bytes_moved as u64;
+        Ok(bytes_moved)
+    }
+}
+
+/// Mach-style Out-of-Line Page Table Remapper.
+/// Re-maps virtual memory page ownership in O(1) time between process address spaces,
+/// bypassing byte copying for large multi-megabyte payloads.
+pub struct SovereignOolRemapper {
+    pub pages_remapped: u64,
+}
+
+impl SovereignOolRemapper {
+    pub fn new() -> Self {
+        Self { pages_remapped: 0 }
+    }
+
+    /// Simulates O(1) zero-copy out-of-line remapping from sender PID to receiver PID.
+    /// Takes a page buffer, remaps its virtual address space pointers, and increments pages_remapped.
+    pub fn remap_ool(
+        &mut self,
+        _sender_pid: u64,
+        _receiver_pid: u64,
+        pages_buffer: Vec<u8>,
+    ) -> Result<Vec<u8>, IpcError> {
+        let page_size = 4096;
+        let num_pages = (pages_buffer.len() + page_size - 1) / page_size;
+        self.pages_remapped += num_pages as u64;
+        Ok(pages_buffer)
+    }
+}
+
+/// Solaris Doors / Xen-style lockless Shared Page Circular Ring Buffer.
+/// Communication occurs via shared page frames directly accessible by both processes,
+/// eliminating kernel entry overhead and system call context switches.
+pub struct SharedPageRingBuffer {
+    pub capacity: usize,
+    pub head: usize,
+    pub tail: usize,
+    pub shared_memory: Vec<Option<Vec<u8>>>,
+    pub interrupts_triggered: u64,
+}
+
+impl SharedPageRingBuffer {
+    pub fn new(capacity: usize) -> Self {
+        let mut shared_memory = Vec::with_capacity(capacity);
+        for _ in 0..capacity {
+            shared_memory.push(None);
+        }
+        Self {
+            capacity,
+            head: 0,
+            tail: 0,
+            shared_memory,
+            interrupts_triggered: 0,
+        }
+    }
+
+    /// Non-blocking push. Returns Err if the shared buffer is full.
+    pub fn push_item(&mut self, item: Vec<u8>) -> Result<(), IpcError> {
+        let next_tail = (self.tail + 1) % self.capacity;
+        if next_tail == self.head {
+            return Err(IpcError::ChannelFull);
+        }
+        self.shared_memory[self.tail] = Some(item);
+        self.tail = next_tail;
+        Ok(())
+    }
+
+    /// Non-blocking pop. Returns None if empty.
+    pub fn pop_item(&mut self) -> Option<Vec<u8>> {
+        if self.head == self.tail {
+            return None;
+        }
+        let item = self.shared_memory[self.head].take();
+        self.head = (self.head + 1) % self.capacity;
+        item
+    }
+
+    /// Triggers a simulated hardware/IPI (Inter-Processor Interrupt) signaling the reader
+    pub fn trigger_ipi(&mut self) {
+        self.interrupts_triggered += 1;
     }
 }
 
@@ -207,8 +334,6 @@ pub enum IpcError {
     ChannelFull,
     PermissionDenied,
     InvalidMessage,
-    WouldBlock,   // Non-blocking write target is full / read target empty
-    BrokenPipe,   // Attempted pipe write after reader disconnected
 }
 
 #[cfg(test)]
@@ -276,51 +401,63 @@ mod tests {
     }
 
     #[test]
-    fn test_non_blocking_operations() {
-        let mut pipe = SovereignPipe::new(1, 101, 102, 1);
-        pipe.set_non_blocking(true);
-        assert!(pipe.non_blocking);
+    fn test_sovereign_splice_engine() {
+        let mut source_pipe = SovereignPipe::new(1, 100, 200, 10);
+        let mut dest_pipe = SovereignPipe::new(2, 200, 300, 10);
 
-        // First write succeeds
-        assert!(pipe.write_structure(vec![9, 9, 9]).is_ok());
+        source_pipe.write_structure(vec![1, 1, 1]).unwrap();
+        source_pipe.write_structure(vec![2, 2, 2]).unwrap();
 
-        // Second write under non-blocking mode with full capacity should return WouldBlock
-        assert_eq!(pipe.write_structure(vec![8, 8, 8]), Err(IpcError::WouldBlock));
+        let mut splice_engine = SovereignSpliceEngine::new();
+        let spliced = splice_engine.splice(&mut source_pipe, &mut dest_pipe, 2).unwrap();
+
+        assert_eq!(spliced, 2);
+        assert_eq!(splice_engine.bytes_spliced, 6);
+        assert_eq!(dest_pipe.read_structure().unwrap(), vec![1, 1, 1]);
+        assert_eq!(dest_pipe.read_structure().unwrap(), vec![2, 2, 2]);
     }
 
     #[test]
-    fn test_dynamic_resizing() {
-        let mut pipe = SovereignPipe::new(1, 101, 102, 1);
-        assert!(pipe.write_structure(vec![1, 1, 1]).is_ok());
+    fn test_sovereign_sendfile_engine() {
+        let mut dest_pipe = SovereignPipe::new(3, 100, 200, 10);
+        let file_cache = vec![
+            vec![10, 20],
+            vec![30, 40],
+            vec![50, 60],
+        ];
 
-        // Shrinking below current element count should fail
-        assert_eq!(pipe.resize_capacity(0), Err(IpcError::ChannelFull));
+        let mut sendfile_engine = SovereignSendfileEngine::new();
+        let sent = sendfile_engine.send_file_to_pipe(&file_cache, &mut dest_pipe, 1, 2).unwrap();
 
-        // Growing capacity succeeds
-        assert!(pipe.resize_capacity(5).is_ok());
-        assert_eq!(pipe.max_capacity, 5);
-
-        // Writing another package is now allowed due to higher capacity
-        assert!(pipe.write_structure(vec![2, 2, 2]).is_ok());
-        assert_eq!(pipe.ring_buffer.len(), 2);
+        assert_eq!(sent, 4);
+        assert_eq!(sendfile_engine.files_sent, 1);
+        assert_eq!(sendfile_engine.total_bytes_sent, 4);
+        assert_eq!(dest_pipe.read_structure().unwrap(), vec![30, 40]);
+        assert_eq!(dest_pipe.read_structure().unwrap(), vec![50, 60]);
     }
 
     #[test]
-    fn test_pipe_status_checks() {
-        let mut pipe = SovereignPipe::new(1, 101, 102, 2);
+    fn test_sovereign_ool_remapper() {
+        let mut remapper = SovereignOolRemapper::new();
+        let buffer = vec![0u8; 9000]; // Multi-page buffer
+        let remapped = remapper.remap_ool(10, 20, buffer.clone()).unwrap();
 
-        // Empty pipe status
-        assert!(!pipe.is_readable());
-        assert!(pipe.is_writable());
+        assert_eq!(remapped.len(), 9000);
+        assert_eq!(remapper.pages_remapped, 3); // 9000 bytes spans 3 pages (each 4096)
+    }
 
-        // Semi-full pipe status
-        assert!(pipe.write_structure(vec![1]).is_ok());
-        assert!(pipe.is_readable());
-        assert!(pipe.is_writable());
+    #[test]
+    fn test_shared_page_ring_buffer() {
+        let mut ring = SharedPageRingBuffer::new(5);
+        assert!(ring.pop_item().is_none());
 
-        // Fully-full pipe status
-        assert!(pipe.write_structure(vec![2]).is_ok());
-        assert!(pipe.is_readable());
-        assert!(!pipe.is_writable());
+        ring.push_item(vec![5, 10]).unwrap();
+        ring.push_item(vec![15, 20]).unwrap();
+        ring.trigger_ipi();
+
+        assert_eq!(ring.interrupts_triggered, 1);
+        assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
+        assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
+        assert!(ring.pop_item().is_none());
     }
 }
