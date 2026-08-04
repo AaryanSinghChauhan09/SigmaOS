@@ -133,6 +133,10 @@
             <div class="desktop-icon-symbol">⚙️</div>
             <div class="desktop-icon-label">Settings</div>
         </div>
+        <div class="desktop-icon" onclick="openWindow('win-olivetin')">
+            <div class="desktop-icon-symbol">🎛️</div>
+            <div class="desktop-icon-label">OliveTin</div>
+        </div>
     </div>
 
     <!-- macOS style Dock at the Bottom -->
@@ -144,6 +148,7 @@
             <div class="dock-item" data-tooltip="S-AI MoE Inference" onclick="openWindow('win-ai')">🧠</div>
             <div class="dock-item" data-tooltip="S-Robo Flight PID" onclick="openWindow('win-robo')">✈️</div>
             <div class="dock-item" data-tooltip="SigmaFS++ File Explorer" onclick="openWindow('win-fs')">📂</div>
+            <div class="dock-item" data-tooltip="OliveTin Quick Commands" onclick="openWindow('win-olivetin')">🎛️</div>
             <div class="dock-separator"></div>
             <div class="dock-item" data-tooltip="Control Center Settings" onclick="openWindow('win-settings')">⚙️</div>
         </div>
@@ -176,6 +181,9 @@
             </div>
             <div class="app-launcher-item" onclick="openWindow('win-settings')">
                 <span>⚙️</span> System Settings & Themes (Zorin Look Changer)
+            </div>
+            <div class="app-launcher-item" onclick="openWindow('win-olivetin')">
+                <span>🎛️</span> OliveTin Quick Command Panel (safe shell buttons)
             </div>
         </div>
     </div>
@@ -438,7 +446,169 @@ This spreadsheet and text editor replacement uses reactive formula dependency tr
         </div>
     </div>
 
+    <!-- OliveTin Quick Command Panel -->
+    <div class="window" id="win-olivetin" style="top: 20%; left: 25%; width: 680px; height: 480px; transform: scale(0.95); opacity: 0; pointer-events: none;">
+        <div class="window-header">
+            <div class="window-title">🎛️ <span>OliveTin</span> - Quick Command Panel</div>
+            <div class="window-controls">
+                <div class="control-dot min" onclick="minimizeWindow('win-olivetin')"></div>
+                <div class="control-dot max" onclick="maximizeWindow('win-olivetin')"></div>
+                <div class="control-dot close" onclick="closeWindow('win-olivetin')"></div>
+            </div>
+        </div>
+        <div class="window-body" style="display: flex; gap: 15px; padding: 15px; background: rgba(18, 18, 18, 0.95); color: #f4f4f5; height: calc(100% - 30px); box-sizing: border-box; overflow: hidden;">
+            <!-- Predefined Commands Sidebar -->
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; border-right: 1px solid var(--border-glass); padding-right: 15px; overflow-y: auto;">
+                <h4 style="color: var(--accent-gold); margin-bottom: 5px;">Quick Actions</h4>
+                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('systemctl')">🔄 Manage Service</button>
+                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('backup')">📦 Timeshift Snapshot</button>
+                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('compact')">🧹 RAM Compaction</button>
+                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('security')">🛡️ Vulnerability Scan</button>
+                <button class="fm-btn" style="text-align: left; padding: 10px; font-size: 0.8rem;" onclick="selectOliveTinCmd('autotune')">⚡ Autotune Kernel</button>
+            </div>
+
+            <!-- Command Form & Console Output -->
+            <div style="flex: 2; display: flex; flex-direction: column; gap: 12px; height: 100%;">
+                <div id="olivetin-form-container" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); padding: 12px; border-radius: 8px;">
+                    <h5 id="olivetin-cmd-title" style="color: var(--accent-gold); margin-bottom: 8px;">Select a command from the sidebar</h5>
+                    <div id="olivetin-inputs" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Dynamic inputs inserted here -->
+                    </div>
+                </div>
+
+                <!-- Console Output Terminal -->
+                <div style="flex-grow: 1; display: flex; flex-direction: column; background: #09090b; border: 1px solid #27272a; border-radius: 8px; padding: 10px; overflow: hidden;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #27272a; padding-bottom: 6px; margin-bottom: 6px; font-size: 0.7rem; color: #a1a1aa; font-family: monospace;">
+                        <span>COMMAND TERMINAL</span>
+                        <span id="olivetin-status-badge" style="background: #18181b; padding: 2px 6px; border-radius: 4px;">IDLE</span>
+                    </div>
+                    <pre id="olivetin-console" style="flex-grow: 1; margin: 0; padding: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; line-height: 1.4; color: #a1a1aa; overflow-y: auto; white-space: pre-wrap; word-break: break-all;">🪶 OliveTin Safe Command Interface initialized.
+Select an administrative quick-action on the left.</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // OliveTin Command Center interactive logic
+        let activeOliveTinCmd = '';
+        function selectOliveTinCmd(cmd) {
+            activeOliveTinCmd = cmd;
+            const title = document.getElementById('olivetin-cmd-title');
+            const inputs = document.getElementById('olivetin-inputs');
+
+            if (cmd === 'systemctl') {
+                title.innerText = 'Service Administration';
+                inputs.innerHTML = `
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem; flex-wrap: wrap;">
+                        <span>Action:</span>
+                        <select id="ot-service-action" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none;">
+                            <option value="restart">restart</option>
+                            <option value="start">start</option>
+                            <option value="stop">stop</option>
+                            <option value="status">status</option>
+                        </select>
+                        <span>Service:</span>
+                        <input type="text" id="ot-service-name" value="systemd-networkd" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none; width: 120px;">
+                        <button class="fm-btn" onclick="executeOliveTin()">Execute</button>
+                    </div>
+                `;
+            } else if (cmd === 'backup') {
+                title.innerText = 'Timeshift btrfs-COW Backup';
+                inputs.innerHTML = `
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem;">
+                        <span>Path:</span>
+                        <input type="text" id="ot-backup-path" value="/dev/sda1/snapshots" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none; flex: 1;">
+                        <button class="fm-btn" onclick="executeOliveTin()">Create Snapshot</button>
+                    </div>
+                `;
+            } else if (cmd === 'compact') {
+                title.innerText = 'Memory Compaction & Defragmentation';
+                inputs.innerHTML = `
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem;">
+                        <span>Defrag Target:</span>
+                        <select id="ot-defrag-target" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none;">
+                            <option value="Slab">Slab Cache</option>
+                            <option value="Buddy">Buddy Allocator</option>
+                            <option value="Page">UVM Pages</option>
+                        </select>
+                        <button class="fm-btn" onclick="executeOliveTin()">Defragment</button>
+                    </div>
+                `;
+            } else if (cmd === 'security') {
+                title.innerText = 'Vulnerability CVE Scanner';
+                inputs.innerHTML = `
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem;">
+                        <span>Target Port/IP:</span>
+                        <input type="text" id="ot-sec-target" value="127.0.0.1:80" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none; width: 110px;">
+                        <button class="fm-btn" onclick="executeOliveTin()">Scan Ports</button>
+                    </div>
+                `;
+            } else if (cmd === 'autotune') {
+                title.innerText = 'Autonomic Kernel Tuning';
+                inputs.innerHTML = `
+                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem;">
+                        <span>Scheduling Profile:</span>
+                        <select id="ot-tune-profile" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none;">
+                            <option value="Bolt">Bolt (High-throughput)</option>
+                            <option value="Autonomic">Autonomic (Energy Aware)</option>
+                            <option value="S-COMP">GDPR/HIPAA Secure Compliant</option>
+                        </select>
+                        <button class="fm-btn" onclick="executeOliveTin()">Tune Kernel</button>
+                    </div>
+                `;
+            }
+        }
+
+        function executeOliveTin() {
+            const consoleBox = document.getElementById('olivetin-console');
+            const badge = document.getElementById('olivetin-status-badge');
+
+            badge.innerText = 'RUNNING';
+            badge.style.background = '#e59e0b';
+            badge.style.color = 'black';
+            consoleBox.innerHTML = `Running safe command sequence...`;
+
+            setTimeout(() => {
+                badge.innerText = 'SUCCESS';
+                badge.style.background = '#4ade80';
+                badge.style.color = 'black';
+
+                if (activeOliveTinCmd === 'systemctl') {
+                    const action = document.getElementById('ot-service-action').value;
+                    const service = document.getElementById('ot-service-name').value;
+                    consoleBox.innerHTML = `$` + ` systemctl ${action} ${service}\n` +
+                        `[SystemdEngine] Transitioning service state to '${action}'...\n` +
+                        `[SystemdEngine] Service '${service}' action completed successfully.\n` +
+                        `[Status] Current state: Active (Running). Up since Sun 10:45 AM.`;
+                } else if (activeOliveTinCmd === 'backup') {
+                    const path = document.getElementById('ot-backup-path').value;
+                    consoleBox.innerHTML = `$` + ` timeshift --create --snapshot-path ${path}\n` +
+                        `[btrfs-COW] Allocating Copy-on-Write metadata root...\n` +
+                        `[btrfs-COW] Root snapshot timeshift_snap_3 committed successfully.\n` +
+                        `[Status] Snapshot created at address address block 1002. Total files: 1,482.`;
+                } else if (activeOliveTinCmd === 'compact') {
+                    const target = document.getElementById('ot-defrag-target').value;
+                    consoleBox.innerHTML = `$` + ` sysctl vm.compact_memory=1 --target ${target}\n` +
+                        `[RAMDefrag] Initializing memory compaction on ${target} structures...\n` +
+                        `[RAMDefrag] Standardized UVM allocations aligned warning-free.\n` +
+                        `[Status] Freed 4,096 allocated byte-blocks. Fragmented spaces compacted: 12.4%.`;
+                } else if (activeOliveTinCmd === 'security') {
+                    const target = document.getElementById('ot-sec-target').value;
+                    consoleBox.innerHTML = `$` + ` nmap --script vuln ${target}\n` +
+                        `[VulnerabilityScanner] Dispatching active port-level CVE audit on ${target}...\n` +
+                        `[VulnerabilityScanner] Sentinel threat mitigation loop activated.\n` +
+                        `[Status] Scan completed: 0 critical, 0 high vulnerabilities found. System secure!`;
+                } else if (activeOliveTinCmd === 'autotune') {
+                    const profile = document.getElementById('ot-tune-profile').value;
+                    consoleBox.innerHTML = `$` + ` sysctl kernel.autotuning_profile=${profile}\n` +
+                        `[Autotuner] Tuning microkernel schedulers, thread contexts, and dynamic links...\n` +
+                        `[Autotuner] Transitioned system performance profile to '${profile}' natively.\n` +
+                        `[Status] Scheduler: Completely Fair CFS. Energy governor: Idle-state-aware.`;
+                }
+            }, 1000);
+        }
+
         // Track open windows
         let activeWindow = 'win-welcome';
 

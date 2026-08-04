@@ -77,7 +77,7 @@ impl PackageFormatAdapter for DebAdapter {
             } else if line.starts_with("Description: ") {
                 description = line[13..].to_string();
             } else if line.starts_with("Depends: ") {
-                let deps_str = line[9..];
+                let deps_str = &line[9..];
                 for dep in deps_str.split(',') {
                     let dep_name = dep.trim().split_whitespace().next().unwrap_or("");
                     if !dep_name.is_empty() {
@@ -217,7 +217,7 @@ impl PackageFormatAdapter for RpmAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
         
-        Ok(content.contains("Name") || content.contains("Version"))
+        Ok(content.contains("Name:") || content.contains("Summary:"))
     }
     
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {

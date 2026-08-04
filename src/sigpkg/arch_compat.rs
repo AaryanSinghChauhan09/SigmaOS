@@ -19,6 +19,7 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
+extern crate alloc;
 use std::collections::HashMap;
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use alloc::string::String;
@@ -118,7 +119,7 @@ impl RollingSyncManager {
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
         let mut updates: Vec<(String, Version, Version)> = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
-            if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
+            if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
                 if remote_ver > installed_ver {
                     updates.push((pkg_name.clone(), *installed_ver, *remote_ver));
                 }
@@ -383,7 +384,7 @@ mod tests {
 
         let pkg = abs.compile_port("abs-test", &compiler).unwrap();
         assert_eq!(pkg.name, "abs-test");
-        assert_eq!(pkg.version, Version::new(4, 42, 0)); // Parsing parses 4.2.0 correctly!
+        assert_eq!(pkg.version, Version::new(4, 2, 0)); // Parsing parses 4.2.0 correctly!
         assert_eq!(pkg.dependencies[0].name, "glibc");
     }
 

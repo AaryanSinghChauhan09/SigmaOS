@@ -103,9 +103,9 @@ pub use security::{
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    AptDebManifest, BuildSystem, ContentAddressedStore, CryptoVerifier, FlatpakManifest,
-    PackageRecipe, PacmanPkgbuild, RecipeError, RecipeManager, SatSolver, SnapcraftManifest,
-    Transaction, UniversalPackageAdapter,
+    BuildSystem, ContentAddressedStore, CryptoVerifier,
+    PackageRecipe, RecipeError, RecipeManager, SatSolver,
+    Transaction,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

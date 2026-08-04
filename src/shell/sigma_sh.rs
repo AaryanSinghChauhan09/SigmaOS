@@ -2,9 +2,8 @@
 extern crate alloc as std_alloc;
 #[cfg(not(target_os = "none"))]
 use std_alloc::boxed::Box;
-
-#![no_std]
-#![no_main]
+#[cfg(not(target_os = "none"))]
+use std_alloc::vec::Vec;
 
 /// OOP-based Sigma Shell for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Milestone 0.1
@@ -229,11 +228,18 @@ impl Shell for SimpleShell {
         }
         
         // 1. Resolve Command Aliases (udev/bash inspiration)
-        let resolved_cmd_name = if let Some(alias_target) = self.get_alias(args[0]) {
-            alias_target
-        } else {
-            args[0]
-        };
+        let mut resolved_buf = [0u8; 64];
+        let mut resolved_len = 0;
+        {
+            let resolved_cmd_ref = if let Some(alias_target) = self.get_alias(args[0]) {
+                alias_target
+            } else {
+                args[0]
+            };
+            resolved_len = resolved_cmd_ref.len().min(64);
+            resolved_buf[..resolved_len].copy_from_slice(&resolved_cmd_ref[..resolved_len]);
+        }
+        let resolved_cmd_name = &resolved_buf[..resolved_len];
 
         // 2. Perform Environment Variable Expansion (e.g. $USER -> sovereign)
         let mut expanded_args = Vec::new();
@@ -249,7 +255,7 @@ impl Shell for SimpleShell {
             }
         }
 
-        let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
+        let cmd_args = expanded_args;
         
         for cmd_option in &mut self.commands {
             if let Some(ref mut cmd) = *cmd_option {
@@ -319,7 +325,9 @@ impl ShellHistory for SimpleShellHistory {
         Some(&self.history[index][..len])
     }
     
-    fn get_last(&self) -> Option<&[u8]>;
+    fn get_last(&self) -> Option<&[u8]> {
+        self.get_last_impl()
+    }
 }
 
 impl SimpleShellHistory {
@@ -329,12 +337,6 @@ impl SimpleShellHistory {
         }
         let index = self.history.len() - 1;
         self.get(index)
-    }
-}
-
-impl ShellHistory for SimpleShellHistory {
-    fn get_last(&self) -> Option<&[u8]> {
-        self.get_last_impl()
     }
 }
 
@@ -417,8 +419,10 @@ impl ShellEnvironment for SimpleShellEnvironment {
     }
 }
 
+#[cfg(target_os = "none")]
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
+#[cfg(target_os = "none")]
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = Vec::new();
@@ -431,6 +435,7 @@ impl<T: Clone> Clone for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     fn push(&mut self, item: T) {
@@ -466,9 +471,10 @@ impl<T> Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
-
+#[cfg(target_os = "none")]
 impl<T> core::ops::Deref for Vec<T> {
     type Target = [T];
     fn deref(&self) -> &Self::Target {
@@ -480,6 +486,7 @@ impl<T> core::ops::Deref for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<T> core::ops::DerefMut for Vec<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         if self.data.is_null() {
@@ -490,6 +497,7 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
@@ -500,7 +508,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     }
 }
 
-
+#[cfg(target_os = "none")]
 impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
@@ -562,9 +570,9 @@ mod tests {
         // Inspect captured variable inside spy command
         if let Some(ref cmd_box) = shell.commands[0] {
             // Unsafe cast to access captured properties (since we can't downcast Box<dyn ShellCommand>)
-            let spy_ptr = cmd_box as *const Box<dyn ShellCommand> as *const SpyCommand;
+            let spy_ptr = &**cmd_box as *const dyn ShellCommand as *const SpyCommand;
             unsafe {
-                let captured = &(*spy_ptr).captured_arg[..(*spy_ptr).captured_len];
+                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
                 assert_eq!(captured, b"sovereign_pass_123");
             }
         }
@@ -574,9 +582,9 @@ mod tests {
         shell.execute_line(b"reveal $USER").unwrap();
 
         if let Some(ref cmd_box) = shell.commands[0] {
-            let spy_ptr = cmd_box as *const Box<dyn ShellCommand> as *const SpyCommand;
+            let spy_ptr = &**cmd_box as *const dyn ShellCommand as *const SpyCommand;
             unsafe {
-                let captured = &(*spy_ptr).captured_arg[..(*spy_ptr).captured_len];
+                let captured = &(&(*spy_ptr).captured_arg)[..(*spy_ptr).captured_len];
                 assert_eq!(captured, b"sovereign");
             }
         }
