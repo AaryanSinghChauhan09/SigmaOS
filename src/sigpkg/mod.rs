@@ -8,7 +8,6 @@ pub mod transaction;
 pub mod verifier;
 pub mod rpm_compat;
 pub mod universal_adapter;
-pub mod importer;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
@@ -19,7 +18,6 @@ pub use verifier::CryptoVerifier;
 pub use universal_adapter::{
     AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
 };
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -81,8 +79,14 @@ pub struct Package {
 }
 
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
             name,
             version,
             description,
