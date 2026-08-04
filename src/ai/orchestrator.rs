@@ -296,3 +296,32 @@ impl AgentCommunication for SimpleAgentCommunication {
         self.messages.push((from, 0, msg_array));
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceTarget {
+    Cpu,
+    Gpu,
+    Tpu,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OrchestratorError {
+    AgentNotFound,
+    Timeout,
+    ExecutionFailed,
+    InvalidDevice,
+}
+
+pub struct LocalLlmOrchestrator {
+    pub device: DeviceTarget,
+    pub active_agents: usize,
+}
+
+impl LocalLlmOrchestrator {
+    pub fn new(device: DeviceTarget) -> Self {
+        LocalLlmOrchestrator {
+            device,
+            active_agents: 0,
+        }
+    }
+}

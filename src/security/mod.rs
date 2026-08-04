@@ -101,3 +101,16 @@ pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
+
+pub mod kali_stack;
+pub mod nemoclaw;
+
+pub use kali_stack::{
+    CronDaemon, CronJob, DmesgLog, KaliError, PluggableAuthenticationModule,
+    SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer, TmuxPane,
+    FirewallRule, IptablesFirewall,
+};
+pub use nemoclaw::{
+    DefaultDenyNetworkPolicy, NemoClawError,
+    OpenShellAgentSandbox, PrivacyRouter,
+};

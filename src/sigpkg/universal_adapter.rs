@@ -132,7 +132,7 @@ impl PackageFormatAdapter for DebAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("Package:") || content.contains("Version:"))
+        Ok(content.contains("Package:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -247,7 +247,7 @@ impl PackageFormatAdapter for RpmAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("Name") || content.contains("Version"))
+        Ok(content.contains("Name:"))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -351,7 +351,7 @@ impl PackageFormatAdapter for PacmanAdapter {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
 
-        Ok(content.contains("pkgname") || content.contains("pkgver"))
+        Ok(content.contains("pkgname ="))
     }
 
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
@@ -453,7 +453,7 @@ impl PackageFormatAdapter for ApkAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("P:") || content.contains("V:"))
+        Ok(content.contains("P:"))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;
@@ -578,7 +578,7 @@ impl PackageFormatAdapter for NixAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("pname =") || content.contains("buildInputs"))
+        Ok(content.contains("pname ="))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;
@@ -684,7 +684,7 @@ impl PackageFormatAdapter for EbuildAdapter {
     fn validate(&self, data: &[u8]) -> Result<bool, AdapterError> {
         let content = String::from_utf8(data.to_vec())
             .map_err(|_| AdapterError::ValidationError("Invalid UTF-8".to_string()))?;
-        Ok(content.contains("PN=") || content.contains("PV="))
+        Ok(content.contains("PN="))
     }
     fn extract_dependencies(&self, data: &[u8]) -> Result<Vec<Dependency>, AdapterError> {
         let package = self.parse_package(data)?;

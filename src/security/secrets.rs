@@ -348,17 +348,20 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
+        let mut index = None;
         for i in 0..self.secrets.len() {
-            unsafe {
-                let slot = &mut *self.secrets.data.add(i);
-                if let Some(ref mut secret) = *slot {
-                    if secret.id() == id {
-                        return Some(secret);
-                    }
+            if let Some(Some(ref secret)) = self.secrets.get(i) {
+                if secret.id() == id {
+                    index = Some(i);
+                    break;
                 }
             }
         }
-        None
+        if let Some(i) = index {
+            self.secrets.get_mut(i).and_then(|opt| opt.as_mut())
+        } else {
+            None
+        }
     }
 
     fn list_secrets(&self) -> Vec<SecretID> {
@@ -400,7 +403,7 @@ mod tests {
         let mut keyring = SimpleKeyring::new(cap);
         let secret_cap = SecretCapability::full();
         let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.store_secret(Box::new(secret)).unwrap();
+        let id = keyring.add_secret(Box::new(secret)).unwrap();
         assert_eq!(id, 1);
 
         let retrieved = keyring.get_secret(1).unwrap();
