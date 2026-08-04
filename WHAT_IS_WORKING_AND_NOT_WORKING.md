@@ -78,6 +78,9 @@ To duplicate the usability of modern Linux Mint, SigmaOS implements 10 compatibi
 - `MintShellScriptInterpreter` (aliases, sshd background triggers, cron daemons)
 - `MintTimeshiftBackup` (Btrfs/Ext4 target snapshot creation and rollback states)
 
+### G. Linux/BSD/Windows-Inspired Arithmetic, Stack, & Call Frame Invocation
+SigmaOS includes high-performance math and system calling convention utilities in `src/core/math.rs` incorporating checked, overflow-safe saturating integer operations (`saturating_add_i32`, `saturating_sub_i32`, `checked_mul_i32`) inspired by standard Linux and BSD kernel memory bounds checks. It also introduces BSD-aligned stack boundary verification (`verify_alignment`) and safe, dynamic call frame structures (`InvocationFrame`, `secure_invoke_sim`) with Control Flow Guard capabilities matching modern Windows NT calling convention rules.
+
 ---
 
 ## 3. What's Not Working: Detailed Compiler Errors & Structural Analysis
