@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // Advanced Routing - Linux-style routing table management
 // Supports multiple routing tables, route caching, and policy routing
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::string::String;
@@ -79,7 +61,6 @@ pub struct RoutingTable {
 }
 
 impl RoutingTable {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             routes: BTreeMap::new(),
@@ -120,10 +101,6 @@ impl RoutingTable {
             }
         }
 
-        if let Some(idx) = found_idx {
-            return Some(&self.route_cache[idx]);
-        }
-
         // Full lookup
         let mut best_route_key = None;
         let mut best_metric = u32::MAX;
@@ -149,10 +126,11 @@ impl RoutingTable {
                 if self.route_cache.len() > 128 {
                     self.route_cache.remove(0);
                 }
+                return Some(route.clone());
             }
         }
 
-        best_route.cloned()
+        None
     }
 
     /// Check if destination matches a route prefix

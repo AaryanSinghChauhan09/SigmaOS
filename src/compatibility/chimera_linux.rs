@@ -150,3 +150,16 @@ mod tests {
         assert!(store.apk_db_synced.load(Ordering::SeqCst));
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DinitServiceState {
+    Stopped,
+    Starting,
+    Running,
+    Stopping,
+}
+
+#[derive(Debug, Clone)]
+pub struct ApkPackageMetadata {
+    pub name: String,
+}

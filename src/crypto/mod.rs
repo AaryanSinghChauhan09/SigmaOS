@@ -26,3 +26,4 @@ pub mod pqc_dilithium;
 pub mod primitives;
 pub mod random;
 pub mod rsa;
+pub mod vectorized_pqc;

@@ -1,37 +1,20 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+#![no_std]
+#![no_main]
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
+#![no_std]
+#![no_main]
 
 #[cfg(not(target_os = "none"))]
 extern crate alloc;
 #[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
 
-use core::mem;
-use core::sync::atomic::AtomicUsize;
 /// OOP-based Sovereign Scheduler for SigmaOS
 /// Based on Roadmap Item: Functional Kernel Scheduler Implementation (Critical Blocker)
 /// Implements MLFQ (Multi-Level Feedback Queue) and MCS (Machine-to-Core Scheduling)
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type ThreadID = usize;
 
@@ -109,7 +92,6 @@ pub struct MLFQScheduler {
 }
 
 impl MLFQScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         MLFQScheduler {
             queues: [Vec::new(), Vec::new(), Vec::new(), Vec::new()],
@@ -229,7 +211,6 @@ pub struct SimpleRealTimeScheduler {
 }
 
 impl SimpleRealTimeScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleRealTimeScheduler {
             rt_queue: Vec::new(),
@@ -257,22 +238,12 @@ impl RealTimeScheduler for SimpleRealTimeScheduler {
 }
 
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }

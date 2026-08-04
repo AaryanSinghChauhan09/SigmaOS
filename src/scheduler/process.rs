@@ -254,6 +254,7 @@ pub enum SchedulerError {
 
 /// Scheduler statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SchedulerStats {
     pub total_processes: usize,
     pub ready_processes: usize,

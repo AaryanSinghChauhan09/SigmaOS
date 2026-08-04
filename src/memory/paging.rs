@@ -90,11 +90,6 @@ impl PageTableEntry {
 
 #[derive(Clone)]
 #[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
 }
@@ -129,9 +124,6 @@ impl Default for PageTable {
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
@@ -179,9 +171,6 @@ impl Default for PageDirectory {
     }
 }
 
-#[derive(Clone)]
-#[derive(Clone)]
-#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,
@@ -244,20 +233,12 @@ impl VirtualMemoryArea {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ZramAlgorithm {
-    Lzo,
-    Lz4,
-    Zstd,
-}
-
 /// Simulated Zram page block for compressed paging swap (Linux zram compression concept)
 #[derive(Clone)]
 pub struct ZramPage {
     pub virt_addr: VirtualAddress,
     pub compressed_data: Vec<u8>,
     pub original_size: usize,
-    pub algorithm: ZramAlgorithm,
 }
 
 /// Simulated KSM Registry entry tracking content hashes for page merging (Linux KSM concept)
@@ -275,10 +256,6 @@ pub struct SimpleVMM {
     pub clock_hand: usize,
     pub zram_pool: Vec<ZramPage>,       // Swapped compressed pages
     pub ksm_registry: Vec<KsmRegistryEntry>, // Tracked KSM hashes and reference vectors
-    pub swappiness: u8,                 // Linux swappiness (0-100)
-    pub zram_algorithm: ZramAlgorithm,  // Selected zram compression algorithm
-    pub zswap_max_pool_pages: usize,    // Max compressed pages before writing to disk
-    pub swap_disk: Vec<(VirtualAddress, Vec<u8>)>, // Secondary Tier 2 disk swap
 }
 
 impl SimpleVMM {
@@ -290,10 +267,6 @@ impl SimpleVMM {
             clock_hand: 0,
             zram_pool: Vec::new(),
             ksm_registry: Vec::new(),
-            swappiness: 60,
-            zram_algorithm: ZramAlgorithm::Zstd,
-            zswap_max_pool_pages: 4,
-            swap_disk: Vec::new(),
         }
     }
 
@@ -443,7 +416,7 @@ impl SimpleVMM {
 
         // 1GB Huge Page Check at PML4 level (points to PDPT huge entry)
         if let Some(huge_pte) = pml4.get_huge_entry(pdpt_idx) {
-            Self::validate_access(huge_pte, write_intent, execute_intent)?;
+            self.validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x3FFF_FFFF; // 1GB offset
             return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset));
         }
@@ -457,7 +430,7 @@ impl SimpleVMM {
 
         // 2MB Huge Page Check at PDPT level (points to PD huge entry)
         if let Some(huge_pte) = pdpt.get_huge_entry(pd_idx) {
-            Self::validate_access(huge_pte, write_intent, execute_intent)?;
+            self.validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x1F_FFFF; // 2MB offset
             return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x1F_FFFF) + offset));
         }
@@ -494,7 +467,7 @@ impl SimpleVMM {
             return Ok(PhysicalAddress(unique_phys.0 + offset));
         }
 
-        Self::validate_access(pte, write_intent, execute_intent)?;
+        self.validate_access(pte, write_intent, execute_intent)?;
 
         // Compute 4KB physical offset
         let offset = virt.0 & 0xFFF;
@@ -508,22 +481,12 @@ impl SimpleVMM {
         write_intent: bool,
         execute_intent: bool,
     ) -> Result<PhysicalAddress, MemoryError> {
-        // Tier 1: Check if the page was swapped to zram pool (zswap cache layer)
+        // First check if the page was swapped to zram pool
         for i in 0..self.zram_pool.len() {
             if self.zram_pool[i].virt_addr.0 == virt.0 {
                 // Decompress page and map it back on demand (zram decompression swap-in)
                 let decompressed_phys = PhysicalAddress(virt.0); // mapped back
                 self.zram_pool.remove(i);
-                self.map_page_with_flags(virt, decompressed_phys, true, false).unwrap();
-                return Ok(decompressed_phys);
-            }
-        }
-
-        // Tier 2: Check if the page was swapped out to secondary swap disk
-        for i in 0..self.swap_disk.len() {
-            if self.swap_disk[i].0.0 == virt.0 {
-                let decompressed_phys = PhysicalAddress(virt.0); // read back from disk
-                self.swap_disk.remove(i);
                 self.map_page_with_flags(virt, decompressed_phys, true, false).unwrap();
                 return Ok(decompressed_phys);
             }
@@ -546,6 +509,7 @@ impl SimpleVMM {
     }
 
     fn validate_access(
+        &self,
         pte: &PageTableEntry,
         write_intent: bool,
         execute_intent: bool,
@@ -590,42 +554,17 @@ impl SimpleVMM {
                                 pte.accessed = false;
                                 self.clock_hand += 1;
                             } else {
-                                // Linux swappiness check: if swappiness is 0, we bypass/avoid swapping out
-                                if self.swappiness == 0 {
-                                    return None;
-                                }
-
                                 // Evict this page and compress its simulated content to ZramPool
                                 let evicted = self.active_pages_for_clock.remove(idx);
                                 self.clock_hand = idx; // Next start point
 
-                                // Compress page contents depending on selected algorithm (simulated)
-                                let ratio = match self.zram_algorithm {
-                                    ZramAlgorithm::Lzo => 0.60,
-                                    ZramAlgorithm::Lz4 => 0.50,
-                                    ZramAlgorithm::Zstd => 0.35,
-                                };
-                                let compressed_len = (4096.0 * ratio) as usize;
-                                let mut compressed_data = vec![0; compressed_len];
-                                if compressed_len >= 3 {
-                                    compressed_data[0] = 0xAB;
-                                    compressed_data[1] = 0xCD;
-                                    compressed_data[2] = 0xEF;
-                                }
-
+                                // Compress page contents (simulated basic byte compress)
+                                let compressed_data = vec![0xAB, 0xCD, 0xEF];
                                 self.zram_pool.push(ZramPage {
                                     virt_addr: evicted,
                                     compressed_data,
                                     original_size: 4096,
-                                    algorithm: self.zram_algorithm,
                                 });
-
-                                // Write-Back Eviction Policy (zswap to secondary disk swap):
-                                // If Tier 1 (zram) pool size exceeds the threshold, unstage the oldest page to Tier 2 (swap_disk)
-                                if self.zram_pool.len() > self.zswap_max_pool_pages {
-                                    let oldest = self.zram_pool.remove(0);
-                                    self.swap_disk.push((oldest.virt_addr, oldest.compressed_data));
-                                }
 
                                 // Unmap the page frame
                                 pd.entries[pt_idx] = None;
@@ -952,55 +891,13 @@ mod tests {
         let evicted = vmm.perform_clock_replacement_step().unwrap();
         assert_eq!(evicted, virt);
 
-        // Verify page was unmapped from page tables into zram_pool
+        // Verify page was unmapped from page tables
+        assert!(vmm.get_physical_address(virt).is_err());
         assert_eq!(vmm.zram_pool.len(), 1);
 
         // Accessing the page triggers zram decompression restore fault handler
         let restored_phys = vmm.get_physical_address(virt).unwrap();
         assert_eq!(restored_phys.0, virt.0);
         assert_eq!(vmm.zram_pool.len(), 0); // removed from zram compressed pool
-    }
-
-    #[test]
-    fn test_advanced_multi_tier_swap_and_swappiness() {
-        let mut vmm = SimpleVMM::new();
-        vmm.swappiness = 0; // Disable swapping!
-
-        let virt1 = VirtualAddress(0x1000);
-        vmm.map_page(virt1, PhysicalAddress(0x10000)).unwrap();
-
-        // Evicting with swappiness = 0 should bypass swapping
-        let evicted = vmm.perform_clock_replacement_step();
-        assert!(evicted.is_none());
-
-        // Re-enable swappiness and change algorithm to Zstd (high compression)
-        vmm.swappiness = 60;
-        vmm.zram_algorithm = ZramAlgorithm::Zstd;
-        vmm.zswap_max_pool_pages = 2; // threshold of 2
-
-        let virt2 = VirtualAddress(0x2000);
-        let virt3 = VirtualAddress(0x3000);
-        let virt4 = VirtualAddress(0x4000);
-
-        vmm.map_page(virt1, PhysicalAddress(0x10000)).unwrap();
-        vmm.map_page(virt2, PhysicalAddress(0x20000)).unwrap();
-        vmm.map_page(virt3, PhysicalAddress(0x30000)).unwrap();
-        vmm.map_page(virt4, PhysicalAddress(0x40000)).unwrap();
-
-        // Evict 3 pages
-        vmm.perform_clock_replacement_step().unwrap();
-        vmm.perform_clock_replacement_step().unwrap();
-        vmm.perform_clock_replacement_step().unwrap();
-
-        // Since max zswap size is 2 pages, the 3rd eviction should push the oldest to Tier 2 swap disk
-        assert_eq!(vmm.zram_pool.len(), 2);
-        assert_eq!(vmm.swap_disk.len(), 1);
-
-        // Verify that the oldest page is located on swap disk
-        let oldest_virt = vmm.swap_disk[0].0;
-        // Restoring it from Tier 2 swap disk should succeed and remove it from swap disk
-        let restored_phys = vmm.get_physical_address(oldest_virt).unwrap();
-        assert_eq!(restored_phys.0, oldest_virt.0);
-        assert_eq!(vmm.swap_disk.len(), 0);
     }
 }

@@ -1,13 +1,14 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
 /// OOP-based AI Agent Framework for SigmaOS
 /// Implements AI agent using OOP principles with traits and structs
 /// No dependency on external AI frameworks
 /// Based on Roadmap Item 81: SigmaAI core agent
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 /// Intent type
 #[repr(C)]
@@ -155,16 +156,8 @@ impl Pattern {
         let template_len = template.len().min(255);
 
         unsafe {
-            core::ptr::copy_nonoverlapping(
-                pattern.as_ptr(),
-                pattern_array.as_mut_ptr(),
-                pattern_len,
-            );
-            core::ptr::copy_nonoverlapping(
-                template.as_ptr(),
-                template_array.as_mut_ptr(),
-                template_len,
-            );
+            core::ptr::copy_nonoverlapping(pattern.as_ptr(), pattern_array.as_mut_ptr(), pattern_len);
+            core::ptr::copy_nonoverlapping(template.as_ptr(), template_array.as_mut_ptr(), template_len);
         }
 
         Pattern {
@@ -198,8 +191,7 @@ impl SimpleAIAgent {
     }
 
     unsafe fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
-        for i in 0..self.patterns.len() {
-            let pattern = &self.patterns[i];
+        for pattern in &self.patterns {
             let pattern_len = pattern.pattern.iter().position(|&b| b == 0).unwrap_or(128);
             let pattern_str = &pattern.pattern[..pattern_len];
 
@@ -256,7 +248,7 @@ impl AIAgent for SimpleAIAgent {
         // For now, return a simulated response
         let mut response = Vec::new();
         let success_msg = b"Command executed successfully";
-
+        
         for byte in success_msg {
             response.push(*byte);
         }
@@ -300,7 +292,7 @@ pub trait AIAgentManager {
 
 /// AI statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AIStats {
     pub total_agents: usize,
     pub total_requests: u64,
@@ -394,8 +386,7 @@ impl AIAgentManager for SimpleAIAgentManager {
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent> {
         if id < self.agents.len() {
             if let Some(ref agent) = self.agents[id] {
-                let r: &dyn AIAgent = agent.as_ref();
-                return Some(r);
+                return Some(agent.as_ref());
             }
         }
         None
@@ -410,10 +401,9 @@ impl AIAgentManager for SimpleAIAgentManager {
 
         let active = self.active_agent.load(Ordering::SeqCst);
         if let Some(ref mut agent) = self.agents[active] {
-            let agent_mut: &mut dyn AIAgent = agent.as_mut();
-            let intent = agent_mut.parse(input)?;
+            let intent = agent.parse(input)?;
 
-            if let Ok(response) = agent_mut.execute(&intent) {
+            if let Ok(response) = agent.execute(&intent) {
                 self.stats.successful_requests += 1;
                 Ok(response)
             } else {
@@ -432,12 +422,16 @@ impl AIAgentManager for SimpleAIAgentManager {
 }
 
 /// Simple Vec implementation for no_std
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {
@@ -465,11 +459,7 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
@@ -487,78 +477,8 @@ impl<T> Vec<T> {
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
 // External allocator functions
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_ai_agent_and_manager() {
-        let capability = AgentCapability::full();
-        let mut agent = SimpleAIAgent::new(b"assistant", (1, 0, 0), capability);
-        let pattern = Pattern::new(b"hello", IntentType::Custom, b"greet");
-        agent.add_pattern(pattern);
-
-        let parsed = agent.parse(b"hello world").unwrap();
-        assert_eq!(parsed.intent_type as usize, IntentType::Custom as usize);
-
-        let mut manager = SimpleAIAgentManager::new(ManagerCapability::full());
-        let agent_id = manager.register_agent(Box::new(agent)).unwrap();
-        assert_eq!(agent_id, 0);
-
-        let response = manager.process(b"hello world").unwrap();
-        assert_eq!(response.len(), 29);
-        assert_eq!(response[0], b'C');
-        assert_eq!(response[28], b'y');
-    }
 }

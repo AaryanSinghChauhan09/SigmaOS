@@ -23,6 +23,7 @@ pub mod eevdf;
 pub mod process;
 pub mod scheduler;
 pub mod sovereign;
+pub mod numa_scheduler;
 
 pub use eevdf::{
     ComputeUnit, EevdfScheduler, SInitSupervisor, Service, ServiceState, Task, TaskState,

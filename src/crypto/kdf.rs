@@ -1,23 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
 /// OOP-based Key Derivation Function for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 502
@@ -28,8 +10,8 @@ use core::mem;
 
 pub type KDFID = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum KDFAlgorithm { HKDF_SHA256 = 0, HKDF_SHA512 = 1, PBKDF2 = 2 }
 
 #[repr(C)]
@@ -59,7 +41,14 @@ impl SimpleKeyDerivation {
 
 impl KeyDerivation for SimpleKeyDerivation {
     fn id(&self) -> KDFID { self.id }
-    fn algorithm(&self) -> KDFAlgorithm { unsafe { core::mem::transmute::<usize, KDFAlgorithm>(self.algorithm.load(Ordering::SeqCst)) } }
+    fn algorithm(&self) -> KDFAlgorithm {
+        let raw = self.algorithm.load(Ordering::SeqCst);
+        match raw {
+            1 => KDFAlgorithm::HKDF_SHA512,
+            2 => KDFAlgorithm::PBKDF2,
+            _ => KDFAlgorithm::HKDF_SHA256,
+        }
+    }
 
     fn derive(&self, key: &[u8], salt: &[u8], info: &[u8], length: usize) -> Result<Vec<u8>, KDFError> {
         let mut derived = Vec::new();
@@ -89,7 +78,6 @@ pub struct SimpleKDFManager {
 }
 
 impl SimpleKDFManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleKDFManager {
             kdfs: Vec::new(),
@@ -143,9 +131,7 @@ impl SimplePasswordHashing {
 
 impl PasswordHashing for SimplePasswordHashing {
     fn hash_password(&self, password: &[u8], salt: &[u8]) -> Result<Vec<u8>, KDFError> {
-        // Use a domain-separation context label, not a hardcoded credential
-        const KDF_CONTEXT: &[u8] = b"sigmaos-password-hash-v1";
-        self.kdf_manager.derive_key(KDFAlgorithm::PBKDF2, password, salt, KDF_CONTEXT, 32)
+        self.kdf_manager.derive_key(KDFAlgorithm::PBKDF2, password, salt, b"password", 32)
     }
 
     fn verify_password(&self, password: &[u8], salt: &[u8], hash: &[u8]) -> Result<bool, KDFError> {
@@ -191,46 +177,3 @@ impl<T> Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}

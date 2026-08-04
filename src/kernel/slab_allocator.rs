@@ -1,25 +1,7 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // Slab Allocator - Linux-style efficient small object allocation
 // Reduces fragmentation by caching freed objects of similar sizes
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
@@ -56,7 +38,6 @@ pub struct SlabAllocator {
 }
 
 impl SlabAllocator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             caches: BTreeMap::new(),
@@ -97,38 +78,35 @@ impl SlabAllocator {
         let next_slab_id = self.next_slab_id;
         let cache = self.caches.get_mut(cache_name).ok_or("Cache not found")?;
 
-        // 1. Short circuit optimization: if free_objects is 0, skip loop search
-        if cache.free_objects > 0 {
-            // Try to find a free object in existing slabs
-            for slab in &mut cache.slabs {
-                if slab.state != SlabState::Full {
-                    for obj in &mut slab.objects {
-                        if obj.is_none() {
-                            let ptr = (0x2000 + next_slab_id as usize) as *mut u8;
-                            *obj = Some(ptr);
-                            slab.inuse += 1;
-                            cache.free_objects -= 1;
+        // Try to find a free object in existing slabs
+        for slab in &mut cache.slabs {
+            if slab.state != SlabState::Full {
+                for obj in &mut slab.objects {
+                    if obj.is_none() {
+                        let ptr = (0x2000 + next_slab_id as usize) as *mut u8;
+                        *obj = Some(ptr);
+                        slab.inuse += 1;
+                        cache.free_objects -= 1;
 
-                            // Update slab state
-                            slab.state = if slab.inuse == cache.objects_per_slab {
-                                SlabState::Full
-                            } else if slab.inuse > 0 {
-                                SlabState::Partial
-                            } else {
-                                SlabState::Empty
-                            };
+                        // Update slab state
+                        slab.state = if slab.inuse == cache.objects_per_slab {
+                            SlabState::Full
+                        } else if slab.inuse > 0 {
+                            SlabState::Partial
+                        } else {
+                            SlabState::Empty
+                        };
 
-                            return Ok(ptr);
-                        }
+                        return Ok(obj.unwrap());
                     }
                 }
             }
         }
 
-        // 2. No free objects, create a new slab
+        // No free objects, create a new slab
+        let objects_per_slab = cache.objects_per_slab;
         let new_slab = Self::create_slab_static(next_slab_id, cache)?;
         let obj = new_slab.objects[0].unwrap();
-        let objects_per_slab = cache.objects_per_slab;
 
         let cache = self.caches.get_mut(cache_name).unwrap();
         cache.slabs.push(new_slab);

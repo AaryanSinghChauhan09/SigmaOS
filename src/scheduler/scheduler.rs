@@ -1,18 +1,12 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-#[cfg(not(target_os = "none"))]
-use alloc::vec::Vec;
-#[cfg(not(target_os = "none"))]
-use alloc::boxed::Box;
-
-use core::mem;
 /// OOP-based Scheduler for SigmaOS
-/// Implements Completely Fair Scheduling (CFS) and Earliest Eligible Virtual Deadline First (EEVDF)
-/// inspired by modern Linux kernels.
+/// Implements process/thread scheduling using OOP principles with traits and structs
+/// No dependency on external scheduler frameworks
+
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, AtomicU64, Ordering};
 
 /// Schedulable trait (OOP interface)
 pub trait Schedulable {
@@ -32,18 +26,14 @@ pub trait Schedulable {
     fn last_run_time(&self) -> u64;
     /// Set last run time
     fn set_last_run_time(&mut self, time: u64);
-    /// Get task ID
+            /// Get task ID
     fn task_id(&self) -> usize;
     /// Get task capability
     fn capability(&self) -> TaskCapability;
-
-    // CFS & EEVDF state variables with default implementations for backward compatibility
-    fn vruntime(&self) -> u64 { 0 }
-    fn set_vruntime(&mut self, _val: u64) {}
-    fn eligibility_time(&self) -> u64 { 0 }
-    fn set_eligibility_time(&mut self, _val: u64) {}
-    fn virtual_deadline(&self) -> u64 { 0 }
-    fn set_virtual_deadline(&mut self, _val: u64) {}
+    /// Check if task can yield
+    fn can_yield(&self) -> bool;
+    /// Check if task can block
+    fn can_block(&self) -> bool;
 }
 
 /// Priority levels
@@ -78,11 +68,6 @@ pub struct Task {
     pub last_run_time: AtomicU64,
     pub quantum: u64,
     pub capability: TaskCapability,
-
-    // CFS & EEVDF tracking
-    pub vruntime: AtomicU64,
-    pub eligibility_time: AtomicU64,
-    pub virtual_deadline: AtomicU64,
 }
 
 impl Task {
@@ -95,67 +80,7 @@ impl Task {
             last_run_time: AtomicU64::new(0),
             quantum,
             capability,
-            vruntime: AtomicU64::new(0),
-            eligibility_time: AtomicU64::new(0),
-            virtual_deadline: AtomicU64::new(quantum), // Default virtual deadline equal to its allocation quantum
         }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &[T] {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut [T] {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if !self.data.is_null() {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-#[cfg(target_os = "none")]
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
     }
 }
 
@@ -169,13 +94,15 @@ impl Schedulable for Task {
     }
 
     fn state(&self) -> TaskState {
-        let raw = self.state.load(Ordering::SeqCst) as u32;
-        match raw {
-            1 => TaskState::Running,
-            2 => TaskState::Blocked,
-            3 => TaskState::Sleeping,
-            4 => TaskState::Terminated,
-            _ => TaskState::Ready,
+        {
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => TaskState::Running,
+                2 => TaskState::Blocked,
+                3 => TaskState::Sleeping,
+                4 => TaskState::Terminated,
+                _ => TaskState::Ready,
+            }
         }
     }
 
@@ -203,33 +130,12 @@ impl Schedulable for Task {
         self.id
     }
 
-    fn capability(&self) -> TaskCapability {
-        self.capability
+    fn can_yield(&self) -> bool {
+        self.capability.can_yield
     }
 
-    // CFS / EEVDF state variables
-    fn vruntime(&self) -> u64 {
-        self.vruntime.load(Ordering::SeqCst)
-    }
-
-    fn set_vruntime(&mut self, val: u64) {
-        self.vruntime.store(val, Ordering::SeqCst);
-    }
-
-    fn eligibility_time(&self) -> u64 {
-        self.eligibility_time.load(Ordering::SeqCst)
-    }
-
-    fn set_eligibility_time(&mut self, val: u64) {
-        self.eligibility_time.store(val, Ordering::SeqCst);
-    }
-
-    fn virtual_deadline(&self) -> u64 {
-        self.virtual_deadline.load(Ordering::SeqCst)
-    }
-
-    fn set_virtual_deadline(&mut self, val: u64) {
-        self.virtual_deadline.store(val, Ordering::SeqCst);
+    fn can_block(&self) -> bool {
+        self.capability.can_block
     }
 }
 
@@ -378,7 +284,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.capability().can_yield {
+                    if !task.can_yield() {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Ready);
@@ -393,7 +299,7 @@ impl Scheduler for RoundRobinScheduler {
         for task_option in &mut self.ready_queue {
             if let Some(ref mut task) = *task_option {
                 if task.task_id() == task_id {
-                    if !task.capability().can_block {
+                    if !task.can_block() {
                         return Err(SchedulerError::PermissionDenied);
                     }
                     task.set_state(TaskState::Blocked);
@@ -446,7 +352,13 @@ pub struct PriorityScheduler {
 impl PriorityScheduler {
     pub fn new() -> Self {
         PriorityScheduler {
-            priority_queues: [Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new()],
+            priority_queues: [
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+                Vec::new(),
+            ],
             current_task: AtomicUsize::new(0),
             context_switches: AtomicU64::new(0),
         }
@@ -505,7 +417,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.capability().can_yield {
+                        if !task.can_yield() {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Ready);
@@ -522,7 +434,7 @@ impl Scheduler for PriorityScheduler {
             for task_option in queue {
                 if let Some(ref mut task) = *task_option {
                     if task.task_id() == task_id {
-                        if !task.capability().can_block {
+                        if !task.can_block() {
                             return Err(SchedulerError::PermissionDenied);
                         }
                         task.set_state(TaskState::Blocked);
@@ -570,341 +482,6 @@ impl Scheduler for PriorityScheduler {
     }
 }
 
-// ===============================================================
-// Linux-Grade Completely Fair Scheduler (CFS)
-// ===============================================================
-
-pub struct CompletelyFairScheduler {
-    tasks: Vec<Option<Box<dyn Schedulable>>>,
-    current_task: AtomicUsize,
-    context_switches: AtomicU64,
-}
-
-impl CompletelyFairScheduler {
-    pub fn new() -> Self {
-        CompletelyFairScheduler {
-            tasks: Vec::new(),
-            current_task: AtomicUsize::new(0),
-            context_switches: AtomicU64::new(0),
-        }
-    }
-
-    /// Retrieve the scaling multiplier based on task Priority (nice/weight emul)
-    fn get_weight_multiplier(priority: Priority) -> u64 {
-        match priority {
-            Priority::Idle => 10,
-            Priority::Low => 5,
-            Priority::Normal => 2,
-            Priority::High => 1,
-            Priority::Realtime => 1, // Real-time runs with minimal vruntime scaling
-        }
-    }
-}
-
-impl Scheduler for CompletelyFairScheduler {
-    fn add_task(&mut self, task: Box<dyn Schedulable>) -> Result<(), SchedulerError> {
-        self.tasks.push(Some(task));
-        Ok(())
-    }
-
-    fn remove_task(&mut self, task_id: usize) -> Result<(), SchedulerError> {
-        for i in 0..self.tasks.len() {
-            if let Some(ref task) = self.tasks[i] {
-                if task.task_id() == task_id {
-                    self.tasks.remove(i);
-                    return Ok(());
-                }
-            }
-        }
-        Err(SchedulerError::TaskNotFound)
-    }
-
-    fn schedule(&mut self) -> Option<usize> {
-        if self.tasks.is_empty() {
-            return None;
-        }
-
-        // Find the ready task with the lowest vruntime
-        let mut best_idx = None;
-        let mut min_vruntime = u64::MAX;
-
-        for i in 0..self.tasks.len() {
-            if let Some(ref task) = self.tasks[i] {
-                if task.state() == TaskState::Ready {
-                    let vr = task.vruntime();
-                    if vr < min_vruntime {
-                        min_vruntime = vr;
-                        best_idx = Some(i);
-                    }
-                }
-            }
-        }
-
-        if let Some(idx) = best_idx {
-            if let Some(ref mut task) = self.tasks[idx] {
-                let task_id = task.task_id();
-                self.current_task.store(task_id, Ordering::SeqCst);
-                self.context_switches.fetch_add(1, Ordering::SeqCst);
-
-                // Emulate execution time and update virtual runtime
-                let run_time = 10; // 10ms execution tick
-                let mult = Self::get_weight_multiplier(task.priority());
-                let vr_add = run_time * mult;
-                task.set_vruntime(task.vruntime() + vr_add);
-                task.increment_cpu_time(run_time);
-
-                return Some(task_id);
-            }
-        }
-
-        None
-    }
-
-    fn yield_task(&mut self, task_id: usize) -> Result<(), SchedulerError> {
-        for task_option in &mut self.tasks {
-            if let Some(ref mut task) = *task_option {
-                if task.task_id() == task_id {
-                    if !task.capability().can_yield {
-                        return Err(SchedulerError::PermissionDenied);
-                    }
-                    task.set_state(TaskState::Ready);
-                    return Ok(());
-                }
-            }
-        }
-        Err(SchedulerError::TaskNotFound)
-    }
-
-    fn block_task(&mut self, task_id: usize) -> Result<(), SchedulerError> {
-        for task_option in &mut self.tasks {
-            if let Some(ref mut task) = *task_option {
-                if task.task_id() == task_id {
-                    if !task.capability().can_block {
-                        return Err(SchedulerError::PermissionDenied);
-                    }
-                    task.set_state(TaskState::Blocked);
-                    return Ok(());
-                }
-            }
-        }
-        Err(SchedulerError::TaskNotFound)
-    }
-
-    fn unblock_task(&mut self, task_id: usize) -> Result<(), SchedulerError> {
-        for task_option in &mut self.tasks {
-            if let Some(ref mut task) = *task_option {
-                if task.task_id() == task_id {
-                    task.set_state(TaskState::Ready);
-                    return Ok(());
-                }
-            }
-        }
-        Err(SchedulerError::TaskNotFound)
-    }
-
-    fn stats(&self) -> SchedulerStats {
-        let mut stats = SchedulerStats::new();
-        stats.total_tasks = self.tasks.len();
-
-        for task_option in &self.tasks {
-            if let Some(ref task) = *task_option {
-                match task.state() {
-                    TaskState::Ready => stats.ready_tasks += 1,
-                    TaskState::Running => stats.running_tasks += 1,
-                    TaskState::Blocked => stats.blocked_tasks += 1,
-                    _ => {}
-                }
-            }
-        }
-
-        stats.context_switches = self.context_switches.load(Ordering::SeqCst);
-        stats
-    }
-}
-
-// ===============================================================
-// Linux-Grade EEVDF (Earliest Eligible Virtual Deadline First)
-// ===============================================================
-
-pub struct EEVDFScheduler {
-    tasks: Vec<Option<Box<dyn Schedulable>>>,
-    current_task: AtomicUsize,
-    context_switches: AtomicU64,
-}
-
-impl EEVDFScheduler {
-    pub fn new() -> Self {
-        EEVDFScheduler {
-            tasks: Vec::new(),
-            current_task: AtomicUsize::new(0),
-            context_switches: AtomicU64::new(0),
-        }
-    }
-
-    /// Compute System Virtual Time (average vruntime of active/eligible ready tasks)
-    fn get_system_virtual_time(&self) -> u64 {
-        let mut total = 0;
-        let mut count = 0;
-        for task_option in &self.tasks {
-            if let Some(ref task) = *task_option {
-                if task.state() == TaskState::Ready {
-                    total += task.vruntime();
-                    count += 1;
-                }
-            }
-        }
-        if count == 0 {
-            0
-        } else {
-            total / count
-        }
-    }
-}
-
-impl Scheduler for EEVDFScheduler {
-    fn add_task(&mut self, task: Box<dyn Schedulable>) -> Result<(), SchedulerError> {
-        self.tasks.push(Some(task));
-        Ok(())
-    }
-
-    fn remove_task(&mut self, task_id: usize) -> Result<(), SchedulerError> {
-        for i in 0..self.tasks.len() {
-            if let Some(ref task) = self.tasks[i] {
-                if task.task_id() == task_id {
-                    self.tasks.remove(i);
-                    return Ok(());
-                }
-            }
-        }
-        Err(SchedulerError::TaskNotFound)
-    }
-
-    fn schedule(&mut self) -> Option<usize> {
-        if self.tasks.is_empty() {
-            return None;
-        }
-
-        let system_vt = self.get_system_virtual_time();
-
-        // 1. Find all "Eligible" tasks (vruntime <= system_virtual_time)
-        // 2. Select the eligible task with the earliest virtual deadline (minimum virtual_deadline)
-        let mut best_idx = None;
-        let mut min_deadline = u64::MAX;
-
-        for i in 0..self.tasks.len() {
-            if let Some(ref task) = self.tasks[i] {
-                if task.state() == TaskState::Ready {
-                    // Check eligibility
-                    if task.vruntime() <= system_vt {
-                        let dl = task.virtual_deadline();
-                        if dl < min_deadline {
-                            min_deadline = dl;
-                            best_idx = Some(i);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Fallback to absolute minimum virtual runtime if no eligible task is found
-        if best_idx.is_none() {
-            let mut min_vr = u64::MAX;
-            for i in 0..self.tasks.len() {
-                if let Some(ref task) = self.tasks[i] {
-                    if task.state() == TaskState::Ready {
-                        let vr = task.vruntime();
-                        if vr < min_vr {
-                            min_vr = vr;
-                            best_idx = Some(i);
-                        }
-                    }
-                }
-            }
-        }
-
-        if let Some(idx) = best_idx {
-            if let Some(ref mut task) = self.tasks[idx] {
-                let task_id = task.task_id();
-                self.current_task.store(task_id, Ordering::SeqCst);
-                self.context_switches.fetch_add(1, Ordering::SeqCst);
-
-                // Run task and update EEVDF metrics
-                let run_time = 10; // execution tick
-                task.set_vruntime(task.vruntime() + run_time);
-
-                // Recalculate earliest virtual deadline
-                task.set_virtual_deadline(task.vruntime() + 20); // deadline deferred
-                task.increment_cpu_time(run_time);
-
-                return Some(task_id);
-            }
-        }
-
-        None
-    }
-
-    fn yield_task(&mut self, task_id: usize) -> Result<(), SchedulerError> {
-        for task_option in &mut self.tasks {
-            if let Some(ref mut task) = *task_option {
-                if task.task_id() == task_id {
-                    if !task.capability().can_yield {
-                        return Err(SchedulerError::PermissionDenied);
-                    }
-                    task.set_state(TaskState::Ready);
-                    return Ok(());
-                }
-            }
-        }
-        Err(SchedulerError::TaskNotFound)
-    }
-
-    fn block_task(&mut self, task_id: usize) -> Result<(), SchedulerError> {
-        for task_option in &mut self.tasks {
-            if let Some(ref mut task) = *task_option {
-                if task.task_id() == task_id {
-                    if !task.capability().can_block {
-                        return Err(SchedulerError::PermissionDenied);
-                    }
-                    task.set_state(TaskState::Blocked);
-                    return Ok(());
-                }
-            }
-        }
-        Err(SchedulerError::TaskNotFound)
-    }
-
-    fn unblock_task(&mut self, task_id: usize) -> Result<(), SchedulerError> {
-        for task_option in &mut self.tasks {
-            if let Some(ref mut task) = *task_option {
-                if task.task_id() == task_id {
-                    task.set_state(TaskState::Ready);
-                    return Ok(());
-                }
-            }
-        }
-        Err(SchedulerError::TaskNotFound)
-    }
-
-    fn stats(&self) -> SchedulerStats {
-        let mut stats = SchedulerStats::new();
-        stats.total_tasks = self.tasks.len();
-
-        for task_option in &self.tasks {
-            if let Some(ref task) = *task_option {
-                match task.state() {
-                    TaskState::Ready => stats.ready_tasks += 1,
-                    TaskState::Running => stats.running_tasks += 1,
-                    TaskState::Blocked => stats.blocked_tasks += 1,
-                    _ => {}
-                }
-            }
-        }
-
-        stats.context_switches = self.context_switches.load(Ordering::SeqCst);
-        stats
-    }
-}
-
 /// Simple Vec implementation for no_std
 #[cfg(target_os = "none")]
 struct Vec<T> {
@@ -939,11 +516,7 @@ impl<T> Vec<T> {
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(
-                self.data.add(index + 1),
-                self.data.add(index),
-                self.len - index - 1,
-            );
+            core::ptr::copy(self.data.add(index + 1), self.data.add(index), self.len - index - 1);
             self.len -= 1;
             item
         }
@@ -958,12 +531,8 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = extern_alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {
             for i in 0..self.len {
@@ -983,52 +552,6 @@ impl<T> Vec<T> {
 // External allocator functions
 #[cfg(target_os = "none")]
 extern "C" {
-    #[link_name = "alloc"]
-    fn extern_alloc(size: usize) -> *mut u8;
+    fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_cfs_priority_scaling() {
-        let mut scheduler = CompletelyFairScheduler::new();
-
-        let task1 = Task::new(1, Priority::Idle, 10, TaskCapability::full());
-        let task2 = Task::new(2, Priority::Realtime, 10, TaskCapability::full());
-
-        scheduler.add_task(Box::new(task1)).unwrap();
-        scheduler.add_task(Box::new(task2)).unwrap();
-
-        // Initially both tasks have vruntime 0. The scheduler will pick one (e.g. task1).
-        let chosen_1 = scheduler.schedule().unwrap();
-        assert!(chosen_1 == 1 || chosen_1 == 2);
-
-        // Next round, the task with the lower scaled vruntime is chosen.
-        // Task 1 (Idle) scales vruntime by 10x run_time, while Task 2 (Realtime) scales by 1x.
-        // Thus, Task 2 will definitely have a lower vruntime next time and be scheduled.
-        let chosen_2 = scheduler.schedule().unwrap();
-        assert_ne!(chosen_1, chosen_2);
-    }
-
-    #[test]
-    fn test_eevdf_deadline_first() {
-        let mut scheduler = EEVDFScheduler::new();
-
-        let mut task1 = Task::new(1, Priority::Normal, 10, TaskCapability::full());
-        let mut task2 = Task::new(2, Priority::Normal, 10, TaskCapability::full());
-
-        // Set virtual deadline of Task 2 to be earlier than Task 1
-        task1.set_virtual_deadline(100);
-        task2.set_virtual_deadline(50);
-
-        scheduler.add_task(Box::new(task1)).unwrap();
-        scheduler.add_task(Box::new(task2)).unwrap();
-
-        // EEVDF selects the task with the earliest virtual deadline
-        let chosen = scheduler.schedule().unwrap();
-        assert_eq!(chosen, 2);
-    }
 }

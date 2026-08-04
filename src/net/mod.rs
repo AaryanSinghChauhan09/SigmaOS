@@ -1,28 +1,35 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Network Module
+// Network stack, browser core, and communication systems
 
-pub mod dns;
-pub mod socket;
-pub mod stack;
-pub mod ping;
+pub mod browser_core;
+pub mod ipv6;
+pub mod routing;
+pub mod sovereign_browser;
+pub mod tls;
+pub mod zenith;
+pub mod signal_client;
+pub mod tor_client;
+pub mod torrent;
 
-pub use stack::{
-    BbrCongestionControl, CongestionControl, NFAction, NetDevice, Netfilter, NetfilterRule,
-    PfifoFast, Qdisc, QdiscManager, RenoCongestionControl, SkBuff, Socket,
+pub use signal_client::DoubleRatchetState;
+pub use tor_client::{TorCircuit, TorRelay};
+pub use torrent::{TorrentClient, TorrentMetadata};
+
+pub use browser_core::{
+    AdblockRule, BrowserCore, BrowserTab, BrowserTabState, SecurityLevel, TabCapabilities,
+    TrackingProtection,
 };
-pub use ping::{SovereignPingEngine, IcmpType, IcmpPacket, PingStats};
+pub use ipv6::{
+    Ipv6Address, Ipv6AddressType, Ipv6ExtensionHeader, Ipv6Header, Ipv6Interface, Ipv6Route,
+    Ipv6Stack,
+};
+pub use routing::{RouteEntry, RouteKey, RouteProtocol, RouteType, RoutingTable};
+pub use sovereign_browser::{
+    AdBlockRule as SovereignAdBlockRule, BraveShield, BrowserTab as SovereignBrowserTab, BrowserError,
+    SecurityProfile, SovereignBrowser, TabContainer, TabState,
+};
+pub use tls::{CipherSuite, TlsConfig, TlsEngine, TlsSession, TlsState, TlsVersion};
+pub use zenith::{
+    E1000NetworkDriver, NetworkDriverDevice, NetworkDriverManager, NetworkDriverType,
+    NetworkError, NetworkPacketFrame, Rtl8139NetworkDriver, ZeroCopyPacketRing,
+};

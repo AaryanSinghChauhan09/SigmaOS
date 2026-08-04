@@ -8,7 +8,10 @@ pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
-pub mod india_professional_tools;
+pub mod endeavour;
+pub mod standards;
+
+pub use standards::{FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager};
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -16,6 +19,8 @@ pub use legacy_adapters::{
     WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
     LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
     GLOBAL_WORKLOAD_OPTIMIZER,
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };
 
 pub use constellation_mesh::{
@@ -62,9 +67,4 @@ pub use relay_nexus::{
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
-};
-
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
 };

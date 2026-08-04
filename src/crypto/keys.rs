@@ -1,23 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
 /// OOP-based Key Management for SigmaOS
 /// Based on Roadmap Item 16: Key management
@@ -27,12 +9,12 @@ use core::mem;
 
 pub type KeyID = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum KeyType { Symmetric = 0, Asymmetric = 1, HMAC = 2 }
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum KeyState { Active = 0, Revoked = 1, Expired = 2 }
 
 pub trait Key {
@@ -69,7 +51,14 @@ impl SimpleKey {
 impl Key for SimpleKey {
     fn id(&self) -> KeyID { self.id }
     fn key_type(&self) -> KeyType { self.key_type }
-    fn state(&self) -> KeyState { unsafe { core::mem::transmute::<usize, KeyState>(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> KeyState {
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
+            1 => KeyState::Revoked,
+            2 => KeyState::Expired,
+            _ => KeyState::Active,
+        }
+    }
     fn revoke(&mut self) { self.state.store(KeyState::Revoked as usize, Ordering::SeqCst); }
 }
 
@@ -90,7 +79,6 @@ pub struct SimpleKeyManager {
 }
 
 impl SimpleKeyManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { SimpleKeyManager { keys: Vec::new(), next_id: AtomicUsize::new(1) } }
 }
 
@@ -155,46 +143,3 @@ impl<T> Vec<T> {
 }
 
 extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-}

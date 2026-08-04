@@ -2,26 +2,8 @@
 //!
 //! This module provides debugging tools for the SigmaOS kernel and userland applications,
 //! including breakpoints, watchpoints, stack tracing, and memory inspection.
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
 
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::string::String;
@@ -31,100 +13,7 @@ pub mod breakpoint;
 
 pub use breakpoint::{BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
 
-#[derive(Debug, Clone)]
-pub struct Breakpoint {
-    pub address: u64,
-    pub breakpoint_type: BreakpointType,
-    pub enabled: bool,
-    pub hit_count: u32,
-}
 
-impl Breakpoint {
-    pub fn new(address: u64, breakpoint_type: BreakpointType) -> Self {
-        Self {
-            address,
-            breakpoint_type,
-            enabled: true,
-            hit_count: 0,
-        }
-    }
-
-    pub fn enable(&mut self) {
-        self.enabled = true;
-    }
-
-    pub fn disable(&mut self) {
-        self.enabled = false;
-    }
-
-    pub fn hit(&mut self) {
-        self.hit_count += 1;
-    }
-}
-
-/// Breakpoint representation for software debugger
-#[derive(Debug, Clone, Copy)]
-pub struct Breakpoint {
-    pub address: u64,
-    pub breakpoint_type: BreakpointType,
-    pub enabled: bool,
-    pub hit_count: u32,
-}
-
-impl Breakpoint {
-    pub fn new(address: u64, breakpoint_type: BreakpointType) -> Self {
-        Self {
-            address,
-            breakpoint_type,
-            enabled: true,
-            hit_count: 0,
-        }
-    }
-
-    pub fn enable(&mut self) {
-        self.enabled = true;
-    }
-
-    pub fn disable(&mut self) {
-        self.enabled = false;
-    }
-
-    pub fn hit(&mut self) {
-        self.hit_count += 1;
-    }
-}
-
-/// Breakpoint representation for software debugger
-#[derive(Debug, Clone, Copy)]
-pub struct Breakpoint {
-    pub address: u64,
-    pub breakpoint_type: BreakpointType,
-    pub enabled: bool,
-    pub hit_count: u32,
-}
-
-impl Breakpoint {
-    pub fn new(address: u64, breakpoint_type: BreakpointType) -> Self {
-        Self {
-            address,
-            breakpoint_type,
-            enabled: true,
-            hit_count: 0,
-        }
-    }
-
-    pub fn enable(&mut self) {
-        self.enabled = true;
-    }
-
-    pub fn disable(&mut self) {
-        self.enabled = false;
-    }
-
-    pub fn hit(&mut self) {
-        self.hit_count += 1;
-    }
-}
 
 /// Breakpoint representation for software debugger
 #[derive(Debug, Clone, Copy)]
@@ -234,7 +123,6 @@ pub struct Debugger {
 }
 
 impl Debugger {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             state: DebuggerState::Detached,

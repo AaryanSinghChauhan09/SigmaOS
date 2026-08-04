@@ -1,20 +1,16 @@
 // SigmaOS Filesystem Module
 pub mod archive;
-pub mod cow_snapshot;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
-pub mod smart_symlink;
+pub mod sigmafs;
+pub mod sigma_fs;
 
-pub use smart_symlink::{
-    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkKernelPersona, SymlinkResolverRule,
-};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
 };
-pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
 pub use disk_usage::{
     AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
     DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
@@ -28,3 +24,4 @@ pub use support::{
     SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use sigmafs::{DagNode, HashId, SigmaFS};
