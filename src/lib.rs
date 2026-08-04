@@ -112,6 +112,7 @@ pub use kernel::{
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
     IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+    VirtualCpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU, Instruction,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
