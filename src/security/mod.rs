@@ -25,6 +25,7 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
+pub mod nemoclaw;
 
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
@@ -101,3 +102,20 @@ pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
+// NemoClaw Security Primitives
+pub use nemoclaw::{
+    NemoClawError, PrivacyRouter, DefaultDenyNetworkPolicy, OpenShellAgentSandbox,
+};
+
+// Placeholder stubs for standard types to satisfy lib.rs exports
+pub struct CronDaemon;
+pub struct CronJob;
+pub struct DmesgLog;
+pub struct FirewallRule;
+pub struct IptablesFirewall;
+pub struct KaliError;
+pub struct PluggableAuthenticationModule;
+pub struct SudoPrivilegeEscalation;
+pub struct SwapSpaceManager;
+pub struct TmuxMultiplexer;
+pub struct TmuxPane;

@@ -30,7 +30,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashSet;
+use std::collections::HashSet;
 use sigma_types::{CapabilityToken, Result};
 
 /// Pledge namespaces representing different syscall categories

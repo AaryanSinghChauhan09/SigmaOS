@@ -296,3 +296,7 @@ impl AgentCommunication for SimpleAgentCommunication {
         self.messages.push((from, 0, msg_array));
     }
 }
+
+pub type DeviceTarget = crate::compatibility::TargetPlatform;
+pub type LocalLlmOrchestrator = SimpleAgentOrchestrator;
+pub type OrchestratorError = AgentError;
