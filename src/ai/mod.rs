@@ -10,6 +10,7 @@ pub mod voice;
 pub mod qwenpaw;
 pub mod perplexity;
 pub mod awesome_ai;
+pub mod open_computer;
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use qwenpaw::{PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentCommunicationProtocol};

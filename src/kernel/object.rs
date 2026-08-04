@@ -147,9 +147,6 @@ impl KernelObject for KObject {
     }
 }
 
-unsafe impl Send for KObject {}
-unsafe impl Sync for KObject {}
-
 impl Drop for KObject {
     fn drop(&mut self) {
         while self.children.pop().is_some() {}

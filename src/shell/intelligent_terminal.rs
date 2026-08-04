@@ -112,14 +112,14 @@ impl TerminalErrorHook {
         }
 
         let mut fix = "Review command syntax and try again.".to_string();
-        if stderr.contains("not found") || stderr.contains("not recognized") {
+        if stderr.contains("Cargo.toml") || stderr.contains("rustc") {
+            fix = "Fix Rust compiler diagnostics reported above.".to_string();
+        } else if stderr.contains("not found") || stderr.contains("not recognized") {
             fix = "Install the missing package or verify command spelling.".to_string();
         } else if stderr.contains("permission") || stderr.contains("Access denied") {
             fix = "Rerun the command with administrator privilege or 'sudo' equivalent.".to_string();
         } else if stderr.contains("syntax error") {
             fix = "Correct the syntax structure of your shell expression.".to_string();
-        } else if stderr.contains("Cargo.toml") || stderr.contains("rustc") {
-            fix = "Fix Rust compiler diagnostics reported above.".to_string();
         }
 
         let err = CapturedError {

@@ -131,35 +131,6 @@ impl BsdSocket for SimpleSocket {
     }
 }
 
-impl BsdSocket for SimpleSocket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => {
-                self.reuse_addr.store(val, Ordering::SeqCst);
-            }
-            SocketOption::TcpNoDelay => {
-                self.tcp_nodelay.store(val, Ordering::SeqCst);
-            }
-            SocketOption::RcvBuf => {
-                self.rcvbuf.store(val, Ordering::SeqCst);
-            }
-            SocketOption::SndBuf => {
-                self.sndbuf.store(val, Ordering::SeqCst);
-            }
-        }
-        Ok(())
-    }
-
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
-            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
-            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
-            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
-        }
-    }
-}
-
 pub trait TCPConnection {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError>;
     fn listen(&mut self) -> Result<(), NetworkError>;
@@ -248,12 +219,6 @@ pub struct RenoCongestionControl {
     pub ssthresh: AtomicUsize,
 }
 
-impl Default for RenoCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl RenoCongestionControl {
     pub fn new() -> Self {
         RenoCongestionControl {
@@ -292,12 +257,6 @@ pub struct BBRCongestionControl {
     pub cwnd: AtomicUsize,
     pub bw_estimate: AtomicUsize,
     pub rtt_min: AtomicUsize,
-}
-
-impl Default for BBRCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl BBRCongestionControl {
@@ -436,12 +395,6 @@ pub trait ZeroCopy {
 
 pub struct ZeroCopyNetwork {
     pub dma_buffer: AtomicUsize,
-}
-
-impl Default for ZeroCopyNetwork {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl ZeroCopyNetwork {
@@ -739,7 +692,7 @@ impl<T> Vec<T> {
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
             if self.capacity > 0 { free(self.data as *mut u8); }
@@ -749,7 +702,62 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+pub struct VecIter<'a, T> {
+    vec: &'a Vec<T>,
+    index: usize,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.vec.len() {
+            let item = unsafe { &*self.vec.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 
 impl<T> core::ops::Deref for Vec<T> {
