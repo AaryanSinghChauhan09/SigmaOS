@@ -1,5 +1,6 @@
 // SigmaOS Driver Module
 pub mod device;
+pub mod distro_drivers;
 pub mod framework;
 pub mod grid;
 pub mod irp_system;
@@ -8,6 +9,9 @@ pub mod pods;
 pub mod simulation;
 pub mod vault;
 
+pub use distro_drivers::{
+    BsdAudioMixer, CryptoCipher, LinuxDevtmpfsSimulator, OpenBsdCryptoDevice, PcmFrame,
+};
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use irp_system::{
     Apc, DeviceObject, Dpc, DriverObject, IoStatus, IoStatusBlock, Irp, IrpManager, Minifilter,
