@@ -113,18 +113,33 @@ pub fn log2(n: u32) -> u32 {
 }
 
 /// Custom logarithm base 10
-pub fn log10(mut n: u32) -> u32 {
+/// Optimised by Bolt ⚡: replaces iterative division loops with a constant-time O(1)
+/// binary decision-tree/range-based range evaluation that avoids slow division operations entirely.
+pub fn log10(n: u32) -> u32 {
     if n == 0 {
         return u32::MAX; // Undefined for 0
     }
-
-    let mut log = 0u32;
-    while n >= 10 {
-        n /= 10;
-        log += 1;
+    if n >= 100_000 {
+        if n >= 10_000_000 {
+            if n >= 100_000_000 {
+                if n >= 1_000_000_000 { 9 } else { 8 }
+            } else {
+                7
+            }
+        } else {
+            if n >= 1_000_000 { 6 } else { 5 }
+        }
+    } else {
+        if n >= 100 {
+            if n >= 1_000 {
+                if n >= 10_000 { 4 } else { 3 }
+            } else {
+                2
+            }
+        } else {
+            if n >= 10 { 1 } else { 0 }
+        }
     }
-
-    log
 }
 
 /// Greatest common divisor using Euclidean algorithm
@@ -302,5 +317,81 @@ mod tests {
         assert_eq!(floor(-3.7), -4);
         assert_eq!(ceil(3.2), 4);
         assert_eq!(ceil(-3.2), -3);
+    }
+
+    #[test]
+    fn test_log10_optimization() {
+        // Correctness check for powers of 10 and their boundaries
+        assert_eq!(log10(1), 0);
+        assert_eq!(log10(9), 0);
+        assert_eq!(log10(10), 1);
+        assert_eq!(log10(99), 1);
+        assert_eq!(log10(100), 2);
+        assert_eq!(log10(999), 2);
+        assert_eq!(log10(1000), 3);
+        assert_eq!(log10(9999), 3);
+        assert_eq!(log10(10000), 4);
+        assert_eq!(log10(99999), 4);
+        assert_eq!(log10(100000), 5);
+        assert_eq!(log10(999999), 5);
+        assert_eq!(log10(1000000), 6);
+        assert_eq!(log10(9999999), 6);
+        assert_eq!(log10(10000000), 7);
+        assert_eq!(log10(99999999), 7);
+        assert_eq!(log10(100000000), 8);
+        assert_eq!(log10(999999999), 8);
+        assert_eq!(log10(1000000000), 9);
+        assert_eq!(log10(4294967295), 9);
+
+        // Verification of correctness over all integers from 1 to 100_000
+        for i in 1..=100_000 {
+            let mut expected = 0;
+            let mut temp = i;
+            while temp >= 10 {
+                temp /= 10;
+                expected += 1;
+            }
+            assert_eq!(log10(i), expected, "Failed correctness check at {}", i);
+        }
+
+        // Simple benchmark to demonstrate the speedup
+        let iterations = 10_000_000;
+
+        let start = std::time::Instant::now();
+        let mut sum_opt = 0;
+        for i in 1..iterations {
+            sum_opt += log10(i as u32);
+        }
+        let duration_opt = start.elapsed();
+
+        // Baseline loop-based division implementation
+        fn baseline_log10(mut n: u32) -> u32 {
+            if n == 0 { return u32::MAX; }
+            let mut log = 0;
+            while n >= 10 {
+                n /= 10;
+                log += 1;
+            }
+            log
+        }
+
+        let start = std::time::Instant::now();
+        let mut sum_base = 0;
+        for i in 1..iterations {
+            sum_base += baseline_log10(i as u32);
+        }
+        let duration_base = start.elapsed();
+
+        assert_eq!(sum_opt, sum_base);
+
+        println!(
+            "\n⚡ log10 Performance Results ⚡\n\
+             Baseline iterative-division: {:?}\n\
+             Optimised O(1) decision-tree: {:?}\n\
+             Speedup: {:.2}x faster!\n",
+            duration_base,
+            duration_opt,
+            duration_base.as_secs_f64() / duration_opt.as_secs_f64()
+        );
     }
 }
