@@ -71,3 +71,18 @@ To systematically realize the architectural advantages of leading Linux distribu
 - **Time-Travel Execution:** The `TimeTravelEngine` records nanosecond-precision memory and virtual file system state checksums (RIP, mem, VFS). It allows the system to rewind any process namespace or container shell to a known secure checkpoint in the event of an error or vulnerability exploit.
 
 ---
+
+## 6. Gentoo Linux Source-Build & Portage USE Flags Integration (`src/distro/gentoo.rs`)
+
+To achieve complete architectural parity with Gentoo Linux and allow fine-grained compiler optimization coupled with conditional dependency compilation, SigmaOS implements a custom source-compilation and USE flags engine:
+
+### A. Fine-Grained USE Flag Management (`FeatureSet` and `UseFlag`)
+- **Per-Package and Global Overrides:** Allows defining both global and per-package overrides to toggle optional compilation features (e.g. `--enable-ssl` vs `--disable-ssl`), drastically cutting down attack surface and binary footprint.
+
+### B. Hardware-Specific CPU Target Tuning (`CpuOptimizationDetector`)
+- **Automated CPU Feature Detection:** Inspects micro-architectural capabilities at compile time (AVX2, AVX-512, AES-NI) and automatically constructs optimal GCC/Clang/Rust CFLAGS/RUSTFLAGS (e.g. `-C target-cpu=native -C opt-level=3`).
+
+### C. Portage-Style Build Graph Order Resolution (`SigmaBuildGraph`)
+- **Topological Sorting with Cycle Detection:** Resolves the complete topological ordering of build and runtime dependencies for any target package, with proactive detection of cyclic dependency deadlocks.
+
+---

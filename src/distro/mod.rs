@@ -7,10 +7,15 @@ pub mod enterprise;
 pub mod i18n;
 pub mod manjaro;
 pub mod nextgen;
+pub mod parity;
 pub mod recovery;
 pub mod specialized;
+pub mod gentoo;
 pub mod tiny_core;
 
+pub use gentoo::{
+    BuildError, BuildSpec, CpuOptimizationDetector, FeatureSet, SigmaBuildGraph, UseFlag,
+};
 pub use parity::{
     InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
     UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,

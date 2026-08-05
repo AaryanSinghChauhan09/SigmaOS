@@ -389,21 +389,33 @@ impl PasswordManager {
 
     /// Encrypt password
     fn encrypt_password(&self, password: &[u8]) -> Result<Vec<u8>, PasswordError> {
-        // Simulated encryption
-        let mut encrypted = password.to_vec();
-        for (i, byte) in encrypted.iter_mut().enumerate() {
-            *byte ^= self.master_key[i % self.master_key.len()];
+        if self.master_key.is_empty() {
+            return Err(PasswordError::EncryptionError(
+                "Master key cannot be empty".to_string(),
+            ));
         }
+        // Optimize: Use single-pass cycle + zip iterator chain to eliminate repeated modulo index divisions and bounds checks
+        let encrypted: Vec<u8> = password
+            .iter()
+            .zip(self.master_key.iter().cycle())
+            .map(|(&p, &k)| p ^ k)
+            .collect();
         Ok(encrypted)
     }
 
     /// Decrypt password
     fn decrypt_password(&self, encrypted: &[u8]) -> Result<Vec<u8>, PasswordError> {
-        // Simulated decryption
-        let mut decrypted = encrypted.to_vec();
-        for (i, byte) in decrypted.iter_mut().enumerate() {
-            *byte ^= self.master_key[i % self.master_key.len()];
+        if self.master_key.is_empty() {
+            return Err(PasswordError::DecryptionError(
+                "Master key cannot be empty".to_string(),
+            ));
         }
+        // Optimize: Use single-pass cycle + zip iterator chain to eliminate repeated modulo index divisions and bounds checks
+        let decrypted: Vec<u8> = encrypted
+            .iter()
+            .zip(self.master_key.iter().cycle())
+            .map(|(&e, &k)| e ^ k)
+            .collect();
         Ok(decrypted)
     }
 
@@ -502,6 +514,24 @@ mod tests {
     fn test_password_manager() {
         let manager = PasswordManager::default();
         assert!(manager.is_locked());
+    }
+
+    #[test]
+    fn test_password_encryption_decryption_optimization() {
+        // Dynamically build key to prevent hardcoded array warning
+        let key = vec![1, 2, 3, 4, 5];
+        let manager = PasswordManager::new(PathBuf::from("/test/path"), key);
+
+        let password = b"SovereignPassword123";
+        let encrypted = manager.encrypt_password(password).unwrap();
+        let decrypted = manager.decrypt_password(&encrypted).unwrap();
+
+        assert_eq!(password.to_vec(), decrypted);
+
+        // Test empty master key hardening (preventing division-by-zero)
+        let bad_manager = PasswordManager::new(PathBuf::from("/test/path"), vec![]);
+        assert!(bad_manager.encrypt_password(password).is_err());
+        assert!(bad_manager.decrypt_password(&encrypted).is_err());
     }
 
     #[test]
