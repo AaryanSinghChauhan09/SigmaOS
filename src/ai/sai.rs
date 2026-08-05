@@ -521,14 +521,22 @@ impl SovereignWorkflowEngine {
         let mut executed_count = 0;
         let node_len = self.nodes.len();
 
+        // Take a snapshot of states before this pass
+        let previous_states: Vec<bool> = self.nodes.iter().map(|n| n.state_executed).collect();
+
         for i in 0..node_len {
+            if self.nodes[i].state_executed {
+                executed_count += 1;
+                continue;
+            }
+
             // Check if independent or its dependency was already executed
             let can_execute = match self.nodes[i].depends_on {
                 None => true,
                 Some(dep_id) => {
                     let mut dep_ok = false;
                     for j in 0..node_len {
-                        if self.nodes[j].id == dep_id && self.nodes[j].state_executed {
+                        if self.nodes[j].id == dep_id && previous_states[j] {
                             dep_ok = true;
                             break;
                         }
