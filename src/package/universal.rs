@@ -181,15 +181,24 @@ pub trait InstallStrategy: Send + Sync {
 pub struct DebianInstallStrategy;
 impl InstallStrategy for DebianInstallStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("DebianStrategy: Executing preinst/postinst for package: {}", package.name);
+        println!(
+            "DebianStrategy: Executing preinst/postinst for package: {}",
+            package.name
+        );
         Ok(())
     }
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("DebianStrategy: Purging configuration files and executing prerm/postrm for {}", package.name);
+        println!(
+            "DebianStrategy: Purging configuration files and executing prerm/postrm for {}",
+            package.name
+        );
         Ok(())
     }
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("DebianStrategy: Upgrading existing package: {}", package.name);
+        println!(
+            "DebianStrategy: Upgrading existing package: {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -197,15 +206,24 @@ impl InstallStrategy for DebianInstallStrategy {
 pub struct RpmInstallStrategy;
 impl InstallStrategy for RpmInstallStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("RpmStrategy: Verifying headers, running %pre and %post scriptlets for {}", package.name);
+        println!(
+            "RpmStrategy: Verifying headers, running %pre and %post scriptlets for {}",
+            package.name
+        );
         Ok(())
     }
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("RpmStrategy: Processing rpm-database deletion of {}", package.name);
+        println!(
+            "RpmStrategy: Processing rpm-database deletion of {}",
+            package.name
+        );
         Ok(())
     }
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("RpmStrategy: Transactionally upgrading rpm package: {}", package.name);
+        println!(
+            "RpmStrategy: Transactionally upgrading rpm package: {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -213,15 +231,24 @@ impl InstallStrategy for RpmInstallStrategy {
 pub struct PacmanInstallStrategy;
 impl InstallStrategy for PacmanInstallStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("PacmanStrategy: Re-syncing local pacman databases and unpacking zst payload for {}", package.name);
+        println!(
+            "PacmanStrategy: Re-syncing local pacman databases and unpacking zst payload for {}",
+            package.name
+        );
         Ok(())
     }
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("PacmanStrategy: Removing and cleaning orphan packages for {}", package.name);
+        println!(
+            "PacmanStrategy: Removing and cleaning orphan packages for {}",
+            package.name
+        );
         Ok(())
     }
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("PacmanStrategy: Rolling release pacman -Syu replacement for {}", package.name);
+        println!(
+            "PacmanStrategy: Rolling release pacman -Syu replacement for {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -233,11 +260,17 @@ impl InstallStrategy for GentooInstallStrategy {
         Ok(())
     }
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("GentooStrategy: Emerge -C clean operation on {}", package.name);
+        println!(
+            "GentooStrategy: Emerge -C clean operation on {}",
+            package.name
+        );
         Ok(())
     }
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("GentooStrategy: Re-compiling and installing dependencies for Gentoo package: {}", package.name);
+        println!(
+            "GentooStrategy: Re-compiling and installing dependencies for Gentoo package: {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -249,11 +282,17 @@ impl InstallStrategy for NixInstallStrategy {
         Ok(())
     }
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("NixStrategy: Removing declarative store path for {}", package.name);
+        println!(
+            "NixStrategy: Removing declarative store path for {}",
+            package.name
+        );
         Ok(())
     }
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("NixStrategy: Updating isolated profile link generation for {}", package.name);
+        println!(
+            "NixStrategy: Updating isolated profile link generation for {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -265,11 +304,17 @@ impl InstallStrategy for FlatpakInstallStrategy {
         Ok(())
     }
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("FlatpakStrategy: Unregistering bubblewrap sandbox and app files for {}", package.name);
+        println!(
+            "FlatpakStrategy: Unregistering bubblewrap sandbox and app files for {}",
+            package.name
+        );
         Ok(())
     }
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("FlatpakStrategy: Pulling OSTree delta update block layers for Flatpak: {}", package.name);
+        println!(
+            "FlatpakStrategy: Pulling OSTree delta update block layers for Flatpak: {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -277,15 +322,24 @@ impl InstallStrategy for FlatpakInstallStrategy {
 pub struct ApkInstallStrategy;
 impl InstallStrategy for ApkInstallStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("ApkStrategy: Running apk add simulation for {}", package.name);
+        println!(
+            "ApkStrategy: Running apk add simulation for {}",
+            package.name
+        );
         Ok(())
     }
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("ApkStrategy: Running apk del simulation for {}", package.name);
+        println!(
+            "ApkStrategy: Running apk del simulation for {}",
+            package.name
+        );
         Ok(())
     }
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("ApkStrategy: Running apk upgrade simulation for {}", package.name);
+        println!(
+            "ApkStrategy: Running apk upgrade simulation for {}",
+            package.name
+        );
         Ok(())
     }
 }
@@ -295,15 +349,24 @@ pub struct DefaultInstallStrategy {
 }
 impl InstallStrategy for DefaultInstallStrategy {
     fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("DefaultStrategy: Deploying package {} under format {}", package.name, self.format_name);
+        println!(
+            "DefaultStrategy: Deploying package {} under format {}",
+            package.name, self.format_name
+        );
         Ok(())
     }
     fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("DefaultStrategy: Removing package {} under format {}", package.name, self.format_name);
+        println!(
+            "DefaultStrategy: Removing package {} under format {}",
+            package.name, self.format_name
+        );
         Ok(())
     }
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("DefaultStrategy: Updating package {} under format {}", package.name, self.format_name);
+        println!(
+            "DefaultStrategy: Updating package {} under format {}",
+            package.name, self.format_name
+        );
         Ok(())
     }
 }
@@ -331,7 +394,9 @@ impl PackageObserver for LdConfigTrigger {
     }
     fn on_event(&self, event: PackageEvent, _package: &UnifiedPackage) {
         if event == PackageEvent::AfterInstall {
-            println!("LdConfigTrigger: Rebuilding system shared library cache dynamically (ldconfig).");
+            println!(
+                "LdConfigTrigger: Rebuilding system shared library cache dynamically (ldconfig)."
+            );
         }
     }
 }
@@ -343,9 +408,15 @@ impl PackageObserver for SystemdServiceTrigger {
     }
     fn on_event(&self, event: PackageEvent, package: &UnifiedPackage) {
         if event == PackageEvent::AfterInstall {
-            println!("SystemdTrigger: Registering, enabling, and starting service units for {}", package.name);
+            println!(
+                "SystemdTrigger: Registering, enabling, and starting service units for {}",
+                package.name
+            );
         } else if event == PackageEvent::BeforeRemove {
-            println!("SystemdTrigger: Disabling and stopping system services for {}", package.name);
+            println!(
+                "SystemdTrigger: Disabling and stopping system services for {}",
+                package.name
+            );
         }
     }
 }
@@ -370,7 +441,9 @@ pub trait PackageCapabilityDecorator: Send + Sync {
 pub struct SandboxedPackageDecorator;
 impl PackageCapabilityDecorator for SandboxedPackageDecorator {
     fn decorate(&self, package: &mut UnifiedPackage) {
-        package.capabilities.push("Sandboxed (cgroups/ns)".to_string());
+        package
+            .capabilities
+            .push("Sandboxed (cgroups/ns)".to_string());
     }
 }
 
@@ -384,7 +457,9 @@ impl PackageCapabilityDecorator for NetworkRestrictedDecorator {
 pub struct HighPriorityDecorator;
 impl PackageCapabilityDecorator for HighPriorityDecorator {
     fn decorate(&self, package: &mut UnifiedPackage) {
-        package.capabilities.push("High Priority (System Critical)".to_string());
+        package
+            .capabilities
+            .push("High Priority (System Critical)".to_string());
     }
 }
 
@@ -461,7 +536,12 @@ impl ForeignMetadataAdapter for PkgBuildAdapter {
                     "pkgname" => package.name = val.trim().replace('"', "").replace('\'', ""),
                     "pkgver" => package.version = val.trim().replace('"', "").replace('\'', ""),
                     "depends" => {
-                        let cleaned = val.trim().replace('(', "").replace(')', "").replace('"', "").replace('\'', "");
+                        let cleaned = val
+                            .trim()
+                            .replace('(', "")
+                            .replace(')', "")
+                            .replace('"', "")
+                            .replace('\'', "");
                         for dep in cleaned.split_whitespace() {
                             package = package.with_dependency(dep.to_string());
                         }
@@ -668,7 +748,8 @@ pub struct UniversalPackageManager {
     // Advanced OOP fields
     pub strategies: HashMap<PackageFormat, Arc<dyn InstallStrategy>>,
     pub observers: Vec<Arc<dyn PackageObserver>>,
-    pub udfs: HashMap<String, Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>>,
+    pub udfs:
+        HashMap<String, Arc<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>>,
 }
 
 impl UniversalPackageManager {
@@ -709,20 +790,31 @@ impl UniversalPackageManager {
     }
 
     fn add_default_strategies(&mut self) {
-        self.strategies.insert(PackageFormat::Deb, Arc::new(DebianInstallStrategy));
-        self.strategies.insert(PackageFormat::Rpm, Arc::new(RpmInstallStrategy));
-        self.strategies.insert(PackageFormat::Pacman, Arc::new(PacmanInstallStrategy));
-        self.strategies.insert(PackageFormat::Ebuild, Arc::new(GentooInstallStrategy));
-        self.strategies.insert(PackageFormat::Nix, Arc::new(NixInstallStrategy));
-        self.strategies.insert(PackageFormat::Flatpak, Arc::new(FlatpakInstallStrategy));
-        self.strategies.insert(PackageFormat::Apk, Arc::new(ApkInstallStrategy));
+        self.strategies
+            .insert(PackageFormat::Deb, Arc::new(DebianInstallStrategy));
+        self.strategies
+            .insert(PackageFormat::Rpm, Arc::new(RpmInstallStrategy));
+        self.strategies
+            .insert(PackageFormat::Pacman, Arc::new(PacmanInstallStrategy));
+        self.strategies
+            .insert(PackageFormat::Ebuild, Arc::new(GentooInstallStrategy));
+        self.strategies
+            .insert(PackageFormat::Nix, Arc::new(NixInstallStrategy));
+        self.strategies
+            .insert(PackageFormat::Flatpak, Arc::new(FlatpakInstallStrategy));
+        self.strategies
+            .insert(PackageFormat::Apk, Arc::new(ApkInstallStrategy));
         self.strategies.insert(
             PackageFormat::AppImage,
-            Arc::new(DefaultInstallStrategy { format_name: "AppImage".to_string() }),
+            Arc::new(DefaultInstallStrategy {
+                format_name: "AppImage".to_string(),
+            }),
         );
         self.strategies.insert(
             PackageFormat::SigmaPkg,
-            Arc::new(DefaultInstallStrategy { format_name: "SigmaPkg".to_string() }),
+            Arc::new(DefaultInstallStrategy {
+                format_name: "SigmaPkg".to_string(),
+            }),
         );
     }
 
@@ -863,7 +955,10 @@ impl UniversalPackageManager {
             }
 
             if !removed_ok {
-                println!("No custom strategy found for package '{}' during removal.", package.name);
+                println!(
+                    "No custom strategy found for package '{}' during removal.",
+                    package.name
+                );
             }
 
             package.transition_to(PackageStateEnum::Uninstalled);
@@ -924,20 +1019,32 @@ impl UniversalPackageManager {
                 } else if parts.len() >= 3 && parts[1] == "remove" {
                     let name = parts[2];
                     self.remove(name)?;
-                    Ok(format!("Translated 'apt remove {}' and removed successfully.", name))
+                    Ok(format!(
+                        "Translated 'apt remove {}' and removed successfully.",
+                        name
+                    ))
                 } else {
-                    Err(PackageError::PackageNotFound(format!("Unsupported apt command: {}", cmd)))
+                    Err(PackageError::PackageNotFound(format!(
+                        "Unsupported apt command: {}",
+                        cmd
+                    )))
                 }
             }
             "pacman" => {
                 if parts.len() >= 3 && parts[1] == "-S" {
                     let name = parts[2];
                     self.install(name)?;
-                    Ok(format!("Translated 'pacman -S {}' and installed successfully.", name))
+                    Ok(format!(
+                        "Translated 'pacman -S {}' and installed successfully.",
+                        name
+                    ))
                 } else if parts.len() >= 3 && parts[1] == "-R" {
                     let name = parts[2];
                     self.remove(name)?;
-                    Ok(format!("Translated 'pacman -R {}' and removed successfully.", name))
+                    Ok(format!(
+                        "Translated 'pacman -R {}' and removed successfully.",
+                        name
+                    ))
                 } else {
                     Err(PackageError::PackageNotFound(format!(
                         "Unsupported pacman command: {}",
@@ -949,11 +1056,17 @@ impl UniversalPackageManager {
                 if parts.len() >= 3 && parts[1] == "install" {
                     let name = parts[2];
                     self.install(name)?;
-                    Ok(format!("Translated '{} install {}' and installed successfully.", parts[0], name))
+                    Ok(format!(
+                        "Translated '{} install {}' and installed successfully.",
+                        parts[0], name
+                    ))
                 } else if parts.len() >= 3 && parts[1] == "remove" {
                     let name = parts[2];
                     self.remove(name)?;
-                    Ok(format!("Translated '{} remove {}' and removed successfully.", parts[0], name))
+                    Ok(format!(
+                        "Translated '{} remove {}' and removed successfully.",
+                        parts[0], name
+                    ))
                 } else {
                     Err(PackageError::PackageNotFound(format!(
                         "Unsupported {} command: {}",
@@ -965,18 +1078,30 @@ impl UniversalPackageManager {
                 if parts.len() >= 3 && parts[1] == "-i" {
                     let name = parts[2];
                     self.install(name)?;
-                    Ok(format!("Translated 'nix-env -i {}' and installed functionally.", name))
+                    Ok(format!(
+                        "Translated 'nix-env -i {}' and installed functionally.",
+                        name
+                    ))
                 } else {
-                    Err(PackageError::PackageNotFound(format!("Unsupported nix command: {}", cmd)))
+                    Err(PackageError::PackageNotFound(format!(
+                        "Unsupported nix command: {}",
+                        cmd
+                    )))
                 }
             }
             "emerge" => {
                 if parts.len() >= 2 {
                     let name = parts[parts.len() - 1];
                     self.install(name)?;
-                    Ok(format!("Translated 'emerge {}' and compiled successfully via Gentoo ebuild.", name))
+                    Ok(format!(
+                        "Translated 'emerge {}' and compiled successfully via Gentoo ebuild.",
+                        name
+                    ))
                 } else {
-                    Err(PackageError::PackageNotFound(format!("Unsupported emerge command: {}", cmd)))
+                    Err(PackageError::PackageNotFound(format!(
+                        "Unsupported emerge command: {}",
+                        cmd
+                    )))
                 }
             }
             _ => {
@@ -985,7 +1110,10 @@ impl UniversalPackageManager {
                     self.install(name)?;
                     Ok(format!("Installed package '{}' natively.", name))
                 } else {
-                    Err(PackageError::PackageNotFound(format!("Unknown command driver: {}", cmd)))
+                    Err(PackageError::PackageNotFound(format!(
+                        "Unknown command driver: {}",
+                        cmd
+                    )))
                 }
             }
         }
@@ -1110,7 +1238,9 @@ mod tests {
 
         let decorator_sandbox = SandboxedPackageDecorator;
         decorator_sandbox.decorate(&mut pkg);
-        assert!(pkg.capabilities.contains(&"Sandboxed (cgroups/ns)".to_string()));
+        assert!(pkg
+            .capabilities
+            .contains(&"Sandboxed (cgroups/ns)".to_string()));
 
         let decorator_net = NetworkRestrictedDecorator;
         decorator_net.decorate(&mut pkg);
@@ -1118,25 +1248,33 @@ mod tests {
 
         let decorator_prio = HighPriorityDecorator;
         decorator_prio.decorate(&mut pkg);
-        assert!(pkg.capabilities.contains(&"High Priority (System Critical)".to_string()));
+        assert!(pkg
+            .capabilities
+            .contains(&"High Priority (System Critical)".to_string()));
     }
 
     #[test]
     fn test_adapters() {
         // Test Deb Control file adapter
         let control_data = ForeignMetadata {
-            raw_content: "Package: super-deb\nVersion: 2.3.4\nDepends: dep1, dep2\nConflicts: old-pkg".to_string(),
+            raw_content:
+                "Package: super-deb\nVersion: 2.3.4\nDepends: dep1, dep2\nConflicts: old-pkg"
+                    .to_string(),
             format: PackageFormat::Deb,
         };
         let adapted_deb = ControlFileAdapter.adapt(&control_data).unwrap();
         assert_eq!(adapted_deb.name, "super-deb");
         assert_eq!(adapted_deb.version, "2.3.4");
-        assert_eq!(adapted_deb.dependencies, vec!["dep1".to_string(), "dep2".to_string()]);
+        assert_eq!(
+            adapted_deb.dependencies,
+            vec!["dep1".to_string(), "dep2".to_string()]
+        );
         assert_eq!(adapted_deb.conflicts, vec!["old-pkg".to_string()]);
 
         // Test RPM SPEC file adapter
         let spec_data = ForeignMetadata {
-            raw_content: "Name: super-rpm\nVersion: 4.1.0\nRequires: glibc\nConflicts: bad-rpm".to_string(),
+            raw_content: "Name: super-rpm\nVersion: 4.1.0\nRequires: glibc\nConflicts: bad-rpm"
+                .to_string(),
             format: PackageFormat::Rpm,
         };
         let adapted_rpm = SpecFileAdapter.adapt(&spec_data).unwrap();
@@ -1147,13 +1285,17 @@ mod tests {
 
         // Test PKGBUILD adapter
         let pkgbuild_data = ForeignMetadata {
-            raw_content: "pkgname=\"super-arch\"\npkgver=\"1.5.0\"\ndepends=('openssl' 'zlib')".to_string(),
+            raw_content: "pkgname=\"super-arch\"\npkgver=\"1.5.0\"\ndepends=('openssl' 'zlib')"
+                .to_string(),
             format: PackageFormat::Pacman,
         };
         let adapted_pacman = PkgBuildAdapter.adapt(&pkgbuild_data).unwrap();
         assert_eq!(adapted_pacman.name, "super-arch");
         assert_eq!(adapted_pacman.version, "1.5.0");
-        assert_eq!(adapted_pacman.dependencies, vec!["openssl".to_string(), "zlib".to_string()]);
+        assert_eq!(
+            adapted_pacman.dependencies,
+            vec!["openssl".to_string(), "zlib".to_string()]
+        );
     }
 
     #[test]
@@ -1168,7 +1310,8 @@ mod tests {
 
         let mut pkg = UnifiedPackage::new("custom-app".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::Apk);
-        pkg.post_install_scripts.push("my_custom_post_install".to_string());
+        pkg.post_install_scripts
+            .push("my_custom_post_install".to_string());
 
         manager.add_package(pkg);
         assert!(manager.install("custom-app").is_ok());

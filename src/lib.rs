@@ -82,13 +82,12 @@ pub use klib::{
     uvm::{UvmAmap, UvmError, UvmPageLoan, UvmPmap},
 };
 pub use network::{
-    EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
-    TcpStack, TcpState, NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
-    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
-    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
-    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
-    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
-    ClearLinuxFlowLoadBalancer,
+    AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,
+    ClearLinuxFlowLoadBalancer, ConnectionInfo, ConnectionState, EnterpriseNetworkError,
+    GentooUseFlagsDissector, IPv6Address, KaliPacketFingerprinter, KaliSnoopAnalysis,
+    NetworkTrafficAnalyzer, NixDeclarativeFilter, Protocol, SecureVpnTunnel, SecurityAnalysis,
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState, TrafficAlert, TrafficPacket,
+    TrafficStatistics,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
