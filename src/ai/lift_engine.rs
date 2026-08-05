@@ -3,7 +3,7 @@
 // JSON schemas, deterministic exact-match structured extraction, multi-source aggregation,
 // near-miss distraction filtering, citations/verification tracking, and high-performance single-pass execution.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Simple schema types supported by the extractor
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

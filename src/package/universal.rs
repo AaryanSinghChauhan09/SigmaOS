@@ -1,9 +1,8 @@
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, ebuild, apk, nix, etc.
 
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::sync::Arc;
+use crate::klib::HashMap;
+use crate::klib::HashSet;
 
 /// Package format type supporting 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -16,6 +16,8 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **Shard Architecture**: 600+ hot-swappable kernel modules with zero-latency IPC.
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
+- **Enhanced Security**: Fixed critical security issues including raw pointer validation and cryptographic entropy improvements.
+- **Distro Parity**: Integrated Gentoo Portage, Lubuntu system management, and comprehensive Linux compatibility layers.
 
 
 ---

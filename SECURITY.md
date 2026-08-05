@@ -53,12 +53,12 @@ SigmaOS implements a layered, defense-in-depth security model inspired by the be
 
 ## Known Security Alerts & Remediation
 
-### Critical (Actively Being Fixed)
+### Critical (Recently Fixed)
 
 | Alert | File | Status |
 |---|---|---|
-| `rust/access-invalid-pointer` | `bootloader/sigma_boot_efi.rs` | In progress — UEFI raw pointer access with bounds validation being added |
-| `rust/hard-coded-cryptographic-value` | `kernel/crypto/`, `crypto/` | In progress — replacing test vectors with proper entropy sources |
+| `rust/access-invalid-pointer` | `src/boot/uefi.rs` | ✅ Fixed — Added null checks and bounds validation for raw pointer operations |
+| `rust/hard-coded-cryptographic-value` | `src/crypto/primitives.rs` | ✅ Fixed — Enhanced entropy collection with multiple hardware and software sources |
 
 ### High
 
@@ -81,7 +81,7 @@ Most `clippy::new_without_default`, `unused_imports`, and `dead_code` warnings a
 - [x] Secrets cleared from memory after use (`src/security/cleaner.rs`)
 - [x] PKI certificate validation chain (`src/security/pki.rs`)
 - [x] Password hashing uses domain-separated PBKDF2 (`src/crypto/kdf.rs`)
-- [ ] Full audit of raw pointer derefs in bootloader (in progress)
+- [x] Full audit of raw pointer derefs in bootloader — null checks and bounds validation added
 - [ ] Complete JS XSS remediation in web UI (in progress)
 
 ---

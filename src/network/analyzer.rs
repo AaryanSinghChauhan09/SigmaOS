@@ -19,20 +19,46 @@
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
 
-use std::collections::HashMap;
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::time::{Duration, Instant};
+use crate::klib::HashMap;
+
+// Simple IP address types to replace std::net
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct SigmaIpv4Addr {
+    pub octets: [u8; 4],
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct SigmaIpv6Addr {
+    pub octets: [u8; 16],
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SigmaIpAddr {
+    V4(SigmaIpv4Addr),
+    V6(SigmaIpv6Addr),
+}
+
+// Simple time types to replace std::time
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SigmaDuration {
+    pub millis: u64,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct SigmaInstant {
+    pub millis: u64,
+}
 
 /// Traffic packet
 #[derive(Debug, Clone)]
 pub struct TrafficPacket {
-    pub source_ip: IpAddr,
-    pub destination_ip: IpAddr,
+    pub source_ip: SigmaIpAddr,
+    pub destination_ip: SigmaIpAddr,
     pub source_port: u16,
     pub destination_port: u16,
     pub protocol: Protocol,
     pub size_bytes: u64,
-    pub timestamp: Instant,
+    pub timestamp: SigmaInstant,
 }
 
 /// Network protocol

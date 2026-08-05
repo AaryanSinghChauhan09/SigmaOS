@@ -4,7 +4,7 @@
 // and topological sort build order dependency resolution.
 
 use crate::klib::HashMap;
-use std::collections::HashSet;
+use crate::klib::HashSet;
 use crate::sigpkg::Version;
 
 /// Portage USE Flag feature representation

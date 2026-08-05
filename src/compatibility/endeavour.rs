@@ -4,7 +4,7 @@
 // such as the Welcome assistant, Reflector mirror ranking, update notifier daemon,
 // log sharing tool with sanitization, and the Yay AUR helper translator.
 
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Represents a package mirror in the SigmaOS network.
 #[derive(Debug, Clone, PartialEq)]

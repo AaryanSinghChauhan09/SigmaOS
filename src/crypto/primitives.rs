@@ -375,14 +375,14 @@ pub fn sha256_hash(data: &[u8]) -> SHA256Hash {
     hasher.finalize()
 }
 
-/// Generate random bytes
+/// Generate random bytes with enhanced entropy collection
 pub fn random_bytes(buf: &mut [u8]) {
     static mut RNG: Option<XorshiftRNG> = None;
     
     unsafe {
         if RNG.is_none() {
-            // Remediation of hardcoded cryptographic seed via multi-source hardware entropy mixing
-            let mut seed = 0x5eece66d_u64;
+            // Enhanced entropy collection with multiple sources
+            let mut seed = 0u64;
 
             // 1. Hardware entropy mixing via RDTSC Time Stamp Counter if on x86_64
             #[cfg(target_arch = "x86_64")]
@@ -394,8 +394,18 @@ pub fn random_bytes(buf: &mut [u8]) {
             let aslr_ptr = &RNG as *const _ as usize as u64;
             seed = seed.wrapping_xor(aslr_ptr);
 
-            // 3. Final chaotic mixing multiplication
-            seed = seed.wrapping_mul(0x5851f42d4c957f2d).wrapping_add(1);
+            // 3. Stack address entropy
+            let stack_var = 0u64;
+            let stack_ptr = &stack_var as *const _ as usize as u64;
+            seed = seed.wrapping_xor(stack_ptr);
+
+            // 4. Additional chaotic mixing with prime constants
+            seed = seed.wrapping_mul(0x5851f42d4c957f2d)
+                   .wrapping_add(0xbf58476d1ce4e5b9)
+                   .rotate_left(13);
+
+            // 5. Final mixing
+            seed = seed.wrapping_mul(0x94d049bb133111eb);
 
             RNG = Some(XorshiftRNG::new(seed));
         }
