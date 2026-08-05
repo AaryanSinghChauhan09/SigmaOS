@@ -7,7 +7,9 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
-use core::mem;
+extern crate alloc;
+use alloc::boxed::Box;
+
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -479,7 +481,7 @@ impl PackageManager for SimplePackageManager {
                     let p_ref: &dyn Package = pkg.as_ref();
                     let dep_name = dep.name;
                     let pkg_name = p_ref.name();
-
+                    
                     let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
                     let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
 

@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 //! SigmaOS GST Act, 2017 Compatibility
 //! Goods and Services Tax ledger auditing and tax split calculators
 //! Zero external dependencies

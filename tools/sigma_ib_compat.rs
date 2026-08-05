@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 //! SigmaOS Insolvency and Bankruptcy Code (IBC), 2016 Compatibility
 //! Corporate Insolvency Resolution Process (CIRP) timeline and CoC voting auditors
 //! Zero external dependencies

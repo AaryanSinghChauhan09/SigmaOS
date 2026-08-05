@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 //! SigmaOS Digital Personal Data Protection (DPDP) Act, 2023 Compatibility
 //! Personal data consent, erasure compliance audits, and statutory penalty calculations
 //! Zero external dependencies
