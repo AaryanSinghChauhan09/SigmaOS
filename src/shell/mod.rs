@@ -2,6 +2,7 @@
 pub mod command;
 pub mod intelligent_terminal;
 pub mod repl;
+pub mod intelligent_terminal;
 
 pub use command::{CommandError, ShellSession, SimpleShellSession};
 pub use intelligent_terminal::{

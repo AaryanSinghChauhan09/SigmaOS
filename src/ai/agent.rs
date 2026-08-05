@@ -11,6 +11,7 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::sigpkg::ManagerCapability;
 
 /// Intent type
 #[repr(C)]
@@ -92,6 +93,9 @@ pub struct AgentCapability {
 }
 
 impl AgentCapability {
+    pub fn new() -> Self {
+        Self::none()
+    }
     pub fn full() -> Self {
         AgentCapability { value: !0 }
     }
