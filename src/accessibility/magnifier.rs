@@ -1,4 +1,6 @@
+extern crate alloc;
 use crate::klib::Vec;
+use alloc::boxed::Box;
 /// OOP-based Screen Magnifier for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 826
 /// Implements screen magnification and zoom

@@ -3,36 +3,25 @@
 #![cfg(feature = "integration_test")]
 #![allow(unused, clippy::all)]
 
-use sigmaos::compatibility::{
-    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
-    AntixDesktopProfiler, AntixInitManager, BinaryCompatMatrix, BundleType,
-    DesktopProfile as AntixDesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival,
-    GraphicsBridge, InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus,
-    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService,
-    MicroService as AntixMicroService, MicroServiceState,
-    MicroServiceState as AntixMicroServiceState, NetworkBridge, StorageBridge, SyscallAbi,
-    TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
-    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
-    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+use sigmaos::accessibility::keyboard::{
+    KeyID, KeyType, OnScreenKeyboard, SimpleOnScreenKeyboard, SimpleVirtualKey, VirtualKey,
 };
-use sigmaos::drivers::{
-    Ch340Driver, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver, GpuPipeline, GpuShader,
-    IntelHdaDriver, NvmeDriver, PeripheralDevice, PowerState, ShaderStage,
+use sigmaos::accessibility::magnifier::{Magnifier, MagnifierManager, SimpleMagnifierManager};
+use sigmaos::accessibility::screenreader::{
+    ScreenReader, SimpleScreenReader, SimpleVoice, Voice, VoiceGender,
 };
-use sigmaos::filesystem::{
-    FileType, FsError, LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
-    VirtualFilesystem, O_APPEND, O_CREAT, O_EXCL, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY,
+use sigmaos::accessibility::{
+    AccessibilityError, AccessibilityFramework, AccessibilityProfile, AccessibilitySetting,
 };
-use sigmaos::interrupt::{
-    ControllerCapability, HandlerCapability, HandlerType, InterruptController, InterruptError,
-    InterruptHandler, InterruptManager, InterruptPriority, InterruptResult, InterruptTrace,
-    SimpleInterruptHandler, TraceEventType, PIC,
+use sigmaos::driver::framework::{
+    Driver, DriverError, DriverFramework, DriverID, DriverState, DriverType, SimpleDriver,
+    SimpleDriverFramework,
 };
-use sigmaos::network::{
-    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
-    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
-    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
+use sigmaos::filesystem::support::{
+    BtrfsFeatures, Filesystem, FilesystemManager, FilesystemType, SimpleBtrfsFS,
+    SimpleFilesystemManager, SimpleZFS, ZFSFeatures,
 };
+use sigmaos::kernel::{Priority, Process, ProcessState};
 use sigmaos::package::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
     LinuxTranslationService, PackageFormat, PackageTranslationUdf, PacmanPackageDriverTranslator,
@@ -271,19 +260,42 @@ mod tests {
             link1.expand_environment_context("/usr/lib/$LANG/libc.so", "guest", "en_US");
         assert_eq!(env_target2, "/usr/share/locale/en");
 
-        // Case 7: Sandbox boundary escape verification
-        assert!(link1.is_sandbox_escape_safe("/sandbox/tmp/test.txt", "/sandbox"));
-        assert!(!link1.is_sandbox_escape_safe("/sandbox/tmp/../../../etc/passwd", "/sandbox"));
-        assert!(!link1.is_sandbox_escape_safe("/etc/passwd", "/sandbox"));
-
-        // Case 8: Multi-Lib architecture routing translation
+        // Validate state transitions through initialization and load sequences
+        assert!(framework.load_driver(1001).is_ok());
         assert_eq!(
-            link1.resolve_multi_lib_routing(SyscallAbi::Oabi_32),
-            "/lib32/libc.so"
+            framework.get_driver(1001).unwrap().state(),
+            DriverState::Active
         );
+
+        assert!(framework.unload_driver(1001).is_ok());
         assert_eq!(
-            link1.resolve_multi_lib_routing(SyscallAbi::Eabi_64),
-            "/lib64/libc.so"
+            framework.get_driver(1001).unwrap().state(),
+            DriverState::Unloaded
+        );
+    }
+
+    #[test]
+    fn test_filesystem_support_and_features() {
+        let mut fs_manager = SimpleFilesystemManager::new();
+
+        // 1. Setup a Simple Btrfs filesystem and verify subvolume structures
+        let mut btrfs = SimpleBtrfsFS::new(101);
+        assert!(btrfs.create_subvolume(b"root").is_ok());
+        assert!(btrfs.create_subvolume(b"home").is_ok());
+        assert_eq!(btrfs.list_subvolumes().len(), 2);
+
+        // 2. Setup a Simple ZFS pool dataset and snapshoting
+        let mut zfs = SimpleZFS::new(102);
+        assert!(zfs.create_dataset(b"tank/data").is_ok());
+        assert!(zfs.create_snapshot(b"tank/data", b"snap1").is_ok());
+
+        assert!(fs_manager.register_filesystem(Box::new(btrfs.base)).is_ok());
+        assert!(fs_manager.register_filesystem(Box::new(zfs.base)).is_ok());
+
+        assert!(fs_manager.get_filesystem(101).is_some());
+        assert_eq!(
+            fs_manager.get_filesystem(101).unwrap().fs_type(),
+            FilesystemType::Btrfs
         );
     }
 

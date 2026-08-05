@@ -1,4 +1,6 @@
+extern crate alloc;
 use crate::klib::Vec;
+use alloc::boxed::Box;
 /// OOP-based Screen Reader for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 816
 /// Implements text-to-speech and accessibility

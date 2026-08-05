@@ -32,7 +32,7 @@ pub use sigma_fs::{
 };
 pub use smart_symlink::{SmartSymlink, SymlinkError};
 pub use support::{
-    Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
-    SimpleFilesystemManager,
+    Filesystem, FilesystemError, FilesystemManager, FilesystemType, LegacyLinuxRule,
+    LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};

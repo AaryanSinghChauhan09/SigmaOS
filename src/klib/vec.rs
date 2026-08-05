@@ -6,9 +6,8 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
+impl<T: PartialEq> Vec<T> {
+    pub fn contains(&self, item: &T) -> bool {
         for i in 0..self.len {
             unsafe {
                 new_vec.push((*self.data.add(i)).clone());
@@ -31,6 +30,16 @@ impl<T> Default for Vec<T> {
 }
 
 impl<T> Vec<T> {
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
@@ -109,6 +118,23 @@ impl<T> Vec<T> {
             item
         }
     }
+
+    pub fn insert(&mut self, index: usize, item: T) {
+        if index > self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            for i in (index..self.len).rev() {
+                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+            }
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
     pub fn retain<F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> bool,
@@ -176,21 +202,50 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
     }
 }
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
 
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            new_vec.push(self[i].clone());
+        }
+        new_vec
+    }
+}
+
+impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Debug::fmt(&**self, f)
     }
 }
 

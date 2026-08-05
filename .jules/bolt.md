@@ -1,11 +1,17 @@
-## 2026-07-31 - [SigmaOS Isolated Compilation and Auto-vectorization]
-**Learning:** In highly complex, no_std/no_main custom OS architectures like SigmaOS with mutual cyclic workspace references and incomplete master commits, standard `cargo check`/`cargo build` workspace builds can fail early on parser and trait conflicts. However, specific performance or security modules (e.g. `src/kernel/performance.rs`, `src/package/universal.rs`) can be successfully compiled and executed in isolation using targeted `rustc --test` invocations, bypassing unrelated workspace issues.
-Moreover, raw indexed indexing loops (such as `for i in 0..N { dest[i] = a[i] + b[i]; }`) trigger costly compiler-generated bounds checking on every iteration. Replacing them with single-pass, iterator-based zip chains (`dest.iter_mut().zip(source_a.iter()).zip(source_b.iter())`) completely eliminates bounds checks, improving performance and facilitating auto-vectorization across various target hosts.
-**Action:** Always check the memory or repository documentation for custom isolated test execution commands (`rustc --test ...`) when dealing with failing workspaces. Implement zero-bounds-checked single-pass zip/iterators to optimize hot loop performance.
+# ⚡ Bolt's Journal — SigmaOS Performance & Optimization
 
-## 2026-08-03 - [Hardware Bitwise Intrinsic and Quadratic Convergence in no_std Math]
-**Learning:** Custom `#![no_std]` math utilities often rely on basic linear-time bitwise shift loops and binary search approximations.
-1. Replacing iterative O(log N) bitwise shifts for `log2` calculations with `31 - n.leading_zeros()` utilizes modern hardware Count Leading Zeros (CLZ/BSR) instruction blocks, achieving an immediate O(1) performance increase (~123% speedup).
-2. Approximating `sqrt` using Newton-Raphson quadratic convergence instead of binary search reduces average iteration count dramatically (by up to 26 loops on larger floats) with double precision limits, achieving a ~234% speedup.
-3. Calculating difference limits manually (`if diff < 0.0 { -diff } else { diff }`) avoids compiling or linking core traits or external platform math libraries.
-**Action:** Always map generic bitwise search/shift operations to hardware leading/trailing zero primitives (`leading_zeros`, `trailing_zeros`) and prioritize Newton-Raphson iteration schemas for transcendental/arithmetic approximations under restricted environment domains.
+This journal logs CRITICAL performance bottlenecks, compiler optimization analyses, and resource-efficiency enhancements implemented across SigmaOS.
+
+---
+
+## 2026-08-01 - Eliminating Index-Based Modulo Division in Loop Bodies
+**Learning:** Using standard indexing loops with modulo division (`i % key.len()`) inside hot loops introduces two severe performance penalties:
+1. **Division Overhead:** Integer division/modulo is one of the slowest CPU instructions (typically 10-40 cycles depending on the architecture).
+2. **Bounds Checks:** Direct array indexing (`key[index]`) forces the Rust compiler to insert branch/panic instructions for out-of-bounds safety checks, preventing auto-vectorization and loop unrolling.
+
+Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`) zipped with the input iterator completely eliminates modulo division and array bounds checks, enabling the compiler to optimize the loop into highly efficient SIMD/vectorized instructions.
+**Action:** Always prefer `.zip(key.iter().cycle())` over index-modulo loops for symmetric/XOR encryption and decryption operations.
+
+## 2026-08-01 - Avoiding Heap Allocations in Dependency Traversal
+**Learning:** Recursively traversing dependency trees with naive `to_visit: Vec<String>` structures incurs heavy heap reallocation and copy overhead if strings are cloned at every node visit. Storing references (`&str`) or using `to_visit` stacks with capacity pre-allocation dramatically cuts allocator stress during package dependency resolution.
+**Action:** Pre-allocate capacity for traversal stacks and use borrowed string references where lifetimes allow.

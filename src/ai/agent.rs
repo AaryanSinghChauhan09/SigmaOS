@@ -174,10 +174,13 @@ impl Pattern {
 
 impl SimpleAIAgent {
     pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
-        let mut name_array = [0u8; 128];
-        let name_len = name.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        let mut name_str = String::new();
+        for &byte in name {
+            if byte == 0 {
+                break;
+            }
+            let c: char = byte as char;
+            name_str.push(c);
         }
         SimpleAIAgent {
             name: name_array,
@@ -424,12 +427,24 @@ impl Default for SimpleAIAgentManager {
     }
 }
 
-/// AI agent manager trait (OOP interface)
-pub trait AIAgentManager {
-    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError>;
-    fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
-    fn process_request(&mut self, id: usize, input: &[u8]) -> Result<Vec<u8>, AIError>;
-    fn stats(&self) -> AIStats;
+#[derive(Debug, Clone)]
+pub struct AgentInfo {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ManagerCapability {
+    pub value: u64,
+}
+
+impl ManagerCapability {
+    pub fn full() -> Self {
+        ManagerCapability { value: !0 }
+    }
+    pub fn none() -> Self {
+        ManagerCapability { value: 0 }
+    }
 }
 
 impl AIAgentManager for SimpleAIAgentManager {
@@ -480,7 +495,10 @@ mod tests {
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
         let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        agent.register_mcp_tool(b"fetch_weather", b"MCP weather fetcher");
+        agent.register_mcp_tool(
+            "fetch_weather".to_string(),
+            "MCP weather fetcher".to_string(),
+        );
         assert_eq!(agent.mcp_tools.len(), 1);
 
         let opt_score = agent.optimize_prompt_weights();

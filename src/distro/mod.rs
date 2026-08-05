@@ -30,13 +30,18 @@ pub mod nextgen;
 pub mod parity;
 pub mod recovery;
 pub mod specialized;
+pub mod gentoo;
 pub mod tiny_core;
 pub mod transformation_engine;
 
-pub use manjaro::{
-    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease, ManjaroKernelSwitcher,
-    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
+pub use gentoo::{
+    BuildError, BuildSpec, CpuOptimizationDetector, FeatureSet, SigmaBuildGraph, UseFlag,
+};
+pub use parity::{
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
