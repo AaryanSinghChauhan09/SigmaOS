@@ -72,7 +72,7 @@ pub struct PcmFrame {
 /// NetBSD-inspired multi-channel PCM software audio mixer driver
 pub struct BsdAudioMixer {
     pub channels: Vec<Vec<PcmFrame>>,
-    pub master_volume: u16, // 0 to 256 scale (256 = 100% volume)
+    pub master_volume: u16,   // 0 to 256 scale (256 = 100% volume)
     pub channel_pan: Vec<i8>, // -128 (full left) to 127 (full right)
 }
 
@@ -183,11 +183,17 @@ impl OpenBsdCryptoDevice {
             CryptoCipher::ChaCha20Poly1305 => {
                 // Highly performant stream cipher emulation via byte-wise key-stream XOR mapping
                 let mut keystream_state = 0u32;
-                for &k in &self.key { keystream_state = keystream_state.wrapping_add(k as u32); }
-                for &i in &self.iv { keystream_state ^= i as u32; }
+                for &k in &self.key {
+                    keystream_state = keystream_state.wrapping_add(k as u32);
+                }
+                for &i in &self.iv {
+                    keystream_state ^= i as u32;
+                }
 
                 for (idx, &byte) in input.iter().enumerate() {
-                    keystream_state = keystream_state.wrapping_mul(1664525).wrapping_add(1013904223);
+                    keystream_state = keystream_state
+                        .wrapping_mul(1664525)
+                        .wrapping_add(1013904223);
                     let keystream_byte = (keystream_state >> 16) as u8;
                     output[idx] = byte ^ keystream_byte;
                 }
@@ -195,10 +201,15 @@ impl OpenBsdCryptoDevice {
             CryptoCipher::Aes256Gcm => {
                 // AES block-chain mixing simulation
                 let mut block_state = 0u64;
-                for &k in &self.key { block_state = block_state.wrapping_add(k as u64); }
+                for &k in &self.key {
+                    block_state = block_state.wrapping_add(k as u64);
+                }
 
                 for (idx, &byte) in input.iter().enumerate() {
-                    block_state = block_state.wrapping_shl(3).wrapping_add(block_state).wrapping_add(byte as u64);
+                    block_state = block_state
+                        .wrapping_shl(3)
+                        .wrapping_add(block_state)
+                        .wrapping_add(byte as u64);
                     let xor_mask = (block_state ^ 0xa5a5_a5a5_a5a5_a5a5) as u8;
                     output[idx] = byte ^ xor_mask;
                 }
@@ -242,16 +253,28 @@ mod tests {
         let mut mixer = BsdAudioMixer::new();
 
         let stream1 = alloc::vec![
-            PcmFrame { left: 1000, right: 2000 },
-            PcmFrame { left: -500, right: -1000 },
+            PcmFrame {
+                left: 1000,
+                right: 2000
+            },
+            PcmFrame {
+                left: -500,
+                right: -1000
+            },
         ];
         let stream2 = alloc::vec![
-            PcmFrame { left: 3000, right: 1000 },
-            PcmFrame { left: 1500, right: 500 },
+            PcmFrame {
+                left: 3000,
+                right: 1000
+            },
+            PcmFrame {
+                left: 1500,
+                right: 500
+            },
         ];
 
         mixer.register_channel(stream1, -64); // Pan slightly left
-        mixer.register_channel(stream2, 64);  // Pan slightly right
+        mixer.register_channel(stream2, 64); // Pan slightly right
 
         let mixed = mixer.mix_channels();
         assert_eq!(mixed.len(), 2);
