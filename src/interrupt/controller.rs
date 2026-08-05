@@ -1,21 +1,29 @@
 #![no_std]
 #![no_main]
 
+use core::mem;
 /// OOP-based Interrupt/IRQ Controller for SigmaOS
 /// Based on Roadmap Item: Interrupt/IRQ Controller + APIC/GIC Support
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type IRQNumber = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum IRQState { Disabled = 0, Enabled = 1, Pending = 2, InService = 3 }
+pub enum IRQState {
+    Disabled = 0,
+    Enabled = 1,
+    Pending = 2,
+    InService = 3,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ControllerType { APIC = 0, GIC = 1, PLIC = 2 }
+pub enum ControllerType {
+    APIC = 0,
+    GIC = 1,
+    PLIC = 2,
+}
 
 pub trait InterruptController {
     fn controller_type(&self) -> ControllerType;
@@ -26,7 +34,11 @@ pub trait InterruptController {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum IRQError { Success = 0, InvalidIRQ = 1, ControllerError = 2 }
+pub enum IRQError {
+    Success = 0,
+    InvalidIRQ = 1,
+    ControllerError = 2,
+}
 
 #[repr(C)]
 pub struct SimpleInterruptController {
@@ -36,26 +48,42 @@ pub struct SimpleInterruptController {
 
 impl SimpleInterruptController {
     pub fn new(controller_type: ControllerType) -> Self {
-        let mut irq_states = [AtomicUsize::new(IRQState::Disabled as usize); 256];
-        SimpleInterruptController { controller_type, irq_states }
+        let irq_states = [const { AtomicUsize::new(IRQState::Disabled as usize) }; 256];
+        SimpleInterruptController {
+            controller_type,
+            irq_states,
+        }
     }
 }
 
 impl InterruptController for SimpleInterruptController {
-    fn controller_type(&self) -> ControllerType { self.controller_type }
+    fn controller_type(&self) -> ControllerType {
+        self.controller_type
+    }
     fn enable_irq(&mut self, irq: IRQNumber) -> Result<(), IRQError> {
-        if irq >= 256 { return Err(IRQError::InvalidIRQ); }
+        if irq >= 256 {
+            return Err(IRQError::InvalidIRQ);
+        }
         self.irq_states[irq].store(IRQState::Enabled as usize, Ordering::SeqCst);
         Ok(())
     }
     fn disable_irq(&mut self, irq: IRQNumber) -> Result<(), IRQError> {
-        if irq >= 256 { return Err(IRQError::InvalidIRQ); }
+        if irq >= 256 {
+            return Err(IRQError::InvalidIRQ);
+        }
         self.irq_states[irq].store(IRQState::Disabled as usize, Ordering::SeqCst);
         Ok(())
     }
     fn get_irq_state(&self, irq: IRQNumber) -> IRQState {
-        if irq >= 256 { return IRQState::Disabled; }
-        unsafe { core::mem::transmute(self.irq_states[irq].load(Ordering::SeqCst)) }
+        if irq >= 256 {
+            return IRQState::Disabled;
+        }
+        match self.irq_states[irq].load(Ordering::SeqCst) {
+            0 => IRQState::Disabled,
+            1 => IRQState::Enabled,
+            2 => IRQState::Pending,
+            _ => IRQState::InService,
+        }
     }
 }
 
@@ -70,7 +98,9 @@ pub struct SimpleIRQHandler {
 
 impl SimpleIRQHandler {
     pub fn new(controller_type: ControllerType) -> Self {
-        SimpleIRQHandler { controller: SimpleInterruptController::new(controller_type) }
+        SimpleIRQHandler {
+            controller: SimpleInterruptController::new(controller_type),
+        }
     }
 }
 
