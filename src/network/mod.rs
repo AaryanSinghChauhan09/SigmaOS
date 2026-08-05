@@ -4,7 +4,6 @@ pub mod enterprise;
 pub mod ring_buffer_stack;
 pub mod stack;
 pub mod tcp;
-pub mod enterprise;
 pub mod tcp_udp;
 
 pub use analyzer::{
