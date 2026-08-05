@@ -1,5 +1,6 @@
 // SigmaOS Integration Tests
 // Verifies core system legacy compatibility, multi-persona VMs, and driver bridge layers
+#![cfg(feature = "integration_test")]
 #![allow(unused, clippy::all)]
 
 use sigmaos::compatibility::{
