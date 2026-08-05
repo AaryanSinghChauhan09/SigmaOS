@@ -1393,7 +1393,7 @@ To maintain absolute execution focus, the startup core operates across a structu
 # 📈 SECTION 18: DAILY STRATEGIC INTELLIGENCE REPORTS
 
 ## 18.1 Sigma Updater: Distro Repository Changes
-The Sigma Updater runs continuous repository scraping sweeps across primary Linux distribution distribution lines to identify changes, kernel patches, and dependency updates:
+The Sigma Updater runs continuous repository scraping sweeps across primary Linux distribution lines to identify changes, kernel patches, and dependency updates:
 *   **Upstream Audit Targets:** Monitors stable and development releases of Debian unstable, Arch core/extra, Fedora rawhide, and the mainline Linux kernel.
 *   **Sovereign Translation Path:** When an upstream update is identified, the scheduler creates an absorption recipe. Security patches are prioritized and translated directly to capability-ring filters, and package version changes update S-PAC registry manifests automatically.
 
