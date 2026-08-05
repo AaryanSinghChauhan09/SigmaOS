@@ -1,5 +1,5 @@
-use crate::klib::Vec;
 use crate::kernel::KernelPersona;
+use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SymlinkError {

@@ -5,8 +5,8 @@ pub mod legacy_keyboard;
 pub mod modern_usb;
 pub mod network;
 pub mod peripheral;
-pub mod storage;
 pub mod soc;
+pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
 

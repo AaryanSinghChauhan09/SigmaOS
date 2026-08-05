@@ -5,7 +5,6 @@ pub mod arch_compat;
 pub mod aur;
 pub mod importer;
 pub mod linux_compat;
-pub mod importer;
 pub mod pacman;
 pub mod recipe;
 pub mod resolver;
@@ -20,13 +19,12 @@ pub mod verifier;
 pub mod zero_alloc_resolver;
 
 pub use importer::{
-    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };
 pub use linux_compat::{
     DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
     TranslatedMetadata, TranslatorError,
 };
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
@@ -37,9 +35,9 @@ pub use verifier::CryptoVerifier;
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
-    major: u64,
-    minor: u64,
-    patch: u64,
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
 }
 
 impl Version {

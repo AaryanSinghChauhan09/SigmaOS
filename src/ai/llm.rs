@@ -203,7 +203,10 @@ impl LocalLlmEngine {
         if !self.loaded {
             return Err("Model not loaded".to_string());
         }
-        Ok(format!("{{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON for {}\"}}", schema_desc))
+        Ok(format!(
+            "{{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON for {}\"}}",
+            schema_desc
+        ))
     }
 
     pub fn new(config: LlmConfig) -> Self {
@@ -244,18 +247,18 @@ impl LocalLlmEngine {
 
         // Determine output based on format
         let text_output = match request.format {
-            InferenceFormat::Json => "{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON\"}".to_string(),
+            InferenceFormat::Json => {
+                "{\"status\": \"success\", \"data\": \"Vercel AI SDK style structured JSON\"}"
+                    .to_string()
+            }
             _ => "Generated response placeholder".to_string(),
         };
 
         // For now, return a placeholder response
         let start_time = 0; // Would use actual timing
 
-        let mut response = InferenceResponse::new(
-            "Generated response placeholder".to_string(),
-            10,
-            100,
-        );
+        let mut response =
+            InferenceResponse::new("Generated response placeholder".to_string(), 10, 100);
 
         if !request.tools.is_empty() {
             let mut calls = Vec::new();

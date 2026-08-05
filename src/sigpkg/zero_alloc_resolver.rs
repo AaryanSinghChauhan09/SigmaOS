@@ -98,7 +98,10 @@ impl PackageDependencyResolver {
     }
 
     fn find_recipe(&self, name: &'static str) -> Option<&PackageRecipe> {
-        self.registry.iter().filter_map(|r| r.as_ref()).find(|r| r.name == name)
+        self.registry
+            .iter()
+            .filter_map(|r| r.as_ref())
+            .find(|r| r.name == name)
     }
 }
 

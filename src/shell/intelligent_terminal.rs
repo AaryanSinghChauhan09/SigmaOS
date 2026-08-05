@@ -18,12 +18,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-use alloc::collections::BTreeMap;
 use alloc::boxed::Box;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
 /// Represents the types of Agent Client Protocol (ACP) message models.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -127,7 +126,12 @@ impl TerminalErrorHook {
     }
 
     /// Analyzes a command execution and captures failure snippets if the exit code is non-zero.
-    pub fn analyze_execution(&mut self, command: &str, exit_code: i32, stderr: &str) -> Option<CapturedError> {
+    pub fn analyze_execution(
+        &mut self,
+        command: &str,
+        exit_code: i32,
+        stderr: &str,
+    ) -> Option<CapturedError> {
         if exit_code == 0 {
             return None;
         }
@@ -138,7 +142,8 @@ impl TerminalErrorHook {
         } else if stderr.contains("not found") || stderr.contains("not recognized") {
             fix = "Install the missing package or verify command spelling.".to_string();
         } else if stderr.contains("permission") || stderr.contains("Access denied") {
-            fix = "Rerun the command with administrator privilege or 'sudo' equivalent.".to_string();
+            fix =
+                "Rerun the command with administrator privilege or 'sudo' equivalent.".to_string();
         } else if stderr.contains("syntax error") {
             fix = "Correct the syntax structure of your shell expression.".to_string();
         }
@@ -176,12 +181,20 @@ impl IntelligentTerminal {
     }
 
     /// Executes a command within the terminal, automatically capturing its context and any errors.
-    pub fn execute_command(&mut self, command: &str, stdout: &str, stderr: &str, exit_code: i32) -> Option<CapturedError> {
+    pub fn execute_command(
+        &mut self,
+        command: &str,
+        stdout: &str,
+        stderr: &str,
+        exit_code: i32,
+    ) -> Option<CapturedError> {
         self.context.command_history.push(command.to_string());
         self.context.last_stdout = Some(stdout.to_string());
         self.context.last_stderr = Some(stderr.to_string());
 
-        let error_opt = self.error_hook.analyze_execution(command, exit_code, stderr);
+        let error_opt = self
+            .error_hook
+            .analyze_execution(command, exit_code, stderr);
 
         if let Some(ref err) = error_opt {
             // Trigger automatic ACP notification to the native background agent
@@ -202,9 +215,15 @@ impl IntelligentTerminal {
     pub fn synchronize_context_to_agent(&mut self) -> AcpMessage {
         let mut params = BTreeMap::new();
         params.insert("pwd".to_string(), self.context.current_dir.clone());
-        params.insert("history_len".to_string(), self.context.command_history.len().to_string());
+        params.insert(
+            "history_len".to_string(),
+            self.context.command_history.len().to_string(),
+        );
         if let Some(ref o) = self.context.last_stdout {
-            params.insert("last_stdout_preview".to_string(), o.chars().take(100).collect());
+            params.insert(
+                "last_stdout_preview".to_string(),
+                o.chars().take(100).collect(),
+            );
         }
 
         let msg = AcpMessage::notification("terminal/sync_context", params);
@@ -216,7 +235,8 @@ impl IntelligentTerminal {
     pub fn handle_slash_command(&mut self, command: &str) -> String {
         let trimmed = command.trim();
         if !trimmed.starts_with('/') {
-            return "Not a valid slash command. Available: /explain, /fix, /generate, /task".to_string();
+            return "Not a valid slash command. Available: /explain, /fix, /generate, /task"
+                .to_string();
         }
 
         let parts: Vec<&str> = trimmed.splitn(2, ' ').collect();
@@ -243,7 +263,10 @@ impl IntelligentTerminal {
                 if arg.is_empty() {
                     "Usage: /generate <description of script or command>".to_string()
                 } else {
-                    format!("Generated code command for '{}':\n```sh\necho \"Executing task: {}\"\n```", arg, arg)
+                    format!(
+                        "Generated code command for '{}':\n```sh\necho \"Executing task: {}\"\n```",
+                        arg, arg
+                    )
                 }
             }
             "/task" => {
@@ -253,7 +276,10 @@ impl IntelligentTerminal {
                     format!("Agent task agent loop initialized for '{}':\nStep 1: Parse requirements.\nStep 2: Dry-run check.\nStep 3: Safe background execution.", arg)
                 }
             }
-            _ => format!("Unknown agent slash command '{}'. Please use /explain, /fix, /generate, or /task.", cmd),
+            _ => format!(
+                "Unknown agent slash command '{}'. Please use /explain, /fix, /generate, or /task.",
+                cmd
+            ),
         }
     }
 
@@ -269,7 +295,10 @@ impl IntelligentTerminal {
             let mut result = BTreeMap::new();
             if msg.method == "agent/get_context" {
                 result.insert("pwd".to_string(), self.context.current_dir.clone());
-                result.insert("history_count".to_string(), self.context.command_history.len().to_string());
+                result.insert(
+                    "history_count".to_string(),
+                    self.context.command_history.len().to_string(),
+                );
                 return Some(AcpMessage::response(msg.id.unwrap_or(1), result));
             } else if msg.method == "agent/execute_slash" {
                 let cmd = msg.params.get("command").cloned().unwrap_or_default();

@@ -801,22 +801,31 @@ impl UniversalPackageManager {
 
         // Step 1: Pre-installation check and parse package
         if data.is_empty() {
-            return Err(AdapterError::ValidationError("Empty package payload".to_string()));
+            return Err(AdapterError::ValidationError(
+                "Empty package payload".to_string(),
+            ));
         }
 
         let mut package = adapter.parse_package(data)?;
 
         // Step 2: Run verification and checks
         if package.name.is_empty() {
-            return Err(AdapterError::ValidationError("Invalid package name".to_string()));
+            return Err(AdapterError::ValidationError(
+                "Invalid package name".to_string(),
+            ));
         }
 
         // Step 3: Capture O(1) transactional snapshot of current generation
         let old_generation = self.active_generation;
-        let mut current_packages = self.generations.get(&old_generation).cloned().unwrap_or_default();
+        let mut current_packages = self
+            .generations
+            .get(&old_generation)
+            .cloned()
+            .unwrap_or_default();
 
         // Step 4: Perform extraction/installation to active set
-        self.installed_packages.insert(package.name.clone(), package.clone());
+        self.installed_packages
+            .insert(package.name.clone(), package.clone());
         current_packages.push(package.name.clone());
 
         // Increment generation snapshot atomically (generation checkpoint)
@@ -837,12 +846,19 @@ impl UniversalPackageManager {
     /// O(1) State Generation pointer rollback (NixOS/Guix style)
     pub fn rollback_generation(&mut self, generation_id: u32) -> Result<(), AdapterError> {
         if let Some(snapshot) = self.generations.get(&generation_id) {
-            self.installed_packages.retain(|name, _| snapshot.contains(name));
+            self.installed_packages
+                .retain(|name, _| snapshot.contains(name));
             self.active_generation = generation_id;
-            println!("O(1) Generation Rollback complete. Reverted active generation pointer to: #{}", generation_id);
+            println!(
+                "O(1) Generation Rollback complete. Reverted active generation pointer to: #{}",
+                generation_id
+            );
             Ok(())
         } else {
-            Err(AdapterError::ValidationError(format!("Generation #{} not found", generation_id)))
+            Err(AdapterError::ValidationError(format!(
+                "Generation #{} not found",
+                generation_id
+            )))
         }
     }
 

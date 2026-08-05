@@ -99,7 +99,9 @@ impl InterimLispVM {
                         }
                         "if" => {
                             if list.len() != 4 {
-                                return Err("Lisp: if expects condition, then, and else expressions");
+                                return Err(
+                                    "Lisp: if expects condition, then, and else expressions",
+                                );
                             }
                             let cond_val = self.eval(&list[1])?;
                             let cond_bool = match cond_val {
@@ -136,7 +138,9 @@ impl InterimLispVM {
                         }
                         "for" => {
                             if list.len() < 5 {
-                                return Err("Lisp: for expects variable, start, end, and body expressions");
+                                return Err(
+                                    "Lisp: for expects variable, start, end, and body expressions",
+                                );
                             }
                             if let LispVal::Atom(var_name) = &list[1] {
                                 let start_val = match self.eval(&list[2])? {
@@ -326,7 +330,10 @@ mod tests {
         // Test LispVal string and char types
         let val_str = LispVal::String(String::from("SigmaOS"));
         let val_char = LispVal::Char('Σ');
-        assert_eq!(vm.eval(&val_str).unwrap(), LispVal::String(String::from("SigmaOS")));
+        assert_eq!(
+            vm.eval(&val_str).unwrap(),
+            LispVal::String(String::from("SigmaOS"))
+        );
         assert_eq!(vm.eval(&val_char).unwrap(), LispVal::Char('Σ'));
 
         // Test begin block
@@ -366,7 +373,10 @@ mod tests {
         ]);
         vm.eval(&for_expr).unwrap();
         // 1 + 2 + 3 + 4 = 10
-        assert_eq!(vm.eval(&LispVal::Atom(String::from("sum"))).unwrap(), LispVal::Number(10));
+        assert_eq!(
+            vm.eval(&LispVal::Atom(String::from("sum"))).unwrap(),
+            LispVal::Number(10)
+        );
 
         // Test while loop: (while (< count 3) (define count (+ count 1)))
         vm.set_var(String::from("count"), LispVal::Number(0));
@@ -388,7 +398,10 @@ mod tests {
             ]),
         ]);
         vm.eval(&while_expr).unwrap();
-        assert_eq!(vm.eval(&LispVal::Atom(String::from("count"))).unwrap(), LispVal::Number(3));
+        assert_eq!(
+            vm.eval(&LispVal::Atom(String::from("count"))).unwrap(),
+            LispVal::Number(3)
+        );
     }
 
     #[test]

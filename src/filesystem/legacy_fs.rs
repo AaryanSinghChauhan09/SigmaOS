@@ -39,7 +39,9 @@ impl LegacyFSAdapter {
         let mut mock_data = [0u8; 16];
         // Populate mock data based on filesystem structures
         for i in 0..16 {
-            mock_data[i] = (cluster_idx as u8).wrapping_add(offset as u8).wrapping_add(i as u8);
+            mock_data[i] = (cluster_idx as u8)
+                .wrapping_add(offset as u8)
+                .wrapping_add(i as u8);
         }
         Ok(mock_data)
     }
