@@ -172,19 +172,29 @@ impl NixDeclarativeFilter {
     /// Pure evaluation function
     pub fn matches(&self, packet: &TrafficPacket) -> bool {
         if let Some(ip) = self.source_ip {
-            if packet.source_ip != ip { return false; }
+            if packet.source_ip != ip {
+                return false;
+            }
         }
         if let Some(ip) = self.destination_ip {
-            if packet.destination_ip != ip { return false; }
+            if packet.destination_ip != ip {
+                return false;
+            }
         }
         if let Some(p) = self.min_port {
-            if packet.source_port < p && packet.destination_port < p { return false; }
+            if packet.source_port < p && packet.destination_port < p {
+                return false;
+            }
         }
         if let Some(p) = self.max_port {
-            if packet.source_port > p && packet.destination_port > p { return false; }
+            if packet.source_port > p && packet.destination_port > p {
+                return false;
+            }
         }
         if let Some(proto) = self.protocol {
-            if packet.protocol != proto { return false; }
+            if packet.protocol != proto {
+                return false;
+            }
         }
         true
     }
@@ -199,11 +209,18 @@ pub struct KaliPacketFingerprinter {
 
 impl KaliPacketFingerprinter {
     pub fn new() -> Self {
-        Self { fingerprints: HashMap::new() }
+        Self {
+            fingerprints: HashMap::new(),
+        }
     }
 
     /// Passive OS fingerprinting heuristic inspired by p0f / wireshark signatures
-    pub fn fingerprint_packet(&mut self, packet: &TrafficPacket, ttl: u8, tcp_window: u16) -> String {
+    pub fn fingerprint_packet(
+        &mut self,
+        packet: &TrafficPacket,
+        ttl: u8,
+        tcp_window: u16,
+    ) -> String {
         // Simple but highly effective passive OS fingerprinting heuristics:
         // - Linux: TTL typically 64, TCP window typically 5840 or 29200
         // - Windows: TTL typically 128, TCP window typically 8192 or 65535
@@ -255,12 +272,21 @@ impl KaliSnoopAnalysis {
 impl AnalysisStrategy for KaliSnoopAnalysis {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert> {
         // Infer TTL and window size from packet size and port properties for emulation
-        let inferred_ttl = if packet.destination_port == 22 || packet.destination_port == 443 { 64 } else { 128 };
+        let inferred_ttl = if packet.destination_port == 22 || packet.destination_port == 443 {
+            64
+        } else {
+            128
+        };
         let inferred_win = if inferred_ttl == 64 { 5840 } else { 8192 };
 
-        let detected_os = self.fingerprinter.fingerprint_packet(packet, inferred_ttl, inferred_win);
+        let detected_os = self
+            .fingerprinter
+            .fingerprint_packet(packet, inferred_ttl, inferred_win);
 
-        let ports = self.scan_history.entry(packet.source_ip).or_insert_with(Vec::new);
+        let ports = self
+            .scan_history
+            .entry(packet.source_ip)
+            .or_insert_with(Vec::new);
         if !ports.contains(&packet.destination_port) {
             ports.push(packet.destination_port);
         }
@@ -301,7 +327,9 @@ impl GentooUseFlagsDissector {
     pub const ALL: u16 = 0xFFFF;
 
     pub fn new(initial_flags: u16) -> Self {
-        Self { enabled_dissectors: initial_flags }
+        Self {
+            enabled_dissectors: initial_flags,
+        }
     }
 
     pub fn is_enabled(&self, flag: u16) -> bool {
@@ -321,21 +349,28 @@ impl GentooUseFlagsDissector {
         match packet.protocol {
             Protocol::Http => {
                 if self.is_enabled(Self::HTTP) {
-                    Some(format!("HTTP payload dissection enabled: Decoded URI on port {}", packet.destination_port))
+                    Some(format!(
+                        "HTTP payload dissection enabled: Decoded URI on port {}",
+                        packet.destination_port
+                    ))
                 } else {
                     None
                 }
             }
             Protocol::Https if packet.destination_port == 443 => {
                 if self.is_enabled(Self::TLS) {
-                    Some(format!("TLS handshake dissector enabled: SNI ClientHello parsed on port 443"))
+                    Some(format!(
+                        "TLS handshake dissector enabled: SNI ClientHello parsed on port 443"
+                    ))
                 } else {
                     None
                 }
             }
             Protocol::Ssh if packet.destination_port == 22 => {
                 if self.is_enabled(Self::SSH) {
-                    Some(format!("SSH transport dissector enabled: Key Exchange decoded on port 22"))
+                    Some(format!(
+                        "SSH transport dissector enabled: Key Exchange decoded on port 22"
+                    ))
                 } else {
                     None
                 }
@@ -402,7 +437,10 @@ impl ClearLinuxFlowLoadBalancer {
     pub fn steer_packet(&mut self, packet: &TrafficPacket) -> usize {
         let hash = self.calculate_flow_hash(packet);
         let core_count = self.core_count;
-        *self.flow_affinity.entry(hash).or_insert_with(|| (hash % core_count as u64) as usize)
+        *self
+            .flow_affinity
+            .entry(hash)
+            .or_insert_with(|| (hash % core_count as u64) as usize)
     }
 
     pub fn get_active_flows_count(&self) -> usize {
@@ -1013,7 +1051,9 @@ mod tests {
 
     #[test]
     fn test_gentoo_use_flags_dissector() {
-        let mut dissector = GentooUseFlagsDissector::new(GentooUseFlagsDissector::HTTP | GentooUseFlagsDissector::TLS);
+        let mut dissector = GentooUseFlagsDissector::new(
+            GentooUseFlagsDissector::HTTP | GentooUseFlagsDissector::TLS,
+        );
         assert!(dissector.is_enabled(GentooUseFlagsDissector::HTTP));
         assert!(!dissector.is_enabled(GentooUseFlagsDissector::SSH));
 
@@ -1040,7 +1080,9 @@ mod tests {
         // HTTP should dissect since HTTP flag is enabled
         let decoded_http = dissector.dissect_packet(&http_packet);
         assert!(decoded_http.is_some());
-        assert!(decoded_http.unwrap().contains("HTTP payload dissection enabled"));
+        assert!(decoded_http
+            .unwrap()
+            .contains("HTTP payload dissection enabled"));
 
         // SSH should return None because SSH flag is disabled
         assert!(dissector.dissect_packet(&ssh_packet).is_none());
@@ -1050,7 +1092,9 @@ mod tests {
         assert!(dissector.is_enabled(GentooUseFlagsDissector::SSH));
         let decoded_ssh = dissector.dissect_packet(&ssh_packet);
         assert!(decoded_ssh.is_some());
-        assert!(decoded_ssh.unwrap().contains("SSH transport dissector enabled"));
+        assert!(decoded_ssh
+            .unwrap()
+            .contains("SSH transport dissector enabled"));
     }
 
     #[test]
