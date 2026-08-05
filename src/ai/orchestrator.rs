@@ -296,3 +296,40 @@ impl AgentCommunication for SimpleAgentCommunication {
         self.messages.push((from, 0, msg_array));
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceTarget {
+    CPU,
+    GPU,
+    TPU,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OrchestratorError {
+    Success = 0,
+    AgentNotFound = 1,
+    ExecutionFailed = 2,
+    Timeout = 3,
+    InvalidTask = 4,
+}
+
+pub struct LocalLlmOrchestrator {
+    pub name: String,
+    pub target: DeviceTarget,
+    pub active_agents: Vec<AgentID>,
+}
+
+impl LocalLlmOrchestrator {
+    pub fn new(name: &str, target: DeviceTarget) -> Self {
+        LocalLlmOrchestrator {
+            name: name.to_string(),
+            target,
+            active_agents: Vec::new(),
+        }
+    }
+
+    pub fn execute_workflow(&self, prompt: &str) -> Result<String, OrchestratorError> {
+        Ok(format!("Executed workflow on {:?}: {}", self.target, prompt))
+    }
+}

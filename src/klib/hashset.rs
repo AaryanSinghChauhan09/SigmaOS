@@ -4,6 +4,7 @@
 use super::HashMap;
 use super::hashmap::HashMapIter;
 
+#[derive(Clone)]
 pub struct HashSet<T>
 where
     T: Eq + core::hash::Hash + Clone,
@@ -77,6 +78,32 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         self.map_iter.next().map(|(key, _)| key)
+    }
+}
+
+impl<T> core::fmt::Debug for HashSet<T>
+where
+    T: Eq + core::hash::Hash + Clone + core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let mut set = f.debug_set();
+        for item in self.iter() {
+            set.entry(item);
+        }
+        set.finish()
+    }
+}
+
+impl<T> core::iter::FromIterator<T> for HashSet<T>
+where
+    T: Eq + core::hash::Hash + Clone,
+{
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut set = HashSet::new();
+        for item in iter {
+            set.insert(item);
+        }
+        set
     }
 }
 

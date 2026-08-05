@@ -520,15 +520,19 @@ impl SovereignWorkflowEngine {
     pub fn execute_workflow(&mut self) -> Result<usize, &'static str> {
         let mut executed_count = 0;
         let node_len = self.nodes.len();
+        let mut initially_executed = alloc::vec::Vec::new();
+        for node in &self.nodes {
+            initially_executed.push(node.state_executed);
+        }
 
         for i in 0..node_len {
-            // Check if independent or its dependency was already executed
+            // Check if independent or its dependency was already executed before this call
             let can_execute = match self.nodes[i].depends_on {
                 None => true,
                 Some(dep_id) => {
                     let mut dep_ok = false;
                     for j in 0..node_len {
-                        if self.nodes[j].id == dep_id && self.nodes[j].state_executed {
+                        if self.nodes[j].id == dep_id && initially_executed[j] {
                             dep_ok = true;
                             break;
                         }
