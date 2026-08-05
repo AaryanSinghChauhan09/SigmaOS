@@ -83,7 +83,12 @@ pub use klib::{
 };
 pub use network::{
     EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
-    TcpStack, TcpState,
+    TcpStack, TcpState, NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
+    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
+    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
+    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
+    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
+    ClearLinuxFlowLoadBalancer,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,

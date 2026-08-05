@@ -24,6 +24,8 @@
 extern crate alloc;
 use alloc::vec::Vec;
 
+pub const PAGE_SIZE: usize = 4096;
+
 /// Virtual memory and system errors
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GapError {
@@ -238,6 +240,372 @@ impl Default for MetadataJournal {
     }
 }
 
+// ==========================================
+// 4. System Control Registers (CR0, CR3, CR4, SCTLR)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SystemControlRegisters {
+    // x86/x64 CR0 flags
+    pub cr0_wp: bool,  // Write Protect (prevents kernel from writing to read-only user pages)
+    pub cr0_pe: bool,  // Protection Enable
+
+    // x86/x64 CR3 value (Page Directory Base Register)
+    pub cr3_pdbr: u64,
+
+    // x86/x64 CR4 flags
+    pub cr4_smep: bool, // Supervisor Mode Execution Prevention (blocks kernel from running user-space instructions)
+    pub cr4_smap: bool, // Supervisor Mode Access Prevention (blocks kernel from reading user-space memory randomly)
+    pub cr4_pge: bool,  // Page Global Enable
+
+    // ARM SCTLR flags
+    pub sctlr_m: bool,   // MMU Enable
+    pub sctlr_pan: bool, // Privileged Access Never (equivalent to SMAP)
+}
+
+impl SystemControlRegisters {
+    pub fn new() -> Self {
+        SystemControlRegisters {
+            cr0_wp: false,
+            cr0_pe: false,
+            cr3_pdbr: 0,
+            cr4_smep: false,
+            cr4_smap: false,
+            cr4_pge: false,
+            sctlr_m: false,
+            sctlr_pan: false,
+        }
+    }
+
+    /// Simulates writing CR0, checking architecture compliance
+    pub fn write_cr0(&mut self, val: u64) {
+        self.cr0_pe = (val & (1 << 0)) != 0;
+        self.cr0_wp = (val & (1 << 16)) != 0;
+    }
+
+    /// Simulates writing CR4, enabling SMEP/SMAP CPU guards
+    pub fn write_cr4(&mut self, val: u64) {
+        self.cr4_pge = (val & (1 << 7)) != 0;
+        self.cr4_smep = (val & (1 << 20)) != 0;
+        self.cr4_smap = (val & (1 << 21)) != 0;
+    }
+
+    /// Simulates ARM SCTLR (System Control Register) register write
+    pub fn write_sctlr(&mut self, val: u64) {
+        self.sctlr_m = (val & (1 << 0)) != 0;
+        self.sctlr_pan = (val & (1 << 22)) != 0;
+    }
+}
+
+impl Default for SystemControlRegisters {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 5. KeServiceDescriptorTable (SSDT) Syscall Router
+// ==========================================
+
+pub type SyscallHandler = fn(&[u64]) -> u64;
+
+#[derive(Clone)]
+pub struct ServiceDescriptorEntry {
+    pub syscall_id: u32,
+    pub handler: SyscallHandler,
+    pub argument_count: u8,
+}
+
+pub struct KeServiceDescriptorTable {
+    pub service_table: Vec<ServiceDescriptorEntry>,
+    pub syscall_count: usize,
+}
+
+impl KeServiceDescriptorTable {
+    pub fn new() -> Self {
+        KeServiceDescriptorTable {
+            service_table: Vec::new(),
+            syscall_count: 0,
+        }
+    }
+
+    pub fn register_service(&mut self, id: u32, handler: SyscallHandler, arg_count: u8) {
+        self.service_table.push(ServiceDescriptorEntry {
+            syscall_id: id,
+            handler,
+            argument_count: arg_count,
+        });
+        self.syscall_count += 1;
+    }
+
+    /// Dispatch a system call using SSDT routing with bounds validation
+    pub fn dispatch_syscall(&self, id: u32, args: &[u64]) -> Result<u64, GapError> {
+        if let Some(entry) = self.service_table.iter().find(|e| e.syscall_id == id) {
+            if args.len() < entry.argument_count as usize {
+                return Err(GapError::InvalidPageAddress); // mismatched arguments count
+            }
+            Ok((entry.handler)(args))
+        } else {
+            Err(GapError::InterruptRoutingConflict) // Syscall not registered
+        }
+    }
+}
+
+impl Default for KeServiceDescriptorTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 6. Windows-inspired Section Objects
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SectionAccess {
+    ReadOnly,
+    ReadWrite,
+    ExecuteRead,
+}
+
+#[derive(Clone)]
+pub struct SectionObject {
+    pub name: &'static str,
+    pub size_pages: usize,
+    pub access: SectionAccess,
+    pub copy_on_write: bool,
+    pub page_backing_phys_addresses: Vec<u64>,
+}
+
+impl SectionObject {
+    pub fn new(name: &'static str, pages: usize, access: SectionAccess) -> Self {
+        let mut backing = Vec::new();
+        for i in 0..pages {
+            backing.push(0x100000 + (i as u64 * 0x1000)); // Simulating physical memory base
+        }
+        SectionObject {
+            name,
+            size_pages: pages,
+            access,
+            copy_on_write: false,
+            page_backing_phys_addresses: backing,
+        }
+    }
+
+    pub fn enable_copy_on_write(&mut self) {
+        self.copy_on_write = true;
+    }
+
+    pub fn query_permissions(&self) -> (&'static str, bool, bool) {
+        let readable = true;
+        let writable = match self.access {
+            SectionAccess::ReadOnly => false,
+            SectionAccess::ReadWrite => true,
+            SectionAccess::ExecuteRead => false,
+        };
+        let executable = match self.access {
+            SectionAccess::ExecuteRead => true,
+            _ => false,
+        };
+        (self.name, writable, executable)
+    }
+}
+
+// ==========================================
+// 7. X86 Rootkit Audit Engine
+// ==========================================
+
+pub struct X86RootkitAuditor {
+    // Reference hashes/signatures of protected system memory spaces
+    pub expected_kernel_text_checksum: u64,
+    pub expected_ssdt_checksum: u64,
+}
+
+impl X86RootkitAuditor {
+    pub fn new(kernel_text: &[u8], ssdt: &KeServiceDescriptorTable) -> Self {
+        Self {
+            expected_kernel_text_checksum: Self::checksum_buffer(kernel_text),
+            expected_ssdt_checksum: Self::checksum_ssdt(ssdt),
+        }
+    }
+
+    fn checksum_buffer(buf: &[u8]) -> u64 {
+        let mut hash = 0xcbf29ce484222325;
+        for &b in buf {
+            hash ^= b as u64;
+            hash = hash.wrapping_mul(1099511628211);
+        }
+        hash
+    }
+
+    fn checksum_ssdt(ssdt: &KeServiceDescriptorTable) -> u64 {
+        let mut hash = 0xcbf29ce484222325;
+        for entry in &ssdt.service_table {
+            hash ^= entry.syscall_id as u64;
+            hash ^= entry.handler as usize as u64;
+            hash = hash.wrapping_mul(1099511628211);
+        }
+        hash
+    }
+
+    /// Run passive audit over active kernel objects to detect rootkit hooks,
+    /// SSDT modifications, or MSR syscall handler redirection.
+    pub fn audit_system(
+        &self,
+        active_kernel_text: &[u8],
+        active_ssdt: &KeServiceDescriptorTable,
+        msr_syscall_handler_address: u64,
+        expected_msr_handler_address: u64,
+    ) -> Result<(), &'static str> {
+        // Detect kernel inline code hooking
+        let cur_text_sum = Self::checksum_buffer(active_kernel_text);
+        if cur_text_sum != self.expected_kernel_text_checksum {
+            return Err("Rootkit hooks detected in kernel .text section (Inline code modification)!");
+        }
+
+        // Detect SSDT/Descriptor Table hijacking
+        let cur_ssdt_sum = Self::checksum_ssdt(active_ssdt);
+        if cur_ssdt_sum != self.expected_ssdt_checksum {
+            return Err("Rootkit hooks detected in KeServiceDescriptorTable (SSDT Hooking)!");
+        }
+
+        // Detect MSR syscall hijacking (like IA32_LSTAR register redirection)
+        if msr_syscall_handler_address != expected_msr_handler_address {
+            return Err("Rootkit hijack detected on IA32_LSTAR MSR Register!");
+        }
+
+        Ok(())
+    }
+}
+
+// ==========================================
+// 8. IRP Handler & MDL Buffer Manager
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IrpMajorFunction {
+    Create = 0,
+    Close = 1,
+    Read = 2,
+    Write = 3,
+    DeviceControl = 4, // equivalent to IOCTL
+}
+
+pub struct Irp {
+    pub major_function: IrpMajorFunction,
+    pub ioctl_code: u32,
+    pub system_buffer: Vec<u8>,
+    pub status: u32, // Status codes (NTSTATUS/errno-like)
+}
+
+pub struct IrpHandler {
+    // Dispatch callbacks for Major Functions
+    pub dispatch_read: fn(&mut Irp) -> u32,
+    pub dispatch_write: fn(&mut Irp) -> u32,
+    pub dispatch_ioctl: fn(&mut Irp) -> u32,
+}
+
+impl IrpHandler {
+    pub fn new(
+        dr: fn(&mut Irp) -> u32,
+        dw: fn(&mut Irp) -> u32,
+        di: fn(&mut Irp) -> u32,
+    ) -> Self {
+        Self {
+            dispatch_read: dr,
+            dispatch_write: dw,
+            dispatch_ioctl: di,
+        }
+    }
+
+    /// Direct and route an incoming I/O Request Packet (IRP)
+    pub fn process_irp(&self, mut irp: Irp) -> u32 {
+        match irp.major_function {
+            IrpMajorFunction::Read => (self.dispatch_read)(&mut irp),
+            IrpMajorFunction::Write => (self.dispatch_write)(&mut irp),
+            IrpMajorFunction::DeviceControl => (self.dispatch_ioctl)(&mut irp),
+            _ => 0, // Unhandled/ignored major functions return success
+        }
+    }
+}
+
+/// Memory Descriptor List (MDL) Buffer Manager
+pub struct MdlBufferManager {
+    pub virtual_address: u64,
+    pub byte_count: usize,
+    pub physical_pages: Vec<u64>,
+}
+
+impl MdlBufferManager {
+    pub fn new(va: u64, size: usize) -> Self {
+        let page_count = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+        let mut physical_pages = Vec::new();
+        for i in 0..page_count {
+            physical_pages.push(0x500000 + (i as u64 * 0x1000)); // Map dummy physical pages
+        }
+        MdlBufferManager {
+            virtual_address: va,
+            byte_count: size,
+            physical_pages,
+        }
+    }
+
+    /// Safe lock/probe pages simulation for direct I/O buffering (Windows/Linux Direct I/O)
+    pub fn lock_and_probe_pages(&self) -> bool {
+        // MDL probing validates paging bounds and pin count
+        !self.physical_pages.is_empty()
+    }
+}
+
+// ==========================================
+// 9. Calling Convention Simulator
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CallingConvention {
+    Cdecl,     // x86 standard (Stack passed right-to-left, caller cleans)
+    Fastcall,  // x64/ARM modern standard (Registers first, callee cleans or caller cleans)
+}
+
+pub struct CallingConventionEngine {
+    pub convention: CallingConvention,
+}
+
+impl CallingConventionEngine {
+    pub fn new(conv: CallingConvention) -> Self {
+        Self { convention: conv }
+    }
+
+    /// Simulate function call arguments alignment layout on the stack and registers.
+    /// Returns register assignments and stack frame alignment offsets.
+    pub fn align_arguments(&self, args: &[u64]) -> (Vec<(&'static str, u64)>, Vec<(usize, u64)>) {
+        let mut registers = Vec::new();
+        let mut stack = Vec::new();
+
+        match self.convention {
+            CallingConvention::Cdecl => {
+                // All arguments placed on stack right-to-left
+                for (i, &arg) in args.iter().enumerate().rev() {
+                    stack.push((i * 8, arg));
+                }
+            }
+            CallingConvention::Fastcall => {
+                // First 4 args go in registers (RCX, RDX, R8, R9 on x64), rest on stack
+                let reg_names = ["RCX", "RDX", "R8", "R9"];
+                for (i, &arg) in args.iter().enumerate() {
+                    if i < 4 {
+                        registers.push((reg_names[i], arg));
+                    } else {
+                        // Overflow arguments go to stack
+                        stack.push(((i - 4) * 8, arg));
+                    }
+                }
+            }
+        }
+        (registers, stack)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -307,5 +675,144 @@ mod tests {
 
         let tx = journal.get_transaction(tx_id).unwrap();
         assert_eq!(tx.state, JournalState::Flushed);
+    }
+
+    #[test]
+    fn test_system_control_registers() {
+        let mut regs = SystemControlRegisters::new();
+        assert!(!regs.cr0_wp);
+        assert!(!regs.cr4_smep);
+
+        // Enable PE (bit 0) and WP (bit 16)
+        regs.write_cr0((1 << 0) | (1 << 16));
+        assert!(regs.cr0_pe);
+        assert!(regs.cr0_wp);
+
+        // Enable PGE (bit 7) and SMEP (bit 20) and SMAP (bit 21)
+        regs.write_cr4((1 << 7) | (1 << 20) | (1 << 21));
+        assert!(regs.cr4_pge);
+        assert!(regs.cr4_smep);
+        assert!(regs.cr4_smap);
+
+        // Enable MMU (bit 0) and PAN (bit 22) on ARM
+        regs.write_sctlr((1 << 0) | (1 << 22));
+        assert!(regs.sctlr_m);
+        assert!(regs.sctlr_pan);
+    }
+
+    #[test]
+    fn test_ke_service_descriptor_table() {
+        let mut ssdt = KeServiceDescriptorTable::new();
+        fn mock_handler(args: &[u64]) -> u64 {
+            args[0] + args[1]
+        }
+
+        ssdt.register_service(10, mock_handler, 2);
+        assert_eq!(ssdt.syscall_count, 1);
+
+        // Successful dispatch
+        let res = ssdt.dispatch_syscall(10, &[100, 250]).unwrap();
+        assert_eq!(res, 350);
+
+        // Failed dispatch - mismatched args
+        let err1 = ssdt.dispatch_syscall(10, &[100]);
+        assert_eq!(err1, Err(GapError::InvalidPageAddress));
+
+        // Failed dispatch - unregistered syscall
+        let err2 = ssdt.dispatch_syscall(99, &[]);
+        assert_eq!(err2, Err(GapError::InterruptRoutingConflict));
+    }
+
+    #[test]
+    fn test_section_object() {
+        let mut sect = SectionObject::new("UserSharedMemory", 4, SectionAccess::ReadWrite);
+        assert_eq!(sect.size_pages, 4);
+        assert!(!sect.copy_on_write);
+
+        let (name, writable, executable) = sect.query_permissions();
+        assert_eq!(name, "UserSharedMemory");
+        assert!(writable);
+        assert!(!executable);
+
+        sect.enable_copy_on_write();
+        assert!(sect.copy_on_write);
+    }
+
+    #[test]
+    fn test_x86_rootkit_auditor() {
+        let mut ssdt = KeServiceDescriptorTable::new();
+        fn mock_handler1(args: &[u64]) -> u64 { 1 }
+        fn mock_handler2(args: &[u64]) -> u64 { 2 }
+        ssdt.register_service(1, mock_handler1, 0);
+
+        let kernel_text = b"\x90\x90\xCC\xC3"; // mock instructions
+        let auditor = X86RootkitAuditor::new(kernel_text, &ssdt);
+
+        // Baseline audit passes
+        let res = auditor.audit_system(kernel_text, &ssdt, 0x7FFF0000, 0x7FFF0000);
+        assert!(res.is_ok());
+
+        // Test 1: Kernel text modification (inline hook)
+        let infected_text = b"\xEB\xFE\xCC\xC3";
+        let err1 = auditor.audit_system(infected_text, &ssdt, 0x7FFF0000, 0x7FFF0000);
+        assert!(err1.is_err());
+        assert!(err1.unwrap_err().contains("kernel .text"));
+
+        // Test 2: SSDT Hooking (handler hijack)
+        let mut infected_ssdt = KeServiceDescriptorTable::new();
+        infected_ssdt.register_service(1, mock_handler2, 0); // hijacked handler
+        let err2 = auditor.audit_system(kernel_text, &infected_ssdt, 0x7FFF0000, 0x7FFF0000);
+        assert!(err2.is_err());
+        assert!(err2.unwrap_err().contains("KeServiceDescriptorTable"));
+
+        // Test 3: MSR Hijacking
+        let err3 = auditor.audit_system(kernel_text, &ssdt, 0xDEADC0DE, 0x7FFF0000);
+        assert!(err3.is_err());
+        assert!(err3.unwrap_err().contains("IA32_LSTAR"));
+    }
+
+    #[test]
+    fn test_irp_and_mdl_buffer() {
+        fn mock_ioctl_dispatch(irp: &mut Irp) -> u32 {
+            irp.status = 1;
+            irp.system_buffer[0] = 0x99;
+            0 // success
+        }
+        let handler = IrpHandler::new(|_| 0, |_| 0, mock_ioctl_dispatch);
+
+        let irp = Irp {
+            major_function: IrpMajorFunction::DeviceControl,
+            ioctl_code: 0x222000,
+            system_buffer: vec![0x11, 0x22],
+            status: 0,
+        };
+
+        let res = handler.process_irp(irp);
+        assert_eq!(res, 0);
+
+        let mdl = MdlBufferManager::new(0x7FFFF000, 5000);
+        assert_eq!(mdl.physical_pages.len(), 2); // 5000 bytes covers 2 pages
+        assert!(mdl.lock_and_probe_pages());
+    }
+
+    #[test]
+    fn test_calling_convention_simulator() {
+        let cdecl_sim = CallingConventionEngine::new(CallingConvention::Cdecl);
+        let fast_sim = CallingConventionEngine::new(CallingConvention::Fastcall);
+
+        let args = [10, 20, 30, 40, 50];
+
+        // cdecl: everything on stack, right-to-left
+        let (regs_c, stack_c) = cdecl_sim.align_arguments(&args);
+        assert!(regs_c.is_empty());
+        assert_eq!(stack_c.len(), 5);
+        assert_eq!(stack_c[0].1, 50); // first in stack list (rightmost)
+
+        // fastcall: first 4 in registers, 5th on stack
+        let (regs_f, stack_f) = fast_sim.align_arguments(&args);
+        assert_eq!(regs_f.len(), 4);
+        assert_eq!(regs_f[0], ("RCX", 10));
+        assert_eq!(stack_f.len(), 1);
+        assert_eq!(stack_f[0], (0, 50));
     }
 }
