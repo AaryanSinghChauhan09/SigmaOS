@@ -8,6 +8,7 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod traits;
+pub mod virtual_cpu;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
@@ -27,3 +28,4 @@ pub use policy_mechanism::{
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use traits::SchedulerError;
+pub use virtual_cpu::{CpuError as VirtualCpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU, Instruction};

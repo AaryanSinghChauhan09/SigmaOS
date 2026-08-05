@@ -62,3 +62,4 @@ pub struct Inode {
     pub modified: u64,
     pub capabilities: CapabilityToken,
     pub link_count: u32, // standard inode link count tracking hard links
+}
