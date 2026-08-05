@@ -13,6 +13,15 @@ pub mod arch_linux;
 pub mod fedora;
 pub mod reactos;
 pub mod standards;
+pub mod lubuntu;
+pub mod antix;
+pub mod bodhi_moksha;
+pub mod cachy_os;
+pub mod chakra;
+pub mod chimera_linux;
+pub mod garuda_zen;
+pub mod gentoo;
+pub mod tiny_core;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -81,3 +90,12 @@ pub use historic_linux::{
     GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
     GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
+
+pub use lubuntu::{
+    CpuGovernor, SystemPressure, LubuntuHealthReport, LubuntuSystemManager,
+    LxqtSessionManager, LxqtSessionState, PcmanfmQtAdapter, FileNode,
+    DiscoverPackageAdapter, AptPackage, FeatherpadEditor, QTerminalEmulator, TerminalTab,
+    CalamaresInstallerShim, CalamaresStage
+};
+pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
+pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
