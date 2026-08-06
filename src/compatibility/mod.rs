@@ -12,6 +12,7 @@ pub mod tiny_core;
 pub mod apache_ossie;
 pub mod sovereign_suite;
 pub mod gentoo;
+pub mod advanced_ecosystem;
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};
@@ -150,4 +151,10 @@ pub use sovereign_suite::{
 pub use gentoo::{
     UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
     EbuildPackage, PortageEngine,
+};
+
+pub use advanced_ecosystem::{
+    NDArray, ImageMat, DependencyProperty, VisualState, SovereignControl,
+    GrpcFrame, SovereignGrpcChannel, MachMessage, MachPort, SovereignXnuKernel,
+    Glyph, SovereignFreeTypeEngine, NavDirection, NavElement, SovereignSpatialNavigation,
 };
