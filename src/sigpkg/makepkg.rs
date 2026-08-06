@@ -41,7 +41,7 @@ impl PkgbuildParser {
 
             // Parse variable assignments
             if line.contains('=') && !line.starts_with("function ") {
-                let parts: Vec<&str> = line.splitn(2, '=').collect();
+                let parts: std::vec::Vec<&str> = line.splitn(2, '=').collect();
                 if parts.len() == 2 {
                     let key = parts[0].trim().to_string();
                     let value = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
@@ -150,18 +150,25 @@ impl MakepkgSandbox {
             .clone();
         
         let pkgdesc = self.pkgbuild.pkgdesc()
-            .map(|s| s.clone())
+            .map(|s: &crate::klib::String| s.clone())
             .unwrap_or_else(|| String::from_str("No description"));
 
-        let version = Version::new(&format!("{}-{}", pkgver, pkgrel));
+        let cleaned_ver = if pkgver.contains('-') {
+            pkgver.split('-').next().unwrap()
+        } else {
+            &pkgver
+        };
+        let version = Version::parse(cleaned_ver).unwrap_or(Version::new(1, 0, 0));
 
-        Ok(Package {
-            name: pkgname,
+        let mut pkg = Package::new(
+            pkgname,
             version,
-            description: pkgdesc,
-            dependencies: Vec::new(),
-            source: String::from_str("arch"),
-        })
+            pkgdesc,
+            std::vec::Vec::new(),
+            String::new(),
+        );
+        pkg.source = String::from_str("arch");
+        Ok(pkg)
     }
 
     /// Validate the PKGBUILD structure

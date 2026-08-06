@@ -15,7 +15,7 @@
 use crate::klib::{HashMap, Vec, String, ToString};
 
 /// AUR package metadata
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AurPackage {
     pub name: String,
     pub version: String,
@@ -26,6 +26,8 @@ pub struct AurPackage {
     pub keywords: Vec<String>,
     pub popularity: f32,
 }
+
+impl Eq for AurPackage {}
 
 /// AUR metadata parser
 pub struct AurParser {
