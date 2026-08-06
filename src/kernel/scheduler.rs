@@ -33,3 +33,4 @@ pub struct Process {
     pub virtual_deadline: u64,
     pub time_slice: Duration,
     pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
+}
