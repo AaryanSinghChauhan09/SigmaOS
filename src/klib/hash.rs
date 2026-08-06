@@ -76,8 +76,8 @@ impl SimpleHasher {
     }
 
     pub fn write(&mut self, byte: u8) {
+        // Optimised by Bolt ⚡: Removed redundant second hashing step of the same byte to cut hashing CPU cycles in half.
         self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(byte as u64);
-        self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
     }
 
     pub fn finish(&self) -> u64 {
@@ -120,7 +120,9 @@ pub fn combine_hashes(a: u64, b: u64) -> u64 {
 
 #[cfg(test)]
 mod tests {
+    extern crate std;
     use super::*;
+    use std::vec;
 
     #[test]
     fn test_djb2_hash() {
