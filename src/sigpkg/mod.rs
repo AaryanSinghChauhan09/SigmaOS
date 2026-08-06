@@ -7,6 +7,7 @@ pub mod aur_helper;
 pub mod importer;
 pub mod linux_compat;
 pub mod makepkg;
+pub mod nix_shell;
 pub mod pacman;
 pub mod recipe;
 pub mod resolver;
@@ -24,6 +25,27 @@ pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use aur::{AurClient, AurPackage as AurPkg, AurPackageQuery, Version as AurVersion};
 pub use aur_helper::{AurHelper, AurPackage, AurParser};
 pub use makepkg::{MakepkgSandbox, PkgbuildParser};
+pub use nix_shell::{DevEnvironment, NixShellManager, PredefinedEnvironments};
+pub use linux_compat::{
+    DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
+    TranslatedMetadata, TranslatorError,
+};
+pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
+pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
+pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
+pub use resolver::SatSolver;
+pub use store::ContentAddressedStore;
+pub use transaction::Transaction;
+pub use verifier::CryptoVerifier;
+pub use universal_adapter::{
+    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
+};
+pub use universal_oop_system::{
+    IPackage, IPackageParser, PackageFormat, PackageMetadata,
+    PackageParserFactory, UniversalPackageManager,
+    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
+    UserDefinedHook, ParseError, InstallError, HookError,
+};
 pub use spec::{
     AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
@@ -32,22 +54,6 @@ pub use spec::{
     TxzPackageAdapter, XbpsPackageAdapter,
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
-};
-pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
-pub use resolver::SatSolver;
-pub use store::ContentAddressedStore;
-pub use transaction::Transaction;
-pub use verifier::CryptoVerifier;
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
-pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
-};
-pub use universal_oop_system::{
-    IPackage, IPackageParser, PackageFormat, PackageMetadata,
-    PackageParserFactory, UniversalPackageManager,
-    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError, InstallError, HookError,
 };
 
 /// Package version using SemVer

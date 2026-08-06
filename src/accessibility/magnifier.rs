@@ -1,19 +1,14 @@
-extern crate alloc;
-use crate::klib::Vec;
-use alloc::boxed::Box;
 /// OOP-based Screen Magnifier for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 826
 /// Implements screen magnification and zoom
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type MagnifierID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MagnifierError {
-    Success = 0,
-    NotFound = 1,
-}
+pub enum MagnifierError { Success = 0, NotFound = 1 }
 
 pub trait Magnifier {
     fn id(&self) -> MagnifierID;

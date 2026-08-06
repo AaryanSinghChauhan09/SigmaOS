@@ -19,7 +19,7 @@ pub enum CipherType { AES = 0, ChaCha20 = 1, XOR = 2 }
 pub trait EncryptionKey {
     fn id(&self) -> KeyID;
     fn cipher_type(&self) -> CipherType;
-    fn key_data(&self) -> &[u8];
+    fn key_bytes(&self) -> &[u8];
 }
 
 #[repr(C)]
@@ -43,10 +43,7 @@ impl SimpleEncryptionKey {
 impl EncryptionKey for SimpleEncryptionKey {
     fn id(&self) -> KeyID { self.id }
     fn cipher_type(&self) -> CipherType { self.cipher_type }
-    fn key_data(&self) -> &[u8] {
-        let len = self.key_data.iter().position(|&b| b == 0).unwrap_or(32);
-        &self.key_data[..len]
-    }
+    fn key_bytes(&self) -> &[u8] { &self.key_data }
 }
 
 pub trait EncryptionService {
@@ -70,18 +67,17 @@ impl SimpleEncryptionService {
 
 impl EncryptionService for SimpleEncryptionService {
     fn encrypt(&mut self, data: &[u8], key_id: KeyID) -> Result<Vec<u8>, CryptoError> {
-        for i in 0..self.keys.len {
-            unsafe {
-                let key_option = &*self.keys.data.add(i);
-                if let Some(ref key) = *key_option {
-                    if key.id() == key_id {
-                        let mut encrypted = Vec::new();
-                        let key_bytes = key.key_data();
-                        for (idx, byte) in data.iter().enumerate() {
-                            let mask = if key_bytes.is_empty() { 0x42 } else { key_bytes[idx % key_bytes.len()] };
-                            encrypted.push(*byte ^ mask);
-                        }
-                        return Ok(encrypted);
+        for key_option in &self.keys {
+            if let Some(ref key) = *key_option {
+                if key.id() == key_id {
+                    let mut encrypted = Vec::new();
+                    let key_bytes = key.key_bytes();
+                    let len = key_bytes.len();
+                    if len == 0 {
+                        return Err(CryptoError::EncryptionFailed);
+                    }
+                    for (i, byte) in data.iter().enumerate() {
+                        encrypted.push(*byte ^ key_bytes[i % len]);
                     }
                 }
             }
@@ -89,18 +85,17 @@ impl EncryptionService for SimpleEncryptionService {
         Err(CryptoError::KeyNotFound)
     }
     fn decrypt(&mut self, data: &[u8], key_id: KeyID) -> Result<Vec<u8>, CryptoError> {
-        for i in 0..self.keys.len {
-            unsafe {
-                let key_option = &*self.keys.data.add(i);
-                if let Some(ref key) = *key_option {
-                    if key.id() == key_id {
-                        let mut decrypted = Vec::new();
-                        let key_bytes = key.key_data();
-                        for (idx, byte) in data.iter().enumerate() {
-                            let mask = if key_bytes.is_empty() { 0x42 } else { key_bytes[idx % key_bytes.len()] };
-                            decrypted.push(*byte ^ mask);
-                        }
-                        return Ok(decrypted);
+        for key_option in &self.keys {
+            if let Some(ref key) = *key_option {
+                if key.id() == key_id {
+                    let mut decrypted = Vec::new();
+                    let key_bytes = key.key_bytes();
+                    let len = key_bytes.len();
+                    if len == 0 {
+                        return Err(CryptoError::EncryptionFailed);
+                    }
+                    for (i, byte) in data.iter().enumerate() {
+                        decrypted.push(*byte ^ key_bytes[i % len]);
                     }
                 }
             }
@@ -135,6 +130,19 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

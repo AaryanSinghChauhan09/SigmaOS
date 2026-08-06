@@ -1,27 +1,18 @@
-extern crate alloc;
-use crate::klib::Vec;
-use alloc::boxed::Box;
 /// OOP-based Accessibility Keyboard for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 836
 /// Implements on-screen keyboard and accessibility input
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type KeyID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KeyType {
-    Character = 0,
-    Modifier = 1,
-    Function = 2,
-}
+pub enum KeyType { Character = 0, Modifier = 1, Function = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KeyboardError {
-    Success = 0,
-    NotFound = 1,
-}
+pub enum KeyboardError { Success = 0, NotFound = 1 }
 
 pub trait VirtualKey {
     fn id(&self) -> KeyID;
@@ -70,12 +61,9 @@ impl VirtualKey for SimpleVirtualKey {
             _ => KeyType::Function,
         }
     }
-    fn is_pressed(&self) -> bool {
-        self.pressed.load(Ordering::SeqCst) == 1
-    }
+    fn is_pressed(&self) -> bool { self.pressed.load(Ordering::SeqCst) == 1 }
     fn set_pressed(&self, pressed: bool) {
-        self.pressed
-            .store(if pressed { 1 } else { 0 }, Ordering::SeqCst);
+        self.pressed.store(if pressed { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 

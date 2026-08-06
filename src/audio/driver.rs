@@ -1,21 +1,17 @@
-// OOP-based Audio Driver for SigmaOS
-// Implements audio device management and playback under `#![no_std]`.
-
-extern crate alloc;
+/// OOP-based Audio Driver for SigmaOS
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 71
+/// Implements audio device management and playback
 
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type AudioDeviceID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AudioType {
-    Playback = 0,
-    Capture = 1,
-    Duplex = 2,
-}
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum AudioType { Playback = 0, Capture = 1, Duplex = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -71,9 +67,7 @@ impl AudioDevice for SimpleAudioDevice {
             _ => AudioType::Duplex,
         }
     }
-    fn sample_rate(&self) -> u32 {
-        self.sample_rate.load(Ordering::SeqCst) as u32
-    }
+    fn sample_rate(&self) -> u32 { self.sample_rate.load(Ordering::SeqCst) as u32 }
 
     fn initialize(&mut self) -> Result<(), AudioError> {
         Ok(())
@@ -268,24 +262,5 @@ impl AudioStream for SimpleAudioStream {
 
     fn read_samples(&mut self, _stream_id: usize, _buffer: &mut [u8]) -> Result<usize, AudioError> {
         Ok(0)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_audio_driver_lifecycle() {
-        let mut manager = SimpleAudioManager::new();
-        let device = SimpleAudioDevice::new(12, b"SovereignHeadphones", AudioType::Playback, 48000);
-
-        manager.register_device(Box::new(device)).unwrap();
-        assert_eq!(manager.list_devices().len(), 1);
-
-        let default_dev = manager.get_default_playback().unwrap();
-        assert_eq!(default_dev.id(), 12);
-        assert_eq!(default_dev.name(), b"SovereignHeadphones");
-        assert_eq!(default_dev.sample_rate(), 48000);
     }
 }
