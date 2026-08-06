@@ -3,6 +3,14 @@
 
 use std::io::{self, BufRead, Write}; // Userspace I/O is acceptable
 
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine;
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine
+    }
+}
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
