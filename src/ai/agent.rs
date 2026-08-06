@@ -510,7 +510,10 @@ mod tests {
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
         let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        agent.register_mcp_tool(b"fetch_weather", b"MCP weather fetcher");
+        agent.register_mcp_tool(
+            b"fetch_weather",
+            b"MCP weather fetcher",
+        );
         assert_eq!(agent.mcp_tools.len(), 1);
 
         let opt_score = agent.optimize_prompt_weights();

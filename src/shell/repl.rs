@@ -3,14 +3,6 @@
 
 use std::io::{self, BufRead, Write}; // Userspace I/O is acceptable
 
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -105,6 +97,44 @@ pub enum ShellCommand {
     Proc {
         args: Vec<String>,
     },
+    Pwd,
+    WhoAmI,
+    Uname,
+    Clear,
+    Touch {
+        filename: String,
+    },
+    Mkdir {
+        dirname: String,
+    },
+    Rm {
+        filename: String,
+    },
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
+    Theme {
+        theme_name: String,
+    },
+    Profile {
+        profile_name: String,
+    },
+    A11y {
+        feature: String,
+        state: String,
+    },
     Unknown(String),
 }
 
@@ -175,19 +205,26 @@ impl ShellRepl {
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
+        let mut installed_packages = std::collections::HashSet::new();
+        installed_packages.insert("sigma-sh".to_string());
+        installed_packages.insert("sigma-vim".to_string());
+
+        let mut a11y_features = std::collections::HashMap::new();
+        a11y_features.insert("screenreader".to_string(), false);
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
-            current_dir: "/home/user".to_string(),
-            current_user: "user".to_string(),
+            current_dir: "/home/sigma".to_string(),
+            current_user: "sigma".to_string(),
             services,
-            installed_packages: std::collections::HashSet::new(),
+            installed_packages,
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
+            a11y_features,
         }
     }
 
@@ -197,19 +234,26 @@ impl ShellRepl {
         services.insert("systemd-logind".to_string(), "Running".to_string());
         services.insert("cron".to_string(), "Running".to_string());
 
+        let mut installed_packages = std::collections::HashSet::new();
+        installed_packages.insert("sigma-sh".to_string());
+        installed_packages.insert("sigma-vim".to_string());
+
+        let mut a11y_features = std::collections::HashMap::new();
+        a11y_features.insert("screenreader".to_string(), false);
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
             prompt,
             agent_engine: AgentAutomationEngine::new(),
-            current_dir: "/home/user".to_string(),
-            current_user: "user".to_string(),
+            current_dir: "/home/sigma".to_string(),
+            current_user: "sigma".to_string(),
             services,
-            installed_packages: std::collections::HashSet::new(),
+            installed_packages,
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
+            a11y_features,
         }
     }
 
