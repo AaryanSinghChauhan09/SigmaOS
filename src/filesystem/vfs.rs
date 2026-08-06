@@ -535,3 +535,5 @@ impl VirtualFilesystem {
         }
     }
 }
+    pub link_count: u32, // standard inode link count tracking hard links
+}

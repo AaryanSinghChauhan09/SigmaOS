@@ -23,6 +23,12 @@ pub use legacy_adapters::{
     LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
     GLOBAL_WORKLOAD_OPTIMIZER,
 };
+pub mod legacy_adapters;
+pub mod linux_security;
+pub mod standards;
+pub mod overtake;
+pub mod arch_linux;
+pub mod fedora;
 
 pub use constellation_mesh::{
     BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
@@ -89,6 +95,11 @@ pub use reactos::{
 pub use jails::{
     NamespaceType as SovereignNamespaceType, NamespaceIsolation as SovereignNamespaceIsolation,
     SeccompFilter as SovereignSeccompFilter, FreeBsdJail, SovereignSandboxCoordinator,
+};
+
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel,
 };
 
 pub use historic_linux::{
