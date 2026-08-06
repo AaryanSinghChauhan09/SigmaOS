@@ -498,7 +498,7 @@ impl DependencyResolver {
 
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
-        let mut to_visit = vec![package_name];
+        let mut to_visit = vec![package_name.to_string()];
         let mut visited = std::collections::HashSet::new();
 
         while let Some(current) = to_visit.pop() {
@@ -683,6 +683,7 @@ pub struct UniversalPackageManager {
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
+    pub metadata_cache: HashMap<String, UnifiedPackage>,
 }
 
 impl UniversalPackageManager {
@@ -693,6 +694,7 @@ impl UniversalPackageManager {
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
+            metadata_cache: HashMap::new(),
         };
 
         manager.add_default_adapters();
