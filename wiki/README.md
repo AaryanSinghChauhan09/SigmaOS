@@ -455,3 +455,4 @@ To surpass legacy operating system titans, SigmaOS maps and systematically resol
 ### 6. AI-Native Desktop Assistant
 *   **OS-Level Context Awareness:** Bypasses isolated app assistant silos. Applications expose their data structures to the system via read-only IPC slots.
 *   **Autonomous Multi-Agent Orchestration:** The embedded `SovereignMultiAgentPlanner` automates complex business and diagnostic workflows directly at the system level.
+# SigmaOS Sovereign Wiki

@@ -136,8 +136,46 @@ static const DriverDescriptor g_driver_table[] = {
 
     { "mmc_block",    "storage", "eMMC / SD (ARM64)",
       (sigma_hw_profile_t)SIGMA_HW_PROFILE_IOT_ARM64,
+<<<<<<< HEAD
       false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED,
       { "sdhci", nullptr }, 0x11AB, 0x0100, true },
+||||||| 65885484f
+      false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED },
+=======
+      false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED,
+      { "sdhci", nullptr }, 0x11AB, 0x0100, true },
+
+    // ---- Emerging & Accelerated Hardware (CISC/RISC AI accelerators & enclaves) ----
+    { "google_tpu",   "compute", "Google TPU v4/v5 Tensor Engine",
+      SIGMA_HW_PROFILE_SERVER,
+      false, 0, 0,
+      { "pci_core", nullptr }, 0x1AE0, 0x0056, true },
+
+    { "graphcore_ipu","compute", "Graphcore Bow IPU Core",
+      SIGMA_HW_PROFILE_SERVER,
+      false, 0, 0,
+      { "pci_core", nullptr }, 0x1E1A, 0x0010, true },
+
+    { "fpga_mgr",     "coproc",  "Xilinx Alveo FPGA Core Manager",
+      SIGMA_HW_PROFILE_SERVER,
+      false, 0, 0,
+      { "pci_core", nullptr }, 0x10EE, 0x5005, true },
+
+    { "optane_dax",   "storage", "Intel Optane Persistent Memory DAX",
+      SIGMA_HW_PROFILE_SERVER,
+      false, 0, 0,
+      { "pci_core", nullptr }, 0x8086, 0x2011, true },
+
+    { "intel_tdx",    "security","Intel Trust Domain Extensions Enclave",
+      SIGMA_HW_PROFILE_ALL,
+      false, 0, 0,
+      { nullptr }, 0xFFFF, 0xFFFF, true },
+
+    { "amd_sev",      "security","AMD Secure Encrypted Virtualization Enclave",
+      SIGMA_HW_PROFILE_ALL,
+      false, 0, 0,
+      { nullptr }, 0xFFFF, 0xFFFF, true },
+>>>>>>> origin/jules-13571719274074749109-6af93541
 };
 
 static const sigma_u32 g_driver_count = sizeof(g_driver_table) / sizeof(g_driver_table[0]);
