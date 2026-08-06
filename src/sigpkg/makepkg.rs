@@ -213,7 +213,7 @@ depends=("glibc")
 
     #[test]
     fn test_makepkg_sandbox() {
-        let sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
+        let mut sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
         let content = r#"
 pkgname="test-package"
 pkgver="1.0.0"

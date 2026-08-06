@@ -8,19 +8,19 @@ use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
 
 /// ArcInner - Internal structure for Arc
-struct ArcInner<T> {
+struct ArcInner<T: ?Sized> {
     count: AtomicUsize,
     data: T,
 }
 
 /// Arc - Atomic Reference Counting smart pointer
 /// Provides thread-safe shared ownership with reference counting
-pub struct Arc<T> {
+pub struct Arc<T: ?Sized> {
     ptr: NonNull<ArcInner<T>>,
 }
 
-unsafe impl<T: Send + Sync> Send for Arc<T> {}
-unsafe impl<T: Send + Sync> Sync for Arc<T> {}
+unsafe impl<T: ?Sized + Send + Sync> Send for Arc<T> {}
+unsafe impl<T: ?Sized + Send + Sync> Sync for Arc<T> {}
 
 impl<T> Arc<T> {
     /// Create a new Arc with the given data
@@ -34,7 +34,9 @@ impl<T> Arc<T> {
             ptr: NonNull::new(inner).expect("ArcInner pointer should not be null"),
         }
     }
+}
 
+impl<T: ?Sized> Arc<T> {
     /// Get the number of strong references to this Arc
     pub fn strong_count(&self) -> usize {
         self.inner().count.load(Ordering::SeqCst)
@@ -75,7 +77,7 @@ impl<T> Arc<T> {
     }
 }
 
-impl<T> Clone for Arc<T> {
+impl<T: ?Sized> Clone for Arc<T> {
     fn clone(&self) -> Self {
         self.increment();
         Arc {
@@ -84,13 +86,13 @@ impl<T> Clone for Arc<T> {
     }
 }
 
-impl<T> Drop for Arc<T> {
+impl<T: ?Sized> Drop for Arc<T> {
     fn drop(&mut self) {
         self.decrement();
     }
 }
 
-impl<T> Deref for Arc<T> {
+impl<T: ?Sized> Deref for Arc<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {

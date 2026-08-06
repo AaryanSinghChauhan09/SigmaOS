@@ -97,6 +97,18 @@ where
     }
 }
 
+impl<K, V> Clone for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    fn clone(&self) -> Self {
+        BTreeMap {
+            entries: self.entries.clone(),
+        }
+    }
+}
+
 pub struct BTreeMapIter<'a, K, V> {
     entries: &'a Vec<(K, V)>,
     idx: usize,
