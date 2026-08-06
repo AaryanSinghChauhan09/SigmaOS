@@ -77,7 +77,7 @@ impl SovereignApm {
 
     /// Verifies the app signature recursively before deployment
     pub fn cryptographically_verify(&self, app_name: &str, signature: &[u8]) -> bool {
-        if let Some(app) = self.registry.get(app_name) {
+        if let Some(_app) = self.registry.get(app_name) {
             // Simulated post-quantum cryptographic signature check against authority_key
             if signature.len() == 32 && signature == self.authority_key {
                 return true;

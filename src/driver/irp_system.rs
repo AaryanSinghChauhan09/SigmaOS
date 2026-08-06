@@ -219,7 +219,7 @@ mod tests {
     use super::*;
 
     static mut MOCK_DPC_CALLED: bool = false;
-    fn mock_dpc_routine(context: usize) {
+    fn mock_dpc_routine(_context: usize) {
         unsafe {
             MOCK_DPC_CALLED = true;
         }
@@ -241,7 +241,7 @@ mod tests {
         let mut dispatch_table = HashMap::new();
         dispatch_table.insert(
             IRP_MJ_READ,
-            (|device: &DeviceObject, irp: &mut Irp| {
+            (|_device: &DeviceObject, irp: &mut Irp| {
                 irp.io_status.information = irp.buffer_length;
                 IoStatus::Success
             }) as fn(&DeviceObject, &mut Irp) -> IoStatus,

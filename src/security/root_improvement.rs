@@ -397,7 +397,7 @@ pub trait PamModule: Send + Sync {
         &self,
         _username: &str,
         _password_hash: &str,
-        context: &mut PamContext,
+        _context: &mut PamContext,
     ) -> PamResult {
         PamResult::Ignore
     }
@@ -417,8 +417,8 @@ pub trait PamModule: Send + Sync {
     fn change_password(
         &self,
         _username: &str,
-        old_hash: &str,
-        new_hash: &str,
+        _old_hash: &str,
+        _new_hash: &str,
         context: &mut PamContext,
     ) -> PamResult {
         PamResult::Ignore

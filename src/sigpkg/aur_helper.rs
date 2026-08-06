@@ -74,7 +74,7 @@ impl AurParser {
     }
 
     /// Parse AUR package metadata from JSON-like format
-    pub fn parse_metadata(&mut self, metadata: &str) -> Result<AurPackage, &'static str> {
+    pub fn parse_metadata(&mut self, _metadata: &str) -> Result<AurPackage, &'static str> {
         // Simplified parsing - in production, would use proper JSON parsing
         // For now, we simulate parsing from a simplified format
         

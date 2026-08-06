@@ -503,7 +503,7 @@ impl CpuCacheHierarchy {
             return (false, self.l1_latency + self.l2_latency + self.l3_latency);
         }
 
-        if let Some(evicted_addr) = l3_evicted {
+        if let Some(_evicted_addr) = l3_evicted {
             // Evicted dirty block from L3 goes to DRAM
             self.dram_traffic_bytes.fetch_add(64, Ordering::Relaxed);
         }

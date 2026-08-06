@@ -108,7 +108,7 @@ impl SimpleSocket {
 impl Socket for SimpleSocket {
     fn id(&self) -> SocketID { self.id }
     fn socket_type(&self) -> SocketType { {
-        let raw = self.socket_type.load(Ordering::SeqCst) as u32;
+        let _raw = self.socket_type.load(Ordering::SeqCst) as u32;
         match raw {
             1 => SocketType::Datagram,
             2 => SocketType::Raw,

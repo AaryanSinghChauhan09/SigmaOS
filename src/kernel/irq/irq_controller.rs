@@ -287,7 +287,7 @@ impl GIC {
     }
 
     /// Enable interrupt
-    pub fn enable_interrupt(&self, irq: usize) {
+    pub fn enable_interrupt(&self, _irq: usize) {
         // Write to GIC distributor enable register
     }
 }

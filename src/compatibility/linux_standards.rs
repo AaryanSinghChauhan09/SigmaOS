@@ -111,7 +111,7 @@ impl Service {
 
     pub fn start(&mut self) -> Result<(), ServiceError> {
         // Check dependencies
-        for dep in &self.dependencies {
+        for _dep in &self.dependencies {
             // In real implementation, check if dependency is running
         }
 

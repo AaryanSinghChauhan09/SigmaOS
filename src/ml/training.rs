@@ -404,7 +404,11 @@ impl SovereignStreamingPool {
             None
         } else {
             // Move items up and return the first element
+            // Safety: self.queue.data is valid when len > 0 (invariant maintained by push)
             unsafe {
+                if self.queue.data.is_null() {
+                    return None;
+                }
                 let first = ::core::ptr::read(self.queue.data);
                 for i in 1..self.queue.len {
                     ::core::ptr::copy_nonoverlapping(self.queue.data.add(i), self.queue.data.add(i - 1), 1);
