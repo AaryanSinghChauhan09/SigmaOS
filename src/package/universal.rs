@@ -295,9 +295,8 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut keys = Vec::new();
         for key in installed.keys() {
-            let key: &String = key;
             keys.push(key.clone());
         }
 
@@ -332,7 +331,6 @@ pub struct UniversalPackageManager {
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
-    pub metadata_cache: HashMap<String, UnifiedPackage>,
 }
 
 impl UniversalPackageManager {
@@ -343,7 +341,6 @@ impl UniversalPackageManager {
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
-            metadata_cache: HashMap::new(),
         };
 
         manager.add_default_adapters();

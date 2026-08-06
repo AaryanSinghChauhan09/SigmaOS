@@ -5,11 +5,12 @@
 
 #![no_std]
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
+use core::mem;
+/// OOP-based AI Agent Framework for SigmaOS
+/// Implements AI agent using OOP principles with traits and structs
+/// No dependency on external AI frameworks
+/// Based on Roadmap Item 81: SigmaAI core agent
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
@@ -373,11 +374,14 @@ impl AIAgent for SimpleAIAgent {
         self.mcp_tools.push((name_array, desc_array));
     }
 
-    fn optimize_prompt_weights(&mut self) -> f32 {
-        // DSPy/GEPA prompt-evaluation algorithm simulation:
-        // Returns the updated Pareto optimization score (auto-tuning)
-        self.prompt_optim_weight = 0.95;
-        self.prompt_optim_weight
+    fn info(&self) -> AgentInfo {
+        AgentInfo {
+            name: self.name,
+            version: self.version,
+            total_intents: self.patterns.len(),
+            execution_count: AtomicUsize::new(self.execution_count.load(Ordering::SeqCst)),
+            capability: self.capability,
+        }
     }
 }
 
@@ -465,11 +469,25 @@ impl AIAgentManager for SimpleAIAgentManager {
         None
     }
 
-    fn process_request(&mut self, id: usize, input: &[u8]) -> Result<Vec<u8>, AIError> {
-        if let Some(ref mut agent) = self.agents[id] {
+    fn process(&mut self, input: &[u8]) -> Result<Vec<u8>, AIError> {
+        if !self.capability.can_process {
+            return Err(AIError::PermissionDenied);
+        }
+
+        self.stats.total_requests += 1;
+
+        let active = self.active_agent.load(Ordering::SeqCst);
+        if let Some(ref mut agent) = self.agents[active] {
             let agent_mut: &mut dyn AIAgent = agent.as_mut();
             let intent = agent_mut.parse(input)?;
-            agent_mut.execute(&intent)
+
+            if let Ok(response) = agent_mut.execute(&intent) {
+                self.stats.successful_requests += 1;
+                Ok(response)
+            } else {
+                self.stats.failed_requests += 1;
+                Err(AIError::ExecutionFailed)
+            }
         } else {
             Err(AIError::InvalidInput)
         }
@@ -518,11 +536,13 @@ mod tests {
         assert_eq!(response_str, "Command executed successfully");
     }
 
-    #[test]
-    fn test_ai_agent_basics() {
-        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
-        assert_eq!(agent.version, (1, 0, 0));
-    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
     #[test]
     fn test_ai_natural_language_translations() {
@@ -581,5 +601,81 @@ mod tests {
 
     fn window_eq(a: &[u8], b: &[u8]) -> bool {
         a == b
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+// External allocator functions
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ai_agent_and_manager() {
+        let capability = AgentCapability::full();
+        let mut agent = SimpleAIAgent::new(b"assistant", (1, 0, 0), capability);
+        let pattern = Pattern::new(b"hello", IntentType::Custom, b"greet");
+        agent.add_pattern(pattern);
+
+        let parsed = agent.parse(b"hello world").unwrap();
+        assert_eq!(parsed.intent_type as usize, IntentType::Custom as usize);
+
+        let mut manager = SimpleAIAgentManager::new(ManagerCapability::full());
+        let agent_id = manager.register_agent(Box::new(agent)).unwrap();
+        assert_eq!(agent_id, 0);
+
+        let response = manager.process(b"hello world").unwrap();
+        assert_eq!(response.len(), 29);
+        assert_eq!(response[0], b'C');
+        assert_eq!(response[28], b'y');
     }
 }

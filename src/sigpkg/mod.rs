@@ -1,12 +1,7 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
-pub mod arch_compat;
-pub mod aur;
-pub mod aur_helper;
-pub mod importer;
 pub mod linux_compat;
-pub mod makepkg;
 pub mod pacman;
 pub mod recipe;
 pub mod resolver;
@@ -20,19 +15,11 @@ pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
 
-pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-pub use aur::{AurClient, AurPackage as AurPkg, AurPackageQuery, Version as AurVersion};
-pub use aur_helper::{AurHelper, AurPackage, AurParser};
-pub use makepkg::{MakepkgSandbox, PkgbuildParser};
-pub use spec::{
-    AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
-    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
-    NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
-    TxzPackageAdapter, XbpsPackageAdapter,
-    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+pub use linux_compat::{
+    DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
+    TranslatedMetadata, TranslatorError,
 };
+pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;

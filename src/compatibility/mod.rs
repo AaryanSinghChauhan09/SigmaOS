@@ -1,16 +1,11 @@
 // SigmaOS Compatibility Module
 pub mod constellation_mesh;
 pub mod cross_platform;
-pub mod historic_linux;
+pub mod india_stack;
+pub mod jehanne;
 pub mod mint_linux;
-pub mod chimera_linux;
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod india_professional_tools;
-pub mod canonical;
-pub mod fedora;
+pub mod reactos;
+pub mod jails;
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};
@@ -71,4 +66,21 @@ pub use solid_kernel::{
 pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+};
+pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
+pub use jehanne::{
+    ComputeNode, DistributedComputeHandoff, JehanneError, JehanneNamespace, NamespaceBindEntry,
+    Plan9pMessage, Plan9pMsgType,
+};
+pub use mint_linux::{
+    MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, MintUpdateManager,
+    SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor,
+};
+pub use reactos::{
+    NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
+    RegistryHive,
+};
+pub use jails::{
+    NamespaceType as SovereignNamespaceType, NamespaceIsolation as SovereignNamespaceIsolation,
+    SeccompFilter as SovereignSeccompFilter, FreeBsdJail, SovereignSandboxCoordinator,
 };

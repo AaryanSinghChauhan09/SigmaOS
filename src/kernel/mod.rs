@@ -5,6 +5,7 @@ pub mod memory;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod numa_scheduler;
 
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,
@@ -19,3 +20,4 @@ pub use policy_mechanism::{
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use numa_scheduler::{NumaTask, LockFreeTaskQueue, NumaNode, NumaScheduler};
