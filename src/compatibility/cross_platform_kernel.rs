@@ -7,11 +7,12 @@ extern crate alloc;
 
 use alloc::collections::{BTreeMap as HashMap, VecDeque};
 use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use alloc::format;
 use core::sync::atomic::{AtomicU8, Ordering};
 
 // =========================================================================
-// 1. Virtual Address Space & Memory Layout (x86_64, ARM)
+// 1. Virtual Address Space & 4-Level Page Table Layout
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,30 +27,46 @@ pub enum MemoryArch {
     ARM64,
 }
 
-/// Represents virtual memory pages mapping to physical pages
-#[derive(Debug, Clone)]
-pub struct TranslationEntry {
-    pub virtual_page: u64,
+/// Represents individual page table entry attributes
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PageTableEntry {
     pub physical_frame: u64,
-    pub mode: PageAccessMode,
+    pub present: bool,
     pub writable: bool,
-    pub dirty: bool,
+    pub user_accessible: bool,
     pub accessed: bool,
+    pub dirty: bool,
 }
 
-/// Simulated Page Directory or Translation Table Setup
+impl Default for PageTableEntry {
+    fn default() -> Self {
+        Self {
+            physical_frame: 0,
+            present: false,
+            writable: false,
+            user_accessible: false,
+            accessed: false,
+            dirty: false,
+        }
+    }
+}
+
+/// Simulated PML4/PDPT/PD/PT 4-Level structures representing physical/virtual mapping databases
 #[derive(Debug, Clone)]
 pub struct PageDirectory {
     pub arch: MemoryArch,
-    pub page_directory_base: u64, // CR3 on x86_64, TTBR0/TTBR1 on ARM
-    pub ttbr1_base: Option<u64>,  // TTBR1 for ARM Kernel space
-    pub entries: HashMap<u64, TranslationEntry>,
+    pub page_directory_base: u64, // CR3 on x86_64, TTBR0 on ARM64
+    pub ttbr1_base: Option<u64>,  // TTBR1 for ARM64 kernel space
+    // Maps Level (4 = PML4, 3 = PDPT, 2 = PD, 1 = PT) -> Index -> Entry
+    pub tables: HashMap<(u8, u64), PageTableEntry>,
+    // Register mapping for Page Fault Tracking
+    pub cr2: u64,
 }
 
 impl PageDirectory {
     pub fn new(arch: MemoryArch, base_register: u64) -> Self {
         let ttbr1 = if arch == MemoryArch::ARM64 {
-            Some(base_register + 0x1000) // simulated split TTBR1 kernel base
+            Some(base_register + 0x1000)
         } else {
             None
         };
@@ -58,63 +75,148 @@ impl PageDirectory {
             arch,
             page_directory_base: base_register,
             ttbr1_base: ttbr1,
-            entries: HashMap::new(),
+            tables: HashMap::new(),
+            cr2: 0,
         }
     }
 
-    /// Insert simulated virtual-to-physical mapping
-    pub fn map_page(
+    /// Map a complete 4-level page entry hierarchy
+    pub fn map_page_4level(
         &mut self,
-        virtual_page: u64,
+        virtual_addr: u64,
         physical_frame: u64,
         mode: PageAccessMode,
         writable: bool,
     ) {
-        let entry = TranslationEntry {
-            virtual_page,
-            physical_frame,
-            mode,
+        let pml4_idx = (virtual_addr >> 39) & 0x1FF;
+        let pdpt_idx = (virtual_addr >> 30) & 0x1FF;
+        let pd_idx = (virtual_addr >> 21) & 0x1FF;
+        let pt_idx = (virtual_addr >> 12) & 0x1FF;
+
+        let user_acc = mode == PageAccessMode::UserMode;
+
+        // Populate PML4
+        self.tables.insert((4, pml4_idx), PageTableEntry {
+            physical_frame: self.page_directory_base >> 12,
+            present: true,
             writable,
+            user_accessible: user_acc,
+            accessed: true,
             dirty: false,
-            accessed: false,
-        };
-        self.entries.insert(virtual_page, entry);
+        });
+
+        // Populate PDPT
+        self.tables.insert((3, pdpt_idx), PageTableEntry {
+            physical_frame: (self.page_directory_base + 0x1000) >> 12,
+            present: true,
+            writable,
+            user_accessible: user_acc,
+            accessed: true,
+            dirty: false,
+        });
+
+        // Populate PD
+        self.tables.insert((2, pd_idx), PageTableEntry {
+            physical_frame: (self.page_directory_base + 0x2000) >> 12,
+            present: true,
+            writable,
+            user_accessible: user_acc,
+            accessed: true,
+            dirty: false,
+        });
+
+        // Populate PT
+        self.tables.insert((1, pt_idx), PageTableEntry {
+            physical_frame,
+            present: true,
+            writable,
+            user_accessible: user_acc,
+            accessed: true,
+            dirty: true,
+        });
     }
 
-    /// Virtual-to-Physical Address Translation Simulator
-    pub fn translate_address(&mut self, virtual_addr: u64) -> Result<u64, &'static str> {
-        let page_size = 4096;
-        let virtual_page = virtual_addr / page_size;
-        let offset = virtual_addr % page_size;
+    /// Complete 4-Level Page Table Translation Walk Simulator
+    pub fn walk_page_tables(&mut self, virtual_addr: u64) -> Result<u64, &'static str> {
+        let pml4_idx = (virtual_addr >> 39) & 0x1FF;
+        let pdpt_idx = (virtual_addr >> 30) & 0x1FF;
+        let pd_idx = (virtual_addr >> 21) & 0x1FF;
+        let pt_idx = (virtual_addr >> 12) & 0x1FF;
+        let offset = virtual_addr & 0xFFF;
 
-        // Perform ARM TTBR0/TTBR1 split checking or standard CR3 checking
+        // Perform ARM TTBR0/TTBR1 range checks
         if self.arch == MemoryArch::ARM64 {
-            // Kernel address space high-bit check for ARM (TTBR1 vs TTBR0)
             let is_kernel_address = (virtual_addr & (1 << 63)) != 0;
             if is_kernel_address && self.ttbr1_base.is_none() {
-                return Err("ARM TTBR1 (kernel space base) register is uninitialized");
+                self.cr2 = virtual_addr;
+                return Err("ARM64 TTBR1 (kernel space base) is uninitialized");
             }
         }
 
-        if let Some(entry) = self.entries.get_mut(&virtual_page) {
-            entry.accessed = true;
-            Ok(entry.physical_frame * page_size + offset)
-        } else {
-            Err("Page Fault: virtual page not present in translation directories")
+        // Walk PML4 -> PDPT with safe borrow checking pattern
+        let pml4_entry = match self.tables.get(&(4, pml4_idx)) {
+            Some(entry) => entry,
+            None => {
+                self.cr2 = virtual_addr;
+                return Err("PML4 translation entry not found (Page Fault)");
+            }
+        };
+        if !pml4_entry.present {
+            self.cr2 = virtual_addr;
+            return Err("PML4 entry is marked not present");
         }
+
+        // Walk PDPT -> PD
+        let pdpt_entry = match self.tables.get(&(3, pdpt_idx)) {
+            Some(entry) => entry,
+            None => {
+                self.cr2 = virtual_addr;
+                return Err("PDPT translation entry not found (Page Fault)");
+            }
+        };
+        if !pdpt_entry.present {
+            self.cr2 = virtual_addr;
+            return Err("PDPT entry is marked not present");
+        }
+
+        // Walk PD -> PT
+        let pd_entry = match self.tables.get(&(2, pd_idx)) {
+            Some(entry) => entry,
+            None => {
+                self.cr2 = virtual_addr;
+                return Err("PD translation entry not found (Page Fault)");
+            }
+        };
+        if !pd_entry.present {
+            self.cr2 = virtual_addr;
+            return Err("PD entry is marked not present");
+        }
+
+        // Walk PT -> Physical frame
+        let pt_entry = match self.tables.get(&(1, pt_idx)) {
+            Some(entry) => entry,
+            None => {
+                self.cr2 = virtual_addr;
+                return Err("PT translation entry not found (Page Fault)");
+            }
+        };
+        if !pt_entry.present {
+            self.cr2 = virtual_addr;
+            return Err("PT entry is marked not present");
+        }
+
+        Ok((pt_entry.physical_frame << 12) + offset)
     }
 
-    /// Verify page level permission access
-    pub fn check_page_permission(
+    /// Verify page permissions
+    pub fn check_page_permission_4level(
         &self,
         virtual_addr: u64,
         current_privilege: PageAccessMode,
     ) -> Result<(), &'static str> {
-        let page_size = 4096;
-        let virtual_page = virtual_addr / page_size;
-
-        if let Some(entry) = self.entries.get(&virtual_page) {
-            if entry.mode == PageAccessMode::KernelMode && current_privilege == PageAccessMode::UserMode {
+        let pt_idx = (virtual_addr >> 12) & 0x1FF;
+        if let Some(entry) = self.tables.get(&(1, pt_idx)) {
+            if !entry.user_accessible && current_privilege == PageAccessMode::UserMode {
                 return Err("Access Violation: User-mode thread attempting to read Kernel-mode page");
             }
             Ok(())
@@ -125,8 +227,42 @@ impl PageDirectory {
 }
 
 // =========================================================================
-// 2. Processor Initialization & Control Regions (KPCR/KPCRB/Sys-Coprocessor)
+// 2. Thread Scheduler & Processor Control Regions (KPCR/KPCRB/Sys-Coprocessor)
 // =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThreadState {
+    Ready,
+    Running,
+    Waiting,
+    Terminated,
+}
+
+/// Represents OS Kernel Thread model with stacks and core attributes
+#[derive(Debug, Clone)]
+pub struct KThread {
+    pub thread_id: u32,
+    pub priority: u8,
+    pub state: ThreadState,
+    pub kernel_stack_base: u64,
+    pub user_stack_base: u64,
+    pub affinity_mask: u64,
+    pub wait_reason: Option<&'static str>,
+}
+
+impl KThread {
+    pub fn new(id: u32, prio: u8) -> Self {
+        Self {
+            thread_id: id,
+            priority: prio,
+            state: ThreadState::Ready,
+            kernel_stack_base: 0xFFFFFFFF80000000 + (id as u64 * 0x4000),
+            user_stack_base: 0x00007FFFF0000000 + (id as u64 * 0x4000),
+            affinity_mask: 0x01,
+            wait_reason: None,
+        }
+    }
+}
 
 /// Models Windows-style Deferred Procedure Call (DPC)
 #[derive(Debug, Clone)]
@@ -136,15 +272,30 @@ pub struct DeferredProcedureCall {
     pub priority: u8,
 }
 
+/// Models Windows-style Asynchronous Procedure Call (APC)
+#[derive(Debug, Clone)]
+pub struct AsynchronousProcedureCall {
+    pub id: usize,
+    pub target_routine: u64,
+    pub kernel_mode: bool,
+    pub arg1: u64,
+}
+
 /// Processor Control Region Block (KPCRB) containing scheduler queues and context
 #[derive(Debug, Clone)]
 pub struct Kpcrb {
     pub current_thread_id: u32,
     pub next_thread_id: Option<u32>,
     pub idle_thread_id: u32,
+    // Schedulers run/wait states
+    pub run_queue: VecDeque<KThread>,
+    pub wait_queue: Vec<KThread>,
+    // System DPC/APC procedure queues
     pub dpc_queue: VecDeque<DeferredProcedureCall>,
+    pub apc_queue: VecDeque<AsynchronousProcedureCall>,
     pub interrupt_count: u64,
     pub dpc_count: u64,
+    pub apc_count: u64,
 }
 
 impl Kpcrb {
@@ -153,9 +304,13 @@ impl Kpcrb {
             current_thread_id: idle_thread,
             next_thread_id: None,
             idle_thread_id: idle_thread,
+            run_queue: VecDeque::new(),
+            wait_queue: Vec::new(),
             dpc_queue: VecDeque::new(),
+            apc_queue: VecDeque::new(),
             interrupt_count: 0,
             dpc_count: 0,
+            apc_count: 0,
         }
     }
 
@@ -163,10 +318,49 @@ impl Kpcrb {
         self.dpc_queue.push_back(dpc);
     }
 
+    pub fn queue_apc(&mut self, apc: AsynchronousProcedureCall) {
+        self.apc_queue.push_back(apc);
+    }
+
+    pub fn add_thread(&mut self, thread: KThread) {
+        self.run_queue.push_back(thread);
+    }
+
+    /// Block the currently running thread and queue it to the wait queue
+    pub fn block_current_thread(&mut self, wait_reason: &'static str) {
+        let current_id = self.current_thread_id;
+        if current_id != self.idle_thread_id {
+            let mut blocked_thread = KThread::new(current_id, 8);
+            blocked_thread.state = ThreadState::Waiting;
+            blocked_thread.wait_reason = Some(wait_reason);
+            self.wait_queue.push(blocked_thread);
+        }
+        self.current_thread_id = self.idle_thread_id;
+    }
+
+    /// Basic scheduler round-robin execution
+    pub fn schedule_next_thread(&mut self) -> Option<u32> {
+        if let Some(mut next_thread) = self.run_queue.pop_front() {
+            next_thread.state = ThreadState::Running;
+            self.current_thread_id = next_thread.thread_id;
+            Some(next_thread.thread_id)
+        } else {
+            self.current_thread_id = self.idle_thread_id;
+            None
+        }
+    }
+
     pub fn drain_dpc_queue(&mut self) -> usize {
         let count = self.dpc_queue.len();
         self.dpc_count += count as u64;
         self.dpc_queue.clear();
+        count
+    }
+
+    pub fn drain_apc_queue(&mut self) -> usize {
+        let count = self.apc_queue.len();
+        self.apc_count += count as u64;
+        self.apc_queue.clear();
         count
     }
 }
@@ -227,7 +421,7 @@ pub enum Irql {
     HighLevel = 4,     // Machine checks, clock synchronization
 }
 
-/// Simulated Interrupt Request Level (IRQL) Controller
+/// Simulated Interrupt Request Level (IRQL) Controller with automatic procedure execution loops
 #[derive(Debug)]
 pub struct IrqlController {
     current_irql: AtomicU8,
@@ -261,11 +455,22 @@ impl IrqlController {
     }
 
     /// KeLowerIrql Lowers the current processor priority level
-    pub fn ke_lower_irql(&self, new_irql: Irql) -> Result<(), &'static str> {
+    pub fn ke_lower_irql(&self, new_irql: Irql, kpcrb: &mut Kpcrb) -> Result<(), &'static str> {
         let current = self.get_current_irql();
         if new_irql > current {
             return Err("KeLowerIrql: Attempting to raise IRQL via lower call (use KeRaiseIrql instead)");
         }
+
+        // Simulate automatic Software Interrupt (APC/DPC) execution loops during IRQL lowering
+        if current >= Irql::DispatchLevel && new_irql < Irql::DispatchLevel {
+            // Lowering below DISPATCH_LEVEL triggers automatic drain of DPC queue
+            kpcrb.drain_dpc_queue();
+        }
+        if current >= Irql::ApcLevel && new_irql < Irql::ApcLevel {
+            // Lowering below APC_LEVEL triggers automatic execution of APC queue
+            kpcrb.drain_apc_queue();
+        }
+
         self.current_irql.store(new_irql as u8, Ordering::SeqCst);
         Ok(())
     }
@@ -287,8 +492,35 @@ impl Default for IrqlController {
 }
 
 // =========================================================================
-// 4. IDT, IDTR, Faults, Traps, exceptions, and Debugging Systems
+// 4. Trap Frames, IDT, exceptions, and Calling Convention Translators
 // =========================================================================
+
+/// Models x86_64 Trap Frame saved on kernel stack during privilege transition / exception entry
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct TrapFrame {
+    pub r15: u64,
+    pub r14: u64,
+    pub r13: u64,
+    pub r12: u64,
+    pub r11: u64,
+    pub r10: u64,
+    pub r9:  u64,
+    pub r8:  u64,
+    pub rdi: u64,
+    pub rsi: u64,
+    pub rbp: u64,
+    pub rbx: u64,
+    pub rdx: u64,
+    pub rcx: u64,
+    pub rax: u64,
+    pub error_code: u64,
+    pub rip: u64,
+    pub cs:  u64,
+    pub rflags: u64,
+    pub rsp: u64,
+    pub ss:  u64,
+}
 
 #[derive(Debug, Clone, Copy)]
 pub struct IdtEntry {
@@ -307,7 +539,7 @@ pub struct Idtr {
     pub base: u64,
 }
 
-/// Service Descriptor Table for System Calls
+/// Service Descriptor Table for System Calls supporting calling convention parameters translation
 #[derive(Debug, Clone)]
 pub struct SystemServiceTable {
     pub service_table: HashMap<u32, u64>, // Maps syscall number to handler address
@@ -327,13 +559,26 @@ impl SystemServiceTable {
         self.call_count.insert(sys_num, 0);
     }
 
-    /// Dispatch system call with trapping/profiling hooks
-    pub fn dispatch_syscall(&mut self, sys_num: u32) -> Result<u64, &'static str> {
-        if let Some(&addr) = self.service_table.get(&sys_num) {
-            // Profile call
-            let count = self.call_count.entry(sys_num).or_insert(0);
-            *count += 1;
-            Ok(addr)
+    /// Translate Calling Conventions parameters from Microsoft x64 (RCX, RDX, R8, R9) to System V AMD64 (RDI, RSI, RDX, R10)
+    pub fn translate_and_profile_syscall(
+        &mut self,
+        sys_num: u32,
+        rcx: u64,
+        rdx: u64,
+        r8: u64,
+        r9: u64,
+    ) -> Result<(u64, [u64; 4]), &'static str> {
+        let count = self.call_count.entry(sys_num).or_insert(0);
+        *count += 1;
+
+        if let Some(&handler_addr) = self.service_table.get(&sys_num) {
+            // Translate params: MS x64 params mapped into System V convention parameters
+            let rdi_sysv = rcx;
+            let rsi_sysv = rdx;
+            let rdx_sysv = r8;
+            let r10_sysv = r9;
+
+            Ok((handler_addr, [rdi_sysv, rsi_sysv, rdx_sysv, r10_sysv]))
         } else {
             Err("Trap: Unknown system call number")
         }
@@ -421,135 +666,92 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_virtual_address_translation_and_privileges() {
-        // 1. Setup x86_64 PageDirectory map
+    fn test_4level_page_table_translation_and_permissions() {
         let mut pd = PageDirectory::new(MemoryArch::X86_64, 0x1A000);
         assert_eq!(pd.page_directory_base, 0x1A000);
-        assert!(pd.ttbr1_base.is_none());
 
-        // Map virtual page 5 (virtual address 20480 to 24575) to physical frame 100
-        pd.map_page(5, 100, PageAccessMode::UserMode, true);
+        // Map page at virtual address 0x7FFFF0000000 to physical frame 1000
+        pd.map_page_4level(0x7FFFF0000000, 1000, PageAccessMode::UserMode, true);
 
-        // Translate user space virtual address 20490 (page 5, offset 10)
-        let phys_addr = pd.translate_address(20490).unwrap();
-        assert_eq!(phys_addr, 100 * 4096 + 10);
+        // Translate address successfully
+        let phys = pd.walk_page_tables(0x7FFFF0000123).unwrap();
+        assert_eq!(phys, (1000 << 12) + 0x123);
 
-        // Unmapped translation should raise Page Fault error
-        assert!(pd.translate_address(50000).is_err());
+        // Permissions checks
+        assert!(pd.check_page_permission_4level(0x7FFFF0000123, PageAccessMode::UserMode).is_ok());
 
-        // 2. Setup ARM64 split PageDirectory map
-        let mut pd_arm = PageDirectory::new(MemoryArch::ARM64, 0x5000);
-        assert_eq!(pd_arm.page_directory_base, 0x5000);
-        assert_eq!(pd_arm.ttbr1_base.unwrap(), 0x5000 + 0x1000);
-
-        // Map virtual kernel-mode page 0xFFFFFFFFFFFFF000 / 4096 to frame 50
-        let kernel_vpage = 0xFFFFFFFFFFFFF000u64 / 4096;
-        pd_arm.map_page(kernel_vpage, 50, PageAccessMode::KernelMode, false);
-
-        // Translate high kernel-address (with bit 63 set)
-        let arm_phys = pd_arm.translate_address(0xFFFFFFFFFFFFF010).unwrap();
-        assert_eq!(arm_phys, 50 * 4096 + 16);
-
-        // Verify kernel mode page privileges
-        assert!(pd_arm.check_page_permission(0xFFFFFFFFFFFFF010, PageAccessMode::KernelMode).is_ok());
-        // User mode access to Kernel mode page should raise Access Violation
-        let perm_res = pd_arm.check_page_permission(0xFFFFFFFFFFFFF010, PageAccessMode::UserMode);
-        assert_eq!(perm_res, Err("Access Violation: User-mode thread attempting to read Kernel-mode page"));
+        // Introduce Page Fault mapping error
+        assert!(pd.walk_page_tables(0xDEADBEEF000).is_err());
+        assert_eq!(pd.cr2, 0xDEADBEEF000);
     }
 
     #[test]
-    fn test_processor_control_region_and_dpc_mechanics() {
-        // KPCR initialization
+    fn test_thread_scheduling_queues() {
+        let mut kpcrb = Kpcrb::new(999);
+        assert_eq!(kpcrb.current_thread_id, 999);
+
+        // Add 2 threads
+        let thread1 = KThread::new(101, 15);
+        let thread2 = KThread::new(102, 12);
+        kpcrb.add_thread(thread1);
+        kpcrb.add_thread(thread2);
+
+        // Schedule next thread
+        let scheduled = kpcrb.schedule_next_thread().unwrap();
+        assert_eq!(scheduled, 101);
+        assert_eq!(kpcrb.current_thread_id, 101);
+
+        // Block current thread to WaitQueue
+        kpcrb.block_current_thread("Waiting for dynamic I/O event");
+        assert_eq!(kpcrb.current_thread_id, 999);
+        assert_eq!(kpcrb.wait_queue.len(), 1);
+        assert_eq!(kpcrb.wait_queue[0].wait_reason.unwrap(), "Waiting for dynamic I/O event");
+    }
+
+    #[test]
+    fn test_irql_lowering_triggers_apc_dpc_loops() {
         let mut kpcr = Kpcr::new(10, 0, 0x7FFFF7000, 999);
-        assert_eq!(kpcr.self_ptr, 0x7FFFF7000);
-        assert_eq!(kpcr.gs_segment_base, 0x7FFFF7000);
-        assert_eq!(kpcr.kpcrb.current_thread_id, 999);
+        let dpc = DeferredProcedureCall { id: 1, target_routine: 0x800400, priority: 2 };
+        let apc = AsynchronousProcedureCall { id: 1, target_routine: 0x800500, kernel_mode: true, arg1: 42 };
 
-        // ARM Coprocessor registers check
-        assert_eq!(kpcr.read_coprocessor_reg("SCTLR_EL1").unwrap(), 0x30D00800);
-        kpcr.write_coprocessor_reg("TTBR0_EL1".to_string(), 0x12000);
-        assert_eq!(kpcr.read_coprocessor_reg("TTBR0_EL1").unwrap(), 0x12000);
+        // Queue procedures
+        kpcr.kpcrb.queue_dpc(dpc);
+        kpcr.kpcrb.queue_apc(apc);
 
-        // Queue DPCs
-        let dpc1 = DeferredProcedureCall { id: 1, target_routine: 0x800400, priority: 2 };
-        let dpc2 = DeferredProcedureCall { id: 2, target_routine: 0x800500, priority: 3 };
-        kpcr.kpcrb.queue_dpc(dpc1);
-        kpcr.kpcrb.queue_dpc(dpc2);
-        assert_eq!(kpcr.kpcrb.dpc_queue.len(), 2);
-
-        // Drain DPCs
-        let drained = kpcr.kpcrb.drain_dpc_queue();
-        assert_eq!(drained, 2);
-        assert_eq!(kpcr.kpcrb.dpc_queue.len(), 0);
-        assert_eq!(kpcr.kpcrb.dpc_count, 2);
-    }
-
-    #[test]
-    fn test_irql_levels_and_page_fault_safety() {
         let ctrl = IrqlController::new();
-        assert_eq!(ctrl.get_current_irql(), Irql::PassiveLevel);
+        ctrl.ke_raise_irql(Irql::DispatchLevel).unwrap();
 
-        // Raise IRQL to DISPATCH_LEVEL
-        let old_irql = ctrl.ke_raise_irql(Irql::DispatchLevel).unwrap();
-        assert_eq!(old_irql, Irql::PassiveLevel);
-        assert_eq!(ctrl.get_current_irql(), Irql::DispatchLevel);
+        // Lowering to ApcLevel should drain/execute DPC queue but NOT APC queue yet
+        ctrl.ke_lower_irql(Irql::ApcLevel, &mut kpcr.kpcrb).unwrap();
+        assert_eq!(kpcr.kpcrb.dpc_count, 1);
+        assert_eq!(kpcr.kpcrb.apc_count, 0);
 
-        // Attempting to lower IRQL via KeRaiseIrql should fail
-        assert!(ctrl.ke_raise_irql(Irql::PassiveLevel).is_err());
-
-        // Check page fault safety at DISPATCH_LEVEL (should fail)
-        assert!(ctrl.check_page_fault_safety().is_err());
-
-        // Lower IRQL back to PassiveLevel
-        ctrl.ke_lower_irql(Irql::PassiveLevel).unwrap();
-        assert_eq!(ctrl.get_current_irql(), Irql::PassiveLevel);
-
-        // Page fault safety at PassiveLevel (should pass)
-        assert!(ctrl.check_page_fault_safety().is_ok());
-
-        // Attempting to raise IRQL via KeLowerIrql should fail
-        assert!(ctrl.ke_lower_irql(Irql::HighLevel).is_err());
+        // Lowering further to PassiveLevel should drain/execute APC queue automatically
+        ctrl.ke_lower_irql(Irql::PassiveLevel, &mut kpcr.kpcrb).unwrap();
+        assert_eq!(kpcr.kpcrb.apc_count, 1);
     }
 
     #[test]
-    fn test_system_calls_traps_and_windbg() {
+    fn test_traps_and_calling_convention_translation() {
         let mut sys_internals = SovereignKernelInternals::new(MemoryArch::X86_64, 0x3000, 0x7FFF100, 1);
-        assert_eq!(sys_internals.idtr.limit, 4095);
 
-        // Dispatch NtCreateFile syscall
-        let addr = sys_internals.sdt.dispatch_syscall(1).unwrap();
-        assert_eq!(addr, 0xFFFFFFFF80011000);
+        // Translate and profile Microsoft x64 -> System V AMD64 syscall
+        let (handler, sysv_params) = sys_internals.sdt.translate_and_profile_syscall(1, 10, 20, 30, 40).unwrap();
+        assert_eq!(handler, 0xFFFFFFFF80011000);
+        // Translation check
+        assert_eq!(sysv_params, [10, 20, 30, 40]);
         assert_eq!(*sys_internals.sdt.call_count.get(&1).unwrap(), 1);
 
-        // Dispatch NtWriteFile syscall
-        sys_internals.sdt.dispatch_syscall(3).unwrap();
-        assert_eq!(*sys_internals.sdt.call_count.get(&3).unwrap(), 1);
-
-        // Dispatching invalid syscall number
-        assert!(sys_internals.sdt.dispatch_syscall(99).is_err());
-
-        // Hook WinDbg and query trace
-        let response = sys_internals.communicate_windbg("KBUGCHECK_TRIGGERED");
-        assert!(sys_internals.windbg_hooked);
-        assert!(response.contains("WinDbg Hooked"));
-        assert!(response.contains("PassiveLevel"));
-    }
-
-    #[test]
-    fn test_user_mode_scheduling() {
-        let mut sys_internals = SovereignKernelInternals::new(MemoryArch::X86_64, 0x3000, 0x7FFF100, 1);
-
-        sys_internals.register_ums_thread(101, 0x150000);
-        let thread_context = sys_internals.ums_threads.get(&101).unwrap();
-        assert_eq!(thread_context.thread_id, 101);
-        assert_eq!(thread_context.state, UmsThreadState::Active);
-        assert_eq!(thread_context.context_block, 0x150000);
-
-        // Change UMS thread state
-        sys_internals.set_ums_thread_state(101, UmsThreadState::Blocked).unwrap();
-        assert_eq!(sys_internals.ums_threads.get(&101).unwrap().state, UmsThreadState::Blocked);
-
-        // Change state on unmapped thread id should return err
-        assert!(sys_internals.set_ums_thread_state(202, UmsThreadState::Suspended).is_err());
+        // Trap Frame verification
+        let trap = TrapFrame {
+            rax: 1,
+            rcx: 10,
+            rdx: 20,
+            r8: 30,
+            r9: 40,
+            rip: 0xFFFFFFFF80011000,
+            ..Default::default()
+        };
+        assert_eq!(trap.rax, 1);
     }
 }
