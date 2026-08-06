@@ -1,9 +1,17 @@
 use core::mem;
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                new_vec.push((*self.data.add(i)).clone());
+            }
+        }
+        new_vec
+    }
 }
 
 impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
@@ -19,58 +27,18 @@ impl<T> Default for Vec<T> {
 }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    /// Add high-performance dynamic pre-allocation constructor
-    /// Optimised by Bolt ⚡: allows pre-allocating the vector's capacity in a single system allocation call,
-    /// avoiding multiple expensive resize and reallocation steps during creation or cloning.
-    pub fn with_capacity(capacity: usize) -> Self {
-        if capacity == 0 {
-            return Self::new();
-        }
-        let size = mem::size_of::<T>();
-        if size == 0 {
-            return Vec {
-                data: core::ptr::null_mut(),
-                len: 0,
-                capacity,
-            };
-        }
-        let align = mem::align_of::<T>();
-        let data = unsafe { alloc(capacity * size, align) as *mut T };
-        if data.is_null() {
-            Vec::new()
-        } else {
-            Vec {
-                data,
-                len: 0,
-                capacity,
-            }
-        }
-    }
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn len(&self) -> usize {
-        self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
 
     pub fn as_slice(&self) -> &[T] {
         if self.len == 0 {
@@ -88,32 +56,19 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn contains(&self, item: &T) -> bool
-    where
-        T: PartialEq,
-    {
+    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
             unsafe {
-                if &*self.data.add(i) == item {
-                    return true;
-                }
+                if &*self.data.add(i) == item { return true; }
             }
         }
         false
     }
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter {
-            vec: self,
-            index: 0,
-        }
+        VecIter { vec: self, index: 0 }
     }
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut {
-            data: self.data,
-            len: self.len,
-            index: 0,
-            _marker: core::marker::PhantomData,
-        }
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
     }
     pub fn remove(&mut self, index: usize) -> T {
         unsafe {
@@ -125,38 +80,14 @@ impl<T> Vec<T> {
             item
         }
     }
-
-    pub fn insert(&mut self, index: usize, item: T) {
-        if index > self.len {
-            panic!("index out of bounds");
-        }
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            for i in (index..self.len).rev() {
-                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
-            }
-            core::ptr::write(self.data.add(index), item);
-            self.len += 1;
-        }
-    }
-
-    pub fn retain<F>(&mut self, mut f: F)
-    where
-        F: FnMut(&T) -> bool,
-    {
+    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
         let mut write_idx = 0;
         for i in 0..self.len {
             unsafe {
                 let item = &*self.data.add(i);
                 if f(item) {
                     if write_idx != i {
-                        core::ptr::copy_nonoverlapping(
-                            self.data.add(i),
-                            self.data.add(write_idx),
-                            1,
-                        );
+                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
                     }
                     write_idx += 1;
                 }
@@ -170,17 +101,11 @@ impl<T> Vec<T> {
             self.capacity = self.capacity.checked_add(4).unwrap_or(self.capacity);
             return;
         }
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let align = mem::align_of::<T>();
         let new_data = alloc(new_capacity * size, align) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
             if self.capacity > 0 && !self.data.is_null() {
                 free(self.data as *mut u8, self.capacity * size, align);
             }
@@ -209,16 +134,21 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
-impl<T: Clone> Clone for Vec<T> {
-    /// High-performance Vector Cloning
-    /// Optimised by Bolt ⚡: utilizes `Vec::with_capacity(self.len)` to pre-allocate memory in one block,
-    /// completely eliminating O(N) intermediate allocator resizing calls and dynamic memory copy overheads.
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::with_capacity(self.len);
-        for i in 0..self.len {
-            new_vec.push(self[i].clone());
-        }
-        new_vec
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
 
@@ -271,11 +201,7 @@ impl<T> Drop for Vec<T> {
             let size = mem::size_of::<T>();
             if size > 0 && !self.data.is_null() {
                 unsafe {
-                    free(
-                        self.data as *mut u8,
-                        self.capacity * size,
-                        mem::align_of::<T>(),
-                    );
+                    free(self.data as *mut u8, self.capacity * size, mem::align_of::<T>());
                 }
             }
         }
@@ -289,8 +215,9 @@ unsafe fn alloc(size: usize, align: usize) -> *mut u8 {
         return core::ptr::null_mut();
     }
     use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, align)
-        .unwrap_or_else(|_| Layout::from_size_align(size, 8).unwrap());
+    let layout = Layout::from_size_align(size, align).unwrap_or_else(|_| {
+        Layout::from_size_align(size, 8).unwrap()
+    });
     std_alloc(layout)
 }
 
@@ -298,8 +225,9 @@ unsafe fn alloc(size: usize, align: usize) -> *mut u8 {
 unsafe fn free(ptr: *mut u8, size: usize, align: usize) {
     use std::alloc::{dealloc as std_dealloc, Layout};
     if !ptr.is_null() && size > 0 {
-        let layout = Layout::from_size_align(size, align)
-            .unwrap_or_else(|_| Layout::from_size_align(size, 8).unwrap());
+        let layout = Layout::from_size_align(size, align).unwrap_or_else(|_| {
+            Layout::from_size_align(size, 8).unwrap()
+        });
         std_dealloc(ptr, layout);
     }
 }

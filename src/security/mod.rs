@@ -1,27 +1,22 @@
-// SigmaOS Security Subsystem
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
+
 pub mod capability;
-pub mod capsicum;
 pub mod kali_stack;
 pub mod nemoclaw;
-pub mod hardening;
 pub mod pledge;
 pub mod vulnerability;
-pub mod deobfuscation;
-pub mod defensive_audit;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use capsicum::{
-    CapDescriptor, CapFileDescriptor, CapManager, CapMode, CapNamespace, CapNamespaceManager,
-    CapResourceType, CapRights, CapSandbox, CapStats, CapValidator,
+pub use kali_stack::{
+    CronDaemon, CronJob, DmesgLog, FirewallRule, IptablesFirewall, KaliError,
+    PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
+    TmuxPane,
 };
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
-};
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
+pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    ExploitPayload, PenetrationAssistant, Severity, Vulnerability, SimpleVulnerability,
+    VulnerabilityScanner, SimpleVulnerabilityScanner, ScanSummary, ScanReport,
+    SimpleScanReport, CIPipelineIntegration, SimpleCIPipelineIntegration,
 };
-pub use deobfuscation::{
-    ArchInstruction, CpuArch, InstructionType, AbstractValue, DisassemblerCallback, MetasmEmulator, DeobfuscationEngine,
-};
-pub use defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};

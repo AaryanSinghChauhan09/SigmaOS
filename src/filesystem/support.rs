@@ -15,14 +15,13 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-extern crate alloc;
 
 extern crate alloc;
 
-use crate::filesystem::smart_symlink::{SmartSymlink, SymlinkResolverRule};
 use crate::klib::Vec;
 use alloc::boxed::Box;
 use core::mem;
+use crate::filesystem::smart_symlink::{SmartSymlink, SymlinkResolverRule};
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
@@ -284,7 +283,3 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 }
 
-pub struct LegacyLinuxRule;
-pub struct LinuxPersonaRule;
-pub struct SmartSymlink;
-pub struct SymlinkResolverRule;
