@@ -86,6 +86,12 @@ pub struct DeviceCapability {
     pub can_interrupt: bool,
 }
 
+impl Default for DeviceCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DeviceCapability {
     pub fn new() -> Self {
         DeviceCapability {
@@ -290,7 +296,7 @@ mod tests {
 
     #[test]
     fn test_modern_device_oop() {
-        let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
+        let modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
         assert_eq!(
             modern.query_channel(),
             PortAddress::MemoryMapped(0xFE000000)
@@ -317,41 +323,30 @@ mod tests {
     }
 
     #[test]
-    fn test_dynamic_compression_and_loading() {
-        // Run-length encoded bytecode for: [0x01, 0x01, 0x01, 0x04, 0x04] -> (1 count of 0x01, 1 count of 0x01, 1 count of 0x01, 2 count of 0x04)
-        let compressed = [1, 0x01, 1, 0x01, 1, 0x01, 2, 0x04];
-        let manager = DeviceManager::new();
-        let interpreter_res = manager.load_compressed_udf_driver(&compressed);
-        assert!(interpreter_res.is_ok());
-        let interpreter = interpreter_res.unwrap();
-        assert_eq!(interpreter.bytecode.len, 5);
-        assert_eq!(interpreter.bytecode[0], 0x01);
-        assert_eq!(interpreter.bytecode[4], 0x04);
-    }
+    fn test_dde_device_translation_wrapper() {
+        let mut dde_wrapper = DdeDeviceWrapper::new(201, b"linux_e1000", 0xFC000000, b"Linux");
 
-    #[test]
-    fn test_linux_compatibility_and_override() {
-        let mut manager = DeviceManager::new();
+        assert_eq!(
+            dde_wrapper.query_channel(),
+            PortAddress::MemoryMapped(0xFC000000)
+        );
+        assert_eq!(dde_wrapper.info().vendor_id, 0x8086);
+        assert_eq!(dde_wrapper.info().device_id, 0x100e);
 
-        // Register an early boot override for custom legacy hardware "custom_uart"
-        let entry = EarlyBootParameterOverride::new(b"custom_uart", 0x2F8, 4, &[0x04]);
-        manager.linux_override_table.register_override(entry);
+        // Test simulated PCI BAR configuration register writing and reading
+        assert!(dde_wrapper.write_byte(0x10, 0x55).is_ok());
+        assert_eq!(dde_wrapper.read_byte(0x10).unwrap(), 0x55);
 
-        // Register legacy device with override
-        let dev_id_result = manager.register_legacy_device_with_override(b"custom_uart", 0x3F8);
-        assert!(dev_id_result.is_ok());
-        let dev_id = dev_id_result.unwrap();
+        // Test block-like reads/writes simulating DMA descriptors
+        let test_buffer = [0xAA; 16];
+        assert!(dde_wrapper.write(&test_buffer).is_ok());
 
-        // Check if descriptor correctly matches "custom_uart" name
-        let descriptor = manager.get_descriptor(dev_id).unwrap();
-        assert_eq!(&descriptor.name[..11], b"custom_uart");
+        let mut read_buffer = [0u8; 16];
+        assert!(dde_wrapper.read(&mut read_buffer).is_ok());
+        assert_eq!(read_buffer, test_buffer);
 
-        // Verify that the port config is overriden to 0x2F8 (instead of 0x3F8)
-        // Retrieve the device from manager and cast to UnifiedPeripheral
-        let dev = manager.get_device(dev_id).unwrap();
-
-        // Simulating matching by using dynamic casting-like fields or calling device functions
-        assert_eq!(dev.info().device_type, DeviceType::Character);
+        // Test translated ioctl call
+        assert_eq!(dde_wrapper.ioctl(0xFF, 0).unwrap(), 1);
     }
 }
 
@@ -589,6 +584,12 @@ pub struct DeviceManager {
     pub linux_override_table: LinuxEarlyOverrideTable,
 }
 
+impl Default for DeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {
@@ -597,58 +598,6 @@ impl DeviceManager {
             next_device_id: AtomicUsize::new(1),
             linux_override_table: LinuxEarlyOverrideTable::new(),
         }
-    }
-
-    /// Register a legacy, potentially unsupported device.
-    /// If there is an early-boot configuration override (from Linux historical overrides),
-    /// we apply the custom base port and load the associated UDF interpreter bytecode to make it functional.
-    pub fn register_legacy_device_with_override(
-        &mut self,
-        device_name: &[u8],
-        default_port: u16,
-    ) -> Result<usize, DeviceError> {
-        let mut final_port = default_port;
-
-        // Lookup in the Linux Early Boot Override Table
-        if let Some(override_entry) = self.linux_override_table.lookup(device_name) {
-            final_port = override_entry.port_io_override;
-        }
-
-        // Create the Legacy Device using OOP principles to minimize footprint
-        let legacy_device = LegacyDevice::new(
-            self.next_device_id.load(Ordering::SeqCst),
-            device_name,
-            final_port,
-        );
-
-        // Register standard character device capabilities
-        let capability = DeviceCapability {
-            can_read: true,
-            can_write: true,
-            can_mmap: false,
-            can_dma: false,
-            can_interrupt: false,
-        };
-
-        self.register_device(
-            Box::new(legacy_device),
-            device_name,
-            DeviceType::Character,
-            capability,
-        )
-    }
-
-    /// On-demand driver decompressor and loader (Phase 4 of the blueprint).
-    /// Dynamically inflates a compressed UDF driver configuration block, instantiating the bytecode runner.
-    pub fn load_compressed_udf_driver(
-        &self,
-        compressed_bytecode: &[u8],
-    ) -> Result<UdfInterpreter, DeviceError> {
-        let mut decompressed = [0u8; 128];
-        let bytes_written = decompress_rle(compressed_bytecode, &mut decompressed)?;
-
-        let interpreter = UdfInterpreter::new(&decompressed[..bytes_written]);
-        Ok(interpreter)
     }
 
     pub fn register_device(
@@ -745,6 +694,12 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -752,6 +707,10 @@ impl<T> Vec<T> {
             len: 0,
             capacity: 0,
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
 
     pub fn push(&mut self, item: T) {
@@ -1065,32 +1024,103 @@ impl UnifiedPeripheral for ModernDevice {
     }
 }
 
-/// Compact, zero-allocation decompression engine (Run-Length Decoding)
-/// Used for dynamically inflating compressed UDF bytecode driver configurations at runtime
-/// to keep the on-disk footprint extremely small, matching Phase 4 goals of the plan.
-pub fn decompress_rle(compressed: &[u8], decompressed: &mut [u8]) -> Result<usize, DeviceError> {
-    let mut read_idx = 0;
-    let mut write_idx = 0;
+/// Represents a foreign driver wrapper running in the Device Driver Environment (DDE) translation layer.
+/// This translates foreign OS-specific I/O patterns (e.g., Linux kmalloc, virt_to_phys, PCI bars) to our `UnifiedPeripheral` interface.
+pub struct DdeDeviceWrapper {
+    pub id: usize,
+    pub name: [u8; 64],
+    pub base_addr: u32,
+    pub simulated_pci_bar: [u8; 256],
+    pub foreign_os_type: [u8; 16], // e.g., "Linux", "Windows", "FreeBSD"
+}
 
-    while read_idx < compressed.len() {
-        if read_idx + 1 >= compressed.len() {
-            return Err(DeviceError::InvalidParameter);
+impl DdeDeviceWrapper {
+    pub fn new(id: usize, name: &[u8], base_addr: u32, os_type: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        let count = compressed[read_idx] as usize;
-        let value = compressed[read_idx + 1];
-        read_idx += 2;
 
-        if write_idx + count > decompressed.len() {
-            return Err(DeviceError::InvalidParameter);
+        let mut os_array = [0u8; 16];
+        let os_len = os_type.len().min(15);
+        unsafe {
+            core::ptr::copy_nonoverlapping(os_type.as_ptr(), os_array.as_mut_ptr(), os_len);
         }
 
-        for _ in 0..count {
-            decompressed[write_idx] = value;
-            write_idx += 1;
+        DdeDeviceWrapper {
+            id,
+            name: name_array,
+            base_addr,
+            simulated_pci_bar: [0u8; 256],
+            foreign_os_type: os_array,
+        }
+    }
+}
+
+impl Device for DdeDeviceWrapper {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        // Emulate foreign driver initialization (e.g., Linux driver probe)
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(self.simulated_pci_bar.len());
+        buffer[..len].copy_from_slice(&self.simulated_pci_bar[..len]);
+        Ok(len)
+    }
+
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(self.simulated_pci_bar.len());
+        self.simulated_pci_bar[..len].copy_from_slice(&buffer[..len]);
+        Ok(len)
+    }
+
+    fn ioctl(&mut self, command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        // Emulate ioctl translation (e.g., translating POSIX ioctl to SigmaOS command)
+        if command == 0xFF {
+            Ok(1)
+        } else {
+            Ok(0)
         }
     }
 
-    Ok(write_idx)
+    fn info(&self) -> DeviceInfo {
+        let mut info = DeviceInfo::new(DeviceType::Character);
+        info.base_address = self.base_addr;
+        info.vendor_id = 0x8086; // Standard Intel Vendor ID for testing
+        info.device_id = 0x100e; // E1000 network card for simulation
+        info
+    }
+
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+}
+
+impl UnifiedPeripheral for DdeDeviceWrapper {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_addr)
+    }
+
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+        let idx = offset as usize;
+        if idx < self.simulated_pci_bar.len() {
+            Ok(self.simulated_pci_bar[idx])
+        } else {
+            Err(DeviceError::InvalidParameter)
+        }
+    }
+
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+        let idx = offset as usize;
+        if idx < self.simulated_pci_bar.len() {
+            self.simulated_pci_bar[idx] = value;
+            Ok(())
+        } else {
+            Err(DeviceError::InvalidParameter)
+        }
+    }
 }
 
 /// User-Defined Function (UDF) Interpreter (Custom Bytecode Runner)

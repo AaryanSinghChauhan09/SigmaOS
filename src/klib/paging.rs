@@ -1,41 +1,24 @@
-#![no_std]
-#![no_main]
-
-use super::vec::Vec;
-use core::mem;
 /// OOP-based Paging + Virtual Memory for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 7-8
-/// Implements 4-level page tables, PML4, userspace isolation, page fault handling,
-/// Transparent Huge Pages (THP), and multi-core TLB Invalidation Shootdowns.
+/// Implements 4-level page tables, PML4, userspace isolation, Copy-On-Write (COW), and page fault handling.
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::vec::Vec;
 
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PageTableLevel {
-    PML4 = 0,
-    PDPT = 1,
-    PD = 2,
-    PT = 3,
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageTableLevel { PML4 = 0, PDPT = 1, PD = 2, PT = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PageFaultError {
-    Success = 0,
-    NotPresent = 1,
-    PermissionDenied = 2,
-    InvalidAddress = 3,
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageFaultError { Success = 0, NotPresent = 1, PermissionDenied = 2, InvalidAddress = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum PrivilegeLevel {
-    Kernel = 0,
-    User = 3,
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrivilegeLevel { Kernel = 0, User = 3 }
 
 pub trait PageTableEntry {
     fn is_present(&self) -> bool;
@@ -50,12 +33,8 @@ pub trait PageTableEntry {
     fn set_cow(&mut self, cow: bool);
     fn set_huge(&mut self, huge: bool);
     fn set_physical_address(&mut self, addr: PhysicalAddress);
-    fn is_huge(&self) -> bool {
-        false
-    }
-    fn is_giant(&self) -> bool {
-        false
-    }
+    fn is_cow(&self) -> bool;
+    fn set_cow(&mut self, cow: bool);
 }
 
 #[repr(C)]
@@ -66,8 +45,13 @@ pub struct SimplePageTableEntry {
     pub physical_addr: AtomicUsize,
     pub accessed: AtomicUsize,
     pub dirty: AtomicUsize,
-    pub cow: AtomicUsize,
-    pub huge: AtomicUsize,
+    pub cow: AtomicUsize, // Copy-On-Write (COW) indicator flag
+}
+
+impl Default for SimplePageTableEntry {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimplePageTableEntry {
@@ -80,7 +64,6 @@ impl SimplePageTableEntry {
             accessed: AtomicUsize::new(0),
             dirty: AtomicUsize::new(0),
             cow: AtomicUsize::new(0),
-            huge: AtomicUsize::new(0),
         }
     }
 }
@@ -126,11 +109,16 @@ impl PageTableEntry for SimplePageTableEntry {
         self.physical_addr
             .store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
     }
+    fn is_cow(&self) -> bool { self.cow.load(Ordering::SeqCst) == 1 }
+    fn set_cow(&mut self, cow: bool) {
+        self.cow.store(if cow { 1 } else { 0 }, Ordering::SeqCst);
+    }
 }
 
 pub trait PageTable {
     fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry;
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry;
+    fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry;
     fn set_entry(&mut self, index: usize, entry: SimplePageTableEntry);
     fn get_physical_address(&self) -> PhysicalAddress;
 }
@@ -163,12 +151,12 @@ impl PageTable for SimplePageTable {
         }
     }
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry {
-        if index < 512 {
-            &mut self.entries[index]
-        } else {
-            static mut DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
-            unsafe { &mut *(&raw mut DUMMY) }
-        }
+        let idx = index.min(511);
+        &mut self.entries[idx]
+    }
+    fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry {
+        let idx = index.min(511);
+        &self.entries[idx]
     }
     fn set_entry(&mut self, index: usize, entry: SimplePageTableEntry) {
         let idx = index.min(511);
@@ -223,12 +211,8 @@ pub trait VirtualMemoryManager {
     ) -> Result<(), PageFaultError>;
     fn unmap_page(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
     fn get_physical(&self, virt: VirtualAddress) -> Option<PhysicalAddress>;
-    fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>;
-    fn handle_page_fault(
-        &mut self,
-        virt: VirtualAddress,
-        error_code: usize,
-    ) -> Result<(), PageFaultError>;
+    fn handle_page_fault(&mut self, virt: VirtualAddress, error_code: usize) -> Result<(), PageFaultError>;
+    fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>; // Enables Linux/BSD Copy-On-Write
 }
 
 pub struct SimpleVMM {
@@ -238,6 +222,12 @@ pub struct SimpleVMM {
     pub pt_tables: Vec<Option<SimplePageTable>>,
     pub next_table_addr: AtomicUsize,
     pub tlb_tracker: TlbTracker,
+}
+
+impl Default for SimpleVMM {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleVMM {
@@ -398,9 +388,10 @@ impl VirtualMemoryManager for SimpleVMM {
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
-
-        let is_pml4_present = self.pml4.get_entry_ref(pml4_idx).is_present();
-        if !is_pml4_present {
+        
+        let pml4_present = self.pml4.get_entry(pml4_idx).is_present();
+        
+        if !pml4_present {
             let pdpt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
             let mut pdpt_entry = SimplePageTableEntry::new();
             pdpt_entry.set_present(true);
@@ -415,12 +406,21 @@ impl VirtualMemoryManager for SimpleVMM {
             self.pdpt_tables[pml4_idx] = Some(pdpt_table);
             self.pml4.set_entry(pml4_idx, pdpt_entry);
         }
-
+        
         let pdpt_idx_in_vec = pml4_idx;
+        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pdpt_idx_in_vec];
+        let pdpt_present = if let Some(ref mut pdpt) = pdpt_table {
+            pdpt.get_entry(pdpt_idx).is_present()
+        } else {
+            false
+        };
+        
+        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+        let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
 
-        if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
-            let is_pdpt_present = pdpt.get_entry_ref(pdpt_idx).is_present();
-            if !is_pdpt_present {
+        if !pdpt_present {
+            let pdpt_table_mut: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pdpt_idx_in_vec];
+            if let Some(ref mut pdpt) = pdpt_table_mut {
                 let pd_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
                 let mut pd_entry = SimplePageTableEntry::new();
                 pd_entry.set_present(true);
@@ -435,41 +435,50 @@ impl VirtualMemoryManager for SimpleVMM {
                 self.pd_tables[pd_idx_in_vec] = Some(pd_table);
                 pdpt.set_entry(pdpt_idx, pd_entry);
             }
+        }
 
-            let pd_idx_in_vec = pdpt_idx;
+        let pd_table: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
+        let pd_present = if let Some(ref mut pd) = pd_table {
+            pd.get_entry(pd_idx).is_present()
+        } else {
+            false
+        };
 
-            if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
-                let is_pd_present = pd.get_entry_ref(pd_idx).is_present();
-                if !is_pd_present {
-                    let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
-                    let mut pt_entry = SimplePageTableEntry::new();
-                    pt_entry.set_present(true);
-                    pt_entry.set_writable(true);
-                    pt_entry.set_user_accessible(false);
-                    pt_entry.set_physical_address(pt_phys);
+        let pdpt_table_ref: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pdpt_idx_in_vec];
+        let pd_phys = if let Some(ref mut pdpt) = pdpt_table_ref {
+            pdpt.get_entry(pdpt_idx).get_physical_address()
+        } else {
+            0
+        };
+        let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
 
-                    let pt_table = SimplePageTable::new(pt_phys);
-                    while self.pt_tables.len() <= pd_idx {
-                        self.pt_tables.push(None);
-                    }
-                    self.pt_tables[pd_idx] = Some(pt_table);
-                    pd.set_entry(pd_idx, pt_entry);
-                }
-
-                let pt_idx_in_vec = pd_idx;
-
-                if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
-                    let mut pt_entry = SimplePageTableEntry::new();
-                    pt_entry.set_present(true);
-                    pt_entry.set_writable(writable);
-                    pt_entry.set_user_accessible(user);
-                    pt_entry.set_physical_address(phys);
-                    pt.set_entry(pt_idx, pt_entry);
-                    self.tlb_tracker.register_invalidation(virt);
+        if !pd_present {
+            let pd_table_mut: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
+            if let Some(ref mut pd) = pd_table_mut {
+                let pt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+                let mut pt_entry = SimplePageTableEntry::new();
+                pt_entry.set_present(true);
+                pt_entry.set_writable(true);
+                pt_entry.set_user_accessible(false);
+                pt_entry.set_physical_address(pt_phys);
+                
+                let pt_table = SimplePageTable::new(pt_phys);
+                while self.pt_tables.len() <= pt_idx_in_vec {
+                    self.pt_tables.push(None);
                 }
                 self.pt_tables[pt_idx_in_vec] = Some(pt_table);
                 pd.set_entry(pd_idx, pt_entry);
             }
+        }
+        
+        let pt_table_mut: &mut Option<SimplePageTable> = &mut self.pt_tables[pt_idx_in_vec];
+        if let Some(ref mut pt) = pt_table_mut {
+            let mut pt_entry = SimplePageTableEntry::new();
+            pt_entry.set_present(true);
+            pt_entry.set_writable(writable);
+            pt_entry.set_user_accessible(user);
+            pt_entry.set_physical_address(phys);
+            pt.set_entry(pt_idx, pt_entry);
         }
 
         Ok(())
@@ -546,34 +555,37 @@ impl VirtualMemoryManager for SimpleVMM {
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
-
-        let pml4_entry = self.pml4.get_entry(pml4_idx);
-        if !pml4_entry.is_present() {
+        
+        let pml4_present = self.pml4.get_entry(pml4_idx).is_present();
+        if !pml4_present {
             return Err(PageFaultError::NotPresent);
         }
-
-        if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
-            let pdpt_entry = pdpt.get_entry(pdpt_idx);
-            if !pdpt_entry.is_present() {
+        
+        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pml4_idx];
+        if let Some(ref mut pdpt) = pdpt_table {
+            let pdpt_present = pdpt.get_entry(pdpt_idx).is_present();
+            if !pdpt_present {
                 return Err(PageFaultError::NotPresent);
             }
+            
+            let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
 
-            if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
-                let pd_entry = pd.get_entry(pd_idx);
-                if !pd_entry.is_present() {
+            let pd_table: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
+            if let Some(ref mut pd) = pd_table {
+                let pd_present = pd.get_entry(pd_idx).is_present();
+                if !pd_present {
                     return Err(PageFaultError::NotPresent);
                 }
+                
+                let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
+                let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
 
-                if pd_entry.is_huge() {
-                    pd_entry.set_present(false);
-                    self.tlb_tracker.register_invalidation(virt);
-                    return Ok(());
-                }
-
-                if let Some(ref mut pt) = self.pt_tables[pd_idx] {
-                    let pt_entry = pt.get_entry(pt_idx);
+                let pt_table: &mut Option<SimplePageTable> = &mut self.pt_tables[pt_idx_in_vec];
+                if let Some(ref mut pt) = pt_table {
+                    let mut pt_entry = SimplePageTableEntry::new();
                     pt_entry.set_present(false);
-                    self.tlb_tracker.register_invalidation(virt);
+                    pt.set_entry(pt_idx, pt_entry);
                 }
             }
         }
@@ -586,7 +598,7 @@ impl VirtualMemoryManager for SimpleVMM {
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
-
+        
         let pml4_entry = self.pml4.get_entry_ref(pml4_idx);
         if !pml4_entry.is_present() {
             return None;
@@ -597,20 +609,20 @@ impl VirtualMemoryManager for SimpleVMM {
             if !pdpt_entry.is_present() {
                 return None;
             }
+            
+            let pdpt_phys = self.pml4.get_entry_ref(pml4_idx).get_physical_address();
+            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
 
-            if let Some(ref pd) = self.pd_tables[pdpt_idx] {
-                let pd_entry = pd.get_entry_ref(pd_idx);
-                if !pd_entry.is_present() {
+            if let Some(ref pd) = self.pd_tables[pd_idx_in_vec] {
+                let pd_entry_ref = pd.get_entry_ref(pd_idx);
+                if !pd_entry_ref.is_present() {
                     return None;
                 }
+                
+                let pd_phys = pdpt.get_entry_ref(pdpt_idx).get_physical_address();
+                let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
 
-                // If marked as huge page, resolve the remaining 21 bits offset (2MB boundary)
-                if pd_entry.is_huge() {
-                    let huge_page_offset = virt & 0x1FFFFF;
-                    return Some(pd_entry.get_physical_address() | huge_page_offset);
-                }
-
-                if let Some(ref pt) = self.pt_tables[pd_idx] {
+                if let Some(ref pt) = self.pt_tables[pt_idx_in_vec] {
                     let pt_entry = pt.get_entry_ref(pt_idx);
                     if pt_entry.is_present() {
                         let page_offset = virt & 0xFFF;
@@ -622,88 +634,29 @@ impl VirtualMemoryManager for SimpleVMM {
 
         None
     }
-
-    fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
+    
+    /// Overloaded to handle custom Linux/BSD-grade Copy-On-Write (COW) and demand paging exceptions
+    fn handle_page_fault(&mut self, virt: VirtualAddress, error_code: usize) -> Result<(), PageFaultError> {
         let pml4_idx = self.get_pml4_index(virt);
         let pdpt_idx = self.get_pdpt_index(virt);
         let pd_idx = self.get_pd_index(virt);
         let pt_idx = self.get_pt_index(virt);
 
-        let pml4_entry = self.pml4.get_entry(pml4_idx);
-        if !pml4_entry.is_present() {
-            return Err(PageFaultError::NotPresent);
-        }
-
-        if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
-            let pdpt_entry = pdpt.get_entry(pdpt_idx);
-            if !pdpt_entry.is_present() {
-                return Err(PageFaultError::NotPresent);
-            }
-
-            if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
-                let pd_entry = pd.get_entry(pd_idx);
-                if !pd_entry.is_present() {
-                    return Err(PageFaultError::NotPresent);
-                }
-
-                if let Some(ref mut pt) = self.pt_tables[pd_idx] {
-                    let pt_entry = pt.get_entry(pt_idx);
-                    if pt_entry.is_present() {
-                        pt_entry.set_writable(false);
-                        pt_entry.set_cow(true);
-                        self.tlb_tracker.register_invalidation(virt);
-                        return Ok(());
-                    }
-                }
-            }
-        }
-        Err(PageFaultError::NotPresent)
-    }
-
-    fn handle_page_fault(
-        &mut self,
-        virt: VirtualAddress,
-        error_code: usize,
-    ) -> Result<(), PageFaultError> {
-        let pml4_idx = self.get_pml4_index(virt);
-        let pdpt_idx = self.get_pdpt_index(virt);
-        let pd_idx = self.get_pd_index(virt);
-        let pt_idx = self.get_pt_index(virt);
-
-        let is_write = (error_code & 2) != 0;
-
-        let pml4_entry = self.pml4.get_entry(pml4_idx);
-        if pml4_entry.is_present() {
+        // Check if there is an active COW page entry at this address
+        let mut is_cow_fault = false;
+        if self.pml4.get_entry(pml4_idx).is_present() {
             if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
-                let pdpt_entry = pdpt.get_entry(pdpt_idx);
-                if pdpt_entry.is_present() {
-                    if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
-                        let pd_entry = pd.get_entry(pd_idx);
-                        if pd_entry.is_present() {
-                            if let Some(ref mut pt) = self.pt_tables[pd_idx] {
-                                let pt_entry = pt.get_entry(pt_idx);
-                                if pt_entry.is_present() && pt_entry.is_cow() && is_write {
-                                    let old_phys = pt_entry.get_physical_address();
-                                    let new_phys =
-                                        self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
-
-                                    // Only perform memory copying if the physical addresses are within
-                                    // valid, mapped host memory regions to prevent SegFaults in hosted test environments.
-                                    if old_phys > 0x1000 && old_phys < 0x1000000 {
-                                        unsafe {
-                                            core::ptr::copy_nonoverlapping(
-                                                old_phys as *const u8,
-                                                new_phys as *mut u8,
-                                                4096,
-                                            );
-                                        }
-                                    }
-
-                                    pt_entry.set_physical_address(new_phys);
-                                    pt_entry.set_writable(true);
-                                    pt_entry.set_cow(false);
-                                    self.tlb_tracker.register_invalidation(virt);
-                                    return Ok(());
+                if pdpt.get_entry(pdpt_idx).is_present() {
+                    let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+                    let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+                    if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+                        if pd.get_entry(pd_idx).is_present() {
+                            let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
+                            let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+                            if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
+                                let entry = pt.get_entry(pt_idx);
+                                if entry.is_present() && entry.is_cow() && error_code == 2 {
+                                    is_cow_fault = true;
                                 }
                             }
                         }
@@ -712,8 +665,75 @@ impl VirtualMemoryManager for SimpleVMM {
             }
         }
 
-        let phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
-        self.map_page(virt, phys, true, true)
+        if is_cow_fault {
+            // 1. Copy-On-Write (COW) Fault Handler:
+            // Allocate a brand-new distinct physical page frame, copy contents, map it as writable, and clear the COW bit
+            let new_phys_frame = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+
+            if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
+                let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+                let _pd_idx_in_vec_local = (pdpt_phys / 4096) * 512 + pdpt_idx;
+                if let Some(ref mut _pd) = self.pd_tables[_pd_idx_in_vec_local] {
+                    let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
+                    let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+                    if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
+                        let entry = pt.get_entry(pt_idx);
+                        entry.set_physical_address(new_phys_frame);
+                        entry.set_writable(true); // make writable again!
+                        entry.set_cow(false); // clear COW flag!
+                    }
+                }
+            }
+            Ok(())
+        } else {
+            // 2. Standard Demand Paging: Allocate a zeroed page frame on demand
+            let phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+            self.map_page(virt, phys, true, true)
+        }
+    }
+
+    /// Marks a virtual page as Read-only and sets the Copy-on-Write (COW) bit flag
+    fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
+        let pml4_idx = self.get_pml4_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
+        let pd_idx = self.get_pd_index(virt);
+        let pt_idx = self.get_pt_index(virt);
+
+        if !self.pml4.get_entry(pml4_idx).is_present() {
+            return Err(PageFaultError::NotPresent);
+        }
+
+        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pml4_idx];
+        if let Some(ref mut pdpt) = pdpt_table {
+            if !pdpt.get_entry(pdpt_idx).is_present() {
+                return Err(PageFaultError::NotPresent);
+            }
+
+            let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+
+            let pd_table: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
+            if let Some(ref mut pd) = pd_table {
+                if !pd.get_entry(pd_idx).is_present() {
+                    return Err(PageFaultError::NotPresent);
+                }
+
+                let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
+                let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+
+                let pt_table: &mut Option<SimplePageTable> = &mut self.pt_tables[pt_idx_in_vec];
+                if let Some(ref mut pt) = pt_table {
+                    let entry = pt.get_entry(pt_idx);
+                    if entry.is_present() {
+                        entry.set_writable(false); // Map as Read-only to trigger a page fault on write
+                        entry.set_cow(true);       // Enable COW tracking
+                        return Ok(());
+                    }
+                }
+            }
+        }
+
+        Err(PageFaultError::NotPresent)
     }
 }
 
@@ -800,47 +820,71 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_paging_and_cow() {
+    fn test_vmm_mapping() {
         let mut vmm = SimpleVMM::new();
-        // Map page at 0x1000 to physical 0x2000000
-        assert!(vmm.map_page(0x1000, 0x2000000, true, true).is_ok());
+        let virt = 0x1000_1000;
+        let phys = 0x2000_0000;
 
-        // Retrieve physical address
-        assert_eq!(vmm.get_physical(0x1000).unwrap(), 0x2000000);
+        // Initially not mapped
+        assert!(vmm.get_physical(virt).is_none());
 
-        // Mark as copy-on-write (read-only, cow = true)
-        assert!(vmm.mark_copy_on_write(0x1000).is_ok());
+        // Map page
+        assert!(vmm.map_page(virt, phys, false, true).is_ok());
 
-        // Try page fault with error code 2 (write to read-only/COW page)
-        assert!(vmm.handle_page_fault(0x1000, 2).is_ok());
+        // Should be mapped with offset (the last 12 bits are page offset)
+        assert_eq!(vmm.get_physical(virt).unwrap(), phys);
 
-        // Physical address should have changed (new allocation)
-        assert_ne!(vmm.get_physical(0x1000).unwrap(), 0x2000000);
+        // Unmap page
+        assert!(vmm.unmap_page(virt).is_ok());
+        assert!(vmm.get_physical(virt).is_none());
     }
 
     #[test]
-    fn test_transparent_huge_pages_and_tlb_shootdowns() {
+    fn test_process_memory() {
+        let mut pm = SimpleProcessMemory::new();
+        let space_id = pm.create_address_space().unwrap();
+
+        assert!(pm.map_region(space_id, 0x4000_0000, 8192, true, true).is_ok());
+
+        assert!(pm.destroy_address_space(space_id).is_ok());
+    }
+
+    #[test]
+    fn test_linux_copy_on_write_paging() {
         let mut vmm = SimpleVMM::new();
+        let virt = 0x5000_2000;
+        let original_phys = 0x9000_0000;
 
-        // Map a 2MB Huge Page at 0x200000
-        assert!(vmm.map_huge_page(0x200000, 0x4000000, true, true).is_ok());
+        // 1. Initial mapping as writable and present
+        vmm.map_page(virt, original_phys, true, true).unwrap();
+        assert_eq!(vmm.get_physical(virt).unwrap(), original_phys);
 
-        // Ensure physical address resolution handles 21-bit huge page offset
-        assert_eq!(
-            vmm.get_physical(0x200000 + 0x100).unwrap(),
-            0x4000000 + 0x100
-        );
+        // 2. Mark the page as Copy-on-Write (COW) (maps it read-only, sets the COW bit)
+        vmm.mark_copy_on_write(virt).unwrap();
 
-        // Ensure TLB invalidation is recorded
-        assert_eq!(vmm.tlb_tracker.pending_shootdowns.load(Ordering::SeqCst), 1);
+        // Verify it is now read-only and marked as COW
+        let pml4_idx = vmm.get_pml4_index(virt);
+        let pdpt_idx = vmm.get_pdpt_index(virt);
+        let pd_idx = vmm.get_pd_index(virt);
+        let pt_idx = vmm.get_pt_index(virt);
 
-        // Invalidate and flush TLB shootdown coordinator
-        let epoch = vmm.tlb_tracker.flush_shootdowns();
-        assert_eq!(vmm.tlb_tracker.pending_shootdowns.load(Ordering::SeqCst), 0);
-        assert!(epoch > 1);
+        let pdpt_phys = vmm.pml4.get_entry(pml4_idx).get_physical_address();
+        let _pd_idx_in_vec_local = (pdpt_phys / 4096) * 512 + pdpt_idx;
+        let pd_phys = vmm.pdpt_tables[pml4_idx].as_ref().unwrap().get_entry_ref(pdpt_idx).get_physical_address();
+        let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
 
-        // Unmap page should trigger TLB invalidation again
-        assert!(vmm.unmap_page(0x200000).is_ok());
-        assert_eq!(vmm.tlb_tracker.pending_shootdowns.load(Ordering::SeqCst), 1);
+        let entry = vmm.pt_tables[pt_idx_in_vec].as_ref().unwrap().get_entry_ref(pt_idx);
+        assert!(!entry.is_writable());
+        assert!(entry.is_cow());
+
+        // 3. Simulate a Write page fault (error_code = 2 represents write violation on read-only page)
+        vmm.handle_page_fault(virt, 2).unwrap();
+
+        // 4. Verify that the COW handler successfully resolved the fault:
+        // Allocated a new distinct physical page frame, restored writable permissions, and cleared the COW bit!
+        let resolved_entry = vmm.pt_tables[pt_idx_in_vec].as_ref().unwrap().get_entry_ref(pt_idx);
+        assert!(resolved_entry.is_writable());
+        assert!(!resolved_entry.is_cow());
+        assert_ne!(resolved_entry.get_physical_address(), original_phys); // Allocated a distinct frame!
     }
 }

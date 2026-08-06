@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 /// OOP-based Access Control System for SigmaOS
 /// Based on Roadmap Item 14: Access control system
 
