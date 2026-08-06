@@ -1,9 +1,8 @@
+use crate::klib::Vec;
 /// Relay-and-Nexus Subsystems for SigmaOS
 /// Implements KernelRelay, SyscallEncyclopedia, DriverVaultV2, FirmwareNexus,
 /// BuildChronicle, SecurityNexus, and PeripheralArchiveV2.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 // ==========================================
 // 1. Kernel Personality Relay
@@ -34,7 +33,12 @@ impl KernelRelay {
         }
     }
 
-    pub fn handoff_execution(&mut self, resource_id: usize, from: PersonaType, to: PersonaType) -> Result<(), &'static str> {
+    pub fn handoff_execution(
+        &mut self,
+        resource_id: usize,
+        from: PersonaType,
+        to: PersonaType,
+    ) -> Result<(), &'static str> {
         // Simulates handoff of execution/memory/scheduling of a specific resource mid-process
         if !self.active_personas.contains(&from) {
             self.active_personas.push(from);
@@ -88,8 +92,12 @@ pub struct FileEntry {
 }
 
 impl SyscallEncyclopediaEntry for FileEntry {
-    fn info(&self) -> SyscallEntry { self.entry.clone() }
-    fn category(&self) -> &'static str { "File" }
+    fn info(&self) -> SyscallEntry {
+        self.entry.clone()
+    }
+    fn category(&self) -> &'static str {
+        "File"
+    }
 }
 
 pub struct NetworkEntry {
@@ -97,8 +105,12 @@ pub struct NetworkEntry {
 }
 
 impl SyscallEncyclopediaEntry for NetworkEntry {
-    fn info(&self) -> SyscallEntry { self.entry.clone() }
-    fn category(&self) -> &'static str { "Network" }
+    fn info(&self) -> SyscallEntry {
+        self.entry.clone()
+    }
+    fn category(&self) -> &'static str {
+        "Network"
+    }
 }
 
 pub struct ProcessEntry {
@@ -106,8 +118,12 @@ pub struct ProcessEntry {
 }
 
 impl SyscallEncyclopediaEntry for ProcessEntry {
-    fn info(&self) -> SyscallEntry { self.entry.clone() }
-    fn category(&self) -> &'static str { "Process" }
+    fn info(&self) -> SyscallEntry {
+        self.entry.clone()
+    }
+    fn category(&self) -> &'static str {
+        "Process"
+    }
 }
 
 pub struct SyscallEncyclopedia {
@@ -174,8 +190,12 @@ pub struct StorageVaultV2 {
 }
 
 impl DriverVaultV2 for StorageVaultV2 {
-    fn driver_info(&self) -> LegacyDriver { self.driver.clone() }
-    fn vault_type(&self) -> &'static str { "Storage" }
+    fn driver_info(&self) -> LegacyDriver {
+        self.driver.clone()
+    }
+    fn vault_type(&self) -> &'static str {
+        "Storage"
+    }
 }
 
 pub struct NetworkVaultV2 {
@@ -183,8 +203,12 @@ pub struct NetworkVaultV2 {
 }
 
 impl DriverVaultV2 for NetworkVaultV2 {
-    fn driver_info(&self) -> LegacyDriver { self.driver.clone() }
-    fn vault_type(&self) -> &'static str { "Network" }
+    fn driver_info(&self) -> LegacyDriver {
+        self.driver.clone()
+    }
+    fn vault_type(&self) -> &'static str {
+        "Network"
+    }
 }
 
 pub struct GraphicsVaultV2 {
@@ -192,8 +216,12 @@ pub struct GraphicsVaultV2 {
 }
 
 impl DriverVaultV2 for GraphicsVaultV2 {
-    fn driver_info(&self) -> LegacyDriver { self.driver.clone() }
-    fn vault_type(&self) -> &'static str { "Graphics" }
+    fn driver_info(&self) -> LegacyDriver {
+        self.driver.clone()
+    }
+    fn vault_type(&self) -> &'static str {
+        "Graphics"
+    }
 }
 
 pub struct DriverVaultV2Manager {
@@ -255,20 +283,32 @@ pub trait FirmwareNexus {
 
 pub struct BIOSNexus;
 impl FirmwareNexus for BIOSNexus {
-    fn firmware_type(&self) -> FirmwareType { FirmwareType::BIOS }
-    fn execute_handshake(&self) -> bool { true }
+    fn firmware_type(&self) -> FirmwareType {
+        FirmwareType::BIOS
+    }
+    fn execute_handshake(&self) -> bool {
+        true
+    }
 }
 
 pub struct UEFINexus;
 impl FirmwareNexus for UEFINexus {
-    fn firmware_type(&self) -> FirmwareType { FirmwareType::UEFI }
-    fn execute_handshake(&self) -> bool { true }
+    fn firmware_type(&self) -> FirmwareType {
+        FirmwareType::UEFI
+    }
+    fn execute_handshake(&self) -> bool {
+        true
+    }
 }
 
 pub struct CorebootNexus;
 impl FirmwareNexus for CorebootNexus {
-    fn firmware_type(&self) -> FirmwareType { FirmwareType::Coreboot }
-    fn execute_handshake(&self) -> bool { true }
+    fn firmware_type(&self) -> FirmwareType {
+        FirmwareType::Coreboot
+    }
+    fn execute_handshake(&self) -> bool {
+        true
+    }
 }
 
 pub struct FirmwareNexusManager {
@@ -310,28 +350,40 @@ pub trait BuildChronicle {
 pub struct LegacyCChronicle;
 impl BuildChronicle for LegacyCChronicle {
     fn replay_build(&self, source_code: &[u8]) -> Result<usize, &'static str> {
-        if source_code.is_empty() { return Err("Empty C source"); }
+        if source_code.is_empty() {
+            return Err("Empty C source");
+        }
         Ok(42) // compiled binary size placeholder
     }
-    fn language_name(&self) -> &'static str { "C" }
+    fn language_name(&self) -> &'static str {
+        "C"
+    }
 }
 
 pub struct LegacyCppChronicle;
 impl BuildChronicle for LegacyCppChronicle {
     fn replay_build(&self, source_code: &[u8]) -> Result<usize, &'static str> {
-        if source_code.is_empty() { return Err("Empty C++ source"); }
+        if source_code.is_empty() {
+            return Err("Empty C++ source");
+        }
         Ok(84)
     }
-    fn language_name(&self) -> &'static str { "C++" }
+    fn language_name(&self) -> &'static str {
+        "C++"
+    }
 }
 
 pub struct LegacyAsmChronicle;
 impl BuildChronicle for LegacyAsmChronicle {
     fn replay_build(&self, source_code: &[u8]) -> Result<usize, &'static str> {
-        if source_code.is_empty() { return Err("Empty ASM source"); }
+        if source_code.is_empty() {
+            return Err("Empty ASM source");
+        }
         Ok(12)
     }
-    fn language_name(&self) -> &'static str { "ASM" }
+    fn language_name(&self) -> &'static str {
+        "ASM"
+    }
 }
 
 pub struct BuildChronicleManager {
@@ -351,7 +403,11 @@ impl BuildChronicleManager {
         }
     }
 
-    pub fn execute_chronicle_build(&self, chronicle: &dyn BuildChronicle, source_code: &[u8]) -> Result<usize, &'static str> {
+    pub fn execute_chronicle_build(
+        &self,
+        chronicle: &dyn BuildChronicle,
+        source_code: &[u8],
+    ) -> Result<usize, &'static str> {
         let size = chronicle.replay_build(source_code)?;
         self.chronicle_runs.fetch_add(1, Ordering::SeqCst);
         Ok(size)
@@ -376,7 +432,9 @@ pub trait SecurityNexus {
 
 pub struct DACNexus;
 impl SecurityNexus for DACNexus {
-    fn security_model(&self) -> SecurityModelType { SecurityModelType::DAC }
+    fn security_model(&self) -> SecurityModelType {
+        SecurityModelType::DAC
+    }
     fn validate_access(&self, _role: &[u8], _label: &[u8]) -> bool {
         // Traditional Unix DAC: check user ID match
         true
@@ -385,7 +443,9 @@ impl SecurityNexus for DACNexus {
 
 pub struct SELinuxNexus;
 impl SecurityNexus for SELinuxNexus {
-    fn security_model(&self) -> SecurityModelType { SecurityModelType::SELinux }
+    fn security_model(&self) -> SecurityModelType {
+        SecurityModelType::SELinux
+    }
     fn validate_access(&self, role: &[u8], label: &[u8]) -> bool {
         // Mandatory Access Control: check exact context label matching
         role == b"system_r" && label == b"httpd_sys_content_t"
@@ -394,7 +454,9 @@ impl SecurityNexus for SELinuxNexus {
 
 pub struct ZeroTrustNexus;
 impl SecurityNexus for ZeroTrustNexus {
-    fn security_model(&self) -> SecurityModelType { SecurityModelType::ZeroTrust }
+    fn security_model(&self) -> SecurityModelType {
+        SecurityModelType::ZeroTrust
+    }
     fn validate_access(&self, role: &[u8], _label: &[u8]) -> bool {
         // Continuous validation: authenticate token role strictly
         role == b"authenticated_service"
@@ -418,7 +480,12 @@ impl SecurityNexusManager {
         }
     }
 
-    pub fn verify_access_through_nexus(&self, model: &dyn SecurityNexus, role: &[u8], label: &[u8]) -> bool {
+    pub fn verify_access_through_nexus(
+        &self,
+        model: &dyn SecurityNexus,
+        role: &[u8],
+        label: &[u8],
+    ) -> bool {
         self.checks_performed.fetch_add(1, Ordering::SeqCst);
         model.validate_access(role, label)
     }
@@ -435,9 +502,13 @@ pub trait PeripheralArchiveV2 {
 
 pub struct FloppyArchiveV2;
 impl PeripheralArchiveV2 for FloppyArchiveV2 {
-    fn peripheral_name(&self) -> &'static str { "3.5 Floppy Drive" }
+    fn peripheral_name(&self) -> &'static str {
+        "3.5 Floppy Drive"
+    }
     fn simulate_io(&self, sector: usize, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if buffer.len() < 512 { return Err("Buffer too small for floppy sector"); }
+        if buffer.len() < 512 {
+            return Err("Buffer too small for floppy sector");
+        }
         buffer[0] = 0xEB; // Boot sector indicator
         buffer[1] = (sector & 0xFF) as u8;
         Ok(512)
@@ -446,9 +517,13 @@ impl PeripheralArchiveV2 for FloppyArchiveV2 {
 
 pub struct TapeArchiveV2;
 impl PeripheralArchiveV2 for TapeArchiveV2 {
-    fn peripheral_name(&self) -> &'static str { "Magnetic Tape Drive" }
+    fn peripheral_name(&self) -> &'static str {
+        "Magnetic Tape Drive"
+    }
     fn simulate_io(&self, _sector: usize, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if buffer.is_empty() { return Err("Tape buffer empty"); }
+        if buffer.is_empty() {
+            return Err("Tape buffer empty");
+        }
         buffer[0] = 0xAA;
         Ok(1)
     }
@@ -456,9 +531,13 @@ impl PeripheralArchiveV2 for TapeArchiveV2 {
 
 pub struct CRTArchiveV2;
 impl PeripheralArchiveV2 for CRTArchiveV2 {
-    fn peripheral_name(&self) -> &'static str { "CRT Monitor" }
+    fn peripheral_name(&self) -> &'static str {
+        "CRT Monitor"
+    }
     fn simulate_io(&self, _sector: usize, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if buffer.is_empty() { return Err("CRT screen buffer empty"); }
+        if buffer.is_empty() {
+            return Err("CRT screen buffer empty");
+        }
         buffer[0] = 0x3F; // VGA screen sync
         Ok(1)
     }
@@ -466,9 +545,13 @@ impl PeripheralArchiveV2 for CRTArchiveV2 {
 
 pub struct DotMatrixArchiveV2;
 impl PeripheralArchiveV2 for DotMatrixArchiveV2 {
-    fn peripheral_name(&self) -> &'static str { "Dot-Matrix Printer" }
+    fn peripheral_name(&self) -> &'static str {
+        "Dot-Matrix Printer"
+    }
     fn simulate_io(&self, _sector: usize, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        if buffer.is_empty() { return Err("Printer queue empty"); }
+        if buffer.is_empty() {
+            return Err("Printer queue empty");
+        }
         buffer[0] = 0x0A; // Form feed / Line feed
         Ok(1)
     }
@@ -491,7 +574,12 @@ impl PeripheralArchiveV2Manager {
         }
     }
 
-    pub fn run_simulation_io(&self, dev: &dyn PeripheralArchiveV2, sector: usize, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    pub fn run_simulation_io(
+        &self,
+        dev: &dyn PeripheralArchiveV2,
+        sector: usize,
+        buffer: &mut [u8],
+    ) -> Result<usize, &'static str> {
         let size = dev.simulate_io(sector, buffer)?;
         self.active_simulations.fetch_add(1, Ordering::SeqCst);
         Ok(size)
@@ -505,7 +593,9 @@ mod tests {
     #[test]
     fn test_kernel_relay_handoff() {
         let mut relay = KernelRelay::new();
-        relay.handoff_execution(1024, PersonaType::Linux2_4, PersonaType::Linux6X).unwrap();
+        relay
+            .handoff_execution(1024, PersonaType::Linux2_4, PersonaType::Linux6X)
+            .unwrap();
         assert_eq!(relay.active_personas.len(), 2);
     }
 
@@ -554,7 +644,9 @@ mod tests {
     fn test_build_chronicle() {
         let manager = BuildChronicleManager::new();
         let c_build = LegacyCChronicle;
-        let size = manager.execute_chronicle_build(&c_build, b"int main() { return 0; }").unwrap();
+        let size = manager
+            .execute_chronicle_build(&c_build, b"int main() { return 0; }")
+            .unwrap();
         assert_eq!(size, 42);
         assert_eq!(manager.chronicle_runs.load(Ordering::SeqCst), 1);
     }
