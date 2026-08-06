@@ -742,7 +742,6 @@ mod tests {
     fn test_x86_rootkit_auditor() {
         let mut ssdt = KeServiceDescriptorTable::new();
         fn mock_handler1(args: &[u64]) -> u64 { 1 }
-        fn mock_handler2(args: &[u64]) -> u64 { 2 }
         ssdt.register_service(1, mock_handler1, 0);
 
         let kernel_text = b"\x90\x90\xCC\xC3"; // mock instructions
@@ -760,6 +759,7 @@ mod tests {
 
         // Test 2: SSDT Hooking (handler hijack)
         let mut infected_ssdt = KeServiceDescriptorTable::new();
+        fn mock_handler2(_args: &[u64]) -> u64 { 2 } // Different handler for hijack simulation
         infected_ssdt.register_service(1, mock_handler2, 0); // hijacked handler
         let err2 = auditor.audit_system(kernel_text, &infected_ssdt, 0x7FFF0000, 0x7FFF0000);
         assert!(err2.is_err());
