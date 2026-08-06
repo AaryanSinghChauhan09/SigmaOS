@@ -321,6 +321,17 @@ Running `cargo check` and `cargo test` on the workspace currently encounters com
   }
   ```
 
+#### **Error 3: Missing Fields and Methods on `AgentAutomationEngine`**
+* **Location:** `src/shell/repl.rs`
+* **Compiler Message:**
+  ```text
+  error[E0609]: no field `registered_tasks` on type `repl::AgentAutomationEngine`
+  ```
+* **Why It Occurs:**
+  The `repl.rs` calls fields like `registered_tasks` and `next_task_id` on the REPL's `AgentAutomationEngine` struct. If the basic stub definition is used, those fields are missing.
+* **How to Fix:**
+  Ensure that only the comprehensive `AgentAutomationEngine` containing those fields remains. Remove the stub definition at the top of the file as instructed in **Error Group B**.
+
 ---
 
 ### Error Group F: Core Library & Type Mismatch Gaps in `sigpkg` and `boot`
@@ -329,49 +340,41 @@ Running `cargo check` and `cargo test` on the workspace currently encounters com
 * **Compiler Message:**
   ```text
   error[E0277]: the trait bound `f32: Eq` is not satisfied
-    --> src/sigpkg/aur_helper.rs:27:5
   ```
 * **Why It Occurs:**
-  The `aur_helper.rs` defines a package meta struct that derives `Eq`, but it contains a field `popularity: f32`. In Rust, `f32` does not implement `Eq` due to `NaN` comparison behaviors.
+  The `aur_helper` struct derives `Eq` but has a `popularity: f32` field. Since float cannot implement `Eq` in safe Rust, this derives to error.
 * **How to Fix:**
-  Remove `Eq` from the `#[derive(...)]` macro of that struct and implement it manually, or only derive `PartialEq`.
+  Implement `Eq` and `PartialEq` manually, or wrap the popularity in a custom `no_std`-compliant ordered float wrapper.
 
-#### **Error 2: Collect Type Mismatches in `sigpkg/makepkg.rs`**
+#### **Error 2: Custom collections FromIterator collect mismatches in `sigpkg/makepkg.rs`**
 * **Compiler Message:**
   ```text
-  error[E0277]: a value of type `klib::vec::Vec<&str>` cannot be built from an iterator over elements of type `&str`
+  error[E0277]: a value of type `klib::vec::Vec<&str>` cannot be built from an iterator
   ```
 * **Why It Occurs:**
-  The `collect()` call is collecting line parts into `klib::vec::Vec<&str>`, but the custom `Vec<T>` inside the crate lacks a `FromIterator` implementation for strings.
+  The package building helper attempts to `.collect()` parts into custom collections `klib::vec::Vec<&str>`.
 * **How to Fix:**
-  Replace the output type with `std::vec::Vec` or implement `FromIterator` on `klib::vec::Vec`.
+  Collect into standard heap allocator collections `std::vec::Vec<&str>` instead, or ensure `klib::vec::Vec` has correct implementations.
 
-#### **Error 3: Missing PageSize Undeclared Type inside `klib/paging.rs`**
+#### **Error 3: Undeclared type `PageSize` inside `klib/paging.rs`**
 * **Compiler Message:**
   ```text
   error[E0433]: cannot find type `PageSize` in this scope
   ```
 * **Why It Occurs:**
-  The page translation loop matches on a `PageSize` type that is not imported or defined in `paging.rs`.
+  The paging translation function references `PageSize::Standard4KB` but `PageSize` is not declared or imported in that file.
 * **How to Fix:**
-  Import or declare the standard `PageSize` enum inside `paging.rs`:
-  ```rust
-  pub enum PageSize {
-      Standard4KB,
-      Huge2MB,
-      Giant1GB,
-  }
-  ```
+  Declare `pub enum PageSize { Standard4KB, Huge2MB, Giant1GB }` in the paging module.
 
-#### **Error 4: Invalid Custom Vec Dereferencing in `boot/verified.rs`**
+#### **Error 4: Invalid custom Vec dereferencing inside `boot/verified.rs`**
 * **Compiler Message:**
   ```text
   error[E0614]: type `Vec<Option<Box<dyn BootStage>>>` cannot be dereferenced
   ```
 * **Why It Occurs:**
-  The loop in `verified.rs` tries to do `for stage_option in &*self.stages`. Since the stages are stored in custom `Vec`, Rust does not allow the `*` dereference mapping to slice.
+  The loop compiles `for stage_option in &*self.stages` but `&*self.stages` is invalid because custom Vec does not implement `Deref`.
 * **How to Fix:**
-  Remove the `*` or implement the standard `Deref<Target = [T]>` for custom `Vec<T>` inside `src/klib/vec.rs`.
+  Remove the dereference asterisk `*` or ensure `Deref` trait is defined on custom collections inside `src/klib/vec.rs`.
 
 ---
 
