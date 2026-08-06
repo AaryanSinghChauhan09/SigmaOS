@@ -25,9 +25,13 @@
 #include "../../include/sigma_driver_codes.h"
 #include <sigma_libc.h>
 
-extern "C" void zenith_log_structured(sigma_u32 code, const char* comp,
-                                       const char* desc, sigma_u32 cid);
-extern "C" sigma_status sigma_package_verify(const sigma_u8* data, sigma_size_t size);
+extern "C" {
+    void sys_print(const char* fmt, ...);
+    int sigma_strcmp(const char* s1, const char* s2);
+    void zenith_log_structured(sigma_u32 code, const char* comp,
+                               const char* desc, sigma_u32 cid);
+    sigma_status sigma_package_verify(const sigma_u8* data, sigma_size_t size);
+}
 
 namespace Sigma {
 namespace Drivers {

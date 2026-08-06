@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 //! SigmaOS Tcpdump Compatibility
 //! Tcpdump packet capture and filtering engine
 //! Zero external dependencies
