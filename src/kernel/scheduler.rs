@@ -32,6 +32,7 @@ pub struct Process {
     pub runtime: Duration,
     pub virtual_deadline: u64,
     pub time_slice: Duration,
+    pub edf_deadline: Option<u64>,
 }
 
 impl Process {
@@ -44,7 +45,13 @@ impl Process {
             runtime: Duration::from_secs(0),
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
+            edf_deadline: None,
         }
+    }
+
+    pub fn with_edf(mut self, deadline: u64) -> Self {
+        self.edf_deadline = Some(deadline);
+        self
     }
 
     pub fn update_virtual_deadline(&mut self, current_time: u64) {
@@ -80,8 +87,19 @@ impl Scheduler {
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
-        // Find process with earliest eligible virtual deadline
+        // Prioritise Earliest Deadline First (EDF) for hard real-time processes
         let now = self.current_time;
+
+        let edf_process = self.processes
+            .iter()
+            .filter(|p| p.state == ProcessState::Ready && p.edf_deadline.is_some())
+            .min_by_key(|p| p.edf_deadline.unwrap());
+
+        if edf_process.is_some() {
+            return edf_process;
+        }
+
+        // Fallback to standard EEVDF
         self.processes
             .iter()
             .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
@@ -149,5 +167,23 @@ mod tests {
         let p1 = Priority::Low;
         let p2 = Priority::High;
         assert!(p2 > p1);
+    }
+
+    #[test]
+    fn test_edf_scheduling() {
+        let mut scheduler = Scheduler::new();
+
+        // Add normal EEVDF task
+        let p1 = Process::new(1, "normal-task".to_string(), Priority::Normal);
+        scheduler.add_process(p1);
+
+        // Add hard real-time EDF task with a deadline of 20 ticks
+        let p2 = Process::new(2, "realtime-task".to_string(), Priority::Normal).with_edf(20);
+        scheduler.add_process(p2);
+
+        // Even if virtual deadlines aren't reached or EEVDF is bypassed, the EDF task is prioritized
+        let scheduled = scheduler.schedule();
+        assert!(scheduled.is_some());
+        assert_eq!(scheduled.unwrap().pid, 2);
     }
 }
