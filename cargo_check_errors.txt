@@ -1,0 +1,3675 @@
+    Checking sigmaos v0.1.0 (/app)
+error[E0428]: the name `accessibility_gamification` is defined multiple times
+  --> src/dashboard/mod.rs:24:1
+   |
+20 | pub mod accessibility_gamification;
+   | ----------------------------------- previous definition of the module `accessibility_gamification` here
+...
+24 | pub mod accessibility_gamification;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `accessibility_gamification` redefined here
+   |
+   = note: `accessibility_gamification` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `is_cow` is defined multiple times
+  --> src/klib/paging.rs:36:5
+   |
+27 |     fn is_cow(&self) -> bool;
+   |     ------------------------- previous definition of the value `is_cow` here
+...
+36 |     fn is_cow(&self) -> bool;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^ `is_cow` redefined here
+   |
+   = note: `is_cow` must be defined only once in the value namespace of this trait
+
+error[E0428]: the name `set_cow` is defined multiple times
+  --> src/klib/paging.rs:37:5
+   |
+33 |     fn set_cow(&mut self, cow: bool);
+   |     --------------------------------- previous definition of the value `set_cow` here
+...
+37 |     fn set_cow(&mut self, cow: bool);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `set_cow` redefined here
+   |
+   = note: `set_cow` must be defined only once in the value namespace of this trait
+
+error[E0428]: the name `get_entry_ref` is defined multiple times
+   --> src/klib/paging.rs:121:5
+    |
+119 |     fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry;
+    |     --------------------------------------------------------------- previous definition of the value `get_entry_ref` here
+120 |     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry;
+121 |     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `get_entry_ref` redefined here
+    |
+    = note: `get_entry_ref` must be defined only once in the value namespace of this trait
+
+error[E0428]: the name `cow_snapshot` is defined multiple times
+  --> src/filesystem/mod.rs:10:1
+   |
+ 4 | pub mod cow_snapshot;
+   | --------------------- previous definition of the module `cow_snapshot` here
+...
+10 | pub mod cow_snapshot;
+   | ^^^^^^^^^^^^^^^^^^^^^ `cow_snapshot` redefined here
+   |
+   = note: `cow_snapshot` must be defined only once in the type namespace of this module
+
+error[E0259]: the name `alloc` is defined multiple times
+  --> src/sigpkg/spec.rs:10:1
+   |
+ 7 | extern crate alloc;
+   | ------------------- previous import of the extern crate `alloc` here
+...
+10 | extern crate alloc;
+   | ^^^^^^^^^^^^^^^^^^^ `alloc` reimported here
+   |
+   = note: `alloc` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `ai` is defined multiple times
+   --> src/lib.rs:176:1
+    |
+ 66 | pub mod ai {
+    | ---------- previous definition of the module `ai` here
+...
+176 | pub mod ai {
+    | ^^^^^^^^^^ `ai` redefined here
+    |
+    = note: `ai` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintBackupTool` is defined multiple times
+  --> src/compatibility/mod.rs:83:5
+   |
+47 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+   |                                                            -------------- previous import of the type `MintBackupTool` here
+...
+83 |     MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, Mi...
+   |     ^^^^^^^^^^^^^^--
+   |     |
+   |     `MintBackupTool` reimported here
+   |     help: remove unnecessary import
+   |
+   = note: `MintBackupTool` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintSoftwareManager` is defined multiple times
+  --> src/compatibility/mod.rs:83:21
+   |
+48 |     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintR...
+   |                      ------------------- previous import of the type `MintSoftwareManager` here
+...
+83 |     MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel...
+   |                     ^^^^^^^^^^^^^^^^^^^--
+   |                     |
+   |                     `MintSoftwareManager` reimported here
+   |                     help: remove unnecessary import
+   |
+   = note: `MintSoftwareManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintUpdateManager` is defined multiple times
+  --> src/compatibility/mod.rs:83:75
+   |
+47 | ...ckage, MintUpdateManager, MintBackupTool,
+   |           ----------------- previous import of the type `MintUpdateManager` here
+...
+83 | ...anager, MintUpdateItem, MintUpdateLevel, MintUpdateManager,
+   |                                             ^^^^^^^^^^^^^^^^^-
+   |                                             |
+   |                                             `MintUpdateManager` reimported here
+   |                                             help: remove unnecessary import
+   |
+   = note: `MintUpdateManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintUpdateManager` is defined multiple times
+   --> src/compatibility/mod.rs:102:41
+    |
+ 47 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    |                                         ----------------- previous import of the type `MintUpdateManager` here
+...
+102 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    |                                         ^^^^^^^^^^^^^^^^^--
+    |                                         |
+    |                                         `MintUpdateManager` reimported here
+    |                                         help: remove unnecessary import
+    |
+    = note: `MintUpdateManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintBackupTool` is defined multiple times
+   --> src/compatibility/mod.rs:102:60
+    |
+ 47 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    |                                                            -------------- previous import of the type `MintBackupTool` here
+...
+102 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    |                                                            ^^^^^^^^^^^^^^-
+    |                                                            |
+    |                                                            `MintBackupTool` reimported here
+    |                                                            help: remove unnecessary import
+    |
+    = note: `MintBackupTool` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintSoftwareManager` is defined multiple times
+   --> src/compatibility/mod.rs:103:22
+    |
+ 48 |     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, Mint...
+    |                      ------------------- previous import of the type `MintSoftwareManager` here
+...
+103 |     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, Mint...
+    |                      ^^^^^^^^^^^^^^^^^^^--
+    |                      |
+    |                      `MintSoftwareManager` reimported here
+    |                      help: remove unnecessary import
+    |
+    = note: `MintSoftwareManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintReportSystem` is defined multiple times
+   --> src/compatibility/mod.rs:104:5
+    |
+ 49 |     MintReportSystem,
+    |     ---------------- previous import of the type `MintReportSystem` here
+...
+104 |     MintReportSystem,
+    |     ^^^^^^^^^^^^^^^^-
+    |     |
+    |     `MintReportSystem` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `MintReportSystem` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `DinitServiceManager` is defined multiple times
+   --> src/compatibility/mod.rs:108:38
+    |
+ 53 | ...ate, DinitService, DinitServiceManager, BsdUserlandCompat,
+    |                       ------------------- previous import of the type `DinitServiceManager` here
+...
+108 | ...ate, DinitService, DinitServiceManager, BsdUserlandCompat,
+    |                       ^^^^^^^^^^^^^^^^^^^--
+    |                       |
+    |                       `DinitServiceManager` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `DinitServiceManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `BsdUserlandCompat` is defined multiple times
+   --> src/compatibility/mod.rs:108:59
+    |
+ 53 | ...nitServiceManager, BsdUserlandCompat,
+    |                       ----------------- previous import of the type `BsdUserlandCompat` here
+...
+108 | ...nitServiceManager, BsdUserlandCompat,
+    |                       ^^^^^^^^^^^^^^^^^-
+    |                       |
+    |                       `BsdUserlandCompat` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `BsdUserlandCompat` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `ApkPackageStore` is defined multiple times
+   --> src/compatibility/mod.rs:109:25
+    |
+ 54 |     ApkPackageMetadata, ApkPackageStore,
+    |                         --------------- previous import of the type `ApkPackageStore` here
+...
+109 |     ApkPackageMetadata, ApkPackageStore,
+    |                         ^^^^^^^^^^^^^^^-
+    |                         |
+    |                         `ApkPackageStore` reimported here
+    |                         help: remove unnecessary import
+    |
+    = note: `ApkPackageStore` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `KernelRelay` is defined multiple times
+   --> src/compatibility/mod.rs:113:18
+    |
+ 58 | ...ype, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    |         ----------- previous import of the type `KernelRelay` here
+...
+113 | ...ype, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    |         ^^^^^^^^^^^--
+    |         |
+    |         `KernelRelay` reimported here
+    |         help: remove unnecessary import
+    |
+    = note: `KernelRelay` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SyscallEncyclopediaEntry` is defined multiple times
+   --> src/compatibility/mod.rs:113:45
+    |
+ 58 | ...y, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    |                     ------------------------ previous import of the trait `SyscallEncyclopediaEntry` here
+...
+113 | ...y, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^--
+    |                     |
+    |                     `SyscallEncyclopediaEntry` reimported here
+    |                     help: remove unnecessary import
+    |
+    = note: `SyscallEncyclopediaEntry` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `FileEntry` is defined multiple times
+   --> src/compatibility/mod.rs:113:71
+    |
+ 58 | ...Entry, FileEntry,
+    |           --------- previous import of the type `FileEntry` here
+...
+113 | ...Entry, FileEntry,
+    |           ^^^^^^^^^-
+    |           |
+    |           `FileEntry` reimported here
+    |           help: remove unnecessary import
+    |
+    = note: `FileEntry` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `NetworkEntry` is defined multiple times
+   --> src/compatibility/mod.rs:114:5
+    |
+ 59 |     NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, Driv...
+    |     ------------ previous import of the type `NetworkEntry` here
+...
+114 |     NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, Driv...
+    |     ^^^^^^^^^^^^--
+    |     |
+    |     `NetworkEntry` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `NetworkEntry` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `ProcessEntry` is defined multiple times
+   --> src/compatibility/mod.rs:114:19
+    |
+ 59 | ...ry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
+    |        ------------ previous import of the type `ProcessEntry` here
+...
+114 | ...ry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
+    |        ^^^^^^^^^^^^--
+    |        |
+    |        `ProcessEntry` reimported here
+    |        help: remove unnecessary import
+    |
+    = note: `ProcessEntry` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SyscallEncyclopedia` is defined multiple times
+   --> src/compatibility/mod.rs:114:33
+    |
+ 59 | ...try, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
+    |                       ------------------- previous import of the type `SyscallEncyclopedia` here
+...
+114 | ...try, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
+    |                       ^^^^^^^^^^^^^^^^^^^--
+    |                       |
+    |                       `SyscallEncyclopedia` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `SyscallEncyclopedia` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `DriverVaultV2` is defined multiple times
+   --> src/compatibility/mod.rs:114:68
+    |
+ 59 | ...pedia, LegacyDriver, DriverVaultV2,
+    |                         ------------- previous import of the trait `DriverVaultV2` here
+...
+114 | ...pedia, LegacyDriver, DriverVaultV2,
+    |                         ^^^^^^^^^^^^^-
+    |                         |
+    |                         `DriverVaultV2` reimported here
+    |                         help: remove unnecessary import
+    |
+    = note: `DriverVaultV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `StorageVaultV2` is defined multiple times
+   --> src/compatibility/mod.rs:115:5
+    |
+ 60 |     StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manag...
+    |     -------------- previous import of the type `StorageVaultV2` here
+...
+115 |     StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manag...
+    |     ^^^^^^^^^^^^^^--
+    |     |
+    |     `StorageVaultV2` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `StorageVaultV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `NetworkVaultV2` is defined multiple times
+   --> src/compatibility/mod.rs:115:21
+    |
+ 60 |     StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manag...
+    |                     -------------- previous import of the type `NetworkVaultV2` here
+...
+115 |     StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manag...
+    |                     ^^^^^^^^^^^^^^--
+    |                     |
+    |                     `NetworkVaultV2` reimported here
+    |                     help: remove unnecessary import
+    |
+    = note: `NetworkVaultV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `GraphicsVaultV2` is defined multiple times
+   --> src/compatibility/mod.rs:115:37
+    |
+ 60 | ...tV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, Firmware...
+    |                         --------------- previous import of the type `GraphicsVaultV2` here
+...
+115 | ...tV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, Firmware...
+    |                         ^^^^^^^^^^^^^^^--
+    |                         |
+    |                         `GraphicsVaultV2` reimported here
+    |                         help: remove unnecessary import
+    |
+    = note: `GraphicsVaultV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `DriverVaultV2Manager` is defined multiple times
+   --> src/compatibility/mod.rs:115:54
+    |
+ 60 | ..., GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
+    |                       -------------------- previous import of the type `DriverVaultV2Manager` here
+...
+115 | ..., GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
+    |                       ^^^^^^^^^^^^^^^^^^^^--
+    |                       |
+    |                       `DriverVaultV2Manager` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `DriverVaultV2Manager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `FirmwareNexus` is defined multiple times
+   --> src/compatibility/mod.rs:116:5
+    |
+ 61 |     FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusMa...
+    |     ------------- previous import of the trait `FirmwareNexus` here
+...
+116 |     FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusMa...
+    |     ^^^^^^^^^^^^^--
+    |     |
+    |     `FirmwareNexus` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `FirmwareNexus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `BIOSNexus` is defined multiple times
+   --> src/compatibility/mod.rs:116:20
+    |
+ 61 | ...Nexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
+    |           --------- previous import of the type `BIOSNexus` here
+...
+116 | ...Nexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
+    |           ^^^^^^^^^--
+    |           |
+    |           `BIOSNexus` reimported here
+    |           help: remove unnecessary import
+    |
+    = note: `BIOSNexus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `UEFINexus` is defined multiple times
+   --> src/compatibility/mod.rs:116:31
+    |
+ 61 | ...Nexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
+    |           --------- previous import of the type `UEFINexus` here
+...
+116 | ...Nexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
+    |           ^^^^^^^^^--
+    |           |
+    |           `UEFINexus` reimported here
+    |           help: remove unnecessary import
+    |
+    = note: `UEFINexus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `CorebootNexus` is defined multiple times
+   --> src/compatibility/mod.rs:116:42
+    |
+ 61 | ...s, CorebootNexus, FirmwareNexusManager,
+    |       ------------- previous import of the type `CorebootNexus` here
+...
+116 | ...s, CorebootNexus, FirmwareNexusManager,
+    |       ^^^^^^^^^^^^^--
+    |       |
+    |       `CorebootNexus` reimported here
+    |       help: remove unnecessary import
+    |
+    = note: `CorebootNexus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `FirmwareNexusManager` is defined multiple times
+   --> src/compatibility/mod.rs:116:57
+    |
+ 61 | ...us, CorebootNexus, FirmwareNexusManager,
+    |                       -------------------- previous import of the type `FirmwareNexusManager` here
+...
+116 | ...us, CorebootNexus, FirmwareNexusManager,
+    |                       ^^^^^^^^^^^^^^^^^^^^-
+    |                       |
+    |                       `FirmwareNexusManager` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `FirmwareNexusManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `BuildChronicle` is defined multiple times
+   --> src/compatibility/mod.rs:117:5
+    |
+ 62 |     BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChro...
+    |     -------------- previous import of the trait `BuildChronicle` here
+...
+117 |     BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChro...
+    |     ^^^^^^^^^^^^^^--
+    |     |
+    |     `BuildChronicle` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `BuildChronicle` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `LegacyCChronicle` is defined multiple times
+   --> src/compatibility/mod.rs:117:21
+    |
+ 62 |     BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChro...
+    |                     ---------------- previous import of the type `LegacyCChronicle` here
+...
+117 |     BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChro...
+    |                     ^^^^^^^^^^^^^^^^--
+    |                     |
+    |                     `LegacyCChronicle` reimported here
+    |                     help: remove unnecessary import
+    |
+    = note: `LegacyCChronicle` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `LegacyCppChronicle` is defined multiple times
+   --> src/compatibility/mod.rs:117:39
+    |
+ 62 | ... LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
+    |                       ------------------ previous import of the type `LegacyCppChronicle` here
+...
+117 | ... LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
+    |                       ^^^^^^^^^^^^^^^^^^--
+    |                       |
+    |                       `LegacyCppChronicle` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `LegacyCppChronicle` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `LegacyAsmChronicle` is defined multiple times
+   --> src/compatibility/mod.rs:117:59
+    |
+ 62 | ...egacyCppChronicle, LegacyAsmChronicle,
+    |                       ------------------ previous import of the type `LegacyAsmChronicle` here
+...
+117 | ...egacyCppChronicle, LegacyAsmChronicle,
+    |                       ^^^^^^^^^^^^^^^^^^-
+    |                       |
+    |                       `LegacyAsmChronicle` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `LegacyAsmChronicle` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `BuildChronicleManager` is defined multiple times
+   --> src/compatibility/mod.rs:118:5
+    |
+ 63 |     BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, ...
+    |     --------------------- previous import of the type `BuildChronicleManager` here
+...
+118 |     BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, ...
+    |     ^^^^^^^^^^^^^^^^^^^^^--
+    |     |
+    |     `BuildChronicleManager` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `BuildChronicleManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SecurityNexus` is defined multiple times
+   --> src/compatibility/mod.rs:118:47
+    |
+ 63 | ..., SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
+    |                         ------------- previous import of the trait `SecurityNexus` here
+...
+118 | ..., SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
+    |                         ^^^^^^^^^^^^^--
+    |                         |
+    |                         `SecurityNexus` reimported here
+    |                         help: remove unnecessary import
+    |
+    = note: `SecurityNexus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `DACNexus` is defined multiple times
+   --> src/compatibility/mod.rs:118:62
+    |
+ 63 | ...yNexus, DACNexus, SELinuxNexus,
+    |            -------- previous import of the type `DACNexus` here
+...
+118 | ...yNexus, DACNexus, SELinuxNexus,
+    |            ^^^^^^^^--
+    |            |
+    |            `DACNexus` reimported here
+    |            help: remove unnecessary import
+    |
+    = note: `DACNexus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SELinuxNexus` is defined multiple times
+   --> src/compatibility/mod.rs:118:72
+    |
+ 63 | ...us, SELinuxNexus,
+    |        ------------ previous import of the type `SELinuxNexus` here
+...
+118 | ...us, SELinuxNexus,
+    |        ^^^^^^^^^^^^-
+    |        |
+    |        `SELinuxNexus` reimported here
+    |        help: remove unnecessary import
+    |
+    = note: `SELinuxNexus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `ZeroTrustNexus` is defined multiple times
+   --> src/compatibility/mod.rs:119:5
+    |
+ 64 |     ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyAr...
+    |     -------------- previous import of the type `ZeroTrustNexus` here
+...
+119 |     ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyAr...
+    |     ^^^^^^^^^^^^^^--
+    |     |
+    |     `ZeroTrustNexus` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `ZeroTrustNexus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SecurityNexusManager` is defined multiple times
+   --> src/compatibility/mod.rs:119:21
+    |
+ 64 |     ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyAr...
+    |                     -------------------- previous import of the type `SecurityNexusManager` here
+...
+119 |     ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyAr...
+    |                     ^^^^^^^^^^^^^^^^^^^^--
+    |                     |
+    |                     `SecurityNexusManager` reimported here
+    |                     help: remove unnecessary import
+    |
+    = note: `SecurityNexusManager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `PeripheralArchiveV2` is defined multiple times
+   --> src/compatibility/mod.rs:119:43
+    |
+ 64 | ...urityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
+    |                       ------------------- previous import of the trait `PeripheralArchiveV2` here
+...
+119 | ...urityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
+    |                       ^^^^^^^^^^^^^^^^^^^--
+    |                       |
+    |                       `PeripheralArchiveV2` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `PeripheralArchiveV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `FloppyArchiveV2` is defined multiple times
+   --> src/compatibility/mod.rs:119:64
+    |
+ 64 | ...PeripheralArchiveV2, FloppyArchiveV2,
+    |                         --------------- previous import of the type `FloppyArchiveV2` here
+...
+119 | ...PeripheralArchiveV2, FloppyArchiveV2,
+    |                         ^^^^^^^^^^^^^^^-
+    |                         |
+    |                         `FloppyArchiveV2` reimported here
+    |                         help: remove unnecessary import
+    |
+    = note: `FloppyArchiveV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `TapeArchiveV2` is defined multiple times
+   --> src/compatibility/mod.rs:120:5
+    |
+ 65 |     TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV...
+    |     ------------- previous import of the type `TapeArchiveV2` here
+...
+120 |     TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV...
+    |     ^^^^^^^^^^^^^--
+    |     |
+    |     `TapeArchiveV2` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `TapeArchiveV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `CRTArchiveV2` is defined multiple times
+   --> src/compatibility/mod.rs:120:20
+    |
+ 65 | ...V2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
+    |        ------------ previous import of the type `CRTArchiveV2` here
+...
+120 | ...V2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
+    |        ^^^^^^^^^^^^--
+    |        |
+    |        `CRTArchiveV2` reimported here
+    |        help: remove unnecessary import
+    |
+    = note: `CRTArchiveV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `DotMatrixArchiveV2` is defined multiple times
+   --> src/compatibility/mod.rs:120:34
+    |
+ 65 | ...eV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
+    |                       ------------------ previous import of the type `DotMatrixArchiveV2` here
+...
+120 | ...eV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
+    |                       ^^^^^^^^^^^^^^^^^^--
+    |                       |
+    |                       `DotMatrixArchiveV2` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `DotMatrixArchiveV2` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `PeripheralArchiveV2Manager` is defined multiple times
+   --> src/compatibility/mod.rs:120:54
+    |
+ 65 | ...MatrixArchiveV2, PeripheralArchiveV2Manager,
+    |                     -------------------------- previous import of the type `PeripheralArchiveV2Manager` here
+...
+120 | ...MatrixArchiveV2, PeripheralArchiveV2Manager,
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^-
+    |                     |
+    |                     `PeripheralArchiveV2Manager` reimported here
+    |                     help: remove unnecessary import
+    |
+    = note: `PeripheralArchiveV2Manager` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `IScheduler` is defined multiple times
+   --> src/compatibility/mod.rs:124:5
+    |
+ 69 |     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKe...
+    |     ---------- previous import of the trait `IScheduler` here
+...
+124 |     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKe...
+    |     ^^^^^^^^^^--
+    |     |
+    |     `IScheduler` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `IScheduler` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `RoundRobinSchedulerPort` is defined multiple times
+   --> src/compatibility/mod.rs:124:17
+    |
+ 69 |     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKe...
+    |                 ----------------------- previous import of the type `RoundRobinSchedulerPort` here
+...
+124 |     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKe...
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^--
+    |                 |
+    |                 `RoundRobinSchedulerPort` reimported here
+    |                 help: remove unnecessary import
+    |
+    = note: `RoundRobinSchedulerPort` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `PrioritySchedulerPort` is defined multiple times
+   --> src/compatibility/mod.rs:124:42
+    |
+ 69 | ...inSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
+    |                     --------------------- previous import of the type `PrioritySchedulerPort` here
+...
+124 | ...inSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
+    |                     ^^^^^^^^^^^^^^^^^^^^^--
+    |                     |
+    |                     `PrioritySchedulerPort` reimported here
+    |                     help: remove unnecessary import
+    |
+    = note: `PrioritySchedulerPort` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SolidKernelCore` is defined multiple times
+   --> src/compatibility/mod.rs:124:65
+    |
+ 69 | ...ioritySchedulerPort, SolidKernelCore,
+    |                         --------------- previous import of the type `SolidKernelCore` here
+...
+124 | ...ioritySchedulerPort, SolidKernelCore,
+    |                         ^^^^^^^^^^^^^^^-
+    |                         |
+    |                         `SolidKernelCore` reimported here
+    |                         help: remove unnecessary import
+    |
+    = note: `SolidKernelCore` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `ComplianceScheduler` is defined multiple times
+   --> src/compatibility/mod.rs:125:5
+    |
+ 70 |     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    |     ------------------- previous import of the type `ComplianceScheduler` here
+...
+125 |     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    |     ^^^^^^^^^^^^^^^^^^^--
+    |     |
+    |     `ComplianceScheduler` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `ComplianceScheduler` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SigmaFSPlusPlus` is defined multiple times
+   --> src/compatibility/mod.rs:125:38
+    |
+ 70 |     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    |                                      --------------- previous import of the type `SigmaFSPlusPlus` here
+...
+125 |     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    |                                      ^^^^^^^^^^^^^^^-
+    |                                      |
+    |                                      `SigmaFSPlusPlus` reimported here
+    |                                      help: remove unnecessary import
+    |
+    = note: `SigmaFSPlusPlus` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `GamifiedProductivityTracker` is defined multiple times
+  --> src/dashboard/mod.rs:39:48
+   |
+27 |     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+   |                                        --------------------------- previous import of the type `GamifiedProductivityTracker` here
+...
+39 |     ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
+   |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^-
+   |                                                |
+   |                                                `GamifiedProductivityTracker` reimported here
+   |                                                help: remove unnecessary import
+   |
+   = note: `GamifiedProductivityTracker` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `Vec` is defined multiple times
+   --> src/klib/buddy_allocator.rs:243:9
+    |
+  2 | use super::vec::Vec;
+    |     --------------- previous import of the type `Vec` here
+...
+243 | pub use crate::klib::vec::Vec;
+    |         ^^^^^^^^^^^^^^^^^^^^^ `Vec` reimported here
+    |
+    = note: `Vec` must be defined only once in the type namespace of this module
+
+error[E0255]: the name `Vec` is defined multiple times
+   --> src/filesystem/support.rs:286:1
+    |
+ 22 | use crate::klib::Vec;
+    |     ---------------- previous import of the type `Vec` here
+...
+286 | pub struct Vec<T> {
+    | ^^^^^^^^^^^^^^^^^ `Vec` redefined here
+    |
+    = note: `Vec` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+    |
+ 22 | use crate::klib::Vec as OtherVec;
+    |                      +++++++++++
+
+error[E0252]: the name `CowSnapshotManager` is defined multiple times
+  --> src/filesystem/mod.rs:36:18
+   |
+21 | ...use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, ...
+   |                                    ------------------ previous import of the type `CowSnapshotManager` here
+...
+36 | ...CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+   |                 ^^^^^^^^^^^^^^^^^^--
+   |                 |
+   |                 `CowSnapshotManager` reimported here
+   |                 help: remove unnecessary import
+   |
+   = note: `CowSnapshotManager` must be defined only once in the type namespace of this module
+
+error[E0255]: the name `Vec` is defined multiple times
+   --> src/network/tcp_udp.rs:701:1
+    |
+  8 | use alloc::vec::Vec;
+    |     --------------- previous import of the type `Vec` here
+...
+701 | pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ^^^^^^^^^^^^^^^^^ `Vec` redefined here
+    |
+    = note: `Vec` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+    |
+  8 | use alloc::vec::Vec as OtherVec;
+    |                     +++++++++++
+
+error[E0252]: the name `Box` is defined multiple times
+  --> src/sigpkg/spec.rs:11:5
+   |
+ 8 | use alloc::boxed::Box;
+   |     ----------------- previous import of the type `Box` here
+...
+11 | use alloc::boxed::Box;
+   |     ^^^^^^^^^^^^^^^^^ `Box` reimported here
+   |
+   = note: `Box` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `RpmPackageTranslator` is defined multiple times
+  --> src/sigpkg/mod.rs:35:22
+   |
+30 | ...ranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
+   |                                                            -------------------- previous import of the type `RpmPackageTranslator` here
+...
+35 | ...::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
+   |       ^^^^^^^^^^^^^^^^^^^^ `RpmPackageTranslator` reimported here
+   |
+   = note: `RpmPackageTranslator` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+   |
+35 | pub use rpm_compat::{RpmPackageTranslator as OtherRpmPackageTranslator, SpecMetadata, PackageSourceFormat};
+   |                                           ++++++++++++++++++++++++++++
+
+error[E0428]: the name `AgentAutomationEngine` is defined multiple times
+  --> src/shell/repl.rs:83:1
+   |
+ 7 | pub struct AgentAutomationEngine;
+   | --------------------------------- previous definition of the type `AgentAutomationEngine` here
+...
+83 | pub struct AgentAutomationEngine {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `AgentAutomationEngine` redefined here
+   |
+   = note: `AgentAutomationEngine` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintUpdateLevel` is defined multiple times
+  --> src/compatibility/mod.rs:83:58
+   |
+47 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+   |     --------------- previous import of the type `MintUpdateLevel` here
+...
+83 |     MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, Min...
+   |                                                          ^^^^^^^^^^^^^^^--
+   |                                                          |
+   |                                                          `MintUpdateLevel` reimported here
+   |                                                          help: remove unnecessary import
+   |
+   = note: `MintUpdateLevel` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintUpdateLevel` is defined multiple times
+   --> src/compatibility/mod.rs:102:5
+    |
+ 47 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    |     --------------- previous import of the type `MintUpdateLevel` here
+...
+102 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    |     ^^^^^^^^^^^^^^^--
+    |     |
+    |     `MintUpdateLevel` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `MintUpdateLevel` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintUpdatePackage` is defined multiple times
+   --> src/compatibility/mod.rs:102:22
+    |
+ 47 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    |                      ----------------- previous import of the type `MintUpdatePackage` here
+...
+102 |     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
+    |                      ^^^^^^^^^^^^^^^^^--
+    |                      |
+    |                      `MintUpdatePackage` reimported here
+    |                      help: remove unnecessary import
+    |
+    = note: `MintUpdatePackage` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintAppMetadata` is defined multiple times
+   --> src/compatibility/mod.rs:103:5
+    |
+ 48 |     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, Mint...
+    |     --------------- previous import of the type `MintAppMetadata` here
+...
+103 |     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, Mint...
+    |     ^^^^^^^^^^^^^^^--
+    |     |
+    |     `MintAppMetadata` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `MintAppMetadata` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintReportAlertSeverity` is defined multiple times
+   --> src/compatibility/mod.rs:103:43
+    |
+ 48 | ...SoftwareManager, MintReportAlertSeverity, MintReportAlert,
+    |                     ----------------------- previous import of the type `MintReportAlertSeverity` here
+...
+103 | ...SoftwareManager, MintReportAlertSeverity, MintReportAlert,
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^--
+    |                     |
+    |                     `MintReportAlertSeverity` reimported here
+    |                     help: remove unnecessary import
+    |
+    = note: `MintReportAlertSeverity` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `MintReportAlert` is defined multiple times
+   --> src/compatibility/mod.rs:103:68
+    |
+ 48 | ...ReportAlertSeverity, MintReportAlert,
+    |                         --------------- previous import of the type `MintReportAlert` here
+...
+103 | ...ReportAlertSeverity, MintReportAlert,
+    |                         ^^^^^^^^^^^^^^^-
+    |                         |
+    |                         `MintReportAlert` reimported here
+    |                         help: remove unnecessary import
+    |
+    = note: `MintReportAlert` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `DinitServiceState` is defined multiple times
+   --> src/compatibility/mod.rs:108:5
+    |
+ 53 |     DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCo...
+    |     ----------------- previous import of the type `DinitServiceState` here
+...
+108 |     DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCo...
+    |     ^^^^^^^^^^^^^^^^^--
+    |     |
+    |     `DinitServiceState` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `DinitServiceState` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `DinitService` is defined multiple times
+   --> src/compatibility/mod.rs:108:24
+    |
+ 53 | ...te, DinitService, DinitServiceManager, BsdUserlandCompat,
+    |        ------------ previous import of the type `DinitService` here
+...
+108 | ...te, DinitService, DinitServiceManager, BsdUserlandCompat,
+    |        ^^^^^^^^^^^^--
+    |        |
+    |        `DinitService` reimported here
+    |        help: remove unnecessary import
+    |
+    = note: `DinitService` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `ApkPackageMetadata` is defined multiple times
+   --> src/compatibility/mod.rs:109:5
+    |
+ 54 |     ApkPackageMetadata, ApkPackageStore,
+    |     ------------------ previous import of the type `ApkPackageMetadata` here
+...
+109 |     ApkPackageMetadata, ApkPackageStore,
+    |     ^^^^^^^^^^^^^^^^^^--
+    |     |
+    |     `ApkPackageMetadata` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `ApkPackageMetadata` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `PersonaType` is defined multiple times
+   --> src/compatibility/mod.rs:113:5
+    |
+ 58 |     PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, F...
+    |     ----------- previous import of the type `PersonaType` here
+...
+113 |     PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, F...
+    |     ^^^^^^^^^^^--
+    |     |
+    |     `PersonaType` reimported here
+    |     help: remove unnecessary import
+    |
+    = note: `PersonaType` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SyscallEntry` is defined multiple times
+   --> src/compatibility/mod.rs:113:31
+    |
+ 58 | ...ay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    |        ------------ previous import of the type `SyscallEntry` here
+...
+113 | ...ay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
+    |        ^^^^^^^^^^^^--
+    |        |
+    |        `SyscallEntry` reimported here
+    |        help: remove unnecessary import
+    |
+    = note: `SyscallEntry` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `LegacyDriver` is defined multiple times
+   --> src/compatibility/mod.rs:114:54
+    |
+ 59 | ...ia, LegacyDriver, DriverVaultV2,
+    |        ------------ previous import of the type `LegacyDriver` here
+...
+114 | ...ia, LegacyDriver, DriverVaultV2,
+    |        ^^^^^^^^^^^^--
+    |        |
+    |        `LegacyDriver` reimported here
+    |        help: remove unnecessary import
+    |
+    = note: `LegacyDriver` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `FirmwareType` is defined multiple times
+   --> src/compatibility/mod.rs:115:76
+    |
+ 60 | ...er, FirmwareType,
+    |        ------------ previous import of the type `FirmwareType` here
+...
+115 | ...er, FirmwareType,
+    |        ^^^^^^^^^^^^-
+    |        |
+    |        `FirmwareType` reimported here
+    |        help: remove unnecessary import
+    |
+    = note: `FirmwareType` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SecurityModelType` is defined multiple times
+   --> src/compatibility/mod.rs:118:28
+    |
+ 63 | ...dChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELin...
+    |                       ----------------- previous import of the type `SecurityModelType` here
+...
+118 | ...dChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELin...
+    |                       ^^^^^^^^^^^^^^^^^--
+    |                       |
+    |                       `SecurityModelType` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `SecurityModelType` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `AuditBlock` is defined multiple times
+   --> src/compatibility/mod.rs:125:26
+    |
+ 70 |     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    |                          ---------- previous import of the type `AuditBlock` here
+...
+125 |     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    |                          ^^^^^^^^^^--
+    |                          |
+    |                          `AuditBlock` reimported here
+    |                          help: remove unnecessary import
+    |
+    = note: `AuditBlock` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `ColorFilter` is defined multiple times
+  --> src/dashboard/mod.rs:39:5
+   |
+27 |     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+   |                           ----------- previous import of the type `ColorFilter` here
+...
+39 |     ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
+   |     ^^^^^^^^^^^--
+   |     |
+   |     `ColorFilter` reimported here
+   |     help: remove unnecessary import
+   |
+   = note: `ColorFilter` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `AccessibilityOverlay` is defined multiple times
+  --> src/dashboard/mod.rs:39:18
+   |
+27 |     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+   |     -------------------- previous import of the type `AccessibilityOverlay` here
+...
+39 |     ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
+   |                  ^^^^^^^^^^^^^^^^^^^^--
+   |                  |
+   |                  `AccessibilityOverlay` reimported here
+   |                  help: remove unnecessary import
+   |
+   = note: `AccessibilityOverlay` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `Trophy` is defined multiple times
+  --> src/dashboard/mod.rs:39:40
+   |
+27 |     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+   |                                                                     ------ previous import of the type `Trophy` here
+...
+39 |     ColorFilter, AccessibilityOverlay, Trophy, GamifiedProductivityTracker,
+   |                                        ^^^^^^--
+   |                                        |
+   |                                        `Trophy` reimported here
+   |                                        help: remove unnecessary import
+   |
+   = note: `Trophy` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `CowSnapshot` is defined multiple times
+  --> src/filesystem/mod.rs:36:5
+   |
+21 | pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction,...
+   |                        ----------- previous import of the type `CowSnapshot` here
+...
+36 |     CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+   |     ^^^^^^^^^^^--
+   |     |
+   |     `CowSnapshot` reimported here
+   |     help: remove unnecessary import
+   |
+   = note: `CowSnapshot` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `FileTransaction` is defined multiple times
+  --> src/filesystem/mod.rs:36:38
+   |
+21 | ...owSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
+   |                                    --------------- previous import of the type `FileTransaction` here
+...
+36 | ...shotManager, FileTransaction, SnapshotState,
+   |                 ^^^^^^^^^^^^^^^--
+   |                 |
+   |                 `FileTransaction` reimported here
+   |                 help: remove unnecessary import
+   |
+   = note: `FileTransaction` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `SnapshotState` is defined multiple times
+  --> src/filesystem/mod.rs:36:55
+   |
+21 | ...SnapshotManager, FileTransaction, SnapshotState};
+   |                                      ------------- previous import of the type `SnapshotState` here
+...
+36 | ...leTransaction, SnapshotState,
+   |                   ^^^^^^^^^^^^^-
+   |                   |
+   |                   `SnapshotState` reimported here
+   |                   help: remove unnecessary import
+   |
+   = note: `SnapshotState` must be defined only once in the type namespace of this module
+
+error[E0255]: the name `ParseError` is defined multiple times
+   --> src/sigpkg/mod.rs:103:1
+    |
+ 47 |     UserDefinedHook, ParseError, InstallError, HookError,
+    |                      ---------- previous import of the type `ParseError` here
+...
+103 | pub enum ParseError {
+    | ^^^^^^^^^^^^^^^^^^^ `ParseError` redefined here
+    |
+    = note: `ParseError` must be defined only once in the type namespace of this module
+help: you can use `as` to change the binding name of the import
+    |
+ 47 |     UserDefinedHook, ParseError as OtherParseError, InstallError, HookError,
+    |                                 ++++++++++++++++++
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/accessibility/framework.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/automation/orchestrator.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/automation/system_level.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `canonical`
+  --> src/compatibility/mod.rs:17:9
+   |
+17 | pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaM...
+   |         ^^^^^^^^^ use of unresolved module or unlinked crate `canonical`
+   |
+help: to make use of source file src/compatibility/canonical.rs, use `mod canonical` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod canonical;
+   |
+
+error[E0432]: unresolved import `fedora`
+  --> src/compatibility/mod.rs:18:9
+   |
+18 | pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer,...
+   |         ^^^^^^ use of unresolved module or unlinked crate `fedora`
+   |
+help: to make use of source file src/compatibility/fedora.rs, use `mod fedora` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod fedora;
+   |
+
+error[E0432]: unresolved import `legacy_adapters`
+  --> src/compatibility/mod.rs:19:9
+   |
+19 | pub use legacy_adapters::{
+   |         ^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `legacy_adapters`
+   |
+help: to make use of source file src/compatibility/legacy_adapters.rs, use `mod legacy_adapters` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod legacy_adapters;
+   |
+
+error[E0432]: unresolved import `endeavour`
+  --> src/compatibility/mod.rs:41:9
+   |
+41 | pub use endeavour::{
+   |         ^^^^^^^^^ use of unresolved module or unlinked crate `endeavour`
+   |
+help: to make use of source file src/compatibility/endeavour.rs, use `mod endeavour` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod endeavour;
+   |
+
+error[E0432]: unresolved import `india_professional_tools`
+  --> src/compatibility/mod.rs:73:9
+   |
+73 | pub use india_professional_tools::{
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `india_professional_tools`
+   |
+help: to make use of source file src/compatibility/india_professional_tools.rs, use `mod india_professional_tools` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod india_professional_tools;
+   |
+
+error[E0432]: unresolved import `india_stack`
+  --> src/compatibility/mod.rs:77:9
+   |
+77 | pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, Mu...
+   |         ^^^^^^^^^^^ use of unresolved module or unlinked crate `india_stack`
+   |
+help: to make use of source file src/compatibility/india_stack.rs, use `mod india_stack` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod india_stack;
+   |
+
+error[E0432]: unresolved import `jehanne`
+  --> src/compatibility/mod.rs:78:9
+   |
+78 | pub use jehanne::{
+   |         ^^^^^^^ use of unresolved module or unlinked crate `jehanne`
+   |
+help: to make use of source file src/compatibility/jehanne.rs, use `mod jehanne` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod jehanne;
+   |
+
+error[E0432]: unresolved import `reactos`
+  --> src/compatibility/mod.rs:86:9
+   |
+86 | pub use reactos::{
+   |         ^^^^^^^ use of unresolved module or unlinked crate `reactos`
+   |
+help: to make use of source file src/compatibility/reactos.rs, use `mod reactos` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod reactos;
+   |
+
+error[E0432]: unresolved import `jails`
+  --> src/compatibility/mod.rs:90:9
+   |
+90 | pub use jails::{
+   |         ^^^^^ use of unresolved module or unlinked crate `jails`
+   |
+help: to make use of source file src/compatibility/jails.rs, use `mod jails` in this file to declare the module
+  --> src/lib.rs:7:1
+   |
+ 7 + mod jails;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/customization/routines.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/customization/theme.rs:23:5
+   |
+23 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+23 - use crate::klib::HashMap;
+23 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/dashboard/monitor.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/dashboard/process.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/filesystem/archive.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/filesystem/manager.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::filesystem::smart_symlink`
+  --> src/filesystem/support.rs:21:24
+   |
+21 | use crate::filesystem::smart_symlink::{SmartSymlink, SymlinkResolverRule};
+   |                        ^^^^^^^^^^^^^ could not find `smart_symlink` in `filesystem`
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+ --> src/filesystem/vfs.rs:5:5
+  |
+5 | use crate::klib::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+  |
+help: consider importing this struct instead
+  |
+5 - use crate::klib::HashMap;
+5 + use std::collections::HashMap;
+  |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/orchestration/cross_device.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/certification.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/community.rs:23:5
+   |
+23 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+23 - use crate::klib::HashMap;
+23 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/compat_layers.rs:19:5
+   |
+19 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+19 - use crate::klib::HashMap;
+19 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/developer.rs:19:5
+   |
+19 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+19 - use crate::klib::HashMap;
+19 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/enterprise.rs:19:5
+   |
+19 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+19 - use crate::klib::HashMap;
+19 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/i18n.rs:19:5
+   |
+19 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+19 - use crate::klib::HashMap;
+19 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/manjaro.rs:23:5
+   |
+23 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+23 - use crate::klib::HashMap;
+23 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/nextgen.rs:19:5
+   |
+19 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+19 - use crate::klib::HashMap;
+19 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/distro/recovery.rs:19:5
+   |
+19 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+19 - use crate::klib::HashMap;
+19 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+ --> src/package/universal.rs:4:5
+  |
+4 | use crate::klib::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+  |
+help: consider importing this struct instead
+  |
+4 - use crate::klib::HashMap;
+4 + use std::collections::HashMap;
+  |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/productivity/gamification.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/productivity/notes.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/productivity/tasks.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/productivity/terminal.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::process::ProcFileSystem`
+   --> src/shell/repl.rs:450:21
+    |
+450 |                 use crate::process::ProcFileSystem;
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `ProcFileSystem` in `process`
+
+error[E0432]: unresolved import `crate::compatibility::india_stack`
+   --> src/shell/repl.rs:673:43
+    |
+673 |                 use crate::compatibility::india_stack::GstCalculator;
+    |                                           ^^^^^^^^^^^ could not find `india_stack` in `compatibility`
+
+error[E0432]: unresolved import `crate::compatibility::india_stack`
+   --> src/shell/repl.rs:683:43
+    |
+683 |                 use crate::compatibility::india_stack::MockUPIService;
+    |                                           ^^^^^^^^^^^ could not find `india_stack` in `compatibility`
+
+error[E0432]: unresolved import `crate::compatibility::india_stack`
+   --> src/shell/repl.rs:695:43
+    |
+695 | ...ty::india_stack::MultilingualSupport;
+    |        ^^^^^^^^^^^ could not find `india_stack` in `compatibility`
+
+error[E0432]: unresolved import `crate::compatibility::reactos`
+   --> src/shell/repl.rs:705:43
+    |
+705 | ...bility::reactos::PortableExecutableLoader;
+    |            ^^^^^^^ could not find `reactos` in `compatibility`
+
+error[E0432]: unresolved import `crate::process::ProcFileSystem`
+   --> src/shell/repl.rs:743:21
+    |
+743 |                 use crate::process::ProcFileSystem;
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `ProcFileSystem` in `process`
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/sigpkg/arch_compat.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved imports `crate::klib::HashMap`, `crate::klib::String`, `crate::klib::ToString`
+  --> src/sigpkg/aur_helper.rs:15:19
+   |
+15 | use crate::klib::{HashMap, Vec, String, ToString};
+   |                   ^^^^^^^       ^^^^^^  ^^^^^^^^ no `ToString` in `klib`
+   |                   |             |
+   |                   |             no `String` in `klib`
+   |                   no `HashMap` in `klib`
+   |
+   = help: consider importing this struct instead:
+           std::collections::HashMap
+   = help: consider importing one of these items instead:
+           crate::compatibility::cross_platform::SysctlValue::String
+           crate::distro::RegistryType::String
+           std::string::String
+   = help: consider importing this trait instead:
+           std::string::ToString
+
+error[E0432]: unresolved imports `crate::klib::HashMap`, `crate::klib::String`, `crate::klib::ToString`
+  --> src/sigpkg/makepkg.rs:15:19
+   |
+15 | use crate::klib::{HashMap, Vec, String, ToString};
+   |                   ^^^^^^^       ^^^^^^  ^^^^^^^^ no `ToString` in `klib`
+   |                   |             |
+   |                   |             no `String` in `klib`
+   |                   no `HashMap` in `klib`
+   |
+   = help: consider importing this struct instead:
+           std::collections::HashMap
+   = help: consider importing one of these items instead:
+           crate::compatibility::cross_platform::SysctlValue::String
+           crate::distro::RegistryType::String
+           std::string::String
+   = help: consider importing this trait instead:
+           std::string::ToString
+
+error[E0432]: unresolved imports `crate::klib::HashMap`, `crate::klib::String`, `crate::klib::ToString`
+  --> src/sigpkg/nix_shell.rs:15:19
+   |
+15 | use crate::klib::{HashMap, Vec, String, ToString};
+   |                   ^^^^^^^       ^^^^^^  ^^^^^^^^ no `ToString` in `klib`
+   |                   |             |
+   |                   |             no `String` in `klib`
+   |                   no `HashMap` in `klib`
+   |
+   = help: consider importing this struct instead:
+           std::collections::HashMap
+   = help: consider importing one of these items instead:
+           crate::compatibility::cross_platform::SysctlValue::String
+           crate::distro::RegistryType::String
+           std::string::String
+   = help: consider importing this trait instead:
+           std::string::ToString
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/sigpkg/store.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+ --> src/sigpkg/universal_engine.rs:5:5
+  |
+5 | use crate::klib::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+  |
+help: consider importing this struct instead
+  |
+5 - use crate::klib::HashMap;
+5 + use std::collections::HashMap;
+  |
+
+error[E0432]: unresolved imports `crate::klib::HashMap`, `crate::klib::Arc`
+  --> src/sigpkg/universal_oop_system.rs:24:19
+   |
+24 | use crate::klib::{HashMap, Arc};
+   |                   ^^^^^^^  ^^^ no `Arc` in `klib`
+   |                   |
+   |                   no `HashMap` in `klib`
+   |
+   = help: consider importing this struct instead:
+           std::collections::HashMap
+   = help: consider importing this struct instead:
+           std::sync::Arc
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+  --> src/virtualization/orchestration.rs:22:5
+   |
+22 | use crate::klib::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+   |
+help: consider importing this struct instead
+   |
+22 - use crate::klib::HashMap;
+22 + use std::collections::HashMap;
+   |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+ --> src/toolchain/codex.rs:4:5
+  |
+4 | use crate::klib::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+  |
+help: consider importing this struct instead
+  |
+4 - use crate::klib::HashMap;
+4 + use std::collections::HashMap;
+  |
+
+error[E0432]: unresolved import `crate::klib::HashMap`
+ --> src/toolchain/bootstrap.rs:4:5
+  |
+4 | use crate::klib::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^ no `HashMap` in `klib`
+  |
+help: consider importing this struct instead
+  |
+4 - use crate::klib::HashMap;
+4 + use std::collections::HashMap;
+  |
+
+error[E0432]: unresolved import `ai::next_gen`
+   --> src/lib.rs:180:13
+    |
+180 | pub use ai::next_gen::{
+    |             ^^^^^^^^ could not find `next_gen` in `ai`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `alloc`
+ --> src/audio/driver.rs:5:5
+  |
+5 | use alloc::boxed::Box;
+  |     ^^^^^ use of unresolved module or unlinked crate `alloc`
+  |
+  = help: add `extern crate alloc` to use the `alloc` crate
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `alloc`
+ --> src/audio/driver.rs:6:5
+  |
+6 | use alloc::vec::Vec;
+  |     ^^^^^ use of unresolved module or unlinked crate `alloc`
+  |
+  = help: add `extern crate alloc` to use the `alloc` crate
+
+error[E0432]: unresolved import `ai::wandr`
+   --> src/lib.rs:185:13
+    |
+185 | pub use ai::wandr::{
+    |             ^^^^^ could not find `wandr` in `ai`
+
+error[E0432]: unresolved imports `mint_linux::MintUpdateItem`, `mint_linux::SoftwareMeta`, `mint_linux::WindowCoordinates`, `mint_linux::ZenithDisplayCompositor`
+  --> src/compatibility/mod.rs:83:42
+   |
+83 |     MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel...
+   |                                          ^^^^^^^^^^^^^^
+   |                                          |
+   |                                          no `MintUpdateItem` in `compatibility::mint_linux`
+   |                                          help: a similar name exists in the module: `MintUpdateLevel`
+84 |     SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor,
+   |     ^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^ no `ZenithDisplayCompositor` in `compatibility::mint_linux`
+   |     |             |
+   |     |             no `WindowCoordinates` in `compatibility::mint_linux`
+   |     no `SoftwareMeta` in `compatibility::mint_linux`
+
+error[E0432]: unresolved import `crate::sigpkg::PackageImporter`
+ --> src/shell/command.rs:5:5
+  |
+5 | use crate::sigpkg::PackageImporter;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `PackageImporter` in `sigpkg`
+  |
+help: consider importing this trait instead
+  |
+5 | use crate::sigpkg::importer::PackageImporter;
+  |                    ++++++++++
+
+error[E0432]: unresolved imports `aur::AurClient`, `aur::AurPackage`, `aur::AurPackageQuery`, `aur::Version`
+  --> src/sigpkg/mod.rs:25:15
+   |
+25 | ...::{AurClient, AurPackage as AurPkg, AurPackageQuery, Version as AurVersion};
+   |       ^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^ no `Version` in `sigpkg::aur`
+   |       |          |                     |
+   |       |          |                     no `AurPackageQuery` in `sigpkg::aur`
+   |       |          no `AurPackage` in `sigpkg::aur`
+   |       no `AurClient` in `sigpkg::aur`
+   |
+   = help: consider importing this struct instead:
+           crate::sigpkg::aur_helper::AurPackage
+   = help: consider importing this struct instead:
+           crate::sigpkg::zero_alloc_resolver::Version
+
+error[E0432]: unresolved imports `uefi::AcpiParser`, `uefi::GopFramebuffer`, `uefi::GopSplashCanvas`, `uefi::MicrokernelProfile`, `uefi::MultiKernelBootSelector`, `uefi::SovereignBootWatchdog`, `uefi::UsbHostController`
+  --> src/boot/mod.rs:17:5
+   |
+17 |     AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
+   |     ^^^^^^^^^^             ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^ no `MicrokernelProfile` in `boot::uefi`
+   |     |                      |               |
+   |     |                      |               no `GopSplashCanvas` in `boot::uefi`
+   |     |                      no `GopFramebuffer` in `boot::uefi`
+   |     no `AcpiParser` in `boot::uefi`
+18 |     MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^ no `MultiKernelBootSelector` in `boot::uefi`
+19 |     SovereignBootWatchdog, UEFIBootloader, UsbHostController,
+   |     ^^^^^^^^^^^^^^^^^^^^^                  ^^^^^^^^^^^^^^^^^ no `UsbHostController` in `boot::uefi`
+   |     |
+   |     no `SovereignBootWatchdog` in `boot::uefi`
+
+error[E0201]: duplicate definitions with name `is_cow`:
+   --> src/klib/paging.rs:112:5
+    |
+ 27 |       fn is_cow(&self) -> bool;
+    |       ------------------------- item in trait
+...
+ 81 | /     fn is_cow(&self) -> bool {
+ 82 | |         self.cow.load(Ordering::SeqCst) == 1
+ 83 | |     }
+    | |_____- previous definition here
+...
+112 |       fn is_cow(&self) -> bool { self.cow.load(Ordering::SeqCst) == 1 }
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definition
+
+error[E0201]: duplicate definitions with name `set_cow`:
+   --> src/klib/paging.rs:113:5
+    |
+ 33 |       fn set_cow(&mut self, cow: bool);
+    |       --------------------------------- item in trait
+...
+102 | /     fn set_cow(&mut self, cow: bool) {
+103 | |         self.cow.store(if cow { 1 } else { 0 }, Ordering::SeqCst);
+104 | |     }
+    | |_____- previous definition here
+...
+113 | /     fn set_cow(&mut self, cow: bool) {
+114 | |         self.cow.store(if cow { 1 } else { 0 }, Ordering::SeqCst);
+115 | |     }
+    | |_____^ duplicate definition
+
+error[E0201]: duplicate definitions with name `get_entry_ref`:
+   --> src/klib/paging.rs:157:5
+    |
+119 |       fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry;
+    |       --------------------------------------------------------------- item in trait
+...
+145 | /     fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry {
+146 | |         if index < 512 {
+147 | |             &self.entries[index]
+148 | |         } else {
+...   |
+152 | |     }
+    | |_____- previous definition here
+...
+157 | /     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry {
+158 | |         let idx = index.min(511);
+159 | |         &self.entries[idx]
+160 | |     }
+    | |_____^ duplicate definition
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `uuid`
+  --> src/productivity/advanced_app_absorber.rs:69:101
+   |
+69 | ...ation, uuid::Uuid::new_v4()));
+   |           ^^^^ use of unresolved module or unlinked crate `uuid`
+   |
+   = help: if you wanted to use a crate named `uuid`, use `cargo add uuid` to add it to your `Cargo.toml`
+
+error[E0425]: cannot find type `PageSize` in this scope
+   --> src/klib/paging.rs:267:15
+    |
+267 |         size: PageSize,
+    |               ^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find type `AtomicUsize` in this scope
+  --> src/network/tcp_udp.rs:53:21
+   |
+53 |     pub local_port: AtomicUsize,
+   |                     ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0425]: cannot find type `AtomicUsize` in this scope
+  --> src/network/tcp_udp.rs:54:22
+   |
+54 |     pub remote_port: AtomicUsize,
+   |                      ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0425]: cannot find type `AtomicUsize` in this scope
+  --> src/network/tcp_udp.rs:55:16
+   |
+55 |     pub state: AtomicUsize,
+   |                ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0425]: cannot find type `AtomicUsize` in this scope
+  --> src/network/tcp_udp.rs:57:21
+   |
+57 |     pub reuse_addr: AtomicUsize,
+   |                     ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0425]: cannot find type `AtomicUsize` in this scope
+  --> src/network/tcp_udp.rs:58:22
+   |
+58 |     pub tcp_nodelay: AtomicUsize,
+   |                      ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0425]: cannot find type `AtomicUsize` in this scope
+  --> src/network/tcp_udp.rs:59:17
+   |
+59 |     pub rcvbuf: AtomicUsize,
+   |                 ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0425]: cannot find type `AtomicUsize` in this scope
+  --> src/network/tcp_udp.rs:60:17
+   |
+60 |     pub sndbuf: AtomicUsize,
+   |                 ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicUsize`
+  --> src/network/tcp_udp.rs:68:25
+   |
+68 |             local_port: AtomicUsize::new(local_port as usize),
+   |                         ^^^^^^^^^^^ use of undeclared type `AtomicUsize`
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicUsize`
+  --> src/network/tcp_udp.rs:69:26
+   |
+69 |             remote_port: AtomicUsize::new(0),
+   |                          ^^^^^^^^^^^ use of undeclared type `AtomicUsize`
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicUsize`
+  --> src/network/tcp_udp.rs:70:20
+   |
+70 |             state: AtomicUsize::new(TCPState::Closed as usize),
+   |                    ^^^^^^^^^^^ use of undeclared type `AtomicUsize`
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicUsize`
+  --> src/network/tcp_udp.rs:71:25
+   |
+71 |             reuse_addr: AtomicUsize::new(0),
+   |                         ^^^^^^^^^^^ use of undeclared type `AtomicUsize`
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicUsize`
+  --> src/network/tcp_udp.rs:72:26
+   |
+72 |             tcp_nodelay: AtomicUsize::new(0),
+   |                          ^^^^^^^^^^^ use of undeclared type `AtomicUsize`
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicUsize`
+  --> src/network/tcp_udp.rs:73:21
+   |
+73 |             rcvbuf: AtomicUsize::new(65536),
+   |                     ^^^^^^^^^^^ use of undeclared type `AtomicUsize`
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicUsize`
+  --> src/network/tcp_udp.rs:74:21
+   |
+74 |             sndbuf: AtomicUsize::new(65536),
+   |                     ^^^^^^^^^^^ use of undeclared type `AtomicUsize`
+   |
+help: consider importing this struct
+   |
+ 8 + use std::sync::atomic::AtomicUsize;
+   |
+
+error[E0425]: cannot find type `AtomicUsize` in this scope
+   --> src/network/tcp_udp.rs:360:28
+    |
+360 |     pub allowed_ports: Vec<AtomicUsize>,
+    |                            ^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+  8 + use std::sync::atomic::AtomicUsize;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicUsize`
+   --> src/network/tcp_udp.rs:373:32
+    |
+373 |             allowed_ports.push(AtomicUsize::new(0));
+    |                                ^^^^^^^^^^^ use of undeclared type `AtomicUsize`
+    |
+help: consider importing this struct
+    |
+  8 + use std::sync::atomic::AtomicUsize;
+    |
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `mem`
+   --> src/network/tcp_udp.rs:749:45
+    |
+749 | ...acity * mem::size_of::<T>()) as *mut T;
+    |            ^^^ use of unresolved module or unlinked crate `mem`
+    |
+    = help: if you wanted to use a crate named `mem`, use `cargo add mem` to add it to your `Cargo.toml`
+help: consider importing this module
+    |
+  8 + use std::mem;
+    |
+
+error[E0433]: failed to resolve: could not find `DebPackageImporter` in `sigpkg`
+  --> src/shell/command.rs:88:39
+   |
+88 |         let importer = crate::sigpkg::DebPackageImporter::new();
+   |                                       ^^^^^^^^^^^^^^^^^^ could not find `DebPackageImporter` in `sigpkg`
+   |
+help: consider importing this struct
+   |
+ 5 + use crate::sigpkg::importer::DebPackageImporter;
+   |
+help: if you import `DebPackageImporter`, refer to it directly
+   |
+88 -         let importer = crate::sigpkg::DebPackageImporter::new();
+88 +         let importer = DebPackageImporter::new();
+   |
+
+error[E0433]: failed to resolve: could not find `RpmPackageImporter` in `sigpkg`
+   --> src/shell/command.rs:119:39
+    |
+119 |         let importer = crate::sigpkg::RpmPackageImporter::new();
+    |                                       ^^^^^^^^^^^^^^^^^^ could not find `RpmPackageImporter` in `sigpkg`
+    |
+help: consider importing this struct
+    |
+  5 + use crate::sigpkg::importer::RpmPackageImporter;
+    |
+help: if you import `RpmPackageImporter`, refer to it directly
+    |
+119 -         let importer = crate::sigpkg::RpmPackageImporter::new();
+119 +         let importer = RpmPackageImporter::new();
+    |
+
+error[E0433]: failed to resolve: could not find `PacmanPackageImporter` in `sigpkg`
+   --> src/shell/command.rs:151:39
+    |
+151 |         let importer = crate::sigpkg::PacmanPackageImporter::new();
+    |                                       ^^^^^^^^^^^^^^^^^^^^^ could not find `PacmanPackageImporter` in `sigpkg`
+    |
+help: a struct with a similar name exists
+    |
+151 -         let importer = crate::sigpkg::PacmanPackageImporter::new();
+151 +         let importer = crate::sigpkg::PacmanPackageAdapter::new();
+    |
+help: consider importing this struct
+    |
+  5 + use crate::sigpkg::importer::PacmanPackageImporter;
+    |
+help: if you import `PacmanPackageImporter`, refer to it directly
+    |
+151 -         let importer = crate::sigpkg::PacmanPackageImporter::new();
+151 +         let importer = PacmanPackageImporter::new();
+    |
+
+error[E0425]: cannot find type `HashMap` in module `crate::klib`
+  --> src/shell/repl.rs:84:40
+   |
+84 |     pub registered_tasks: crate::klib::HashMap<usize, AgentTask>,
+   |                                        ^^^^^^^ not found in `crate::klib`
+   |
+help: consider importing this struct
+   |
+ 4 + use std::collections::HashMap;
+   |
+help: if you import `HashMap`, refer to it directly
+   |
+84 -     pub registered_tasks: crate::klib::HashMap<usize, AgentTask>,
+84 +     pub registered_tasks: HashMap<usize, AgentTask>,
+   |
+
+error[E0433]: failed to resolve: could not find `HashMap` in `klib`
+  --> src/shell/repl.rs:91:44
+   |
+91 |             registered_tasks: crate::klib::HashMap::new(),
+   |                                            ^^^^^^^ could not find `HashMap` in `klib`
+   |
+help: consider importing this struct
+   |
+ 4 + use std::collections::HashMap;
+   |
+help: if you import `HashMap`, refer to it directly
+   |
+91 -             registered_tasks: crate::klib::HashMap::new(),
+91 +             registered_tasks: HashMap::new(),
+   |
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `mem`
+   --> src/sigpkg/spec.rs:549:45
+    |
+549 | ...acity * mem::size_of::<T>()) as *mut T;
+    |            ^^^ use of unresolved module or unlinked crate `mem`
+    |
+    = help: if you wanted to use a crate named `mem`, use `cargo add mem` to add it to your `Cargo.toml`
+help: consider importing this module
+    |
+  8 + use std::mem;
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:111:28
+    |
+111 |     pub name: crate::klib::String,
+    |                            ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+111 -     pub name: crate::klib::String,
+111 +     pub name: String,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:113:35
+    |
+113 |     pub description: crate::klib::String,
+    |                                   ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+113 -     pub description: crate::klib::String,
+113 +     pub description: String,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:115:32
+    |
+115 |     pub checksum: crate::klib::String,
+    |                                ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+115 -     pub checksum: crate::klib::String,
+115 +     pub checksum: String,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:116:35
+    |
+116 |     pub mirrors: Vec<crate::klib::String>,
+    |                                   ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+116 -     pub mirrors: Vec<crate::klib::String>,
+116 +     pub mirrors: Vec<String>,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:117:40
+    |
+117 |     pub signing_keys: Vec<crate::klib::String>,
+    |                                        ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+117 -     pub signing_keys: Vec<crate::klib::String>,
+117 +     pub signing_keys: Vec<String>,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:118:36
+    |
+118 |     pub licenses: Vec<crate::klib::String>,
+    |                                    ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+118 -     pub licenses: Vec<crate::klib::String>,
+118 +     pub licenses: Vec<String>,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:119:39
+    |
+119 |     pub maintainers: Vec<crate::klib::String>,
+    |                                       ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+119 -     pub maintainers: Vec<crate::klib::String>,
+119 +     pub maintainers: Vec<String>,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:120:38
+    |
+120 |     pub changelogs: Vec<crate::klib::String>,
+    |                                      ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+120 -     pub changelogs: Vec<crate::klib::String>,
+120 +     pub changelogs: Vec<String>,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:121:30
+    |
+121 |     pub source: crate::klib::String,
+    |                              ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+121 -     pub source: crate::klib::String,
+121 +     pub source: String,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:126:28
+    |
+126 |         name: crate::klib::String,
+    |                            ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+126 -         name: crate::klib::String,
+126 +         name: String,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:128:35
+    |
+128 |         description: crate::klib::String,
+    |                                   ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+128 -         description: crate::klib::String,
+128 +         description: String,
+    |
+
+error[E0425]: cannot find type `String` in module `crate::klib`
+   --> src/sigpkg/mod.rs:130:32
+    |
+130 |         checksum: crate::klib::String,
+    |                                ^^^^^^ not found in `crate::klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+130 -         checksum: crate::klib::String,
+130 +         checksum: String,
+    |
+
+error[E0433]: failed to resolve: could not find `String` in `klib`
+   --> src/sigpkg/mod.rs:143:34
+    |
+143 |             source: crate::klib::String::new(),
+    |                                  ^^^^^^ could not find `String` in `klib`
+    |
+help: consider importing this struct
+    |
+ 24 + use std::string::String;
+    |
+help: if you import `String`, refer to it directly
+    |
+143 -             source: crate::klib::String::new(),
+143 +             source: String::new(),
+    |
+
+error[E0119]: conflicting implementations of trait `Debug` for type `repl::AgentAutomationEngine`
+  --> src/shell/repl.rs:82:10
+   |
+ 6 | #[derive(Debug, Clone)]
+   |          ----- first implementation here
+...
+82 | #[derive(Debug, Clone)]
+   |          ^^^^^ conflicting implementation for `repl::AgentAutomationEngine`
+
+error[E0119]: conflicting implementations of trait `Clone` for type `repl::AgentAutomationEngine`
+  --> src/shell/repl.rs:82:17
+   |
+ 6 | #[derive(Debug, Clone)]
+   |                 ----- first implementation here
+...
+82 | #[derive(Debug, Clone)]
+   |                 ^^^^^ conflicting implementation for `repl::AgentAutomationEngine`
+
+error[E0046]: not all trait items implemented, missing: `is_cow`, `set_cow`
+  --> src/klib/paging.rs:71:1
+   |
+36 |     fn is_cow(&self) -> bool;
+   |     ------------------------- `is_cow` from trait
+37 |     fn set_cow(&mut self, cow: bool);
+   |     --------------------------------- `set_cow` from trait
+...
+71 | impl PageTableEntry for SimplePageTableEntry {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ missing `is_cow`, `set_cow` in implementation
+
+error[E0046]: not all trait items implemented, missing: `get_entry_ref`
+   --> src/klib/paging.rs:144:1
+    |
+121 |     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry;
+    |     ------------------------------------------------------------- `get_entry_ref` from trait
+...
+144 | impl PageTable for SimplePageTable {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ missing `get_entry_ref` in implementation
+
+error[E0119]: conflicting implementations of trait `BsdSocket` for type `SimpleSocket`
+   --> src/network/tcp_udp.rs:127:1
+    |
+ 97 | impl BsdSocket for SimpleSocket {
+    | ------------------------------- first implementation here
+...
+127 | impl BsdSocket for SimpleSocket {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `SimpleSocket`
+
+error[E0592]: duplicate definitions with name `new`
+  --> src/shell/repl.rs:9:5
+   |
+ 9 |     pub fn new() -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `new`
+...
+89 |     pub fn new() -> Self {
+   |     -------------------- other definition for `new`
+
+error[E0282]: type annotations needed
+   --> src/audio/driver.rs:120:20
+    |
+120 |                 if device.audio_type() == AudioType::Playback
+    |                    ^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/audio/driver.rs:133:20
+    |
+133 |                 if device.audio_type() == AudioType::Capture
+    |                    ^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/audio/driver.rs:147:26
+    |
+147 |                 ids.push(device.id());
+    |                          ^^^^^^ cannot infer type
+
+error[E0616]: field `len` of struct `klib::vec::Vec` is private
+   --> src/auth/user.rs:113:32
+    |
+113 |         for i in 0..self.users.len {
+    |                                ^^^ private field
+    |
+help: a method `len` also exists, call it with parentheses
+    |
+113 |         for i in 0..self.users.len() {
+    |                                   ++
+
+error[E0616]: field `data` of struct `klib::vec::Vec` is private
+   --> src/auth/user.rs:115:52
+    |
+115 |                 let user_option = &mut *self.users.data.add(i);
+    |                                                    ^^^^ private field
+
+error[E0282]: type annotations needed
+   --> src/auth/user.rs:117:24
+    |
+117 | ...   if user.username() == username { return user.authenticate(passwor...
+    |          ^^^^ cannot infer type
+
+error[E0616]: field `len` of struct `klib::vec::Vec` is private
+   --> src/auth/user.rs:124:32
+    |
+124 |         for i in 0..self.users.len {
+    |                                ^^^ private field
+    |
+help: a method `len` also exists, call it with parentheses
+    |
+124 |         for i in 0..self.users.len() {
+    |                                   ++
+
+error[E0616]: field `data` of struct `klib::vec::Vec` is private
+   --> src/auth/user.rs:126:48
+    |
+126 |                 let user_option = &*self.users.data.add(i);
+    |                                                ^^^^ private field
+
+error[E0282]: type annotations needed
+   --> src/auth/user.rs:128:24
+    |
+128 |                     if user.id() == id { return Some(user.as_ref()); }
+    |                        ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/accessibility/framework.rs:226:13
+    |
+226 |             profile.enable_all();
+    |             ^^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/customization/routines.rs:150:23
+    |
+150 |                 .map(|s| s.as_str())
+    |                       ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+150 |                 .map(|s: /* Type */| s.as_str())
+    |                        ++++++++++++
+
+error[E0282]: type annotations needed
+   --> src/customization/routines.rs:438:16
+    |
+438 |             if routine.should_trigger(&self.context) {
+    |                ^^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/customization/theme.rs:612:49
+    |
+612 |         self.mapped_sounds.get(event_name).map(|s| s.as_str())
+    |                                                 ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+612 |         self.mapped_sounds.get(event_name).map(|s: /* Type */| s.as_str())
+    |                                                  ++++++++++++
+
+error[E0282]: type annotations needed
+   --> src/dashboard/monitor.rs:179:13
+    |
+179 |             widget.add_data_point(data);
+    |             ^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/dashboard/monitor.rs:187:34
+    |
+187 |             if let Some(value) = widget.get_latest_value() {
+    |                                  ^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/dashboard/monitor.rs:188:32
+    |
+188 |                 summary.insert(id.clone(), value);
+    |                                ^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/dashboard/process.rs:331:45
+    |
+331 |         self.process_history.get(&pid).map(|v| v.as_slice())
+    |                                             ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+331 |         self.process_history.get(&pid).map(|v: /* Type */| v.as_slice())
+    |                                              ++++++++++++
+
+error[E0609]: no field `huge` on type `&SimplePageTableEntry`
+  --> src/klib/paging.rs:85:14
+   |
+85 |         self.huge.load(Ordering::SeqCst) == 1
+   |              ^^^^ unknown field
+   |
+   = note: available fields are: `present`, `writable`, `user_accessible`, `physical_addr`, `accessed` ... and 2 others
+
+error[E0609]: no field `huge` on type `&mut SimplePageTableEntry`
+   --> src/klib/paging.rs:106:14
+    |
+106 |         self.huge.store(if huge { 1 } else { 0 }, Ordering::SeqCst);
+    |              ^^^^ unknown field
+    |
+    = note: available fields are: `present`, `writable`, `user_accessible`, `physical_addr`, `accessed` ... and 2 others
+
+error[E0609]: no field `burst_score` on type `&mut kernel::scheduler::Process`
+  --> src/kernel/scheduler.rs:78:33
+   |
+78 |         let bore_penalty = self.burst_score / 2;
+   |                                 ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `pid`, `name`, `priority`, `state`, `runtime` ... and 3 others
+
+error[E0609]: no field `burst_score` on type `&mut kernel::scheduler::Process`
+   --> src/kernel/scheduler.rs:104:21
+    |
+104 | ...   process.burst_score = process.burst_score.saturating_add(burst_am...
+    |               ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `pid`, `name`, `priority`, `state`, `runtime` ... and 3 others
+
+error[E0609]: no field `burst_score` on type `&mut kernel::scheduler::Process`
+   --> src/kernel/scheduler.rs:104:43
+    |
+104 | ...   process.burst_score = process.burst_score.saturating_add(burst_am...
+    |                                     ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `pid`, `name`, `priority`, `state`, `runtime` ... and 3 others
+
+error[E0609]: no field `burst_score` on type `&mut kernel::scheduler::Process`
+   --> src/kernel/scheduler.rs:111:21
+    |
+111 |             process.burst_score = process.burst_score.saturating_sub(1);
+    |                     ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `pid`, `name`, `priority`, `state`, `runtime` ... and 3 others
+
+error[E0609]: no field `burst_score` on type `&mut kernel::scheduler::Process`
+   --> src/kernel/scheduler.rs:111:43
+    |
+111 |             process.burst_score = process.burst_score.saturating_sub(1);
+    |                                           ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `pid`, `name`, `priority`, `state`, `runtime` ... and 3 others
+
+error[E0609]: no field `rcv_buf` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:108:22
+    |
+108 |                 self.rcv_buf.store(u_val, Ordering::SeqCst);
+    |                      ^^^^^^^ unknown field
+    |
+help: a field with a similar name exists
+    |
+108 -                 self.rcv_buf.store(u_val, Ordering::SeqCst);
+108 +                 self.rcvbuf.store(u_val, Ordering::SeqCst);
+    |
+
+error[E0609]: no field `snd_buf` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:111:22
+    |
+111 |                 self.snd_buf.store(u_val, Ordering::SeqCst);
+    |                      ^^^^^^^ unknown field
+    |
+help: a field with a similar name exists
+    |
+111 -                 self.snd_buf.store(u_val, Ordering::SeqCst);
+111 +                 self.sndbuf.store(u_val, Ordering::SeqCst);
+    |
+
+error[E0609]: no field `rcv_buf` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:121:45
+    |
+121 | ...   SocketOption::RcvBuf => Ok(self.rcv_buf.load(Ordering::SeqCst) as...
+    |                                       ^^^^^^^ unknown field
+    |
+help: a field with a similar name exists
+    |
+121 -             SocketOption::RcvBuf => Ok(self.rcv_buf.load(Ordering::SeqCst) as usize),
+121 +             SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst) as usize),
+    |
+
+error[E0609]: no field `snd_buf` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:122:45
+    |
+122 | ...   SocketOption::SndBuf => Ok(self.snd_buf.load(Ordering::SeqCst) as...
+    |                                       ^^^^^^^ unknown field
+    |
+help: a field with a similar name exists
+    |
+122 -             SocketOption::SndBuf => Ok(self.snd_buf.load(Ordering::SeqCst) as usize),
+122 +             SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst) as usize),
+    |
+
+error[E0282]: type annotations needed
+   --> src/orchestration/cross_device.rs:529:39
+    |
+529 |         self.devices.values().filter(|d| d.is_connected()).collect()
+    |                                       ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+529 |         self.devices.values().filter(|d: /* Type */| d.is_connected()).collect()
+    |                                        ++++++++++++
+
+error[E0282]: type annotations needed
+  --> src/distro/i18n.rs:43:41
+   |
+43 |         self.translations.get(key).map(|s| s.as_str())
+   |                                         ^  - type must be known at this point
+   |
+help: consider giving this closure parameter an explicit type
+   |
+43 |         self.translations.get(key).map(|s: /* Type */| s.as_str())
+   |                                          ++++++++++++
+
+error[E0282]: type annotations needed
+   --> src/distro/i18n.rs:101:17
+    |
+101 |             if !candidates.is_empty() {
+    |                 ^^^^^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/distro/i18n.rs:224:40
+    |
+224 |             if let Some(translation) = pack.translate(key) {
+    |                                        ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/distro/i18n.rs:225:24
+    |
+225 |                 return translation.to_string();
+    |                        ^^^^^^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/distro/recovery.rs:175:38
+    |
+175 |                 modified_or_new.push(path.clone());
+    |                                      ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/distro/recovery.rs:194:41
+    |
+194 |                     target_files.insert(path.clone(), hash.clone());
+    |                                         ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/distro/recovery.rs:194:55
+    |
+194 |                     target_files.insert(path.clone(), hash.clone());
+    |                                                       ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/package/universal.rs:300:23
+    |
+300 |             keys.push(key.clone());
+    |                       ^^^ cannot infer type
+
+error[E0599]: no method named `data_mut` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/process/spawn.rs:162:64
+    |
+162 | ...ses.data_mut()[i] {
+    |        ^^^^^^^^ method not found in `Vec<Option<Box<dyn Process>>>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ----------------- method `data_mut` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+note: `Surface` defines an item `data_mut`, perhaps you need to implement it
+   --> src/graphics/compositor.rs:94:1
+    |
+ 94 | pub trait Surface {
+    | ^^^^^^^^^^^^^^^^^
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0f9dadc02dd4ce03.long-type-12450385209059686610.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/process/spawn.rs:163:20
+    |
+163 |                 if process.id() == process_id {
+    |                    ^^^^^^^ cannot infer type
+
+error[E0599]: no method named `data` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/process/spawn.rs:204:63
+    |
+204 |             if let Some(ref process) = self.spawner.processes.data()[i] {
+    |                                                               ^^^^ private field, not a method
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ----------------- method `data` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+note: `Surface` defines an item `data`, perhaps you need to implement it
+   --> src/graphics/compositor.rs:94:1
+    |
+ 94 | pub trait Surface {
+    | ^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/process/spawn.rs:205:20
+    |
+205 |                 if process.id() == process_id {
+    |                    ^^^^^^^ cannot infer type
+
+error[E0599]: no method named `data` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/process/spawn.rs:217:63
+    |
+217 |             if let Some(ref process) = self.spawner.processes.data()[i] {
+    |                                                               ^^^^ private field, not a method
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ----------------- method `data` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+note: `Surface` defines an item `data`, perhaps you need to implement it
+   --> src/graphics/compositor.rs:94:1
+    |
+ 94 | pub trait Surface {
+    | ^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/process/spawn.rs:218:20
+    |
+218 |                 if process.id() == process_id {
+    |                    ^^^^^^^ cannot infer type
+
+error[E0599]: no method named `data_mut` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/process/spawn.rs:267:42
+    |
+267 |             let group = &mut self.groups.data_mut()[i];
+    |                                          ^^^^^^^^ method not found in `klib::vec::Vec<(usize, klib::vec::Vec<usize>)>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ----------------- method `data_mut` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+note: `Surface` defines an item `data_mut`, perhaps you need to implement it
+   --> src/graphics/compositor.rs:94:1
+    |
+ 94 | pub trait Surface {
+    | ^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `data` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/process/spawn.rs:278:38
+    |
+278 |             let group = &self.groups.data()[i];
+    |                                      ^^^^ private field, not a method
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ----------------- method `data` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+note: `Surface` defines an item `data`, perhaps you need to implement it
+   --> src/graphics/compositor.rs:94:1
+    |
+ 94 | pub trait Surface {
+    | ^^^^^^^^^^^^^^^^^
+
+error[E0609]: no field `registered_tasks` on type `&repl::AgentAutomationEngine`
+  --> src/shell/repl.rs:84:9
+   |
+84 |     pub registered_tasks: crate::klib::HashMap<usize, AgentTask>,
+   |         ^^^^^^^^^^^^^^^^ unknown field
+
+error[E0609]: no field `next_task_id` on type `&repl::AgentAutomationEngine`
+  --> src/shell/repl.rs:85:9
+   |
+85 |     pub next_task_id: usize,
+   |         ^^^^^^^^^^^^ unknown field
+
+error[E0560]: struct `repl::AgentAutomationEngine` has no field named `registered_tasks`
+  --> src/shell/repl.rs:84:5
+   |
+84 |     pub registered_tasks: crate::klib::HashMap<usize, AgentTask>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `repl::AgentAutomationEngine` does not have this field
+   |
+   = note: all struct fields are already assigned
+
+error[E0560]: struct `repl::AgentAutomationEngine` has no field named `next_task_id`
+  --> src/shell/repl.rs:85:5
+   |
+85 |     pub next_task_id: usize,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^ `repl::AgentAutomationEngine` does not have this field
+   |
+   = note: all struct fields are already assigned
+
+error[E0560]: struct `repl::AgentAutomationEngine` has no field named `registered_tasks`
+  --> src/shell/repl.rs:91:13
+   |
+91 |             registered_tasks: crate::klib::HashMap::new(),
+   |             ^^^^^^^^^^^^^^^^ `repl::AgentAutomationEngine` does not have this field
+   |
+   = note: all struct fields are already assigned
+
+error[E0560]: struct `repl::AgentAutomationEngine` has no field named `next_task_id`
+  --> src/shell/repl.rs:92:13
+   |
+92 |             next_task_id: 1,
+   |             ^^^^^^^^^^^^ `repl::AgentAutomationEngine` does not have this field
+   |
+   = note: all struct fields are already assigned
+
+error[E0609]: no field `next_task_id` on type `&mut repl::AgentAutomationEngine`
+  --> src/shell/repl.rs:97:23
+   |
+97 |         let id = self.next_task_id;
+   |                       ^^^^^^^^^^^^ unknown field
+
+error[E0609]: no field `next_task_id` on type `&mut repl::AgentAutomationEngine`
+  --> src/shell/repl.rs:98:14
+   |
+98 |         self.next_task_id += 1;
+   |              ^^^^^^^^^^^^ unknown field
+
+error[E0609]: no field `registered_tasks` on type `&mut repl::AgentAutomationEngine`
+  --> src/shell/repl.rs:99:14
+   |
+99 |         self.registered_tasks.insert(
+   |              ^^^^^^^^^^^^^^^^ unknown field
+
+error[E0034]: multiple applicable items in scope
+   --> src/shell/repl.rs:113:15
+    |
+113 |         Self::new()
+    |               ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:9:5
+    |
+  9 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:89:5
+    |
+ 89 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+   --> src/shell/repl.rs:138:50
+    |
+138 |             agent_engine: AgentAutomationEngine::new(),
+    |                                                  ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:9:5
+    |
+  9 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:89:5
+    |
+ 89 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+   --> src/shell/repl.rs:153:50
+    |
+153 |             agent_engine: AgentAutomationEngine::new(),
+    |                                                  ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:9:5
+    |
+  9 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:89:5
+    |
+ 89 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant or associated item named `Pwd` found for enum `repl::ShellCommand` in the current scope
+   --> src/shell/repl.rs:233:36
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant or associated item `Pwd` not found for this enum
+...
+233 |             "pwd" => ShellCommand::Pwd,
+    |                                    ^^^ variant or associated item not found in `repl::ShellCommand`
+
+error[E0599]: no variant or associated item named `WhoAmI` found for enum `repl::ShellCommand` in the current scope
+   --> src/shell/repl.rs:234:39
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant or associated item `WhoAmI` not found for this enum
+...
+234 |             "whoami" => ShellCommand::WhoAmI,
+    |                                       ^^^^^^ variant or associated item not found in `repl::ShellCommand`
+
+error[E0599]: no variant or associated item named `Uname` found for enum `repl::ShellCommand` in the current scope
+   --> src/shell/repl.rs:235:38
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant or associated item `Uname` not found for this enum
+...
+235 |             "uname" => ShellCommand::Uname,
+    |                                      ^^^^^ variant or associated item not found in `repl::ShellCommand`
+
+error[E0599]: no variant or associated item named `Clear` found for enum `repl::ShellCommand` in the current scope
+   --> src/shell/repl.rs:236:38
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant or associated item `Clear` not found for this enum
+...
+236 |             "clear" => ShellCommand::Clear,
+    |                                      ^^^^^ variant or associated item not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Touch` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:239:35
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Touch` not found here
+...
+239 |                     ShellCommand::Touch {
+    |                                   ^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Mkdir` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:248:35
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Mkdir` not found here
+...
+248 |                     ShellCommand::Mkdir {
+    |                                   ^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Theme` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:257:35
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Theme` not found here
+...
+257 |                     ShellCommand::Theme {
+    |                                   ^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Profile` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:266:35
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Profile` not found here
+...
+266 |                     ShellCommand::Profile {
+    |                                   ^^^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `A11y` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:275:35
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `A11y` not found here
+...
+275 |                     ShellCommand::A11y {
+    |                                   ^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant or associated item named `Pwd` found for enum `repl::ShellCommand` in the current scope
+   --> src/shell/repl.rs:470:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant or associated item `Pwd` not found for this enum
+...
+470 |             ShellCommand::Pwd => Ok(self.current_dir.clone()),
+    |                           ^^^ variant or associated item not found in `repl::ShellCommand`
+
+error[E0599]: no variant or associated item named `WhoAmI` found for enum `repl::ShellCommand` in the current scope
+   --> src/shell/repl.rs:471:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant or associated item `WhoAmI` not found for this enum
+...
+471 |             ShellCommand::WhoAmI => Ok(self.current_user.clone()),
+    |                           ^^^^^^ variant or associated item not found in `repl::ShellCommand`
+
+error[E0599]: no variant or associated item named `Uname` found for enum `repl::ShellCommand` in the current scope
+   --> src/shell/repl.rs:472:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant or associated item `Uname` not found for this enum
+...
+472 |             ShellCommand::Uname => Ok("Linux sigmaos 6.24.0-mainline #1...
+    |                           ^^^^^ variant or associated item not found in `repl::ShellCommand`
+
+error[E0599]: no variant or associated item named `Clear` found for enum `repl::ShellCommand` in the current scope
+   --> src/shell/repl.rs:473:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant or associated item `Clear` not found for this enum
+...
+473 |             ShellCommand::Clear => Ok("\x1B[2J\x1B[H".to_string()),
+    |                           ^^^^^ variant or associated item not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Touch` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:474:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Touch` not found here
+...
+474 |             ShellCommand::Touch { filename } => Ok(format!("Created emp...
+    |                           ^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Mkdir` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:475:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Mkdir` not found here
+...
+475 |             ShellCommand::Mkdir { dirname } => Ok(format!("Created dire...
+    |                           ^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Rm` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:476:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Rm` not found here
+...
+476 |             ShellCommand::Rm { filename } => Ok(format!("Removed file: ...
+    |                           ^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Su` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:477:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Su` not found here
+...
+477 |             ShellCommand::Su { username, password } => {
+    |                           ^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Cat` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:495:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Cat` not found here
+...
+495 |             ShellCommand::Cat { filename } => {
+    |                           ^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Systemctl` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:504:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Systemctl` not found here
+...
+504 |             ShellCommand::Systemctl { action, service } => {
+    |                           ^^^^^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Apt` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:535:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Apt` not found here
+...
+535 |             ShellCommand::Apt { subcommand, package } => {
+    |                           ^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Theme` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:585:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Theme` not found here
+...
+585 |             ShellCommand::Theme { theme_name } => {
+    |                           ^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `Profile` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:589:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `Profile` not found here
+...
+589 |             ShellCommand::Profile { profile_name } => {
+    |                           ^^^^^^^ variant not found in `repl::ShellCommand`
+
+error[E0599]: no variant named `A11y` found for enum `repl::ShellCommand`
+   --> src/shell/repl.rs:593:27
+    |
+ 16 | pub enum ShellCommand {
+    | --------------------- variant `A11y` not found here
+...
+593 |             ShellCommand::A11y { feature, state } => {
+    |                           ^^^^ variant not found in `repl::ShellCommand`
+
+error[E0609]: no field `current_dir` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:470:42
+    |
+470 |             ShellCommand::Pwd => Ok(self.current_dir.clone()),
+    |                                          ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `current_user` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:471:45
+    |
+471 |             ShellCommand::WhoAmI => Ok(self.current_user.clone()),
+    |                                             ^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `current_user` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:481:30
+    |
+481 |                         self.current_user = "root".to_string();
+    |                              ^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `current_dir` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:482:30
+    |
+482 |                         self.current_dir = "/root".to_string();
+    |                              ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `current_user` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:489:26
+    |
+489 |                     self.current_user = username.clone();
+    |                          ^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `current_dir` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:490:26
+    |
+490 |                     self.current_dir = format!("/home/{}", username);
+    |                          ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `services` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:507:42
+    |
+507 |                     for (s, st) in &self.services {
+    |                                          ^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `services` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:512:29
+    |
+512 |                     if self.services.contains_key(&service) {
+    |                             ^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `services` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:513:30
+    |
+513 | ...   self.services.insert(service.clone(), "Running".to_string());
+    |            ^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `services` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:519:29
+    |
+519 |                     if self.services.contains_key(&service) {
+    |                             ^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `services` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:520:30
+    |
+520 | ...   self.services.insert(service.clone(), "Stopped".to_string());
+    |            ^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `services` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:526:48
+    |
+526 |                     if let Some(status) = self.services.get(&service) {
+    |                                                ^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `installed_packages` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:545:38
+    |
+545 |                     for pkg in &self.installed_packages {
+    |                                      ^^^^^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `installed_packages` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:572:26
+    |
+572 |                     self.installed_packages.insert(pkg.clone());
+    |                          ^^^^^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `current_theme` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:586:22
+    |
+586 |                 self.current_theme = theme_name.clone();
+    |                      ^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `current_profile` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:590:22
+    |
+590 |                 self.current_profile = profile_name.clone();
+    |                      ^^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `a11y_features` on type `&mut ShellRepl`
+   --> src/shell/repl.rs:595:22
+    |
+595 |                 self.a11y_features.insert(feature.clone(), is_on);
+    |                      ^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `running`, `variables`, `aliases`, `prompt`, `agent_engine`
+
+error[E0609]: no field `registered_tasks` on type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:641:38
+    |
+641 |                 if self.agent_engine.registered_tasks.is_empty() {
+    |                                      ^^^^^^^^^^^^^^^^ unknown field
+
+error[E0609]: no field `registered_tasks` on type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:645:58
+    |
+645 | ...&self.agent_engine.registered_tasks {
+    |                       ^^^^^^^^^^^^^^^^ unknown field
+
+error[E0609]: no field `registered_tasks` on type `repl::AgentAutomationEngine`
+   --> src/shell/repl.rs:657:55
+    |
+657 | ... self.agent_engine.registered_tasks.get(&task_id).cloned() {
+    |                       ^^^^^^^^^^^^^^^^ unknown field
+
+error[E0282]: type annotations needed
+   --> src/sigpkg/arch_compat.rs:117:66
+    |
+117 | ...emote_repository.get(pkg_name.as_str()) {
+    |                         ^^^^^^^^ cannot infer type
+
+error[E0277]: the trait bound `f32: std::cmp::Eq` is not satisfied
+  --> src/sigpkg/aur_helper.rs:27:5
+   |
+18 | #[derive(Debug, Clone, PartialEq, Eq)]
+   |                                   -- in this derive macro expansion
+...
+27 |     pub popularity: f32,
+   |     ^^^^^^^^^^^^^^^^^^^ the trait `std::cmp::Eq` is not implemented for `f32`
+   |
+   = help: the following other types implement trait `std::cmp::Eq`:
+             i128
+             i16
+             i32
+             i64
+             i8
+             isize
+             u128
+             u16
+           and 4 others
+note: required by a bound in `AssertParamIsEq`
+  --> /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/core/src/cmp.rs:371:0
+
+error[E0277]: a value of type `klib::vec::Vec<&str>` cannot be built from an iterator over elements of type `&str`
+  --> src/sigpkg/makepkg.rs:44:60
+   |
+44 |                 let parts: Vec<&str> = line.splitn(2, '=').collect();
+   |                                                            ^^^^^^^ value of type `klib::vec::Vec<&str>` cannot be built from `std::iter::Iterator<Item=&str>`
+   |
+help: the trait `FromIterator<&str>` is not implemented for `klib::vec::Vec<&str>`
+  --> src/klib/vec.rs:3:1
+   |
+ 3 | pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+   | ^^^^^^^^^^^^^^^^^
+note: required by a bound in `collect`
+  --> /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/core/src/iter/traits/iterator.rs:2022:4
+
+error[E0282]: type annotations needed
+   --> src/sigpkg/makepkg.rs:153:19
+    |
+153 |             .map(|s| s.clone())
+    |                   ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+153 |             .map(|s: /* Type */| s.clone())
+    |                    ++++++++++++
+
+error[E0061]: this function takes 3 arguments but 1 argument was supplied
+   --> src/sigpkg/makepkg.rs:156:23
+    |
+156 |         let version = Version::new(&format!("{}-{}", pkgver, pkgrel));
+    |                       ^^^^^^^^^^^^-----------------------------------
+    |                                   ||
+    |                                   |expected `u64`, found `&String`
+    |                                   two arguments of type `u64` and `u64` are missing
+    |
+note: associated function defined here
+   --> src/sigpkg/mod.rs:68:12
+    |
+ 68 |     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+    |            ^^^ ----------  ----------  ----------
+help: provide the arguments
+    |
+156 -         let version = Version::new(&format!("{}-{}", pkgver, pkgrel));
+156 +         let version = Version::new(/* u64 */, /* u64 */, /* u64 */);
+    |
+
+error[E0308]: mismatched types
+   --> src/sigpkg/makepkg.rs:162:27
+    |
+162 |             dependencies: Vec::new(),
+    |                           ^^^^^^^^^^ expected `Vec<Dependency>`, found `Vec<_>`
+    |
+    = note: `klib::vec::Vec<_>` and `std::vec::Vec<Dependency>` have similar names, but are actually distinct types
+note: `klib::vec::Vec<_>` is defined in the current crate
+   --> src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ^^^^^^^^^^^^^^^^^
+note: `std::vec::Vec<Dependency>` is defined in crate `alloc`
+   --> /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/alloc/src/vec/mod.rs:440:0
+
+error[E0063]: missing fields `changelogs`, `checksum`, `licenses` and 3 other fields in initializer of `sigpkg::Package`
+   --> src/sigpkg/makepkg.rs:158:12
+    |
+158 |         Ok(Package {
+    |            ^^^^^^^ missing `changelogs`, `checksum`, `licenses` and 3 other fields
+
+error[E0277]: `sigpkg::Version` doesn't implement `std::fmt::Display`
+   --> src/sigpkg/recipe.rs:174:49
+    |
+174 |         let key = format!("{}@{}", recipe.name, recipe.version);
+    |                               --                ^^^^^^^^^^^^^^ `sigpkg::Version` cannot be formatted with the default formatter
+    |                               |
+    |                               required by this formatting parameter
+    |
+help: the trait `std::fmt::Display` is not implemented for `sigpkg::Version`
+   --> src/sigpkg/mod.rs:61:1
+    |
+ 61 | pub struct Version {
+    | ^^^^^^^^^^^^^^^^^^
+    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `sigpkg::Version` doesn't implement `std::fmt::Display`
+   --> src/sigpkg/recipe.rs:180:42
+    |
+180 |         let key = format!("{}@{}", name, version);
+    |                               --         ^^^^^^^ `sigpkg::Version` cannot be formatted with the default formatter
+    |                               |
+    |                               required by this formatting parameter
+    |
+help: the trait `std::fmt::Display` is not implemented for `sigpkg::Version`
+   --> src/sigpkg/mod.rs:61:1
+    |
+ 61 | pub struct Version {
+    | ^^^^^^^^^^^^^^^^^^
+    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+    = note: required for `&sigpkg::Version` to implement `std::fmt::Display`
+    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `sigpkg::Version` doesn't implement `std::fmt::Display`
+   --> src/sigpkg/recipe.rs:193:42
+    |
+193 |         let key = format!("{}@{}", name, version);
+    |                               --         ^^^^^^^ `sigpkg::Version` cannot be formatted with the default formatter
+    |                               |
+    |                               required by this formatting parameter
+    |
+help: the trait `std::fmt::Display` is not implemented for `sigpkg::Version`
+   --> src/sigpkg/mod.rs:61:1
+    |
+ 61 | pub struct Version {
+    | ^^^^^^^^^^^^^^^^^^
+    = note: in format strings you may be able to use `{:?}` (or {:#?} for pretty-print) instead
+    = note: required for `&sigpkg::Version` to implement `std::fmt::Display`
+    = note: this error originates in the macro `$crate::__export::format_args` which comes from the expansion of the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0063]: missing fields `changelogs`, `licenses`, `maintainers` and 3 other fields in initializer of `sigpkg::Package`
+   --> src/sigpkg/universal_adapter.rs:251:12
+    |
+251 |         Ok(Package {
+    |            ^^^^^^^ missing `changelogs`, `licenses`, `maintainers` and 3 other fields
+
+error[E0282]: type annotations needed
+   --> src/sigpkg/universal_engine.rs:312:33
+    |
+312 |                 if let Err(e) = hook.execute(&ctx, token) {
+    |                                 ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/sigpkg/universal_engine.rs:345:33
+    |
+345 |                 if let Err(e) = hook.execute(&ctx, token) {
+    |                                 ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/sigpkg/universal_engine.rs:368:35
+    |
+368 |                 .retain(|name, _| snapshot.contains(name));
+    |                                   ^^^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+   --> src/sigpkg/universal_oop_system.rs:140:13
+    |
+140 |             hook.execute(package)?;
+    |             ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+    --> src/sigpkg/universal_oop_system.rs:1955:40
+     |
+1955 |         self.parsers.get(&format).map(|p| p.as_ref())
+     |                                        ^  - type must be known at this point
+     |
+help: consider giving this closure parameter an explicit type
+     |
+1955 |         self.parsers.get(&format).map(|p: /* Type */| p.as_ref())
+     |                                         ++++++++++++
+
+error[E0282]: type annotations needed
+    --> src/sigpkg/universal_oop_system.rs:1960:16
+     |
+1960 |             if parser.can_parse(data) {
+     |                ^^^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+    --> src/sigpkg/universal_oop_system.rs:2001:13
+     |
+2001 |             hook.execute(package)?;
+     |             ^^^^ cannot infer type
+
+error[E0282]: type annotations needed
+    --> src/sigpkg/universal_oop_system.rs:2055:48
+     |
+2055 |         self.installed_packages.get(name).map(|p| p.as_ref())
+     |                                                ^  - type must be known at this point
+     |
+help: consider giving this closure parameter an explicit type
+     |
+2055 |         self.installed_packages.get(name).map(|p: /* Type */| p.as_ref())
+     |                                                 ++++++++++++
+
+error[E0282]: type annotations needed
+    --> src/sigpkg/universal_oop_system.rs:2062:19
+     |
+2062 |             .map(|p| p.as_ref())
+     |                   ^  - type must be known at this point
+     |
+help: consider giving this closure parameter an explicit type
+     |
+2062 |             .map(|p: /* Type */| p.as_ref())
+     |                    ++++++++++++
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:158:11
+    |
+156 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+157 | pub enum VersionConstraint {
+158 |     Exact(Version),
+    |           ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 61 + #[derive(Hash)]
+ 62 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:159:17
+    |
+156 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+159 |     GreaterThan(Version),
+    |                 ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 61 + #[derive(Hash)]
+ 62 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:160:14
+    |
+156 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+160 |     LessThan(Version),
+    |              ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 61 + #[derive(Hash)]
+ 62 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:161:20
+    |
+156 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+161 |     GreaterOrEqual(Version),
+    |                    ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 61 + #[derive(Hash)]
+ 62 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:162:17
+    |
+156 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+162 |     LessOrEqual(Version),
+    |                 ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 61 + #[derive(Hash)]
+ 62 | pub struct Version {
+    |
+
+error[E0614]: type `Vec<Option<Box<dyn BootStage>>>` cannot be dereferenced
+   --> src/boot/verified.rs:141:30
+    |
+141 |         for stage_option in &*self.stages {
+    |                              ^^^^^^^^^^^^ can't be dereferenced
+    |
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0f9dadc02dd4ce03.long-type-10723596111993939040.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/boot/verified.rs:143:21
+    |
+143 |                 if !stage.verify(public_key)? {
+    |                     ^^^^^ cannot infer type
+
+error[E0614]: type `Vec<Option<Box<dyn BootStage>>>` cannot be dereferenced
+   --> src/boot/verified.rs:152:30
+    |
+152 |         for stage_option in &*self.stages {
+    |                              ^^^^^^^^^^^^ can't be dereferenced
+    |
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0f9dadc02dd4ce03.long-type-10723596111993939040.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/boot/verified.rs:154:20
+    |
+154 |                 if stage.id() == id {
+    |                    ^^^^^ cannot infer type
+
+error[E0433]: failed to resolve: use of undeclared type `PageSize`
+   --> src/klib/paging.rs:279:13
+    |
+279 | ...   PageSize::Standard4KB => self.map_page(virt, phys, user, writable),
+    |       ^^^^^^^^ use of undeclared type `PageSize`
+
+error[E0433]: failed to resolve: use of undeclared type `PageSize`
+   --> src/klib/paging.rs:280:13
+    |
+280 |             PageSize::Huge2MB => {
+    |             ^^^^^^^^ use of undeclared type `PageSize`
+
+error[E0433]: failed to resolve: use of undeclared type `PageSize`
+   --> src/klib/paging.rs:338:13
+    |
+338 |             PageSize::Giant1GB => {
+    |             ^^^^^^^^ use of undeclared type `PageSize`
+
+Some errors have detailed explanations: E0034, E0046, E0061, E0063, E0119, E0201, E0252, E0255, E0259...
+For more information about an error, try `rustc --explain E0034`.
+error: could not compile `sigmaos` (lib) due to 325 previous errors

@@ -1,6 +1,6 @@
 # 📑 SigmaOS Algorithmic & Compiler Diagnostics Guide: What's Working, What's Not Working, Why, & How to Fix
 
-This document provides a highly comprehensive, detailed, and mathematically sound diagnostics guide for **SigmaOS**. It lists exactly what subsystems are working, identifies all active compiler errors/blockers in the codebase, explains why these errors occur at an architectural level, and provides precise code blueprints and step-by-step remediation procedures.
+This document provides a highly comprehensive, detailed, and mathematically sound diagnostics guide for **SigmaOS**. It lists exactly what subsystems and algorithms are working, identifies all active compiler errors/blockers in the codebase, explains why these errors occur at an architectural level, and provides precise code blueprints and step-by-step remediation procedures.
 
 With this master guide, any autonomous AI agent or software engineer can systematically fix the remaining algorithmic and compiler issues and achieve 100% successful compile status.
 
@@ -15,12 +15,16 @@ With this master guide, any autonomous AI agent or software engineer can systema
    - [D. Decoupled Custom Collections (Vec & HashMap)](#d-decoupled-custom-collections-vec--hashmap)
    - [E. Compatibilities & Translation Layers (Lindows, Historic Linux, HolyC, ReactOS)](#e-compatibilities--translation-layers-lindows-historic-linux-holyc-reactos)
    - [F. Mint Linux Parity Subsystems & Unified UI Experience](#f-mint-linux-parity-subsystems--unified-ui-experience)
+   - [G. Arithmetic, Stack, & Call Frame Invocation](#g-arithmetic-stack--call-frame-invocation)
+   - [H. Hardware Register Sets and Trapframe States](#h-hardware-register-sets-and-trapframe-states)
+   - [I. CPU Exception Vectors and Privilege Mode Trapping](#i-cpu-exception-vectors-and-privilege-mode-trapping)
+   - [J. Advanced Debugger Engine](#j-advanced-debugger-engine)
 3. [What's Not Working: Detailed Compiler Errors & Structural Analysis](#3-whats-not-working-detailed-compiler-errors--structural-analysis)
-   - [Error Group A: Syntax & Structural Incoherence in `src/shell/`](#error-group-a-syntax--structural-incoherence-in-srcshell)
-   - [Error Group B: Duplication, Reimportation, & Redefinition Clashes](#error-group-b-duplication-reimportation--redefinition-clashes)
-   - [Error Group C: Missing Types, Unresolved Imports, & Missing Modules](#error-group-c-missing-types-unresolved-imports--missing-modules)
-   - [Error Group D: Undeclared Variable Errors (`buffer` scopes)](#error-group-d-undeclared-variable-errors-buffer-scopes)
-   - [Error Group E: Zero-Allocation Package Manager (`sigpkg`) Compilation Gaps](#error-group-e-zero-allocation-package-manager-sigpkg-compilation-gaps)
+   - [Error Group A: Duplicate Module & Symbol Redeclarations](#error-group-a-duplicate-module--symbol-redeclarations)
+   - [Error Group B: Duplicate and Conflicting Struct Implementations](#error-group-b-duplicate-and-conflicting-struct-implementations)
+   - [Error Group C: Duplicate Imports in Compatibility Layer](#error-group-c-duplicate-imports-in-compatibility-layer)
+   - [Error Group D: Display and Hash Trait Failures for `Version`](#error-group-d-display-and-hash-trait-failures-for-version)
+   - [Error Group E: Missing Fields in Initializers and Field Resolution Gaps](#error-group-e-missing-fields-in-initializers-and-field-resolution-gaps)
 4. [Long-Term Subsystem Gaps & Bare-Metal Hardening](#4-long-term-subsystem-gaps--bare-metal-hardening)
 5. [AI Agent Execution Pipeline & Verification Protocols](#5-ai-agent-execution-pipeline--verification-protocols)
 
@@ -78,16 +82,16 @@ To duplicate the usability of modern Linux Mint, SigmaOS implements 10 compatibi
 - `MintShellScriptInterpreter` (aliases, sshd background triggers, cron daemons)
 - `MintTimeshiftBackup` (Btrfs/Ext4 target snapshot creation and rollback states)
 
-### G. Linux/BSD/Windows-Inspired Arithmetic, Stack, & Call Frame Invocation
+### G. Arithmetic, Stack, & Call Frame Invocation
 SigmaOS includes high-performance math and system calling convention utilities in `src/core/math.rs` incorporating checked, overflow-safe saturating integer operations (`saturating_add_i32`, `saturating_sub_i32`, `checked_mul_i32`) inspired by standard Linux and BSD kernel memory bounds checks. It also introduces BSD-aligned stack boundary verification (`verify_alignment`) and safe, dynamic call frame structures (`InvocationFrame`, `secure_invoke_sim`) with Control Flow Guard capabilities matching modern Windows NT calling convention rules.
 
-### H. Hardware Register Sets and Trapframe States (x86_64, ARM, Linux, BSD, Windows)
-SigmaOS features highly mature processor context and register structures in `src/compatibility/register_set.rs`. In addition to standard general-purpose GPR fields for `x86_64` (including type-safe control word EFLAGS/RFLAGS toggling like Carry, Sign, Parity, Interrupt Enable flags), it implements complete register representations for `ARM` / `AArch64` architecture architectures (`ArmRegisterSet` including CPSR flag parsing). These state structures are inspired directly by Linux `pt_regs`, FreeBSD `trapframe`, and Windows NT `_KTRAP_FRAME` patterns, supporting multi-hardware thread scheduling, debugging via hardware breakpoints, and virtualization contexts with integrated unit tests.
+### H. Hardware Register Sets and Trapframe States
+SigmaOS features highly mature processor context and register structures in `src/compatibility/register_set.rs`. In addition to standard general-purpose GPR fields for `x86_64` (including type-safe control word EFLAGS/RFLAGS toggling like Carry, Sign, Parity, Interrupt Enable flags), it implements complete register representations for `ARM` / `AArch64` architectures (`ArmRegisterSet` including CPSR flag parsing). These state structures are inspired directly by Linux `pt_regs`, FreeBSD `trapframe`, and Windows NT `_KTRAP_FRAME` patterns, supporting multi-hardware thread scheduling, debugging via hardware breakpoints, and virtualization contexts.
 
-### I. CPU Exception Vectors and Privilege Mode Trapping (User, FIQ, IRQ, SVC, Monitor, Abort, Undefined, System)
-SigmaOS implements a comprehensive CPU privilege and exception mapping system in `src/interrupt/handler.rs`. This handles all eight standard execution and privilege mode traps defined by modern processors (such as ARM and x86 privilege rings): `User` (usr), `Fiq` (Fast Interrupt Request), `Irq` (Normal Interrupt), `Supervisor` (svc software interrupt gates for syscalls), `Monitor` (mon secure world boundaries), `Abort` (abt instruction/data prefetch page faults), `Undefined` (und instruction decode traps), and `System` (sys privileged execution). It parses dynamic exception vectors (`PrivilegeExceptionFrame`) and executes secure, hardware-isolated routing (`dispatch_privilege_exception`) mimicking Linux, BSD, and Windows kernel trap dispatchers.
+### I. CPU Exception Vectors and Privilege Mode Trapping
+SigmaOS implements a comprehensive CPU privilege and exception mapping system in `src/interrupt/handler.rs`. This handles all eight standard execution and privilege mode traps defined by modern processors: `User` (usr), `Fiq` (Fast Interrupt Request), `Irq` (Normal Interrupt), `Supervisor` (svc software interrupt gates for syscalls), `Monitor` (mon secure world boundaries), `Abort` (abt instruction/data prefetch page faults), `Undefined` (und instruction decode traps), and `System` (sys privileged execution). It parses dynamic exception vectors (`PrivilegeExceptionFrame`) and executes secure, hardware-isolated routing (`dispatch_privilege_exception`) mimicking Linux, BSD, and Windows kernel trap dispatchers.
 
-### J. CISC/RISC/Windbg/GDB-Grade Advanced Debugger Engine (Processes, Modules, Pseudo-Registers, Aliases, DML, .printf)
+### J. Advanced Debugger Engine
 SigmaOS implements a robust, professional debugging and runtime-inspection toolkit in `src/debugger/breakpoint.rs`. Drawing directly from Windbg, GDB, and LLDB specifications, the debugger engine natively manages:
 - **Process and Module Inspection:** Structuring debug processes (`DebugProcess`) and associated binary module frames (`DebugModule`) to allow full runtime tracing.
 - **Pseudo-Registers:** Provides a predefined registers environment (mapping `$peb`, `$teb`, `$ip`, `$sp`) and supports ten distinct user-defined temporary debug registers (`$u0` to `$u9`).
@@ -99,324 +103,154 @@ SigmaOS implements a robust, professional debugging and runtime-inspection toolk
 
 ## 3. What's Not Working: Detailed Compiler Errors & Structural Analysis
 
-As of this diagnostics cycle, running `cargo check --lib` produces **53 compilation errors**. Below is an exhaustive breakdown of the errors, explaining *why* they occur and providing a *step-by-step code-level remediation blueprint* for each.
+Running `cargo check` and `cargo test` on the workspace currently encounters compilation blockers. Below is an exhaustive breakdown of these errors, detailing **why** they occur and providing **step-by-step remediation procedures** for an AI agent to resolve them.
 
 ---
 
-### Error Group A: Syntax & Structural Incoherence in `src/shell/`
+### Error Group A: Duplicate Module & Symbol Redeclarations
 
-#### **Error 1: Expected Item After Attributes & Visibility Placement**
-* **Location:** `src/shell/command.rs:717-718`
-* **Compiler Message:**
-  ```text
-  error: visibility `pub` is not followed by an item
-    --> src/shell/command.rs:718:1
-  error: expected item after attributes
-    --> src/shell/command.rs:717:1
-  ```
-* **Why It Occurs:**
-  In `src/shell/command.rs`, the definition of the custom vector `struct Vec<T>` uses conditional compilation attributes stacked in an incorrect syntax order:
-  ```rust
-  #[derive(Debug, Clone, PartialEq, Eq)]
-  pub #[cfg(target_os = "none")]
-  #[cfg(target_os = "none")]
-  #[cfg(target_os = "none")]
-  struct Vec<T> { ... }
-  ```
-  The compiler expects an item directly following the `pub` keyword, but instead encounters the attribute `#[cfg(target_os = "none")]`.
-* **How to Fix:**
-  Reorder the attributes and visibility modifier so they conform to standard Rust grammar rules:
-  ```rust
-  #[derive(Debug, Clone, PartialEq, Eq)]
-  #[cfg(target_os = "none")]
-  pub struct Vec<T> {
-      data: *mut T,
-      len: usize,
-      capacity: usize,
-  }
-  ```
-
-#### **Error 2: Inner Attributes in Nested Module Contexts**
-* **Location:** `src/shell/sigma_sh.rs:6-7`
-* **Compiler Message:**
-  ```text
-  error: an inner attribute is not permitted in this context
-   --> src/shell/sigma_sh.rs:6:1
-    |
-  6 | #![no_std]
-    | ^^^^^^^^^^
-  ```
-* **Why It Occurs:**
-  Inner attributes `#![...]` apply to the enclosing block (the entire crate when at the top of a file, or a module block). In `src/shell/sigma_sh.rs`, several lines of code are written at the very top of the file before these attributes:
-  ```rust
-  #[cfg(not(target_os = "none"))]
-  extern crate alloc as std_alloc;
-  #[cfg(not(target_os = "none"))]
-  use std_alloc::boxed::Box;
-
-  #![no_std]
-  #![no_main]
-  ```
-  Because of the preceeding imports, the parser treats these as module-level statements and triggers a parsing error because inner attributes cannot follow other items.
-* **How to Fix:**
-  Place the inner attributes at the absolute top of the file before any other statements or remove them entirely since the root crate already defines `#![no_std]`.
-  ```rust
-  #![no_std]
-  #![no_main]
-
-  #[cfg(not(target_os = "none"))]
-  extern crate alloc as std_alloc;
-  #[cfg(not(target_os = "none"))]
-  use std_alloc::boxed::Box;
-  ```
-
-#### **Error 3: Associated Function Without Body**
-* **Location:** `src/shell/sigma_sh.rs:322`
-* **Compiler Message:**
-  ```text
-  error: associated function in `impl` without body
-     --> src/shell/sigma_sh.rs:322:5
-  ```
-* **Why It Occurs:**
-  In the file `src/shell/sigma_sh.rs`, a function signature is listed inside an `impl` block instead of a body. In particular, we have:
-  ```rust
-  impl SimpleShellHistory {
-      ...
-  }
-
-  impl ShellHistory for SimpleShellHistory {
-      fn add(&mut self, command: &[u8]) { ... }
-      fn get(&self, index: usize) -> Option<&[u8]> { ... }
-      fn get_last(&self) -> Option<&[u8]>; // <--- Missing body here!
-  }
-  ```
-* **How to Fix:**
-  Provide the implementation block for `get_last` by delegating to the existing `get_last_impl()` helper method defined on `SimpleShellHistory`:
-  ```rust
-  impl ShellHistory for SimpleShellHistory {
-      fn add(&mut self, command: &[u8]) { ... }
-      fn get(&self, index: usize) -> Option<&[u8]> { ... }
-      fn get_last(&self) -> Option<&[u8]> {
-          self.get_last_impl()
-      }
-  }
-  ```
-
----
-
-### Error Group B: Duplication, Reimportation, & Redefinition Clashes
-
-#### **Error 1: Redefined Module `accessibility_gamification`**
-* **Location:** `src/dashboard/mod.rs:24`
+#### **Error 1: Duplicate Module declaration for `accessibility_gamification`**
+* **Location:** `src/dashboard/mod.rs`
 * **Compiler Message:**
   ```text
   error[E0428]: the name `accessibility_gamification` is defined multiple times
     --> src/dashboard/mod.rs:24:1
   ```
 * **Why It Occurs:**
-  Inside `src/dashboard/mod.rs`, the sub-module `accessibility_gamification` is declared twice using `pub mod accessibility_gamification;` on different lines.
-* **How to Fix:**
-  Open `src/dashboard/mod.rs` and remove the duplicate `pub mod accessibility_gamification;` declaration.
-
-#### **Error 2: Reimported Traits & Structs in Dashboard Module**
-* **Location:** `src/dashboard/mod.rs:39`
-* **Compiler Message:**
-  ```text
-  error[E0252]: the name `GamifiedProductivityTracker` is defined multiple times
-    --> src/dashboard/mod.rs:39:48
-  ```
-* **Why It Occurs:**
-  Imports of `AccessibilityOverlay`, `ColorFilter`, `GamifiedProductivityTracker`, and `Trophy` are repeated in consecutive `use` blocks within `src/dashboard/mod.rs`.
-* **How to Fix:**
-  Consolidate or delete the duplicate `use` statements on line 39 of `src/dashboard/mod.rs`.
-
-#### **Error 3: Conflicting Implementation of `ShellHistory`**
-* **Location:** `src/shell/sigma_sh.rs:335`
-* **Compiler Message:**
-  ```text
-  error[E0119]: conflicting implementations of trait `ShellHistory` for type `SimpleShellHistory`
-     --> src/shell/sigma_sh.rs:335:1
-  ```
-* **Why It Occurs:**
-  `impl ShellHistory for SimpleShellHistory` is defined twice within the same file. The first implementation begins around line 302, and the second starts around line 335.
-* **How to Fix:**
-  Consolidate the methods (including providing a body for `get_last` inside the single implementation block) and delete the duplicate `impl ShellHistory for SimpleShellHistory` block entirely.
-
-#### **Error 4: Duplicate Method Definitions in Package Recipe**
-* **Location:** `src/sigpkg/recipe.rs:104` and `114`
-* **Compiler Message:**
-  ```text
-  error[E0592]: duplicate definitions with name `with_pkgrel`
-  error[E0592]: duplicate definitions with name `with_prepare_command`
-  ```
-* **Why It Occurs:**
-  Inside `src/sigpkg/recipe.rs`, the methods `with_pkgrel` and `with_prepare_command` are defined twice inside the `impl PackageRecipe` block (once with and once without the leading underscore in parameters, likely from a prior manual merge).
-* **How to Fix:**
-  Delete the duplicate method blocks in `src/sigpkg/recipe.rs`. Retain only one clean version of each method:
+  The sub-module is declared twice inside `src/dashboard/mod.rs`:
   ```rust
-  pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
-      self.pkgrel = pkgrel;
-      self
-  }
+  pub mod accessibility_gamification; // Line 20
+  ...
+  pub mod accessibility_gamification; // Line 24
+  ```
+* **How to Fix:**
+  Open `src/dashboard/mod.rs` and delete the duplicate declaration on line 24.
 
-  pub fn with_prepare_command(mut self, command: String) -> Self {
-      self.prepare_command = Some(command);
-      self
+#### **Error 2: Duplicate Value definitions `is_cow`, `set_cow`, and `get_entry_ref` in `PageTableEntry` & `PageTable`**
+* **Location:** `src/klib/paging.rs`
+* **Compiler Message:**
+  ```text
+  error[E0428]: the name `is_cow` is defined multiple times
+    --> src/klib/paging.rs:36:5
+  error[E0428]: the name `set_cow` is defined multiple times
+    --> src/klib/paging.rs:37:5
+  error[E0428]: the name `get_entry_ref` is defined multiple times
+    --> src/klib/paging.rs:121:5
+  ```
+* **Why It Occurs:**
+  In `src/klib/paging.rs`, inside the trait `PageTableEntry` (lines 20-39), the methods `is_cow` and `set_cow` are defined twice. Similarly, inside the trait `PageTable` (lines 118-124), `get_entry_ref` is defined twice returning different types (`&SimplePageTableEntry` vs `&dyn PageTableEntry`).
+* **How to Fix:**
+  1. Remove the duplicate definitions of `is_cow(&self) -> bool` and `set_cow(&mut self, cow: bool)` from the `PageTableEntry` trait (lines 36-37).
+  2. For the `PageTable` trait, keep the single generic signature that returns `&dyn PageTableEntry` and remove the duplicate `get_entry_ref` returning `&SimplePageTableEntry` if it is redundant, or rename them appropriately to distinguish (e.g. `get_entry_ref_simple` vs `get_entry_ref`). Update the corresponding implementation `impl PageTable for SimplePageTable` to match.
+
+#### **Error 3: Duplicate Module declaration for `cow_snapshot`**
+* **Location:** `src/filesystem/mod.rs`
+* **Compiler Message:**
+  ```text
+  error[E0428]: the name `cow_snapshot` is defined multiple times
+    --> src/filesystem/mod.rs:10:1
+  ```
+* **Why It Occurs:**
+  The sub-module `cow_snapshot` is declared on both line 4 and line 10 in `src/filesystem/mod.rs`. It is also re-exported twice.
+* **How to Fix:**
+  Open `src/filesystem/mod.rs`, delete `pub mod cow_snapshot;` on line 10, and consolidate the imports so `cow_snapshot` re-exports are only present once.
+
+#### **Error 4: Duplicate Module declaration for `ai`**
+* **Location:** `src/lib.rs`
+* **Compiler Message:**
+  ```text
+  error[E0428]: the name `ai` is defined multiple times
+     --> src/lib.rs:176:1
+  ```
+* **Why It Occurs:**
+  The module `ai` is declared twice in the root library file `src/lib.rs` (on line 66 and line 176):
+  ```rust
+  pub mod ai {
+      pub mod agent;
+      pub mod orchestrator;
+  }
+  // And then later:
+  pub mod ai {
+      pub mod next_gen;
+      pub mod wandr;
+  }
+  ```
+* **How to Fix:**
+  Consolidate the declarations of `ai` module in `src/lib.rs` into a single module block:
+  ```rust
+  pub mod ai {
+      pub mod agent;
+      pub mod orchestrator;
+      pub mod next_gen;
+      pub mod wandr;
   }
   ```
 
 ---
 
-### Error Group C: Missing Types, Unresolved Imports, & Missing Modules
+### Error Group B: Duplicate and Conflicting Struct Implementations
 
-#### **Error 1: Unresolved Import `kernel::SchedulerError`**
-* **Location:** `src/lib.rs:78`
+#### **Error 1: Redefinition of `AgentAutomationEngine`**
+* **Location:** `src/shell/repl.rs`
 * **Compiler Message:**
   ```text
-  error[E0432]: unresolved import `kernel::SchedulerError`
-    --> src/lib.rs:78:69
+  error[E0428]: the name `AgentAutomationEngine` is defined multiple times
+    --> src/shell/repl.rs:83:1
   ```
 * **Why It Occurs:**
-  `src/lib.rs` attempts to import `SchedulerError` directly from `kernel::*`. However, `SchedulerError` is actually defined inside the submodule `kernel::roundrobin`.
-* **How to Fix:**
-  Update the import in `src/lib.rs` to point to the correct submodule path, or expose `SchedulerError` publicly at the `kernel` module root (`src/kernel/mod.rs`):
-  ```rust
-  pub use crate::kernel::roundrobin::SchedulerError;
-  ```
-
-#### **Error 2: Unresolved Import `DdeDeviceWrapper`**
-* **Location:** `src/compatibility/historic_linux.rs:1`
-* **Compiler Message:**
-  ```text
-  error[E0432]: unresolved import `crate::driver::device::DdeDeviceWrapper`
-   --> src/compatibility/historic_linux.rs:1:5
-  ```
-* **Why It Occurs:**
-  `historic_linux.rs` references `DdeDeviceWrapper` from `crate::driver::device`, but this struct has either been renamed, removed, or is not declared in that file.
-* **How to Fix:**
-  Determine if `DdeDeviceWrapper` exists under a different driver module or define a stub wrapper struct inside `src/compatibility/historic_linux.rs` (or `src/driver/device.rs`) to satisfy the import. For example, in `src/driver/device.rs`:
-  ```rust
-  pub struct DdeDeviceWrapper;
-  ```
-
-#### **Error 3: Unresolved Imports in Network Module**
-* **Location:** `src/network/mod.rs:14`
-* **Compiler Message:**
-  ```text
-  error[E0432]: unresolved imports `tcp_udp::FirewallTarget`, `tcp_udp::FirewallChain`, `tcp_udp::ConntrackState`, `tcp_udp::FirewallRule`
-  ```
-* **Why It Occurs:**
-  `src/network/mod.rs` tries to import firewall-related structures from `tcp_udp` which do not exist there, or have been declared inside another submodule.
-* **How to Fix:**
-  Either declare these structures inside `src/network/tcp_udp.rs` or adjust the imports in `src/network/mod.rs` if they are defined elsewhere (e.g. `src/compatibility/mint_linux.rs` contains firewall emulations).
-
-#### **Error 4: Unresolved Shell Utilities**
-* **Location:** `src/shell/mod.rs:9`
-* **Compiler Message:**
-  ```text
-  error[E0432]: unresolved imports `sigma_sh::CronJob`, `sigma_sh::LogEntry`, `sigma_sh::LogLevel`, `sigma_sh::Privilege`, `sigma_sh::Service`, `sigma_sh::SigmaCoreUtils`, `sigma_sh::SigmaCron`, `sigma_sh::SigmaDoc`, `sigma_sh::SigmaInit`, `sigma_sh::SigmaLog`, `sigma_sh::SigmaPriv`
-  ```
-* **Why It Occurs:**
-  `src/shell/mod.rs` attempts to re-export shell and init utilities from `sigma_sh`, but they are defined in another module (like `src/shell/command.rs` or `src/init/systemd_init.rs`).
-* **How to Fix:**
-  Declare these structs and enums as public items inside `src/shell/sigma_sh.rs` or redirect imports in `src/shell/mod.rs` to the actual files where they reside.
-
-#### **Error 5: Undeclared `AgentAutomationEngine` Struct**
-* **Location:** `src/shell/repl.rs:74, 97, 120`
-* **Compiler Message:**
-  ```text
-  error[E0425]: cannot find type `AgentAutomationEngine` in this scope
-  ```
-* **Why It Occurs:**
-  `src/shell/repl.rs` references `AgentAutomationEngine`, but the struct has not been imported or defined.
-* **How to Fix:**
-  Add a stub or actual definition of `AgentAutomationEngine` in `src/shell/repl.rs` or import it from the appropriate module:
+  In `src/shell/repl.rs`, there is a basic stub struct `AgentAutomationEngine` defined on lines 7-12:
   ```rust
   pub struct AgentAutomationEngine;
   impl AgentAutomationEngine {
       pub fn new() -> Self { AgentAutomationEngine }
   }
   ```
+  And then starting on line 83, there is a full implementation of `AgentAutomationEngine` containing fields `registered_tasks` and `next_task_id`. This causes type collisions and conflicting implementations of traits.
+* **How to Fix:**
+  Remove the stub struct and its `impl` block (lines 7-12) entirely, and rely solely on the comprehensive struct definition on line 83.
+
+#### **Error 2: Conflicting Implementations of `BsdSocket` for `SimpleSocket`**
+* **Location:** `src/network/tcp_udp.rs`
+* **Compiler Message:**
+  ```text
+  error[E0119]: conflicting implementations of trait `BsdSocket` for type `SimpleSocket`
+     --> src/network/tcp_udp.rs:127:1
+  ```
+* **Why It Occurs:**
+  The trait `BsdSocket` is implemented twice for `SimpleSocket` in `src/network/tcp_udp.rs`. The first implementation starts on line 97 and contains basic helper logic using fields like `rcv_buf` and `snd_buf`, whereas the second implementation on line 127 uses correct fields like `rcvbuf` and `sndbuf`.
+* **How to Fix:**
+  Consolidate or delete the duplicate `impl BsdSocket for SimpleSocket` blocks. Keep the correct block (the one utilizing the actual struct fields `rcvbuf` and `sndbuf`) and delete the conflicting one.
 
 ---
 
-### Error Group D: Undeclared Variable Errors (`buffer` scopes)
+### Error Group C: Duplicate Imports in Compatibility Layer
 
-#### **Error: Cannot Find Value `buffer` in Scope**
-* **Location:** `src/driver/device.rs` (lines 1326, 1375, 1575, 1624, 1672, 1721, 1770, 1819, 1868, 1917, 2063)
+#### **Error 1: Repeated re-exports in Compatibility module**
+* **Location:** `src/compatibility/mod.rs`
 * **Compiler Message:**
   ```text
-  error[E0425]: cannot find value `buffer` in this scope
-      --> src/driver/device.rs:1326:12
-       |
-  1325 |     fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
-       |                         ------- `_buffer` defined here
-  1326 |         Ok(buffer.len())
-       |            ^^^^^^ help: consider renaming it to `buffer`
+  error[E0252]: the name `MintBackupTool` is defined multiple times
+    --> src/compatibility/mod.rs:83:5
   ```
 * **Why It Occurs:**
-  In several `write` method implementations inside `src/driver/device.rs`, the input parameter is named `_buffer` to suppress unused variable warnings. However, the function body tries to access `buffer.len()`. Since the compiler only knows `_buffer`, this fails.
+  In `src/compatibility/mod.rs`, many symbols (such as `MintBackupTool`, `MintSoftwareManager`, `DinitServiceManager`, `KernelRelay`, etc.) are imported and re-exported multiple times in distinct, overlapping `use` statements (one starting around line 47, and another starting around line 83).
 * **How to Fix:**
-  Remove the leading underscore from the variable name in the function signatures:
-  ```rust
-  fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
-      Ok(buffer.len())
-  }
-  ```
+  Consolidate all re-exports under `src/compatibility/mod.rs` by removing duplicate lines or using a single unified `use` block for each module.
 
 ---
 
-### Error Group E: Zero-Allocation Package Manager (`sigpkg`) Compilation Gaps
+### Error Group D: Display and Hash Trait Failures for `Version`
 
-#### **Error 1: Missing Crate Modules Declarations**
-* **Location:** `src/sigpkg/mod.rs:13, 27, 28, 32`
+#### **Error 1: `sigpkg::Version` doesn't implement `std::fmt::Display`**
+* **Location:** `src/sigpkg/recipe.rs`
 * **Compiler Message:**
   ```text
-  error[E0432]: unresolved import `spec` (and `zero_alloc_resolver`, `universal_adapter`, `universal_oop_system`)
+  error[E0277]: `sigpkg::Version` doesn't implement `std::fmt::Display`
   ```
 * **Why It Occurs:**
-  In `src/sigpkg/mod.rs`, several items are imported from modules like `spec`, `zero_alloc_resolver`, etc., but these sub-modules were never declared using `pub mod spec;` or `pub mod zero_alloc_resolver;` inside `mod.rs`.
+  Format formatting operations such as `format!("{}@{}", name, version)` in `src/sigpkg/recipe.rs` require `Version` to implement the `Display` trait. Currently, `Version` in `src/sigpkg/mod.rs` only implements `Debug`, `Clone`, etc.
 * **How to Fix:**
-  Declare all necessary sub-modules at the top of `src/sigpkg/mod.rs`:
-  ```rust
-  pub mod spec;
-  pub mod zero_alloc_resolver;
-  pub mod universal_adapter;
-  pub mod universal_oop_system;
-  ```
-
-#### **Error 2: Unresolved Imports in Crate Root `src/lib.rs`**
-* **Location:** `src/lib.rs:106`
-* **Compiler Message:**
-  ```text
-  error[E0432]: unresolved imports `sigpkg::AptDebManifest`, `sigpkg::FlatpakManifest`, `sigpkg::PacmanPkgbuild`, `sigpkg::SnapcraftManifest`, `sigpkg::UniversalPackageAdapter`
-  ```
-* **Why It Occurs:**
-  These manifests and adapters are referenced in the crate root but are not declared or re-exported publicly in the `sigpkg` module.
-* **How to Fix:**
-  Add public stubs for these items inside `src/sigpkg/mod.rs` or export them from their respective sub-modules.
-
-#### **Error 3: Missing `alloc` and `format` Crate in `no_std` context**
-* **Location:** `src/sigpkg/arch_compat.rs:24-27`
-* **Compiler Message:**
-  ```text
-  error[E0433]: failed to resolve: use of unresolved module or unlinked crate `alloc`
-  ```
-* **Why It Occurs:**
-  In `#![no_std]` Rust, heap allocations require explicit `extern crate alloc;` declaration. In `arch_compat.rs`, the compiler cannot find `alloc::string::String`, etc. because `alloc` has not been registered.
-* **How to Fix:**
-  Add `extern crate alloc;` at the top of the file or at the crate root (`src/lib.rs`) so that the `alloc` module is available in the compiler's namespace.
-
-#### **Error 4: `Version` does not implement `std::fmt::Display`**
-* **Location:** `src/sigpkg/recipe.rs:189, 195, 208`
-* **Compiler Message:**
-  ```text
-  error[E0277]: `Version` doesn't implement `std::fmt::Display`
-  ```
-* **Why It Occurs:**
-  In `recipe.rs`, `format!("{}@{}", name, version)` tries to format `version` (which is a `Version` struct) using `{}`. However, `Version` does not implement `core::fmt::Display`.
-* **How to Fix:**
-  Implement `core::fmt::Display` for `Version` in `src/sigpkg/mod.rs` or use the debug formatter `{:?}` in the formatting macros.
+  Add a standard implementation of the `core::fmt::Display` trait for `Version` in `src/sigpkg/mod.rs`:
   ```rust
   impl core::fmt::Display for Version {
       fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -425,22 +259,64 @@ As of this diagnostics cycle, running `cargo check --lib` produces **53 compilat
   }
   ```
 
-#### **Error 5: Trait Bound `Version: Hash` not Satisfied**
-* **Location:** `src/sigpkg/mod.rs:136-140`
+#### **Error 2: `sigpkg::Version` doesn't implement `Hash`**
+* **Location:** `src/sigpkg/mod.rs`
 * **Compiler Message:**
   ```text
-  error[E0277]: the trait bound `Version: Hash` is not satisfied
+  error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
   ```
 * **Why It Occurs:**
-  The `VersionConstraint` enum derives `Hash`, but the `Version` struct inside its variants does not implement/derive `Hash`.
+  The `VersionConstraint` enum in `src/sigpkg/mod.rs` derives `Hash`, but the `Version` struct it wraps does not implement the `Hash` trait.
 * **How to Fix:**
-  Add `Hash` to the `#[derive(...)]` macro of the `Version` struct inside `src/sigpkg/mod.rs`:
+  Add `Hash` to the `#[derive(...)]` attribute on the `Version` struct in `src/sigpkg/mod.rs`:
   ```rust
   #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
   pub struct Version {
       pub major: u64,
       pub minor: u64,
       pub patch: u64,
+  }
+  ```
+
+---
+
+### Error Group E: Missing Fields in Initializers and Field Resolution Gaps
+
+#### **Error 1: Missing Fields in `sigpkg::Package` Struct Initialization**
+* **Location:** `src/sigpkg/universal_adapter.rs`
+* **Compiler Message:**
+  ```text
+  error[E0063]: missing fields `changelogs`, `licenses`, `maintainers` and 3 other fields in initializer of `sigpkg::Package`
+  ```
+* **Why It Occurs:**
+  The instantiation of `Package` inside `src/sigpkg/universal_adapter.rs` lacks recently added fields on `Package` like `changelogs`, `licenses`, `maintainers`, and others.
+* **How to Fix:**
+  Initialize all missing fields in `universal_adapter.rs` to their standard defaults (e.g. empty vectors `Vec::new()` or `String::new()`).
+
+#### **Error 2: Field Resolution mismatch in `repl::ShellRepl`**
+* **Location:** `src/shell/repl.rs`
+* **Compiler Message:**
+  ```text
+  error[E0609]: no field `current_dir` on type `&mut repl::ShellRepl`
+  ```
+* **Why It Occurs:**
+  Methods in `repl.rs` try to access fields like `current_dir`, `current_user`, `services`, `installed_packages`, `current_theme`, `current_profile`, and `a11y_features` on the `ShellRepl` struct. However, these fields are absent from the `ShellRepl` struct definition.
+* **How to Fix:**
+  Ensure the `ShellRepl` struct definition in `src/shell/repl.rs` contains all required fields:
+  ```rust
+  pub struct ShellRepl {
+      pub running: bool,
+      pub variables: crate::klib::HashMap<String, String>,
+      pub aliases: crate::klib::HashMap<String, String>,
+      pub prompt: String,
+      pub agent_engine: AgentAutomationEngine,
+      pub current_dir: String,
+      pub current_user: String,
+      pub services: crate::klib::HashMap<String, String>,
+      pub installed_packages: crate::klib::HashSet<String>,
+      pub current_theme: String,
+      pub current_profile: String,
+      pub a11y_features: crate::klib::HashMap<String, bool>,
   }
   ```
 
