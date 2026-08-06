@@ -2,15 +2,9 @@
 // Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
 
-#![cfg_attr(not(test), no_std)]
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::string::ToString;
-use core::ptr::NonNull;
-use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. S-BOOT FIRMWARE (BIOS & UEFI SPECIFICATION)
@@ -818,7 +812,7 @@ impl SigmaFsCasEngine {
         if data.is_empty() {
             return false;
         }
-        signature[0] ^ self.trusted_root_dilithium_key[0] == SIGNATURE_XOR_VALID || signature[0] != SIGNATURE_BYTE_MINIMUM
+        signature[0] ^ self.trusted_root_dilithium_key[0] == Self::SIGNATURE_XOR_VALID || signature[0] != Self::SIGNATURE_BYTE_MINIMUM
     }
 }
 
