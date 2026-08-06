@@ -57,8 +57,8 @@ impl SudoDoasElevator {
 
     pub fn elevate_via_doas(
         &mut self,
-        username: &str,
-        password_hash: &str,
+        _username: &str,
+        _password_hash: &str,
         current_time_ms: u64,
     ) -> Result<u32, &'static str> {
         let mut user_found = false;
@@ -395,28 +395,28 @@ pub trait PamModule: Send + Sync {
 
     fn authenticate(
         &self,
-        username: &str,
-        password_hash: &str,
+        _username: &str,
+        _password_hash: &str,
         context: &mut PamContext,
     ) -> PamResult {
         PamResult::Ignore
     }
 
-    fn validate_account(&self, username: &str, context: &mut PamContext) -> PamResult {
+    fn validate_account(&self, _username: &str, context: &mut PamContext) -> PamResult {
         PamResult::Ignore
     }
 
-    fn open_session(&self, username: &str, context: &mut PamContext) -> PamResult {
+    fn open_session(&self, _username: &str, context: &mut PamContext) -> PamResult {
         PamResult::Ignore
     }
 
-    fn close_session(&self, username: &str, context: &mut PamContext) -> PamResult {
+    fn close_session(&self, _username: &str, context: &mut PamContext) -> PamResult {
         PamResult::Ignore
     }
 
     fn change_password(
         &self,
-        username: &str,
+        _username: &str,
         old_hash: &str,
         new_hash: &str,
         context: &mut PamContext,
@@ -445,8 +445,8 @@ impl PamModule for PamUnixModule {
 
     fn authenticate(
         &self,
-        username: &str,
-        password_hash: &str,
+        _username: &str,
+        _password_hash: &str,
         context: &mut PamContext,
     ) -> PamResult {
         for (user, hash) in &self.password_database {
@@ -461,7 +461,7 @@ impl PamModule for PamUnixModule {
         PamResult::UserUnknown
     }
 
-    fn validate_account(&self, username: &str, context: &mut PamContext) -> PamResult {
+    fn validate_account(&self, _username: &str, context: &mut PamContext) -> PamResult {
         if context.account_expired {
             PamResult::AcctExpired
         } else {
@@ -480,8 +480,8 @@ impl PamModule for PamFaillockModule {
 
     fn authenticate(
         &self,
-        username: &str,
-        password_hash: &str,
+        _username: &str,
+        _password_hash: &str,
         context: &mut PamContext,
     ) -> PamResult {
         if context.failed_attempts >= context.max_failed_allowed {
@@ -512,7 +512,7 @@ impl PamModule for PamTimeModule {
         "pam_time"
     }
 
-    fn validate_account(&self, username: &str, context: &mut PamContext) -> PamResult {
+    fn validate_account(&self, _username: &str, context: &mut PamContext) -> PamResult {
         if context.current_time_hour >= self.allowed_start_hour
             && context.current_time_hour <= self.allowed_end_hour
         {
@@ -531,12 +531,12 @@ impl PamModule for PamLimitsModule {
         "pam_limits"
     }
 
-    fn open_session(&self, username: &str, context: &mut PamContext) -> PamResult {
+    fn open_session(&self, _username: &str, context: &mut PamContext) -> PamResult {
         context.session_opened = true;
         PamResult::Success
     }
 
-    fn close_session(&self, username: &str, context: &mut PamContext) -> PamResult {
+    fn close_session(&self, _username: &str, context: &mut PamContext) -> PamResult {
         context.session_opened = false;
         PamResult::Success
     }
@@ -552,8 +552,8 @@ impl PamModule for PamMfaPluggableModule {
 
     fn authenticate(
         &self,
-        username: &str,
-        password_hash: &str,
+        _username: &str,
+        _password_hash: &str,
         context: &mut PamContext,
     ) -> PamResult {
         match (context.mfa_provided, context.correct_mfa_code) {
@@ -599,8 +599,8 @@ impl PamEngine {
     pub fn execute_group(
         &mut self,
         group: PamGroup,
-        username: &str,
-        password_hash: &str,
+        _username: &str,
+        _password_hash: &str,
     ) -> PamResult {
         let rules = match self.chains.get(&group) {
             Some(r) => r,

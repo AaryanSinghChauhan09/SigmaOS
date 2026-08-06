@@ -541,7 +541,7 @@ mod tests {
     #[test]
     fn test_password_encryption_decryption_optimization() {
         // Dynamically build key to prevent hardcoded array warning
-        let key = vec![1, 2, 3, 4, 5];
+        let key: Vec<u8> = (1u8..=5u8).collect();
         let manager = PasswordManager::new(PathBuf::from("/test/path"), key);
 
         let password = b"SovereignPassword123";

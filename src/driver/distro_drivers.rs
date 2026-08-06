@@ -293,7 +293,7 @@ mod tests {
         let mut iv = [0u8; 12];
         
         // Use a more complex, non-linear generation pattern for test purposes
-        let seed: u64 = 0x5BD1E9955C3A7B2D; // Test seed constant
+        let seed: u64 = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos() as u64;
         for i in 0..32 {
             let mut val = seed.wrapping_mul(i as u64 + 1);
             val ^= val >> 33;

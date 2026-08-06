@@ -276,7 +276,7 @@ impl TinyCoreEphemeralEngine {
         Ok(())
     }
 
-    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
+    pub fn write_to_volatile_overlay(&mut self, _file_path: &str, _data_len: usize) -> Result<usize, HistoricError> {
         if self.persistence_enabled {
             return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
         }

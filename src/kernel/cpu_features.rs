@@ -95,7 +95,7 @@ impl CpuState {
 
     /// CP15 Coprocessor Emulation: MCR (Move to Coprocessor from ARM Register)
     /// Emulates: mcr p15, 0, <reg>, c1, c0, 0 (Write MMU/Cache control register)
-    pub fn mcr(&mut self, coproc: u8, opcode1: u8, value: u32, cr_n: u8, cr_m: u8, opcode2: u8) -> Result<(), &'static str> {
+    pub fn mcr(&mut self, _coproc: u8, _opcode1: u8, _value: u32, _cr_n: u8, _cr_m: u8, _opcode2: u8) -> Result<(), &'static str> {
         if self.arch != CpuArch::Arm64 {
             return Err("MCR instruction is only valid on ARM architecture");
         }

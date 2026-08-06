@@ -339,7 +339,7 @@ impl KeServiceDescriptorTable {
     }
 
     /// Dispatch a system call using SSDT routing with bounds validation
-    pub fn dispatch_syscall(&self, id: u32, args: &[u64]) -> Result<u64, GapError> {
+    pub fn dispatch_syscall(&self, id: u32, _args: &[u64]) -> Result<u64, GapError> {
         if let Some(entry) = self.service_table.iter().find(|e| e.syscall_id == id) {
             if args.len() < entry.argument_count as usize {
                 return Err(GapError::InvalidPageAddress); // mismatched arguments count
@@ -578,7 +578,7 @@ impl CallingConventionEngine {
 
     /// Simulate function call arguments alignment layout on the stack and registers.
     /// Returns register assignments and stack frame alignment offsets.
-    pub fn align_arguments(&self, args: &[u64]) -> (Vec<(&'static str, u64)>, Vec<(usize, u64)>) {
+    pub fn align_arguments(&self, _args: &[u64]) -> (Vec<(&'static str, u64)>, Vec<(usize, u64)>) {
         let mut registers = Vec::new();
         let mut stack = Vec::new();
 
@@ -703,7 +703,7 @@ mod tests {
     #[test]
     fn test_ke_service_descriptor_table() {
         let mut ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler(args: &[u64]) -> u64 {
+        fn mock_handler(_args: &[u64]) -> u64 {
             args[0] + args[1]
         }
 
@@ -741,7 +741,7 @@ mod tests {
     #[test]
     fn test_x86_rootkit_auditor() {
         let mut ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler1(args: &[u64]) -> u64 { 1 }
+        fn mock_handler1(_args: &[u64]) -> u64 { 1 }
         ssdt.register_service(1, mock_handler1, 0);
 
         let kernel_text = b"\x90\x90\xCC\xC3"; // mock instructions
@@ -759,7 +759,7 @@ mod tests {
 
         // Test 2: SSDT Hooking (handler hijack)
         let mut infected_ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler2(_args: &[u64]) -> u64 { 2 } // Different handler for hijack simulation
+        fn mock_handler2(__args: &[u64]) -> u64 { 2 } // Different handler for hijack simulation
         infected_ssdt.register_service(1, mock_handler2, 0); // hijacked handler
         let err2 = auditor.audit_system(kernel_text, &infected_ssdt, 0x7FFF0000, 0x7FFF0000);
         assert!(err2.is_err());

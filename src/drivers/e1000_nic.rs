@@ -110,7 +110,7 @@ impl E1000Driver {
         }
     }
 
-    unsafe fn read_reg(&self, offset: u32) -> u32 {
+    unsafe fn read_reg(&self, _offset: u32) -> u32 {
         #[cfg(target_os = "none")]
         {
             read_volatile((self.mmio_base + offset as usize) as *const u32)
@@ -121,7 +121,7 @@ impl E1000Driver {
         }
     }
 
-    unsafe fn write_reg(&self, offset: u32, value: u32) {
+    unsafe fn write_reg(&self, _offset: u32, _value: u32) {
         #[cfg(target_os = "none")]
         {
             write_volatile((self.mmio_base + offset as usize) as *mut u32, value);
