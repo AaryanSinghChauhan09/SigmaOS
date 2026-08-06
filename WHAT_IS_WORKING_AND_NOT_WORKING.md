@@ -21,6 +21,9 @@ This document provides a comprehensive, highly technical, and mathematically pre
    - [D. Ownership, Borrow-Checker, & Lifetime Violations](#d-ownership-borrow-checker--lifetime-violations)
    - [E. Missing Package Constructor & Struct Initializer Gaps](#e-missing-package-constructor--struct-initializer-gaps)
    - [F. Type Mismatches & Closure Parameter Type Inference Gaps](#f-type-mismatches--closure-parameter-type-inference-gaps)
+   - [G. Underscore Parameter Gaps & Spelling Mismatches](#g-underscore-parameter-gaps--spelling-mismatches)
+   - [H. Unresolved Module Dependency in App Absorber](#h-unresolved-module-dependency-in-app-absorber)
+   - [I. Missing System Interface & Kernel Imports](#i-missing-system-interface--kernel-imports)
 4. [Executable Remediation Blueprints for AI Agents](#4-executable-remediation-blueprints-for-ai-agents)
 5. [AI Agent Verification Protocol](#5-ai-agent-verification-protocol)
 
@@ -157,6 +160,36 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 ---
 
+### G. Underscore Parameter Gaps & Spelling Mismatches
+* **Symptoms:**
+  - `error[E0425]: cannot find value data_len in this scope` in `src/compatibility/historic_linux.rs:283`
+  - `error[E0425]: cannot find value rule in this scope` in `src/network/nftables.rs:751`
+  - `error[E0308]: mismatched types: expected u8, found u32` in `src/compatibility/historic_linux.rs:222`
+* **Why It Occurs:**
+  1. In `historic_linux.rs`, the parameter is named `_data_len` with a leading underscore to mark it as unused, but is then accessed as `data_len` inside the method body.
+  2. In `nftables.rs`, the parameter is named `_rule` with a leading underscore, but is accessed as `rule` when looping over expressions.
+  3. In `historic_linux.rs:222`, assigning `val as u32` to `simulated_pci_bar[idx]` fails because the array elements are `u8` rather than `u32`. Since `val` is already a `u8`, the cast `as u32` is both incorrect and redundant.
+
+---
+
+### H. Unresolved Module Dependency in App Absorber
+* **Symptoms:**
+  - `error[E0433]: cannot find module or crate uuid in this scope` in `src/productivity/advanced_app_absorber.rs:69`
+* **Why It Occurs:**
+  The `uuid` third-party library was removed from `Cargo.toml` as part of SigmaOS's pure self-sufficiency and digital sovereignty mandate. However, `advanced_app_absorber.rs` still references the external `uuid::Uuid::new_v4()` function.
+
+---
+
+### I. Missing System Interface & Kernel Imports
+* **Symptoms:**
+  - `error[E0432]: unresolved import kernel::SchedulerError` in `src/lib.rs`
+  - `error[E0432]: unresolved imports support::LegacyLinuxRule, support::LinuxPersonaRule` in `src/filesystem/mod.rs`
+  - `error[E0432]: unresolved imports vfs::FileDescriptor, vfs::FsError, vfs::VirtualFilesystem` in `src/filesystem/mod.rs`
+* **Why It Occurs:**
+  Overlapping namespace declarations and private visibilities in `support.rs` and `vfs.rs` prevent re-exporting these structures cleanly.
+
+---
+
 ## 4. Executable Remediation Blueprints for AI Agents
 
 Below are the exact code solutions and edits required to restore flawless compilation of the SigmaOS workspace.
@@ -172,12 +205,15 @@ pub mod hashmap;
 pub mod hashset;
 pub mod string;
 pub mod time;
+pub mod uuid;
+pub mod hash;
 
 pub use vec::Vec;
 pub use hashmap::HashMap;
 pub use hashset::HashSet;
 pub use string::String;
 pub use time::{Duration, Instant};
+pub use uuid::Uuid;
 ```
 
 ---
@@ -326,6 +362,57 @@ Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to 
        self.states.remove(key);
    }
    expired.len()
+   ```
+
+---
+
+### 11. Fix `src/compatibility/historic_linux.rs` (Spelling & Cast Correction)
+1. Rename the parameter `_data_len` to `data_len` on line 279:
+   ```rust
+   pub fn write_to_volatile_overlay(&mut self, _file_path: &str, data_len: usize) -> Result<usize, HistoricError>
+   ```
+2. Correct the assignment casting error on line 222:
+   ```rust
+   self.wrapper.simulated_pci_bar[idx] = val;
+   ```
+
+---
+
+### 12. Fix `src/network/nftables.rs` (Parameter Matching & Expired Move)
+1. Rename the parameter `_rule` to `rule` on line 741:
+   ```rust
+   rule: &NftRule,
+   ```
+2. Iterate over the reference `&expired` in `cleanup_expired_states` on line 552:
+   ```rust
+   for key in &expired {
+       self.states.remove(key);
+   }
+   expired.len()
+   ```
+
+---
+
+### 13. Fix `src/productivity/advanced_app_absorber.rs` (Zero-Dependency UUID Integration)
+Replace standard `uuid::Uuid` call with the native `#![no_std]` sovereign UUID implementation:
+```rust
+screenshot.cloud_url = Some(format!(
+    "{}/capture_{}.png",
+    self.target_cloud_destination,
+    crate::klib::uuid::Uuid::new().to_string()
+));
+```
+
+---
+
+### 14. Fix Type Inference / Annotation Errors
+1. In `src/orchestration/cross_device.rs:529`, explicitly annotate types:
+   ```rust
+   self.devices.values().filter(|d: &&ConnectedDevice| d.is_connected()).collect()
+   ```
+2. In `src/dashboard/process.rs:331`, explicitly annotate type:
+   ```rust
+   self.process_history.get(&pid).map(|v: &std::vec::Vec<f64>| v.as_slice())
    ```
 
 ---
