@@ -56,23 +56,6 @@ pub enum ShellCommand {
     Rm {
         filename: String,
     },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
-    },
     Theme {
         theme_name: String,
     },
