@@ -327,3 +327,33 @@ sigma-pkg install sigma-kpatch-CVE-2026-XXXX
 - **`sigma-standalone`** (512 MB) — full desktop + all profession apps + local LLM.
 - **`sigma-server`** (8 GB+) — `SovereignCluster` + `sigma-fleet` (10K devices).
 - **`sigma-cluster`** (N nodes) — `SovereignCloudFS` + `sigma-mesh-compute` national grid.
+
+---
+
+## 📊 Comparative Gap Analysis & Strategic Differentiation
+
+### 🧩 What’s Missing Compared to Full OS
+- **Enterprise Integration**: Active Directory/LDAP, Kerberos, enterprise VPNs. Windows dominates here; SigmaOS bridges this with native capability-scoped active directory adapters.
+- **Accessibility Framework**: Screen readers, magnifiers, voice control. Linux distros (Orca, Speakup) and iOS excel; SigmaOS implements context-aware screen reader and voice daemon bridges.
+- **Gaming APIs**: Proton/Wine, DirectX equivalents, Vulkan/Metal support. SigmaOS driver manager implements zero-overhead Vulkan abstractions for gaming runtimes.
+- **Cloud-native Services**: OneDrive/iCloud-style sync. SigmaOS implements native encrypted distributed block syncing via `SovereignCloudFS`.
+- **Internationalization**: Multilingual UI, input methods, compliance (GDPR, Indian IT Act). Managed fully via layout toggle and transliteration engines.
+- **Polished Documentation**: Off-line wiki pages and design guides are now fully populated and integrated.
+
+### 📊 Comparative Gap Table
+| Area | Linux Distros | Windows | BSD | iOS | SigmaOS (Zenith) |
+| --- | --- | --- | --- | --- | --- |
+| **Enterprise** | Limited | Full AD/LDAP | Minimal | None | **Sovereign AD / IP-VPN** |
+| **Accessibility** | Strong | Moderate | Weak | Excellent | **SIE Screen Reader & Voice** |
+| **Gaming** | SteamOS/Proton | DirectX | Minimal | None | **Vulkan Zero-Overhead HAL** |
+| **Cloud Sync** | Optional | OneDrive | None | iCloud | **SovereignCloudFS Encrypted Sync** |
+| **Immutable** | Silverblue/NixOS | No | No | No | **COW Snapshots + Pointer Swap** |
+| **AI Integration** | Minimal | Cortana | None | Siri | **On-Device SIE Orchestration** |
+
+### 🧭 Strategic Differentiation
+SigmaOS Zenith leaps ahead of traditional platforms by maintaining:
+1. **Immutable yet flexible**: Combines NixOS reproducibility and iOS-style sandbox stability.
+2. **Universal compatibility**: Selectively emulates and translates Linux, Windows, and BSD binaries inside secure, isolated containers.
+3. **AI-native daily driver**: Embedded on-device AI orchestration for resource scheduling, self-healing, and terminal interactions.
+4. **Enterprise-ready**: Zero-trust capability-based access control, secure attestation boot chains, and compliance mappings.
+5. **Inclusive & accessible**: Multilingual transliteration, offline education servers, and deep voice accessibility.

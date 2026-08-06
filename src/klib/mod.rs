@@ -10,3 +10,4 @@ pub use error::{CryptoError, FsError, KernelError, NetError, SecurityError, Sigm
 pub use isa::{CpuIsaAssessor, IsaLevel};
 pub use store::{Reducer, Store, Subscriber};
 pub use vec::Vec;
+pub use std::collections::HashMap;
