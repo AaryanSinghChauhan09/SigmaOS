@@ -305,123 +305,88 @@ impl Default for SelfHealingModule {
     }
 }
 
-/// Tracks a registered system shard/component's heartbeat status
 #[derive(Debug, Clone)]
 pub struct ShardHeartbeat {
-    pub name: String,
-    pub last_ping_secs: u64,
+    pub shard_name: String,
+    pub last_heartbeat_timestamp: u64,
     pub latency_ms: u32,
     pub is_responsive: bool,
 }
 
-/// Prevents recursive recovery cascades by tracking recovery attempts per resource.
-/// If recovery fails repeatedly within a window, triggers safe mode fallback.
-#[derive(Debug, Clone)]
 pub struct DoubleFaultGuard {
-    pub recovery_counts: HashMap<String, usize>,
-    pub threshold_limit: usize,
+    pub consecutive_failures: u32,
+    pub max_allowed_failures: u32,
+    pub safety_mode_activated: bool,
 }
 
 impl DoubleFaultGuard {
-    pub fn new(threshold_limit: usize) -> Self {
+    pub fn new(max_allowed_failures: u32) -> Self {
         Self {
-            recovery_counts: HashMap::new(),
-            threshold_limit,
+            consecutive_failures: 0,
+            max_allowed_failures,
+            safety_mode_activated: false,
         }
     }
 
-    /// Increments recovery attempt. Returns true if recursive fault threshold is breached (Double Fault detected)
-    pub fn register_attempt(&mut self, resource: &str) -> bool {
-        let count = self.recovery_counts.entry(resource.to_string()).or_insert(0);
-        *count += 1;
-        *count >= self.threshold_limit
+    pub fn record_failure(&mut self) -> bool {
+        self.consecutive_failures += 1;
+        if self.consecutive_failures >= self.max_allowed_failures {
+            self.safety_mode_activated = true;
+        }
+        self.safety_mode_activated
     }
 
-    /// Reset recovery count for a resource upon successful restoration
-    pub fn reset_attempts(&mut self, resource: &str) {
-        self.recovery_counts.remove(resource);
+    pub fn record_success(&mut self) {
+        self.consecutive_failures = 0;
+        self.safety_mode_activated = false;
     }
 }
 
-/// Comprehensive stability and resilience monitor (Sovereign OS Parity)
 pub struct SystemStabilityMonitor {
-    pub heartbeats: HashMap<String, ShardHeartbeat>,
-    pub double_fault_guard: DoubleFaultGuard,
-    pub system_stability_score: f64, // 0.0 to 100.0
-    pub in_safe_mode: bool,
+    pub shards: HashMap<String, ShardHeartbeat>,
+    pub fault_guard: DoubleFaultGuard,
 }
 
 impl SystemStabilityMonitor {
     pub fn new() -> Self {
-        let mut heartbeats = HashMap::new();
-        // Register default essential kernel shards
-        for shard in &["kernel", "vfs", "scheduler", "ipc"] {
-            heartbeats.insert(
-                shard.to_string(),
-                ShardHeartbeat {
-                    name: shard.to_string(),
-                    last_ping_secs: 0,
-                    latency_ms: 0,
-                    is_responsive: true,
-                },
-            );
-        }
         Self {
-            heartbeats,
-            double_fault_guard: DoubleFaultGuard::new(3), // 3 failures triggers double fault
-            system_stability_score: 100.0,
-            in_safe_mode: false,
+            shards: HashMap::new(),
+            fault_guard: DoubleFaultGuard::new(2), // Max 2 consecutive failures triggers safety-mode
         }
     }
 
-    /// Updates shard ping. Recalculates system stability score based on responsiveness and latencies
-    pub fn ping_shard(&mut self, name: &str, latency_ms: u32, is_responsive: bool) {
-        if let Some(hb) = self.heartbeats.get_mut(name) {
-            hb.latency_ms = latency_ms;
-            hb.is_responsive = is_responsive;
-            hb.last_ping_secs = 123456; // Simulated timestamp
+    pub fn report_heartbeat(&mut self, shard_name: String, timestamp: u64, latency_ms: u32) {
+        let is_responsive = latency_ms < 500; // Unresponsive if latency >= 500ms
+        let shard = ShardHeartbeat {
+            shard_name: shard_name.clone(),
+            last_heartbeat_timestamp: timestamp,
+            latency_ms,
+            is_responsive,
+        };
+        self.shards.insert(shard_name, shard);
+    }
+
+    pub fn check_overall_health(&mut self) -> u32 {
+        let mut responsive_count = 0;
+        let total_count = self.shards.len();
+        if total_count == 0 {
+            return 100;
         }
 
-        // Calculate score
-        let mut responsive_count = 0;
-        let mut total_latency = 0;
-        for hb in self.heartbeats.values() {
-            if hb.is_responsive {
+        for shard in self.shards.values() {
+            if shard.is_responsive {
                 responsive_count += 1;
-                total_latency += hb.latency_ms;
             }
         }
 
-        let responsiveness_factor = (responsive_count as f64 / self.heartbeats.len() as f64) * 70.0;
-        // Average latency under 50ms is perfect. Penalize overhead.
-        let avg_latency = if responsive_count > 0 {
-            total_latency as f64 / responsive_count as f64
+        let health_percent = (responsive_count * 100) / total_count;
+        if health_percent < 50 {
+            self.fault_guard.record_failure();
         } else {
-            0.0
-        };
-        let latency_penalty = (avg_latency / 10.0).min(30.0);
-        let stability = (responsiveness_factor + (30.0 - latency_penalty)).clamp(0.0, 100.0);
-        self.system_stability_score = stability;
-
-        // Auto safe mode degradation if stability score falls below 50%
-        if self.system_stability_score < 50.0 {
-            self.in_safe_mode = true;
+            self.fault_guard.record_success();
         }
-    }
 
-    /// Registers a fault event for a component. Triggers safe mode if recursive double-fault is caught.
-    pub fn trigger_recovery_for_fault(&mut self, resource: &str) -> &'static str {
-        if self.double_fault_guard.register_attempt(resource) {
-            self.in_safe_mode = true;
-            "DOUBLE_FAULT_DETECTED: DEGRADED_TO_SAFE_MODE"
-        } else {
-            "ATTEMPTING_RECOVERY"
-        }
-    }
-
-    /// Clear fault counts upon successful manual or automated recovery
-    pub fn clear_fault(&mut self, resource: &str) {
-        self.double_fault_guard.reset_attempts(resource);
+        health_percent as u32
     }
 }
 
@@ -489,54 +454,37 @@ mod tests {
     }
 
     #[test]
-    fn test_system_stability_monitor_heartbeat() {
+    fn test_double_fault_guard_and_heartbeats() {
         let mut monitor = SystemStabilityMonitor::new();
-        assert_eq!(monitor.system_stability_score, 100.0);
-        assert!(!monitor.in_safe_mode);
+        assert_eq!(monitor.check_overall_health(), 100);
 
-        // Ping kernel shard with fast response
-        monitor.ping_shard("kernel", 10, true);
-        // Ping scheduler with very slow response (150ms)
-        monitor.ping_shard("scheduler", 150, true);
+        // Report normal heartbeats
+        monitor.report_heartbeat("network_shard".to_string(), 1718900000, 50);
+        monitor.report_heartbeat("audio_shard".to_string(), 1718900000, 120);
+        assert_eq!(monitor.check_overall_health(), 100);
+        assert!(!monitor.fault_guard.safety_mode_activated);
 
-        // Stability score should adjust, but still responsive enough to avoid safe mode
-        assert!(monitor.system_stability_score < 100.0);
-        assert!(!monitor.in_safe_mode);
+        // Report high latency (unresponsive) on one shard
+        monitor.report_heartbeat("audio_shard".to_string(), 1718900100, 600); // unresponsive
+        assert_eq!(monitor.check_overall_health(), 50); // 50% responsive
+        assert!(!monitor.fault_guard.safety_mode_activated);
 
-        // Mark scheduler, vfs, and ipc as unresponsive to crash the stability score
-        monitor.ping_shard("scheduler", 0, false);
-        monitor.ping_shard("vfs", 0, false);
-        monitor.ping_shard("ipc", 0, false);
+        // Report unresponsive on both shards -> health falls below 50%
+        monitor.report_heartbeat("network_shard".to_string(), 1718900100, 750); // unresponsive
+        assert_eq!(monitor.check_overall_health(), 0); // 0% responsive, triggers first failure
+        assert_eq!(monitor.fault_guard.consecutive_failures, 1);
+        assert!(!monitor.fault_guard.safety_mode_activated);
 
-        assert!(monitor.system_stability_score < 50.0);
-        assert!(monitor.in_safe_mode);
-    }
+        // Second check with 0% responsive triggers second failure -> activates safety-mode
+        assert_eq!(monitor.check_overall_health(), 0);
+        assert_eq!(monitor.fault_guard.consecutive_failures, 2);
+        assert!(monitor.fault_guard.safety_mode_activated); // Safety mode successfully locked!
 
-    #[test]
-    fn test_double_fault_guard_trigger() {
-        let mut monitor = SystemStabilityMonitor::default();
-        assert!(!monitor.in_safe_mode);
-
-        // Register first attempt
-        let status1 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
-        assert_eq!(status1, "ATTEMPTING_RECOVERY");
-        assert!(!monitor.in_safe_mode);
-
-        // Register second attempt
-        let status2 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
-        assert_eq!(status2, "ATTEMPTING_RECOVERY");
-        assert!(!monitor.in_safe_mode);
-
-        // Register third attempt (breaching threshold of 3)
-        let status3 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
-        assert_eq!(status3, "DOUBLE_FAULT_DETECTED: DEGRADED_TO_SAFE_MODE");
-        assert!(monitor.in_safe_mode);
-
-        // Clear fault and confirm reset works
-        monitor.clear_fault("filesystem_corrupt");
-        monitor.in_safe_mode = false;
-        let status_after_clear = monitor.trigger_recovery_for_fault("filesystem_corrupt");
-        assert_eq!(status_after_clear, "ATTEMPTING_RECOVERY");
-        assert!(!monitor.in_safe_mode);
+        // Back to normal responsive state clears failure counters
+        monitor.report_heartbeat("network_shard".to_string(), 1718900200, 50);
+        monitor.report_heartbeat("audio_shard".to_string(), 1718900200, 50);
+        assert_eq!(monitor.check_overall_health(), 100);
+        assert_eq!(monitor.fault_guard.consecutive_failures, 0);
+        assert!(!monitor.fault_guard.safety_mode_activated);
     }
 }

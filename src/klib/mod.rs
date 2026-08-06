@@ -8,8 +8,12 @@ pub mod hashmap;
 pub mod hashset;
 pub mod math;
 pub mod paging;
+pub mod string;
+pub mod time;
 pub mod uvm;
+pub mod uuid;
 pub mod vec;
+pub mod vecdeque;
 
 pub use btreemap::BTreeMap;
 pub use conversion::{
@@ -24,6 +28,7 @@ pub use math::{
 };
 pub use string::{
     atoi, itoa, memcmp, memcpy, memset, strcat, strchr, strcmp, strcpy, strlen, strstr,
+    String, ToString,
 };
 pub use time::{monotonic_ms, sleep_ms, uptime_ms, Date, Time, Timestamp};
 pub use uuid::Uuid;

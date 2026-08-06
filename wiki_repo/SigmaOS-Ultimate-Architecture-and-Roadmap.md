@@ -39,6 +39,7 @@ SigmaOS absorbs the greatest strengths of major traditional Linux distributions 
 | **Interrupts & Address Safety** | Canonical Address Check + Fault Registers + ISR Routing | Linux IDT exception handling | Linux IDT | Linux IDT | Linux IDT |
 | **Citizen & Professional Tools** | Krishi, Vyapaar, Kanoon, Chikitshak & Abhiyanta Engines | None | None | None | None |
 | **Multi-Arch IRQ Controller** | x86 APIC + ARM GIC (FIQ) + RISC-V PLIC (Supervisor) | APIC (x86) / GIC (ARM) | APIC / GIC | APIC / GIC | APIC / GIC |
+| **Man Page & Help System** | On-the-Fly ANSI Compilers + Multisection Indexers | Compressed Gzip static manual files | Compressed Gzip | Compressed Gzip | Compressed Gzip |
 
 ---
 
@@ -336,7 +337,16 @@ To support heterogeneous execution targets dynamically on the microkernel level,
 
 ---
 
-## 14. Modular Workflows & Community-Driven Innovation
+## 14. Sovereign ANSI Manual Compiler & Multi-Section Indexer
+
+To offer high-fidelity interactive instructions and reference help systems natively at the command line, SigmaOS implements a BSD/Linux-style `man` documentation engine:
+
+- **Section-Wise Categorization**: Indexes manual records (`ManPage`) according to standard UNIX classifications: Section 1 (User Commands), Section 2 (System Calls), Section 5 (File Formats), and Section 8 (System Administration).
+- **ANSI Terminal Formatting**: Dynamically compiles page metadata to output standardized, visually readable ANSI text templates detailing `NAME`, `SYNOPSIS`, `DESCRIPTION`, and `EXAMPLES` fields on-the-fly.
+
+---
+
+## 15. Modular Workflows & Community-Driven Innovation
 
 To maintain publisher-grade quality, the SigmaOS project employs standardized workflows for code contribution and validation.
 

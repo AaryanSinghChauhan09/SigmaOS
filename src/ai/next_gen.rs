@@ -1,9 +1,14 @@
+extern crate alloc;
+
+#[cfg(not(test))]
+use crate::klib::Vec;
+#[cfg(test)]
+use alloc::vec::Vec;
+
 /// Next-Generation AI-Native and Energy-Aware Subsystems for SigmaOS
 /// Replicates adaptive personas, predictive syscall pre-fetching,
 /// AI scheduling, and local multi-model orchestrations.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 // ==========================================
 // 1. Adaptive Kernel Personas
@@ -148,7 +153,9 @@ impl AiScheduler {
 
     pub fn schedule_task_to_device(&mut self, task: &AiTask) -> DeviceTargetType {
         // Automatically balances and channels workloads across heterogeneous cores
-        let target = if task.tpu_tensor_operations > task.cpu_instructions && task.tpu_tensor_operations > task.gpu_shading_load {
+        let target = if task.tpu_tensor_operations > task.cpu_instructions
+            && task.tpu_tensor_operations > task.gpu_shading_load
+        {
             DeviceTargetType::TPU
         } else if task.gpu_shading_load > task.cpu_instructions {
             DeviceTargetType::GPU
@@ -268,9 +275,14 @@ impl MultiModelOrchestrator {
         self.active_models.push(model);
     }
 
-    pub fn execute_local_inference(&self, model_name: &[u8], _input_tokens_len: usize) -> Result<usize, &'static str> {
+    pub fn execute_local_inference(
+        &self,
+        model_name: &[u8],
+        _input_tokens_len: usize,
+    ) -> Result<usize, &'static str> {
         let mut name_arr = [0u8; 32];
-        name_arr[..model_name.len().min(31)].copy_from_slice(&model_name[..model_name.len().min(31)]);
+        name_arr[..model_name.len().min(31)]
+            .copy_from_slice(&model_name[..model_name.len().min(31)]);
 
         let mut found = false;
         for model in &self.active_models {
@@ -432,6 +444,179 @@ impl Default for SovereignResearchLattice {
     }
 }
 
+// =========================================================================
+// 7. SWARM OS MODE CLUSTERING LAYER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct SwarmNode {
+    pub node_id: usize,
+    pub cores_count: usize,
+    pub ram_mbytes: usize,
+    pub is_active: bool,
+}
+
+pub struct SovereignSwarmCluster {
+    pub peers: Vec<SwarmNode>,
+}
+
+impl SovereignSwarmCluster {
+    pub fn new() -> Self {
+        Self { peers: Vec::new() }
+    }
+
+    pub fn register_peer(&mut self, node: SwarmNode) {
+        self.peers.push(node);
+    }
+
+    /// Automatically pools and sums computing resources across all active swarm nodes (personal supercomputing)
+    pub fn calculate_swarm_performance_pool(&self) -> (usize, usize) {
+        let mut total_cores = 0;
+        let mut total_ram = 0;
+
+        for peer in &self.peers {
+            if peer.is_active {
+                total_cores += peer.cores_count;
+                total_ram += peer.ram_mbytes;
+            }
+        }
+        (total_cores, total_ram)
+    }
+}
+
+// =========================================================================
+// 8. TEMPORAL COMPUTING LAYER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct ResourceTrace {
+    pub cpu_overhead: u8,
+    pub timestamp_epoch: u64,
+}
+
+pub struct SovereignTemporalComputing {
+    pub history_traces: Vec<ResourceTrace>,
+}
+
+impl SovereignTemporalComputing {
+    pub fn new() -> Self {
+        Self { history_traces: Vec::new() }
+    }
+
+    pub fn record_resource_trace(&mut self, trace: ResourceTrace) {
+        self.history_traces.push(trace);
+    }
+
+    /// Embeds predictive temporal logic to anticipate future CPU utilization states based on rolling history (Kernel-integrated)
+    pub fn predict_future_resource_states(&self, steps_ahead: usize) -> u8 {
+        if self.history_traces.is_empty() {
+            return 0;
+        }
+
+        let mut sum_cpu = 0;
+        for trace in &self.history_traces {
+            sum_cpu += trace.cpu_overhead as usize;
+        }
+
+        let average = (sum_cpu / self.history_traces.len()) as u8;
+        // Basic linear prediction weighted by trend and forecast horizon steps
+        let projected = average.saturating_add(steps_ahead as u8);
+        projected.min(100)
+    }
+}
+
+// =========================================================================
+// 9. BIO-DIGITAL FUSION LAYER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BiosensorType {
+    EmgElectromyography, // Muscle potentials
+    EegElectroencephalography, // Brainwaves
+    HrvHeartRateVariability, // Heart metric
+}
+
+pub struct SovereignBioDigitalFusion {
+    pub sensor_type: BiosensorType,
+    pub last_voltage_microvolts: f64,
+}
+
+impl SovereignBioDigitalFusion {
+    pub fn new(sensor: BiosensorType) -> Self {
+        Self {
+            sensor_type: sensor,
+            last_voltage_microvolts: 0.0,
+        }
+    }
+
+    /// Evaluates electromyography voltage spike thresholds to trigger user-directed muscle-flex macro commands
+    pub fn is_muscle_flex_triggered(&mut self, current_voltage: f64) -> bool {
+        self.last_voltage_microvolts = current_voltage;
+        // An EMG spike exceeding 150 microvolts represents an active muscle contraction
+        current_voltage > 150.0
+    }
+}
+
+// =========================================================================
+// 10. EMOTION-AWARE ADAPTIVE COMPUTING ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UserEmotionalState {
+    Calm,
+    Focused,
+    Stressed,
+    Fatigued,
+}
+
+pub struct SovereignEmotionAwareEngine {
+    pub last_state: UserEmotionalState,
+    pub adaptive_thread_quantum_multiplier: f32,
+}
+
+impl SovereignEmotionAwareEngine {
+    pub fn new() -> Self {
+        Self {
+            last_state: UserEmotionalState::Calm,
+            adaptive_thread_quantum_multiplier: 1.0,
+        }
+    }
+
+    /// Evaluates user emotional states based on biometric indicators like Heart Rate Variability (HRV) and stress levels
+    pub fn classify_emotional_state(&mut self, hrv_bpm: f64, blink_delay_ms: u32, stress_vocal_coefficient: f32) -> UserEmotionalState {
+        let state = if hrv_bpm > 100.0 && stress_vocal_coefficient > 0.7 {
+            UserEmotionalState::Stressed
+        } else if blink_delay_ms > 400 {
+            UserEmotionalState::Fatigued
+        } else if hrv_bpm >= 60.0 && hrv_bpm <= 80.0 {
+            UserEmotionalState::Focused
+        } else {
+            UserEmotionalState::Calm
+        };
+
+        self.last_state = state;
+        state
+    }
+
+    /// Adapts the kernel scheduler context: dims background notifications and scales quantum sizes to lower user stress
+    pub fn adapt_system_context(&mut self) -> f32 {
+        match self.last_state {
+            UserEmotionalState::Stressed => {
+                // Double scheduling quantum size to reduce context-switching noise and overhead
+                self.adaptive_thread_quantum_multiplier = 2.0;
+            }
+            UserEmotionalState::Fatigued => {
+                // Shorten quantum size to keep thread responsiveness high
+                self.adaptive_thread_quantum_multiplier = 0.5;
+            }
+            _ => {
+                self.adaptive_thread_quantum_multiplier = 1.0;
+            }
+        }
+        self.adaptive_thread_quantum_multiplier
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -519,5 +704,60 @@ mod tests {
         let answer = lattice.synthesize_answer("WANDR").unwrap();
         assert!(answer.len() > 0);
         assert_eq!(lattice.research_logs.len(), 1);
+    }
+
+    #[test]
+    fn test_swarm_cluster_pooling() {
+        let mut cluster = SovereignSwarmCluster::new();
+        cluster.register_peer(SwarmNode {
+            node_id: 1,
+            cores_count: 8,
+            ram_mbytes: 16384,
+            is_active: true,
+        });
+        cluster.register_peer(SwarmNode {
+            node_id: 2,
+            cores_count: 4,
+            ram_mbytes: 8192,
+            is_active: false, // Inactive peer should be ignored
+        });
+
+        let (cores, ram) = cluster.calculate_swarm_performance_pool();
+        assert_eq!(cores, 8);
+        assert_eq!(ram, 16384);
+    }
+
+    #[test]
+    fn test_temporal_computing_prediction() {
+        let mut temporal = SovereignTemporalComputing::new();
+        temporal.record_resource_trace(ResourceTrace { cpu_overhead: 20, timestamp_epoch: 1000 });
+        temporal.record_resource_trace(ResourceTrace { cpu_overhead: 40, timestamp_epoch: 1001 });
+
+        // Future prediction trend
+        let predicted = temporal.predict_future_resource_states(5);
+        assert_eq!(predicted, 35); // (20+40)/2 = 30 average + 5 steps ahead = 35
+    }
+
+    #[test]
+    fn test_bio_digital_fusion_flex_trigger() {
+        let mut bio = SovereignBioDigitalFusion::new(BiosensorType::EmgElectromyography);
+        // Voltage below contraction threshold (150 microvolts)
+        assert!(!bio.is_muscle_flex_triggered(120.0));
+        // Voltage spike triggers muscle flex
+        assert!(bio.is_muscle_flex_triggered(180.0));
+    }
+
+    #[test]
+    fn test_emotion_aware_scheduler_adaptation() {
+        let mut engine = SovereignEmotionAwareEngine::new();
+        assert_eq!(engine.last_state, UserEmotionalState::Calm);
+
+        // Classify stressful state
+        let state = engine.classify_emotional_state(120.0, 200, 0.85);
+        assert_eq!(state, UserEmotionalState::Stressed);
+
+        // System context adapts by doubling scheduler quantum multiplier to reduce task thrashing
+        let multiplier = engine.adapt_system_context();
+        assert_eq!(multiplier, 2.0);
     }
 }

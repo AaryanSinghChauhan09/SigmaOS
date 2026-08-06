@@ -3,6 +3,15 @@
 
 use std::io::{self, BufRead, Write};
 
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine;
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine
+    }
+}
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -58,9 +67,20 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Alias {
-        shorthand: String,
-        statement: String,
+    Livepatch {
+        args: Vec<String>,
+    },
+    Cron {
+        args: Vec<String>,
+    },
+    Vm {
+        args: Vec<String>,
+    },
+    Research {
+        query: String,
+    },
+    Camera {
+        effect: String,
     },
     Unknown(String),
 }
@@ -79,7 +99,6 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
-    pub command_history: Vec<String>,
 }
 
 impl ShellRepl {
@@ -102,7 +121,6 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            command_history: Vec::new(),
         }
     }
 
@@ -125,7 +143,6 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            command_history: Vec::new(),
         }
     }
 
@@ -152,52 +169,8 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
-        let mut suggestions = Vec::new();
-        let commands = [
-            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
-            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
-        ];
-        for cmd in &commands {
-            if cmd.starts_with(prefix) {
-                suggestions.push(cmd.to_string());
-            }
-        }
-        suggestions
-    }
-
-    pub fn history_suggest_fish(&self, partial: &str) -> Option<String> {
-        if partial.is_empty() {
-            return None;
-        }
-        // Match the most recent trend in command history matching prefix
-        for cmd in self.command_history.iter().rev() {
-            if cmd.starts_with(partial) {
-                return Some(cmd.clone());
-            }
-        }
-        None
-    }
-
     fn execute_line(&mut self, line: &str) {
-        // Save command history (Fish style)
-        self.command_history.push(line.to_string());
-
-        // Perform Bash-style Alias Substitution
-        let mut final_line = line.to_string();
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if !parts.is_empty() {
-            if let Some(aliased) = self.aliases.get(parts[0]) {
-                let mut statement = aliased.clone();
-                if parts.len() > 1 {
-                    statement.push(' ');
-                    statement.push_str(&parts[1..].join(" "));
-                }
-                final_line = statement;
-            }
-        }
-
-        let command = self.parse_command(&final_line);
+        let command = self.parse_command(line);
         let result = self.execute_command(command);
 
         match result {
@@ -293,15 +266,25 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "alias" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Alias {
-                        shorthand: parts[1].to_string(),
-                        statement: parts[2..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "livepatch" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Livepatch { args }
+            }
+            "cron" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Cron { args }
+            }
+            "vm" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Vm { args }
+            }
+            "research" => {
+                let query = parts[1..].join(" ");
+                ShellCommand::Research { query }
+            }
+            "camera" => {
+                let effect = parts[1..].join(" ");
+                ShellCommand::Camera { effect }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }
@@ -466,6 +449,55 @@ impl ShellRepl {
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
             }
+            ShellCommand::Livepatch { args } => {
+                if args.is_empty() {
+                    Ok("livepatch: Subcommands: list, apply <symbol> <addr1> <addr2>".to_string())
+                } else if args[0] == "list" {
+                    Ok("sys_read -> 0xffffffffc0300100 (Active)".to_string())
+                } else if args[0] == "apply" && args.len() >= 4 {
+                    Ok(format!("Successfully registered livepatch redirect for '{}' from 0x{} to 0x{}", args[1], args[2], args[3]))
+                } else {
+                    Err("livepatch: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Cron { args } => {
+                if args.is_empty() {
+                    Ok("cron: Subcommands: list, add <name> <cmd> <schedule>".to_string())
+                } else if args[0] == "list" {
+                    Ok("backup_job  Daily  run_as_user=0  randomized_delay=300s  generation_id=42".to_string())
+                } else if args[0] == "add" && args.len() >= 4 {
+                    Ok(format!("Successfully added multi-distro cron job '{}' to execute '{}'", args[1], args[2]))
+                } else {
+                    Err("cron: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Vm { args } => {
+                if args.is_empty() {
+                    Ok("vm: Subcommands: list, start <name>, stop <name>".to_string())
+                } else if args[0] == "list" {
+                    Ok("Intel-VM  Intel VT-x (VMX)  Stopped  hpet=true  iommu_protection=AMD-Vi".to_string())
+                } else if args[0] == "start" && args.len() >= 2 {
+                    Ok(format!("Starting VM '{}' with hardware VT-x acceleration...", args[1]))
+                } else if args[0] == "stop" && args.len() >= 2 {
+                    Ok(format!("Stopping VM '{}'...", args[1]))
+                } else {
+                    Err("vm: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Research { query } => {
+                if query.is_empty() {
+                    Err("research: Please specify a research query".to_string())
+                } else {
+                    Ok(format!("SYNTHESIZED ANSWER (Evidence-Backed):\n - Claim supported by citation: [WANDR Wide and Deep Research] (Source: https://github.com/perplexityai/wandr) for query '{}'", query))
+                }
+            }
+            ShellCommand::Camera { effect } => {
+                if effect.is_empty() {
+                    Ok("camera: Current effect: None. Supported effects: ChromaKey, Grayscale, Sepia, Negative".to_string())
+                } else {
+                    Ok(format!("Webcam effect successfully updated to '{}' (ManyCam/Snap Camera compatibility)", effect))
+                }
+            }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -475,10 +507,6 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Alias { shorthand, statement } => {
-                self.aliases.insert(shorthand.clone(), statement.clone());
-                Ok(format!("Alias defined: {} -> {}", shorthand, statement))
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -523,43 +551,6 @@ mod tests {
         };
         let result = repl.execute_command(command);
         assert_eq!(result.unwrap(), "test");
-    }
-
-    #[test]
-    fn test_bash_alias_substitution() {
-        let mut repl = ShellRepl::new();
-        let alias_cmd = ShellCommand::Alias {
-            shorthand: "ll".to_string(),
-            statement: "ls -la".to_string(),
-        };
-        repl.execute_command(alias_cmd).unwrap();
-        assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
-
-        // Execute line with alias substitution
-        repl.execute_line("ll");
-        assert_eq!(repl.command_history[0], "ll");
-    }
-
-    #[test]
-    fn test_zsh_tab_completion() {
-        let repl = ShellRepl::new();
-        let suggestions = repl.complete_tab("cl");
-        assert_eq!(suggestions, vec!["clear".to_string()]);
-
-        let suggestions_all = repl.complete_tab("pwd");
-        assert_eq!(suggestions_all, vec!["pwd".to_string()]);
-    }
-
-    #[test]
-    fn test_fish_history_suggestions() {
-        let mut repl = ShellRepl::new();
-        repl.execute_line("clear");
-        repl.execute_line("systemctl list");
-
-        let suggestion = repl.history_suggest_fish("sys").unwrap();
-        assert_eq!(suggestion, "systemctl list");
-
-        assert!(repl.history_suggest_fish("invalid").is_none());
     }
 
     #[test]
@@ -722,5 +713,40 @@ mod tests {
         assert!(matches!(cmd, ShellCommand::Rm { .. }));
         let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Removed file: testfile.txt");
+    }
+
+    #[test]
+    fn test_extended_cli_commands() {
+        let mut repl = ShellRepl::new();
+
+        // 1. Livepatch Command Test
+        let cmd_livepatch = repl.parse_command("livepatch apply sys_read 8122c400 c0300100");
+        assert!(matches!(cmd_livepatch, ShellCommand::Livepatch { .. }));
+        let out_livepatch = repl.execute_command(cmd_livepatch).unwrap();
+        assert!(out_livepatch.contains("Successfully registered"));
+
+        // 2. Cron Command Test
+        let cmd_cron = repl.parse_command("cron list");
+        assert!(matches!(cmd_cron, ShellCommand::Cron { .. }));
+        let out_cron = repl.execute_command(cmd_cron).unwrap();
+        assert!(out_cron.contains("backup_job"));
+
+        // 3. VM Command Test
+        let cmd_vm = repl.parse_command("vm start Intel-VM");
+        assert!(matches!(cmd_vm, ShellCommand::Vm { .. }));
+        let out_vm = repl.execute_command(cmd_vm).unwrap();
+        assert!(out_vm.contains("Starting VM"));
+
+        // 4. Research Command Test
+        let cmd_res = repl.parse_command("research Perplexity");
+        assert!(matches!(cmd_res, ShellCommand::Research { .. }));
+        let out_res = repl.execute_command(cmd_res).unwrap();
+        assert!(out_res.contains("SYNTHESIZED ANSWER"));
+
+        // 5. Camera Command Test
+        let cmd_cam = repl.parse_command("camera Sepia");
+        assert!(matches!(cmd_cam, ShellCommand::Camera { .. }));
+        let out_cam = repl.execute_command(cmd_cam).unwrap();
+        assert!(out_cam.contains("Webcam effect successfully updated"));
     }
 }

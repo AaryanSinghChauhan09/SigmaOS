@@ -3,6 +3,7 @@ pub mod antix;
 pub mod chakra;
 pub mod cross_platform;
 pub mod legacy_adapters;
+pub mod cross_platform_kernel;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -25,4 +26,10 @@ pub use antix::{
     AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
     LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
     GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
+};
+
+pub use cross_platform_kernel::{
+    PageAccessMode, MemoryArch, TranslationEntry, PageDirectory, DeferredProcedureCall,
+    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
+    UmsThreadState, UmsContext, SovereignKernelInternals,
 };
