@@ -138,7 +138,7 @@ impl BootChain for SimpleBootChain {
     }
 
     fn verify_chain(&self, public_key: &[u8]) -> Result<bool, BootError> {
-        for stage_option in &*self.stages {
+        for stage_option in &self.stages {
             if let Some(ref stage) = *stage_option {
                 if !stage.verify(public_key)? {
                     return Ok(false);
@@ -149,7 +149,7 @@ impl BootChain for SimpleBootChain {
     }
 
     fn get_stage(&self, id: BootStageID) -> Option<&dyn BootStage> {
-        for stage_option in &*self.stages {
+        for stage_option in &self.stages {
             if let Some(ref stage) = *stage_option {
                 if stage.id() == id {
                     return Some(stage.as_ref());
