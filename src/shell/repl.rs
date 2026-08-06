@@ -3,14 +3,6 @@
 
 use std::io::{self, BufRead, Write}; // Userspace I/O is acceptable
 
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine;
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine
-    }
-}
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -18,6 +10,44 @@ pub enum ShellCommand {
     ListProcesses,
     ListFiles,
     Exit,
+    Pwd,
+    WhoAmI,
+    Uname,
+    Clear,
+    Touch {
+        filename: String,
+    },
+    Mkdir {
+        dirname: String,
+    },
+    Rm {
+        filename: String,
+    },
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
+    Theme {
+        theme_name: String,
+    },
+    Profile {
+        profile_name: String,
+    },
+    A11y {
+        feature: String,
+        state: String,
+    },
     Echo {
         message: String,
     },
@@ -121,6 +151,13 @@ pub struct ShellRepl {
     aliases: std::collections::HashMap<String, String>,
     prompt: String,
     agent_engine: AgentAutomationEngine,
+    pub current_dir: String,
+    pub current_user: String,
+    pub services: std::collections::HashMap<String, String>,
+    pub installed_packages: std::collections::HashSet<String>,
+    pub current_theme: String,
+    pub current_profile: String,
+    pub a11y_features: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
@@ -136,6 +173,13 @@ impl ShellRepl {
             aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
+            current_dir: "/home/user".to_string(),
+            current_user: "user".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: std::collections::HashMap::new(),
         }
     }
 
@@ -151,6 +195,13 @@ impl ShellRepl {
             aliases: std::collections::HashMap::new(),
             prompt,
             agent_engine: AgentAutomationEngine::new(),
+            current_dir: "/home/user".to_string(),
+            current_user: "user".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: std::collections::HashMap::new(),
         }
     }
 
