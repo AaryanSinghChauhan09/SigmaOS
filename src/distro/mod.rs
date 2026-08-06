@@ -1,25 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod certification;
-pub mod improvements;
-pub mod linux_ideas;
 pub mod community;
 pub mod compat_layers;
 pub mod developer;
@@ -27,21 +7,15 @@ pub mod enterprise;
 pub mod i18n;
 pub mod manjaro;
 pub mod nextgen;
-pub mod parity;
 pub mod recovery;
 pub mod specialized;
-pub mod gentoo;
 pub mod tiny_core;
 pub mod transformation_engine;
 
-pub use gentoo::{
-    BuildError, BuildSpec, CpuOptimizationDetector, FeatureSet, SigmaBuildGraph, UseFlag,
-};
-pub use parity::{
-    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
-    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
-    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
-    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
+pub use manjaro::{
+    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
+    ManjaroKernelRelease, ManjaroKernelSwitcher,
+    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
