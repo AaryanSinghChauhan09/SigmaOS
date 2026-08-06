@@ -1,6 +1,7 @@
 // SigmaOS AI-Native Subsystem Module
 
 pub mod agent;
+pub mod autonomous_agents;
 pub mod orchestrator;
 pub mod sai;
 pub mod openclaw;
@@ -12,6 +13,12 @@ pub mod wiki;
 pub use agent::{
     AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, Intent, IntentType,
     ManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
+};
+pub use autonomous_agents::{
+    AgentBase, AgentError as AutonomousAgentError, AgentStatus, AgentType, BridgeAgent,
+    CapabilityToken, GovernanceAgent, Intent as AutonomousIntent, InterfaceAgent,
+    MaintenanceAgent, ObservationAgent, SovereignEvent, SovereignEventBus, SovereignMonitor,
+    WatchdogShard,
 };
 pub use orchestrator::{
     AIAgent as OrchestratorAIAgent, AgentCommunication, AgentError, AgentID, AgentOrchestrator,

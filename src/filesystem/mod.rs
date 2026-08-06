@@ -1,5 +1,6 @@
 // SigmaOS Filesystem Module
 pub mod archive;
+pub mod btrfs_inspired;
 pub mod complete_filesystems;
 pub mod cow_snapshot;
 pub mod disk_usage;
@@ -7,6 +8,7 @@ pub mod manager;
 pub mod support;
 pub mod tmpfs;
 pub mod vfs;
+pub mod zfs_inspired;
 
 pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{
@@ -30,3 +32,12 @@ pub use support::{
     Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem, SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use zfs_inspired::{
+    AdaptiveReplacementCache, CompressionAlgorithm, DatasetConfig, DatasetManager, DeduplicationTable,
+    RaidLevel, Snapshot, SnapshotManager, StorageStats, WriteSync, ZfsInspiredFilesystem, Zpool, ZpoolManager,
+    ChecksumAlgorithm,
+};
+pub use btrfs_inspired::{
+    BtrfsCompression, BtrfsDevice, BtrfsManager, BtrfsRaidProfile, BtrfsStats, Chunk, QuotaManager,
+    SendReceiveManager, Subvolume, SubvolumeManager,
+};

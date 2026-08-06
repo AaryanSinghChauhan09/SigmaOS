@@ -1,5 +1,6 @@
 // SigmaOS Security Subsystem
 pub mod capability;
+pub mod capsicum;
 pub mod kali_stack;
 pub mod nemoclaw;
 pub mod hardening;
@@ -9,6 +10,10 @@ pub mod deobfuscation;
 pub mod defensive_audit;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use capsicum::{
+    CapDescriptor, CapFileDescriptor, CapManager, CapMode, CapNamespace, CapNamespaceManager,
+    CapResourceType, CapRights, CapSandbox, CapStats, CapValidator,
+};
 pub use hardening::{
     secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
 };

@@ -3,6 +3,7 @@
 
 pub mod accessibility;
 pub mod automation;
+pub mod compliance;
 pub mod compatibility;
 pub mod container;
 pub mod customization;
@@ -60,6 +61,12 @@ pub mod crypto {
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
+};
+pub use compliance::{
+    ComplianceAlert, ComplianceOverviewDashboard, ComplianceStatus, Deadline,
+    BoardMeetingModule, ComplianceReport, RegulatoryComplianceError, GovernanceStatus,
+    TaxationStatus, LabourStatus, EnvironmentalStatus, BankingStatus,
+    TDSComplianceModule, EPFContributionModule, AlertSeverity,
 };
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
