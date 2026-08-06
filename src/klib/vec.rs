@@ -6,22 +6,6 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
-impl<T: PartialEq> Vec<T> {
-    pub fn contains(&self, item: &T) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_list().entries(self.iter()).finish()
-    }
-}
 
 impl<T> Default for Vec<T> {
     fn default() -> Self {
@@ -30,16 +14,6 @@ impl<T> Default for Vec<T> {
 }
 
 impl<T> Vec<T> {
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
@@ -202,36 +176,6 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
 
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
