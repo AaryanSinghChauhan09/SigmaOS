@@ -176,3 +176,59 @@ mod tests {
         assert_eq!(itoa(0), "0");
     }
 }
+
+/// Simple String struct to replace std::string::String
+/// Note: This is a basic implementation - for production use, consider using alloc::string::String
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct String {
+    // Using alloc::vec::Vec for now - in Phase 2 we'll use klib::Vec
+    inner: alloc::string::String,
+}
+
+impl String {
+    pub fn new() -> Self {
+        String {
+            inner: alloc::string::String::new(),
+        }
+    }
+
+    pub fn from_str(s: &str) -> Self {
+        String {
+            inner: alloc::string::String::from(s),
+        }
+    }
+
+    pub fn as_str(&self) -> &str {
+        self.inner.as_str()
+    }
+}
+
+impl Default for String {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// ToString trait to replace std::string::ToString
+pub trait ToString {
+    fn to_string(&self) -> String;
+}
+
+// Implement ToString for common types
+impl ToString for str {
+    fn to_string(&self) -> String {
+        String::from_str(self)
+    }
+}
+
+impl ToString for i32 {
+    fn to_string(&self) -> String {
+        String::from_str(&itoa(*self))
+    }
+}
+
+impl ToString for u32 {
+    fn to_string(&self) -> String {
+        String::from_str(&itoa(*self as i32))
+    }
+}
