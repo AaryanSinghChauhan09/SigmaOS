@@ -4,13 +4,12 @@
 /// Implements package management using OOP principles with traits and structs
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
-
 extern crate alloc;
 use alloc::boxed::Box;
 
+use core::mem;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Package version
 #[repr(C)]
@@ -153,7 +152,11 @@ impl SimplePackage {
     pub fn set_description(&mut self, description: &[u8]) {
         let len = description.len().min(255);
         unsafe {
-            core::ptr::copy_nonoverlapping(description.as_ptr(), self.description.as_mut_ptr(), len);
+            core::ptr::copy_nonoverlapping(
+                description.as_ptr(),
+                self.description.as_mut_ptr(),
+                len,
+            );
         }
     }
 
@@ -180,7 +183,11 @@ impl SimplePackage {
 
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(version_constraint.as_ptr(), constraint_array.as_mut_ptr(), constraint_len);
+            core::ptr::copy_nonoverlapping(
+                version_constraint.as_ptr(),
+                constraint_array.as_mut_ptr(),
+                constraint_len,
+            );
         }
 
         self.dependencies.push(PackageDependency {
@@ -250,7 +257,10 @@ pub trait PackageManager {
     /// Update package
     fn update(&mut self, name: &[u8]) -> Result<(), PackageError>;
     /// Resolve dependencies
-    fn resolve_dependencies(&self, package: &dyn Package) -> Result<Vec<PackageDependency>, PackageError>;
+    fn resolve_dependencies(
+        &self,
+        package: &dyn Package,
+    ) -> Result<Vec<PackageDependency>, PackageError>;
     /// Get manager statistics
     fn stats(&self) -> PackageStats;
 }
@@ -455,7 +465,10 @@ impl PackageManager for SimplePackageManager {
         self.install(name)
     }
 
-    fn resolve_dependencies(&self, package: &dyn Package) -> Result<Vec<PackageDependency>, PackageError> {
+    fn resolve_dependencies(
+        &self,
+        package: &dyn Package,
+    ) -> Result<Vec<PackageDependency>, PackageError> {
         let mut resolved = Vec::new();
         let dependencies = package.dependencies();
 
@@ -466,7 +479,7 @@ impl PackageManager for SimplePackageManager {
                     let p_ref: &dyn Package = pkg.as_ref();
                     let dep_name = dep.name;
                     let pkg_name = p_ref.name();
-                    
+
                     let dep_len = dep_name.iter().position(|&b| b == 0).unwrap_or(64);
                     let pkg_len = pkg_name.iter().position(|&b| b == 0).unwrap_or(64);
 
@@ -526,7 +539,11 @@ impl<T> Vec<T> {
     }
 
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
         if !new_data.is_null() {

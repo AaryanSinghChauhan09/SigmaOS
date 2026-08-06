@@ -26,6 +26,9 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod performance;
+pub mod interrupt;
+pub mod runtime;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -43,12 +46,11 @@ pub use automation::{
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
-    JehanneError, JehanneNamespace, MintBackupTool, MintSoftwareManager, MintUpdateItem,
-    MintUpdateLevel, MintUpdateManager, MockUPIService, MultilingualSupport, NamespaceBindEntry,
-    NtHandle, NtObjectManager, NtObjectType, NtStatus, Plan9pMessage, Plan9pMsgType,
-    PortableExecutableLoader, RegistryHive, SoftwareMeta, TargetPlatform, TranslationLayer,
-    WindowCoordinates, ZenithDisplayCompositor,
-    InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats,
+    InterimLispVM, JehanneError, JehanneNamespace, LispVal, MintBackupTool, MintSoftwareManager,
+    MintUpdateItem, MintUpdateLevel, MintUpdateManager, MntReformLpcDriver, MockUPIService,
+    MultilingualSupport, NamespaceBindEntry, NtHandle, NtObjectManager, NtObjectType, NtStatus,
+    Plan9pMessage, Plan9pMsgType, PortableExecutableLoader, ReformPowerStats, RegistryHive,
+    SoftwareMeta, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -56,16 +58,16 @@ pub use customization::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
+pub use driver::{
+    Apc, DeviceObject, Dpc, DriverObject, IoStatus, IoStatusBlock, Irp, IrpManager, Minifilter,
+    IRP_MJ_CLOSE, IRP_MJ_CREATE, IRP_MJ_DEVICE_CONTROL, IRP_MJ_READ, IRP_MJ_WRITE, METHOD_BUFFERED,
+    METHOD_IN_DIRECT, METHOD_NEITHER, METHOD_OUT_DIRECT,
+};
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
-};
-pub use driver::{
-    Irp, IrpManager, DriverObject, DeviceObject, IoStatus, IoStatusBlock, Apc, Dpc, Minifilter,
-    IRP_MJ_CREATE, IRP_MJ_CLOSE, IRP_MJ_READ, IRP_MJ_WRITE, IRP_MJ_DEVICE_CONTROL,
-    METHOD_BUFFERED, METHOD_IN_DIRECT, METHOD_OUT_DIRECT, METHOD_NEITHER,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -75,9 +77,12 @@ pub use kernel::{
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
 pub use klib::{
-    paging::{PageTableEntry, SimplePageTableEntry, PageTable, SimplePageTable, VirtualMemoryManager, SimpleVMM, ProcessMemory, SimpleProcessMemory},
-    buddy_allocator::{BlockID, Block, SimpleBuddyAllocator},
-    uvm::{UvmPmap, UvmAmap, UvmPageLoan, UvmError},
+    buddy_allocator::{Block, BlockID, SimpleBuddyAllocator},
+    paging::{
+        PageTable, PageTableEntry, ProcessMemory, SimplePageTable, SimplePageTableEntry,
+        SimpleProcessMemory, SimpleVMM, VirtualMemoryManager,
+    },
+    uvm::{UvmAmap, UvmError, UvmPageLoan, UvmPmap},
 };
 pub use network::{
     EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,

@@ -2,9 +2,9 @@
 pub mod controller;
 pub mod handler;
 
+pub use controller::{InterruptController, InterruptPriority};
 pub use handler::{
-    ControllerCapability, HandlerCapability, HandlerType, InterruptController, InterruptDescriptor,
-    InterruptError, InterruptHandler, InterruptHandlerInfo, InterruptManager, InterruptResult,
-    InterruptStats, InterruptTrace, Priority as InterruptPriority, SimpleInterruptHandler,
-    TraceEventType, PIC,
+    ControllerCapability, HandlerCapability, HandlerType, InterruptDescriptor, InterruptError,
+    InterruptHandler, InterruptManager, InterruptResult, InterruptStats, InterruptTrace,
+    SimpleInterruptHandler, TraceEventType, PIC,
 };

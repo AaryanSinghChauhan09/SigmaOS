@@ -64,3 +64,6 @@ pub use terminal::{
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
+pub use media::{
+    AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE,
+};

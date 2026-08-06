@@ -27,10 +27,9 @@ pub mod roundrobin;
 pub mod scheduler;
 
 pub use breakthroughs::{
-    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
-    UniversalAbiTranslator, UserDefinedKernelFunctions,
-    DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
-    KernelPersonalityMode,
+    AiNativeRuntime, DeterministicReplayEngine, DynamicKernelPersonalitySwitcher,
+    EnergyAwareScheduler, InterruptRatePredictor, KernelPersonalityMode, PrivacyFirstSandbox,
+    SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};

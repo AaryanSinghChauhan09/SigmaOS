@@ -4,6 +4,14 @@
 use crate::security::CapabilityToken;
 use std::collections::HashMap;
 
+pub const O_RDONLY: u32 = 0x0000;
+pub const O_WRONLY: u32 = 0x0001;
+pub const O_RDWR:   u32 = 0x0002;
+pub const O_CREAT:  u32 = 0x0040;
+pub const O_EXCL:   u32 = 0x0080;
+pub const O_TRUNC:  u32 = 0x0200;
+pub const O_APPEND: u32 = 0x0400;
+
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FileType {

@@ -42,6 +42,10 @@ impl KernelPersonaVM {
     pub fn hot_swap_persona(&self, persona: KernelPersona) {
         self.current_persona.set(persona);
     }
+
+    pub fn get_persona(&self) -> KernelPersona {
+        self.current_persona.get()
+    }
 }
 
 /// Libc version identifiers
@@ -56,6 +60,7 @@ pub enum LibcVersion {
 pub enum SyscallAbi {
     Oabi_32,
     Eabi_32,
+    Eabi_64,
 }
 
 /// Matrix that maps old libc calls to modern equivalents
@@ -151,6 +156,10 @@ impl WorkloadOptimizer {
 
     pub fn apply_workload_tuning(&self, profile: WorkloadProfile) {
         self.active_profile.set(profile);
+    }
+
+    pub fn get_profile(&self) -> WorkloadProfile {
+        self.active_profile.get()
     }
 }
 

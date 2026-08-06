@@ -3,7 +3,6 @@
 
 use std::io::{self, BufRead, Write};
 
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {

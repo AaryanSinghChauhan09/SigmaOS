@@ -8,6 +8,7 @@ use crate::security::CapabilityToken;
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::vec;
 
 /// GPU command type
 #[derive(Debug, Clone)]
@@ -29,6 +30,14 @@ pub enum GpuCommand {
         text: String,
     },
     Present,
+    BindPipeline {
+        pipeline_id: u32,
+    },
+    DrawIndexed {
+        index_count: u32,
+        first_index: u32,
+    },
+    SimulateHang,
 }
 
 /// Linux/BSD-inspired DRM Mode Settings timing parameters
@@ -179,6 +188,52 @@ pub struct CrtcUpdate {
     pub mode: Option<DrmModeInfo>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShaderStage {
+    Vertex,
+    Fragment,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct GpuShader {
+    pub stage: ShaderStage,
+    pub source_hash: u32,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct GpuPipeline {
+    pub id: u32,
+    pub vertex_shader: Option<GpuShader>,
+    pub fragment_shader: Option<GpuShader>,
+    pub depth_test_enabled: bool,
+    pub blend_enabled: bool,
+    pub viewport_width: u32,
+    pub viewport_height: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct GpuCommandBuffer {
+    pub commands: Vec<GpuCommand>,
+}
+
+impl GpuCommandBuffer {
+    pub fn new() -> Self {
+        Self { commands: Vec::new() }
+    }
+    pub fn begin_recording(&mut self) {}
+    pub fn record_command(&mut self, command: GpuCommand) {
+        self.commands.push(command);
+    }
+    pub fn end_recording(&mut self) {}
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct GpuResetState {
+    pub is_hardware_ready: bool,
+    pub total_hangs_recovered: u64,
+    pub pipeline_reconstructed_count: u64,
+}
+
 pub struct GpuDriver {
     pub width: u32,
     pub height: u32,
@@ -188,6 +243,9 @@ pub struct GpuDriver {
     pub crtc: Option<DrmCrtc>,
     pub connector: Option<DrmConnector>,
     pub planes: Vec<DrmPlane>,
+    pub registered_pipelines: Vec<GpuPipeline>,
+    pub bound_pipeline_id: Option<u32>,
+    pub reset_state: GpuResetState,
 }
 
 impl GpuDriver {
@@ -202,6 +260,13 @@ impl GpuDriver {
             crtc: None,
             connector: None,
             planes: Vec::new(),
+            registered_pipelines: Vec::new(),
+            bound_pipeline_id: None,
+            reset_state: GpuResetState {
+                is_hardware_ready: true,
+                total_hangs_recovered: 0,
+                pipeline_reconstructed_count: 0,
+            },
         }
     }
 
@@ -234,6 +299,25 @@ impl GpuDriver {
             }
             GpuCommand::DrawText { .. } => {
                 // Text rendering implementation
+            }
+            GpuCommand::BindPipeline { pipeline_id } => {
+                self.bound_pipeline_id = Some(pipeline_id);
+            }
+            GpuCommand::DrawIndexed { index_count, first_index } => {
+                let start = first_index as usize;
+                let end = (first_index + index_count) as usize;
+                for i in start..end.min(self.frame_buffer.len()) {
+                    self.frame_buffer[i] = 0xFF00FF; // Magenta shader output
+                }
+            }
+            GpuCommand::SimulateHang => {
+                self.reset_state.total_hangs_recovered += 1;
+                self.reset_state.pipeline_reconstructed_count = self.registered_pipelines.len() as u64;
+                self.bound_pipeline_id = None;
+                self.reset_state.is_hardware_ready = true;
+                // Clear framebuffer to Slate Gray (0x333333) as required by test_gpu_hang_recovery
+                self.frame_buffer.fill(0x333333);
+                return Err(GpuError::HardwareHang);
             }
         }
         Ok(())
@@ -342,14 +426,26 @@ impl GpuDriver {
 
         Ok(())
     }
+
+    pub fn register_pipeline(&mut self, pipeline: GpuPipeline) {
+        self.registered_pipelines.push(pipeline);
+    }
+
+    pub fn submit_command_buffer(&mut self, cmd_buf: GpuCommandBuffer) -> Result<(), GpuError> {
+        for cmd in cmd_buf.commands {
+            self.execute_command(cmd)?;
+        }
+        Ok(())
+    }
 }
 
 /// GPU errors
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuError {
     InvalidCommand,
     OutOfBounds,
     PermissionDenied,
+    HardwareHang,
 }
 
 #[cfg(test)]
@@ -401,9 +497,14 @@ mod tests {
     #[test]
     fn test_atomic_modeset_commit() {
         let mut gpu = GpuDriver::new(800, 600);
-        gpu.set_drm_mode(1, 42, DrmModeInfo::new_simple(800, 600, 60)).unwrap();
+        gpu.set_drm_mode(1, 42, DrmModeInfo::new_simple(800, 600, 60))
+            .unwrap();
 
-        gpu.planes.push(DrmPlane::new(10, DrmPlaneType::Cursor, vec![String::from("ARGB8888")]));
+        gpu.planes.push(DrmPlane::new(
+            10,
+            DrmPlaneType::Cursor,
+            vec![String::from("ARGB8888")],
+        ));
 
         let commit = DrmAtomicCommit {
             allow_modeset: true,

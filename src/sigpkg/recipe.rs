@@ -3,8 +3,8 @@
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 
-use std::collections::HashMap;
 use crate::sigpkg::{Dependency, Version, VersionConstraint};
+use std::collections::HashMap;
 
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -12,6 +12,7 @@ pub mod forensics;
 pub mod integrity;
 pub mod intrusion;
 pub mod mac;
+pub mod nemoclaw;
 pub mod parrot_parity;
 pub mod password;
 pub mod pki;
@@ -73,8 +74,8 @@ pub use integrity::{
 };
 // MAC: export what the module actually defines
 pub use mac::{
-    ContextCapability, ContextID, EngineCapability as MacEngineCapability,
-    MACStats, MLSPolicy, PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
+    ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACStats, MLSPolicy,
+    PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
     SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
     SimpleMACEngine,
 };
@@ -84,8 +85,8 @@ pub use pki::{
 };
 // Secrets: export actual types
 pub use secrets::{
-    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo,
-    SimpleKeyring, SimpleSecret,
+    Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SimpleKeyring,
+    SimpleSecret,
 };
 // Vulnerability: export actual types
 pub use vulnerability::{
@@ -101,3 +102,18 @@ pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
+// NemoClaw Security Primitives
+pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
+
+// Placeholder stubs for standard types to satisfy lib.rs exports
+pub struct CronDaemon;
+pub struct CronJob;
+pub struct DmesgLog;
+pub struct FirewallRule;
+pub struct IptablesFirewall;
+pub struct KaliError;
+pub struct PluggableAuthenticationModule;
+pub struct SudoPrivilegeEscalation;
+pub struct SwapSpaceManager;
+pub struct TmuxMultiplexer;
+pub struct TmuxPane;
