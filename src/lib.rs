@@ -10,13 +10,13 @@ pub mod dashboard;
 pub mod device;
 pub mod driver;
 pub mod drivers;
+pub mod ecosystem;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
 pub mod legal;
 pub mod ml;
 pub mod network;
-pub mod observability;
 pub mod orchestration;
 pub mod distro;
 pub mod package;
@@ -41,6 +41,7 @@ pub mod power {
 }
 pub mod observability {
     pub mod profiler;
+    pub mod stack;
 }
 pub mod ai {
     pub mod agent;
@@ -82,11 +83,20 @@ pub use compatibility::{
     TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
     EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
     Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
     ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
     SimpleContainer, SimpleContainerRuntime,
+};
+pub use ecosystem::{
+    ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
+    EnterprisePartner, KimiCodeAssistant, CodeSnippet, NDArray, numpy_mean, numpy_std_dev,
+    CvImage, WinUiControl, WinUiState, WinUiPanel,
+    SigmaGrpcEngine, GrpcServiceStub, MachMessageHeader, MachPort, MachZone,
+    SigmaFreeTypeFont, UiRect, NavigationDirection, SpatialNavigationEngine,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -99,6 +109,29 @@ pub use drivers::{
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+    Ch340Driver, CH340_VENDOR_ID, CH340_PRODUCT_ID,
+    E1000Driver, RxDescriptor, TxDescriptor,
+    IntelHdaDriver, Bdle,
+    LegacyFloppyDisk,
+    LegacySerialPort,
+    ModernWifiDriver,
+    ModernNvmeDriver, ModernNvmeCmd, NvmeSubmissionQueue, NvmeCompletionQueue, SmartTelemetry, AhciCommandHeader, AhciPort,
+    LegacyParallelPrinter,
+    TouchJingosDriver,
+    ModernAudioIntelHda,
+    LegacyAudioAc97,
+    ModernUsbPrinterDriver,
+    NvmeDriver, NvmeStorageCmd, NvmeCqe,
+    PinController, ClockController, GenericPin, GenericClock, SocPinController, SocClockController, UnifiedSocController, PinDirection, PinPull, PinError, ClockError,
+    BluetoothHciDriver, BluetoothMode, AclPacket, ScoPacket, L2capChannel, L2capState, BluetoothError,
+    PrinterCupsDriver, PrinterProtocol, PrinterBackend, PrintJob, PrintFormat, JobStatus, PrinterError,
+    GpuAccelerationDriver, CommandBuffer, SuiteGpuCommand, PrimitiveType, CommandStatus, FlipRequest, DisplayMode, PixelFormat, SuiteGpuError,
+    AlsaSoundDriver, RingBuffer, SampleFormat, AlsaError,
+    WifiFullStackDriver, WifiState, ScanResult, SecurityType, BssInfo, WpaToken, WpaTokenType, QosMapping, WifiError,
+    MultiTouchDriver, TouchProtocol, TouchContact, GestureState, GestureType, TouchError,
+    VesaFramebufferDriver, Cursor, VesaFramebufferError,
+    UsbHidFullDriver, HidInputReport, HidOutputReport, HidFullError,
+    AncientDeviceLayer, Uart8250, IsaBus, IsaDevice, Ne2000Ethernet, MfmDiskInterface, AdLibSynth, EgaCgaAdapter, VideoMode, AncientError, HidTokenType, PrinterFormat,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -112,15 +145,18 @@ pub use kernel::{
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
     IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+    VirtualCpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU, Instruction,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
     ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
 };
-pub use observability::{
-    ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
-    SimpleObservabilityStack,
+pub use observability::stack::{
+    Metric, MetricCapability, MetricID, MetricInfo, MetricType, ObservabilityError,
+    ObservabilityStack, ObservabilityStats, SigmaDebug, SigmaMetrics, SigmaTrace, SimpleMetric,
+    SimpleObservabilityStack, SimpleSigmaDebug, SimpleSigmaMetrics, SimpleSigmaTrace, SimpleSpan,
+    Span, SpanCapability, SpanInfo, StackCapability, TraceID,
 };
 pub use distro::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -141,7 +177,6 @@ pub use distro::{
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
     MpiCommunicator,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
@@ -183,7 +218,7 @@ pub use shell::{
 };
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
-    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, AdapterError,
+    SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{
