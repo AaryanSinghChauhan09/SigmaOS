@@ -114,8 +114,22 @@ mrproper: distclean
 	@rm -f .config
 	@echo "Mrproper complete."
 
+# Build all networking and security compatibility tools from source
+compat:
+	@mkdir -p build
+	@echo "Building SigmaOS networking and security compatibility tools..."
+	@rustc --crate-type=lib tools/sigma_ssh_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_scp_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_nfs_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_samba_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_rsync_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_tcpdump_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_dns_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_secure_alloc_compat.rs --out-dir build/
+	@echo "Compatibility tools build complete."
+
 # Build complete system (Unified profile routing with no circular warnings)
-build:
+build: compat
 	@mkdir -p build
 	@echo "Building SigmaOS (Profile: $(PROFILE), Arch: $(ARCH))..."
 	@cargo build $(CARGO_FLAGS)
