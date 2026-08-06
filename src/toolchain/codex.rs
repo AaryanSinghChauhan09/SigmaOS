@@ -1,7 +1,7 @@
 // SigmaOS Ancient Build Replay Codex (BuildCodex)
 // Formulates compiler build codex logs for legacy reproducible tooling
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodexCategory {
@@ -30,14 +30,11 @@ impl BuildCodex {
     }
 
     pub fn register_build_log(&mut self, file: String, cc: String, hash: String) {
-        self.codex_map.insert(
-            file.clone(),
-            CodexEntry {
-                file_name: file,
-                compiler_used: cc,
-                binary_hash: hash,
-            },
-        );
+        self.codex_map.insert(file.clone(), CodexEntry {
+            file_name: file,
+            compiler_used: cc,
+            binary_hash: hash,
+        });
     }
 
     pub fn verify_build_integrity(&self, file: &str, expected_hash: &str) -> bool {
@@ -56,11 +53,7 @@ mod tests {
     #[test]
     fn test_build_codex_registration() {
         let mut codex = BuildCodex::new(CodexCategory::LegacyC);
-        codex.register_build_log(
-            "init.c".to_string(),
-            "gcc-2.7.2".to_string(),
-            "hash999".to_string(),
-        );
+        codex.register_build_log("init.c".to_string(), "gcc-2.7.2".to_string(), "hash999".to_string());
 
         assert!(codex.verify_build_integrity("init.c", "hash999"));
         assert!(!codex.verify_build_integrity("init.c", "badhash"));

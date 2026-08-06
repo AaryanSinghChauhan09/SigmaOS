@@ -21,22 +21,13 @@ impl DriverMapper {
         match cat {
             MapperCategory::Storage => {
                 translations.insert("ide_read_sector".to_string(), "nvme_read_block".to_string());
-                translations.insert(
-                    "ide_write_sector".to_string(),
-                    "nvme_write_block".to_string(),
-                );
+                translations.insert("ide_write_sector".to_string(), "nvme_write_block".to_string());
             }
             MapperCategory::Network => {
-                translations.insert(
-                    "slip_tx_packet".to_string(),
-                    "ethernet_tx_packet".to_string(),
-                );
+                translations.insert("slip_tx_packet".to_string(), "ethernet_tx_packet".to_string());
             }
             MapperCategory::Graphics => {
-                translations.insert(
-                    "vga_set_mode_13h".to_string(),
-                    "vesa_set_linear_modebar".to_string(),
-                );
+                translations.insert("vga_set_mode_13h".to_string(), "vesa_set_linear_modebar".to_string());
             }
         }
         DriverMapper {
