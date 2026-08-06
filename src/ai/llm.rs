@@ -515,11 +515,6 @@ impl LocalLlmEngine {
             config,
             loaded: false,
             cache_enabled: true,
-            sharding: JaxTensorSharding::new(
-                vec![1, 8],
-                vec!["data".to_string(), "model".to_string()],
-            ),
-            router: GrokMoeRouter::new(num_ex, per_tok),
         }
     }
 

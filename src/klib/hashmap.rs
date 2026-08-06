@@ -58,7 +58,7 @@ where
 
 impl<K, V> HashMap<K, V>
 where
-    K: PartialEq,
+    K: Eq + core::hash::Hash,
 {
     pub fn new() -> Self {
         let mut map = HashMap {
@@ -294,7 +294,7 @@ where
 
 impl<K, V> core::fmt::Debug for HashMap<K, V>
 where
-    K: core::fmt::Debug + PartialEq,
+    K: core::fmt::Debug + Eq + core::hash::Hash,
     V: core::fmt::Debug,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -417,7 +417,7 @@ where
 
 impl<'a, K, V> IntoIterator for &'a HashMap<K, V>
 where
-    K: PartialEq,
+    K: Eq + core::hash::Hash,
 {
     type Item = (&'a K, &'a V);
     type IntoIter = HashMapIter<'a, K, V>;

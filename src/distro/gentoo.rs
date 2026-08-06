@@ -163,15 +163,16 @@ impl SigmaBuildGraph {
         visited: &mut HashSet<String>,
         resolved: &mut Vec<BuildSpec>,
     ) -> Result<(), BuildError> {
-        if visiting.contains(node) {
+        let node_string = node.to_string();
+        if visiting.contains(&node_string) {
             return Err(BuildError::CircularDependency(node.to_string()));
         }
 
-        if visited.contains(node) {
+        if visited.contains(&node_string) {
             return Ok(());
         }
 
-        visiting.insert(node.to_string());
+        visiting.insert(node_string.clone());
 
         let spec = self
             .packages
@@ -183,8 +184,8 @@ impl SigmaBuildGraph {
             self.topo_sort(dep, visiting, visited, resolved)?;
         }
 
-        visiting.remove(node);
-        visited.insert(node.to_string());
+        visiting.remove(&node_string);
+        visited.insert(node_string);
         resolved.push(spec.clone());
 
         Ok(())
