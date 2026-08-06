@@ -188,12 +188,8 @@ impl InterruptMechanism {
         self.active_interrupts += 1;
 
         match class {
-            InterruptClass::Program => {
-                Ok(IoWaitProfile::None)
-            }
-            InterruptClass::Timer => {
-                Ok(IoWaitProfile::None)
-            }
+            InterruptClass::Program => Ok(IoWaitProfile::None),
+            InterruptClass::Timer => Ok(IoWaitProfile::None),
             InterruptClass::IO => {
                 let profile = if vector % 2 == 0 {
                     self.short_io_waits += 1;

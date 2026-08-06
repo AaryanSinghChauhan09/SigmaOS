@@ -5,6 +5,7 @@ pub mod io_scheduler;
 pub mod network_bbr;
 pub mod eevdf;
 pub mod zero_copy_ipc;
+pub mod smart_optimizer;
 
 pub use profiler::{Profiler, SimpleProfiler, Profile, SimpleProfile, ProfileType, ProfilerError, CallGraph, SimpleCallGraph};
 pub use mglru::{MultiGenLRU, PageInfo, PageState, MAX_GENERATIONS, MAX_PAGES_TRACKED};
@@ -13,3 +14,8 @@ pub use io_scheduler::{AdaptiveIOScheduler, DeviceType, IOSchedulerPolicy, IOReq
 pub use network_bbr::{BbrEngine, BbrState};
 pub use eevdf::{EevdfScheduler, EevdfTask, MAX_SCHED_TASKS};
 pub use zero_copy_ipc::{ZeroCopyQueue, IPCError, QUEUE_SIZE};
+pub use smart_optimizer::{
+    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
+    PerformanceProfileRule, RamDefragmenter, SmartPerformanceProfile, SmartResourceOptimizer,
+    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+};

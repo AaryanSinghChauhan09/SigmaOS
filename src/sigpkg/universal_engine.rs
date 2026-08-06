@@ -264,10 +264,7 @@ impl SovereignPackageManager {
     }
 
     pub fn register_udf_hook(&mut self, hook: UserDefinedPackageHook) {
-        self.hooks
-            .entry(hook.hook_type)
-            .or_default()
-            .push(hook);
+        self.hooks.entry(hook.hook_type).or_default().push(hook);
     }
 
     /// Dynamically routes package resolution to the most optimal microarchitecture binary based on CPU capability level (V4 down to V1)
@@ -394,7 +391,9 @@ impl PackageAdapterFactory {
             PackageFormat::Apt => std::boxed::Box::new(AptPackageAdapter),
             PackageFormat::Yum => std::boxed::Box::new(YumPackageAdapter),
             PackageFormat::Pacman => std::boxed::Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage => std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new())),
+            PackageFormat::Portage => {
+                std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new()))
+            }
             PackageFormat::Sovereign => std::boxed::Box::new(SovereignPackageAdapter),
             PackageFormat::Nix => std::boxed::Box::new(NixPackageAdapter),
             PackageFormat::Apk => std::boxed::Box::new(ApkPackageAdapter),
@@ -579,9 +578,21 @@ impl CachyCpuDetector {
     /// x86-64-v3: AVX, AVX2, BMI1, BMI2, F16C, FMA, LZCNT, MOVBE, OSXSAVE
     /// x86-64-v4: AVX512F, AVX512CD, AVX512ER, AVX512PF, AVX512VL, AVX512DQ, AVX512BW
     pub fn detect_level_from_features(features: &[&str]) -> CpuArchLevel {
-        let has_v2 = features.contains(&"sse3") && features.contains(&"sse4.1") && features.contains(&"sse4.2") && features.contains(&"popcnt");
-        let has_v3 = has_v2 && features.contains(&"avx") && features.contains(&"avx2") && features.contains(&"fma") && features.contains(&"bmi1") && features.contains(&"bmi2");
-        let has_v4 = has_v3 && features.contains(&"avx512f") && features.contains(&"avx512vl") && features.contains(&"avx512dq") && features.contains(&"avx512bw");
+        let has_v2 = features.contains(&"sse3")
+            && features.contains(&"sse4.1")
+            && features.contains(&"sse4.2")
+            && features.contains(&"popcnt");
+        let has_v3 = has_v2
+            && features.contains(&"avx")
+            && features.contains(&"avx2")
+            && features.contains(&"fma")
+            && features.contains(&"bmi1")
+            && features.contains(&"bmi2");
+        let has_v4 = has_v3
+            && features.contains(&"avx512f")
+            && features.contains(&"avx512vl")
+            && features.contains(&"avx512dq")
+            && features.contains(&"avx512bw");
 
         if has_v4 {
             CpuArchLevel::X86_64_v4
@@ -595,7 +606,9 @@ impl CachyCpuDetector {
     }
 
     pub fn detect_level() -> CpuArchLevel {
-        Self::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2"])
+        Self::detect_level_from_features(&[
+            "sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2",
+        ])
     }
 }
 
@@ -705,10 +718,15 @@ mod tests {
 
     #[test]
     fn test_cachyos_cpu_detector() {
-        let level = CachyCpuDetector::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2"]);
+        let level = CachyCpuDetector::detect_level_from_features(&[
+            "sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2",
+        ]);
         assert_eq!(level, CpuArchLevel::X86_64_v3);
 
-        let v4_level = CachyCpuDetector::detect_level_from_features(&["sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2", "avx512f", "avx512vl", "avx512dq", "avx512bw"]);
+        let v4_level = CachyCpuDetector::detect_level_from_features(&[
+            "sse3", "sse4.1", "sse4.2", "popcnt", "avx", "avx2", "fma", "bmi1", "bmi2", "avx512f",
+            "avx512vl", "avx512dq", "avx512bw",
+        ]);
         assert_eq!(v4_level, CpuArchLevel::X86_64_v4);
     }
 

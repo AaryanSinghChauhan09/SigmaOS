@@ -104,14 +104,22 @@ impl TmuxWindow {
             LayoutPreset::EvenHorizontal => {
                 let pane_width = total_width / n as u16;
                 for i in 0..n {
-                    let w = if i == n - 1 { total_width - (pane_width * (n - 1) as u16) } else { pane_width };
+                    let w = if i == n - 1 {
+                        total_width - (pane_width * (n - 1) as u16)
+                    } else {
+                        pane_width
+                    };
                     self.panes[i].resize(w, total_height, i as u16 * pane_width, 0);
                 }
             }
             LayoutPreset::EvenVertical => {
                 let pane_height = total_height / n as u16;
                 for i in 0..n {
-                    let h = if i == n - 1 { total_height - (pane_height * (n - 1) as u16) } else { pane_height };
+                    let h = if i == n - 1 {
+                        total_height - (pane_height * (n - 1) as u16)
+                    } else {
+                        pane_height
+                    };
                     self.panes[i].resize(total_width, h, 0, i as u16 * pane_height);
                 }
             }
@@ -126,8 +134,17 @@ impl TmuxWindow {
                     let stack_count = n - 1;
                     let stack_height = total_height / stack_count as u16;
                     for i in 1..n {
-                        let h = if i == n - 1 { total_height - (stack_height * (stack_count - 1) as u16) } else { stack_height };
-                        self.panes[i].resize(stack_width, h, main_width, (i - 1) as u16 * stack_height);
+                        let h = if i == n - 1 {
+                            total_height - (stack_height * (stack_count - 1) as u16)
+                        } else {
+                            stack_height
+                        };
+                        self.panes[i].resize(
+                            stack_width,
+                            h,
+                            main_width,
+                            (i - 1) as u16 * stack_height,
+                        );
                     }
                 }
             }
@@ -142,8 +159,17 @@ impl TmuxWindow {
                     let stack_count = n - 1;
                     let stack_width = total_width / stack_count as u16;
                     for i in 1..n {
-                        let w = if i == n - 1 { total_width - (stack_width * (stack_count - 1) as u16) } else { stack_width };
-                        self.panes[i].resize(w, stack_height, (i - 1) as u16 * stack_width, main_height);
+                        let w = if i == n - 1 {
+                            total_width - (stack_width * (stack_count - 1) as u16)
+                        } else {
+                            stack_width
+                        };
+                        self.panes[i].resize(
+                            w,
+                            stack_height,
+                            (i - 1) as u16 * stack_width,
+                            main_height,
+                        );
                     }
                 }
             }
@@ -158,8 +184,16 @@ impl TmuxWindow {
                     let r = i as u16 / cols;
                     let c = i as u16 % cols;
 
-                    let w = if c == cols - 1 || i == n - 1 { total_width - (c * cell_width) } else { cell_width };
-                    let h = if r == rows - 1 { total_height - (r * cell_height) } else { cell_height };
+                    let w = if c == cols - 1 || i == n - 1 {
+                        total_width - (c * cell_width)
+                    } else {
+                        cell_width
+                    };
+                    let h = if r == rows - 1 {
+                        total_height - (r * cell_height)
+                    } else {
+                        cell_height
+                    };
 
                     self.panes[i].resize(w, h, c * cell_width, r * cell_height);
                 }
@@ -168,8 +202,15 @@ impl TmuxWindow {
     }
 
     /// Splits an existing pane in the window
-    pub fn split_pane(&mut self, target_pane_id: usize, direction: SplitDirection) -> Result<usize, &'static str> {
-        let target_idx = self.panes.iter().position(|p| p.id == target_pane_id)
+    pub fn split_pane(
+        &mut self,
+        target_pane_id: usize,
+        direction: SplitDirection,
+    ) -> Result<usize, &'static str> {
+        let target_idx = self
+            .panes
+            .iter()
+            .position(|p| p.id == target_pane_id)
             .ok_or("Target pane not found")?;
 
         let parent_width = self.panes[target_idx].width;
@@ -186,12 +227,22 @@ impl TmuxWindow {
             SplitDirection::Horizontal => {
                 let half_width = parent_width / 2;
                 self.panes[target_idx].resize(half_width, parent_height, parent_x, parent_y);
-                new_pane.resize(parent_width - half_width, parent_height, parent_x + half_width, parent_y);
+                new_pane.resize(
+                    parent_width - half_width,
+                    parent_height,
+                    parent_x + half_width,
+                    parent_y,
+                );
             }
             SplitDirection::Vertical => {
                 let half_height = parent_height / 2;
                 self.panes[target_idx].resize(parent_width, half_height, parent_x, parent_y);
-                new_pane.resize(parent_width, parent_height - half_height, parent_x, parent_y + half_height);
+                new_pane.resize(
+                    parent_width,
+                    parent_height - half_height,
+                    parent_x,
+                    parent_y + half_height,
+                );
             }
         }
 
@@ -202,7 +253,10 @@ impl TmuxWindow {
 
     /// Toggles zoom state of active or specified pane
     pub fn toggle_zoom(&mut self, pane_id: usize) -> Result<bool, &'static str> {
-        let idx = self.panes.iter().position(|p| p.id == pane_id)
+        let idx = self
+            .panes
+            .iter()
+            .position(|p| p.id == pane_id)
             .ok_or("Pane not found")?;
 
         let current_state = self.panes[idx].is_zoomed;
@@ -245,10 +299,22 @@ impl TmuxSession {
         let mut state = format!("SESSION_NAME={}\n", self.name);
         state.push_str(&format!("ACTIVE_WINDOW_IDX={}\n", self.active_window_idx));
         for (idx, win) in self.windows.iter().enumerate() {
-            state.push_str(&format!("WINDOW_ID={};NAME={};ACTIVE_PANE={};LAYOUT={:?}\n", idx, win.name, win.active_pane_idx, win.layout));
+            state.push_str(&format!(
+                "WINDOW_ID={};NAME={};ACTIVE_PANE={};LAYOUT={:?}\n",
+                idx, win.name, win.active_pane_idx, win.layout
+            ));
             for pane in &win.panes {
                 let cmd_str = pane.current_command.as_deref().unwrap_or("None");
-                state.push_str(&format!("  PANE_ID={};TITLE={};GEOM={}x{}+{},{};COMMAND={}\n", pane.id, pane.title, pane.width, pane.height, pane.offset_x, pane.offset_y, cmd_str));
+                state.push_str(&format!(
+                    "  PANE_ID={};TITLE={};GEOM={}x{}+{},{};COMMAND={}\n",
+                    pane.id,
+                    pane.title,
+                    pane.width,
+                    pane.height,
+                    pane.offset_x,
+                    pane.offset_y,
+                    cmd_str
+                ));
             }
         }
         state
@@ -270,7 +336,9 @@ impl TmuxSession {
             if trimmed.starts_with("SESSION_NAME=") {
                 self.name = trimmed["SESSION_NAME=".len()..].to_string();
             } else if trimmed.starts_with("ACTIVE_WINDOW_IDX=") {
-                self.active_window_idx = trimmed["ACTIVE_WINDOW_IDX=".len()..].parse::<usize>().unwrap_or(0);
+                self.active_window_idx = trimmed["ACTIVE_WINDOW_IDX=".len()..]
+                    .parse::<usize>()
+                    .unwrap_or(0);
             } else if trimmed.starts_with("WINDOW_ID=") {
                 if let Some(win) = current_window.take() {
                     self.windows.push(win);
@@ -284,9 +352,17 @@ impl TmuxSession {
                     }
                 }
 
-                let id = parts.get("WINDOW_ID").unwrap_or(&"0").parse::<usize>().unwrap_or(0);
+                let id = parts
+                    .get("WINDOW_ID")
+                    .unwrap_or(&"0")
+                    .parse::<usize>()
+                    .unwrap_or(0);
                 let name = parts.get("NAME").unwrap_or(&"default").to_string();
-                let active_pane = parts.get("ACTIVE_PANE").unwrap_or(&"0").parse::<usize>().unwrap_or(0);
+                let active_pane = parts
+                    .get("ACTIVE_PANE")
+                    .unwrap_or(&"0")
+                    .parse::<usize>()
+                    .unwrap_or(0);
                 let layout_str = parts.get("LAYOUT").unwrap_or(&"Tiled");
                 let layout = match *layout_str {
                     "EvenHorizontal" => LayoutPreset::EvenHorizontal,
@@ -311,7 +387,11 @@ impl TmuxSession {
                         }
                     }
 
-                    let id = parts.get("PANE_ID").unwrap_or(&"0").parse::<usize>().unwrap_or(0);
+                    let id = parts
+                        .get("PANE_ID")
+                        .unwrap_or(&"0")
+                        .parse::<usize>()
+                        .unwrap_or(0);
                     let title = parts.get("TITLE").unwrap_or(&"pane").to_string();
                     let command_str = parts.get("COMMAND").unwrap_or(&"None").to_string();
 
@@ -341,23 +421,47 @@ impl TmuxSession {
     }
 
     /// Copy selected history range of a pane to a named register
-    pub fn copy_pane_history_to_register(&mut self, window_id: usize, pane_id: usize, range: Range<usize>, register_name: &str) -> Result<(), &'static str> {
+    pub fn copy_pane_history_to_register(
+        &mut self,
+        window_id: usize,
+        pane_id: usize,
+        range: Range<usize>,
+        register_name: &str,
+    ) -> Result<(), &'static str> {
         let win = self.windows.get_mut(window_id).ok_or("Window not found")?;
-        let pane = win.panes.iter().find(|p| p.id == pane_id).ok_or("Pane not found")?;
+        let pane = win
+            .panes
+            .iter()
+            .find(|p| p.id == pane_id)
+            .ok_or("Pane not found")?;
 
         let start = range.start.min(pane.history_buffer.len());
         let end = range.end.min(pane.history_buffer.len());
         let selected_text = pane.history_buffer[start..end].join("\n");
 
-        self.copy_registers.insert(register_name.to_string(), selected_text);
+        self.copy_registers
+            .insert(register_name.to_string(), selected_text);
         Ok(())
     }
 
     /// Paste from a named register into a pane
-    pub fn paste_register_to_pane(&mut self, window_id: usize, pane_id: usize, register_name: &str) -> Result<(), &'static str> {
-        let content = self.copy_registers.get(register_name).cloned().ok_or("Register is empty")?;
+    pub fn paste_register_to_pane(
+        &mut self,
+        window_id: usize,
+        pane_id: usize,
+        register_name: &str,
+    ) -> Result<(), &'static str> {
+        let content = self
+            .copy_registers
+            .get(register_name)
+            .cloned()
+            .ok_or("Register is empty")?;
         let win = self.windows.get_mut(window_id).ok_or("Window not found")?;
-        let pane = win.panes.iter_mut().find(|p| p.id == pane_id).ok_or("Pane not found")?;
+        let pane = win
+            .panes
+            .iter_mut()
+            .find(|p| p.id == pane_id)
+            .ok_or("Pane not found")?;
 
         pane.execute_command(&content);
         Ok(())
@@ -413,7 +517,10 @@ impl TmuxSessionManager {
         let memory_indicator = "MEM: 12% |";
         let time_indicator = "SigmaTime: UTC 12:00";
 
-        format!("{} | {} {} {}", active_info, cpu_indicator, memory_indicator, time_indicator)
+        format!(
+            "{} | {} {} {}",
+            active_info, cpu_indicator, memory_indicator, time_indicator
+        )
     }
 }
 
@@ -484,8 +591,14 @@ mod tests {
         window.split_pane(0, SplitDirection::Horizontal).unwrap();
 
         window.broadcast_command("echo 'Hello SigmaOS'");
-        assert_eq!(window.panes[0].current_command.as_deref(), Some("echo 'Hello SigmaOS'"));
-        assert_eq!(window.panes[1].current_command.as_deref(), Some("echo 'Hello SigmaOS'"));
+        assert_eq!(
+            window.panes[0].current_command.as_deref(),
+            Some("echo 'Hello SigmaOS'")
+        );
+        assert_eq!(
+            window.panes[1].current_command.as_deref(),
+            Some("echo 'Hello SigmaOS'")
+        );
     }
 
     #[test]
@@ -501,11 +614,15 @@ mod tests {
         }
 
         // Copy history to buffer "a"
-        session.copy_pane_history_to_register(active_win_idx, 0, 0..2, "a").unwrap();
+        session
+            .copy_pane_history_to_register(active_win_idx, 0, 0..2, "a")
+            .unwrap();
         assert!(session.copy_registers.contains_key("a"));
 
         // Paste register to pane 1
-        session.paste_register_to_pane(active_win_idx, 1, "a").unwrap();
+        session
+            .paste_register_to_pane(active_win_idx, 1, "a")
+            .unwrap();
 
         let window = &session.windows[active_win_idx];
         assert!(window.panes[1].current_command.is_some());
@@ -560,6 +677,11 @@ mod tests {
         restored_session.resurrect_state(&serialized).unwrap();
 
         assert_eq!(restored_session.name, "first");
-        assert_eq!(restored_session.windows[0].panes[0].current_command.as_deref(), Some("htop"));
+        assert_eq!(
+            restored_session.windows[0].panes[0]
+                .current_command
+                .as_deref(),
+            Some("htop")
+        );
     }
 }

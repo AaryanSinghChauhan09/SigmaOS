@@ -1,12 +1,12 @@
 // Sovereign APM (Agent Package Manager)
 // Core native package manager for isolated, reproducible sovereign application deployments.
 
-use std::collections::HashMap;
 use crate::security::CapabilityToken;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum IsolationLevel {
-    FullSandbox,    // Complete isolation (no IPC/network unless granted)
+    FullSandbox,     // Complete isolation (no IPC/network unless granted)
     SharedNamespace, // Shared namespace (restricted access)
     BareMetalDirect, // Real-time bare metal direct thread (highly restricted, verified signature required)
 }
@@ -88,7 +88,11 @@ impl SovereignApm {
 
     /// Deploys and installs the sovereign application, enforcing sandboxing boundaries
     pub fn install_app(&mut self, app_name: &str, signature: &[u8]) -> Result<(), String> {
-        let mut app = self.registry.get(app_name).cloned().ok_or("Application not registered in APM registry")?;
+        let mut app = self
+            .registry
+            .get(app_name)
+            .cloned()
+            .ok_or("Application not registered in APM registry")?;
 
         // 1. Check signature verification
         if !self.cryptographically_verify(app_name, signature) {
@@ -98,7 +102,10 @@ impl SovereignApm {
 
         // 2. Enforce Sovereign constraints (No application can request BareMetalDirect unless verified and limited to < 512MB RAM)
         if app.isolation == IsolationLevel::BareMetalDirect && app.memory_limit_mb > 512 {
-            return Err("Resource violation: BareMetalDirect isolation level must restrict RAM below 512MB".to_string());
+            return Err(
+                "Resource violation: BareMetalDirect isolation level must restrict RAM below 512MB"
+                    .to_string(),
+            );
         }
 
         self.installed.insert(app_name.to_string(), app);
@@ -106,20 +113,34 @@ impl SovereignApm {
     }
 
     /// Launch application in isolated container
-    pub fn launch_app(&mut self, app_name: &str, granted_permissions: &CapabilityToken) -> Result<IsolationLevel, String> {
-        let app = self.installed.get(app_name).ok_or("Application not installed")?;
+    pub fn launch_app(
+        &mut self,
+        app_name: &str,
+        granted_permissions: &CapabilityToken,
+    ) -> Result<IsolationLevel, String> {
+        let app = self
+            .installed
+            .get(app_name)
+            .ok_or("Application not installed")?;
 
         // Check if sandbox permissions are satisfied by the security capability token
         for perm in &app.required_permissions {
             if perm == "Network" && (granted_permissions.bits() & 1 == 0) {
-                return Err(format!("Security Violation: App '{}' requires Network permission", app_name));
+                return Err(format!(
+                    "Security Violation: App '{}' requires Network permission",
+                    app_name
+                ));
             }
             if perm == "HardwareAccess" && (granted_permissions.bits() & 2 == 0) {
-                return Err(format!("Security Violation: App '{}' requires HardwareAccess permission", app_name));
+                return Err(format!(
+                    "Security Violation: App '{}' requires HardwareAccess permission",
+                    app_name
+                ));
             }
         }
 
-        self.active_containers.insert(app_name.to_string(), app.isolation);
+        self.active_containers
+            .insert(app_name.to_string(), app.isolation);
         Ok(app.isolation)
     }
 

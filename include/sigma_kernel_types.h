@@ -18,4 +18,9 @@ typedef int                sigma_bool;
 #define SIGMA_TRUE         1
 #define SIGMA_FALSE        0
 
+#define SIGMA_NULL         0
+#define SIGMA_TRUE         true
+#define SIGMA_FALSE        false
+typedef unsigned long long sigma_uptr;
+
 #endif // SIGMA_KERNEL_TYPES_H

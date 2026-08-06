@@ -42,10 +42,14 @@ pub enum CpuPrivilegeMode {
 /// Interrupt Priority Level (FIQ is highest priority)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InterruptPriority {
-    StandardIrq = 0,
-    SupervisorTrap = 1,
-    MonitorTrap = 2,
-    FastInterruptFiq = 3, // ARM Fast Interrupt
+    Low = 0,
+    Normal = 1,
+    High = 2,
+    Critical = 3,
+    StandardIrq = 4,
+    SupervisorTrap = 5,
+    MonitorTrap = 6,
+    FastInterruptFiq = 7, // ARM Fast Interrupt
 }
 
 #[repr(C)]

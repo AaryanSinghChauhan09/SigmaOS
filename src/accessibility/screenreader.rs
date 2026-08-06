@@ -1,18 +1,25 @@
+use crate::klib::Vec;
 /// OOP-based Screen Reader for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 816
 /// Implements text-to-speech and accessibility
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 pub type VoiceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VoiceGender { Male = 0, Female = 1, Neutral = 2 }
+pub enum VoiceGender {
+    Male = 0,
+    Female = 1,
+    Neutral = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AccessibilityError { Success = 0, NotFound = 1 }
+pub enum AccessibilityError {
+    Success = 0,
+    NotFound = 1,
+}
 
 pub trait Voice {
     fn id(&self) -> VoiceID;
@@ -61,8 +68,10 @@ impl Voice for SimpleVoice {
             _ => VoiceGender::Neutral,
         }
     }
-    fn rate(&self) -> f32 { (self.rate.load(Ordering::SeqCst) as f32) / 100.0 }
-    
+    fn rate(&self) -> f32 {
+        (self.rate.load(Ordering::SeqCst) as f32) / 100.0
+    }
+
     fn set_rate(&mut self, rate: f32) {
         self.rate.store((rate * 100.0) as usize, Ordering::SeqCst);
     }
@@ -172,7 +181,10 @@ mod tests {
         assert!(reader.get_voice(42).is_some());
         assert_eq!(reader.get_voice(42).unwrap().gender(), VoiceGender::Female);
         assert_eq!(reader.speak(b"Hello", 42), Ok(()));
-        assert_eq!(reader.speak(b"Hello", 999), Err(AccessibilityError::NotFound));
+        assert_eq!(
+            reader.speak(b"Hello", 999),
+            Err(AccessibilityError::NotFound)
+        );
     }
 
     #[test]
