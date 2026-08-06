@@ -2,14 +2,28 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod aur;
+pub mod aur_helper;
+pub mod importer;
+pub mod linux_compat;
+pub mod makepkg;
+pub mod pacman;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
+pub mod universal_adapter;
+pub mod universal_engine;
+pub mod universal_oop_system;
 pub mod verifier;
+pub mod zero_alloc_resolver;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use aur::{AurClient, AurPackage as AurPkg, AurPackageQuery, Version as AurVersion};
+pub use aur_helper::{AurHelper, AurPackage, AurParser};
+pub use makepkg::{MakepkgSandbox, PkgbuildParser};
 pub use spec::{
     AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
     PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
@@ -88,25 +102,26 @@ pub enum ParseError {
 /// Package metadata
 #[derive(Debug, Clone)]
 pub struct Package {
-    pub name: String,
+    pub name: crate::klib::String,
     pub version: Version,
-    pub description: String,
+    pub description: crate::klib::String,
     pub dependencies: Vec<Dependency>,
-    pub checksum: String,
-    pub mirrors: Vec<String>,
-    pub signing_keys: Vec<String>,
-    pub licenses: Vec<String>,
-    pub maintainers: Vec<String>,
-    pub changelogs: Vec<String>,
+    pub checksum: crate::klib::String,
+    pub mirrors: Vec<crate::klib::String>,
+    pub signing_keys: Vec<crate::klib::String>,
+    pub licenses: Vec<crate::klib::String>,
+    pub maintainers: Vec<crate::klib::String>,
+    pub changelogs: Vec<crate::klib::String>,
+    pub source: crate::klib::String,
 }
 
 impl Package {
     pub fn new(
-        name: String,
+        name: crate::klib::String,
         version: Version,
-        description: String,
+        description: crate::klib::String,
         dependencies: Vec<Dependency>,
-        checksum: String,
+        checksum: crate::klib::String,
     ) -> Self {
         Self {
             name,
@@ -119,6 +134,7 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
+            source: crate::klib::String::new(),
         }
     }
 }

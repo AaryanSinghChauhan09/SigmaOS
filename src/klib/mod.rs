@@ -1,4 +1,5 @@
 // SigmaOS Kernel Library
+pub mod arc;
 pub mod btreemap;
 pub mod buddy_allocator;
 pub mod conversion;
@@ -15,6 +16,7 @@ pub mod uuid;
 pub mod vec;
 pub mod vecdeque;
 
+pub use arc::Arc;
 pub use btreemap::BTreeMap;
 pub use conversion::{
     base64_encode, base_to_dec, binary_to_bytes, bytes_to_binary, bytes_to_hex, dec_to_base,
