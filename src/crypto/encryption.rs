@@ -16,6 +16,7 @@ pub enum CipherType { AES = 0, ChaCha20 = 1, XOR = 2 }
 pub trait EncryptionKey {
     fn id(&self) -> KeyID;
     fn cipher_type(&self) -> CipherType;
+    fn key_bytes(&self) -> &[u8];
 }
 
 #[repr(C)]
@@ -39,6 +40,7 @@ impl SimpleEncryptionKey {
 impl EncryptionKey for SimpleEncryptionKey {
     fn id(&self) -> KeyID { self.id }
     fn cipher_type(&self) -> CipherType { self.cipher_type }
+    fn key_bytes(&self) -> &[u8] { &self.key_data }
 }
 
 pub trait EncryptionService {
@@ -66,8 +68,13 @@ impl EncryptionService for SimpleEncryptionService {
             if let Some(ref key) = *key_option {
                 if key.id() == key_id {
                     let mut encrypted = Vec::new();
-                    for byte in data {
-                        encrypted.push(*byte ^ 0x42);
+                    let key_bytes = key.key_bytes();
+                    let len = key_bytes.len();
+                    if len == 0 {
+                        return Err(CryptoError::EncryptionFailed);
+                    }
+                    for (i, byte) in data.iter().enumerate() {
+                        encrypted.push(*byte ^ key_bytes[i % len]);
                     }
                     return Ok(encrypted);
                 }
@@ -80,8 +87,13 @@ impl EncryptionService for SimpleEncryptionService {
             if let Some(ref key) = *key_option {
                 if key.id() == key_id {
                     let mut decrypted = Vec::new();
-                    for byte in data {
-                        decrypted.push(*byte ^ 0x42);
+                    let key_bytes = key.key_bytes();
+                    let len = key_bytes.len();
+                    if len == 0 {
+                        return Err(CryptoError::EncryptionFailed);
+                    }
+                    for (i, byte) in data.iter().enumerate() {
+                        decrypted.push(*byte ^ key_bytes[i % len]);
                     }
                     return Ok(decrypted);
                 }
@@ -117,6 +129,19 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }
