@@ -157,9 +157,7 @@ impl PMWaniHotspotController {
     }
 
     pub fn register_pdo(&mut self, pdo_id: &str, location: &str) -> bool {
-        let is_new = !self.registered_pdos.contains_key(pdo_id);
-        self.registered_pdos.insert(pdo_id.to_string(), location.to_string());
-        is_new
+        self.registered_pdos.insert(pdo_id.to_string(), location.to_string()).is_none()
     }
 
     pub fn get_trai_bandwidth_profile(&self, active_users: u32) -> &'static str {
@@ -193,9 +191,7 @@ impl DigiYatraPassScanner {
     }
 
     pub fn enroll_passenger(&mut self, passenger_id: &str, face_signature: &[u8]) -> bool {
-        let is_new = !self.passenger_faces.contains_key(passenger_id);
-        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec());
-        is_new
+        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec()).is_none()
     }
 
     pub fn verify_passenger_boarding(&self, passenger_id: &str, scan_signature: &[u8]) -> bool {

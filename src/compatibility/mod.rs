@@ -17,6 +17,9 @@ pub mod fedora;
 pub mod bsd;
 pub mod innovations;
 pub mod india_professional_tools;
+pub mod india_stack_localization;
+pub mod legacy_adapters;
+pub mod canonical;
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};
@@ -160,4 +163,3 @@ pub use bsd::{
 pub use innovations::{
     WorkloadCategory, SigmaScheduler, UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingOS,
 };
-
