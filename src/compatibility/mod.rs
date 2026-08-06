@@ -79,10 +79,6 @@ pub use jehanne::{
     ComputeNode, DistributedComputeHandoff, JehanneError, JehanneNamespace, NamespaceBindEntry,
     Plan9pMessage, Plan9pMsgType,
 };
-pub use mint_linux::{
-    MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, MintUpdateManager,
-    SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor,
-};
 pub use reactos::{
     NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
     RegistryHive,
@@ -98,32 +94,6 @@ pub use historic_linux::{
     VintageDriverTranslator, VintagePackageConverter, HistoricError,
 };
 
-pub use mint_linux::{
-    MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
-    MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
-    MintReportSystem,
-};
-
-pub use chimera_linux::{
-    DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
-    ApkPackageMetadata, ApkPackageStore,
-};
-
-pub use relay_nexus::{
-    PersonaType, KernelRelay, SyscallEntry, SyscallEncyclopediaEntry, FileEntry,
-    NetworkEntry, ProcessEntry, SyscallEncyclopedia, LegacyDriver, DriverVaultV2,
-    StorageVaultV2, NetworkVaultV2, GraphicsVaultV2, DriverVaultV2Manager, FirmwareType,
-    FirmwareNexus, BIOSNexus, UEFINexus, CorebootNexus, FirmwareNexusManager,
-    BuildChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyAsmChronicle,
-    BuildChronicleManager, SecurityModelType, SecurityNexus, DACNexus, SELinuxNexus,
-    ZeroTrustNexus, SecurityNexusManager, PeripheralArchiveV2, FloppyArchiveV2,
-    TapeArchiveV2, CRTArchiveV2, DotMatrixArchiveV2, PeripheralArchiveV2Manager,
-};
-
-pub use solid_kernel::{
-    IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
-    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
-};
 
 pub use wasm_sandbox::{
     WasmState, WasmModule, WasmSandboxEngine,
@@ -157,4 +127,10 @@ pub use advanced_ecosystem::{
     NDArray, ImageMat, DependencyProperty, VisualState, SovereignControl,
     GrpcFrame, SovereignGrpcChannel, MachMessage, MachPort, SovereignXnuKernel,
     Glyph, SovereignFreeTypeEngine, NavDirection, NavElement, SovereignSpatialNavigation,
+};
+
+pub mod debian;
+pub use debian::{
+    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
+    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
 };
