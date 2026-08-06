@@ -19,15 +19,13 @@
 // SigmaOS Startup Optimizer
 // OOP-based startup process optimization with dependency analysis
 
-use crate::klib::HashMap;
-use std::path::PathBuf;
-use std::time::{Duration, Instant};
+use crate::klib::{HashMap, Duration, Instant};
 
 /// Startup service
 #[derive(Debug, Clone)]
 pub struct StartupService {
     pub name: String,
-    pub path: PathBuf,
+    pub path: String,
     pub enabled: bool,
     pub delay_seconds: u64,
     pub dependencies: Vec<String>,
@@ -357,7 +355,7 @@ impl StartupOptimizer {
         let default_services = vec![
             StartupService {
                 name: "network".to_string(),
-                path: PathBuf::from("/usr/bin/networkd"),
+                path: "/usr/bin/networkd".to_string(),
                 enabled: true,
                 delay_seconds: 0,
                 dependencies: Vec::new(),
@@ -366,7 +364,7 @@ impl StartupOptimizer {
             },
             StartupService {
                 name: "bluetooth".to_string(),
-                path: PathBuf::from("/usr/bin/bluetoothd"),
+                path: "/usr/bin/bluetoothd".to_string(),
                 enabled: true,
                 delay_seconds: 0,
                 dependencies: vec!["network".to_string()],
@@ -375,7 +373,7 @@ impl StartupOptimizer {
             },
             StartupService {
                 name: "printing".to_string(),
-                path: PathBuf::from("/usr/bin/cupsd"),
+                path: "/usr/bin/cupsd".to_string(),
                 enabled: true,
                 delay_seconds: 0,
                 dependencies: vec!["network".to_string()],
@@ -384,7 +382,7 @@ impl StartupOptimizer {
             },
             StartupService {
                 name: "update-checker".to_string(),
-                path: PathBuf::from("/usr/bin/update-daemon"),
+                path: "/usr/bin/update-daemon".to_string(),
                 enabled: true,
                 delay_seconds: 0,
                 dependencies: Vec::new(),
@@ -413,7 +411,7 @@ mod tests {
     fn test_startup_service() {
         let service = StartupService {
             name: "test".to_string(),
-            path: PathBuf::from("/test"),
+            path: "/test".to_string(),
             enabled: true,
             delay_seconds: 0,
             dependencies: Vec::new(),

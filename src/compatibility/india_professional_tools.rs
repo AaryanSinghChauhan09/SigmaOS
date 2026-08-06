@@ -2,13 +2,13 @@
 // Localized, high-performance, OOP-compliant tools for Indian Professionals.
 // Refers to India-Apps-Overview.md and India-first architecture.
 
-use std::collections::HashMap;
+use crate::klib::{HashMap, SigmaString};
 
 /// 1. Legal & Judicial Professionals (`sigma-judicial`)
 /// Manages Bharatiya Nyaya Sanhita (BNS), Bharatiya Nagarik Suraksha Sanhita (BNSS),
 /// and Bharatiya Sakshya Adhiniyam (BSA) case schedules and bail readiness.
 pub struct JudicialTimelinePlanner {
-    pub active_cases: HashMap<String, u64>,
+    pub active_cases: HashMap<SigmaString, u64>,
 }
 
 impl JudicialTimelinePlanner {
@@ -57,7 +57,7 @@ impl Default for JudicialTimelinePlanner {
 /// 2. Business & Trade Professionals (`sigma-msme`)
 /// Verifies Udyam Registration parameters and computes delayed payment interest under the MSMED Act.
 pub struct MsmeComplianceEngine {
-    pub registered_udyam_ids: HashMap<String, String>,
+    pub registered_udyam_ids: HashMap<SigmaString, SigmaString>,
 }
 
 impl MsmeComplianceEngine {
@@ -105,20 +105,20 @@ impl Default for MsmeComplianceEngine {
 /// 3. Medical & AYUSH Practitioners (`sigma-ayush`)
 /// Digital integration for AYUSH practitioner registry and Ayurvedic Formulary lookups.
 pub struct AyushFormularyHelper {
-    pub verified_practitioners: HashMap<String, String>,
-    pub formulary_registry: HashMap<String, Vec<String>>,
+    pub verified_practitioners: HashMap<SigmaString, SigmaString>,
+    pub formulary_registry: HashMap<SigmaString, Vec<SigmaString>>,
 }
 
 impl AyushFormularyHelper {
     pub fn new() -> Self {
         let mut formulary = HashMap::new();
         formulary.insert(
-            "Chyawanprash".to_string(),
-            vec!["Amla".to_string(), "Ashwagandha".to_string(), "Guduchi".to_string()],
+            SigmaString::from_str("Chyawanprash"),
+            vec![SigmaString::from_str("Amla"), SigmaString::from_str("Ashwagandha"), SigmaString::from_str("Guduchi")],
         );
         formulary.insert(
-            "Triphala".to_string(),
-            vec!["Amalaki".to_string(), "Bibhitaki".to_string(), "Haritaki".to_string()],
+            SigmaString::from_str("Triphala"),
+            vec![SigmaString::from_str("Amalaki"), SigmaString::from_str("Bibhitaki"), SigmaString::from_str("Haritaki")],
         );
 
         Self {
@@ -146,7 +146,7 @@ impl Default for AyushFormularyHelper {
 /// 4. Hotspot & Telecommunications Operators (`sigma-wani`)
 /// Implements TRAI Public Data Office (PDO) registries and bandwidth sharing profiles.
 pub struct PMWaniHotspotController {
-    pub registered_pdos: HashMap<String, String>,
+    pub registered_pdos: HashMap<SigmaString, SigmaString>,
 }
 
 impl PMWaniHotspotController {
@@ -157,7 +157,7 @@ impl PMWaniHotspotController {
     }
 
     pub fn register_pdo(&mut self, pdo_id: &str, location: &str) -> bool {
-        self.registered_pdos.insert(pdo_id.to_string(), location.to_string()).is_none()
+        self.registered_pdos.insert(SigmaString::from_str(pdo_id), SigmaString::from_str(location)).is_none()
     }
 
     pub fn get_trai_bandwidth_profile(&self, active_users: u32) -> &'static str {
@@ -180,7 +180,7 @@ impl Default for PMWaniHotspotController {
 /// 5. Aviation & Airport Operators (`sigma-digiyatra`)
 /// Deep integration for passenger face enrollment and paperless railway/airport boarding validation.
 pub struct DigiYatraPassScanner {
-    pub passenger_faces: HashMap<String, Vec<u8>>,
+    pub passenger_faces: HashMap<SigmaString, Vec<u8>>,
 }
 
 impl DigiYatraPassScanner {
@@ -191,11 +191,11 @@ impl DigiYatraPassScanner {
     }
 
     pub fn enroll_passenger(&mut self, passenger_id: &str, face_signature: &[u8]) -> bool {
-        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec()).is_none()
+        self.passenger_faces.insert(SigmaString::from_str(passenger_id), face_signature.to_vec()).is_none()
     }
 
     pub fn verify_passenger_boarding(&self, passenger_id: &str, scan_signature: &[u8]) -> bool {
-        if let Some(enrolled) = self.passenger_faces.get(passenger_id) {
+        if let Some(enrolled) = self.passenger_faces.get(&SigmaString::from_str(passenger_id)) {
             enrolled == scan_signature
         } else {
             false
@@ -212,7 +212,7 @@ impl Default for DigiYatraPassScanner {
 /// 6. Transit & Logistics Professionals (`sigma-irctc`)
 /// Facilitates deep train running status track, Tatkal window status, and PNR monitoring.
 pub struct IrctcPnrTracker {
-    pub pnr_statuses: HashMap<String, String>,
+    pub pnr_statuses: HashMap<SigmaString, SigmaString>,
 }
 
 impl IrctcPnrTracker {
@@ -243,11 +243,11 @@ impl IrctcPnrTracker {
     }
 
     pub fn update_pnr_status(&mut self, pnr: &str, status: &str) {
-        self.pnr_statuses.insert(pnr.to_string(), status.to_string());
+        self.pnr_statuses.insert(SigmaString::from_str(pnr), SigmaString::from_str(status));
     }
 
     pub fn get_pnr_status(&self, pnr: &str) -> Option<&str> {
-        self.pnr_statuses.get(pnr).map(|s| s.as_str())
+        self.pnr_statuses.get(&SigmaString::from_str(pnr)).map(|s| s.as_str())
     }
 }
 
@@ -294,7 +294,7 @@ mod tests {
     #[test]
     fn test_ayush_formulary_helper() {
         let mut helper = AyushFormularyHelper::new();
-        helper.verified_practitioners.insert("REG-AYUSH-1234".to_string(), "Dr. Aaryan".to_string());
+        helper.verified_practitioners.insert(SigmaString::from_str("REG-AYUSH-1234"), SigmaString::from_str("Dr. Aaryan"));
 
         assert!(helper.verify_practitioner("REG-AYUSH-1234"));
         assert!(!helper.verify_practitioner("REG-AYUSH-9999"));

@@ -20,7 +20,6 @@
 // OOP-based password management with biometric unlock and encryption
 
 use crate::klib::HashMap;
-use std::path::PathBuf;
 
 /// Password entry
 #[derive(Debug, Clone)]
@@ -182,17 +181,17 @@ pub struct PasswordManagerResult {
 
 /// OOP-based Password Manager
 pub struct PasswordManager {
-    vault_path: PathBuf,
+    vault_path: String,
     master_key: Vec<u8>,
     passwords: HashMap<String, PasswordEntry>,
     biometric_auth: Option<Box<dyn BiometricAuth>>,
     biometric_enabled: bool,
     auto_lock_timeout_seconds: u64,
-    last_access: Option<std::time::Instant>,
+    last_access: Option<crate::klib::Instant>,
 }
 
 impl PasswordManager {
-    pub fn new(vault_path: PathBuf, master_key: Vec<u8>) -> Self {
+    pub fn new(vault_path: String, master_key: Vec<u8>) -> Self {
         Self {
             vault_path,
             master_key,
@@ -234,7 +233,7 @@ impl PasswordManager {
         let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(crate::klib::Instant::now());
 
         Ok(PasswordManagerResult {
             success: true,
@@ -257,7 +256,7 @@ impl PasswordManager {
         let mut decrypted_entry = entry.clone();
         decrypted_entry.encrypted_password = decrypted_password;
 
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(crate::klib::Instant::now());
         Ok(decrypted_entry)
     }
 
@@ -276,17 +275,14 @@ impl PasswordManager {
 
         let encrypted_entry = PasswordEntry {
             encrypted_password,
-            last_modified: std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_secs(),
+            last_modified: crate::klib::monotonic_ms() / 1000,
             ..entry
         };
 
         let service_name = encrypted_entry.service.clone();
         self.passwords
             .insert(encrypted_entry.id.clone(), encrypted_entry);
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(crate::klib::Instant::now());
 
         Ok(PasswordManagerResult {
             success: true,
@@ -303,7 +299,7 @@ impl PasswordManager {
             .remove(id)
             .ok_or_else(|| PasswordError::PasswordNotFound(id.to_string()))?;
 
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(crate::klib::Instant::now());
 
         Ok(PasswordManagerResult {
             success: true,
@@ -325,7 +321,7 @@ impl PasswordManager {
             })
             .collect();
 
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(crate::klib::Instant::now());
         Ok(entries)
     }
 
@@ -343,7 +339,7 @@ impl PasswordManager {
             })
             .collect();
 
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(crate::klib::Instant::now());
         Ok(results)
     }
 
@@ -364,7 +360,7 @@ impl PasswordManager {
         let result = auth.authenticate(biometric_type)?;
 
         if result.success {
-            self.last_access = Some(std::time::Instant::now());
+            self.last_access = Some(crate::klib::Instant::now());
         }
 
         Ok(result)
@@ -386,13 +382,13 @@ impl PasswordManager {
 
     /// Unlock the password manager
     pub fn unlock(&mut self) {
-        self.last_access = Some(std::time::Instant::now());
+        self.last_access = Some(crate::klib::Instant::now());
     }
 
     /// Check if locked
     pub fn is_locked(&self) -> bool {
         if let Some(last) = self.last_access {
-            last.elapsed() > std::time::Duration::from_secs(self.auto_lock_timeout_seconds)
+            last.elapsed() > crate::klib::Duration::from_secs(self.auto_lock_timeout_seconds)
         } else {
             true
         }
@@ -457,10 +453,7 @@ impl PasswordManager {
 
         let mut password = String::new();
         // Simple, zero-dependency, safe LCG pseudo-random generator using nanosecond seed
-        let mut seed = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos() as u64;
+        let mut seed = crate::klib::monotonic_ms() * 1_000_000;
 
         for _ in 0..length {
             seed = seed
@@ -477,7 +470,7 @@ impl PasswordManager {
 impl Default for PasswordManager {
     fn default() -> Self {
         Self::new(
-            PathBuf::from("/home/user/.sigmaos/passwords"),
+            "/home/user/.sigmaos/passwords".to_string(),
             vec![0u8; 32],
         )
     }
@@ -545,7 +538,7 @@ mod tests {
             let bits = (i.wrapping_mul(0x9e3779b9) ^ (i << 6) ^ (i >> 2)) as u8;
             bits
         }).collect();
-        let manager = PasswordManager::new(PathBuf::from("/test/path"), key);
+        let manager = PasswordManager::new("/test/path".to_string(), key);
 
         let password = b"SovereignPassword123";
         let encrypted = manager.encrypt_password(password).unwrap();
@@ -554,7 +547,7 @@ mod tests {
         assert_eq!(password.to_vec(), decrypted);
 
         // Test empty master key hardening (preventing division-by-zero)
-        let bad_manager = PasswordManager::new(PathBuf::from("/test/path"), vec![]);
+        let bad_manager = PasswordManager::new("/test/path".to_string(), vec![]);
         assert!(bad_manager.encrypt_password(password).is_err());
         assert!(bad_manager.decrypt_password(&encrypted).is_err());
     }

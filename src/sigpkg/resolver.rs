@@ -20,7 +20,7 @@
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
 use crate::sigpkg::{Package, Version, VersionConstraint};
-use std::collections::{HashMap, HashSet};
+use crate::klib::{HashMap, HashSet};
 
 /// SAT Solver for dependency resolution
 pub struct SatSolver {

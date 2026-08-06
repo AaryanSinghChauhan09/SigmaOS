@@ -146,6 +146,130 @@ pub fn monotonic_ms() -> u64 {
     0
 }
 
+/// Custom Duration - replaces std::time::Duration
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Duration {
+    pub secs: u64,
+    pub nanos: u32,
+}
+
+impl Duration {
+    pub const fn new(secs: u64, nanos: u32) -> Self {
+        Duration { secs, nanos: nanos % 1_000_000_000 }
+    }
+
+    pub const fn from_secs(secs: u64) -> Self {
+        Duration { secs, nanos: 0 }
+    }
+
+    pub const fn from_millis(millis: u64) -> Self {
+        Duration {
+            secs: millis / 1_000,
+            nanos: (millis % 1_000) * 1_000_000,
+        }
+    }
+
+    pub const fn from_micros(micros: u64) -> Self {
+        Duration {
+            secs: micros / 1_000_000,
+            nanos: (micros % 1_000_000) * 1_000,
+        }
+
+    }
+
+    pub const fn from_nanos(nanos: u64) -> Self {
+        Duration {
+            secs: nanos / 1_000_000_000,
+            nanos: (nanos % 1_000_000_000) as u32,
+        }
+    }
+
+    pub const fn as_secs(&self) -> u64 {
+        self.secs
+    }
+
+    pub const fn as_millis(&self) -> u64 {
+        self.secs * 1_000 + (self.nanos / 1_000_000) as u64
+    }
+
+    pub const fn as_micros(&self) -> u64 {
+        self.secs * 1_000_000 + (self.nanos / 1_000) as u64
+    }
+
+    pub const fn as_nanos(&self) -> u64 {
+        self.secs * 1_000_000_000 + self.nanos as u64
+    }
+
+    pub const fn zero() -> Self {
+        Duration { secs: 0, nanos: 0 }
+    }
+
+    pub fn checked_add(self, rhs: Duration) -> Option<Duration> {
+        let mut secs = self.secs.checked_add(rhs.secs)?;
+        let mut nanos = self.nanos + rhs.nanos;
+        if nanos >= 1_000_000_000 {
+            nanos -= 1_000_000_000;
+            secs = secs.checked_add(1)?;
+        }
+        Some(Duration { secs, nanos })
+    }
+
+    pub fn checked_sub(self, rhs: Duration) -> Option<Duration> {
+        let mut secs = self.secs.checked_sub(rhs.secs)?;
+        let nanos = if self.nanos >= rhs.nanos {
+            self.nanos - rhs.nanos
+        } else {
+            secs = secs.checked_sub(1)?;
+            self.nanos + 1_000_000_000 - rhs.nanos
+        };
+        Some(Duration { secs, nanos })
+    }
+}
+
+impl Default for Duration {
+    fn default() -> Self {
+        Duration::zero()
+    }
+}
+
+/// Custom Instant - replaces std::time::Instant
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Instant {
+    pub nanos_since_epoch: u64,
+}
+
+impl Instant {
+    pub fn now() -> Self {
+        // In a real implementation, this would use hardware timers
+        // For now, use a placeholder based on uptime
+        Instant {
+            nanos_since_epoch: monotonic_ms() * 1_000_000,
+        }
+    }
+
+    pub fn duration_since(&self, earlier: Instant) -> Duration {
+        Duration::from_nanos(self.nanos_since_epoch.saturating_sub(earlier.nanos_since_epoch))
+    }
+
+    pub fn elapsed(&self) -> Duration {
+        Self::now().duration_since(*self)
+    }
+
+    pub fn checked_add(&self, duration: Duration) -> Option<Instant> {
+        let new_nanos = self.nanos_since_epoch.checked_add(duration.as_nanos())?;
+        Some(Instant {
+            nanos_since_epoch: new_nanos,
+        })
+    }
+
+    pub fn checked_sub(&self, duration: Duration) -> Option<Instant> {
+        let new_nanos = self.nanos_since_epoch.checked_sub(duration.as_nanos())?;
+        Some(Instant {
+            nanos_since_epoch: new_nanos,
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -200,5 +324,47 @@ mod tests {
         let date2 = date.add_days(1);
         assert_eq!(date2.month, 2);
         assert_eq!(date2.day, 1);
+    }
+
+    #[test]
+    fn test_duration_creation() {
+        let dur = Duration::new(5, 500_000_000);
+        assert_eq!(dur.secs, 5);
+        assert_eq!(dur.nanos, 500_000_000);
+
+        let dur_secs = Duration::from_secs(10);
+        assert_eq!(dur_secs.as_secs(), 10);
+
+        let dur_millis = Duration::from_millis(1500);
+        assert_eq!(dur_millis.as_secs(), 1);
+        assert_eq!(dur_millis.as_millis(), 1500);
+    }
+
+    #[test]
+    fn test_duration_arithmetic() {
+        let dur1 = Duration::from_secs(5);
+        let dur2 = Duration::from_secs(3);
+        let sum = dur1.checked_add(dur2).unwrap();
+        assert_eq!(sum.as_secs(), 8);
+
+        let diff = dur1.checked_sub(dur2).unwrap();
+        assert_eq!(diff.as_secs(), 2);
+    }
+
+    #[test]
+    fn test_instant() {
+        let now = Instant::now();
+        let later = now.checked_add(Duration::from_secs(1)).unwrap();
+        let elapsed = later.duration_since(now);
+        assert_eq!(elapsed.as_secs(), 1);
+    }
+
+    #[test]
+    fn test_duration_conversions() {
+        let dur = Duration::from_nanos(1_500_000_000);
+        assert_eq!(dur.as_secs(), 1);
+        assert_eq!(dur.as_millis(), 1500);
+        assert_eq!(dur.as_micros(), 1_500_000);
+        assert_eq!(dur.as_nanos(), 1_500_000_000);
     }
 }

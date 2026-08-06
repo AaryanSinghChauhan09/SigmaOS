@@ -19,8 +19,7 @@
 // SigmaOS Unified Dashboard System
 // Publisher-grade dashboards for system monitoring and productivity
 
-use crate::klib::HashMap;
-use std::time::{Duration, Instant};
+use crate::klib::{HashMap, Duration, Instant};
 
 /// System metric type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -128,7 +127,7 @@ impl DashboardWidget {
         }
 
         // Standard htop formatting
-        let bar_str = std::str::from_utf8(&bar).unwrap_or("");
+        let bar_str = core::str::from_utf8(&bar).unwrap_or("");
         format!("{:<12} [{}] {:.1}%", title, bar_str, latest)
     }
 }
@@ -263,10 +262,7 @@ impl SystemMonitor {
         }
 
         let pseudo_random = || -> f64 {
-            let nanos = std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_nanos())
-                .unwrap_or(123456789);
+            let nanos = crate::klib::monotonic_ms() * 1_000_000;
             let state = (nanos ^ 0x5DEECE66D) & ((1 << 48) - 1);
             let state = (state.wrapping_mul(0x5DEECE66D).wrapping_add(0xB)) & ((1 << 48) - 1);
             (state as f64) / ((1u64 << 48) as f64)

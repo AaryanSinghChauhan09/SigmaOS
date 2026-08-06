@@ -27,6 +27,10 @@ pub mod time;
 pub mod math;
 pub mod uuid;
 pub mod conversion;
+pub mod ffi;
+
+// Re-export FFI functions for reduced std dependency
+pub use ffi::{cstr_to_rust_string, rust_string_to_cstr, cstrlen, cstrcmp, cstrcpy, cstrcat};
 
 // Re-export existing modules if present
 #[cfg(feature = "default")]
@@ -47,11 +51,14 @@ pub use slab::{SlabCache, TypedSlabCache};
 // Re-export String and related types from custom_string if present
 #[cfg(all())]
 pub use crate::klib::string::String as KString;
-pub use std::collections::HashMap;
+pub use custom_string::SigmaString;
 pub use hashmap::{HashMap, Entry};
 pub use btreemap::BTreeMap;
 pub use vecdeque::VecDeque;
 pub use alloc::string::String;
+
+// Re-export custom time types
+pub use time::{Duration, Instant, Time, Date, Timestamp};
 
 /// Format integer to string without std::fmt
 pub fn format_int(mut num: u64) -> String {

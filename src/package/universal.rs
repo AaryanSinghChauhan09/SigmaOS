@@ -1,11 +1,7 @@
 // SigmaOS Universal Package Manager
 // Unified system absorbing all 18 major distribution formats.
 
-#[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, HashSet, Arc};
-
-#[cfg(feature = "standalone_test")]
-use std::{collections::{HashMap, HashSet}, sync::Arc};
 
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
