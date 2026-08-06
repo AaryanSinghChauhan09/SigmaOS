@@ -16,6 +16,7 @@ use crate::klib::{HashMap, Vec, String, ToString};
 
 /// AUR package metadata
 #[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct AurPackage {
     pub name: String,
     pub version: String,
@@ -39,6 +40,8 @@ impl PartialEq for AurPackage {
             && self.popularity.to_bits() == other.popularity.to_bits()
     }
 }
+
+impl Eq for AurPackage {}
 
 impl Eq for AurPackage {}
 

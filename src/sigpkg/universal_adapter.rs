@@ -269,8 +269,14 @@ impl UniversalPackageAdapter {
             crate::klib::String::from_str(name),
             parsed_ver,
             crate::klib::String::from_str(desc),
+        Ok(Package::new(
+            name.to_string(),
+            parsed_ver,
+            desc.to_string(),
             dependencies,
             crate::klib::String::from_str(&format!("SHA256:{}", name)),
+        ))
+            format!("SHA256:{}", name),
         ))
     }
 }

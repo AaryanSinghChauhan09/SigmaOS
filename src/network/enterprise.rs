@@ -1,10 +1,10 @@
 #![cfg_attr(not(test), no_std)]
 #![cfg_attr(not(test), no_main)]
 
-use core::mem;
 /// Advanced Enterprise Networking Suite for SigmaOS
 /// Provides sovereign enterprise network features including IPv6 addressing, VPN encrypted tunneling, and SSL/TLS.
 use core::sync::atomic::{AtomicUsize, Ordering};
+/// Provides sovereign enterprise network features including IPv6 addressing, VPN encrypted tunneling, and SSL/TLS.
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -115,6 +115,9 @@ pub use compatibility::{
     PqcSecureChannel, ProcMonitor, ProcessExplorerState, SemanticRow, SpreadsheetCore, SysDiag,
     TargetPlatform, TceLoader, TczExtension, TinyCoreBootConfig, TranslationLayer, WasmModule,
     WasmSandboxEngine, WasmState,
+    NDArray, ImageMat, DependencyProperty, VisualState, SovereignControl,
+    GrpcFrame, SovereignGrpcChannel, MachMessage, MachPort, SovereignXnuKernel,
+    Glyph, SovereignFreeTypeEngine, NavDirection, NavElement, SovereignSpatialNavigation,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

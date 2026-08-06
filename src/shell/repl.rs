@@ -225,6 +225,13 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            current_dir: "/home/sigma".to_string(),
+            current_user: "sigma".to_string(),
+            services,
+            installed_packages,
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features,
         }
     }
 
@@ -254,6 +261,13 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            current_dir: "/home/sigma".to_string(),
+            current_user: "sigma".to_string(),
+            services,
+            installed_packages,
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features,
         }
     }
 
@@ -843,7 +857,6 @@ impl ShellRepl {
                 }
             }
             ShellCommand::Proc { args } => {
-                use crate::process::ProcFileSystem;
                 let pfs = ProcFileSystem::new();
                 if args.is_empty() {
                     Ok("Usage: proc cat <file_path>\nAvailable files:\n  /proc/meminfo\n  /proc/cpuinfo\n  /proc/uptime\n  /proc/cgroups\n  /proc/<pid>/status\n  /proc/<pid>/cmdline\n  /proc/<pid>/stat".to_string())
