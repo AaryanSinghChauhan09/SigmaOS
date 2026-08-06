@@ -231,12 +231,6 @@ where
     pub fn values_mut(&mut self) -> HashMapValuesMut<'_, K, V> {
         HashMapValuesMut {
             iter: self.iter_mut(),
-    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
-        if self.capacity == 0 || self.buckets.is_empty() {
-            if self.capacity == 0 {
-                self.capacity = 16;
-            }
-            self.resize_buckets();
         }
     }
 

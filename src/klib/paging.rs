@@ -815,6 +815,7 @@ impl VirtualMemoryManager for SimpleVMM {
         }
 
         Err(PageFaultError::NotPresent)
+    }
 
     fn handle_page_fault(
         &mut self,

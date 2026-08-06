@@ -461,4 +461,3 @@ mod tests {
         assert!(ring.pop_item().is_none());
     }
 }
-    }}

@@ -384,24 +384,9 @@ mod tests {
         let res = tool.backup_user_profile("test_user").unwrap();
         assert!(res.contains("test_user"));
         assert_eq!(tool.backed_up_items, 10);
-    fn test_mint_update_manager() {
-        let mut manager = MintUpdateManager::new();
-        let pkg =
-            MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe);
-        manager.add_update(pkg);
 
         let restore_res = tool.restore_user_profile("test_user").unwrap();
         assert!(restore_res.contains("Restored"));
-        assert_eq!(manager.pending_updates.len(), 1);
-        assert_eq!(manager.pending_updates[0].safety_score, 99);
-
-        // Fast mirror selection
-        manager.auto_select_fastest_mirror(&[(b"us-mirror", 45), (b"eu-mirror", 120)]);
-        assert_eq!(manager.selected_mirror_speed_ms, 45);
-
-        // Hot swap active kernel version
-        manager.hot_swap_active_kernel(b"6.6.0").unwrap();
-        assert!(manager.current_kernel_ver.starts_with(b"6.6.0"));
     }
 
     #[test]
@@ -432,6 +417,35 @@ mod tests {
         let reports = sys.check_diagnostics();
         assert_eq!(reports.len(), 2);
         assert_eq!(sys.active_alerts, 2);
+    }
+
+    #[test]
+    fn test_mint_update_manager() {
+        let mut manager = MintUpdateManager::new();
+        let pkg =
+            MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe);
+        manager.add_update(pkg);
+
+        assert_eq!(manager.pending_updates.len(), 1);
+        assert_eq!(manager.pending_updates[0].safety_score, 99);
+
+        // Fast mirror selection
+        manager.auto_select_fastest_mirror(&[(b"us-mirror", 45), (b"eu-mirror", 120)]);
+        assert_eq!(manager.selected_mirror_speed_ms, 45);
+
+        // Hot swap active kernel version
+        manager.hot_swap_active_kernel(b"6.6.0").unwrap();
+        assert!(manager.current_kernel_ver.starts_with(b"6.6.0"));
+    }
+
+    #[test]
+    fn test_mint_backup_tool() {
+        let mut backup = MintBackupTool::new();
+        let backup_id = backup.perform_user_backup(b"/backup/user_state").unwrap();
+        assert_eq!(backup_id, 0);
+    }
+
+    #[test]
     fn test_mint_report_system() {
         let mut report = MintReportSystem::new();
         report.register_crash_alert(b"launcher");

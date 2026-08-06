@@ -157,7 +157,6 @@ impl PMWaniHotspotController {
     }
 
     pub fn register_pdo(&mut self, pdo_id: &str, location: &str) -> bool {
-        self.registered_pdos.insert(pdo_id.to_string(), location.to_string()).is_none()
         let is_new = !self.registered_pdos.contains_key(pdo_id);
         self.registered_pdos.insert(pdo_id.to_string(), location.to_string());
         is_new
@@ -194,7 +193,6 @@ impl DigiYatraPassScanner {
     }
 
     pub fn enroll_passenger(&mut self, passenger_id: &str, face_signature: &[u8]) -> bool {
-        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec()).is_none()
         let is_new = !self.passenger_faces.contains_key(passenger_id);
         self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec());
         is_new

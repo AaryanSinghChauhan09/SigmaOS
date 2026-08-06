@@ -262,5 +262,4 @@ mod tests {
         assert_eq!(proc_cpu_decayed.burst_score, 49); // decayed by 1
     }
 }
-    pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
-}
+

@@ -231,6 +231,8 @@ impl TCPConnection for SimpleSocket {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError> {
         let current = self.get_state();
         if current != TCPState::Closed {
+            return Err(NetworkError::ConnectionFailed);
+        }
         self.remote_port
             .store(remote_port as usize, Ordering::SeqCst);
         self.state
@@ -394,9 +396,6 @@ impl CongestionControl for RenoCongestionControl {
     }
 
     fn get_cwnd(&self) -> usize {
-        self.cwnd as usize
-    }
-    fn get_cwnd(&self) -> usize {
         self.cwnd.load(Ordering::SeqCst)
     }
 }
@@ -406,12 +405,6 @@ pub struct BBRCongestionControl {
     pub cwnd: u32,
     pub bw_estimate: u32,
     pub rtt_min_ms: u32,
-}
-
-impl Default for BBRCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl Default for BBRCongestionControl {
@@ -444,11 +437,6 @@ impl CongestionControl for BBRCongestionControl {
 
     fn get_cwnd(&self) -> usize {
         self.cwnd as usize
-        self.cwnd
-            .store(self.cwnd.load(Ordering::SeqCst) / 2, Ordering::SeqCst);
-    }
-    fn get_cwnd(&self) -> usize {
-        self.cwnd.load(Ordering::SeqCst)
     }
 }
 
@@ -640,9 +628,6 @@ impl Default for ZeroCopyNetwork {
 
 impl ZeroCopyNetwork {
     pub fn new() -> Self {
-        ZeroCopyNetwork {
-            dma_buffer_address: 0,
-        }
         ZeroCopyNetwork {
             dma_buffer: AtomicUsize::new(0),
         }
@@ -877,14 +862,6 @@ impl NetworkStack for SimpleNetworkStack {
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
         self.sockets.iter().find(|s| s.id() == id).map(|s| s.as_ref())
-        for socket_option in &self.sockets {
-            if let Some(ref socket) = *socket_option {
-                if socket.id() == id {
-                    return Some(socket.as_ref());
-                }
-            }
-        }
-        None
     }
 }
 
