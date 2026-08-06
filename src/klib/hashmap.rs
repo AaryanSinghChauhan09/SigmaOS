@@ -232,11 +232,6 @@ where
         }
     }
 
-    pub fn clear(&mut self) {
-        self.resize_buckets();
-        self.len = 0;
-    }
-
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V>
     where
         K: Clone,
@@ -429,52 +424,6 @@ where
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
-    }
-}
-
-pub enum Entry<'a, K, V> {
-    Occupied(OccupiedEntry<'a, K, V>),
-    Vacant(VacantEntry<'a, K, V>),
-}
-
-pub struct OccupiedEntry<'a, K, V> {
-    value: &'a mut V,
-    pub _marker: core::marker::PhantomData<K>,
-}
-
-pub struct VacantEntry<'a, K, V> {
-    map: &'a mut HashMap<K, V>,
-    key: K,
-}
-
-impl<'a, K, V> Entry<'a, K, V>
-where
-    K: PartialEq + Clone,
-{
-    pub fn or_insert(self, default: V) -> &'a mut V {
-        match self {
-            Entry::Occupied(entry) => entry.value,
-            Entry::Vacant(entry) => {
-                let key = entry.key;
-                entry.map.insert(key.clone(), default);
-                entry.map.get_mut(&key).unwrap()
-            }
-        }
-    }
-
-    pub fn or_insert_with<F>(self, default_fn: F) -> &'a mut V
-    where
-        F: FnOnce() -> V,
-    {
-        match self {
-            Entry::Occupied(entry) => entry.value,
-            Entry::Vacant(entry) => {
-                let key = entry.key.clone();
-                let default = default_fn();
-                entry.map.insert(key.clone(), default);
-                entry.map.get_mut(&key).unwrap()
-            }
-        }
     }
 }
 
