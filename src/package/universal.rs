@@ -2,12 +2,10 @@
 // Unified system absorbing all 18 major distribution formats.
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::HashMap;
+use crate::klib::{HashMap, HashSet, Arc};
 
 #[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
-
-use std::sync::Arc;
+use std::{collections::{HashMap, HashSet}, sync::Arc};
 
 /// Package format type covering 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -36,8 +34,8 @@ pub enum PackageFormat {
 #[derive(Debug, Clone)]
 pub enum PackageSource {
     Repository { url: String },
-    Local { path: String },
-    Remote { url: String },
+    _Local { path: String },
+    _Remote { url: String },
 }
 
 /// Dependency conflict resolution strategy
@@ -54,13 +52,13 @@ pub enum ConflictResolution {
 pub enum PackageState {
     Uninstalled,
     Downloading,
-    VerifyingSignature,
-    Unpacking,
+    _VerifyingSignature,
+    _Unpacking,
     Installing,
-    RunningHooks,
+    _RunningHooks,
     Installed,
     BrokenDependency,
-    Corrupted,
+    _Corrupted,
 }
 
 /// Unified package holding format-specific properties and metadata
@@ -136,8 +134,8 @@ impl InstallStrategy for DebInstallStrategy {
         println!("Strategy: Unpacking deb and invoking preinst/postinst scripts for '{}'", package.name);
         Ok(())
     }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct RpmInstallStrategy;
@@ -146,8 +144,8 @@ impl InstallStrategy for RpmInstallStrategy {
         println!("Strategy: Installing RPM package '{}' into global system database.", package.name);
         Ok(())
     }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct PacmanInstallStrategy;
@@ -156,113 +154,113 @@ impl InstallStrategy for PacmanInstallStrategy {
         println!("Strategy: Extracting pacman tarball for '{}'", package.name);
         Ok(())
     }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct EbuildInstallStrategy;
 impl InstallStrategy for EbuildInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct ApkInstallStrategy;
 impl InstallStrategy for ApkInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct NixInstallStrategy;
 impl InstallStrategy for NixInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct FlatpakInstallStrategy;
 impl InstallStrategy for FlatpakInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct SnapInstallStrategy;
 impl InstallStrategy for SnapInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct AppImageInstallStrategy;
 impl InstallStrategy for AppImageInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct XbpsInstallStrategy;
 impl InstallStrategy for XbpsInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct TxzInstallStrategy;
 impl InstallStrategy for TxzInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct EopkgInstallStrategy;
 impl InstallStrategy for EopkgInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct ZypperInstallStrategy;
 impl InstallStrategy for ZypperInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct GuixInstallStrategy;
 impl InstallStrategy for GuixInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct CachyOSInstallStrategy;
 impl InstallStrategy for CachyOSInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct SwupdInstallStrategy;
 impl InstallStrategy for SwupdInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct StarlingInstallStrategy;
 impl InstallStrategy for StarlingInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 pub struct SigmaPkgInstallStrategy;
 impl InstallStrategy for SigmaPkgInstallStrategy {
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
-    fn verify(&self, package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
+    fn verify(&self, _package: &UnifiedPackage) -> Result<bool, PackageError> { Ok(true) }
+    fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> { Ok(()) }
 }
 
 // ============================================================================
@@ -618,7 +616,7 @@ impl PackageAdapter {
         }
     }
 
-    pub fn can_handle(&self, package: &UnifiedPackage) -> bool {
+    pub fn _can_handle(&self, package: &UnifiedPackage) -> bool {
         package.formats.contains(&self.format)
     }
 
@@ -678,7 +676,7 @@ impl DependencyResolver {
         let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
         let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
         to_visit.push(package_name.to_string());
-        let mut visited = std::collections::HashSet::<String>::new();
+        let mut visited = HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;
@@ -1034,9 +1032,9 @@ impl Default for UniversalPackageManager {
 pub enum PackageError {
     PackageNotFound(String),
     DependencyNotFound(String),
-    AdapterNotFound,
+    _AdapterNotFound,
     InstallationFailed(String),
-    ConflictDetected(Vec<(String, String)>),
+    _ConflictDetected(Vec<(String, String)>),
 }
 
 // ============================================================================

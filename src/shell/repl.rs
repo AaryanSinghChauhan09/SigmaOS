@@ -218,13 +218,13 @@ impl ShellRepl {
             aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
-            current_dir: "/home/sigma".to_string(),
-            current_user: "sigma".to_string(),
+            current_dir: "/home/user".to_string(),
+            current_user: "user".to_string(),
             services,
-            installed_packages,
+            installed_packages: std::collections::HashSet::new(),
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features,
+            a11y_features: std::collections::HashMap::new(),
         }
     }
 
@@ -247,13 +247,13 @@ impl ShellRepl {
             aliases: std::collections::HashMap::new(),
             prompt,
             agent_engine: AgentAutomationEngine::new(),
-            current_dir: "/home/sigma".to_string(),
-            current_user: "sigma".to_string(),
+            current_dir: "/home/user".to_string(),
+            current_user: "user".to_string(),
             services,
-            installed_packages,
+            installed_packages: std::collections::HashSet::new(),
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
-            a11y_features,
+            a11y_features: std::collections::HashMap::new(),
         }
     }
 

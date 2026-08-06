@@ -15,7 +15,7 @@
 use crate::klib::{HashMap, Vec, String, ToString};
 
 /// AUR package metadata
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct AurPackage {
     pub name: String,
     pub version: String,
@@ -25,6 +25,19 @@ pub struct AurPackage {
     pub makedepends: Vec<String>,
     pub keywords: Vec<String>,
     pub popularity: f32,
+}
+
+impl PartialEq for AurPackage {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.version == other.version
+            && self.description == other.description
+            && self.url == other.url
+            && self.depends == other.depends
+            && self.makedepends == other.makedepends
+            && self.keywords == other.keywords
+            && self.popularity.to_bits() == other.popularity.to_bits()
+    }
 }
 
 impl Eq for AurPackage {}
