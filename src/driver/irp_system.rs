@@ -281,9 +281,7 @@ mod tests {
             assert!(MOCK_DPC_CALLED);
         }
 
-        manager
-            .callbacks
-            .register_process_callback(mock_process_callback);
+        manager.callbacks.register_process_callback(mock_process_callback);
         manager.callbacks.trigger_process_event(42, true);
         unsafe {
             assert!(MOCK_PROCESS_CREATION_NOTIFIED);
