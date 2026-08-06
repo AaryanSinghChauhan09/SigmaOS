@@ -536,14 +536,6 @@ mod tests {
         assert_eq!(response_str, "Command executed successfully");
     }
 
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
     #[test]
     fn test_ai_natural_language_translations() {
         let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
