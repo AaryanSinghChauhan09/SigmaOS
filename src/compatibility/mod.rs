@@ -71,3 +71,9 @@ pub use sovereign_suite::{
     EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
 };
+
+pub mod debian;
+pub use debian::{
+    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
+    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
+};
