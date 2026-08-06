@@ -111,14 +111,14 @@ pub struct AgentTask {
 /// AI Agent Automation Engine inside SigmaOS REPL
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine {
-    pub registered_tasks: crate::klib::HashMap<usize, AgentTask>,
+    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
     pub next_task_id: usize,
 }
 
 impl AgentAutomationEngine {
     pub fn new() -> Self {
         AgentAutomationEngine {
-            registered_tasks: crate::klib::HashMap::new(),
+            registered_tasks: std::collections::HashMap::new(),
             next_task_id: 1,
         }
     }
