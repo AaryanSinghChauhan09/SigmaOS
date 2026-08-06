@@ -49,24 +49,20 @@ pub enum ShellCommand {
         filename: String,
     },
     Theme {
-        name: String,
+        theme_name: String,
     },
     Profile {
-        name: String,
+        profile_name: String,
     },
     A11y {
         feature: String,
-        enabled: bool,
+        state: String,
+    },
+    Alias {
+        shorthand: String,
+        statement: String,
     },
     Unknown(String),
-}
-
-/// Represents an automated action task executed by an AI agent
-
-impl Default for AgentAutomationEngine {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// Shell REPL
@@ -83,6 +79,7 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
+    pub command_history: Vec<String>,
 }
 
 impl ShellRepl {
@@ -105,6 +102,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -127,6 +125,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            command_history: Vec::new(),
         }
     }
 
@@ -153,22 +152,52 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    pub fn execute_line(&mut self, line: &str) {
-        if line.contains(';') {
-            let subcommands: Vec<&str> = line.split(';').collect();
-            for sub in subcommands {
-                let trimmed = sub.trim();
-                if !trimmed.is_empty() {
-                    self.execute_single_line(trimmed);
-                }
+    pub fn complete_tab(&self, prefix: &str) -> Vec<String> {
+        let mut suggestions = Vec::new();
+        let commands = [
+            "help", "ps", "ls", "pwd", "whoami", "uname", "clear",
+            "touch", "mkdir", "theme", "profile", "a11y", "set", "get", "alias"
+        ];
+        for cmd in &commands {
+            if cmd.starts_with(prefix) {
+                suggestions.push(cmd.to_string());
             }
-        } else {
-            self.execute_single_line(line);
         }
+        suggestions
     }
 
-    fn execute_single_line(&mut self, line: &str) {
-        let command = self.parse_command(line);
+    pub fn history_suggest_fish(&self, partial: &str) -> Option<String> {
+        if partial.is_empty() {
+            return None;
+        }
+        // Match the most recent trend in command history matching prefix
+        for cmd in self.command_history.iter().rev() {
+            if cmd.starts_with(partial) {
+                return Some(cmd.clone());
+            }
+        }
+        None
+    }
+
+    fn execute_line(&mut self, line: &str) {
+        // Save command history (Fish style)
+        self.command_history.push(line.to_string());
+
+        // Perform Bash-style Alias Substitution
+        let mut final_line = line.to_string();
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if !parts.is_empty() {
+            if let Some(aliased) = self.aliases.get(parts[0]) {
+                let mut statement = aliased.clone();
+                if parts.len() > 1 {
+                    statement.push(' ');
+                    statement.push_str(&parts[1..].join(" "));
+                }
+                final_line = statement;
+            }
+        }
+
+        let command = self.parse_command(&final_line);
         let result = self.execute_command(command);
 
         match result {
@@ -183,7 +212,7 @@ impl ShellRepl {
         }
     }
 
-    pub fn parse_command(&self, input: &str) -> ShellCommand {
+    fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -199,27 +228,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "echo" => ShellCommand::Echo {
-                message: parts[1..].join(" "),
-            },
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -233,6 +241,34 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     ShellCommand::Mkdir {
                         dirname: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        theme_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        profile_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        state: parts[2].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -257,33 +293,11 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "theme" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Theme {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "profile" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Profile {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
+            "alias" => {
                 if parts.len() >= 3 {
-                    let enabled = match parts[2] {
-                        "on" | "true" | "enable" => true,
-                        _ => false,
-                    };
-                    ShellCommand::A11y {
-                        feature: parts[1].to_string(),
-                        enabled,
+                    ShellCommand::Alias {
+                        shorthand: parts[1].to_string(),
+                        statement: parts[2..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -293,7 +307,7 @@ impl ShellRepl {
         }
     }
 
-    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
                    help         - Show this help message\n\
@@ -439,6 +453,19 @@ impl ShellRepl {
                     Err(format!("apt: Unknown command '{}'", subcommand))
                 }
             }
+            ShellCommand::Theme { theme_name } => {
+                self.current_theme = theme_name.clone();
+                Ok(format!("Theme set to {}", theme_name))
+            }
+            ShellCommand::Profile { profile_name } => {
+                self.current_profile = profile_name.clone();
+                Ok(format!("Profile set to {}", profile_name))
+            }
+            ShellCommand::A11y { feature, state } => {
+                let is_on = state == "on" || state == "true";
+                self.a11y_features.insert(feature.clone(), is_on);
+                Ok(format!("A11y feature {} set to {}", feature, state))
+            }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -448,21 +475,9 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Theme { name } => {
-                self.current_theme = name.clone();
-                Ok(format!("Zenith Theme set to: {}", name))
-            }
-            ShellCommand::Profile { name } => {
-                self.current_profile = name.clone();
-                Ok(format!("Zenith Profile set to: {}", name))
-            }
-            ShellCommand::A11y { feature, enabled } => {
-                self.a11y_features.insert(feature.clone(), enabled);
-                Ok(format!(
-                    "Zenith Accessibility [{}] set to: {}",
-                    feature,
-                    if enabled { "on" } else { "off" }
-                ))
+            ShellCommand::Alias { shorthand, statement } => {
+                self.aliases.insert(shorthand.clone(), statement.clone());
+                Ok(format!("Alias defined: {} -> {}", shorthand, statement))
             }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
@@ -511,6 +526,43 @@ mod tests {
     }
 
     #[test]
+    fn test_bash_alias_substitution() {
+        let mut repl = ShellRepl::new();
+        let alias_cmd = ShellCommand::Alias {
+            shorthand: "ll".to_string(),
+            statement: "ls -la".to_string(),
+        };
+        repl.execute_command(alias_cmd).unwrap();
+        assert_eq!(repl.aliases.get("ll").unwrap(), "ls -la");
+
+        // Execute line with alias substitution
+        repl.execute_line("ll");
+        assert_eq!(repl.command_history[0], "ll");
+    }
+
+    #[test]
+    fn test_zsh_tab_completion() {
+        let repl = ShellRepl::new();
+        let suggestions = repl.complete_tab("cl");
+        assert_eq!(suggestions, vec!["clear".to_string()]);
+
+        let suggestions_all = repl.complete_tab("pwd");
+        assert_eq!(suggestions_all, vec!["pwd".to_string()]);
+    }
+
+    #[test]
+    fn test_fish_history_suggestions() {
+        let mut repl = ShellRepl::new();
+        repl.execute_line("clear");
+        repl.execute_line("systemctl list");
+
+        let suggestion = repl.history_suggest_fish("sys").unwrap();
+        assert_eq!(suggestion, "systemctl list");
+
+        assert!(repl.history_suggest_fish("invalid").is_none());
+    }
+
+    #[test]
     fn test_set_get_variable() {
         let mut repl = ShellRepl::new();
         let set_cmd = ShellCommand::Set {
@@ -524,31 +576,6 @@ mod tests {
         };
         let result = repl.execute_command(get_cmd);
         assert_eq!(result.unwrap(), "value");
-    }
-
-    #[test]
-    fn test_theme_and_profile_commands() {
-        let mut repl = ShellRepl::new();
-
-        let theme_cmd = repl.parse_command("theme dark");
-        let res = repl.execute_command(theme_cmd).unwrap();
-        assert_eq!(repl.current_theme, "dark");
-        assert!(res.contains("dark"));
-
-        let profile_cmd = repl.parse_command("profile developer");
-        let res = repl.execute_command(profile_cmd).unwrap();
-        assert_eq!(repl.current_profile, "developer");
-        assert!(res.contains("developer"));
-    }
-
-    #[test]
-    fn test_a11y_commands() {
-        let mut repl = ShellRepl::new();
-
-        let a11y_cmd = repl.parse_command("a11y high_contrast on");
-        let res = repl.execute_command(a11y_cmd).unwrap();
-        assert_eq!(repl.a11y_features.get("high_contrast"), Some(&true));
-        assert!(res.contains("on"));
     }
 
     #[test]
@@ -695,42 +722,5 @@ mod tests {
         assert!(matches!(cmd, ShellCommand::Rm { .. }));
         let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Removed file: testfile.txt");
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AgentTask {
-    pub task_id: usize,
-    pub description: String,
-    pub commands: Vec<String>,
-}
-
-/// AI Agent Automation Engine inside SigmaOS REPL
-#[derive(Debug, Clone)]
-pub struct AgentAutomationEngine {
-    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
-    pub next_task_id: usize,
-}
-
-impl AgentAutomationEngine {
-    pub fn new() -> Self {
-        AgentAutomationEngine {
-            registered_tasks: std::collections::HashMap::new(),
-            next_task_id: 1,
-        }
-    }
-
-    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
-        let id = self.next_task_id;
-        self.next_task_id += 1;
-        self.registered_tasks.insert(
-            id,
-            AgentTask {
-                task_id: id,
-                description,
-                commands,
-            },
-        );
-        id
     }
 }

@@ -1,5 +1,3 @@
-#![no_std]
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -16,7 +14,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type ContextID = usize;
 
 /// Security level
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SecurityLevel {
     Low = 0,
@@ -26,8 +24,8 @@ pub enum SecurityLevel {
 }
 
 /// Security domain
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum SecurityDomain {
     System = 0,
     User = 1,
@@ -38,7 +36,6 @@ pub enum SecurityDomain {
 
 /// Security context (OOP: Context object)
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct SecurityContext {
     pub id: ContextID,
     pub level: SecurityLevel,
@@ -48,7 +45,7 @@ pub struct SecurityContext {
 
 /// Context capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct ContextCapability {
     pub can_read: bool,
     pub can_write: bool,
@@ -70,12 +67,6 @@ impl ContextCapability {
             can_write: true,
             can_execute: true,
         }
-    }
-}
-
-impl Default for ContextCapability {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -104,8 +95,8 @@ pub trait MACPolicy {
 }
 
 /// Security operation
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum SecurityOperation {
     Read = 0,
     Write = 1,
@@ -117,11 +108,10 @@ pub enum SecurityOperation {
 
 /// Policy info
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
 pub struct PolicyInfo {
-    pub policy_type: PolicyType,
-    pub strictness: SecurityLevel,
-    pub capability: PolicyCapability,
+    policy_type: PolicyType,
+    strictness: SecurityLevel,
+    capability: PolicyCapability,
 }
 
 impl PolicyInfo {
@@ -135,8 +125,8 @@ impl PolicyInfo {
 }
 
 /// Policy type
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum PolicyType {
     MLS = 0,  // Multi-Level Security
     Biba = 1, // Integrity
@@ -146,7 +136,7 @@ pub enum PolicyType {
 
 /// Policy capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct PolicyCapability {
     pub can_enforce: bool,
     pub can_modify: bool,
@@ -168,13 +158,8 @@ impl PolicyCapability {
     }
 }
 
-impl Default for PolicyCapability {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// MLS policy (OOP: Concrete policy class)
+#[repr(C)]
 pub struct MLSPolicy {
     pub policy_type: PolicyType,
     pub strictness: SecurityLevel,
@@ -245,8 +230,8 @@ pub trait MACEngine {
 }
 
 /// MAC error types
-#[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub enum MACError {
     Success = 0,
     PolicyNotFound = 1,
@@ -276,12 +261,6 @@ impl MACStats {
     }
 }
 
-impl Default for MACStats {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Simple MAC engine (OOP: Concrete engine class)
 pub struct SimpleMACEngine {
     policies: Vec<Option<Box<dyn MACPolicy>>>,
@@ -296,7 +275,7 @@ pub struct SimpleMACEngine {
 
 /// Engine capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct EngineCapability {
     pub can_register_policies: bool,
     pub can_create_contexts: bool,
@@ -465,13 +444,11 @@ mod tests {
     fn test_simple_mac_engine() {
         let cap = EngineCapability::full();
         let mut engine = SimpleMACEngine::new(cap);
-        let ctx_id = engine
-            .create_context(
-                SecurityLevel::Medium,
-                SecurityDomain::System,
-                ContextCapability::full(),
-            )
-            .unwrap();
+        let ctx_id = engine.create_context(
+            SecurityLevel::Medium,
+            SecurityDomain::System,
+            ContextCapability::full(),
+        ).unwrap();
         let policy_cap = PolicyCapability::full();
         let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
         engine.register_policy(Box::new(policy)).unwrap();

@@ -1,17 +1,15 @@
-#![no_std]
-#![no_main]
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-use core::mem;
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
 /// Based on Roadmap Item 63: Secrets management
+
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicBool};
+use core::mem;
 
 /// Secret ID
 pub type SecretID = usize;
@@ -117,12 +115,7 @@ pub struct SimpleSecret {
 }
 
 impl SimpleSecret {
-    pub fn new(
-        id: SecretID,
-        name: &[u8],
-        secret_type: SecretType,
-        capability: SecretCapability,
-    ) -> Self {
+    pub fn new(id: SecretID, name: &[u8], secret_type: SecretType, capability: SecretCapability) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
 
@@ -352,8 +345,8 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        for secret_opt in &mut self.secrets {
-            if let Some(ref mut secret) = secret_opt {
+        for slot in self.secrets.iter_mut() {
+            if let Some(ref mut secret) = slot {
                 if secret.id() == id {
                     return Some(secret);
                 }
@@ -408,3 +401,4 @@ mod tests {
         assert_eq!(retrieved.name(), b"TestSecret");
     }
 }
+

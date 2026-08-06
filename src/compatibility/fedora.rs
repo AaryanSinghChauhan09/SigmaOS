@@ -295,6 +295,86 @@ impl SigmaNextChannel {
     }
 }
 
+/// ALU Status Flags (mimicking x86 EFLAGS and ARM CPSR/PSTATE inside Fedora packaging and reliability suites)
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct FedoraAluFlags {
+    pub carry: bool,
+    pub zero: bool,
+    pub sign: bool,
+    pub overflow: bool,
+}
+
+/// Fedora-inspired High-Reliability Arithmetic Logic Unit (ALU) Emulator.
+/// Restores mathematical stability constraints and saturated DSP boundaries to critical subsystems.
+pub struct FedoraAlu {
+    pub flags: FedoraAluFlags,
+}
+
+impl FedoraAlu {
+    pub fn new() -> Self {
+        Self {
+            flags: FedoraAluFlags::default(),
+        }
+    }
+
+    /// Reset status flags
+    pub fn reset_flags(&mut self) {
+        self.flags = FedoraAluFlags::default();
+    }
+
+    /// Updates common Zero and Sign flags
+    fn update_zero_sign(&mut self, result: u64) {
+        self.flags.zero = result == 0;
+        self.flags.sign = (result as i64) < 0;
+    }
+
+    /// 64-bit Addition with Carry and Overflow detection (x86 ADD parity)
+    pub fn add(&mut self, op1: u64, op2: u64) -> u64 {
+        let (res, carry) = op1.overflowing_add(op2);
+        self.flags.carry = carry;
+
+        let sign1 = (op1 as i64) < 0;
+        let sign2 = (op2 as i64) < 0;
+        let sign_res = (res as i64) < 0;
+        self.flags.overflow = (sign1 == sign2) && (sign1 != sign_res);
+
+        self.update_zero_sign(res);
+        res
+    }
+
+    /// 64-bit Subtraction with Carry (Borrow) and Overflow (x86 SUB parity)
+    pub fn sub(&mut self, op1: u64, op2: u64) -> u64 {
+        let (res, carry) = op1.overflowing_sub(op2);
+        self.flags.carry = carry;
+
+        let sign1 = (op1 as i64) < 0;
+        let sign2 = (op2 as i64) < 0;
+        let sign_res = (res as i64) < 0;
+        self.flags.overflow = (sign1 != sign2) && (sign1 != sign_res);
+
+        self.update_zero_sign(res);
+        res
+    }
+
+    /// Saturated 64-bit Addition (ARM NEON / DSP parity)
+    /// Prevents standard overflow warping by clamping results to numeric bounds
+    pub fn saturated_add(&mut self, op1: i64, op2: i64) -> i64 {
+        match op1.checked_add(op2) {
+            Some(res) => {
+                self.flags.overflow = false;
+                self.update_zero_sign(res as u64);
+                res
+            }
+            None => {
+                self.flags.overflow = true;
+                let res = if op1 > 0 { i64::MAX } else { i64::MIN };
+                self.update_zero_sign(res as u64);
+                res
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -401,5 +481,74 @@ mod tests {
         assert_eq!(msg_next, "sigma.next rolling Rawhide update complete");
         assert_eq!(channel.package_version, "1.1.0-rawhide");
         assert_eq!(channel.rollback_snapshots, vec!["1.0.0".to_string()]);
+    }
+
+    #[test]
+    fn test_fedora_alu_addition() {
+        let mut alu = FedoraAlu::new();
+        assert_eq!(alu.flags, FedoraAluFlags::default());
+
+        // Simple addition
+        let r1 = alu.add(10, 20);
+        assert_eq!(r1, 30);
+        assert!(!alu.flags.carry);
+        assert!(!alu.flags.zero);
+        assert!(!alu.flags.sign);
+        assert!(!alu.flags.overflow);
+
+        // Addition causing zero and sign
+        let r2 = alu.add(0xFFFF_FFFF_FFFF_FFFF, 1);
+        assert_eq!(r2, 0);
+        assert!(alu.flags.carry);
+        assert!(alu.flags.zero);
+        assert!(!alu.flags.sign);
+        assert!(!alu.flags.overflow);
+
+        // Sign test
+        let r3 = alu.add(0, 0x8000_0000_0000_0000);
+        assert_eq!(r3, 0x8000_0000_0000_0000);
+        assert!(!alu.flags.carry);
+        assert!(!alu.flags.zero);
+        assert!(alu.flags.sign);
+        assert!(!alu.flags.overflow);
+
+        // Overflow test: positive + positive = negative
+        let r4 = alu.add(0x7FFF_FFFF_FFFF_FFFF, 1);
+        assert_eq!(r4, 0x8000_0000_0000_0000);
+        assert!(!alu.flags.carry);
+        assert!(!alu.flags.zero);
+        assert!(alu.flags.sign);
+        assert!(alu.flags.overflow);
+    }
+
+    #[test]
+    fn test_fedora_alu_subtraction() {
+        let mut alu = FedoraAlu::new();
+        let r1 = alu.sub(10, 20);
+        assert_eq!(r1, 0xFFFF_FFFF_FFFF_FFF6);
+        assert!(alu.flags.carry); // Borrow occurred
+        assert!(!alu.flags.zero);
+        assert!(alu.flags.sign);
+        assert!(!alu.flags.overflow);
+    }
+
+    #[test]
+    fn test_fedora_alu_saturated_math() {
+        let mut alu = FedoraAlu::new();
+
+        // Simple saturated add
+        let r1 = alu.saturated_add(10, 20);
+        assert_eq!(r1, 30);
+        assert!(!alu.flags.overflow);
+
+        // Overflow saturated add
+        let r2 = alu.saturated_add(i64::MAX, 1);
+        assert_eq!(r2, i64::MAX);
+        assert!(alu.flags.overflow);
+
+        // Underflow saturated add
+        let r3 = alu.saturated_add(i64::MIN, -1);
+        assert_eq!(r3, i64::MIN);
+        assert!(alu.flags.overflow);
     }
 }

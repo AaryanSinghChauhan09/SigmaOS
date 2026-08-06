@@ -37,15 +37,12 @@ pub struct IsolatedDomain {
 }
 
 impl IsolatedDomain {
-    pub fn new(
-        id: DomainID,
-        name_str: &[u8],
-        domain_type: DomainType,
-        caps: CapabilityToken,
-    ) -> Self {
+    pub fn new(id: DomainID, name_str: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Self {
         let mut name_arr = [0u8; 32];
         let len = name_str.len().min(31);
-        name_arr[..len].copy_from_slice(&name_str[..len]);
+        for i in 0..len {
+            name_arr[i] = name_str[i];
+        }
         Self {
             id,
             name: name_arr,
@@ -81,17 +78,8 @@ impl QrexecPolicyEngine {
         Self { rules: Vec::new() }
     }
 
-    pub fn add_rule(
-        &mut self,
-        source_type: DomainType,
-        dest_type: DomainType,
-        action: QrexecPolicyAction,
-    ) {
-        self.rules.push(QrexecRule {
-            source_type,
-            dest_type,
-            action,
-        });
+    pub fn add_rule(&mut self, source_type: DomainType, dest_type: DomainType, action: QrexecPolicyAction) {
+        self.rules.push(QrexecRule { source_type, dest_type, action });
     }
 
     pub fn check_rpc_policy(&self, src: DomainType, dest: DomainType) -> QrexecPolicyAction {
@@ -137,9 +125,7 @@ impl TemplateVmManager {
     pub fn discard_volatile_overlay(&mut self) {
         if self.app_vm_count > 0 {
             self.app_vm_count -= 1;
-            self.active_overlays_allocated_bytes = self
-                .active_overlays_allocated_bytes
-                .saturating_sub(128 * 1024 * 1024);
+            self.active_overlays_allocated_bytes = self.active_overlays_allocated_bytes.saturating_sub(128 * 1024 * 1024);
         }
     }
 }
@@ -149,12 +135,6 @@ pub struct DomainOrchestrator {
     domains: Vec<Option<IsolatedDomain>>,
     next_id: AtomicUsize,
     pub qrexec_policy: QrexecPolicyEngine,
-}
-
-impl Default for DomainOrchestrator {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl DomainOrchestrator {
@@ -167,12 +147,7 @@ impl DomainOrchestrator {
     }
 
     /// Spawns a compartmentalized secure domain with custom hardware capability tokens
-    pub fn spawn_domain(
-        &mut self,
-        name: &[u8],
-        domain_type: DomainType,
-        caps: CapabilityToken,
-    ) -> Result<DomainID, IsolationError> {
+    pub fn spawn_domain(&mut self, name: &[u8], domain_type: DomainType, caps: CapabilityToken) -> Result<DomainID, IsolationError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let domain = IsolatedDomain::new(id, name, domain_type, caps);
         self.domains.push(Some(domain));
@@ -193,12 +168,7 @@ impl DomainOrchestrator {
     }
 
     /// Routes inter-domain requests securely via capability-gated microkernel IPC pathways (Qrexec equivalent)
-    pub fn send_interdomain_request(
-        &self,
-        src_id: DomainID,
-        dest_id: DomainID,
-        req_payload: &[u8],
-    ) -> Result<Vec<u8>, IsolationError> {
+    pub fn send_interdomain_request(&self, src_id: DomainID, dest_id: DomainID, req_payload: &[u8]) -> Result<Vec<u8>, IsolationError> {
         let mut src_domain = None;
         let mut dest_domain = None;
 
@@ -217,9 +187,7 @@ impl DomainOrchestrator {
         let dest = dest_domain.ok_or(IsolationError::DomainNotFound)?;
 
         // Enforce Qrexec policy checks
-        let action = self
-            .qrexec_policy
-            .check_rpc_policy(src.domain_type, dest.domain_type);
+        let action = self.qrexec_policy.check_rpc_policy(src.domain_type, dest.domain_type);
         if action == QrexecPolicyAction::Deny {
             return Err(IsolationError::PermissionDenied);
         }
@@ -298,12 +266,6 @@ impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -325,9 +287,6 @@ impl<T> Vec<T> {
     }
     pub fn len(&self) -> usize {
         self.len
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
@@ -446,41 +405,21 @@ mod tests {
     #[test]
     fn test_qubes_domain_compartmentalization() {
         let mut orchestrator = DomainOrchestrator::new();
-        orchestrator.qrexec_policy.add_rule(
-            DomainType::App,
-            DomainType::Net,
-            QrexecPolicyAction::Allow,
-        );
+        orchestrator.qrexec_policy.add_rule(DomainType::App, DomainType::Net, QrexecPolicyAction::Allow);
 
         // 1. Spawn Net domain with full hardware token (0xFFFF)
-        let net_id = orchestrator
-            .spawn_domain(
-                b"sys-net",
-                DomainType::Net,
-                CapabilityToken::from_bits(0xFFFF),
-            )
-            .unwrap();
+        let net_id = orchestrator.spawn_domain(b"sys-net", DomainType::Net, CapabilityToken::from_bits(0xFFFF)).unwrap();
 
         // 2. Spawn standard App domain with no Net capability (bits = 0x00)
-        let app_id = orchestrator
-            .spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00))
-            .unwrap();
+        let app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
 
         // 3. Send interdomain IPC - Should fail due to zero Net capabilities on AppVM
         let res = orchestrator.send_interdomain_request(app_id, net_id, b"Ping Net");
         assert_eq!(res, Err(IsolationError::PermissionDenied));
 
         // 4. Spawn a trust-authorized AppVM with Net permission (bits = 0x02)
-        let secure_app_id = orchestrator
-            .spawn_domain(
-                b"secure-app",
-                DomainType::App,
-                CapabilityToken::from_bits(0x02),
-            )
-            .unwrap();
-        let secure_res = orchestrator
-            .send_interdomain_request(secure_app_id, net_id, b"Ping Net")
-            .unwrap();
+        let secure_app_id = orchestrator.spawn_domain(b"secure-app", DomainType::App, CapabilityToken::from_bits(0x02)).unwrap();
+        let secure_res = orchestrator.send_interdomain_request(secure_app_id, net_id, b"Ping Net").unwrap();
         assert_eq!(secure_res[0], b'P');
         assert_eq!(secure_res[secure_res.len() - 1], b'R'); // Response confirmation
     }
@@ -488,29 +427,12 @@ mod tests {
     #[test]
     fn test_qrexec_policy_engine() {
         let mut policy = QrexecPolicyEngine::new();
-        policy.add_rule(
-            DomainType::App,
-            DomainType::Storage,
-            QrexecPolicyAction::Allow,
-        );
-        policy.add_rule(
-            DomainType::Disposable,
-            DomainType::Net,
-            QrexecPolicyAction::Ask,
-        );
+        policy.add_rule(DomainType::App, DomainType::Storage, QrexecPolicyAction::Allow);
+        policy.add_rule(DomainType::Disposable, DomainType::Net, QrexecPolicyAction::Ask);
 
-        assert_eq!(
-            policy.check_rpc_policy(DomainType::App, DomainType::Storage),
-            QrexecPolicyAction::Allow
-        );
-        assert_eq!(
-            policy.check_rpc_policy(DomainType::Disposable, DomainType::Net),
-            QrexecPolicyAction::Ask
-        );
-        assert_eq!(
-            policy.check_rpc_policy(DomainType::App, DomainType::Net),
-            QrexecPolicyAction::Deny
-        ); // default deny
+        assert_eq!(policy.check_rpc_policy(DomainType::App, DomainType::Storage), QrexecPolicyAction::Allow);
+        assert_eq!(policy.check_rpc_policy(DomainType::Disposable, DomainType::Net), QrexecPolicyAction::Ask);
+        assert_eq!(policy.check_rpc_policy(DomainType::App, DomainType::Net), QrexecPolicyAction::Deny); // default deny
     }
 
     #[test]
@@ -521,10 +443,7 @@ mod tests {
         let app_id = template_manager.instantiate_app_vm().unwrap();
         assert_eq!(app_id, 501);
         assert_eq!(template_manager.app_vm_count, 1);
-        assert_eq!(
-            template_manager.active_overlays_allocated_bytes,
-            128 * 1024 * 1024
-        );
+        assert_eq!(template_manager.active_overlays_allocated_bytes, 128 * 1024 * 1024);
 
         template_manager.discard_volatile_overlay();
         assert_eq!(template_manager.app_vm_count, 0);
@@ -535,16 +454,8 @@ mod tests {
     fn test_qubes_disposable_domain_cleanup() {
         let mut orchestrator = DomainOrchestrator::new();
 
-        let app_id = orchestrator
-            .spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00))
-            .unwrap();
-        let disp_id = orchestrator
-            .spawn_domain(
-                b"disp-browser",
-                DomainType::Disposable,
-                CapabilityToken::from_bits(0x00),
-            )
-            .unwrap();
+        let app_id = orchestrator.spawn_domain(b"work", DomainType::App, CapabilityToken::from_bits(0x00)).unwrap();
+        let disp_id = orchestrator.spawn_domain(b"disp-browser", DomainType::Disposable, CapabilityToken::from_bits(0x00)).unwrap();
 
         assert_eq!(orchestrator.active_domains_count(), 2);
 
@@ -554,9 +465,6 @@ mod tests {
         assert_eq!(orchestrator.active_domains_count(), 1);
 
         // Ensure browser is fully purged
-        assert_eq!(
-            orchestrator.terminate_domain(disp_id),
-            Err(IsolationError::DomainNotFound)
-        );
+        assert_eq!(orchestrator.terminate_domain(disp_id), Err(IsolationError::DomainNotFound));
     }
 }
