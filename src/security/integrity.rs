@@ -128,7 +128,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst) as u32) }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
