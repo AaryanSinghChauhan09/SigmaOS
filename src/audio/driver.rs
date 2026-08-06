@@ -1,3 +1,4 @@
+use crate::klib::Vec;
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements audio device management and playback
@@ -5,16 +6,26 @@
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 pub type AudioDeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum AudioType { Playback = 0, Capture = 1, Duplex = 2 }
+pub enum AudioType {
+    Playback = 0,
+    Capture = 1,
+    Duplex = 2,
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AudioError {
+    Success = 0,
+    NotFound = 1,
+    InitFailed = 2,
+    PlaybackFailed = 3,
+}
+#[derive(Debug, Clone, Copy)]
 pub enum AudioError {
     Success = 0,
     NotFound = 1,
@@ -67,7 +78,9 @@ impl AudioDevice for SimpleAudioDevice {
             _ => AudioType::Duplex,
         }
     }
-    fn sample_rate(&self) -> u32 { self.sample_rate.load(Ordering::SeqCst) as u32 }
+    fn sample_rate(&self) -> u32 {
+        self.sample_rate.load(Ordering::SeqCst) as u32
+    }
 
     fn initialize(&mut self) -> Result<(), AudioError> {
         Ok(())

@@ -67,7 +67,7 @@ impl SimpleBuddyAllocator {
         ];
         let mut blocks = Vec::new();
         let next_id = AtomicUsize::new(0);
-        
+
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
         let initial_block = Block::new(initial_order);
@@ -92,15 +92,15 @@ impl BuddyAllocator for SimpleBuddyAllocator {
         for current_order in order..=self.max_order.load(Ordering::SeqCst) {
             if !self.free_lists[current_order].is_empty() {
                 let block_id = self.free_lists[current_order].remove(0);
-                
+
                 if current_order > order {
                     let new_order = current_order - 1;
                     let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-                    
+
                     let left_block = Block::new(new_order);
                     let right_block = Block::new(new_order);
-                    
+
                     if let Some(ref mut parent) = self.blocks[block_id] {
                         parent.left.store(left_id, Ordering::SeqCst);
                         parent.right.store(right_id, Ordering::SeqCst);

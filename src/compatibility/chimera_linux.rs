@@ -5,6 +5,11 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
+use crate::klib::Vec;
+/// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
+/// Replicates Chimera's signature modern features:
+/// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 use core::sync::atomic::{AtomicBool, Ordering};
 

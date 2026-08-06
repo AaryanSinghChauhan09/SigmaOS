@@ -13,6 +13,4 @@ pub use orchestration::{
     VirtualizationStrategy, VirtualizationStrategyFactory, VirtualizationTech, VmState,
 };
 
-pub use oci_pod::{
-    ContainerConfig, OciPod, OciPodManager, PodState,
-};
+pub use oci_pod::{ContainerConfig, OciPod, OciPodManager, PodState};

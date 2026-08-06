@@ -5,6 +5,7 @@ pub mod error;
 pub mod isa;
 pub mod store;
 pub mod vec;
+// SigmaOS Kernel Library
 pub mod buddy_allocator;
 pub mod paging;
 pub mod hashmap;

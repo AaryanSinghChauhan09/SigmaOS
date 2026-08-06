@@ -18,6 +18,6 @@ pub use policy_mechanism::{
     AdaptivePolicy, InstructionCyclePhase, InterruptClass, IoWaitProfile, KernelMechanism,
     KernelPolicy, PolicyMechanismCoordinator, SovereignMechanism,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use numa_scheduler::{NumaTask, LockFreeTaskQueue, NumaNode, NumaScheduler};
