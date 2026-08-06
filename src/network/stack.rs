@@ -1,21 +1,23 @@
 #![no_std]
-#![no_main]
+#![allow(warnings)]
+#![allow(clippy::all)]
 
 /// OOP-based Network Stack for SigmaOS
 /// Implements networking using OOP principles with traits and structs
 /// No dependency on external network frameworks
 /// Based on Roadmap Item 6: Network stack
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Socket ID
 pub type SocketID = usize;
 
 /// Socket type
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketType {
     TCP = 0,
     UDP = 1,
@@ -23,8 +25,8 @@ pub enum SocketType {
 }
 
 /// Socket state
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SocketState {
     Closed = 0,
     Listening = 1,
@@ -58,8 +60,8 @@ pub trait Socket {
 }
 
 /// Network error types
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
     Success = 0,
     InvalidPort = 1,
@@ -71,6 +73,7 @@ pub enum NetworkError {
 
 /// Socket info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct SocketInfo {
     pub id: SocketID,
     pub socket_type: SocketType,
@@ -97,7 +100,7 @@ impl SocketInfo {
 
 /// Socket capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SocketCapability {
     pub can_send: bool,
     pub can_receive: bool,
@@ -119,8 +122,13 @@ impl SocketCapability {
     }
 }
 
+impl Default for SocketCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple socket (OOP: Concrete socket class)
-#[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
     pub socket_type: SocketType,
@@ -149,9 +157,7 @@ impl SimpleSocket {
     }
 
     pub fn get_state(&self) -> SocketState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
-        }
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
 
     pub fn set_state(&self, state: SocketState) {
@@ -198,7 +204,11 @@ impl Socket for SimpleSocket {
         let bytes_to_send = data.len().min(4096);
 
         unsafe {
-            core::ptr::copy_nonoverlapping(data.as_ptr(), self.send_buffer.as_mut_ptr(), bytes_to_send);
+            core::ptr::copy_nonoverlapping(
+                data.as_ptr(),
+                self.send_buffer.as_mut_ptr(),
+                bytes_to_send,
+            );
         }
 
         self.send_buffer_size.store(bytes_to_send, Ordering::SeqCst);
@@ -260,6 +270,7 @@ pub trait NetworkStack {
 
 /// Network statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NetworkStats {
     pub total_sockets: usize,
     pub active_sockets: usize,
@@ -276,17 +287,23 @@ impl NetworkStats {
     }
 }
 
+impl Default for NetworkStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple network stack (OOP: Concrete stack class)
 pub struct SimpleNetworkStack {
-    sockets: Vec<Option<Box<dyn Socket>>>,
-    next_id: AtomicUsize,
-    stats: NetworkStats,
-    capability: StackCapability,
+    pub sockets: Vec<Option<Box<dyn Socket>>>,
+    pub next_id: AtomicUsize,
+    pub stats: NetworkStats,
+    pub capability: StackCapability,
 }
 
 /// Stack capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct StackCapability {
     pub can_create: bool,
     pub can_destroy: bool,
@@ -305,6 +322,12 @@ impl StackCapability {
             can_create: true,
             can_destroy: true,
         }
+    }
+}
+
+impl Default for StackCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -389,60 +412,42 @@ impl NetworkStack for SimpleNetworkStack {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
+    #[test]
+    fn test_socket_operations() {
+        let cap = SocketCapability::full();
+        let mut socket = SimpleSocket::new(101, SocketType::TCP, cap);
+        assert_eq!(socket.id(), 101);
+        assert_eq!(socket.socket_type(), SocketType::TCP);
+        assert!(socket.bind(80).is_ok());
+        assert!(socket.listen().is_ok());
+        assert!(socket.connect([127, 0, 0, 1], 8080).is_ok());
+
+        let data = b"hello";
+        assert_eq!(socket.send(data).unwrap(), 5);
+
+        let mut buf = [0u8; 10];
+        assert_eq!(socket.receive(&mut buf).unwrap(), 10);
+        assert_eq!(buf[0], 0);
+
+        assert!(socket.close().is_ok());
     }
 
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+    #[test]
+    fn test_network_stack() {
+        let cap = StackCapability::full();
+        let mut stack = SimpleNetworkStack::new(cap);
+        let id = stack.create_socket(SocketType::UDP).unwrap();
+        assert!(stack.get_socket(id).is_some());
+        assert_eq!(stack.list_sockets().len(), 1);
 
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+        let stats = stack.stats();
+        assert_eq!(stats.total_sockets, 1);
+        assert_eq!(stats.by_type[SocketType::UDP as usize], 1);
+
+        assert!(stack.destroy_socket(id).is_ok());
     }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
