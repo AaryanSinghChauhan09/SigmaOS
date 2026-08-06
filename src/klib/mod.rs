@@ -34,3 +34,4 @@ pub use slab::{SlabCache, TypedSlabCache};
 // Re-export String and related types from custom_string if present
 #[cfg(all())]
 pub use crate::klib::string::String as KString;
+pub use std::collections::HashMap;
