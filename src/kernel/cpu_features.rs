@@ -198,6 +198,22 @@ impl SovereignCompilerOptimizer {
                     i += 1;
                 }
             }
+            CpuInstructionExtension::Neon => {
+                // Vectorized ARM NEON FMA/SIMD execution path (quadword unrolled)
+                let len = lhs.len().min(rhs.len()).min(out.len());
+                let mut i = 0;
+                while i + 3 < len {
+                    out[i] = lhs[i] * rhs[i];
+                    out[i + 1] = lhs[i + 1] * rhs[i + 1];
+                    out[i + 2] = lhs[i + 2] * rhs[i + 2];
+                    out[i + 3] = lhs[i + 3] * rhs[i + 3];
+                    i += 4;
+                }
+                while i < len {
+                    out[i] = lhs[i] * rhs[i];
+                    i += 1;
+                }
+            }
             _ => {
                 // Fallback serial execution path
                 for i in 0..lhs.len() {
@@ -227,7 +243,6 @@ impl Default for SovereignCompilerOptimizer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
 
     #[test]
     fn test_cpu_optimizer_creation() {

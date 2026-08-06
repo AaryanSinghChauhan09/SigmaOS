@@ -677,6 +677,11 @@ impl DependencyResolver {
         let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
         to_visit.push(package_name.to_string());
         let mut visited = HashSet::<String>::new();
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
+        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+        to_visit.push(package_name.to_string());
+        let mut visited = std::collections::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;
@@ -813,7 +818,9 @@ impl TransactionalHistory {
         self.next_checkpoint_id += 1;
 
         let mut keys: Vec<String> = Vec::new();
+        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
         for key in installed.keys() {
+            let key: &String = key;
             keys.push(key.clone());
         }
 
@@ -939,6 +946,13 @@ impl UniversalPackageManager {
                     if let Err(err_msg) = hook(&installing_package) {
                         installing_package.state = PackageState::BrokenDependency;
                         return Err(PackageError::InstallationFailed(format!("Pre-install hook failed: {}", err_msg)));
+            if let Some(package) = self.packages.get(&dep_name) {
+                // Find appropriate adapter
+                for format in &package.formats {
+                    if let Some(adapter) = self.adapters.get(format) {
+                        let adapter: &PackageAdapter = adapter;
+                        adapter.install(package)?;
+                        break;
                     }
                 }
 
@@ -984,6 +998,7 @@ impl UniversalPackageManager {
                 strategy.remove(package)?;
             } else if let Some(format) = package.formats.first() {
                 if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
                     adapter.remove(package)?;
                 }
             }

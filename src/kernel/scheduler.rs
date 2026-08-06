@@ -33,6 +33,8 @@ pub struct Process {
     pub virtual_deadline: u64,
     pub time_slice: Duration,
     pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
+    pub burst_score: u64,
+    pub last_active_time: u64,
 }
 
 impl Process {
@@ -46,6 +48,8 @@ impl Process {
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
             edf_deadline: None,
+            burst_score: 0,
+            last_active_time: 0,
         }
     }
 
@@ -221,5 +225,40 @@ mod tests {
         let chosen = scheduler.schedule().unwrap();
         assert_eq!(chosen.pid, 3);
         assert_eq!(chosen.name, "rt_early");
+    }
+
+    #[test]
+    fn test_bore_scheduling_prioritization() {
+        let mut scheduler = Scheduler::new();
+
+        // 1. Create a CPU-bound process and an interactive process with identical priorities
+        let p_cpu = Process::new(1, "cpu_bound".to_string(), Priority::Normal);
+        let p_interactive = Process::new(2, "interactive".to_string(), Priority::Normal);
+
+        // Add both to scheduler
+        scheduler.add_process(p_cpu);
+        scheduler.add_process(p_interactive);
+
+        // 2. Simulate CPU-bound process running for long bursts, accumulating high burst score
+        scheduler.charge_process_burst(1, 50); // charge 50 burst penalty to cpu_bound
+
+        // Assert that the CPU-bound process now has a significantly higher virtual deadline (penalized)
+        let proc_cpu = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        let proc_interactive = scheduler.processes.iter().find(|p| p.pid == 2).unwrap();
+        assert!(proc_cpu.virtual_deadline > proc_interactive.virtual_deadline);
+
+        // 3. Advancing scheduler time ticks and scheduling should pick the interactive process first
+        for _ in 0..10 {
+            scheduler.tick();
+        }
+
+        let chosen = scheduler.schedule().unwrap();
+        assert_eq!(chosen.pid, 2); // interactive should be scheduled first
+        assert_eq!(chosen.name, "interactive");
+
+        // 4. Test decay of burst scores
+        scheduler.decay_process_bursts();
+        let proc_cpu_decayed = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        assert_eq!(proc_cpu_decayed.burst_score, 49); // decayed by 1
     }
 }
