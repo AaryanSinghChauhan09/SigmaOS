@@ -458,7 +458,7 @@ impl SendReceiveManager {
         Ok(Vec::new())
     }
 
-    pub fn receive_subvolume(&mut self, data: &[u8], name: String) -> Result<u64, &'static str> {
+    pub fn receive_subvolume(&mut self, _data: &[u8], name: String) -> Result<u64, &'static str> {
         // In a real implementation, this would parse the binary stream and create subvolume
         self.subvolume_manager.create_subvolume(name, None)
     }

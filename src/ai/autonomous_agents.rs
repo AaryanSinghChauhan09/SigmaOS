@@ -299,7 +299,7 @@ impl SovereignMonitor {
     }
 
     fn initiate_recovery(&mut self, agent_id: u32) {
-        if let Some(ref mut agent) = self.agents.iter_mut().find(|a| {
+        if let Some(ref mut _agent) = self.agents.iter_mut().find(|a| {
             if let Some(ref a) = a {
                 a.agent_id() == agent_id
             } else {
@@ -307,7 +307,7 @@ impl SovereignMonitor {
             }
         }) {
             // Rollback to last known good state
-            if let Some(state) = self.watchdog.rollback_state(agent_id) {
+            if let Some(_state) = self.watchdog.rollback_state(agent_id) {
                 // In a real implementation, this would restore the agent state
                 // For now, we just mark it as recovering
             }
@@ -341,7 +341,7 @@ impl AgentBase for GovernanceAgent {
         self.id
     }
 
-    fn on_intent(&mut self, intent: &Intent) -> Result<(), AgentError> {
+    fn on_intent(&mut self, _intent: &Intent) -> Result<(), AgentError> {
         // Check if the intent complies with security policies
         if self.capabilities.has_capability(0b0001) {
             // Enforce security policy
@@ -351,7 +351,7 @@ impl AgentBase for GovernanceAgent {
         }
     }
 
-    fn on_event(&mut self, event: &SovereignEvent) {
+    fn on_event(&mut self, _event: &SovereignEvent) {
         // Respond to security-related events
     }
 
@@ -390,12 +390,12 @@ impl AgentBase for MaintenanceAgent {
         self.id
     }
 
-    fn on_intent(&mut self, intent: &Intent) -> Result<(), AgentError> {
+    fn on_intent(&mut self, _intent: &Intent) -> Result<(), AgentError> {
         // Perform maintenance tasks
         Ok(())
     }
 
-    fn on_event(&mut self, event: &SovereignEvent) {
+    fn on_event(&mut self, _event: &SovereignEvent) {
         // Respond to system health events
     }
 
@@ -434,12 +434,12 @@ impl AgentBase for ObservationAgent {
         self.id
     }
 
-    fn on_intent(&mut self, intent: &Intent) -> Result<(), AgentError> {
+    fn on_intent(&mut self, _intent: &Intent) -> Result<(), AgentError> {
         // Monitor system health
         Ok(())
     }
 
-    fn on_event(&mut self, event: &SovereignEvent) {
+    fn on_event(&mut self, _event: &SovereignEvent) {
         // Process monitoring events
     }
 
@@ -478,12 +478,12 @@ impl AgentBase for InterfaceAgent {
         self.id
     }
 
-    fn on_intent(&mut self, intent: &Intent) -> Result<(), AgentError> {
+    fn on_intent(&mut self, _intent: &Intent) -> Result<(), AgentError> {
         // Optimize UI based on user intent
         Ok(())
     }
 
-    fn on_event(&mut self, event: &SovereignEvent) {
+    fn on_event(&mut self, _event: &SovereignEvent) {
         // Respond to UI events
     }
 
@@ -522,12 +522,12 @@ impl AgentBase for BridgeAgent {
         self.id
     }
 
-    fn on_intent(&mut self, intent: &Intent) -> Result<(), AgentError> {
+    fn on_intent(&mut self, _intent: &Intent) -> Result<(), AgentError> {
         // Handle legacy compatibility
         Ok(())
     }
 
-    fn on_event(&mut self, event: &SovereignEvent) {
+    fn on_event(&mut self, _event: &SovereignEvent) {
         // Respond to compatibility events
     }
 

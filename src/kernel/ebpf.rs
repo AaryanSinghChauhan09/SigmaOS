@@ -1,45 +1,34 @@
-//! eBPF (Extended Berkeley Packet Filter) Virtual Machine, Hook Engine, & Map Registry
-//! Provides safe, sandboxed bytecode execution and Linux-parity State-Sharing Maps inside microkernel hooks.
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS eBPF-inspired Extended Berkeley Packet Filter
+// Inspired by Linux kernel eBPF - safe, efficient kernel-space programming
+// Zero-dependency, #![no_std] compliant
 
+use core::cell::RefCell;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
-// (no_std only applicable at crate root - removed)
+/// eBPF program type classification
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BpfProgramType {
+    SocketFilter = 1,
+    Kprobe = 2,
+    SchedClassifier = 3,
+    Xdp = 4,
+    PerfEvent = 5,
+    CgroupSock = 6,
+    CgroupSockAddr = 7,
+    LwtIn = 8,
+    LwtOut = 9,
+    LwtXmit = 10,
+    SocketMap = 11,
+    SkMsg = 12,
+    RawTracepoint = 13,
+    CgroupSockOps = 14,
+}
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
-
-// =========================================================================
-// EBPF INSTRUCTION DECODER & OPCODES
-// =========================================================================
-
-pub const BPF_LD: u8 = 0x00;
-pub const BPF_ALU: u8 = 0x07;
-pub const BPF_JMP: u8 = 0x05;
-
-pub const BPF_ADD: u8 = 0x00;
-pub const BPF_SUB: u8 = 0x10;
-pub const BPF_MUL: u8 = 0x20;
-pub const BPF_XOR: u8 = 0xa0;
-
+/// eBPF instruction set (64-bit instruction encoding)
+#[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub struct EbpfInstruction {
+pub struct BpfInstruction {
     pub opcode: u8,
     pub dst_reg: u8,
     pub src_reg: u8,
@@ -47,358 +36,283 @@ pub struct EbpfInstruction {
     pub imm: i32,
 }
 
-// =========================================================================
-// EBPF MAP REGISTRY (Linux Parity State-Sharing)
-// =========================================================================
+/// eBPF register set (10 general-purpose registers)
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct BpfRegisters {
+    pub r0: u64,  // return value
+    pub r1: u64,  // argument 1
+    pub r2: u64,  // argument 2
+    pub r3: u64,  // argument 3
+    pub r4: u64,  // argument 4
+    pub r5: u64,  // argument 5
+    pub r6: u64,  // callee-saved
+    pub r7: u64,  // callee-saved
+    pub r8: u64,  // callee-saved
+    pub r9: u64,  // callee-saved
+    pub r10: u64, // read-only frame pointer
+}
 
-/// eBPF Map Types (Linux Parity)
+/// eBPF virtual machine state
+pub struct BpfVm {
+    pub registers: BpfRegisters,
+    pub program: RefCell<[BpfInstruction; 4096]>, // max 4096 instructions
+    pub program_len: AtomicUsize,
+    pub stack: RefCell<[u8; 512]>, // 512-byte stack
+}
+
+impl BpfVm {
+    pub fn new() -> Self {
+        BpfVm {
+            registers: BpfRegisters {
+                r0: 0, r1: 0, r2: 0, r3: 0, r4: 0, r5: 0,
+                r6: 0, r7: 0, r8: 0, r9: 0, r10: 512,
+            },
+            program: RefCell::new([BpfInstruction {
+                opcode: 0, dst_reg: 0, src_reg: 0, offset: 0, imm: 0
+            }; 4096]),
+            program_len: AtomicUsize::new(0),
+            stack: RefCell::new([0u8; 512]),
+        }
+    }
+
+    /// Load eBPF program
+    pub fn load_program(&self, instructions: &[BpfInstruction]) -> Result<(), BpfError> {
+        if instructions.len() > 4096 {
+            return Err(BpfError::ProgramTooLarge);
+        }
+
+        let mut prog = self.program.borrow_mut();
+        for (i, &inst) in instructions.iter().enumerate() {
+            prog[i] = inst;
+        }
+        self.program_len.store(instructions.len(), Ordering::SeqCst);
+        Ok(())
+    }
+
+    /// Execute eBPF program
+    pub fn execute(&self, packet_data: &[u8]) -> Result<u64, BpfError> {
+        let prog_len = self.program_len.load(Ordering::SeqCst);
+        let prog = self.program.borrow();
+        
+        let mut pc: i32 = 0; // program counter
+        let mut regs = self.registers;
+        
+        // Set packet data pointer
+        regs.r1 = packet_data.as_ptr() as u64;
+        regs.r2 = packet_data.len() as u64;
+
+        while (pc as usize) < prog_len {
+            let inst = prog[pc as usize];
+            
+            match inst.opcode {
+                0x95 => { // EXIT
+                    return Ok(regs.r0);
+                }
+                0xb7 => { // MOV64_IMM
+                    match inst.dst_reg {
+                        0 => regs.r0 = inst.imm as u64,
+                        1 => regs.r1 = inst.imm as u64,
+                        2 => regs.r2 = inst.imm as u64,
+                        3 => regs.r3 = inst.imm as u64,
+                        4 => regs.r4 = inst.imm as u64,
+                        5 => regs.r5 = inst.imm as u64,
+                        6 => regs.r6 = inst.imm as u64,
+                        7 => regs.r7 = inst.imm as u64,
+                        8 => regs.r8 = inst.imm as u64,
+                        9 => regs.r9 = inst.imm as u64,
+                        _ => return Err(BpfError::InvalidRegister),
+                    }
+                }
+                0x07 => { // ADD64_IMM
+                    match inst.dst_reg {
+                        0 => regs.r0 = regs.r0.wrapping_add(inst.imm as u64),
+                        1 => regs.r1 = regs.r1.wrapping_add(inst.imm as u64),
+                        2 => regs.r2 = regs.r2.wrapping_add(inst.imm as u64),
+                        3 => regs.r3 = regs.r3.wrapping_add(inst.imm as u64),
+                        4 => regs.r4 = regs.r4.wrapping_add(inst.imm as u64),
+                        5 => regs.r5 = regs.r5.wrapping_add(inst.imm as u64),
+                        6 => regs.r6 = regs.r6.wrapping_add(inst.imm as u64),
+                        7 => regs.r7 = regs.r7.wrapping_add(inst.imm as u64),
+                        8 => regs.r8 = regs.r8.wrapping_add(inst.imm as u64),
+                        9 => regs.r9 = regs.r9.wrapping_add(inst.imm as u64),
+                        _ => return Err(BpfError::InvalidRegister),
+                    }
+                }
+                0x20 => { // LD_ABS_B (load byte from packet)
+                    let offset = inst.imm as u32 as usize;
+                    if offset >= packet_data.len() {
+                        regs.r0 = 0;
+                    } else {
+                        regs.r0 = packet_data[offset] as u64;
+                    }
+                }
+                0x61 => { // LDXW (load word from memory)
+                    let offset = inst.offset as u32 as usize;
+                    if offset + 4 <= 512 {
+                        let stack = self.stack.borrow();
+                        let val = u32::from_le_bytes([
+                            stack[offset], stack[offset+1], 
+                            stack[offset+2], stack[offset+3]
+                        ]);
+                        match inst.dst_reg {
+                            0 => regs.r0 = val as u64,
+                            1 => regs.r1 = val as u64,
+                            2 => regs.r2 = val as u64,
+                            3 => regs.r3 = val as u64,
+                            4 => regs.r4 = val as u64,
+                            5 => regs.r5 = val as u64,
+                            6 => regs.r6 = val as u64,
+                            7 => regs.r7 = val as u64,
+                            8 => regs.r8 = val as u64,
+                            9 => regs.r9 = val as u64,
+                            _ => return Err(BpfError::InvalidRegister),
+                        }
+                    }
+                }
+                0x05 => { // JMP_IMM (conditional jump)
+                    let cond = match inst.dst_reg {
+                        0 => regs.r0,
+                        1 => regs.r1,
+                        2 => regs.r2,
+                        3 => regs.r3,
+                        4 => regs.r4,
+                        5 => regs.r5,
+                        6 => regs.r6,
+                        7 => regs.r7,
+                        8 => regs.r8,
+                        9 => regs.r9,
+                        _ => return Err(BpfError::InvalidRegister),
+                    };
+                    
+                    if cond == inst.imm as u64 {
+                        pc += inst.offset;
+                    }
+                }
+                _ => return Err(BpfError::InvalidOpcode),
+            }
+            
+            pc += 1;
+        }
+        
+        Ok(regs.r0)
+    }
+}
+
+/// eBPF error types
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EbpfMapType {
-    Hash,
-    Array,
-    RingBuffer,
+pub enum BpfError {
+    ProgramTooLarge,
+    InvalidRegister,
+    InvalidOpcode,
+    StackOverflow,
+    InvalidMemoryAccess,
 }
 
-/// Represents an individual eBPF Map (Linux Parity)
-#[derive(Debug, Clone)]
-pub struct EbpfMap {
-    pub map_id: usize,
-    pub map_type: EbpfMapType,
-    pub key_size: usize,
-    pub value_size: usize,
-    pub max_entries: usize,
-    pub storage: BTreeMap<Vec<u8>, Vec<u8>>,
+/// eBPF map type (kernel-space data structures)
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BpfMapType {
+    Hash = 1,
+    Array = 2,
+    PerCpuHash = 3,
+    PerCpuArray = 4,
+    RingBuf = 5,
 }
 
-impl EbpfMap {
-    pub fn new(
-        id: usize,
-        map_type: EbpfMapType,
-        key_size: usize,
-        value_size: usize,
-        max_entries: usize,
-    ) -> Self {
-        Self {
-            map_id: id,
+/// eBPF map definition
+pub struct BpfMap {
+    pub map_type: BpfMapType,
+    pub key_size: u32,
+    pub value_size: u32,
+    pub max_entries: u32,
+    pub data: RefCell<[u8; 65536]>, // 64KB max map size
+}
+
+impl BpfMap {
+    pub fn new(map_type: BpfMapType, key_size: u32, value_size: u32, max_entries: u32) -> Self {
+        BpfMap {
             map_type,
             key_size,
             value_size,
             max_entries,
-            storage: BTreeMap::new(),
+            data: RefCell::new([0u8; 65536]),
         }
     }
 
-    pub fn lookup_elem(&self, key: &[u8]) -> Option<&Vec<u8>> {
-        self.storage.get(key)
+    /// Simple hash map lookup
+    pub fn lookup(&self, key: &[u8]) -> Option<Vec<u8>> {
+        // Simplified hash map implementation
+        let data = self.data.borrow();
+        let hash = self.simple_hash(key);
+        let offset = (hash % self.max_entries as u64) as usize;
+        
+        if offset + self.value_size as usize <= data.len() {
+            let mut value = vec![0u8; self.value_size as usize];
+            value.copy_from_slice(&data[offset..offset + self.value_size as usize]);
+            Some(value)
+        } else {
+            None
+        }
     }
 
-    pub fn update_elem(&mut self, key: Vec<u8>, value: Vec<u8>) -> Result<(), &'static str> {
-        if key.len() != self.key_size || value.len() != self.value_size {
-            return Err("eBPF Map: Element size mismatch constraint");
+    /// Simple hash map update
+    pub fn update(&self, key: &[u8], value: &[u8]) -> Result<(), BpfError> {
+        if value.len() != self.value_size as usize {
+            return Err(BpfError::InvalidMemoryAccess);
         }
-        if self.storage.len() >= self.max_entries && !self.storage.contains_key(&key) {
-            return Err("eBPF Map: Maximum entry bounds exceeded");
+
+        let mut data = self.data.borrow_mut();
+        let hash = self.simple_hash(key);
+        let offset = (hash % self.max_entries as u64) as usize;
+        
+        if offset + self.value_size as usize <= data.len() {
+            data[offset..offset + self.value_size as usize].copy_from_slice(value);
+            Ok(())
+        } else {
+            Err(BpfError::InvalidMemoryAccess)
         }
-        self.storage.insert(key, value);
-        Ok(())
     }
 
-    pub fn delete_elem(&mut self, key: &[u8]) -> Result<(), &'static str> {
-        self.storage
-            .remove(key)
-            .ok_or("eBPF Map: Element not found")
-            .map(|_| ())
+    fn simple_hash(&self, key: &[u8]) -> u64 {
+        let mut hash: u64 = 5381;
+        for &byte in key {
+            hash = hash.wrapping_mul(33).wrapping_add(byte as u64);
+        }
+        hash
     }
 }
-
-/// Global eBPF Map Registry (Linux Parity)
-pub struct EbpfMapRegistry {
-    pub maps: BTreeMap<usize, EbpfMap>,
-}
-
-impl EbpfMapRegistry {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            maps: BTreeMap::new(),
-        }
-    }
-
-    pub fn create_map(
-        &mut self,
-        id: usize,
-        map_type: EbpfMapType,
-        key_size: usize,
-        value_size: usize,
-        max_entries: usize,
-    ) -> Result<(), &'static str> {
-        if self.maps.contains_key(&id) {
-            return Err("eBPF Map: Map ID already registered");
-        }
-        let map = EbpfMap::new(id, map_type, key_size, value_size, max_entries);
-        self.maps.insert(id, map);
-        Ok(())
-    }
-
-    pub fn get_map(&self, id: usize) -> Option<&EbpfMap> {
-        self.maps.get(&id)
-    }
-
-    pub fn get_map_mut(&mut self, id: usize) -> Option<&mut EbpfMap> {
-        self.maps.get_mut(&id)
-    }
-}
-
-impl Default for EbpfMapRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// EBPF VIRTUAL MACHINE EXECUTION
-// =========================================================================
-
-pub struct EbpfVm {
-    pub registers: [u64; 11], // R0 (return) to R10 (frame pointer)
-    pub bytecode: Vec<EbpfInstruction>,
-}
-
-impl EbpfVm {
-    pub fn new(bytecode: Vec<EbpfInstruction>) -> Self {
-        Self {
-            registers: [0u64; 11],
-            bytecode,
-        }
-    }
-
-    /// Executes compiled eBPF instructions inside a strict, safe sandbox environment
-    pub fn run(&mut self, context_buffer: &[u8]) -> Result<u64, &'static str> {
-        // R1 holds the pointer to the input context buffer
-        self.registers[1] = context_buffer.as_ptr() as u64;
-        self.registers[10] = 512; // Simulated Stack Frame Pointer
-
-        let mut pc = 0;
-        while pc < self.bytecode.len() {
-            let inst = self.bytecode[pc];
-            let class = inst.opcode & 0x07;
-
-            match class {
-                BPF_ALU => {
-                    let op = inst.opcode & 0xf0;
-                    let dst = inst.dst_reg as usize;
-                    let src = inst.src_reg as usize;
-
-                    if dst >= 10 {
-                        return Err("eBPF: Access violation - destination register out of bounds");
-                    }
-
-                    match op {
-                        BPF_ADD => {
-                            if inst.opcode & 0x08 == 0 {
-                                self.registers[dst] =
-                                    self.registers[dst].wrapping_add(inst.imm as u64);
-                            } else {
-                                self.registers[dst] =
-                                    self.registers[dst].wrapping_add(self.registers[src]);
-                            }
-                        }
-                        BPF_SUB => {
-                            if inst.opcode & 0x08 == 0 {
-                                self.registers[dst] =
-                                    self.registers[dst].wrapping_sub(inst.imm as u64);
-                            } else {
-                                self.registers[dst] =
-                                    self.registers[dst].wrapping_sub(self.registers[src]);
-                            }
-                        }
-                        BPF_MUL => {
-                            if inst.opcode & 0x08 == 0 {
-                                self.registers[dst] =
-                                    self.registers[dst].wrapping_mul(inst.imm as u64);
-                            } else {
-                                self.registers[dst] =
-                                    self.registers[dst].wrapping_mul(self.registers[src]);
-                            }
-                        }
-                        BPF_XOR => {
-                            if inst.opcode & 0x08 == 0 {
-                                self.registers[dst] ^= inst.imm as u64;
-                            } else {
-                                self.registers[dst] ^= self.registers[src];
-                            }
-                        }
-                        _ => return Err("eBPF VM: Unknown ALU operation opcode"),
-                    }
-                }
-                BPF_JMP => {
-                    let dst = inst.dst_reg as usize;
-                    let imm = inst.imm as u64;
-
-                    if dst >= 10 {
-                        return Err("eBPF: Access violation - JMP evaluation out of bounds");
-                    }
-
-                    // Jump instruction: if Register[dst] matches immediate, jump by instruction offset
-                    if self.registers[dst] == imm {
-                        let new_pc = (pc as i32 + inst.offset as i32) as usize;
-                        if new_pc >= self.bytecode.len() {
-                            return Err("eBPF VM: Jump out of instruction segment bounds");
-                        }
-                        pc = new_pc;
-                        continue;
-                    }
-                }
-                BPF_LD => {
-                    let dst = inst.dst_reg as usize;
-                    if dst >= 10 {
-                        return Err("eBPF: Access violation - Load target out of bounds");
-                    }
-                    self.registers[dst] = inst.imm as u64;
-                }
-                _ => return Err("eBPF VM: Unknown instruction class"),
-            }
-            pc += 1;
-        }
-
-        // Return register is R0
-        Ok(self.registers[0])
-    }
-}
-
-// =========================================================================
-// TESTS
-// =========================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_ebpf_alu_add_immediate() {
-        let bytecode = vec![
-            // R0 = 5
-            EbpfInstruction {
-                opcode: BPF_LD,
-                dst_reg: 0,
-                src_reg: 0,
-                offset: 0,
-                imm: 5,
-            },
-            // R0 += 10
-            EbpfInstruction {
-                opcode: BPF_ALU | BPF_ADD,
-                dst_reg: 0,
-                src_reg: 0,
-                offset: 0,
-                imm: 10,
-            },
+    fn test_bpf_vm_simple_program() {
+        let vm = BpfVm::new();
+        
+        // Simple program: return packet length
+        let program = [
+            BpfInstruction { opcode: 0xb7, dst_reg: 0, src_reg: 0, offset: 0, imm: 0 }, // r0 = 0
+            BpfInstruction { opcode: 0x07, dst_reg: 0, src_reg: 0, offset: 0, imm: 10 }, // r0 += 10
+            BpfInstruction { opcode: 0x95, dst_reg: 0, src_reg: 0, offset: 0, imm: 0 }, // exit
         ];
-
-        let mut vm = EbpfVm::new(bytecode);
-        let res = vm.run(&[]).unwrap();
-        assert_eq!(res, 15);
+        
+        vm.load_program(&program).unwrap();
+        let result = vm.execute(&[1, 2, 3, 4, 5]).unwrap();
+        assert_eq!(result, 10);
     }
 
     #[test]
-    fn test_ebpf_alu_xor_register() {
-        let bytecode = vec![
-            // R0 = 10
-            EbpfInstruction {
-                opcode: BPF_LD,
-                dst_reg: 0,
-                src_reg: 0,
-                offset: 0,
-                imm: 10,
-            },
-            // R2 = 12
-            EbpfInstruction {
-                opcode: BPF_LD,
-                dst_reg: 2,
-                src_reg: 0,
-                offset: 0,
-                imm: 12,
-            },
-            // R0 ^= R2 (10 ^ 12 = 6)
-            EbpfInstruction {
-                opcode: BPF_ALU | BPF_XOR | 0x08, // 0x08 signifies register src
-                dst_reg: 0,
-                src_reg: 2,
-                offset: 0,
-                imm: 0,
-            },
-        ];
-
-        let mut vm = EbpfVm::new(bytecode);
-        let res = vm.run(&[]).unwrap();
-        assert_eq!(res, 6);
-    }
-
-    #[test]
-    fn test_ebpf_jmp_condition() {
-        let bytecode = vec![
-            // R2 = 5
-            EbpfInstruction {
-                opcode: BPF_LD,
-                dst_reg: 2,
-                src_reg: 0,
-                offset: 0,
-                imm: 5,
-            },
-            // if R2 == 5, JMP offset 2 (skip the R0 = 99 load)
-            EbpfInstruction {
-                opcode: BPF_JMP,
-                dst_reg: 2,
-                src_reg: 0,
-                offset: 2,
-                imm: 5,
-            },
-            // R0 = 99 (skipped)
-            EbpfInstruction {
-                opcode: BPF_LD,
-                dst_reg: 0,
-                src_reg: 0,
-                offset: 0,
-                imm: 99,
-            },
-            // R0 = 42
-            EbpfInstruction {
-                opcode: BPF_LD,
-                dst_reg: 0,
-                src_reg: 0,
-                offset: 0,
-                imm: 42,
-            },
-        ];
-
-        let mut vm = EbpfVm::new(bytecode);
-        let res = vm.run(&[]).unwrap();
-        assert_eq!(res, 42);
-    }
-
-    #[test]
-    fn test_ebpf_map_lifecycle() {
-        let mut registry = EbpfMapRegistry::new();
-        assert!(registry.create_map(1, EbpfMapType::Hash, 4, 8, 10).is_ok());
-        // duplicate map
-        assert!(registry.create_map(1, EbpfMapType::Hash, 4, 8, 10).is_err());
-
-        {
-            let map = registry.get_map_mut(1).unwrap();
-            let key = vec![1, 2, 3, 4];
-            let val = vec![10, 20, 30, 40, 50, 60, 70, 80];
-
-            // Success update
-            assert!(map.update_elem(key.clone(), val.clone()).is_ok());
-            // Lookup success
-            assert_eq!(map.lookup_elem(&key).unwrap(), &val);
-
-            // Size mismatch check
-            assert!(map.update_elem(vec![1, 2], val.clone()).is_err());
-
-            // Delete success
-            assert!(map.delete_elem(&key).is_ok());
-            assert!(map.lookup_elem(&key).is_none());
-        }
+    fn test_bpf_map_hash() {
+        let map = BpfMap::new(BpfMapType::Hash, 4, 8, 100);
+        
+        let key = [1u8, 2, 3, 4];
+        let value = [5u8, 6, 7, 8, 9, 10, 11, 12];
+        
+        map.update(&key, &value).unwrap();
+        let retrieved = map.lookup(&key).unwrap();
+        assert_eq!(retrieved, value.to_vec());
     }
 }

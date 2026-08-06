@@ -738,12 +738,12 @@ impl NftablesManager {
 
     fn evaluate_rule(
         &self,
-        rule: &NftRule,
-        src_addr: &str,
-        src_port: u16,
-        dst_addr: &str,
-        dst_port: u16,
-        protocol: NftPayloadProtocol,
+        _rule: &NftRule,
+        _src_addr: &str,
+        _src_port: u16,
+        _dst_addr: &str,
+        _dst_port: u16,
+        _protocol: NftPayloadProtocol,
     ) -> bool {
         // Simplified rule evaluation
         // In a real implementation, this would evaluate all expressions

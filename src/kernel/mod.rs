@@ -1,6 +1,7 @@
 pub mod linux_bsd_innovations;
 // SigmaOS Kernel Module
 pub mod architecture;
+pub mod ebpf;
 pub mod ipc;
 pub mod memory;
 pub mod policy_mechanism;
@@ -15,6 +16,7 @@ pub use architecture::{
     InstructionCyclePhase as ArchInstructionCyclePhase, Irql, LookasideList, MemoryDescriptorList,
     Pcb, PoolType, ProcessorInitState, Tcb, ThreadState,
 };
+pub use ebpf::{BpfError, BpfInstruction, BpfMap, BpfMapType, BpfProgramType, BpfRegisters, BpfVm};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use policy_mechanism::{

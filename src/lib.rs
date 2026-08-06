@@ -118,6 +118,7 @@ pub use kernel::{
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
     IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+    BpfError, BpfInstruction, BpfMap, BpfMapType, BpfProgramType, BpfRegisters, BpfVm,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
@@ -185,6 +186,9 @@ pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageDependencyResolver, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction, Version, MAX_RECIPE_DEPENDENCIES, PackageFormatAdapter, UniversalPackageManager, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
+};
+pub use klib::{
+    SimpleHashSet, SimpleBinaryHeap, SimpleOrderedSet, SimpleDeque,
 };
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,

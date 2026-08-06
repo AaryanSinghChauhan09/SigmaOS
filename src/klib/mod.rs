@@ -28,9 +28,13 @@ pub mod math;
 pub mod uuid;
 pub mod conversion;
 pub mod ffi;
+pub mod collections;
 
 // Re-export FFI functions for reduced std dependency
 pub use ffi::{cstr_to_rust_string, rust_string_to_cstr, cstrlen, cstrcmp, cstrcpy, cstrcat};
+
+// Re-export custom collections for reduced std dependency
+pub use collections::{SimpleHashSet, SimpleBinaryHeap, SimpleOrderedSet, SimpleDeque};
 
 // Re-export existing modules if present
 #[cfg(feature = "default")]

@@ -429,7 +429,7 @@ impl PortageResolver {
                     self.extract_required_flags(cond, flags);
                 }
             }
-            DependencyCondition::AtLeastOne(conditions) => {
+            DependencyCondition::AtLeastOne(_conditions) => {
                 // For at least one, we can't determine which one to enable
                 // In a real implementation, this would be more sophisticated
             }
