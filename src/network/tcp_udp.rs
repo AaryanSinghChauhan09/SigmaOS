@@ -153,6 +153,35 @@ impl BsdSocket for SimpleSocket {
     }
 }
 
+impl BsdSocket for SimpleSocket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => {
+                self.reuse_addr.store(val, Ordering::SeqCst);
+            }
+            SocketOption::TcpNoDelay => {
+                self.tcp_nodelay.store(val, Ordering::SeqCst);
+            }
+            SocketOption::RcvBuf => {
+                self.rcvbuf.store(val, Ordering::SeqCst);
+            }
+            SocketOption::SndBuf => {
+                self.sndbuf.store(val, Ordering::SeqCst);
+            }
+        }
+        Ok(())
+    }
+
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
+            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
+            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
+            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
+        }
+    }
+}
+
 pub trait TCPConnection {
     fn connect(&mut self, remote_port: Port) -> Result<(), NetworkError>;
     fn listen(&mut self) -> Result<(), NetworkError>;
@@ -278,6 +307,12 @@ impl Default for RenoCongestionControl {
     }
 }
 
+impl Default for RenoCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl RenoCongestionControl {
     pub fn new() -> Self {
         RenoCongestionControl {
@@ -315,6 +350,12 @@ pub struct BBRCongestionControl {
     pub cwnd: u32,
     pub bw_estimate: u32,
     pub rtt_min_ms: u32,
+}
+
+impl Default for BBRCongestionControl {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Default for BBRCongestionControl {
@@ -449,6 +490,65 @@ impl NetfilterFirewall {
     }
 }
 
+/// Linux-Grade Netfilter/iptables Firewall
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterChain {
+    Input,
+    Output,
+    Forward,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterAction {
+    Accept,
+    Drop,
+    Reject,
+}
+
+#[derive(Debug, Clone)]
+pub struct NetfilterRule {
+    pub chain: NetfilterChain,
+    pub source_ip: [u8; 4],
+    pub dest_ip: [u8; 4],
+    pub protocol: Protocol,
+    pub port: Port,
+    pub action: NetfilterAction,
+}
+
+pub struct NetfilterFirewall {
+    pub rules: Vec<NetfilterRule>,
+}
+
+impl Default for NetfilterFirewall {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl NetfilterFirewall {
+    pub fn new() -> Self {
+        NetfilterFirewall { rules: Vec::new() }
+    }
+
+    pub fn add_rule(&mut self, rule: NetfilterRule) {
+        self.rules.push(rule);
+    }
+
+    pub fn match_packet(&self, chain: NetfilterChain, src: [u8; 4], dest: [u8; 4], proto: Protocol, port: Port) -> NetfilterAction {
+        for rule in &self.rules {
+            if rule.chain == chain
+                && (rule.source_ip == [0, 0, 0, 0] || rule.source_ip == src)
+                && (rule.dest_ip == [0, 0, 0, 0] || rule.dest_ip == dest)
+                && rule.protocol == proto
+                && (rule.port == 0 || rule.port == port)
+            {
+                return rule.action;
+            }
+        }
+        NetfilterAction::Accept // Default policy is Accept
+    }
+}
+
 pub trait ZeroCopy {
     fn zero_copy_send(&mut self, data: &[u8]) -> Result<usize, NetworkError>;
     fn zero_copy_recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError>;
@@ -456,6 +556,12 @@ pub trait ZeroCopy {
 
 pub struct ZeroCopyNetwork {
     pub dma_buffer_address: u64,
+}
+
+impl Default for ZeroCopyNetwork {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Default for ZeroCopyNetwork {

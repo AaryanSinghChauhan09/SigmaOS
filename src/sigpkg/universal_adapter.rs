@@ -248,13 +248,13 @@ impl UniversalPackageAdapter {
             });
         }
 
-        Ok(Package::new(
-            crate::klib::String::from_str(name),
-            parsed_ver,
-            crate::klib::String::from_str(desc),
+        Ok(Package {
+            name: name.to_string(),
+            version: parsed_ver,
+            description: desc.to_string(),
             dependencies,
-            crate::klib::String::from_str(&format!("SHA256:{}", name)),
-        ))
+            checksum: format!("SHA256:{}", name),
+        })
     }
 }
 

@@ -1,4 +1,6 @@
+// SigmaOS Kernel Library
 pub mod vec;
-pub mod paging;
 pub mod buddy_allocator;
-pub mod uvm;
+pub mod paging;
+
+pub use vec::Vec;
