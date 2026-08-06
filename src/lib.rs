@@ -104,6 +104,9 @@ pub use compatibility::{
     EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
     UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager, EbuildPackage, PortageEngine,
+    NDArray, ImageMat, DependencyProperty, VisualState, SovereignControl,
+    GrpcFrame, SovereignGrpcChannel, MachMessage, MachPort, SovereignXnuKernel,
+    Glyph, SovereignFreeTypeEngine, NavDirection, NavElement, SovereignSpatialNavigation,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
