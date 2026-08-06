@@ -1,3 +1,4 @@
+// SigmaOS Network Protocol Layer
 /// Custom Production-Grade TCP/IP Stack for SigmaOS
 /// Implements full TCP/IP and UDP networking without relying on external stack
 /// Supports internet checksum computation, full TCP state machine, and UDP parsing
