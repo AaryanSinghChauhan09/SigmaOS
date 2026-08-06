@@ -165,5 +165,8 @@ mod tests {
 
         let items: std::vec::Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
         assert_eq!(items, vec![(1, "a"), (2, "b"), (3, "c")]);
+        
+        let items: Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
+        assert_eq!(items.as_slice(), &[(1, "a"), (2, "b"), (3, "c")]);
     }
 }

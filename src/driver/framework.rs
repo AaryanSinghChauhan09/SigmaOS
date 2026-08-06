@@ -1,12 +1,17 @@
-use core::mem;
 /// OOP-based Driver Framework for SigmaOS
 /// Based on Roadmap Item 1: Driver framework
+
+extern crate alloc;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
+use alloc::boxed::Box;
 
 pub type DriverID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverType {
     Block = 0,
     Char = 1,
@@ -81,7 +86,7 @@ impl Driver for SimpleDriver {
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state
-            .store(DriverState::Loaded as usize, Ordering::SeqCst);
+            .store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
@@ -126,8 +131,8 @@ impl DriverFramework for SimpleDriverFramework {
         Ok(id)
     }
     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in self.drivers.iter_mut() {
-            if let Some(ref mut driver) = *driver_option {
+        for i in 0..self.drivers.len() {
+            if let Some(ref mut driver) = self.drivers[i] {
                 if driver.id() == id {
                     return driver.load();
                 }
@@ -136,8 +141,8 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::LoadFailed)
     }
     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
-        for driver_option in self.drivers.iter_mut() {
-            if let Some(ref mut driver) = *driver_option {
+        for i in 0..self.drivers.len() {
+            if let Some(ref mut driver) = self.drivers[i] {
                 if driver.id() == id {
                     return driver.unload();
                 }
@@ -146,8 +151,8 @@ impl DriverFramework for SimpleDriverFramework {
         Err(DriverError::UnloadFailed)
     }
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver> {
-        for driver_option in self.drivers.iter() {
-            if let Some(ref driver) = *driver_option {
+        for i in 0..self.drivers.len() {
+            if let Some(ref driver) = self.drivers[i] {
                 if driver.id() == id {
                     return Some(driver.as_ref());
                 }

@@ -13,6 +13,10 @@ pub mod gentoo;
 pub mod advanced_ecosystem;
 pub mod tiny_core;
 pub mod wasm_sandbox;
+pub mod fedora;
+pub mod bsd;
+pub mod innovations;
+pub mod india_professional_tools;
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};
@@ -28,7 +32,6 @@ pub mod linux_security;
 pub mod standards;
 pub mod overtake;
 pub mod arch_linux;
-pub mod fedora;
 
 pub use constellation_mesh::{
     BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
@@ -146,5 +149,14 @@ pub mod debian;
 pub use debian::{
     DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
     AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
+};
+
+
+pub use bsd::{
+    BsdJail, FreeBsdJailManager, OpenBsdSysctlKernelMib,
+};
+
+pub use innovations::{
+    WorkloadCategory, SigmaScheduler, UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingOS,
 };
 

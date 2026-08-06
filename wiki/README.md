@@ -667,3 +667,11 @@ SigmaOS relies on dedicated, lightweight background daemons inspired by Linux di
    - Keyboard hotkey interception and toggle mappings (e.g. Ctrl+Space).
    - Candidate suggestion list matching and filtering for CJK input.
    - Custom user dictionaries for local phrases.
+# SigmaOS Documentation Wiki
+
+Welcome to the SigmaOS development wiki. This directory contains detailed architectural resources and specifications for our sovereign operating system.
+
+## Table of Contents
+1. [Core Microkernel Specification](../FUTURE-DEVELOPMENT-ROADMAP.md)
+2. [Driver Subsystem and Hardware Integration](../FUTURE-DEVELOPMENT-ROADMAP.md)
+3. [Zenith Desktop and Compositor Architecture](../FUTURE-DEVELOPMENT-ROADMAP.md)

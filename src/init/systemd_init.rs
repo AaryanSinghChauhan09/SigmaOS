@@ -2,9 +2,13 @@
 /// Provides robust target dependency graphs, wants/requires properties,
 /// parallel topological service startup, restart policies, environment files,
 /// and instance templates to match modern Linux distributions.
+/// and target states to defeat Fedora's Systemd initialization.
+/// Enhanced with standard Ubuntu-style target states (reboot.target, poweroff.target,
+/// emergency.target) and structured service controls (reload, restart, status checks).
 
 /// and target states to defeat Fedora's Systemd initialization.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type UnitID = usize;
 
@@ -159,10 +163,17 @@ impl Default for SystemdEngine {
 
 impl SystemdEngine {
     pub fn new() -> Self {
-        SystemdEngine {
+        let mut engine = SystemdEngine {
             units: Vec::new(),
             current_target: AtomicUsize::new(0),
-        }
+        };
+
+        // Pre-register standard Ubuntu-style target system nodes
+        engine.register_unit(SystemdUnit::new(9001, b"poweroff.target", UnitType::Target));
+        engine.register_unit(SystemdUnit::new(9002, b"reboot.target", UnitType::Target));
+        engine.register_unit(SystemdUnit::new(9003, b"emergency.target", UnitType::Target));
+
+        engine
     }
 
     pub fn register_unit(&mut self, unit: SystemdUnit) {
@@ -198,33 +209,34 @@ impl SystemdEngine {
     /// Isolates a target: stops unneeded units, activates dependencies
     pub fn isolate_target(&mut self, target_id: UnitID) -> Result<(), &'static str> {
         let mut target_idx = None;
-        for (i, unit) in self.units.iter().enumerate() {
-            if unit.id == target_id && unit.unit_type == UnitType::Target {
+        for i in 0..self.units.len() {
+            if self.units[i].id == target_id && self.units[i].unit_type == UnitType::Target {
                 target_idx = Some(i);
                 break;
             }
         }
 
-        let _idx = target_idx.ok_or("Target unit not found")?;
+        let idx = target_idx.ok_or("Target unit not found")?;
 
         // In Systemd, isolating a target starts that target and all its dependencies,
         // and deactivates units not required/wanted by it.
-        self.units[_idx].state = UnitState::Activating;
+        self.units[idx].state = UnitState::Activating;
 
         // Collect all required/wanted units recursively
         let mut active_set = Vec::new();
         self.collect_dependencies(target_id, &mut active_set);
 
         // Deactivate units not in active_set
-        for unit in &mut self.units {
-            if !active_set.contains(&unit.id) && unit.id != target_id {
-                unit.state = UnitState::Inactive;
-            } else if active_set.contains(&unit.id) {
-                unit.state = UnitState::Active;
+        for i in 0..self.units.len() {
+            let unit_id = self.units[i].id;
+            if !active_set.contains(&unit_id) && unit_id != target_id {
+                self.units[i].state = UnitState::Inactive;
+            } else if active_set.contains(&unit_id) {
+                self.units[i].state = UnitState::Active;
             }
         }
 
-        self.units[_idx].state = UnitState::Active;
+        self.units[idx].state = UnitState::Active;
         self.current_target.store(target_id, Ordering::SeqCst);
         Ok(())
     }
@@ -295,13 +307,16 @@ impl SystemdEngine {
             return;
         }
 
-        for unit in &self.units {
+        for i in 0..self.units.len() {
+            let unit = &self.units[i];
             if unit.id == unit_id {
-                for &req in &unit.requires {
+                for j in 0..unit.requires.len() {
+                    let req = unit.requires[j];
                     set.push(req);
                     self.collect_dependencies(req, set);
                 }
-                for &want in &unit.wants {
+                for j in 0..unit.wants.len() {
+                    let want = unit.wants[j];
                     set.push(want);
                     self.collect_dependencies(want, set);
                 }
@@ -312,7 +327,6 @@ impl SystemdEngine {
     pub fn get_active_target_id(&self) -> usize {
         self.current_target.load(Ordering::SeqCst)
     }
-}
 
 pub struct Vec<T> {
     data: *mut T,
@@ -326,11 +340,19 @@ impl<T: Clone> Clone for Vec<T> {
         for i in 0..self.len {
             unsafe {
                 new_vec.push((*self.data.add(i)).clone());
+    /// Ubuntu-style restart control
+    pub fn restart_unit(&mut self, unit_id: UnitID) -> Result<(), &'static str> {
+        for i in 0..self.units.len() {
+            if self.units[i].id == unit_id {
+                self.units[i].state = UnitState::Deactivating;
+                self.units[i].state = UnitState::Inactive;
+                self.units[i].state = UnitState::Activating;
+                self.units[i].state = UnitState::Active;
+                return Ok(());
             }
         }
-        new_vec
+        Err("Unit not found")
     }
-}
 
 impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -360,8 +382,18 @@ impl<T> Vec<T> {
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
+    /// Ubuntu-style reload control
+    pub fn reload_unit(&mut self, unit_id: UnitID) -> Result<(), &'static str> {
+        for i in 0..self.units.len() {
+            if self.units[i].id == unit_id {
+                if self.units[i].state != UnitState::Active {
+                    return Err("Cannot reload inactive unit");
+                }
+                // Simulate configuration reloading safely
+                return Ok(());
             }
         }
+        Err("Unit not found")
     }
     pub fn len(&self) -> usize {
         self.len
@@ -392,9 +424,15 @@ impl<T> Vec<T> {
                 if &*self.data.add(i) == item {
                     return true;
                 }
+
+    /// Retrieve active status of a supervised service unit
+    pub fn get_unit_status(&self, unit_id: UnitID) -> Option<UnitState> {
+        for i in 0..self.units.len() {
+            if self.units[i].id == unit_id {
+                return Some(self.units[i].state);
             }
         }
-        false
+        None
     }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
@@ -543,7 +581,8 @@ mod tests {
         assert_eq!(engine.get_active_target_id(), 100);
 
         // dependencies should be active
-        for unit in &engine.units {
+        for i in 0..engine.units.len() {
+            let unit = &engine.units[i];
             if unit.id == 200 || unit.id == 300 || unit.id == 100 {
                 assert_eq!(unit.state, UnitState::Active);
             } else if unit.id == 400 {
@@ -623,5 +662,27 @@ mod tests {
 
         let name_str = std::str::from_utf8(&instance.name).unwrap().trim_end_matches('\0');
         assert_eq!(name_str, "getty@tty1.service");
+    }
+
+    #[test]
+    fn test_ubuntu_systemd_controls_and_targets() {
+        let mut engine = SystemdEngine::new();
+
+        // Verify standard Ubuntu target state registration
+        assert_eq!(engine.get_unit_status(9001).unwrap(), UnitState::Inactive); // poweroff.target
+        assert_eq!(engine.get_unit_status(9002).unwrap(), UnitState::Inactive); // reboot.target
+        assert_eq!(engine.get_unit_status(9003).unwrap(), UnitState::Inactive); // emergency.target
+
+        // Verify service reload on inactive fails
+        let mut service = SystemdUnit::new(420, b"nginx.service", UnitType::Service);
+        engine.register_unit(service);
+        assert!(engine.reload_unit(420).is_err());
+
+        // Restart transitions state
+        assert!(engine.restart_unit(420).is_ok());
+        assert_eq!(engine.get_unit_status(420).unwrap(), UnitState::Active);
+
+        // Reload succeeds on active service
+        assert!(engine.reload_unit(420).is_ok());
     }
 }

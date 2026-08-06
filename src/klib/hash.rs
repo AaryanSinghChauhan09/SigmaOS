@@ -7,6 +7,11 @@
 /// Optimised by Bolt ⚡: redirects to simple_hash which utilizes a 4-byte unrolled chunk loop to maximize instruction pipelining.
 pub fn djb2_hash(s: &str) -> u64 {
     simple_hash(s.as_bytes())
+    let mut hash: u64 = 5381;
+    for byte in s.bytes() {
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
+    }
+    hash
 }
 
 /// Simple hash function for byte arrays
@@ -26,6 +31,8 @@ pub fn simple_hash(data: &[u8]) -> u64 {
 
     for &byte in remainder {
         hash = (hash << 5).wrapping_add(hash).wrapping_add(byte as u64);
+    for &byte in data {
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
     }
     hash
 }
@@ -77,6 +84,7 @@ impl SimpleHasher {
 
     pub fn write(&mut self, byte: u8) {
         self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(byte as u64);
+        self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
     }
 
     pub fn finish(&self) -> u64 {
@@ -108,6 +116,8 @@ impl core::hash::Hasher for SimpleHasher {
 
         for &byte in remainder {
             self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(byte as u64);
+        for &byte in bytes {
+            self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
         }
     }
 }

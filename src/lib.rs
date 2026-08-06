@@ -148,6 +148,13 @@ pub use ecosystem::{
     CvImage, WinUiControl, WinUiState, WinUiPanel,
     SigmaGrpcEngine, GrpcServiceStub, MachMessageHeader, MachPort, MachZone,
     SigmaFreeTypeFont, UiRect, NavigationDirection, SpatialNavigationEngine,
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    FirewalldZone, RichRule, FirewalldZoneManager, PartitionLayout, AnacondaKickstartInstaller,
+    CoprBuildJob, CoprUserRepoBuilder, IpaUser, HbacRule, FreeIpaDirectoryService,
+    BsdJail, FreeBsdJailManager, OpenBsdSysctlKernelMib,
+    WorkloadCategory, SigmaScheduler, UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingOS,
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper, PMWaniHotspotController,
+    DigiYatraPassScanner, IrctcPnrTracker,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

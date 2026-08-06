@@ -15,6 +15,7 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
+extern crate alloc;
 
 extern crate alloc;
 
@@ -282,3 +283,8 @@ impl FilesystemManager for SimpleFilesystemManager {
         ids
     }
 }
+
+pub struct LegacyLinuxRule;
+pub struct LinuxPersonaRule;
+pub struct SmartSymlink;
+pub struct SymlinkResolverRule;

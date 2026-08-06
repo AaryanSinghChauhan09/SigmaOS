@@ -38,6 +38,9 @@ pub use universal_adapter::{
 };
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use verifier::CryptoVerifier;
+pub use importer::{
+    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -173,6 +176,24 @@ impl Package {
 impl Package {
     pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
         Package {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
             name,
             version,
             description,
