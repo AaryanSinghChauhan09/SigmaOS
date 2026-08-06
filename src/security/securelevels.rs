@@ -1,126 +1,105 @@
-// Sovereign BSD Securelevels and Granular Linux Capabilities Subsystem
-// Integrates core security paradigms from BSD securelevels and Linux capabilities into a unified microkernel privilege manager.
+//! FreeBSD-style Securelevels System for SigmaOS
+//! Implements a progressive security model (Securelevels -1 to 3) to protect system integrity.
 
-extern crate alloc;
+#![no_std]
 
-use crate::klib::error::{SecurityError, SigmaError};
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU8, Ordering};
+use core::sync::atomic::{AtomicI32, Ordering};
 
-/// Granular system capabilities inspired by Linux capability sets
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LinuxCapability {
-    CapSysAdmin,  // Administrative/Module load controls
-    CapNetAdmin,  // Firewall and network configurations
-    CapKill,      // Process killing
-    CapFileWrite, // Direct raw disk and file write permissions
-}
-
-/// Strict system-wide operational states inspired by BSD securelevels
+/// Securelevels represents the system security modes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Securelevel {
-    Permissive = 0,    // Normal startup defaults
-    Secure = 1,        // Disables writing to mounted raw disks and changing kernel modules
-    HighlySecure = 2,  // Disables changing system clocks, firewalls, or disk layouts
-    NetworkSecure = 3, // Locks all network routing and sockets binding entirely
+    /// Permanently insecure mode. All protections are disabled, and securelevel cannot be raised or lowered.
+    PermanentlyInsecure = -1,
+    /// Insecure mode. Any transition is allowed, and securelevel can be raised.
+    Insecure = 0,
+    /// Secure mode. Securelevel can only be raised, not lowered. Disables raw disk writes, kernel memory writes, and immutable file modification.
+    Secure = 1,
+    /// Highly secure mode. Same as Secure, plus disables partitioning/formatting and setting system time back.
+    HighlySecure = 2,
+    /// Network secure mode. Same as HighlySecure, plus disables modifying firewall rules.
+    NetworkSecure = 3,
 }
 
-/// Sovereign Manager enforcing securelevel constraints and validating capabilities
-pub struct SovereignSecurelevelManager {
-    pub current_level: AtomicU8, // Securelevel as u8
-    pub assigned_capabilities: Vec<LinuxCapability>,
-}
-
-impl SovereignSecurelevelManager {
-    /// Initialize manager with permissive level
-    pub fn new() -> Self {
-        Self {
-            current_level: AtomicU8::new(Securelevel::Permissive as u8),
-            assigned_capabilities: Vec::new(),
-        }
-    }
-
-    /// Retrieve the current securelevel
-    pub fn securelevel(&self) -> Securelevel {
-        match self.current_level.load(Ordering::SeqCst) {
+impl Securelevel {
+    pub fn from_i32(val: i32) -> Self {
+        match val {
+            -1 => Securelevel::PermanentlyInsecure,
             1 => Securelevel::Secure,
             2 => Securelevel::HighlySecure,
             3 => Securelevel::NetworkSecure,
-            _ => Securelevel::Permissive,
-        }
-    }
-
-    /// Safely raise the system securelevel.
-    /// - Securelevel can only be raised, never lowered (can only be reset via reboot).
-    pub fn raise_securelevel(&mut self, level: Securelevel) -> Result<(), SigmaError> {
-        let current = self.securelevel();
-        if level <= current {
-            return Err(SigmaError::Security(SecurityError::AccessDenied));
-        }
-        self.current_level.store(level as u8, Ordering::SeqCst);
-        Ok(())
-    }
-
-    /// Assign granular capability permissions to the active context
-    pub fn grant_capability(&mut self, cap: LinuxCapability) {
-        if !self.assigned_capabilities.contains(&cap) {
-            self.assigned_capabilities.push(cap);
-        }
-    }
-
-    /// Revoke capability permissions from the active context
-    pub fn revoke_capability(&mut self, cap: LinuxCapability) {
-        self.assigned_capabilities.retain(|&c| c != cap);
-    }
-
-    /// Validates whether an operation is allowed based on active capabilities AND current system-wide BSD securelevel constraints
-    pub fn validate_operation(&self, required_cap: LinuxCapability) -> Result<(), SigmaError> {
-        let current_level = self.securelevel();
-
-        // 1. Core BSD Securelevel constraints override assigned capabilities
-        match current_level {
-            Securelevel::NetworkSecure => {
-                // NetworkSecure locks out all network administration
-                if required_cap == LinuxCapability::CapNetAdmin {
-                    return Err(SigmaError::Security(
-                        SecurityError::PrivilegeEscalationDetected,
-                    ));
-                }
-            }
-            Securelevel::HighlySecure => {
-                // HighlySecure locks out file writes and network administration
-                if required_cap == LinuxCapability::CapFileWrite
-                    || required_cap == LinuxCapability::CapNetAdmin
-                {
-                    return Err(SigmaError::Security(
-                        SecurityError::PrivilegeEscalationDetected,
-                    ));
-                }
-            }
-            Securelevel::Secure => {
-                // Secure locks out administrative module loads and disk formats
-                if required_cap == LinuxCapability::CapSysAdmin {
-                    return Err(SigmaError::Security(
-                        SecurityError::PrivilegeEscalationDetected,
-                    ));
-                }
-            }
-            Securelevel::Permissive => {}
-        }
-
-        // 2. Fall back to checking assigned capabilities
-        if self.assigned_capabilities.contains(&required_cap) {
-            Ok(())
-        } else {
-            Err(SigmaError::Security(SecurityError::AccessDenied))
+            _ => Securelevel::Insecure,
         }
     }
 }
 
-impl Default for SovereignSecurelevelManager {
-    fn default() -> Self {
-        Self::new()
+/// Global system securelevel
+static SYSTEM_SECURELEVEL: AtomicI32 = AtomicI32::new(0);
+
+/// Get the current system securelevel
+pub fn get_securelevel() -> Securelevel {
+    Securelevel::from_i32(SYSTEM_SECURELEVEL.load(Ordering::SeqCst))
+}
+
+/// Set the system securelevel. Transitions are only permitted if they raise the securelevel
+/// (or if current level is Insecure), unless the current level is PermanentlyInsecure.
+pub fn set_securelevel(level: Securelevel) -> Result<(), &'static str> {
+    let current_raw = SYSTEM_SECURELEVEL.load(Ordering::SeqCst);
+    let current = Securelevel::from_i32(current_raw);
+
+    if current == Securelevel::PermanentlyInsecure {
+        return Err("Securelevel cannot be changed in PermanentlyInsecure mode");
     }
+
+    if level == Securelevel::PermanentlyInsecure {
+        return Err("Cannot transition system into PermanentlyInsecure mode at runtime");
+    }
+
+    if current_raw > 0 && (level as i32) <= current_raw {
+        return Err("Securelevel can only be raised, not lowered");
+    }
+
+    SYSTEM_SECURELEVEL.store(level as i32, Ordering::SeqCst);
+    Ok(())
+}
+
+/// Helper to temporarily override for unit tests (resetting level)
+#[cfg(test)]
+pub fn reset_securelevel_for_test() {
+    SYSTEM_SECURELEVEL.store(0, Ordering::SeqCst);
+}
+
+/// Checks if raw disk block writes are permitted under the current securelevel
+pub fn check_raw_disk_write_allowed() -> bool {
+    get_securelevel() < Securelevel::Secure
+}
+
+/// Checks if writing to kernel memory (/dev/mem or /dev/kmem) is permitted under the current securelevel
+pub fn check_kernel_memory_write_allowed() -> bool {
+    get_securelevel() < Securelevel::Secure
+}
+
+/// Checks if changing system immutable/append-only file flags is permitted
+pub fn check_immutable_flag_change_allowed() -> bool {
+    get_securelevel() < Securelevel::Secure
+}
+
+/// Checks if partition table modification or formatting is permitted
+pub fn check_disk_partition_allowed() -> bool {
+    get_securelevel() < Securelevel::HighlySecure
+}
+
+/// Checks if setting system clock backward or adjusting by more than 1 second is permitted
+pub fn check_time_adjustment_allowed(delta_seconds: i64) -> bool {
+    if get_securelevel() >= Securelevel::HighlySecure {
+        delta_seconds >= 0 && delta_seconds <= 1
+    } else {
+        true
+    }
+}
+
+/// Checks if modifying firewall rules or clearing tables is permitted
+pub fn check_firewall_modification_allowed() -> bool {
+    get_securelevel() < Securelevel::NetworkSecure
 }
 
 #[cfg(test)]
@@ -128,50 +107,53 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_securelevel_monotonically_increments() {
-        let mut manager = SovereignSecurelevelManager::new();
-        assert_eq!(manager.securelevel(), Securelevel::Permissive);
+    fn test_securelevel_transitions() {
+        reset_securelevel_for_test();
+        assert_eq!(get_securelevel(), Securelevel::Insecure);
 
-        // Raise level to Secure (1)
-        manager.raise_securelevel(Securelevel::Secure).unwrap();
-        assert_eq!(manager.securelevel(), Securelevel::Secure);
+        // Transition from Insecure (0) to Secure (1) is allowed
+        assert!(set_securelevel(Securelevel::Secure).is_ok());
+        assert_eq!(get_securelevel(), Securelevel::Secure);
 
-        // Attempting to lower securelevel back to Permissive (0) should fail!
-        assert!(manager.raise_securelevel(Securelevel::Permissive).is_err());
-        assert_eq!(manager.securelevel(), Securelevel::Secure);
+        // Lowering securelevel from Secure (1) to Insecure (0) is blocked
+        assert!(set_securelevel(Securelevel::Insecure).is_err());
+        assert_eq!(get_securelevel(), Securelevel::Secure);
+
+        // Raising securelevel from Secure (1) to HighlySecure (2) is allowed
+        assert!(set_securelevel(Securelevel::HighlySecure).is_ok());
+        assert_eq!(get_securelevel(), Securelevel::HighlySecure);
+
+        // Transition to PermanentlyInsecure is blocked
+        assert!(set_securelevel(Securelevel::PermanentlyInsecure).is_err());
     }
 
     #[test]
-    fn test_linux_capabilities_and_securelevel_overrides() {
-        let mut manager = SovereignSecurelevelManager::new();
+    fn test_securelevel_policies() {
+        reset_securelevel_for_test();
+        assert!(check_raw_disk_write_allowed());
+        assert!(check_kernel_memory_write_allowed());
+        assert!(check_immutable_flag_change_allowed());
+        assert!(check_disk_partition_allowed());
+        assert!(check_time_adjustment_allowed(-10));
+        assert!(check_firewall_modification_allowed());
 
-        // Grant Network and Admin capabilities
-        manager.grant_capability(LinuxCapability::CapNetAdmin);
-        manager.grant_capability(LinuxCapability::CapSysAdmin);
+        // Raise to Secure
+        set_securelevel(Securelevel::Secure).unwrap();
+        assert!(!check_raw_disk_write_allowed());
+        assert!(!check_kernel_memory_write_allowed());
+        assert!(!check_immutable_flag_change_allowed());
+        assert!(check_disk_partition_allowed());
+        assert!(check_firewall_modification_allowed());
 
-        // Under Permissive level, both should pass validation
-        assert!(manager
-            .validate_operation(LinuxCapability::CapNetAdmin)
-            .is_ok());
-        assert!(manager
-            .validate_operation(LinuxCapability::CapSysAdmin)
-            .is_ok());
+        // Raise to HighlySecure
+        set_securelevel(Securelevel::HighlySecure).unwrap();
+        assert!(!check_disk_partition_allowed());
+        assert!(!check_time_adjustment_allowed(-5));
+        assert!(check_time_adjustment_allowed(1));
+        assert!(check_firewall_modification_allowed());
 
-        // Raise securelevel to Secure (1) -> CapSysAdmin is instantly blocked!
-        manager.raise_securelevel(Securelevel::Secure).unwrap();
-        assert!(manager
-            .validate_operation(LinuxCapability::CapSysAdmin)
-            .is_err());
-        assert!(manager
-            .validate_operation(LinuxCapability::CapNetAdmin)
-            .is_ok()); // CapNetAdmin still allowed
-
-        // Raise securelevel to NetworkSecure (3) -> CapNetAdmin is also blocked!
-        manager
-            .raise_securelevel(Securelevel::NetworkSecure)
-            .unwrap();
-        assert!(manager
-            .validate_operation(LinuxCapability::CapNetAdmin)
-            .is_err());
+        // Raise to NetworkSecure
+        set_securelevel(Securelevel::NetworkSecure).unwrap();
+        assert!(!check_firewall_modification_allowed());
     }
 }

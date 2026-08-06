@@ -58,7 +58,7 @@ where
 
 impl<K, V> HashMap<K, V>
 where
-    K: PartialEq,
+    K: Eq + core::hash::Hash,
 {
     pub fn new() -> Self {
         let mut map = HashMap {
@@ -232,11 +232,6 @@ where
         }
     }
 
-    pub fn clear(&mut self) {
-        self.resize_buckets();
-        self.len = 0;
-    }
-
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V>
     where
         K: Clone,
@@ -299,7 +294,7 @@ where
 
 impl<K, V> core::fmt::Debug for HashMap<K, V>
 where
-    K: core::fmt::Debug + PartialEq,
+    K: core::fmt::Debug + Eq + core::hash::Hash,
     V: core::fmt::Debug,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
@@ -422,59 +417,13 @@ where
 
 impl<'a, K, V> IntoIterator for &'a HashMap<K, V>
 where
-    K: PartialEq,
+    K: Eq + core::hash::Hash,
 {
     type Item = (&'a K, &'a V);
     type IntoIter = HashMapIter<'a, K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
-    }
-}
-
-pub enum Entry<'a, K, V> {
-    Occupied(OccupiedEntry<'a, K, V>),
-    Vacant(VacantEntry<'a, K, V>),
-}
-
-pub struct OccupiedEntry<'a, K, V> {
-    value: &'a mut V,
-    pub _marker: core::marker::PhantomData<K>,
-}
-
-pub struct VacantEntry<'a, K, V> {
-    map: &'a mut HashMap<K, V>,
-    key: K,
-}
-
-impl<'a, K, V> Entry<'a, K, V>
-where
-    K: PartialEq + Clone,
-{
-    pub fn or_insert(self, default: V) -> &'a mut V {
-        match self {
-            Entry::Occupied(entry) => entry.value,
-            Entry::Vacant(entry) => {
-                let key = entry.key;
-                entry.map.insert(key.clone(), default);
-                entry.map.get_mut(&key).unwrap()
-            }
-        }
-    }
-
-    pub fn or_insert_with<F>(self, default_fn: F) -> &'a mut V
-    where
-        F: FnOnce() -> V,
-    {
-        match self {
-            Entry::Occupied(entry) => entry.value,
-            Entry::Vacant(entry) => {
-                let key = entry.key.clone();
-                let default = default_fn();
-                entry.map.insert(key.clone(), default);
-                entry.map.get_mut(&key).unwrap()
-            }
-        }
     }
 }
 

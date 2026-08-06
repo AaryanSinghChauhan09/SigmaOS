@@ -20,34 +20,17 @@
 // OOP-based network traffic monitoring and analysis
 
 use crate::klib::HashMap;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::time::{Duration, Instant};
 
 // Simple IP address types to replace std::net
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct SigmaIpv4Addr {
-    pub octets: [u8; 4],
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct SigmaIpv6Addr {
-    pub octets: [u8; 16],
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum SigmaIpAddr {
-    V4(SigmaIpv4Addr),
-    V6(SigmaIpv6Addr),
-}
+pub type SigmaIpv4Addr = std::net::Ipv4Addr;
+pub type SigmaIpv6Addr = std::net::Ipv6Addr;
+pub type SigmaIpAddr = std::net::IpAddr;
 
 // Simple time types to replace std::time
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SigmaDuration {
-    pub millis: u64,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct SigmaInstant {
-    pub millis: u64,
-}
+pub type SigmaDuration = std::time::Duration;
+pub type SigmaInstant = std::time::Instant;
 
 /// Traffic packet
 #[derive(Debug, Clone)]

@@ -8,8 +8,12 @@ pub mod hashmap;
 pub mod hashset;
 pub mod math;
 pub mod paging;
+pub mod string;
+pub mod time;
+pub mod uuid;
 pub mod uvm;
 pub mod vec;
+pub mod vecdeque;
 
 pub use btreemap::BTreeMap;
 pub use conversion::{

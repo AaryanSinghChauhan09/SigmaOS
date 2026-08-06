@@ -6,17 +6,6 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
-impl<T: PartialEq> Vec<T> {
-    pub fn contains(&self, item: &T) -> bool {
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
-            }
-        }
-        new_vec
-    }
-}
-
 impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_list().entries(self.iter()).finish()
@@ -30,16 +19,6 @@ impl<T> Default for Vec<T> {
 }
 
 impl<T> Vec<T> {
-    pub fn iter(&self) -> core::slice::Iter<'_, T> {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-
-    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-
     pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
@@ -47,6 +26,7 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
+
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -58,9 +38,20 @@ impl<T> Vec<T> {
             }
         }
     }
+
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            self.len -= 1;
+            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.len
     }
+
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
@@ -94,12 +85,14 @@ impl<T> Vec<T> {
         }
         false
     }
+
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
             vec: self,
             index: 0,
         }
     }
+
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
         VecIterMut {
             data: self.data,
@@ -108,7 +101,11 @@ impl<T> Vec<T> {
             _marker: core::marker::PhantomData,
         }
     }
+
     pub fn remove(&mut self, index: usize) -> T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -157,6 +154,7 @@ impl<T> Vec<T> {
         }
         self.len = write_idx;
     }
+
     unsafe fn grow(&mut self) {
         let size = mem::size_of::<T>();
         if size == 0 {
@@ -183,6 +181,19 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        self.as_slice()
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.as_mut_slice()
+    }
+}
+
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
     fn index(&self, index: usize) -> &Self::Output {
@@ -202,37 +213,6 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = Vec::new();
@@ -240,12 +220,6 @@ impl<T: Clone> Clone for Vec<T> {
             new_vec.push(self[i].clone());
         }
         new_vec
-    }
-}
-
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        core::fmt::Debug::fmt(&**self, f)
     }
 }
 
@@ -335,4 +309,88 @@ unsafe fn free(ptr: *mut u8, size: usize, align: usize) {
 extern "C" {
     fn alloc(size: usize, align: usize) -> *mut u8;
     fn free(ptr: *mut u8, size: usize, align: usize);
+}
+
+impl<T> core::iter::FromIterator<T> for Vec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut vec = Vec::new();
+        for item in iter {
+            vec.push(item);
+        }
+        vec
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_slice().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.as_mut_slice().iter_mut()
+    }
+}
+
+impl<T> IntoIterator for Vec<T> {
+    type Item = T;
+    type IntoIter = VecIntoIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        VecIntoIter {
+            data: self.data,
+            len: self.len,
+            capacity: self.capacity,
+            index: 0,
+        }
+    }
+}
+
+pub struct VecIntoIter<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+    index: usize,
+}
+
+impl<T> Iterator for VecIntoIter<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { core::ptr::read(self.data.add(self.index)) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+impl<T> Drop for VecIntoIter<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            for i in self.index..self.len {
+                unsafe {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+            }
+            let size = mem::size_of::<T>();
+            if size > 0 && !self.data.is_null() {
+                unsafe {
+                    free(
+                        self.data as *mut u8,
+                        self.capacity * size,
+                        mem::align_of::<T>(),
+                    );
+                }
+            }
+        }
+    }
 }

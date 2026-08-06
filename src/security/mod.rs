@@ -19,9 +19,13 @@ pub mod selinux;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
+pub mod jails;
+pub mod securelevels;
 pub mod vpn;
 pub mod vulnerability;
 
+pub use self::jails::{Jail, JailCapabilities, JailManager};
+pub use self::securelevels::{Securelevel, get_securelevel, set_securelevel, check_raw_disk_write_allowed, check_kernel_memory_write_allowed, check_immutable_flag_change_allowed, check_disk_partition_allowed, check_time_adjustment_allowed, check_firewall_modification_allowed};
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
 pub use audit::{AuditLogger, AuditPolicy, LogFormat};

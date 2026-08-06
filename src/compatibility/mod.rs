@@ -1,14 +1,38 @@
 // SigmaOS Compatibility Module
+pub mod arch_linux;
+pub mod constellation_mesh;
 pub mod cross_platform;
 pub mod endeavour;
+pub mod fedora;
 pub mod historic_linux;
 pub mod india_stack;
 pub mod interim;
 pub mod jehanne;
 pub mod legacy_adapters;
 pub mod linux_security;
+pub mod lubuntu;
+pub mod mint_linux;
 pub mod overtake;
+pub mod reactos;
 pub mod standards;
+
+pub use constellation_mesh::{
+    BIOSGatewayMesh, BuildCodexGrid, ConstellationNode, CorebootGatewayMesh, DACConstellation,
+    DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh,
+    GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid, LegacyCCodexGrid,
+    LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
+    ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation, StorageArchiveGridV2,
+    SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
+};
+
+pub use legacy_adapters::{
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+
+pub use endeavour::{
+    EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab, YayAurHelper,
+};
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,

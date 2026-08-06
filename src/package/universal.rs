@@ -3,6 +3,7 @@
 
 use crate::klib::HashMap;
 use crate::klib::HashSet;
+use std::sync::Arc;
 
 /// Package format type supporting 18 major distribution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -8,6 +8,7 @@ pub mod accessibility;
 pub mod ai;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
@@ -142,7 +143,6 @@ pub use security::{
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
 };
-pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, DebianPackageTranslator,
     LinuxPackageCompatManager, LinuxPackageType, MakePkgEngine, PackageRecipe, PacmanError,

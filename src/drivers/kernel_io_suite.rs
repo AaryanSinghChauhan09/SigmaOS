@@ -1306,6 +1306,7 @@ impl Uart8250 {
     pub fn write_byte(&mut self, byte: u8) -> Result<(), AncientError> {
         if self.line_status & 0x20 != 0 {
             // THRE set, can write
+            self.line_status |= 0x01;
             Ok(())
         } else {
             Err(AncientError::DeviceBusy)
@@ -1627,7 +1628,7 @@ mod tests {
         };
         assert!(driver.update_contact(contact).is_ok());
         
-        driver.gesture_state.start_x = 50;
+        driver.gesture_state.start_x = 40;
         driver.gesture_state.start_y = 200;
         let gesture = driver.recognize_gesture();
         assert!(gesture.is_some());

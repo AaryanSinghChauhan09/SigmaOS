@@ -1,8 +1,18 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+use alloc::boxed::Box;
 use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverError {
+    LoadFailed,
+    UnloadFailed,
+    ReadFailed,
+    WriteFailed,
+}
 
 pub type DriverID = usize;
 
@@ -45,6 +55,21 @@ impl SimpleDriver {
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
+    pub fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    pub fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    pub fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    pub fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    pub fn dependencies(&self) -> &'static [DriverType] {
+        &[]
+    }
 }
 
 impl Driver for SimpleDriver {
@@ -55,16 +80,11 @@ impl Driver for SimpleDriver {
         self.driver_type
     }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-    }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
+        match self.state.load(Ordering::SeqCst) {
+            1 => DriverState::Loaded,
+            2 => DriverState::Active,
+            _ => DriverState::Unloaded,
+        }
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Active);
@@ -73,12 +93,6 @@ impl Driver for SimpleDriver {
     fn unload(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Unloaded);
         Ok(())
-    }
-    fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn dependencies(&self) -> &'static [DriverType] {
-        &[]
     }
 }
 
@@ -117,6 +131,21 @@ impl SimpleStorageDriver {
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
+    pub fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    pub fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    pub fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    pub fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    pub fn dependencies(&self) -> &'static [DriverType] {
+        &[]
+    }
 }
 
 impl Driver for SimpleStorageDriver {
@@ -127,16 +156,11 @@ impl Driver for SimpleStorageDriver {
         DriverType::Storage
     }
     fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
-    }
-    fn set_state(&self, state: DriverState) {
-        self.state.store(state as usize, Ordering::SeqCst);
-    }
-    fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
+        match self.state.load(Ordering::SeqCst) {
+            1 => DriverState::Loaded,
+            2 => DriverState::Active,
+            _ => DriverState::Unloaded,
+        }
     }
     fn load(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Active);
@@ -145,12 +169,6 @@ impl Driver for SimpleStorageDriver {
     fn unload(&mut self) -> Result<(), DriverError> {
         self.set_state(DriverState::Unloaded);
         Ok(())
-    }
-    fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-    fn dependencies(&self) -> &'static [DriverType] {
-        &[]
     }
 }
 
@@ -176,38 +194,6 @@ pub struct SimpleNetworkDriver {
     pub id: DriverID,
     pub driver_type: DriverType,
     pub state: AtomicUsize,
-}
-
-impl SimpleStorageDriver {
-    pub fn new(id: DriverID) -> Self {
-        SimpleStorageDriver {
-            id,
-            driver_type: DriverType::Storage,
-            state: AtomicUsize::new(DriverState::Unloaded as usize),
-        }
-    }
-}
-
-impl Driver for SimpleStorageDriver {
-    fn id(&self) -> DriverID {
-        self.id
-    }
-    fn driver_type(&self) -> DriverType {
-        self.driver_type
-    }
-    fn state(&self) -> DriverState {
-        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) }
-    }
-    fn load(&mut self) -> Result<(), DriverError> {
-        self.state
-            .store(DriverState::Active as usize, Ordering::SeqCst);
-        Ok(())
-    }
-    fn unload(&mut self) -> Result<(), DriverError> {
-        self.state
-            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
-        Ok(())
-    }
 }
 
 pub trait DriverFramework {

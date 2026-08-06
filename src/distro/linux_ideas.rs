@@ -7,7 +7,9 @@
 #![allow(unused_imports)]
 #![allow(clippy::new_without_default)]
 
-use crate::klib::{Vec, String};
+extern crate alloc;
+use alloc::string::String;
+use crate::klib::Vec;
 
 // ─── 1. ARCH LINUX: Pacman-style rolling dependency resolver ──────────────────
 /// Arch-inspired: topological sort for package dependency resolution with cycle detection
@@ -397,8 +399,7 @@ impl YastConfigStore {
                 return;
             }
         }
-        let mut k = String::new();
-        for &b in key.as_bytes() { k.push(b); }
+        let k = key.to_string();
         self.entries.push((k, val));
     }
 
@@ -429,8 +430,8 @@ impl YastConfigStore {
             out.push_str(k.as_str());
             out.push_str(" = ");
             match v {
-                ConfigValue::Bool(b) => out.push_str(if b { "true" } else { "false" }),
-                ConfigValue::Int(i) => { let s = format_int(i); out.push_str(&s); }
+                ConfigValue::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
+                ConfigValue::Int(i) => { let s = format_int(*i); out.push_str(&s); }
                 ConfigValue::Text(t) => { out.push('"'); out.push_str(t.as_str()); out.push('"'); }
                 ConfigValue::List(l) => {
                     out.push('[');
@@ -557,7 +558,9 @@ mod tests {
     fn test_dep_resolver() {
         let mut r = NativeDependencyResolver::new();
         r.add_package(String::from("libssl"), Vec::new());
-        r.add_package(String::from("curl"), vec![String::from("libssl")]);
+        let mut deps = Vec::new();
+        deps.push(String::from("libssl"));
+        r.add_package(String::from("curl"), deps);
         let order = r.resolve_order().unwrap();
         assert_eq!(order[0].as_str(), "libssl");
         assert_eq!(order[1].as_str(), "curl");

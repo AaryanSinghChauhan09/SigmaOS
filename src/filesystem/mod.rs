@@ -30,9 +30,8 @@ pub use sigma_fs::{
     SigmaFhsNamespace, SigmaFhsRouter, SigmaFsCow, SigmaFsCrypt, SigmaFsJournal, SigmaFsRaid,
     SigmaFsVirtio, SigmaFsVolume,
 };
-pub use smart_symlink::{SmartSymlink, SymlinkError};
+pub use smart_symlink::{SmartSymlink, SymlinkError, SymlinkResolverRule, LegacyLinuxRule, LinuxPersonaRule};
 pub use support::{
-    Filesystem, FilesystemError, FilesystemManager, FilesystemType, LegacyLinuxRule,
-    LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
+    Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem, SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};

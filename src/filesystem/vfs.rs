@@ -54,3 +54,44 @@ pub struct Inode {
     pub capabilities: CapabilityToken,
     pub link_count: u32, // standard inode link count tracking hard links
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct FileDescriptor {
+    pub fd: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FsError {
+    Success = 0,
+    NotFound = 1,
+    PermissionDenied = 2,
+    AlreadyExists = 3,
+    NotADirectory = 4,
+    IsADirectory = 5,
+    NotEmpty = 6,
+    IOError = 7,
+    InvalidParameter = 8,
+}
+
+pub struct VirtualFilesystem {
+    pub root: Inode,
+}
+
+impl VirtualFilesystem {
+    pub fn new() -> Self {
+        Self {
+            root: Inode {
+                id: 1,
+                file_type: FileType::Directory,
+                permissions: FilePermissions::all(),
+                size: 0,
+                owner: 0,
+                group: 0,
+                created: 0,
+                modified: 0,
+                capabilities: CapabilityToken::from_bits(!0),
+                link_count: 1,
+            },
+        }
+    }
+}

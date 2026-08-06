@@ -515,11 +515,6 @@ impl LocalLlmEngine {
             config,
             loaded: false,
             cache_enabled: true,
-            sharding: JaxTensorSharding::new(
-                vec![1, 8],
-                vec!["data".to_string(), "model".to_string()],
-            ),
-            router: GrokMoeRouter::new(num_ex, per_tok),
         }
     }
 
@@ -561,10 +556,20 @@ impl LocalLlmEngine {
         };
 
         // For now, return a placeholder response
-        let start_time = 0; // Would use actual timing
+        let mut response =
+            InferenceResponse::new(text_output, 10, 100);
 
-        let response =
-            InferenceResponse::new("Generated response placeholder".to_string(), 10, 100);
+        if !request.tools.is_empty() {
+            let mut calls = Vec::new();
+            for tool in &request.tools {
+                calls.push(ToolCall {
+                    id: "call_123".to_string(),
+                    name: tool.name.clone(),
+                    arguments_json: "{}".to_string(),
+                });
+            }
+            response = response.with_tool_calls(calls);
+        }
 
         Ok(response)
     }
@@ -853,10 +858,6 @@ mod tests {
         assert_eq!(start, 3 * 128);
     }
 
-        // 1. Test Structured JSON Object generation (generateObject style)
-        let json_result = engine.generate_object("get_weather").unwrap();
-        assert!(json_result.contains("Vercel AI SDK style structured JSON"));
-
     #[test]
     fn test_moe_gating_and_balancing_loss() {
         let mut router = GrokMoeRouter::new(8, 2);
@@ -867,6 +868,21 @@ mod tests {
         assert_eq!(scores[0].len(), 2);
         assert!(loss > 0.0);
     }
+
+    #[test]
+    fn test_structured_generation_and_tool_calling() {
+        let mut engine = LocalLlmEngine::new(LlmConfig::default());
+        engine.load().unwrap();
+
+        // 1. Test Structured JSON Object generation (generateObject style)
+        let json_result = engine.generate_object("get_weather").unwrap();
+        assert!(json_result.contains("Vercel AI SDK style structured JSON"));
+
+        let weather_tool = AiTool {
+            name: "get_weather".to_string(),
+            description: "Get the current weather".to_string(),
+            parameters_schema_json: "{}".to_string(),
+        };
 
         let request = InferenceRequest::new("Please get_weather for Mumbai".to_string())
             .with_tool(weather_tool);
