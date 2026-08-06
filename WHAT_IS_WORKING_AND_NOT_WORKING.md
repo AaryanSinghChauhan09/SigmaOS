@@ -25,6 +25,7 @@ With this master guide, any autonomous AI agent or software engineer can systema
    - [Error Group C: Duplicate Imports in Compatibility Layer](#error-group-c-duplicate-imports-in-compatibility-layer)
    - [Error Group D: Display and Hash Trait Failures for `Version`](#error-group-d-display-and-hash-trait-failures-for-version)
    - [Error Group E: Missing Fields in Initializers and Field Resolution Gaps](#error-group-e-missing-fields-in-initializers-and-field-resolution-gaps)
+   - [Error Group F: Core Library & Type Mismatch Gaps in `sigpkg` and `boot`](#error-group-f-core-library--type-mismatch-gaps-in-sigpkg-and-boot)
 4. [Long-Term Subsystem Gaps & Bare-Metal Hardening](#4-long-term-subsystem-gaps--bare-metal-hardening)
 5. [AI Agent Execution Pipeline & Verification Protocols](#5-ai-agent-execution-pipeline--verification-protocols)
 
@@ -319,6 +320,58 @@ Running `cargo check` and `cargo test` on the workspace currently encounters com
       pub a11y_features: crate::klib::HashMap<String, bool>,
   }
   ```
+
+---
+
+### Error Group F: Core Library & Type Mismatch Gaps in `sigpkg` and `boot`
+
+#### **Error 1: Missing `Eq` trait in float popularity field inside `sigpkg/aur_helper.rs`**
+* **Compiler Message:**
+  ```text
+  error[E0277]: the trait bound `f32: Eq` is not satisfied
+    --> src/sigpkg/aur_helper.rs:27:5
+  ```
+* **Why It Occurs:**
+  The `aur_helper.rs` defines a package meta struct that derives `Eq`, but it contains a field `popularity: f32`. In Rust, `f32` does not implement `Eq` due to `NaN` comparison behaviors.
+* **How to Fix:**
+  Remove `Eq` from the `#[derive(...)]` macro of that struct and implement it manually, or only derive `PartialEq`.
+
+#### **Error 2: Collect Type Mismatches in `sigpkg/makepkg.rs`**
+* **Compiler Message:**
+  ```text
+  error[E0277]: a value of type `klib::vec::Vec<&str>` cannot be built from an iterator over elements of type `&str`
+  ```
+* **Why It Occurs:**
+  The `collect()` call is collecting line parts into `klib::vec::Vec<&str>`, but the custom `Vec<T>` inside the crate lacks a `FromIterator` implementation for strings.
+* **How to Fix:**
+  Replace the output type with `std::vec::Vec` or implement `FromIterator` on `klib::vec::Vec`.
+
+#### **Error 3: Missing PageSize Undeclared Type inside `klib/paging.rs`**
+* **Compiler Message:**
+  ```text
+  error[E0433]: cannot find type `PageSize` in this scope
+  ```
+* **Why It Occurs:**
+  The page translation loop matches on a `PageSize` type that is not imported or defined in `paging.rs`.
+* **How to Fix:**
+  Import or declare the standard `PageSize` enum inside `paging.rs`:
+  ```rust
+  pub enum PageSize {
+      Standard4KB,
+      Huge2MB,
+      Giant1GB,
+  }
+  ```
+
+#### **Error 4: Invalid Custom Vec Dereferencing in `boot/verified.rs`**
+* **Compiler Message:**
+  ```text
+  error[E0614]: type `Vec<Option<Box<dyn BootStage>>>` cannot be dereferenced
+  ```
+* **Why It Occurs:**
+  The loop in `verified.rs` tries to do `for stage_option in &*self.stages`. Since the stages are stored in custom `Vec`, Rust does not allow the `*` dereference mapping to slice.
+* **How to Fix:**
+  Remove the `*` or implement the standard `Deref<Target = [T]>` for custom `Vec<T>` inside `src/klib/vec.rs`.
 
 ---
 
