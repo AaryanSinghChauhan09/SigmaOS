@@ -1,7 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
-use std::io::{self, BufRead, Write};
+use std::io::{self, BufRead, Write}; // Userspace I/O is acceptable
 
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
@@ -81,14 +81,14 @@ pub struct AgentTask {
 /// AI Agent Automation Engine inside SigmaOS REPL
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine {
-    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
+    pub registered_tasks: crate::klib::HashMap<usize, AgentTask>,
     pub next_task_id: usize,
 }
 
 impl AgentAutomationEngine {
     pub fn new() -> Self {
         AgentAutomationEngine {
-            registered_tasks: std::collections::HashMap::new(),
+            registered_tasks: crate::klib::HashMap::new(),
             next_task_id: 1,
         }
     }

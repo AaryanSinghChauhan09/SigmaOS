@@ -1,7 +1,13 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod arch_compat;
+pub mod aur;
+pub mod aur_helper;
+pub mod importer;
 pub mod linux_compat;
+pub mod makepkg;
+pub mod nix_shell;
 pub mod pacman;
 pub mod recipe;
 pub mod resolver;
@@ -13,9 +19,13 @@ pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
 pub mod verifier;
-pub mod rpm_compat;
-pub mod universal_adapter;
+pub mod zero_alloc_resolver;
 
+pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use aur::{AurClient, AurPackage as AurPkg, AurPackageQuery, Version as AurVersion};
+pub use aur_helper::{AurHelper, AurPackage, AurParser};
+pub use makepkg::{MakepkgSandbox, PkgbuildParser};
+pub use nix_shell::{DevEnvironment, NixShellManager, PredefinedEnvironments};
 pub use linux_compat::{
     DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
     TranslatedMetadata, TranslatorError,
@@ -29,6 +39,21 @@ pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 pub use universal_adapter::{
     AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
+};
+pub use universal_oop_system::{
+    IPackage, IPackageParser, PackageFormat, PackageMetadata,
+    PackageParserFactory, UniversalPackageManager,
+    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
+    UserDefinedHook, ParseError, InstallError, HookError,
+};
+pub use spec::{
+    AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
+    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
+    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
+    NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
+    TxzPackageAdapter, XbpsPackageAdapter,
+    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
+    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
 };
 
 /// Package version using SemVer

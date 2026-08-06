@@ -2,7 +2,7 @@
 // Capability-based filesystem with security and advanced Linux-inspired abstractions (xattrs, hardlinks, symlinks)
 
 use crate::security::{CapabilityToken, Permission};
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
