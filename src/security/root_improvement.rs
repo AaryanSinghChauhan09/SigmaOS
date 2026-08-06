@@ -402,15 +402,15 @@ pub trait PamModule: Send + Sync {
         PamResult::Ignore
     }
 
-    fn validate_account(&self, _username: &str, context: &mut PamContext) -> PamResult {
+    fn validate_account(&self, _username: &str, _context: &mut PamContext) -> PamResult {
         PamResult::Ignore
     }
 
-    fn open_session(&self, _username: &str, context: &mut PamContext) -> PamResult {
+    fn open_session(&self, _username: &str, _context: &mut PamContext) -> PamResult {
         PamResult::Ignore
     }
 
-    fn close_session(&self, _username: &str, context: &mut PamContext) -> PamResult {
+    fn close_session(&self, _username: &str, _context: &mut PamContext) -> PamResult {
         PamResult::Ignore
     }
 

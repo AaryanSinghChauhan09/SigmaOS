@@ -302,11 +302,11 @@ mod tests {
             key[i] = (val & 0xFF) as u8;
         }
         
+        // Initialize IV with non-zero values for test security
         for i in 0..12 {
-            let mut val = seed.wrapping_mul((i + 32) as u64);
-            val ^= val >> 29;
+            let mut val = seed.wrapping_add(i as u64 * 7);
+            val ^= val >> 17;
             val = val.wrapping_mul(0x9e3779b97f4a7c15);
-            val ^= val >> 29;
             iv[i] = (val & 0xFF) as u8;
         }
 

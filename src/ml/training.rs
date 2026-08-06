@@ -406,7 +406,7 @@ impl SovereignStreamingPool {
             // Move items up and return the first element
             // Safety: self.queue.data is valid when len > 0 (invariant maintained by push)
             unsafe {
-                if self.queue.data.is_null() {
+                if self.queue.data.is_null() || self.queue.len == 0 {
                     return None;
                 }
                 let first = ::core::ptr::read(self.queue.data);
