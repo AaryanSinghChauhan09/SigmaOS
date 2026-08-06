@@ -160,6 +160,7 @@ impl MakepkgSandbox {
             &pkgver
         };
         let version = Version::parse(cleaned_ver).unwrap_or(Version::new(1, 0, 0));
+        let version = Version::parse(&pkgver).unwrap_or_else(|_| Version::new(1, 0, 0));
 
         let mut pkg = Package::new(
             pkgname,
@@ -173,6 +174,12 @@ impl MakepkgSandbox {
             pkgdesc,
             std::vec::Vec::new(),
             String::new(),
+        );
+        pkg.source = String::from_str("arch");
+        Ok(pkg)
+            pkgdesc,
+            std::vec::Vec::new(),
+            crate::klib::String::new(),
         );
         pkg.source = String::from_str("arch");
         Ok(pkg)
