@@ -1,14 +1,8 @@
-// Linux Mint Emulation Utilities for SigmaOS
-// Implements backup, security updates levels, and system diagnostic reporting
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::Vec;
 
@@ -110,116 +104,139 @@ impl MintUpdateManager {
 
 /// MintBackup: Incremental user-data backup and profile state archiver
 pub struct MintBackupTool {
-    pub backed_up_items: usize,
+    pub user_backups_count: AtomicUsize,
+    pub active_backup_path: [u8; 64],
+}
+
+impl Default for MintBackupTool {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MintBackupTool {
     pub fn new() -> Self {
-        Self { backed_up_items: 0 }
-    }
-
-    pub fn backup_user_profile(&mut self, user: &str) -> Result<String, &'static str> {
-        self.backed_up_items += 10; // Simulated backed up user directory items
-        Ok(format!("Backup of user '{}' completed successfully.", user))
-    }
-
-    pub fn restore_user_profile(&mut self, user: &str) -> Result<String, &'static str> {
-        Ok(format!(
-            "Restored user '{}' profile from latest snapshot.",
-            user
-        ))
-    }
-}
-
-pub struct MintUpdateManager {
-    pub checked_updates: usize,
-}
-
-impl MintUpdateManager {
-    pub fn new() -> Self {
-        Self { checked_updates: 0 }
-    }
-
-    /// Classifies updates from Level 1 to 5:
-    /// Level 1: Certified / Extremely Safe
-    /// Level 2: Recommended / Safe
-    /// Level 3: Safe / Extra testing suggested
-    /// Level 4: Unverified / Advanced users only
-    /// Level 5: Dangerous / Expert users only
-    pub fn classify_update(&mut self, package_name: &str) -> u8 {
-        self.checked_updates += 1;
-        if package_name.contains("kernel") || package_name.contains("systemd") {
-            4
-        } else if package_name.contains("openssl") || package_name.contains("glibc") {
-            3
-        } else if package_name.contains("firefox") || package_name.contains("vlc") {
-            2
-        } else if package_name.contains("theme") || package_name.contains("wallpaper") {
-            1
-        } else {
-            5
+        MintBackupTool {
+            user_backups_count: AtomicUsize::new(0),
+            active_backup_path: [0u8; 64],
         }
     }
 
-    pub fn test_mirror_latency(&self, mirror_url: &str) -> u32 {
-        if mirror_url.contains("fast") {
-            12 // ms
-        } else {
-            150 // ms
+    pub fn perform_user_backup(&mut self, backup_dir: &[u8]) -> Result<usize, &'static str> {
+        if backup_dir.is_empty() {
+            return Err("Backup target directory is invalid");
+        }
+        let len = backup_dir.len().min(63);
+        self.active_backup_path[..len].copy_from_slice(&backup_dir[..len]);
+        let id = self.user_backups_count.fetch_add(1, Ordering::SeqCst);
+        Ok(id)
+    }
+}
+
+/// MintInstall: High-level application software ratings and metadata
+#[derive(Debug, Clone)]
+pub struct MintAppMetadata {
+    pub name: [u8; 32],
+    pub rating_stars: usize, // 1 to 5
+    pub reviews_count: usize,
+    pub is_flatpak: bool,
+}
+
+impl MintAppMetadata {
+    pub fn new(name: &[u8], rating_stars: usize, reviews_count: usize, is_flatpak: bool) -> Self {
+        let mut name_arr = [0u8; 32];
+        name_arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
+        MintAppMetadata {
+            name: name_arr,
+            rating_stars: rating_stars.clamp(1, 5),
+            reviews_count,
+            is_flatpak,
         }
     }
 }
 
 pub struct MintSoftwareManager {
-    pub total_packages: usize,
+    pub apps_catalog: Vec<MintAppMetadata>,
+}
+
+impl Default for MintSoftwareManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MintSoftwareManager {
     pub fn new() -> Self {
-        Self {
-            total_packages: 50000,
+        MintSoftwareManager {
+            apps_catalog: Vec::new(),
         }
     }
 
-    pub fn get_package_reviews(&self, package_name: &str) -> Vec<String> {
-        if package_name == "vlc" {
-            vec![
-                "Great media player, runs everything!".to_string(),
-                "Absolute lifesaver on Linux.".to_string(),
-            ]
-        } else {
-            vec!["No reviews yet.".to_string()]
-        }
+    pub fn add_app_to_catalog(&mut self, app: MintAppMetadata) {
+        self.apps_catalog.push(app);
     }
+}
 
-    pub fn get_package_rating(&self, package_name: &str) -> f32 {
-        if package_name == "vlc" {
-            4.8
-        } else if package_name == "firefox" {
-            4.6
-        } else {
-            3.0
+/// MintReport: Detects system crashes, memory warnings, and provides direct advice remedies
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MintReportAlertSeverity {
+    Info,
+    Warning,
+    Critical,
+}
+
+#[derive(Debug, Clone)]
+pub struct MintReportAlert {
+    pub name: [u8; 32],
+    pub severity: MintReportAlertSeverity,
+    pub remedy_advice: [u8; 64],
+}
+
+impl MintReportAlert {
+    pub fn new(name: &[u8], severity: MintReportAlertSeverity, advice: &[u8]) -> Self {
+        let mut name_arr = [0u8; 32];
+        let mut advice_arr = [0u8; 64];
+        name_arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
+        advice_arr[..advice.len().min(63)].copy_from_slice(&advice[..advice.len().min(63)]);
+
+        MintReportAlert {
+            name: name_arr,
+            severity,
+            remedy_advice: advice_arr,
         }
     }
 }
 
 pub struct MintReportSystem {
-    pub active_alerts: usize,
+    pub active_alerts: Vec<MintReportAlert>,
+}
+
+impl Default for MintReportSystem {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl MintReportSystem {
     pub fn new() -> Self {
-        Self { active_alerts: 0 }
+        MintReportSystem {
+            active_alerts: Vec::new(),
+        }
     }
 
-    pub fn check_diagnostics(&mut self) -> Vec<String> {
-        let mut reports = Vec::new();
-        // Check for crashed processes
-        reports.push("No core dumps or crashed processes detected.".to_string());
-        // Check for missing multimedia codecs
-        reports.push("Multimedia codecs verified: H.264, AAC, MP3 are fully active.".to_string());
-        self.active_alerts = reports.len();
-        reports
+    pub fn register_crash_alert(&mut self, app_name: &[u8]) {
+        let mut alert_name = [0u8; 32];
+        let len = app_name.len().min(15);
+        alert_name[..len].copy_from_slice(&app_name[..len]);
+        let suffix = b" crashed";
+        alert_name[len..len + suffix.len()].copy_from_slice(suffix);
+
+        let alert = MintReportAlert::new(
+            &alert_name,
+            MintReportAlertSeverity::Critical,
+            b"Please restart the service or run sigpkg update",
+        );
+        self.active_alerts.push(alert);
     }
 }
 
@@ -379,47 +396,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_mint_backup() {
-        let mut tool = MintBackupTool::new();
-        let res = tool.backup_user_profile("test_user").unwrap();
-        assert!(res.contains("test_user"));
-        assert_eq!(tool.backed_up_items, 10);
-
-        let restore_res = tool.restore_user_profile("test_user").unwrap();
-        assert!(restore_res.contains("Restored"));
-    }
-
-    #[test]
-    fn test_mint_updates() {
-        let mut manager = MintUpdateManager::new();
-        assert_eq!(manager.classify_update("linux-kernel"), 4);
-        assert_eq!(manager.classify_update("mint-y-theme"), 1);
-        assert_eq!(manager.classify_update("firefox"), 2);
-        assert_eq!(manager.classify_update("malicious-rootkit"), 5);
-
-        assert_eq!(manager.test_mirror_latency("mirror.fast.org"), 12);
-        assert_eq!(manager.test_mirror_latency("mirror.slow.edu"), 150);
-    }
-
-    #[test]
-    fn test_mint_software_manager() {
-        let manager = MintSoftwareManager::new();
-        let ratings = manager.get_package_rating("vlc");
-        assert_eq!(ratings, 4.8);
-
-        let reviews = manager.get_package_reviews("vlc");
-        assert_eq!(reviews.len(), 2);
-    }
-
-    #[test]
-    fn test_mint_report() {
-        let mut sys = MintReportSystem::new();
-        let reports = sys.check_diagnostics();
-        assert_eq!(reports.len(), 2);
-        assert_eq!(sys.active_alerts, 2);
-    }
-
-    #[test]
     fn test_mint_update_manager() {
         let mut manager = MintUpdateManager::new();
         let pkg =
@@ -443,6 +419,15 @@ mod tests {
         let mut backup = MintBackupTool::new();
         let backup_id = backup.perform_user_backup(b"/backup/user_state").unwrap();
         assert_eq!(backup_id, 0);
+    }
+
+    #[test]
+    fn test_mint_software_manager() {
+        let mut software = MintSoftwareManager::new();
+        let app = MintAppMetadata::new(b"alacritty", 5, 230, true);
+        software.add_app_to_catalog(app);
+        assert_eq!(software.apps_catalog.len(), 1);
+        assert_eq!(software.apps_catalog[0].rating_stars, 5);
     }
 
     #[test]

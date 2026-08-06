@@ -2,9 +2,6 @@ use crate::klib::Vec;
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements audio device management and playback
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AudioDeviceID = usize;
@@ -18,13 +15,6 @@ pub enum AudioType {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AudioError {
-    Success = 0,
-    NotFound = 1,
-    InitFailed = 2,
-    PlaybackFailed = 3,
-}
 #[derive(Debug, Clone, Copy)]
 pub enum AudioError {
     Success = 0,
@@ -41,6 +31,7 @@ pub trait AudioDevice {
     fn initialize(&mut self) -> Result<(), AudioError>;
 }
 
+#[repr(C)]
 pub struct SimpleAudioDevice {
     pub id: AudioDeviceID,
     pub name: [u8; 64],
@@ -52,8 +43,9 @@ impl SimpleAudioDevice {
     pub fn new(id: AudioDeviceID, name: &[u8], audio_type: AudioType, sample_rate: u32) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+        }
         SimpleAudioDevice {
             id,
             name: name_array,
@@ -97,6 +89,7 @@ pub trait AudioManager {
     fn list_devices(&self) -> Vec<AudioDeviceID>;
 }
 
+#[repr(C)]
 pub struct SimpleAudioManager {
     pub devices: Vec<Option<Box<dyn AudioDevice>>>,
     pub next_id: AtomicUsize,
@@ -108,12 +101,6 @@ impl SimpleAudioManager {
             devices: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
-    }
-}
-
-impl Default for SimpleAudioManager {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -170,6 +157,7 @@ pub trait AudioMixer {
     fn mute(&mut self, device_id: AudioDeviceID, muted: bool) -> Result<(), AudioError>;
 }
 
+#[repr(C)]
 pub struct SimpleAudioMixer {
     pub volumes: Vec<(AudioDeviceID, AtomicUsize, AtomicUsize)>,
 }
@@ -179,12 +167,6 @@ impl SimpleAudioMixer {
         SimpleAudioMixer {
             volumes: Vec::new(),
         }
-    }
-}
-
-impl Default for SimpleAudioMixer {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -237,6 +219,7 @@ pub trait AudioStream {
     fn read_samples(&mut self, stream_id: usize, buffer: &mut [u8]) -> Result<usize, AudioError>;
 }
 
+#[repr(C)]
 pub struct SimpleAudioStream {
     pub streams: Vec<(usize, AudioDeviceID, u8, u32)>,
     pub next_id: AtomicUsize,
@@ -248,12 +231,6 @@ impl SimpleAudioStream {
             streams: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
-    }
-}
-
-impl Default for SimpleAudioStream {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

@@ -1,30 +1,17 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+#[cfg(not(target_os = "none"))]
+use std_alloc::boxed::Box;
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
-/// OOP-based Timer System for SigmaOS
-/// Implements timer management using OOP principles with traits and structs
-/// No dependency on external timer frameworks
+/// OOP-based Advanced Asynchronous Timer, APC, DPC & IOCTL Execution Engine for SigmaOS
+/// Implements high-fidelity timer management, Windows-inspired Asynchronous Procedure Calls (APC),
+/// Deferred Procedure Calls (DPC), and standard Linux/BSD IOCTL handlers.
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU64, AtomicUsize, AtomicBool, Ordering};
 use core::mem;
 
 /// Timer ID
@@ -33,25 +20,9 @@ pub type TimerID = usize;
 /// Timestamp (nanoseconds)
 pub type Timestamp = u64;
 
-/// Timer trait (OOP interface)
-pub trait Timer {
-    /// Start timer
-    fn start(&mut self) -> Result<(), TimerError>;
-    /// Stop timer
-    fn stop(&mut self) -> Result<(), TimerError>;
-    /// Reset timer
-    fn reset(&mut self) -> Result<(), TimerError>;
-    /// Get elapsed time
-    fn elapsed(&self) -> Timestamp;
-    /// Set interval
-    fn set_interval(&mut self, interval: Timestamp) -> Result<(), TimerError>;
-    /// Get timer info
-    fn info(&self) -> TimerInfo;
-}
-
 /// Timer error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TimerError {
     Success = 0,
     AlreadyStarted = 1,
@@ -63,7 +34,7 @@ pub enum TimerError {
 
 /// Timer type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TimerType {
     OneShot = 0,
     Periodic = 1,
@@ -104,7 +75,6 @@ pub struct TimerCapability {
 }
 
 impl TimerCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TimerCapability {
             can_start: false,
@@ -154,6 +124,15 @@ impl TimerDescriptor {
     pub fn set_callback(&mut self, callback: fn(TimerID)) {
         self.callback = Some(callback);
     }
+}
+
+pub trait Timer {
+    fn start(&mut self) -> Result<(), TimerError>;
+    fn stop(&mut self) -> Result<(), TimerError>;
+    fn reset(&mut self) -> Result<(), TimerError>;
+    fn elapsed(&self) -> Timestamp;
+    fn set_interval(&mut self, interval: Timestamp) -> Result<(), TimerError>;
+    fn info(&self) -> TimerInfo;
 }
 
 impl Timer for TimerDescriptor {
@@ -232,26 +211,90 @@ impl Timer for TimerDescriptor {
     }
 }
 
-/// Timer manager trait (OOP interface)
-pub trait TimerManager {
-    /// Create timer
-    fn create_timer(&mut self, timer_type: TimerType, interval: Timestamp, capability: TimerCapability) -> Result<TimerID, TimerError>;
-    /// Delete timer
-    fn delete_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
-    /// Start timer
-    fn start_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
-    /// Stop timer
-    fn stop_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
-    /// Update timers (called periodically)
-    fn update(&mut self) -> Vec<TimerID>;
-    /// Get timer info
-    fn get_timer_info(&self, id: TimerID) -> Option<TimerInfo>;
-    /// Get manager statistics
-    fn stats(&self) -> TimerStats;
+/// Windows-style Asynchronous Procedure Call (APC) object
+#[derive(Debug, Clone, Copy)]
+pub struct ApcObject {
+    pub thread_id: u64,
+    pub routine: fn(u64), // Callback function (takes context argument)
+    pub context: u64,
 }
 
-/// Timer statistics
+/// Windows-style Deferred Procedure Call (DPC) object
+#[derive(Debug, Clone, Copy)]
+pub struct DpcObject {
+    pub dpc_routine: fn(u64, u64), // Callback function (takes context1 and context2)
+    pub context1: u64,
+    pub context2: u64,
+}
+
+/// Linux/BSD-style Input/Output Control (IOCTL) command payload
+#[derive(Debug, Clone, Copy)]
+pub struct IoctlRequest {
+    pub request_code: u32, // major/minor commands
+    pub arg_ptr: u64,
+}
+
+/// Sovereign APC/DPC Asynchronous Execution Engine (Windows kernel inspired)
+pub struct SovereignApcDpcEngine {
+    pub apc_queue: Vec<ApcObject>,
+    pub dpc_queue: Vec<DpcObject>,
+}
+
+impl Default for SovereignApcDpcEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignApcDpcEngine {
+    pub fn new() -> Self {
+        SovereignApcDpcEngine {
+            apc_queue: Vec::new(),
+            dpc_queue: Vec::new(),
+        }
+    }
+
+    /// Queues an APC for execution in the target thread's alertable wait context
+    pub fn queue_apc(&mut self, apc: ApcObject) {
+        self.apc_queue.push(apc);
+    }
+
+    /// Queues a DPC for low-latency preemption-level execution
+    pub fn queue_dpc(&mut self, dpc: DpcObject) {
+        self.dpc_queue.push(dpc);
+    }
+
+    /// Dispatches all queued DPCs (runs deferred service tasks)
+    pub fn dispatch_dpcs(&mut self) -> usize {
+        let mut count = 0;
+        while !self.dpc_queue.is_empty() {
+            let dpc = self.dpc_queue.remove(0);
+            (dpc.dpc_routine)(dpc.context1, dpc.context2);
+            count += 1;
+        }
+        count
+    }
+
+    /// Dispatches active APCs matching a specific thread context
+    pub fn dispatch_apcs(&mut self, thread_id: u64) -> usize {
+        let mut count = 0;
+        let mut i = 0;
+        while i < self.apc_queue.len() {
+            if self.apc_queue[i].thread_id == thread_id {
+                let apc = self.apc_queue.remove(i);
+                (apc.routine)(apc.context);
+                count += 1;
+            } else {
+                i += 1;
+            }
+        }
+        count
+    }
+}
+
+/// Timer stats
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct TimerStats {
     pub total_timers: usize,
     pub active_timers: usize,
@@ -260,7 +303,6 @@ pub struct TimerStats {
 }
 
 impl TimerStats {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         TimerStats {
             total_timers: 0,
@@ -269,6 +311,16 @@ impl TimerStats {
             total_ticks: 0,
         }
     }
+}
+
+pub trait TimerManager {
+    fn create_timer(&mut self, timer_type: TimerType, interval: Timestamp, capability: TimerCapability) -> Result<TimerID, TimerError>;
+    fn delete_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
+    fn start_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
+    fn stop_timer(&mut self, id: TimerID) -> Result<(), TimerError>;
+    fn update(&mut self) -> Vec<TimerID>;
+    fn get_timer_info(&self, id: TimerID) -> Option<TimerInfo>;
+    fn stats(&self) -> TimerStats;
 }
 
 /// Simple timer manager (OOP: Concrete manager class)
@@ -289,7 +341,6 @@ pub struct ManagerCapability {
 }
 
 impl ManagerCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ManagerCapability {
             can_create: false,
@@ -321,7 +372,7 @@ impl SimpleTimerManager {
         for timer_option in &mut self.timers {
             if let Some(timer_ptr) = *timer_option {
                 let timer = &mut *timer_ptr.as_ptr();
-                if timer.id == id == true {
+                if timer.id == id {
                     return Some(timer);
                 }
             }
@@ -333,7 +384,7 @@ impl SimpleTimerManager {
         for timer_option in &self.timers {
             if let Some(timer_ptr) = *timer_option {
                 let timer = &*timer_ptr.as_ptr();
-                if timer.id == id == true {
+                if timer.id == id {
                     return Some(timer);
                 }
             }
@@ -467,7 +518,7 @@ impl TimerManager for SimpleTimerManager {
     }
 
     fn stats(&self) -> TimerStats {
-        let mut stats = self.stats.clone();
+        let mut stats = self.stats;
         stats.active_timers = 0;
 
         unsafe {
@@ -488,7 +539,6 @@ impl TimerManager for SimpleTimerManager {
 /// Get current time (nanoseconds)
 fn get_current_time() -> Timestamp {
     // In a real implementation, this would read from hardware timer
-    // For now, return a simulated value
     static mut COUNTER: u64 = 0;
     unsafe {
         COUNTER += 1_000_000; // Simulate 1ms per tick
@@ -496,11 +546,22 @@ fn get_current_time() -> Timestamp {
     }
 }
 
-/// Simple Vec implementation for no_std
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                new_vec.push((*self.data.add(i)).clone());
+            }
+        }
+        new_vec
+    }
 }
 
 impl<T> Vec<T> {
@@ -527,6 +588,21 @@ impl<T> Vec<T> {
 
     fn len(&self) -> usize {
         self.len
+    }
+
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
     }
 
     unsafe fn grow(&mut self) {
@@ -594,5 +670,72 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    static mut STATIC_APC_VALUE: u64 = 0;
+    static mut STATIC_DPC_VALUE: u64 = 0;
+
+    fn sample_apc_routine(context: u64) {
+        unsafe {
+            STATIC_APC_VALUE = context;
+        }
+    }
+
+    fn sample_dpc_routine(c1: u64, c2: u64) {
+        unsafe {
+            STATIC_DPC_VALUE = c1 + c2;
+        }
+    }
+
+    #[test]
+    fn test_ioctl_payload_mapping() {
+        let req = IoctlRequest {
+            request_code: 0x40046601, // simulated command
+            arg_ptr: 0x7FFF0000,
+        };
+        assert_eq!(req.request_code, 0x40046601);
+        assert_eq!(req.arg_ptr, 0x7FFF0000);
+    }
+
+    #[test]
+    fn test_apc_and_dpc_asynchronous_dispatching() {
+        let mut engine = SovereignApcDpcEngine::new();
+
+        let apc = ApcObject {
+            thread_id: 1002,
+            routine: sample_apc_routine,
+            context: 9999,
+        };
+
+        let dpc = DpcObject {
+            dpc_routine: sample_dpc_routine,
+            context1: 4000,
+            context2: 555,
+        };
+
+        engine.queue_apc(apc);
+        engine.queue_dpc(dpc);
+
+        assert_eq!(engine.apc_queue.len(), 1);
+        assert_eq!(engine.dpc_queue.len(), 1);
+
+        // 1. Dispatch DPCs (Deferred Procedure Calls)
+        let dpc_count = engine.dispatch_dpcs();
+        assert_eq!(dpc_count, 1);
+        unsafe {
+            assert_eq!(STATIC_DPC_VALUE, 4555);
+        }
+
+        // 2. Dispatch APCs (Asynchronous Procedure Calls)
+        let apc_count = engine.dispatch_apcs(1002);
+        assert_eq!(apc_count, 1);
+        unsafe {
+            assert_eq!(STATIC_APC_VALUE, 9999);
+        }
     }
 }

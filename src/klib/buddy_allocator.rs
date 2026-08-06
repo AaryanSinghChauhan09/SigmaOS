@@ -1,6 +1,3 @@
-
-use super::vec::Vec;
-use core::mem;
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
 /// Implements 2^n page frames with free list per order, split/coalesce
@@ -207,8 +204,8 @@ impl MemoryPool for SimpleBuddyAllocator {
 
     fn get_used_frames(&self) -> usize {
         let mut used = 0;
-        for i in 0..self.blocks.len() {
-            if let Some(ref block) = self.blocks[i] {
+        for block_option in &self.blocks {
+            if let Some(ref block) = *block_option {
                 if block.free.load(Ordering::SeqCst) == 0 {
                     used += 1;
                 }
