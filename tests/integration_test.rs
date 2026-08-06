@@ -1,27 +1,38 @@
 // SigmaOS Integration Tests
 // Verifies core system legacy compatibility, multi-persona VMs, and driver bridge layers
-#![cfg(feature = "integration_test")]
 #![allow(unused, clippy::all)]
 
-use sigmaos::accessibility::keyboard::{
-    KeyID, KeyType, OnScreenKeyboard, SimpleOnScreenKeyboard, SimpleVirtualKey, VirtualKey,
+use core::sync::atomic::Ordering;
+use sigmaos::compatibility::{
+    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
+    AntixDesktopProfiler, AntixInitManager, BinaryCompatMatrix, BundleType,
+    DesktopProfile as AntixDesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus,
+    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService,
+    MicroService as AntixMicroService, MicroServiceState,
+    MicroServiceState as AntixMicroServiceState, NetworkBridge, StorageBridge, SyscallAbi,
+    TribeInstaller, WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
-use sigmaos::accessibility::magnifier::{Magnifier, MagnifierManager, SimpleMagnifierManager};
-use sigmaos::accessibility::screenreader::{
-    ScreenReader, SimpleScreenReader, SimpleVoice, Voice, VoiceGender,
+use sigmaos::drivers::{
+    Ch340Driver, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver, GpuPipeline, GpuShader,
+    IntelHdaDriver, NvmeDriver, PeripheralDevice, PowerState, ShaderStage,
 };
-use sigmaos::accessibility::{
-    AccessibilityError, AccessibilityFramework, AccessibilityProfile, AccessibilitySetting,
+use sigmaos::filesystem::{
+    FileType, FsError, LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
+    VirtualFilesystem, O_APPEND, O_CREAT, O_EXCL, O_RDONLY, O_RDWR, O_TRUNC, O_WRONLY,
 };
-use sigmaos::driver::framework::{
-    Driver, DriverError, DriverFramework, DriverID, DriverState, DriverType, SimpleDriver,
-    SimpleDriverFramework,
+use sigmaos::interrupt::{
+    ControllerCapability, HandlerCapability, HandlerType, InterruptController, InterruptError,
+    InterruptHandler, InterruptManager, InterruptPriority, InterruptResult, InterruptTrace,
+    SimpleInterruptHandler, TraceEventType, PIC,
 };
-use sigmaos::filesystem::support::{
-    BtrfsFeatures, Filesystem, FilesystemManager, FilesystemType, SimpleBtrfsFS,
-    SimpleFilesystemManager, SimpleZFS, ZFSFeatures,
+use sigmaos::network::{
+    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
+    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
 };
-use sigmaos::kernel::{Priority, Process, ProcessState};
 use sigmaos::package::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
     LinuxTranslationService, PackageFormat, PackageTranslationUdf, PacmanPackageDriverTranslator,
@@ -42,7 +53,13 @@ use sigmaos::security::{
     SIGNATURE_LEN,
 };
 
-use sigmaos::kernel::{Priority, Process, ProcessState};
+use sigmaos::kernel::{
+    AdaptivePolicy, ArchitectureEngine, CpuRegisters, HardwareException,
+    InstructionCyclePhase as ArchInstructionCyclePhase, InstructionCyclePhase, InterruptClass,
+    IoWaitProfile, Irql, KernelMechanism, KernelPolicy, LookasideList, MemoryDescriptorList, Pcb,
+    PolicyMechanismCoordinator, PoolType, Priority, Process, ProcessState, ProcessorInitState,
+    SovereignMechanism, Tcb, ThreadState,
+};
 
 #[cfg(test)]
 mod tests {
@@ -260,42 +277,19 @@ mod tests {
             link1.expand_environment_context("/usr/lib/$LANG/libc.so", "guest", "en_US");
         assert_eq!(env_target2, "/usr/share/locale/en");
 
-        // Validate state transitions through initialization and load sequences
-        assert!(framework.load_driver(1001).is_ok());
+        // Case 7: Sandbox boundary escape verification
+        assert!(link1.is_sandbox_escape_safe("/sandbox/tmp/test.txt", "/sandbox"));
+        assert!(!link1.is_sandbox_escape_safe("/sandbox/tmp/../../../etc/passwd", "/sandbox"));
+        assert!(!link1.is_sandbox_escape_safe("/etc/passwd", "/sandbox"));
+
+        // Case 8: Multi-Lib architecture routing translation
         assert_eq!(
-            framework.get_driver(1001).unwrap().state(),
-            DriverState::Active
+            link1.resolve_multi_lib_routing(SyscallAbi::Oabi_32),
+            "/lib32/libc.so"
         );
-
-        assert!(framework.unload_driver(1001).is_ok());
         assert_eq!(
-            framework.get_driver(1001).unwrap().state(),
-            DriverState::Unloaded
-        );
-    }
-
-    #[test]
-    fn test_filesystem_support_and_features() {
-        let mut fs_manager = SimpleFilesystemManager::new();
-
-        // 1. Setup a Simple Btrfs filesystem and verify subvolume structures
-        let mut btrfs = SimpleBtrfsFS::new(101);
-        assert!(btrfs.create_subvolume(b"root").is_ok());
-        assert!(btrfs.create_subvolume(b"home").is_ok());
-        assert_eq!(btrfs.list_subvolumes().len(), 2);
-
-        // 2. Setup a Simple ZFS pool dataset and snapshoting
-        let mut zfs = SimpleZFS::new(102);
-        assert!(zfs.create_dataset(b"tank/data").is_ok());
-        assert!(zfs.create_snapshot(b"tank/data", b"snap1").is_ok());
-
-        assert!(fs_manager.register_filesystem(Box::new(btrfs.base)).is_ok());
-        assert!(fs_manager.register_filesystem(Box::new(zfs.base)).is_ok());
-
-        assert!(fs_manager.get_filesystem(101).is_some());
-        assert_eq!(
-            fs_manager.get_filesystem(101).unwrap().fs_type(),
-            FilesystemType::Btrfs
+            link1.resolve_multi_lib_routing(SyscallAbi::Eabi_64),
+            "/lib64/libc.so"
         );
     }
 
@@ -617,6 +611,111 @@ mod tests {
     }
 
     #[test]
+    fn test_vfs_path_traversal_and_flags() {
+        let mut vfs = VirtualFilesystem::new();
+
+        // 1. Resolve root path "/"
+        let root_id = vfs.resolve_path("/").unwrap();
+        assert_eq!(root_id, 0);
+
+        // 2. Open "/file.txt" with O_CREAT
+        let fd = vfs.open_path("/file.txt", O_CREAT | O_RDWR, 100).unwrap();
+
+        // 3. Write data to fd
+        let data = b"Hello VFS";
+        let written = vfs.write_file(fd, data).unwrap();
+        assert_eq!(written, data.len());
+
+        // 4. Seek offset back to 0 and read actual stored data back
+        assert!(vfs.close_file(fd).is_ok());
+        let fd_read = vfs.open_path("/file.txt", O_RDONLY, 100).unwrap();
+        let mut buf = [0u8; 16];
+        let bytes_read = vfs.read_file(fd_read, &mut buf).unwrap();
+        assert_eq!(bytes_read, data.len());
+        assert_eq!(&buf[..bytes_read], data);
+        assert!(vfs.close_file(fd_read).is_ok());
+
+        // 5. Test O_CREAT | O_EXCL triggers AlreadyExists error on existing file
+        let err_excl = vfs.open_path("/file.txt", O_CREAT | O_EXCL | O_RDWR, 100);
+        assert_eq!(err_excl.err(), Some(FsError::AlreadyExists));
+
+        // 6. Test O_APPEND mode
+        let fd_append = vfs.open_path("/file.txt", O_APPEND | O_RDWR, 100).unwrap();
+        let append_data = b" Conforming";
+        let written_append = vfs.write_file(fd_append, append_data).unwrap();
+        assert_eq!(written_append, append_data.len());
+        assert!(vfs.close_file(fd_append).is_ok());
+
+        // Read all back
+        let fd_all = vfs.open_path("/file.txt", O_RDONLY, 100).unwrap();
+        let mut all_buf = [0u8; 32];
+        let all_read = vfs.read_file(fd_all, &mut all_buf).unwrap();
+        assert_eq!(&all_buf[..all_read], b"Hello VFS Conforming");
+        assert!(vfs.close_file(fd_all).is_ok());
+
+        // 7. Test O_TRUNC mode
+        let fd_trunc = vfs.open_path("/file.txt", O_TRUNC | O_RDWR, 100).unwrap();
+        let inode_id = vfs.resolve_path("/file.txt").unwrap();
+        let inode = vfs.get_inode(inode_id).unwrap();
+        assert_eq!(inode.size, 0);
+        assert_eq!(inode.data.len(), 0);
+        assert!(vfs.close_file(fd_trunc).is_ok());
+    }
+
+    #[test]
+    fn test_vfs_hard_links_and_ref_counting() {
+        let mut vfs = VirtualFilesystem::new();
+
+        // 1. Create source file
+        let fd = vfs.open_path("/src.txt", O_CREAT | O_RDWR, 100).unwrap();
+        vfs.write_file(fd, b"shared content").unwrap();
+        assert!(vfs.close_file(fd).is_ok());
+
+        let src_id = vfs.resolve_path("/src.txt").unwrap();
+        let src_inode = vfs.get_inode(src_id).unwrap();
+        assert_eq!(src_inode.hard_links_count, 1);
+
+        // 2. Link "/src.txt" to "/link1.txt"
+        assert!(vfs.link_inode("/src.txt", "/link1.txt").is_ok());
+
+        // Hard links count should now be 2
+        let src_inode2 = vfs.get_inode(src_id).unwrap();
+        assert_eq!(src_inode2.hard_links_count, 2);
+
+        // Link "/src.txt" to "/link2.txt"
+        assert!(vfs.link_inode("/src.txt", "/link2.txt").is_ok());
+
+        // Hard links count should now be 3
+        let src_inode3 = vfs.get_inode(src_id).unwrap();
+        assert_eq!(src_inode3.hard_links_count, 3);
+
+        // 3. Unlink "/link1.txt"
+        assert!(vfs.unlink_inode("/link1.txt").is_ok());
+
+        // Inode should still exist, with link count 2
+        assert!(vfs.resolve_path("/src.txt").is_ok());
+        let src_inode4 = vfs.get_inode(src_id).unwrap();
+        assert_eq!(src_inode4.hard_links_count, 2);
+
+        // 4. Unlink "/src.txt"
+        assert!(vfs.unlink_inode("/src.txt").is_ok());
+
+        // Inode should still exist, with link count 1 (via link2.txt)
+        let src_inode5 = vfs.get_inode(src_id).unwrap();
+        assert_eq!(src_inode5.hard_links_count, 1);
+
+        // 5. Unlink "/link2.txt"
+        assert!(vfs.unlink_inode("/link2.txt").is_ok());
+
+        // Inode should now be completely deleted
+        assert_eq!(
+            vfs.resolve_path("/link2.txt").err(),
+            Some(FsError::NotFound)
+        );
+        assert!(vfs.get_inode(src_id).is_none());
+    }
+
+    #[test]
     fn test_interrupt_nesting_preemption() {
         let mut manager = InterruptManager::new();
         let mut pic = Box::new(PIC::new(sigmaos::interrupt::ControllerCapability::full()));
@@ -731,50 +830,147 @@ mod tests {
     }
 
     #[test]
-    fn test_process_signals_integration() {
-        use sigmaos::runtime::process::{Process, ProcessCapability, ProcessSignal};
+    fn test_cpu_bootstrap_and_instructions() {
+        let mut engine = ArchitectureEngine::new();
+        assert_eq!(engine.init_state, ProcessorInitState::Offline);
 
-        let cap = ProcessCapability::full();
-        let process = unsafe { Process::new(10, 1, cap) };
+        // Bootstrap Core
+        assert!(engine.init_processor().is_ok());
+        assert_eq!(engine.init_state, ProcessorInitState::Ready);
 
-        assert!(!process.consume_pending_signal(ProcessSignal::SigKill));
-        process.send_signal(ProcessSignal::SigKill);
-        assert!(process.consume_pending_signal(ProcessSignal::SigKill));
-        assert!(!process.consume_pending_signal(ProcessSignal::SigKill));
+        // Verify some instructions cycle phase compiles
+        let phase = ArchInstructionCyclePhase::Commit;
+        assert_eq!(phase, ArchInstructionCyclePhase::Commit);
     }
 
     #[test]
-    fn test_supervised_service_targets() {
-        use sigmaos::runtime::process::{
-            Process, ProcessCapability, ProcessState, SupervisedServiceTarget,
-        };
+    fn test_vmm_pool_memory_and_mdl() {
+        let mut engine = ArchitectureEngine::new();
 
-        let cap = ProcessCapability::full();
-        let process = unsafe { Process::new(11, 1, cap) };
-        let mut supervisor = SupervisedServiceTarget::new(11);
+        // Alloc NonPagedPool
+        let np_block = engine.allocate_pool(PoolType::NonPagedPool).unwrap();
+        assert_eq!(np_block.len(), 1024);
 
-        assert!(!unsafe { supervisor.monitor_and_supervise(&process) });
+        // Recycles block in Lookaside List
+        engine.lookaside_nonpaged.free_block(np_block);
+        assert_eq!(engine.lookaside_nonpaged.cached_blocks.len(), 1);
 
-        process.set_state(ProcessState::Terminated);
-        assert!(unsafe { supervisor.monitor_and_supervise(&process) });
-        assert!(supervisor.auto_respawn_triggered);
-        assert_eq!(supervisor.restart_count, 1);
-        assert_eq!(process.get_state(), ProcessState::Running);
+        // Alloc PagedPool (Allowed under IRQL PassiveLevel)
+        let p_block = engine.allocate_pool(PoolType::PagedPool).unwrap();
+        assert_eq!(p_block.len(), 1024);
+
+        // MDL Locking Verification
+        let mut mdl = MemoryDescriptorList::new(0x20000000, 16384);
+        assert!(!mdl.is_locked);
+        mdl.lock_pages();
+        assert!(mdl.is_locked);
+        assert_eq!(mdl.locked_physical_pages.len(), 4); // 16KB / 4096 = 4 pages
+        assert_eq!(mdl.locked_physical_pages[0], 0x30000); // 0x20000000/4096 + 0x10000
     }
 
     #[test]
-    fn test_multi_distro_packaging_compatibility() {
-        use sigmaos::sigpkg::universal_adapter::{
-            ApkAdapter, EbuildAdapter, NixAdapter, PackageFormatAdapter,
-        };
+    fn test_irql_enforcement_and_faults() {
+        let mut engine = ArchitectureEngine::new();
+        assert_eq!(engine.current_irql, Irql::PassiveLevel);
 
-        let apk = ApkAdapter::new();
-        assert_eq!(apk.format_name(), "apk");
+        // Promote to HighLevel
+        let old_irql = engine.raise_irql(Irql::HighLevel).unwrap();
+        assert_eq!(old_irql, Irql::PassiveLevel);
+        assert_eq!(engine.current_irql, Irql::HighLevel);
 
-        let nix = NixAdapter::new();
-        assert_eq!(nix.format_name(), "nix");
+        // Trigger PagedPool allocate -> Rejected because IRQL >= DispatchLevel
+        let res = engine.allocate_pool(PoolType::PagedPool);
+        assert_eq!(res, Err(HardwareException::DoubleFault));
 
-        let ebuild = EbuildAdapter::new();
-        assert_eq!(ebuild.format_name(), "ebuild");
+        // Demote back
+        assert!(engine.lower_irql(old_irql).is_ok());
+        assert_eq!(engine.current_irql, Irql::PassiveLevel);
+    }
+
+    #[test]
+    fn test_pcb_tcb_context_switching() {
+        let mut engine = ArchitectureEngine::new();
+
+        // Create PCB
+        let mut pcb = Pcb::new(500, 0x1A000); // CR3 PML4 Directory
+
+        // Add 2 Threads
+        let tcb1 = Tcb::new(1, 500, 0x1000, 0x9000);
+        let tcb2 = Tcb::new(2, 500, 0x2000, 0xA000);
+        pcb.thread_list.push(tcb1);
+        pcb.thread_list.push(tcb2);
+
+        engine.running_pcb = Some(pcb);
+
+        // Switch Thread 0 -> Thread 1
+        assert!(engine.context_switch_threads(0, 1).is_ok());
+
+        let active_pcb = engine.running_pcb.as_ref().unwrap();
+        assert_eq!(active_pcb.thread_list[0].state, ThreadState::Ready);
+        assert_eq!(active_pcb.thread_list[1].state, ThreadState::Running);
+    }
+
+    #[test]
+    fn test_policy_mechanism_separation() {
+        let policy = Box::new(AdaptivePolicy::new());
+        let mut coord = PolicyMechanismCoordinator::new(policy);
+
+        // Under normal policy, decide_next_task selects highest ID task
+        let active_tasks = vec![100, 101, 102];
+        coord.execute_policy_schedule(&active_tasks, 50);
+        assert_eq!(coord.mechanism.active_task_id, 102);
+
+        // Change dynamic policy to power-saving mode (which selects task index 0 if load is low)
+        let mut save_policy = AdaptivePolicy::new();
+        save_policy.power_save_mode = true;
+        coord.policy = Box::new(save_policy);
+
+        coord.execute_policy_schedule(&active_tasks, 10);
+        assert_eq!(coord.mechanism.active_task_id, 100);
+    }
+
+    #[test]
+    fn test_interrupt_class_routing() {
+        let policy = Box::new(AdaptivePolicy::new());
+        let coord = PolicyMechanismCoordinator::new(policy);
+
+        // Dispatch interrupt events of different classes
+        coord.dispatch_interrupt_class(InterruptClass::Io);
+        coord.dispatch_interrupt_class(InterruptClass::Io);
+        coord.dispatch_interrupt_class(InterruptClass::Software);
+        coord.dispatch_interrupt_class(InterruptClass::Timer);
+
+        assert_eq!(coord.io_irq_count.load(Ordering::SeqCst), 2);
+        assert_eq!(coord.software_irq_count.load(Ordering::SeqCst), 1);
+        assert_eq!(coord.timer_irq_count.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn test_io_wait_profile_balancing() {
+        let policy = Box::new(AdaptivePolicy::new());
+        let mut coord = PolicyMechanismCoordinator::new(policy);
+
+        // Verify dynamic priority boosting for I/O bound wait profiles
+        let boosted = coord
+            .policy
+            .calculate_dynamic_priority(8, IoWaitProfile::DiskBound);
+        assert_eq!(boosted, 12); // priority boosted by +4
+
+        let unboosted = coord
+            .policy
+            .calculate_dynamic_priority(8, IoWaitProfile::Idle);
+        assert_eq!(unboosted, 8); // remains 8
+
+        // Verify time slice adjustments
+        assert_eq!(
+            coord
+                .policy
+                .get_max_time_slice_ms(IoWaitProfile::DevicePolling),
+            2
+        );
+        assert_eq!(
+            coord.policy.get_max_time_slice_ms(IoWaitProfile::DiskBound),
+            10
+        );
     }
 }

@@ -1,26 +1,23 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
-
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
-pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
-pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod interrupt;
 pub mod kernel;
-pub mod klib;
-pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
+pub mod performance;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
@@ -32,43 +29,22 @@ pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
     AccessibilityProfile, AccessibilitySetting,
 };
-pub use ai::{
-    AIAgent, AIAgentManager, AIError, AIStats, AgentCapability, AgentInfo, ApmDependency,
-    ApmLockfile, ApmManifest, ApmPolicy, ApmStatus, DependencySource, Intent, IntentType,
-    ManagerCapability as AiManagerCapability, McpServer, Pattern, SimpleAIAgent,
-    SimpleAIAgentManager, SovereignApmEngine, SovereignWikiEngine, WikiArticle,
-};
 pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BodhiProfileSelector, BudgieAppletManager,
-    BudgieLayoutSwitcher, BudgieShuffler, BuildCodexGrid, CoasAdminSuite, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
-    CorebootGatewayMesh, CosmicDesktopEngine, DACConstellation, DotMatrixMesh, DrakxtoolsSuite,
-    DriverArchiveGridV2, ElementaryAppCenter, EosLogTool, EosMirrorReflector, EosUpdateNotifier,
-    EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub, FirmwareGatewayMesh, FloppyMesh,
-    GraniteHigLibrary, GraphicsArchiveGridV2, HarddrakeDetector, JujuOrchestrator,
-    KernelConstellationGrid, LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid,
-    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
-    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter, LizardInstaller, LsbProfile,
-    MaasProvisioner, Mirror as EosMirror, MokshaDesktopEngine, MokshaGadgetManager,
-    MultipassVmlight, NetworkAlmanacHub, NetworkArchiveGridV2, PacstallAur,
-    PantheonGalaWindowManager, PeripheralArchiveMesh, PopShellTiling, PosixComplianceLevel,
-    ProcessAlmanacHub, RhinoPkgUnified, SELinuxConstellation, SecurityConstellation,
-    SnapcraftRuntime, StandardsComplianceManager, StarlingCompositor, StarlingTilingEngine,
-    StarlingWidgetTree, StarlingX11Server, StorageArchiveGridV2, SyscallAlmanacHub,
-    System76PowerSwitcher, System76Scheduler, TapeMesh, TargetPlatform, TranslationLayer,
-    UEFIGatewayMesh, UbuntuDockManager, UbuntuProEsm, UnicornDesktopShell, UrpmiPackageResolver,
-    WelcomeTab as EosWelcomeTab, YayAurHelper, ZeroTrustConstellation, ZorinConnectBridge,
-    ZorinLookChanger, ZorinWinePreflight,
-};
-pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
+    AntixDesktopProfiler, AntixInitManager, ApplicationBinary, BinaryCompatMatrix, BinaryFormat,
+    BundleType, CompatibilityError, CompatibilityManager, CompatibilityMode, ContainerRuntime,
+    DesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival, GraphicsBridge,
+    InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
+    LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService, MicroServiceState,
+    NetworkBridge, StorageBridge, SyscallAbi, TargetPlatform, TranslationLayer, TribeInstaller,
+    WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP,
+    GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM,
+    GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -76,39 +52,36 @@ pub use customization::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
-pub use driver::{
-    Apc, DeviceObject, Dpc, DriverObject, IoStatus, IoStatusBlock, Irp, IrpManager, Minifilter,
-    IRP_MJ_CLOSE, IRP_MJ_CREATE, IRP_MJ_DEVICE_CONTROL, IRP_MJ_READ, IRP_MJ_WRITE, METHOD_BUFFERED,
-    METHOD_IN_DIRECT, METHOD_NEITHER, METHOD_OUT_DIRECT,
-};
 pub use drivers::{
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    Bdle, Ch340Driver, DeviceGeneration, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver,
+    GpuError, GpuPipeline, GpuShader, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, IntelHdaDriver, NetworkCommand, NetworkDriver, NetworkError,
+    NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
+    RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
+    TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
+    SmartSymlink, SymlinkResolverRule, VirtualFilesystem, O_APPEND, O_CREAT, O_EXCL, O_RDONLY,
+    O_RDWR, O_TRUNC, O_WRONLY,
+};
+pub use interrupt::{
+    ControllerCapability, HandlerCapability, HandlerType, InterruptController, InterruptDescriptor,
+    InterruptError, InterruptHandler, InterruptHandlerInfo, InterruptManager, InterruptPriority,
+    InterruptResult, InterruptStats, InterruptTrace, SimpleInterruptHandler, TraceEventType, PIC,
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
-    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
-};
-pub use klib::{
-    buddy_allocator::{Block, BlockID, SimpleBuddyAllocator},
-    paging::{
-        PageTable, PageTableEntry, ProcessMemory, SimplePageTable, SimplePageTableEntry,
-        SimpleProcessMemory, SimpleVMM, VirtualMemoryManager,
-    },
-    uvm::{UvmAmap, UvmError, UvmPageLoan, UvmPmap},
+    AdaptivePolicy, ArchitectureEngine, BuddyAllocator, Channel, CpuRegisters, HardwareException,
+    InstructionCyclePhase as ArchInstructionCyclePhase, InstructionCyclePhase, InterruptClass,
+    IoWaitProfile, IpcError, IpcManager, Irql, KernelMechanism, KernelPolicy, LookasideList,
+    MemoryBlock, MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType,
+    Priority, Process, ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler,
+    Scheduler, SchedulerError, SovereignMechanism, Tcb, ThreadState, PAGE_SIZE,
 };
 pub use network::{
-    AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,
-    ClearLinuxFlowLoadBalancer, ConnectionInfo, ConnectionState, EnterpriseNetworkError,
-    GentooUseFlagsDissector, IPv6Address, KaliPacketFingerprinter, KaliSnoopAnalysis,
-    NetworkTrafficAnalyzer, NixDeclarativeFilter, Protocol, SecureVpnTunnel, SecurityAnalysis,
-    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState, TrafficAlert, TrafficPacket,
-    TrafficStatistics,
+    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
+    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -119,42 +92,36 @@ pub use package::{
     ConflictResolution, DebPackageDriverTranslator, DependencyResolver, GenericLinuxTranslationUdf,
     LinuxDriverPackageTranslator, LinuxTranslationService, PackageAdapter, PackageError,
     PackageFormat, PackageSource, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, UnifiedPackage, UniversalPackageManager,
-    GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
+    RpmPackageDriverTranslator, SigmaSoftwareStore, SoftwareRegistryEntry, UnifiedPackage,
+    UniversalPackageManager, GLOBAL_SOFTWARE_STORE, GLOBAL_TRANSLATION_SERVICE,
+    GLOBAL_TRANSLATION_UDF,
+};
+pub use performance::{
+    CallGraph, CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
+    PerformanceProfileRule, Profile, ProfileType, Profiler, ProfilerError, RamDefragmenter,
+    SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
+    SmartResourceOptimizer, GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
 };
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore,
+    Achievement, AchievementType, AudioChannel, GamifiedProductivity, Goal, PomodoroState,
+    PomodoroTimer, ProductivityScore, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE,
 };
 pub use resilience::{
-    RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
-    SystemSnapshot,
+    FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
+    SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
 };
 pub use security::{
-    secure_zeroize, AppArmorManager, AppArmorProfile, AuditLogEntry, BiometricAuth,
-    BiometricResult, BiometricType, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    DomainID, DomainOrchestrator, DomainType, FaceIdAuth, FingerprintAuth, ForensicBlock,
-    HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity, IsolatedDomain, IsolationError,
-    MaliciousSignature, ObjectType, PasswordCategory, PasswordEntry, PasswordError,
-    PasswordManager, PasswordManagerResult, Permission, PledgeManager, PledgePromise,
-    SecurityContext, SecurityLabel, SecurityPolicy, SecurityRule, SelinuxPermission,
-};
-pub use shell::{
-    CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
+    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
+    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
-    BuildSystem, ContentAddressedStore, CryptoVerifier, DebianPackageTranslator,
-    LinuxPackageCompatManager, LinuxPackageType, MakePkgEngine, PackageRecipe, PacmanError,
-    PacmanManager, PkgBuildScript, RecipeError, RecipeManager, RpmPackageTranslator, SatSolver,
-    Transaction, TranslatedMetadata, TranslatorError,
+    BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
+    SatSolver, Transaction,
 };
 pub use virtualization::{
-    Container, DeterministicError, DeterministicHypervisor, DeterministicVirtualMachine,
-    KubernetesPod, ResourcePool, VirtualCpuContext, VirtualMachine, VirtualizationError,
-    VirtualizationOrchestrator, VirtualizationTech, VmExecutionSnapshot, VmState,
-};
-pub use distro::{
-    AppManifest as DistroAppManifest, BuildError as DistroBuildError, BuildSpec as DistroBuildSpec, CertificationStatus,
-    CpuOptimizationDetector, FeatureSet as DistroFeatureSet, SigmaBuildGraph, UseFlag,
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
