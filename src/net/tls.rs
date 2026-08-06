@@ -282,7 +282,7 @@ mod tests {
             enable_0rtt: false,
         };
         
-        let session_id = engine.create_session(config);
+        let _session_id = engine.create_session(config);
         assert_eq!(engine.session_count(), 1);
     }
 

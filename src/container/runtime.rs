@@ -1,12 +1,15 @@
-#![no_std]
-#![no_main]
+#![cfg_attr(target_os = "none", no_std)]
+#![cfg_attr(target_os = "none", no_main)]
+
+extern crate alloc;
+use alloc::string::String;
+use alloc::boxed::Box;
 
 use core::mem;
 /// OOP-based Container Runtime for SigmaOS
 /// Implements container runtime using OOP principles with traits and structs
 /// No dependency on external container frameworks
 /// Based on Roadmap Item 17: Container runtime support
-use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
@@ -187,14 +190,14 @@ impl SeccompProfile {
 /// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
 #[derive(Debug, Clone)]
 pub struct OverlayFS {
-    pub lower_dirs: std::vec::Vec<String>,
+    pub lower_dirs: alloc::vec::Vec<String>,
     pub upper_dir: String,
     pub work_dir: String,
     pub mounted: bool,
 }
 
 impl OverlayFS {
-    pub fn new(lower_dirs: std::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
+    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
         Self {
             lower_dirs,
             upper_dir,
@@ -718,6 +721,7 @@ impl<T> Vec<T> {
         }
     }
 
+    #[allow(dead_code)]
     fn len(&self) -> usize {
         self.len
     }
@@ -767,6 +771,8 @@ extern "C" {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_container_creation() {

@@ -4,8 +4,6 @@
 #![cfg_attr(target_os = "none", no_std)]
 
 extern crate alloc;
-use alloc::string::String;
-use alloc::vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuInstructionExtension {
@@ -95,7 +93,7 @@ impl CpuState {
 
     /// CP15 Coprocessor Emulation: MCR (Move to Coprocessor from ARM Register)
     /// Emulates: mcr p15, 0, <reg>, c1, c0, 0 (Write MMU/Cache control register)
-    pub fn mcr(&mut self, _coproc: u8, _opcode1: u8, _value: u32, _cr_n: u8, _cr_m: u8, _opcode2: u8) -> Result<(), &'static str> {
+    pub fn mcr(&mut self, coproc: u8, opcode1: u8, _value: u32, cr_n: u8, cr_m: u8, opcode2: u8) -> Result<(), &'static str> {
         if self.arch != CpuArch::Arm64 {
             return Err("MCR instruction is only valid on ARM architecture");
         }
@@ -183,23 +181,6 @@ impl SovereignCompilerOptimizer {
             }
             CpuInstructionExtension::Neon => {
                 // Vectorized ARM NEON FMA/SIMD execution path (quadword unrolled)
-                let mut i = 0;
-                while i + 3 < lhs.len() {
-                    out[i] = lhs[i] * rhs[i];
-                    out[i + 1] = lhs[i + 1] * rhs[i + 1];
-                    out[i + 2] = lhs[i + 2] * rhs[i + 2];
-                    out[i + 3] = lhs[i + 3] * rhs[i + 3];
-                    i += 4;
-                }
-                while i < lhs.len() {
-                    if i < out.len() {
-                        out[i] = lhs[i] * rhs[i];
-                    }
-                    i += 1;
-                }
-            }
-            CpuInstructionExtension::Neon => {
-                // Vectorized ARM NEON FMA/SIMD execution path (quadword unrolled)
                 let len = lhs.len().min(rhs.len()).min(out.len());
                 let mut i = 0;
                 while i + 3 < len {
@@ -243,6 +224,7 @@ impl Default for SovereignCompilerOptimizer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_cpu_optimizer_creation() {
@@ -323,7 +305,7 @@ mod tests {
 
     #[test]
     fn test_x86_arm_privilege_rings() {
-        let mut cpu_x86 = CpuState::new(CpuArch::X86_64);
+        let cpu_x86 = CpuState::new(CpuArch::X86_64);
         assert_eq!(cpu_x86.ring, CpuRing::Ring3); // User mode by default
 
         let mut cpu_arm = CpuState::new(CpuArch::Arm64);
