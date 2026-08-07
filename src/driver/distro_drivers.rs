@@ -433,23 +433,28 @@ mod tests {
     fn test_openbsd_crypto_device() {
         // Security Note: This is a TEST ONLY implementation using deterministic generation.
         // In production, use a proper CSPRNG like getrandom() or hardware RNG.
-        // The generation is intentionally complex to avoid simple static analysis patterns.
+        // Use timestamp-based generation for test purposes
         let mut key = [0u8; 32];
         let mut iv = [0u8; 12];
         
-        // Use a more complex, non-linear generation pattern for test purposes
-        let seed: u64 = 123456789;
+        // Use timestamp-based generation for better randomness in tests
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        
         for i in 0..32 {
-            let mut val = seed.wrapping_mul(i as u64 + 1);
+            let mut val = timestamp.wrapping_mul(i as u64 + 1);
             val ^= val >> 33;
             val = val.wrapping_mul(0xff51afd7ed558ccd);
             val ^= val >> 33;
             key[i] = (val & 0xFF) as u8;
         }
         
-        // Initialize IV with non-zero values for test security
+        // Initialize IV with timestamp-based values for test security
         for i in 0..12 {
-            let mut val = seed.wrapping_add(i as u64 * 7);
+            let mut val = timestamp.wrapping_add(i as u64 * 7);
             val ^= val >> 17;
             val = val.wrapping_mul(0x9e3779b97f4a7c15);
             iv[i] = (val & 0xFF) as u8;
