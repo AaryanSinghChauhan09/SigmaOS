@@ -71,7 +71,6 @@ log_info "Active target branch: ${BRANCH:-unknown}"
 # Verify presence of core strategic files based on current repo structure
 # (Local wiki/ directory has been migrated to GitHub wiki; roadmap exists as -origin.txt)
 REQUIRED_FILES=(
-    "FUTURE-DEVELOPMENT-ROADMAP.md"
     "Cargo.toml"
     "Makefile"
 )
@@ -85,6 +84,16 @@ for file in "${REQUIRED_FILES[@]}"; do
         failed=1
     fi
 done
+
+# Check for either FUTURE-DEVELOPMENT-ROADMAP.md or FUTURE-DEVELOPMENT-ROADMAP-origin.txt
+if [ -f "FUTURE-DEVELOPMENT-ROADMAP.md" ]; then
+    log_success "Required layout file is present: FUTURE-DEVELOPMENT-ROADMAP.md"
+elif [ -f "FUTURE-DEVELOPMENT-ROADMAP-origin.txt" ]; then
+    log_success "Required layout file is present: FUTURE-DEVELOPMENT-ROADMAP-origin.txt"
+else
+    log_error "Mandatory layout file is MISSING: FUTURE-DEVELOPMENT-ROADMAP.md or FUTURE-DEVELOPMENT-ROADMAP-origin.txt"
+    failed=1
+fi
 
 if [ $failed -eq 1 ]; then
     log_error "Branch parity validation failed!"
