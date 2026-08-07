@@ -256,11 +256,11 @@
 
 - [Transactional Updates](Transactional-Updates)
 
-- [sigpkg Spec](SIGPKG_SPEC)
+- [sigpkg Spec](../docs/SIGPKG_SPEC.md)
 
-- [Reproducible Builds](REPRODUCIBLE_BUILD)
+- [Reproducible Builds](../docs/REPRODUCIBLE_BUILD.md)
 
-- [Distribution Formats](DISTRIBUTION_FORMATS)
+- [Distribution Formats](../docs/DISTRIBUTION_FORMATS.md)
 
 ## 🧠 AI & Agent Platform
 
@@ -290,11 +290,11 @@
 
 - [12-Week Milestone Plan](12-Week-Milestone-Plan)
 
-- [Kernel Developer Handbook](KERNEL_DEVELOPER_HANDBOOK)
+- [Kernel Developer Handbook](../docs/KERNEL_DEVELOPER_HANDBOOK.md)
 
-- [Linux Compat RFC](LINUX_COMPAT_RFC)
+- [Linux Compat RFC](../docs/LINUX_COMPAT_RFC.md)
 
-- [Driver SDK](https://github.com/AaryanSinghChauhan09/SigmaOS/blob/main/sdk/driver/src/lib.rs)
+- [Driver SDK](../sdk/driver/src/lib.rs)
 
 ## Download Formats
 
