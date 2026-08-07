@@ -208,7 +208,7 @@ impl DiskUsageAnalyzer {
     }
 
     /// Get size by file type
-    pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
+    pub fn get_size_by_type(&self, _path: &Path) -> HashMap<String, u64> {
         let mut sizes = HashMap::new();
         sizes.insert("txt".to_string(), 1024 * 1024);
         sizes.insert("pdf".to_string(), 5 * 1024 * 1024);
