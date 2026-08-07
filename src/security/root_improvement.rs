@@ -19,6 +19,12 @@
 // SigmaOS Linux-Inspired Superuser / Root Improvements Suite
 // Implements advanced privilege management: timed sudo/doas tokens, Polkit fine-grained control,
 // Cap capability splitting, user namespaces / root-less translation, and PAM MFA verification.
+//
+// SECURITY WARNING: This module contains placeholder password hashes for testing purposes only.
+// In production, use:
+// - `crate::security::crypto_utils::hash_password_placeholder` or proper Argon2/bcrypt
+// - `crate::security::crypto_utils::SecureRandom` for salt generation
+// - Never use hard-coded password hashes or weak hashing algorithms
 
 extern crate alloc;
 use alloc::string::String;
@@ -49,8 +55,10 @@ impl SudoDoasElevator {
         Self {
             active_tokens: Vec::new(),
             password_database: vec![
-                ("admin".to_string(), "hash_sec_admin_99".to_string()),
-                ("user".to_string(), "hash_sec_user_12".to_string()),
+                // WARNING: These are placeholder hashes for testing only.
+                // In production, use proper password hashing (Argon2, bcrypt, scrypt)
+                ("admin".to_string(), "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8".to_string()), // "password" (SHA-256 - placeholder only)
+                ("user".to_string(), "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f".to_string()), // "secret" (SHA-256 - placeholder only)
             ],
         }
     }
@@ -681,12 +689,12 @@ mod tests {
         let mut elevator = SudoDoasElevator::new();
         // Failed attempt with incorrect password hash
         assert!(elevator
-            .elevate_via_doas("admin", "invalid_pass", 10000)
+            .elevate_via_doas("admin", "invalid_hash", 10000)
             .is_err());
 
         // Correct elevation attempt creates active token session
         let uid = elevator
-            .elevate_via_doas("admin", "hash_sec_admin_99", 10000)
+            .elevate_via_doas("admin", "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", 10000)
             .unwrap();
         assert_eq!(uid, 0);
 
@@ -760,8 +768,8 @@ mod tests {
         let mut engine = PamEngine::new();
 
         let unix_db = vec![
-            ("alice".to_string(), "correct_hash".to_string()),
-            ("bob".to_string(), "bob_hash".to_string()),
+            ("alice".to_string(), "2e7d2c03a9507e7d3f6b9b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b".to_string()), // Placeholder hash
+            ("bob".to_string(), "1e7d2c03a9507e7d3f6b9b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b".to_string()), // Placeholder hash
         ];
         let pam_unix = std::sync::Arc::new(PamUnixModule::new(unix_db));
         let pam_faillock = std::sync::Arc::new(PamFaillockModule);
@@ -793,7 +801,7 @@ mod tests {
 
         // Test normal successful authentication
         assert_eq!(
-            engine.execute_group(PamGroup::Auth, "alice", "correct_hash"),
+            engine.execute_group(PamGroup::Auth, "alice", "2e7d2c03a9507e7d3f6b9b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b"),
             PamResult::Success
         );
 
@@ -806,7 +814,7 @@ mod tests {
         // Scenario 2: Test account lockout with pam_faillock
         engine.context.failed_attempts = 4; // Locked out!
         assert_eq!(
-            engine.execute_group(PamGroup::Auth, "alice", "correct_hash"),
+            engine.execute_group(PamGroup::Auth, "alice", "2e7d2c03a9507e7d3f6b9b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b8b"),
             PamResult::MaxTries
         );
 

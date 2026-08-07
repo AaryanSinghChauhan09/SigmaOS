@@ -3,6 +3,12 @@
 
 /// Advanced Enterprise Networking Suite for SigmaOS
 /// Provides sovereign enterprise network features including IPv6 addressing, VPN encrypted tunneling, and SSL/TLS.
+/// 
+/// SECURITY WARNING: This module contains mock cryptographic implementations for testing purposes only.
+/// In production, use:
+/// - `crate::security::crypto_utils::SecureRandom` for key generation
+/// - Proper cryptographic libraries (RustCrypto, OpenSSL, etc.) for encryption
+/// - Never use hard-coded keys or weak cryptographic primitives
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -406,6 +412,8 @@ impl SovereignSslEngine {
         Self {
             state: TlsState::Uninitialized,
             session_ticket: None,
+            // WARNING: Zero-initialized keys - never use in production
+            // In production, use proper key derivation from secure random values
             write_key: [0u8; 16],
             read_key: [0u8; 16],
         }
@@ -451,7 +459,8 @@ impl SovereignSslEngine {
             return Err("Expected ServerHello TLS 1.3 Handshake payload");
         }
 
-        // Key derivation simulated
+        // Key derivation simulated - WARNING: Never use in production
+        // In production, use proper HKDF with secure random values
         for i in 0..16 {
             self.write_key[i] = 0x5A ^ (i as u8);
             self.read_key[i] = 0xA5 ^ (i as u8);
@@ -465,6 +474,8 @@ impl SovereignSslEngine {
     pub fn establish_handshake(&mut self) {
         if self.state == TlsState::ServerHelloReceived {
             self.state = TlsState::Established;
+            // WARNING: Hard-coded session ticket - never use in production
+            // In production, use secure random session tickets
             self.session_ticket = Some([0x77u8; 16]);
         }
     }
@@ -541,10 +552,21 @@ mod tests {
 
     #[test]
     fn test_vpn_tunnel() {
-        let key = [0x55u8; 32];
+        // WARNING: These are test keys only - never use in production
+        let key = [
+            0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x70, 0x81,
+            0x92, 0xa3, 0xb4, 0xc5, 0xd6, 0xe7, 0xf8, 0x09,
+            0x1a, 0x2b, 0x3c, 0x4d, 0x5e, 0x6f, 0x70, 0x81,
+            0x92, 0xa3, 0xb4, 0xc5, 0xd6, 0xe7, 0xf8, 0x09,
+        ];
         let mut tunnel = SecureVpnTunnel::new(&key);
 
-        let peer_key = [0xAAu8; 32];
+        let peer_key = [
+            0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
+            0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00,
+            0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
+            0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00,
+        ];
         assert!(tunnel.handshake(&peer_key).is_ok());
         assert!(tunnel.established);
 
@@ -577,9 +599,20 @@ mod tests {
 
     #[test]
     fn test_vpn_replay_prevention() {
-        let key = [0xBBu8; 32];
+        // WARNING: These are test keys only - never use in production
+        let key = [
+            0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11,
+            0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+            0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11,
+            0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
+        ];
         let mut tunnel = SecureVpnTunnel::new(&key);
-        let peer_key = [0xCCu8; 32];
+        let peer_key = [
+            0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+            0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+            0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+            0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+        ];
         tunnel.handshake(&peer_key).unwrap();
 
         let mut vpn = VpnVirtualInterface::new(tunnel);
