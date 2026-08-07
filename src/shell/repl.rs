@@ -323,7 +323,7 @@ impl ShellRepl {
         }
     }
 
-    pub fn with_prompt(prompt: String) -> Self {
+    pub fn with_prompt(_prompt: String) -> Self {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
