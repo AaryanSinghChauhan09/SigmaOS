@@ -1,6 +1,3 @@
-#![no_std]
-#![cfg_attr(not(test), no_main)]
-
 /// Sovereign Dependency-Aware Parallel Service Activation & Boot Optimizer for SigmaOS
 /// Replaces traditional linear initialization with a topological-sort dependency scheduler, drastically improving boot speed (defeating systemd).
 

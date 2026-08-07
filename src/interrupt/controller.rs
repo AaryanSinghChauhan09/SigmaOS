@@ -1,6 +1,3 @@
-#![no_std]
-#![cfg_attr(not(test), no_main)]
-
 /// Advanced High-Fidelity Heterogeneous Interrupt Controller (APIC, GIC, PLIC) for SigmaOS
 /// Models x86_64 APIC Inter-Processor Interrupts (IPI), ARM GIC Fast Interrupts (FIQ), and RISC-V PLIC Supervisor targets.
 
@@ -42,14 +39,10 @@ pub enum CpuPrivilegeMode {
 /// Interrupt Priority Level (FIQ is highest priority)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InterruptPriority {
-    Low = 0,
-    Normal = 1,
-    High = 2,
-    Critical = 3,
-    StandardIrq = 4,
-    SupervisorTrap = 5,
-    MonitorTrap = 6,
-    FastInterruptFiq = 7, // ARM Fast Interrupt
+    StandardIrq = 0,
+    SupervisorTrap = 1,
+    MonitorTrap = 2,
+    FastInterruptFiq = 3, // ARM Fast Interrupt
 }
 
 #[repr(C)]

@@ -1,69 +1,112 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
-
 /// OOP-based Thread Management for SigmaOS
 /// Based on Roadmap Item 12: Thread management
+/// Absorbing Linux interruptible/alertable state concepts, CPU affinity, and nice prioritization values
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
+
+use alloc::boxed::Box;
+use core::sync::atomic::{AtomicUsize, Ordering, AtomicI32};
 use core::mem;
 
 pub type ThreadID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ThreadState { Ready = 0, Running = 1, Blocked = 2, Terminated = 3 }
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThreadAlertableState { NonAlertable = 0, Alertable = 1 }
 
 pub trait Thread {
     fn id(&self) -> ThreadID;
     fn state(&self) -> ThreadState;
     fn start(&mut self) -> Result<(), ThreadError>;
     fn stop(&mut self) -> Result<(), ThreadError>;
+    fn alertable_state(&self) -> ThreadAlertableState;
+    fn set_alertable_state(&mut self, state: ThreadAlertableState);
+    fn nice(&self) -> i32;
+    fn set_nice(&mut self, value: i32) -> Result<(), ThreadError>;
+    fn cpu_affinity(&self) -> u64;
+    fn set_cpu_affinity(&mut self, mask: u64);
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ThreadError { Success = 0, StartFailed = 1, StopFailed = 2 }
+pub enum ThreadError { Success = 0, StartFailed = 1, StopFailed = 2, InvalidNiceValue = 3 }
 
 #[repr(C)]
 pub struct SimpleThread {
     pub id: ThreadID,
     pub state: AtomicUsize,
+    pub alert_state: AtomicUsize,
+    pub nice_val: AtomicI32,
+    pub affinity: AtomicUsize,
 }
 
 impl SimpleThread {
     pub fn new(id: ThreadID) -> Self {
-        SimpleThread { id, state: AtomicUsize::new(ThreadState::Ready as usize) }
+        SimpleThread {
+            id,
+            state: AtomicUsize::new(ThreadState::Ready as usize),
+            alert_state: AtomicUsize::new(ThreadAlertableState::NonAlertable as usize),
+            nice_val: AtomicI32::new(0), // Default Nice level = 0
+            affinity: AtomicUsize::new(0xFFFFFFFF), // Default affinity = all CPUs
+        }
     }
 }
 
 impl Thread for SimpleThread {
     fn id(&self) -> ThreadID { self.id }
-    fn state(&self) -> ThreadState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ThreadState {
+        match self.state.load(Ordering::SeqCst) {
+            1 => ThreadState::Running,
+            2 => ThreadState::Blocked,
+            3 => ThreadState::Terminated,
+            _ => ThreadState::Ready,
+        }
+    }
+
     fn start(&mut self) -> Result<(), ThreadError> {
         self.state.store(ThreadState::Running as usize, Ordering::SeqCst);
         Ok(())
     }
+
     fn stop(&mut self) -> Result<(), ThreadError> {
         self.state.store(ThreadState::Terminated as usize, Ordering::SeqCst);
         Ok(())
+    }
+
+    fn alertable_state(&self) -> ThreadAlertableState {
+        match self.alert_state.load(Ordering::SeqCst) {
+            1 => ThreadAlertableState::Alertable,
+            _ => ThreadAlertableState::NonAlertable,
+        }
+    }
+
+    fn set_alertable_state(&mut self, state: ThreadAlertableState) {
+        self.alert_state.store(state as usize, Ordering::SeqCst);
+    }
+
+    fn nice(&self) -> i32 {
+        self.nice_val.load(Ordering::SeqCst)
+    }
+
+    fn set_nice(&mut self, value: i32) -> Result<(), ThreadError> {
+        // Linux Nice priority levels must reside strictly within -20 and 19
+        if value < -20 || value > 19 {
+            return Err(ThreadError::InvalidNiceValue);
+        }
+        self.nice_val.store(value, Ordering::SeqCst);
+        Ok(())
+    }
+
+    fn cpu_affinity(&self) -> u64 {
+        self.affinity.load(Ordering::SeqCst) as u64
+    }
+
+    fn set_cpu_affinity(&mut self, mask: u64) {
+        self.affinity.store(mask as usize, Ordering::SeqCst);
     }
 }
 
@@ -71,6 +114,7 @@ pub trait ThreadManager {
     fn create_thread(&mut self) -> Result<ThreadID, ThreadError>;
     fn destroy_thread(&mut self, id: ThreadID) -> Result<(), ThreadError>;
     fn get_thread(&self, id: ThreadID) -> Option<&dyn Thread>;
+    fn get_thread_mut(&mut self, id: ThreadID) -> Option<&mut dyn Thread>;
 }
 
 pub struct SimpleThreadManager {
@@ -79,7 +123,6 @@ pub struct SimpleThreadManager {
 }
 
 impl SimpleThreadManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self { SimpleThreadManager { threads: Vec::new(), next_id: AtomicUsize::new(1) } }
 }
 
@@ -90,8 +133,9 @@ impl ThreadManager for SimpleThreadManager {
         self.threads.push(Some(Box::new(thread)));
         Ok(id)
     }
+
     fn destroy_thread(&mut self, id: ThreadID) -> Result<(), ThreadError> {
-        for thread_option in &mut self.threads {
+        for thread_option in self.threads.as_slice_mut() {
             if let Some(ref mut thread) = *thread_option {
                 if thread.id() == id {
                     self.threads.clear();
@@ -101,17 +145,27 @@ impl ThreadManager for SimpleThreadManager {
         }
         Err(ThreadError::StopFailed)
     }
+
     fn get_thread(&self, id: ThreadID) -> Option<&dyn Thread> {
-        for thread_option in &self.threads {
+        for thread_option in self.threads.as_slice() {
             if let Some(ref thread) = *thread_option {
                 if thread.id() == id { return Some(thread.as_ref()); }
             }
         }
         None
     }
+
+    fn get_thread_mut(&mut self, id: ThreadID) -> Option<&mut dyn Thread> {
+        for thread_option in self.threads.as_slice_mut() {
+            if let Some(ref mut thread) = *thread_option {
+                if thread.id() == id { return Some(thread.as_mut()); }
+            }
+        }
+        None
+    }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
@@ -125,6 +179,20 @@ impl<T> Vec<T> {
         }
     }
     fn clear(&mut self) { self.len = 0; }
+    fn as_slice(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+    fn as_slice_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -137,47 +205,62 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
+#[cfg(not(test))]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
+#[cfg(test)]
+extern crate std;
+
+#[cfg(test)]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
 }
 
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
+#[cfg(test)]
+unsafe fn free(_ptr: *mut u8) {
+    // In standard shims, we can just let OS reclaim heap on test exit or perform simple dummy dealloc
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
+    #[test]
+    fn test_thread_nice_alertable_and_affinity() {
+        let mut thread = SimpleThread::new(101);
+        assert_eq!(thread.id(), 101);
+        assert_eq!(thread.state(), ThreadState::Ready);
+        assert_eq!(thread.alertable_state(), ThreadAlertableState::NonAlertable);
+        assert_eq!(thread.nice(), 0);
+        assert_eq!(thread.cpu_affinity(), 0xFFFFFFFF);
 
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        // Modify alertable state
+        thread.set_alertable_state(ThreadAlertableState::Alertable);
+        assert_eq!(thread.alertable_state(), ThreadAlertableState::Alertable);
+
+        // Modify nice levels with boundary check
+        assert!(thread.set_nice(-15).is_ok());
+        assert_eq!(thread.nice(), -15);
+        assert!(thread.set_nice(-30).is_err()); // invalid nice level
+        assert!(thread.set_nice(20).is_err());  // invalid nice level
+
+        // Modify CPU affinity mask
+        thread.set_cpu_affinity(0b1101);
+        assert_eq!(thread.cpu_affinity(), 0b1101);
+    }
+
+    #[test]
+    fn test_thread_state_transitions() {
+        let mut thread = SimpleThread::new(102);
+        assert_eq!(thread.state(), ThreadState::Ready);
+
+        thread.start().unwrap();
+        assert_eq!(thread.state(), ThreadState::Running);
+
+        thread.stop().unwrap();
+        assert_eq!(thread.state(), ThreadState::Terminated);
     }
 }

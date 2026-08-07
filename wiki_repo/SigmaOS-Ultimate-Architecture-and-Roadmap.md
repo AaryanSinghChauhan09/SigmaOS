@@ -5,7 +5,7 @@
 
 ## 1. Executive Summary & Vision
 
-SigmaOS is designed as a next-generation, AI-native, secure, and sovereign operating system built to address the limitations of traditional operating system architectures. By combining a memory-safe Rust-based microkernel with native AI orchestration, BSD-style sysctl dynamic tuning, advanced sandboxing, built-in global statutory compliance dashboards, and adaptive accessibility-driven UI/UX, SigmaOS redefines operating system design.
+SigmaOS is designed as a next-generation, AI-native, secure, and sovereign operating system built to address the limitations of traditional Linux distributions and alternative operating system ecosystems. By combining a memory-safe Rust-based microkernel with native AI orchestration, BSD-style sysctl dynamic tuning, advanced sandboxing, built-in global statutory compliance dashboards, and adaptive accessibility-driven UI/UX, SigmaOS redefines operating system design.
 
 Our vision is to provide an ecosystem that:
 - **Ensures Absolute Stability & Performance**: Zero-reboot livepatching, adaptive thread schedulers, and DMA/device-level IOMMU protections.
@@ -16,32 +16,30 @@ Our vision is to provide an ecosystem that:
 
 ## 2. Competitor Feature Benchmarking & Unique Selling Points (USPs)
 
-SigmaOS absorbs the strengths of traditional operating systems while eliminating their architectural weaknesses, fragmented configuration paths, and security gaps.
+SigmaOS absorbs the greatest strengths of major traditional Linux distributions while eliminating their architectural weaknesses, fragmented configuration paths, and security gaps.
 
 ### 2.1 Comparative Feature Matrix
 
-| Feature Dimension | SigmaOS | Ubuntu Linux | Fedora Workstation | Arch Linux | Windows 10/11 | FreeBSD |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Core Architecture** | Memory-Safe Rust Microkernel + Hybrid Scheduler | Monolithic C Kernel | Monolithic C Kernel | Monolithic C Kernel | Hybrid C/C++ Kernel | Monolithic C Kernel |
-| **Dynamic Tuning** | BSD-Style `SovereignSysctlManager` dot-notation paths | Inconsistent sysctl / procfs files | sysctl / procfs files | sysctl / procfs files | Registry parameters | sysctl |
-| **Rebootless Hotpatching** | Native `SigmaLivepatch` built into microkernel | Ubuntu Livepatch (requires Canonical Account) | kpatch (kernel-dependent, manual) | kexec (requires kexec reboot sequence) | Hotpatching (restricted to server editions) | Complex manual compile |
-| **Package Management** | Unified `sigpkg` with content-addressed transactional store | `apt` (dpkg) + Snaps (highly criticized loopback mounts) | `dnf` (rpm) + Flatpak | `pacman` (libalpm) + AUR (dangerous user scripts) | WinGet / MSI | `pkg` |
-| **Native AI Orchestration** | Natively integrated Sovereign AI Runtimes & WANDR | None (requires external userland setups) | None | None | Copilot (web-wrapped bloat) | None |
-| **Compliance & Labour Laws** | Built-in EPF/ESI payroll engines, MCA & GDPR compliance | None | None | None | None | None |
-| **Accessibility & Gamification** | Adaptive `AccessibilityOverlay` + Trophy Achievements | Basic screen readers & high contrast settings | Standard GNOME a11y options | Fully manual installation | Basic settings | Basic settings |
-| **Legacy Protection Elements** | Native historical simulation (Protected Mode, text driver) | Requires slow CPU emulator VM (QEMU/BOSCH) | Requires slow emulator VM | Requires manual emulator setup | Compatibility modes | Emulator setup |
-| **Paging & Swap Space** | Dual-Tier Zswap Cache + Zram Pool (Zstd, LZ4, LZO) + Swap Disk | Zram (since Ubuntu 22.04) | Zram (default since F33) | Configurable manually | Pagefile.sys | Configurable manually |
-| **Control Flow & Sandboxing** | Epoll/Kqueue Loop (`SovereignKqueue`) + OpenBSD Pledge | Epoll (no native Pledge sandboxing) | Epoll (no native Pledge) | Epoll | Object handles | Kqueue / Capsicum |
-| **Stateful Firewall & NAT** | Stateful Netfilter (`SovereignConntrack`) + SimpleNAT | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables + conntrack | Windows Defender | Packet Filter (pf) |
-| **Boot Loader & Secure Boot** | Raw Memory Copy + Cryptographic Hash Verification | GRUB / systemd-boot | GRUB / systemd-boot | GRUB / systemd-boot | Windows Boot Manager | FreeBSD Loader |
-| **Parallel Boot Activation** | Topological Dependency Sort (`SovereignSort`) | systemd parallelized target units | systemd parallelized | Fully sequential SysV init | Fast Startup hiberfile | RC.d sequential |
-| **TCP Sockets & Congestion** | Stateful RFC-793 + BSD Options + Reno/BBR Congestion | Linux Sockets + Reno/BBR | Linux Sockets + Reno/BBR | Linux Sockets + Reno/BBR | Winsock | BSD TCP stack |
-| **Interrupts & Address Safety** | Canonical Address Check + Fault Registers + ISR Routing | Linux IDT exception handling | Linux IDT | Linux IDT | Windows IDT | BSD IDT |
-| **Citizen & Professional Tools** | Krishi, Vyapaar, Kanoon, Chikitshak & Abhiyanta Engines | None | None | None | None | None |
-| **Multi-Arch IRQ Controller** | x86 APIC + ARM GIC (FIQ) + RISC-V PLIC (Supervisor) | APIC (x86) / GIC (ARM) | APIC / GIC | APIC / GIC | APIC / GIC | APIC / GIC |
-| **Man Page & Help System** | On-the-Fly ANSI Compilers + Multisection Indexers | Compressed Gzip static manual files | Compressed Gzip | Compressed Gzip | Compiled Help (CHM) | Compressed Gzip |
-| **Terminal & Shell** | AI-Native Sockets + Bash/PowerShell Script Translation Layers | Bash / Zsh | Bash / GNOME Terminal | Bash / Alacritty | PowerShell / Windows Terminal | Tcsh / zsh |
-| **Futuristic Frontiers** | Swarms, Bio-Digital, Temporal & Emotion-Aware Loops | None | None | None | None | None |
+| Feature Dimension | SigmaOS | Ubuntu Linux | Fedora Workstation | Arch Linux | Debian GNU/Linux |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Core Architecture** | Memory-Safe Rust Microkernel + Hybrid Scheduler | Monolithic C Kernel | Monolithic C Kernel | Monolithic C Kernel | Monolithic C Kernel |
+| **Dynamic Tuning** | BSD-Style `SovereignSysctlManager` dot-notation paths | Inconsistent sysctl / procfs files | sysctl / procfs files | sysctl / procfs files | sysctl / procfs files |
+| **Rebootless Hotpatching** | Native `SigmaLivepatch` built into microkernel | Ubuntu Livepatch (requires Canonical Account) | kpatch (kernel-dependent, manual) | kexec (requires kexec reboot sequence) | livepatch (complex, manually built) |
+| **Package Management** | Unified `sigpkg` with content-addressed transactional store | `apt` (dpkg) + Snaps (highly criticized loopback mounts) | `dnf` (rpm) + Flatpak | `pacman` (libalpm) + AUR (dangerous user scripts) | `apt` (highly stable but extremely outdated pkgs) |
+| **Native AI Orchestration** | Natively integrated Sovereign AI Runtimes & WANDR | None (requires external userland setups) | None | None | None |
+| **Compliance & Labour Laws** | Built-in EPF/ESI payroll engines, MCA & GDPR compliance | None | None | None | None |
+| **Accessibility & Gamification** | Adaptive `AccessibilityOverlay` + Trophy Achievements | Basic screen readers & high contrast settings | Standard GNOME a11y options | Fully manual installation | Standard a11y packages |
+| **Legacy Protection Elements** | Native historical simulation (Protected Mode, text driver) | Requires slow CPU emulator VM (QEMU/BOSCH) | Requires slow emulator VM | Requires manual emulator setup | Requires emulator setup |
+| **Paging & Swap Space** | Dual-Tier Zswap Cache + Zram Pool (Zstd, LZ4, LZO) + Swap Disk | Zram (since Ubuntu 22.04) | Zram (default since F33) | Configurable manually | Configurable manually |
+| **Control Flow & Sandboxing** | Epoll/Kqueue Loop (`SovereignKqueue`) + OpenBSD Pledge | Epoll (no native Pledge sandboxing) | Epoll (no native Pledge) | Epoll | Epoll |
+| **Stateful Firewall & NAT** | Stateful Netfilter (`SovereignConntrack`) + SimpleNAT | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables + conntrack | iptables/nftables |
+| **Boot Loader & Secure Boot** | Raw Memory Copy + Cryptographic Hash Verification | GRUB / systemd-boot | GRUB / systemd-boot | GRUB / systemd-boot | GRUB |
+| **Parallel Boot Activation** | Topological Dependency Sort (`SovereignSort`) | systemd parallelized target units | systemd parallelized | Fully sequential SysV init | systemd parallelized |
+| **TCP Sockets & Congestion** | Stateful RFC-793 + BSD Options + Reno/BBR Congestion | Linux Sockets + Reno/BBR | Linux Sockets + Reno/BBR | Linux Sockets + Reno/BBR | Linux Sockets |
+| **Interrupts & Address Safety** | Canonical Address Check + Fault Registers + ISR Routing | Linux IDT exception handling | Linux IDT | Linux IDT | Linux IDT |
+| **Citizen & Professional Tools** | Krishi, Vyapaar, Kanoon, Chikitshak & Abhiyanta Engines | None | None | None | None |
+| **Multi-Arch IRQ Controller** | x86 APIC + ARM GIC (FIQ) + RISC-V PLIC (Supervisor) | APIC (x86) / GIC (ARM) | APIC / GIC | APIC / GIC | APIC / GIC |
+| **Man Page & Help System** | On-the-Fly ANSI Compilers + Multisection Indexers | Compressed Gzip static manual files | Compressed Gzip | Compressed Gzip | Compressed Gzip |
 
 ---
 
@@ -348,42 +346,7 @@ To offer high-fidelity interactive instructions and reference help systems nativ
 
 ---
 
-## 15. AI-Native Terminal Orchestration & Script Translation Layers
-
-To surpass legacy command consoles, the native SigmaOS shell integrates built-in AI copilot primitives and robust cross-platform conversion:
-
-### 15.1 AI-Native Core Commands
-- **Dynamic Goals Planning (`ai_run`)**: Decomposes high-level intent (e.g. `"deploy web"`) into ordered terminal scripts natively.
-- **Auto-Debugging (`ai_fix`)**: Analyzes prior command failures and error output to dynamically output verified, fixed syntax lines on the fly.
-- **Self-Healing Dependencies (`ai_heal_dependency`)**: Intercepts missing shared object linkage faults and broken package recipes, invoking backend package managers to resolve and re-link broken targets automatically.
-
-### 15.2 Cross-Platform Script Translators
-Translates syntax structures of foreign shells dynamically into native microkernel system calls:
-- **PowerShell (PWSH)**: Converts cmdlets like `Get-Process` to `ps`, `dir` to `ls`, `Set-Location` to `cd`, and `Write-Output` to `echo`.
-- **Bash / POSIX Sh**: Simplifies redundant commands, converting `ls -la` to `ls` and sandboxing broad deletes.
-- **BSD Ports / Pkg**: Translates `pkg install` targets into unified content-addressed `sigpkg` transactional acquisitions natively.
-
----
-
-## 16. Immersive Swarm, Bio-Digital, Temporal & Emotion-Aware Processing
-
-To represent the absolute cutting edge of future operating systems, SigmaOS natively compiles next-generation cybernetic loops within its `#![no_std]` core module architecture:
-
-### 16.1 Personal Swarm Clustering (`SovereignSwarmCluster`)
-Enables multiple local SigmaOS nodes to form autonomous swarm clusters (`SwarmNode`), automatically polling, summing, and pooling hardware processing limits (CPU cores, RAM limits) to form an elastic personal supercomputer.
-
-### 16.2 Bio-Digital Fusion (`SovereignBioDigitalFusion`)
-Exposes standardized native sensor APIs to capture biological electro-potentials (such as EMG/EEG bio-voltages and heart rate variability). Converts voltage spikes (e.g., muscle-flex contractions exceeding 150 microvolts) into actual userland input events dynamically.
-
-### 16.3 Temporal Computing (`SovereignTemporalComputing`)
-Fuses predictive temporal logic into scheduling primitives. Tracks historical resource traces to forecast future CPU and memory utilization states, anticipating processor load spikes.
-
-### 16.4 Emotion-Aware Adaptability (`SovereignEmotionAwareEngine`)
-Monitors biometric coefficients (voice stress, eye blink delays, heart rate metrics) to classify the user's emotional state (`Calm`, `Focused`, `Stressed`, `Fatigued`). Adapts kernel scheduler contexts on the fly: if stress/fatigue are detected, the system doubles quantum slices and disables background notifications to lower user cognitive overhead.
-
----
-
-## 17. Modular Workflows & Community-Driven Innovation
+## 15. Modular Workflows & Community-Driven Innovation
 
 To maintain publisher-grade quality, the SigmaOS project employs standardized workflows for code contribution and validation.
 

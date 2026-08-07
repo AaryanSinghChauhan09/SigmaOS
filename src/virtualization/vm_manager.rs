@@ -18,13 +18,6 @@ pub struct VmConfig {
     pub cpu_pinning_cores: Vec<u32>,
     pub hugepages_enabled: bool,
     pub vfio_pci_passthrough_address: Option<String>,
-    pub memory_balloon_mb: u64,
-    pub virtio_net_queues: u32,
-    pub cpu_model: String,
-    pub machine_type: String,
-    pub nested_virtualization: bool,
-    pub io_uring_enabled: bool,
-    pub kvm_dirty_ring_size: u32,
 }
 
 /// OS type
@@ -92,32 +85,6 @@ pub trait HypervisorBackend {
     fn restore_snapshot(&mut self, vm_id: &str, snapshot_id: &str) -> Result<(), VmError>;
     /// Get backend name
     fn name(&self) -> &str;
-
-    // Distro-inspired Virtualization Enhancements
-    /// Set memory balloon (VirtIO ballooning)
-    fn set_memory_balloon(&mut self, vm_id: &str, target_mb: u64) -> Result<(), VmError> {
-        let _ = vm_id;
-        let _ = target_mb;
-        Err(VmError::FeatureNotSupported("Memory Ballooning".to_string()))
-    }
-    /// Pin CPU cores
-    fn pin_cpu_cores(&mut self, vm_id: &str, cores: Vec<u32>) -> Result<(), VmError> {
-        let _ = vm_id;
-        let _ = cores;
-        Err(VmError::FeatureNotSupported("CPU Pinning".to_string()))
-    }
-    /// Set VirtIO Net Multiqueue queues
-    fn set_virtio_queues(&mut self, vm_id: &str, queues: u32) -> Result<(), VmError> {
-        let _ = vm_id;
-        let _ = queues;
-        Err(VmError::FeatureNotSupported("VirtIO Multi-queueing".to_string()))
-    }
-    /// Configure Hugepages
-    fn set_hugepages(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
-        let _ = vm_id;
-        let _ = enabled;
-        Err(VmError::FeatureNotSupported("Hugepages".to_string()))
-    }
 }
 
 /// QEMU/KVM backend
@@ -223,42 +190,6 @@ impl HypervisorBackend for QemuBackend {
 
     fn name(&self) -> &str {
         "QEMU/KVM"
-    }
-
-    fn set_memory_balloon(&mut self, vm_id: &str, target_mb: u64) -> Result<(), VmError> {
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.memory_balloon_mb = target_mb;
-            Ok(())
-        } else {
-            Err(VmError::VmNotFound(vm_id.to_string()))
-        }
-    }
-
-    fn pin_cpu_cores(&mut self, vm_id: &str, cores: Vec<u32>) -> Result<(), VmError> {
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.cpu_pinning_cores = cores;
-            Ok(())
-        } else {
-            Err(VmError::VmNotFound(vm_id.to_string()))
-        }
-    }
-
-    fn set_virtio_queues(&mut self, vm_id: &str, queues: u32) -> Result<(), VmError> {
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.virtio_net_queues = queues;
-            Ok(())
-        } else {
-            Err(VmError::VmNotFound(vm_id.to_string()))
-        }
-    }
-
-    fn set_hugepages(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.hugepages_enabled = enabled;
-            Ok(())
-        } else {
-            Err(VmError::VmNotFound(vm_id.to_string()))
-        }
     }
 }
 
@@ -656,43 +587,6 @@ impl VmManager {
     pub fn backend_name(&self) -> &str {
         self.backend.name()
     }
-
-    // Distro-inspired Virtualization Enhancements
-    /// Set memory balloon size dynamically (RHEL/oVirt VirtIO Ballooning)
-    pub fn set_memory_balloon(&mut self, vm_id: &str, target_mb: u64) -> Result<(), VmError> {
-        self.backend.set_memory_balloon(vm_id, target_mb)?;
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.memory_balloon_mb = target_mb;
-        }
-        Ok(())
-    }
-
-    /// Pin CPU cores dynamically (Proxmox/Debian tuning)
-    pub fn pin_cpu_cores(&mut self, vm_id: &str, cores: Vec<u32>) -> Result<(), VmError> {
-        self.backend.pin_cpu_cores(vm_id, cores.clone())?;
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.cpu_pinning_cores = cores;
-        }
-        Ok(())
-    }
-
-    /// Set VirtIO network queues dynamically (Gentoo multiqueue scaling)
-    pub fn set_virtio_queues(&mut self, vm_id: &str, queues: u32) -> Result<(), VmError> {
-        self.backend.set_virtio_queues(vm_id, queues)?;
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.virtio_net_queues = queues;
-        }
-        Ok(())
-    }
-
-    /// Enable hugepages dynamically (Fedora/KVM acceleration)
-    pub fn set_hugepages(&mut self, vm_id: &str, enabled: bool) -> Result<(), VmError> {
-        self.backend.set_hugepages(vm_id, enabled)?;
-        if let Some(config) = self.vms.get_mut(vm_id) {
-            config.hugepages_enabled = enabled;
-        }
-        Ok(())
-    }
 }
 
 impl Default for VmManager {
@@ -714,7 +608,6 @@ pub enum VmError {
     DeleteFailed(String),
     SnapshotFailed(String),
     RestoreFailed(String),
-    FeatureNotSupported(String),
 }
 
 #[cfg(test)]
@@ -734,25 +627,11 @@ mod tests {
             cpu_pinning_cores: vec![0, 1],
             hugepages_enabled: true,
             vfio_pci_passthrough_address: Some("0000:01:00.0".to_string()),
-            memory_balloon_mb: 2048,
-            virtio_net_queues: 4,
-            cpu_model: "host-passthrough".to_string(),
-            machine_type: "q35".to_string(),
-            nested_virtualization: true,
-            io_uring_enabled: true,
-            kvm_dirty_ring_size: 1024,
         };
         assert_eq!(config.name, "Test VM");
         assert_eq!(config.cpu_pinning_cores.len(), 2);
         assert!(config.hugepages_enabled);
         assert_eq!(config.vfio_pci_passthrough_address.unwrap(), "0000:01:00.0");
-        assert_eq!(config.memory_balloon_mb, 2048);
-        assert_eq!(config.virtio_net_queues, 4);
-        assert_eq!(config.cpu_model, "host-passthrough");
-        assert_eq!(config.machine_type, "q35");
-        assert!(config.nested_virtualization);
-        assert!(config.io_uring_enabled);
-        assert_eq!(config.kvm_dirty_ring_size, 1024);
     }
 
     #[test]
@@ -787,13 +666,6 @@ mod tests {
             cpu_pinning_cores: Vec::new(),
             hugepages_enabled: false,
             vfio_pci_passthrough_address: None,
-            memory_balloon_mb: 2048,
-            virtio_net_queues: 4,
-            cpu_model: "host-passthrough".to_string(),
-            machine_type: "q35".to_string(),
-            nested_virtualization: true,
-            io_uring_enabled: true,
-            kvm_dirty_ring_size: 1024,
         };
         let vm_id = manager.create_vm(config).unwrap();
         assert!(!vm_id.is_empty());
@@ -813,13 +685,6 @@ mod tests {
             cpu_pinning_cores: Vec::new(),
             hugepages_enabled: false,
             vfio_pci_passthrough_address: None,
-            memory_balloon_mb: 2048,
-            virtio_net_queues: 4,
-            cpu_model: "host-passthrough".to_string(),
-            machine_type: "q35".to_string(),
-            nested_virtualization: true,
-            io_uring_enabled: true,
-            kvm_dirty_ring_size: 1024,
         };
         let vm_id = manager.create_vm(config).unwrap();
         manager.start_vm(&vm_id).unwrap();
@@ -844,13 +709,6 @@ mod tests {
             cpu_pinning_cores: vec![2, 3],
             hugepages_enabled: true,
             vfio_pci_passthrough_address: Some("0000:02:00.0".to_string()),
-            memory_balloon_mb: 2048,
-            virtio_net_queues: 4,
-            cpu_model: "host-passthrough".to_string(),
-            machine_type: "q35".to_string(),
-            nested_virtualization: true,
-            io_uring_enabled: true,
-            kvm_dirty_ring_size: 1024,
         };
 
         let vm_id = vtx.create_vm(&config).unwrap();
@@ -876,46 +734,5 @@ mod tests {
 
         iommu.attach_device(pci_addr.clone());
         assert!(iommu.verify_dma_access(&pci_addr));
-    }
-
-    #[test]
-    fn test_linux_distro_virtualization_features() {
-        let mut manager = VmManager::default(); // Uses QemuBackend by default
-        let config = VmConfig {
-            name: "Distro VM".to_string(),
-            cpu_cores: 4,
-            memory_mb: 8192,
-            disk_size_gb: 100,
-            network_enabled: true,
-            gpu_passthrough: false,
-            os_type: OsType::Linux,
-            cpu_pinning_cores: vec![0, 1],
-            hugepages_enabled: true,
-            vfio_pci_passthrough_address: None,
-            memory_balloon_mb: 4096,
-            virtio_net_queues: 4,
-            cpu_model: "host-passthrough".to_string(),
-            machine_type: "q35".to_string(),
-            nested_virtualization: true,
-            io_uring_enabled: true,
-            kvm_dirty_ring_size: 1024,
-        };
-        let vm_id = manager.create_vm(config).unwrap();
-
-        // 1. Test VirtIO memory ballooning (RHEL inspired)
-        manager.set_memory_balloon(&vm_id, 2048).unwrap();
-        assert_eq!(manager.get_vm_config(&vm_id).unwrap().memory_balloon_mb, 2048);
-
-        // 2. Test CPU core pinning (Proxmox inspired)
-        manager.pin_cpu_cores(&vm_id, vec![2, 3]).unwrap();
-        assert_eq!(manager.get_vm_config(&vm_id).unwrap().cpu_pinning_cores, vec![2, 3]);
-
-        // 3. Test VirtIO-net multi-queuing (Gentoo inspired)
-        manager.set_virtio_queues(&vm_id, 8).unwrap();
-        assert_eq!(manager.get_vm_config(&vm_id).unwrap().virtio_net_queues, 8);
-
-        // 4. Test hugepages setting (Fedora inspired)
-        manager.set_hugepages(&vm_id, false).unwrap();
-        assert!(!manager.get_vm_config(&vm_id).unwrap().hugepages_enabled);
     }
 }
