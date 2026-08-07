@@ -7,6 +7,7 @@ pub mod enterprise;
 pub mod i18n;
 pub mod manjaro;
 pub mod nextgen;
+pub mod parity;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;

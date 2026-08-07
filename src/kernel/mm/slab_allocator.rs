@@ -2,7 +2,9 @@
 /// Inspired by Bonwick's 1994 paper and the Linux kernel SLUB allocator.
 /// Exposes caches for fixed-size allocations to prevent fragmentation.
 use crate::klib::HashMap;
-use std::vec::Vec;
+extern crate alloc;
+use alloc::vec;
+use alloc::vec::Vec;
 
 pub struct Slab {
     pub object_size: usize,
@@ -12,7 +14,10 @@ pub struct Slab {
 
 impl Slab {
     pub fn new(object_size: usize, num_objects: usize) -> Self {
-        let free_list = (0..num_objects).collect();
+        let mut free_list = Vec::new();
+        for i in 0..num_objects {
+            free_list.push(i);
+        }
         let data = vec![0u8; object_size * num_objects];
         Slab {
             object_size,
@@ -95,9 +100,23 @@ impl SlabAllocator {
 
     pub fn allocate(&mut self, size: usize) -> Option<(usize, usize)> {
         // Find best fitting cache
-        let mut sorted_sizes: Vec<&usize> = self.caches.keys().collect();
-        sorted_sizes.sort();
-        for &cache_size in sorted_sizes {
+        let mut sorted_sizes = Vec::new();
+        for &k in self.caches.keys() {
+            sorted_sizes.push(k);
+        }
+
+        // simple sort
+        for i in 0..sorted_sizes.len() {
+            for j in (i+1)..sorted_sizes.len() {
+                if sorted_sizes[j] < sorted_sizes[i] {
+                    let tmp = sorted_sizes[i];
+                    sorted_sizes[i] = sorted_sizes[j];
+                    sorted_sizes[j] = tmp;
+                }
+            }
+        }
+
+        for cache_size in sorted_sizes {
             if cache_size >= size {
                 let cache = self.caches.get_mut(&cache_size)?;
                 let id = cache.allocate()?;

@@ -7,6 +7,7 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod mm;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
@@ -25,3 +26,7 @@ pub use policy_mechanism::{
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use mm::{
+    HugePageManager, HugePageSize, NumaNode, NumaTopologyManager, OomKiller, PageCache, CachedPage,
+    SlabAllocator, VmallocManager,
+};
