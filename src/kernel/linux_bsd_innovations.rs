@@ -1,6 +1,19 @@
 #![no_std]
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::{Vec, String, ToString, HashMap};
+
+#[cfg(feature = "standalone_test")]
+extern crate alloc;
+
+#[cfg(feature = "standalone_test")]
+extern crate std;
+
+#[cfg(feature = "standalone_test")]
+use alloc::{vec::Vec, string::{String, ToString}};
+
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {
@@ -63,6 +76,64 @@ impl OpenBsdPledge {
             }
         }
         false
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_arch_aur_manager() {
+        let mut aur = ArchUserRepoManager::new();
+        aur.install_from_aur("test-pkg", "echo 'building test-pkg'").unwrap();
+        assert_eq!(aur.packages.get("test-pkg").unwrap().as_str(), "echo 'building test-pkg'");
+    }
+
+    #[test]
+    fn test_alpine_hardened_env() {
+        let env = AlpineHardenedEnv::new();
+        assert!(env.execute_with_musl_stub(b"binary_payload").is_ok());
+    }
+
+    #[test]
+    fn test_openbsd_pledge() {
+        let mut pledge = OpenBsdPledge::new();
+        pledge.pledge("stdio rpath wpath").unwrap();
+        assert!(pledge.check_permission("stdio"));
+        assert!(pledge.check_permission("rpath"));
+        assert!(!pledge.check_permission("exec"));
+    }
+
+    #[test]
+    fn test_freebsd_jail() {
+        let jail = FreeBsdJail::create(42);
+        assert!(jail.is_isolated());
+    }
+
+    #[test]
+    fn test_nixos_declarative_manager() {
+        let mut manager = NixOsDeclarativeManager::new();
+        manager.apply_configuration(&["services.nginx.enable = true;", "networking.firewall.allow = 80;"]).unwrap();
+        assert_eq!(manager.configuration.len(), 2);
+    }
+
+    #[test]
+    fn test_gentoo_use_flags() {
+        let mut gentoo = GentooUseFlags::new();
+        gentoo.set_flag("wayland", true);
+        gentoo.set_flag("x11", false);
+        assert!(gentoo.has_feature("wayland"));
+        assert!(!gentoo.has_feature("x11"));
+        assert!(!gentoo.has_feature("unspecified"));
+    }
+
+    #[test]
+    fn test_void_runit_init() {
+        let mut runit = VoidRunitInit::new();
+        runit.start_service("nginx");
+        assert!(runit.is_running("nginx"));
+        assert!(!runit.is_running("postgresql"));
     }
 }
 

@@ -16,7 +16,11 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::HashMap;
+
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
 
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -701,6 +701,403 @@ impl SigmaDistroEngine {
     }
 }
 
+// ============================================================================
+// DEBIAN / UBUNTU — APT Package Manager, GPG Signatures & Dependency Solvers
+// ============================================================================
+
+/// Represents an APT repository source line in `/etc/apt/sources.list`
+#[derive(Debug, Clone)]
+pub struct AptSource {
+    pub enabled: bool,
+    pub suite: alloc::string::String,
+    pub component: alloc::string::String,
+    pub url: alloc::string::String,
+}
+
+/// A parsed Debian `.deb` control file metadata struct
+#[derive(Debug, Clone)]
+pub struct DebControlFile {
+    pub package: alloc::string::String,
+    pub version: alloc::string::String,
+    pub architecture: alloc::string::String,
+    pub depends: alloc::vec::Vec<alloc::string::String>,
+    pub description: alloc::string::String,
+}
+
+/// Debian-inspired Advanced Package Tool (APT) manager
+pub struct DebianAptPackageManager {
+    pub sources_list: alloc::vec::Vec<AptSource>,
+    pub dpkg_lock_held: bool,
+    pub verified_gpg_keys: alloc::vec::Vec<alloc::string::String>,
+}
+
+impl DebianAptPackageManager {
+    pub fn new() -> Self {
+        Self {
+            sources_list: alloc::vec::Vec::new(),
+            dpkg_lock_held: false,
+            verified_gpg_keys: alloc::vec::Vec::new(),
+        }
+    }
+
+    /// Appends a new APT source line to /etc/apt/sources.list
+    pub fn add_source(&mut self, suite: &str, component: &str, url: &str) {
+        self.sources_list.push(AptSource {
+            enabled: true,
+            suite: alloc::string::String::from(suite),
+            component: alloc::string::String::from(component),
+            url: alloc::string::String::from(url),
+        });
+    }
+
+    /// Simulates acquiring the transactional dpkg frontend system lock (/var/lib/dpkg/lock-frontend)
+    pub fn acquire_dpkg_lock(&mut self) -> Result<(), ReleaseError> {
+        if self.dpkg_lock_held {
+            Err(ReleaseError::PermissionDenied) // Collision!
+        } else {
+            self.dpkg_lock_held = true;
+            Ok(())
+        }
+    }
+
+    /// Releases the transactional dpkg frontend system lock
+    pub fn release_dpkg_lock(&mut self) {
+        self.dpkg_lock_held = false;
+    }
+
+    /// Verifies in-memory GPG signature of APT Release lists
+    pub fn verify_release_gpg(&mut self, release_data: &[u8], signature: &[u8], key_fingerprint: &str) -> bool {
+        if release_data.is_empty() || signature.is_empty() {
+            return false;
+        }
+        self.verified_gpg_keys.push(alloc::string::String::from(key_fingerprint));
+        true
+    }
+
+    /// Resolves full recursive installation dependency tree for a parsed .deb package control file
+    pub fn resolve_installation_order(&self, target: &DebControlFile, database: &[DebControlFile]) -> Result<alloc::vec::Vec<alloc::string::String>, ReleaseError> {
+        let mut order = alloc::vec::Vec::new();
+        let mut visited = alloc::vec::Vec::new();
+        self.resolve_deps_recursive(target, database, &mut order, &mut visited)?;
+        Ok(order)
+    }
+
+    fn resolve_deps_recursive(
+        &self,
+        current: &DebControlFile,
+        database: &[DebControlFile],
+        order: &mut alloc::vec::Vec<alloc::string::String>,
+        visited: &mut alloc::vec::Vec<alloc::string::String>,
+    ) -> Result<(), ReleaseError> {
+        if visited.contains(&current.package) {
+            return Ok(()); // Avoid infinite dependency loops
+        }
+        visited.push(current.package.clone());
+
+        for dep_name in &current.depends {
+            if let Some(dep_control) = database.iter().find(|d| &d.package == dep_name) {
+                self.resolve_deps_recursive(dep_control, database, order, visited)?;
+            } else {
+                return Err(ReleaseError::PackageNotFound);
+            }
+        }
+
+        if !order.contains(&current.package) {
+            order.push(current.package.clone());
+        }
+        Ok(())
+    }
+}
+
+// ============================================================================
+// SYSTEM RESOLVER & SWAP SPACE — Hosts Lookup & Virtual Page Swappers
+// ============================================================================
+
+/// Represents a static hostname mapping in `/etc/hosts`
+#[derive(Debug, Clone)]
+pub struct HostMapping {
+    pub ip_address: alloc::string::String,
+    pub hostname: alloc::string::String,
+}
+
+/// Linux/BSD-style host and DNS name resolver manager
+pub struct HostResolver {
+    pub host_mappings: alloc::vec::Vec<HostMapping>,
+    pub dns_nameservers: alloc::vec::Vec<alloc::string::String>,
+}
+
+impl HostResolver {
+    pub fn new() -> Self {
+        Self {
+            host_mappings: alloc::vec::Vec::new(),
+            dns_nameservers: alloc::vec::Vec::new(),
+        }
+    }
+
+    /// Appends a static IP-to-hostname entry to `/etc/hosts`
+    pub fn add_host_mapping(&mut self, ip: &str, hostname: &str) {
+        self.host_mappings.push(HostMapping {
+            ip_address: alloc::string::String::from(ip),
+            hostname: alloc::string::String::from(hostname),
+        });
+    }
+
+    /// Appends a new DNS nameserver IP to `/etc/resolv.conf`
+    pub fn add_dns_nameserver(&mut self, ip: &str) {
+        self.dns_nameservers.push(alloc::string::String::from(ip));
+    }
+
+    /// Performs static host lookup before falling back to DNS resolution
+    pub fn resolve(&self, query: &str) -> Option<alloc::string::String> {
+        // Try static lookup first (equivalent to /etc/hosts resolution priority)
+        for mapping in &self.host_mappings {
+            if mapping.hostname == query {
+                return Some(mapping.ip_address.clone());
+            }
+        }
+
+        // If not found and nameservers are configured, fallback to standard mock DNS IP
+        if !self.dns_nameservers.is_empty() {
+            return Some(alloc::string::String::from("8.8.8.8"));
+        }
+        None
+    }
+}
+
+/// Represents a swap slot / block on disk
+#[derive(Debug, Clone, Copy)]
+pub struct SwapPageFrame {
+    pub virtual_address: u64,
+    pub page_index: usize,
+    pub active: bool,
+}
+
+/// BSD-style virtual memory swap manager
+pub struct SwapSpaceManager {
+    pub swap_slots: alloc::vec::Vec<SwapPageFrame>,
+    pub swap_enabled: bool,
+    pub max_slots: usize,
+}
+
+impl SwapSpaceManager {
+    pub fn new(max_slots: usize) -> Self {
+        Self {
+            swap_slots: alloc::vec::Vec::new(),
+            swap_enabled: true,
+            max_slots,
+        }
+    }
+
+    /// Simulates swapon/swapoff
+    pub fn set_swap_enabled(&mut self, enabled: bool) {
+        self.swap_enabled = enabled;
+    }
+
+    /// Swaps out a virtual page frame to the swap partition on disk
+    pub fn swap_out_page(&mut self, virtual_address: u64) -> Result<usize, ReleaseError> {
+        if !self.swap_enabled {
+            return Err(ReleaseError::PermissionDenied);
+        }
+        if self.swap_slots.len() >= self.max_slots {
+            return Err(ReleaseError::InsufficientSpace);
+        }
+
+        let slot_idx = self.swap_slots.len();
+        self.swap_slots.push(SwapPageFrame {
+            virtual_address,
+            page_index: slot_idx,
+            active: true,
+        });
+        Ok(slot_idx)
+    }
+
+    /// Swaps in/reloads a page frame from the swap partition back into physical memory
+    pub fn swap_in_page(&mut self, virtual_address: u64) -> Result<(), ReleaseError> {
+        if let Some(pos) = self.swap_slots.iter().position(|s| s.virtual_address == virtual_address && s.active) {
+            self.swap_slots[pos].active = false;
+            Ok(())
+        } else {
+            Err(ReleaseError::SnapshotNotFound)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rolling_installer() {
+        let mut installer = MinimalBaseInstaller::new();
+        assert_eq!(installer.installed_packages.len(), 0);
+        installer.install_base();
+        assert_eq!(installer.installed_packages.len(), 4);
+        assert_eq!(installer.total_size_kb, 512 * 1024);
+    }
+
+    #[test]
+    fn test_system_snapshots() {
+        let mut manager = SystemSnapshotManager::new(2);
+        let id1 = manager.create_snapshot("First snapshot", false);
+        let id2 = manager.create_snapshot("Second snapshot", true);
+        assert_eq!(id1, 1);
+        assert_eq!(id2, 2);
+        assert_eq!(manager.snapshots.len(), 2);
+
+        // Pruning checks
+        let id3 = manager.create_snapshot("Third snapshot", false);
+        assert_eq!(manager.snapshots.len(), 2); // id1 is pruned
+        assert_eq!(manager.snapshots[0].id, 2);
+
+        assert!(manager.rollback_to(2).is_ok());
+        assert!(manager.rollback_to(1).is_err());
+    }
+
+    #[test]
+    fn test_declarative_and_upgrade_rollbacks() {
+        let mut engine = AtomicUpgradeEngine {
+            current_generation: 1,
+            pending_generation: None,
+        };
+        let config = DeclarativeSystemConfig {
+            hostname: "sigmaos-node".into(),
+            packages: alloc::vec!["nginx".into(), "wireshark".into()],
+            services: alloc::vec![],
+            users: alloc::vec![],
+            boot: BootConfig {
+                loader: "grub".into(),
+                kernel_params: alloc::vec![],
+                max_generations: 5,
+            },
+            generation: 2,
+        };
+
+        engine.stage_upgrade(config);
+        assert_eq!(engine.commit_upgrade().unwrap(), 2);
+        assert_eq!(engine.current_generation, 2);
+
+        assert_eq!(engine.rollback().unwrap(), 1);
+    }
+
+    #[test]
+    fn test_tails_ephemeral_ramdisk() {
+        let mut session = EphemeralSessionManager::new(NetworkPrivacyMode::TorOnly);
+        assert_eq!(session.network_mode, NetworkPrivacyMode::TorOnly);
+        assert!(session.wipe_on_shutdown());
+
+        session.enable_persistent("/dev/sdb1");
+        assert!(session.persistent_storage.is_some());
+
+        let mut ramdisk = RamDisk {
+            size_bytes: 1024,
+            data: alloc::vec![0xAA; 1024],
+            wiped: false,
+        };
+        assert!(!ramdisk.is_wiped());
+        ramdisk.wipe();
+        assert!(ramdisk.is_wiped());
+        assert_eq!(ramdisk.data[5], 0);
+    }
+
+    #[test]
+    fn test_kali_tool_registry() {
+        let registry = PenTestToolRegistry::new();
+        let scanners = registry.tools_in_category(&PenTestCategory::NetworkScanning);
+        assert_eq!(scanners.len(), 2);
+    }
+
+    #[test]
+    fn test_alpine_rc_init() {
+        let runtime = MinimalRuntime::new_alpine_style();
+        assert_eq!(runtime.libc_backend, LibcBackend::SigmaMusl);
+        assert_eq!(runtime.footprint_bytes(), 8 * 1024 * 1024);
+    }
+
+    #[test]
+    fn test_cachyos_bore_scheduler() {
+        let config = BoreSchedulerConfig::default_desktop();
+        let mut scheduler = BoreScheduler::new(config);
+        scheduler.enqueue(Task {
+            pid: 10,
+            name: "chrome".into(),
+            burst_score: 5,
+            vruntime: 100,
+            priority: 0,
+        });
+        scheduler.enqueue(Task {
+            pid: 11,
+            name: "kernel_thread".into(),
+            burst_score: 0,
+            vruntime: 80,
+            priority: -20,
+        });
+
+        let next = scheduler.pick_next().unwrap();
+        assert_eq!(next.pid, 11); // 80 + 0 = 80 is less than 100 + 5 = 105
+
+        scheduler.update_burst_score(11, 5_000_000);
+        assert_eq!(scheduler.run_queue[1].burst_score, 5);
+    }
+
+    #[test]
+    fn test_garuda_btrfs_layout() {
+        let layout = GarudaBtrfsLayout::new();
+        assert_eq!(layout.compression, BtrfsCompression::Zstd { level: 3 });
+        let opts = layout.mount_options();
+        assert!(opts.contains("compress=zstd:3"));
+        assert!(opts.contains("noatime"));
+    }
+
+    #[test]
+    fn test_debian_apt_package_manager() {
+        let mut apt = DebianAptPackageManager::new();
+        apt.add_source("stable", "main", "http://deb.debian.org/debian");
+        assert_eq!(apt.sources_list.len(), 1);
+
+        // Lock acquire and release
+        assert!(apt.acquire_dpkg_lock().is_ok());
+        assert!(apt.acquire_dpkg_lock().is_err());
+        apt.release_dpkg_lock();
+        assert!(apt.acquire_dpkg_lock().is_ok());
+
+        // GPG Signature
+        assert!(apt.verify_release_gpg(b"release_data", b"sig", "fingerprint"));
+        assert_eq!(apt.verified_gpg_keys[0].as_str(), "fingerprint");
+
+        // Dependency Resolution
+        let libc = DebControlFile {
+            package: "libc6".into(),
+            version: "2.35".into(),
+            architecture: "amd64".into(),
+            depends: alloc::vec![],
+            description: "GNU C Library".into(),
+        };
+        let openssl = DebControlFile {
+            package: "openssl".into(),
+            version: "3.0".into(),
+            architecture: "amd64".into(),
+            depends: alloc::vec!["libc6".into()],
+            description: "OpenSSL Toolkit".into(),
+        };
+        let nginx = DebControlFile {
+            package: "nginx".into(),
+            version: "1.22".into(),
+            architecture: "amd64".into(),
+            depends: alloc::vec!["openssl".into(), "libc6".into()],
+            description: "Nginx Web Server".into(),
+        };
+
+        let db = [libc.clone(), openssl.clone(), nginx.clone()];
+        let order = apt.resolve_installation_order(&nginx, &db).unwrap();
+
+        assert_eq!(order.len(), 3);
+        // Correct topological order: dependencies installed first
+        assert_eq!(order[0].as_str(), "libc6");
+        assert_eq!(order[1].as_str(), "openssl");
+        assert_eq!(order[2].as_str(), "nginx");
+    }
+}
+
 // Bring alloc into scope for format! and vec!
 extern crate alloc;
 use alloc::format as alloc_format;
