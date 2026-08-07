@@ -15,9 +15,7 @@
 use crate::klib::{HashMap, Vec, String, ToString};
 
 /// AUR package metadata
-#[derive(Debug, Clone)]
 #[derive(Debug, Clone, PartialEq)]
-#[derive(Debug, Clone)]
 pub struct AurPackage {
     pub name: String,
     pub version: String,
@@ -27,36 +25,6 @@ pub struct AurPackage {
     pub makedepends: Vec<String>,
     pub keywords: Vec<String>,
     pub popularity: f32,
-}
-
-impl PartialEq for AurPackage {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-            && self.version == other.version
-            && self.description == other.description
-            && self.url == other.url
-            && self.depends == other.depends
-            && self.makedepends == other.makedepends
-            && self.keywords == other.keywords
-            && self.popularity.to_bits() == other.popularity.to_bits()
-    }
-}
-
-impl Eq for AurPackage {}
-
-impl Eq for AurPackage {}
-
-impl PartialEq for AurPackage {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-            && self.version == other.version
-            && self.description == other.description
-            && self.url == other.url
-            && self.depends == other.depends
-            && self.makedepends == other.makedepends
-            && self.keywords == other.keywords
-            && self.popularity.to_bits() == other.popularity.to_bits()
-    }
 }
 
 impl Eq for AurPackage {}
@@ -74,7 +42,7 @@ impl AurParser {
     }
 
     /// Parse AUR package metadata from JSON-like format
-    pub fn parse_metadata(&mut self, _metadata: &str) -> Result<AurPackage, &'static str> {
+    pub fn parse_metadata(&mut self, metadata: &str) -> Result<AurPackage, &'static str> {
         // Simplified parsing - in production, would use proper JSON parsing
         // For now, we simulate parsing from a simplified format
         

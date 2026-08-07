@@ -3,8 +3,6 @@
 
 /// Advanced Enterprise Networking Suite for SigmaOS
 /// Provides sovereign enterprise network features including IPv6 addressing, VPN encrypted tunneling, and SSL/TLS.
-use core::sync::atomic::{AtomicUsize, Ordering};
-/// Provides sovereign enterprise network features including IPv6 addressing, VPN encrypted tunneling, and SSL/TLS.
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -90,12 +88,7 @@ pub struct IPv6Header {
 }
 
 impl IPv6Header {
-    pub fn new(
-        source: IPv6Address,
-        destination: IPv6Address,
-        next_header: u8,
-        payload_len: u16,
-    ) -> Self {
+    pub fn new(source: IPv6Address, destination: IPv6Address, next_header: u8, payload_len: u16) -> Self {
         Self {
             version_traffic_class_flow_label: 0x6000_0000, // Version 6
             payload_length: payload_len,
@@ -348,12 +341,7 @@ impl VpnVirtualInterface {
     }
 
     /// Encapsulates and encrypts packet prepending big-endian 64-bit sequence number
-    pub fn encapsulate(
-        &mut self,
-        seq: u64,
-        payload: &[u8],
-        out_buffer: &mut [u8],
-    ) -> Result<usize, EnterpriseNetworkError> {
+    pub fn encapsulate(&mut self, seq: u64, payload: &[u8], out_buffer: &mut [u8]) -> Result<usize, EnterpriseNetworkError> {
         if !self.tunnel.established {
             return Err(EnterpriseNetworkError::TunnelNotEstablished);
         }
@@ -370,11 +358,7 @@ impl VpnVirtualInterface {
     }
 
     /// Decapsulates packet, runs anti-replay checks and decrypts payload
-    pub fn decapsulate(
-        &mut self,
-        packet: &[u8],
-        out_payload: &mut [u8],
-    ) -> Result<usize, EnterpriseNetworkError> {
+    pub fn decapsulate(&mut self, packet: &[u8], out_payload: &mut [u8]) -> Result<usize, EnterpriseNetworkError> {
         if packet.len() < 8 {
             return Err(EnterpriseNetworkError::EncryptionFailed);
         }
@@ -486,11 +470,7 @@ impl SovereignSslEngine {
     }
 
     /// Encapsulates application data payload inside encrypted record
-    pub fn encrypt_record(
-        &self,
-        plaintext: &[u8],
-        record_buffer: &mut [u8],
-    ) -> Result<usize, &'static str> {
+    pub fn encrypt_record(&self, plaintext: &[u8], record_buffer: &mut [u8]) -> Result<usize, &'static str> {
         if self.state != TlsState::Established {
             return Err("Handshake not established");
         }
@@ -513,11 +493,7 @@ impl SovereignSslEngine {
     }
 
     /// Decapsulates and decrypts TLS ApplicationData records
-    pub fn decrypt_record(
-        &self,
-        record: &[u8],
-        plaintext_buffer: &mut [u8],
-    ) -> Result<usize, &'static str> {
+    pub fn decrypt_record(&self, record: &[u8], plaintext_buffer: &mut [u8]) -> Result<usize, &'static str> {
         if self.state != TlsState::Established {
             return Err("Handshake not established");
         }
@@ -590,16 +566,8 @@ mod tests {
         let prefix1 = IPv6Address::parse(b"2001:db8:1::").unwrap();
         let prefix2 = IPv6Address::parse(b"2001:db8:1:2::").unwrap();
 
-        table.add_route(
-            prefix1,
-            48,
-            Some(IPv6Address::parse(b"fe80:0:0:0:0:0:0:1").unwrap()),
-        );
-        table.add_route(
-            prefix2,
-            64,
-            Some(IPv6Address::parse(b"fe80:0:0:0:0:0:0:2").unwrap()),
-        );
+        table.add_route(prefix1, 48, Some(IPv6Address::parse(b"fe80:0:0:0:0:0:0:1").unwrap()));
+        table.add_route(prefix2, 64, Some(IPv6Address::parse(b"fe80:0:0:0:0:0:0:2").unwrap()));
 
         let dst = IPv6Address::parse(b"2001:db8:1:2:3:4:5:6").unwrap();
         let matched = table.lookup(&dst).unwrap();
@@ -644,9 +612,7 @@ mod tests {
         response_buf[5..5 + smsg.len()].copy_from_slice(smsg);
 
         // Client processes server hello
-        assert!(client
-            .receive_server_hello(&response_buf[..5 + smsg.len()])
-            .is_ok());
+        assert!(client.receive_server_hello(&response_buf[..5 + smsg.len()]).is_ok());
 
         client.establish_handshake();
         assert_eq!(client.state, TlsState::Established);

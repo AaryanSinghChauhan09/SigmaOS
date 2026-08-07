@@ -145,7 +145,7 @@ impl MakepkgSandbox {
             .ok_or("pkgver not found in PKGBUILD")?
             .clone();
         
-        let _pkgrel = self.pkgbuild.pkgrel()
+        let pkgrel = self.pkgbuild.pkgrel()
             .ok_or("pkgrel not found in PKGBUILD")?
             .clone();
         
@@ -154,18 +154,18 @@ impl MakepkgSandbox {
             .unwrap_or_else(|| String::from_str("No description"));
 
         let cleaned_ver = if pkgver.contains('-') {
-            pkgver.split('-').next().unwrap().to_string()
+            pkgver.split('-').next().unwrap()
         } else {
-            pkgver.to_string()
+            &pkgver
         };
-        let version = Version::parse(&cleaned_ver).unwrap_or(Version::new(1, 0, 0));
+        let version = Version::parse(cleaned_ver).unwrap_or(Version::new(1, 0, 0));
 
         let mut pkg = Package::new(
             pkgname,
             version,
             pkgdesc,
             std::vec::Vec::new(),
-            crate::klib::String::new(),
+            String::new(),
         );
         pkg.source = String::from_str("arch");
         Ok(pkg)
@@ -220,7 +220,7 @@ depends=("glibc")
 
     #[test]
     fn test_makepkg_sandbox() {
-        let mut sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
+        let sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
         let content = r#"
 pkgname="test-package"
 pkgver="1.0.0"
