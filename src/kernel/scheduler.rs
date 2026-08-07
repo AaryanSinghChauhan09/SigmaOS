@@ -33,7 +33,6 @@ pub struct Process {
     pub virtual_deadline: u64,
     pub time_slice: Duration,
     pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
-    pub burst_score: u64, // CachyOS-style Burst-Oriented Response Enhancer (BORE) metric
 }
 
 impl Process {
@@ -47,7 +46,6 @@ impl Process {
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
             edf_deadline: None,
-            burst_score: 0,
         }
     }
 
@@ -59,26 +57,13 @@ impl Process {
     pub fn update_virtual_deadline(&mut self, current_time: u64) {
         // EEVDF virtual deadline calculation
         let weight = match self.priority {
-            Priority::Idle => 64,
-            Priority::Low => 128,
+            Priority::Idle => 1024,
+            Priority::Low => 512,
             Priority::Normal => 256,
-            Priority::High => 512,
-            Priority::Realtime => 1024,
+            Priority::High => 128,
+            Priority::Realtime => 64,
         };
         self.virtual_deadline = current_time + (1000 / weight);
-    }
-
-    pub fn update_virtual_deadline_bore(&mut self, current_time: u64) {
-        let weight = match self.priority {
-            Priority::Idle => 64,
-            Priority::Low => 128,
-            Priority::Normal => 256,
-            Priority::High => 512,
-            Priority::Realtime => 1024,
-        };
-        // CachyOS-style BORE burst penalty: higher burst score means higher virtual deadline (less eligibility)
-        let bore_penalty = self.burst_score / 2;
-        self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
     }
 }
 
@@ -97,21 +82,8 @@ impl Scheduler {
     }
 
     pub fn add_process(&mut self, mut process: Process) {
-        process.update_virtual_deadline_bore(self.current_time);
+        process.update_virtual_deadline(self.current_time);
         self.processes.push(process);
-    }
-
-    pub fn charge_process_burst(&mut self, pid: u64, burst_amount: u64) {
-        if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
-            process.burst_score = process.burst_score.saturating_add(burst_amount);
-            process.update_virtual_deadline_bore(self.current_time);
-        }
-    }
-
-    pub fn decay_process_bursts(&mut self) {
-        for process in &mut self.processes {
-            process.burst_score = process.burst_score.saturating_sub(1);
-        }
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
@@ -149,7 +121,7 @@ impl Scheduler {
         if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
             process.state = state;
             if state == ProcessState::Ready {
-                process.update_virtual_deadline_bore(self.current_time);
+                process.update_virtual_deadline(self.current_time);
             }
         }
     }
@@ -223,37 +195,5 @@ mod tests {
         let chosen = scheduler.schedule().unwrap();
         assert_eq!(chosen.pid, 3);
         assert_eq!(chosen.name, "rt_early");
-    }
-
-    #[test]
-    fn test_bore_burst_penalty_and_decay() {
-        let mut scheduler = Scheduler::new();
-        let p1 = Process::new(10, "interactive".to_string(), Priority::Normal);
-        let p2 = Process::new(11, "cpu_bound".to_string(), Priority::Normal);
-
-        scheduler.add_process(p1);
-        scheduler.add_process(p2);
-
-        // Charge p2 with burst amount (simulating a CPU burst)
-        scheduler.charge_process_burst(11, 20);
-
-        // Retrieve processes and check their burst scores and deadlines
-        let proc1 = scheduler.processes.iter().find(|p| p.pid == 10).unwrap();
-        let proc2 = scheduler.processes.iter().find(|p| p.pid == 11).unwrap();
-
-        assert_eq!(proc1.burst_score, 0);
-        assert_eq!(proc2.burst_score, 20);
-
-        // p2 virtual deadline should be penalized (larger than p1's virtual deadline)
-        assert!(proc2.virtual_deadline > proc1.virtual_deadline);
-
-        // Decay the bursts
-        for _ in 0..10 {
-            scheduler.decay_process_bursts();
-        }
-
-        // Recover proc2 reference and check updated burst_score
-        let proc2_decayed = scheduler.processes.iter().find(|p| p.pid == 11).unwrap();
-        assert_eq!(proc2_decayed.burst_score, 10);
     }
 }

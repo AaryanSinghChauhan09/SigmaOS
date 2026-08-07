@@ -1,11 +1,8 @@
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
-#[cfg(not(feature = "standalone_test"))]
-use crate::klib::Vec;
 
-#[cfg(feature = "standalone_test")]
-use std::vec::Vec;
+use crate::klib::Vec;
 
 #[derive(Debug, Clone)]
 pub struct AudioTrack {
@@ -113,57 +110,6 @@ impl MultiTrackSession {
 
         master_mix
     }
-
-    /// Mixes all enabled audio tracks down to an interleaved stereo output channel.
-    /// Standard constant-power panning distributes samples to Left (index 2*i) and Right (index 2*i + 1) channels.
-    pub fn mix_session_stereo(&self) -> Vec<f32> {
-        let mut max_len = 0;
-        let mut has_solo_active = false;
-
-        for i in 0..self.tracks.len() {
-            let track = &self.tracks[i];
-            if track.is_solo && !track.is_muted {
-                has_solo_active = true;
-            }
-            if track.samples.len() > max_len {
-                max_len = track.samples.len();
-            }
-        }
-
-        let mut master_mix = Vec::new();
-        for _ in 0..(max_len * 2) {
-            master_mix.push(0.0);
-        }
-
-        for i in 0..self.tracks.len() {
-            let track = &self.tracks[i];
-            let is_active = if has_solo_active {
-                track.is_solo && !track.is_muted
-            } else {
-                !track.is_muted
-            };
-
-            if is_active {
-                // Constant-power panning law
-                let pan = track.pan.clamp(-1.0f32, 1.0f32);
-                let left_gain = (1.0f32 - pan).min(1.0f32) * track.volume;
-                let right_gain = (1.0f32 + pan).min(1.0f32) * track.volume;
-
-                for sample_idx in 0..track.samples.len() {
-                    let raw_sample = track.samples[sample_idx];
-                    master_mix[sample_idx * 2] += raw_sample * left_gain;
-                    master_mix[sample_idx * 2 + 1] += raw_sample * right_gain;
-                }
-            }
-        }
-
-        // Digital Clipping Prevention (Hard limiting)
-        for i in 0..master_mix.len() {
-            master_mix[i] = master_mix[i].clamp(-1.0, 1.0);
-        }
-
-        master_mix
-    }
 }
 
 impl Default for MultiTrackSession {
@@ -212,10 +158,7 @@ pub struct EchoEffect {
 
 impl EchoEffect {
     pub fn new(delay_samples: usize, decay: f32) -> Self {
-        EchoEffect {
-            delay_samples,
-            decay,
-        }
+        EchoEffect { delay_samples, decay }
     }
 }
 
@@ -241,9 +184,7 @@ pub struct LowPassFilter {
 
 impl LowPassFilter {
     pub fn new(cutoff_factor: f32) -> Self {
-        LowPassFilter {
-            cutoff_factor: cutoff_factor.clamp(0.0, 1.0),
-        }
+        LowPassFilter { cutoff_factor: cutoff_factor.clamp(0.0, 1.0) }
     }
 }
 
@@ -260,145 +201,6 @@ impl AudioEffect for LowPassFilter {
             let smoothed_y = current_x * self.cutoff_factor + prev_y * (1.0 - self.cutoff_factor);
             samples[i] = smoothed_y;
             prev_y = smoothed_y;
-        }
-    }
-}
-
-/// Dynamic High-Pass Infinite Impulse Response (IIR) Filter
-pub struct HighPassFilter {
-    pub cutoff_factor: f32, // Attenuation parameter beta (typically 0.85 to 0.99)
-}
-
-impl HighPassFilter {
-    pub fn new(cutoff_factor: f32) -> Self {
-        HighPassFilter {
-            cutoff_factor: cutoff_factor.clamp(0.0, 1.0),
-        }
-    }
-}
-
-impl AudioEffect for HighPassFilter {
-    fn apply(&self, samples: &mut [f32]) {
-        if samples.len() < 2 {
-            return;
-        }
-        let mut prev_x = samples[0];
-        let mut prev_y = samples[0];
-        samples[0] = 0.0;
-        for i in 1..samples.len() {
-            let current_x = samples[i];
-            let current_y = self.cutoff_factor * (prev_y + current_x - prev_x);
-            prev_x = current_x;
-            prev_y = current_y;
-            samples[i] = current_y.clamp(-1.0, 1.0);
-        }
-    }
-}
-
-/// Chorus DSP Effect (Thickens voice tracks via LFO-modulated delay lines)
-pub struct ChorusEffect {
-    pub delay_samples: usize,
-    pub depth: f32,       // modulation depth (0.0 to 1.0)
-    pub rate_factor: f32, // LFO frequency factor
-}
-
-impl ChorusEffect {
-    pub fn new(delay_samples: usize, depth: f32, rate_factor: f32) -> Self {
-        ChorusEffect {
-            delay_samples,
-            depth: depth.clamp(0.0, 1.0),
-            rate_factor: rate_factor.clamp(0.0, 1.0),
-        }
-    }
-}
-
-impl AudioEffect for ChorusEffect {
-    fn apply(&self, samples: &mut [f32]) {
-        if self.delay_samples == 0 || self.delay_samples >= samples.len() {
-            return;
-        }
-        let mut buffer = Vec::new();
-        for &s in samples.iter() {
-            buffer.push(s);
-        }
-        for i in 0..samples.len() {
-            // Sinusoidal LFO modulation
-            let lfo = ((i as f32) * self.rate_factor * 0.1).sin();
-            let delay = ((self.delay_samples as f32) * (1.0 + self.depth * lfo)) as usize;
-            if i >= delay {
-                let delay_idx = i - delay;
-                samples[i] = (samples[i] * 0.7 + buffer[delay_idx] * 0.3 * self.depth).clamp(-1.0, 1.0);
-            }
-        }
-    }
-}
-
-/// 3-Band Parametric Equalizer Effect
-pub struct EqualizerEffect {
-    pub bass_gain: f32,   // Gain multiplier for lower frequencies
-    pub mid_gain: f32,    // Gain multiplier for mid frequencies
-    pub treble_gain: f32, // Gain multiplier for higher frequencies
-}
-
-impl EqualizerEffect {
-    pub fn new(bass_gain: f32, mid_gain: f32, treble_gain: f32) -> Self {
-        EqualizerEffect {
-            bass_gain,
-            mid_gain,
-            treble_gain,
-        }
-    }
-}
-
-impl AudioEffect for EqualizerEffect {
-    fn apply(&self, samples: &mut [f32]) {
-        if samples.len() < 3 {
-            return;
-        }
-        let mut low_state = samples[0];
-        let mut mid_state = samples[0];
-        for i in 0..samples.len() {
-            let input = samples[i];
-            low_state = low_state * 0.8 + input * 0.2;
-            let high = input - low_state;
-            mid_state = mid_state * 0.5 + input * 0.5;
-            let mid = mid_state - low_state;
-
-            let output = (low_state * self.bass_gain) + (mid * self.mid_gain) + (high * self.treble_gain);
-            samples[i] = output.clamp(-1.0, 1.0);
-        }
-    }
-}
-
-/// Dynamic Range Compressor / Limiter Effect
-pub struct CompressorEffect {
-    pub threshold: f32,   // Amplitude threshold
-    pub ratio: f32,       // Compression ratio
-    pub makeup_gain: f32, // Final volume boost factor
-}
-
-impl CompressorEffect {
-    pub fn new(threshold: f32, ratio: f32, makeup_gain: f32) -> Self {
-        CompressorEffect {
-            threshold: threshold.abs(),
-            ratio: ratio.max(1.0),
-            makeup_gain,
-        }
-    }
-}
-
-impl AudioEffect for CompressorEffect {
-    fn apply(&self, samples: &mut [f32]) {
-        for sample in samples.iter_mut() {
-            let abs_val = sample.abs();
-            if abs_val > self.threshold {
-                let overshoot = abs_val - self.threshold;
-                let compressed_overshoot = overshoot / self.ratio;
-                let new_val = (self.threshold + compressed_overshoot) * sample.signum();
-                *sample = (new_val * self.makeup_gain).clamp(-1.0, 1.0);
-            } else {
-                *sample = (*sample * self.makeup_gain).clamp(-1.0, 1.0);
-            }
         }
     }
 }
@@ -529,7 +331,8 @@ mod tests {
             .with_samples(&[0.5, 0.5, 0.5])
             .with_volume(1.2); // linear amplification
 
-        let track2 = AudioTrack::new(2, "Backing").with_samples(&[0.2, -0.2, 0.2]);
+        let track2 = AudioTrack::new(2, "Backing")
+            .with_samples(&[0.2, -0.2, 0.2]);
 
         session.add_track(track1);
         session.add_track(track2);
@@ -596,64 +399,5 @@ mod tests {
         AudioEditor::paste(&mut track, 1, clipboard.as_slice());
         assert_eq!(track.samples.len(), 4);
         assert_eq!(track.samples[2], 3.0);
-    }
-
-    #[test]
-    fn test_high_pass_filter() {
-        let mut samples = [1.0, 1.0, 1.0, 1.0];
-        let filter = HighPassFilter::new(0.9);
-        filter.apply(&mut samples);
-        // Direct DC offset input (flat 1.0 values) should attenuate to 0.0 under HighPassFilter
-        assert_eq!(samples[0], 0.0);
-        // Output should decay monotonically towards 0.0
-        assert!(samples[3].abs() < samples[2].abs());
-        assert!(samples[2].abs() < samples[1].abs());
-    }
-
-    #[test]
-    fn test_chorus_effect() {
-        let mut samples = [0.5; 16];
-        let chorus = ChorusEffect::new(4, 0.5, 0.5);
-        chorus.apply(&mut samples);
-        // Ensure chorus modulates sample amplitude over standard baseline
-        assert!(samples[12] != 0.5);
-    }
-
-    #[test]
-    fn test_parametric_equalizer() {
-        let mut samples = [0.2, 0.4, 0.6, 0.8];
-        let eq = EqualizerEffect::new(2.0, 1.0, 0.5); // Boost bass, attenuate treble
-        eq.apply(&mut samples);
-        assert!(samples.len() == 4);
-    }
-
-    #[test]
-    fn test_compressor_effect() {
-        let mut samples = [0.2, 0.9, -0.9, 0.1];
-        let compressor = CompressorEffect::new(0.5, 2.0, 1.0); // Threshold 0.5, Ratio 2:1
-        compressor.apply(&mut samples);
-        // Samples above threshold (0.9, -0.9) must be compressed down to 0.7 and -0.7 respectively
-        assert!((samples[1].abs() - 0.7).abs() < 1e-5);
-        // Samples below threshold (0.2, 0.1) are unchanged
-        assert!((samples[0].abs() - 0.2).abs() < 1e-5);
-    }
-
-    #[test]
-    fn test_stereo_mixing_and_panning_law() {
-        let mut session = MultiTrackSession::new(48000);
-
-        let mut track1 = AudioTrack::new(1, "Stereo Vocals")
-            .with_samples(&[0.5])
-            .with_volume(1.0);
-        track1.pan = -0.5; // Panned 50% left
-
-        session.add_track(track1);
-
-        let mix = session.mix_session_stereo();
-        assert_eq!(mix.len(), 2);
-        // Left channel (index 0) gain: 1.0 - (-0.5) = 1.5 clamped to 1.0. 0.5 * 1.0 = 0.5
-        assert_eq!(mix[0], 0.5);
-        // Right channel (index 1) gain: 1.0 + (-0.5) = 0.5. 0.5 * 0.5 = 0.25
-        assert_eq!(mix[1], 0.25);
     }
 }

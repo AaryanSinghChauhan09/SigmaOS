@@ -1,17 +1,15 @@
-#![allow(warnings)]
-#![allow(clippy::all)]
-#![cfg_attr(target_os = "none", no_std)]
+// SigmaOS Kernel Main Entry Point
+#![no_std]
 #![cfg_attr(target_os = "none", no_main)]
-#![allow(clippy::all, unused)]
 
 extern crate alloc;
 use alloc::string::ToString;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 
-use sigmaos::compatibility::{OpenRcManager, OpenRcRunlevel, OpenRcService};
-use sigmaos::kernel::{BuddyAllocator, Priority, Process, Scheduler};
+use sigmaos::kernel::{BuddyAllocator, Scheduler, Process, Priority};
 use sigmaos::klib::paging::{SimpleVMM, VirtualMemoryManager};
+use sigmaos::compatibility::{OpenRcManager, OpenRcService, OpenRcRunlevel};
 
 /// Mock representation of x86_64 CPU Context during early boot
 #[derive(Debug, Clone, Copy)]
@@ -82,7 +80,8 @@ pub fn start_kernel(
     scheduler.add_process(idle_proc);
 
     // Stage 4: Open early userland runlevels (OpenRC)
-    let udev = OpenRcService::new("udev").with_runlevel(OpenRcRunlevel::SingleUser);
+    let udev = OpenRcService::new("udev")
+        .with_runlevel(OpenRcRunlevel::SingleUser);
     let dhcpcd = OpenRcService::new("dhcpcd")
         .with_dependency("udev")
         .with_runlevel(OpenRcRunlevel::MultiUser);
@@ -109,13 +108,7 @@ pub extern "C" fn _start() -> ! {
     let mut scheduler = Scheduler::new();
     let mut openrc = OpenRcManager::new();
 
-    let _ = start_kernel(
-        &mut context,
-        &mut allocator,
-        &mut vmm,
-        &mut scheduler,
-        &mut openrc,
-    );
+    let _ = start_kernel(&mut context, &mut allocator, &mut vmm, &mut scheduler, &mut openrc);
 
     loop {}
 }
@@ -147,14 +140,7 @@ mod tests {
         assert_eq!(EARLY_CPU_STATE.load(Ordering::SeqCst), 0);
 
         // Run full early start_kernel bootstrap
-        start_kernel(
-            &mut context,
-            &mut allocator,
-            &mut vmm,
-            &mut scheduler,
-            &mut openrc,
-        )
-        .unwrap();
+        start_kernel(&mut context, &mut allocator, &mut vmm, &mut scheduler, &mut openrc).unwrap();
 
         // Verify context flags (cld set, sti set, gdt/idt bases loaded)
         assert!(context.interrupts_enabled);

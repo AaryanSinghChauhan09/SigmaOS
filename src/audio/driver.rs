@@ -1,27 +1,19 @@
-use crate::klib::Vec;
 /// OOP-based Audio Driver for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 71
 /// Implements audio device management and playback
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type AudioDeviceID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum AudioType {
-    Playback = 0,
-    Capture = 1,
-    Duplex = 2,
-}
+pub enum AudioType { Playback = 0, Capture = 1, Duplex = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum AudioError {
-    Success = 0,
-    NotFound = 1,
-    InitFailed = 2,
-    PlaybackFailed = 3,
-}
+pub enum AudioError { Success = 0, NotFound = 1, InitFailed = 2, PlaybackFailed = 3 }
 
 pub trait AudioDevice {
     fn id(&self) -> AudioDeviceID;
@@ -56,9 +48,7 @@ impl SimpleAudioDevice {
 }
 
 impl AudioDevice for SimpleAudioDevice {
-    fn id(&self) -> AudioDeviceID {
-        self.id
-    }
+    fn id(&self) -> AudioDeviceID { self.id }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
@@ -70,9 +60,7 @@ impl AudioDevice for SimpleAudioDevice {
             _ => AudioType::Duplex,
         }
     }
-    fn sample_rate(&self) -> u32 {
-        self.sample_rate.load(Ordering::SeqCst) as u32
-    }
+    fn sample_rate(&self) -> u32 { self.sample_rate.load(Ordering::SeqCst) as u32 }
 
     fn initialize(&mut self) -> Result<(), AudioError> {
         Ok(())
@@ -80,10 +68,7 @@ impl AudioDevice for SimpleAudioDevice {
 }
 
 pub trait AudioManager {
-    fn register_device(
-        &mut self,
-        device: Box<dyn AudioDevice>,
-    ) -> Result<AudioDeviceID, AudioError>;
+    fn register_device(&mut self, device: Box<dyn AudioDevice>) -> Result<AudioDeviceID, AudioError>;
     fn get_default_playback(&self) -> Option<&dyn AudioDevice>;
     fn get_default_capture(&self) -> Option<&dyn AudioDevice>;
     fn list_devices(&self) -> Vec<AudioDeviceID>;
@@ -105,10 +90,7 @@ impl SimpleAudioManager {
 }
 
 impl AudioManager for SimpleAudioManager {
-    fn register_device(
-        &mut self,
-        device: Box<dyn AudioDevice>,
-    ) -> Result<AudioDeviceID, AudioError> {
+    fn register_device(&mut self, device: Box<dyn AudioDevice>) -> Result<AudioDeviceID, AudioError> {
         let id = device.id();
         self.devices.push(Some(device));
         Ok(id)
@@ -117,9 +99,7 @@ impl AudioManager for SimpleAudioManager {
     fn get_default_playback(&self) -> Option<&dyn AudioDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
-                if device.audio_type() == AudioType::Playback
-                    || device.audio_type() == AudioType::Duplex
-                {
+                if device.audio_type() == AudioType::Playback || device.audio_type() == AudioType::Duplex {
                     return Some(device.as_ref());
                 }
             }
@@ -130,9 +110,7 @@ impl AudioManager for SimpleAudioManager {
     fn get_default_capture(&self) -> Option<&dyn AudioDevice> {
         for device_option in &self.devices {
             if let Some(ref device) = *device_option {
-                if device.audio_type() == AudioType::Capture
-                    || device.audio_type() == AudioType::Duplex
-                {
+                if device.audio_type() == AudioType::Capture || device.audio_type() == AudioType::Duplex {
                     return Some(device.as_ref());
                 }
             }
@@ -178,11 +156,7 @@ impl AudioMixer for SimpleAudioMixer {
                 return Ok(());
             }
         }
-        self.volumes.push((
-            device_id,
-            AtomicUsize::new(volume as usize),
-            AtomicUsize::new(0),
-        ));
+        self.volumes.push((device_id, AtomicUsize::new(volume as usize), AtomicUsize::new(0)));
         Ok(())
     }
 
@@ -198,9 +172,7 @@ impl AudioMixer for SimpleAudioMixer {
     fn mute(&mut self, device_id: AudioDeviceID, muted: bool) -> Result<(), AudioError> {
         for i in 0..self.volumes.len() {
             if self.volumes[i].0 == device_id {
-                self.volumes[i]
-                    .2
-                    .store(if muted { 1 } else { 0 }, Ordering::SeqCst);
+                self.volumes[i].2.store(if muted { 1 } else { 0 }, Ordering::SeqCst);
                 return Ok(());
             }
         }
@@ -209,12 +181,7 @@ impl AudioMixer for SimpleAudioMixer {
 }
 
 pub trait AudioStream {
-    fn create_stream(
-        &mut self,
-        device_id: AudioDeviceID,
-        channels: u8,
-        format: u32,
-    ) -> Result<usize, AudioError>;
+    fn create_stream(&mut self, device_id: AudioDeviceID, channels: u8, format: u32) -> Result<usize, AudioError>;
     fn write_samples(&mut self, stream_id: usize, samples: &[u8]) -> Result<(), AudioError>;
     fn read_samples(&mut self, stream_id: usize, buffer: &mut [u8]) -> Result<usize, AudioError>;
 }
@@ -235,12 +202,7 @@ impl SimpleAudioStream {
 }
 
 impl AudioStream for SimpleAudioStream {
-    fn create_stream(
-        &mut self,
-        device_id: AudioDeviceID,
-        channels: u8,
-        format: u32,
-    ) -> Result<usize, AudioError> {
+    fn create_stream(&mut self, device_id: AudioDeviceID, channels: u8, format: u32) -> Result<usize, AudioError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         self.streams.push((id, device_id, channels, format));
         Ok(id)

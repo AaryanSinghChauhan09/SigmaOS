@@ -1,8 +1,9 @@
-use crate::klib::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
 /// Dinit Service Manager, BSD-userland/chimerautils, and apk-tools database compatibility.
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DinitServiceState {
@@ -167,6 +168,7 @@ impl ApkPackageStore {
         false
     }
 }
+
 
 #[cfg(test)]
 mod tests {

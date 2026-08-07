@@ -1,6 +1,3 @@
-#![allow(warnings)]
-#![allow(clippy::all)]
-
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -13,8 +10,7 @@ pub use audio::driver::{
     SimpleAudioManager, AudioMixer, SimpleAudioMixer, AudioStream, SimpleAudioStream,
 };
 pub use audio::editor::{
-    AudioTrack, MultiTrackSession, AudioEffect, AmplifyEffect, EchoEffect, LowPassFilter, HighPassFilter,
-    ChorusEffect, EqualizerEffect, CompressorEffect, NoiseGateEffect, AudioEditor,
+    AudioTrack, MultiTrackSession, AudioEffect, AmplifyEffect, EchoEffect, LowPassFilter, NoiseGateEffect, AudioEditor,
 };
 
 pub mod auth;
@@ -40,7 +36,6 @@ pub mod filesystem;
 pub mod kernel;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod process;
 pub mod productivity;
@@ -49,38 +44,6 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
-pub mod graphics {
-    pub mod compositor;
-    pub mod paint;
-    pub mod video;
-}
-pub mod hardware {
-    pub mod compatibility;
-    pub mod win32;
-}
-pub mod power {
-    pub mod governor;
-}
-pub mod observability {
-    pub mod profiler;
-}
-pub mod ai {
-    pub mod agent;
-    pub mod orchestrator;
-}
-pub mod boot;
-pub mod toolchain {
-    pub mod adapter;
-    pub mod capsule;
-    pub mod codex;
-    pub mod bootstrap;
-}
-pub mod scheduler {
-    pub mod numa_scheduler;
-}
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -105,9 +68,6 @@ pub use compatibility::{
     EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
     UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager, EbuildPackage, PortageEngine,
-    NDArray, ImageMat, DependencyProperty, VisualState, SovereignControl,
-    GrpcFrame, SovereignGrpcChannel, MachMessage, MachPort, SovereignXnuKernel,
-    Glyph, SovereignFreeTypeEngine, NavDirection, NavElement, SovereignSpatialNavigation,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
