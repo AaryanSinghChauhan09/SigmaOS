@@ -8,7 +8,7 @@ pub struct Vec<T> {
 
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
+        let mut new_vec = Vec::with_capacity(self.len);
         for i in 0..self.len {
             unsafe {
                 new_vec.push((*self.data.add(i)).clone());
@@ -38,6 +38,32 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
+
+    /// Pre-allocates memory for `capacity` number of elements to avoid dynamic reallocations.
+    pub fn with_capacity(capacity: usize) -> Self {
+        let data = if capacity == 0 {
+            core::ptr::null_mut()
+        } else {
+            let p = unsafe { alloc(capacity * mem::size_of::<T>()) as *mut T };
+            if p.is_null() {
+                core::ptr::null_mut()
+            } else {
+                p
+            }
+        };
+        let actual_capacity = if data.is_null() { 0 } else { capacity };
+        Vec {
+            data,
+            len: 0,
+            capacity: actual_capacity,
+        }
+    }
+
+    /// Returns the number of elements the vector can hold without reallocating.
+    pub fn capacity(&self) -> usize {
+        self.capacity
+    }
+
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -262,4 +288,42 @@ unsafe fn free(ptr: *mut u8, size: usize) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8, size: usize);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vec_with_capacity() {
+        let mut v: Vec<i32> = Vec::with_capacity(10);
+        assert_eq!(v.len(), 0);
+        assert_eq!(v.capacity(), 10);
+        v.push(42);
+        v.push(100);
+        assert_eq!(v.len(), 2);
+        assert_eq!(v[0], 42);
+        assert_eq!(v[1], 100);
+    }
+
+    #[test]
+    fn test_vec_clone_optimization() {
+        let mut v: Vec<i32> = Vec::with_capacity(1000);
+        for i in 0..1000 {
+            v.push(i as i32);
+        }
+        assert_eq!(v.capacity(), 1000);
+
+        let start_time = std::time::Instant::now();
+        let cloned = v.clone();
+        let duration = start_time.elapsed();
+
+        assert_eq!(cloned.len(), 1000);
+        assert_eq!(cloned.capacity(), 1000); // Should match exactly without extra reallocs/grows!
+        for i in 0..1000 {
+            assert_eq!(cloned[i], i as i32);
+        }
+
+        println!("⚡ [Performance] Cloned 1000 elements in {:?}", duration);
+    }
 }
