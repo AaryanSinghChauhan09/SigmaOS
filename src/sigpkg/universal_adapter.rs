@@ -249,15 +249,12 @@ impl UniversalPackageAdapter {
         }
 
         Ok(Package::new(
-            name.to_string(),
+            crate::klib::String::from(name),
             parsed_ver,
-            desc.to_string(),
+            crate::klib::String::from(desc),
             dependencies,
-            format!("SHA256:{}", name),
+            crate::klib::String::from(&format!("SHA256:{}", name)),
         ))
-    }
-}
-
 impl Default for UniversalPackageAdapter {
     fn default() -> Self {
         Self::new()

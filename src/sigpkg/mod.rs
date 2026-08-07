@@ -121,10 +121,6 @@ impl Package {
     }
 }
 
-/// Package dependency
-#[derive(Debug, Clone)]
-pub struct Dependency {
-    pub name: String,
     pub version_constraint: VersionConstraint,
 }
 
