@@ -143,6 +143,11 @@ impl ColorFilter for SimpleColorFilter {
         self.enabled.store(0, Ordering::SeqCst);
     }
 
+    fn is_filter_enabled(&self) -> bool {
+        self.enabled.load(Ordering::SeqCst) == 1
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

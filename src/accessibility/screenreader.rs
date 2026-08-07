@@ -154,6 +154,11 @@ impl BrailleDisplay for SimpleBrailleDisplay {
         }
     }
 
+    fn get_cells(&self) -> &[u8] {
+        &self.cells
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

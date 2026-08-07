@@ -33,6 +33,7 @@ pub struct Process {
     pub virtual_deadline: u64,
     pub time_slice: Duration,
     pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
+    pub burst_score: u64, // CachyOS-style Burst-Oriented Response Enhancer (BORE) metric
 }
 
 impl Process {
@@ -46,6 +47,7 @@ impl Process {
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
             edf_deadline: None,
+            burst_score: 0,
         }
     }
 
@@ -221,5 +223,37 @@ mod tests {
         let chosen = scheduler.schedule().unwrap();
         assert_eq!(chosen.pid, 3);
         assert_eq!(chosen.name, "rt_early");
+    }
+
+    #[test]
+    fn test_bore_burst_penalty_and_decay() {
+        let mut scheduler = Scheduler::new();
+        let p1 = Process::new(10, "interactive".to_string(), Priority::Normal);
+        let p2 = Process::new(11, "cpu_bound".to_string(), Priority::Normal);
+
+        scheduler.add_process(p1);
+        scheduler.add_process(p2);
+
+        // Charge p2 with burst amount (simulating a CPU burst)
+        scheduler.charge_process_burst(11, 20);
+
+        // Retrieve processes and check their burst scores and deadlines
+        let proc1 = scheduler.processes.iter().find(|p| p.pid == 10).unwrap();
+        let proc2 = scheduler.processes.iter().find(|p| p.pid == 11).unwrap();
+
+        assert_eq!(proc1.burst_score, 0);
+        assert_eq!(proc2.burst_score, 20);
+
+        // p2 virtual deadline should be penalized (larger than p1's virtual deadline)
+        assert!(proc2.virtual_deadline > proc1.virtual_deadline);
+
+        // Decay the bursts
+        for _ in 0..10 {
+            scheduler.decay_process_bursts();
+        }
+
+        // Recover proc2 reference and check updated burst_score
+        let proc2_decayed = scheduler.processes.iter().find(|p| p.pid == 11).unwrap();
+        assert_eq!(proc2_decayed.burst_score, 10);
     }
 }
