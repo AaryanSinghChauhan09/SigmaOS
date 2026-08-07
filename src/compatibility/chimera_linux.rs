@@ -1,4 +1,3 @@
-// SigmaOS Distro Compatibility Layer
 use crate::klib::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
@@ -86,14 +85,7 @@ impl DinitServiceManager {
         // Recursively start dependencies first (Dinit logic)
         let deps = self.services[idx].dependencies.clone();
         for dep in &deps {
-            let mut dep_len = 32;
-            for i in 0..32 {
-                if dep[i] == 0 {
-                    dep_len = i;
-                    break;
-                }
-            }
-            let dep_name = &dep[..dep_len];
+            let dep_name = &dep[..dep.iter().position(|&b| b == 0).unwrap_or(32)];
             self.start_service(dep_name)?;
         }
 

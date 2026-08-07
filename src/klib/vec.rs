@@ -8,7 +8,7 @@ pub struct Vec<T> {
 
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
-        let mut new_vec = Vec::with_capacity(self.len);
+        let mut new_vec = Vec::new();
         for i in 0..self.len {
             unsafe {
                 new_vec.push((*self.data.add(i)).clone());
@@ -38,32 +38,6 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
-
-    /// Pre-allocates memory for `capacity` number of elements to avoid dynamic reallocations.
-    pub fn with_capacity(capacity: usize) -> Self {
-        let data = if capacity == 0 {
-            core::ptr::null_mut()
-        } else {
-            let p = unsafe { alloc(capacity * mem::size_of::<T>()) as *mut T };
-            if p.is_null() {
-                core::ptr::null_mut()
-            } else {
-                p
-            }
-        };
-        let actual_capacity = if data.is_null() { 0 } else { capacity };
-        Vec {
-            data,
-            len: 0,
-            capacity: actual_capacity,
-        }
-    }
-
-    /// Returns the number of elements the vector can hold without reallocating.
-    pub fn capacity(&self) -> usize {
-        self.capacity
-    }
-
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -80,45 +54,6 @@ impl<T> Vec<T> {
     }
     pub fn is_empty(&self) -> bool {
         self.len == 0
-    }
-
-    pub fn pop(&mut self) -> Option<T> {
-        if self.len == 0 {
-            None
-        } else {
-            self.len -= 1;
-            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
-        }
-    }
-
-    pub fn first(&self) -> Option<&T> {
-        if self.len == 0 {
-            None
-        } else {
-            unsafe { Some(&*self.data) }
-        }
-    }
-
-    pub fn last(&self) -> Option<&T> {
-        if self.len == 0 {
-            None
-        } else {
-            unsafe { Some(&*self.data.add(self.len - 1)) }
-        }
-    }
-
-    pub fn insert(&mut self, index: usize, item: T) {
-        assert!(index <= self.len, "index out of bounds");
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            for i in (index..self.len).rev() {
-                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
-            }
-            core::ptr::write(self.data.add(index), item);
-            self.len += 1;
-        }
     }
 
     pub fn as_slice(&self) -> &[T] {
@@ -210,8 +145,6 @@ impl<T> Vec<T> {
             if self.capacity > 0 {
                 free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
             }
-            if self.capacity > 0 { free(self.data as *mut u8); }
->>>>>>> origin/jules-12039768019242344345-034693dc
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -234,19 +167,6 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
             panic!("index out of bounds");
         }
         unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        self.as_slice()
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_mut_slice()
     }
 }
 
@@ -315,7 +235,7 @@ impl<T> Drop for Vec<T> {
                 }
             }
             unsafe {
-                free(self.data as *mut u8);
+                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
             }
         }
     }
@@ -325,67 +245,21 @@ impl<T> Drop for Vec<T> {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
-    let total_size = size + mem::size_of::<usize>();
-    let layout = Layout::from_size_align(total_size, 8).unwrap();
-    let ptr = std_alloc(layout);
-    if ptr.is_null() {
-        return ptr;
-    }
-    *(ptr as *mut usize) = total_size;
-    ptr.add(mem::size_of::<usize>())
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
 }
 
 #[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
+unsafe fn free(ptr: *mut u8, size: usize) {
     use std::alloc::{dealloc as std_dealloc, Layout};
-    if !ptr.is_null() {
-        let prefix_ptr = ptr.sub(mem::size_of::<usize>());
-        let total_size = *(prefix_ptr as *const usize);
-        let layout = Layout::from_size_align(total_size, 8).unwrap();
-        std_dealloc(prefix_ptr, layout);
+    if !ptr.is_null() && size > 0 {
+        let layout = Layout::from_size_align(size, 8).unwrap();
+        std_dealloc(ptr, layout);
     }
 }
 
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_vec_with_capacity() {
-        let mut v: Vec<i32> = Vec::with_capacity(10);
-        assert_eq!(v.len(), 0);
-        assert_eq!(v.capacity(), 10);
-        v.push(42);
-        v.push(100);
-        assert_eq!(v.len(), 2);
-        assert_eq!(v[0], 42);
-        assert_eq!(v[1], 100);
-    }
-
-    #[test]
-    fn test_vec_clone_optimization() {
-        let mut v: Vec<i32> = Vec::with_capacity(1000);
-        for i in 0..1000 {
-            v.push(i as i32);
-        }
-        assert_eq!(v.capacity(), 1000);
-
-        let start_time = std::time::Instant::now();
-        let cloned = v.clone();
-        let duration = start_time.elapsed();
-
-        assert_eq!(cloned.len(), 1000);
-        assert_eq!(cloned.capacity(), 1000); // Should match exactly without extra reallocs/grows!
-        for i in 0..1000 {
-            assert_eq!(cloned[i], i as i32);
-        }
-
-        println!("⚡ [Performance] Cloned 1000 elements in {:?}", duration);
-    }
+    fn free(ptr: *mut u8, size: usize);
 }

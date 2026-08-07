@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Unified Peripheral Device Architecture
 // Implements OOP principles for robust, low footprint device management
 // Improved with Windows Driver Model (WDM), WDF/KMDF/UMDF concepts,
@@ -77,7 +59,6 @@ pub struct PeripheralManager {
 }
 
 impl PeripheralManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             devices: Vec::new(),
@@ -116,20 +97,20 @@ impl Default for PeripheralManager {
 /// WDM/WDF-inspired Major I/O Control Codes (IRP Major Functions)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MajorFunction {
-    IrpMjCreate = 0,        // Device Open
-    IrpMjClose = 1,         // Device Close
-    IrpMjRead = 2,          // Device Read
-    IrpMjWrite = 3,         // Device Write
-    IrpMjDeviceControl = 4, // Device IOCTL control
+    IrpMjCreate = 0,         // Device Open
+    IrpMjClose = 1,          // Device Close
+    IrpMjRead = 2,           // Device Read
+    IrpMjWrite = 3,          // Device Write
+    IrpMjDeviceControl = 4,  // Device IOCTL control
 }
 
 /// Windows Driver Model (WDM) I/O Request Packet (IRP)
 #[derive(Debug, Clone)]
 pub struct Irp {
     pub major_function: MajorFunction,
-    pub io_status: i32,         // NTSTATUS equivalent (0 = Success)
-    pub information: usize,     // Bytes processed
-    pub system_buffer: Vec<u8>, // Buffer for kernel/user data transfer
+    pub io_status: i32,           // NTSTATUS equivalent (0 = Success)
+    pub information: usize,        // Bytes processed
+    pub system_buffer: Vec<u8>,    // Buffer for kernel/user data transfer
 }
 
 impl Irp {
@@ -168,11 +149,7 @@ impl DriverObject {
         }
     }
 
-    pub fn set_dispatch(
-        &mut self,
-        major_fn: MajorFunction,
-        handler: fn(&mut DeviceObject, &mut Irp) -> i32,
-    ) {
+    pub fn set_dispatch(&mut self, major_fn: MajorFunction, handler: fn(&mut DeviceObject, &mut Irp) -> i32) {
         self.major_functions[major_fn as usize] = Some(handler);
     }
 }
@@ -231,11 +208,7 @@ impl IoManager {
     }
 
     /// Attaches a legacy filter driver or file system minifilter to a device stack.
-    pub fn attach_device_to_device_stack(
-        &mut self,
-        filter_device_id: usize,
-        target_device_id: usize,
-    ) -> Result<(), &'static str> {
+    pub fn attach_device_to_device_stack(&mut self, filter_device_id: usize, target_device_id: usize) -> Result<(), &'static str> {
         let mut target_found = false;
         for dev in self.devices.iter() {
             if dev.id == target_device_id {
@@ -363,9 +336,7 @@ mod tests {
         let filter_dev_id = io_mgr.create_device("FsMinifilter");
 
         // Attach Minifilter on top of target disk in device stack
-        io_mgr
-            .attach_device_to_device_stack(filter_dev_id, disk_dev_id)
-            .unwrap();
+        io_mgr.attach_device_to_device_stack(filter_dev_id, disk_dev_id).unwrap();
 
         let mut irp = Irp::new(MajorFunction::IrpMjWrite, alloc::vec![0x00, 0x55]);
 
@@ -385,34 +356,20 @@ mod tests {
             power: PowerState,
         }
         impl PeripheralDevice for DummyDevice {
-            fn name(&self) -> &'static str {
-                "Dummy"
-            }
-            fn generation(&self) -> DeviceGeneration {
-                DeviceGeneration::Modern
-            }
-            fn initialize(&mut self) -> Result<(), &'static str> {
-                Ok(())
-            }
-            fn read(&mut self, _buf: &mut [u8]) -> Result<usize, &'static str> {
-                Ok(0)
-            }
-            fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> {
-                Ok(0)
-            }
+            fn name(&self) -> &'static str { "Dummy" }
+            fn generation(&self) -> DeviceGeneration { DeviceGeneration::Modern }
+            fn initialize(&mut self) -> Result<(), &'static str> { Ok(()) }
+            fn read(&mut self, _buf: &mut [u8]) -> Result<usize, &'static str> { Ok(0) }
+            fn write(&mut self, _data: &[u8]) -> Result<usize, &'static str> { Ok(0) }
             fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
                 self.power = state;
                 Ok(())
             }
-            fn shutdown(&mut self) -> Result<(), &'static str> {
-                Ok(())
-            }
+            fn shutdown(&mut self) -> Result<(), &'static str> { Ok(()) }
         }
 
         let mut p_mgr = PeripheralManager::new();
-        let dev = Box::new(DummyDevice {
-            power: PowerState::Off,
-        });
+        let dev = Box::new(DummyDevice { power: PowerState::Off });
         p_mgr.register_device(dev).unwrap();
 
         assert_eq!(p_mgr.device_count(), 1);
