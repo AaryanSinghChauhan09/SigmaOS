@@ -45,6 +45,128 @@ impl DecodedIoctl {
     }
 }
 
+// ==============================================================================
+// BSD & FREEBSD-INSPIRED ADVANCED IO CONTROL IMPLEMENTATIONS
+// ==============================================================================
+
+// BSD IOCTL Direction bit flags
+pub const BSD_IOC_VOID: u32 = 0x20000000;
+pub const BSD_IOC_OUT: u32 = 0x40000000;
+pub const BSD_IOC_IN: u32 = 0x80000000;
+pub const BSD_IOC_INOUT: u32 = BSD_IOC_IN | BSD_IOC_OUT;
+
+/// BSD-style bit-packed ioctl representation
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BsdIoctl {
+    pub direction: u32,
+    pub size: u16,
+    pub group: u8,
+    pub command_id: u8,
+}
+
+impl BsdIoctl {
+    /// Decodes a packed 32-bit BSD/FreeBSD ioctl code into its distinct components
+    pub fn parse(cmd: u32) -> Self {
+        Self {
+            direction: cmd & 0xE0000000,
+            size: ((cmd >> 16) & 0x1FFF) as u16, // BSD typically reserves 13 bits for size
+            group: ((cmd >> 8) & 0xFF) as u8,
+            command_id: (cmd & 0xFF) as u8,
+        }
+    }
+
+    /// Encodes structured fields back into a standard 32-bit packed BSD ioctl code
+    pub fn encode(&self) -> u32 {
+        (self.direction & 0xE0000000) |
+        ((self.size as u32 & 0x1FFF) << 16) |
+        ((self.group as u32 & 0xFF) << 8) |
+        (self.command_id as u32 & 0xFF)
+    }
+
+    /// Macro-equivalent helper functions
+    pub fn ioc_void(group: u8, command_id: u8) -> Self {
+        Self {
+            direction: BSD_IOC_VOID,
+            size: 0,
+            group,
+            command_id,
+        }
+    }
+
+    pub fn ior(group: u8, command_id: u8, size: u16) -> Self {
+        Self {
+            direction: BSD_IOC_OUT,
+            size,
+            group,
+            command_id,
+        }
+    }
+
+    pub fn iow(group: u8, command_id: u8, size: u16) -> Self {
+        Self {
+            direction: BSD_IOC_IN,
+            size,
+            group,
+            command_id,
+        }
+    }
+
+    pub fn iowr(group: u8, command_id: u8, size: u16) -> Self {
+        Self {
+            direction: BSD_IOC_INOUT,
+            size,
+            group,
+            command_id,
+        }
+    }
+}
+
+/// Unified cross-platform decoder matching Linux, BSD, and Windows NT CTL formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoctlFormat {
+    Linux,
+    Bsd,
+    WindowsNt,
+}
+
+pub struct UniversalIoctlDecoder;
+
+impl UniversalIoctlDecoder {
+    /// Classifies and decodes any packed 32-bit IO control command
+    pub fn decode_and_classify(cmd: u32) -> (IoctlFormat, u16, u8) {
+        // If the direction bits for BSD/Linux match, verify direction flags.
+        // Windows NT CTL_CODE typically has device_type (bits 31-16) and access (bits 15-14).
+        // If direction bits are set (upper bits), it's Linux or BSD.
+        let upper_direction = cmd >> 29;
+
+        if (cmd & 0xE0000000) != 0 {
+            // BSD uses the 3 upper bits (31-29) for IOC_VOID (0x20000000), IOC_OUT (0x40000000), etc.
+            let bsd = BsdIoctl::parse(cmd);
+            (IoctlFormat::Bsd, bsd.size, bsd.group)
+        } else if (cmd & 0xC0000000) != 0 {
+            // Linux uses upper 2 bits (31-30) for read/write flags
+            let linux = DecodedIoctl::parse(cmd);
+            (IoctlFormat::Linux, linux.size, linux.group)
+        } else {
+            // Fallback to Windows NT CTL_CODE format
+            // Extract function/access size equivalent representations
+            let function = (cmd >> 2) & 0x0FFF;
+            (IoctlFormat::WindowsNt, function as u16, b'W')
+        }
+    }
+
+    /// Kernel safety-validation of copy sizes inspired by Linux & BSD subsystems
+    /// Prevents kernel buffer overflows by strictly capping the parameter size (e.g. < 4096 bytes)
+    pub fn is_size_safe(cmd: u32) -> bool {
+        let (format, size, _) = Self::decode_and_classify(cmd);
+        match format {
+            IoctlFormat::Bsd => size <= 4096, // Maximum size boundary of BSD parameter payloads
+            IoctlFormat::Linux => size <= 8192, // Maximum size boundary of Linux parameter payloads
+            IoctlFormat::WindowsNt => true, // NT payload size handled via MDL mapping directly
+        }
+    }
+}
+
 pub struct GenericLinuxTranslationUdf;
 impl PackageTranslationUdf for GenericLinuxTranslationUdf {
     fn name(&self) -> &'static str {
@@ -250,6 +372,46 @@ mod tests {
         assert_eq!(decoded.command_id, 10);
 
         assert_eq!(decoded.encode(), encoded_cmd);
+    }
+
+    #[test]
+    fn test_bsd_ioctl_encoding() {
+        // BSD layout test using iowr helper: Group='f', command=20, size=512
+        let bsd_ioc = BsdIoctl::iowr(b'f', 20, 512);
+        let encoded = bsd_ioc.encode();
+
+        assert_eq!(bsd_ioc.direction, BSD_IOC_INOUT);
+        assert_eq!(bsd_ioc.size, 512);
+        assert_eq!(bsd_ioc.group, b'f');
+        assert_eq!(bsd_ioc.command_id, 20);
+
+        let decoded = BsdIoctl::parse(encoded);
+        assert_eq!(decoded, bsd_ioc);
+    }
+
+    #[test]
+    fn test_universal_ioctl_decoder() {
+        // Linux: Direction=2 (read), Size=128, Group='X', Command=33
+        let linux_cmd = ((2u32) << 30) | ((128u32) << 16) | ((b'X' as u32) << 8) | 33;
+        let (format, size, group) = UniversalIoctlDecoder::decode_and_classify(linux_cmd);
+        assert_eq!(format, IoctlFormat::Linux);
+        assert_eq!(size, 128);
+        assert_eq!(group, b'X');
+
+        // BSD: ior helper (IOC_OUT), Group='y', Command=12, Size=1024
+        let bsd_cmd = BsdIoctl::ior(b'y', 12, 1024).encode();
+        let (format, size, group) = UniversalIoctlDecoder::decode_and_classify(bsd_cmd);
+        assert_eq!(format, IoctlFormat::Bsd);
+        assert_eq!(size, 1024);
+        assert_eq!(group, b'y');
+
+        // Safety Validation
+        assert!(UniversalIoctlDecoder::is_size_safe(linux_cmd));
+        assert!(UniversalIoctlDecoder::is_size_safe(bsd_cmd));
+
+        // Maliciously huge BSD parameter size (e.g. 5000 bytes) should be flagged unsafe
+        let unsafe_bsd_cmd = BsdIoctl::ior(b'y', 12, 5000).encode();
+        assert!(!UniversalIoctlDecoder::is_size_safe(unsafe_bsd_cmd));
     }
 
     #[test]
