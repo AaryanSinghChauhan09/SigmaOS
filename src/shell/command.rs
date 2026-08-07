@@ -777,7 +777,7 @@ impl<T> Vec<T> {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
             if self.capacity > 0 {
-                free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                free(self.data as *mut u8);
             }
             self.data = new_data;
             self.capacity = new_capacity;
@@ -796,7 +796,7 @@ impl<T> Drop for Vec<T> {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
                 if self.capacity > 0 {
-                    free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
+                    free(self.data as *mut u8);
                 }
             }
             self.data = core::ptr::null_mut();
@@ -810,23 +810,31 @@ impl<T> Drop for Vec<T> {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    let total_size = size + mem::size_of::<usize>();
+    let layout = Layout::from_size_align(total_size, 8).unwrap();
+    let ptr = std_alloc(layout);
+    if ptr.is_null() {
+        return ptr;
+    }
+    *(ptr as *mut usize) = total_size;
+    ptr.add(mem::size_of::<usize>())
 }
 
 #[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8, size: usize) {
-    use std::alloc::{dealloc, Layout};
-    if !ptr.is_null() && size > 0 {
-        let layout = Layout::from_size_align(size, 8).unwrap();
-        dealloc(ptr, layout);
+unsafe fn free(ptr: *mut u8) {
+    use std::alloc::{dealloc as std_dealloc, Layout};
+    if !ptr.is_null() {
+        let prefix_ptr = ptr.sub(mem::size_of::<usize>());
+        let total_size = *(prefix_ptr as *const usize);
+        let layout = Layout::from_size_align(total_size, 8).unwrap();
+        std_dealloc(prefix_ptr, layout);
     }
 }
 
 #[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8, size: usize);
+    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]

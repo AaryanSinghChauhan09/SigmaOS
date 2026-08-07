@@ -247,7 +247,6 @@ impl UniversalPackageAdapter {
                 version_constraint: VersionConstraint::Any,
             });
         }
-
         Ok(Package::new(
             crate::klib::String::from(name),
             parsed_ver,
@@ -255,6 +254,17 @@ impl UniversalPackageAdapter {
             dependencies,
             crate::klib::String::from(&format!("SHA256:{}", name)),
         ))
+        })
+    }
+}
+
+=======
+            format!("SHA256:{}", name),
+        ))
+    }
+}
+
+>>>>>>> origin/jules-12039768019242344345-034693dc
 impl Default for UniversalPackageAdapter {
     fn default() -> Self {
         Self::new()

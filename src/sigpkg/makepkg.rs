@@ -152,14 +152,12 @@ impl MakepkgSandbox {
         let pkgdesc = self.pkgbuild.pkgdesc()
             .map(|s: &crate::klib::String| s.clone())
             .unwrap_or_else(|| String::from_str("No description"));
-
-        let cleaned_ver = if pkgver.contains('-') {
-            pkgver.split('-').next().unwrap().to_string()
+        let cleaned_ver = if pkgver.contains(-) {
+            pkgver.split(-).next().unwrap().to_string()
         } else {
             pkgver.to_string()
         };
         let version = Version::parse(&cleaned_ver).unwrap_or(Version::new(1, 0, 0));
->>>>>>> origin/bolt-hasher-and-repos-absorption-plan-5370057352677181426
 
         let mut pkg = Package::new(
             pkgname,
@@ -168,7 +166,12 @@ impl MakepkgSandbox {
             std::vec::Vec::new(),
             crate::klib::String::new(),
         );
->>>>>>> origin/bolt-hasher-and-repos-absorption-plan-5370057352677181426
+        pkg.source = String::from_str("arch");
+        Ok(pkg)
+        );
+        pkg.source = String::from_str("arch");
+        Ok(pkg)
+>>>>>>> origin/jules-12039768019242344345-034693dc
     }
 
     /// Validate the PKGBUILD structure
