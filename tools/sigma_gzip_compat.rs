@@ -65,7 +65,7 @@ pub unsafe extern "C" fn gzip_compress(
 #[no_mangle]
 pub unsafe extern "C" fn gzip_decompress(
     input_file: *const u8,
-    output_file: *const u8,
+    _output_file: *const u8,
     _options: GzipOptions,
 ) -> SigmaI32 {
     if !GZIP_INITIALIZED || input_file.isnull() {
@@ -76,7 +76,7 @@ pub unsafe extern "C" fn gzip_decompress(
     // 1. Read gzip file
     // 2. Validate gzip header
     // 3. Apply DEFLATE decompression
-    // 4. Write to output file or remove .gz extension
+    // 4. Remove .gz extension for in-place decompression
     
     0 // Success
 }

@@ -164,7 +164,7 @@ pub unsafe extern "C" fn sed_process_line(
 #[no_mangle]
 pub unsafe extern "C" fn sed_process_file(
     input_file: *const u8,
-    output_file: *const u8,
+    _output_file: *const u8,
     _options: SedOptions,
 ) -> SigmaI32 {
     if !SED_INITIALIZED || input_file.isnull() {
@@ -174,8 +174,7 @@ pub unsafe extern "C" fn sed_process_file(
     // In a real implementation, this would:
     // 1. Read input file line by line
     // 2. Process each line with sed commands
-    // 3. Write output to file or stdout
-    // 4. Handle in-place editing if enabled
+    // 3. Handle in-place editing if enabled
     
     0 // Success
 }
