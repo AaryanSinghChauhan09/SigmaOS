@@ -19,7 +19,12 @@
 // SigmaOS Intrusion Detection System
 // OOP-based IDS with anomaly detection and rule-based analysis
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
+
+#[cfg(test)]
+use std::collections::HashMap;
+
 use std::net::IpAddr;
 use std::time::Instant;
 
@@ -179,7 +184,7 @@ impl DetectionStrategy for AnomalyDetection {
         let metric_key = format!("{:?}", event.event_type);
         if let Some(baseline) = self.baseline.get(&metric_key) {
             // Simulate deviation calculation
-            let deviation = (event.timestamp.elapsed().as_secs() as f64 - baseline).abs();
+            let deviation: f64 = (event.timestamp.elapsed().as_secs() as f64 - *baseline).abs();
 
             if deviation > self.threshold {
                 return Some(DetectionResult {
@@ -208,7 +213,119 @@ impl DetectionStrategy for AnomalyDetection {
     }
 }
 
-/// OOP-based Intrusion Detection System
+// =========================================================================
+// Snort Signature Firewall & CrowdStrike Falcon AI Engines
+// =========================================================================
+
+/// Snort-Style Rule Definition: alert tcp $EXTERNAL_NET any -> $HTTP_SERVERS 80 (msg:"Malicious Payload"; content:"malware_payload")
+#[derive(Debug, Clone)]
+pub struct SnortRule {
+    pub id: String,
+    pub action: RuleAction,
+    pub protocol: String, // e.g. "tcp", "udp", "icmp"
+    pub dest_port: u16,
+    pub content_signature: String,
+    pub message: String,
+}
+
+/// Simulated Snort Signature Firewall Engine
+pub struct SnortSignatureFirewall {
+    pub rules: Vec<SnortRule>,
+}
+
+impl SnortSignatureFirewall {
+    pub fn new() -> Self {
+        Self { rules: Vec::new() }
+    }
+
+    pub fn add_snort_rule(&mut self, rule: SnortRule) {
+        self.rules.push(rule);
+    }
+
+    /// Evaluates raw packet headers and payload contents against registered Snort rules
+    pub fn evaluate_packet(&self, protocol: &str, dest_port: u16, payload: &[u8]) -> Option<DetectionResult> {
+        let payload_str = String::from_utf8_lossy(payload);
+        for rule in &self.rules {
+            if rule.protocol == protocol && rule.dest_port == dest_port {
+                if payload_str.contains(&rule.content_signature) {
+                    return Some(DetectionResult {
+                        rule_id: rule.id.clone(),
+                        matched: true,
+                        confidence: 1.0,
+                        action: rule.action,
+                        message: format!("Snort Match: {}", rule.message),
+                    });
+                }
+            }
+        }
+        None
+    }
+}
+
+impl Default for SnortSignatureFirewall {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Simulated CrowdStrike Falcon AI Anomaly Detection Engine
+pub struct CrowdStrikeFalconAi {
+    pub threat_score_threshold: f64,
+}
+
+impl CrowdStrikeFalconAi {
+    pub fn new(threshold: f64) -> Self {
+        Self {
+            threat_score_threshold: threshold,
+        }
+    }
+
+    /// Analyses process behavioral metrics (thread migrations, allocation spikes, unauthorized API hooks)
+    /// to dynamically calculate an AI Threat Score
+    pub fn calculate_threat_score(
+        &self,
+        thread_migration_count: usize,
+        unauthorized_hooks_probed: usize,
+        allocation_burst_bytes: usize,
+    ) -> f64 {
+        let migration_score = (thread_migration_count * 10) as f64;
+        let hook_score = (unauthorized_hooks_probed * 35) as f64;
+        let allocation_score = (allocation_burst_bytes as f64 / 1_000_000.0) * 15.0; // scale per MB
+
+        migration_score + hook_score + allocation_score
+    }
+
+    /// Inspects behavioral signals, triggering a quarantine or block action on anomaly detection
+    pub fn evaluate_anomaly(
+        &self,
+        thread_migration_count: usize,
+        unauthorized_hooks_probed: usize,
+        allocation_burst_bytes: usize,
+    ) -> Option<DetectionResult> {
+        let score = self.calculate_threat_score(thread_migration_count, unauthorized_hooks_probed, allocation_burst_bytes);
+        if score >= self.threat_score_threshold {
+            let action = if score >= 80.0 {
+                RuleAction::Quarantine // Highly malicious -> Quarantine process
+            } else {
+                RuleAction::Block
+            };
+
+            return Some(DetectionResult {
+                rule_id: "crowdstrike_falcon_ai".to_string(),
+                matched: true,
+                confidence: (score / 100.0).min(1.0),
+                action,
+                message: format!("CrowdStrike Falcon AI: Suspicious process behavioral anomaly detected! Score: {:.2}", score),
+            });
+        }
+        None
+    }
+}
+
+// =========================================================================
+// OOP-based Intrusion Detection System
+// =========================================================================
+
 pub struct IntrusionDetectionSystem {
     strategies: Vec<Box<dyn DetectionStrategy>>,
     events: Vec<SecurityEvent>,
@@ -429,7 +546,7 @@ mod tests {
             metadata: HashMap::new(),
         };
 
-        let result = detection.analyze(&event);
+        let _result = detection.analyze(&event);
         // May or may not detect depending on timing
     }
 
@@ -455,5 +572,36 @@ mod tests {
 
         let results = ids.process_event(event);
         assert!(!results.is_empty());
+    }
+
+    #[test]
+    fn test_snort_and_crowdstrike_engines() {
+        // 1. Test Snort Signature Firewall
+        let mut snort = SnortSignatureFirewall::new();
+        snort.add_snort_rule(SnortRule {
+            id: "snort_01".to_string(),
+            action: RuleAction::Block,
+            protocol: "tcp".to_string(),
+            dest_port: 80,
+            content_signature: "malware_payload".to_string(),
+            message: "Block malicious payload injection!".to_string(),
+        });
+
+        let packet_payload = b"GET /index.php?payload=malware_payload HTTP/1.1\r\n";
+        let snort_res = snort.evaluate_packet("tcp", 80, packet_payload).unwrap();
+        assert!(snort_res.matched);
+        assert_eq!(snort_res.action, RuleAction::Block);
+
+        // 2. Test CrowdStrike Falcon AI Anomaly Detection
+        let falcon = CrowdStrikeFalconAi::new(50.0);
+
+        // Safe process behavior metrics -> No anomaly detected
+        let safe_res = falcon.evaluate_anomaly(1, 0, 10_000);
+        assert!(safe_res.is_none());
+
+        // Dangerous process behavior metrics -> Anomaly block detected!
+        let anomaly_res = falcon.evaluate_anomaly(3, 2, 5_000_000).unwrap();
+        assert!(anomaly_res.matched);
+        assert_eq!(anomaly_res.action, RuleAction::Quarantine);
     }
 }
