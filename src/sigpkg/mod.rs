@@ -71,11 +71,41 @@ pub enum ParseError {
 /// Package metadata
 #[derive(Debug, Clone)]
 pub struct Package {
-    pub name: String,
+    pub name: crate::klib::String,
     pub version: Version,
-    pub description: String,
+    pub description: crate::klib::String,
     pub dependencies: Vec<Dependency>,
-    pub checksum: String,
+    pub checksum: crate::klib::String,
+    pub mirrors: Vec<crate::klib::String>,
+    pub signing_keys: Vec<crate::klib::String>,
+    pub licenses: Vec<crate::klib::String>,
+    pub maintainers: Vec<crate::klib::String>,
+    pub changelogs: Vec<crate::klib::String>,
+    pub source: crate::klib::String,
+}
+
+impl Package {
+    pub fn new(
+        name: crate::klib::String,
+        version: Version,
+        description: crate::klib::String,
+        dependencies: Vec<Dependency>,
+        checksum: crate::klib::String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+            mirrors: Vec::new(),
+            signing_keys: Vec::new(),
+            licenses: Vec::new(),
+            maintainers: Vec::new(),
+            changelogs: Vec::new(),
+            source: crate::klib::String::new(),
+        }
+    }
 }
 
 /// Package dependency
