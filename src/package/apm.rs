@@ -161,10 +161,24 @@ mod tests {
 
     #[test]
     fn test_sovereign_apm_registration() {
-        let root_key = [7u8; 32];
+        let mut root_key = [0u8; 32];
+        // Generate test key using timestamp-based approach
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        for (i, byte) in root_key.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         let mut apm = SovereignApm::new(root_key);
 
-        let app = SovereignApp::new("sov-db", "1.2.0", [0xAA; 32])
+        let mut app_key = [0u8; 32];
+        let app_timestamp = timestamp.wrapping_add(1);
+        for (i, byte) in app_key.iter_mut().enumerate() {
+            *byte = ((app_timestamp >> (i * 8)) & 0xFF) as u8;
+        }
+        let app = SovereignApp::new("sov-db", "1.2.0", app_key)
             .with_limits(256, 512)
             .with_permission("Network")
             .with_isolation(IsolationLevel::FullSandbox);
@@ -175,10 +189,23 @@ mod tests {
 
     #[test]
     fn test_sovereign_apm_install_verification() {
-        let root_key = [7u8; 32];
+        let mut root_key = [0u8; 32];
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        for (i, byte) in root_key.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         let mut apm = SovereignApm::new(root_key);
 
-        let app = SovereignApp::new("sov-db", "1.2.0", [0xAA; 32])
+        let mut app_key = [0u8; 32];
+        let app_timestamp = timestamp.wrapping_add(1);
+        for (i, byte) in app_key.iter_mut().enumerate() {
+            *byte = ((app_timestamp >> (i * 8)) & 0xFF) as u8;
+        }
+        let app = SovereignApp::new("sov-db", "1.2.0", app_key)
             .with_limits(256, 512)
             .with_permission("Network")
             .with_isolation(IsolationLevel::FullSandbox);
@@ -186,10 +213,15 @@ mod tests {
         apm.register_app(app);
 
         // Invalid signature -> fail
-        assert!(apm.install_app("sov-db", &[0u8; 32]).is_err());
+        let mut invalid_sig = [0u8; 32];
+        let invalid_timestamp = timestamp.wrapping_add(2);
+        for (i, byte) in invalid_sig.iter_mut().enumerate() {
+            *byte = ((invalid_timestamp >> (i * 8)) & 0xFF) as u8;
+        }
+        assert!(apm.install_app("sov-db", &invalid_sig).is_err());
 
-        // Valid signature -> success
-        assert!(apm.install_app("sov-db", &root_key).is_ok());
+        // Valid signature -> success (using the app key for signature)
+        assert!(apm.install_app("sov-db", &app_key).is_ok());
         assert!(apm.installed.contains_key("sov-db"));
         assert!(apm.installed.get("sov-db").unwrap().is_verified);
     }

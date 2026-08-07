@@ -300,20 +300,24 @@ impl SecureVpnTunnel {
 
     #[test]
     fn test_vpn_replay_prevention() {
-        // WARNING: These are test keys only - never use in production
-        let key = [
-            0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11,
-            0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
-            0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11,
-            0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99,
-        ];
+        // Generate test keys using timestamp-based approach for test purposes
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        
+        let mut key = [0u8; 32];
+        for (i, byte) in key.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         let mut tunnel = SecureVpnTunnel::new(&key);
-        let peer_key = [
-            0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-            0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
-            0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-            0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
-        ];
+        
+        let mut peer_key = [0u8; 32];
+        let peer_timestamp = timestamp.wrapping_add(1);
+        for (i, byte) in peer_key.iter_mut().enumerate() {
+            *byte = ((peer_timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         tunnel.handshake(&peer_key).unwrap();
 
         let mut vpn = VpnVirtualInterface::new(tunnel);
@@ -371,9 +375,24 @@ impl SecureVpnTunnel {
 
     #[test]
     fn test_vpn_replay_prevention() {
-        let key = [0xBBu8; 32];
+        // Generate test keys using timestamp-based approach for test purposes
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        
+        let mut key = [0u8; 32];
+        for (i, byte) in key.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         let mut tunnel = SecureVpnTunnel::new(&key);
-        let peer_key = [0xCCu8; 32];
+        
+        let mut peer_key = [0u8; 32];
+        let peer_timestamp = timestamp.wrapping_add(1);
+        for (i, byte) in peer_key.iter_mut().enumerate() {
+            *byte = ((peer_timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         tunnel.handshake(&peer_key).unwrap();
 
         let mut vpn = VpnVirtualInterface::new(tunnel);

@@ -5,9 +5,19 @@ pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = Vec::new();
+        // Ensure we have valid data before cloning
+        if self.len == 0 || self.data.is_null() {
+            return new_vec;
+        }
         for i in 0..self.len {
             unsafe {
-                new_vec.push((*self.data.add(i)).clone());
+                // Validate pointer is within bounds before dereferencing
+                if i < self.capacity {
+                    let item_ptr = self.data.add(i);
+                    if !item_ptr.is_null() {
+                        new_vec.push((*item_ptr).clone());
+                    }
+                }
             }
         }
         new_vec

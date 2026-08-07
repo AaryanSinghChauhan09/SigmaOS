@@ -32,9 +32,36 @@ pub struct SimpleEncryptionKey {
 impl SimpleEncryptionKey {
     pub fn new(id: KeyID, cipher_type: CipherType, key_data: &[u8]) -> Self {
         let mut key_array = [0u8; 32];
-        let key_len = key_data.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(key_data.as_ptr(), key_array.as_mut_ptr(), key_len);
+        let key_len = key_data.len().min(32);
+        if key_len > 0 {
+            unsafe {
+                core::ptr::copy_nonoverlapping(key_data.as_ptr(), key_array.as_mut_ptr(), key_len);
+            }
+        } else {
+            // Generate random key if no key data provided
+            #[cfg(not(target_os = "none"))]
+            {
+                use std::time::{SystemTime, UNIX_EPOCH};
+                let timestamp = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_nanos();
+                for (i, byte) in key_array.iter_mut().enumerate() {
+                    *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+                }
+            }
+            #[cfg(target_os = "none")]
+            {
+                // On bare metal, use a simple counter-based approach (should be replaced with proper RNG)
+                static mut KEY_COUNTER: u64 = 1;
+                unsafe {
+                    KEY_COUNTER = KEY_COUNTER.wrapping_add(1);
+                    let counter = KEY_COUNTER;
+                    for (i, byte) in key_array.iter_mut().enumerate() {
+                        *byte = ((counter >> (i * 8)) & 0xFF) as u8;
+                    }
+                }
+            }
         }
         SimpleEncryptionKey { id, cipher_type, key_data: key_array }
     }

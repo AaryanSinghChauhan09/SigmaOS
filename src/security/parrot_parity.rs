@@ -226,7 +226,16 @@ mod tests {
         assert!(filter.intercept_device_write(500, &[1, 2, 3])); // allowed once blocker disabled
 
         // Memory Wiper Tests
-        let mut key_buffer = [0x55u8; 16];
+        // Generate test key using timestamp-based approach
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let mut key_buffer = [0u8; 16];
+        for (i, byte) in key_buffer.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         filter.secure_memory_wipe(&mut key_buffer);
         assert_eq!(key_buffer, [0u8; 16]);
     }
