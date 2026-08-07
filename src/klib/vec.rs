@@ -82,6 +82,45 @@ impl<T> Vec<T> {
         self.len == 0
     }
 
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            self.len -= 1;
+            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
+        }
+    }
+
+    pub fn first(&self) -> Option<&T> {
+        if self.len == 0 {
+            None
+        } else {
+            unsafe { Some(&*self.data) }
+        }
+    }
+
+    pub fn last(&self) -> Option<&T> {
+        if self.len == 0 {
+            None
+        } else {
+            unsafe { Some(&*self.data.add(self.len - 1)) }
+        }
+    }
+
+    pub fn insert(&mut self, index: usize, item: T) {
+        assert!(index <= self.len, "index out of bounds");
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            for i in (index..self.len).rev() {
+                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+            }
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
     pub fn as_slice(&self) -> &[T] {
         if self.len == 0 {
             &[]
