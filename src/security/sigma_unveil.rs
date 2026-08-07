@@ -11,26 +11,9 @@
 //! sigma_unveil!("/tmp", "rw");
 //! sigma_unveil!(nullptr, nullptr); // Lock the veil
 //! ```
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashMap;
-use sigma_types::{CapabilityToken, Result};
+use sigma_types::Result;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Access permissions for unveiled paths
@@ -123,7 +106,6 @@ pub struct UnveilState {
 
 impl UnveilState {
     /// Create a new unveil state
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         UnveilState {
             entries: Vec::new(),
@@ -161,6 +143,17 @@ impl UnveilState {
 
     /// Check if a path is accessible with given permission
     pub fn check_access(&self, path: &Path, required_perm: UnveilPermissions) -> Result<()> {
+        // Mitigate directory traversal: reject paths containing parent directory segments
+        for component in path.components() {
+            if let std::path::Component::ParentDir = component {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::InvalidInput,
+                    "Directory traversal sequence detected",
+                )
+                .into());
+            }
+        }
+
         // Find the most specific matching entry
         let mut best_entry: Option<&UnveilEntry> = None;
         let mut best_len = 0;
@@ -223,7 +216,6 @@ pub struct UnveilManager {
 
 impl UnveilManager {
     /// Create a new unveil manager
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         UnveilManager {
             process_states: HashMap::new(),
@@ -364,6 +356,11 @@ mod tests {
         // Access to /var should be denied (not unveiled)
         assert!(state
             .check_access(Path::new("/var/log"), UnveilPermissions::Read)
+            .is_err());
+
+        // Traversal sequences should be immediately blocked and return Err
+        assert!(state
+            .check_access(Path::new("/etc/../tmp/file"), UnveilPermissions::Read)
             .is_err());
     }
 

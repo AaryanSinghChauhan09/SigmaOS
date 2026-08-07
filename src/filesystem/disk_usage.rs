@@ -208,7 +208,7 @@ impl DiskUsageAnalyzer {
     }
 
     /// Get size by file type
-    pub fn get_size_by_type(&self, _path: &Path) -> HashMap<String, u64> {
+    pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
         let mut sizes = HashMap::new();
         sizes.insert("txt".to_string(), 1024 * 1024);
         sizes.insert("pdf".to_string(), 5 * 1024 * 1024);
@@ -340,8 +340,8 @@ impl Default for SovereignDfEngine {
             filesystem: "/dev/sda1".to_string(),
             fs_type: "SigmaFS".to_string(),
             total_bytes: 100 * 1024 * 1024 * 1024, // 100GB
-            used_bytes: 40 * 1024 * 1024 * 1024,   // 40GB
-            free_bytes: 60 * 1024 * 1024 * 1024,   // 60GB
+            used_bytes: 40 * 1024 * 1024 * 1024,  // 40GB
+            free_bytes: 60 * 1024 * 1024 * 1024,  // 60GB
             use_percent: 40.0,
             total_inodes: 10_000_000,
             used_inodes: 1_200_000,
@@ -353,8 +353,8 @@ impl Default for SovereignDfEngine {
             filesystem: "tmpfs".to_string(),
             fs_type: "tmpfs".to_string(),
             total_bytes: 8 * 1024 * 1024 * 1024, // 8GB
-            used_bytes: 512 * 1024 * 1024,       // 512MB
-            free_bytes: 75 * 1024 * 1024 * 1024, // remaining
+            used_bytes: 512 * 1024 * 1024,      // 512MB
+            free_bytes: 75 * 1024 * 1024 * 1024,  // remaining
             use_percent: 6.25,
             total_inodes: 500_000,
             used_inodes: 5_000,
