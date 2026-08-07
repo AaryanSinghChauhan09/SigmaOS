@@ -152,8 +152,9 @@ impl MakepkgSandbox {
         let pkgdesc = self.pkgbuild.pkgdesc()
             .map(|s: &crate::klib::String| s.clone())
             .unwrap_or_else(|| String::from_str("No description"));
-        let cleaned_ver = if pkgver.contains(-) {
-            pkgver.split(-).next().unwrap().to_string()
+
+        let cleaned_ver = if pkgver.contains('-') {
+            pkgver.split('-').next().unwrap().to_string()
         } else {
             pkgver.to_string()
         };
@@ -168,10 +169,6 @@ impl MakepkgSandbox {
         );
         pkg.source = String::from_str("arch");
         Ok(pkg)
-        );
-        pkg.source = String::from_str("arch");
-        Ok(pkg)
->>>>>>> origin/jules-12039768019242344345-034693dc
     }
 
     /// Validate the PKGBUILD structure
@@ -223,7 +220,7 @@ depends=("glibc")
 
     #[test]
     fn test_makepkg_sandbox() {
-        let sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
+        let mut sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
         let content = r#"
 pkgname="test-package"
 pkgver="1.0.0"

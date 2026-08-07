@@ -809,6 +809,119 @@ impl DebianAptPackageManager {
     }
 }
 
+// ============================================================================
+// SYSTEM RESOLVER & SWAP SPACE — Hosts Lookup & Virtual Page Swappers
+// ============================================================================
+
+/// Represents a static hostname mapping in `/etc/hosts`
+#[derive(Debug, Clone)]
+pub struct HostMapping {
+    pub ip_address: alloc::string::String,
+    pub hostname: alloc::string::String,
+}
+
+/// Linux/BSD-style host and DNS name resolver manager
+pub struct HostResolver {
+    pub host_mappings: alloc::vec::Vec<HostMapping>,
+    pub dns_nameservers: alloc::vec::Vec<alloc::string::String>,
+}
+
+impl HostResolver {
+    pub fn new() -> Self {
+        Self {
+            host_mappings: alloc::vec::Vec::new(),
+            dns_nameservers: alloc::vec::Vec::new(),
+        }
+    }
+
+    /// Appends a static IP-to-hostname entry to `/etc/hosts`
+    pub fn add_host_mapping(&mut self, ip: &str, hostname: &str) {
+        self.host_mappings.push(HostMapping {
+            ip_address: alloc::string::String::from(ip),
+            hostname: alloc::string::String::from(hostname),
+        });
+    }
+
+    /// Appends a new DNS nameserver IP to `/etc/resolv.conf`
+    pub fn add_dns_nameserver(&mut self, ip: &str) {
+        self.dns_nameservers.push(alloc::string::String::from(ip));
+    }
+
+    /// Performs static host lookup before falling back to DNS resolution
+    pub fn resolve(&self, query: &str) -> Option<alloc::string::String> {
+        // Try static lookup first (equivalent to /etc/hosts resolution priority)
+        for mapping in &self.host_mappings {
+            if mapping.hostname == query {
+                return Some(mapping.ip_address.clone());
+            }
+        }
+
+        // If not found and nameservers are configured, fallback to standard mock DNS IP
+        if !self.dns_nameservers.is_empty() {
+            return Some(alloc::string::String::from("8.8.8.8"));
+        }
+        None
+    }
+}
+
+/// Represents a swap slot / block on disk
+#[derive(Debug, Clone, Copy)]
+pub struct SwapPageFrame {
+    pub virtual_address: u64,
+    pub page_index: usize,
+    pub active: bool,
+}
+
+/// BSD-style virtual memory swap manager
+pub struct SwapSpaceManager {
+    pub swap_slots: alloc::vec::Vec<SwapPageFrame>,
+    pub swap_enabled: bool,
+    pub max_slots: usize,
+}
+
+impl SwapSpaceManager {
+    pub fn new(max_slots: usize) -> Self {
+        Self {
+            swap_slots: alloc::vec::Vec::new(),
+            swap_enabled: true,
+            max_slots,
+        }
+    }
+
+    /// Simulates swapon/swapoff
+    pub fn set_swap_enabled(&mut self, enabled: bool) {
+        self.swap_enabled = enabled;
+    }
+
+    /// Swaps out a virtual page frame to the swap partition on disk
+    pub fn swap_out_page(&mut self, virtual_address: u64) -> Result<usize, ReleaseError> {
+        if !self.swap_enabled {
+            return Err(ReleaseError::PermissionDenied);
+        }
+        if self.swap_slots.len() >= self.max_slots {
+            return Err(ReleaseError::InsufficientSpace);
+        }
+
+        let slot_idx = self.swap_slots.len();
+        self.swap_slots.push(SwapPageFrame {
+            virtual_address,
+            page_index: slot_idx,
+            active: true,
+        });
+        Ok(slot_idx)
+    }
+
+    /// Swaps in/reloads a page frame from the swap partition back into physical memory
+    pub fn swap_in_page(&mut self, virtual_address: u64) -> Result<(), ReleaseError> {
+        if let Some(pos) = self.swap_slots.iter().position(|s| s.virtual_address == virtual_address && s.active) {
+            self.swap_slots[pos].active = false;
+            Ok(())
+        } else {
+            Err(ReleaseError::SnapshotNotFound)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
