@@ -8,6 +8,10 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
+pub mod boot_init;
+pub mod dde;
+pub mod even_more_devices;
+pub mod flipper_gpio_sensor;
 
 // Exposing additional audio, printer, wifi drivers
 pub mod legacy_audio_ac97;
