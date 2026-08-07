@@ -13,6 +13,13 @@ pub trait SymlinkResolverRule {
 }
 
 pub struct LegacyLinuxRule;
+
+impl SymlinkResolverRule for LegacyLinuxRule {
+    fn is_legacy(&self) -> bool {
+        true
+    }
+}
+
 pub struct LinuxPersonaRule;
 
 impl SymlinkResolverRule for LinuxPersonaRule {
