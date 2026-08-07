@@ -6,10 +6,22 @@ pub mod mint_linux;
 pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
+pub mod india_stack_localization;
+pub mod legacy_adapters;
+pub mod freedos;
+
+pub use legacy_adapters::{
+    KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
+    APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
+    WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
+    LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
+    GLOBAL_WORKLOAD_OPTIMIZER,
+};
+pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
 
 pub use cross_platform::{
-    ApplicationBinary, BinaryFormat as CrossPlatformBinaryFormat,
-    CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
+    ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat,
+    CompatibilityError, CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
@@ -19,12 +31,6 @@ pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
     HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
     VintagePackageConverter, VintageVirtualizationSandbox,
-};
-
-pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError,
 };
 
 pub use mint_linux::{
