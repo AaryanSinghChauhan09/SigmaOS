@@ -2,6 +2,9 @@ use core::sync::atomic::{AtomicU64, Ordering};
 /// SigmaOS System Call Table — Phase K expansion
 /// Absorbs Linux syscall interface: POSIX-complete table with 300+ syscalls
 /// Categories: fs, mm, proc, net, time, signal, ipc, sched, crypto, io_uring
+/// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
+/// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
+
 use crate::klib::HashMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
@@ -316,6 +319,63 @@ impl Default for SyscallTable {
     }
 }
 
+// ── Kernel Exporter, SSDT & Anti-Rootkit Guard (Windows/Linux/BSD inspired) ──
+
+/// Represents a compiled kernel function symbol (PE export or /proc/kallsyms equivalent)
+#[derive(Debug, Clone)]
+pub struct KernelSymbol {
+    pub name: String,
+    pub address: u64,
+    pub module_owner: String,
+}
+
+/// System Service Descriptor Table (SSDT) element mapping
+#[derive(Debug, Clone, Copy)]
+pub struct SsdtEntry {
+    pub service_number: u32,
+    pub service_routine_address: u64,
+}
+
+/// Anti-Rootkit System Call tampering detector
+pub struct AntiRootkitGuard {
+    pub shadow_ssdt: HashMap<u32, u64>, // Pristine service_number -> address copy
+}
+
+impl Default for AntiRootkitGuard {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AntiRootkitGuard {
+    pub fn new() -> Self {
+        AntiRootkitGuard {
+            shadow_ssdt: HashMap::new(),
+        }
+    }
+
+    /// Backups a pristine snapshot of the SSDT pointers
+    pub fn snapshot_pristine_table(&mut self, active_ssdt: &[SsdtEntry]) {
+        for entry in active_ssdt {
+            self.shadow_ssdt.insert(entry.service_number, entry.service_routine_address);
+        }
+    }
+
+    /// Audits the active SSDT pointer addresses against the shadow snapshot to detect rootkit hooking!
+    /// Returns a list of corrupted / hooked service numbers.
+    pub fn audit_system_service_table(&self, active_ssdt: &[SsdtEntry]) -> Vec<u32> {
+        let mut hijacked_services = Vec::new();
+        for entry in active_ssdt {
+            if let Some(&pristine_address) = self.shadow_ssdt.get(&entry.service_number) {
+                if entry.service_routine_address != pristine_address {
+                    hijacked_services.push(entry.service_number); // Tampering detected!
+                }
+            }
+        }
+        hijacked_services
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -415,5 +475,42 @@ mod tests {
         assert!(names.contains(&"getpid".to_string()));
         assert!(names.contains(&"exit".to_string()));
         assert!(names.contains(&"brk".to_string()));
+    }
+
+    #[test]
+    fn test_kernel_symbol_exporters() {
+        let sym = KernelSymbol {
+            name: "NtCreateFile".to_string(),
+            address: 0xFFFFFFFF80012000,
+            module_owner: "ntoskrnl.exe".to_string(),
+        };
+        assert_eq!(sym.name, "NtCreateFile");
+        assert_eq!(sym.address, 0xFFFFFFFF80012000);
+        assert_eq!(sym.module_owner, "ntoskrnl.exe");
+    }
+
+    #[test]
+    fn test_ssdt_anti_rootkit_tampering_guard() {
+        let pristine_ssdt = [
+            SsdtEntry { service_number: 0, service_routine_address: 0x801000 }, // NtRead
+            SsdtEntry { service_number: 1, service_routine_address: 0x802000 }, // NtWrite
+        ];
+
+        let mut guard = AntiRootkitGuard::new();
+        guard.snapshot_pristine_table(&pristine_ssdt);
+
+        // Audit clean SSDT -> should return no hijacked service numbers
+        let clean_violations = guard.audit_system_service_table(&pristine_ssdt);
+        assert!(clean_violations.is_empty());
+
+        // Simulate rootkit hooking NtWrite (service_number 1 redirecting address to rootkit_jmp_cave)
+        let hooked_ssdt = [
+            SsdtEntry { service_number: 0, service_routine_address: 0x801000 },
+            SsdtEntry { service_number: 1, service_routine_address: 0x909090 }, // Redirection!
+        ];
+
+        let hooked_violations = guard.audit_system_service_table(&hooked_ssdt);
+        assert_eq!(hooked_violations.len(), 1);
+        assert_eq!(hooked_violations[0], 1); // TAMPERING DETECTED ON SERVICE_NUMBER 1!
     }
 }
