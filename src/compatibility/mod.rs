@@ -4,6 +4,7 @@ pub mod india_stack;
 pub mod jehanne;
 pub mod mint_linux;
 pub mod reactos;
+pub mod interim;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -22,3 +23,4 @@ pub use reactos::{
     NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
     RegistryHive,
 };
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
