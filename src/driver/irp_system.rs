@@ -481,7 +481,7 @@ mod tests {
 
     /// Driver's Entry Point implementation for tests
     fn mock_driver_entry(driver_object: &mut DriverObject) -> IoStatus {
-        driver_object.register_dispatch_routine(IRP_MJ_READ, |device, irp| {
+        driver_object.register_dispatch_routine(IRP_MJ_READ, |_device, irp| {
             irp.io_status.information = irp.buffer_length;
             IoStatus::Success
         });
@@ -634,7 +634,7 @@ mod tests {
     #[test]
     fn test_rootkit_hook_detection() {
         let mut driver = DriverObject::new("SecureDriver");
-        driver.register_dispatch_routine(IRP_MJ_READ, |device, irp| IoStatus::Success);
+        driver.register_dispatch_routine(IRP_MJ_READ, |_device, _irp| IoStatus::Success);
 
         // Intact, no hooks detected
         assert!(!RootkitDetector::is_driver_compromised(&driver));
