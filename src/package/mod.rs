@@ -21,6 +21,7 @@ pub mod apm;
 pub mod linux_translation;
 pub mod store;
 pub mod universal;
+pub mod store;
 
 pub use apm::{IsolationLevel as SovereignIsolationLevel, SovereignApm, SovereignApp};
 pub use linux_translation::{
@@ -32,4 +33,7 @@ pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use store::{
+    StoreError, StoreApp, SigmaSoftwareStore,
 };

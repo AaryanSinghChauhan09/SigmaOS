@@ -36,11 +36,13 @@ impl BuddyAllocator {
         let order = self.calculate_order(pages);
 
         if order < 12 {
-            let block = MemoryBlock {
-                addr: NonNull::new(base_addr as *mut u8).unwrap(),
-                size,
-            };
-            self.free_lists[order].push(block);
+            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
+                let block = MemoryBlock {
+                    addr,
+                    size,
+                };
+                self.free_lists[order].push(block);
+            }
         }
     }
 
@@ -122,8 +124,8 @@ impl BuddyAllocator {
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
-        if order < 12 && !self.free_lists[order].is_empty() {
-            Some(self.free_lists[order].pop().unwrap())
+        if order < 12 {
+            self.free_lists[order].pop()
         } else {
             None
         }

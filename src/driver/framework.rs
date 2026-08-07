@@ -83,16 +83,9 @@ pub trait DriverFramework {
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
 }
 
-#[allow(dead_code)]
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
     next_id: AtomicUsize,
-}
-
-impl Default for SimpleDriverFramework {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleDriverFramework {
@@ -142,12 +135,6 @@ impl DriverFramework for SimpleDriverFramework {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -161,9 +148,6 @@ impl<T> Vec<T> {
             len: 0,
             capacity: 0,
         }
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
     pub fn push(&mut self, item: T) {
         unsafe {

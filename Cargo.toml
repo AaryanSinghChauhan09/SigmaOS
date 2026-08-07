@@ -9,13 +9,14 @@ repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
 [dependencies]
 # Core dependencies (minimal as per SigmaOS philosophy)
-# Removed uuid and rand dependencies - using custom implementations
+uuid = { version = "1.4", features = ["v4"] }
+rand = "0.8"
 
 [dev-dependencies]
 # Test dependencies
 
 [features]
-default = ["microkernel"]
+default = []
 desktop = []
 drivers = []
 ai = []
@@ -57,8 +58,3 @@ name = "sigma_userspace"
 path = "src/userspace/main.rs"
 test = false
 required-features = ["microkernel"]
-
-[[test]]
-name = "integration_test"
-path = "tests/integration_test.rs"
-test = false
