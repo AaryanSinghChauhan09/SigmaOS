@@ -38,10 +38,10 @@ impl DecodedIoctl {
 
     /// Encodes structured fields back into a standard 32-bit packed ioctl code
     pub fn encode(&self) -> u32 {
-        ((self.direction as u32 & 0x03) << 30) |
-        ((self.size as u32 & 0x3FFF) << 16) |
-        ((self.group as u32 & 0xFF) << 8) |
-        (self.command_id as u32 & 0xFF)
+        ((self.direction as u32 & 0x03) << 30)
+            | ((self.size as u32 & 0x3FFF) << 16)
+            | ((self.group as u32 & 0xFF) << 8)
+            | (self.command_id as u32 & 0xFF)
     }
 }
 
@@ -82,13 +82,16 @@ impl PackageTranslationUdf for GenericLinuxTranslationUdf {
 
         // Otherwise, dynamically translate using decoded groups safely
         match decoded.group {
-            b'T' => { // TTY / Serial group
+            b'T' => {
+                // TTY / Serial group
                 0x100 + decoded.command_id as u32
             }
-            b'f' => { // Filesystem / Socket group
+            b'f' => {
+                // Filesystem / Socket group
                 0x200 + decoded.command_id as u32
             }
-            0x12 => { // Block device group
+            0x12 => {
+                // Block device group
                 0x300 + decoded.command_id as u32
             }
             _ => {

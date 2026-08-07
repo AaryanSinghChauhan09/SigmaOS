@@ -919,7 +919,10 @@ impl OpenSourceOsGapBridge {
     /// Linux-inspired eBPF-style bytecode verifier.
     /// Analyzes the control flow graph to ensure no backward jumps (preventing infinite loops),
     /// and verifies that all register indices are strictly within bounds (registers 0..10).
-    pub fn verify_ebpf_bytecode(&self, instructions: &[EbpfInstruction]) -> Result<(), &'static str> {
+    pub fn verify_ebpf_bytecode(
+        &self,
+        instructions: &[EbpfInstruction],
+    ) -> Result<(), &'static str> {
         if instructions.is_empty() {
             return Err("Empty instructions");
         }
@@ -930,7 +933,9 @@ impl OpenSourceOsGapBridge {
             match ins.opcode {
                 EbpfOpcode::JmpEq => {
                     if ins.offset <= 0 {
-                        return Err("Infinite loop or backward jump detected in eBPF bytecode verifier");
+                        return Err(
+                            "Infinite loop or backward jump detected in eBPF bytecode verifier",
+                        );
                     }
                     let target_pc = pc as i16 + 1 + ins.offset;
                     if target_pc < 0 || target_pc as usize >= instructions.len() {
@@ -950,7 +955,11 @@ impl OpenSourceOsGapBridge {
     }
 
     /// Evaluates verified eBPF instructions on a simulated packet buffer.
-    pub fn execute_ebpf_bytecode(&self, instructions: &[EbpfInstruction], packet: &[u8]) -> Result<i64, &'static str> {
+    pub fn execute_ebpf_bytecode(
+        &self,
+        instructions: &[EbpfInstruction],
+        packet: &[u8],
+    ) -> Result<i64, &'static str> {
         self.verify_ebpf_bytecode(instructions)?;
 
         let mut regs = [0i64; 10];
@@ -968,10 +977,12 @@ impl OpenSourceOsGapBridge {
                     regs[ins.dst as usize] = ins.imm;
                 }
                 EbpfOpcode::AddReg => {
-                    regs[ins.dst as usize] = regs[ins.dst as usize].wrapping_add(regs[ins.src as usize]);
+                    regs[ins.dst as usize] =
+                        regs[ins.dst as usize].wrapping_add(regs[ins.src as usize]);
                 }
                 EbpfOpcode::SubReg => {
-                    regs[ins.dst as usize] = regs[ins.dst as usize].wrapping_sub(regs[ins.src as usize]);
+                    regs[ins.dst as usize] =
+                        regs[ins.dst as usize].wrapping_sub(regs[ins.src as usize]);
                 }
                 EbpfOpcode::JmpEq => {
                     if regs[ins.dst as usize] == ins.imm {

@@ -354,23 +354,36 @@ mod tests {
         let mut io_mgr = IoManager::new();
 
         // 1. Emulate normal driver installation process
-        let driver_idx = io_mgr.normal_driver_installation_process(b"MySerialDriver", b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver").unwrap();
+        let driver_idx = io_mgr
+            .normal_driver_installation_process(
+                b"MySerialDriver",
+                b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver",
+            )
+            .unwrap();
         assert_eq!(io_mgr.active_drivers.len(), 1);
 
         let driver = &mut io_mgr.active_drivers[driver_idx];
         assert_eq!(&driver.driver_name[..14], b"MySerialDriver");
-        assert_eq!(&driver.registry_path[..66], b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver");
+        assert_eq!(
+            &driver.registry_path[..66],
+            b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver"
+        );
 
         // Set DRIVERUNLOAD unload routine callback
         driver.unload_routine = Some(|_drv| {});
 
         // 2. Create Device associated with the Driver Object
-        assert!(io_mgr.io_create_device(driver_idx, b"COM1", DeviceType::Character).is_ok());
+        assert!(io_mgr
+            .io_create_device(driver_idx, b"COM1", DeviceType::Character)
+            .is_ok());
 
         let driver_updated = &io_mgr.active_drivers[driver_idx];
         assert_eq!(driver_updated.device_objects.len(), 1);
         assert_eq!(&driver_updated.device_objects[0].name[..4], b"COM1");
-        assert_eq!(driver_updated.device_objects[0].device_type, DeviceType::Character);
+        assert_eq!(
+            driver_updated.device_objects[0].device_type,
+            DeviceType::Character
+        );
 
         // Configure HW Resource allocations inside Device Extension
         let ext = &mut io_mgr.active_drivers[driver_idx].device_objects[0].device_extension;
@@ -1007,20 +1020,31 @@ impl IoManager {
     }
 
     /// Emulate the normal driver installation process (creates a registered DriverObject)
-    pub fn normal_driver_installation_process(&mut self, driver_name: &[u8], registry_path: &[u8]) -> Result<usize, DeviceError> {
+    pub fn normal_driver_installation_process(
+        &mut self,
+        driver_name: &[u8],
+        registry_path: &[u8],
+    ) -> Result<usize, DeviceError> {
         let driver = DriverObject::new(driver_name, registry_path);
         self.active_drivers.push(driver);
         Ok(self.active_drivers.len() - 1)
     }
 
     /// IoCreateDevice: Create a Device Object associated with the specific Driver Object
-    pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
+    pub fn io_create_device(
+        &mut self,
+        driver_idx: usize,
+        name: &[u8],
+        device_type: DeviceType,
+    ) -> Result<(), DeviceError> {
         if driver_idx >= self.active_drivers.len() {
             return Err(DeviceError::InvalidParameter);
         }
 
         let device_obj = DeviceObject::new(name, device_type);
-        self.active_drivers[driver_idx].device_objects.push(device_obj);
+        self.active_drivers[driver_idx]
+            .device_objects
+            .push(device_obj);
         Ok(())
     }
 

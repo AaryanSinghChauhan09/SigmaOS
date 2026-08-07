@@ -12,24 +12,24 @@ use std::sync::Arc;
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PackageFormat {
-    Deb,          // apt
-    Rpm,          // yum/dnf
-    Pacman,       // pacman
-    Snap,         // snap
-    Flatpak,      // flatpak
-    SigmaPkg,     // native SigmaOS format
-    Ebuild,       // Gentoo portage (emerge)
-    Apk,          // Alpine apk
-    Nix,          // Nix package manager
-    AppImage,     // AppImage portable
-    Xbps,         // Void Linux xbps
-    Txz,          // Slackware txz
-    Eopkg,        // Solus eopkg
-    Zypper,       // openSUSE zypper
-    Guix,         // GNU Guix
-    CachyOS,      // CachyOS optimized pacman
-    Swupd,        // Intel Clear Linux swupd
-    Starling,     // Starling Linux package
+    Deb,      // apt
+    Rpm,      // yum/dnf
+    Pacman,   // pacman
+    Snap,     // snap
+    Flatpak,  // flatpak
+    SigmaPkg, // native SigmaOS format
+    Ebuild,   // Gentoo portage (emerge)
+    Apk,      // Alpine apk
+    Nix,      // Nix package manager
+    AppImage, // AppImage portable
+    Xbps,     // Void Linux xbps
+    Txz,      // Slackware txz
+    Eopkg,    // Solus eopkg
+    Zypper,   // openSUSE zypper
+    Guix,     // GNU Guix
+    CachyOS,  // CachyOS optimized pacman
+    Swupd,    // Intel Clear Linux swupd
+    Starling, // Starling Linux package
 }
 
 /// Package source
@@ -116,18 +116,18 @@ impl UnifiedPackage {
 
     pub fn transition_to(&mut self, next: PackageState) -> Result<(), PackageError> {
         let allowed = match (self.state, next) {
-            (PackageState::Uninstalled, PackageState::Resolved) |
-            (PackageState::Uninstalled, PackageState::Installing) => true,
+            (PackageState::Uninstalled, PackageState::Resolved)
+            | (PackageState::Uninstalled, PackageState::Installing) => true,
             (PackageState::Resolved, PackageState::Installing) => true,
-            (PackageState::Installing, PackageState::Installed) |
-            (PackageState::Installing, PackageState::Broken) => true,
-            (PackageState::Installed, PackageState::Uninstalled) |
-            (PackageState::Installed, PackageState::Broken) |
-            (PackageState::Installed, PackageState::RolledBack) => true,
-            (PackageState::Broken, PackageState::Resolved) |
-            (PackageState::Broken, PackageState::Uninstalled) => true,
-            (PackageState::RolledBack, PackageState::Resolved) |
-            (PackageState::RolledBack, PackageState::Uninstalled) => true,
+            (PackageState::Installing, PackageState::Installed)
+            | (PackageState::Installing, PackageState::Broken) => true,
+            (PackageState::Installed, PackageState::Uninstalled)
+            | (PackageState::Installed, PackageState::Broken)
+            | (PackageState::Installed, PackageState::RolledBack) => true,
+            (PackageState::Broken, PackageState::Resolved)
+            | (PackageState::Broken, PackageState::Uninstalled) => true,
+            (PackageState::RolledBack, PackageState::Resolved)
+            | (PackageState::RolledBack, PackageState::Uninstalled) => true,
             (a, b) if a == b => true,
             _ => false,
         };
@@ -159,13 +159,19 @@ pub trait VerifyStrategy: Send + Sync {
 pub struct NativeStrategy;
 impl InstallStrategy for NativeStrategy {
     fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Strategy [Native]: Directly deploying {} binary package files.", package.name);
+        println!(
+            "Strategy [Native]: Directly deploying {} binary package files.",
+            package.name
+        );
         Ok(())
     }
 }
 impl VerifyStrategy for NativeStrategy {
     fn execute(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
-        println!("Strategy [Native]: Verifying {} native files structure.", package.name);
+        println!(
+            "Strategy [Native]: Verifying {} native files structure.",
+            package.name
+        );
         Ok(true)
     }
 }
@@ -176,13 +182,19 @@ pub struct SandboxStrategy {
 }
 impl InstallStrategy for SandboxStrategy {
     fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Strategy [Sandbox ({})]: Enforcing secure jail container for {}.", self.isolation_level, package.name);
+        println!(
+            "Strategy [Sandbox ({})]: Enforcing secure jail container for {}.",
+            self.isolation_level, package.name
+        );
         Ok(())
     }
 }
 impl VerifyStrategy for SandboxStrategy {
     fn execute(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
-        println!("Strategy [Sandbox]: Checking containment namespaces and permissions for {}.", package.name);
+        println!(
+            "Strategy [Sandbox]: Checking containment namespaces and permissions for {}.",
+            package.name
+        );
         Ok(true)
     }
 }
@@ -191,7 +203,10 @@ impl VerifyStrategy for SandboxStrategy {
 pub struct SourceCompileStrategy;
 impl InstallStrategy for SourceCompileStrategy {
     fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Strategy [SourceCompile]: Compiling {} from source recipes.", package.name);
+        println!(
+            "Strategy [SourceCompile]: Compiling {} from source recipes.",
+            package.name
+        );
         Ok(())
     }
 }
@@ -206,35 +221,47 @@ impl VerifyStrategy for SourceCompileStrategy {
 pub struct BinaryExtractStrategy;
 impl InstallStrategy for BinaryExtractStrategy {
     fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Strategy [BinaryExtract]: Extracting pre-built binary archives for {}.", package.name);
+        println!(
+            "Strategy [BinaryExtract]: Extracting pre-built binary archives for {}.",
+            package.name
+        );
         Ok(())
     }
 }
 impl VerifyStrategy for BinaryExtractStrategy {
     fn execute(&self, package: &UnifiedPackage) -> Result<bool, PackageError> {
-        println!("Strategy [BinaryExtract]: Verifying checksum of extracted files for {}.", package.name);
+        println!(
+            "Strategy [BinaryExtract]: Verifying checksum of extracted files for {}.",
+            package.name
+        );
         Ok(true)
     }
 }
 
 /// Helper function to retrieve appropriate Strategy based on format
-pub fn get_strategies(format: PackageFormat) -> (Box<dyn InstallStrategy>, Box<dyn VerifyStrategy>) {
+pub fn get_strategies(
+    format: PackageFormat,
+) -> (Box<dyn InstallStrategy>, Box<dyn VerifyStrategy>) {
     match format {
         PackageFormat::SigmaPkg | PackageFormat::Pacman | PackageFormat::CachyOS => {
             (Box::new(NativeStrategy), Box::new(NativeStrategy))
         }
-        PackageFormat::Snap | PackageFormat::Flatpak | PackageFormat::AppImage => {
-            (
-                Box::new(SandboxStrategy { isolation_level: "strict" }),
-                Box::new(SandboxStrategy { isolation_level: "strict" })
-            )
-        }
-        PackageFormat::Ebuild | PackageFormat::Nix | PackageFormat::Guix => {
-            (Box::new(SourceCompileStrategy), Box::new(SourceCompileStrategy))
-        }
-        _ => {
-            (Box::new(BinaryExtractStrategy), Box::new(BinaryExtractStrategy))
-        }
+        PackageFormat::Snap | PackageFormat::Flatpak | PackageFormat::AppImage => (
+            Box::new(SandboxStrategy {
+                isolation_level: "strict",
+            }),
+            Box::new(SandboxStrategy {
+                isolation_level: "strict",
+            }),
+        ),
+        PackageFormat::Ebuild | PackageFormat::Nix | PackageFormat::Guix => (
+            Box::new(SourceCompileStrategy),
+            Box::new(SourceCompileStrategy),
+        ),
+        _ => (
+            Box::new(BinaryExtractStrategy),
+            Box::new(BinaryExtractStrategy),
+        ),
     }
 }
 
@@ -286,7 +313,10 @@ impl AdapterDecorator for GpgVerificationDecorator {
         "GpgVerification"
     }
     fn pre_install_action(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Decorator [GPG]: Verifying signature of {} using GPG key: {}", package.name, self.key_id);
+        println!(
+            "Decorator [GPG]: Verifying signature of {} using GPG key: {}",
+            package.name, self.key_id
+        );
         Ok(())
     }
     fn post_install_action(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
@@ -303,7 +333,10 @@ impl AdapterDecorator for BandwidthShaperDecorator {
         "BandwidthShaper"
     }
     fn pre_install_action(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Decorator [BandwidthShaper]: Setting download rate limit for {} to {} KB/s.", package.name, self.max_kbps);
+        println!(
+            "Decorator [BandwidthShaper]: Setting download rate limit for {} to {} KB/s.",
+            package.name, self.max_kbps
+        );
         Ok(())
     }
     fn post_install_action(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
@@ -320,7 +353,10 @@ impl AdapterDecorator for SandboxEnforcerDecorator {
         "SandboxEnforcer"
     }
     fn pre_install_action(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Decorator [SandboxEnforcer]: Checking confinement constraints ({}) for {}.", self.confinement, package.name);
+        println!(
+            "Decorator [SandboxEnforcer]: Checking confinement constraints ({}) for {}.",
+            self.confinement, package.name
+        );
         Ok(())
     }
     fn post_install_action(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
@@ -335,7 +371,10 @@ impl AdapterDecorator for IntegrityAuditDecorator {
         "IntegrityAudit"
     }
     fn pre_install_action(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("Decorator [IntegrityAudit]: Initiating deep cryptographic integrity scan of {}.", package.name);
+        println!(
+            "Decorator [IntegrityAudit]: Initiating deep cryptographic integrity scan of {}.",
+            package.name
+        );
         Ok(())
     }
     fn post_install_action(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
@@ -532,7 +571,10 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
+    pub fn resolve_dependencies(
+        &self,
+        package_name: &str,
+    ) -> Result<std::vec::Vec<String>, PackageError> {
         let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
         let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
         to_visit.push(package_name.to_string());
@@ -748,7 +790,8 @@ impl UniversalPackageManager {
         ];
 
         for (format, name) in formats {
-            self.adapters.insert(format, PackageAdapter::new(format, name.to_string()));
+            self.adapters
+                .insert(format, PackageAdapter::new(format, name.to_string()));
         }
     }
 
@@ -849,7 +892,10 @@ impl UniversalPackageManager {
                     }
                     let pkg_broken = self.packages.get(&dep_name).unwrap().clone();
                     self.notify_observers(PackageEvent::OnFailure, &pkg_broken);
-                    return Err(PackageError::InstallationFailed(format!("Verification failed for {}", package.name)));
+                    return Err(PackageError::InstallationFailed(format!(
+                        "Verification failed for {}",
+                        package.name
+                    )));
                 }
             }
 
@@ -963,10 +1009,16 @@ impl TranslationRoutingEngine {
         Self
     }
 
-    pub fn translate_and_route(&self, manager: &mut UniversalPackageManager, cmd_line: &str) -> Result<String, PackageError> {
+    pub fn translate_and_route(
+        &self,
+        manager: &mut UniversalPackageManager,
+        cmd_line: &str,
+    ) -> Result<String, PackageError> {
         let parts: Vec<&str> = cmd_line.split_whitespace().collect();
         if parts.is_empty() {
-            return Err(PackageError::InstallationFailed("Empty command string.".to_string()));
+            return Err(PackageError::InstallationFailed(
+                "Empty command string.".to_string(),
+            ));
         }
 
         let tool = parts[0];
@@ -980,13 +1032,22 @@ impl TranslationRoutingEngine {
                         manager.add_package(pkg);
                     }
                     manager.install(pkg_name)?;
-                    Ok(format!("Routed 'apt' -> UniversalPackageManager: Installed Deb package '{}'", pkg_name))
+                    Ok(format!(
+                        "Routed 'apt' -> UniversalPackageManager: Installed Deb package '{}'",
+                        pkg_name
+                    ))
                 } else if parts.len() >= 3 && parts[1] == "remove" {
                     let pkg_name = parts[2];
                     manager.remove(pkg_name)?;
-                    Ok(format!("Routed 'apt' -> UniversalPackageManager: Removed Deb package '{}'", pkg_name))
+                    Ok(format!(
+                        "Routed 'apt' -> UniversalPackageManager: Removed Deb package '{}'",
+                        pkg_name
+                    ))
                 } else {
-                    Err(PackageError::InstallationFailed(format!("Unsupported apt command format: {}", cmd_line)))
+                    Err(PackageError::InstallationFailed(format!(
+                        "Unsupported apt command format: {}",
+                        cmd_line
+                    )))
                 }
             }
             "pacman" => {
@@ -998,13 +1059,22 @@ impl TranslationRoutingEngine {
                         manager.add_package(pkg);
                     }
                     manager.install(pkg_name)?;
-                    Ok(format!("Routed 'pacman' -> UniversalPackageManager: Installed Pacman package '{}'", pkg_name))
+                    Ok(format!(
+                        "Routed 'pacman' -> UniversalPackageManager: Installed Pacman package '{}'",
+                        pkg_name
+                    ))
                 } else if parts.len() >= 3 && parts[1] == "-R" {
                     let pkg_name = parts[2];
                     manager.remove(pkg_name)?;
-                    Ok(format!("Routed 'pacman' -> UniversalPackageManager: Removed Pacman package '{}'", pkg_name))
+                    Ok(format!(
+                        "Routed 'pacman' -> UniversalPackageManager: Removed Pacman package '{}'",
+                        pkg_name
+                    ))
                 } else {
-                    Err(PackageError::InstallationFailed(format!("Unsupported pacman command format: {}", cmd_line)))
+                    Err(PackageError::InstallationFailed(format!(
+                        "Unsupported pacman command format: {}",
+                        cmd_line
+                    )))
                 }
             }
             "dnf" | "yum" => {
@@ -1016,19 +1086,28 @@ impl TranslationRoutingEngine {
                         manager.add_package(pkg);
                     }
                     manager.install(pkg_name)?;
-                    Ok(format!("Routed 'dnf/yum' -> UniversalPackageManager: Installed Rpm package '{}'", pkg_name))
+                    Ok(format!(
+                        "Routed 'dnf/yum' -> UniversalPackageManager: Installed Rpm package '{}'",
+                        pkg_name
+                    ))
                 } else {
-                    Err(PackageError::InstallationFailed(format!("Unsupported dnf/yum command format: {}", cmd_line)))
+                    Err(PackageError::InstallationFailed(format!(
+                        "Unsupported dnf/yum command format: {}",
+                        cmd_line
+                    )))
                 }
             }
             "emerge" => {
-                let pkg_name = if parts.len() >= 3 && (parts[1].starts_with('-') || parts[1] == "--ask") {
-                    parts[2]
-                } else if parts.len() >= 2 {
-                    parts[1]
-                } else {
-                    return Err(PackageError::InstallationFailed("Emerge package target unspecified.".to_string()));
-                };
+                let pkg_name =
+                    if parts.len() >= 3 && (parts[1].starts_with('-') || parts[1] == "--ask") {
+                        parts[2]
+                    } else if parts.len() >= 2 {
+                        parts[1]
+                    } else {
+                        return Err(PackageError::InstallationFailed(
+                            "Emerge package target unspecified.".to_string(),
+                        ));
+                    };
                 if manager.get_package(pkg_name).is_none() {
                     let pkg = UnifiedPackage::new(pkg_name.to_string(), "1.0.0".to_string())
                         .with_format(PackageFormat::Ebuild);
@@ -1045,7 +1124,10 @@ impl TranslationRoutingEngine {
                     manager.add_package(pkg);
                 }
                 manager.install(tool)?;
-                Ok(format!("Routed arbitrary command '{}' -> UniversalPackageManager as native SigmaPkg", tool))
+                Ok(format!(
+                    "Routed arbitrary command '{}' -> UniversalPackageManager as native SigmaPkg",
+                    tool
+                ))
             }
         }
     }
@@ -1065,7 +1147,10 @@ pub enum PackageError {
     AdapterNotFound,
     InstallationFailed(String),
     ConflictDetected(Vec<(String, String)>),
-    InvalidStateTransition { from: PackageState, to: PackageState },
+    InvalidStateTransition {
+        from: PackageState,
+        to: PackageState,
+    },
 }
 
 #[cfg(test)]
@@ -1197,7 +1282,10 @@ mod tests {
         let closure_observer = Arc::new(UdfClosureObserver {
             observer_name: "test_closure_observer",
             handler: Box::new(move |event, package| {
-                events_clone.lock().unwrap().push((event, package.name.clone()));
+                events_clone
+                    .lock()
+                    .unwrap()
+                    .push((event, package.name.clone()));
             }),
         });
 
@@ -1217,11 +1305,17 @@ mod tests {
     #[test]
     fn test_decorator_pattern() {
         let mut adapter = PackageAdapter::new(PackageFormat::Deb, "apt".to_string());
-        adapter.add_decorator(Arc::new(GpgVerificationDecorator { key_id: "0xABCDEF".to_string() }));
+        adapter.add_decorator(Arc::new(GpgVerificationDecorator {
+            key_id: "0xABCDEF".to_string(),
+        }));
         adapter.add_decorator(Arc::new(BandwidthShaperDecorator { max_kbps: 1024 }));
-        adapter.add_decorator(Arc::new(SandboxEnforcerDecorator { confinement: "strict".to_string() }));
+        adapter.add_decorator(Arc::new(SandboxEnforcerDecorator {
+            confinement: "strict".to_string(),
+        }));
         adapter.add_decorator(Arc::new(IntegrityAuditDecorator));
-        adapter.add_decorator(Arc::new(PostQuantumCryptoDecorator { algorithm: "Dilithium5".to_string() }));
+        adapter.add_decorator(Arc::new(PostQuantumCryptoDecorator {
+            algorithm: "Dilithium5".to_string(),
+        }));
 
         let pkg = UnifiedPackage::new("secured-pkg".to_string(), "1.0.0".to_string());
         assert!(adapter.install(&pkg).is_ok());
@@ -1249,15 +1343,21 @@ mod tests {
         let mut manager = UniversalPackageManager::new();
         let engine = TranslationRoutingEngine::new();
 
-        let r1 = engine.translate_and_route(&mut manager, "apt install tmux").unwrap();
+        let r1 = engine
+            .translate_and_route(&mut manager, "apt install tmux")
+            .unwrap();
         assert!(r1.contains("tmux"));
         assert!(manager.installed_packages.contains_key("tmux"));
 
-        let r2 = engine.translate_and_route(&mut manager, "pacman -S zsh").unwrap();
+        let r2 = engine
+            .translate_and_route(&mut manager, "pacman -S zsh")
+            .unwrap();
         assert!(r2.contains("zsh"));
         assert!(manager.installed_packages.contains_key("zsh"));
 
-        let r3 = engine.translate_and_route(&mut manager, "emerge htop").unwrap();
+        let r3 = engine
+            .translate_and_route(&mut manager, "emerge htop")
+            .unwrap();
         assert!(r3.contains("htop"));
         assert!(manager.installed_packages.contains_key("htop"));
     }

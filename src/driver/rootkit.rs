@@ -61,7 +61,11 @@ pub struct SectionObject {
 }
 
 impl SectionObject {
-    pub fn new(backing_type: SectionBackingType, size_bytes: usize, page_allocator: &mut dyn FnMut() -> u64) -> Self {
+    pub fn new(
+        backing_type: SectionBackingType,
+        size_bytes: usize,
+        page_allocator: &mut dyn FnMut() -> u64,
+    ) -> Self {
         let page_count = (size_bytes + 4095) / 4096;
         let mut pages = Vec::new();
         for _ in 0..page_count {
@@ -127,7 +131,10 @@ impl StealthFilterDriver {
     }
 
     /// Intercepts the directory listing responses (IRP_MJ_DIRECTORY_CONTROL) and filters out hidden files
-    pub fn filter_directory_response(&self, directory_entries: &mut Vec<FileDirectoryEntry>) -> usize {
+    pub fn filter_directory_response(
+        &self,
+        directory_entries: &mut Vec<FileDirectoryEntry>,
+    ) -> usize {
         let initial_len = directory_entries.len();
         directory_entries.retain(|entry| entry.filename != self.hidden_filename);
         initial_len - directory_entries.len() // Return number of hidden files filtered out

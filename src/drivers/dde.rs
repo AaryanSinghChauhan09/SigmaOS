@@ -449,7 +449,11 @@ impl UdfInterpreter {
                 let (res, overflow) = val1.overflowing_add(operand);
 
                 let sat_res = if overflow {
-                    if val1 >= 0 { i64::MAX } else { i64::MIN }
+                    if val1 >= 0 {
+                        i64::MAX
+                    } else {
+                        i64::MIN
+                    }
                 } else {
                     res
                 };
@@ -468,7 +472,11 @@ impl UdfInterpreter {
                 let (res, overflow) = val1.overflowing_sub(operand);
 
                 let sat_res = if overflow {
-                    if val1 >= 0 { i64::MAX } else { i64::MIN }
+                    if val1 >= 0 {
+                        i64::MAX
+                    } else {
+                        i64::MIN
+                    }
                 } else {
                     res
                 };
@@ -642,19 +650,25 @@ mod tests {
 
         // 2. Test Sign Flag (SF) on MOV -5
         let val_neg_5 = -5i64 as u64;
-        interpreter.execute_instruction(0x01, &[0, val_neg_5]).unwrap();
+        interpreter
+            .execute_instruction(0x01, &[0, val_neg_5])
+            .unwrap();
         assert_eq!(interpreter.registers[0], val_neg_5);
         assert!(interpreter.sf);
 
         // 3. Test Carry Flag (CF) on addition overflow: u64::MAX + 1
-        interpreter.execute_instruction(0x01, &[1, u64::MAX]).unwrap();
+        interpreter
+            .execute_instruction(0x01, &[1, u64::MAX])
+            .unwrap();
         interpreter.execute_instruction(0x02, &[1, 1]).unwrap(); // R1 = R1 + 1
         assert_eq!(interpreter.registers[1], 0);
         assert!(interpreter.cf);
         assert!(interpreter.zf);
 
         // 4. Test signed overflow flag (OF): i64::MAX + 1 -> negative
-        interpreter.execute_instruction(0x01, &[2, i64::MAX as u64]).unwrap();
+        interpreter
+            .execute_instruction(0x01, &[2, i64::MAX as u64])
+            .unwrap();
         interpreter.execute_instruction(0x02, &[2, 1]).unwrap(); // R2 = R2 + 1
         assert_eq!(interpreter.registers[2], i64::MIN as u64);
         assert!(interpreter.of);
@@ -679,7 +693,9 @@ mod tests {
 
         // SAR (Arithmetic Shift Right) checks
         let signed_neg_16 = -16i64 as u64;
-        interpreter.execute_instruction(0x01, &[2, signed_neg_16]).unwrap();
+        interpreter
+            .execute_instruction(0x01, &[2, signed_neg_16])
+            .unwrap();
         interpreter.execute_instruction(0x0E, &[2, 2]).unwrap(); // R2 = R2 >>_sar 2
         assert_eq!(interpreter.registers[2] as i64, -4);
     }
@@ -690,13 +706,17 @@ mod tests {
         let mut interpreter = UdfInterpreter::new(device_id, 0x1000);
 
         // SADD i64::MAX + 10 -> clamp to i64::MAX
-        interpreter.execute_instruction(0x01, &[0, i64::MAX as u64]).unwrap();
+        interpreter
+            .execute_instruction(0x01, &[0, i64::MAX as u64])
+            .unwrap();
         interpreter.execute_instruction(0x0C, &[0, 10]).unwrap(); // R0 = SADD R0, 10
         assert_eq!(interpreter.registers[0] as i64, i64::MAX);
         assert!(interpreter.of);
 
         // SSUB i64::MIN - 10 -> clamp to i64::MIN
-        interpreter.execute_instruction(0x01, &[1, i64::MIN as u64]).unwrap();
+        interpreter
+            .execute_instruction(0x01, &[1, i64::MIN as u64])
+            .unwrap();
         interpreter.execute_instruction(0x0D, &[1, 10]).unwrap(); // R1 = SSUB R1, 10
         assert_eq!(interpreter.registers[1] as i64, i64::MIN);
         assert!(interpreter.of);

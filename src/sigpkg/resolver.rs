@@ -19,8 +19,8 @@
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
-use crate::sigpkg::{Package, Version, VersionConstraint};
 use crate::klib::{HashMap, HashSet};
+use crate::sigpkg::{Package, Version, VersionConstraint};
 
 /// SAT Solver for dependency resolution
 pub struct SatSolver {

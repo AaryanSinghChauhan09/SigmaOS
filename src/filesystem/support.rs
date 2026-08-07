@@ -18,10 +18,12 @@
 
 extern crate alloc;
 
+pub use crate::filesystem::smart_symlink::{
+    LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule,
+};
 use crate::klib::Vec;
 use alloc::boxed::Box;
 use core::mem;
-pub use crate::filesystem::smart_symlink::{SmartSymlink, SymlinkResolverRule, LegacyLinuxRule, LinuxPersonaRule};
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
@@ -282,4 +284,3 @@ impl FilesystemManager for SimpleFilesystemManager {
         ids
     }
 }
-

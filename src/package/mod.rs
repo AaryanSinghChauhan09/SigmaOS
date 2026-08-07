@@ -17,11 +17,12 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Package Module
+pub mod apm;
 pub mod linux_translation;
 pub mod store;
 pub mod universal;
-pub mod apm;
 
+pub use apm::{IsolationLevel as SovereignIsolationLevel, SovereignApm, SovereignApp};
 pub use linux_translation::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
     LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
@@ -29,10 +30,6 @@ pub use linux_translation::{
 };
 pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE};
 pub use universal::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError,
-    PackageFormat, PackageSource,
-    UnifiedPackage, UniversalPackageManager,
-};
-pub use apm::{
-    SovereignApp, SovereignApm, IsolationLevel as SovereignIsolationLevel,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };

@@ -1,10 +1,9 @@
+use crate::klib::Vec;
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
 /// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
 /// Cinnamon-like desktop theme manager, and MintDrivers manager.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintUpdateLevel {
@@ -444,7 +443,8 @@ mod tests {
     #[test]
     fn test_mint_timeshift_restore_points() {
         let mut timeshift = MintTimeshiftEngine::new();
-        let snap_id = timeshift.create_checkpoint(1690000000, b"Fresh boot restore point", 0xDEADBEEF);
+        let snap_id =
+            timeshift.create_checkpoint(1690000000, b"Fresh boot restore point", 0xDEADBEEF);
         assert_eq!(snap_id, 1);
 
         let hash = timeshift.restore_checkpoint(1).unwrap();
@@ -475,7 +475,9 @@ mod tests {
         assert_eq!(drivers.available_drivers.len(), 1);
         assert!(!drivers.available_drivers[0].active);
 
-        drivers.toggle_driver(b"Broadcom BCM4360 WiFi", true).unwrap();
+        drivers
+            .toggle_driver(b"Broadcom BCM4360 WiFi", true)
+            .unwrap();
         assert!(drivers.available_drivers[0].active);
     }
 }

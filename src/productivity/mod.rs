@@ -19,6 +19,7 @@ pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
+pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
 pub use notes::{
     ContentType, Folder, InMemoryNoteStorage, Note, NoteError, NoteSearchResult, NoteStorage,
     NoteTakingApp, Notebook,
@@ -46,8 +47,5 @@ pub use terminal::{
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
 pub use tmux::{
-    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
-};
-pub use media::{
-    AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE,
+    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };

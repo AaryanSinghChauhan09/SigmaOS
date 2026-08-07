@@ -19,7 +19,7 @@
 // SigmaOS Unified Dashboard System
 // Publisher-grade dashboards for system monitoring and productivity
 
-use crate::klib::{HashMap, Duration, Instant};
+use crate::klib::{Duration, HashMap, Instant};
 
 /// System metric type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

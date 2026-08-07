@@ -145,7 +145,13 @@ impl SystemdEngine {
         None
     }
 
-    pub fn log_journal(&mut self, unit_id: UnitID, message: &[u8], from_state: UnitState, to_state: UnitState) {
+    pub fn log_journal(
+        &mut self,
+        unit_id: UnitID,
+        message: &[u8],
+        from_state: UnitState,
+        to_state: UnitState,
+    ) {
         let entry = JournalEntry::new(unit_id, message, from_state, to_state);
         self.journal.push(entry);
     }
@@ -243,7 +249,10 @@ impl SystemdEngine {
                     continue;
                 }
                 let mut is_before = false;
-                if unit.after.contains(&other_id) || unit.requires.contains(&other_id) || unit.wants.contains(&other_id) {
+                if unit.after.contains(&other_id)
+                    || unit.requires.contains(&other_id)
+                    || unit.wants.contains(&other_id)
+                {
                     is_before = true;
                 }
                 if let Some(other) = self.find_unit(other_id) {
@@ -270,7 +279,12 @@ impl SystemdEngine {
             if unit.state == UnitState::Active {
                 return Ok(()); // Already running
             }
-            (unit.is_enabled, unit.conflicts.clone(), unit.requires.clone(), unit.wants.clone())
+            (
+                unit.is_enabled,
+                unit.conflicts.clone(),
+                unit.requires.clone(),
+                unit.wants.clone(),
+            )
         } else {
             return Err("Unit not found");
         };
@@ -305,7 +319,12 @@ impl SystemdEngine {
                 if let Some(u) = self.find_unit_mut(id) {
                     u.state = UnitState::Failed;
                 }
-                self.log_journal(id, b"Required dependency failed to start", UnitState::Inactive, UnitState::Failed);
+                self.log_journal(
+                    id,
+                    b"Required dependency failed to start",
+                    UnitState::Inactive,
+                    UnitState::Failed,
+                );
                 return Err("Required dependency failed to start");
             }
         }
@@ -319,7 +338,12 @@ impl SystemdEngine {
         if let Some(u) = self.find_unit_mut(id) {
             u.state = UnitState::Activating;
         }
-        self.log_journal(id, b"Unit starting/activating", UnitState::Inactive, UnitState::Activating);
+        self.log_journal(
+            id,
+            b"Unit starting/activating",
+            UnitState::Inactive,
+            UnitState::Activating,
+        );
 
         // Transition to Active, record timings
         if let Some(u) = self.find_unit_mut(id) {
@@ -327,7 +351,12 @@ impl SystemdEngine {
             u.startup_time_ms = 100; // Mock timing for analyze compatibility
             u.duration_ms = 150;
         }
-        self.log_journal(id, b"Unit started successfully", UnitState::Activating, UnitState::Active);
+        self.log_journal(
+            id,
+            b"Unit started successfully",
+            UnitState::Activating,
+            UnitState::Active,
+        );
 
         Ok(())
     }
@@ -345,13 +374,23 @@ impl SystemdEngine {
             }
             u.state = UnitState::Deactivating;
         }
-        self.log_journal(id, b"Unit stopping/deactivating", UnitState::Active, UnitState::Deactivating);
+        self.log_journal(
+            id,
+            b"Unit stopping/deactivating",
+            UnitState::Active,
+            UnitState::Deactivating,
+        );
 
         // Transition to Inactive
         if let Some(u) = self.find_unit_mut(id) {
             u.state = UnitState::Inactive;
         }
-        self.log_journal(id, b"Unit stopped successfully", UnitState::Deactivating, UnitState::Inactive);
+        self.log_journal(
+            id,
+            b"Unit stopped successfully",
+            UnitState::Deactivating,
+            UnitState::Inactive,
+        );
 
         // BindsTo dependency handling
         let mut bound_units = Vec::new();
@@ -405,12 +444,22 @@ impl SystemdEngine {
         if let Some(u) = self.find_unit_mut(id) {
             u.state = UnitState::Activating;
         }
-        self.log_journal(id, b"Reloading unit configuration", state, UnitState::Activating);
+        self.log_journal(
+            id,
+            b"Reloading unit configuration",
+            state,
+            UnitState::Activating,
+        );
 
         if let Some(u) = self.find_unit_mut(id) {
             u.state = UnitState::Active;
         }
-        self.log_journal(id, b"Unit reloaded successfully", UnitState::Activating, UnitState::Active);
+        self.log_journal(
+            id,
+            b"Unit reloaded successfully",
+            UnitState::Activating,
+            UnitState::Active,
+        );
         Ok(())
     }
 
@@ -438,14 +487,24 @@ impl SystemdEngine {
                 unit.restart_count += 1;
                 unit.state = UnitState::Activating;
             }
-            self.log_journal(id, b"Auto-restarting failed unit based on restart policy", UnitState::Failed, UnitState::Activating);
+            self.log_journal(
+                id,
+                b"Auto-restarting failed unit based on restart policy",
+                UnitState::Failed,
+                UnitState::Activating,
+            );
             self.systemctl_start(id)?;
             Ok(true)
         } else {
             if let Some(unit) = self.find_unit_mut(id) {
                 unit.state = UnitState::Failed;
             }
-            self.log_journal(id, b"Unit entered Failed state, restart policy not met or limit exceeded", UnitState::Inactive, UnitState::Failed);
+            self.log_journal(
+                id,
+                b"Unit entered Failed state, restart policy not met or limit exceeded",
+                UnitState::Inactive,
+                UnitState::Failed,
+            );
             Ok(false)
         }
     }
@@ -461,7 +520,12 @@ impl SystemdEngine {
         }
 
         if let Some(srv_id) = triggered_id {
-            self.log_journal(socket_id, b"Socket activation triggered", UnitState::Active, UnitState::Active);
+            self.log_journal(
+                socket_id,
+                b"Socket activation triggered",
+                UnitState::Active,
+                UnitState::Active,
+            );
             self.systemctl_start(srv_id)?;
             Ok(())
         } else {
@@ -479,7 +543,12 @@ impl SystemdEngine {
         }
 
         if let Some(srv_id) = triggered_id {
-            self.log_journal(path_id, b"Path modification activation triggered", UnitState::Active, UnitState::Active);
+            self.log_journal(
+                path_id,
+                b"Path modification activation triggered",
+                UnitState::Active,
+                UnitState::Active,
+            );
             self.systemctl_start(srv_id)?;
             Ok(())
         } else {
@@ -497,7 +566,12 @@ impl SystemdEngine {
         }
 
         if let Some(srv_id) = triggered_id {
-            self.log_journal(timer_id, b"Timer activation triggered", UnitState::Active, UnitState::Active);
+            self.log_journal(
+                timer_id,
+                b"Timer activation triggered",
+                UnitState::Active,
+                UnitState::Active,
+            );
             self.systemctl_start(srv_id)?;
             Ok(())
         } else {
@@ -608,7 +682,10 @@ impl<T> Vec<T> {
         }
         false
     }
-    pub fn remove_item(&mut self, item: &T) -> bool where T: PartialEq {
+    pub fn remove_item(&mut self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
         for i in 0..self.len {
             unsafe {
                 if &*self.data.add(i) == item {
@@ -622,7 +699,10 @@ impl<T> Vec<T> {
         }
         false
     }
-    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
+    pub fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
         let mut write_idx = 0;
         for read_idx in 0..self.len {
             unsafe {

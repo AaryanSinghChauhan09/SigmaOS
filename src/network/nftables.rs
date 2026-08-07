@@ -121,10 +121,7 @@ pub enum NftExpression {
         dest_reg: NftRegister,
     },
     /// Counter expression
-    Counter {
-        packets: u64,
-        bytes: u64,
-    },
+    Counter { packets: u64, bytes: u64 },
     /// Verdict expression
     Verdict(NftVerdict),
     /// Match expression
@@ -341,7 +338,12 @@ impl NftSet {
         }
     }
 
-    pub fn anonymous(name: String, table: String, family: NftFamily, key_type: NftDataType) -> Self {
+    pub fn anonymous(
+        name: String,
+        table: String,
+        family: NftFamily,
+        key_type: NftDataType,
+    ) -> Self {
         Self {
             name,
             table,
@@ -380,7 +382,13 @@ pub struct NftMap {
 }
 
 impl NftMap {
-    pub fn new(name: String, table: String, family: NftFamily, key_type: NftDataType, data_type: NftDataType) -> Self {
+    pub fn new(
+        name: String,
+        table: String,
+        family: NftFamily,
+        key_type: NftDataType,
+        data_type: NftDataType,
+    ) -> Self {
         Self {
             name,
             table,
@@ -528,12 +536,27 @@ impl NftConntrack {
         id
     }
 
-    pub fn get_connection(&self, src_addr: &str, src_port: u16, dst_addr: &str, dst_port: u16, protocol: NftPayloadProtocol) -> Option<&NftConnection> {
+    pub fn get_connection(
+        &self,
+        src_addr: &str,
+        src_port: u16,
+        dst_addr: &str,
+        dst_port: u16,
+        protocol: NftPayloadProtocol,
+    ) -> Option<&NftConnection> {
         let key = self.calculate_key(src_addr, src_port, dst_addr, dst_port, protocol);
         self.connections.get(&key)
     }
 
-    pub fn update_connection_state(&mut self, src_addr: &str, src_port: u16, dst_addr: &str, dst_port: u16, protocol: NftPayloadProtocol, new_state: NftConnState) {
+    pub fn update_connection_state(
+        &mut self,
+        src_addr: &str,
+        src_port: u16,
+        dst_addr: &str,
+        dst_port: u16,
+        protocol: NftPayloadProtocol,
+        new_state: NftConnState,
+    ) {
         let key = self.calculate_key(src_addr, src_port, dst_addr, dst_port, protocol);
         if let Some(conn) = self.connections.get_mut(&key) {
             conn.state = new_state;
@@ -542,7 +565,7 @@ impl NftConntrack {
 
     pub fn cleanup_expired(&mut self, current_time: u64) -> usize {
         let mut expired = Vec::new();
-        
+
         for (&key, conn) in &self.connections {
             if current_time - conn.created > conn.timeout {
                 expired.push(key);
@@ -557,10 +580,23 @@ impl NftConntrack {
     }
 
     fn calculate_conn_key(&self, conn: &NftConnection) -> u64 {
-        self.calculate_key(&conn.src_addr, conn.src_port, &conn.dst_addr, conn.dst_port, conn.protocol)
+        self.calculate_key(
+            &conn.src_addr,
+            conn.src_port,
+            &conn.dst_addr,
+            conn.dst_port,
+            conn.protocol,
+        )
     }
 
-    fn calculate_key(&self, src_addr: &str, src_port: u16, dst_addr: &str, dst_port: u16, protocol: NftPayloadProtocol) -> u64 {
+    fn calculate_key(
+        &self,
+        src_addr: &str,
+        src_port: u16,
+        dst_addr: &str,
+        dst_port: u16,
+        protocol: NftPayloadProtocol,
+    ) -> u64 {
         let mut hash: u64 = 5381;
         for byte in src_addr.bytes() {
             hash = hash.wrapping_mul(33).wrapping_add(byte as u64);
@@ -714,7 +750,8 @@ impl NftablesManager {
                 // Process rules in this chain
                 for rule in &chain.rules {
                     // Evaluate rule expressions
-                    if self.evaluate_rule(rule, &src_addr, src_port, &dst_addr, dst_port, protocol) {
+                    if self.evaluate_rule(rule, &src_addr, src_port, &dst_addr, dst_port, protocol)
+                    {
                         // Extract verdict from rule
                         for expr in &rule.expressions {
                             if let NftExpression::Verdict(verdict) = expr {
@@ -747,7 +784,7 @@ impl NftablesManager {
     ) -> bool {
         // Simplified rule evaluation
         // In a real implementation, this would evaluate all expressions
-        
+
         for expr in &rule.expressions {
             match expr {
                 NftExpression::Verdict(_) => continue,
@@ -766,7 +803,9 @@ impl NftablesManager {
     pub fn get_stats(&self) -> NftablesStats {
         let total_tables = self.tables.len();
         let total_chains: usize = self.tables.values().map(|t| t.chains.len()).sum();
-        let total_rules: usize = self.tables.values()
+        let total_rules: usize = self
+            .tables
+            .values()
             .flat_map(|t| t.chains.values())
             .map(|c| c.rules.len())
             .sum();
@@ -803,30 +842,36 @@ impl NftablesManager {
         let mut output = String::new();
 
         for table in self.tables.values() {
-            output.push_str(&format!("table {} {} {{\n", format_family(table.family), table.name));
-            
+            output.push_str(&format!(
+                "table {} {} {{\n",
+                format_family(table.family),
+                table.name
+            ));
+
             for chain in table.chains.values() {
                 output.push_str(&format!("  chain {} {{\n", chain.name));
-                
+
                 if let Some(hook) = chain.hook {
-                    output.push_str(&format!("    type {} hook {} priority {};\n", 
-                        format_chain_type(chain.chain_type), 
-                        format_hook(hook), 
-                        chain.priority.map_or(0, |p| p.raw())));
+                    output.push_str(&format!(
+                        "    type {} hook {} priority {};\n",
+                        format_chain_type(chain.chain_type),
+                        format_hook(hook),
+                        chain.priority.map_or(0, |p| p.raw())
+                    ));
                 }
-                
+
                 output.push_str(&format!("    policy {};\n", format_policy(chain.policy)));
-                
+
                 for rule in &chain.rules {
                     output.push_str(&format!("    # rule handle {}\n", rule.handle));
                     if !rule.comment.is_empty() {
                         output.push_str(&format!("    # {}\n", rule.comment));
                     }
                 }
-                
+
                 output.push_str("  }\n");
             }
-            
+
             output.push_str("}\n");
         }
 
@@ -900,7 +945,7 @@ mod tests {
         let chain = NftChain::new("input".to_string(), NftFamily::Ip, "filter".to_string())
             .with_hook(NftHook::Input, NftPriority::new(0))
             .with_policy(NftChainPolicy::Drop);
-        
+
         assert_eq!(chain.hook, Some(NftHook::Input));
         assert_eq!(chain.policy, NftChainPolicy::Drop);
     }
@@ -910,19 +955,24 @@ mod tests {
         let mut manager = NftablesManager::new();
         let table = NftTable::new("filter".to_string(), NftFamily::Ip);
         manager.add_table(table).unwrap();
-        
+
         assert!(manager.get_table("filter").is_some());
     }
 
     #[test]
     fn test_set_operations() {
-        let set = NftSet::new("blocked".to_string(), "filter".to_string(), NftFamily::Ip, NftDataType::Ipv4Addr);
+        let set = NftSet::new(
+            "blocked".to_string(),
+            "filter".to_string(),
+            NftFamily::Ip,
+            NftDataType::Ipv4Addr,
+        );
         let mut manager = NftablesManager::new();
         manager.add_set(set).unwrap();
-        
+
         let set = manager.get_set_mut("blocked").unwrap();
         set.add_element(vec![192, 168, 1, 1]).unwrap();
-        
+
         assert!(set.contains(&vec![192, 168, 1, 1]));
     }
 }

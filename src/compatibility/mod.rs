@@ -69,6 +69,6 @@ pub use sovereign_suite::{
 
 pub mod debian;
 pub use debian::{
-    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
-    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
+    AlternativeLink, AptRepositorySync, DebianAlternativesSystem, DebianChannel, DebootstrapEngine,
+    SysVInitEngine, SysVRunlevel,
 };
