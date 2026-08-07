@@ -640,7 +640,7 @@ mod tests {
         assert!(!RootkitDetector::is_driver_compromised(&driver));
 
         // Maliciously swap dispatcher pointer (simulated Rootkit Hook)
-        driver.dispatch_table.insert(IRP_MJ_READ, |device, irp| IoStatus::Cancelled);
+        driver.dispatch_table.insert(IRP_MJ_READ, |_device, _irp| IoStatus::Cancelled);
 
         // Rootkit hook detected!
         assert!(RootkitDetector::is_driver_compromised(&driver));
