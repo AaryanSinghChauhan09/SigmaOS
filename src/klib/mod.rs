@@ -21,6 +21,8 @@ pub mod uuid;
 pub mod uvm;
 pub mod vec;
 pub mod vecdeque;
+pub mod math_ops;
+pub mod string_ops;
 
 pub use vec::Vec;
 pub use hashmap::HashMap;

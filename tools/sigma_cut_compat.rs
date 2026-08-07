@@ -230,7 +230,7 @@ pub unsafe extern "C" fn cut_fields(
 pub unsafe extern "C" fn cut_process_file(
     input_file: *const u8,
     output_file: *const u8,
-    options: CutOptions,
+    _options: CutOptions,
 ) -> SigmaI32 {
     if !CUT_INITIALIZED || input_file.isnull() {
         return -1;

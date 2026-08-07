@@ -1303,7 +1303,7 @@ impl Uart8250 {
         }
     }
 
-    pub fn write_byte(&mut self, byte: u8) -> Result<(), AncientError> {
+    pub fn write_byte(&mut self, _byte: u8) -> Result<(), AncientError> {
         if self.line_status & 0x20 != 0 {
             // THRE set, can write
             self.line_status |= 0x01;

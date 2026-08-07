@@ -71,7 +71,7 @@ pub unsafe extern "C" fn diff_init() -> SigmaI32 {
 pub unsafe extern "C" fn diff_compare(
     file1: *const u8,
     file2: *const u8,
-    options: DiffOptions,
+    _options: DiffOptions,
 ) -> SigmaI32 {
     if !DIFF_INITIALIZED || file1.isnull() || file2.isnull() {
         return -1;

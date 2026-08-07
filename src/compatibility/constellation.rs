@@ -233,7 +233,7 @@ impl BuildArchive {
         }
     }
 
-    pub fn replay_legacy_build(&self, recipe_name: &str) -> &'static str {
+    pub fn replay_legacy_build(&self, _recipe_name: &str) -> &'static str {
         match self.profile {
             ArchiveProfile::LegacyCArchive => "Replayed GCC 2.7.2 executable build successfully",
             ArchiveProfile::LegacyCppArchive => "Replayed GCC 2.95 object file build successfully",

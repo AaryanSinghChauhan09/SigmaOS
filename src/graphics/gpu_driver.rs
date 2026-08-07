@@ -194,11 +194,11 @@ impl GpuDriver {
     pub fn fill_rect(
         &self,
         id: u32,
-        x: u32,
-        y: u32,
-        width: u32,
-        height: u32,
-        color: u32,
+        _x: u32,
+        _y: u32,
+        _width: u32,
+        _height: u32,
+        _color: u32,
     ) -> Result<(), &'static str> {
         let device = self.devices.get(&id).ok_or("Device not found")?;
 
@@ -218,12 +218,12 @@ impl GpuDriver {
     pub fn copy_rect(
         &self,
         id: u32,
-        src_x: u32,
-        src_y: u32,
-        dst_x: u32,
-        dst_y: u32,
-        width: u32,
-        height: u32,
+        _src_x: u32,
+        _src_y: u32,
+        _dst_x: u32,
+        _dst_y: u32,
+        _width: u32,
+        _height: u32,
     ) -> Result<(), &'static str> {
         let device = self.devices.get(&id).ok_or("Device not found")?;
 

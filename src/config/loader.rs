@@ -93,7 +93,7 @@ impl ConfigValue for SimpleConfigValue {
 pub trait ConfigLoader {
     fn load_config(&mut self, config: Box<dyn ConfigValue>) -> Result<ConfigID, ConfigError>;
     fn get_config(&self, key: &[u8]) -> Option<&dyn ConfigValue>;
-    fn set_config(&mut self, key: &[u8], value: &[u8]) -> Result<(), ConfigError>;
+    fn set_config(&mut self, _key: &[u8], _value: &[u8]) -> Result<(), ConfigError>;
     fn save_config(&self) -> Result<(), ConfigError>;
 }
 
@@ -129,7 +129,7 @@ impl ConfigLoader for SimpleConfigLoader {
         None
     }
 
-    fn set_config(&mut self, key: &[u8], value: &[u8]) -> Result<(), ConfigError> {
+    fn set_config(&mut self, _key: &[u8], _value: &[u8]) -> Result<(), ConfigError> {
         for config_option in &mut self.configs {
             if let Some(ref mut config) = *config_option {
                 if config.key() == key {

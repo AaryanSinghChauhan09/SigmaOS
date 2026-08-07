@@ -60,7 +60,7 @@ pub unsafe extern "C" fn grep_init() -> SigmaI32 {
 pub unsafe extern "C" fn grep_search(
     pattern: *const u8,
     file_path: *const u8,
-    options: GrepOptions,
+    _options: GrepOptions,
     matches: *mut GrepMatch,
     max_count: SigmaU32,
 ) -> SigmaU32 {

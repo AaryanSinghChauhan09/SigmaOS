@@ -135,7 +135,7 @@ impl SovereignGameEngine {
 
     fn process_physics_node(node: &mut SceneNode, delta: f64, gravity: f64) {
         match node {
-            SceneNode::RigidBody2D { position, velocity, mass, children, .. } => {
+            SceneNode::RigidBody2D { position, velocity, mass: _mass, children, .. } => {
                 // Apply gravity acceleration: v = v + g * dt
                 velocity.y += gravity * delta;
                 // Apply velocity translation: p = p + v * dt

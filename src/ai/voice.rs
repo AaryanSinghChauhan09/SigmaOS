@@ -119,7 +119,7 @@ impl VoiceRecognizer {
     /// Recognize speech from audio data
     pub fn recognize(
         &self,
-        audio_data: &[u8],
+        _audio_data: &[u8],
         format: AudioFormat,
     ) -> Result<RecognitionResult, String> {
         // Validate audio format

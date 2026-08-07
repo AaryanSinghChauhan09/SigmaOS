@@ -71,7 +71,7 @@ impl FingerprintTemplate for SimpleFingerprintTemplate {
 
 pub trait FingerprintScanner {
     fn scan(&mut self) -> Result<Box<dyn FingerprintTemplate>, ScanError>;
-    fn enroll(&mut self, user_id: usize) -> Result<FingerID, ScanError>;
+    fn enroll(&mut self, _user_id: usize) -> Result<FingerID, ScanError>;
     def verify(&self, template: &dyn FingerprintTemplate) -> Result<bool, ScanError>;
 }
 
@@ -98,14 +98,14 @@ impl FingerprintScanner for SimpleFingerprintScanner {
         Ok(Box::new(template))
     }
 
-    fn enroll(&mut self, user_id: usize) -> Result<FingerID, ScanError> {
+    fn enroll(&mut self, _user_id: usize) -> Result<FingerID, ScanError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let template = SimpleFingerprintTemplate::new(id, b"enrolled_template", 90);
         self.templates.push(Some(Box::new(template)));
         Ok(id)
     }
 
-    fn verify(&self, template: &dyn FingerprintTemplate) -> Result<bool, ScanError> {
+    fn verify(&self, _template: &dyn FingerprintTemplate) -> Result<bool, ScanError> {
         for stored_option in &self.templates {
             if let Some(ref stored) = *stored_option {
                 if stored.quality() > 80 {
@@ -118,8 +118,8 @@ impl FingerprintScanner for SimpleFingerprintScanner {
 }
 
 pub trait BiometricAuth {
-    fn authenticate(&mut self, fingerprint: &dyn FingerprintTemplate) -> Result<usize, ScanError>;
-    def register_user(&mut self, user_id: usize, template: Box<dyn FingerprintTemplate>) -> Result<(), ScanError>;
+    fn authenticate(&mut self, _fingerprint: &dyn FingerprintTemplate) -> Result<usize, ScanError>;
+    fn register_user(&mut self, user_id: usize, template: Box<dyn FingerprintTemplate>) -> Result<(), ScanError>;
 }
 
 #[repr(C)]
@@ -137,7 +137,7 @@ impl SimpleBiometricAuth {
 }
 
 impl BiometricAuth for SimpleBiometricAuth {
-    fn authenticate(&mut self, fingerprint: &dyn FingerprintTemplate) -> Result<usize, ScanError> {
+    fn authenticate(&mut self, _fingerprint: &dyn FingerprintTemplate) -> Result<usize, ScanError> {
         for &(user_id, ref template) in &self.users {
             if template.quality() > 80 {
                 return Ok(user_id);

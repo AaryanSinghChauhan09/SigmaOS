@@ -189,7 +189,7 @@ pub struct SimpleRegisterViewer {
 impl SimpleRegisterViewer {
     pub fn new() -> Self {
         let mut registers = Vec::new();
-        for i in 0..16 {
+        for _ in 0..16 {
             registers.push(0u64);
         }
         SimpleRegisterViewer { registers }

@@ -60,7 +60,7 @@ pub unsafe extern "C" fn tee_process(
     input_size: SigmaU32,
     output: *mut u8,
     max_output: SigmaU32,
-    options: TeeOptions,
+    _options: TeeOptions,
 ) -> SigmaI32 {
     if !TEE_INITIALIZED || input.isnull() || output.isnull() {
         return -1;

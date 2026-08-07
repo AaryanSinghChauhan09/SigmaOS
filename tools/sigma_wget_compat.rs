@@ -62,7 +62,7 @@ pub unsafe extern "C" fn wget_init() -> SigmaI32 {
 #[no_mangle]
 pub unsafe extern "C" fn wget_download(
     url: *const u8,
-    options: DownloadOptions,
+    _options: DownloadOptions,
 ) -> SigmaI32 {
     if !WGET_INITIALIZED || url.isnull() {
         return -1;

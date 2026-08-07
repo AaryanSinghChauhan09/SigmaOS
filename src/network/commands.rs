@@ -421,7 +421,7 @@ impl IptablesEngine {
         &self,
         rule: &IptablesRule,
         src_ip: u32,
-        src_port: u16,
+        _src_port: u16,
         dest_ip: u32,
         dest_port: u16,
         protocol: NetworkProtocol,

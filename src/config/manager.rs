@@ -267,7 +267,7 @@ pub trait ConfigManager {
     /// Set value
     fn set_value(&mut self, section: &[u8], key: &[u8], value: ConfigValue) -> Result<(), ConfigError>;
     /// Load configuration
-    fn load(&mut self, data: &[u8]) -> Result<(), ConfigError>;
+    fn load(&mut self, _data: &[u8]) -> Result<(), ConfigError>;
     /// Save configuration
     fn save(&self) -> Result<Vec<u8>, ConfigError>;
     /// Get manager statistics
@@ -433,7 +433,7 @@ impl ConfigManager for SimpleConfigManager {
         }
     }
 
-    fn load(&mut self, data: &[u8]) -> Result<(), ConfigError> {
+    fn load(&mut self, _data: &[u8]) -> Result<(), ConfigError> {
         if !self.capability.can_load {
             return Err(ConfigError::PermissionDenied);
         }

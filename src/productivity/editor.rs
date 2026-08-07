@@ -378,7 +378,7 @@ impl CodeEditor {
     pub fn delete_text(
         &mut self,
         doc_id: &str,
-        selection: TextSelection,
+        _selection: TextSelection,
     ) -> Result<(), EditorError> {
         if let Some(doc) = self.documents.get_mut(doc_id) {
             // Simple deletion (in real implementation, would handle selection properly)

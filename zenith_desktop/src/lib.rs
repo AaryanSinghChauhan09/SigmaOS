@@ -689,7 +689,7 @@ impl AIAdapter {
     }
 
     /// Optimize profile
-    pub fn optimize_profile(&mut self, profile: &mut UserProfile) {
+    pub fn optimize_profile(&mut self, _profile: &mut UserProfile) {
         if self.enabled {
             // Use ML to optimize profile
         }

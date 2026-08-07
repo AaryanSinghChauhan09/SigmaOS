@@ -165,7 +165,7 @@ pub unsafe extern "C" fn sed_process_line(
 pub unsafe extern "C" fn sed_process_file(
     input_file: *const u8,
     output_file: *const u8,
-    options: SedOptions,
+    _options: SedOptions,
 ) -> SigmaI32 {
     if !SED_INITIALIZED || input_file.isnull() {
         return -1;

@@ -230,7 +230,7 @@ pub unsafe extern "C" fn awk_get_line_number() -> SigmaU32 {
 #[no_mangle]
 pub unsafe extern "C" fn awk_process_file(
     input_file: *const u8,
-    options: AwkOptions,
+    _options: AwkOptions,
 ) -> SigmaI32 {
     if !AWK_INITIALIZED || input_file.isnull() {
         return -1;

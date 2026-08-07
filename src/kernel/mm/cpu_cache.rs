@@ -565,7 +565,7 @@ impl CpuCacheHierarchy {
         }
 
         let (l3_hit, l3_evicted) = self.l3.access(addr, true, Some(data), system_time);
-        if let Some(evicted_addr) = l3_evicted {
+        if let Some(_evicted_addr) = l3_evicted {
             self.dram_traffic_bytes.fetch_add(64, Ordering::Relaxed);
         }
 

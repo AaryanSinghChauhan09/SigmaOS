@@ -61,7 +61,7 @@ pub unsafe extern "C" fn zip_create(
     archive_name: *const u8,
     files: *const *const u8,
     file_count: SigmaU32,
-    options: ZipOptions,
+    _options: ZipOptions,
 ) -> SigmaI32 {
     if !ZIP_INITIALIZED || archive_name.isnull() || files.isnull() {
         return -1;
@@ -110,7 +110,7 @@ pub unsafe extern "C" fn zip_create(
 #[no_mangle]
 pub unsafe extern "C" fn zip_extract(
     archive_name: *const u8,
-    options: ZipOptions,
+    _options: ZipOptions,
 ) -> SigmaI32 {
     if !ZIP_INITIALIZED || archive_name.isnull() {
         return -1;

@@ -214,7 +214,7 @@ impl ScreenReader {
         self.voice_pitch = pitch.min(100);
     }
 
-    pub fn speak(&self, text: &str) {
+    pub fn speak(&self, _text: &str) {
         if self.enabled {
             // In real implementation, would synthesize speech
         }

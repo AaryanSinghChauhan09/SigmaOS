@@ -289,7 +289,7 @@ impl Debugger {
     }
 
     /// Write memory to a specific address
-    pub fn write_memory(&self, address: u64, data: &[u8]) -> Result<(), String> {
+    pub fn write_memory(&self, address: u64, _data: &[u8]) -> Result<(), String> {
         let region = self
             .find_memory_region(address)
             .ok_or("Address not in any known memory region")?;

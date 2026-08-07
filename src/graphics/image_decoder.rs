@@ -124,7 +124,7 @@ impl ImageDecoder {
     }
 
     /// Decode PNG image (simplified implementation)
-    fn decode_png(&self, data: &[u8]) -> Result<DecodedImage, &'static str> {
+    fn decode_png(&self, _data: &[u8]) -> Result<DecodedImage, &'static str> {
         // Simplified PNG decoder - in production, use full PNG specification
         let metadata = ImageMetadata {
             width: 100, // Placeholder - would parse from PNG IHDR chunk
@@ -153,7 +153,7 @@ impl ImageDecoder {
     }
 
     /// Decode JPEG image (simplified implementation)
-    fn decode_jpeg(&self, data: &[u8]) -> Result<DecodedImage, &'static str> {
+    fn decode_jpeg(&self, _data: &[u8]) -> Result<DecodedImage, &'static str> {
         // Simplified JPEG decoder - in production, use full JPEG specification
         let metadata = ImageMetadata {
             width: 100, // Placeholder - would parse from JPEG SOF marker
@@ -181,7 +181,7 @@ impl ImageDecoder {
     }
 
     /// Decode GIF image (simplified implementation)
-    fn decode_gif(&self, data: &[u8]) -> Result<DecodedImage, &'static str> {
+    fn decode_gif(&self, _data: &[u8]) -> Result<DecodedImage, &'static str> {
         let metadata = ImageMetadata {
             width: 100,
             height: 100,
@@ -208,7 +208,7 @@ impl ImageDecoder {
     }
 
     /// Decode BMP image (simplified implementation)
-    fn decode_bmp(&self, data: &[u8]) -> Result<DecodedImage, &'static str> {
+    fn decode_bmp(&self, _data: &[u8]) -> Result<DecodedImage, &'static str> {
         let metadata = ImageMetadata {
             width: 100,
             height: 100,

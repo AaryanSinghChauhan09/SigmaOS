@@ -227,7 +227,7 @@ impl BuddyAllocator {
         }
     }
 
-    fn split_block(&self, block: *mut BuddyBlock, from_order: usize, to_order: usize) -> *mut BuddyBlock {
+    fn split_block(&self, block: *mut BuddyBlock, _from_order: usize, to_order: usize) -> *mut BuddyBlock {
         unsafe {
             let offset = (PAGE_SIZE << to_order) as isize;
             let buddy = (block as *mut u8).offset(offset) as *mut BuddyBlock;

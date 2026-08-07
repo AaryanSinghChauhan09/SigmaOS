@@ -414,7 +414,7 @@ pub struct UsbHidDevice {
 }
 
 impl UsbHidDevice {
-    pub fn keyboard(addr: u8) -> Self {
+    pub fn keyboard(_addr: u8) -> Self {
         UsbHidDevice {
             descriptor: UsbDescriptor::new(0x04B3, 0x3003, 0x03, "USB Keyboard"),
             report_size: 8,
@@ -423,7 +423,7 @@ impl UsbHidDevice {
         }
     }
 
-    pub fn mouse(addr: u8) -> Self {
+    pub fn mouse(_addr: u8) -> Self {
         UsbHidDevice {
             descriptor: UsbDescriptor::new(0x046D, 0xC077, 0x03, "USB Mouse"),
             report_size: 4,

@@ -26,7 +26,7 @@ impl KimiCodeGenerator {
     /// Simulates generating code and recursively healing syntax/compilation issues
     pub fn generate_and_heal(
         &self,
-        prompt: &str,
+        _prompt: &str,
         compiles_successfully: bool,
     ) -> Result<Vec<u8>, &'static str> {
         self.generation_count.fetch_add(1, Ordering::SeqCst);

@@ -419,7 +419,7 @@ pub trait PamModule: Send + Sync {
         _username: &str,
         _old_hash: &str,
         _new_hash: &str,
-        context: &mut PamContext,
+        _context: &mut PamContext,
     ) -> PamResult {
         PamResult::Ignore
     }
@@ -447,7 +447,7 @@ impl PamModule for PamUnixModule {
         &self,
         _username: &str,
         _password_hash: &str,
-        context: &mut PamContext,
+        _context: &mut PamContext,
     ) -> PamResult {
         for (user, hash) in &self.password_database {
             if user == username {

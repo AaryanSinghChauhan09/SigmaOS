@@ -179,8 +179,8 @@ impl SettingsCategory for SimpleSettingsCategory {
         for &(ref cat, ref ids) in &self.categories {
             let cat_len = cat.iter().position(|&b| b == 0).unwrap_or(64);
             if &cat[..cat_len] == category {
-                for &id in ids {
-                    if let Some(setting) = self.manager.get_setting(b"") {
+                for &_id in ids {
+                    if let Some(_setting) = self.manager.get_setting(b"") {
                     }
                 }
             }

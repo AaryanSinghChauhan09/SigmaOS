@@ -133,21 +133,21 @@ impl TransformerSchedClass {
 }
 
 impl SchedClass for TransformerSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
 
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.nr_running.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
 
-    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn check_preempt_curr(&self, rq: &mut RunQueue, task: &Task) -> bool {
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
 
@@ -165,9 +165,9 @@ impl SchedClass for TransformerSchedClass {
 
     fn task_fork(
         &self,
-        rq: &mut RunQueue,
-        child: &mut Task,
-        parent: &Task,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
     ) -> Result<(), FsError> {
         Ok(())
     }

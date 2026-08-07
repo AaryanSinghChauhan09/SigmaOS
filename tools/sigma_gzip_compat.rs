@@ -46,7 +46,7 @@ pub unsafe extern "C" fn gzip_init() -> SigmaI32 {
 pub unsafe extern "C" fn gzip_compress(
     input_file: *const u8,
     output_file: *const u8,
-    options: GzipOptions,
+    _options: GzipOptions,
 ) -> SigmaI32 {
     if !GZIP_INITIALIZED || input_file.isnull() {
         return -1;
@@ -66,7 +66,7 @@ pub unsafe extern "C" fn gzip_compress(
 pub unsafe extern "C" fn gzip_decompress(
     input_file: *const u8,
     output_file: *const u8,
-    options: GzipOptions,
+    _options: GzipOptions,
 ) -> SigmaI32 {
     if !GZIP_INITIALIZED || input_file.isnull() {
         return -1;

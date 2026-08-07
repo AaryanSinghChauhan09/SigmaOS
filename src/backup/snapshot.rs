@@ -185,7 +185,7 @@ impl BackupScheduler for SimpleBackupScheduler {
 
     fn run_scheduled_backups(&mut self) -> Vec<SnapshotID> {
         let mut created = Vec::new();
-        for &(id, _, snapshot_type) in &self.schedules {
+        for &(id, _, _snapshot_type) in &self.schedules {
             let snapshot_id = id + 1000;
             created.push(snapshot_id);
         }

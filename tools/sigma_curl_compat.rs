@@ -62,7 +62,7 @@ pub unsafe extern "C" fn curl_init() -> SigmaI32 {
 #[no_mangle]
 pub unsafe extern "C" fn curl_perform(
     url: *const u8,
-    options: CurlOptions,
+    _options: CurlOptions,
     response: *mut HttpResponse,
 ) -> SigmaI32 {
     if !CURL_INITIALIZED || url.isnull() || response.isnull() {
@@ -160,7 +160,7 @@ pub unsafe extern "C" fn curl_set_data(
 pub unsafe extern "C" fn curl_download(
     url: *const u8,
     output_file: *const u8,
-    options: CurlOptions,
+    _options: CurlOptions,
 ) -> SigmaI32 {
     if !CURL_INITIALIZED || url.isnull() || output_file.isnull() {
         return -1;

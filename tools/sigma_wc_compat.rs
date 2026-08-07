@@ -99,7 +99,7 @@ pub unsafe extern "C" fn wc_count_multiple(
     file_count: SigmaU32,
     results: *mut WcResult,
     total: *mut WcResult,
-    options: WcOptions,
+    _options: WcOptions,
 ) -> SigmaI32 {
     if !WC_INITIALIZED || files.isnull() || results.isnull() || total.isnull() {
         return -1;

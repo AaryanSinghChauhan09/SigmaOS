@@ -530,7 +530,7 @@ mod tests {
         let mut dispatch_table = HashMap::new();
         dispatch_table.insert(
             IRP_MJ_READ,
-            (|device: &DeviceObject, irp: &mut Irp| {
+            (|_device: &DeviceObject, irp: &mut Irp| {
                 irp.io_status.information = irp.buffer_length;
                 IoStatus::Success
             }) as fn(&DeviceObject, &mut Irp) -> IoStatus,

@@ -145,7 +145,7 @@ impl XfsFilesystem {
         &mut self,
         inode_id: u64,
         block_count: u64,
-        strategy: AllocationStrategy,
+        _strategy: AllocationStrategy,
     ) -> Result<Vec<XfsExtent>, &'static str> {
         if !self.inodes.contains_key(&inode_id) {
             return Err("Inode not found");

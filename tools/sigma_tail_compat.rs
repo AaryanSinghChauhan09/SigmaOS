@@ -105,7 +105,7 @@ pub unsafe extern "C" fn tail_bytes(
 pub unsafe extern "C" fn tail_follow(
     file_path: *const u8,
     output: *mut u8,
-    max_output: SigmaU32,
+    _max_output: SigmaU32,
 ) -> SigmaI32 {
     if !TAIL_INITIALIZED || file_path.isnull() || output.isnull() {
         return -1;

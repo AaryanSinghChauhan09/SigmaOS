@@ -277,7 +277,7 @@ impl ResourceManagementService {
     }
 
     /// Predict resource usage
-    pub fn predict_usage(&self, resource_type: &str) -> Result<f32, String> {
+    pub fn predict_usage(&self, _resource_type: &str) -> Result<f32, String> {
         if self.service.state() != AiServiceState::Running {
             return Err("Service not running".to_string());
         }
@@ -317,7 +317,7 @@ impl PredictiveMaintenanceService {
     }
 
     /// Predict component failure
-    pub fn predict_failure(&self, component_id: &str) -> Result<f32, String> {
+    pub fn predict_failure(&self, _component_id: &str) -> Result<f32, String> {
         if self.service.state() != AiServiceState::Running {
             return Err("Service not running".to_string());
         }
@@ -360,7 +360,7 @@ impl AdaptiveSchedulingService {
     }
 
     /// Suggest scheduling decision
-    pub fn suggest_schedule(&self, task_info: &str) -> Result<String, String> {
+    pub fn suggest_schedule(&self, _task_info: &str) -> Result<String, String> {
         if self.service.state() != AiServiceState::Running {
             return Err("Service not running".to_string());
         }

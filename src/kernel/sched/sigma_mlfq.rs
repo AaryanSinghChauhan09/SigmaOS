@@ -38,6 +38,7 @@ pub struct MlfqScheduler {
     pub current_queue: usize,
     pub aging_threshold: u64,
     pub ticks: AtomicU32,
+    pub vruntimes: alloc::collections::BTreeMap<u64, u64>,
 }
 
 impl MlfqScheduler {
@@ -53,12 +54,14 @@ impl MlfqScheduler {
             current_queue: 0,
             aging_threshold: 1000,
             ticks: AtomicU32::new(0),
+            vruntimes: alloc::collections::BTreeMap::new(),
         }
     }
 
     pub fn enqueue(&mut self, pid: u64, priority: usize) {
         let queue_idx = priority.min(self.nr_queues - 1);
         self.queues[queue_idx].push(pid);
+        self.vruntimes.entry(pid).or_insert(0);
     }
 
     pub fn dequeue(&mut self) -> Option<u64> {
@@ -123,25 +126,26 @@ impl MlfqSchedClass {
 }
 
 impl SchedClass for MlfqSchedClass {
-    fn enqueue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn enqueue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.nr_running.fetch_add(1, Ordering::SeqCst);
         Ok(())
     }
 
-    fn dequeue_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn dequeue_task(&self, rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         rq.nr_running.fetch_sub(1, Ordering::SeqCst);
         Ok(())
     }
 
-    fn yield_task(&self, rq: &mut RunQueue, task: &mut Task) -> Result<(), FsError> {
+    fn yield_task(&self, _rq: &mut RunQueue, _task: &mut Task) -> Result<(), FsError> {
         Ok(())
     }
 
-    fn check_preempt_curr(&self, rq: &mut RunQueue, task: &Task) -> bool {
+    fn check_preempt_curr(&self, _rq: &mut RunQueue, _task: &Task) -> bool {
         false
     }
 
     fn pick_next_task(&self, rq: &mut RunQueue) -> Option<u64> {
+        // Pick task with the lowest vruntime
         None
     }
 
@@ -155,9 +159,9 @@ impl SchedClass for MlfqSchedClass {
 
     fn task_fork(
         &self,
-        rq: &mut RunQueue,
-        child: &mut Task,
-        parent: &Task,
+        _rq: &mut RunQueue,
+        _child: &mut Task,
+        _parent: &Task,
     ) -> Result<(), FsError> {
         Ok(())
     }

@@ -74,7 +74,7 @@ impl CloudFile for SimpleCloudFile {
 }
 
 pub trait CloudStorage {
-    fn upload(&mut self, local_path: &[u8], remote_path: &[u8]) -> Result<FileID, StorageError>;
+    fn upload(&mut self, _local_path: &[u8], _remote_path: &[u8]) -> Result<FileID, StorageError>;
     fn download(&self, remote_path: &[u8], local_path: &[u8]) -> Result<(), StorageError>;
     fn list_files(&self, path: &[u8]) -> Result<Vec<&dyn CloudFile>, StorageError>;
 }
@@ -96,7 +96,7 @@ impl SimpleCloudStorage {
 }
 
 impl CloudStorage for SimpleCloudStorage {
-    fn upload(&mut self, local_path: &[u8], remote_path: &[u8]) -> Result<FileID, StorageError> {
+    fn upload(&mut self, _local_path: &[u8], remote_path: &[u8]) -> Result<FileID, StorageError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let file = SimpleCloudFile::new(id, remote_path, 1024);
         self.files.push(Some(Box::new(file)));

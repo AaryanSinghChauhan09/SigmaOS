@@ -67,7 +67,7 @@ impl CANMessage for SimpleCANMessage {
 }
 
 pub trait CANBus {
-    fn send(&self, message: &dyn CANMessage) -> Result<(), CANError>;
+    fn send(&self, _message: &dyn CANMessage) -> Result<(), CANError>;
     fn receive(&self) -> Option<Box<dyn CANMessage>>;
     def set_filter(&mut self, id: u32, mask: u32);
 }
@@ -91,7 +91,7 @@ impl SimpleCANBus {
 }
 
 impl CANBus for SimpleCANBus {
-    fn send(&self, message: &dyn CANMessage) -> Result<(), CANError> {
+    fn send(&self, _message: &dyn CANMessage) -> Result<(), CANError> {
         Ok(())
     }
     

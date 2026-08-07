@@ -194,7 +194,7 @@ impl IRQController {
     }
 
     /// Send End of Interrupt
-    fn send_eoi(&self, irq: usize) {
+    fn send_eoi(&self, _irq: usize) {
         match self.controller_type {
             ControllerType::APIC => {
                 // Write to APIC EOI register
@@ -282,7 +282,7 @@ impl GIC {
     }
 
     /// Set interrupt priority
-    pub fn set_priority(&self, irq: usize, priority: usize) {
+    pub fn set_priority(&self, _irq: usize, _priority: usize) {
         // Write to GIC distributor priority register
     }
 
@@ -304,12 +304,12 @@ impl PLIC {
     }
 
     /// Set interrupt priority
-    pub fn set_priority(&self, irq: usize, priority: usize) {
+    pub fn set_priority(&self, _irq: usize, _priority: usize) {
         // Write to PLIC priority register
     }
 
     /// Enable interrupt for context
-    pub fn enable_context(&self, context_id: usize, irq: usize) {
+    pub fn enable_context(&self, _context_id: usize, _irq: usize) {
         // Write to PLIC enable register for context
     }
 

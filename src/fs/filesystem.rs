@@ -17,9 +17,9 @@ pub trait Filesystem {
     /// Close a file
     fn close(&self, handle: FileHandle) -> Result<(), FilesystemError>;
     /// Read from file
-    fn read(&self, handle: FileHandle, buffer: &mut [u8]) -> Result<usize, FilesystemError>;
+    fn read(&self, _handle: FileHandle, buffer: &mut [u8]) -> Result<usize, FilesystemError>;
     /// Write to file
-    fn write(&self, handle: FileHandle, buffer: &[u8]) -> Result<usize, FilesystemError>;
+    fn write(&self, _handle: FileHandle, buffer: &[u8]) -> Result<usize, FilesystemError>;
     /// Seek in file
     fn seek(&self, handle: FileHandle, offset: isize, origin: SeekOrigin) -> Result<isize, FilesystemError>;
     /// Create directory
@@ -540,7 +540,7 @@ impl Filesystem for MemoryFilesystem {
         Ok(())
     }
 
-    fn read(&self, handle: FileHandle, buffer: &mut [u8]) -> Result<usize, FilesystemError> {
+    fn read(&self, _handle: FileHandle, buffer: &mut [u8]) -> Result<usize, FilesystemError> {
         unsafe {
             // In a real implementation, this would read from the inode data
             // For now, return success
@@ -548,7 +548,7 @@ impl Filesystem for MemoryFilesystem {
         }
     }
 
-    fn write(&self, handle: FileHandle, buffer: &[u8]) -> Result<usize, FilesystemError> {
+    fn write(&self, _handle: FileHandle, buffer: &[u8]) -> Result<usize, FilesystemError> {
         unsafe {
             // In a real implementation, this would write to the inode data
             // For now, return success

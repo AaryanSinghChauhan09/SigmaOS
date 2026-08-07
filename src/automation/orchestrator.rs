@@ -89,7 +89,7 @@ pub trait AiOptimizationStrategy {
     /// Analyze system state
     fn analyze(&self, state: &SystemState) -> Vec<OptimizationRecommendation>;
     /// Execute action
-    fn execute(&mut self, action: &SystemAction) -> Result<(), OptimizationError>;
+    fn execute(&mut self, _action: &SystemAction) -> Result<(), OptimizationError>;
     /// Get strategy name
     fn name(&self) -> &str;
 }
@@ -273,7 +273,7 @@ impl AiOptimizationStrategy for RuleBasedOptimizer {
         recommendations
     }
 
-    fn execute(&mut self, action: &SystemAction) -> Result<(), OptimizationError> {
+    fn execute(&mut self, _action: &SystemAction) -> Result<(), OptimizationError> {
         // Simulated action execution
         match action.action_type {
             ActionType::AdjustCpuFrequency => {
@@ -343,7 +343,7 @@ impl AiOptimizationStrategy for MlOptimizer {
         }
     }
 
-    fn execute(&mut self, action: &SystemAction) -> Result<(), OptimizationError> {
+    fn execute(&mut self, _action: &SystemAction) -> Result<(), OptimizationError> {
         // Simulated action execution
         Ok(())
     }
