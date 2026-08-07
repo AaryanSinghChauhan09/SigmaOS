@@ -9,34 +9,32 @@ This document serves as the master daily improvement plan, comprehensive system 
 
 | Task ID | Domain | Detailed Description | Priority | Target Milestone |
 | :--- | :--- | :--- | :--- | :--- |
-| **ACT-01** | Code Quality | Fix duplicate module declarations inside `src/dashboard/mod.rs`, `src/security/mod.rs`, and constructor bugs (COMPLETED). | **High** | Stable v0.2.0 |
-| **ACT-02** | Security | Upgrade npm dependency `brace-expansion` to `v2.0.1` to resolve the ReDoS vulnerability (GHSA-mh99-v99m-4gvg / GHSA-rgw5-rvv9-x895). | **High** | Hotfix Release |
-| **ACT-03** | Code Quality | Fix duplicate `ShellVec` declaration inside `src/shell/command.rs`. | **High** | Stable v0.2.0 |
-| **ACT-04** | OOP / Patterns | Refactor procedural package translation logic into an abstract `PackageTranslator` factory pattern. | **Medium** | Stable v0.2.0 |
-| **ACT-05** | Performance | Transition logging from dynamic format strings to pre-allocated circular ring buffers in hotpaths. | **Medium** | Perf Sprint 1 |
-| **ACT-06** | Documentation | Document RISC-V and ARM64 cross-compilation target setups in `CONTRIBUTING.md`. | **Low** | Docs Overhaul |
+| **ACT-01** | Code Quality | Fix interleaved / corrupted package translation code inside `src/sigpkg/universal_adapter.rs` (E0308, E0599). | **High** | Stable v0.2.0 |
+| **ACT-02** | Code Quality | Fix borrow checker / move errors in firewall rules evaluator inside `src/network/pf_firewall.rs` and `src/network/nftables.rs` (E0382, E0502). | **High** | Stable v0.2.0 |
+| **ACT-03** | Code Quality | Fix missing `mem` size_of and box imports inside custom `Vec` under `#[cfg(target_os = "none")]` in `src/scheduler/scheduler.rs`. | **High** | Stable v0.2.0 |
+| **ACT-04** | Security | Upgrade npm dependency `brace-expansion` to `v2.0.1` to resolve the ReDoS vulnerability (GHSA-mh99-v99m-4gvg / GHSA-rgw5-rvv9-x895). | **High** | Hotfix Release |
+| **ACT-05** | OOP / Patterns | Refactor procedural package translation logic into an abstract `PackageTranslator` factory pattern. | **Medium** | Stable v0.2.0 |
+| **ACT-06** | Performance | Transition logging from dynamic format strings to pre-allocated circular ring buffers in hotpaths. | **Medium** | Perf Sprint 1 |
+| **ACT-07** | Workflow | Consolidate the 30+ overlapping GitHub Actions workflow files to simplify pipeline maintenance. | **Medium** | CI Overhaul |
+| **ACT-08** | Documentation | Document RISC-V and ARM64 cross-compilation target setups in `CONTRIBUTING.md`. | **Low** | Docs Overhaul |
 
 ---
 
 ## 🔍 1. Code Quality & Testing
 
-### A. Resolved Compilation Blockers (Successfully Patched on Active Branch)
-We have conducted a thorough compilation audit of the workspace and successfully patched all major compilation blockers:
-*   **Custom Smart Pointer `Arc` Unsized Support (`src/klib/arc.rs`):**
-    *   *Issue:* The custom thread-safe smart pointer `Arc<T>` did not support unsized types `T: ?Sized`. This blocked compiling package formats using dynamic trait objects like `Arc<dyn UserDefinedHook>`, throwing E0277.
-    *   *Resolution:* Refactored `ArcInner<T>` and `Arc<T>` structs and implemented thread safety (`Send`/`Sync`), `Clone`, `Drop`, and `Deref` traits with standard `?Sized` bounds.
-*   **Widespread Vector and Allocator Duplication (`src/klib/vec.rs`):**
-    *   *Issue:* Redundant, copy-pasted blocks of obsolete code (including conflicting implementations of `Drop`, `core::fmt::Debug`, and invalid `contains` blocks using undeclared variables) existed inside `src/klib/vec.rs`, causing multiple symbol collision errors.
-    *   *Resolution:* Fully consolidated the duplicate blocks, retaining a single, robust allocator-shim model supporting dynamic sizing and alignments under hosted test platforms and bare-metal environments.
-*   **Duplicate Structures and Missing Trait in AI Agent (`src/ai/agent.rs`):**
-    *   *Issue:* Dual declarations of `AgentInfo` and `ManagerCapability` caused name collision compilation failures. Additionally, `SimpleAIAgentManager` implemented an `AIAgentManager` trait which was missing from the scope.
-    *   *Resolution:* Eliminated duplicate structures and formally declared the `AIAgentManager` trait with robust method signatures.
-*   **Non-Exhaustive Shell Command Match Router (`src/shell/repl.rs`):**
-    *   *Issue:* The shell command execution engine experienced `non-exhaustive patterns` mismatch errors because multiple enum variants (like `Pwd`, `WhoAmI`, `Su`, `Cat`, `Systemctl`, and `Apt`) were declared twice inside `ShellCommand`.
-    *   *Resolution:* Eliminated duplicate variants inside the `ShellCommand` enum.
-*   **Immutable Test Sandbox (`src/sigpkg/makepkg.rs`):**
-    *   *Issue:* The `test_makepkg_sandbox` test failed to compile due to calling `&mut self` methods on an immutable `sandbox` declaration.
-    *   *Resolution:* Declared the sandbox as mutable (`let mut sandbox`).
+### A. Core Compilation & Syntax Blockers
+We have conducted a thorough compilation audit of the workspace and identified several critical syntax/compilation issues:
+*   **Interleaved / Corrupted Package Translator (`src/sigpkg/universal_adapter.rs`):**
+    *   *Issue:* The `translate_to_native_package` function is heavily corrupted with three conflicting `Ok(Package::new(...))` blocks interleaved together, leading to mismatched parameters and multiple syntax and type errors.
+    *   *Resolution:* Refactor this function to have a single, clean constructor invocation that matches the exact signature of `Package::new(...)` from `src/sigpkg/mod.rs`.
+*   **Borrow Checker & Move Errors in Firewall Subsystems (`src/network/pf_firewall.rs` & `src/network/nftables.rs`):**
+    *   *Issue 1:* In `pf_firewall.rs`, variables `source_addr` and `dest_addr` are passed by-value into `self.create_state(...)` inside a loop, moving them. On subsequent iterations, `self.rule_matches(...)` attempts to borrow them again, violating Rust's borrow checker (E0382).
+    *   *Issue 2:* Mutably borrowing `self` in `self.create_state(...)` while already immutably borrowing `self.rules` in the parent loop causes E0502.
+    *   *Issue 3:* In both `pf_firewall.rs` and `nftables.rs`, iterating over `expired` using `for key in expired` moves the vector, and then `expired.len()` is called on the moved value (E0382).
+    *   *Resolution:* Clone strings before passing them, capture rule properties to avoid long borrows, and iterate over `&expired` or retrieve the length beforehand.
+*   **Custom Vector Deficiencies under Bare-Metal Configs (`src/scheduler/scheduler.rs`):**
+    *   *Issue:* Under `#[cfg(target_os = "none")]`, the custom `Vec` implementation references `mem::size_of` without importing `core::mem` or using full path, and uses `Box` without any `no_std` allocator import.
+    *   *Resolution:* Use `core::mem::size_of::<T>()` and add appropriate target-gated allocator imports.
 
 ### B. Linting and Style Checks
 *   **ESLint Configuration Gap:** The Node.js/Electron interface (`zenith_desktop`) is configured to run `pnpm lint`, but the workspace lacks a root `eslint.config.js` file, causing ESLint execution to fail instantly. Recommend generating a standard ESLint flat config.
@@ -96,8 +94,9 @@ While the monorepo utilizes a comprehensive integration suite testing driver bri
 *   **API Docs:** Enforce `#![warn(missing_docs)]` to guarantee document coverage on all newly designed subsystems.
 
 ### B. GHA CI/CD Pipelines
-*   **CI Wait Times:** Current GHA pipeline wait times exceed 15 minutes.
-*   **Remediation:** Implement caching steps for cargo registries (`~/.cargo/registry`) and build target folders to reduce pipeline execution to under 3 minutes.
+*   **CI Wait Times:** Current GHA pipeline wait times exceed 15 minutes due to rebuilding without caching.
+*   **Redundant Workflows:** There are over 30 separate YAML files inside `.github/workflows/` that overlap in trigger conditions and execution.
+*   **Remediation:** Consolidate these into a unified, modular multi-stage workflow, and implement caching steps for cargo registries (`~/.cargo/registry`) and build target folders to reduce pipeline execution to under 3 minutes.
 
 ---
 
@@ -105,7 +104,7 @@ While the monorepo utilizes a comprehensive integration suite testing driver bri
 
 ### A. Issue & Pull Request Triage
 *   **Issues Categorization:** Define three clear categories: `bug` (compilation failures), `feature` (adding new distribution layers), and `enhancement` (OOP modular refactoring).
-*   **Stale Branches:** Remove inactive or unmerged feature branches older than 6 months.
+*   **Stale Branches:** Remove inactive or unmerged feature branches older than 6 months (e.g., outdated `jules-*` and leftover `bolt-*` experimental branches).
 
 ### B. Draft Release Notes (v0.2.0 - "Sovereign Dawn")
 *   **New Features:** Multi-distro package parser compatibility, hardware-accelerated desktop compositor, post-quantum cryptography hardening.
