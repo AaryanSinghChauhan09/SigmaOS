@@ -44,7 +44,7 @@ jobs:
       - name: Setup Rust nightly for ${{ matrix.arch }}
         run: |
           rustup toolchain install nightly-2026-06-01 \
-            --component clippy rust-src rustfmt
+            --component clippy --component rust-src --component rustfmt
           # Map arch names to Rust target triples
           case "${{ matrix.arch }}" in
             x86_64)   TARGET="x86_64-unknown-none"   ;;

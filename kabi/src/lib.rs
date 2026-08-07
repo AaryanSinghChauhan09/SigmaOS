@@ -18,9 +18,9 @@
 //   Windows WDM/WDDM: stable ABI per OS version, breaks across major releases
 //   SigmaOS kabi:     stable ABI across ALL versions once DDK_ABI_VERSION frozen
 //
-// Language: Rust #![no_std]
+// Language: Rust #![cfg_attr(target_os = "none", no_std)]
 
-#![no_std]
+#![cfg_attr(target_os = "none", no_std)]
 #![allow(dead_code)]
 
 // ── ABI version constants ─────────────────────────────────────────────────
@@ -264,7 +264,8 @@ pub extern "C" fn kabi_check_pledge(required: u64, granted: u64) -> i32 {
     if required & granted == required { 0 } else { -1 }
 }
 
+#[cfg(target_os = "none")]
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
-    loop { unsafe { core::arch::asm!("cli; hlt", options(nomem, nostack)); } }
+    loop {}
 }

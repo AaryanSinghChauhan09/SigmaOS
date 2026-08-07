@@ -8,9 +8,13 @@ mod panic;
 mod log;
 
 // Phase G kernel components
+#[path = "../scheduler/mod.rs"]
 mod scheduler;
+#[path = "../mm/mod.rs"]
 mod mm;
+#[path = "../hal/mod.rs"]
 mod hal;
+#[path = "../syscalls/mod.rs"]
 mod syscalls;
 
 use core::panic::PanicInfo;

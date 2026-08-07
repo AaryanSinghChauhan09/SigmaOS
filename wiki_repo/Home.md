@@ -69,4 +69,4 @@ graph TD
 
 ## Getting Started
 
-See [INSTALL.md](INSTALL.md) for build instructions using the new `Justfile` toolchain.
+See [Installation](Installation) for build instructions using the new `Justfile` toolchain.

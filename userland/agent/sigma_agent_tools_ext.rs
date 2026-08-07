@@ -302,7 +302,7 @@ impl Tool for AccessibilityTool {
         let mut entries: std::collections::BTreeMap<String,String> = existing.lines()
             .filter_map(|l| { let p: Vec<&str> = l.splitn(2,'=').collect(); if p.len()==2 { Some((p[0].trim().to_owned(), p[1].trim().trim_matches('"').to_owned())) } else { None } })
             .collect();
-        let key = feature.replace('-','_');
+        let key = feature.replace('-', "_");
         let new_val = match state {
             "on"  => "true",
             "off" => "false",

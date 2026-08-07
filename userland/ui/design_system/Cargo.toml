@@ -6,5 +6,8 @@ authors = ["SigmaOS Project"]
 license = "MIT"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
 
+[lib]
+path = "mod.rs"
+
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }

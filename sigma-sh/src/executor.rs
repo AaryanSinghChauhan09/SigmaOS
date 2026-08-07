@@ -3,7 +3,6 @@
 
 use std::fs::{File, OpenOptions};
 use std::process::{Command as ProcCmd, Stdio};
-use std::os::windows::io::IntoRawHandle;
 
 use crate::parser::{Command, Pipeline, Redirect, Statement};
 use crate::scripting::ShellEnv;

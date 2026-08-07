@@ -2,8 +2,9 @@
 /// Phase G Blocker #5: APIC + PIC init
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 
-#![no_std]
-#![allow(dead_code)]
+#[allow(dead_code)]
+
+use core::arch::asm;
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -211,7 +212,7 @@ impl InterruptController {
     /// Read byte from I/O port
     unsafe fn inb(&self, port: SigmaU16) -> SigmaU8 {
         let value: SigmaU8;
-        asm!("in al, dx", in("al") value, in("dx") port, options(nomem, nostack));
+        asm!("in al, dx", out("al") value, in("dx") port, options(nomem, nostack));
         value
     }
 

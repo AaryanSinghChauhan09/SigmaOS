@@ -2,8 +2,7 @@
 /// Phase G Blocker #1: Round-robin scheduler
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
 
-#![no_std]
-#![allow(dead_code)]
+#[allow(dead_code)]
 
 // ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
@@ -241,6 +240,8 @@ impl RoundRobinScheduler {
             self.enqueue_task(current_tid);
         }
 
+        let timestamp = self.get_timestamp();
+
         // Get next task from queue
         let next_tid = self.dequeue_head();
         
@@ -250,7 +251,7 @@ impl RoundRobinScheduler {
                 tcb.state.running = true;
                 tcb.state.ready = false;
                 tcb.time_slice = self.time_slice;
-                tcb.last_run = self.get_timestamp();
+                tcb.last_run = timestamp;
             }
 
             self.current_task = Some(tid);
@@ -335,8 +336,6 @@ impl RoundRobinScheduler {
             let mut high: u32;
             core::arch::asm!(
                 "rdtsc",
-                "mov edx, eax",
-                "mov eax, 0",
                 out("eax") low,
                 out("edx") high,
                 options(nomem, nostack)
@@ -380,7 +379,7 @@ impl RoundRobinScheduler {
         }
         
         // Write task count
-        written += self.write_number(self.task_count, &mut buf[written..]);
+        written += self.write_number(self.task_count as u64, &mut buf[written..]);
         
         // Write " Switches: "
         let prefix2 = b" Switches: ";
