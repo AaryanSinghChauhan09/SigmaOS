@@ -5,6 +5,7 @@ pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
+pub mod improvements;
 pub mod linux_bsd_inspirations;
 pub mod manjaro;
 pub mod nextgen;
@@ -13,6 +14,17 @@ pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
+
+pub use improvements::{
+    RollingReleaseChannel, RollingPackage, BtrfsVolumeManager, BtrfsSubvolume, SystemSnapshotManager,
+    SystemSnapshot, DeclarativeSystemConfig, ServiceConfig, UserConfig, BootConfig, NixStyleStorePath,
+    AtomicUpgradeEngine, EphemeralSessionManager, EncryptedPersistentStorage, PenTestToolRegistry,
+    PenTestTool, MinimalRuntime, OpenRcStyleInit, InitService, BoreSchedulerConfig, Task,
+    BoreScheduler, OptimizedKernelProfile, GarudaBtrfsLayout, SnapperIntegration, SnapperConfig,
+    SigmaDistroEngine, DebianAptPackageManager, CpuPerformanceGovernor, CpuGovernorType,
+    DirtyBlockFlusher, DirtyPageRecord, TransparentHugePageManager, PageFrame, ZramCompressedSwapDevice,
+    ZramPage,
+};
 
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,

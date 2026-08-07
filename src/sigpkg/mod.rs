@@ -121,6 +121,10 @@ impl Package {
     }
 }
 
+/// Package dependency
+#[derive(Debug, Clone)]
+pub struct Dependency {
+    pub name: crate::klib::String,
     pub version_constraint: VersionConstraint,
 }
 

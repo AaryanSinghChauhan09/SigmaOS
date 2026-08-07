@@ -13,7 +13,8 @@ pub use audio::driver::{
     SimpleAudioManager, AudioMixer, SimpleAudioMixer, AudioStream, SimpleAudioStream,
 };
 pub use audio::editor::{
-    AudioTrack, MultiTrackSession, AudioEffect, AmplifyEffect, EchoEffect, LowPassFilter, NoiseGateEffect, AudioEditor,
+    AudioTrack, MultiTrackSession, AudioEffect, AmplifyEffect, EchoEffect, LowPassFilter, HighPassFilter,
+    ChorusEffect, EqualizerEffect, CompressorEffect, NoiseGateEffect, AudioEditor,
 };
 
 pub mod auth;
