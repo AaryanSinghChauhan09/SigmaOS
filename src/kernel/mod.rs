@@ -25,6 +25,7 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod numa_scheduler;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
@@ -45,3 +46,4 @@ pub use policy_mechanism::{
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use numa_scheduler::{NumaTask, LockFreeTaskQueue, NumaNode, NumaScheduler};
