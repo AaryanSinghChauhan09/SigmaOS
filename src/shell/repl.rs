@@ -1,7 +1,131 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
 // Interactive shell for SigmaOS
 
-use std::io::{self, BufRead, Write}; // Userspace I/O is acceptable
+use std::io::{self, BufRead, Write}; // Userspace I/O acceptable
+
+#[cfg(feature = "standalone_test")]
+pub mod klib {
+    pub use std::collections::HashMap;
+}
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::process::ProcFileSystem;
+#[cfg(feature = "standalone_test")]
+use process::ProcFileSystem;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::compatibility::india_stack::GstCalculator;
+#[cfg(feature = "standalone_test")]
+use compatibility::india_stack::GstCalculator;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::compatibility::india_stack::MockUPIService;
+#[cfg(feature = "standalone_test")]
+use compatibility::india_stack::MockUPIService;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::compatibility::india_stack::MultilingualSupport;
+#[cfg(feature = "standalone_test")]
+use compatibility::india_stack::MultilingualSupport;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::compatibility::reactos::PortableExecutableLoader;
+#[cfg(feature = "standalone_test")]
+use compatibility::reactos::PortableExecutableLoader;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::virtualization::deterministic::DeterministicVirtualMachine;
+#[cfg(feature = "standalone_test")]
+use virtualization::deterministic::DeterministicVirtualMachine;
+
+#[cfg(feature = "standalone_test")]
+pub mod process {
+    pub struct Process {
+        pub pid: usize,
+        pub name: String,
+        pub state: ProcessState,
+    }
+    pub enum ProcessState {
+        Running,
+        Ready,
+    }
+    impl ProcessState {
+        pub fn as_str(&self) -> &'static str { "Running" }
+    }
+    pub struct ProcFileSystem {
+        pub processes: std::collections::HashMap<usize, Process>,
+    }
+    impl ProcFileSystem {
+        pub fn new() -> Self {
+            let mut processes = std::collections::HashMap::new();
+            processes.insert(1, Process { pid: 1, name: "init".to_string(), state: ProcessState::Running });
+            Self { processes }
+        }
+        pub fn read_file(&self, path: &str) -> Result<String, String> {
+            Ok(format!("mock ProcFS content of {}", path))
+        }
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+pub mod compatibility {
+    pub mod india_stack {
+        pub struct GstCalculator;
+        impl GstCalculator {
+            pub fn calculate_gst(cost: f64, rate: u32, _is_inter: bool) -> Result<(f64, f64, f64), ()> {
+                let gst = cost * (rate as f64) / 100.0;
+                Ok((gst / 2.0, gst / 2.0, cost + gst))
+            }
+        }
+        pub struct MockUPIService;
+        impl MockUPIService {
+            pub fn new(_amount: usize) -> Self { MockUPIService }
+            pub fn generate_upi_qr(&self, vpa: &[u8], amount: usize, buf: &mut [u8]) -> Result<usize, ()> {
+                let vpa_str = std::str::from_utf8(vpa).unwrap_or("");
+                let url = format!("upi://pay?pa={}&am={}", vpa_str, amount);
+                let bytes = url.as_bytes();
+                buf[..bytes.len()].copy_from_slice(bytes);
+                Ok(bytes.len())
+            }
+        }
+        pub struct MultilingualSupport;
+        impl MultilingualSupport {
+            pub fn translate(_lang: &[u8], _key: &[u8]) -> Result<&'static [u8], ()> {
+                Ok(b"\xe0\xa4\xb8\xe0\xa5\x8d\xe0\xa4\xb5\xe0\xa4\xbe\xe0\xa4\x97\xe0\xa4\xa4\xe0\xa4\xae\xe0\xa5\x8d") // welcome in devanagari
+            }
+        }
+    }
+    pub mod reactos {
+        pub struct PortableExecutableLoader;
+        impl PortableExecutableLoader {
+            pub fn validate_pe_image(_bytes: &[u8]) -> Result<(), ()> {
+                Ok(())
+            }
+        }
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+pub mod virtualization {
+    pub mod deterministic {
+        pub struct Cpu {
+            pub rip: u64,
+            pub r: [u64; 8],
+        }
+        pub struct DeterministicVirtualMachine {
+            pub cpu: Cpu,
+        }
+        impl DeterministicVirtualMachine {
+            pub fn new() -> Self {
+                Self { cpu: Cpu { rip: 0, r: [0; 8] } }
+            }
+            pub fn step_instruction(&mut self, _bytes: &[u8]) -> Result<(), ()> {
+                self.cpu.rip += 1;
+                Ok(())
+            }
+        }
+    }
+}
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -97,6 +221,8 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
+    Neofetch,
+    History,
     Unknown(String),
 }
 
@@ -108,17 +234,22 @@ pub struct AgentTask {
     pub commands: Vec<String>,
 }
 
+#[cfg(not(feature = "standalone_test"))]
+pub type TaskHashMap = crate::klib::HashMap<usize, AgentTask>;
+#[cfg(feature = "standalone_test")]
+pub type TaskHashMap = std::collections::HashMap<usize, AgentTask>;
+
 /// AI Agent Automation Engine inside SigmaOS REPL
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine {
-    pub registered_tasks: crate::klib::HashMap<usize, AgentTask>,
+    pub registered_tasks: TaskHashMap,
     pub next_task_id: usize,
 }
 
 impl AgentAutomationEngine {
     pub fn new() -> Self {
         AgentAutomationEngine {
-            registered_tasks: crate::klib::HashMap::new(),
+            registered_tasks: TaskHashMap::new(),
             next_task_id: 1,
         }
     }
@@ -158,6 +289,7 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
+    pub history: std::vec::Vec<String>,
 }
 
 impl ShellRepl {
@@ -187,6 +319,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features,
+            history: std::vec::Vec::new(),
         }
     }
 
@@ -216,6 +349,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features,
+            history: std::vec::Vec::new(),
         }
     }
 
@@ -257,6 +391,7 @@ impl ShellRepl {
     }
 
     fn execute_single_line(&mut self, line: &str) {
+        self.history.push(line.to_string());
         let command = self.parse_command(line);
         let result = self.execute_command(command);
 
@@ -299,6 +434,13 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "neofetch" => ShellCommand::Neofetch,
+            "history" => ShellCommand::History,
+            "echo" => {
+                ShellCommand::Echo {
+                    message: parts[1..].join(" "),
+                }
+            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -512,7 +654,6 @@ impl ShellRepl {
                    exit      - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => {
-                use crate::process::ProcFileSystem;
                 let pfs = ProcFileSystem::new();
                 let mut out = "PID  NAME             STATE\n".to_string();
                 let mut keys: Vec<&usize> = pfs.processes.keys().collect();
@@ -735,7 +876,6 @@ impl ShellRepl {
                 }
             }
             ShellCommand::Gst { basic_cost, rate } => {
-                use crate::compatibility::india_stack::GstCalculator;
                 match GstCalculator::calculate_gst(basic_cost, rate, false) {
                     Ok((cgst, sgst, _)) => Ok(format!(
                         "GST Details:\n  Basic Cost: INR {:.2}\n  CGST: INR {:.2}\n  SGST: INR {:.2}\n  Total: INR {:.2}",
@@ -745,7 +885,6 @@ impl ShellRepl {
                 }
             }
             ShellCommand::Upi { vpa, amount } => {
-                use crate::compatibility::india_stack::MockUPIService;
                 let upi = MockUPIService::new(amount);
                 let mut buf = [0u8; 128];
                 match upi.generate_upi_qr(vpa.as_bytes(), amount, &mut buf) {
@@ -757,7 +896,6 @@ impl ShellRepl {
                 }
             }
             ShellCommand::Translate { lang, key } => {
-                use crate::compatibility::india_stack::MultilingualSupport;
                 match MultilingualSupport::translate(lang.as_bytes(), key.as_bytes()) {
                     Ok(translated_bytes) => {
                         let translated_str = std::str::from_utf8(translated_bytes).unwrap_or("");
@@ -767,7 +905,6 @@ impl ShellRepl {
                 }
             }
             ShellCommand::PeValidate { hex_stub } => {
-                use crate::compatibility::reactos::PortableExecutableLoader;
                 let mut bytes = Vec::new();
                 let mut i = 0;
                 while i + 1 < hex_stub.len() {
@@ -785,7 +922,6 @@ impl ShellRepl {
                 }
             }
             ShellCommand::VmStep { hex_bytecode } => {
-                use crate::virtualization::deterministic::DeterministicVirtualMachine;
                 let mut vm = DeterministicVirtualMachine::new();
                 let mut bytes = Vec::new();
                 let mut i = 0;
@@ -805,7 +941,6 @@ impl ShellRepl {
                 }
             }
             ShellCommand::Proc { args } => {
-                use crate::process::ProcFileSystem;
                 let pfs = ProcFileSystem::new();
                 if args.is_empty() {
                     Ok("Usage: proc cat <file_path>\nAvailable files:\n  /proc/meminfo\n  /proc/cpuinfo\n  /proc/uptime\n  /proc/cgroups\n  /proc/<pid>/status\n  /proc/<pid>/cmdline\n  /proc/<pid>/stat".to_string())
@@ -819,9 +954,81 @@ impl ShellRepl {
                     Err(format!("Unknown proc action. Only 'cat' is supported."))
                 }
             }
-            ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
+            ShellCommand::Neofetch => {
+                let info = format!(
+                    "      /\\        OS: SigmaOS v0.1.0\n\
+                     |   /  \\       Kernel: sigmaos-mainline 6.24.0\n\
+                     |  /\\  /\\      Shell: sigma-sh (Sovereign REPL)\n\
+                     | /  \\/  \\     Theme: {}\n\
+                     |/________\\    Profile: {}\n\
+                     |              Uptime: 1 hour, 15 mins\n\
+                     |              Packages: {} (sigma-sh, sigma-vim)",
+                    self.current_theme, self.current_profile, self.installed_packages.len()
+                );
+                Ok(info)
+            }
+            ShellCommand::History => {
+                let mut out = String::new();
+                for (idx, cmd) in self.history.iter().enumerate() {
+                    out.push_str(&format!("  {:>3}  {}\n", idx + 1, cmd));
+                }
+                Ok(out)
+            }
+            ShellCommand::Unknown(cmd) => {
+                let parts: Vec<&str> = cmd.split_whitespace().collect();
+                if parts.is_empty() {
+                    return Err("Unknown command".to_string());
+                }
+                let typed_cmd = parts[0];
+                let commands = [
+                    "help", "ps", "proc", "ls", "echo", "set", "get", "alias", "unalias",
+                    "run", "agent", "gst", "upi", "translate", "pe", "vm", "exit", "pwd",
+                    "whoami", "uname", "clear", "touch", "mkdir", "rm", "su", "cat",
+                    "systemctl", "apt", "theme", "profile", "a11y", "neofetch", "history"
+                ];
+                let mut best_suggestion = None;
+                let mut min_dist = 3; // only suggest if distance is <= 2
+                for possible in &commands {
+                    let dist = levenshtein_distance(typed_cmd, possible);
+                    if dist < min_dist {
+                        min_dist = dist;
+                        best_suggestion = Some(*possible);
+                    }
+                }
+                match best_suggestion {
+                    Some(sugg) => Err(format!("Unknown command: {}. Did you mean: {}?", typed_cmd, sugg)),
+                    None => Err(format!("Unknown command: {}", typed_cmd)),
+                }
+            }
         }
     }
+}
+
+fn levenshtein_distance(s1: &str, s2: &str) -> usize {
+    let len1 = s1.chars().count();
+    let len2 = s2.chars().count();
+    let mut dp = vec![vec![0; len2 + 1]; len1 + 1];
+
+    for i in 0..=len1 {
+        dp[i][0] = i;
+    }
+    for j in 0..=len2 {
+        dp[0][j] = j;
+    }
+
+    for (i, c1) in s1.chars().enumerate() {
+        for (j, c2) in s2.chars().enumerate() {
+            if c1 == c2 {
+                dp[i + 1][j + 1] = dp[i][j];
+            } else {
+                dp[i + 1][j + 1] = 1 + std::cmp::min(
+                    dp[i][j + 1],
+                    std::cmp::min(dp[i + 1][j], dp[i][j])
+                );
+            }
+        }
+    }
+    dp[len1][len2]
 }
 
 impl Default for ShellRepl {
@@ -989,5 +1196,35 @@ mod tests {
         };
         let vm_res = repl.execute_command(vm_cmd).unwrap();
         assert!(vm_res.contains("VM Step Completed"));
+    }
+
+    #[test]
+    fn test_shell_neofetch() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("neofetch");
+        let res = repl.execute_command(cmd).unwrap();
+        assert!(res.contains("SigmaOS"));
+        assert!(res.contains("sigma-sh"));
+    }
+
+    #[test]
+    fn test_shell_history() {
+        let mut repl = ShellRepl::new();
+        repl.execute_line("echo first");
+        repl.execute_line("ls");
+        repl.execute_line("history");
+
+        assert_eq!(repl.history.len(), 3);
+        assert_eq!(repl.history[0], "echo first");
+        assert_eq!(repl.history[1], "ls");
+        assert_eq!(repl.history[2], "history");
+    }
+
+    #[test]
+    fn test_shell_command_not_found() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("lss");
+        let err = repl.execute_command(cmd).unwrap_err();
+        assert!(err.contains("Did you mean: ls?"));
     }
 }
