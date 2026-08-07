@@ -813,11 +813,9 @@ impl TransactionalHistory {
         self.next_checkpoint_id += 1;
 
         let mut keys: Vec<String> = Vec::new();
-        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
-        let mut keys: Vec<String> = Vec::new();
         for key in installed.keys() {
             let key: &String = key;
-            keys.push(key.clone());
+            keys.push((*key).clone());
         }
 
         self.checkpoints.push(PackageCheckpoint {

@@ -716,10 +716,8 @@ impl CommandHistory for SimpleCommandHistory {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,

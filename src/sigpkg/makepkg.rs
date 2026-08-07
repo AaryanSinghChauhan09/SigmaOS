@@ -153,30 +153,16 @@ impl MakepkgSandbox {
             .map(|s: &crate::klib::String| s.clone())
             .unwrap_or_else(|| String::from_str("No description"));
 
-        let version = Version::parse(&pkgver).unwrap_or_else(|_| Version::new(1, 0, 0));
         let cleaned_ver = if pkgver.contains('-') {
-            pkgver.split('-').next().unwrap()
+            pkgver.split('-').next().unwrap().to_string()
         } else {
-            &pkgver
+            pkgver.to_string()
         };
-        let version = Version::parse(cleaned_ver).unwrap_or(Version::new(1, 0, 0));
-        let version = Version::parse(&pkgver).unwrap_or_else(|_| Version::new(1, 0, 0));
+        let version = Version::parse(&cleaned_ver).unwrap_or(Version::new(1, 0, 0));
 
         let mut pkg = Package::new(
             pkgname,
             version,
-            pkgdesc,
-            std::vec::Vec::new(),
-            crate::klib::String::new(),
-        );
-        pkg.source = String::from_str("arch");
-        Ok(pkg)
-            pkgdesc,
-            std::vec::Vec::new(),
-            String::new(),
-        );
-        pkg.source = String::from_str("arch");
-        Ok(pkg)
             pkgdesc,
             std::vec::Vec::new(),
             crate::klib::String::new(),

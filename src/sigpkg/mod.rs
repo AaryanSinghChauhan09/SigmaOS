@@ -149,65 +149,6 @@ impl Package {
     }
 }
 
-impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Package {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
-
-impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Package {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
 
 /// Package dependency
 #[derive(Debug, Clone)]
