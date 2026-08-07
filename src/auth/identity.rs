@@ -1,21 +1,16 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Identity Management for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 543
 /// Implements decentralized identity and DID support
 
+use crate::klib::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type IdentityID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdentityType { User = 0, Service = 1, Device = 2, Organization = 3 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdentityError { Success = 0, NotFound = 1, InvalidDID = 2, VerificationFailed = 3 }
 
 pub trait DigitalIdentity {
@@ -59,7 +54,14 @@ impl DigitalIdentity for SimpleDigitalIdentity {
         let len = self.did.iter().position(|&b| b == 0).unwrap_or(128);
         &self.did[..len]
     }
-    fn identity_type(&self) -> IdentityType { unsafe { core::mem::transmute(self.identity_type.load(Ordering::SeqCst)) } }
+    fn identity_type(&self) -> IdentityType {
+        match self.identity_type.load(Ordering::SeqCst) {
+            0 => IdentityType::User,
+            1 => IdentityType::Service,
+            2 => IdentityType::Device,
+            _ => IdentityType::Organization,
+        }
+    }
 
     fn verify(&self, _challenge: &[u8]) -> Result<bool, IdentityError> {
         Ok(true)
@@ -198,30 +200,3 @@ impl DecentralizedAuth for SimpleDecentralizedAuth {
         }
     }
 }
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
