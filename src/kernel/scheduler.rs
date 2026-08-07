@@ -1,5 +1,5 @@
 // SigmaOS Kernel Scheduler
-// Implements EEVDF (Earliest Eligible Virtual Deadline First) scheduler
+// Implements EEVDF (Earliest Eligible Virtual Deadline First) & EDF (Earliest Deadline First) hybrid real-time scheduler
 
 use core::time::Duration;
 
@@ -32,6 +32,7 @@ pub struct Process {
     pub runtime: Duration,
     pub virtual_deadline: u64,
     pub time_slice: Duration,
+    pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
 }
 
 impl Process {
@@ -44,7 +45,13 @@ impl Process {
             runtime: Duration::from_secs(0),
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
+            edf_deadline: None,
         }
+    }
+
+    pub fn with_edf(mut self, deadline: u64) -> Self {
+        self.edf_deadline = Some(deadline);
+        self
     }
 
     pub fn update_virtual_deadline(&mut self, current_time: u64) {
@@ -60,7 +67,7 @@ impl Process {
     }
 }
 
-/// EEVDF Scheduler
+/// EEVDF & EDF Hybrid Real-Time Scheduler
 pub struct Scheduler {
     processes: Vec<Process>,
     current_time: u64,
@@ -80,7 +87,25 @@ impl Scheduler {
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
-        // Find process with earliest eligible virtual deadline
+        // Find process with Earliest Deadline First (EDF) if real-time constraints are present
+        let mut edf_ready_process: Option<&Process> = None;
+        for p in &self.processes {
+            if p.state == ProcessState::Ready && p.edf_deadline.is_some() {
+                if let Some(current_best) = edf_ready_process {
+                    if p.edf_deadline.unwrap() < current_best.edf_deadline.unwrap() {
+                        edf_ready_process = Some(p);
+                    }
+                } else {
+                    edf_ready_process = Some(p);
+                }
+            }
+        }
+
+        if let Some(edf_proc) = edf_ready_process {
+            return Some(edf_proc);
+        }
+
+        // Otherwise, fall back to EEVDF earliest eligible virtual deadline
         let now = self.current_time;
         self.processes
             .iter()
@@ -149,5 +174,26 @@ mod tests {
         let p1 = Priority::Low;
         let p2 = Priority::High;
         assert!(p2 > p1);
+    }
+
+    #[test]
+    fn test_edf_realtime_scheduler_tick() {
+        let mut scheduler = Scheduler::new();
+
+        // Add regular process
+        let p_normal = Process::new(1, "normal".to_string(), Priority::Normal);
+        scheduler.add_process(p_normal);
+
+        // Add real-time processes with explicit EDF deadlines
+        let p_rt_late = Process::new(2, "rt_late".to_string(), Priority::Realtime).with_edf(100);
+        let p_rt_early = Process::new(3, "rt_early".to_string(), Priority::Realtime).with_edf(50);
+
+        scheduler.add_process(p_rt_late);
+        scheduler.add_process(p_rt_early);
+
+        // Schedule should pick rt_early (absolute deadline 50) first, because it is the earliest real-time deadline
+        let chosen = scheduler.schedule().unwrap();
+        assert_eq!(chosen.pid, 3);
+        assert_eq!(chosen.name, "rt_early");
     }
 }
