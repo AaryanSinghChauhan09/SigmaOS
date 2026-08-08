@@ -212,6 +212,12 @@ impl Default for SigmaInit {
     fn default() -> Self {
         Self::new()
     }
+
+    pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        self.stop_service(id)?;
+        self.start_service(id)?;
+        Ok(())
+    }
 }
 
 impl InitSystem for SigmaInit {
@@ -540,23 +546,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_rancher_container_init() {
-        let mut r_init = RancherContainerInit::new();
-        assert!(!r_init.system_daemon_active);
-        assert!(!r_init.user_daemon_active);
+    fn test_service_dependency_resolution() {
+        let mut init = SigmaInit::new();
 
         let svc1 = SimpleService::new(1, "udev");
         let svc2 = SimpleService::new(2, "display").with_deps(vec![1]);
 
-        // Start system daemon (PID 1)
-        r_init.start_system_daemon();
-        assert!(r_init.system_daemon_active);
-        assert_eq!(r_init.system_containers.len(), 2); // syslog and udev seeded
+        init.register_service(Box::new(svc1)).unwrap();
+        init.register_service(Box::new(svc2)).unwrap();
 
-        // Launch system-level container (e.g. ntp daemon)
-        let ntp_id = r_init.launch_container("ntpd", "system-ntpd", ContainerDaemonType::SystemDaemon).unwrap();
-        assert_eq!(ntp_id, 3);
-        assert_eq!(r_init.system_containers.len(), 3);
+        let resolver = SimpleDependencyResolver::new(init);
+        let order = resolver.resolve_startup_order(&[2]).unwrap();
+        assert_eq!(order.len(), 2);
+        assert_eq!(order[0], 1); // udev must start first
+        assert_eq!(order[1], 2);
+    }
 
     #[test]
     fn test_linux_runlevels_and_target_transitions() {
@@ -595,9 +599,25 @@ mod tests {
         let uefi: Box<dyn FirmwarePort> = Box::new(UEFIPort);
         let coreboot: Box<dyn FirmwarePort> = Box::new(CorebootPort);
 
-        // Launch user-level workload container
-        let web_id = r_init.launch_container("nginx", "user-nginx", ContainerDaemonType::UserDaemon).unwrap();
-        assert_eq!(web_id, 1);
-        assert_eq!(r_init.user_containers.len(), 1);
+        assert_eq!(bios.boot_type(), "Legacy BIOS (MBR)");
+        assert_eq!(uefi.boot_type(), "Modern UEFI (GPT)");
+        assert_eq!(coreboot.boot_type(), "Coreboot (Open Source Firmware)");
+
+        assert!(bios.handoff().is_ok());
+    }
+
+    #[test]
+    fn test_security_ports() {
+        let dac: Box<dyn SecurityPort> = Box::new(DACPort);
+        let selinux: Box<dyn SecurityPort> = Box::new(SELinuxPort);
+        let zt: Box<dyn SecurityPort> = Box::new(ZeroTrustPort);
+
+        assert_eq!(dac.policy_name(), "Discretionary Access Control (DAC)");
+        assert_eq!(selinux.policy_name(), "Security-Enhanced Linux (SELinux)");
+        assert_eq!(zt.policy_name(), "Zero-Trust Enforcement Security");
+
+        assert!(dac.check_capability(1));
+        assert!(selinux.check_capability(20));
+        assert!(!zt.check_capability(1));
     }
 }

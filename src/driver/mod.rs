@@ -1,6 +1,7 @@
 // SigmaOS Driver Module
 pub mod device;
 pub mod framework;
+<<<<<<< HEAD
 pub mod grid;
 pub mod mapper;
 pub mod pods;
@@ -19,3 +20,20 @@ pub use irp_system::{
     IoManager, DriverEntry, OpaqueDriverExtension,
     ObjectManager, ObjectType, NonPagedPool, RootkitDetector, IrpParameters,
 };
+||||||| 23ef22a4a
+pub mod windows_compat;
+pub mod grid;
+pub mod mapper;
+pub mod pods;
+pub mod simulation;
+pub mod vault;
+pub mod rootkit;
+
+pub use grid::{GridSlotType, PeripheralArchiveGrid};
+pub use mapper::{DriverMapper, MapperCategory};
+pub use pods::{PeripheralPod, PodType};
+pub use vault::{DriverArchiveVault, VaultEntry};
+pub use rootkit::{SyscallStubDisassembler, SectionObject, SectionBackingType, MappedView, StealthFilterDriver, FileDirectoryEntry};
+=======
+pub mod windows_compat;
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e

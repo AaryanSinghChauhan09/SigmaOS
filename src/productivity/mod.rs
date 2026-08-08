@@ -27,14 +27,16 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod tmux;
+<<<<<<< HEAD
 pub mod linux_bsd_tools;
+||||||| 23ef22a4a
+=======
+pub mod mind_map;
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
-};
-pub use mind_map::{
-    MindMapCreator, MindMapLayout, MindMapNode, NodeShape, NodeStyle, RelationshipConnection,
 };
 pub use notes::{
     ContentType, Folder, InMemoryNoteStorage, Note, NoteError, NoteSearchResult, NoteStorage,
@@ -65,4 +67,11 @@ pub use terminal::{
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
+<<<<<<< HEAD
 pub use linux_bsd_tools::{TopCommand, ProcessTaskInfo, IfconfigCommand, NetworkInterface, PingCommand, PingResult};
+||||||| 23ef22a4a
+=======
+pub use mind_map::{
+    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
+};
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e

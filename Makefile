@@ -1,32 +1,12 @@
 # SigmaOS Makefile
 # Build system for SigmaOS operating system
-# Stylized with a polished, Linux kernel Kbuild-style aligned logging interface.
 
+# Set standard reproducible build epoch timestamp
 export SOURCE_DATE_EPOCH ?= 1716000000
 
-# Aligned Quiet/Verbose Logging Logic (inspired by Linux Kbuild)
-ifeq ($(V),1)
-  quiet =
-  Q =
-else
-  quiet = quiet_
-  Q = @
-endif
+.PHONY: all clean build kernel drivers userspace test test-unit test-integration test-qemu help
 
-# Aligned Log helper
-define cmd
-	$(if $($(quiet)$(1)),@echo '  $($(quiet)$(1))')
-	$(Q)$(2)
-endef
-
-quiet_cmd_cargo_build = CARGO   $(bin_name)
-quiet_cmd_wasm_build  = WASM    $(bin_name)
-quiet_cmd_gen_iso     = GEN     build/sigmaos.iso
-quiet_cmd_clean       = CLEAN   build target
-
-# Default targets
-.PHONY: all clean build kernel drivers userspace test test-unit test-integration test-qemu help defconfig menuconfig
-
+# Default target
 all: build
 
 # Build profiles
@@ -62,20 +42,19 @@ else
 CARGO_FLAGS += --profile $(if $(filter 1,$(RELEASE)),release,dev)
 endif
 
+# Verbose output
 ifeq ($(V),1)
 CARGO_FLAGS += --verbose
 endif
 
 # Help target
 help:
-	@echo "SigmaOS Kbuild Build System"
-	@echo "==========================="
+	@echo "SigmaOS Build System"
+	@echo "==================="
 	@echo ""
 	@echo "Available targets:"
 	@echo "  all              - Build complete system (default)"
 	@echo "  build            - Build complete system"
-	@echo "  defconfig        - Generate default .config and Config.sigma"
-	@echo "  menuconfig       - Interactive system parameter configuration manager"
 	@echo "  kernel           - Build kernel only"
 	@echo "  drivers          - Build drivers only"
 	@echo "  userspace        - Build userspace only"
@@ -107,33 +86,14 @@ help:
 	@echo "Examples:"
 	@echo "  make PROFILE=standalone all"
 	@echo "  make ARCH=aarch64 all"
-	@echo "  make defconfig && make"
-
-# defconfig target: generates standard Linux-style config file
-defconfig:
-	@echo "  GEN     .config"
-	@echo "CONFIG_SIGMAOS_PROFILE=\"$(PROFILE)\"" > .config
-	@echo "CONFIG_SIGMAOS_ARCH=\"$(ARCH)\"" >> .config
-	@echo "CONFIG_SIGMAOS_SOVEREIGNTY_LEVEL=\"maximum\"" >> .config
-	@echo "CONFIG_SIGMAOS_PQC_ALGO=\"dilithium-5\"" >> .config
-	@echo "  GEN     Config.sigma"
-	@echo "# Auto-generated from defconfig target" > Config.sigma
-	@echo "system.profile = \"$(PROFILE)\"" >> Config.sigma
-	@echo "system.arch = \"$(ARCH)\"" >> Config.sigma
-
-# menuconfig target: provides console-interactive parameter configuration
-menuconfig: defconfig
-	@echo "========================================================="
-	@echo "       SigmaOS Sovereign Interactive Configuration       "
-	@echo "========================================================="
-	@echo "Current Active Configuration:"
-	@cat .config
-	@echo "========================================================="
-	@echo "[INFO] Interactive menuconfig updated."
+	@echo "  make DEBUG=1 test"
 
 # Clean build artifacts
 clean:
-	$(call cmd,clean,rm -rf build && cargo clean)
+	@echo "Cleaning build artifacts..."
+	@rm -rf build
+	@cargo clean
+	@echo "Clean complete."
 
 # Mock target for Singularity image and container validation pipelines
 singularity:
@@ -142,94 +102,136 @@ singularity:
 
 # Distclean - remove all generated files
 distclean: clean
-	@echo "  CLEAN   all targets and lockfiles"
-	$(Q)rm -rf target
-	$(Q)rm -f Cargo.lock
+	@echo "Removing all generated files..."
+	@rm -rf target
+	@rm -f Cargo.lock
+	@echo "Distclean complete."
 
 # Mrproper - remove everything including config
 mrproper: distclean
+<<<<<<< HEAD
 	@echo "  CLEAN   configuration files"
 	$(Q)rm -f Config.sigma
 	$(Q)rm -f .config
 
+||||||| 23ef22a4a
+	@echo "  CLEAN   configuration files"
+	$(Q)rm -f Config.sigma
+	$(Q)rm -f .config
+
+# Build all networking, security, and processor compatibility tools from source
+compat:
+	@mkdir -p build
+	@echo "Building SigmaOS networking, security, and processor compatibility tools..."
+	@rustc --crate-type=lib tools/sigma_ssh_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_scp_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_nfs_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_samba_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_rsync_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_tcpdump_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_dns_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_secure_alloc_compat.rs --out-dir build/
+	@rustc --crate-type=lib tools/sigma_cpu_compat.rs --out-dir build/
+	@echo "Compatibility tools build complete."
+
+=======
+	@echo "Removing configuration..."
+	@rm -f Config.sigma
+	@rm -f .config
+	@echo "Mrproper complete."
+
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 # Build complete system (Unified profile routing with no circular warnings)
 build:
-	$(Q)mkdir -p build
-	$(eval bin_name := complete_system)
-	$(call cmd,cargo_build,cargo build $(CARGO_FLAGS))
+	@mkdir -p build
+	@echo "Building SigmaOS (Profile: $(PROFILE), Arch: $(ARCH))..."
+	@cargo build $(CARGO_FLAGS)
 ifeq ($(PROFILE),browser)
-	$(eval bin_name := wasm_web)
-	$(call cmd,wasm_build,wasm-pack build --target web)
+	@wasm-pack build --target web
 endif
-	$(call cmd,gen_iso,./scripts/build-iso.sh --profile $(PROFILE) --arch $(ARCH))
+	@./scripts/build-iso.sh
+	@echo "Build complete."
 
 # Build kernel only
 kernel:
-	$(Q)mkdir -p build
-	$(eval bin_name := sigma_kernel)
-	$(call cmd,cargo_build,cargo build --bin sigma_kernel)
+	@mkdir -p build
+	@echo "Building SigmaOS kernel..."
+	@cargo build --bin sigma_kernel
+	@echo "Kernel build complete."
 
 # Build drivers only
 drivers:
-	$(Q)mkdir -p build
-	$(eval bin_name := sigma_drivers)
-	$(call cmd,cargo_build,cargo build --bin sigma_drivers)
+	@mkdir -p build
+	@echo "Building SigmaOS drivers..."
+	@cargo build --bin sigma_drivers
+	@echo "Drivers build complete."
 
 # Build userspace only
 userspace:
-	$(Q)mkdir -p build
-	$(eval bin_name := sigma_userspace)
-	$(call cmd,cargo_build,cargo build --bin sigma_userspace)
+	@mkdir -p build
+	@echo "Building SigmaOS userspace..."
+	@cargo build --bin sigma_userspace
+	@echo "Userspace build complete."
 
 # Run all tests
 test:
-	@echo "  TEST    all workspace checks"
-	$(Q)cargo test
+	@echo "Running all tests..."
+	@cargo test
+	@echo "All tests complete."
 
 # Run unit tests only
 test-unit:
-	@echo "  TEST    unit tests"
-	$(Q)cargo test --lib
+	@echo "Running unit tests..."
+	@cargo test --lib
+	@echo "Unit tests complete."
 
 # Run integration tests
 test-integration:
-	@echo "  TEST    integration tests"
-	$(Q)cargo test --test '*'
+	@echo "Running integration tests..."
+	@cargo test --test '*'
+	@echo "Integration tests complete."
 
 # Run QEMU boot test
 test-qemu: build
-	@echo "  BOOT    QEMU virtualization"
-	$(Q)python3 scripts/qemu_smoke_test.py $(ARCH)
+	@echo "Running QEMU boot test..."
+	@qemu-system-x86_64 -cdrom build/sigmaos.iso -m 2G -serial stdio -no-reboot -display none
+	@echo "QEMU boot test complete."
 
 # Format code
 fmt:
-	@echo "  FMT     codebase"
-	$(Q)cargo fmt
+	@echo "Formatting code..."
+	@cargo fmt
+	@echo "Formatting complete."
 
 # Lint code
 lint:
-	@echo "  LINT    codebase warnings"
-	$(Q)cargo clippy -- -D warnings
+	@echo "Linting code..."
+	@cargo clippy -- -D warnings
+	@echo "Linting complete."
 
 # Check code
 check:
-	@echo "  CHECK   codebase compile"
-	$(Q)cargo check
+	@echo "Checking code..."
+	@cargo check
+	@echo "Code check complete."
 
 # Build documentation
 docs:
-	@echo "  DOC     generate docs"
-	$(Q)cargo doc --no-deps
+	@echo "Building documentation..."
+	@cargo doc --no-deps
+	@echo "Documentation build complete."
 
 # Install dependencies
 deps:
-	@echo "  DEPS    fetch crates"
-	$(Q)cargo fetch
+	@echo "Installing dependencies..."
+	@cargo fetch
+	@echo "Dependencies installed."
 
 # Update dependencies
 update:
-	@echo "  DEPS    update crates"
-	$(Q)cargo update
+	@echo "Updating dependencies..."
+	@cargo update
+	@echo "Dependencies updated."
 
 # Architecture-specific settings
 ifeq ($(ARCH),aarch64)

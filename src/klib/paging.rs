@@ -8,6 +8,7 @@ pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
 #[repr(C)]
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy)]
 pub enum PageTableLevel {
     PML4 = 0,
@@ -24,6 +25,22 @@ pub enum PageFaultError {
     PermissionDenied = 2,
     InvalidAddress = 3,
 }
+||||||| 23ef22a4a
+#[derive(Debug, Clone, Copy)]
+pub enum PageTableLevel {
+    PML4 = 0,
+    PDPT = 1,
+    PD = 2,
+    PT = 3,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageTableLevel { PML4 = 0, PDPT = 1, PD = 2, PT = 3 }
+=======
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageTableLevel { PML4 = 0, PDPT = 1, PD = 2, PT = 3 }
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]

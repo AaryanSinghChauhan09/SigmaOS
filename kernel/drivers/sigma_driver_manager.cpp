@@ -1,7 +1,8 @@
 /**
  * =========================================================================
- * Σ SIGMAOS DRIVER MANAGER & I/O MANAGER
+ * Σ SIGMAOS DRIVER MANAGER
  * =========================================================================
+<<<<<<< HEAD
  * Central kernel-space driver lifecycle manager with Windows-inspired features:
  *   - Transparent DriverObject & DeviceObject structures.
  *   - DeviceExtension structure storing custom private driver context.
@@ -12,6 +13,30 @@
  *   - modprobe-style recursive module dependency resolution.
  *   - Fedora/RHEL-style Secure Module Signature verification (PQC Dilithium-5).
  *   - Self-heal on driver failure.
+||||||| 23ef22a4a
+ * Central kernel-space driver lifecycle manager.
+ *
+ * Responsibilities:
+ *   - Load / unload kernel modules by hardware profile.
+ *   - Self-heal on driver failure (reload, fallback, or safe mode).
+ *   - Report structured ZEN-DRIVER-xxxx codes via sigma_driver_codes.h.
+ *   - Enforce hardware profiles: Standard / Gaming / IoT-ARM64 / Forensic.
+ *   - Implement DAG Topological Sort (Kahn's Algorithm) for service and
+ *     driver dependency loading to prevent resource deadlocks.
+ *
+ * Inspired by:
+ *   - SteamOS: GPU driver recovery and gaming hardware tuning.
+ *   - Raspberry Pi OS: ARM64 / eMMC / PWM driver selection.
+ *   - Rescuezilla / SystemRescue: Fallback safe mode on driver crash.
+ *   - Clear Linux: Performance-first driver configuration.
+ *   - Fedora CoreOS: Cloud hardware and DKMS integration.
+=======
+ * Central kernel-space driver lifecycle manager with Linux-inspired features:
+ *   - udev-style dynamic PCI ID Modalias auto-detection.
+ *   - modprobe-style recursive module dependency resolution.
+ *   - Fedora/RHEL-style Secure Module Signature verification (PQC Dilithium-5).
+ *   - Self-heal on driver failure.
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
  * =========================================================================
  */
 
@@ -30,6 +55,7 @@ namespace Sigma {
 namespace Drivers {
 
 // -------------------------------------------------------------------------
+<<<<<<< HEAD
 // Windows-Inspired Transparent Structures
 // -------------------------------------------------------------------------
 
@@ -64,6 +90,11 @@ struct DriverObject {
 
 // -------------------------------------------------------------------------
 // Driver Descriptor
+||||||| 23ef22a4a
+// Driver Descriptor with explicit dependency tracking
+=======
+// Driver Descriptor
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 // -------------------------------------------------------------------------
 struct DriverDescriptor {
     const char*       module_name;    // e.g. "amdgpu", "r8169", "snd_hda_intel"
@@ -174,6 +205,7 @@ static const DriverDescriptor g_driver_table[] = {
 
     { "mmc_block",    "storage", "eMMC / SD (ARM64)",
       (sigma_hw_profile_t)SIGMA_HW_PROFILE_IOT_ARM64,
+<<<<<<< HEAD
       false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED,
       { "sdhci", nullptr }, 0x11AB, 0x0100, true },
 
@@ -207,6 +239,37 @@ static const DriverDescriptor g_driver_table[] = {
       SIGMA_HW_PROFILE_ALL,
       false, 0, 0,
       { nullptr }, 0xFFFF, 0xFFFF, true },
+||||||| 23ef22a4a
+      false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED, "pci_bus" },
+=======
+      false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED,
+      { "sdhci", nullptr }, 0x11AB, 0x0100, true },
+
+    // ---- Emerging & Accelerated Hardware (CISC/RISC AI accelerators & enclaves) ----
+    { "google_tpu",   "compute", "Google TPU v4/v5 Tensor Engine",
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_SERVER, false, 0, 0,
+      { "pci_core", nullptr }, 0x1AE0, 0x0056, true },
+
+    { "graphcore_ipu","compute", "Graphcore Bow IPU Core",
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_SERVER, false, 0, 0,
+      { "pci_core", nullptr }, 0x1E1A, 0x0010, true },
+
+    { "fpga_mgr",     "coproc",  "Xilinx Alveo FPGA Core Manager",
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_SERVER, false, 0, 0,
+      { "pci_core", nullptr }, 0x10EE, 0x5005, true },
+
+    { "optane_dax",   "storage", "Intel Optane Persistent Memory DAX",
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_SERVER, false, 0, 0,
+      { "pci_core", nullptr }, 0x8086, 0x2011, true },
+
+    { "intel_tdx",    "security","Intel Trust Domain Extensions Enclave",
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_ALL, false, 0, 0,
+      { nullptr }, 0xFFFF, 0xFFFF, true },
+
+    { "amd_sev",      "security","AMD Secure Encrypted Virtualization Enclave",
+      (sigma_hw_profile_t)SIGMA_HW_PROFILE_ALL, false, 0, 0,
+      { nullptr }, 0xFFFF, 0xFFFF, true },
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 };
 
 static const sigma_u32 g_driver_count = sizeof(g_driver_table) / sizeof(g_driver_table[0]);
@@ -215,172 +278,15 @@ static const sigma_u32 g_driver_count = sizeof(g_driver_table) / sizeof(g_driver
 static const char* g_loaded_modules[64];
 static sigma_u32   g_loaded_count = 0;
 
-// Object Manager memory boundaries (Simulated Non-Paged Pool)
-static DriverObject g_driver_pool[32];
-static sigma_u32    g_driver_pool_count = 0;
-
-static DeviceObject g_device_pool[64];
-static sigma_u32    g_device_pool_count = 0;
-
 // -------------------------------------------------------------------------
+<<<<<<< HEAD
 // IoManager & DriverManager Classes
+||||||| 23ef22a4a
+// DriverManager with linear-time zero-allocation DAG Topological Sorter
+=======
+// DriverManager
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 // -------------------------------------------------------------------------
-class IoManager {
-public:
-    static IoManager& getInstance() {
-        static IoManager instance;
-        return instance;
-    }
-
-    /**
-     * Normal driver installation process - Creates and initializes a new DriverObject
-     */
-    sigma_status registerDriver(const char* name, const char* registry_path, sigma_status (*unload_cb)(void*)) {
-        sys_print("[IoManager] Installing driver: '%s' from RegistryPath '%s'...\n", name, registry_path);
-
-        if (g_driver_pool_count >= 32) {
-            sys_print("[IoManager] ❌ ERROR: Simulated Non-Paged Pool Full (DriverObject exhaust).\n");
-            return SIGMA_ERROR;
-        }
-
-        // Initialize DriverObject
-        DriverObject& drv = g_driver_pool[g_driver_pool_count++];
-        sigma_size_t i = 0;
-        for (; i < 63 && name[i] != '\0'; i++) {
-            drv.driver_name[i] = name[i];
-        }
-        drv.driver_name[i] = '\0';
-
-        for (i = 0; i < 255 && registry_path[i] != '\0'; i++) {
-            drv.registry_path[i] = registry_path[i];
-        }
-        drv.registry_path[i] = '\0';
-
-        drv.device_list_head = nullptr;
-        drv.driver_unload = unload_cb;
-        drv.is_loaded = true;
-
-        sys_print("[IoManager] ✅ DriverObject '%s' allocated and registered successfully in Non-Paged Pool.\n", name);
-        return SIGMA_SUCCESS;
-    }
-
-    /**
-     * Create Device Object - Allocates a DeviceObject and its DeviceExtension context data
-     */
-    sigma_status createDevice(const char* driver_name, const char* device_name, sigma_size_t extension_size, void** out_device_extension) {
-        sys_print("[IoManager] Creating DeviceObject '%s' for Driver '%s'...\n", device_name, driver_name);
-
-        DriverObject* drv = findDriver(driver_name);
-        if (!drv) {
-            sys_print("[IoManager] ❌ ERROR: Driver '%s' not registered. Device creation aborted.\n", driver_name);
-            return SIGMA_ERROR;
-        }
-
-        if (g_device_pool_count >= 64) {
-            sys_print("[IoManager] ❌ ERROR: Simulated Non-Paged Pool Full (DeviceObject exhaust).\n");
-            return SIGMA_ERROR;
-        }
-
-        // Allocate DeviceObject
-        DeviceObject& dev = g_device_pool[g_device_pool_count++];
-        dev.driver_object = drv;
-        dev.is_active = true;
-
-        // Initialize DeviceExtension Context Information
-        sigma_size_t i = 0;
-        for (; i < 63 && device_name[i] != '\0'; i++) {
-            dev.device_extension.device_name[i] = device_name[i];
-        }
-        dev.device_extension.device_name[i] = '\0';
-
-        dev.device_extension.context_size = extension_size;
-        dev.device_extension.context_data = nullptr; // Simulated dynamic context block
-        dev.device_extension.irq = 0;
-        dev.device_extension.io_port_base = 0;
-        dev.device_extension.resources_assigned = false;
-
-        // Insert into Driver's device list (linked list representation)
-        dev.next_device = drv->device_list_head;
-        drv->device_list_head = &dev;
-
-        if (out_device_extension) {
-            *out_device_extension = &dev.device_extension;
-        }
-
-        sys_print("[IoManager] ✅ DeviceObject '%s' linked to Driver '%s'. DeviceExtension context mapped.\n", device_name, driver_name);
-        return SIGMA_SUCCESS;
-    }
-
-    /**
-     * Assign Hardware Resources to a specific DeviceObject
-     */
-    sigma_status assignResources(const char* device_name, sigma_u32 irq, sigma_u32 io_port_base) {
-        DeviceObject* dev = findDevice(device_name);
-        if (!dev) {
-            return SIGMA_ERROR;
-        }
-
-        sys_print("[IoManager] [Resource Handler] Assigning IRQ %u, I/O Port 0x%X to device '%s'...\n",
-                  irq, io_port_base, device_name);
-        dev->device_extension.irq = irq;
-        dev->device_extension.io_port_base = io_port_base;
-        dev->device_extension.resources_assigned = true;
-        return SIGMA_SUCCESS;
-    }
-
-    /**
-     * Unload Driver & Cleanup all related DeviceObjects (DriverUnload routine)
-     */
-    sigma_status unloadDriver(const char* driver_name) {
-        sys_print("[IoManager] Unload requested for driver: '%s'...\n", driver_name);
-
-        DriverObject* drv = findDriver(driver_name);
-        if (!drv || !drv->is_loaded) {
-            sys_print("[IoManager] ❌ ERROR: Driver '%s' is not loaded.\n", driver_name);
-            return SIGMA_ERROR;
-        }
-
-        // Step 1: Execute driver specific cleanup tasks (DriverUnload Callback)
-        if (drv->driver_unload) {
-            sys_print("[IoManager] Calling DriverUnload routine for '%s'...\n", driver_name);
-            drv->driver_unload(drv);
-        }
-
-        // Step 2: Delete and clean up all associated DeviceObjects (Reclaim Non-Paged Pool memory)
-        DeviceObject* current = drv->device_list_head;
-        while (current != nullptr) {
-            sys_print("[IoManager]   Cleaning up DeviceObject '%s' (releasing IRQ %u)...\n",
-                      current->device_extension.device_name, current->device_extension.irq);
-            current->is_active = false;
-            current->device_extension.resources_assigned = false;
-            current = current->next_device;
-        }
-        drv->device_list_head = nullptr;
-        drv->is_loaded = false;
-
-        sys_print("[IoManager] ✅ Driver '%s' completely unloaded from memory pool.\n", driver_name);
-        return SIGMA_SUCCESS;
-    }
-
-    DriverObject* findDriver(const char* name) {
-        for (sigma_u32 i = 0; i < g_driver_pool_count; i++) {
-            if (g_driver_pool[i].is_loaded && sigma_strcmp(g_driver_pool[i].driver_name, name) == 0) {
-                return &g_driver_pool[i];
-            }
-        }
-        return nullptr;
-    }
-
-    DeviceObject* findDevice(const char* name) {
-        for (sigma_u32 i = 0; i < g_device_pool_count; i++) {
-            if (g_device_pool[i].is_active && sigma_strcmp(g_device_pool[i].device_extension.device_name, name) == 0) {
-                return &g_device_pool[i];
-            }
-        }
-        return nullptr;
-    }
-};
-
 class DriverManager {
 public:
     static DriverManager& getInstance() {
@@ -439,22 +345,12 @@ public:
                       module_name);
         }
 
-        // Step 3: Load the driver and install it dynamically via IoManager
+        // Step 3: Load the driver
         sys_print("[DriverManager] Loading [%s] (%s)...", drv->module_name, drv->chipset_hint);
         if (drv->requires_fw) {
             sys_print(" [FW required]");
         }
         sys_print(" ✅ OK\n");
-
-        // Normal driver installation mapping
-        char reg_path[256] = "/registry/machine/system/currentcontrolset/services/";
-        sigma_size_t reg_offset = 52;
-        for (sigma_size_t i = 0; i < 64 && drv->module_name[i] != '\0'; i++) {
-            reg_path[reg_offset++] = drv->module_name[i];
-        }
-        reg_path[reg_offset] = '\0';
-
-        IoManager::getInstance().registerDriver(drv->module_name, reg_path, nullptr);
 
         // Record as loaded
         g_loaded_modules[g_loaded_count++] = drv->module_name;
@@ -521,9 +417,6 @@ public:
      */
     sigma_status unloadDriver(const char* module_name) {
         sys_print("[DriverManager] Unloading module: %s\n", module_name);
-
-        // Trigger Windows-inspired Object cleanup
-        IoManager::getInstance().unloadDriver(module_name);
 
         // Remove from loaded list
         for (sigma_u32 i = 0; i < g_loaded_count; i++) {
@@ -636,21 +529,5 @@ extern "C" {
 
     sigma_bool sigma_driver_is_loaded(const char* module_name) {
         return Sigma::Drivers::DriverManager::getInstance().isLoaded(module_name) ? SIGMA_TRUE : SIGMA_FALSE;
-    }
-
-    sigma_status sigma_io_register_driver(const char* name, const char* registry_path, sigma_status (*unload_cb)(void*)) {
-        return Sigma::Drivers::IoManager::getInstance().registerDriver(name, registry_path, unload_cb);
-    }
-
-    sigma_status sigma_io_create_device(const char* driver_name, const char* device_name, sigma_size_t extension_size, void** out_device_extension) {
-        return Sigma::Drivers::IoManager::getInstance().createDevice(driver_name, device_name, extension_size, out_device_extension);
-    }
-
-    sigma_status sigma_io_assign_resources(const char* device_name, sigma_u32 irq, sigma_u32 io_port_base) {
-        return Sigma::Drivers::IoManager::getInstance().assignResources(device_name, irq, io_port_base);
-    }
-
-    sigma_status sigma_io_unload_driver(const char* name) {
-        return Sigma::Drivers::IoManager::getInstance().unloadDriver(name);
     }
 }

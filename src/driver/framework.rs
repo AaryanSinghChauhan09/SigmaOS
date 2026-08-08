@@ -11,8 +11,17 @@ pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
+<<<<<<< HEAD
     Storage = 3,
     Input = 4,
+||||||| 23ef22a4a
+    Filter = 3,
+    MiniFilter = 4,
+    Storage = 5,
+    Input = 6,
+=======
+    Storage = 3,
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
 
 #[repr(usize)]
@@ -21,6 +30,7 @@ pub enum DriverState {
     Unloaded = 0,
     Loaded = 1,
     Active = 2,
+<<<<<<< HEAD
 }
 
 pub trait Driver {
@@ -29,8 +39,13 @@ pub trait Driver {
     fn state(&self) -> DriverState;
     fn load(&mut self) -> Result<(), DriverError>;
     fn unload(&mut self) -> Result<(), DriverError>;
+||||||| 23ef22a4a
+    Error = 3,
+=======
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
 
+<<<<<<< HEAD
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverError {
@@ -42,6 +57,100 @@ pub enum DriverError {
 
 #[repr(C)]
 pub struct SimpleDriver {
+||||||| 23ef22a4a
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverError {
+    Success = 0,
+    LoadFailed = 1,
+    UnloadFailed = 2,
+    InvalidDevice = 3,
+    IrpNotHandled = 4,
+    AccessDenied = 5,
+    InvalidParameter = 6,
+    ProbeFailed = 7,
+}
+
+/// Abstract Base Interface (Driver) - Core OOP abstraction
+pub trait Driver {
+    fn id(&self) -> DriverID;
+    fn driver_type(&self) -> DriverType;
+    fn state(&self) -> DriverState;
+    fn set_state(&self, state: DriverState);
+
+    /// Initialises the driver, configuring standard structures
+    fn init(&mut self) -> Result<(), DriverError>;
+
+    /// Probes hardware to verify device presence
+    fn probe(&mut self) -> Result<bool, DriverError>;
+
+    /// Loads driver into memory and transitions state to Active
+    fn load(&mut self) -> Result<(), DriverError>;
+
+    /// Unloads driver from memory and transitions state to Unloaded
+    fn unload(&mut self) -> Result<(), DriverError>;
+
+    /// Gracefully powers down hardware resources
+    fn shutdown(&mut self) -> Result<(), DriverError>;
+
+    /// Returns driver dependencies
+    fn dependencies(&self) -> &'static [DriverType];
+}
+
+pub trait StorageDriver: Driver {
+    fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
+    fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
+}
+
+pub trait NetworkDriver: Driver {
+    fn send_packet(&mut self, packet: &[u8]) -> Result<(), DriverError>;
+    fn receive_packet(&mut self, buf: &mut [u8]) -> Result<usize, DriverError>;
+}
+
+pub trait GraphicsDriver: Driver {
+    fn set_resolution(&mut self, width: u32, height: u32) -> Result<(), DriverError>;
+    fn flip_buffers(&mut self) -> Result<(), DriverError>;
+}
+
+pub trait InputDriver: Driver {
+    fn poll_events(&mut self) -> Result<usize, DriverError>;
+}
+
+// Concrete Driver Classes (OOP Implementation)
+
+pub struct SimpleStorageDriver {
+=======
+pub trait Driver {
+    fn id(&self) -> DriverID;
+    fn driver_type(&self) -> DriverType;
+    fn state(&self) -> DriverState;
+    fn load(&mut self) -> Result<(), DriverError>;
+    fn unload(&mut self) -> Result<(), DriverError>;
+}
+
+pub trait StorageDriver: Driver {
+    fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
+    fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
+}
+
+pub trait NetworkDriver: Driver {
+    fn send_packet(&mut self, packet: &[u8]) -> Result<(), DriverError>;
+    fn receive_packet(&mut self, buf: &mut [u8]) -> Result<usize, DriverError>;
+}
+
+pub trait GraphicsDriver: Driver {
+    fn set_resolution(&mut self, width: u32, height: u32) -> Result<(), DriverError>;
+    fn flip_buffers(&mut self) -> Result<(), DriverError>;
+}
+
+pub trait InputDriver: Driver {
+    fn poll_events(&mut self) -> Result<usize, DriverError>;
+}
+
+// Concrete Driver Classes (OOP Implementation)
+
+pub struct SimpleStorageDriver {
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
     pub id: DriverID,
     pub driver_type: DriverType,
     pub state: AtomicUsize,
@@ -55,6 +164,7 @@ impl SimpleDriver {
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
+<<<<<<< HEAD
 
     pub fn init(&self) -> Result<(), DriverError> {
         Ok(())
@@ -67,6 +177,21 @@ impl SimpleDriver {
     pub fn shutdown(&self) -> Result<(), DriverError> {
         Ok(())
     }
+||||||| 23ef22a4a
+
+    pub fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+
+    pub fn probe(&self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+
+    pub fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+=======
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
 
 impl Driver for SimpleDriver {
@@ -98,16 +223,9 @@ pub trait DriverFramework {
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
 }
 
-#[allow(dead_code)]
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
     next_id: AtomicUsize,
-}
-
-impl Default for SimpleDriverFramework {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleDriverFramework {
@@ -155,12 +273,28 @@ impl DriverFramework for SimpleDriverFramework {
         }
         None
     }
+<<<<<<< HEAD
 }
 
 impl<T> Default for Vec<T> {
     fn default() -> Self {
         Self::new()
     }
+||||||| 23ef22a4a
+
+    fn query_by_type(&self, driver_type: DriverType) -> Vec<DriverID> {
+        let mut ids = Vec::new();
+        for driver_option in self.drivers.iter() {
+            if let Some(ref d) = *driver_option {
+                if d.driver_type() == driver_type {
+                    ids.push(d.id());
+                }
+            }
+        }
+        ids
+    }
+=======
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
 
 pub struct Vec<T> {

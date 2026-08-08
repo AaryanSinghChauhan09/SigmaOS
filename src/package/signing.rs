@@ -23,10 +23,16 @@ extern crate alloc;
 
 extern crate alloc;
 
+<<<<<<< HEAD
 extern crate alloc;
 
 extern crate alloc;
 
+||||||| 23ef22a4a
+extern crate alloc;
+
+=======
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 /// OOP-based Package Signing & Attestation for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
 /// Implements provenance metadata and supply-chain attestations

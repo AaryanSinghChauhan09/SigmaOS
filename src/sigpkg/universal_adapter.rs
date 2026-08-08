@@ -264,14 +264,36 @@ impl UniversalPackageAdapter {
                 version_constraint: VersionConstraint::Any,
             });
         }
+<<<<<<< HEAD
         Ok(Package::new(
             crate::klib::String::from(name),
             parsed_ver,
             crate::klib::String::from(desc),
+||||||| 23ef22a4a
+
+        Ok(Package {
+            name: name.to_string(),
+            version: parsed_ver,
+            description: desc.to_string(),
+=======
+
+        Ok(Package::new(
+            crate::klib::String::from(name),
+            parsed_ver,
+            crate::klib::String::from(desc),
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
             dependencies,
+<<<<<<< HEAD
             crate::klib::String::from(&format!("SHA256:{}", name)),
         ))
         })
+||||||| 23ef22a4a
+            checksum: format!("SHA256:{}", name),
+        })
+=======
+            crate::klib::String::from(&format!("SHA256:{}", name)),
+        ))
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
     }
 }
 

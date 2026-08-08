@@ -1,3 +1,5 @@
+#![allow(clippy::useless_format)]
+
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 // Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.

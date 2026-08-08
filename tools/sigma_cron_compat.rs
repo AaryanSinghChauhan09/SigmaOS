@@ -74,98 +74,11 @@ static mut CRON_JOBS: [CronJob; MAX_CRON_JOBS] = [CronJob {
 static mut CRON_JOB_COUNT: SigmaU32 = 0;
 static mut CRON_INITIALIZED: SigmaBool = false;
 
-/// Gentoo-style CPU load average mitigation state (e.g. 100 represents 1.00 load)
-static mut SYSTEM_LOAD_AVERAGE: u32 = 100;
-
-/// Simple log entry system to capture and verify execution logs in testing & inspection
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CronLogEntry {
-    pub job_name: [u8; 64],
-    pub action: [u8; 32], // "executed", "skipped_load", "skipped_overlap", "skipped_missed", "selinux_enforced", "mail_dispatched"
-    pub user_id: u32,
-}
-
-static mut CRON_LOGS: [CronLogEntry; 32] = [CronLogEntry {
-    job_name: [0; 64],
-    action: [0; 32],
-    user_id: 0,
-}; 32];
-static mut CRON_LOG_COUNT: usize = 0;
-
-unsafe fn log_cron_action(job_name: &[u8; 64], action_str: &str, user_id: u32) {
-    if CRON_LOG_COUNT < 32 {
-        let mut entry = CronLogEntry {
-            job_name: *job_name,
-            action: [0; 32],
-            user_id,
-        };
-        let bytes = action_str.as_bytes();
-        let len = bytes.len().min(31);
-        for i in 0..len {
-            entry.action[i] = bytes[i];
-        }
-        CRON_LOGS[CRON_LOG_COUNT] = entry;
-        CRON_LOG_COUNT += 1;
-    }
-}
-
-/// Reset log buffer for testing
-#[no_mangle]
-pub unsafe extern "C" fn cron_reset_logs() {
-    CRON_LOG_COUNT = 0;
-    for i in 0..32 {
-        CRON_LOGS[i] = CronLogEntry {
-            job_name: [0; 64],
-            action: [0; 32],
-            user_id: 0,
-        };
-    }
-}
-
-/// Retrieve log count
-#[no_mangle]
-pub unsafe extern "C" fn cron_get_log_count() -> u32 {
-    CRON_LOG_COUNT as u32
-}
-
-/// Get a log entry details
-#[no_mangle]
-pub unsafe extern "C" fn cron_get_log_entry(
-    index: u32,
-    job_name: *mut u8,
-    action: *mut u8,
-    user_id: *mut u32,
-) -> SigmaI32 {
-    let idx = index as usize;
-    if idx >= CRON_LOG_COUNT {
-        return -1;
-    }
-    let entry = &CRON_LOGS[idx];
-    if !job_name.is_null() {
-        core::ptr::copy_nonoverlapping(entry.job_name.as_ptr(), job_name, 64);
-    }
-    if !action.is_null() {
-        core::ptr::copy_nonoverlapping(entry.action.as_ptr(), action, 32);
-    }
-    if !user_id.is_null() {
-        *user_id = entry.user_id;
-    }
-    0
-}
-
-/// Set the system load average value (represented as load * 100, e.g., 250 for 2.50 load)
-#[no_mangle]
-pub unsafe extern "C" fn cron_set_system_load(load: u32) {
-    SYSTEM_LOAD_AVERAGE = load;
-}
-
 /// Initialize cron
 #[no_mangle]
 pub unsafe extern "C" fn cron_init() -> SigmaI32 {
     CRON_INITIALIZED = true;
     CRON_JOB_COUNT = 0;
-    SYSTEM_LOAD_AVERAGE = 100;
-    cron_reset_logs();
     
     0 // Success
 }
@@ -369,7 +282,7 @@ pub unsafe extern "C" fn cron_list_jobs(jobs: *mut CronJob, max_count: SigmaU32)
     count as SigmaU32
 }
 
-/// Check and run due jobs (Improved with modern Linux distro-inspired controls)
+/// Check and run due jobs
 #[no_mangle]
 pub unsafe extern "C" fn cron_check_and_run() -> SigmaI32 {
     if !CRON_INITIALIZED {
@@ -386,27 +299,6 @@ pub unsafe extern "C" fn cron_check_and_run() -> SigmaI32 {
         }
         
         if current_time >= job.next_run {
-            // Check overlapping runs (Cronie flock style prevention)
-            if job.is_running && !job.allow_overlap {
-                log_cron_action(&job.name, "skipped_overlap", job.run_as_user);
-                continue;
-            }
-
-            // Check Gentoo-style CPU load average limit
-            if job.max_load_average > 0 && SYSTEM_LOAD_AVERAGE > job.max_load_average {
-                log_cron_action(&job.name, "skipped_load", job.run_as_user);
-                continue;
-            }
-
-            // Check Debian/Anacron style missed execution windows
-            let missed_by = current_time - job.next_run;
-            if missed_by > 50 && !job.run_if_missed {
-                // Skip execution because we missed the window and run_if_missed is false
-                log_cron_action(&job.name, "skipped_missed", job.run_as_user);
-                job.next_run = calculate_next_run(job);
-                continue;
-            }
-
             // Execute job
             execute_cron_job(job);
             job.last_run = current_time;
@@ -546,109 +438,17 @@ pub unsafe extern "C" fn cron_add_job_ext(
     res
 }
 
-/// Add cron job with extended multi-distro parameters
-#[no_mangle]
-pub unsafe extern "C" fn cron_add_job_ext(
-    name: *const u8,
-    command: *const u8,
-    minute: *const u8,
-    hour: *const u8,
-    day_of_month: *const u8,
-    month: *const u8,
-    day_of_week: *const u8,
-    category: u8,
-    run_as_user: u32,
-    randomized_delay_sec: u32,
-    generation_id: u32,
-) -> SigmaI32 {
-    let res = cron_add_job(name, command, minute, hour, day_of_month, month, day_of_week);
-    if res == 0 {
-        let job = &mut CRON_JOBS[(CRON_JOB_COUNT - 1) as usize];
-        job.category = category;
-        job.run_as_user = run_as_user;
-        job.randomized_delay_sec = randomized_delay_sec;
-        job.generation_id = generation_id;
-    }
-    res
-}
-
-/// Add cron job with advanced Linux-distro inspired parameters
-#[no_mangle]
-pub unsafe extern "C" fn cron_add_job_linux(
-    name: *const u8,
-    command: *const u8,
-    minute: *const u8,
-    hour: *const u8,
-    day_of_month: *const u8,
-    month: *const u8,
-    day_of_week: *const u8,
-    category: u8,
-    run_as_user: u32,
-    randomized_delay_sec: u32,
-    generation_id: u32,
-    max_load_average: u32,
-    run_if_missed: SigmaBool,
-    selinux_context: *const u8,
-    mailto: *const u8,
-    allow_overlap: SigmaBool,
-) -> SigmaI32 {
-    let res = cron_add_job(name, command, minute, hour, day_of_month, month, day_of_week);
-    if res == 0 {
-        let job = &mut CRON_JOBS[(CRON_JOB_COUNT - 1) as usize];
-        job.category = category;
-        job.run_as_user = run_as_user;
-        job.randomized_delay_sec = randomized_delay_sec;
-        job.generation_id = generation_id;
-        job.max_load_average = max_load_average;
-        job.run_if_missed = run_if_missed;
-        job.allow_overlap = allow_overlap;
-
-        if !selinux_context.is_null() {
-            for i in 0..63 {
-                let byte = *selinux_context.add(i);
-                if byte == 0 { break; }
-                job.selinux_context[i] = byte;
-            }
-        }
-
-        if !mailto.is_null() {
-            for i in 0..63 {
-                let byte = *mailto.add(i);
-                if byte == 0 { break; }
-                job.mailto[i] = byte;
-            }
-        }
-    }
-    res
-}
-
 /// Execute cron job helper
-unsafe fn execute_cron_job(job: &mut CronJob) {
-    job.is_running = true;
-    log_cron_action(&job.name, "executed", job.run_as_user);
-
-    // Simulate SELinux transition and MAILTO configuration logs
-    let mut mailto_has_val = false;
-    for &b in &job.mailto {
-        if b != 0 { mailto_has_val = true; break; }
-    }
-    if mailto_has_val {
-        log_cron_action(&job.name, "mail_dispatched", job.run_as_user);
-    }
-
-    let mut selinux_has_val = false;
-    for &b in &job.selinux_context {
-        if b != 0 { selinux_has_val = true; break; }
-    }
-    if selinux_has_val {
-        log_cron_action(&job.name, "selinux_enforced", job.run_as_user);
-    }
-
-    job.is_running = false;
+unsafe fn execute_cron_job(job: &CronJob) {
+    // In a real implementation, this would:
+    // 1. Fork a process
+    // 2. Execute the command
+    // 3. Capture output
+    // 4. Log results
 }
 
 /// Calculate next run time helper
-unsafe fn calculate_next_run(_job: &CronJob) -> SigmaU64 {
+unsafe fn calculate_next_run(job: &CronJob) -> SigmaU64 {
     // In a real implementation, this would:
     // 1. Get current time
     // 2. Find next matching time based on schedule

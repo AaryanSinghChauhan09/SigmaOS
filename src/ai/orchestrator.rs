@@ -1,34 +1,42 @@
-#![no_std]
-#![no_main]
+// OOP-based AI Orchestrator for SigmaOS
+// Implements sigma-ai core with multi-agent coordination, workflow automation,
+// and self-diagnosis capabilities for system optimization.
 
 use core::mem;
 /// Local LLM Orchestrator for SigmaOS
 /// Dynamically schedules models, checks device bounds, and prunes context windows.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+pub type AgentID = usize;
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceTarget {
-    Cpu = 0,
-    Gpu = 1,
-    Tpu = 2,
+pub enum AgentState {
+    Idle = 0,
+    Active = 1,
+    Busy = 2,
+    Error = 3,
+    Learning = 4,
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OrchestratorError {
+pub enum AgentError {
     Success = 0,
-    OutOfMemory = 1,
-    ModelNotFound = 2,
-    LimitExceeded = 3,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    Timeout = 3,
+    InvalidInput = 4,
 }
 
-pub struct ModelResource {
-    pub name: [u8; 32],
-    pub memory_required_mb: usize,
-    pub target: DeviceTarget,
+pub trait AIAgent {
+    fn id(&self) -> AgentID;
+    fn name(&self) -> &str;
+    fn state(&self) -> AgentState;
+    fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError>;
 }
 
+<<<<<<< HEAD
 impl ModelResource {
     pub fn new(name: &[u8], memory_required_mb: usize, target: DeviceTarget) -> Self {
         let mut name_array = [0u8; 32];
@@ -40,10 +48,42 @@ impl ModelResource {
             name: name_array,
             memory_required_mb,
             target,
+||||||| 23ef22a4a
+pub struct SimpleAIAgent {
+    pub id: AgentID,
+    pub name: String,
+    pub state: AtomicUsize,
+}
+
+impl SimpleAIAgent {
+    pub fn new(id: AgentID, name: &str) -> Self {
+        SimpleAIAgent {
+            id,
+            name: name.to_string(),
+            state: AtomicUsize::new(AgentState::Idle as usize),
+=======
+pub struct SimpleAIAgent {
+    pub id: AgentID,
+    pub name: String,
+    pub state: AtomicUsize,
+}
+
+impl SimpleAIAgent {
+    pub fn new(id: AgentID, name: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let name_len = name.len().min(63);
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+
+        SimpleAIAgent {
+            id,
+            name: name.to_string(),
+            state: AtomicUsize::new(AgentState::Idle as usize),
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
         }
     }
 }
 
+<<<<<<< HEAD
 /// Local LLM and deep learning model resource orchestrator
 pub struct LocalLlmOrchestrator {
     pub active_models: Vec<Option<ModelResource>>,
@@ -51,6 +91,74 @@ pub struct LocalLlmOrchestrator {
     pub total_tpu_memory_mb: usize,
     pub allocated_gpu_memory_mb: AtomicUsize,
     pub allocated_tpu_memory_mb: AtomicUsize,
+||||||| 23ef22a4a
+impl AIAgent for SimpleAIAgent {
+    fn id(&self) -> AgentID {
+        self.id
+    }
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn state(&self) -> AgentState {
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
+            1 => AgentState::Active,
+            2 => AgentState::Busy,
+            3 => AgentState::Error,
+            4 => AgentState::Learning,
+            _ => AgentState::Idle,
+        }
+    }
+
+    fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
+        self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
+        let mut result = Vec::new();
+        for &byte in self.name.as_bytes() {
+            result.push(byte);
+        }
+        result.push(b':');
+        result.push(b' ');
+        for &byte in task {
+            result.push(byte);
+        }
+        self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
+        Ok(result)
+    }
+=======
+impl AIAgent for SimpleAIAgent {
+    fn id(&self) -> AgentID {
+        self.id
+    }
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn state(&self) -> AgentState {
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
+            1 => AgentState::Active,
+            2 => AgentState::Busy,
+            3 => AgentState::Error,
+            4 => AgentState::Learning,
+            _ => AgentState::Idle,
+        }
+    }
+
+    fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
+        self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
+        let mut result = Vec::new();
+        for &byte in self.name.as_bytes() {
+            result.push(byte);
+        }
+        result.push(b':');
+        result.push(b' ');
+        for &byte in task {
+            result.push(byte);
+        }
+        self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
+        Ok(result)
+    }
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
 
 impl LocalLlmOrchestrator {
@@ -73,6 +181,7 @@ impl LocalLlmOrchestrator {
     ) -> Result<DeviceTarget, OrchestratorError> {
         let mut final_device = prefer_device;
 
+<<<<<<< HEAD
         match prefer_device {
             DeviceTarget::Gpu => {
                 let current_gpu = self.allocated_gpu_memory_mb.load(Ordering::SeqCst);
@@ -83,6 +192,101 @@ impl LocalLlmOrchestrator {
                     // Fallback to CPU
                     final_device = DeviceTarget::Cpu;
                 }
+||||||| 23ef22a4a
+pub struct SimpleAgentOrchestrator {
+    pub agents: Vec<Box<dyn AIAgent>>,
+    pub next_id: AtomicUsize,
+    pub model_temperature: f32,
+    pub response_timeout_secs: u32,
+}
+
+impl SimpleAgentOrchestrator {
+    pub fn new() -> Self {
+        SimpleAgentOrchestrator {
+            agents: Vec::new(),
+            next_id: AtomicUsize::new(1),
+            model_temperature: 0.7,
+            response_timeout_secs: 30,
+        }
+    }
+
+    pub fn set_model_temperature(&mut self, temp: f32) {
+        self.model_temperature = temp;
+    }
+
+    pub fn set_response_timeout(&mut self, secs: u32) {
+        self.response_timeout_secs = secs;
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AgentOrchestrator for SimpleAgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
+        let id = agent.id();
+        self.agents.push(agent);
+        Ok(id)
+    }
+
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError> {
+        if let Some(target_id) = agent_id {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+=======
+pub struct SimpleAgentOrchestrator {
+    pub agents: Vec<Box<dyn AIAgent>>,
+    pub next_id: AtomicUsize,
+}
+
+impl SimpleAgentOrchestrator {
+    pub fn new() -> Self {
+        SimpleAgentOrchestrator {
+            agents: Vec::new(),
+            next_id: AtomicUsize::new(1),
+        }
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AgentOrchestrator for SimpleAgentOrchestrator {
+    fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
+        let id = agent.id();
+        self.agents.push(agent);
+        Ok(id)
+    }
+
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError> {
+        if let Some(target_id) = agent_id {
+            if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
+                agent.execute(task)
+            } else {
+                Err(AgentError::NotFound)
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
             }
             DeviceTarget::Tpu => {
                 let current_tpu = self.allocated_tpu_memory_mb.load(Ordering::SeqCst);
@@ -134,14 +338,19 @@ impl LocalLlmOrchestrator {
                 }
             }
         }
-        Err(OrchestratorError::ModelNotFound)
+        None
+    }
+
+    fn list_agents(&self) -> Vec<AgentID> {
+        self.agents.iter().map(|a| a.id()).collect()
     }
 }
 
-/// A sliding context window history pruner
-pub struct ContextWindowPruner {
-    pub history: Vec<[u8; 128]>,
-    pub max_lines: usize,
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn peek(&self) -> Option<&[u8]>;
+    fn size(&self) -> usize;
 }
 
 impl ContextWindowPruner {

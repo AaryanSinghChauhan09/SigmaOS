@@ -1,13 +1,18 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 // SigmaOS Process Management Module
+||||||| 23ef22a4a
+// SigmaOS Process Management Module
+=======
+// SigmaOS Process Spawning & Signal Execution Subsystem Mod
+
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 pub mod spawn;
-pub mod kernel_data;
 
 pub use spawn::{
-    Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
-};
-pub use kernel_data::{
-    ThreadWaitMode, ThreadState, MemoryDescriptorList, KThread, EThread, VasDescriptor, KProcess, EProcess, KPrcb, Kpcr, KernelDebuggerShim,
+    Process, ProcessError, ProcessGroup, ProcessID, ProcessSpawner, ProcessState, ProcessWaiter,
+    SignalHandlerFn, SimpleProcess, SimpleProcessGroup, SimpleProcessSpawner, SimpleProcessWaiter,
+    SIGINT, SIGKILL, SIGTERM, SIGUSR1,
 };
 ||||||| 43be3a7e8
 =======

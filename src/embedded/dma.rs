@@ -27,10 +27,16 @@ extern crate alloc;
 
 extern crate alloc;
 
+<<<<<<< HEAD
 extern crate alloc;
 
 extern crate alloc;
 
+||||||| 23ef22a4a
+extern crate alloc;
+
+=======
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 /// OOP-based DMA for SigmaOS
 /// Based on Ideas-999-Structured: Embedded & Firmware Item 1146
 /// Implements DMA transfers with Linux and BSD-inspired safety wrappers.

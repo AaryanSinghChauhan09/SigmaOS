@@ -177,6 +177,7 @@ impl LinuxTranslationService {
 pub static GLOBAL_TRANSLATION_UDF: GenericLinuxTranslationUdf = GenericLinuxTranslationUdf;
 pub static GLOBAL_TRANSLATION_SERVICE: LinuxTranslationService =
     LinuxTranslationService::new(&GLOBAL_TRANSLATION_UDF);
+<<<<<<< HEAD
 
 // =========================================================================
 // DEBIAN-DEFEATING ADVANCED SANDBOXED PACKAGE SYSTEM (DEBIAN PARITY & DOMINATION)
@@ -384,3 +385,41 @@ mod tests {
         assert!(!DebianParityVerifier::verify_post_quantum_signature(&unsigned_header));
     }
 }
+||||||| 23ef22a4a
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_linux_ioctl_parsing_and_encoding() {
+        // Standard layout test: Direction=2 (read), Size=256, Group='T', Command=10
+        let encoded_cmd = ((2u32) << 30) | ((256u32) << 16) | ((b'T' as u32) << 8) | 10;
+        let decoded = DecodedIoctl::parse(encoded_cmd);
+
+        assert_eq!(decoded.direction, 2);
+        assert_eq!(decoded.size, 256);
+        assert_eq!(decoded.group, b'T');
+        assert_eq!(decoded.command_id, 10);
+
+        assert_eq!(decoded.encode(), encoded_cmd);
+    }
+
+    #[test]
+    fn test_linux_ioctl_group_routing() {
+        let udf = GenericLinuxTranslationUdf;
+
+        // 1. TCGETS direct translation
+        assert_eq!(udf.translate_io_control(0x5401), 0x101);
+
+        // 2. TTY dynamic translation Group='T' (0x54), Command=5 -> 0x100 + 5 = 0x105
+        let tty_cmd = ((1u32) << 30) | ((4u32) << 16) | ((b'T' as u32) << 8) | 5;
+        assert_eq!(udf.translate_io_control(tty_cmd), 0x105);
+
+        // 3. Filesystem dynamic translation Group='f', Command=12 -> 0x200 + 12 = 0x20C
+        let fs_cmd = ((3u32) << 30) | ((8u32) << 16) | ((b'f' as u32) << 8) | 12;
+        assert_eq!(udf.translate_io_control(fs_cmd), 0x20C);
+    }
+}
+=======
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e

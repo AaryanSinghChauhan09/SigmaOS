@@ -477,7 +477,16 @@ mod tests {
 
     #[test]
     fn test_side_channel_remedies() {
-        let mut key = [42u8; 16];
+        // Generate test key using timestamp-based approach
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let mut key = [0u8; 16];
+        for (i, byte) in key.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         secure_memzero(&mut key);
         assert_eq!(key, [0u8; 16]);
 

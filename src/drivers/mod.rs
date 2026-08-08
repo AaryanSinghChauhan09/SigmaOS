@@ -14,6 +14,7 @@ pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
 
+<<<<<<< HEAD
 // Expose rich hidden Linux/BSD-inspired drivers
 pub mod ch340_usb;
 pub mod e1000_nic;
@@ -47,6 +48,18 @@ pub use even_more_devices::{
 };
 pub use flipper_gpio_sensor::FlipperGpioSensor;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
+||||||| 23ef22a4a
+pub use gpu::{GpuCommand, GpuDriver, GpuError};
+=======
+pub mod ch340_usb;
+pub mod e1000_nic;
+pub mod intel_hda;
+pub mod nvme_storage;
+
+pub use gpu::{
+    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline, GpuShader, ShaderStage,
+};
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;
