@@ -363,4 +363,87 @@ mod tests {
         assert!(bootloader.enter_kernel(0x100000, &params).is_ok());
         assert!(bootloader.enter_kernel(0, &params).is_err());
     }
+
+    #[test]
+    fn test_initramfs_cpio_parsing() {
+        let mut initramfs = Initramfs::new();
+
+        // Build mock standard CPIO "newc" archive bytes for a single file "test.txt" containing "hello world"
+        let mut cpio_bytes = Vec::new();
+        // 110-byte header
+        cpio_bytes.extend_from_slice(b"070701"); // magic
+        cpio_bytes.extend_from_slice(b"00000001"); // ino
+        cpio_bytes.extend_from_slice(b"000081a4"); // mode (regular file)
+        cpio_bytes.extend_from_slice(b"000003e8"); // uid
+        cpio_bytes.extend_from_slice(b"000003e8"); // gid
+        cpio_bytes.extend_from_slice(b"00000001"); // nlink
+        cpio_bytes.extend_from_slice(b"00000000"); // mtime
+        cpio_bytes.extend_from_slice(b"0000000b"); // filesize (11 bytes)
+        cpio_bytes.extend_from_slice(b"00000000"); // devmajor
+        cpio_bytes.extend_from_slice(b"00000000"); // devminor
+        cpio_bytes.extend_from_slice(b"00000000"); // rdevmajor
+        cpio_bytes.extend_from_slice(b"00000000"); // rdevminor
+        cpio_bytes.extend_from_slice(b"00000009"); // namesize (9 bytes: "test.txt\0")
+        cpio_bytes.extend_from_slice(b"00000000"); // check
+
+        // 9-byte filename (null-terminated)
+        cpio_bytes.extend_from_slice(b"test.txt\0");
+        // 1-byte padding to 4-byte boundary (110 + 9 = 119 -> 120, pad 1)
+        cpio_bytes.extend_from_slice(b"\0");
+
+        // 11-byte file content
+        cpio_bytes.extend_from_slice(b"hello world");
+        // 1-byte padding to 4-byte boundary (11 -> 12, pad 1)
+        cpio_bytes.extend_from_slice(b"\0");
+
+        // Trailer block
+        cpio_bytes.extend_from_slice(b"070701"); // magic (6)
+        cpio_bytes.extend_from_slice(b"00000000"); // ino (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // mode (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // uid (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // gid (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // nlink (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // mtime (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // filesize (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // devmajor (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // devminor (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // rdevmajor (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // rdevminor (8)
+        cpio_bytes.extend_from_slice(b"0000000b"); // namesize (8)
+        cpio_bytes.extend_from_slice(b"00000000"); // check (8)
+        cpio_bytes.extend_from_slice(b"TRAILER!!!\0"); // filename (11)
+        cpio_bytes.extend_from_slice(b"\0\0\0"); // padding to 4-byte boundary (110 + 11 = 121 -> 124, pad 3)
+
+        initramfs.load(&cpio_bytes).unwrap();
+        let extracted = initramfs.extract_cpio().unwrap();
+
+        assert_eq!(extracted.len(), 1);
+        assert_eq!(extracted[0].name, "test.txt");
+        assert_eq!(extracted[0].size, 11);
+        assert!(!extracted[0].is_dir);
+        assert_eq!(extracted[0].content, b"hello world".to_vec());
+    }
+
+    #[test]
+    fn test_initramfs_uuid_root_mount() {
+        let initramfs = Initramfs::new();
+
+        // 1. Success matching root device by UUID
+        let mount_str1 = initramfs.mount_root_by_uuid("root=UUID=8f9a2e3c-4b5d quiet").unwrap();
+        assert!(mount_str1.contains("Mounted device with UUID=8f9a2e3c-4b5d"));
+
+        // 2. Success matching root device by LABEL
+        let mount_str2 = initramfs.mount_root_by_uuid("root=LABEL=SIGMAOS_ROOT verbose").unwrap();
+        assert!(mount_str2.contains("Mounted device with Label=SIGMAOS_ROOT"));
+    }
+
+    #[test]
+    fn test_initramfs_rescue_fallback() {
+        let initramfs = Initramfs::new();
+
+        // Invalid or missing root parameters drops dynamically to the fallback rescue ramfs
+        let mount_str = initramfs.mount_root_by_uuid("loglevel=debug").unwrap();
+        assert!(mount_str.contains("WARNING: Target root device not found!"));
+        assert!(mount_str.contains("emergency ramfs shell"));
+    }
 }
