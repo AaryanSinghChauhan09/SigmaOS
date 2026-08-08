@@ -402,7 +402,7 @@ impl TypographyRenderer {
     }
 
     /// Render text node to GPU buffer
-    pub fn render_text(&self, text: &str, font_size: u32, position: (f32, f32)) -> Result<Vec<u8>> {
+    pub fn render_text(&self, text: &str, _font_size: u32, _position: (f32, f32)) -> Result<Vec<u8>> {
         // In real implementation, this would use GPU-accelerated text rendering
         // via the Zenith compositor's text rendering pipeline
         let mut buffer = Vec::new();
@@ -492,7 +492,7 @@ impl SigmaOffice {
     }
 
     /// Load document from SigmaFS
-    pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
+    pub fn load_document(&mut self, _path: &str) -> Result<SigmaDocument> {
         // In real implementation, this would load from SigmaFS with capability checks
         // Load logic here
         Err(std::io::Error::new(std::io::ErrorKind::NotFound, "Not implemented").into())

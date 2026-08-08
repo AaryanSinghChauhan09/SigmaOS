@@ -23,6 +23,10 @@
 /// Based on Ideas-999-Structured: IoT & Smart Home Item 976
 /// Implements IoT device management
 
+extern crate alloc;
+pub use alloc::string::String;
+pub use alloc::boxed::Box;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -73,7 +77,14 @@ impl IoTDevice for SimpleIoTDevice {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
     }
-    fn device_type(&self) -> DeviceType { unsafe { core::mem::transmute(self.device_type.load(Ordering::SeqCst)) } }
+    fn device_type(&self) -> DeviceType {
+        match self.device_type.load(Ordering::SeqCst) {
+            0 => DeviceType::Sensor,
+            1 => DeviceType::Actuator,
+            2 => DeviceType::Controller,
+            _ => DeviceType::Gateway,
+        }
+    }
     fn is_online(&self) -> bool { self.online.load(Ordering::SeqCst) == 1 }
 }
 
@@ -81,7 +92,7 @@ pub trait IoTHub {
     fn add_device(&mut self, device: Box<dyn IoTDevice>) -> Result<DeviceID, IoTError>;
     fn remove_device(&mut self, id: DeviceID) -> Result<(), IoTError>;
     fn get_device(&self, id: DeviceID) -> Option<&dyn IoTDevice>;
-    def send_command(&self, id: DeviceID, command: &[u8]) -> Result<(), IoTError>;
+    fn send_command(&self, id: DeviceID, command: &[u8]) -> Result<(), IoTError>;
 }
 
 #[repr(C)]
@@ -138,7 +149,7 @@ impl IoTHub for SimpleIoTHub {
 
 pub trait AutomationRule {
     fn add_rule(&mut self, trigger: &[u8], action: &[u8]);
-    def execute_rules(&self, event: &[u8]) -> Vec<&[u8]>;
+    fn execute_rules(&self, event: &[u8]) -> Vec<&[u8]>;
 }
 
 #[repr(C)]
@@ -179,7 +190,150 @@ impl AutomationRule for SimpleAutomationRule {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+/// SmartScene models a grouped set of actuator commands (inspired by Google Home)
+pub struct SmartScene {
+    pub name: String,
+    pub commands: Vec<(DeviceID, [u8; 64])>,
+}
+
+impl SmartScene {
+    pub fn new(name: &str) -> Self {
+        let mut s = String::new();
+        for &b in name.as_bytes() { s.push(b as char); }
+        Self {
+            name: s,
+            commands: Vec::new(),
+        }
+    }
+
+    pub fn add_command(&mut self, device_id: DeviceID, cmd: &[u8]) {
+        let mut cmd_array = [0u8; 64];
+        let cmd_len = cmd.len().min(63);
+        for i in 0..cmd_len { cmd_array[i] = cmd[i]; }
+        self.commands.push((device_id, cmd_array));
+    }
+
+    pub fn execute(&self, hub: &dyn IoTHub) -> Result<(), IoTError> {
+        for &(device_id, ref cmd) in &self.commands {
+            let cmd_len = cmd.iter().position(|&b| b == 0).unwrap_or(64);
+            hub.send_command(device_id, &cmd[..cmd_len])?;
+        }
+        Ok(())
+    }
+}
+
+/// DeviceState models properties of an active device (inspired by Home Assistant)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeviceState {
+    pub device_id: DeviceID,
+    pub battery_level: u8,
+    pub temperature_c: i8,
+    pub is_active: bool,
+}
+
+/// DeviceStateStore caches state information of all smart devices
+pub struct DeviceStateStore {
+    pub states: Vec<DeviceState>,
+}
+
+impl DeviceStateStore {
+    pub fn new() -> Self {
+        Self {
+            states: Vec::new(),
+        }
+    }
+
+    pub fn update_state(&mut self, state: DeviceState) {
+        for i in 0..self.states.len() {
+            if self.states[i].device_id == state.device_id {
+                self.states[i] = state;
+                return;
+            }
+        }
+        self.states.push(state);
+    }
+
+    pub fn get_state(&self, device_id: DeviceID) -> Option<&DeviceState> {
+        for s in &self.states {
+            if s.device_id == device_id {
+                return Some(s);
+            }
+        }
+        None
+    }
+}
+
+/// VoiceAssistantMock parses plain-text phrase patterns (Alexa/Google style) to trigger actions
+pub struct VoiceAssistantMock {
+    pub scenes: Vec<(String, SmartScene)>,
+}
+
+impl VoiceAssistantMock {
+    pub fn new() -> Self {
+        Self {
+            scenes: Vec::new(),
+        }
+    }
+
+    pub fn register_scene(&mut self, phrase: &str, scene: SmartScene) {
+        let mut p = String::new();
+        for &b in phrase.as_bytes() { p.push(b as char); }
+        self.scenes.push((p, scene));
+    }
+
+    /// Process a natural language voice command phrase (e.g. "turn on lights" or "trigger movie night")
+    pub fn handle_voice_phrase(&self, phrase: &str, hub: &dyn IoTHub) -> Result<String, IoTError> {
+        let clean_phrase = phrase.trim().to_lowercase();
+
+        // Match registered scene phrases first
+        for &(ref trigger_phrase, ref scene) in &self.scenes {
+            if trigger_phrase.to_lowercase() == clean_phrase {
+                scene.execute(hub)?;
+                let mut response = String::new();
+                response.push_str("triggered scene: ");
+                response.push_str(&scene.name);
+                return Ok(response);
+            }
+        }
+
+        // Direct device command parsing: "turn on device X" or "activate device X"
+        if clean_phrase.contains("turn on device") || clean_phrase.contains("activate device") {
+            for ch in clean_phrase.chars() {
+                if ch.is_ascii_digit() {
+                    let device_id = (ch as u8 - b'0') as DeviceID;
+                    hub.send_command(device_id, b"ON")?;
+                    let mut response = String::new();
+                    response.push_str("activated device ID ");
+                    response.push(ch);
+                    return Ok(response);
+                }
+            }
+        }
+
+        // Direct device query parsing: "query status of device X"
+        if clean_phrase.contains("status of device") || clean_phrase.contains("query device") {
+            for ch in clean_phrase.chars() {
+                if ch.is_ascii_digit() {
+                    let device_id = (ch as u8 - b'0') as DeviceID;
+                    if let Some(dev) = hub.get_device(device_id) {
+                        let mut response = String::new();
+                        response.push_str("device ");
+                        for &b in dev.name() { response.push(b as char); }
+                        response.push_str(" is ");
+                        response.push_str(if dev.is_online() { "online" } else { "offline" });
+                        return Ok(response);
+                    }
+                }
+            }
+        }
+
+        let mut fallback = String::new();
+        fallback.push_str("sorry, I didn't catch that command");
+        Ok(fallback)
+    }
+}
+
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
@@ -204,7 +358,23 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(not(test))]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+extern "C" {
+    fn malloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+#[no_mangle]
+pub extern "C" fn alloc(size: usize) -> *mut u8 {
+    unsafe { malloc(size) }
+}
 
 
 impl<T> core::ops::Deref for Vec<T> {
@@ -246,5 +416,100 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_iot_device_properties() {
+        let dev = SimpleIoTDevice::new(1, b"Living Room Light", DeviceType::Actuator);
+        assert_eq!(dev.id(), 1);
+        assert_eq!(dev.name(), b"Living Room Light");
+        assert_eq!(dev.device_type() as usize, DeviceType::Actuator as usize);
+        assert!(!dev.is_online());
+    }
+
+    #[test]
+    fn test_iot_hub_management() {
+        let mut hub = SimpleIoTHub::new();
+        let dev = SimpleIoTDevice::new(1, b"Living Room Light", DeviceType::Actuator);
+        assert_eq!(hub.add_device(Box::new(dev)).unwrap(), 1);
+
+        assert!(hub.get_device(1).is_some());
+        assert_eq!(hub.get_device(1).unwrap().name(), b"Living Room Light");
+
+        // Verify command execution
+        assert!(hub.send_command(1, b"ON").is_ok());
+
+        // Device not found scenarios
+        assert!(hub.send_command(99, b"ON").is_err());
+    }
+
+    #[test]
+    fn test_smart_scene_execution() {
+        let mut hub = SimpleIoTHub::new();
+        let dev = SimpleIoTDevice::new(5, b"Smart Plug", DeviceType::Actuator);
+        hub.add_device(Box::new(dev)).unwrap();
+
+        let mut scene = SmartScene::new("Movie Night");
+        scene.add_command(5, b"TURN_ON");
+        assert_eq!(scene.commands.len(), 1);
+
+        assert!(scene.execute(&hub).is_ok());
+    }
+
+    #[test]
+    fn test_device_state_store() {
+        let mut store = DeviceStateStore::new();
+        let s = DeviceState {
+            device_id: 10,
+            battery_level: 85,
+            temperature_c: 22,
+            is_active: true,
+        };
+        store.update_state(s);
+
+        let retrieved = store.get_state(10).unwrap();
+        assert_eq!(retrieved.battery_level, 85);
+        assert_eq!(retrieved.temperature_c, 22);
+        assert!(retrieved.is_active);
+
+        // Update existing state
+        let mut updated_s = s;
+        updated_s.battery_level = 80;
+        store.update_state(updated_s);
+        assert_eq!(store.get_state(10).unwrap().battery_level, 80);
+    }
+
+    #[test]
+    fn test_voice_assistant_parsing() {
+        let mut hub = SimpleIoTHub::new();
+        let dev = SimpleIoTDevice::new(2, b"Thermostat", DeviceType::Sensor);
+        hub.add_device(Box::new(dev)).unwrap();
+
+        let mut assistant = VoiceAssistantMock::new();
+
+        let mut scene = SmartScene::new("Good Morning");
+        scene.add_command(2, b"SET_TEMP_21");
+        assistant.register_scene("good morning", scene);
+
+        // 1. Trigger registered scene phrase
+        let res1 = assistant.handle_voice_phrase("Good Morning", &hub).unwrap();
+        assert_eq!(res1, "triggered scene: Good Morning");
+
+        // 2. Direct device command parsing "turn on device X"
+        let res2 = assistant.handle_voice_phrase("Alexa, turn on device 2", &hub).unwrap();
+        assert_eq!(res2, "activated device ID 2");
+
+        // 3. Direct device query status parsing "status of device X"
+        let res3 = assistant.handle_voice_phrase("Google, query status of device 2", &hub).unwrap();
+        assert_eq!(res3, "device Thermostat is offline");
+
+        // 4. Fallback message
+        let res4 = assistant.handle_voice_phrase("Open the pod bay doors", &hub).unwrap();
+        assert_eq!(res4, "sorry, I didn't catch that command");
     }
 }
