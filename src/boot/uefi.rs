@@ -1,6 +1,3 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based UEFI Bootloader for SigmaOS
 /// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 
@@ -9,8 +6,8 @@ use core::mem;
 
 pub type BootStatus = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 
 #[repr(C)]
