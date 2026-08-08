@@ -62,12 +62,20 @@ pub enum PledgeError {
     Violation,
 }
 
+#[derive(Debug, Clone)]
+pub struct UnveilEntry {
+    pub path: String,
+    pub permissions: String, // e.g., "r", "rw", "rx"
+}
+
 /// Process pledge manager
 pub struct PledgeManager {
     /// Current pledge promise
     pledge: Option<PledgePromise>,
     /// Capability gate for validation
     gate: CapabilityGate,
+    /// Unveiled paths for filesystem sandboxing
+    unveiled_paths: Vec<UnveilEntry>,
 }
 
 impl PledgeManager {
@@ -76,6 +84,44 @@ impl PledgeManager {
         Self {
             pledge: None,
             gate: CapabilityGate::new(),
+            unveiled_paths: Vec::new(),
+        }
+    }
+
+    /// Unveil filesystem paths to restrict access (sigma_unveil)
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), PledgeError> {
+        self.unveiled_paths.push(UnveilEntry {
+            path: path.to_string(),
+            permissions: permissions.to_string(),
+        });
+        Ok(())
+    }
+
+    /// Validate path access against unveil permissions
+    pub fn validate_unveil_access(&self, path: &str, requested_perm: char) -> bool {
+        if self.unveiled_paths.is_empty() {
+            return true; // If no paths are unveiled, allow all accesses
+        }
+
+        // Find the most specific match (longest prefix match)
+        let mut best_match: Option<&UnveilEntry> = None;
+        for entry in &self.unveiled_paths {
+            if path.starts_with(&entry.path) {
+                match best_match {
+                    None => best_match = Some(entry),
+                    Some(best) => {
+                        if entry.path.len() > best.path.len() {
+                            best_match = Some(entry);
+                        }
+                    }
+                }
+            }
+        }
+
+        if let Some(entry) = best_match {
+            entry.permissions.contains(requested_perm)
+        } else {
+            false // Not in unveiled paths, block access!
         }
     }
 
@@ -218,5 +264,29 @@ mod tests {
 
         let full_promise = full();
         assert!(full_promise.allows(Permission::ProcessExec));
+    }
+
+    #[test]
+    fn test_unveil_sandboxing() {
+        let mut manager = PledgeManager::new();
+
+        // Before any unveil, everything is allowed
+        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
+        assert!(manager.validate_unveil_access("/etc/passwd", 'r'));
+
+        // Unveil /var/www for read access, and /tmp for write access
+        manager.unveil("/var/www", "r").unwrap();
+        manager.unveil("/tmp", "rw").unwrap();
+
+        // Check path within /var/www
+        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
+        assert!(!manager.validate_unveil_access("/var/www/index.html", 'w'));
+
+        // Check path within /tmp
+        assert!(manager.validate_unveil_access("/tmp/session.log", 'r'));
+        assert!(manager.validate_unveil_access("/tmp/session.log", 'w'));
+
+        // Paths outside of unveiled must be blocked completely
+        assert!(!manager.validate_unveil_access("/etc/passwd", 'r'));
     }
 }
