@@ -32,6 +32,8 @@ use alloc::format;
 ||||||| 65885484f
 use alloc::format;
 use alloc::string::ToString;
+||||||| 984d1301f
+use alloc::format;
 
 /// Documentation format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -509,5 +511,34 @@ mod tests {
         assert!(pdf.starts_with("%PDF-1.4"));
         assert!(pdf.contains("Architecture Guide"));
         assert!(pdf.ends_with("%%EOF"));
+    }
+||||||| 984d1301f
+
+    #[test]
+    fn test_sovereign_man_pages() {
+        let mut indexer = SovereignManPageIndexer::new();
+
+        // Check default pages registered
+        assert_eq!(indexer.pages.len(), 2);
+
+        // Compile sigpkg page
+        let compiled = indexer.compile_man_page("sigpkg", None).unwrap();
+        assert!(compiled.contains("NAME"));
+        assert!(compiled.contains("sigpkg"));
+        assert!(compiled.contains("SYNOPSIS"));
+        assert!(compiled.contains("sigma-vim"));
+
+        // Add custom manual page (Pledge)
+        indexer.register_man_page(ManPage {
+            name: "pledge".to_string(),
+            section: 2,
+            synopsis: "pledge(promises)".to_string(),
+            description: "Dropping execution capabilities statically.".to_string(),
+            examples: "pledge(\"stdio rpath\")".to_string(),
+        });
+
+        assert_eq!(indexer.pages.len(), 3);
+        let pledge_page = indexer.compile_man_page("pledge", Some(2)).unwrap();
+        assert!(pledge_page.contains("stdio rpath"));
     }
 }

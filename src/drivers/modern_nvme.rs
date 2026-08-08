@@ -17,6 +17,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // Modern high-performance NVMe PCIe block storage driver
+#[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -143,6 +144,26 @@ impl AhciPort {
             self.cmd_issue &= !(1 << slot);
         }
     }
+}
+
+||||||| 984d1301f
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceGeneration { Legacy, Modern }
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerState { Off, On }
+
+#[cfg(test)]
+pub trait PeripheralDevice {
+    fn name(&self) -> &'static str;
+    fn generation(&self) -> DeviceGeneration;
+    fn initialize(&mut self) -> Result<(), &'static str>;
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str>;
+    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str>;
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str>;
+    fn shutdown(&mut self) -> Result<(), &'static str>;
 }
 
 pub struct ModernNvmeDriver {

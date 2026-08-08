@@ -418,6 +418,50 @@ impl BrailleMatrix {
 // ==========================================
 // 10. Localization (i18n) & Translation Engine
 // ==========================================
+||||||| 984d1301f
+#[cfg(test)]
+mod tests {
+    use super::*;
+pub struct SigmaLivepatchPatch {
+    pub target_symbol: String,
+    pub old_function_address: usize,
+    pub new_function_address: usize,
+    pub checksum: String,
+}
+
+pub struct SigmaLivepatch {
+    pub active_patches: HashMap<String, SigmaLivepatchPatch>,
+    pub redirection_log: Vec<String>,
+}
+
+impl SigmaLivepatch {
+    pub fn new() -> Self {
+        SigmaLivepatch {
+            active_patches: HashMap::new(),
+            redirection_log: Vec::new(),
+        }
+    }
+
+    pub fn register_patch(&mut self, patch: SigmaLivepatchPatch) -> Result<(), &'static str> {
+        if patch.old_function_address == 0 || patch.new_function_address == 0 {
+            return Err("Invalid memory address offset");
+        }
+        self.redirection_log.push(format!(
+            "LIVEPATCH: Redirecting calls of '{}' (0x{:x}) to patched body (0x{:x}). Checksum={}.",
+            patch.target_symbol, patch.old_function_address, patch.new_function_address, patch.checksum
+        ));
+        self.active_patches.insert(patch.target_symbol.clone(), patch);
+        Ok(())
+    }
+
+    pub fn redirect_call(&self, target_symbol: &str) -> Option<usize> {
+        self.active_patches.get(target_symbol).map(|patch| patch.new_function_address)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
 
 pub struct LanguageTranslationCatalog {
     pub locale: String,
@@ -581,5 +625,29 @@ impl CloudOrchestrator {
         );
         self.active_containers.push(container);
         Ok(id)
+    }
+
+    #[test]
+    fn test_sigma_livepatch() {
+        let mut patcher = SigmaLivepatch::new();
+        let patch = SigmaLivepatchPatch {
+            target_symbol: "sys_read".to_string(),
+            old_function_address: 0xffffffff8122c400,
+            new_function_address: 0xffffffffc0300100,
+            checksum: "livepatch-sha256-abcde".to_string(),
+        };
+
+        assert!(patcher.register_patch(patch).is_ok());
+        assert_eq!(patcher.redirect_call("sys_read").unwrap(), 0xffffffffc0300100);
+        assert!(patcher.redirect_call("sys_write").is_none());
+        assert_eq!(patcher.redirection_log.len(), 1);
+
+        let invalid_patch = SigmaLivepatchPatch {
+            target_symbol: "sys_write".to_string(),
+            old_function_address: 0,
+            new_function_address: 0,
+            checksum: "invalid-checksum".to_string(),
+        };
+        assert!(patcher.register_patch(invalid_patch).is_err());
     }
 }

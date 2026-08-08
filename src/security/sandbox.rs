@@ -1,8 +1,13 @@
 // SigmaOS Privacy-First Sandbox Subsystem
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Enhanced with Sandboxie-style file system overlays and Firejail-style execution profiles.
+||||||| 984d1301f
+// Taking inspiration from industry-leading competitors Sandboxie (FS virtualization overlays) and Firejail (strict execution profiles)
 
 use std::collections::{HashSet, HashMap};
+||||||| 984d1301f
+use std::collections::HashSet;
+use std::collections::{HashSet, HashMap, BTreeMap};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SandboxRule {
@@ -19,6 +24,17 @@ pub enum SandboxProfile {
     None,
     StrictBrowser,   // Demands network, blocks local filesystems except user downloads
     RestrictedOffice, // Demands file writes, absolutely blocks network gates
+||||||| 984d1301f
+    IpcAccessGate,           // New: Prevents raw inter-process communications
+    MemoryDbgAttachGate,     // New: Prevents ptrace or debugger attachments
+    RawSocketOpenGate,       // New: Blocks raw network socket creation
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SandboxProfile {
+    StrictBrowser,
+    RestrictedOffice,
+    UntrustedInstaller,
 }
 
 pub struct PrivacyFirstSandbox {
@@ -29,6 +45,12 @@ pub struct PrivacyFirstSandbox {
     pub profile: SandboxProfile,
     pub sanitized_env: HashMap<String, String>,
     pub virtual_filesystem_overlay: HashMap<String, Vec<u8>>, // Sandboxie-style overlay file system
+||||||| 984d1301f
+    // Sandboxie-inspired file system virtualization overlays
+    pub virtualization_overlay: BTreeMap<String, String>,
+    // Firejail-inspired sanitized execution environment
+    pub environment_variables: HashMap<String, String>,
+    pub profile: Option<SandboxProfile>,
 }
 
 impl PrivacyFirstSandbox {
@@ -65,7 +87,40 @@ impl PrivacyFirstSandbox {
             SandboxProfile::None => {
                 self.blocked_rules.clear();
             }
+||||||| 984d1301f
+            virtualization_overlay: BTreeMap::new(),
+            environment_variables: HashMap::new(),
+            profile: None,
         }
+    }
+
+    /// Construct a Sandbox with predefined strict competitor execution profiles
+    pub fn with_profile(pid: u32, pqc_key: &str, profile: SandboxProfile) -> Self {
+        let mut sandbox = Self::new(pid, pqc_key);
+        sandbox.profile = Some(profile);
+
+        match profile {
+            SandboxProfile::StrictBrowser => {
+                sandbox.block_syscall_rule(SandboxRule::FSWriteGate);
+                sandbox.block_syscall_rule(SandboxRule::ProcessForkGate);
+                sandbox.block_syscall_rule(SandboxRule::MemoryDbgAttachGate);
+                sandbox.block_syscall_rule(SandboxRule::RawSocketOpenGate);
+                sandbox.set_environment("BROWSER_SANDBOX_ENFORCED".to_string(), "1".to_string());
+            }
+            SandboxProfile::RestrictedOffice => {
+                sandbox.block_syscall_rule(SandboxRule::NetworkWriteGate);
+                sandbox.block_syscall_rule(SandboxRule::IpcAccessGate);
+                sandbox.block_syscall_rule(SandboxRule::MemoryDbgAttachGate);
+                sandbox.set_environment("OFFICE_ISOLATION_ENFORCED".to_string(), "1".to_string());
+            }
+            SandboxProfile::UntrustedInstaller => {
+                sandbox.block_syscall_rule(SandboxRule::NetworkWriteGate);
+                sandbox.block_syscall_rule(SandboxRule::RawSocketOpenGate);
+                sandbox.block_syscall_rule(SandboxRule::MemoryDbgAttachGate);
+                sandbox.set_environment("INSTALLER_GUARD_ACTIVE".to_string(), "1".to_string());
+            }
+        }
+        sandbox
     }
 
     pub fn block_syscall_rule(&mut self, rule: SandboxRule) {
@@ -122,6 +177,32 @@ impl PrivacyFirstSandbox {
     /// Purges all virtualized file modifications inside the sandbox (perfect clean reset)
     pub fn purge_sandbox(&mut self) {
         self.virtual_filesystem_overlay.clear();
+    }
+||||||| 984d1301f
+
+    /// Sandboxie-style virtualization write: writes securely to an isolated memory overlay instead of modifying the host FS
+    pub fn virtual_write(&mut self, path: &str, content: String) {
+        self.virtualization_overlay.insert(path.to_string(), content);
+    }
+
+    /// Sandboxie-style virtualization read: attempts to read from the memory overlay first
+    pub fn virtual_read(&self, path: &str) -> Option<&str> {
+        self.virtualization_overlay.get(path).map(|s| s.as_str())
+    }
+
+    /// Purges all isolated writes and virtual file structures
+    pub fn purge_sandbox(&mut self) {
+        self.virtualization_overlay.clear();
+    }
+
+    /// Set isolated environment variable
+    pub fn set_environment(&mut self, key: String, val: String) {
+        self.environment_variables.insert(key, val);
+    }
+
+    /// Query isolated environment variable
+    pub fn get_environment(&self, key: &str) -> Option<&str> {
+        self.environment_variables.get(key).map(|s| s.as_str())
     }
 }
 
@@ -198,5 +279,36 @@ mod tests {
         sandbox.purge_sandbox();
         let read_after_purge = sandbox.virtual_read("/etc/hosts", host_etc_hosts);
         assert_eq!(read_after_purge, host_etc_hosts.to_vec());
+    }
+||||||| 984d1301f
+
+    #[test]
+    fn test_competitor_profiles_sandboxing() {
+        // Test strict browser profile
+        let browser_sandbox = PrivacyFirstSandbox::with_profile(601, "dilithium-key-1", SandboxProfile::StrictBrowser);
+        assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::FSWriteGate));
+        assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::ProcessForkGate));
+        assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::MemoryDbgAttachGate));
+        assert_eq!(browser_sandbox.get_environment("BROWSER_SANDBOX_ENFORCED").unwrap(), "1");
+
+        // Test restricted office profile
+        let office_sandbox = PrivacyFirstSandbox::with_profile(602, "dilithium-key-2", SandboxProfile::RestrictedOffice);
+        assert!(!office_sandbox.validate_syscall_transition(SandboxRule::NetworkWriteGate));
+        assert!(!office_sandbox.validate_syscall_transition(SandboxRule::IpcAccessGate));
+        assert_eq!(office_sandbox.get_environment("OFFICE_ISOLATION_ENFORCED").unwrap(), "1");
+    }
+
+    #[test]
+    fn test_sandboxie_style_virtualization_overlays() {
+        let mut sandbox = PrivacyFirstSandbox::new(701, "key-3");
+        assert!(sandbox.virtual_read("/etc/passwd").is_none());
+
+        // Virtual write
+        sandbox.virtual_write("/etc/passwd", "root:x:0:0:root:/root:/bin/sh".to_string());
+        assert_eq!(sandbox.virtual_read("/etc/passwd").unwrap(), "root:x:0:0:root:/root:/bin/sh");
+
+        // Purge
+        sandbox.purge_sandbox();
+        assert!(sandbox.virtual_read("/etc/passwd").is_none());
     }
 }
