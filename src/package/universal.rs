@@ -43,6 +43,9 @@ pub struct UnifiedPackage {
     pub provides: Vec<String>,
     pub source: PackageSource,
     pub installed: bool,
+    pub use_flags: Vec<String>,               // Portage-style available USE flags
+    pub active_use_flags: Vec<String>,         // Portage-style enabled USE flags
+    pub conditional_dependencies: Vec<(String, String)>, // (use_flag, dependency)
 }
 
 impl UnifiedPackage {
@@ -56,6 +59,9 @@ impl UnifiedPackage {
             provides: Vec::new(),
             source: PackageSource::Repository { url: String::new() },
             installed: false,
+            use_flags: Vec::new(),
+            active_use_flags: Vec::new(),
+            conditional_dependencies: Vec::new(),
         }
     }
 
@@ -77,6 +83,37 @@ impl UnifiedPackage {
     pub fn with_provides(mut self, provides: String) -> Self {
         self.provides.push(provides);
         self
+    }
+
+    pub fn with_use_flag(mut self, flag: String) -> Self {
+        self.use_flags.push(flag);
+        self
+    }
+
+    pub fn with_conditional_dependency(mut self, flag: String, dep: String) -> Self {
+        self.conditional_dependencies.push((flag, dep));
+        self
+    }
+
+    pub fn enable_use_flag(&mut self, flag: &str) {
+        if self.use_flags.iter().any(|f| f == flag) && !self.active_use_flags.iter().any(|f| f == flag) {
+            self.active_use_flags.push(flag.to_string());
+        }
+    }
+
+    pub fn disable_use_flag(&mut self, flag: &str) {
+        self.active_use_flags.retain(|f| f != flag);
+    }
+
+    /// Portage-style dynamic dependency resolution depending on active USE flags
+    pub fn get_resolved_dependencies(&self) -> Vec<String> {
+        let mut deps = self.dependencies.clone();
+        for (flag, dep) in &self.conditional_dependencies {
+            if self.active_use_flags.contains(flag) && !deps.contains(dep) {
+                deps.push(dep.clone());
+            }
+        }
+        deps
     }
 
     pub fn has_conflict_with(&self, other: &UnifiedPackage) -> bool {
@@ -169,8 +206,8 @@ impl DependencyResolver {
             visited.insert(current.clone());
 
             if let Some(package) = self.packages.get(&current) {
-                for dep in &package.dependencies {
-                    if !visited.contains(dep) {
+                for dep in package.get_resolved_dependencies() {
+                    if !visited.contains(&dep) {
                         to_visit.push(dep.clone());
                     }
                 }
@@ -265,6 +302,20 @@ impl Default for DependencyResolver {
     }
 }
 
+/// Transactional history representing a history of installed and removed packages
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub transactions: Vec<String>,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        Self {
+            transactions: Vec::new(),
+        }
+    }
+}
+
 /// Package snapshot representing a saved system state of installed packages
 #[derive(Debug, Clone)]
 pub struct PackageSnapshot {
@@ -282,6 +333,8 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
+    pub snapshots: HashMap<usize, PackageSnapshot>,
+    pub next_snapshot_id: usize,
 }
 
 impl UniversalPackageManager {
@@ -293,6 +346,8 @@ impl UniversalPackageManager {
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
+            snapshots: HashMap::new(),
+            next_snapshot_id: 1,
         };
 
         manager.add_default_adapters();
@@ -441,9 +496,9 @@ impl UniversalPackageManager {
             .clone();
 
         // 1. Identify and uninstall packages currently installed but not in the snapshot
-        let mut to_uninstall = Vec::new();
+        let mut to_uninstall: Vec<String> = Vec::new();
         for pkg_name in self.installed_packages.keys() {
-            if !snapshot.installed_packages.contains_key(pkg_name) {
+            if !snapshot.installed_packages.contains_key(pkg_name.as_str()) {
                 to_uninstall.push(pkg_name.clone());
             }
         }
@@ -453,9 +508,9 @@ impl UniversalPackageManager {
         }
 
         // 2. Identify and reinstall packages in the snapshot but not currently installed
-        let mut to_install = Vec::new();
+        let mut to_install: Vec<String> = Vec::new();
         for (pkg_name, _) in &snapshot.installed_packages {
-            if !self.installed_packages.contains_key(pkg_name) {
+            if !self.installed_packages.contains_key(pkg_name.as_str()) {
                 to_install.push(pkg_name.clone());
             }
         }
@@ -1030,6 +1085,70 @@ impl SovereignOfflineInstaller {
     }
 }
 
+// =========================================================================
+// 5. Nix-inspired Atomic Profiles & Generation Symlink switching
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ProfileGeneration {
+    pub generation_id: usize,
+    pub description: String,
+    pub active_symlink: String,
+    pub installed_package_names: Vec<String>,
+}
+
+pub struct SovereignProfileManager {
+    pub active_profile_name: String,
+    pub generations: Vec<ProfileGeneration>,
+    pub current_generation_id: usize,
+}
+
+impl SovereignProfileManager {
+    pub fn new(profile_name: &str) -> Self {
+        Self {
+            active_profile_name: profile_name.to_string(),
+            generations: Vec::new(),
+            current_generation_id: 0,
+        }
+    }
+
+    /// Creates and switches to a new profile generation
+    pub fn create_generation(&mut self, desc: &str, packages: Vec<String>) -> usize {
+        let gen_id = self.generations.len() + 1;
+        let symlink = format!("/nix/var/nix/profiles/per-user/{}/profile-{}", self.active_profile_name, gen_id);
+
+        let gen = ProfileGeneration {
+            generation_id: gen_id,
+            description: desc.to_string(),
+            active_symlink: symlink,
+            installed_package_names: packages,
+        };
+
+        self.generations.push(gen);
+        self.current_generation_id = gen_id;
+        gen_id
+    }
+
+    /// Switches the symlink pointer back to a previously saved generation
+    pub fn switch_to_generation(&mut self, gen_id: usize) -> Result<String, &'static str> {
+        if let Some(gen) = self.generations.iter().find(|g| g.generation_id == gen_id) {
+            self.current_generation_id = gen_id;
+            Ok(gen.active_symlink.clone())
+        } else {
+            Err("Profile generation not found")
+        }
+    }
+
+    /// Rollbacks to the previous generation
+    pub fn rollback(&mut self) -> Result<String, &'static str> {
+        if self.current_generation_id <= 1 {
+            return Err("No older generation available for rollback");
+        }
+        let prev_gen_id = self.current_generation_id - 1;
+        self.switch_to_generation(prev_gen_id)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1124,5 +1243,51 @@ mod tests {
         // Delete snapshot
         assert!(manager.delete_snapshot(snap_id).is_ok());
         assert!(manager.list_snapshots().is_empty());
+    }
+
+    #[test]
+    fn test_portage_style_use_flags() {
+        let mut pkg = UnifiedPackage::new("lib-curl".to_string(), "8.2.1".to_string())
+            .with_dependency("lib-base".to_string())
+            .with_use_flag("ssl".to_string())
+            .with_conditional_dependency("ssl".to_string(), "openssl".to_string());
+
+        // Under default flags, only lib-base is resolved
+        let core_deps = pkg.get_resolved_dependencies();
+        assert_eq!(core_deps.len(), 1);
+        assert_eq!(core_deps[0], "lib-base");
+
+        // Enable SSL flag, now openssl is dynamically included as a dependency
+        pkg.enable_use_flag("ssl");
+        let active_deps = pkg.get_resolved_dependencies();
+        assert_eq!(active_deps.len(), 2);
+        assert!(active_deps.contains(&"lib-base".to_string()));
+        assert!(active_deps.contains(&"openssl".to_string()));
+
+        // Disable USE flag
+        pkg.disable_use_flag("ssl");
+        assert_eq!(pkg.get_resolved_dependencies().len(), 1);
+    }
+
+    #[test]
+    fn test_nix_style_profile_atomic_rollback() {
+        let mut profile = SovereignProfileManager::new("admin-user");
+        assert_eq!(profile.current_generation_id, 0);
+
+        let gen1 = profile.create_generation("Base config", vec!["bash".to_string()]);
+        assert_eq!(gen1, 1);
+        assert_eq!(profile.current_generation_id, 1);
+
+        let gen2 = profile.create_generation("Developer tools", vec!["bash".to_string(), "git".to_string()]);
+        assert_eq!(gen2, 2);
+        assert_eq!(profile.current_generation_id, 2);
+
+        // Rollback to gen1
+        let symlink_path = profile.rollback().unwrap();
+        assert_eq!(profile.current_generation_id, 1);
+        assert!(symlink_path.contains("profile-1"));
+
+        // Rollback further fails
+        assert!(profile.rollback().is_err());
     }
 }
