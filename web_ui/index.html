@@ -567,7 +567,7 @@ Select an administrative quick-action on the left.</pre>
             badge.innerText = 'RUNNING';
             badge.style.background = '#e59e0b';
             badge.style.color = 'black';
-            consoleBox.innerHTML = `Running safe command sequence...`;
+            consoleBox.textContent = `Running safe command sequence...`;
 
             setTimeout(() => {
                 badge.innerText = 'SUCCESS';
@@ -577,31 +577,31 @@ Select an administrative quick-action on the left.</pre>
                 if (activeOliveTinCmd === 'systemctl') {
                     const action = document.getElementById('ot-service-action').value;
                     const service = document.getElementById('ot-service-name').value;
-                    consoleBox.innerHTML = `$` + ` systemctl ${action} ${service}\n` +
+                    consoleBox.textContent = `$` + ` systemctl ${action} ${service}\n` +
                         `[SystemdEngine] Transitioning service state to '${action}'...\n` +
                         `[SystemdEngine] Service '${service}' action completed successfully.\n` +
                         `[Status] Current state: Active (Running). Up since Sun 10:45 AM.`;
                 } else if (activeOliveTinCmd === 'backup') {
                     const path = document.getElementById('ot-backup-path').value;
-                    consoleBox.innerHTML = `$` + ` timeshift --create --snapshot-path ${path}\n` +
+                    consoleBox.textContent = `$` + ` timeshift --create --snapshot-path ${path}\n` +
                         `[btrfs-COW] Allocating Copy-on-Write metadata root...\n` +
                         `[btrfs-COW] Root snapshot timeshift_snap_3 committed successfully.\n` +
                         `[Status] Snapshot created at address address block 1002. Total files: 1,482.`;
                 } else if (activeOliveTinCmd === 'compact') {
                     const target = document.getElementById('ot-defrag-target').value;
-                    consoleBox.innerHTML = `$` + ` sysctl vm.compact_memory=1 --target ${target}\n` +
+                    consoleBox.textContent = `$` + ` sysctl vm.compact_memory=1 --target ${target}\n` +
                         `[RAMDefrag] Initializing memory compaction on ${target} structures...\n` +
                         `[RAMDefrag] Standardized UVM allocations aligned warning-free.\n` +
                         `[Status] Freed 4,096 allocated byte-blocks. Fragmented spaces compacted: 12.4%.`;
                 } else if (activeOliveTinCmd === 'security') {
                     const target = document.getElementById('ot-sec-target').value;
-                    consoleBox.innerHTML = `$` + ` nmap --script vuln ${target}\n` +
+                    consoleBox.textContent = `$` + ` nmap --script vuln ${target}\n` +
                         `[VulnerabilityScanner] Dispatching active port-level CVE audit on ${target}...\n` +
                         `[VulnerabilityScanner] Sentinel threat mitigation loop activated.\n` +
                         `[Status] Scan completed: 0 critical, 0 high vulnerabilities found. System secure!`;
                 } else if (activeOliveTinCmd === 'autotune') {
                     const profile = document.getElementById('ot-tune-profile').value;
-                    consoleBox.innerHTML = `$` + ` sysctl kernel.autotuning_profile=${profile}\n` +
+                    consoleBox.textContent = `$` + ` sysctl kernel.autotuning_profile=${profile}\n` +
                         `[Autotuner] Tuning microkernel schedulers, thread contexts, and dynamic links...\n` +
                         `[Autotuner] Transitioned system performance profile to '${profile}' natively.\n` +
                         `[Status] Scheduler: Completely Fair CFS. Energy governor: Idle-state-aware.`;

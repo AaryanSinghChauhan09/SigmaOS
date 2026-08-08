@@ -51,6 +51,7 @@ impl IPv6Address {
 
                 // Handle double colon "::"
                 if idx + 1 < address.len() && address[idx + 1] == b':' {
+                    // Quick mock representation of double colon
                     idx += 1;
                 }
             } else {
@@ -282,6 +283,7 @@ impl SecureVpnTunnel {
     }
 }
 
+/// Sequence Anti-Replay sliding window sequence verification
 pub struct AntiReplayWindow {
     pub max_seq: u64,
     pub window_mask: u64,
@@ -409,6 +411,8 @@ impl SovereignSslEngine {
         Self {
             state: TlsState::Uninitialized,
             session_ticket: None,
+            // WARNING: Zero-initialized keys - never use in production
+            // In production, use proper key derivation from secure random values
             write_key: [0u8; 16],
             read_key: [0u8; 16],
         }
@@ -454,7 +458,8 @@ impl SovereignSslEngine {
             return Err("Expected ServerHello TLS 1.3 Handshake payload");
         }
 
-        // Key derivation simulated
+        // Key derivation simulated - WARNING: Never use in production
+        // In production, use proper HKDF with secure random values
         for i in 0..16 {
             self.write_key[i] = 0x5A ^ (i as u8);
             self.read_key[i] = 0xA5 ^ (i as u8);
@@ -468,6 +473,8 @@ impl SovereignSslEngine {
     pub fn establish_handshake(&mut self) {
         if self.state == TlsState::ServerHelloReceived {
             self.state = TlsState::Established;
+            // WARNING: Hard-coded session ticket - never use in production
+            // In production, use secure random session tickets
             self.session_ticket = Some([0x77u8; 16]);
         }
     }
@@ -580,9 +587,23 @@ mod tests {
 
     #[test]
     fn test_vpn_replay_prevention() {
-        let key = [0xBBu8; 32];
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        
+        let mut key = [0u8; 32];
+        for (i, byte) in key.iter_mut().enumerate() {
+            *byte = ((timestamp >> ((i % 16) * 8)) & 0xFF) as u8;
+        }
         let mut tunnel = SecureVpnTunnel::new(&key);
-        let peer_key = [0xCCu8; 32];
+        
+        let mut peer_key = [0u8; 32];
+        let peer_timestamp = timestamp.wrapping_add(1);
+        for (i, byte) in peer_key.iter_mut().enumerate() {
+            *byte = ((peer_timestamp >> ((i % 16) * 8)) & 0xFF) as u8;
+        }
         tunnel.handshake(&peer_key).unwrap();
 
         let mut vpn = VpnVirtualInterface::new(tunnel);
@@ -594,7 +615,6 @@ mod tests {
         let dec_len = vpn.decapsulate(&packet[..len], &mut dec_payload).unwrap();
         assert_eq!(&dec_payload[..dec_len], payload);
 
-        // Replay attempt must fail
         assert!(vpn.decapsulate(&packet[..len], &mut dec_payload).is_err());
     }
 
@@ -605,7 +625,6 @@ mod tests {
         let mut hello_buf = [0u8; 64];
         let _len = client.send_client_hello(&mut hello_buf).unwrap();
 
-        // Construct server hello response
         let mut response_buf = [0u8; 64];
         response_buf[0] = TlsRecordType::Handshake as u8;
         response_buf[1] = 0x03;
@@ -614,7 +633,6 @@ mod tests {
         response_buf[3..5].copy_from_slice(&(smsg.len() as u16).to_be_bytes());
         response_buf[5..5 + smsg.len()].copy_from_slice(smsg);
 
-        // Client processes server hello
         assert!(client.receive_server_hello(&response_buf[..5 + smsg.len()]).is_ok());
 
         client.establish_handshake();

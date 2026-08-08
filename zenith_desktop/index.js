@@ -67,7 +67,15 @@ export function renderCognitiveNarrative(event_type, pid, details, containerElem
       narrative = `System narrative: Process ${pid} behavior updated successfully. Details: ${details}.`;
   }
 
-  containerElement.innerHTML = `<div class="cognitive-story-card" role="status"><p class="narrative-text">${narrative}</p></div>`;
+  const cardDiv = document.createElement("div");
+  cardDiv.className = "cognitive-story-card";
+  cardDiv.setAttribute("role", "status");
+  const p = document.createElement("p");
+  p.className = "narrative-text";
+  p.textContent = narrative;
+  cardDiv.appendChild(p);
+  containerElement.innerHTML = "";
+  containerElement.appendChild(cardDiv);
   return narrative;
 }
 
