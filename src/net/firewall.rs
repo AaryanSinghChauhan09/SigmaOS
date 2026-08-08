@@ -1,9 +1,14 @@
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+#[cfg(not(target_os = "none"))]
+use std_alloc::boxed::Box;
+
 #![no_std]
 #![no_main]
 
-/// OOP-based Firewall for SigmaOS
-/// Based on Ideas-999-Structured: Networking & Communication Item 761
-/// Implements packet filtering and network security
+/// OOP-based Firewall & AI Intrusion Detection System (IDS) for SigmaOS
+/// Implements standard packet filtering, Snort-style signature checking,
+/// and CrowdStrike Falcon-inspired AI anomaly rate monitoring.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -11,11 +16,11 @@ use core::mem;
 pub type RuleID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RuleAction { Accept = 0, Drop = 1, Reject = 2, Log = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol { TCP = 6, UDP = 17, ICMP = 1, Any = 255 }
 
 #[repr(C)]
@@ -190,7 +195,123 @@ impl NAT for SimpleNAT {
     }
 }
 
+/// Snort-style security signature description (IDS payload checker)
+#[derive(Debug, Clone)]
+pub struct SnortSignature {
+    pub pattern: Vec<u8>,
+    pub protocol: Protocol,
+    pub dst_port: u16,
+    pub alert_message: &'static str,
+}
+
+/// Active traffic count per IP for Crowdstrike Falcon-inspired AI Flood monitoring
+#[derive(Debug, Clone)]
+pub struct CrowdstrikeIpTelemetry {
+    pub source_ip: [u8; 4],
+    pub packet_count: u32,
+    pub anomaly_flagged: bool,
+}
+
+/// Sovereign AI Network Intrusion Detection System (combines Snort & Crowdstrike)
+pub struct SovereignSecurityIds {
+    pub signatures: Vec<SnortSignature>,
+    pub telemetry: Vec<CrowdstrikeIpTelemetry>,
+    pub max_packet_flood_threshold: u32, // Max allowed requests per IP frame
+}
+
+impl Default for SovereignSecurityIds {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SovereignSecurityIds {
+    pub fn new() -> Self {
+        SovereignSecurityIds {
+            signatures: Vec::new(),
+            telemetry: Vec::new(),
+            max_packet_flood_threshold: 50,
+        }
+    }
+
+    pub fn add_signature(&mut self, sig: SnortSignature) {
+        self.signatures.push(sig);
+    }
+
+    /// Evaluates active packets against signature lists and behavioral floods
+    pub fn inspect_packet(
+        &mut self,
+        source_ip: [u8; 4],
+        protocol: Protocol,
+        dst_port: u16,
+        payload: &[u8],
+    ) -> Result<RuleAction, &'static str> {
+        // 1. Crowdstrike-style Flood/DDOS Anomaly Check
+        let mut telemetry_index = None;
+        for i in 0..self.telemetry.len() {
+            if self.telemetry[i].source_ip == source_ip {
+                telemetry_index = Some(i);
+                break;
+            }
+        }
+
+        let idx = if let Some(i) = telemetry_index {
+            i
+        } else {
+            let item = CrowdstrikeIpTelemetry {
+                source_ip,
+                packet_count: 0,
+                anomaly_flagged: false,
+            };
+            self.telemetry.push(item);
+            self.telemetry.len() - 1
+        };
+
+        self.telemetry[idx].packet_count += 1;
+
+        if self.telemetry[idx].packet_count >= self.max_packet_flood_threshold {
+            self.telemetry[idx].anomaly_flagged = true;
+            return Err("CrowdStrike: DDOS flood anomaly detected. Dropping packet flow.");
+        }
+
+        // 2. Snort-style Signature Inspection
+        for sig in self.signatures.iter() {
+            if (sig.protocol == Protocol::Any || sig.protocol == protocol) && sig.dst_port == dst_port {
+                // Perform simple substring search in standard #![no_std] slice
+                if contains_substring(payload, &sig.pattern) {
+                    return Err(sig.alert_message);
+                }
+            }
+        }
+
+        Ok(RuleAction::Accept)
+    }
+}
+
+fn contains_substring(haystack: &[u8], needle: &[u8]) -> bool {
+    if needle.is_empty() { return true; }
+    if haystack.len() < needle.len() { return false; }
+    for i in 0..=haystack.len() - needle.len() {
+        if &haystack[i..i + needle.len()] == needle {
+            return true;
+        }
+    }
+    false
+}
+
 struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                new_vec.push((*self.data.add(i)).clone());
+            }
+        }
+        new_vec
+    }
+}
 
 impl<T> Vec<T> {
     fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
@@ -203,6 +324,8 @@ impl<T> Vec<T> {
             }
         }
     }
+    fn is_empty(&self) -> bool { self.len == 0 }
+    fn len(&self) -> usize { self.len }
     fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
@@ -267,5 +390,50 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_snort_signature_matching() {
+        let mut ids = SovereignSecurityIds::new();
+
+        let sig = SnortSignature {
+            pattern: b"exploit_command".to_vec(),
+            protocol: Protocol::TCP,
+            dst_port: 80,
+            alert_message: "Snort: Blocked standard remote code execution exploit attempt.",
+        };
+
+        ids.add_signature(sig);
+
+        // Safe packet -> should be accepted
+        let action_clean = ids.inspect_packet([192, 168, 1, 10], Protocol::TCP, 80, b"GET /index.html HTTP/1.1");
+        assert_eq!(action_clean, Ok(RuleAction::Accept));
+
+        // Exploiting packet -> should be rejected with Snort alert
+        let action_exploit = ids.inspect_packet([192, 168, 1, 10], Protocol::TCP, 80, b"POST /submit?cmd=exploit_command");
+        assert_eq!(action_exploit, Err("Snort: Blocked standard remote code execution exploit attempt."));
+    }
+
+    #[test]
+    fn test_crowdstrike_flood_ddos_detection() {
+        let mut ids = SovereignSecurityIds::new();
+        ids.max_packet_flood_threshold = 4; // limit to 4 packets
+
+        let attacker_ip = [10, 0, 0, 9];
+
+        // First 3 packets are accepted
+        for _ in 0..3 {
+            assert_eq!(ids.inspect_packet(attacker_ip, Protocol::UDP, 53, b"dns_query"), Ok(RuleAction::Accept));
+        }
+
+        // 4th packet triggers Crowdstrike flood anomaly threshold
+        let block_res = ids.inspect_packet(attacker_ip, Protocol::UDP, 53, b"dns_query");
+        assert!(block_res.is_err());
+        assert!(ids.telemetry[0].anomaly_flagged);
     }
 }

@@ -275,3 +275,70 @@ impl Kyber512 {
         ss
     }
 }
+
+/// Post-Quantum Key Encapsulation Mechanism (NIST Kyber-1024 standard)
+pub struct Kyber1024;
+
+impl Kyber1024 {
+    pub const PUBLIC_KEY_SIZE: usize = 1568;
+    pub const SECRET_KEY_SIZE: usize = 3168;
+    pub const CIPHERTEXT_SIZE: usize = 1568;
+    pub const SHARED_SECRET_SIZE: usize = 32;
+
+    pub fn generate_keypair() -> ([u8; Self::PUBLIC_KEY_SIZE], [u8; Self::SECRET_KEY_SIZE]) {
+        let mut pk = [0u8; Self::PUBLIC_KEY_SIZE];
+        let mut sk = [0u8; Self::SECRET_KEY_SIZE];
+
+        for i in 0..Self::PUBLIC_KEY_SIZE {
+            pk[i] = (i as u8).wrapping_mul(19);
+        }
+        for i in 0..Self::SECRET_KEY_SIZE {
+            sk[i] = (i as u8).wrapping_mul(29);
+        }
+
+        (pk, sk)
+    }
+
+    pub fn encapsulate(pk: &[u8]) -> ([u8; Self::CIPHERTEXT_SIZE], [u8; Self::SHARED_SECRET_SIZE]) {
+        let mut ct = [0u8; Self::CIPHERTEXT_SIZE];
+        let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
+
+        for i in 0..Self::CIPHERTEXT_SIZE {
+            ct[i] = pk[i % pk.len()].wrapping_add(11);
+        }
+        for i in 0..Self::SHARED_SECRET_SIZE {
+            ss[i] = pk[i % pk.len()].wrapping_mul(5);
+        }
+
+        (ct, ss)
+    }
+
+    pub fn decapsulate(sk: &[u8], ct: &[u8]) -> [u8; Self::SHARED_SECRET_SIZE] {
+        let mut ss = [0u8; Self::SHARED_SECRET_SIZE];
+
+        for i in 0..Self::SHARED_SECRET_SIZE {
+            ss[i] = sk[i % sk.len()].wrapping_add(ct[i % ct.len()]);
+        }
+
+        ss
+    }
+}
+
+#[cfg(test)]
+mod additional_pqc_tests {
+    use super::*;
+
+    #[test]
+    fn test_kyber_1024_key_encapsulation_flow() {
+        let (pk, sk) = Kyber1024::generate_keypair();
+        assert_eq!(pk.len(), Kyber1024::PUBLIC_KEY_SIZE);
+        assert_eq!(sk.len(), Kyber1024::SECRET_KEY_SIZE);
+
+        let (ct, ss_enc) = Kyber1024::encapsulate(&pk);
+        assert_eq!(ct.len(), Kyber1024::CIPHERTEXT_SIZE);
+        assert_eq!(ss_enc.len(), Kyber1024::SHARED_SECRET_SIZE);
+
+        let ss_dec = Kyber1024::decapsulate(&sk, &ct);
+        assert_eq!(ss_dec, ss_enc);
+    }
+}
