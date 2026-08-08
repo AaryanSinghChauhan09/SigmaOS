@@ -2,8 +2,8 @@
 #![cfg_attr(target_os = "none", no_main)]
 
 extern crate alloc;
-use alloc::boxed::Box;
 use alloc::string::String;
+use alloc::boxed::Box;
 
 use core::mem;
 /// OOP-based Container Runtime for SigmaOS
@@ -841,7 +841,11 @@ mod tests {
         assert!(!overlay.mounted);
 
         // Mount failure on empty lowerdirs
-        let mut invalid_overlay = OverlayFS::new(vec![], "/upper".to_string(), "/work".to_string());
+        let mut invalid_overlay = OverlayFS::new(
+            vec![],
+            "/upper".to_string(),
+            "/work".to_string(),
+        );
         assert!(invalid_overlay.mount().is_err());
     }
 
@@ -863,8 +867,12 @@ mod tests {
 
     #[test]
     fn test_hardened_seccomp_syscall_filtering() {
-        let mut container =
-            SimpleContainer::new(1, b"hardened_ct", b"alpine", ContainerCapability::full());
+        let mut container = SimpleContainer::new(
+            1,
+            b"hardened_ct",
+            b"alpine",
+            ContainerCapability::full(),
+        );
         container.seccomp = SeccompProfile {
             hardened: true,
             blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)

@@ -1,5 +1,5 @@
 // SigmaOS Kernel Scheduler
-// Implements EEVDF (Earliest Eligible Virtual Deadline First) scheduler
+// Implements EEVDF (Earliest Eligible Virtual Deadline First) & EDF (Earliest Deadline First) hybrid real-time scheduler
 
 use core::time::Duration;
 
@@ -32,7 +32,9 @@ pub struct Process {
     pub runtime: Duration,
     pub virtual_deadline: u64,
     pub time_slice: Duration,
-    pub edf_deadline: Option<u64>,
+    pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
+    pub burst_score: u64,
+    pub last_active_time: u64,
 }
 
 impl Process {
@@ -46,6 +48,8 @@ impl Process {
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
             edf_deadline: None,
+            burst_score: 0,
+            last_active_time: 0,
         }
     }
 
@@ -57,17 +61,30 @@ impl Process {
     pub fn update_virtual_deadline(&mut self, current_time: u64) {
         // EEVDF virtual deadline calculation
         let weight = match self.priority {
-            Priority::Idle => 1024,
-            Priority::Low => 512,
+            Priority::Idle => 64,
+            Priority::Low => 128,
             Priority::Normal => 256,
-            Priority::High => 128,
-            Priority::Realtime => 64,
+            Priority::High => 512,
+            Priority::Realtime => 1024,
         };
         self.virtual_deadline = current_time + (1000 / weight);
     }
+
+    pub fn update_virtual_deadline_bore(&mut self, current_time: u64) {
+        let weight = match self.priority {
+            Priority::Idle => 64,
+            Priority::Low => 128,
+            Priority::Normal => 256,
+            Priority::High => 512,
+            Priority::Realtime => 1024,
+        };
+        // CachyOS-style BORE burst penalty: higher burst score means higher virtual deadline (less eligibility)
+        let bore_penalty = self.burst_score / 2;
+        self.virtual_deadline = current_time + (1000 / weight) + bore_penalty;
+    }
 }
 
-/// EEVDF Scheduler
+/// EEVDF & EDF Hybrid Real-Time Scheduler
 pub struct Scheduler {
     processes: Vec<Process>,
     current_time: u64,
@@ -82,24 +99,44 @@ impl Scheduler {
     }
 
     pub fn add_process(&mut self, mut process: Process) {
-        process.update_virtual_deadline(self.current_time);
+        process.update_virtual_deadline_bore(self.current_time);
         self.processes.push(process);
     }
 
+    pub fn charge_process_burst(&mut self, pid: u64, burst_amount: u64) {
+        if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
+            process.burst_score = process.burst_score.saturating_add(burst_amount);
+            process.update_virtual_deadline_bore(self.current_time);
+        }
+    }
+
+    pub fn decay_process_bursts(&mut self) {
+        for process in &mut self.processes {
+            process.burst_score = process.burst_score.saturating_sub(1);
+        }
+    }
+
     pub fn schedule(&mut self) -> Option<&Process> {
-        // Prioritise Earliest Deadline First (EDF) for hard real-time processes
-        let now = self.current_time;
-
-        let edf_process = self.processes
-            .iter()
-            .filter(|p| p.state == ProcessState::Ready && p.edf_deadline.is_some())
-            .min_by_key(|p| p.edf_deadline.unwrap());
-
-        if edf_process.is_some() {
-            return edf_process;
+        // Find process with Earliest Deadline First (EDF) if real-time constraints are present
+        let mut edf_ready_process: Option<&Process> = None;
+        for p in &self.processes {
+            if p.state == ProcessState::Ready && p.edf_deadline.is_some() {
+                if let Some(current_best) = edf_ready_process {
+                    if p.edf_deadline.unwrap() < current_best.edf_deadline.unwrap() {
+                        edf_ready_process = Some(p);
+                    }
+                } else {
+                    edf_ready_process = Some(p);
+                }
+            }
         }
 
-        // Fallback to standard EEVDF
+        if let Some(edf_proc) = edf_ready_process {
+            return Some(edf_proc);
+        }
+
+        // Otherwise, fall back to EEVDF earliest eligible virtual deadline
+        let now = self.current_time;
         self.processes
             .iter()
             .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
@@ -114,7 +151,7 @@ impl Scheduler {
         if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
             process.state = state;
             if state == ProcessState::Ready {
-                process.update_virtual_deadline(self.current_time);
+                process.update_virtual_deadline_bore(self.current_time);
             }
         }
     }
@@ -170,20 +207,58 @@ mod tests {
     }
 
     #[test]
-    fn test_edf_scheduling() {
+    fn test_edf_realtime_scheduler_tick() {
         let mut scheduler = Scheduler::new();
 
-        // Add normal EEVDF task
-        let p1 = Process::new(1, "normal-task".to_string(), Priority::Normal);
-        scheduler.add_process(p1);
+        // Add regular process
+        let p_normal = Process::new(1, "normal".to_string(), Priority::Normal);
+        scheduler.add_process(p_normal);
 
-        // Add hard real-time EDF task with a deadline of 20 ticks
-        let p2 = Process::new(2, "realtime-task".to_string(), Priority::Normal).with_edf(20);
-        scheduler.add_process(p2);
+        // Add real-time processes with explicit EDF deadlines
+        let p_rt_late = Process::new(2, "rt_late".to_string(), Priority::Realtime).with_edf(100);
+        let p_rt_early = Process::new(3, "rt_early".to_string(), Priority::Realtime).with_edf(50);
 
-        // Even if virtual deadlines aren't reached or EEVDF is bypassed, the EDF task is prioritized
-        let scheduled = scheduler.schedule();
-        assert!(scheduled.is_some());
-        assert_eq!(scheduled.unwrap().pid, 2);
+        scheduler.add_process(p_rt_late);
+        scheduler.add_process(p_rt_early);
+
+        // Schedule should pick rt_early (absolute deadline 50) first, because it is the earliest real-time deadline
+        let chosen = scheduler.schedule().unwrap();
+        assert_eq!(chosen.pid, 3);
+        assert_eq!(chosen.name, "rt_early");
+    }
+
+    #[test]
+    fn test_bore_scheduling_prioritization() {
+        let mut scheduler = Scheduler::new();
+
+        // 1. Create a CPU-bound process and an interactive process with identical priorities
+        let p_cpu = Process::new(1, "cpu_bound".to_string(), Priority::Normal);
+        let p_interactive = Process::new(2, "interactive".to_string(), Priority::Normal);
+
+        // Add both to scheduler
+        scheduler.add_process(p_cpu);
+        scheduler.add_process(p_interactive);
+
+        // 2. Simulate CPU-bound process running for long bursts, accumulating high burst score
+        scheduler.charge_process_burst(1, 50); // charge 50 burst penalty to cpu_bound
+
+        // Assert that the CPU-bound process now has a significantly higher virtual deadline (penalized)
+        let proc_cpu = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        let proc_interactive = scheduler.processes.iter().find(|p| p.pid == 2).unwrap();
+        assert!(proc_cpu.virtual_deadline > proc_interactive.virtual_deadline);
+
+        // 3. Advancing scheduler time ticks and scheduling should pick the interactive process first
+        for _ in 0..10 {
+            scheduler.tick();
+        }
+
+        let chosen = scheduler.schedule().unwrap();
+        assert_eq!(chosen.pid, 2); // interactive should be scheduled first
+        assert_eq!(chosen.name, "interactive");
+
+        // 4. Test decay of burst scores
+        scheduler.decay_process_bursts();
+        let proc_cpu_decayed = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        assert_eq!(proc_cpu_decayed.burst_score, 49); // decayed by 1
     }
 }
