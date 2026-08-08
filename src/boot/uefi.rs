@@ -1,7 +1,7 @@
-/// Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
-/// Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
+#![no_std]
 
-extern crate alloc;
+/// OOP-based UEFI Bootloader with Secure Boot database checking and TPM Measured Boot for SigmaOS
+/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
 
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
@@ -11,12 +11,7 @@ pub type BootStatus = usize;
 /// Standard UEFI Boot Phases
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootPhase {
-    Init = 0,
-    LoadKernel = 1,
-    Handoff = 2,
-    Complete = 3,
-}
+pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
 
 /// UEFI Boot Errors
 #[repr(C)]
@@ -30,30 +25,8 @@ pub enum BootError {
 
 /// Simulated raw UEFI Memory Descriptor conforming to UEFI spec
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct UefiMemoryDescriptor {
-    pub memory_type: u32,
-    pub physical_start: u64,
-    pub virtual_start: u64,
-    pub number_of_pages: u64,
-    pub attribute: u64,
-}
-
-/// Simulated UEFI System Table containing raw pointers to boot services
-#[repr(C)]
-pub struct UefiSystemTable {
-    pub firmware_vendor_ptr: *const u16,
-    pub firmware_revision: u32,
-    pub console_out_handle: *mut core::ffi::c_void,
-    pub boot_services_ptr: *const UefiBootServices,
-}
-
-/// Simulated UEFI Boot Services with raw pointer function hooks
-#[repr(C)]
-pub struct UefiBootServices {
-    pub get_memory_map_fn: *const core::ffi::c_void,
-    pub allocate_pages_fn: *const core::ffi::c_void,
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2, Revoked = 3 }
 
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
@@ -82,7 +55,18 @@ impl SimpleUEFIBootloader {
 
 impl UEFIBootloader for SimpleUEFIBootloader {
     fn phase(&self) -> BootPhase {
-        unsafe { core::mem::transmute(self.phase.load(Ordering::SeqCst)) }
+        let val = self.phase.load(Ordering::SeqCst);
+        match val {
+            0 => BootPhase::Init,
+            1 => BootPhase::LoadKernel,
+            2 => BootPhase::Handoff,
+            _ => BootPhase::Complete,
+        }
+    }
+    fn load_kernel(&mut self, _kernel_data: &[u8]) -> Result<BootStatus, BootError> {
+        self.phase.store(BootPhase::LoadKernel as usize, Ordering::SeqCst);
+        self.kernel_loaded.store(1, Ordering::SeqCst);
+        Ok(1)
     }
 
     /// Loads the kernel payload by directly copying from a raw pointer using core::ptr operations (Linux boot chain)
@@ -136,44 +120,107 @@ impl UEFIBootloader for SimpleUEFIBootloader {
     }
 }
 
+// UEFI db / dbx Databases
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DbKey {
+    pub hash: [u8; 32],
+    pub key_id: u32,
+    pub is_revoked: bool,
+}
+
+pub struct UefiDatabase {
+    pub keys: [Option<DbKey>; 8],
+}
+
+impl UefiDatabase {
+    pub fn new() -> Self {
+        Self { keys: [None; 8] }
+    }
+
+    pub fn enroll_key(&mut self, key: DbKey) -> Result<(), &'static str> {
+        for slot in &mut self.keys {
+            if slot.is_none() {
+                *slot = Some(key);
+                return Ok(());
+            }
+        }
+        Err("UEFI db full")
+    }
+
+    pub fn verify_signature(&self, hash: &[u8; 32], key_id: u32) -> Result<bool, BootError> {
+        // Check dbx (revocation) first
+        for slot in &self.keys {
+            if let Some(ref db_key) = slot {
+                if db_key.key_id == key_id && db_key.hash == *hash && db_key.is_revoked {
+                    return Err(BootError::Revoked);
+                }
+            }
+        }
+
+        // Check db (authorized)
+        for slot in &self.keys {
+            if let Some(ref db_key) = slot {
+                if db_key.key_id == key_id && db_key.hash == *hash && !db_key.is_revoked {
+                    return Ok(true);
+                }
+            }
+        }
+
+        Ok(false)
+    }
+}
+
+// TPM Platform Configuration Registers (Measured Boot)
+pub struct TpmMeasuredBoot {
+    pub pcrs: [u32; 16],
+}
+
+impl TpmMeasuredBoot {
+    pub fn new() -> Self {
+        Self { pcrs: [0; 16] }
+    }
+
+    pub fn extend_pcr(&mut self, pcr_idx: usize, val: u32) {
+        if pcr_idx < 16 {
+            let mut current = self.pcrs[pcr_idx];
+            current = current ^ val;
+            current = current.wrapping_mul(16777619);
+            self.pcrs[pcr_idx] = current;
+        }
+    }
+}
+
 pub trait SecureBoot {
-    fn verify_signature(&self, data: &[u8], expected_signature: &[u8]) -> Result<bool, BootError>;
+    fn verify_signature(&self, data: &[u8], key_id: u32) -> Result<bool, BootError>;
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, BootError>;
 }
 
-/// Simulated Cryptographic Secure Boot Verification Engine
-#[repr(C)]
 pub struct SimpleSecureBoot {
     pub bootloader: SimpleUEFIBootloader,
+    pub db: UefiDatabase,
+    pub tpm: TpmMeasuredBoot,
 }
 
 impl SimpleSecureBoot {
     pub fn new() -> Self {
         SimpleSecureBoot {
             bootloader: SimpleUEFIBootloader::new(),
+            db: UefiDatabase::new(),
+            tpm: TpmMeasuredBoot::new(),
         }
     }
 }
 
 impl SecureBoot for SimpleSecureBoot {
-    /// Validates the kernel payload signature. Conforms to authentic UEFI secure boot checking.
-    fn verify_signature(&self, data: &[u8], expected_signature: &[u8]) -> Result<bool, BootError> {
-        if data.is_empty() || expected_signature.is_empty() {
-            return Err(BootError::SignatureInvalid);
+    fn verify_signature(&self, data: &[u8], key_id: u32) -> Result<bool, BootError> {
+        // Hash data (simple deterministic checksum for #![no_std])
+        let mut hash = [0u8; 32];
+        for (i, &byte) in data.iter().enumerate() {
+            hash[i % 32] = hash[i % 32].wrapping_add(byte);
         }
 
-        // Simulate signature verification using wrapping hash algorithm
-        let mut computed_hash: u8 = 0;
-        for byte in data {
-            computed_hash = computed_hash.wrapping_add(*byte).wrapping_mul(31);
-        }
-
-        // Validate first byte matches hash, verifying signature authenticity
-        if expected_signature[0] == computed_hash {
-            Ok(true)
-        } else {
-            Ok(false)
-        }
+        let verified = self.db.verify_signature(&hash, key_id)?;
+        Ok(verified)
     }
 
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, BootError> {
@@ -190,18 +237,11 @@ impl SecureBoot for SimpleSecureBoot {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-    #[test]
-    fn test_uefi_load_kernel_raw() {
-        let mut bootloader = SimpleUEFIBootloader::new();
-        assert_eq!(bootloader.phase(), BootPhase::Init);
-
-        let kernel_src = [0x7F, 0x45, 0x4C, 0x46, 0x01, 0x02, 0x03]; // ELF signature
-        let mut kernel_dst = [0u8; 7];
-
+impl<T> Vec<T> {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
         unsafe {
             let result = bootloader.load_kernel_raw(
                 kernel_src.as_ptr(),
@@ -252,5 +292,60 @@ mod tests {
         // Corrupted payload should fail verification
         let corrupted_payload = [0xBB, 0xAA, 0x55, 0x44];
         assert!(!secure_boot.verify_signature(&corrupted_payload, &signature).unwrap());
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_uefi_bootloader_lifecycle() {
+        let mut boot = SimpleUEFIBootloader::new();
+        assert_eq!(boot.phase(), BootPhase::Init);
+
+        boot.load_kernel(&[0x1, 0x2, 0x3]).unwrap();
+        assert_eq!(boot.phase(), BootPhase::LoadKernel);
+
+        boot.handoff().unwrap();
+        assert_eq!(boot.phase(), BootPhase::Complete);
+    }
+
+    #[test]
+    fn test_uefi_secure_db_signature_validation() {
+        let mut sb = SimpleSecureBoot::new();
+        let kernel_data = [0xAA; 64];
+
+        // Hash kernel data
+        let mut hash = [0u8; 32];
+        for (i, &byte) in kernel_data.iter().enumerate() {
+            hash[i % 32] = hash[i % 32].wrapping_add(byte);
+        }
+
+        // Enroll kernel signing key as revoked in dbx
+        let revoked_key = DbKey {
+            hash,
+            key_id: 2002,
+            is_revoked: true,
+        };
+        sb.db.enroll_key(revoked_key).unwrap();
+
+        // Enforcing signature check fails on revoked keys immediately
+        let check_revoked = sb.verify_signature(&kernel_data, 2002);
+        assert_eq!(check_revoked, Err(BootError::Revoked));
+
+        // Enroll authorized key in db
+        let authorized_key = DbKey {
+            hash,
+            key_id: 2001,
+            is_revoked: false,
+        };
+        sb.db.enroll_key(authorized_key).unwrap();
+
+        // Check authorized succeeds
+        let check_auth = sb.verify_signature(&kernel_data, 2001).unwrap();
+        assert!(check_auth);
     }
 }

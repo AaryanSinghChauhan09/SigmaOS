@@ -5,7 +5,6 @@ use std::io::{self, BufRead, Write};
 
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
-
 impl AgentAutomationEngine {
     pub fn new() -> Self {
         AgentAutomationEngine
@@ -47,26 +46,6 @@ pub enum ShellCommand {
     AgentRun {
         task_id: usize,
     },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
-    },
-    Dpkg {
-        args: Vec<String>,
-    },
     Theme {
         theme_name: String,
     },
@@ -98,16 +77,38 @@ pub struct ShellRepl {
 
 impl ShellRepl {
     pub fn new() -> Self {
-        let mut a11y = std::collections::HashMap::new();
-        a11y.insert("screen_reader".to_string(), false);
-        a11y.insert("high_contrast".to_string(), false);
-        a11y.insert("magnification".to_string(), false);
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
 
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt: "ubuntu@sigmaos:~$ ".to_string(),
+            prompt: "sigma-sh> ".to_string(),
+            agent_engine: AgentAutomationEngine::new(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: std::collections::HashMap::new(),
+        }
+    }
+
+    pub fn with_prompt(prompt: String) -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
+            prompt,
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
