@@ -193,6 +193,13 @@ impl SelfHealingModule {
         let snapshot = self
             .get_snapshot(id)
             .ok_or(ResilienceError::SnapshotNotFound)?;
+||||||| 43be3a7e8
+        if !self.snapshots.iter().any(|s| s.id == id) {
+            return Err(ResilienceError::SnapshotNotFound);
+        }
+
+        let snapshot = self.get_snapshot(id).unwrap();
+        let snapshot = self.get_snapshot(id).ok_or(ResilienceError::SnapshotNotFound)?;
         println!("Rolling back to snapshot: {}", snapshot.description);
 
         // Simulate rollback

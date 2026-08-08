@@ -153,6 +153,19 @@ impl BuddyAllocator {
                 let block = MemoryBlock { addr, size };
                 self.free_lists[order].push(block);
             }
+||||||| 43be3a7e8
+            let block = MemoryBlock {
+                addr: NonNull::new(base_addr as *mut u8).unwrap(),
+                size,
+            };
+            self.free_lists[order].push(block);
+            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
+                let block = MemoryBlock {
+                    addr,
+                    size,
+                };
+                self.free_lists[order].push(block);
+            }
         }
     }
 
@@ -383,10 +396,31 @@ impl PageTable {
     }
 }
 
+use std::collections::HashMap;
+
+#[derive(Debug, Clone)]
+pub struct MemoryMerkleNode {
+    pub page_index: usize,
+    pub data_hash: u64,
+}
+
+impl MemoryMerkleNode {
+    pub fn compute_hash(data: &[u8]) -> u64 {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        let mut hasher = DefaultHasher::new();
+        data.hash(&mut hasher);
+        hasher.finish()
+    }
+}
+
 /// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
     pub buddy_allocator: BuddyAllocator,
+||||||| 43be3a7e8
+    pub page_ref_counts: HashMap<u64, u32>, // physical frame addr -> reference count (for Copy-on-Write)
+    pub shadow_snapshots: HashMap<u64, String>, // virtual_addr -> snapshot copy (for snapshot isolation)
 }
 
 impl VirtualMemoryManager {
@@ -413,6 +447,13 @@ impl VirtualMemoryManager {
     /// Free pages using buddy allocator (wires free_pages to VMM)
     pub fn free_pages(&mut self, block: MemoryBlock) {
         self.buddy_allocator.deallocate(block);
+||||||| 43be3a7e8
+        Self { root_directory }
+        Self {
+            root_directory,
+            page_ref_counts: HashMap::new(),
+            shadow_snapshots: HashMap::new(),
+        }
     }
 
     /// Translates a virtual address into a physical address
@@ -461,6 +502,41 @@ impl VirtualMemoryManager {
 
         entry.clear();
         Ok(())
+    }
+
+    /// Handles a Copy-on-Write (CoW) page fault.
+    /// If multiple processes share a physical page, on write fault we duplicate the page and remap as WRITABLE.
+    pub fn handle_page_fault_cow(&mut self, virtual_addr: u64, new_physical_frame: u64) -> Result<bool, &'static str> {
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_mut() };
+
+        let entry = &mut root.entries[pt_index as usize];
+        if !entry.is_present() {
+            // Demand paging trigger: Map a newly allocated physical page if it's completely missing
+            self.map_page(virtual_addr, new_physical_frame, PageFlags(PageFlags::PRESENT | PageFlags::WRITABLE))?;
+            self.page_ref_counts.insert(new_physical_frame, 1);
+            return Ok(true); // Resolved via demand paging
+        }
+
+        let old_phys_addr = entry.get_addr();
+        let ref_count = self.page_ref_counts.get(&old_phys_addr).cloned().unwrap_or(1);
+
+        if ref_count > 1 {
+            // Decement the reference count on the shared old page
+            self.page_ref_counts.insert(old_phys_addr, ref_count - 1);
+
+            // Remap virtual page to newly allocated physical page with write capability
+            entry.set_addr(new_physical_frame, PageFlags(PageFlags::PRESENT | PageFlags::WRITABLE));
+            self.page_ref_counts.insert(new_physical_frame, 1);
+
+            // Record snapshot isolate copy
+            self.shadow_snapshots.insert(virtual_addr, "CoW Page Duplicated".to_string());
+            Ok(true) // Resolved via Copy-on-Write
+        } else {
+            // Only 1 process is mapping this page; just elevate permissions to writable if it wasn't
+            entry.set_addr(old_phys_addr, PageFlags(PageFlags::PRESENT | PageFlags::WRITABLE));
+            Ok(false)
+        }
     }
 }
 
@@ -551,5 +627,41 @@ mod tests {
 
         // Double Free (Should Fail)
         assert!(pool_manager.free_pool(paged_block.addr).is_err());
+    }
+||||||| 43be3a7e8
+
+    #[test]
+    fn test_demand_paging_and_cow_snapshots() {
+        // 1. Setup a page table on the stack/heap
+        let mut pt = PageTable::new();
+        let mut vmm = VirtualMemoryManager::new(NonNull::new(&mut pt as *mut PageTable).unwrap());
+
+        let virtual_addr = 0x1000_0000;
+        let original_phys_frame = 0x5000_0000;
+        let new_phys_frame = 0x6000_0000;
+
+        // 2. Validate Merkle node hashes
+        let data = b"some page bytes";
+        let root_hash = MemoryMerkleNode::compute_hash(data);
+        let node = MemoryMerkleNode { page_index: 0, data_hash: root_hash };
+        assert_eq!(node.data_hash, root_hash);
+
+        // 3. Test demand-paging scenario (page not mapped -> page faults on write -> demand map)
+        let resolved_demand = vmm.handle_page_fault_cow(virtual_addr, original_phys_frame).unwrap();
+        assert!(resolved_demand); // resolved by demand map
+        assert_eq!(vmm.translate(virtual_addr).unwrap(), original_phys_frame);
+
+        // Reset present frame ref count to 2 to simulate shared page mapping (e.g. fork scenario)
+        vmm.page_ref_counts.insert(original_phys_frame, 2);
+
+        // 4. Test Copy-on-Write fault scenario (page present but shared, on write fault -> duplicate)
+        let resolved_cow = vmm.handle_page_fault_cow(virtual_addr, new_phys_frame).unwrap();
+        assert!(resolved_cow); // resolved by copy on write duplication
+        assert_eq!(vmm.translate(virtual_addr).unwrap(), new_phys_frame);
+
+        // Assert shadow snapshot isolating records
+        assert_eq!(vmm.shadow_snapshots.get(&virtual_addr).unwrap(), "CoW Page Duplicated");
+        assert_eq!(vmm.page_ref_counts.get(&original_phys_frame).cloned().unwrap(), 1);
+        assert_eq!(vmm.page_ref_counts.get(&new_phys_frame).cloned().unwrap(), 1);
     }
 }

@@ -17,6 +17,10 @@ pub mod vulnerability;
 pub mod hardening;
 pub mod hardening;
 pub mod qubes_isolation;
+||||||| 43be3a7e8
+pub mod bridge;
+pub mod prism;
+pub mod sandbox;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use obfuscator::{SovereignCodeHardener, SovereignThreatDetector};
@@ -36,3 +40,13 @@ pub use hardening::{
     secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
 };
 pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
+||||||| 43be3a7e8
+pub use bridge::{
+    LegacySecurityType, SecurityBridge,
+};
+pub use prism::{
+    SecurityFacet, SecurityPrism,
+};
+pub use sandbox::{
+    SandboxRule, PrivacyFirstSandbox,
+};

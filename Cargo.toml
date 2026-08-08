@@ -37,17 +37,22 @@ panic = "abort"
 [profile.release]
 opt-level = 3
 debug = false
-lto = true
+lto = "fat"
 codegen-units = 1
 panic = "abort"
+strip = true
 
 [[bin]]
 name = "sigma_kernel"
 path = "src/kernel/main.rs"
+test = false
+required-features = ["microkernel"]
 
 [[bin]]
 name = "sigma_drivers"
 path = "src/drivers/main.rs"
+test = false
+required-features = ["microkernel"]
 
 [[bin]]
 name = "sigma_userspace"
@@ -64,3 +69,6 @@ path = "tools/build/sigma_make.rs"
 [[bin]]
 name = "sigmaos_setup_wizard"
 path = "tools/build/SigmaOSSetupWizard.rs"
+||||||| 43be3a7e8
+test = false
+required-features = ["microkernel"]

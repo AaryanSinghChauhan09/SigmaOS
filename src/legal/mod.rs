@@ -16,3 +16,10 @@ pub use compliance::{
     LabourLawConfig, StatutoryPayrollBreakdown, LabourLawCompliance, StatutoryFiling,
     StatutoryFilingDashboard,
 };
+||||||| 43be3a7e8
+// SigmaOS Legal & Compliance Module
+pub mod licensing;
+
+pub use licensing::{
+    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+};

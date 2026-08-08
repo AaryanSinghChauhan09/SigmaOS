@@ -22,6 +22,10 @@ pub mod modern_nvme;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
 pub mod touch_jingos;
+||||||| 43be3a7e8
+pub mod peripheral;
+pub mod legacy_keyboard;
+pub mod modern_usb;
 
 pub use gpu::{
     DrmError, DrmPlaneType, GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
@@ -41,3 +45,7 @@ pub use modern_nvme::ModernNvmeDriver;
 pub use modern_usb_printer::ModernUsbPrinterDriver;
 pub use modern_wifi::ModernWifiDriver;
 pub use touch_jingos::TouchJingosDriver;
+||||||| 43be3a7e8
+pub use peripheral::{PeripheralDevice, PeripheralManager, DeviceGeneration, PowerState};
+pub use legacy_keyboard::LegacyKeyboard;
+pub use modern_usb::ModernUsbController;
