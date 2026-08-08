@@ -4,6 +4,7 @@ pub mod india_stack;
 pub mod jehanne;
 pub mod mint_linux;
 pub mod reactos;
+pub mod sigmawin;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,

@@ -19,7 +19,10 @@
 // SigmaOS Sovereign Win32 Compatibility Subsystem (SigmaWin)
 // Implementing complete Windows 11 Gap Closure & PE Loading / Registry / USER32/GDI32 Emulation
 
+#[cfg(not(test))]
 use crate::klib::HashMap;
+#[cfg(test)]
+use std::collections::HashMap;
 
 /// PE execution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
