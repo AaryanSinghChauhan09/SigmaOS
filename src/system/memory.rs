@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -422,7 +423,7 @@ impl AsanGuardZoneDetector {
 
     pub fn track_allocation(&mut self, record: AllocationRecord) {
         let mut magic_pattern = Vec::new();
-        for i in 0..self.redzone_size {
+        for _i in 0..self.redzone_size {
             magic_pattern.push(0xFA); // Standard ASan Heap Redzone marker byte
         }
         self.redzones.insert(record.address + record.size, magic_pattern);

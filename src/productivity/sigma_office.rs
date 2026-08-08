@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 //! # SigmaOffice - Sovereign Office Suite (SigmaCalc, SigmaWrite)
 //!
 //! This module implements SigmaOffice:

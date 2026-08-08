@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // Windows Driver Compatibility, Emulation, and PE Loading Framework for SigmaOS
 // Implements WDM, WDF (KMDF/UMDF), NDIS, Storport, WDDM, and PE-grade .sys loading.
 

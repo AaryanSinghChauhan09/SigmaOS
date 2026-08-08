@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // SigmaOS AUR Helper - Arch User Repository integration
 // Provides high-speed CLI helpers for AUR metadata parsing and package management
 

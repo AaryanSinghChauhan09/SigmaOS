@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 // SigmaOS Windows/Linux-Inspired Advanced I/O and Driver subsystem (S-IRP)
 // Implements highly-flexible Windows-style IRPs, APCs, DPCs, Buffering Methods,
 // Driver & Device Objects, File System Minifilters, and Kernel Callbacks.

@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 /// SigmaOS: Buddy Physical Memory Allocator
 /// Phase G Blocker #2: Buddy physical allocator
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
