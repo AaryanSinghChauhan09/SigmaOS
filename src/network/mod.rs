@@ -3,7 +3,8 @@ pub mod analyzer;
 pub mod enterprise;
 pub mod tcp;
 pub mod tcp_udp;
-pub mod ring_buffer_stack;
+pub mod sync;
+pub mod torrent;
 
 pub use analyzer::{
     NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
@@ -15,9 +16,5 @@ pub use analyzer::{
 };
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-pub use tcp_udp::{
-    Protocol, TCPState as UdpTcpState, NetworkError as UdpNetworkError, Socket, SimpleSocket,
-    TCPConnection as UdpTCPConnection, UDPSocket, RenoCongestionControl, BBRCongestionControl,
-    FirewallTarget, FirewallChain, ConntrackState, FirewallRule, Firewall as IptablesFirewall,
-    SimpleFirewall, ZeroCopy, ZeroCopyNetwork, NetworkStack as CoreNetworkStack, SimpleNetworkStack,
-};
+pub use sync::{CloudSyncManager, ConflictResolution, SyncConfig, SyncCredentials, SyncError, SyncItem, SyncItemType, SyncProvider, SyncResult, SyncStatus};
+pub use torrent::{PeerInfo, TorrentClient, TorrentError, TorrentState};
