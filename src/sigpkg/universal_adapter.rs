@@ -480,7 +480,7 @@ mod additional_adapter_tests {
         let adapter = UniversalPackageAdapter::new();
         let spec_text = r#"
             Name: custom_service
-            Version: 2.1
+            Version: 2.1.0
             Release: 1%{?dist}
             Summary: High performance backend service
             License: GPL-3.0
@@ -489,7 +489,7 @@ mod additional_adapter_tests {
 
         let parsed = adapter.parse_rpm_spec(spec_text).unwrap();
         assert_eq!(parsed.name, "custom_service");
-        assert_eq!(parsed.version, "2.1");
+        assert_eq!(parsed.version, "2.1.0");
         assert_eq!(parsed.license, "GPL-3.0");
         assert_eq!(parsed.requires.len(), 2);
         assert_eq!(parsed.requires[0], "bash");

@@ -171,7 +171,7 @@ impl SimpleStickyKeys {
 
 impl StickyKeys for SimpleStickyKeys {
     fn enable_sticky(&mut self, key_id: KeyID) {
-        if !self.sticky_keys.contains(&key_id) {
+        if !self.sticky_keys.contains(|&k| k == key_id) {
             self.sticky_keys.push(key_id);
         }
     }
@@ -186,7 +186,7 @@ impl StickyKeys for SimpleStickyKeys {
     }
 
     fn is_sticky(&self, key_id: KeyID) -> bool {
-        self.sticky_keys.contains(&key_id)
+        self.sticky_keys.contains(|&k| k == key_id)
     }
 }
 

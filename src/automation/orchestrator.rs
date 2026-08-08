@@ -273,7 +273,7 @@ impl AiOptimizationStrategy for RuleBasedOptimizer {
         recommendations
     }
 
-    fn execute(&mut self, _action: &SystemAction) -> Result<(), OptimizationError> {
+    fn execute(&mut self, action: &SystemAction) -> Result<(), OptimizationError> {
         // Simulated action execution
         match action.action_type {
             ActionType::AdjustCpuFrequency => {

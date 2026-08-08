@@ -253,8 +253,14 @@ impl IoManager {
         for driver in self.drivers.iter_mut() {
             if driver.name == driver_name {
                 if let Some(handler) = driver.major_functions[irp.major_function as usize] {
-                    // Temporarily create a mutable slice reference to simulate WDM vtable calling
                     let mut dummy_dev = DeviceObject::new(current_id, driver_name);
+                    for dev in &self.devices {
+                        if dev.id == current_id {
+                            dummy_dev.is_minifilter = dev.is_minifilter;
+                            dummy_dev.attached_device_id = dev.attached_device_id;
+                            break;
+                        }
+                    }
                     let status = handler(&mut dummy_dev, irp);
                     irp.io_status = status;
                     return status;

@@ -88,6 +88,24 @@ impl<T> Vec<T> {
         false
     }
 
+    /// Returns a slice containing the entire vector
+    pub fn as_slice(&self) -> &[T] {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+
+    /// Returns a mutable slice containing the entire vector
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+
     /// Helper to grow the backing memory capacity
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
@@ -117,6 +135,23 @@ impl<T> Vec<T> {
 
         self.data = new_data;
         self.capacity = new_capacity;
+    }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
+    }
+
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
 }
 
@@ -218,6 +253,62 @@ impl<T> IntoIterator for Vec<T> {
             vec: self,
             index: 0,
         }
+    }
+}
+
+pub struct VecIter<'a, T> {
+    data: *const T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a T>,
+}
+
+impl<'a, T> Iterator for VecIter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &*self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct VecIterMut<'a, T> {
+    data: *mut T,
+    len: usize,
+    index: usize,
+    _marker: core::marker::PhantomData<&'a mut T>,
+}
+
+impl<'a, T> Iterator for VecIterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.len {
+            let item = unsafe { &mut *self.data.add(self.index) };
+            self.index += 1;
+            Some(item)
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
     }
 }
 

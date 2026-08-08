@@ -46,7 +46,7 @@ impl PledgePromise {
         if !self.active.load(Ordering::SeqCst) {
             return true; // Not activated yet, allow everything
         }
-        self.permissions.contains(&permission)
+        self.permissions.contains(|p| *p == permission)
     }
 
     /// Get all allowed permissions

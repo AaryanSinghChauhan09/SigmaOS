@@ -27,7 +27,7 @@ pub use linux_translation::{
     LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
     RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
 };
-pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE};
+pub use store::SigmaSoftwareStore;
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,

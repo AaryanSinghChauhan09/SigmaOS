@@ -158,15 +158,18 @@ impl SovereignSpliceEngine {
     ) -> Result<usize, IpcError> {
         let mut moved = 0;
         while moved < max_elements {
-            if let Some(payload) = source.read_structure() {
-                let size = payload.len();
-                if let Err(e) = destination.write_structure(payload) {
-                    return Err(e);
+            match source.read_structure() {
+                Ok(Some(payload)) => {
+                    let size = payload.len();
+                    if let Err(e) = destination.write_structure(payload) {
+                        return Err(e);
+                    }
+                    self.bytes_spliced += size as u64;
+                    moved += 1;
                 }
-                self.bytes_spliced += size as u64;
-                moved += 1;
-            } else {
-                break;
+                Ok(None) => break,
+                Err(IpcError::WouldBlock) => break,
+                Err(e) => return Err(e),
             }
         }
         Ok(moved)
@@ -457,8 +460,8 @@ mod tests {
 
         assert_eq!(spliced, 2);
         assert_eq!(splice_engine.bytes_spliced, 6);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![1, 1, 1]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![2, 2, 2]);
+        assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![1, 1, 1]));
+        assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![2, 2, 2]));
     }
 
     #[test]
@@ -476,8 +479,8 @@ mod tests {
         assert_eq!(sent, 4);
         assert_eq!(sendfile_engine.files_sent, 1);
         assert_eq!(sendfile_engine.total_bytes_sent, 4);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![30, 40]);
-        assert_eq!(dest_pipe.read_structure().unwrap(), vec![50, 60]);
+        assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![30, 40]));
+        assert_eq!(dest_pipe.read_structure().unwrap(), Some(vec![50, 60]));
     }
 
     #[test]
