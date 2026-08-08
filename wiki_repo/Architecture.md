@@ -66,7 +66,7 @@ Process → System Call → Capability Enforcer
                               ↓
                         SELinux check
                               ↓
-                        AppArmor check
+                        AppArmor check  
                               ↓
                         Sigma-Pledge check
                               ↓
