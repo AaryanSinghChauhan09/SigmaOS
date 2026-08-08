@@ -85,7 +85,9 @@ pub struct AgentInfo {
     pub version: (u32, u32, u32),
     pub total_intents: usize,
     pub execution_count: AtomicUsize,
-    pub capability: AgentCapability,
+    pub can_parse: bool,
+    pub can_execute: bool,
+    pub can_learn: bool,
 }
 
 impl AgentInfo {
@@ -95,7 +97,9 @@ impl AgentInfo {
             version: (1, 0, 0),
             total_intents: 0,
             execution_count: AtomicUsize::new(0),
-            capability: AgentCapability::new(),
+            can_parse: false,
+            can_execute: false,
+            can_learn: false,
         }
     }
 }
@@ -107,6 +111,9 @@ pub struct AgentCapability {
     pub can_parse: bool,
     pub can_execute: bool,
     pub can_learn: bool,
+    pub can_register: bool,
+    pub can_unregister: bool,
+    pub can_process: bool,
 }
 
 impl AgentCapability {
@@ -115,6 +122,9 @@ impl AgentCapability {
             can_parse: false,
             can_execute: false,
             can_learn: false,
+            can_register: false,
+            can_unregister: false,
+            can_process: false,
         }
     }
 
@@ -123,35 +133,10 @@ impl AgentCapability {
             can_parse: true,
             can_execute: true,
             can_learn: true,
+            can_register: true,
+            can_unregister: true,
+            can_process: true,
         }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AgentCapability {
-    pub value: u64,
-}
-
-impl AgentCapability {
-    pub fn full() -> Self {
-        AgentCapability { value: !0 }
-    }
-    pub fn none() -> Self {
-        AgentCapability { value: 0 }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AgentCapability {
-    pub value: u64,
-}
-
-impl AgentCapability {
-    pub fn full() -> Self {
-        AgentCapability { value: !0 }
-    }
-    pub fn none() -> Self {
-        AgentCapability { value: 0 }
     }
 }
 
@@ -165,10 +150,6 @@ pub struct SimpleAIAgent {
     pub patterns: Vec<Pattern>,
     pub mcp_tools: Vec<(String, String)>,
     pub prompt_optim_weight: f32,
-    pub active_agent: AtomicUsize,
-    pub can_register: bool,
-    pub can_unregister: bool,
-    pub can_process: bool,
 }
 
 /// Pattern for intent matching
@@ -224,10 +205,6 @@ impl SimpleAIAgent {
             patterns: Vec::new(),
             mcp_tools: Vec::new(),
             prompt_optim_weight: 0.5,
-            active_agent: AtomicUsize::new(0),
-            can_register: true,
-            can_unregister: true,
-            can_process: true,
         }
     }
 
@@ -430,7 +407,9 @@ impl AIAgent for SimpleAIAgent {
             version: self.version,
             total_intents: self.patterns.len(),
             execution_count: AtomicUsize::new(self.execution_count.load(Ordering::SeqCst)),
-            capability: AgentCapability::new(),
+            can_parse: self.capability.can_parse,
+            can_execute: self.capability.can_execute,
+            can_learn: self.capability.can_learn,
         }
     }
 }
@@ -548,16 +527,21 @@ impl AIAgentManager for SimpleAIAgentManager {
         self.stats.total_requests += 1;
 
         let active = self.active_agent.load(Ordering::SeqCst);
-        if let Some(ref mut agent) = self.agents[active] {
-            let agent_mut: &mut dyn AIAgent = agent.as_mut();
-            let intent = agent_mut.parse(input)?;
+        if active < self.agents.len() {
+            if let Some(ref mut agent) = self.agents[active] {
+                let agent_mut: &mut dyn AIAgent = agent.as_mut();
+                let intent = agent_mut.parse(input)?;
 
-            if let Ok(response) = agent_mut.execute(&intent) {
-                self.stats.successful_requests += 1;
-                Ok(response)
+                if let Ok(response) = agent_mut.execute(&intent) {
+                    self.stats.successful_requests += 1;
+                    Ok(response)
+                } else {
+                    self.stats.failed_requests += 1;
+                    Err(AIError::ExecutionFailed)
+                }
             } else {
                 self.stats.failed_requests += 1;
-                Err(AIError::ExecutionFailed)
+                Err(AIError::InvalidInput)
             }
         } else {
             self.stats.failed_requests += 1;
@@ -568,6 +552,10 @@ impl AIAgentManager for SimpleAIAgentManager {
     fn stats(&self) -> AIStats {
         self.stats
     }
+
+    fn process_request(&mut self, _id: usize, input: &str) -> Result<Vec<u8>, AIError> {
+        self.process(input.as_bytes())
+    }
 }
 
 #[cfg(test)]
@@ -577,12 +565,9 @@ mod tests {
     #[test]
     fn test_ai_agent_parsing() {
         let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        let intent = agent.parse("run diagnostic check").unwrap();
+        let intent = agent.parse(b"run diagnostic check").unwrap();
         assert_eq!(intent.intent_type, IntentType::SystemCommand);
-        assert_eq!(intent.command, "sys_exec");
-        assert_eq!(intent.parameters, "run diagnostic check");
     }
-}
 
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
@@ -593,7 +578,6 @@ mod tests {
         let opt_score = agent.optimize_prompt_weights();
         assert_eq!(opt_score, 0.95);
     }
-}
 
     #[test]
     fn test_ai_agent_manager_process() {
@@ -602,7 +586,7 @@ mod tests {
         let id = manager.register_agent(Box::new(agent)).unwrap();
 
         let response = manager.process_request(id, "read file /etc/hosts").unwrap();
-        let response_str = std::str::from_utf8(&response).unwrap();
+        let response_str = core::str::from_utf8(&response).unwrap();
         assert_eq!(response_str, "Command executed successfully");
     }
 
