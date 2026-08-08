@@ -54,7 +54,7 @@ where
     pub fn new() -> Self {
         HashMap {
             buckets: Vec::new(),
-            capacity: 16,
+            capacity: 0,
             len: 0,
         }
     }

@@ -76,3 +76,9 @@ pub use historic_linux::{
     VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
     ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
 };
+
+pub mod debian;
+pub use debian::{
+    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
+    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
+};
