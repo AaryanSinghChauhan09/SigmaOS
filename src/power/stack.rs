@@ -1,18 +1,21 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+
 /// OOP-based Power Management Stack for SigmaOS
 /// Implements power management using OOP principles with traits and structs
 /// No dependency on external power management frameworks
 /// Based on Roadmap Item 8: Power management stack
 
+use alloc::boxed::Box;
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 /// Power profile
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerProfile {
     Performance = 0,
     Balanced = 1,
@@ -21,8 +24,8 @@ pub enum PowerProfile {
 }
 
 /// CPU governor
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CPUGovernor {
     Performance = 0,
     Ondemand = 1,
@@ -52,6 +55,13 @@ pub enum PowerError {
     InvalidProfile = 1,
     InvalidGovernor = 2,
     PermissionDenied = 3,
+}
+
+/// Power event represent transitions
+#[derive(Debug, Clone, Copy)]
+pub struct PowerEvent {
+    pub event_id: u32,
+    pub event_type: u32,
 }
 
 /// Power info
@@ -199,6 +209,7 @@ pub trait PowerStack {
 
 /// Power statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PowerStats {
     pub current_profile: PowerProfile,
     pub current_governor: CPUGovernor,
@@ -299,62 +310,4 @@ impl PowerStack for SimplePowerStack {
     fn stats(&self) -> PowerStats {
         self.stats
     }
-}
-
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
