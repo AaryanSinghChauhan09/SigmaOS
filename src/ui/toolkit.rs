@@ -1,21 +1,18 @@
-#![no_std]
-#![no_main]
+// OOP-based Native UI Toolkit for SigmaOS
+// Implements UI toolkit using OOP principles with traits and structs.
 
-/// OOP-based Native UI Toolkit for SigmaOS
-/// Implements UI toolkit using OOP principles with traits and structs
-/// No dependency on external UI frameworks
-/// Based on Roadmap Item 44: Native toolkit
+extern crate alloc;
 
-use core::ptr::{self, NonNull};
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Widget ID
 pub type WidgetID = usize;
 
 /// Widget type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WidgetType {
     Button = 0,
     Label = 1,
@@ -28,7 +25,7 @@ pub enum WidgetType {
 
 /// Widget state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WidgetState {
     Normal = 0,
     Hovered = 1,
@@ -59,7 +56,7 @@ pub trait Widget {
 
 /// UI error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UIError {
     Success = 0,
     RenderFailed = 1,
@@ -99,7 +96,7 @@ impl WidgetInfo {
 
 /// Widget capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WidgetCapability {
     pub can_interact: bool,
     pub can_modify: bool,
@@ -107,7 +104,7 @@ pub struct WidgetCapability {
 }
 
 impl WidgetCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         WidgetCapability {
             can_interact: false,
             can_modify: false,
@@ -115,7 +112,7 @@ impl WidgetCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         WidgetCapability {
             can_interact: true,
             can_modify: true,
@@ -124,8 +121,13 @@ impl WidgetCapability {
     }
 }
 
+impl Default for WidgetCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple widget (OOP: Concrete widget class)
-#[repr(C)]
 pub struct SimpleWidget {
     pub id: WidgetID,
     pub widget_type: WidgetType,
@@ -139,13 +141,15 @@ pub struct SimpleWidget {
 }
 
 impl SimpleWidget {
-    pub fn new(id: WidgetID, widget_type: WidgetType, label: &[u8], capability: WidgetCapability) -> Self {
+    pub fn new(
+        id: WidgetID,
+        widget_type: WidgetType,
+        label: &[u8],
+        capability: WidgetCapability,
+    ) -> Self {
         let mut label_array = [0u8; 128];
         let label_len = label.len().min(127);
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(label.as_ptr(), label_array.as_mut_ptr(), label_len);
-        }
+        label_array[..label_len].copy_from_slice(&label[..label_len]);
 
         SimpleWidget {
             id,
@@ -171,8 +175,12 @@ impl SimpleWidget {
     }
 
     pub fn get_state(&self) -> WidgetState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
+        match self.state.load(Ordering::SeqCst) {
+            0 => WidgetState::Normal,
+            1 => WidgetState::Hovered,
+            2 => WidgetState::Pressed,
+            3 => WidgetState::Disabled,
+            _ => WidgetState::Hidden,
         }
     }
 }
@@ -193,9 +201,8 @@ impl Widget for SimpleWidget {
 
     fn set_label(&mut self, label: &[u8]) {
         let len = label.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(label.as_ptr(), self.label.as_mut_ptr(), len);
-        }
+        self.label = [0; 128];
+        self.label[..len].copy_from_slice(&label[..len]);
     }
 
     fn state(&self) -> WidgetState {
@@ -210,7 +217,6 @@ impl Widget for SimpleWidget {
         if self.get_state() == WidgetState::Hidden {
             return Ok(());
         }
-        // In a real implementation, this would render to a surface
         Ok(())
     }
 
@@ -245,6 +251,7 @@ pub trait UILayout {
 
 /// Layout statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LayoutStats {
     pub total_widgets: usize,
     pub visible_widgets: usize,
@@ -252,7 +259,7 @@ pub struct LayoutStats {
 }
 
 impl LayoutStats {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         LayoutStats {
             total_widgets: 0,
             visible_widgets: 0,
@@ -261,17 +268,23 @@ impl LayoutStats {
     }
 }
 
+impl Default for LayoutStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Simple UI layout (OOP: Concrete layout class)
 pub struct SimpleUILayout {
-    widgets: Vec<Option<Box<dyn Widget>>>,
-    next_id: AtomicUsize,
-    stats: LayoutStats,
-    capability: LayoutCapability,
+    pub widgets: Vec<Option<Box<dyn Widget>>>,
+    pub next_id: AtomicUsize,
+    pub stats: LayoutStats,
+    pub capability: LayoutCapability,
 }
 
 /// Layout capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LayoutCapability {
     pub can_add: bool,
     pub can_remove: bool,
@@ -279,7 +292,7 @@ pub struct LayoutCapability {
 }
 
 impl LayoutCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         LayoutCapability {
             can_add: false,
             can_remove: false,
@@ -287,12 +300,18 @@ impl LayoutCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         LayoutCapability {
             can_add: true,
             can_remove: true,
             can_render: true,
         }
+    }
+}
+
+impl Default for LayoutCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -380,60 +399,25 @@ impl UILayout for SimpleUILayout {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
+    #[test]
+    fn test_ui_toolkit_rendering_and_layout() {
+        let mut layout = SimpleUILayout::new(LayoutCapability::full());
+        let button = SimpleWidget::new(
+            101,
+            WidgetType::Button,
+            b"Confirm",
+            WidgetCapability::full(),
+        );
+
+        layout.add_widget(Box::new(button)).unwrap();
+        assert_eq!(layout.stats().total_widgets, 1);
+
+        let widget_ref = layout.get_widget(101).unwrap();
+        assert_eq!(widget_ref.label(), b"Confirm");
+        assert_eq!(widget_ref.state(), WidgetState::Normal);
     }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
