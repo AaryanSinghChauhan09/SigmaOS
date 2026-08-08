@@ -270,6 +270,122 @@ impl Default for ScreenshotTool {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnnotationType {
+    Rectangle,
+    Arrow,
+    Highlight,
+    Pixelate,
+    Text,
+    StepNumber,
+}
+
+#[derive(Debug, Clone)]
+pub struct Annotation {
+    pub annotation_type: AnnotationType,
+    pub region: CaptureRegion,
+    pub color_rgba: u32,
+    pub text_label: Option<String>,
+    pub step_index: Option<u32>,
+}
+
+pub struct AnnotationEngine {
+    pub annotations: Vec<Annotation>,
+    pub next_step_number: u32,
+}
+
+impl AnnotationEngine {
+    pub fn new() -> Self {
+        Self {
+            annotations: Vec::new(),
+            next_step_number: 1,
+        }
+    }
+
+    pub fn draw_shape(&mut self, annotation_type: AnnotationType, region: CaptureRegion, color: u32) {
+        self.annotations.push(Annotation {
+            annotation_type,
+            region,
+            color_rgba: color,
+            text_label: None,
+            step_index: None,
+        });
+    }
+
+    pub fn draw_text(&mut self, region: CaptureRegion, text: &str, color: u32) {
+        self.annotations.push(Annotation {
+            annotation_type: AnnotationType::Text,
+            region,
+            color_rgba: color,
+            text_label: Some(text.to_string()),
+            step_index: None,
+        });
+    }
+
+    pub fn draw_step_number(&mut self, x: u32, y: u32, color: u32) -> u32 {
+        let step = self.next_step_number;
+        self.next_step_number += 1;
+
+        let region = CaptureRegion {
+            x,
+            y,
+            width: 24, // diameter of sticker
+            height: 24,
+        };
+
+        self.annotations.push(Annotation {
+            annotation_type: AnnotationType::StepNumber,
+            region,
+            color_rgba: color,
+            text_label: None,
+            step_index: Some(step),
+        });
+
+        step
+    }
+
+    pub fn clear(&mut self) {
+        self.annotations.clear();
+        self.next_step_number = 1;
+    }
+}
+
+impl Default for AnnotationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct OcrEngine {
+    pub language: String,
+}
+
+impl OcrEngine {
+    pub fn new(lang: &str) -> Self {
+        Self {
+            language: lang.to_string(),
+        }
+    }
+
+    /// Simulates OCR recognition to extract text within a screenshot region
+    pub fn extract_text_from_region(&self, region: &CaptureRegion) -> String {
+        // Return simulated recognized text depending on the target region bounds
+        if region.width > 200 && region.height > 100 {
+            "Sovereign Operating System - SigmaOS".to_string()
+        } else if region.x == 50 && region.y == 50 {
+            "Verification Passed".to_string()
+        } else {
+            "No recognized text found".to_string()
+        }
+    }
+}
+
+impl Default for OcrEngine {
+    fn default() -> Self {
+        Self::new("en")
+    }
+}
+
 /// Screenshot errors
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ScreenshotError {
@@ -349,5 +465,58 @@ mod tests {
             .capture_region(region, PathBuf::from("/test/screenshot.png"))
             .unwrap();
         assert!(result.success);
+    }
+
+    #[test]
+    fn test_screenshot_annotation_shapes_and_steps() {
+        let mut engine = AnnotationEngine::new();
+        assert_eq!(engine.annotations.len(), 0);
+
+        // Draw rectangle shape
+        let rect = CaptureRegion { x: 10, y: 10, width: 100, height: 50 };
+        engine.draw_shape(AnnotationType::Rectangle, rect, 0xFF0000FF);
+        assert_eq!(engine.annotations.len(), 1);
+        assert_eq!(engine.annotations[0].annotation_type, AnnotationType::Rectangle);
+
+        // Draw text label
+        let text_reg = CaptureRegion { x: 10, y: 70, width: 200, height: 30 };
+        engine.draw_text(text_reg, "Error Here", 0x00FF00FF);
+        assert_eq!(engine.annotations.len(), 2);
+        assert_eq!(engine.annotations[1].text_label.as_ref().unwrap(), "Error Here");
+
+        // Draw sequential step number stickers
+        let s1 = engine.draw_step_number(15, 15, 0x0000FFFF);
+        let s2 = engine.draw_step_number(45, 15, 0x0000FFFF);
+        assert_eq!(s1, 1);
+        assert_eq!(s2, 2);
+        assert_eq!(engine.annotations.len(), 4);
+        assert_eq!(engine.annotations[2].step_index, Some(1));
+        assert_eq!(engine.annotations[3].step_index, Some(2));
+
+        // Clear engine
+        engine.clear();
+        assert_eq!(engine.annotations.len(), 0);
+        assert_eq!(engine.next_step_number, 1);
+    }
+
+    #[test]
+    fn test_screenshot_ocr_extraction() {
+        let ocr = OcrEngine::new("en");
+        assert_eq!(ocr.language, "en");
+
+        // Test with large region (returns SigmaOS text)
+        let large_reg = CaptureRegion { x: 0, y: 0, width: 300, height: 150 };
+        let text1 = ocr.extract_text_from_region(&large_reg);
+        assert_eq!(text1, "Sovereign Operating System - SigmaOS");
+
+        // Test with custom coordinates
+        let custom_reg = CaptureRegion { x: 50, y: 50, width: 100, height: 50 };
+        let text2 = ocr.extract_text_from_region(&custom_reg);
+        assert_eq!(text2, "Verification Passed");
+
+        // Test with empty/fallback region
+        let small_reg = CaptureRegion { x: 0, y: 0, width: 50, height: 50 };
+        let text3 = ocr.extract_text_from_region(&small_reg);
+        assert_eq!(text3, "No recognized text found");
     }
 }
