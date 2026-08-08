@@ -6,9 +6,9 @@
 extern crate alloc;
 
 use alloc::collections::{BTreeMap as HashMap, VecDeque};
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 use core::sync::atomic::{AtomicU8, Ordering};
 
 // =========================================================================
@@ -96,56 +96,44 @@ impl PageDirectory {
         let user_acc = mode == PageAccessMode::UserMode;
 
         // Populate PML4
-        self.tables.insert(
-            (4, pml4_idx),
-            PageTableEntry {
-                physical_frame: self.page_directory_base >> 12,
-                present: true,
-                writable,
-                user_accessible: user_acc,
-                accessed: true,
-                dirty: false,
-            },
-        );
+        self.tables.insert((4, pml4_idx), PageTableEntry {
+            physical_frame: self.page_directory_base >> 12,
+            present: true,
+            writable,
+            user_accessible: user_acc,
+            accessed: true,
+            dirty: false,
+        });
 
         // Populate PDPT
-        self.tables.insert(
-            (3, pdpt_idx),
-            PageTableEntry {
-                physical_frame: (self.page_directory_base + 0x1000) >> 12,
-                present: true,
-                writable,
-                user_accessible: user_acc,
-                accessed: true,
-                dirty: false,
-            },
-        );
+        self.tables.insert((3, pdpt_idx), PageTableEntry {
+            physical_frame: (self.page_directory_base + 0x1000) >> 12,
+            present: true,
+            writable,
+            user_accessible: user_acc,
+            accessed: true,
+            dirty: false,
+        });
 
         // Populate PD
-        self.tables.insert(
-            (2, pd_idx),
-            PageTableEntry {
-                physical_frame: (self.page_directory_base + 0x2000) >> 12,
-                present: true,
-                writable,
-                user_accessible: user_acc,
-                accessed: true,
-                dirty: false,
-            },
-        );
+        self.tables.insert((2, pd_idx), PageTableEntry {
+            physical_frame: (self.page_directory_base + 0x2000) >> 12,
+            present: true,
+            writable,
+            user_accessible: user_acc,
+            accessed: true,
+            dirty: false,
+        });
 
         // Populate PT
-        self.tables.insert(
-            (1, pt_idx),
-            PageTableEntry {
-                physical_frame,
-                present: true,
-                writable,
-                user_accessible: user_acc,
-                accessed: true,
-                dirty: true,
-            },
-        );
+        self.tables.insert((1, pt_idx), PageTableEntry {
+            physical_frame,
+            present: true,
+            writable,
+            user_accessible: user_acc,
+            accessed: true,
+            dirty: true,
+        });
     }
 
     /// Complete 4-Level Page Table Translation Walk Simulator
@@ -229,9 +217,7 @@ impl PageDirectory {
         let pt_idx = (virtual_addr >> 12) & 0x1FF;
         if let Some(entry) = self.tables.get(&(1, pt_idx)) {
             if !entry.user_accessible && current_privilege == PageAccessMode::UserMode {
-                return Err(
-                    "Access Violation: User-mode thread attempting to read Kernel-mode page",
-                );
+                return Err("Access Violation: User-mode thread attempting to read Kernel-mode page");
             }
             Ok(())
         } else {
@@ -382,12 +368,12 @@ impl Kpcrb {
 /// Processor Control Region (KPCR) mapped to FS/GS segment registers
 #[derive(Debug, Clone)]
 pub struct Kpcr {
-    pub self_ptr: u64,       // Points to self for validation
-    pub pc_region_base: u64, // Memory address of the PCR
+    pub self_ptr: u64,            // Points to self for validation
+    pub pc_region_base: u64,       // Memory address of the PCR
     pub major_version: u16,
     pub minor_version: u16,
-    pub fs_segment_base: u64,                   // Segment base for x86
-    pub gs_segment_base: u64,                   // Segment base for x64
+    pub fs_segment_base: u64,     // Segment base for x86
+    pub gs_segment_base: u64,     // Segment base for x64
     pub coprocessor_regs: HashMap<String, u64>, // ARM System Coprocessor registers (e.g. CP15, TTBR, SCTLR)
     pub kpcrb: Kpcrb,
 }
@@ -397,7 +383,7 @@ impl Kpcr {
         let mut coprocessor_regs = HashMap::new();
         // Initialize basic ARM System Coprocessor control registers
         coprocessor_regs.insert("SCTLR_EL1".to_string(), 0x30D00800); // System Control Register default
-        coprocessor_regs.insert("CPACR_EL1".to_string(), 0x300000); // Coprocessor Access Control Register
+        coprocessor_regs.insert("CPACR_EL1".to_string(), 0x300000);   // Coprocessor Access Control Register
 
         Self {
             self_ptr: gs_base,
@@ -462,9 +448,7 @@ impl IrqlController {
     pub fn ke_raise_irql(&self, new_irql: Irql) -> Result<Irql, &'static str> {
         let current = self.get_current_irql();
         if new_irql < current {
-            return Err(
-                "KeRaiseIrql: Attempting to lower IRQL via raise call (use KeLowerIrql instead)",
-            );
+            return Err("KeRaiseIrql: Attempting to lower IRQL via raise call (use KeLowerIrql instead)");
         }
         self.current_irql.store(new_irql as u8, Ordering::SeqCst);
         Ok(current)
@@ -474,9 +458,7 @@ impl IrqlController {
     pub fn ke_lower_irql(&self, new_irql: Irql, kpcrb: &mut Kpcrb) -> Result<(), &'static str> {
         let current = self.get_current_irql();
         if new_irql > current {
-            return Err(
-                "KeLowerIrql: Attempting to raise IRQL via lower call (use KeRaiseIrql instead)",
-            );
+            return Err("KeLowerIrql: Attempting to raise IRQL via lower call (use KeRaiseIrql instead)");
         }
 
         // Simulate automatic Software Interrupt (APC/DPC) execution loops during IRQL lowering
@@ -523,8 +505,8 @@ pub struct TrapFrame {
     pub r12: u64,
     pub r11: u64,
     pub r10: u64,
-    pub r9: u64,
-    pub r8: u64,
+    pub r9:  u64,
+    pub r8:  u64,
     pub rdi: u64,
     pub rsi: u64,
     pub rbp: u64,
@@ -534,10 +516,10 @@ pub struct TrapFrame {
     pub rax: u64,
     pub error_code: u64,
     pub rip: u64,
-    pub cs: u64,
+    pub cs:  u64,
     pub rflags: u64,
     pub rsp: u64,
-    pub ss: u64,
+    pub ss:  u64,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -648,10 +630,7 @@ impl SovereignKernelInternals {
             kpcr: Kpcr::new(10, 0, gs_base, idle_thread),
             irql_ctrl: IrqlController::new(),
             sdt,
-            idtr: Idtr {
-                limit: 256 * 16 - 1,
-                base: 0xFFFFFFFF80100000,
-            },
+            idtr: Idtr { limit: 256 * 16 - 1, base: 0xFFFFFFFF80100000 },
             ums_threads: HashMap::new(),
             windbg_hooked: false,
         }
@@ -666,11 +645,7 @@ impl SovereignKernelInternals {
         self.ums_threads.insert(thread_id, thread);
     }
 
-    pub fn set_ums_thread_state(
-        &mut self,
-        thread_id: u32,
-        state: UmsThreadState,
-    ) -> Result<(), &'static str> {
+    pub fn set_ums_thread_state(&mut self, thread_id: u32, state: UmsThreadState) -> Result<(), &'static str> {
         if let Some(thread) = self.ums_threads.get_mut(&thread_id) {
             thread.state = state;
             Ok(())
@@ -682,11 +657,7 @@ impl SovereignKernelInternals {
     /// WinDbg Debugging Host Interface Emulator
     pub fn communicate_windbg(&mut self, event_desc: &str) -> String {
         self.windbg_hooked = true;
-        format!(
-            "WinDbg Hooked: Captured event '{}' at current IRQL: {:?}",
-            event_desc,
-            self.irql_ctrl.get_current_irql()
-        )
+        format!("WinDbg Hooked: Captured event '{}' at current IRQL: {:?}", event_desc, self.irql_ctrl.get_current_irql())
     }
 }
 
@@ -707,9 +678,7 @@ mod tests {
         assert_eq!(phys, (1000 << 12) + 0x123);
 
         // Permissions checks
-        assert!(pd
-            .check_page_permission_4level(0x7FFFF0000123, PageAccessMode::UserMode)
-            .is_ok());
+        assert!(pd.check_page_permission_4level(0x7FFFF0000123, PageAccessMode::UserMode).is_ok());
 
         // Introduce Page Fault mapping error
         assert!(pd.walk_page_tables(0xDEADBEEF000).is_err());
@@ -736,26 +705,14 @@ mod tests {
         kpcrb.block_current_thread("Waiting for dynamic I/O event");
         assert_eq!(kpcrb.current_thread_id, 999);
         assert_eq!(kpcrb.wait_queue.len(), 1);
-        assert_eq!(
-            kpcrb.wait_queue[0].wait_reason.unwrap(),
-            "Waiting for dynamic I/O event"
-        );
+        assert_eq!(kpcrb.wait_queue[0].wait_reason.unwrap(), "Waiting for dynamic I/O event");
     }
 
     #[test]
     fn test_irql_lowering_triggers_apc_dpc_loops() {
         let mut kpcr = Kpcr::new(10, 0, 0x7FFFF7000, 999);
-        let dpc = DeferredProcedureCall {
-            id: 1,
-            target_routine: 0x800400,
-            priority: 2,
-        };
-        let apc = AsynchronousProcedureCall {
-            id: 1,
-            target_routine: 0x800500,
-            kernel_mode: true,
-            arg1: 42,
-        };
+        let dpc = DeferredProcedureCall { id: 1, target_routine: 0x800400, priority: 2 };
+        let apc = AsynchronousProcedureCall { id: 1, target_routine: 0x800500, kernel_mode: true, arg1: 42 };
 
         // Queue procedures
         kpcr.kpcrb.queue_dpc(dpc);
@@ -770,21 +727,16 @@ mod tests {
         assert_eq!(kpcr.kpcrb.apc_count, 0);
 
         // Lowering further to PassiveLevel should drain/execute APC queue automatically
-        ctrl.ke_lower_irql(Irql::PassiveLevel, &mut kpcr.kpcrb)
-            .unwrap();
+        ctrl.ke_lower_irql(Irql::PassiveLevel, &mut kpcr.kpcrb).unwrap();
         assert_eq!(kpcr.kpcrb.apc_count, 1);
     }
 
     #[test]
     fn test_traps_and_calling_convention_translation() {
-        let mut sys_internals =
-            SovereignKernelInternals::new(MemoryArch::X86_64, 0x3000, 0x7FFF100, 1);
+        let mut sys_internals = SovereignKernelInternals::new(MemoryArch::X86_64, 0x3000, 0x7FFF100, 1);
 
         // Translate and profile Microsoft x64 -> System V AMD64 syscall
-        let (handler, sysv_params) = sys_internals
-            .sdt
-            .translate_and_profile_syscall(1, 10, 20, 30, 40)
-            .unwrap();
+        let (handler, sysv_params) = sys_internals.sdt.translate_and_profile_syscall(1, 10, 20, 30, 40).unwrap();
         assert_eq!(handler, 0xFFFFFFFF80011000);
         // Translation check
         assert_eq!(sysv_params, [10, 20, 30, 40]);

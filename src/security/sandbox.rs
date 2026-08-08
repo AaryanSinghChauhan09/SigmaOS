@@ -1,51 +1,24 @@
 // SigmaOS Privacy-First Sandbox Subsystem
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
-// Absorbs advanced security controls from SELinux, AppArmor, and Firejail to satisfy Common Criteria and FIPS compliance
+// Taking inspiration from industry-leading competitors Sandboxie (FS virtualization overlays) and Firejail (strict execution profiles)
 
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap, BTreeMap};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SandboxRule {
     NetworkWriteGate,
     FSWriteGate,
     ProcessForkGate,
+    IpcAccessGate,           // New: Prevents raw inter-process communications
+    MemoryDbgAttachGate,     // New: Prevents ptrace or debugger attachments
+    RawSocketOpenGate,       // New: Blocks raw network socket creation
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EnforcementLevel {
-    Enforce,  // Block and log
-    Complain, // Log but allow
-    Disable,  // Bypass all checks
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ComplianceProfile {
-    StandardSandbox,
-    Fips140_3,
-    CommonCriteria_EAL4,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SovereignSecurityContext {
-    pub user: String,
-    pub role: String,
-    pub domain: String,
-    pub sensitivity: String, // Multi-Level Security (MLS) label
-}
-
-impl SovereignSecurityContext {
-    pub fn new(user: &str, role: &str, domain: &str, level: &str) -> Self {
-        SovereignSecurityContext {
-            user: user.to_string(),
-            role: role.to_string(),
-            domain: domain.to_string(),
-            sensitivity: level.to_string(),
-        }
-    }
-
-    pub fn to_string_context(&self) -> String {
-        format!("{}:{}:{}:{}", self.user, self.role, self.domain, self.sensitivity)
-    }
+pub enum SandboxProfile {
+    StrictBrowser,
+    RestrictedOffice,
+    UntrustedInstaller,
 }
 
 pub struct PrivacyFirstSandbox {
@@ -53,12 +26,11 @@ pub struct PrivacyFirstSandbox {
     pub is_active_sandboxed: bool,
     pub active_pqc_key_attestation: String,
     pub blocked_rules: HashSet<SandboxRule>,
-    // Advanced SELinux, AppArmor, and Firejail absorptions:
-    pub enforcement: EnforcementLevel,
-    pub security_context: SovereignSecurityContext,
-    pub private_dir_shields: HashSet<String>,
-    pub compliance: ComplianceProfile,
-    pub security_audit_log: Vec<String>,
+    // Sandboxie-inspired file system virtualization overlays
+    pub virtualization_overlay: BTreeMap<String, String>,
+    // Firejail-inspired sanitized execution environment
+    pub environment_variables: HashMap<String, String>,
+    pub profile: Option<SandboxProfile>,
 }
 
 impl PrivacyFirstSandbox {
@@ -68,65 +40,76 @@ impl PrivacyFirstSandbox {
             is_active_sandboxed: true,
             active_pqc_key_attestation: pqc_key.to_string(),
             blocked_rules: HashSet::new(),
-            enforcement: EnforcementLevel::Enforce,
-            security_context: SovereignSecurityContext::new("system_u", "system_r", "sandbox_t", "s0"),
-            private_dir_shields: HashSet::new(),
-            compliance: ComplianceProfile::StandardSandbox,
-            security_audit_log: Vec::new(),
+            virtualization_overlay: BTreeMap::new(),
+            environment_variables: HashMap::new(),
+            profile: None,
         }
+    }
+
+    /// Construct a Sandbox with predefined strict competitor execution profiles
+    pub fn with_profile(pid: u32, pqc_key: &str, profile: SandboxProfile) -> Self {
+        let mut sandbox = Self::new(pid, pqc_key);
+        sandbox.profile = Some(profile);
+
+        match profile {
+            SandboxProfile::StrictBrowser => {
+                sandbox.block_syscall_rule(SandboxRule::FSWriteGate);
+                sandbox.block_syscall_rule(SandboxRule::ProcessForkGate);
+                sandbox.block_syscall_rule(SandboxRule::MemoryDbgAttachGate);
+                sandbox.block_syscall_rule(SandboxRule::RawSocketOpenGate);
+                sandbox.set_environment("BROWSER_SANDBOX_ENFORCED".to_string(), "1".to_string());
+            }
+            SandboxProfile::RestrictedOffice => {
+                sandbox.block_syscall_rule(SandboxRule::NetworkWriteGate);
+                sandbox.block_syscall_rule(SandboxRule::IpcAccessGate);
+                sandbox.block_syscall_rule(SandboxRule::MemoryDbgAttachGate);
+                sandbox.set_environment("OFFICE_ISOLATION_ENFORCED".to_string(), "1".to_string());
+            }
+            SandboxProfile::UntrustedInstaller => {
+                sandbox.block_syscall_rule(SandboxRule::NetworkWriteGate);
+                sandbox.block_syscall_rule(SandboxRule::RawSocketOpenGate);
+                sandbox.block_syscall_rule(SandboxRule::MemoryDbgAttachGate);
+                sandbox.set_environment("INSTALLER_GUARD_ACTIVE".to_string(), "1".to_string());
+            }
+        }
+        sandbox
     }
 
     pub fn block_syscall_rule(&mut self, rule: SandboxRule) {
         self.blocked_rules.insert(rule);
     }
 
-    pub fn shield_private_directory(&mut self, path: &str) {
-        self.private_dir_shields.insert(path.to_string());
+    pub fn validate_syscall_transition(&self, rule: SandboxRule) -> bool {
+        if !self.is_active_sandboxed {
+            return true; // Bypass checks if sandboxing is explicitly disabled
+        }
+        // If the rule is blocked, deny transition
+        !self.blocked_rules.contains(&rule)
     }
 
-    /// AppArmor and SELinux parity validation checking
-    pub fn validate_syscall_transition(&mut self, rule: SandboxRule) -> bool {
-        if self.enforcement == EnforcementLevel::Disable || !self.is_active_sandboxed {
-            return true;
-        }
-
-        let is_blocked = self.blocked_rules.contains(&rule);
-
-        if is_blocked {
-            let log_msg = format!(
-                "AUDIT: Syscall rule {:?} denied for context '{}'",
-                rule,
-                self.security_context.to_string_context()
-            );
-            self.security_audit_log.push(log_msg);
-
-            if self.enforcement == EnforcementLevel::Enforce {
-                return false; // Action Blocked
-            }
-        }
-
-        true // Allowed (or allowed in Complain mode)
+    /// Sandboxie-style virtualization write: writes securely to an isolated memory overlay instead of modifying the host FS
+    pub fn virtual_write(&mut self, path: &str, content: String) {
+        self.virtualization_overlay.insert(path.to_string(), content);
     }
 
-    /// Firejail-parity path security shield validation
-    pub fn validate_path_access(&mut self, target_path: &str) -> bool {
-        if self.enforcement == EnforcementLevel::Disable {
-            return true;
-        }
+    /// Sandboxie-style virtualization read: attempts to read from the memory overlay first
+    pub fn virtual_read(&self, path: &str) -> Option<&str> {
+        self.virtualization_overlay.get(path).map(|s| s.as_str())
+    }
 
-        // Check if path is shielded inside the private sandbox overlay
-        for shield in &self.private_dir_shields {
-            if target_path.starts_with(shield) {
-                let log_msg = format!("AUDIT: Access to shielded path '{}' denied", target_path);
-                self.security_audit_log.push(log_msg);
+    /// Purges all isolated writes and virtual file structures
+    pub fn purge_sandbox(&mut self) {
+        self.virtualization_overlay.clear();
+    }
 
-                if self.enforcement == EnforcementLevel::Enforce {
-                    return false; // Blocked
-                }
-            }
-        }
+    /// Set isolated environment variable
+    pub fn set_environment(&mut self, key: String, val: String) {
+        self.environment_variables.insert(key, val);
+    }
 
-        true
+    /// Query isolated environment variable
+    pub fn get_environment(&self, key: &str) -> Option<&str> {
+        self.environment_variables.get(key).map(|s| s.as_str())
     }
 }
 
@@ -150,39 +133,32 @@ mod tests {
     }
 
     #[test]
-    fn test_selinux_rbac_contexts() {
-        let mut sandbox = PrivacyFirstSandbox::new(606, "pqc-token-111");
-        assert_eq!(sandbox.security_context.to_string_context(), "system_u:system_r:sandbox_t:s0");
+    fn test_competitor_profiles_sandboxing() {
+        // Test strict browser profile
+        let browser_sandbox = PrivacyFirstSandbox::with_profile(601, "dilithium-key-1", SandboxProfile::StrictBrowser);
+        assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::FSWriteGate));
+        assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::ProcessForkGate));
+        assert!(!browser_sandbox.validate_syscall_transition(SandboxRule::MemoryDbgAttachGate));
+        assert_eq!(browser_sandbox.get_environment("BROWSER_SANDBOX_ENFORCED").unwrap(), "1");
 
-        // Set high sensitivity Multi-Level Security context
-        sandbox.security_context = SovereignSecurityContext::new("admin_u", "admin_r", "trusted_t", "s0-s3:c0.c1023");
-        assert_eq!(sandbox.security_context.to_string_context(), "admin_u:admin_r:trusted_t:s0-s3:c0.c1023");
+        // Test restricted office profile
+        let office_sandbox = PrivacyFirstSandbox::with_profile(602, "dilithium-key-2", SandboxProfile::RestrictedOffice);
+        assert!(!office_sandbox.validate_syscall_transition(SandboxRule::NetworkWriteGate));
+        assert!(!office_sandbox.validate_syscall_transition(SandboxRule::IpcAccessGate));
+        assert_eq!(office_sandbox.get_environment("OFFICE_ISOLATION_ENFORCED").unwrap(), "1");
     }
 
     #[test]
-    fn test_apparmor_complain_mode() {
-        let mut sandbox = PrivacyFirstSandbox::new(707, "pqc-token-222");
-        sandbox.block_syscall_rule(SandboxRule::ProcessForkGate);
+    fn test_sandboxie_style_virtualization_overlays() {
+        let mut sandbox = PrivacyFirstSandbox::new(701, "key-3");
+        assert!(sandbox.virtual_read("/etc/passwd").is_none());
 
-        // AppArmor Complain mode allows but logs
-        sandbox.enforcement = EnforcementLevel::Complain;
-        assert!(sandbox.validate_syscall_transition(SandboxRule::ProcessForkGate));
-        assert_eq!(sandbox.security_audit_log.len(), 1);
-        assert!(sandbox.security_audit_log[0].contains("ProcessForkGate"));
-    }
+        // Virtual write
+        sandbox.virtual_write("/etc/passwd", "root:x:0:0:root:/root:/bin/sh".to_string());
+        assert_eq!(sandbox.virtual_read("/etc/passwd").unwrap(), "root:x:0:0:root:/root:/bin/sh");
 
-    #[test]
-    fn test_firejail_directory_shields() {
-        let mut sandbox = PrivacyFirstSandbox::new(808, "pqc-token-333");
-        sandbox.shield_private_directory("/etc/shadow");
-        sandbox.shield_private_directory("/var/log/audit");
-
-        // Enforce mode blocks access
-        assert!(!sandbox.validate_path_access("/etc/shadow/admin"));
-        assert!(sandbox.validate_path_access("/home/user/document.txt"));
-
-        // Disable mode bypasses blocks
-        sandbox.enforcement = EnforcementLevel::Disable;
-        assert!(sandbox.validate_path_access("/etc/shadow/admin"));
+        // Purge
+        sandbox.purge_sandbox();
+        assert!(sandbox.virtual_read("/etc/passwd").is_none());
     }
 }

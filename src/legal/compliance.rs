@@ -97,12 +97,12 @@ impl InternationalComplianceTracker {
 
 /// Statutory limits and configurations for EPF and ESI under Indian Labour Laws
 pub struct LabourLawConfig {
-    pub epf_wage_ceiling: f64,  // e.g. ₹15,000 per month
-    pub epf_employee_rate: f64, // 12% (0.12)
-    pub epf_employer_rate: f64, // 12% (0.12)
-    pub esi_wage_ceiling: f64,  // e.g. ₹21,000 per month
-    pub esi_employee_rate: f64, // 0.75% (0.0075)
-    pub esi_employer_rate: f64, // 3.25% (0.0325)
+    pub epf_wage_ceiling: f64,          // e.g. ₹15,000 per month
+    pub epf_employee_rate: f64,         // 12% (0.12)
+    pub epf_employer_rate: f64,         // 12% (0.12)
+    pub esi_wage_ceiling: f64,          // e.g. ₹21,000 per month
+    pub esi_employee_rate: f64,         // 0.75% (0.0075)
+    pub esi_employer_rate: f64,         // 3.25% (0.0325)
 }
 
 impl Default for LabourLawConfig {
@@ -196,18 +196,10 @@ pub struct StatutoryFilingDashboard {
 
 impl StatutoryFilingDashboard {
     pub fn new() -> Self {
-        Self {
-            filings: Vec::new(),
-        }
+        Self { filings: Vec::new() }
     }
 
-    pub fn register_filing(
-        &mut self,
-        form: String,
-        jurisdiction: String,
-        due_date: String,
-        priority: u32,
-    ) {
+    pub fn register_filing(&mut self, form: String, jurisdiction: String, due_date: String, priority: u32) {
         self.filings.push(StatutoryFiling {
             form_name: form,
             jurisdiction,
@@ -289,13 +281,13 @@ mod tests {
         // Employee below ceilings (Pooja earns ₹12,000)
         let pooja = engine.calculate_payroll("Pooja".to_string(), 12000.0);
         assert_eq!(pooja.epf_employee_deduction, 1440.0); // 12% of 12k
-        assert_eq!(pooja.esi_employee_deduction, 90.0); // 0.75% of 12k
+        assert_eq!(pooja.esi_employee_deduction, 90.0);   // 0.75% of 12k
         assert_eq!(pooja.net_take_home, 12000.0 - 1440.0 - 90.0);
 
         // Employee above ceilings (Aditya earns ₹30,000)
         let aditya = engine.calculate_payroll("Aditya".to_string(), 30000.0);
         assert_eq!(aditya.epf_employee_deduction, 1800.0); // 12% of 15k limit
-        assert_eq!(aditya.esi_employee_deduction, 0.0); // Aditya earns > ₹21,000, exempt from ESI
+        assert_eq!(aditya.esi_employee_deduction, 0.0);   // Aditya earns > ₹21,000, exempt from ESI
         assert_eq!(aditya.net_take_home, 30000.0 - 1800.0);
     }
 

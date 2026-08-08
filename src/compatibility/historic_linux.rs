@@ -1,4 +1,17 @@
+#[cfg(not(test))]
 use crate::driver::device::DdeDeviceWrapper;
+
+#[cfg(test)]
+pub struct DdeDeviceWrapper {
+    pub simulated_pci_bar: [u8; 256],
+}
+#[cfg(test)]
+impl DdeDeviceWrapper {
+    pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
+        Self { simulated_pci_bar: [0; 256] }
+    }
+}
+
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
@@ -283,7 +296,7 @@ impl Default for LfsToolchainBuilder {
 
 /// os-tutorial: 16-bit real mode to 32-bit protected mode CPU transition simulator
 pub struct ProtectedModeSwitchSimulator {
-    pub cr0_pe_bit: bool, // Protection Enable (PE) bit of CR0
+    pub cr0_pe_bit: bool,       // Protection Enable (PE) bit of CR0
     pub gdt_descriptor_loaded: bool,
     pub active_cs_segment: u16, // Code segment register
     pub active_ds_segment: u16, // Data segment register
