@@ -2207,22 +2207,6 @@ mod tests {
     }
 
     #[test]
-<<<<<<< HEAD
-    fn test_dynamic_compression_and_loading() {
-        // Run-length encoded bytecode for: [0x01, 0x01, 0x01, 0x04, 0x04] -> (1 count of 0x01, 1 count of 0x01, 1 count of 0x01, 2 count of 0x04)
-        let compressed = [1, 0x01, 1, 0x01, 1, 0x01, 2, 0x04];
-        let manager = DeviceManager::new();
-        let interpreter_res = manager.load_compressed_udf_driver(&compressed);
-        assert!(interpreter_res.is_ok());
-        let interpreter = interpreter_res.unwrap();
-        assert_eq!(interpreter.bytecode.len, 5);
-        assert_eq!(interpreter.bytecode[0], 0x01);
-        assert_eq!(interpreter.bytecode[4], 0x04);
-    }
-||||||| 23ef22a4a
-    fn test_dde_device_translation_wrapper() {
-        let mut dde_wrapper = DdeDeviceWrapper::new(201, b"linux_e1000", 0xFC000000, b"Linux");
-=======
     fn test_graphics_drivers() {
         let mut intel_gpu = IntelHDGpu::new(1, b"intel_gpu", 0xE0000000);
         assert!(intel_gpu.init().is_ok());
@@ -2230,54 +2214,20 @@ mod tests {
         assert!(intel_gpu.ioctl(0x1001, (1024 << 16) | 768).is_ok());
         assert_eq!(intel_gpu.res_width, 1024);
         assert_eq!(intel_gpu.res_height, 768);
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 
-<<<<<<< HEAD
-    #[test]
-    fn test_linux_compatibility_and_override() {
-        let mut manager = DeviceManager::new();
-||||||| 23ef22a4a
-        assert_eq!(
-            dde_wrapper.query_channel(),
-            PortAddress::MemoryMapped(0xFC000000)
-        );
-        assert_eq!(dde_wrapper.info().vendor_id, 0x8086);
-        assert_eq!(dde_wrapper.info().device_id, 0x100e);
-=======
         let mut amd_gpu = RadeonGpu::new(2, b"radeon_gpu", 0xE1000000);
         assert!(amd_gpu.init().is_ok());
         assert_eq!(amd_gpu.info().vendor_id, 0x1002);
         assert!(amd_gpu.ioctl(0x1004, 1200).is_ok());
         assert_eq!(amd_gpu.engine_clock_mhz, 1200);
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 
-<<<<<<< HEAD
-        // Register an early boot override for custom legacy hardware "custom_uart"
-        let entry = EarlyBootParameterOverride::new(b"custom_uart", 0x2F8, 4, &[0x04]);
-        manager.linux_override_table.register_override(entry);
-||||||| 23ef22a4a
-        // Test simulated PCI BAR configuration register writing and reading
-        assert!(dde_wrapper.write_byte(0x10, 0x55).is_ok());
-        assert_eq!(dde_wrapper.read_byte(0x10).unwrap(), 0x55);
-=======
         let mut nvidia_gpu = NvidiaGpu::new(3, b"nvidia_gpu", 0xE2000000);
         assert!(nvidia_gpu.init().is_ok());
         assert_eq!(nvidia_gpu.info().vendor_id, 0x10DE);
         assert!(!nvidia_gpu.cuda_cores_active);
         assert!(nvidia_gpu.ioctl(0x1005, 1).is_ok());
         assert!(nvidia_gpu.cuda_cores_active);
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 
-<<<<<<< HEAD
-        // Register legacy device with override
-        let dev_id_result = manager.register_legacy_device_with_override(b"custom_uart", 0x3F8);
-        assert!(dev_id_result.is_ok());
-        let dev_id = dev_id_result.unwrap();
-||||||| 23ef22a4a
-        // Test block-like reads/writes simulating DMA descriptors
-        let test_buffer = [0xAA; 16];
-        assert!(dde_wrapper.write(&test_buffer).is_ok());
-=======
         let mut vesa_dev = VesaFramebufferDevice::new(4, b"vesa_gpu", 0xE3000000);
         assert!(vesa_dev.init().is_ok());
         assert_eq!(vesa_dev.info().vendor_id, 0x0000);
@@ -2285,17 +2235,7 @@ mod tests {
         assert!(vesa_dev.ioctl(0x1006, 16).is_ok());
         assert_eq!(vesa_dev.color_depth_bpp, 16);
     }
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 
-<<<<<<< HEAD
-        // Check if descriptor correctly matches "custom_uart" name
-        let descriptor = manager.get_descriptor(dev_id).unwrap();
-        assert_eq!(&descriptor.name[..11], b"custom_uart");
-||||||| 23ef22a4a
-        let mut read_buffer = [0u8; 16];
-        assert!(dde_wrapper.read(&mut read_buffer).is_ok());
-        assert_eq!(read_buffer, test_buffer);
-=======
     #[test]
     fn test_storage_drivers() {
         let mut nvme = NvmeController::new(5, b"nvme0", 10, 512);
@@ -2304,19 +2244,7 @@ mod tests {
         assert_eq!(nvme.block_size(), 512);
         assert_eq!(nvme.total_blocks(), 10);
         assert_eq!(nvme.ioctl(0x2001, 0).unwrap(), 64);
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 
-<<<<<<< HEAD
-        // Verify that the port config is overriden to 0x2F8 (instead of 0x3F8)
-        // Retrieve the device from manager and cast to UnifiedPeripheral
-        let dev = manager.get_device(dev_id).unwrap();
-
-        // Simulating matching by using dynamic casting-like fields or calling device functions
-        assert_eq!(dev.info().device_type, DeviceType::Character);
-||||||| 23ef22a4a
-        // Test translated ioctl call
-        assert_eq!(dde_wrapper.ioctl(0xFF, 0).unwrap(), 1);
-=======
         let mut write_buf = [0u8; 512];
         write_buf[0] = 42;
         assert!(nvme.write_block(2, &write_buf).is_ok());
@@ -2524,7 +2452,6 @@ mod tests {
         let mut isa = IsaBusDevice::new(94, b"isapnp");
         assert!(isa.init().is_ok());
         assert_eq!(isa.ioctl(0xB001, 0).unwrap(), 4);
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
     }
 }
 
@@ -2688,154 +2615,20 @@ impl CharacterDevice for SimpleCharacterDevice {
     }
 }
 
-/// Linux-history inspired Early Boot Parameter Override Entry
-/// Maps a device identifier or legacy serial/io port to custom base IO, IRQs, or UDF bytecode overrides.
-/// This allows SigmaOS to work with older unsupported devices (ISA cards, custom PC clones, legacy serial, etc.)
-/// without needing a massive compiled-in driver binary, satisfying OOP size-reduction goals.
-pub struct EarlyBootParameterOverride {
-    pub device_name: [u8; 32],
-    pub port_io_override: u16,
-    pub irq_override: u8,
-    pub udf_bytecode: [u8; 16], // Light bytecode override for custom scaling/reg mapping
-    pub udf_len: usize,
-}
-
-impl EarlyBootParameterOverride {
-    pub fn new(device_name: &[u8], port: u16, irq: u8, bytecode: &[u8]) -> Self {
-        let mut name_array = [0u8; 32];
-        let len = device_name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(device_name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        let mut bc_array = [0u8; 16];
-        let bc_len = bytecode.len().min(16);
-        for i in 0..bc_len {
-            bc_array[i] = bytecode[i];
-        }
-
-        EarlyBootParameterOverride {
-            device_name: name_array,
-            port_io_override: port,
-            irq_override: irq,
-            udf_bytecode: bc_array,
-            udf_len: bc_len,
-        }
-    }
-}
-
-/// Linux-inspired early parameter override table for unmatched legacy devices
-pub struct LinuxEarlyOverrideTable {
-    pub overrides: Vec<Option<EarlyBootParameterOverride>>,
-}
-
-impl LinuxEarlyOverrideTable {
-    pub fn new() -> Self {
-        LinuxEarlyOverrideTable {
-            overrides: Vec::new(),
-        }
-    }
-
-    pub fn register_override(&mut self, entry: EarlyBootParameterOverride) {
-        self.overrides.push(Some(entry));
-    }
-
-    /// Checks if a legacy device has early boot-override configuration from early Linux history
-    pub fn lookup(&self, device_name: &[u8]) -> Option<&EarlyBootParameterOverride> {
-        for i in 0..self.overrides.len() {
-            if let Some(ref entry) = self.overrides[i] {
-                let entry_name_len = entry.device_name.iter().position(|&b| b == 0).unwrap_or(32);
-                if &entry.device_name[..entry_name_len] == device_name {
-                    return Some(entry);
-                }
-            }
-        }
-        None
-    }
-}
-
 /// Device manager (OOP: Manager class)
 pub struct DeviceManager {
     devices: Vec<Option<Box<dyn Device>>>,
     descriptors: Vec<Option<NonNull<DeviceDescriptor>>>,
     next_device_id: AtomicUsize,
-<<<<<<< HEAD
-    pub linux_override_table: LinuxEarlyOverrideTable,
 }
 
-||||||| 23ef22a4a
-}
-
-impl Default for DeviceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-=======
-}
-
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {
             devices: Vec::new(),
             descriptors: Vec::new(),
             next_device_id: AtomicUsize::new(1),
-            linux_override_table: LinuxEarlyOverrideTable::new(),
         }
-    }
-
-    /// Register a legacy, potentially unsupported device.
-    /// If there is an early-boot configuration override (from Linux historical overrides),
-    /// we apply the custom base port and load the associated UDF interpreter bytecode to make it functional.
-    pub fn register_legacy_device_with_override(
-        &mut self,
-        device_name: &[u8],
-        default_port: u16,
-    ) -> Result<usize, DeviceError> {
-        let mut final_port = default_port;
-
-        // Lookup in the Linux Early Boot Override Table
-        if let Some(override_entry) = self.linux_override_table.lookup(device_name) {
-            final_port = override_entry.port_io_override;
-        }
-
-        // Create the Legacy Device using OOP principles to minimize footprint
-        let legacy_device = LegacyDevice::new(
-            self.next_device_id.load(Ordering::SeqCst),
-            device_name,
-            final_port,
-        );
-
-        // Register standard character device capabilities
-        let capability = DeviceCapability {
-            can_read: true,
-            can_write: true,
-            can_mmap: false,
-            can_dma: false,
-            can_interrupt: false,
-        };
-
-        self.register_device(
-            Box::new(legacy_device),
-            device_name,
-            DeviceType::Character,
-            capability,
-        )
-    }
-
-    /// On-demand driver decompressor and loader (Phase 4 of the blueprint).
-    /// Dynamically inflates a compressed UDF driver configuration block, instantiating the bytecode runner.
-    pub fn load_compressed_udf_driver(
-        &self,
-        compressed_bytecode: &[u8],
-    ) -> Result<UdfInterpreter, DeviceError> {
-        let mut decompressed = [0u8; 128];
-        let bytes_written = decompress_rle(compressed_bytecode, &mut decompressed)?;
-
-        let interpreter = UdfInterpreter::new(&decompressed[..bytes_written]);
-        Ok(interpreter)
     }
 
     pub fn register_device(
@@ -2864,35 +2657,34 @@ impl DeviceManager {
     }
 
     pub fn unregister_device(&mut self, id: usize) -> Result<(), DeviceError> {
-        if id == 0 || id - 1 >= self.devices.len() {
+        if id >= self.devices.len() {
             return Err(DeviceError::InvalidParameter);
         }
 
-        let idx = id - 1;
-        self.devices[idx] = None;
+        self.devices[id] = None;
 
-        if let Some(descriptor_ptr) = self.descriptors[idx] {
+        if let Some(descriptor_ptr) = self.descriptors[id] {
             unsafe {
                 core::ptr::drop_in_place(descriptor_ptr.as_ptr());
                 free(descriptor_ptr.as_ptr() as *mut u8);
             }
         }
 
-        self.descriptors[idx] = None;
+        self.descriptors[id] = None;
         Ok(())
     }
 
     pub fn get_device(&mut self, id: usize) -> Option<&mut Box<dyn Device>> {
-        if id > 0 && id - 1 < self.devices.len() {
-            self.devices[id - 1].as_mut()
+        if id < self.devices.len() {
+            self.devices[id].as_mut()
         } else {
             None
         }
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id > 0 && id - 1 < self.descriptors.len() {
-            self.descriptors[id - 1].map(|ptr| unsafe { &*ptr.as_ptr() })
+        if id < self.descriptors.len() {
+            self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
         }
@@ -3009,19 +2801,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }
@@ -3253,34 +3032,6 @@ impl UnifiedPeripheral for ModernDevice {
             Ok(())
         }
     }
-}
-
-/// Compact, zero-allocation decompression engine (Run-Length Decoding)
-/// Used for dynamically inflating compressed UDF bytecode driver configurations at runtime
-/// to keep the on-disk footprint extremely small, matching Phase 4 goals of the plan.
-pub fn decompress_rle(compressed: &[u8], decompressed: &mut [u8]) -> Result<usize, DeviceError> {
-    let mut read_idx = 0;
-    let mut write_idx = 0;
-
-    while read_idx < compressed.len() {
-        if read_idx + 1 >= compressed.len() {
-            return Err(DeviceError::InvalidParameter);
-        }
-        let count = compressed[read_idx] as usize;
-        let value = compressed[read_idx + 1];
-        read_idx += 2;
-
-        if write_idx + count > decompressed.len() {
-            return Err(DeviceError::InvalidParameter);
-        }
-
-        for _ in 0..count {
-            decompressed[write_idx] = value;
-            write_idx += 1;
-        }
-    }
-
-    Ok(write_idx)
 }
 
 /// User-Defined Function (UDF) Interpreter (Custom Bytecode Runner)

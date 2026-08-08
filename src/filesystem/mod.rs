@@ -7,6 +7,9 @@ pub mod manager;
 pub mod support;
 pub mod tmpfs;
 pub mod vfs;
+pub mod legacy_fs;
+pub mod sigma_fs;
+pub mod smart_symlink;
 
 <<<<<<< HEAD
 ||||||| 23ef22a4a
@@ -39,3 +42,15 @@ pub use support::{
 >>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use legacy_fs::{
+    LegacyFsType, LegacyFSAdapter,
+};
+pub use sigma_fs::{
+    FileBlock, SigmaFS,
+    SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+    SigmaDisasterRecoveryCleaner,
+    SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio,
+};
+pub use smart_symlink::{
+    SymlinkError, SmartSymlink,
+};

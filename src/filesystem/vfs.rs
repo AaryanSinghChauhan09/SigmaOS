@@ -1,17 +1,9 @@
 // SigmaOS Virtual Filesystem (VFS)
-// Capability-based, standard Linux/BSD conforming filesystem with security, hard links, and path traversal
+// Capability-based filesystem with security
+// Enhanced with standard Linux-conforming Hard Link reference counting
 
 use crate::security::CapabilityToken;
 use std::collections::HashMap;
-
-// Standard POSIX / Linux / BSD open flags
-pub const O_RDONLY: u32 = 0x0000;
-pub const O_WRONLY: u32 = 0x0001;
-pub const O_RDWR: u32 = 0x0002;
-pub const O_CREAT: u32 = 0x0040;
-pub const O_EXCL: u32 = 0x0080;
-pub const O_TRUNC: u32 = 0x0200;
-pub const O_APPEND: u32 = 0x0400;
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,9 +53,7 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-<<<<<<< HEAD
-    pub link_count: u32, // standard inode link count tracking hard links
-||||||| 23ef22a4a
+    pub hard_links_count: u32, // standard Linux reference links counter
 }
 
 impl Inode {
@@ -78,257 +68,7 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-        }
-    }
-}
-
-/// File descriptor
-#[derive(Debug, Clone)]
-pub struct FileDescriptor {
-    pub inode_id: u64,
-    pub offset: u64,
-    pub flags: u32,
-}
-
-impl FileDescriptor {
-    pub fn new(inode_id: u64, flags: u32) -> Self {
-        Self {
-            inode_id,
-            offset: 0,
-            flags,
-        }
-    }
-}
-
-/// Virtual Filesystem
-pub struct VirtualFilesystem {
-    inodes: HashMap<u64, Inode>,
-    next_inode_id: u64,
-    root_inode: u64,
-    file_descriptors: HashMap<u64, FileDescriptor>,
-    next_fd: u64,
-}
-
-impl VirtualFilesystem {
-    pub fn new() -> Self {
-        let mut fs = Self {
-            inodes: HashMap::new(),
-            next_inode_id: 1,
-            root_inode: 0,
-            file_descriptors: HashMap::new(),
-            next_fd: 0,
-        };
-
-        // Create root directory
-        let root = Inode::new(0, FileType::Directory, 0);
-        fs.inodes.insert(0, root);
-        fs.root_inode = 0;
-
-        fs
-    }
-
-    pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
-        let inode_id = self.next_inode_id;
-        self.next_inode_id += 1;
-
-        let inode = Inode::new(inode_id, file_type, owner);
-        self.inodes.insert(inode_id, inode);
-
-        Ok(inode_id)
-    }
-
-    pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
-        if !self.inodes.contains_key(&inode_id) {
-            return Err(FsError::NotFound);
-        }
-
-        let fd = self.next_fd;
-        self.next_fd += 1;
-
-        let file_descriptor = FileDescriptor::new(inode_id, flags);
-        self.file_descriptors.insert(fd, file_descriptor);
-
-        Ok(fd)
-    }
-
-    pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
-        if !self.file_descriptors.contains_key(&fd) {
-            return Err(FsError::InvalidFd);
-        }
-
-        self.file_descriptors.remove(&fd);
-        Ok(())
-    }
-
-    pub fn read_file(&mut self, fd: u64, buffer: &mut [u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
-            .ok_or(FsError::InvalidFd)?;
-
-        let inode = self
-            .inodes
-            .get(&file_descriptor.inode_id)
-            .ok_or(FsError::NotFound)?;
-
-        // Check read permission
-        if !inode.permissions.read {
-            return Err(FsError::PermissionDenied);
-        }
-
-        // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor
-            .offset
-            .checked_add(buffer.len() as u64)
-            .ok_or(FsError::InvalidFd)?;
-
-        // Simulate read (in production, actual file I/O)
-        let bytes_read = buffer.len().min(inode.size as usize);
-        file_descriptor.offset += bytes_read as u64;
-
-        Ok(bytes_read)
-    }
-
-    pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
-        let file_descriptor = self
-            .file_descriptors
-            .get_mut(&fd)
-            .ok_or(FsError::InvalidFd)?;
-
-        let inode = self
-            .inodes
-            .get_mut(&file_descriptor.inode_id)
-            .ok_or(FsError::NotFound)?;
-
-        // Check write permission
-        if !inode.permissions.write {
-            return Err(FsError::PermissionDenied);
-        }
-
-        // Prevent integer overflow in size calculation
-        let _new_size = inode
-            .size
-            .checked_add(buffer.len() as u64)
-            .ok_or(FsError::NoSpace)?;
-
-        // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
-            .offset
-            .checked_add(buffer.len() as u64)
-            .ok_or(FsError::NoSpace)?;
-
-        // Simulate write (in production, actual file I/O)
-        let bytes_written = buffer.len();
-        inode.size += bytes_written as u64;
-        file_descriptor.offset += bytes_written as u64;
-        inode.modified = 0; // In production, actual timestamp
-
-        Ok(bytes_written)
-    }
-
-    pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
-        if inode_id == self.root_inode {
-            return Err(FsError::PermissionDenied);
-        }
-
-        if !self.inodes.contains_key(&inode_id) {
-            return Err(FsError::NotFound);
-        }
-
-        self.inodes.remove(&inode_id);
-        Ok(())
-    }
-
-    pub fn get_inode(&self, inode_id: u64) -> Option<&Inode> {
-        self.inodes.get(&inode_id)
-    }
-
-    pub fn list_directory(&self, inode_id: u64) -> Result<Vec<u64>, FsError> {
-        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
-
-        if inode.file_type != FileType::Directory {
-            return Err(FsError::NotADirectory);
-        }
-
-        // Return all inodes (in production, actual directory listing)
-        Ok(self.inodes.keys().copied().collect())
-    }
-}
-
-impl Default for VirtualFilesystem {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Filesystem errors
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum FsError {
-    NotFound,
-    PermissionDenied,
-    InvalidFd,
-    NotADirectory,
-    IsDirectory,
-    NoSpace,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_vfs_creation() {
-        let vfs = VirtualFilesystem::new();
-        assert!(vfs.inodes.contains_key(&0));
-    }
-
-    #[test]
-    fn test_create_file() {
-        let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        assert!(vfs.inodes.contains_key(&inode_id));
-    }
-
-    #[test]
-    fn test_open_close_file() {
-        let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        let fd = vfs.open_file(inode_id, 0).unwrap();
-        assert!(vfs.close_file(fd).is_ok());
-    }
-
-    #[test]
-    fn test_read_write() {
-        let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        let fd = vfs.open_file(inode_id, 0).unwrap();
-
-        let data = b"test data";
-        let written = vfs.write_file(fd, data).unwrap();
-        assert_eq!(written, data.len());
-    }
-=======
-    // Conforming Linux/BSD additions
-    pub hard_links_count: u32,
-    pub data: Vec<u8>,                 // File storage data
-    pub entries: HashMap<String, u64>, // Directory entries
-}
-
-impl Inode {
-    pub fn new(id: u64, file_type: FileType, owner: u64) -> Self {
-        Self {
-            id,
-            file_type,
-            permissions: FilePermissions::all(),
-            size: 0,
-            owner,
-            group: 0,
-            created: 0,
-            modified: 0,
-            capabilities: CapabilityToken::new(),
-            hard_links_count: 1,
-            data: Vec::new(),
-            entries: HashMap::new(),
+            hard_links_count: 1, // Default initial link
         }
     }
 }
@@ -455,7 +195,7 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor
+        let _new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
@@ -548,7 +288,6 @@ pub enum FsError {
     NotADirectory,
     IsDirectory,
     NoSpace,
-    AlreadyExists,
 }
 
 #[cfg(test)]
@@ -610,5 +349,4 @@ mod tests {
         assert_eq!(count, 0);
         assert!(!vfs.inodes.contains_key(&inode_id)); // Inode fully freed
     }
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
