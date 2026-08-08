@@ -14,6 +14,7 @@ pub mod fedora;
 pub mod bsd;
 pub mod innovations;
 pub mod india_professional_tools;
+pub mod debian;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -93,4 +94,9 @@ pub use innovations::{
 pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper, PMWaniHotspotController,
     DigiYatraPassScanner, IrctcPnrTracker,
+};
+
+pub use debian::{
+    SysVinitRunlevel, SysVinitManager, AptPackageMetadata, AptRepositorySynchronizer,
+    AlternativeProvider, DebianAlternativesSystem, DebootstrapEngine,
 };
