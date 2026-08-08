@@ -1,30 +1,71 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod arch_compat;
+pub mod aur;
+pub mod aur_helper;
+pub mod importer;
+pub mod linux_compat;
+pub mod makepkg;
+pub mod nix_shell;
+pub mod pacman;
 pub mod recipe;
 pub mod resolver;
+pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
-pub mod verifier;
-pub mod rpm_compat;
 pub mod universal_adapter;
+pub mod verifier;
 
+pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
+pub use aur::{AurClient, AurPackage as AurPkg, AurPackageQuery, Version as AurVersion};
+pub use aur_helper::{AurHelper, AurPackage, AurParser};
+pub use makepkg::{MakepkgSandbox, PkgbuildParser};
+pub use nix_shell::{DevEnvironment, NixShellManager, PredefinedEnvironments};
+pub use linux_compat::{
+    DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
+    TranslatedMetadata, TranslatorError,
+};
+pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
-pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
+pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
-pub use verifier::CryptoVerifier;
 pub use universal_adapter::{
-    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
+    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
+};
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
+pub use verifier::CryptoVerifier;
+pub use importer::{
+    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
 };
 
 /// Package version using SemVer
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {
@@ -36,29 +77,29 @@ impl Version {
         }
     }
 
+    /// Parses version input safely with a zero-allocation, stateless next() token iterator over '.' separators
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        let parts: Vec<&str> = version_str.split('.').collect();
-        if parts.len() != 3 {
+        let mut parts = version_str.split('.');
+
+        let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+        let minor_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+        let patch_str = parts.next().ok_or(ParseError::InvalidFormat)?;
+
+        if parts.next().is_some() {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = parts[0]
+        let major = major_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = parts[1]
+        let minor = minor_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = parts[2]
+        let patch = patch_str
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
 
         Ok(Version::new(major, minor, patch))
-    }
-}
-
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
@@ -71,12 +112,43 @@ pub enum ParseError {
 /// Package metadata
 #[derive(Debug, Clone)]
 pub struct Package {
-    pub name: String,
+    pub name: crate::klib::String,
     pub version: Version,
-    pub description: String,
+    pub description: crate::klib::String,
     pub dependencies: Vec<Dependency>,
-    pub checksum: String,
+    pub checksum: crate::klib::String,
+    pub mirrors: Vec<crate::klib::String>,
+    pub signing_keys: Vec<crate::klib::String>,
+    pub licenses: Vec<crate::klib::String>,
+    pub maintainers: Vec<crate::klib::String>,
+    pub changelogs: Vec<crate::klib::String>,
+    pub source: crate::klib::String,
 }
+
+impl Package {
+    pub fn new(
+        name: crate::klib::String,
+        version: Version,
+        description: crate::klib::String,
+        dependencies: Vec<Dependency>,
+        checksum: crate::klib::String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+            mirrors: Vec::new(),
+            signing_keys: Vec::new(),
+            licenses: Vec::new(),
+            maintainers: Vec::new(),
+            changelogs: Vec::new(),
+            source: crate::klib::String::new(),
+        }
+    }
+}
+
 
 /// Package dependency
 #[derive(Debug, Clone)]
@@ -86,7 +158,7 @@ pub struct Dependency {
 }
 
 /// Version constraint
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),
