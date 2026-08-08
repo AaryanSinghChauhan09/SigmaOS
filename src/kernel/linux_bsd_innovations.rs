@@ -53,23 +53,44 @@ impl AlpineHardenedEnv {
 
 /// OpenBSD inspired pledge/unveil syscall restrictions
 pub struct OpenBsdPledge {
-    promises: Vec<String>,
+    pub promises: Vec<String>,
+    pub is_pledged: bool,
 }
 
 impl OpenBsdPledge {
     pub fn new() -> Self {
-        Self { promises: Vec::new() }
+        Self {
+            promises: Vec::new(),
+            is_pledged: false,
+        }
     }
     
     pub fn pledge(&mut self, promise_list: &str) -> Result<(), &'static str> {
+        let mut new_promises = Vec::new();
         for promise in promise_list.split(' ') {
-            self.promises.push(promise.to_string());
+            if !promise.is_empty() {
+                new_promises.push(promise.to_string());
+            }
         }
+
+        if self.is_pledged {
+            // Once pledged, subsequent calls can only drop capabilities, never escalate
+            for promise in &new_promises {
+                if !self.promises.contains(promise) {
+                    return Err("Illegal pledge escalation blocked");
+                }
+            }
+        }
+
+        self.promises = new_promises;
+        self.is_pledged = true;
         Ok(())
     }
     
     pub fn check_permission(&self, operation: &str) -> bool {
-        // Simplified check
+        if !self.is_pledged {
+            return true;
+        }
         for promise in &self.promises {
             if promise.as_str() == operation {
                 return true;
@@ -99,33 +120,68 @@ mod tests {
     #[test]
     fn test_openbsd_pledge() {
         let mut pledge = OpenBsdPledge::new();
+        // Before pledge, everything is allowed
+        assert!(pledge.check_permission("exec"));
+
+        // Pledge rules set
         pledge.pledge("stdio rpath wpath").unwrap();
         assert!(pledge.check_permission("stdio"));
         assert!(pledge.check_permission("rpath"));
         assert!(!pledge.check_permission("exec"));
+
+        // Subsequent pledge can only subset
+        pledge.pledge("stdio").unwrap();
+        assert!(pledge.check_permission("stdio"));
+        assert!(!pledge.check_permission("rpath"));
+
+        // Attempting to escalate should fail
+        assert!(pledge.pledge("stdio rpath").is_err());
     }
 
     #[test]
     fn test_freebsd_jail() {
-        let jail = FreeBsdJail::create(42);
-        assert!(jail.is_isolated());
+        let parent = FreeBsdJail::create(1);
+        let child = FreeBsdJail::create_nested(2, 1);
+        let stranger = FreeBsdJail::create_nested(3, 99);
+
+        assert!(parent.is_isolated());
+        assert!(child.is_isolated());
+        assert!(child.is_descendant_of(1));
+        assert!(!stranger.is_descendant_of(1));
     }
 
     #[test]
     fn test_nixos_declarative_manager() {
         let mut manager = NixOsDeclarativeManager::new();
-        manager.apply_configuration(&["services.nginx.enable = true;", "networking.firewall.allow = 80;"]).unwrap();
-        assert_eq!(manager.configuration.len(), 2);
+        manager.apply_configuration(&["services.nginx.enable = true;"]).unwrap();
+        assert_eq!(manager.configuration.len(), 1);
+
+        // Apply new configuration (saves previous)
+        manager.apply_configuration(&["services.nginx.enable = false;"]).unwrap();
+        assert_eq!(manager.configuration.len(), 1);
+        assert_eq!(manager.configuration[0], "services.nginx.enable = false;");
+
+        // Rollback configuration to previous state
+        manager.rollback().unwrap();
+        assert_eq!(manager.configuration.len(), 1);
+        assert_eq!(manager.configuration[0], "services.nginx.enable = true;");
+
+        // Rollback further should fail
+        assert!(manager.rollback().is_err());
     }
 
     #[test]
     fn test_gentoo_use_flags() {
         let mut gentoo = GentooUseFlags::new();
         gentoo.set_flag("wayland", true);
-        gentoo.set_flag("x11", false);
-        assert!(gentoo.has_feature("wayland"));
-        assert!(!gentoo.has_feature("x11"));
-        assert!(!gentoo.has_feature("unspecified"));
+        gentoo.add_dependency("wayland", "egl");
+
+        // Dependencies violated because egl is not set
+        assert!(!gentoo.check_dependencies());
+
+        // Enable egl flag, satisfying dependency
+        gentoo.set_flag("egl", true);
+        assert!(gentoo.check_dependencies());
     }
 
     #[test]
@@ -139,51 +195,100 @@ mod tests {
 
 /// FreeBSD inspired Jails (capability-based isolation)
 pub struct FreeBsdJail {
-    id: u32,
-    isolated: bool,
+    pub id: u32,
+    pub parent_id: Option<u32>,
+    pub isolated: bool,
 }
 
 impl FreeBsdJail {
     pub fn create(id: u32) -> Self {
-        Self { id, isolated: true }
+        Self {
+            id,
+            parent_id: None,
+            isolated: true,
+        }
+    }
+
+    pub fn create_nested(id: u32, parent_id: u32) -> Self {
+        Self {
+            id,
+            parent_id: Some(parent_id),
+            isolated: true,
+        }
     }
     
     pub fn is_isolated(&self) -> bool {
         self.isolated
     }
+
+    /// Recursively check if this jail is a descendant of the target parent jail ID
+    pub fn is_descendant_of(&self, target_parent_id: u32) -> bool {
+        if let Some(pid) = self.parent_id {
+            if pid == target_parent_id {
+                return true;
+            }
+        }
+        false
+    }
 }
 
 /// NixOS inspired Declarative package management
 pub struct NixOsDeclarativeManager {
-    configuration: Vec<String>,
+    pub configuration: Vec<String>,
+    pub previous_generations: Vec<Vec<String>>,
 }
 
 impl NixOsDeclarativeManager {
     pub fn new() -> Self {
-        Self { configuration: Vec::new() }
+        Self {
+            configuration: Vec::new(),
+            previous_generations: Vec::new(),
+        }
     }
     
     pub fn apply_configuration(&mut self, config: &[&str]) -> Result<(), &'static str> {
+        // Save previous generation before applying new one
+        if !self.configuration.is_empty() {
+            self.previous_generations.push(self.configuration.clone());
+        }
         self.configuration.clear();
         for c in config {
             self.configuration.push(c.to_string());
         }
         Ok(())
     }
+
+    /// Rollbacks to the previous configuration generation atomically
+    pub fn rollback(&mut self) -> Result<(), &'static str> {
+        if let Some(prev) = self.previous_generations.pop() {
+            self.configuration = prev;
+            Ok(())
+        } else {
+            Err("No previous generations available for rollback")
+        }
+    }
 }
 
 /// Gentoo inspired USE flags / compile-time feature selection
 pub struct GentooUseFlags {
-    flags: HashMap<String, bool>,
+    pub flags: HashMap<String, bool>,
+    pub dependencies: HashMap<String, String>, // (flag -> required companion flag)
 }
 
 impl GentooUseFlags {
     pub fn new() -> Self {
-        Self { flags: HashMap::new() }
+        Self {
+            flags: HashMap::new(),
+            dependencies: HashMap::new(),
+        }
     }
     
     pub fn set_flag(&mut self, flag: &str, enabled: bool) {
         self.flags.insert(flag.to_string(), enabled);
+    }
+
+    pub fn add_dependency(&mut self, flag: &str, required_companion: &str) {
+        self.dependencies.insert(flag.to_string(), required_companion.to_string());
     }
     
     pub fn has_feature(&self, flag: &str) -> bool {
@@ -192,6 +297,16 @@ impl GentooUseFlags {
         } else {
             false
         }
+    }
+
+    /// Check if all active USE-flags have their required companion dependencies enabled
+    pub fn check_dependencies(&self) -> bool {
+        for (flag, required) in &self.dependencies {
+            if self.has_feature(flag) && !self.has_feature(required) {
+                return false;
+            }
+        }
+        true
     }
 }
 
