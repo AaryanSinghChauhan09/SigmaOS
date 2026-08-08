@@ -1,12 +1,9 @@
 //! SigmaOS Hardware Abstraction Layer (HAL)
-//! Unified driver interface abstraction and platform-specific shims (x86_64, ARM64, RISC-V).
-//! Inspired by professional x86/x64 GDT, ARM64 Exception Levels, and Windows NT Kernel architectures (IRQL, KPCR, DPC, APC).
+//! Unified driver interface abstraction
+//! Platform-specific shims: x86_64, ARM64, RISC-V
 
 #![no_std]
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Unified driver interface trait
@@ -17,7 +14,7 @@ pub trait SovereignDriver {
     fn shutdown(&mut self);
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug)]
 pub enum DriverError {
     ProbeFailed,
     InitFailed,
@@ -26,7 +23,7 @@ pub enum DriverError {
     ResourceConflict,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug)]
 pub enum IRQHandlerResult {
     Handled,
     NotHandled,
@@ -60,7 +57,7 @@ impl X86_64HAL {
     /// PCI enumeration for x86_64
     pub fn enumerate_pci(&self) -> Result<(), DriverError> {
         // Scan PCI configuration space
-        for bus in 0..=255u8 {
+        for bus in 0..=255 {
             for device in 0..32 {
                 for function in 0..8 {
                     let vendor_id = self.read_pci_config(bus, device, function, 0x00);
@@ -77,7 +74,7 @@ impl X86_64HAL {
     fn read_pci_config(&self, bus: u8, device: u8, function: u8, offset: u16) -> u16 {
         // In real implementation, would use PCI configuration I/O ports
         // 0xCF8 for address, 0xCFC for data
-        let _address = (1u32 << 31) | ((bus as u32) << 16) | ((device as u32) << 11) | ((function as u32) << 8) | ((offset as u32) & 0xFC);
+        let address = (1u32 << 31) | ((bus as u32) << 16) | ((device as u32) << 11) | ((function as u32) << 8) | ((offset as u32) & 0xFC);
         // Write to 0xCF8, read from 0xCFC
         0xFFFF // Stub
     }
@@ -303,163 +300,5 @@ impl SovereignDriver for ExampleDriver {
 
     fn shutdown(&mut self) {
         self.initialized.store(0, Ordering::SeqCst);
-    }
-}
-
-// ==============================================================================
-// Windows NT-style IRQL (Interrupt Request Levels)
-// ==============================================================================
-#[repr(u32)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum KeIrql {
-    PassiveLevel = 0,     // User mode and normal thread execution
-    ApcLevel = 1,         // Asynchronous Procedure Calls execution
-    DispatchLevel = 2,    // Thread scheduler & deferred execution (DPCs)
-    Dirql = 3,            // Device Interrupt Request Level (hardware drivers)
-    HighLevel = 31,       // All interrupts masked/disabled (panic, IPIs)
-}
-
-#[repr(C)]
-pub struct KeIrqlManager {
-    pub current_irql: AtomicUsize,
-}
-
-impl KeIrqlManager {
-    pub const fn new() -> Self {
-        Self { current_irql: AtomicUsize::new(KeIrql::PassiveLevel as usize) }
-    }
-
-    pub fn get_irql(&self) -> KeIrql {
-        match self.current_irql.load(Ordering::SeqCst) {
-            0 => KeIrql::PassiveLevel,
-            1 => KeIrql::ApcLevel,
-            2 => KeIrql::DispatchLevel,
-            3 => KeIrql::Dirql,
-            _ => KeIrql::HighLevel,
-        }
-    }
-
-    pub fn raise_irql(&self, new_irql: KeIrql) -> Result<KeIrql, &'static str> {
-        let old_irql = self.get_irql();
-        if new_irql < old_irql {
-            return Err("KeRaiseIrql: Cannot raise to a lower IRQL level!");
-        }
-        self.current_irql.store(new_irql as usize, Ordering::SeqCst);
-        Ok(old_irql)
-    }
-
-    pub fn lower_irql(&self, new_irql: KeIrql) -> Result<KeIrql, &'static str> {
-        let old_irql = self.get_irql();
-        if new_irql > old_irql {
-            return Err("KeLowerIrql: Cannot lower to a higher IRQL level!");
-        }
-        self.current_irql.store(new_irql as usize, Ordering::SeqCst);
-        Ok(old_irql)
-    }
-}
-
-impl Default for KeIrqlManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==============================================================================
-// Windows NT-style KPCR (Processor Control Region) and KPRCB (Processor Control Block)
-// ==============================================================================
-#[repr(C)]
-pub struct Kpcr {
-    pub cpu_id: u32,
-    pub current_thread_id: u64,
-    pub irql_manager: KeIrqlManager,
-    pub dpc_queue: Vec<Dpc>,
-    pub apc_queue: Vec<Apc>,
-}
-
-impl Kpcr {
-    pub fn new(id: u32) -> Self {
-        Self {
-            cpu_id: id,
-            current_thread_id: 0,
-            irql_manager: KeIrqlManager::new(),
-            dpc_queue: Vec::new(),
-            apc_queue: Vec::new(),
-        }
-    }
-
-    pub fn queue_dpc(&mut self, dpc: Dpc) -> bool {
-        self.dpc_queue.push(dpc);
-        true
-    }
-
-    pub fn queue_apc(&mut self, apc: Apc) -> bool {
-        self.apc_queue.push(apc);
-        true
-    }
-
-    pub fn dispatch_pending_dpcs(&mut self) -> usize {
-        let old_irql = self.irql_manager.raise_irql(KeIrql::DispatchLevel).unwrap();
-        let mut executed = 0;
-        // Executing deferred callbacks at DISPATCH_LEVEL (resembling Linux bottom-halves/softirqs)
-        while let Some(dpc) = self.dpc_queue.pop() {
-            if let Some(ref routine) = dpc.deferred_routine {
-                routine();
-                executed += 1;
-            }
-        }
-        let _ = self.irql_manager.lower_irql(old_irql);
-        executed
-    }
-
-    pub fn dispatch_pending_apcs(&mut self) -> usize {
-        let old_irql = self.irql_manager.raise_irql(KeIrql::ApcLevel).unwrap();
-        let mut executed = 0;
-        // Executing async callbacks in target thread context at APC_LEVEL
-        while let Some(apc) = self.apc_queue.pop() {
-            if let Some(ref routine) = apc.kernel_routine {
-                routine();
-                executed += 1;
-            }
-        }
-        let _ = self.irql_manager.lower_irql(old_irql);
-        executed
-    }
-}
-
-// ==============================================================================
-// Windows NT-style DPC (Deferred Procedure Call)
-// ==============================================================================
-pub struct Dpc {
-    pub id: u32,
-    pub deferred_routine: Option<Box<dyn Fn()>>,
-    pub importance: u32, // 0 = Low, 1 = Medium, 2 = High
-}
-
-impl Dpc {
-    pub fn new(id: u32, routine: Option<Box<dyn Fn()>>) -> Self {
-        Self {
-            id,
-            deferred_routine: routine,
-            importance: 1, // Medium priority
-        }
-    }
-}
-
-// ==============================================================================
-// Windows NT-style APC (Asynchronous Procedure Call)
-// ==============================================================================
-pub struct Apc {
-    pub id: u32,
-    pub target_thread_id: u64,
-    pub kernel_routine: Option<Box<dyn Fn()>>,
-}
-
-impl Apc {
-    pub fn new(id: u32, thread: u64, routine: Option<Box<dyn Fn()>>) -> Self {
-        Self {
-            id,
-            target_thread_id: thread,
-            kernel_routine: routine,
-        }
     }
 }

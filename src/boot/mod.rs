@@ -1,20 +1,8 @@
-// SigmaOS Boot Module
-// Firmware, PCI scanning, and early system initialization
-
-pub mod bridge_grid;
 pub mod firmware;
-pub mod firmware_bridge;
-pub mod optimization;
-pub mod pci;
-pub mod post;
-pub mod secure;
-pub mod uefi;
-pub mod verified;
+pub mod multiboot2;
 
-pub use pci::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
-pub use post::{PostDiagnostics, PostStatus, PostTest, TestType};
-pub use uefi::{
-    AcpiParser, BootError, GopFramebuffer, GopSplashCanvas, MicrokernelProfile,
-    MultiKernelBootSelector, SecureBoot, SimpleSecureBoot, SimpleUEFIBootloader,
-    SovereignBootWatchdog, UEFIBootloader, UsbHostController,
+pub use firmware::{FirmwareInterface, BootLoader, BootParams, SetupHeader, Initramfs, KernelCommandLine, FirmwareMemoryMapEntry, FirmwareInfo, AcpiTable, SmpInfo, BootError};
+pub use multiboot2::{
+    Multiboot2Header, Multiboot2BootLoader, ParsedMbi, MbiFramebuffer, MmapEntry as Multiboot2MmapEntry, MbiModule,
+    parse_mbi, validate_header,
 };
