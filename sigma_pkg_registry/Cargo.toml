@@ -1,0 +1,11 @@
+[package]
+name = "sigma_pkg_registry"
+version = "0.1.0"
+edition = "2021"
+description = "SigmaOS Package Registry - recipe loader and parser"
+
+[lib]
+name = "sigma_pkg_registry"
+path = "src/lib.rs"
+
+[dependencies]

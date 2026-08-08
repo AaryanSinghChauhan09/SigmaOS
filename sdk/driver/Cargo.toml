@@ -1,0 +1,21 @@
+[package]
+name        = "sigma-driver-sdk"
+version     = "1.0.0"
+edition     = "2021"
+description = "SigmaOS Driver Development Kit — safe userspace driver building blocks"
+license     = "MIT"
+repository  = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+
+[lib]
+name = "sigma_driver_sdk"
+path = "src/lib.rs"
+
+[dependencies]
+# Zero external dependencies — all primitives hand-implemented
+
+[dev-dependencies]
+# None
+
+[[example]]
+name = "virtio_blk"
+path = "examples/virtio_blk.rs"
