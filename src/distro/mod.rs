@@ -4,19 +4,19 @@ pub mod community;
 pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
-pub mod gentoo;
 pub mod i18n;
-pub mod improvements;
-pub mod linux_bsd_inspirations;
-pub mod linux_ideas;
 pub mod manjaro;
 pub mod nextgen;
-pub mod parity;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
 
+pub use manjaro::{
+    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
+    ManjaroKernelRelease, ManjaroKernelSwitcher,
+    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
+};
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
@@ -38,40 +38,24 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
-pub use linux_bsd_inspirations::{
-    AptPinStore, ArchDependencyResolver, FreeBSDJail, NixStyleStore, OpenBSDPledge, OpenRCService,
-    PackageNode, PinRule,
-};
-pub use manjaro::{
-    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
-    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
-};
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
-    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
-    TimeTravelEngine,
+    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
+    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
+    LivepatchPatch, LivepatchManager,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
 pub use specialized::{
-    AptCacheSimulator, CanFrame, DebianPolicyEnforcer, DebianSocialContract, DpkgMultiArch,
-    EcuController, EduChallenge, EduPlayground, FreezeBasedStabilization, HpcClusterJob,
-    HpcJobState, MpiCommunicator, ThreeTierReleaseModel,
+    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
+    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
+    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
 };
-pub use tiny_core::{AppsAuditTool, TczExtensionManager, TinyCoreMode, TinyCoreRAMEngine};
+pub use tiny_core::{
+    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+};
 pub use transformation_engine::{
-    AccessibilityOverlayManager, AutomationRoutineController, DeveloperToolkitConverter,
-    ForensicReadinessAuditor, GlobalComplianceDashboard, IotDeviceMeshOrchestrator, IotMeshDevice,
-    RoutineTrigger, SmartRoutine,
-};
-pub use parity::{
-    LiveInstaller, SovereignInstaller, InstallationTarget, InstallerStep, InstallerError,
-    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
-    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
-    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
-    MacSecurityContext, DynamicMacEnforcer,
-    UfwAction, UfwCompiledRule, UfwFirewallCompiler,
-    DriverClass, RumpUserlandDriver, RumpKernelDriverBridge,
-    HookType, AlpmHook, PacmanTransactionHooks,
+    AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,
+    ForensicReadinessAuditor, GlobalComplianceDashboard, DeveloperToolkitConverter,
+    IotDeviceMeshOrchestrator, IotMeshDevice,
 };

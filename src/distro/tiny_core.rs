@@ -64,11 +64,7 @@ impl TczExtensionManager {
     }
 
     /// Dynamically loop-mounts read-only application extension onto storage loop overlays
-    pub fn mount_extension(
-        &mut self,
-        tcz_name: &str,
-        size_kb: u32,
-    ) -> Result<String, &'static str> {
+    pub fn mount_extension(&mut self, tcz_name: &str, size_kb: u32) -> Result<String, &'static str> {
         if self.mounted_extensions.contains_key(tcz_name) {
             return Err("Extension is already mounted");
         }
@@ -78,16 +74,13 @@ impl TczExtensionManager {
             mount_point: mount_point.clone(),
             size_kb,
         };
-        self.mounted_extensions
-            .insert(tcz_name.to_string(), extension);
+        self.mounted_extensions.insert(tcz_name.to_string(), extension);
         Ok(mount_point)
     }
 
     /// Dynamically unmounts and detaches loop extension, cleaning memory/mount namespaces
     pub fn unmount_extension(&mut self, tcz_name: &str) -> Result<(), &'static str> {
-        self.mounted_extensions
-            .remove(tcz_name)
-            .ok_or("Extension not mounted")?;
+        self.mounted_extensions.remove(tcz_name).ok_or("Extension not mounted")?;
         Ok(())
     }
 

@@ -447,15 +447,11 @@ impl AptCacheSimulator {
         }
     }
 
-    pub fn cache_package_metadata(
-        &mut self,
-        manifest: AptPackageManifest,
-    ) -> Result<&'static str, &'static str> {
+    pub fn cache_package_metadata(&mut self, manifest: AptPackageManifest) -> Result<&'static str, &'static str> {
         if self.cached_manifests.len() >= self.max_cache_size {
             return Err("APT Cache is full, trigger cache pruning");
         }
-        self.cached_manifests
-            .insert(manifest.name.clone(), manifest);
+        self.cached_manifests.insert(manifest.name.clone(), manifest);
         Ok("Package metadata stored in offline APT cache")
     }
 
@@ -511,9 +507,7 @@ impl DebianPolicyEnforcer {
         }
         if self.enforce_fhs {
             // FHS conventions require standard starting blocks
-            return path.starts_with("/usr/")
-                || path.starts_with("/bin/")
-                || path.starts_with("/etc/");
+            return path.starts_with("/usr/") || path.starts_with("/bin/") || path.starts_with("/etc/");
         }
         true
     }
@@ -534,18 +528,9 @@ pub struct ThreeTierReleaseModel {
 impl ThreeTierReleaseModel {
     pub fn new() -> Self {
         let mut channels = HashMap::new();
-        channels.insert(
-            "sigma.next".to_string(),
-            "Rolling, experimental, daily updates".to_string(),
-        );
-        channels.insert(
-            "sigma.beta".to_string(),
-            "Pre-release, weekly, mostly stable".to_string(),
-        );
-        channels.insert(
-            "sigma.stable".to_string(),
-            "Production LTS, quarterly security-only".to_string(),
-        );
+        channels.insert("sigma.next".to_string(), "Rolling, experimental, daily updates".to_string());
+        channels.insert("sigma.beta".to_string(), "Pre-release, weekly, mostly stable".to_string());
+        channels.insert("sigma.stable".to_string(), "Production LTS, quarterly security-only".to_string());
 
         Self {
             active_channel: "sigma.stable".to_string(),
@@ -572,10 +557,7 @@ impl ThreeTierReleaseModel {
     pub fn set_channel(&mut self, channel: &str) -> Result<String, &'static str> {
         if self.channels.contains_key(channel) {
             self.active_channel = channel.to_string();
-            Ok(format!(
-                "Σ [PKG] Channel set to {} (LTS). No experimental features.",
-                channel
-            ))
+            Ok(format!("Σ [PKG] Channel set to {} (LTS). No experimental features.", channel))
         } else {
             Err("Unknown release channel")
         }
@@ -612,12 +594,7 @@ impl DebianSocialContract {
         }
     }
 
-    pub fn evaluate_social_contract_compliance(
-        &self,
-        is_open_source: bool,
-        is_bug_public: bool,
-        is_user_needs_prioritized: bool,
-    ) -> bool {
+    pub fn evaluate_social_contract_compliance(&self, is_open_source: bool, is_bug_public: bool, is_user_needs_prioritized: bool) -> bool {
         if self.open_source_only && !is_open_source {
             return false;
         }
@@ -812,28 +789,15 @@ mod tests {
     fn test_runit_service_manager() {
         let mut manager = RunitServiceManager::new();
         manager.register_and_start_service("vfs_shard");
-        assert_eq!(
-            manager.active_services.get("vfs_shard").unwrap().status,
-            ServiceStatus::Up
-        );
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
 
         // Manually panic the service
         manager.active_services.get_mut("vfs_shard").unwrap().status = ServiceStatus::Panicked;
 
         let recovered = manager.supervise_and_recover_services();
         assert_eq!(recovered, 1);
-        assert_eq!(
-            manager.active_services.get("vfs_shard").unwrap().status,
-            ServiceStatus::Up
-        );
-        assert_eq!(
-            manager
-                .active_services
-                .get("vfs_shard")
-                .unwrap()
-                .restart_count,
-            1
-        );
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
+        assert_eq!(manager.active_services.get("vfs_shard").unwrap().restart_count, 1);
     }
 
     #[test]
@@ -855,10 +819,7 @@ mod tests {
             sha256: "sha256_mock_manifest_bytes".to_string(),
         };
         assert!(cache.cache_package_metadata(m1).is_ok());
-        assert_eq!(
-            cache.query_cached_package("libreoffice").unwrap().version,
-            "1.0.0"
-        );
+        assert_eq!(cache.query_cached_package("libreoffice").unwrap().version, "1.0.0");
 
         let m2 = AptPackageManifest {
             name: "vim".to_string(),
