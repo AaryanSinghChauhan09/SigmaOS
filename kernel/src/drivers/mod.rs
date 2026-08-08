@@ -71,7 +71,7 @@ impl DriverRegistry {
     }
 
     pub fn init_all(&mut self) {
-        if let Err(e) = self.vga.init() {
+        if let Err(e) = unsafe { self.vga.init() } {
             panic!("VGA Initialization failed: {}", e);
         }
     }
