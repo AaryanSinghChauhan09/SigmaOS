@@ -2,6 +2,7 @@
 pub mod analyzer;
 pub mod enterprise;
 pub mod tcp;
+pub mod tcp_udp;
 
 pub use analyzer::{
     NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,

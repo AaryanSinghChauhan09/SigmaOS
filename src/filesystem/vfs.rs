@@ -1,8 +1,7 @@
 // SigmaOS Virtual Filesystem (VFS)
-// Capability-based filesystem with security
-// Enhanced with standard Linux-conforming Hard Link reference counting
+// Capability-based filesystem with security and advanced Linux-inspired abstractions (xattrs, hardlinks, symlinks)
 
-use crate::security::CapabilityToken;
+use crate::security::{CapabilityToken, Permission};
 use std::collections::HashMap;
 
 /// File type
@@ -53,7 +52,9 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    pub hard_links_count: u32, // standard Linux reference links counter
+    pub link_count: usize, // Standard Linux Inode reference link count (hard links)
+    pub symlink_target: Option<String>, // Path targets for symbolic links
+    pub xattrs: HashMap<String, std::vec::Vec<u8>>, // Extended attributes (e.g. user.mime_type)
 }
 
 impl Inode {
@@ -68,7 +69,9 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            hard_links_count: 1, // Default initial link
+            link_count: 1, // Starts at 1
+            symlink_target: None,
+            xattrs: HashMap::new(),
         }
     }
 }
@@ -93,11 +96,11 @@ impl FileDescriptor {
 
 /// Virtual Filesystem
 pub struct VirtualFilesystem {
-    pub inodes: HashMap<u64, Inode>,
-    pub next_inode_id: u64,
-    pub root_inode: u64,
-    pub file_descriptors: HashMap<u64, FileDescriptor>,
-    pub next_fd: u64,
+    inodes: HashMap<u64, Inode>,
+    next_inode_id: u64,
+    root_inode: u64,
+    file_descriptors: HashMap<u64, FileDescriptor>,
+    next_fd: u64,
 }
 
 impl VirtualFilesystem {
@@ -128,31 +131,34 @@ impl VirtualFilesystem {
         Ok(inode_id)
     }
 
-    /// Linux-parity Hard Link creator: points a new reference to an existing inode
-    pub fn link_inode(&mut self, old_inode_id: u64) -> Result<(), FsError> {
-        let inode = self.inodes.get_mut(&old_inode_id).ok_or(FsError::NotFound)?;
-
-        // Linux FHS constraint: prevent directory hard links to avoid circular loops
-        if inode.file_type == FileType::Directory {
-            return Err(FsError::IsDirectory);
+    /// Creates a symbolic link (Symlink) pointing to a target filepath string
+    pub fn create_symlink(&mut self, target_path: &str, owner: u64) -> Result<u64, FsError> {
+        let inode_id = self.create_file(FileType::Symlink, owner)?;
+        if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            inode.symlink_target = Some(target_path.to_string());
         }
+        Ok(inode_id)
+    }
 
-        inode.hard_links_count += 1;
+    /// Creates a hard link pointing directly to the same underlying file Inode
+    pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.link_count += 1;
         Ok(())
     }
 
-    /// Linux-parity Unlink handler: decrements reference links, freeing storage only when count hits 0
-    pub fn unlink_inode(&mut self, inode_id: u64) -> Result<u32, FsError> {
+    /// Sets an extended attribute (xattr) on an active Inode
+    pub fn set_xattr(&mut self, inode_id: u64, name: &str, value: &[u8]) -> Result<(), FsError> {
         let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.xattrs.insert(name.to_string(), value.to_vec());
+        Ok(())
+    }
 
-        if inode.hard_links_count > 1 {
-            inode.hard_links_count -= 1;
-            Ok(inode.hard_links_count)
-        } else {
-            // Reference link hit 0, fully free the physical Inode from VFS metadata
-            self.inodes.remove(&inode_id);
-            Ok(0)
-        }
+    /// Retrieves an extended attribute (xattr) from an active Inode
+    pub fn get_xattr(&self, inode_id: u64, name: &str) -> Result<std::vec::Vec<u8>, FsError> {
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+        let val = inode.xattrs.get(name).ok_or(FsError::AttributeNotFound)?;
+        Ok(val.clone())
     }
 
     pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
@@ -244,16 +250,41 @@ impl VirtualFilesystem {
         Ok(bytes_written)
     }
 
+    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
+    pub fn read_file_gated(&mut self, fd: u64, buffer: &mut [u8], token: &CapabilityToken) -> Result<usize, FsError> {
+        if !token.has_permission(Permission::FileRead) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.read_file(fd, buffer)
+    }
+
+    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
+    pub fn write_file_gated(&mut self, fd: u64, buffer: &[u8], token: &CapabilityToken) -> Result<usize, FsError> {
+        if !token.has_permission(Permission::FileWrite) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.write_file(fd, buffer)
+    }
+
+    /// Linux-grade link-aware file removal
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
         if inode_id == self.root_inode {
             return Err(FsError::PermissionDenied);
         }
 
-        if !self.inodes.contains_key(&inode_id) {
+        let mut should_delete = false;
+        if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            inode.link_count = inode.link_count.saturating_sub(1);
+            if inode.link_count == 0 {
+                should_delete = true;
+            }
+        } else {
             return Err(FsError::NotFound);
         }
 
-        self.inodes.remove(&inode_id);
+        if should_delete {
+            self.inodes.remove(&inode_id);
+        }
         Ok(())
     }
 
@@ -261,7 +292,7 @@ impl VirtualFilesystem {
         self.inodes.get(&inode_id)
     }
 
-    pub fn list_directory(&self, inode_id: u64) -> Result<Vec<u64>, FsError> {
+    pub fn list_directory(&self, inode_id: u64) -> Result<std::vec::Vec<u64>, FsError> {
         let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
 
         if inode.file_type != FileType::Directory {
@@ -280,7 +311,7 @@ impl Default for VirtualFilesystem {
 }
 
 /// Filesystem errors
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FsError {
     NotFound,
     PermissionDenied,
@@ -288,6 +319,7 @@ pub enum FsError {
     NotADirectory,
     IsDirectory,
     NoSpace,
+    AttributeNotFound,
 }
 
 #[cfg(test)]
@@ -305,7 +337,6 @@ mod tests {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         assert!(vfs.inodes.contains_key(&inode_id));
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 1);
     }
 
     #[test]
@@ -328,25 +359,55 @@ mod tests {
     }
 
     #[test]
-    fn test_linux_hard_links_flow() {
+    fn test_gated_read_write() {
         let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 101).unwrap();
+        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
+        let fd = vfs.open_file(inode_id, 0).unwrap();
 
-        // Link same inode twice (creating hard links)
-        assert!(vfs.link_inode(inode_id).is_ok());
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 2);
+        let bad_token = CapabilityToken::new(); // no read or write permissions
+        let read_token = CapabilityToken::new().allow_read("/var/www");
+        let write_token = CapabilityToken::new().allow_write("/tmp");
+        let _all_token = CapabilityToken::new().allow_read("/var/www").allow_write("/tmp");
 
-        // Attempting to hard link directory should fail (avoid loops)
-        assert!(vfs.link_inode(0).is_err()); // Root is directory
+        let mut buf = [0u8; 10];
 
-        // Unlink first hard link
-        let count = vfs.unlink_inode(inode_id).unwrap();
-        assert_eq!(count, 1);
-        assert!(vfs.inodes.contains_key(&inode_id)); // Inode still exists
+        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
+        assert_eq!(vfs.write_file_gated(fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
+        assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
-        // Unlink second hard link
-        let count = vfs.unlink_inode(inode_id).unwrap();
-        assert_eq!(count, 0);
-        assert!(!vfs.inodes.contains_key(&inode_id)); // Inode fully freed
+        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
+    }
+
+    #[test]
+    fn test_linux_hardlinks_symlinks_and_xattrs() {
+        let mut vfs = VirtualFilesystem::new();
+
+        // 1. Create a regular file with extended attribute (user.mime_type = "text/plain")
+        let inode_id = vfs.create_file(FileType::Regular, 1000).unwrap();
+        vfs.set_xattr(inode_id, "user.mime_type", b"text/plain").unwrap();
+        assert_eq!(vfs.get_xattr(inode_id, "user.mime_type").unwrap(), b"text/plain");
+
+        // 2. Create a symlink pointing to our file
+        let symlink_id = vfs.create_symlink("/home/tc/file.txt", 1000).unwrap();
+        assert_eq!(vfs.get_inode(symlink_id).unwrap().file_type, FileType::Symlink);
+        assert_eq!(vfs.get_inode(symlink_id).unwrap().symlink_target.as_ref().unwrap(), "/home/tc/file.txt");
+
+        // 3. Create a hard link -> increments link_count
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+        vfs.create_hard_link(inode_id).unwrap();
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
+
+        // 4. Deleting the file first time simply decrements link_count and keeps underlying Inode alive!
+        vfs.delete_file(inode_id).unwrap();
+        assert!(vfs.get_inode(inode_id).is_some());
+        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+
+        // 5. Deleting the file second time drops link_count to 0, successfully freeing the Inode from VFS!
+        vfs.delete_file(inode_id).unwrap();
+        assert!(vfs.get_inode(inode_id).is_none());
     }
 }

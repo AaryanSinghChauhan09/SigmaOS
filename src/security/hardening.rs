@@ -159,16 +159,7 @@ mod tests {
 
     #[test]
     fn test_secure_zeroization() {
-        // Generate test key using timestamp-based approach
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-        let mut key = [0u8; 4];
-        for (i, byte) in key.iter_mut().enumerate() {
-            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
-        }
+        let mut key = [13u8, 37u8, 42u8, 100u8];
         assert_ne!(key, [0u8; 4]);
 
         secure_zeroize(&mut key);
