@@ -1,0 +1,334 @@
+   Compiling sigmaos v0.1.0 (/app)
+error[E0428]: the name `PowerProfile` is defined multiple times
+  --> src/power/management.rs:26:1
+   |
+16 | pub enum PowerProfile { Performance = 0, Balanced = 1, PowerSaver = 2, C...
+   | --------------------- previous definition of the type `PowerProfile` here
+...
+26 | pub trait PowerProfile {
+   | ^^^^^^^^^^^^^^^^^^^^^^ `PowerProfile` redefined here
+   |
+   = note: `PowerProfile` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `CPUGovernor` is defined multiple times
+  --> src/power/management.rs:75:1
+   |
+20 | pub enum CPUGovernor { Performance = 0, Ondemand = 1, Conservative = 2, ...
+   | -------------------- previous definition of the type `CPUGovernor` here
+...
+75 | pub trait CPUGovernor {
+   | ^^^^^^^^^^^^^^^^^^^^^ `CPUGovernor` redefined here
+   |
+   = note: `CPUGovernor` must be defined only once in the type namespace of this module
+
+error[E0432]: unresolved imports `battery::BatteryDevice`, `battery::BatteryInfo`, `battery::BatteryStatus`, `battery::SimpleBatteryDevice`
+ --> src/power/mod.rs:7:19
+  |
+7 | ...::{BatteryDevice, BatteryError, BatteryInfo, BatteryStatus, SimpleBatteryDevice};
+  |       ^^^^^^^^^^^^^                ^^^^^^^^^^^  ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^ no `SimpleBatteryDevice` in `power::battery`
+  |       |                            |            |
+  |       |                            |            no `BatteryStatus` in `power::battery`
+  |       |                            no `BatteryInfo` in `power::battery`
+  |       no `BatteryDevice` in `power::battery`
+  |
+  = help: consider importing this enum instead:
+          crate::power::management::BatteryStatus
+help: a similar name exists in the module
+  |
+7 - pub use battery::{BatteryDevice, BatteryError, BatteryInfo, BatteryStatus, SimpleBatteryDevice};
+7 + pub use battery::{BatteryDevice, BatteryError, BatteryID, BatteryStatus, SimpleBatteryDevice};
+  |
+help: a similar name exists in the module
+  |
+7 - pub use battery::{BatteryDevice, BatteryError, BatteryInfo, BatteryStatus, SimpleBatteryDevice};
+7 + pub use battery::{BatteryDevice, BatteryError, BatteryInfo, BatteryState, SimpleBatteryDevice};
+  |
+help: a similar name exists in the module
+  |
+7 - pub use battery::{BatteryDevice, BatteryError, BatteryInfo, BatteryStatus, SimpleBatteryDevice};
+7 + pub use battery::{BatteryDevice, BatteryError, BatteryInfo, BatteryStatus, SimpleBattery};
+  |
+
+error[E0432]: unresolved imports `management::PowerManagement`, `management::PowerState`
+  --> src/power/mod.rs:11:34
+   |
+11 | ...nt::{PowerError, PowerManagement, PowerState, SimplePowerManager};
+   |                     ^^^^^^^^^^^^^^^  ^^^^^^^^^^ no `PowerState` in `power::management`
+   |                     |
+   |                     no `PowerManagement` in `power::management`
+   |                     help: a similar name exists in the module: `PowerManager`
+   |
+   = help: consider importing this enum through its public re-export instead:
+           crate::drivers::PowerState
+
+error[E0432]: unresolved import `stack::PowerEvent`
+  --> src/power/mod.rs:12:34
+   |
+12 | pub use stack::{PowerCapability, PowerEvent, PowerStack, SimplePowerStack};
+   |                                  ^^^^^^^^^^ no `PowerEvent` in `power::stack`
+
+warning: unused import: `std::collections::HashMap`
+ --> src/automation/ai_optimizer.rs:4:5
+  |
+4 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/compatibility/constellation_mesh.rs:5:5
+  |
+5 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/compatibility/constellation_mesh.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+  --> src/compatibility/endeavour.rs:10:5
+   |
+10 | use alloc::boxed::Box;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+  --> src/compatibility/endeavour.rs:13:26
+   |
+13 | use core::sync::atomic::{AtomicUsize, Ordering};
+   |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+  --> src/compatibility/hopper_lab.rs:12:5
+   |
+12 | use alloc::boxed::Box;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/container/runtime.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `self`
+ --> src/driver/device.rs:5:17
+  |
+5 | use core::ptr::{self, NonNull};
+  |                 ^^^^
+
+warning: unused import: `alloc::boxed::Box`
+  --> src/kernel/breakthroughs_v2.rs:14:5
+   |
+14 | use alloc::boxed::Box;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+ --> src/kernel/exports.rs:7:5
+  |
+7 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/kernel/meta.rs:4:5
+  |
+4 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/kernel/meta.rs:5:26
+  |
+5 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `core::time::Duration`
+ --> src/network/tcp.rs:4:5
+  |
+4 | use core::time::Duration;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `String` and `ToString`
+ --> src/network/tcp_udp.rs:8:21
+  |
+8 | use alloc::string::{String, ToString};
+  |                     ^^^^^^  ^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/observability/stack.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+ --> src/power/governor.rs:7:5
+  |
+7 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `String` and `ToString`
+ --> src/power/governor.rs:8:21
+  |
+8 | use alloc::string::{String, ToString};
+  |                     ^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::vec::Vec`
+ --> src/power/governor.rs:9:5
+  |
+9 | use alloc::vec::Vec;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/power/stack.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `alloc::vec`
+  --> src/productivity/subtitle_editor.rs:10:5
+   |
+10 | use alloc::vec;
+   |     ^^^^^^^^^^
+
+warning: unused import: `VersionConstraint`
+ --> src/sigpkg/recipe.rs:4:42
+  |
+4 | use crate::sigpkg::{Dependency, Version, VersionConstraint};
+  |                                          ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Dependency`
+ --> src/sigpkg/resolver.rs:4:21
+  |
+4 | use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+  |                     ^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+ --> src/sigpkg/transaction.rs:5:5
+  |
+5 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/container/oci_runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: crate-level attribute should be in the root module
+ --> src/container/runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/observability/stack.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/power/battery.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/power/management.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/power/stack.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/shell/command.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+error[E0782]: expected a type, found a trait
+  --> src/power/management.rs:15:10
+   |
+15 | #[derive(Debug, Clone, Copy)]
+   |          ^^^^^
+
+error[E0782]: expected a type, found a trait
+  --> src/power/management.rs:19:10
+   |
+19 | #[derive(Debug, Clone, Copy)]
+   |          ^^^^^
+
+error[E0782]: expected a type, found a trait
+  --> src/power/management.rs:15:17
+   |
+15 | #[derive(Debug, Clone, Copy)]
+   |                 ^^^^^
+
+error[E0782]: expected a type, found a trait
+  --> src/power/management.rs:19:17
+   |
+19 | #[derive(Debug, Clone, Copy)]
+   |                 ^^^^^
+
+error[E0782]: expected a type, found a trait
+  --> src/power/management.rs:15:24
+   |
+15 | #[derive(Debug, Clone, Copy)]
+   |                        ^^^^
+
+error[E0782]: expected a type, found a trait
+  --> src/power/management.rs:19:24
+   |
+19 | #[derive(Debug, Clone, Copy)]
+   |                        ^^^^
+
+error[E0206]: the trait `Copy` cannot be implemented for this type
+  --> src/power/management.rs:15:24
+   |
+15 | #[derive(Debug, Clone, Copy)]
+   |                        ^^^^ type is not a structure or enumeration
+
+error[E0206]: the trait `Copy` cannot be implemented for this type
+  --> src/power/management.rs:19:24
+   |
+19 | #[derive(Debug, Clone, Copy)]
+   |                        ^^^^ type is not a structure or enumeration
+
+error[E0391]: cycle detected when checking if trait `power::management::CPUGovernor` is dyn-compatible
+  --> src/power/management.rs:75:1
+   |
+75 | pub trait CPUGovernor {
+   | ^^^^^^^^^^^^^^^^^^^^^
+   |
+note: ...which requires determining dyn-compatibility of trait `power::management::CPUGovernor`...
+  --> src/power/management.rs:75:1
+   |
+75 | pub trait CPUGovernor {
+   | ^^^^^^^^^^^^^^^^^^^^^
+note: ...which requires computing function signature of `power::management::CPUGovernor::set_governor`...
+  --> src/power/management.rs:76:5
+   |
+76 |     fn set_governor(&mut self, governor: CPUGovernor) -> Result<(), PowerError>;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = note: ...which again requires checking if trait `power::management::CPUGovernor` is dyn-compatible, completing the cycle
+note: cycle used when computing function signature of `power::management::PowerProfile::cpu_governor`
+  --> src/power/management.rs:30:5
+   |
+30 |     fn cpu_governor(&self) -> CPUGovernor;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = note: see https://rustc-dev-guide.rust-lang.org/overview.html#queries and https://rustc-dev-guide.rust-lang.org/query.html for more information
+
+Some errors have detailed explanations: E0206, E0391, E0428, E0432, E0782.
+For more information about an error, try `rustc --explain E0206`.
+warning: `sigmaos` (lib) generated 30 warnings
+error: could not compile `sigmaos` (lib) due to 16 previous errors; 30 warnings emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `sigmaos` (lib) generated 30 warnings (30 duplicates)
+error: could not compile `sigmaos` (lib) due to 16 previous errors; 30 warnings emitted
+warning: `sigmaos` (lib test) generated 29 warnings (29 duplicates)
+error: could not compile `sigmaos` (lib test) due to 16 previous errors; 29 warnings emitted

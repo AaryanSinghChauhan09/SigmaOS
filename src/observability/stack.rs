@@ -1,14 +1,12 @@
 #![no_std]
-
-#[cfg(not(target_os = "none"))]
-extern crate std;
+#![no_main]
 
 use core::mem;
 /// OOP-based Observability Stack for SigmaOS
 /// Implements observability using OOP principles with traits and structs
 /// No dependency on external observability frameworks
 /// Based on Roadmap Item 90: Observability stack
-use core::ptr::NonNull;
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Metric ID
@@ -174,59 +172,6 @@ impl Metric for SimpleMetric {
             metric_type: self.metric_type,
             value: self.value(),
             capability: self.capability,
-        }
-    }
-}
-
-/// Custom Box implementation for no_std
-pub struct Box<T: ?Sized> {
-    ptr: NonNull<T>,
-}
-
-impl<T> Box<T> {
-    pub fn new(val: T) -> Self {
-        unsafe {
-            let ptr = alloc(mem::size_of::<T>()) as *mut T;
-            core::ptr::write(ptr, val);
-            Self { ptr: NonNull::new_unchecked(ptr) }
-        }
-    }
-    pub fn into_raw(boxed: Self) -> *mut T {
-        let ptr = boxed.ptr.as_ptr();
-        core::mem::forget(boxed);
-        ptr
-    }
-}
-
-impl<T: ?Sized> Box<T> {
-    pub unsafe fn from_raw(ptr: *mut T) -> Self {
-        Self { ptr: NonNull::new_unchecked(ptr) }
-    }
-    pub fn as_ref(&self) -> &T {
-        unsafe { self.ptr.as_ref() }
-    }
-    pub fn as_mut(&mut self) -> &mut T {
-        unsafe { self.ptr.as_mut() }
-    }
-}
-
-impl<T: ?Sized> core::ops::Deref for Box<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        self.as_ref()
-    }
-}
-
-impl<T: ?Sized> core::ops::DerefMut for Box<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_mut()
-    }
-}
-
-impl<T: ?Sized> Drop for Box<T> {
-    fn drop(&mut self) {
-        unsafe {
-            free(self.ptr.as_ptr() as *mut u8);
         }
     }
 }
@@ -656,10 +601,7 @@ impl ObservabilityStack for SimpleObservabilityStack {
 
         let id = self.next_span_id.fetch_add(1, Ordering::SeqCst);
         let span = SimpleSpan::new(id, name, SpanCapability::full());
-        // Coerce concrete SimpleSpan Box to dyn Span Box by casting raw pointer to trait object
-        let raw_ptr = Box::into_raw(Box::new(span)) as *mut dyn Span;
-        let boxed_span: Box<dyn Span> = Box { ptr: NonNull::new(raw_ptr).unwrap() };
-        self.spans.push(Some(boxed_span));
+        self.spans.push(Some(Box::new(span)));
         self.stats.total_spans += 1;
         self.stats.active_spans += 1;
         Ok(id)
@@ -775,13 +717,7 @@ impl<T> Vec<T> {
     }
 }
 
-// External allocator functions
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
@@ -791,11 +727,13 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 
 #[cfg(not(target_os = "none"))]
 unsafe fn free(ptr: *mut u8) {
-    use std::alloc::{dealloc, Layout};
-    let layout = Layout::from_size_align(8, 8).unwrap(); // dummy layout for simple free
-    // In test environment, we can let the OS clean up or use dealloc with correct layout.
-    // To be perfectly safe and not panic or segfault, let's use standard Box/Vec leak fallback or leak memory in test targets:
-    // leaking in test targets is perfectly safe since tests are short-lived processes.
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]

@@ -1,0 +1,612 @@
+   Compiling sigmaos v0.1.0 (/app)
+warning: unused import: `std::collections::HashMap`
+ --> src/automation/ai_optimizer.rs:4:5
+  |
+4 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/compatibility/constellation_mesh.rs:5:5
+  |
+5 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/compatibility/constellation_mesh.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+  --> src/compatibility/endeavour.rs:10:5
+   |
+10 | use alloc::boxed::Box;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+  --> src/compatibility/endeavour.rs:13:26
+   |
+13 | use core::sync::atomic::{AtomicUsize, Ordering};
+   |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+  --> src/compatibility/hopper_lab.rs:12:5
+   |
+12 | use alloc::boxed::Box;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/container/runtime.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `self`
+ --> src/driver/device.rs:5:17
+  |
+5 | use core::ptr::{self, NonNull};
+  |                 ^^^^
+
+warning: unused import: `alloc::boxed::Box`
+  --> src/kernel/breakthroughs_v2.rs:14:5
+   |
+14 | use alloc::boxed::Box;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+ --> src/kernel/exports.rs:7:5
+  |
+7 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/kernel/meta.rs:4:5
+  |
+4 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/kernel/meta.rs:5:26
+  |
+5 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `core::time::Duration`
+ --> src/network/tcp.rs:4:5
+  |
+4 | use core::time::Duration;
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `String` and `ToString`
+ --> src/network/tcp_udp.rs:8:21
+  |
+8 | use alloc::string::{String, ToString};
+  |                     ^^^^^^  ^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/observability/stack.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+ --> src/power/governor.rs:7:5
+  |
+7 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `String` and `ToString`
+ --> src/power/governor.rs:8:21
+  |
+8 | use alloc::string::{String, ToString};
+  |                     ^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::vec::Vec`
+ --> src/power/governor.rs:9:5
+  |
+9 | use alloc::vec::Vec;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused import: `core::mem`
+  --> src/power/management.rs:14:5
+   |
+14 | use core::mem;
+   |     ^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+  --> src/power/stack.rs:12:17
+   |
+12 | use core::ptr::{self, NonNull};
+   |                 ^^^^  ^^^^^^^
+
+warning: unused import: `core::mem`
+  --> src/power/stack.rs:14:5
+   |
+14 | use core::mem;
+   |     ^^^^^^^^^
+
+warning: unused import: `alloc::vec`
+  --> src/productivity/subtitle_editor.rs:10:5
+   |
+10 | use alloc::vec;
+   |     ^^^^^^^^^^
+
+warning: unused import: `VersionConstraint`
+ --> src/sigpkg/recipe.rs:4:42
+  |
+4 | use crate::sigpkg::{Dependency, Version, VersionConstraint};
+  |                                          ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+ --> src/sigpkg/transaction.rs:5:5
+  |
+5 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/container/oci_runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: crate-level attribute should be in the root module
+ --> src/container/runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/observability/stack.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/power/battery.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/power/management.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/power/stack.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/shell/command.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/container/oci_runtime.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/container/runtime.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/observability/stack.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/power/battery.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/power/management.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/power/stack.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/shell/command.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: unused variable: `context`
+   --> src/automation/system_level.rs:168:51
+    |
+168 | ... event: SystemEventType, context: &HashMap<String, f64>) -> bool {
+    |                             ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `task_duration`
+   --> src/automation/system_level.rs:402:40
+    |
+402 |     pub fn get_smart_scheduling(&self, task_duration: Duration) -> u64 {
+    |                                        ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_task_duration`
+
+warning: variable does not need to be mutable
+   --> src/compatibility/endeavour.rs:174:13
+    |
+174 |         let mut words: Vec<String> = sanitized
+    |             ----^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> src/driver/device.rs:293:13
+    |
+293 | ...   let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
+    |           ----^^^^^^
+    |           |
+    |           help: remove this `mut`
+
+warning: unused variable: `data`
+  --> src/drivers/network.rs:46:42
+   |
+46 |             NetworkCommand::SendPacket { data } => {
+   |                                          ^^^^ help: try ignoring the field: `data: _`
+
+warning: unused variable: `ssid`
+  --> src/drivers/network.rs:65:39
+   |
+65 |             NetworkCommand::Connect { ssid, password } => {
+   |                                       ^^^^ help: try ignoring the field: `ssid: _`
+
+warning: unused variable: `password`
+  --> src/drivers/network.rs:65:45
+   |
+65 |             NetworkCommand::Connect { ssid, password } => {
+   |                                             ^^^^^^^^ help: try ignoring the field: `password: _`
+
+warning: unused variable: `data`
+  --> src/drivers/storage.rs:61:42
+   |
+61 |             StorageCommand::Write { lba, data } => {
+   |                                          ^^^^ help: try ignoring the field: `data: _`
+
+warning: unused variable: `data`
+  --> src/drivers/usb_hid.rs:64:63
+   |
+64 | ...ort_type: HidReportType, data: &[u8]) -> Result<(), HidError> {
+   |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_data`
+
+warning: unused variable: `color`
+  --> src/drivers/vesa.rs:94:47
+   |
+94 | ...l(&self, x: u32, y: u32, color: u32) -> Result<(), VesaError> {
+   |                             ^^^^^ help: if this is intentional, prefix it with an underscore: `_color`
+
+warning: unused variable: `offset`
+   --> src/drivers/vesa.rs:100:13
+    |
+100 |         let offset = (y * self.mode_info.pitch + x * (self.mode_info.bp...
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_offset`
+
+warning: unused variable: `color`
+   --> src/drivers/vesa.rs:107:32
+    |
+107 |     pub fn clear_screen(&self, color: u32) -> Result<(), VesaError> {
+    |                                ^^^^^ help: if this is intentional, prefix it with an underscore: `_color`
+
+warning: unused variable: `new_offset`
+   --> src/filesystem/vfs.rs:168:13
+    |
+168 |         let new_offset = file_descriptor
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_new_offset`
+
+warning: unused variable: `result`
+   --> src/kernel/memory.rs:325:13
+    |
+325 |         let result = allocator.allocate(4096);
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_result`
+
+warning: variable does not need to be mutable
+   --> src/kernel/paging.rs:270:13
+    |
+270 |         let mut pdpt_ptr = NonNull::new(&mut pdpt as *mut PageTable);
+    |             ----^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/kernel/paging.rs:271:13
+    |
+271 |         let mut pd_ptr = NonNull::new(&mut pd as *mut PageTable);
+    |             ----^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/kernel/paging.rs:272:13
+    |
+272 |         let mut pt_ptr = NonNull::new(&mut pt as *mut PageTable);
+    |             ----^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/kernel/paging.rs:345:13
+    |
+345 | ...   let mut vmm = unsafe { VirtualMemoryManagerV2::new(&pml4 as *cons...
+    |           ----^^^
+    |           |
+    |           help: remove this `mut`
+
+warning: unused variable: `context`
+   --> src/resilience/self_healing.rs:101:9
+    |
+101 |         context: &HashMap<String, String>,
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context`
+
+warning: unused variable: `app_id`
+   --> src/security/qubes_isolation.rs:376:13
+    |
+376 |         let app_id = orchestrator
+    |             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_app_id`
+
+warning: variable does not need to be mutable
+   --> src/shell/command.rs:835:13
+    |
+835 |         let mut session = SimpleShellSession::new();
+    |             ----^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/shell/command.rs:886:13
+    |
+886 |         let mut session = SimpleShellSession::new();
+    |             ----^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> src/shell/command.rs:893:13
+    |
+893 |         let mut session = SimpleShellSession::new();
+    |             ----^^^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: type `oci_runtime::Vec<Option<Box<(dyn oci_runtime::Container + 'static)>>>` is more private than the item `SimpleOCISpec::containers`
+   --> src/container/oci_runtime.rs:124:5
+    |
+124 |     pub containers: Vec<Option<Box<dyn Container>>>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `SimpleOCISpec::containers` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<Option<Box<(dyn oci_runtime::Container + 'static)>>>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `oci_runtime::Vec<(usize, Namespace)>` is more private than the item `SimpleSandbox::namespaces`
+   --> src/container/oci_runtime.rs:183:5
+    |
+183 |     pub namespaces: Vec<(ContainerID, Namespace)>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `SimpleSandbox::namespaces` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<(usize, Namespace)>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `oci_runtime::Vec<(usize, (usize, usize))>` is more private than the item `SimpleSandbox::cgroups`
+   --> src/container/oci_runtime.rs:184:5
+    |
+184 |     pub cgroups: Vec<(ContainerID, (usize, usize))>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `SimpleSandbox::cgroups` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<(usize, (usize, usize))>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `oci_runtime::Vec<(usize, [u8; 256])>` is more private than the item `SimpleSandbox::seccomp_profiles`
+   --> src/container/oci_runtime.rs:185:5
+    |
+185 |     pub seccomp_profiles: Vec<(ContainerID, [u8; 256])>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `SimpleSandbox::seccomp_profiles` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<(usize, [u8; 256])>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `oci_runtime::Vec<([u8; 128], [u8; 32])>` is more private than the item `ImageManager::list_images`
+   --> src/container/oci_runtime.rs:235:5
+    |
+235 |     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `ImageManager::list_images` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<([u8; 128], [u8; 32])>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `oci_runtime::Vec<([u8; 128], [u8; 32])>` is more private than the item `SimpleImageManager::images`
+   --> src/container/oci_runtime.rs:241:5
+    |
+241 |     pub images: Vec<([u8; 128], [u8; 32])>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `SimpleImageManager::images` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<([u8; 128], [u8; 32])>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `oci_runtime::Vec<([u8; 128], [u8; 32])>` is more private than the item `<SimpleImageManager as ImageManager>::list_images`
+   --> src/container/oci_runtime.rs:265:5
+    |
+265 |     fn list_images(&self) -> Vec<([u8; 128], [u8; 32])> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `<SimpleImageManager as ImageManager>::list_images` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<([u8; 128], [u8; 32])>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `oci_runtime::Vec<usize>` is more private than the item `oci_runtime::ContainerRuntime::list_containers`
+   --> src/container/oci_runtime.rs:291:5
+    |
+291 |     fn list_containers(&self) -> Vec<ContainerID>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `oci_runtime::ContainerRuntime::list_containers` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<usize>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `oci_runtime::Vec<usize>` is more private than the item `<oci_runtime::SimpleContainerRuntime as oci_runtime::ContainerRuntime>::list_containers`
+   --> src/container/oci_runtime.rs:363:5
+    |
+363 |     fn list_containers(&self) -> Vec<ContainerID> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `<oci_runtime::SimpleContainerRuntime as oci_runtime::ContainerRuntime>::list_containers` is reachable at visibility `pub`
+    |
+note: but type `oci_runtime::Vec<usize>` is only usable at visibility `pub(self)`
+   --> src/container/oci_runtime.rs:374:1
+    |
+374 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `runtime::Vec<usize>` is more private than the item `runtime::ContainerRuntime::list_containers`
+   --> src/container/runtime.rs:348:5
+    |
+348 |     fn list_containers(&self) -> Vec<ContainerID>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `runtime::ContainerRuntime::list_containers` is reachable at visibility `pub`
+    |
+note: but type `runtime::Vec<usize>` is only usable at visibility `pub(self)`
+   --> src/container/runtime.rs:583:1
+    |
+583 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: type `runtime::Vec<usize>` is more private than the item `<runtime::SimpleContainerRuntime as runtime::ContainerRuntime>::list_containers`
+   --> src/container/runtime.rs:554:5
+    |
+554 |     fn list_containers(&self) -> Vec<ContainerID> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `<runtime::SimpleContainerRuntime as runtime::ContainerRuntime>::list_containers` is reachable at visibility `pub`
+    |
+note: but type `runtime::Vec<usize>` is only usable at visibility `pub(self)`
+   --> src/container/runtime.rs:583:1
+    |
+583 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+
+warning: method `len` is never used
+   --> src/container/runtime.rs:632:8
+    |
+610 | impl<T> Vec<T> {
+    | -------------- method in this implementation
+...
+632 |     fn len(&self) -> usize {
+    |        ^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `next_id` is never read
+   --> src/driver/framework.rs:281:5
+    |
+279 | pub struct SimpleDriverFramework {
+    |            --------------------- field in this struct
+280 |     drivers: Vec<Option<Box<dyn Driver>>>,
+281 |     next_id: AtomicUsize,
+    |     ^^^^^^^
+
+warning: field `base_port` is never read
+ --> src/drivers/legacy_floppy.rs:8:5
+  |
+7 | pub struct LegacyFloppyDisk {
+  |            ---------------- field in this struct
+8 |     base_port: u16,
+  |     ^^^^^^^^^
+
+warning: field `base_port` is never read
+ --> src/drivers/legacy_serial.rs:8:5
+  |
+7 | pub struct LegacySerialPort {
+  |            ---------------- field in this struct
+8 |     base_port: u16,
+  |     ^^^^^^^^^
+
+warning: field `release_count` is never read
+   --> src/kernel/meta.rs:246:5
+    |
+245 | pub struct KernelGraph {
+    |            ----------- field in this struct
+246 |     release_count: usize,
+    |     ^^^^^^^^^^^^^
+
+warning: field `next_metric_id` is never read
+   --> src/observability/stack.rs:495:5
+    |
+492 | pub struct SimpleObservabilityStack {
+    |            ------------------------ field in this struct
+...
+495 |     next_metric_id: AtomicUsize,
+    |     ^^^^^^^^^^^^^^
+
+warning: method `len` is never used
+   --> src/observability/stack.rs:693:8
+    |
+671 | impl<T> Vec<T> {
+    | -------------- method in this implementation
+...
+693 |     fn len(&self) -> usize {
+    |        ^^^
+
+warning: field `rendezvous_server` is never read
+  --> src/remote/desktop.rs:77:5
+   |
+76 | pub struct SigmaRendezvous {
+   |            --------------- field in this struct
+77 |     rendezvous_server: [u8; 64],
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: `sigmaos` (lib test) generated 80 warnings (run `cargo fix --lib -p sigmaos --tests` to apply 47 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.32s
+     Running unittests src/lib.rs (target/debug/deps/sigmaos-6a7e5d2cfdfa60d7)
+
+running 9 tests
+test compatibility::endeavour::tests::test_compile_and_register_aur_integrated_flow ... ok
+test compatibility::endeavour::tests::test_aur_downloader_resolution ... ok
+test compatibility::endeavour::tests::test_log_sanitization ... ok
+test compatibility::endeavour::tests::test_alpm_sync_db ... ok
+test compatibility::endeavour::tests::test_reflector_mirror_ranking ... ok
+test compatibility::endeavour::tests::test_makepkg_sandboxed_compile ... ok
+test compatibility::endeavour::tests::test_update_notifier ... ok
+test compatibility::endeavour::tests::test_welcome_assistant_flow ... ok
+test compatibility::endeavour::tests::test_yay_aur_helper_translation ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 258 filtered out; finished in 0.00s
