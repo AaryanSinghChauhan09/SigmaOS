@@ -1,5 +1,5 @@
 // SigmaOS Kernel Scheduler
-// Implements EEVDF (Earliest Eligible Virtual Deadline First) & EDF (Earliest Deadline First) hybrid real-time scheduler
+// Implements EEVDF (Earliest Eligible Virtual Deadline First) scheduler
 
 use core::time::Duration;
 
@@ -22,7 +22,7 @@ pub enum ProcessState {
     Terminated,
 }
 
-/// Process control block
+/// Process control block (PCB) enhanced with EEVDF vruntime and deadline models
 #[derive(Debug, Clone)]
 pub struct Process {
     pub pid: u64,
@@ -30,9 +30,9 @@ pub struct Process {
     pub priority: Priority,
     pub state: ProcessState,
     pub runtime: Duration,
-    pub virtual_deadline: u64,
+    pub virtual_runtime: u64,  // EEVDF vruntime (ticks)
+    pub virtual_deadline: u64, // EEVDF virtual deadline
     pub time_slice: Duration,
-    pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
 }
 
 impl Process {
@@ -43,34 +43,35 @@ impl Process {
             priority,
             state: ProcessState::Ready,
             runtime: Duration::from_secs(0),
+            virtual_runtime: 0,
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
-            edf_deadline: None,
         }
     }
 
-    pub fn with_edf(mut self, deadline: u64) -> Self {
-        self.edf_deadline = Some(deadline);
-        self
+    pub fn get_weight(&self) -> u64 {
+        match self.priority {
+            Priority::Idle => 1,
+            Priority::Low => 2,
+            Priority::Normal => 4,
+            Priority::High => 8,
+            Priority::Realtime => 16,
+        }
     }
 
-    pub fn update_virtual_deadline(&mut self, current_time: u64) {
-        // EEVDF virtual deadline calculation
-        let weight = match self.priority {
-            Priority::Idle => 1024,
-            Priority::Low => 512,
-            Priority::Normal => 256,
-            Priority::High => 128,
-            Priority::Realtime => 64,
-        };
-        self.virtual_deadline = current_time + (1000 / weight);
+    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
+        let weight = self.get_weight();
+        // deadline = vruntime + (q / w) where q is time slice slice equivalent ticks (10)
+        let q = 10;
+        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
     }
 }
 
-/// EEVDF & EDF Hybrid Real-Time Scheduler
+/// EEVDF Scheduler Engine
 pub struct Scheduler {
-    processes: Vec<Process>,
-    current_time: u64,
+    pub processes: Vec<Process>,
+    pub current_time: u64,
+    pub system_vtime: u64, // EEVDF System Virtual Time (V)
 }
 
 impl Scheduler {
@@ -78,50 +79,111 @@ impl Scheduler {
         Self {
             processes: Vec::new(),
             current_time: 0,
+            system_vtime: 0,
         }
     }
 
     pub fn add_process(&mut self, mut process: Process) {
-        process.update_virtual_deadline(self.current_time);
+        // Set initial vruntime to system virtual time to prevent newly spawned process from hogging CPU
+        process.virtual_runtime = self.system_vtime;
+        process.update_virtual_deadline(self.system_vtime);
         self.processes.push(process);
     }
 
     pub fn schedule(&mut self) -> Option<&Process> {
-        // Find process with Earliest Deadline First (EDF) if real-time constraints are present
-        let mut edf_ready_process: Option<&Process> = None;
-        for p in &self.processes {
-            if p.state == ProcessState::Ready && p.edf_deadline.is_some() {
-                if let Some(current_best) = edf_ready_process {
-                    if p.edf_deadline.unwrap() < current_best.edf_deadline.unwrap() {
-                        edf_ready_process = Some(p);
-                    }
-                } else {
-                    edf_ready_process = Some(p);
-                }
+        // 1. Filter ready processes
+        let mut ready_indices = Vec::new();
+        for (idx, p) in self.processes.iter().enumerate() {
+            if p.state == ProcessState::Ready {
+                ready_indices.push(idx);
             }
         }
 
-        if let Some(edf_proc) = edf_ready_process {
-            return Some(edf_proc);
+        if ready_indices.is_empty() {
+            return None;
         }
 
-        // Otherwise, fall back to EEVDF earliest eligible virtual deadline
-        let now = self.current_time;
-        self.processes
-            .iter()
-            .filter(|p| p.state == ProcessState::Ready && p.virtual_deadline <= now)
-            .min_by_key(|p| p.virtual_deadline)
+        // 2. Identify eligible processes (virtual_runtime <= system_vtime)
+        let mut eligible_indices = Vec::new();
+        for &idx in &ready_indices {
+            let p = &self.processes[idx];
+            if p.virtual_runtime <= self.system_vtime {
+                eligible_indices.push(idx);
+            }
+        }
+
+        // 3. Selection rules:
+        // - Standard EEVDF: pick the eligible process with the EARLIEST virtual deadline
+        // - Starvation Prevention: if no processes are currently eligible (e.g. system_vtime is lagging),
+        //   fallback to selecting the process with the minimum virtual_runtime
+        let selected_idx = if !eligible_indices.is_empty() {
+            let mut earliest_idx = eligible_indices[0];
+            let mut earliest_deadline = self.processes[earliest_idx].virtual_deadline;
+
+            for &idx in &eligible_indices {
+                let p = &self.processes[idx];
+                if p.virtual_deadline < earliest_deadline {
+                    earliest_deadline = p.virtual_deadline;
+                    earliest_idx = idx;
+                }
+            }
+            earliest_idx
+        } else {
+            let mut min_idx = ready_indices[0];
+            let mut min_vruntime = self.processes[min_idx].virtual_runtime;
+
+            for &idx in &ready_indices {
+                let p = &self.processes[idx];
+                if p.virtual_runtime < min_vruntime {
+                    min_vruntime = p.virtual_runtime;
+                    min_idx = idx;
+                }
+            }
+            min_idx
+        };
+
+        Some(&self.processes[selected_idx])
     }
 
     pub fn tick(&mut self) {
         self.current_time += 1;
+
+        // Advance system virtual time (V) based on active threads vruntime progress
+        let mut active_count = 0;
+        let mut total_vruntime = 0;
+
+        for p in &self.processes {
+            if p.state == ProcessState::Ready || p.state == ProcessState::Running {
+                active_count += 1;
+                total_vruntime += p.virtual_runtime;
+            }
+        }
+
+        if active_count > 0 {
+            let avg_vtime = total_vruntime / active_count;
+            // System virtual time advances gracefully
+            self.system_vtime = self.system_vtime.max(avg_vtime);
+        }
+        self.system_vtime += 1;
+    }
+
+    pub fn execute_process_ticks(&mut self, pid: u64, ticks_executed: u64) {
+        // Simulates thread execution and updates its vruntime based on priority weight:
+        // vruntime_delta = executed_ticks / weight
+        if let Some(p) = self.processes.iter_mut().find(|p| p.pid == pid) {
+            let weight = p.get_weight();
+            let delta = (ticks_executed / weight).max(1);
+            p.virtual_runtime = p.virtual_runtime.saturating_add(delta);
+            p.update_virtual_deadline(self.system_vtime);
+            p.runtime += Duration::from_millis(ticks_executed * 10);
+        }
     }
 
     pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
         if let Some(process) = self.processes.iter_mut().find(|p| p.pid == pid) {
             process.state = state;
             if state == ProcessState::Ready {
-                process.update_virtual_deadline(self.current_time);
+                process.update_virtual_deadline(self.system_vtime);
             }
         }
     }
@@ -177,23 +239,18 @@ mod tests {
     }
 
     #[test]
-    fn test_edf_realtime_scheduler_tick() {
+    fn test_eevdf_deadline_and_weight() {
         let mut scheduler = Scheduler::new();
+        let mut p1 = Process::new(1, "low-prio".to_string(), Priority::Low);
+        let mut p2 = Process::new(2, "high-prio".to_string(), Priority::High);
 
-        // Add regular process
-        let p_normal = Process::new(1, "normal".to_string(), Priority::Normal);
-        scheduler.add_process(p_normal);
+        scheduler.add_process(p1.clone());
+        scheduler.add_process(p2.clone());
 
-        // Add real-time processes with explicit EDF deadlines
-        let p_rt_late = Process::new(2, "rt_late".to_string(), Priority::Realtime).with_edf(100);
-        let p_rt_early = Process::new(3, "rt_early".to_string(), Priority::Realtime).with_edf(50);
+        p1.update_virtual_deadline(0);
+        p2.update_virtual_deadline(0);
 
-        scheduler.add_process(p_rt_late);
-        scheduler.add_process(p_rt_early);
-
-        // Schedule should pick rt_early (absolute deadline 50) first, because it is the earliest real-time deadline
-        let chosen = scheduler.schedule().unwrap();
-        assert_eq!(chosen.pid, 3);
-        assert_eq!(chosen.name, "rt_early");
+        // High priority must have a tighter/earlier virtual deadline for the same vruntime!
+        assert!(p2.virtual_deadline < p1.virtual_deadline);
     }
 }

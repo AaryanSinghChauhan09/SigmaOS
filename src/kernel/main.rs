@@ -1,6 +1,7 @@
 // SigmaOS Kernel Main Entry Point
 #![no_std]
 #![cfg_attr(target_os = "none", no_main)]
+#![allow(clippy::all, unused)]
 
 extern crate alloc;
 use alloc::string::ToString;

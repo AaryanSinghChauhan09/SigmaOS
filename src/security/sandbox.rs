@@ -1,10 +1,8 @@
 // SigmaOS Privacy-First Sandbox Subsystem
 // Enforces zero-trust sandboxing by default, with post-quantum cryptography baked into kernel-level syscall filters
 // Absorbs advanced security controls from SELinux, AppArmor, and Firejail to satisfy Common Criteria and FIPS compliance
-// Enhanced with Sandboxie-style write redirection overlays and Firejail-style capability/network namespace constraints
 
 use std::collections::HashSet;
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SandboxRule {
@@ -24,16 +22,7 @@ pub enum EnforcementLevel {
 pub enum ComplianceProfile {
     StandardSandbox,
     Fips140_3,
-    CommonCriteriaEal4,
-}
-
-/// Linux/Firejail-style Process Capability tokens
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum SandboxCapability {
-    CapNetRaw,      // RAW network socket actions
-    CapSysAdmin,    // Mount, namespace, chroot actions
-    CapChown,       // File ownership updates
-    CapDacOverride, // Bypass read, write, execute permissions
+    CommonCriteria_EAL4,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,22 +59,6 @@ pub struct PrivacyFirstSandbox {
     pub private_dir_shields: HashSet<String>,
     pub compliance: ComplianceProfile,
     pub security_audit_log: Vec<String>,
-
-    // ========================================================================
-    // ADVANCED SANDBOXIE & FIREJAIL-STYLE CAPABILITIES & OVERLAYS
-    // ========================================================================
-
-    /// Sandboxie-style Write Redirection: Maps source path to redirected (isolated) path on disk
-    pub write_redirection_overlay: HashMap<String, String>,
-
-    /// Firejail-style Network Isolation: If true, prevents socket creation or data transmission
-    pub network_namespace_restricted: bool,
-
-    /// Firejail-style Dropped Capability Set: System operations blocked dynamically
-    pub dropped_capabilities: HashSet<SandboxCapability>,
-
-    /// Isolated PID namespace simulator: Translates physical process IDs to localized sandbox IDs
-    pub pid_namespace_map: HashMap<u32, u32>,
 }
 
 impl PrivacyFirstSandbox {
@@ -100,10 +73,6 @@ impl PrivacyFirstSandbox {
             private_dir_shields: HashSet::new(),
             compliance: ComplianceProfile::StandardSandbox,
             security_audit_log: Vec::new(),
-            write_redirection_overlay: HashMap::new(),
-            network_namespace_restricted: false,
-            dropped_capabilities: HashSet::new(),
-            pid_namespace_map: HashMap::new(),
         }
     }
 
@@ -113,60 +82,6 @@ impl PrivacyFirstSandbox {
 
     pub fn shield_private_directory(&mut self, path: &str) {
         self.private_dir_shields.insert(path.to_string());
-    }
-
-    // ========================================================================
-    // ADVANCED METHODS
-    // ========================================================================
-
-    /// Sandboxie-style Write Redirection: Adds a rule to redirect file mutations from source to an isolated target
-    pub fn add_write_redirection(&mut self, source: &str, isolated_target: &str) {
-        self.write_redirection_overlay.insert(source.to_string(), isolated_target.to_string());
-    }
-
-    /// Sandboxie-style Write Redirection Resolver: Translates path before file operations
-    pub fn resolve_file_operation_path(&self, source_path: &str) -> String {
-        for (src, target) in &self.write_redirection_overlay {
-            if source_path == src || source_path.starts_with(src) {
-                // If it is a matching prefix, substitute the source with target path prefix
-                let substituted = source_path.replacen(src, target, 1);
-                return substituted;
-            }
-        }
-        source_path.to_string()
-    }
-
-    /// Firejail-style network sandbox restriction configuration
-    pub fn set_network_restricted(&mut self, restricted: bool) {
-        self.network_namespace_restricted = restricted;
-        if restricted {
-            self.blocked_rules.insert(SandboxRule::NetworkWriteGate);
-        } else {
-            self.blocked_rules.remove(&SandboxRule::NetworkWriteGate);
-        }
-    }
-
-    /// Firejail-style dynamic capability dropping (e.g. `caps.drop all`)
-    pub fn drop_capability(&mut self, capability: SandboxCapability) {
-        self.dropped_capabilities.insert(capability);
-    }
-
-    /// Firejail-style capability validation
-    pub fn has_capability(&self, capability: SandboxCapability) -> bool {
-        if self.enforcement == EnforcementLevel::Disable {
-            return true;
-        }
-        !self.dropped_capabilities.contains(&capability)
-    }
-
-    /// Isolated PID namespace translation: Returns translated namespace pid or default
-    pub fn get_namespaced_pid(&self, physical_pid: u32) -> u32 {
-        *self.pid_namespace_map.get(&physical_pid).unwrap_or(&physical_pid)
-    }
-
-    /// Isolated PID namespace configuration
-    pub fn register_namespaced_pid(&mut self, physical_pid: u32, sandbox_pid: u32) {
-        self.pid_namespace_map.insert(physical_pid, sandbox_pid);
     }
 
     /// AppArmor and SELinux parity validation checking
@@ -269,34 +184,5 @@ mod tests {
         // Disable mode bypasses blocks
         sandbox.enforcement = EnforcementLevel::Disable;
         assert!(sandbox.validate_path_access("/etc/shadow/admin"));
-    }
-
-    #[test]
-    fn test_sandboxie_write_redirection() {
-        let mut sandbox = PrivacyFirstSandbox::new(909, "pqc-token-444");
-        sandbox.add_write_redirection("/etc", "/sandbox/909/etc");
-
-        // Resolved isolated paths
-        assert_eq!(sandbox.resolve_file_operation_path("/etc/passwd"), "/sandbox/909/etc/passwd");
-        assert_eq!(sandbox.resolve_file_operation_path("/home/user/text.txt"), "/home/user/text.txt");
-    }
-
-    #[test]
-    fn test_firejail_dropped_caps() {
-        let mut sandbox = PrivacyFirstSandbox::new(1010, "pqc-token-555");
-        assert!(sandbox.has_capability(SandboxCapability::CapNetRaw));
-
-        sandbox.drop_capability(SandboxCapability::CapNetRaw);
-        assert!(!sandbox.has_capability(SandboxCapability::CapNetRaw));
-        assert!(sandbox.has_capability(SandboxCapability::CapSysAdmin));
-    }
-
-    #[test]
-    fn test_isolated_pid_namespace() {
-        let mut sandbox = PrivacyFirstSandbox::new(2020, "pqc-token-666");
-        sandbox.register_namespaced_pid(4567, 2);
-
-        assert_eq!(sandbox.get_namespaced_pid(4567), 2);
-        assert_eq!(sandbox.get_namespaced_pid(9999), 9999);
     }
 }

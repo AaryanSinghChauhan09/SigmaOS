@@ -1,8 +1,19 @@
 // SigmaOS Filesystem Module
 pub mod vfs;
-pub mod cow_snapshot;
+pub mod legacy_fs;
+pub mod sigma_fs;
+pub mod smart_symlink;
 
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use cow_snapshot::{
-    CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+pub use legacy_fs::{
+    LegacyFsType, LegacyFSAdapter,
+};
+pub use sigma_fs::{
+    FileBlock, SigmaFS,
+    SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+    SigmaDisasterRecoveryCleaner,
+    SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio,
+};
+pub use smart_symlink::{
+    SymlinkError, SmartSymlink,
 };
