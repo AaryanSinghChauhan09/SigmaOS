@@ -182,6 +182,212 @@ impl DhcpClient {
     }
 }
 
+/// Linux-inspired SSHD Daemon Configuration
+#[derive(Debug, Clone)]
+pub struct SshdConfig {
+    pub port: u16,
+    pub permit_root_login: bool,
+    pub password_authentication: bool,
+    pub pubkey_authentication: bool,
+    pub max_auth_tries: u32,
+    pub banner: Option<String>,
+    pub allow_users: Vec<String>,
+}
+
+impl Default for SshdConfig {
+    fn default() -> Self {
+        Self {
+            port: 22,
+            permit_root_login: false,
+            password_authentication: true,
+            pubkey_authentication: true,
+            max_auth_tries: 6,
+            banner: Some("Welcome to SigmaOS Sovereign Secure Shell".to_string()),
+            allow_users: Vec::new(),
+        }
+    }
+}
+
+impl SshdConfig {
+    /// Parse an OpenSSH-style config string (e.g. sshd_config)
+    pub fn parse(config_str: &str) -> Self {
+        let mut config = SshdConfig::default();
+        for line in config_str.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            let mut parts = line.splitn(2, |c: char| c.is_whitespace());
+            let key = parts.next().unwrap_or("").trim().to_lowercase();
+            let val = parts.next().unwrap_or("").trim();
+            if key.is_empty() || val.is_empty() {
+                continue;
+            }
+
+            match key.as_str() {
+                "port" => {
+                    if let Ok(p) = val.parse::<u16>() {
+                        config.port = p;
+                    }
+                }
+                "permitrootlogin" => {
+                    config.permit_root_login = val.to_lowercase() == "yes";
+                }
+                "passwordauthentication" => {
+                    config.password_authentication = val.to_lowercase() == "yes";
+                }
+                "pubkeyauthentication" => {
+                    config.pubkey_authentication = val.to_lowercase() == "yes";
+                }
+                "maxauthtries" => {
+                    if let Ok(tries) = val.parse::<u32>() {
+                        config.max_auth_tries = tries;
+                    }
+                }
+                "banner" => {
+                    if val.to_lowercase() == "none" {
+                        config.banner = None;
+                    } else {
+                        config.banner = Some(val.to_string());
+                    }
+                }
+                "allowusers" => {
+                    config.allow_users = val.split_whitespace().map(|s| s.to_string()).collect();
+                }
+                _ => {}
+            }
+        }
+        config
+    }
+}
+
+/// Linux-inspired SSH Daemon with fail2ban-style defensive blocklisting,
+/// concurrent session tracking, AllowUsers filters, and PAM MFA simulation.
+pub struct SshDaemon {
+    pub config: SshdConfig,
+    pub active_sessions: usize,
+    pub max_sessions: usize,
+    pub failed_attempts: crate::klib::HashMap<String, u32>, // IP -> Count
+    pub blocklisted_ips: Vec<String>,
+}
+
+impl SshDaemon {
+    pub fn new(config: SshdConfig, max_sessions: usize) -> Self {
+        Self {
+            config,
+            active_sessions: 0,
+            max_sessions,
+            failed_attempts: crate::klib::HashMap::new(),
+            blocklisted_ips: Vec::new(),
+        }
+    }
+
+    /// Connect a client from an IP. Returns a welcome banner or error.
+    pub fn handle_connection(&mut self, client_ip: &str) -> Result<Option<String>, &'static str> {
+        if self.blocklisted_ips.contains(&client_ip.to_string()) {
+            return Err("SSHD: Connection rejected. IP address is blocklisted (brute force protection).");
+        }
+        if self.active_sessions >= self.max_sessions {
+            return Err("SSHD: Max connection limit reached.");
+        }
+        self.active_sessions += 1;
+        Ok(self.config.banner.clone())
+    }
+
+    /// Disconnect an active client
+    pub fn handle_disconnect(&mut self, _client_ip: &str) {
+        if self.active_sessions > 0 {
+            self.active_sessions -= 1;
+        }
+    }
+
+    /// Authenticate a user session with a Password or Public Key.
+    /// Supports PAM multi-factor security simulation and fail2ban defensive blocklisting.
+    pub fn authenticate(
+        &mut self,
+        client_ip: &str,
+        username: &str,
+        auth_method: &str,
+        credentials: &[u8],
+        mfa_token: Option<&str>,
+    ) -> Result<SshSession, &'static str> {
+        if self.blocklisted_ips.contains(&client_ip.to_string()) {
+            return Err("SSHD: IP is blocked due to too many failed authentication attempts.");
+        }
+
+        // 1. Check root login permissions
+        if username == "root" && !self.config.permit_root_login {
+            self.record_failure(client_ip);
+            return Err("SSHD: Root login is not permitted under the current security policy.");
+        }
+
+        // 2. Check AllowUsers filters
+        if !self.config.allow_users.is_empty() && !self.config.allow_users.contains(&username.to_string()) {
+            self.record_failure(client_ip);
+            return Err("SSHD: User not in AllowUsers list.");
+        }
+
+        // 3. Verify Authentication Type Allowed
+        let mut auth_success = false;
+        if auth_method == "password" {
+            if !self.config.password_authentication {
+                self.record_failure(client_ip);
+                return Err("SSHD: Password authentication is disabled.");
+            }
+            // Simple password check
+            if credentials == b"sovereign_pass" {
+                auth_success = true;
+            }
+        } else if auth_method == "pubkey" {
+            if !self.config.pubkey_authentication {
+                self.record_failure(client_ip);
+                return Err("SSHD: Public key authentication is disabled.");
+            }
+            // Simple pubkey check
+            if credentials == b"sovereign_key" {
+                auth_success = true;
+            }
+        } else {
+            self.record_failure(client_ip);
+            return Err("SSHD: Unsupported authentication method.");
+        }
+
+        if !auth_success {
+            self.record_failure(client_ip);
+            return Err("SSHD: Authentication failed.");
+        }
+
+        // 4. PAM-like Multi-factor Authentication stage if enabled
+        if let Some(token) = mfa_token {
+            if token != "123456" {
+                self.record_failure(client_ip);
+                return Err("SSHD: Multi-Factor Authentication (PAM) verification failed.");
+            }
+        }
+
+        // Success! Reset failed attempts for this IP
+        self.failed_attempts.remove(&client_ip.to_string());
+
+        let mut session = SshSession::new(SshVersion::Ssh2);
+        session.key_exchange().unwrap();
+        session.is_authenticated = true;
+        session.open_shell_channel().unwrap();
+
+        Ok(session)
+    }
+
+    fn record_failure(&mut self, client_ip: &str) {
+        let attempts = self.failed_attempts.get(client_ip).cloned().unwrap_or(0) + 1;
+        self.failed_attempts.insert(client_ip.to_string(), attempts);
+
+        if attempts >= self.config.max_auth_tries {
+            if !self.blocklisted_ips.contains(&client_ip.to_string()) {
+                self.blocklisted_ips.push(client_ip.to_string());
+            }
+        }
+    }
+}
+
 impl Default for DhcpClient {
     fn default() -> Self {
         Self::new()
@@ -810,6 +1016,97 @@ mod tests {
         ssh.authenticate(b"key").unwrap();
         ssh.open_shell_channel().unwrap();
         assert!(ssh.channel_opened);
+    }
+
+    #[test]
+    fn test_sshd_config_parsing() {
+        let config_str = r#"
+            # This is a comment
+            Port 2222
+            PermitRootLogin Yes
+            PasswordAuthentication No
+            PubkeyAuthentication Yes
+            MaxAuthTries 3
+            Banner Welcome to Linux Distro Inspired SSHD
+            AllowUsers alice bob
+        "#;
+        let config = SshdConfig::parse(config_str);
+        assert_eq!(config.port, 2222);
+        assert!(config.permit_root_login);
+        assert!(!config.password_authentication);
+        assert!(config.pubkey_authentication);
+        assert_eq!(config.max_auth_tries, 3);
+        assert_eq!(config.banner, Some("Welcome to Linux Distro Inspired SSHD".to_string()));
+        assert_eq!(config.allow_users, vec!["alice".to_string(), "bob".to_string()]);
+    }
+
+    #[test]
+    fn test_sshd_daemon_authentication_flow() {
+        let config_str = r#"
+            Port 22
+            PermitRootLogin No
+            PasswordAuthentication Yes
+            PubkeyAuthentication Yes
+            MaxAuthTries 3
+            AllowUsers secure_user
+        "#;
+        let config = SshdConfig::parse(config_str);
+        let mut daemon = SshDaemon::new(config, 2);
+
+        // 1. Connection check
+        let banner = daemon.handle_connection("192.168.1.1").unwrap();
+        assert!(banner.is_some());
+        assert_eq!(daemon.active_sessions, 1);
+
+        // 2. Reject connection when max limit is exceeded
+        let conn_res = daemon.handle_connection("192.168.1.2");
+        assert!(conn_res.is_ok());
+        let conn_res_limit = daemon.handle_connection("192.168.1.3");
+        assert!(conn_res_limit.is_err()); // Limit is 2
+
+        daemon.handle_disconnect("192.168.1.2");
+        assert_eq!(daemon.active_sessions, 1);
+
+        // 3. Authenticate with invalid password
+        let auth_failed = daemon.authenticate("192.168.1.1", "secure_user", "password", b"wrong_pass", None);
+        assert!(auth_failed.is_err());
+
+        // 4. Authenticate with valid password
+        let session = daemon.authenticate("192.168.1.1", "secure_user", "password", b"sovereign_pass", None).unwrap();
+        assert!(session.is_authenticated);
+
+        // 5. Test root login permission check (root permitted is false)
+        let root_res = daemon.authenticate("192.168.1.1", "root", "password", b"sovereign_pass", None);
+        assert!(root_res.is_err());
+
+        // 6. Test PAM-like MFA support
+        let mfa_failed = daemon.authenticate("192.168.1.1", "secure_user", "password", b"sovereign_pass", Some("wrong_token"));
+        assert!(mfa_failed.is_err());
+
+        let mfa_success = daemon.authenticate("192.168.1.1", "secure_user", "password", b"sovereign_pass", Some("123456")).unwrap();
+        assert!(mfa_success.is_authenticated);
+    }
+
+    #[test]
+    fn test_sshd_daemon_fail2ban_brute_force_protection() {
+        let config_str = r#"
+            MaxAuthTries 2
+        "#;
+        let config = SshdConfig::parse(config_str);
+        let mut daemon = SshDaemon::new(config, 10);
+
+        let ip = "10.0.0.5";
+        let res1 = daemon.authenticate(ip, "user1", "password", b"wrong_pass", None);
+        assert!(res1.is_err());
+        assert!(!daemon.blocklisted_ips.contains(&ip.to_string()));
+
+        let res2 = daemon.authenticate(ip, "user1", "password", b"wrong_pass", None);
+        assert!(res2.is_err());
+        // Blocklisted after 2 attempts
+        assert!(daemon.blocklisted_ips.contains(&ip.to_string()));
+
+        let res_blocked = daemon.authenticate(ip, "user1", "password", b"sovereign_pass", None);
+        assert!(res_blocked.is_err());
     }
 
     #[test]
