@@ -241,8 +241,8 @@ unsafe fn alloc(size: usize) -> *mut u8 {
 }
 
 #[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
+unsafe fn free(_ptr: *mut u8) {
+    // Stub for hosted targets - no deallocation needed
 }
 
 #[cfg(target_os = "none")]
