@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// Virtual File System (VFS) Abstraction
 /// This module provides the OOP-based traits for mounting and interacting with
 /// diverse file systems (FAT32, Ext2, and the future Sovereign FS).

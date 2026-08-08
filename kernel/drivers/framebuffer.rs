@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// SigmaOS: VESA/GOP Framebuffer Driver
 /// Phase G Blocker #7: VESA/GOP framebuffer
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.

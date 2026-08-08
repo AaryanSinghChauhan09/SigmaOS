@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Mock custom TCP/IP stack implementation for SigmaOS
 #include <stddef.h>
 #include <stdint.h>

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pub mod vga;
 pub mod bus;
 pub mod nic;

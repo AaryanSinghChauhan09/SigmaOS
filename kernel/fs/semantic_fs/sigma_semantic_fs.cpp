@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /*
  * =========================================================================
  * Σ SIGMAOS: SEMANTIC FILE SYSTEM (SemanticFS)

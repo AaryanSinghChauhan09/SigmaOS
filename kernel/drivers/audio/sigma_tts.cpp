@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /*
  * =========================================================================
  * Σ SIGMAOS: SIGMA-TTS — NATIVE TEXT-TO-SPEECH DRIVER

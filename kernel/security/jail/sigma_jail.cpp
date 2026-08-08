@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /*
  * =========================================================================
  * Σ SIGMAOS: POST-QUANTUM SANDBOXING (sigma-jail)

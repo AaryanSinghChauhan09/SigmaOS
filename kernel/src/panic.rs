@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// SigmaOS: Kernel Panic Handler
 /// Enhanced panic handler with detailed error reporting
 

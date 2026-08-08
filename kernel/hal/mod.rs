@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 // Hardware Abstraction Layer module - exports Phase G HAL components
 pub mod interrupt_controller;
 

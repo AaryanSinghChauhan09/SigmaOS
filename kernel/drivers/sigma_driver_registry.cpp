@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * =========================================================================
  * Σ SIGMAOS SOVEREIGN DRIVER REGISTRY

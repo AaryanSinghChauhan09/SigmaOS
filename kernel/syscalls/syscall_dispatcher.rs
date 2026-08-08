@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// SigmaOS: System Call Dispatcher
 /// Phase G Blocker #6: 30-syscall dispatch
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
