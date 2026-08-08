@@ -74,6 +74,11 @@ jobs:
         uses: rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
+||||||| 11f4f2cdf
+        uses: rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: "1. Run Standalone POSIX & Libc compatibility tests"
         run: |
