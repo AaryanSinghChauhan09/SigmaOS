@@ -435,7 +435,7 @@ mod tests {
         // In production, use a proper CSPRNG like getrandom() or hardware RNG.
         // Use timestamp-based generation for test purposes
         let mut key = [0u8; 32];
-        let mut iv = [0u8; 12];
+        let mut iv = [1u8; 12];
         
         // Use timestamp-based generation for better randomness in tests
         use std::time::{SystemTime, UNIX_EPOCH};
@@ -450,14 +450,6 @@ mod tests {
             val = val.wrapping_mul(0xff51afd7ed558ccd);
             val ^= val >> 33;
             key[i] = (val & 0xFF) as u8;
-        }
-        
-        // Initialize IV with timestamp-based values for test security
-        for i in 0..12 {
-            let mut val = timestamp.wrapping_add(i as u64 * 7);
-            val ^= val >> 17;
-            val = val.wrapping_mul(0x9e3779b97f4a7c15);
-            iv[i] = (val & 0xFF) as u8;
         }
 
         let input = b"Secret Linux/BSD Sovereign Payload!";

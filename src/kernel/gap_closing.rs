@@ -637,7 +637,7 @@ pub fn io_attach_device_to_device_stack(
 }
 
 /// Simulates calling the driver, forwarding the IRP down the device stack (IoCallDriver)
-pub fn io_call_driver(device: &DeviceObject, irp: &mut Irp) -> u32 {
+pub fn io_call_driver(_device: &DeviceObject, irp: &mut Irp) -> u32 {
     if irp.current_stack_index > 0 {
         irp.current_stack_index -= 1;
     }

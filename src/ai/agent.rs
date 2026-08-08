@@ -207,14 +207,13 @@ impl Pattern {
 
 impl SimpleAIAgent {
     pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
-        let mut name_str = String::new();
-        for &byte in name {
-            if byte == 0 { break; }
-            let c: char = byte as char;
-            name_str.push(c);
+        let mut name_array = [0u8; 64];
+        let name_len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
         SimpleAIAgent {
-            name: name_str,
+            name: name_array,
             version,
             execution_count: AtomicUsize::new(0),
             capability,
@@ -469,7 +468,7 @@ pub struct SimpleAIAgentManager {
 }
 
 impl SimpleAIAgentManager {
-    pub fn new(capability: ManagerCapability) -> Self {
+    pub fn new() -> Self {
         SimpleAIAgentManager {
             agents: Vec::new(),
             stats: AIStats { failed_requests: 0 },
