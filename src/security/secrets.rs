@@ -344,6 +344,7 @@ impl Keyring for SimpleKeyring {
         }
 
         if let Some(i) = index {
+            // Remove secret without logging sensitive data
             self.secrets.remove(i);
             self.stats.total_secrets -= 1;
             self.stats.by_type[secret_type as usize] -= 1;

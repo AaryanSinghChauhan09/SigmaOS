@@ -1067,7 +1067,7 @@ mod tests {
     fn test_rootkit_dispatch_table_hook_auditer() {
         let mut major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8] = [None; 8];
 
-        fn mock_dispatch(dev: &DeviceObject, irp: &mut Irp) -> u32 { 0 }
+        fn mock_dispatch(_dev: &DeviceObject, _irp: &mut Irp) -> u32 { 0 }
         major_function[0] = Some(mock_dispatch);
 
         let driver = DriverObject {
