@@ -26,6 +26,8 @@ pub use auth::{
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
+pub mod init;
 pub mod customization;
 pub mod dashboard;
 pub mod klib;
@@ -34,6 +36,8 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
+pub mod klib;
+pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
@@ -44,6 +48,31 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai;
+pub mod arch;
+pub mod boot;
+pub mod toolchain;
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -59,15 +88,8 @@ pub use automation::{
 };
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer, WasmState, WasmModule, WasmSandboxEngine,
-    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
-    DpllSatSolver, CasObject, ContentAddressedStorage,
-    TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
-    MetricAggregation, OssieMetric, OssieDimension, OssieRelationship, OssieCatalog,
-    SemanticRow, OssieInterpreter, OssieOntology,
-    EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
-    FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
-    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager, EbuildPackage, PortageEngine,
+    ContainerRuntime, TargetPlatform, TranslationLayer,
+    ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -83,10 +105,12 @@ pub use drivers::{
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    ClusterState as DefragClusterState, FragmentedFile, DefragStats, DiskDefragmenter,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process as KernelProcess,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    ModuleLoadError as LkmLoadError, KernelModule as LkmModule, LkmLoader, KpatchPatch, KpatchManager,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
@@ -95,7 +119,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use process::spawn::{
@@ -106,6 +130,8 @@ pub use process::spawn::{
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+    SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
+    TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -113,10 +139,14 @@ pub use resilience::{
 };
 pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
-    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
-    PenetrationAssistant, secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
+    AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
+    KaliSniffer, PentestAssistant, SecureWipeTool, IntrusionSeverity, IntrusionAlert, SigmaIDS,
 };
-pub use security::hardening;
+pub use init::{
+    Runlevel, ServiceState as InitServiceState, InitError, Service as InitService, SimpleService as InitSimpleService,
+    InitSystem, SigmaInit, DependencyResolver as InitDependencyResolver, SimpleDependencyResolver, ServiceMonitor, SimpleServiceMonitor,
+    FirmwarePort, BIOSPort, UEFIPort, CorebootPort, SecurityPort, DACPort, SELinuxPort, ZeroTrustPort,
+};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
@@ -126,32 +156,9 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-
-pub mod init {
-    pub mod systemd_init;
-}
-pub use init::systemd_init::{
-    SystemdEngine, SystemdUnit, UnitState, UnitType,
-};
-
-pub mod ai {
-    pub mod next_gen;
-    pub mod wandr;
-}
-pub use ai::next_gen::{
-    WorkloadType, AdaptiveKernelPersona, PredictiveSyscallTranslator, DeviceTargetType,
-    AiTask, AiScheduler, EnergyGovernorMode, EnergyAwareScheduler, ModelType,
-    AIModel, MultiModelOrchestrator,
-};
-pub use ai::wandr::{
-    WandrTask, WandrDocument, ResearchResult, WandrEvaluator, SigmaWandrAgent, WandrResearchAgent,
-};
-
-pub mod virt;
-pub use virt::hypervisor::{
-    Guest, GuestID, GuestState, Hypervisor, HypervisorError, SimpleGuest, SimpleHypervisor,
-    VirtualizationGeneration,
-};
-pub use virt::microvm::{
-    MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
+pub use toolchain::self_host::{ToolchainError, CompilerConfig, SelfHostingManager};
+pub use arch::cpu_sys::{
+    SegmentType as CpuSegmentType, GdtDescriptor as CpuGdtDescriptor, IdtGate as CpuIdtGate,
+    VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
+    FastSyscallDispatcher as CpuFastSyscallDispatcher,
 };

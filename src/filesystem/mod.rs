@@ -6,8 +6,9 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
-pub mod cow_snapshot;
+pub mod defragmenter;
 
+pub use defragmenter::{ClusterState, FragmentedFile, DefragStats, DiskDefragmenter};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
@@ -27,6 +28,3 @@ pub use support::{
     LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use cow_snapshot::{
-    CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
-};

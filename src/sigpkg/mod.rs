@@ -8,13 +8,10 @@ pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
 pub mod verifier;
-pub mod rpm_compat;
-pub mod universal_adapter;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use universal_adapter::{
@@ -31,6 +28,12 @@ pub struct Version {
     pub major: u64,
     pub minor: u64,
     pub patch: u64,
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {
@@ -82,6 +85,34 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
+    pub mirrors: Vec<String>,
+    pub signing_keys: Vec<String>,
+    pub licenses: Vec<String>,
+    pub maintainers: Vec<String>,
+    pub changelogs: Vec<String>,
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+            mirrors: Vec::new(),
+            signing_keys: Vec::new(),
+            licenses: Vec::new(),
+            maintainers: Vec::new(),
+            changelogs: Vec::new(),
+        }
+    }
 }
 
 /// Package dependency

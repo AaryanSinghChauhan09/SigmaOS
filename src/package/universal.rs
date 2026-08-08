@@ -155,11 +155,24 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
-        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
-        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
-        to_visit.push(package_name.to_string());
-        let mut visited = std::collections::HashSet::<String>::new();
+    /// Parse a dependency string (e.g. "curl>=7.81.0" or just "curl") into package name and constraint
+    pub fn parse_dependency(dep_str: &str) -> (String, SemVerConstraint) {
+        let operators = [">=", "<=", ">", "<", "="];
+        for op in &operators {
+            if let Some(idx) = dep_str.find(op) {
+                let name = dep_str[..idx].trim().to_string();
+                let constraint_str = &dep_str[idx..];
+                let constraint = SemVerConstraint::parse(constraint_str);
+                return (name, constraint);
+            }
+        }
+        (dep_str.trim().to_string(), SemVerConstraint::Any)
+    }
+
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
+        let mut resolved = Vec::new();
+        let mut to_visit = vec![package_name.to_string()];
+        let mut visited = std::collections::HashSet::new();
 
         while let Some(current) = to_visit.pop() {
             let current: String = current;
@@ -332,6 +345,7 @@ pub struct UniversalPackageManager {
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
+    pub metadata_cache: HashMap<String, UnifiedPackage>,
 }
 
 impl UniversalPackageManager {
@@ -342,6 +356,7 @@ impl UniversalPackageManager {
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
+            metadata_cache: HashMap::new(),
         };
 
         manager.add_default_adapters();

@@ -20,7 +20,7 @@
 pub mod linux_translation;
 pub mod store;
 pub mod universal;
-pub mod apm;
+pub mod debian;
 
 pub use linux_translation::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
@@ -35,4 +35,7 @@ pub use universal::{
 };
 pub use apm::{
     SovereignApp, SovereignApm, IsolationLevel as SovereignIsolationLevel,
+};
+pub use debian::{
+    DebControl, DebPackage, AptSource, DpkgStatusEntry, parse_sources_list, parse_dpkg_status,
 };

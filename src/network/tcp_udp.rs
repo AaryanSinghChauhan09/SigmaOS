@@ -15,11 +15,28 @@ pub enum Protocol { TCP = 0, UDP = 1 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TCPState { Closed = 0, Listen = 1, SynSent = 2, SynReceived = 3, Established = 4, FinWait1 = 5, FinWait2 = 6, CloseWait = 7, Closing = 8, TimeWait = 9 }
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum NetworkError { Success = 0, InvalidSocket = 1, ConnectionFailed = 2, SendFailed = 3, InvalidParameter = 4 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetworkError {
+    Success = 0,
+    InvalidSocket = 1,
+    ConnectionFailed = 2,
+    SendFailed = 3,
+    InvalidParameter = 4,
+}
 
 pub trait Socket {
     fn id(&self) -> SocketID;
@@ -42,7 +59,6 @@ pub enum SocketOption {
     SndBuf,
 }
 
-#[repr(C)]
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
@@ -77,35 +93,6 @@ impl Socket for SimpleSocket {
     fn protocol(&self) -> Protocol { self.protocol }
     fn local_port(&self) -> Port { self.local_port.load(Ordering::SeqCst) as Port }
     fn remote_port(&self) -> Port { self.remote_port.load(Ordering::SeqCst) as Port }
-}
-
-impl BsdSocket for SimpleSocket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => {
-                self.reuse_addr.store(val, Ordering::SeqCst);
-            }
-            SocketOption::TcpNoDelay => {
-                self.tcp_nodelay.store(val, Ordering::SeqCst);
-            }
-            SocketOption::RcvBuf => {
-                self.rcvbuf.store(val, Ordering::SeqCst);
-            }
-            SocketOption::SndBuf => {
-                self.sndbuf.store(val, Ordering::SeqCst);
-            }
-        }
-        Ok(())
-    }
-
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
-            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
-            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
-            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
-        }
-    }
 }
 
 pub trait TCPConnection {
@@ -203,12 +190,6 @@ pub struct RenoCongestionControl {
     pub ssthresh: AtomicUsize,
 }
 
-impl Default for RenoCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl RenoCongestionControl {
     pub fn new() -> Self {
         RenoCongestionControl {
@@ -240,12 +221,6 @@ pub struct BBRCongestionControl {
     pub cwnd: AtomicUsize,
     pub bw_estimate: AtomicUsize,
     pub rtt_min: AtomicUsize,
-}
-
-impl Default for BBRCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl BBRCongestionControl {
@@ -564,12 +539,6 @@ pub struct SimpleNetworkStack {
     pub netfilter: NetfilterFirewall,
     pub routing_table: RoutingTable,
     pub interfaces: Vec<NetworkInterface>,
-}
-
-impl Default for SimpleNetworkStack {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleNetworkStack {

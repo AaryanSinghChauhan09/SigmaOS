@@ -38,29 +38,36 @@ pub enum ShellCommand {
     AgentRun {
         task_id: usize,
     },
-    Gst {
-        basic_cost: f64,
-        rate: u32,
+    Pwd,
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
     },
-    Upi {
-        vpa: String,
-        amount: usize,
+    Cat {
+        filename: String,
     },
-    Translate {
-        lang: String,
-        key: String,
+    Systemctl {
+        action: String,
+        service: String,
     },
-    PeValidate {
-        hex_stub: String,
+    Apt {
+        subcommand: String,
+        package: Option<String>,
     },
-    VmStep {
-        hex_bytecode: String,
-    },
-    Proc {
+    Dpkg {
         args: Vec<String>,
     },
-    FixAnomalies,
-    UnixSocketBridge,
+    Theme {
+        theme_name: String,
+    },
+    Profile {
+        profile_name: String,
+    },
+    A11y {
+        feature: String,
+        state: String,
+    },
     Unknown(String),
 }
 
@@ -110,11 +117,18 @@ impl Default for AgentAutomationEngine {
 
 /// Shell REPL
 pub struct ShellRepl {
-    running: bool,
-    variables: std::collections::HashMap<String, String>,
-    aliases: std::collections::HashMap<String, String>,
-    prompt: String,
-    agent_engine: AgentAutomationEngine,
+    pub running: bool,
+    pub variables: std::collections::HashMap<String, String>,
+    pub aliases: std::collections::HashMap<String, String>,
+    pub prompt: String,
+    pub agent_engine: AgentAutomationEngine,
+    pub current_user: String,
+    pub current_dir: String,
+    pub services: std::collections::HashMap<String, String>,
+    pub installed_packages: std::collections::HashSet<String>,
+    pub current_theme: String,
+    pub current_profile: String,
+    pub a11y_features: std::collections::HashMap<String, bool>,
 }
 
 impl ShellRepl {
@@ -123,18 +137,15 @@ impl ShellRepl {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt: "sigma-sh> ".to_string(),
+            prompt: "ubuntu@sigmaos:~$ ".to_string(),
             agent_engine: AgentAutomationEngine::new(),
-        }
-    }
-
-    pub fn with_prompt(prompt: String) -> Self {
-        Self {
-            running: true,
-            variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
-            prompt,
-            agent_engine: AgentAutomationEngine::new(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: std::collections::HashMap::new(),
         }
     }
 
@@ -217,6 +228,94 @@ impl ShellRepl {
             "echo" => {
                 let message = parts[1..].join(" ");
                 ShellCommand::Echo { message }
+            }
+            "su" => {
+                if parts.len() >= 2 {
+                    let password = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
+                    } else {
+                        None
+                    };
+                    ShellCommand::Su {
+                        username: parts[1].to_string(),
+                        password,
+                    }
+                } else {
+                    ShellCommand::Su {
+                        username: "root".to_string(),
+                        password: None,
+                    }
+                }
+            }
+            "cat" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Cat {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "systemctl" => {
+                if parts.len() >= 2 {
+                    let action = parts[1].to_string();
+                    let service = if parts.len() >= 3 {
+                        parts[2].to_string()
+                    } else {
+                        String::new()
+                    };
+                    ShellCommand::Systemctl { action, service }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "apt" => {
+                if parts.len() >= 2 {
+                    let subcommand = parts[1].to_string();
+                    let package = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
+                    } else {
+                        None
+                    };
+                    ShellCommand::Apt {
+                        subcommand,
+                        package,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "dpkg" => {
+                let args = parts[1..].iter().map(|&s| s.to_string()).collect();
+                ShellCommand::Dpkg { args }
+            }
+            "theme" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Theme {
+                        theme_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "profile" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Profile {
+                        profile_name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "a11y" => {
+                if parts.len() >= 3 {
+                    ShellCommand::A11y {
+                        feature: parts[1].to_string(),
+                        state: parts[2].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
             "set" => {
                 if parts.len() >= 3 {
@@ -408,6 +507,221 @@ impl ShellRepl {
             ShellCommand::Exit => {
                 self.running = false;
                 Ok(String::new())
+            }
+            ShellCommand::Pwd => Ok(self.current_dir.clone()),
+            ShellCommand::WhoAmI => Ok(self.current_user.clone()),
+            ShellCommand::Su { username, password } => {
+                if username == "root" {
+                    let pwd = password.unwrap_or_default();
+                    if pwd == "admin" || pwd == "root" {
+                        self.current_user = "root".to_string();
+                        self.current_dir = "/root".to_string();
+                        self.prompt = "root@sigmaos:# ".to_string();
+                        Ok("Successfully logged in as root.".to_string())
+                    } else {
+                        Err("su: Authentication failure (hint: use 'su root admin')".to_string())
+                    }
+                } else {
+                    self.current_user = username.clone();
+                    self.current_dir = format!("/home/{}", username);
+                    self.prompt = format!("{}@sigmaos:~$ ", username);
+                    Ok(format!("Logged in as {}.", username))
+                }
+            }
+            ShellCommand::Cat { filename } => {
+                if filename == "README.md" {
+                    Ok("# 🛡️ SigmaOS — Sovereign, AI-Native Operating System".to_string())
+                } else if filename == "Cargo.toml" {
+                    Ok("[package]\nname = \"sigmaos\"\nversion = \"0.1.0\"".to_string())
+                } else {
+                    Err(format!("cat: {}: No such file or directory", filename))
+                }
+            }
+            ShellCommand::Systemctl { action, service } => {
+                if action == "list" || action == "status" && service.is_empty() {
+                    let mut list_str = "UNIT                ACTIVE   SUB\n".to_string();
+                    for (s, st) in &self.services {
+                        list_str.push_str(&format!("{:<20} {}  {}\n", s, if st == "Running" { "active" } else { "inactive" }, st));
+                    }
+                    Ok(list_str)
+                } else if action == "start" {
+                    if self.services.contains_key(&service) {
+                        self.services.insert(service.clone(), "Running".to_string());
+                        Ok(format!("Started {} service.", service))
+                    } else {
+                        Err(format!("Failed to start {}.service: Unit not found.", service))
+                    }
+                } else if action == "stop" {
+                    if self.services.contains_key(&service) {
+                        self.services.insert(service.clone(), "Stopped".to_string());
+                        Ok(format!("Stopped {} service.", service))
+                    } else {
+                        Err(format!("Failed to stop {}.service: Unit not found.", service))
+                    }
+                } else if action == "status" {
+                    if let Some(status) = self.services.get(&service) {
+                        Ok(format!("● {}.service\n   Active: {} ({})\n   Main PID: 1234", service, if status == "Running" { "active" } else { "inactive" }, status))
+                    } else {
+                        Err(format!("Unit {}.service could not be found.", service))
+                    }
+                } else {
+                    Err(format!("systemctl: Unknown action '{}'", action))
+                }
+            }
+            ShellCommand::Apt { subcommand, package } => {
+                use crate::package::debian::parse_sources_list;
+
+                if subcommand == "update" {
+                    let mock_sources = "deb http://deb.debian.org/debian bookworm main\n\
+                                        deb-src http://security.debian.org/debian-security bookworm-security main\n";
+                    let parsed_sources = parse_sources_list(mock_sources).unwrap_or_default();
+                    let mut out = String::new();
+                    for (i, source) in parsed_sources.iter().enumerate() {
+                        let prefix = if source.is_source { "Get" } else { "Hit" };
+                        out.push_str(&format!("{}:{} {} {} InRelease\n", prefix, i + 1, source.uri, source.suite));
+                    }
+                    out.push_str("Reading package lists... Done\nBuilding dependency tree... Done\nAll packages are up to date.");
+                    Ok(out)
+                } else if subcommand == "list" {
+                    let mut list_str = "Listing installed packages...\n".to_string();
+                    for pkg in &self.installed_packages {
+                        list_str.push_str(&format!("{}/noble,now 1.0.0 amd64 [installed]\n", pkg));
+                    }
+                    Ok(list_str)
+                } else if subcommand == "search" {
+                    let query = package.unwrap_or_default();
+                    if query.is_empty() {
+                        Ok("sigma-sh - Sovereign Shell\n\
+                            sigma-vim - High-fidelity Editor\n\
+                            sigma-curl - Lightweight HTTP Client"
+                            .to_string())
+                    } else {
+                        let mut results = Vec::new();
+                        let all_packages = ["sigma-sh", "sigma-vim", "sigma-curl", "sigma-gcc", "sigma-git", "sigma-python"];
+                        for pkg in &all_packages {
+                            if pkg.contains(&query) {
+                                results.push(format!("{} - Package matching query", pkg));
+                            }
+                        }
+                        if results.is_empty() {
+                            Ok("No matching packages found.".to_string())
+                        } else {
+                            Ok(results.join("\n"))
+                        }
+                    }
+                } else if subcommand == "install" {
+                    let pkg = package.ok_or_else(|| "apt: Please specify a package to install".to_string())?;
+                    self.installed_packages.insert(pkg.clone());
+                    Ok(format!("Reading package lists...\n\
+                                Building dependency tree...\n\
+                                The following NEW packages will be installed:\n\
+                                  {}\n\
+                                Preparing to unpack ...\n\
+                                Unpacking {} ...\n\
+                                Setting up {} ...\n\
+                                Successfully installed.", pkg, pkg, pkg))
+                } else {
+                    Err(format!("apt: Unknown command '{}'", subcommand))
+                }
+            }
+            ShellCommand::Dpkg { args } => {
+                use crate::package::debian::{parse_dpkg_status, DebPackage};
+
+                if args.is_empty() {
+                    return Err("dpkg: Please specify action (-l, -i)".to_string());
+                }
+
+                if args[0] == "-l" {
+                    let mock_status = "Package: coreutils\n\
+                                       Status: install ok installed\n\
+                                       Version: 9.1-1\n\
+                                       Description: GNU core utilities\n\n\
+                                       Package: bash\n\
+                                       Status: install ok installed\n\
+                                       Version: 5.2.15-1\n\
+                                       Description: GNU Bourne Again SHell\n";
+                    let mut status_entries = parse_dpkg_status(mock_status);
+
+                    for pkg in &self.installed_packages {
+                        status_entries.push(crate::package::debian::DpkgStatusEntry {
+                            package: pkg.clone(),
+                            status: "install ok installed".to_string(),
+                            priority: "optional".to_string(),
+                            section: "utils".to_string(),
+                            installed_size: 1024,
+                            maintainer: "Debian".to_string(),
+                            architecture: "amd64".to_string(),
+                            version: "1.0.0".to_string(),
+                            description: "Dynamically installed package".to_string(),
+                        });
+                    }
+
+                    let mut out = "Desired=Unknown/Install/Remove/Purge/Hold\n\
+                                   | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend\n\
+                                   |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)\n\
+                                   ||/ Name           Version      Architecture Description\n\
+                                   +++-==============-============-============-=================================\n".to_string();
+                    for entry in status_entries {
+                        out.push_str(&format!("ii  {:<14} {:<12} amd64        {}\n", entry.package, entry.version, entry.description));
+                    }
+                    Ok(out)
+                } else if args[0] == "-i" {
+                    if args.len() < 2 {
+                        return Err("dpkg: Please specify a .deb package file to install".to_string());
+                    }
+                    let file_name = &args[1];
+
+                    let mut mock_deb = Vec::new();
+                    mock_deb.extend_from_slice(b"!<arch>\n");
+
+                    let mut bin_header = [b' '; 60];
+                    bin_header[0..13].copy_from_slice(b"debian-binary");
+                    bin_header[48..51].copy_from_slice(b"4  ");
+                    bin_header[58..60].copy_from_slice(b"\x60\x0A");
+                    mock_deb.extend_from_slice(&bin_header);
+                    mock_deb.extend_from_slice(b"2.0\n");
+
+                    let mut ctrl_header = [b' '; 60];
+                    ctrl_header[0..7].copy_from_slice(b"control");
+                    let ctrl_data = format!("Package: {}\nVersion: 2.1.0\nDescription: Installed from debian file\n", file_name.replace(".deb", ""));
+                    let size_str = format!("{:<10}", ctrl_data.len());
+                    ctrl_header[48..58].copy_from_slice(size_str.as_bytes());
+                    ctrl_header[58..60].copy_from_slice(b"\x60\x0A");
+                    mock_deb.extend_from_slice(&ctrl_header);
+                    mock_deb.extend_from_slice(ctrl_data.as_bytes());
+                    if ctrl_data.len() % 2 != 0 {
+                        mock_deb.push(0);
+                    }
+
+                    let deb_package = DebPackage::parse_binary(&mock_deb).map_err(|e| format!("dpkg error: {}", e))?;
+                    let pkg_name = deb_package.control.package.clone();
+
+                    self.installed_packages.insert(pkg_name.clone());
+
+                    Ok(format!(
+                        "Selecting previously unselected package {}.\n\
+                         (Reading database ... 128503 files and directories currently installed.)\n\
+                         Preparing to unpack {} ...\n\
+                         Unpacking {} ({}) ...\n\
+                         Setting up {} ({}) ...",
+                        pkg_name, file_name, pkg_name, deb_package.control.version, pkg_name, deb_package.control.version
+                    ))
+                } else {
+                    Err(format!("dpkg: Unknown action '{}'", args[0]))
+                }
+            }
+            ShellCommand::Theme { theme_name } => {
+                self.current_theme = theme_name.clone();
+                Ok(format!("Theme set to {}", theme_name))
+            }
+            ShellCommand::Profile { profile_name } => {
+                self.current_profile = profile_name.clone();
+                Ok(format!("Profile set to {}", profile_name))
+            }
+            ShellCommand::A11y { feature, state } => {
+                let is_on = state == "on" || state == "true";
+                self.a11y_features.insert(feature.clone(), is_on);
+                Ok(format!("A11y feature {} set to {}", feature, state))
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
