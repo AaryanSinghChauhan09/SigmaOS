@@ -1,28 +1,19 @@
-use crate::klib::Vec;
 /// OOP-based ML Inference Engine for SigmaOS
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 926
 /// Implements neural network inference and model loading
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type ModelID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModelType {
-    NeuralNetwork = 0,
-    DecisionTree = 1,
-    SVM = 2,
-    Transformer = 3,
-}
+pub enum ModelType { NeuralNetwork = 0, DecisionTree = 1, SVM = 2, Transformer = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MLError {
-    Success = 0,
-    ModelNotFound = 1,
-    InvalidInput = 2,
-    InferenceFailed = 3,
-}
+pub enum MLError { Success = 0, ModelNotFound = 1, InvalidInput = 2, InferenceFailed = 3 }
 
 pub trait MLModel {
     fn id(&self) -> ModelID;
@@ -58,9 +49,7 @@ impl SimpleMLModel {
 }
 
 impl MLModel for SimpleMLModel {
-    fn id(&self) -> ModelID {
-        self.id
-    }
+    fn id(&self) -> ModelID { self.id }
     fn model_type(&self) -> ModelType {
         match self.model_type.load(Ordering::SeqCst) {
             0 => ModelType::NeuralNetwork,
@@ -69,12 +58,8 @@ impl MLModel for SimpleMLModel {
             _ => ModelType::Transformer,
         }
     }
-    fn input_size(&self) -> usize {
-        self.input_size.load(Ordering::SeqCst)
-    }
-    fn output_size(&self) -> usize {
-        self.output_size.load(Ordering::SeqCst)
-    }
+    fn input_size(&self) -> usize { self.input_size.load(Ordering::SeqCst) }
+    fn output_size(&self) -> usize { self.output_size.load(Ordering::SeqCst) }
 
     fn infer(&self, input: &[f32]) -> Result<Vec<f32>, MLError> {
         let input_size = self.input_size();
@@ -141,9 +126,7 @@ impl InferenceEngine for SimpleInferenceEngine {
     fn get_model(&self, id: ModelID) -> Option<&dyn MLModel> {
         for model_option in &self.models {
             if let Some(ref model) = *model_option {
-                if model.id() == id {
-                    return Some(model.as_ref());
-                }
+                if model.id() == id { return Some(model.as_ref()); }
             }
         }
         None
@@ -192,12 +175,8 @@ impl SimpleTensor {
 }
 
 impl Tensor for SimpleTensor {
-    fn shape(&self) -> &[usize] {
-        &self.shape
-    }
-    fn data(&self) -> &[f32] {
-        &self.data
-    }
+    fn shape(&self) -> &[usize] { &self.shape }
+    fn data(&self) -> &[f32] { &self.data }
 
     fn reshape(&mut self, new_shape: &[usize]) -> Result<(), MLError> {
         let mut new_size = 1;

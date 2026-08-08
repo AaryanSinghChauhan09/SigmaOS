@@ -13,6 +13,16 @@ pub use audio::editor::{
     AudioTrack, MultiTrackSession, AudioEffect, AmplifyEffect, EchoEffect, LowPassFilter, NoiseGateEffect, AudioEditor,
 };
 
+pub mod auth;
+pub use auth::{
+    UserID, UserState, User, AuthError, SimpleUser, AuthService, SimpleAuthService,
+    PermissionID, PermissionType as AuthPermissionType, AccessResult, Permission as AuthPermission, SimplePermission, AccessControl,
+    AccessError as AuthAccessError, SimpleAccessControl,
+    IdentityID, IdentityType, IdentityError as AuthIdentityError, DigitalIdentity, SimpleDigitalIdentity,
+    IdentityManager, SimpleIdentityManager, CredentialManager, SimpleCredentialManager,
+    DecentralizedAuth, SimpleDecentralizedAuth,
+};
+
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -27,6 +37,7 @@ pub mod kernel;
 pub mod network;
 pub mod orchestration;
 pub mod package;
+pub mod process;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
@@ -56,15 +67,7 @@ pub use compatibility::{
     SemanticRow, OssieInterpreter, OssieOntology,
     EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
-    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
-    FirewalldZone, RichRule, FirewalldZoneManager, PartitionLayout, AnacondaKickstartInstaller,
-    CoprBuildJob, CoprUserRepoBuilder, IpaUser, HbacRule, FreeIpaDirectoryService,
-    BsdJail, FreeBsdJailManager, OpenBsdSysctlKernelMib,
-    WorkloadCategory, SigmaScheduler, UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingOS,
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper, PMWaniHotspotController,
-    DigiYatraPassScanner, IrctcPnrTracker,
-    SysVinitRunlevel, SysVinitManager, AptPackageMetadata, AptRepositorySynchronizer,
-    AlternativeProvider, DebianAlternativesSystem, DebootstrapEngine,
+    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager, EbuildPackage, PortageEngine,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -82,7 +85,7 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
+    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process as KernelProcess,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
@@ -94,6 +97,11 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use process::spawn::{
+    ProcessID, SIGINT, SIGKILL, SIGUSR1, SIGSEGV, SIGTERM, ProcessState as SpawnProcessState,
+    ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter,
+    SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,

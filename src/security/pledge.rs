@@ -1,25 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// SigmaOS Pledge - Process Privilege Reduction Mechanism
-// Inspired by OpenBSD pledge but capability-based
+// SigmaOS Pledge and Unveil - Process Privilege Reduction Mechanisms
+// Inspired by OpenBSD's security sandboxing models but capability-based
 
 use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
+use crate::klib::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Pledge promise representing process permissions
@@ -68,7 +51,7 @@ impl PledgePromise {
 
     /// Get all allowed permissions
     pub fn permissions(&self) -> &[Permission] {
-        &self.permissions
+        self.permissions.as_slice()
     }
 }
 
@@ -80,67 +63,77 @@ pub enum PledgeError {
     Violation,
 }
 
-#[derive(Debug, Clone)]
-pub struct UnveilEntry {
-    pub path: String,
-    pub permissions: String, // e.g., "r", "rw", "rx"
+/// Represents an unveiled directory or file path with permitted permissions (OpenBSD style)
+pub struct UnveiledPath {
+    pub path: [u8; 64],
+    pub read: bool,
+    pub write: bool,
+    pub execute: bool,
+    pub create: bool,
 }
 
-/// Process pledge manager
+impl UnveiledPath {
+    pub fn new(path: &[u8], permissions: &[u8]) -> Self {
+        let mut path_arr = [0u8; 64];
+        let len = path.len().min(63);
+        path_arr[..len].copy_from_slice(&path[..len]);
+
+        let mut read = false;
+        let mut write = false;
+        let mut execute = false;
+        let mut create = false;
+
+        for &b in permissions {
+            match b {
+                b'r' => read = true,
+                b'w' => write = true,
+                b'x' => execute = true,
+                b'c' => create = true,
+                _ => {}
+            }
+        }
+
+        UnveiledPath {
+            path: path_arr,
+            read,
+            write,
+            execute,
+            create,
+        }
+    }
+
+    /// Returns the length of the string path
+    pub fn path_len(&self) -> usize {
+        self.path.iter().position(|&b| b == 0).unwrap_or(64)
+    }
+
+    /// Checks if a requested path starts with this unveiled prefix
+    pub fn matches_prefix(&self, target_path: &[u8]) -> bool {
+        let len = self.path_len();
+        if target_path.len() < len {
+            return false;
+        }
+        &target_path[..len] == &self.path[..len]
+    }
+}
+
+/// Process pledge and unveil manager
 pub struct PledgeManager {
     /// Current pledge promise
     pledge: Option<PledgePromise>,
     /// Capability gate for validation
     gate: CapabilityGate,
-    /// Unveiled paths for filesystem sandboxing
-    unveiled_paths: Vec<UnveilEntry>,
+    /// Unveiled files/directories list (OpenBSD style)
+    pub unveiled_paths: Vec<UnveiledPath>,
 }
 
 impl PledgeManager {
     /// Create new pledge manager
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pledge: None,
             gate: CapabilityGate::new(),
             unveiled_paths: Vec::new(),
-        }
-    }
-
-    /// Unveil filesystem paths to restrict access (sigma_unveil)
-    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<(), PledgeError> {
-        self.unveiled_paths.push(UnveilEntry {
-            path: path.to_string(),
-            permissions: permissions.to_string(),
-        });
-        Ok(())
-    }
-
-    /// Validate path access against unveil permissions
-    pub fn validate_unveil_access(&self, path: &str, requested_perm: char) -> bool {
-        if self.unveiled_paths.is_empty() {
-            return true; // If no paths are unveiled, allow all accesses
-        }
-
-        // Find the most specific match (longest prefix match)
-        let mut best_match: Option<&UnveilEntry> = None;
-        for entry in &self.unveiled_paths {
-            if path.starts_with(&entry.path) {
-                match best_match {
-                    None => best_match = Some(entry),
-                    Some(best) => {
-                        if entry.path.len() > best.path.len() {
-                            best_match = Some(entry);
-                        }
-                    }
-                }
-            }
-        }
-
-        if let Some(entry) = best_match {
-            entry.permissions.contains(requested_perm)
-        } else {
-            false // Not in unveiled paths, block access!
         }
     }
 
@@ -171,6 +164,46 @@ impl PledgeManager {
         Ok(())
     }
 
+    /// Register an unveiled path with its permitted permission set (e.g. "rw")
+    pub fn unveil(&mut self, path: &[u8], permissions: &[u8]) {
+        self.unveiled_paths.push(UnveiledPath::new(path, permissions));
+    }
+
+    /// Validates requested path access.
+    /// Rules (OpenBSD spec):
+    /// 1. If no paths are unveiled, standard UNIX/Capability rules apply (allow path).
+    /// 2. If at least one path is unveiled, the namespace is locked down: any path that does NOT match an unveiled prefix is forbidden!
+    pub fn validate_path_access(&self, target_path: &[u8], is_write: bool) -> bool {
+        if self.unveiled_paths.is_empty() {
+            return true; // No unveil lockdown active
+        }
+
+        // Find the most specific (longest) matching prefix
+        let mut best_match: Option<&UnveiledPath> = None;
+        let mut best_len = 0;
+
+        for i in 0..self.unveiled_paths.len() {
+            let entry = &self.unveiled_paths[i];
+            if entry.matches_prefix(target_path) {
+                let len = entry.path_len();
+                if len > best_len {
+                    best_len = len;
+                    best_match = Some(entry);
+                }
+            }
+        }
+
+        if let Some(entry) = best_match {
+            if is_write {
+                entry.write
+            } else {
+                entry.read
+            }
+        } else {
+            false // Path is completely hidden / forbidden outside the unveiled namespace
+        }
+    }
+
     /// Validate syscall against pledge
     pub fn validate(&self, permission: Permission) -> Result<(), PledgeError> {
         if let Some(ref pledge) = self.pledge {
@@ -196,45 +229,52 @@ impl Default for PledgeManager {
 /// Common pledge promises
 pub mod promises {
     use super::{Permission, PledgePromise};
+    use crate::klib::Vec;
 
     /// Stdio promise - basic I/O only
     pub fn stdio() -> PledgePromise {
-        PledgePromise::new(vec![Permission::FileRead, Permission::FileWrite])
+        let mut p = Vec::new();
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
     }
 
     /// Network promise - network access
     pub fn network() -> PledgePromise {
-        PledgePromise::new(vec![
-            Permission::NetworkTcp,
-            Permission::NetworkUdp,
-            Permission::FileRead,
-        ])
+        let mut p = Vec::new();
+        p.push(Permission::NetworkTcp);
+        p.push(Permission::NetworkUdp);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
     }
 
     /// Exec promise - can execute processes
     pub fn exec() -> PledgePromise {
-        PledgePromise::new(vec![
-            Permission::ProcessExec,
-            Permission::FileRead,
-            Permission::FileWrite,
-        ])
+        let mut p = Vec::new();
+        p.push(Permission::ProcessExec);
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
     }
 
     /// IPC promise - inter-process communication
     pub fn ipc() -> PledgePromise {
-        PledgePromise::new(vec![Permission::Ipc, Permission::FileRead])
+        let mut p = Vec::new();
+        p.push(Permission::Ipc);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
     }
 
     /// Full promise - all permissions
     pub fn full() -> PledgePromise {
-        PledgePromise::new(vec![
-            Permission::NetworkTcp,
-            Permission::NetworkUdp,
-            Permission::FileRead,
-            Permission::FileWrite,
-            Permission::ProcessExec,
-            Permission::Ipc,
-        ])
+        let mut p = Vec::new();
+        p.push(Permission::NetworkTcp);
+        p.push(Permission::NetworkUdp);
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        p.push(Permission::ProcessExec);
+        p.push(Permission::Ipc);
+        PledgePromise::new(p)
     }
 }
 
@@ -245,20 +285,26 @@ mod tests {
 
     #[test]
     fn test_pledge_creation() {
-        let promise = PledgePromise::new(vec![Permission::FileRead]);
+        let mut p = Vec::new();
+        p.push(Permission::FileRead);
+        let promise = PledgePromise::new(p);
         assert!(!promise.active.load(Ordering::SeqCst));
     }
 
     #[test]
     fn test_pledge_activation() {
-        let promise = PledgePromise::new(vec![Permission::FileRead]);
+        let mut p = Vec::new();
+        p.push(Permission::FileRead);
+        let promise = PledgePromise::new(p);
         assert!(promise.activate().is_ok());
         assert!(promise.activate().is_err());
     }
 
     #[test]
     fn test_pledge_permission_check() {
-        let promise = PledgePromise::new(vec![Permission::FileRead]);
+        let mut p = Vec::new();
+        p.push(Permission::FileRead);
+        let promise = PledgePromise::new(p);
         promise.activate().unwrap();
         assert!(promise.allows(Permission::FileRead));
         assert!(!promise.allows(Permission::FileWrite));
@@ -286,26 +332,23 @@ mod tests {
     }
 
     #[test]
-    fn test_unveil_sandboxing() {
+    fn test_openbsd_unveil_sandboxing() {
         let mut manager = PledgeManager::new();
 
-        // Before any unveil, everything is allowed
-        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
-        assert!(manager.validate_unveil_access("/etc/passwd", 'r'));
+        // 1. By default, with no unveiled paths, access is permitted
+        assert!(manager.validate_path_access(b"/etc/passwd", false));
+        assert!(manager.validate_path_access(b"/tmp/session.lock", true));
 
-        // Unveil /var/www for read access, and /tmp for write access
-        manager.unveil("/var/www", "r").unwrap();
-        manager.unveil("/tmp", "rw").unwrap();
+        // 2. Unveil a specific read-only prefix and a read-write prefix
+        manager.unveil(b"/tmp", b"rw");
+        manager.unveil(b"/usr/local", b"r");
 
-        // Check path within /var/www
-        assert!(manager.validate_unveil_access("/var/www/index.html", 'r'));
-        assert!(!manager.validate_unveil_access("/var/www/index.html", 'w'));
+        // 3. Namespace should be locked down: unrelated paths are blocked / hidden!
+        assert!(!manager.validate_path_access(b"/etc/passwd", false));
 
-        // Check path within /tmp
-        assert!(manager.validate_unveil_access("/tmp/session.log", 'r'));
-        assert!(manager.validate_unveil_access("/tmp/session.log", 'w'));
-
-        // Paths outside of unveiled must be blocked completely
-        assert!(!manager.validate_unveil_access("/etc/passwd", 'r'));
+        // 4. Mapped prefixes should satisfy requested read/write constraints
+        assert!(manager.validate_path_access(b"/tmp/file.txt", true));  // ReadWrite allowed
+        assert!(manager.validate_path_access(b"/usr/local/bin/rustc", false)); // Read allowed
+        assert!(!manager.validate_path_access(b"/usr/local/bin/rustc", true)); // Write rejected
     }
 }
