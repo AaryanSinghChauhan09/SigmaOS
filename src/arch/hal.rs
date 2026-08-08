@@ -2,7 +2,7 @@
 //! Unified driver interface abstraction and platform-specific shims (x86_64, ARM64, RISC-V).
 //! Inspired by professional x86/x64 GDT, ARM64 Exception Levels, and Windows NT Kernel architectures (IRQL, KPCR, DPC, APC).
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -60,7 +60,7 @@ impl X86_64HAL {
     /// PCI enumeration for x86_64
     pub fn enumerate_pci(&self) -> Result<(), DriverError> {
         // Scan PCI configuration space
-        for bus in 0..=255 {
+        for bus in 0..=255u8 {
             for device in 0..32 {
                 for function in 0..8 {
                     let vendor_id = self.read_pci_config(bus, device, function, 0x00);
