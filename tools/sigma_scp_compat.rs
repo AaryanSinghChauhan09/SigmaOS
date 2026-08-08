@@ -32,6 +32,7 @@ pub struct ScpTransfer {
 }
 
 /// SCP progress
+#[derive(Copy, Clone)]
 #[repr(C)]
 pub struct ScpProgress {
     pub transferred_bytes: SigmaU64,
@@ -74,7 +75,7 @@ pub unsafe extern "C" fn scp_copy(
     username: *const u8,
     direction: ScpDirection,
 ) -> SigmaI32 {
-    if !SCP_INITIALIZED || source.isnull() || destination.isnull() || username.isnull() {
+    if !SCP_INITIALIZED || source.is_null() || destination.is_null() || username.is_null() {
         return -1;
     }
     
@@ -84,6 +85,9 @@ pub unsafe extern "C" fn scp_copy(
     // 3. Transfer file
     // 4. Verify integrity
     
+    let _ = host;
+    let _ = port;
+    let _ = direction;
     SCP_PROGRESS.total_bytes = 1024 * 1024; // Simulated 1MB
     SCP_PROGRESS.transferred_bytes = SCP_PROGRESS.total_bytes;
     SCP_PROGRESS.percent = 100;
@@ -102,7 +106,7 @@ pub unsafe extern "C" fn scp_copy_recursive(
     username: *const u8,
     direction: ScpDirection,
 ) -> SigmaI32 {
-    if !SCP_INITIALIZED || source.isnull() || destination.isnull() || username.isnull() {
+    if !SCP_INITIALIZED || source.is_null() || destination.is_null() || username.is_null() {
         return -1;
     }
     
@@ -124,7 +128,7 @@ pub unsafe extern "C" fn scp_copy_preserve(
     username: *const u8,
     direction: ScpDirection,
 ) -> SigmaI32 {
-    if !SCP_INITIALIZED || source.isnull() || destination.isnull() || username.isnull() {
+    if !SCP_INITIALIZED || source.is_null() || destination.is_null() || username.is_null() {
         return -1;
     }
     
@@ -138,7 +142,7 @@ pub unsafe extern "C" fn scp_copy_preserve(
 /// Get transfer progress
 #[no_mangle]
 pub unsafe extern "C" fn scp_get_progress(progress: *mut ScpProgress) -> SigmaI32 {
-    if !SCP_INITIALIZED || progress.isnull() {
+    if !SCP_INITIALIZED || progress.is_null() {
         return -1;
     }
     

@@ -65,7 +65,7 @@ pub unsafe extern "C" fn find_by_name(
     results: *mut FindResult,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !FIND_INITIALIZED || path.isnull() || name.isnull() || results.isnull() {
+    if !FIND_INITIALIZED || path.is_null() || name.is_null() || results.is_null() {
         return 0;
     }
     
@@ -94,7 +94,7 @@ pub unsafe extern "C" fn find_by_type(
     results: *mut FindResult,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !FIND_INITIALIZED || path.isnull() || results.isnull() {
+    if !FIND_INITIALIZED || path.is_null() || results.is_null() {
         return 0;
     }
     
@@ -122,7 +122,7 @@ pub unsafe extern "C" fn find_by_size(
     results: *mut FindResult,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !FIND_INITIALIZED || path.isnull() || results.isnull() {
+    if !FIND_INITIALIZED || path.is_null() || results.is_null() {
         return 0;
     }
     
@@ -150,7 +150,7 @@ pub unsafe extern "C" fn find_by_perms(
     results: *mut FindResult,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !FIND_INITIALIZED || path.isnull() || results.isnull() {
+    if !FIND_INITIALIZED || path.is_null() || results.is_null() {
         return 0;
     }
     
@@ -196,7 +196,7 @@ pub unsafe extern "C" fn find_add_result(
         modified_time: 0,
     };
     
-    if !path.isnull() {
+    if !path.is_null() {
         for i in 0..511 {
             let byte = *path.add(i);
             if byte == 0 { break; }

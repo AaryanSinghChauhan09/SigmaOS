@@ -47,7 +47,7 @@ pub unsafe extern "C" fn gzip_compress(
     output_file: *const u8,
     options: GzipOptions,
 ) -> SigmaI32 {
-    if !GZIP_INITIALIZED || input_file.isnull() {
+    if !GZIP_INITIALIZED || input_file.is_null() {
         return -1;
     }
     
@@ -67,7 +67,7 @@ pub unsafe extern "C" fn gzip_decompress(
     output_file: *const u8,
     options: GzipOptions,
 ) -> SigmaI32 {
-    if !GZIP_INITIALIZED || input_file.isnull() {
+    if !GZIP_INITIALIZED || input_file.is_null() {
         return -1;
     }
     
@@ -86,7 +86,7 @@ pub unsafe extern "C" fn gzip_get_ratio(
     input_file: *const u8,
     ratio: *mut SigmaU32,
 ) -> SigmaI32 {
-    if !GZIP_INITIALIZED || input_file.isnull() || ratio.isnull() {
+    if !GZIP_INITIALIZED || input_file.is_null() || ratio.is_null() {
         return -1;
     }
     
