@@ -530,7 +530,7 @@ impl<T: DeviceDriver> SecureDriverWrapper<T> {
     
     /// Check if the operation is permitted by capabilities
     fn check_capability(&self, required_capability: u64) -> Result<(), DriverError> {
-        if !self.capabilities.contains(required_capability) {
+        if (self.capabilities.bits() & required_capability) == 0 {
             return Err(DriverError::PermissionDenied);
         }
         Ok(())

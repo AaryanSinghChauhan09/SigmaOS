@@ -4,7 +4,15 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use crate::kernel::vfs::inode::{FsError, Inode, InodeAttr};
+use crate::filesystem::vfs::{FsError, Inode};
+
+#[derive(Debug, Clone)]
+pub struct InodeAttr {
+    pub mode: u32,
+    pub uid: u32,
+    pub gid: u32,
+    pub size: u64,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityError {
