@@ -745,8 +745,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
 }
 
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
