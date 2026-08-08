@@ -2237,3 +2237,302 @@ mod kali_slaying_tests {
         assert_eq!(scanner.scan_virtual_segment(dump_infected), Some(b"MALWARE_SIGNATURE_A"[..].as_ref()));
     }
 }
+
+// =========================================================================
+// 25. DEMAND PAGING & SWAPPING ENGINE
+// =========================================================================
+
+pub struct PagedFrame {
+    pub virtual_page: usize,
+    pub is_dirty: bool,
+    pub last_accessed: u64,
+}
+
+pub struct DemandPagingEngine {
+    pub ram_pool: [Option<PagedFrame>; 8],
+    pub swap_store_inode: u64,
+    pub swap_out_count: usize,
+}
+
+impl DemandPagingEngine {
+    pub fn new(swap_inode: u64) -> Self {
+        Self {
+            ram_pool: [None, None, None, None, None, None, None, None],
+            swap_store_inode: swap_inode,
+            swap_out_count: 0,
+        }
+    }
+
+    /// Access page: if present, update access timestamp. If not, trigger demand swap
+    pub fn access_page(&mut self, virtual_page: usize, timestamp: u64) -> Result<usize, &'static str> {
+        for (idx, slot) in self.ram_pool.iter_mut().enumerate() {
+            if let Some(ref mut frame) = slot {
+                if frame.virtual_page == virtual_page {
+                    frame.last_accessed = timestamp;
+                    return Ok(idx);
+                }
+            }
+        }
+
+        // Trigger page swap using Least Recently Used (LRU) policy
+        let victim_idx = self.find_lru_victim();
+        self.swap_out_page(victim_idx)?;
+
+        self.ram_pool[victim_idx] = Some(PagedFrame {
+            virtual_page,
+            is_dirty: false,
+            last_accessed: timestamp,
+        });
+
+        Ok(victim_idx)
+    }
+
+    fn find_lru_victim(&self) -> usize {
+        let mut oldest_ts = u64::MAX;
+        let mut victim_idx = 0;
+
+        for (idx, slot) in self.ram_pool.iter().enumerate() {
+            if let Some(ref frame) = slot {
+                if frame.last_accessed < oldest_ts {
+                    oldest_ts = frame.last_accessed;
+                    victim_idx = idx;
+                }
+            } else {
+                return idx; // Found empty slot, no swapping needed
+            }
+        }
+        victim_idx
+    }
+
+    fn swap_out_page(&mut self, idx: usize) -> Result<(), &'static str> {
+        if let Some(ref frame) = self.ram_pool[idx] {
+            if frame.is_dirty {
+                // Simulate writing dirty pages back to disk swap space
+                self.swap_out_count += 1;
+            }
+        }
+        self.ram_pool[idx] = None;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 26. APIC/ACPI MULTICORE INTERRUPT BALANCER
+// =========================================================================
+
+pub struct CpuCoreInterruptLoad {
+    pub core_id: usize,
+    pub irq_count: u64,
+}
+
+pub struct MulticoreInterruptBalancer {
+    pub cores_load: [CpuCoreInterruptLoad; 4],
+}
+
+impl MulticoreInterruptBalancer {
+    pub fn new() -> Self {
+        Self {
+            cores_load: [
+                CpuCoreInterruptLoad { core_id: 0, irq_count: 0 },
+                CpuCoreInterruptLoad { core_id: 1, irq_count: 0 },
+                CpuCoreInterruptLoad { core_id: 2, irq_count: 0 },
+                CpuCoreInterruptLoad { core_id: 3, irq_count: 0 },
+            ],
+        }
+    }
+
+    /// Route incoming hardware interrupt (APIC/ACPI style) to least loaded CPU core
+    pub fn route_incoming_irq(&mut self) -> usize {
+        let mut least_loaded_idx = 0;
+        let mut lowest_irq = u64::MAX;
+
+        for (idx, core) in self.cores_load.iter().enumerate() {
+            if core.irq_count < lowest_irq {
+                lowest_irq = core.irq_count;
+                least_loaded_idx = idx;
+            }
+        }
+
+        self.cores_load[least_loaded_idx].irq_count += 1;
+        self.cores_load[least_loaded_idx].core_id
+    }
+}
+
+// =========================================================================
+// 27. HOTPLUGGING HARDWARE CONTROLLER (UDEV PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceEvent {
+    Add,
+    Remove,
+}
+
+pub struct HotplugDevice {
+    pub pci_bus: u8,
+    pub vendor_id: u16,
+    pub device_id: u16,
+    pub is_bound: bool,
+}
+
+pub struct UdevHotplugManager {
+    pub registry: [Option<HotplugDevice>; 8],
+    pub binds_count: usize,
+}
+
+impl UdevHotplugManager {
+    pub fn new() -> Self {
+        Self {
+            registry: [None, None, None, None, None, None, None, None],
+            binds_count: 0,
+        }
+    }
+
+    pub fn receive_hotplug_event(&mut self, event: DeviceEvent, bus: u8, vendor: u16, device: u16) -> Result<(), &'static str> {
+        match event {
+            DeviceEvent::Add => {
+                for slot in self.registry.iter_mut() {
+                    if slot.is_none() {
+                        *slot = Some(HotplugDevice {
+                            pci_bus: bus,
+                            vendor_id: vendor,
+                            device_id: device,
+                            is_bound: true,
+                        });
+                        self.binds_count += 1;
+                        return Ok(());
+                    }
+                }
+                Err("Hotplug device slots are full")
+            }
+            DeviceEvent::Remove => {
+                for slot in self.registry.iter_mut() {
+                    if let Some(ref dev) = slot {
+                        if dev.pci_bus == bus && dev.vendor_id == vendor && dev.device_id == device {
+                            *slot = None;
+                            self.binds_count = self.binds_count.saturating_sub(1);
+                            return Ok(());
+                        }
+                    }
+                }
+                Err("No matching hotplug device found to remove")
+            }
+        }
+    }
+}
+
+// =========================================================================
+// 28. CONTRIBUTOR STARTER KIT TEMPLATES & SKELETONS
+// =========================================================================
+
+pub struct StarterTextEditor {
+    pub buffer: String,
+}
+impl StarterTextEditor {
+    pub fn new() -> Self {
+        Self { buffer: String::new() }
+    }
+    pub fn write_char(&mut self, c: char) {
+        self.buffer.push(c);
+    }
+}
+
+pub struct StarterCalculator {
+    pub operand_a: i32,
+    pub operand_b: i32,
+}
+impl StarterCalculator {
+    pub fn add(&self) -> i32 {
+        self.operand_a + self.operand_b
+    }
+}
+
+pub struct GpuDriverSkeleton {
+    pub width: u32,
+    pub height: u32,
+}
+impl GpuDriverSkeleton {
+    pub fn new() -> Self {
+        Self { width: 1024, height: 768 }
+    }
+    pub fn fill_framebuffer_color(&self, color: u32) -> u32 {
+        color // Hardware specific blitting logic is filled here
+    }
+}
+
+pub struct ZenithWidgetButton {
+    pub label: &'static str,
+    pub action_command: &'static str,
+}
+
+pub struct EchoServerDemo {
+    pub active_connections: usize,
+}
+impl EchoServerDemo {
+    pub fn handle_packet(&mut self, payload: &[u8]) -> Vec<u8> {
+        payload.to_vec() // Echo standard payload directly back to client
+    }
+}
+
+#[cfg(test)]
+mod roadmap_gap_tests {
+    use super::*;
+
+    #[test]
+    fn test_lru_demand_paging() {
+        let mut paging = DemandPagingEngine::new(42);
+
+        // Access 8 different pages (filling RAM pool)
+        for i in 0..8 {
+            assert!(paging.access_page(i, i as u64).is_ok());
+        }
+
+        // Accessing page 0 should update its timestamp
+        paging.access_page(0, 10).unwrap();
+
+        // Accessing page 8 should trigger swapping of page 1 (oldest timestamp = 1)
+        paging.ram_pool[1].as_mut().unwrap().is_dirty = true;
+        let victim_slot = paging.access_page(8, 11).unwrap();
+        assert_eq!(victim_slot, 1);
+        assert_eq!(paging.swap_out_count, 1);
+    }
+
+    #[test]
+    fn test_multicore_interrupt_balancer() {
+        let mut balancer = MulticoreInterruptBalancer::new();
+
+        // Router should route IRQs round-robin or load-balanced
+        let core_a = balancer.route_incoming_irq();
+        let core_b = balancer.route_incoming_irq();
+        assert_ne!(core_a, core_b);
+        assert_eq!(balancer.cores_load[core_a].irq_count, 1);
+    }
+
+    #[test]
+    fn test_hot_plugging_udev() {
+        let mut hotplug = UdevHotplugManager::new();
+        assert_eq!(hotplug.binds_count, 0);
+
+        hotplug.receive_hotplug_event(DeviceEvent::Add, 1, 0x8086, 0x1111).unwrap();
+        assert_eq!(hotplug.binds_count, 1);
+
+        hotplug.receive_hotplug_event(DeviceEvent::Remove, 1, 0x8086, 0x1111).unwrap();
+        assert_eq!(hotplug.binds_count, 0);
+    }
+
+    #[test]
+    fn test_starter_pack_scaffolding() {
+        let mut editor = StarterTextEditor::new();
+        editor.write_char('S');
+        assert_eq!(editor.buffer, "S");
+
+        let calc = StarterCalculator { operand_a: 10, operand_b: 20 };
+        assert_eq!(calc.add(), 30);
+
+        let gpu = GpuDriverSkeleton::new();
+        assert_eq!(gpu.fill_framebuffer_color(0xFF00FF), 0xFF00FF);
+
+        let mut echo = EchoServerDemo { active_connections: 1 };
+        assert_eq!(echo.handle_packet(b"PING"), b"PING");
+    }
+}
