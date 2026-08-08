@@ -1,12 +1,16 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+
 /// OOP-based DMA for SigmaOS
 /// Based on Ideas-999-Structured: Embedded & Firmware Item 1146
-/// Implements DMA transfers
+/// Implements DMA transfers with Linux and BSD-inspired safety wrappers.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
+use crate::klib::Vec;
+use alloc::boxed::Box;
 
 pub type ChannelID = usize;
 
@@ -15,8 +19,16 @@ pub type ChannelID = usize;
 pub enum DMADirection { MemoryToMemory = 0, MemoryToPeripheral = 1, PeripheralToMemory = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum DMAError { Success = 0, NotFound = 1, TransferFailed = 2 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DMAError {
+    Success = 0,
+    NotFound = 1,
+    TransferFailed = 2,
+    InvalidParameter = 3,
+    UnalignedAddress = 4,
+    OutOfBounds = 5,
+    PermissionDenied = 6
+}
 
 pub trait DMAChannel {
     fn id(&self) -> ChannelID;
@@ -71,9 +83,23 @@ impl DMAController for SimpleDMAController {
         Ok(())
     }
     
-    fn start_transfer(&mut self, channel_id: ChannelID, _src: u32, _dst: u32, _size: u32) -> Result<(), DMAError> {
-        for channel_option in &mut self.channels {
-            if let Some(ref mut channel) = *channel_option {
+    fn start_transfer(&mut self, channel_id: ChannelID, src: u32, dst: u32, size: u32) -> Result<(), DMAError> {
+        if size == 0 {
+            return Err(DMAError::InvalidParameter);
+        }
+
+        // Linux-inspired Alignment check: verify standard 4-byte (word) aligned buffer addresses
+        if (src % 4 != 0) || (dst % 4 != 0) {
+            return Err(DMAError::UnalignedAddress);
+        }
+
+        // BSD-inspired Bounds check: protect core kernel memory maps (prevent accesses above 0xF0000000)
+        if src >= 0xF0000000 || dst >= 0xF0000000 {
+            return Err(DMAError::OutOfBounds);
+        }
+
+        for i in 0..self.channels.len() {
+            if let Some(ref mut channel) = self.channels[i] {
                 if channel.id() == channel_id {
                     channel.busy.store(1, Ordering::SeqCst);
                     return Ok(());
@@ -84,8 +110,8 @@ impl DMAController for SimpleDMAController {
     }
     
     fn is_complete(&self, channel_id: ChannelID) -> bool {
-        for channel_option in &self.channels {
-            if let Some(ref channel) = *channel_option {
+        for i in 0..self.channels.len() {
+            if let Some(ref channel) = self.channels[i] {
                 if channel.id() == channel_id {
                     return !channel.is_busy();
                 }
@@ -164,72 +190,35 @@ impl CircularBuffer for SimpleCircularBuffer {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+    #[test]
+    fn test_dma_controller_success() {
+        let mut controller = SimpleDMAController::new();
+        assert!(controller.configure(1, DMADirection::MemoryToMemory).is_ok());
+
+        // 4-byte aligned safe transfer
+        assert!(controller.start_transfer(1, 0x1000, 0x2000, 64).is_ok());
+        assert!(!controller.is_complete(1));
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    #[test]
+    fn test_dma_alignment_violations() {
+        let mut controller = SimpleDMAController::new();
+        assert!(controller.configure(2, DMADirection::MemoryToPeripheral).is_ok());
+
+        // Unaligned source (0x1001)
+        assert_eq!(controller.start_transfer(2, 0x1001, 0x2000, 64), Err(DMAError::UnalignedAddress));
     }
-}
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    #[test]
+    fn test_dma_bounds_violations() {
+        let mut controller = SimpleDMAController::new();
+        assert!(controller.configure(3, DMADirection::PeripheralToMemory).is_ok());
 
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        // Out-of-bounds address (0xF0000000)
+        assert_eq!(controller.start_transfer(3, 0x1000, 0xF0000000, 64), Err(DMAError::OutOfBounds));
     }
 }
