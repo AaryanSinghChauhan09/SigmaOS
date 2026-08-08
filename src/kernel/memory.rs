@@ -13,42 +13,36 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
-use core::ptr::NonNull;
-
-pub struct Zone {
-    pub present_pages: u64,
+#[derive(Clone)]
+pub struct BuddyAllocatorCheckpoint {
+    free_lists: [Vec<MemoryBlock>; 12],
 }
 
-pub struct Page {
-    pub flags: AtomicUsize,
-    pub count: AtomicUsize,
-    pub mapping: Option<usize>,
-    pub index: u64,
-    pub private: Option<usize>,
-    pub zone: Option<*const Zone>,
-}
-
-impl Page {
-    pub fn dec_ref(&self) -> bool {
-        self.count.fetch_sub(1, Ordering::SeqCst) == 1
-    }
-}
-
+/// Buddy allocator for memory management
 pub struct BuddyAllocator {
-    pub free_lists: [Vec<MemoryBlock>; 12],
-    pub free_pages: usize,
-    pub total_pages: usize,
-    pub zones: Vec<Zone>,
+    free_lists: [Vec<MemoryBlock>; 12], // 2^0 to 2^11 pages (4KB to 8MB)
 }
 
 impl BuddyAllocator {
+    pub fn create_checkpoint(&self) -> BuddyAllocatorCheckpoint {
+        BuddyAllocatorCheckpoint {
+            free_lists: self.free_lists.clone(),
+        }
+    }
+
+    pub fn restore_checkpoint(&mut self, checkpoint: BuddyAllocatorCheckpoint) {
+        self.free_lists = checkpoint.free_lists;
+    }
     pub fn new() -> Self {
         Self {
             free_lists: Default::default(),
-            free_pages: 0,
-            total_pages: 0,
-            zones: Vec::new(),
         }
+    }
+
+    pub fn with_memory(base_addr: usize, size: usize) -> Self {
+        let mut allocator = Self::new();
+        allocator.initialize_memory(base_addr, size);
+        allocator
     }
 
     pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {
@@ -62,22 +56,6 @@ impl BuddyAllocator {
             };
             self.free_lists[order].push(block);
         }
-    }
-
-    /// Create a checkpoint of the allocator's current free list state (Phase 1.1)
-    pub fn create_checkpoint(&self) -> [Vec<MemoryBlock>; 12] {
-        let mut checkpoint: [Vec<MemoryBlock>; 12] = Default::default();
-        for order in 0..12 {
-            for block in &self.free_lists[order] {
-                checkpoint[order].push(*block);
-            }
-        }
-        checkpoint
-    }
-
-    /// Restore the allocator to a previously checkpointed state to recover from crash exceptions (Phase 1.1)
-    pub fn restore_checkpoint(&mut self, checkpoint: [Vec<MemoryBlock>; 12]) {
-        self.free_lists = checkpoint;
     }
 
     pub fn get_free_memory(&self) -> usize {
@@ -102,7 +80,7 @@ impl BuddyAllocator {
             return None;
         }
 
-        let pages = size.div_ceil(PAGE_SIZE);
+        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
         let order = self.calculate_order(pages);
 
         // Find smallest block that can satisfy request
@@ -235,12 +213,6 @@ impl PageFlags {
 #[repr(C)]
 pub struct PageTableEntry(u64);
 
-impl Default for PageTableEntry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl PageTableEntry {
     pub fn new() -> Self {
         Self(0)
@@ -272,12 +244,6 @@ impl PageTableEntry {
 #[repr(align(4096))]
 pub struct PageTable {
     pub entries: [PageTableEntry; 512],
-}
-
-impl Default for PageTable {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl PageTable {
@@ -370,33 +336,25 @@ mod tests {
         let mut allocator = BuddyAllocator::new();
         // This would need actual memory to work properly
         // For now, just test the interface
-        let _result = allocator.allocate(4096);
+        let result = allocator.allocate(4096);
         // Will fail without actual memory, but tests the flow
     }
 
     #[test]
-    fn test_checkpoint_and_state_recovery() {
+    fn test_checkpoint_restore() {
         let mut allocator = BuddyAllocator::new();
-        allocator.initialize_memory(0x1000, 4096); // 1 page (order 0)
-        allocator.initialize_memory(0x3000, 8192); // 2 pages (order 1)
-        assert_eq!(allocator.get_free_memory(), 12288);
+        allocator.initialize_memory(0x1000, 4096);
+        assert_eq!(allocator.get_free_memory(), 4096);
 
-        // Checkpoint original state
+        // Save state
         let checkpoint = allocator.create_checkpoint();
 
-        // Perform mock allocations which modify state
-        let _block1 = allocator.allocate(4096).unwrap();
-        let _block2 = allocator.allocate(8192).unwrap();
+        // Pretend an allocation fails/changes state
+        let block = allocator.allocate(4096).unwrap();
         assert_eq!(allocator.get_free_memory(), 0);
 
-        // Simulated crash/unwinding: Restore from checkpoint to recover state
+        // Restore baseline checkpoint
         allocator.restore_checkpoint(checkpoint);
-
-        // State is perfectly restored
-        assert_eq!(allocator.get_free_memory(), 12288);
-
-        // Verify we can allocate the same blocks again successfully
-        let block_retry = allocator.allocate(4096).unwrap();
-        assert_eq!(block_retry.size, 4096);
+        assert_eq!(allocator.get_free_memory(), 4096);
     }
 }

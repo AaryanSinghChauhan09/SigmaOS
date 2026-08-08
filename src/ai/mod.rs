@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 pub mod agent;
 pub mod orchestrator;
 pub mod sai;
@@ -31,3 +32,8 @@ pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
 };
+||||||| 43be3a7e8
+=======
+pub mod agent;
+pub mod orchestrator;
+>>>>>>> origin/fix/mem-leak-custom-vec-drop-7188808108065826003

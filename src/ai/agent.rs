@@ -1,16 +1,17 @@
 #![no_std]
 #![no_main]
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::boxed::Box;
+use core::mem;
+/// OOP-based AI Agent Framework for SigmaOS
+/// Implements AI agent using OOP principles with traits and structs
+/// No dependency on external AI frameworks
+/// Based on Roadmap Item 81: SigmaAI core agent
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum IntentType {
     SystemCommand = 0,
     FileOperation = 1,
@@ -85,9 +86,7 @@ pub struct AgentInfo {
     pub version: (u32, u32, u32),
     pub total_intents: usize,
     pub execution_count: AtomicUsize,
-    pub can_parse: bool,
-    pub can_execute: bool,
-    pub can_learn: bool,
+    pub capability: AgentCapability,
 }
 
 impl AgentInfo {
@@ -97,9 +96,7 @@ impl AgentInfo {
             version: (1, 0, 0),
             total_intents: 0,
             execution_count: AtomicUsize::new(0),
-            can_parse: false,
-            can_execute: false,
-            can_learn: false,
+            capability: AgentCapability::new(),
         }
     }
 }
@@ -111,9 +108,6 @@ pub struct AgentCapability {
     pub can_parse: bool,
     pub can_execute: bool,
     pub can_learn: bool,
-    pub can_register: bool,
-    pub can_unregister: bool,
-    pub can_process: bool,
 }
 
 impl AgentCapability {
@@ -122,9 +116,6 @@ impl AgentCapability {
             can_parse: false,
             can_execute: false,
             can_learn: false,
-            can_register: false,
-            can_unregister: false,
-            can_process: false,
         }
     }
 
@@ -133,9 +124,6 @@ impl AgentCapability {
             can_parse: true,
             can_execute: true,
             can_learn: true,
-            can_register: true,
-            can_unregister: true,
-            can_process: true,
         }
     }
 }
@@ -148,13 +136,10 @@ pub struct SimpleAIAgent {
     pub execution_count: AtomicUsize,
     pub capability: AgentCapability,
     pub patterns: Vec<Pattern>,
-    pub mcp_tools: Vec<(String, String)>,
-    pub prompt_optim_weight: f32,
 }
 
 /// Pattern for intent matching
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Pattern {
     pub pattern: [u8; 128],
     pub intent_type: IntentType,
@@ -194,31 +179,22 @@ impl SimpleAIAgent {
     pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
+
         unsafe {
             core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
         }
+
         SimpleAIAgent {
             name: name_array,
             version,
             execution_count: AtomicUsize::new(0),
             capability,
             patterns: Vec::new(),
-            mcp_tools: Vec::new(),
-            prompt_optim_weight: 0.5,
         }
     }
 
     pub fn add_pattern(&mut self, pattern: Pattern) {
         self.patterns.push(pattern);
-    }
-
-    pub fn register_mcp_tool(&mut self, name: String, description: String) {
-        self.mcp_tools.push((name, description));
-    }
-
-    pub fn optimize_prompt_weights(&mut self) -> f32 {
-        self.prompt_optim_weight = 0.95;
-        0.95
     }
 
     unsafe fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
@@ -242,110 +218,6 @@ impl SimpleAIAgent {
             }
         }
         None
-    }
-
-    /// Helper byte-level search function
-    fn contains_bytes(&self, haystack: &[u8], needle: &[u8]) -> bool {
-        if needle.is_empty() {
-            return true;
-        }
-        haystack
-            .windows(needle.len())
-            .any(|window| window == needle)
-    }
-
-    /// Translates natural language CLI commands (supporting English, Hindi, and Tamil)
-    pub fn translate_natural_command(&self, input: &[u8]) -> Result<Vec<u8>, AIError> {
-        if input.is_empty() {
-            return Err(AIError::InvalidInput);
-        }
-
-        // Direct check for "libreoffice" and "install" or "karo" (Hindi) or "நிறுவவும்" (Tamil)
-        let has_libreoffice = self.contains_bytes(input, b"libreoffice") || self.contains_bytes(input, b"\xE0\xAE\xB2\xE0\xAE\xBF\xE0\xAE\xAA\xE0\xAF\x8D\xE0\xAE\xB0\xE0\xAF\x87\xE0\xAE\x86\xE0\xAE\xAA\xE0\xAE\xBF\xE0\xAE\xB8\xAF");
-        let has_install = self.contains_bytes(input, b"install")
-            || self.contains_bytes(input, b"karo")
-            || self.contains_bytes(input, b"\xE0\xAE\xA0\xE0\xAE\xBF\xE0\xAE\xB1\xE0\xAF\x81\xE0\xAE\xB5\xE0\xAE\xB5\xE0\xAF\x81\xE0\xAE\xAE\xAF");
-
-        if has_libreoffice && has_install {
-            let mut out = Vec::new();
-            for &b in b"sigpkg install libreoffice" {
-                out.push(b);
-            }
-            return Ok(out);
-        }
-
-        // Disk usage checks
-        if self.contains_bytes(input, b"disk")
-            && (self.contains_bytes(input, b"usage") || self.contains_bytes(input, b"show"))
-        {
-            let mut out = Vec::new();
-            for &b in b"df -h" {
-                out.push(b);
-            }
-            return Ok(out);
-        }
-
-        // WiFi connection checks
-        if self.contains_bytes(input, b"connect") && (self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi")) {
-            let mut out = Vec::new();
-            for &b in b"sigma-wifi connect --ssid Home" {
-                out.push(b);
-            }
-            return Ok(out);
-        }
-
-        // Default to returning the input command
-        let mut out = Vec::new();
-        for &b in input {
-            out.push(b);
-        }
-        Ok(out)
-    }
-
-    /// Performs safety checks on potentially dangerous commands (such as rm -rf / or deleting accounts folder)
-    pub fn perform_safety_check(&self, command: &[u8]) -> Option<Vec<u8>> {
-        if self.contains_bytes(command, b"rm -rf /")
-            || self.contains_bytes(command, b"delete all files")
-        {
-            let mut warning = Vec::new();
-            for &b in b"Warning: This will delete all files. Are you sure? (y/N)" {
-                warning.push(b);
-            }
-            return Some(warning);
-        }
-
-        if self.contains_bytes(command, b"sigma-accounts")
-            || self.contains_bytes(command, b"home/ravi/sigma-accounts")
-        {
-            let mut warning = Vec::new();
-            for &b in b"Warning: You're deleting your accounts folder." {
-                warning.push(b);
-            }
-            return Some(warning);
-        }
-
-        None
-    }
-
-    /// Explains low-level command options in clear, plain language (e.g., tar extraction flags)
-    pub fn explain_command(&self, command: &[u8]) -> Result<Vec<u8>, AIError> {
-        if command.is_empty() {
-            return Err(AIError::InvalidInput);
-        }
-
-        if self.contains_bytes(command, b"tar -xvf") || self.contains_bytes(command, b"tar") {
-            let mut out = Vec::new();
-            for &b in b"Extracts (-x) a tar archive (-f) verbosely (-v) with gzip compression" {
-                out.push(b);
-            }
-            return Ok(out);
-        }
-
-        let mut fallback = Vec::new();
-        for &b in b"Executes the input system parameters inside Ring 3 sandboxes" {
-            fallback.push(b);
-        }
-        Ok(fallback)
     }
 }
 
@@ -407,9 +279,7 @@ impl AIAgent for SimpleAIAgent {
             version: self.version,
             total_intents: self.patterns.len(),
             execution_count: AtomicUsize::new(self.execution_count.load(Ordering::SeqCst)),
-            can_parse: self.capability.can_parse,
-            can_execute: self.capability.can_execute,
-            can_learn: self.capability.can_learn,
+            capability: self.capability,
         }
     }
 }
@@ -422,19 +292,10 @@ pub trait AIAgentManager {
     fn unregister_agent(&mut self, id: usize) -> Result<(), AIError>;
     /// Get agent
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
+    /// Process natural language request
     fn process(&mut self, input: &[u8]) -> Result<Vec<u8>, AIError>;
-    fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError>;
+    /// Get manager statistics
     fn stats(&self) -> AIStats;
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct AIStats {
-    pub failed_requests: usize,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct AIStats {
-    pub failed_requests: usize,
 }
 
 /// AI statistics
@@ -460,26 +321,47 @@ impl AIStats {
 
 /// Simple AI agent manager (OOP: Concrete manager class)
 pub struct SimpleAIAgentManager {
-    pub agents: Vec<Option<Box<dyn AIAgent>>>,
-    pub stats: AIStats,
-    pub active_agent: AtomicUsize,
-    pub capability: AgentCapability,
+    agents: Vec<Option<Box<dyn AIAgent>>>,
+    active_agent: AtomicUsize,
+    stats: AIStats,
+    capability: ManagerCapability,
 }
 
-impl SimpleAIAgentManager {
+/// Manager capability
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct ManagerCapability {
+    pub can_register: bool,
+    pub can_unregister: bool,
+    pub can_process: bool,
+}
+
+impl ManagerCapability {
     pub fn new() -> Self {
-        SimpleAIAgentManager {
-            agents: Vec::new(),
-            stats: AIStats::new(),
-            active_agent: AtomicUsize::new(0),
-            capability: AgentCapability::full(),
+        ManagerCapability {
+            can_register: false,
+            can_unregister: false,
+            can_process: false,
+        }
+    }
+
+    pub fn full() -> Self {
+        ManagerCapability {
+            can_register: true,
+            can_unregister: true,
+            can_process: true,
         }
     }
 }
 
-impl Default for SimpleAIAgentManager {
-    fn default() -> Self {
-        Self::new()
+impl SimpleAIAgentManager {
+    pub fn new(capability: ManagerCapability) -> Self {
+        SimpleAIAgentManager {
+            agents: Vec::new(),
+            active_agent: AtomicUsize::new(0),
+            stats: AIStats::new(),
+            capability,
+        }
     }
 }
 
@@ -527,21 +409,16 @@ impl AIAgentManager for SimpleAIAgentManager {
         self.stats.total_requests += 1;
 
         let active = self.active_agent.load(Ordering::SeqCst);
-        if active < self.agents.len() {
-            if let Some(ref mut agent) = self.agents[active] {
-                let agent_mut: &mut dyn AIAgent = agent.as_mut();
-                let intent = agent_mut.parse(input)?;
+        if let Some(ref mut agent) = self.agents[active] {
+            let agent_mut: &mut dyn AIAgent = agent.as_mut();
+            let intent = agent_mut.parse(input)?;
 
-                if let Ok(response) = agent_mut.execute(&intent) {
-                    self.stats.successful_requests += 1;
-                    Ok(response)
-                } else {
-                    self.stats.failed_requests += 1;
-                    Err(AIError::ExecutionFailed)
-                }
+            if let Ok(response) = agent_mut.execute(&intent) {
+                self.stats.successful_requests += 1;
+                Ok(response)
             } else {
                 self.stats.failed_requests += 1;
-                Err(AIError::InvalidInput)
+                Err(AIError::ExecutionFailed)
             }
         } else {
             self.stats.failed_requests += 1;
@@ -552,10 +429,113 @@ impl AIAgentManager for SimpleAIAgentManager {
     fn stats(&self) -> AIStats {
         self.stats
     }
+}
 
-    fn process_request(&mut self, _id: usize, input: &str) -> Result<Vec<u8>, AIError> {
-        self.process(input.as_bytes())
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
     }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if self.capacity > 0 {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+// External allocator functions
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]
@@ -563,95 +543,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_ai_agent_parsing() {
-        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        let intent = agent.parse(b"run diagnostic check").unwrap();
-        assert_eq!(intent.intent_type, IntentType::SystemCommand);
-    }
+    fn test_ai_agent_and_manager() {
+        let capability = AgentCapability::full();
+        let mut agent = SimpleAIAgent::new(b"assistant", (1, 0, 0), capability);
+        let pattern = Pattern::new(b"hello", IntentType::Custom, b"greet");
+        agent.add_pattern(pattern);
 
-    #[test]
-    fn test_ai_agent_mcp_and_optimization() {
-        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        agent.register_mcp_tool("fetch_weather".to_string(), "MCP weather fetcher".to_string());
-        assert_eq!(agent.mcp_tools.len(), 1);
+        let parsed = agent.parse(b"hello world").unwrap();
+        assert_eq!(parsed.intent_type as usize, IntentType::Custom as usize);
 
-        let opt_score = agent.optimize_prompt_weights();
-        assert_eq!(opt_score, 0.95);
-    }
+        let mut manager = SimpleAIAgentManager::new(ManagerCapability::full());
+        let agent_id = manager.register_agent(Box::new(agent)).unwrap();
+        assert_eq!(agent_id, 0);
 
-    #[test]
-    fn test_ai_agent_manager_process() {
-        let mut manager = SimpleAIAgentManager::new();
-        let agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        let id = manager.register_agent(Box::new(agent)).unwrap();
-
-        let response = manager.process_request(id, "read file /etc/hosts").unwrap();
-        let response_str = core::str::from_utf8(&response).unwrap();
-        assert_eq!(response_str, "Command executed successfully");
-    }
-
-    #[test]
-    fn test_ai_agent_basics() {
-        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
-        assert_eq!(agent.version, (1, 0, 0));
-    }
-
-    #[test]
-    fn test_ai_natural_language_translations() {
-        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
-
-        let install_en = agent
-            .translate_natural_command(b"install libreoffice")
-            .unwrap();
-        assert_eq!(install_en, b"sigpkg install libreoffice");
-
-        let install_hi = agent
-            .translate_natural_command(b"libreoffice install karo")
-            .unwrap();
-        assert_eq!(install_hi, b"sigpkg install libreoffice");
-
-        let disk_usage = agent
-            .translate_natural_command(b"show my disk usage")
-            .unwrap();
-        assert_eq!(disk_usage, b"df -h");
-
-        let wifi_connect = agent
-            .translate_natural_command(b"connect to WiFi Home")
-            .unwrap();
-        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
-    }
-
-    #[test]
-    fn test_ai_safety_checks() {
-        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
-
-        let dangerous_res = agent.perform_safety_check(b"rm -rf /");
-        assert!(dangerous_res.is_some());
-        assert!(dangerous_res
-            .unwrap()
-            .windows(7)
-            .any(|w| window_eq(w, b"Warning")));
-
-        let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
-        assert!(account_delete_res.is_some());
-        assert!(account_delete_res
-            .unwrap()
-            .windows(7)
-            .any(|w| window_eq(w, b"Warning")));
-
-        let safe_res = agent.perform_safety_check(b"ls -la /var/www");
-        assert!(safe_res.is_none());
-    }
-
-    #[test]
-    fn test_ai_command_explanations() {
-        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
-
-        let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
-        assert!(explanation.windows(8).any(|w| window_eq(w, b"Extracts")));
-    }
-
-    fn window_eq(a: &[u8], b: &[u8]) -> bool {
-        a == b
+        let response = manager.process(b"hello world").unwrap();
+        assert_eq!(response.len(), 29);
+        assert_eq!(response[0], b'C');
+        assert_eq!(response[28], b'y');
     }
 }
