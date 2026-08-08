@@ -10,6 +10,7 @@ pub enum DriverType {
     Char = 1,
     Network = 2,
     Storage = 3,
+    Input = 4,
 }
 
 #[repr(usize)]
@@ -28,9 +29,13 @@ pub trait Driver {
     fn unload(&mut self) -> Result<(), DriverError>;
 }
 
-pub trait StorageDriver: Driver {
-    fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
-    fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverError {
+    Success = 0,
+    LoadFailed = 1,
+    UnloadFailed = 2,
+    ProbeFailed = 3,
 }
 
 pub trait NetworkDriver: Driver {
@@ -61,6 +66,18 @@ impl SimpleStorageDriver {
             id,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
+    }
+
+    pub fn init(&self) -> Result<(), DriverError> {
+        Ok(())
+    }
+
+    pub fn probe(&self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+
+    pub fn shutdown(&self) -> Result<(), DriverError> {
+        Ok(())
     }
 }
 
