@@ -9,9 +9,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::string::ToString;
 use core::any::Any;
-use std::collections::HashMap;
 
 use crate::kernel::subsystem::{
     DeviceDriver, DriverError, DriverMetadata, DriverType, FileFlags, FileHandle, FileSystem,
@@ -273,14 +271,12 @@ pub enum AbsorptionError {
 pub struct AbsorbedUsbHidDriver {
     metadata: DriverMetadata,
     _capabilities: CapabilityToken,
-    connected: bool,
+    _connected: bool,
     _report_descriptor: Vec<u8>,
 }
 
 impl AbsorbedUsbHidDriver {
-    pub fn new(vendor_id: u16, product_id: u16) -> Self {
-        let _ = vendor_id;
-        let _ = product_id;
+    pub fn new(_vendor_id: u16, _product_id: u16) -> Self {
         Self {
             metadata: DriverMetadata {
                 name: String::from("AbsorbedUsbHidDriver"),
@@ -302,7 +298,7 @@ impl AbsorbedUsbHidDriver {
                 required_capabilities: vec![0x1000],
             },
             _capabilities: CapabilityToken::new(),
-            connected: false,
+            _connected: false,
             _report_descriptor: Vec::new(),
         }
     }
@@ -310,7 +306,7 @@ impl AbsorbedUsbHidDriver {
 
 impl DeviceDriver for AbsorbedUsbHidDriver {
     fn init(&mut self) -> Result<(), DriverError> {
-        self.connected = true;
+        self._connected = true;
         Ok(())
     }
 
@@ -328,7 +324,7 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
     }
 
     fn shutdown(&mut self) -> Result<(), DriverError> {
-        self.connected = false;
+        self._connected = false;
         Ok(())
     }
 
@@ -349,8 +345,8 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
 pub struct AbsorbedExt4Driver {
     metadata: DriverMetadata,
     fs_metadata: crate::kernel::subsystem::FilesystemMetadata,
-    mounted: bool,
-    mount_point: String,
+    _mounted: bool,
+    _mount_point: String,
 }
 
 impl AbsorbedExt4Driver {
@@ -387,8 +383,8 @@ impl AbsorbedExt4Driver {
                     crate::kernel::subsystem::FilesystemFeature::AccessControlLists,
                 ],
             },
-            mounted: false,
-            mount_point: String::new(),
+            _mounted: false,
+            _mount_point: String::new(),
         }
     }
 }
@@ -399,14 +395,14 @@ impl FileSystem for AbsorbedExt4Driver {
     }
 
     fn mount(&mut self, _device: &str, mount_point: &str) -> Result<(), FsError> {
-        self.mounted = true;
-        self.mount_point = String::from(mount_point);
+        self._mounted = true;
+        self._mount_point = String::from(mount_point);
         Ok(())
     }
 
     fn unmount(&mut self) -> Result<(), FsError> {
-        self.mounted = false;
-        self.mount_point.clear();
+        self._mounted = false;
+        self._mount_point.clear();
         Ok(())
     }
 
@@ -851,7 +847,7 @@ pub enum NinePMessage {
     Rversion { msize: u32, version: String },
     Tattach { fid: u32, afid: u32, uname: String, aname: String },
     Rattach { qid_path: u64 },
-    Twalk { fid: u32, newfid: u32, names: Vec<String> },
+    Twalk { fid: u32, new_fid: u32, names: Vec<String> },
     Rwalk { qids: Vec<u64> },
     Tread { fid: u32, offset: u64, count: u32 },
     Rread { data: Vec<u8> },
@@ -868,28 +864,25 @@ impl Plan9Server {
     /// Handles a 9P message, routing resource-oriented commands
     pub fn handle_request(&mut self, request: NinePMessage) -> Result<NinePMessage, &'static str> {
         match request {
-            NinePMessage::Tversion { msize, version } => {
+            NinePMessage::Tversion { msize, version: _ } => {
                 self.max_message_size = msize.min(8192);
                 Ok(NinePMessage::Rversion {
                     msize: self.max_message_size,
                     version: String::from("9P2000"),
                 })
             }
-            NinePMessage::Tattach { fid, afid, uname, aname } => {
-                let _ = afid;
-                let _ = uname;
-                let _ = aname;
+            NinePMessage::Tattach { fid, afid: _, uname: _, aname: _ } => {
                 if !self.active_fids.contains(&fid) {
                     self.active_fids.push(fid);
                 }
                 Ok(NinePMessage::Rattach { qid_path: 0xFF10 })
             }
-            NinePMessage::Twalk { fid, newfid, names } => {
+            NinePMessage::Twalk { fid, new_fid, names } => {
                 if !self.active_fids.contains(&fid) {
                     return Err("Fid not attached");
                 }
-                if !self.active_fids.contains(&newfid) {
-                    self.active_fids.push(newfid);
+                if !self.active_fids.contains(&new_fid) {
+                    self.active_fids.push(new_fid);
                 }
                 let mut qids = Vec::new();
                 for _ in &names {
@@ -897,8 +890,7 @@ impl Plan9Server {
                 }
                 Ok(NinePMessage::Rwalk { qids })
             }
-            NinePMessage::Tread { fid, offset, count } => {
-                let _ = offset;
+            NinePMessage::Tread { fid, offset: _, count } => {
                 if !self.active_fids.contains(&fid) {
                     return Err("Fid not valid");
                 }
@@ -913,109 +905,6 @@ impl Plan9Server {
 impl Default for Plan9Server {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-// ============================================================================
-// Linux-Inspired Dynamic Kernel Module Loader (LkmLoader) & Signatures Verifier
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModuleLoadError {
-    InvalidSignature,
-    InvalidFormat,
-    SymbolCollision,
-    OutOfMemory,
-}
-
-pub struct KernelModule {
-    pub name: String,
-    pub size_bytes: usize,
-    pub entry_point: usize,
-    pub signature_verified: bool,
-}
-
-pub struct LkmLoader {
-    pub loaded_modules: HashMap<String, KernelModule>,
-    pub trusted_public_key: Vec<u8>,
-}
-
-impl LkmLoader {
-    pub fn new(public_key: &[u8]) -> Self {
-        Self {
-            loaded_modules: HashMap::new(),
-            trusted_public_key: public_key.to_vec(),
-        }
-    }
-
-    /// Dynamically loads a signed .ko kernel module into the microkernel address space
-    pub fn load_module(&mut self, name: &str, raw_elf: &[u8], signature: &[u8]) -> Result<(), ModuleLoadError> {
-        if raw_elf.len() < 4 || raw_elf[..4] != [0x7F, b'E', b'L', b'F'] {
-            return Err(ModuleLoadError::InvalidFormat);
-        }
-
-        // Validate Dilithium-5 post-quantum signature
-        if signature.is_empty() || self.trusted_public_key.is_empty() {
-            return Err(ModuleLoadError::InvalidSignature);
-        }
-
-        let module = KernelModule {
-            name: name.to_string(),
-            size_bytes: raw_elf.len(),
-            entry_point: 0x200000 + raw_elf.len(),
-            signature_verified: true,
-        };
-
-        self.loaded_modules.insert(name.to_string(), module);
-        Ok(())
-    }
-
-    /// Unloads a module
-    pub fn unload_module(&mut self, name: &str) -> bool {
-        self.loaded_modules.remove(name).is_some()
-    }
-}
-
-// ============================================================================
-// Kernel Livepatching Framework (Kpatch)
-// ============================================================================
-
-pub struct KpatchPatch {
-    pub target_function_addr: usize,
-    pub replacement_function_addr: usize,
-    pub original_opcode: Vec<u8>,
-}
-
-pub struct KpatchManager {
-    pub active_patches: HashMap<usize, KpatchPatch>,
-}
-
-impl KpatchManager {
-    pub fn new() -> Self {
-        Self {
-            active_patches: HashMap::new(),
-        }
-    }
-
-    /// Registers a runtime hot-swap patch for a hot kernel path without restarts
-    pub fn apply_patch(&mut self, target: usize, replacement: usize) -> Result<(), &'static str> {
-        if target == 0 || replacement == 0 {
-            return Err("Invalid address");
-        }
-
-        let patch = KpatchPatch {
-            target_function_addr: target,
-            replacement_function_addr: replacement,
-            original_opcode: vec![0x90, 0x90, 0x90], // Original NOP instruction bytes
-        };
-
-        self.active_patches.insert(target, patch);
-        Ok(())
-    }
-
-    /// Unapplies/reverts a patch
-    pub fn revert_patch(&mut self, target: usize) -> bool {
-        self.active_patches.remove(&target).is_some()
     }
 }
 
@@ -1168,38 +1057,5 @@ mod tests {
         } else {
             panic!("Expected Rread");
         }
-    }
-
-    #[test]
-    fn test_lkm_loader_signatures() {
-        let mut loader = LkmLoader::new(b"public_key");
-        let raw_elf = b"\x7FELF_binary_test_data";
-
-        // Fails with invalid signature
-        let fail_res = loader.load_module("usb_hid_absorbed", raw_elf, b"");
-        assert_eq!(fail_res.err(), Some(ModuleLoadError::InvalidSignature));
-
-        // Succeeds with signature
-        let success_res = loader.load_module("usb_hid_absorbed", raw_elf, b"valid_sig");
-        assert!(success_res.is_ok());
-        assert_eq!(loader.loaded_modules.len(), 1);
-        assert!(loader.loaded_modules.get("usb_hid_absorbed").unwrap().signature_verified);
-
-        // Unload verification
-        assert!(loader.unload_module("usb_hid_absorbed"));
-        assert_eq!(loader.loaded_modules.len(), 0);
-    }
-
-    #[test]
-    fn test_kpatch_hot_swapping() {
-        let mut patcher = KpatchManager::new();
-        assert_eq!(patcher.active_patches.len(), 0);
-
-        patcher.apply_patch(0x1000, 0x2000).unwrap();
-        assert_eq!(patcher.active_patches.len(), 1);
-        assert_eq!(patcher.active_patches.get(&0x1000).unwrap().replacement_function_addr, 0x2000);
-
-        assert!(patcher.revert_patch(0x1000));
-        assert_eq!(patcher.active_patches.len(), 0);
     }
 }
