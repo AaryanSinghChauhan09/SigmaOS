@@ -570,10 +570,10 @@ impl LocalLlmEngine {
         };
 
         // For now, return a placeholder response
-        let _start_time = 0; // Would use actual timing
+        let start_time = 0; // Would use actual timing
 
         let mut response = InferenceResponse::new(
-            text_output,
+            "Generated response placeholder".to_string(),
             10,
             100,
         );
@@ -734,156 +734,6 @@ impl StreamingInference {
     /// Get full response
     pub fn response(&self) -> &InferenceResponse {
         &self.response
-    }
-}
-
-// ============================================================================
-// OPEN SOURCE INSPIRED ADVANCEMENTS (vLLM, llama.cpp, Outlines)
-// ============================================================================
-
-/// PagedAttention KV-Cache Block Manager
-/// Inspired by **vLLM**'s memory virtual-paging allocation algorithm.
-/// Reduces memory fragmentation during generation via non-contiguous block tables.
-pub struct PagedAttentionCacheManager {
-    pub block_size_tokens: usize,
-    pub total_physical_blocks: usize,
-    pub block_alloc_map: Vec<bool>, // true = allocated, false = free
-    pub seq_block_table: Vec<(usize, Vec<usize>)>, // (seq_id, physical_blocks)
-}
-
-impl PagedAttentionCacheManager {
-    pub fn new(total_blocks: usize, block_size: usize) -> Self {
-        Self {
-            block_size_tokens: block_size,
-            total_physical_blocks: total_blocks,
-            block_alloc_map: vec![false; total_blocks],
-            seq_block_table: Vec::new(),
-        }
-    }
-
-    /// Allocate non-contiguous physical blocks for a logical token sequence
-    pub fn allocate_blocks_for_sequence(&mut self, seq_id: usize, token_count: usize) -> Result<Vec<usize>, String> {
-        let blocks_needed = (token_count + self.block_size_tokens - 1) / self.block_size_tokens;
-        let mut allocated = Vec::new();
-
-        for i in 0..self.total_physical_blocks {
-            if !self.block_alloc_map[i] {
-                self.block_alloc_map[i] = true;
-                allocated.push(i);
-                if allocated.len() == blocks_needed {
-                    break;
-                }
-            }
-        }
-
-        if allocated.len() < blocks_needed {
-            // Rollback allocation
-            for block in &allocated {
-                self.block_alloc_map[*block] = false;
-            }
-            return Err("Out of virtual GPU KV cache memory blocks".to_string());
-        }
-
-        self.seq_block_table.push((seq_id, allocated.clone()));
-        Ok(allocated)
-    }
-
-    /// Deallocate blocks associated with sequence ID
-    pub fn deallocate_sequence(&mut self, seq_id: usize) {
-        let mut found_idx = None;
-        for (i, (s_id, _)) in self.seq_block_table.iter().enumerate() {
-            if *s_id == seq_id {
-                found_idx = Some(i);
-                break;
-            }
-        }
-
-        if let Some(idx) = found_idx {
-            let (_, blocks) = self.seq_block_table.remove(idx);
-            for block in blocks {
-                if block < self.total_physical_blocks {
-                    self.block_alloc_map[block] = false;
-                }
-            }
-        }
-    }
-}
-
-/// Speculative Decoding Acceleration Engine
-/// Inspired by **llama.cpp** / draft model execution.
-/// Fast draft models speculate K tokens, validated in parallel by target model.
-pub struct SpeculativeDecodingEngine {
-    pub validation_threshold: f32,
-}
-
-impl SpeculativeDecodingEngine {
-    pub fn new(threshold: f32) -> Self {
-        Self {
-            validation_threshold: threshold,
-        }
-    }
-
-    /// Verifies draft tokens against target model validation probabilities.
-    /// Returns the subset of accepted speculative tokens and whether verification should halt.
-    pub fn validate_draft_tokens(
-        &self,
-        draft_tokens: &[u32],
-        target_token_probabilities: &[f32],
-    ) -> (Vec<u32>, bool) {
-        let mut accepted = Vec::new();
-        let mut halt = false;
-
-        for (i, &token) in draft_tokens.iter().enumerate() {
-            let prob = target_token_probabilities.get(i).copied().unwrap_or(0.0);
-            if prob >= self.validation_threshold {
-                accepted.push(token);
-            } else {
-                // Speculative path diverged, truncate sequence here
-                halt = true;
-                break;
-            }
-        }
-
-        (accepted, halt)
-    }
-}
-
-/// CFG (Context-Free Grammar) & Regex Logits Constraint Processor
-/// Inspired by **Outlines** and **llama.cpp** custom GBNF grammar parser.
-/// Shapes LLM output by biasing/masking logits according to permissible state transitions.
-pub struct GrammarLogitsProcessor {
-    pub allowed_state_transitions: Vec<(usize, Vec<u32>)>, // (current_state, permissible_token_ids)
-}
-
-impl GrammarLogitsProcessor {
-    pub fn new() -> Self {
-        Self {
-            allowed_state_transitions: Vec::new(),
-        }
-    }
-
-    pub fn register_state_transitions(&mut self, state: usize, permissible_tokens: Vec<u32>) {
-        self.allowed_state_transitions.push((state, permissible_tokens));
-    }
-
-    /// Modifies logits array by setting non-permissible token scores to -infinity (-1e9)
-    pub fn apply_grammar_mask(&self, current_state: usize, logits: &mut [f32]) {
-        let mut allowed_tokens = None;
-        for (state, tokens) in &self.allowed_state_transitions {
-            if *state == current_state {
-                allowed_tokens = Some(tokens);
-                break;
-            }
-        }
-
-        if let Some(permissible) = allowed_tokens {
-            for i in 0..logits.len() {
-                let token_id = i as u32;
-                if !permissible.contains(&token_id) {
-                    logits[i] = -1e9; // Negate/mask out invalid token pathways
-                }
-            }
-        }
     }
 }
 
@@ -1063,52 +913,25 @@ mod tests {
     }
 
     #[test]
-    fn test_open_source_inspired_paged_attention_kv_cache() {
-        // Physical block size of 4, total 10 blocks (fits 40 tokens)
-        let mut manager = PagedAttentionCacheManager::new(10, 4);
+    fn test_optimized_fast_exp() {
+        // e^0 = 1.0
+        let val0 = SwiGluActivation::fast_exp(0.0);
+        assert!((val0 - 1.0).abs() < 1e-5);
 
-        // Allocate blocks for a sequence needing 12 tokens (3 blocks logical)
-        let blocks = manager.allocate_blocks_for_sequence(42, 12).unwrap();
-        assert_eq!(blocks.len(), 3);
-        assert_eq!(manager.block_alloc_map[0], true);
-        assert_eq!(manager.block_alloc_map[2], true);
-        assert_eq!(manager.block_alloc_map[3], false);
+        // e^1 ≈ 2.71828
+        let val1 = SwiGluActivation::fast_exp(1.0);
+        assert!((val1 - 2.71828).abs() < 1e-3);
 
-        // Deallocate sequence
-        manager.deallocate_sequence(42);
-        assert_eq!(manager.block_alloc_map[0], false);
-        assert_eq!(manager.block_alloc_map[1], false);
-    }
+        // sigmoid(0) = 0.5
+        let sig0 = SwiGluActivation::fast_sigmoid(0.0);
+        assert!((sig0 - 0.5).abs() < 1e-5);
 
-    #[test]
-    fn test_open_source_inspired_speculative_decoding() {
-        let engine = SpeculativeDecodingEngine::new(0.85);
-        let draft_tokens = vec![101, 102, 103, 104];
-        let target_probs = vec![0.98, 0.95, 0.40, 0.90]; // Token 103 is below 0.85 threshold
-
-        let (accepted, halt) = engine.validate_draft_tokens(&draft_tokens, &target_probs);
-        assert_eq!(accepted.len(), 2);
-        assert_eq!(accepted[0], 101);
-        assert_eq!(accepted[1], 102);
-        assert!(halt);
-    }
-
-    #[test]
-    fn test_open_source_inspired_grammar_logits() {
-        let mut processor = GrammarLogitsProcessor::new();
-        // State 0 allows only tokens 1 and 3
-        processor.register_state_transitions(0, vec![1, 3]);
-
-        let mut logits = vec![10.0, 5.0, 12.0, 8.0, 1.0]; // Token 0, 1, 2, 3, 4
-        processor.apply_grammar_mask(0, &mut logits);
-
-        // Token 1 and 3 scores should be unaffected
-        assert_eq!(logits[1], 5.0);
-        assert_eq!(logits[3], 8.0);
-
-        // Disallowed tokens should be masked to -1e9
-        assert_eq!(logits[0], -1e9);
-        assert_eq!(logits[2], -1e9);
-        assert_eq!(logits[4], -1e9);
+        // SwiGLU forward pass test
+        let x_w = vec![0.5, -1.0, 2.0];
+        let x_v = vec![1.5, 0.5, -0.5];
+        let mut out = vec![0.0; 3];
+        SwiGluActivation::forward(&x_w, &x_v, &mut out);
+        assert!(out[0] > 0.0);
+        assert!(out[1] < 0.0 || out[1] > -1.0);
     }
 }

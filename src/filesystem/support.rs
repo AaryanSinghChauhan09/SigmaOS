@@ -1,15 +1,23 @@
-// OOP-based Filesystem Support for SigmaOS
-// Based on Ideas-999-Structured: Core System Item 7
-// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs.
-// Features advanced read-only ext4 traversal metadata structures inspired by Linux & BSD.
-
-#![cfg_attr(target_os = "none", no_std)]
-#![cfg_attr(target_os = "none", no_main)]
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
 
 extern crate alloc;
 
-use alloc::string::{String, ToString};
-use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::Vec;
 use alloc::boxed::Box;
 use core::mem;
@@ -21,80 +29,23 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type FilesystemID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FilesystemError { Success = 0, InvalidFS = 1, MountFailed = 2, SnapshotFailed = 3 }
-
-// ==========================================
-// ADVANCED READ-ONLY EXT4 STRUCTURES
-// ==========================================
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Ext4Superblock {
-    pub magic_number: u16,         // 0xEF53 for ext2/3/4
-    pub inodes_count: u32,
-    pub blocks_count: u32,
-    pub blocks_per_group: u32,
-    pub inodes_per_group: u32,
-    pub block_size_log: u32,       // block size is 1024 << block_size_log
-}
-
-impl Ext4Superblock {
-    pub fn block_size(&self) -> u32 {
-        1024 << self.block_size_log
-    }
+pub enum FilesystemType {
+    Ext4 = 0,
+    Btrfs = 1,
+    ZFS = 2,
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Ext4Inode {
-    pub mode: u16,
-    pub uid: u16,
-    pub size_low: u32,
-    pub atime: u32,
-    pub mtime: u32,
-    pub links_count: u16,
-    pub blocks_count: u32,         // 512-byte blocks allocated
-    pub block_pointers: [u32; 15], // 12 direct, 1 single indirect, 1 double indirect, 1 triple indirect
+#[derive(Debug, Clone, Copy)]
+pub enum FilesystemError {
+    Success = 0,
+    InvalidFS = 1,
+    MountFailed = 2,
+    SnapshotFailed = 3,
 }
 
-#[derive(Debug, Clone)]
-pub struct Ext4DirEntry {
-    pub inode: u32,
-    pub rec_len: u16,
-    pub name_len: u8,
-    pub file_type: u8,
-    pub name: String,
-}
-
-pub struct Ext4Reader {
-    pub superblock: Ext4Superblock,
-}
-
-impl Ext4Reader {
-    pub fn new(sb: Ext4Superblock) -> Self {
-        Self { superblock: sb }
-    }
-
-    /// Read raw block pointer for a specific logical block index within an inode.
-    pub fn locate_logical_block(&self, inode: &Ext4Inode, logical_block: usize) -> Option<u32> {
-        if logical_block < 12 {
-            // Direct block pointer
-            Some(inode.block_pointers[logical_block])
-        } else {
-            // Indirect pointers (simplified for read-only emulation)
-            Some(inode.block_pointers[12])
-        }
-    }
-}
-
-// ==========================================
-// FILESYSTEM TRAITS
-// ==========================================
 pub trait Filesystem {
     fn id(&self) -> FilesystemID;
     fn fs_type(&self) -> FilesystemType;
@@ -276,14 +227,17 @@ impl ZFSFeatures for SimpleZFS {
 }
 
 pub trait FilesystemManager {
-    fn register_filesystem(&mut self, fs: alloc::boxed::Box<dyn Filesystem>) -> Result<FilesystemID, FilesystemError>;
+    fn register_filesystem(
+        &mut self,
+        fs: Box<dyn Filesystem>,
+    ) -> Result<FilesystemID, FilesystemError>;
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem>;
     fn list_filesystems(&self) -> Vec<FilesystemID>;
 }
 
 #[repr(C)]
 pub struct SimpleFilesystemManager {
-    pub filesystems: Vec<Option<alloc::boxed::Box<dyn Filesystem>>>,
+    pub filesystems: Vec<Option<Box<dyn Filesystem>>>,
     pub next_id: AtomicUsize,
 }
 
@@ -298,7 +252,10 @@ impl SimpleFilesystemManager {
 }
 
 impl FilesystemManager for SimpleFilesystemManager {
-    fn register_filesystem(&mut self, fs: alloc::boxed::Box<dyn Filesystem>) -> Result<FilesystemID, FilesystemError> {
+    fn register_filesystem(
+        &mut self,
+        fs: Box<dyn Filesystem>,
+    ) -> Result<FilesystemID, FilesystemError> {
         let id = fs.id();
         self.filesystems.push(Some(fs));
         Ok(id)
@@ -307,7 +264,9 @@ impl FilesystemManager for SimpleFilesystemManager {
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
         for i in 0..self.filesystems.len() {
             if let Some(ref fs) = self.filesystems[i] {
-                if fs.id() == id { return Some(fs.as_ref()); }
+                if fs.id() == id {
+                    return Some(fs.as_ref());
+                }
             }
         }
         None

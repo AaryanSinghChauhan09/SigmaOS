@@ -1,5 +1,6 @@
-#![no_std]
-#![no_main]
+// OOP-based AI Orchestrator for SigmaOS
+// Implements sigma-ai core with multi-agent coordination, workflow automation,
+// and self-diagnosis capabilities for system optimization.
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -8,27 +9,33 @@ use alloc::string::ToString;
 use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+pub type AgentID = usize;
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceTarget {
-    Cpu = 0,
-    Gpu = 1,
-    Tpu = 2,
+pub enum AgentState {
+    Idle = 0,
+    Active = 1,
+    Busy = 2,
+    Error = 3,
+    Learning = 4,
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OrchestratorError {
+pub enum AgentError {
     Success = 0,
-    OutOfMemory = 1,
-    ModelNotFound = 2,
-    LimitExceeded = 3,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    Timeout = 3,
+    InvalidInput = 4,
 }
 
-pub struct ModelResource {
-    pub name: [u8; 32],
-    pub memory_required_mb: usize,
-    pub target: DeviceTarget,
+pub trait AIAgent {
+    fn id(&self) -> AgentID;
+    fn name(&self) -> &str;
+    fn state(&self) -> AgentState;
+    fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError>;
 }
 
 pub struct SimpleAIAgent {
@@ -38,7 +45,11 @@ pub struct SimpleAIAgent {
 }
 
 impl SimpleAIAgent {
-    pub fn new(id: AgentID, name: &str) -> Self {
+    pub fn new(id: AgentID, name: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let name_len = name.len().min(63);
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+
         SimpleAIAgent {
             id,
             name: name.to_string(),
@@ -54,6 +65,7 @@ impl AIAgent for SimpleAIAgent {
     fn name(&self) -> &str {
         &self.name
     }
+
     fn state(&self) -> AgentState {
         let raw = self.state.load(Ordering::SeqCst);
         match raw {
@@ -95,8 +107,6 @@ pub trait AgentOrchestrator {
 pub struct SimpleAgentOrchestrator {
     pub agents: Vec<Box<dyn AIAgent>>,
     pub next_id: AtomicUsize,
-    pub model_temperature: f32,
-    pub response_timeout_secs: u32,
 }
 
 impl SimpleAgentOrchestrator {
@@ -104,17 +114,13 @@ impl SimpleAgentOrchestrator {
         SimpleAgentOrchestrator {
             agents: Vec::new(),
             next_id: AtomicUsize::new(1),
-            model_temperature: 0.7,
-            response_timeout_secs: 30,
         }
     }
+}
 
-    pub fn set_model_temperature(&mut self, temp: f32) {
-        self.model_temperature = temp;
-    }
-
-    pub fn set_response_timeout(&mut self, secs: u32) {
-        self.response_timeout_secs = secs;
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -157,14 +163,19 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
                 return Some(agent.as_ref());
             }
         }
-        Err(OrchestratorError::ModelNotFound)
+        None
+    }
+
+    fn list_agents(&self) -> Vec<AgentID> {
+        self.agents.iter().map(|a| a.id()).collect()
     }
 }
 
-/// A sliding context window history pruner
-pub struct ContextWindowPruner {
-    pub history: Vec<[u8; 128]>,
-    pub max_lines: usize,
+pub trait TaskQueue {
+    fn enqueue(&mut self, task: &[u8], priority: u8);
+    fn dequeue(&mut self) -> Option<[u8; 256]>;
+    fn peek(&self) -> Option<&[u8]>;
+    fn size(&self) -> usize;
 }
 
 pub struct SimpleTaskQueue {

@@ -441,6 +441,261 @@ pub struct CliTranslator {
 impl CliTranslator {
     pub fn new() -> Self {
         let mut patterns = BTreeMap::new();
+        patterns.insert(
+            "clean up temp files".to_string(),
+            "sigma-cleanup --temp".to_string(),
+        );
+        patterns.insert(
+            "free up disk space".to_string(),
+            "sigma-cleanup --all".to_string(),
+        );
+        patterns.insert(
+            "update system packages".to_string(),
+            "sigpkg update".to_string(),
+        );
+        patterns.insert(
+            "run core diagnostic audit".to_string(),
+            "sigma-diagnose --core".to_string(),
+        );
+        patterns.insert(
+            "get kernel system status".to_string(),
+            "sigma-systemd-analyze".to_string(),
+        );
+        Self { patterns }
+    }
+
+    pub fn translate(&self, prompt: &str) -> Option<String> {
+        let p_lower = prompt.to_string();
+        for (pattern, command) in &self.patterns {
+            if p_lower.contains(pattern) {
+                return Some(command.clone());
+            }
+        }
+        None
+    }
+}
+
+// -------------------------------------------------------------------------
+// Phase 2: Workflow Orchestration Engine (n8n / Airflow style)
+// -------------------------------------------------------------------------
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WorkflowTrigger {
+    Event,
+    Timer,
+    Manual,
+}
+
+pub struct WorkflowNode {
+    pub id: u32,
+    pub name: String,
+    pub command: String,
+    pub depends_on: Option<u32>,
+    pub state_executed: bool,
+}
+
+pub struct SovereignWorkflowEngine {
+    pub nodes: Vec<WorkflowNode>,
+    pub trigger: WorkflowTrigger,
+}
+
+impl SovereignWorkflowEngine {
+    pub fn new(trigger: WorkflowTrigger) -> Self {
+        Self {
+            nodes: Vec::new(),
+            trigger,
+        }
+    }
+
+    pub fn add_node(&mut self, id: u32, name: &str, cmd: &str, depends: Option<u32>) {
+        self.nodes.push(WorkflowNode {
+            id,
+            name: name.to_string(),
+            command: cmd.to_string(),
+            depends_on: depends,
+            state_executed: false,
+        });
+    }
+
+    /// Executes sequential nodes of the DAG pipeline safely (n8n style)
+    pub fn execute_workflow(&mut self) -> Result<usize, &'static str> {
+        let mut executed_count = 0;
+        let node_len = self.nodes.len();
+
+        // Take a snapshot of states before this pass
+        let previous_states: Vec<bool> = self.nodes.iter().map(|n| n.state_executed).collect();
+
+        for i in 0..node_len {
+            if self.nodes[i].state_executed {
+                executed_count += 1;
+                continue;
+            }
+
+            // Check if independent or its dependency was already executed
+            let can_execute = match self.nodes[i].depends_on {
+                None => true,
+                Some(dep_id) => {
+                    let mut dep_ok = false;
+                    for j in 0..node_len {
+                        if self.nodes[j].id == dep_id && previous_states[j] {
+                            dep_ok = true;
+                            break;
+                        }
+                    }
+                    dep_ok
+                }
+            };
+
+            if can_execute {
+                self.nodes[i].state_executed = true;
+                executed_count += 1;
+            }
+        }
+        Ok(executed_count)
+    }
+}
+
+// -------------------------------------------------------------------------
+// Phase 3: Adaptive CLI Suggestions (Pattern Recognition Learning)
+// -------------------------------------------------------------------------
+pub struct AdaptiveCliSuggestions {
+    pub command_history: BTreeMap<String, u32>,
+}
+
+impl AdaptiveCliSuggestions {
+    pub fn new() -> Self {
+        Self {
+            command_history: BTreeMap::new(),
+        }
+    }
+
+    pub fn record_command_usage(&mut self, cmd: &str) {
+        let key = cmd.to_string();
+        let count = self.command_history.get(&key).cloned().unwrap_or(0);
+        self.command_history.insert(key, count + 1);
+    }
+
+    /// Suggests the most frequently used matching command prefix (Arch/Clear style)
+    pub fn suggest_completion(&self, prefix: &str) -> Option<String> {
+        let mut best_match: Option<String> = None;
+        let mut max_count = 0;
+
+        for (cmd, &count) in &self.command_history {
+            if cmd.starts_with(prefix) && count > max_count {
+                max_count = count;
+                best_match = Some(cmd.clone());
+            }
+        }
+        best_match
+    }
+}
+
+// -------------------------------------------------------------------------
+// Phase 4: Error Explanation Layer (Plain Language Diagnostics)
+// -------------------------------------------------------------------------
+pub struct ErrorExplanationLayer {
+    errors_map: BTreeMap<u32, (String, String)>, // Code -> (Plain explanation, Solution proposal)
+}
+
+impl ErrorExplanationLayer {
+    pub fn new() -> Self {
+        let mut errors_map = BTreeMap::new();
+        errors_map.insert(
+            0xD001,
+            (
+                "GPU Initialization Failed".to_string(),
+                "Perform a SteamOS-style dynamic reset and clear the frame buffer cache."
+                    .to_string(),
+            ),
+        );
+        errors_map.insert(
+            0xD101,
+            (
+                "Realtek NIC Initialization Failed".to_string(),
+                "Initialize pci_bus root driver first and retry modprobe reload on r8169."
+                    .to_string(),
+            ),
+        );
+        errors_map.insert(
+            0xD301,
+            (
+                "NVMe Driver Probe Failure".to_string(),
+                "Switch the system to standard AHCI/SATA compatibility mode and retry boot."
+                    .to_string(),
+            ),
+        );
+        Self { errors_map }
+    }
+
+    pub fn explain_error(&self, code: u32) -> Option<(String, String)> {
+        self.errors_map.get(&code).cloned()
+    }
+}
+
+// -------------------------------------------------------------------------
+// Phase 5: AI-Driven Security & Behavioral Anomaly Protection
+// -------------------------------------------------------------------------
+pub struct AiSecurityGuard {
+    pub threat_database_size: usize,
+    pub anomaly_threshold: f32,
+}
+
+impl AiSecurityGuard {
+    pub fn new(threshold: f32) -> Self {
+        Self {
+            threat_database_size: 1500,
+            anomaly_threshold: threshold,
+        }
+    }
+
+    /// Evaluates dynamic system events and triggers alerts on behavioral anomalies (Tails style)
+    pub fn evaluate_anomalous_behavior(&self, network_port: u16, payload: &str) -> f32 {
+        let mut score = 0.0;
+
+        // Critical port accesses without permission score high threats
+        if network_port == 22 || network_port == 3389 {
+            score += 0.45;
+        }
+
+        // Suspicious directory traversal or system commands
+        if payload.contains("../") || payload.contains("/bin/sh") {
+            score += 0.50;
+        }
+
+        score
+    }
+}
+
+// -------------------------------------------------------------------------
+// Phase 6: AI-Assisted Development (Code & Unit Test generation)
+// -------------------------------------------------------------------------
+pub struct AiDeveloperAssistant;
+
+impl AiDeveloperAssistant {
+    pub fn generate_unit_tests(&self, language: &str, function_sig: &str) -> String {
+        if language == "rust" {
+            let mut test_out = "#[test]\nfn test_generated_".to_string();
+            test_out.push_str(function_sig.split_whitespace().next().unwrap_or("func"));
+            test_out.push_str("() {\n    assert!(true);\n}");
+            test_out
+        } else {
+            "// Standard unit tests generated.".to_string()
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+// S-AI Engine Coordinator
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// Phase 1: SigmaAI Natural Language to CLI Command Translator
+// -------------------------------------------------------------------------
+pub struct CliTranslator {
+    patterns: BTreeMap<String, String>,
+}
+
+impl CliTranslator {
+    pub fn new() -> Self {
+        let mut patterns = BTreeMap::new();
         patterns.insert("clean up temp files".to_string(), "sigma-cleanup --temp".to_string());
         patterns.insert("free up disk space".to_string(), "sigma-cleanup --all".to_string());
         patterns.insert("update system packages".to_string(), "sigpkg update".to_string());

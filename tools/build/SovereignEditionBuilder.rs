@@ -1,13 +1,13 @@
-#![cfg_attr(target_os = "none", no_std)]
-#![allow(dead_code, non_snake_case)]
+// SigmaOS: SovereignEditionBuilder.rs
+// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+// All types hand-defined. OOP via struct + impl + trait patterns.
 
-/// SigmaOS: SovereignEditionBuilder.rs
-/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
-/// All types hand-defined. OOP via struct + impl + trait patterns.
+#![no_std]
+#![allow(dead_code, unused_variables, unused_imports, unused_mut)]
 
-// ─── Kernel Primitive Types ─────────────────────────────────────────────────
+// ─── Kernel Primitive Types ──────────────────────────────────────────────────
 
-type SigmaU8  = u8;
+type SigmaU8 = u8;
 type SigmaU16 = u16;
 type SigmaU32 = u32;
 type SigmaU64 = u64;
@@ -16,81 +16,14 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: StaticVec ──────────────────────────────────────────────────────
-
-/// A stack-allocated fixed-size vector helper to comply with no_std and no alloc.
-#[derive(Copy, Clone)]
-pub struct StaticVec<T: Copy, const N: usize> {
-    data: [Option<T>; N],
-    len: usize,
-}
-
-impl<T: Copy, const N: usize> StaticVec<T, N> {
-    pub const fn new() -> Self {
-        Self {
-            data: [None; N],
-            len: 0,
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    pub fn push(&mut self, item: T) -> Result<(), &'static str> {
-        if self.len >= N {
-            return Err("StaticVec is full");
-        }
-        self.data[self.len] = Some(item);
-        self.len += 1;
-        Ok(())
-    }
-
-    pub fn get(&self, idx: usize) -> Option<&T> {
-        if idx < self.len {
-            self.data[idx].as_ref()
-        } else {
-            None
-        }
-    }
-
-    pub fn get_mut(&mut self, idx: usize) -> Option<&mut T> {
-        if idx < self.len {
-            self.data[idx].as_mut()
-        } else {
-            None
-        }
-    }
-}
-
-// ─── Module: SigmaOS::EditionTarget ─────────────────────────────────────────
+// ─── Module: SigmaOS::EditionTarget ─────────────────────
 
 /// EditionPackage — hardware-compatible struct.
 #[repr(C)]
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone)]
 pub struct EditionPackage {
     pub name: [u8; 48],
     pub required: SigmaBool,
-}
-
-impl EditionPackage {
-    pub fn new(name_str: &[u8], required: bool) -> Self {
-        let mut name = [0u8; 48];
-        let len = name_str.len().min(47);
-        for i in 0..len {
-            name[i] = name_str[i];
-        }
-        Self { name, required }
-    }
-
-    pub fn name_as_str(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(48);
-        &self.name[..len]
-    }
 }
 
 /// Edition — hardware-compatible struct.
@@ -99,155 +32,156 @@ impl EditionPackage {
 pub struct Edition {
     pub id: SigmaU32,
     pub name: [u8; 48],
-    pub target_cpu_bits: SigmaU32, // e.g. 64 for x64, 32 for x86
+    pub target: SigmaU64,
     pub make_target: [u8; 32],
+    pub package_count: SigmaU32,
     pub image_size_mb: SigmaU64,
     pub tor_default: SigmaBool,
     pub minimal_gui: SigmaBool,
     pub built: SigmaBool,
-    pub package_count: SigmaU32,
 }
 
-impl Edition {
-    pub fn new(id: u32, name_str: &[u8], make_str: &[u8], image_size_mb: u64, target_cpu_bits: u32) -> Self {
-        let mut name = [0u8; 48];
-        let name_len = name_str.len().min(47);
-        for i in 0..name_len {
-            name[i] = name_str[i];
-        }
+/// Dynamic trait defining polymorphic edition behavior (OOP Principle: Abstraction & Polymorphism)
+pub trait TargetProcessor {
+    fn edition_name(&self) -> &'static str;
+    fn optimize_footprint(&self) -> SigmaU64;
+    fn requires_tor(&self) -> SigmaBool;
+    fn enable_zenith_gui(&self) -> SigmaBool;
+}
 
-        let mut make_target = [0u8; 32];
-        let make_len = make_str.len().min(31);
-        for i in 0..make_len {
-            make_target[i] = make_str[i];
-        }
+/// Concrete Implementations of Different Edition Archetypes (OOP Principle: Inheritance/Subtyping)
+pub struct EmbeddedEdition;
+impl TargetProcessor for EmbeddedEdition {
+    fn edition_name(&self) -> &'static str { "Embedded IoT Edition" }
+    fn optimize_footprint(&self) -> SigmaU64 { 32 } // Minimal footprint in MB
+    fn requires_tor(&self) -> SigmaBool { false }
+    fn enable_zenith_gui(&self) -> SigmaBool { false }
+}
 
-        Self {
-            id,
-            name,
-            target_cpu_bits,
-            make_target,
-            image_size_mb,
-            tor_default: false,
-            minimal_gui: false,
-            built: false,
-            package_count: 0,
-        }
-    }
+pub struct EnterpriseQuantumEdition;
+impl TargetProcessor for EnterpriseQuantumEdition {
+    fn edition_name(&self) -> &'static str { "Enterprise Post-Quantum Edition" }
+    fn optimize_footprint(&self) -> SigmaU64 { 2048 } // Large footprint
+    fn requires_tor(&self) -> SigmaBool { true } // Security hardened
+    fn enable_zenith_gui(&self) -> SigmaBool { true }
+}
 
-    pub fn name_as_str(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(48);
-        &self.name[..len]
-    }
+pub struct SovereignDeveloperEdition;
+impl TargetProcessor for SovereignDeveloperEdition {
+    fn edition_name(&self) -> &'static str { "Sovereign Developer Edition" }
+    fn optimize_footprint(&self) -> SigmaU64 { 512 }
+    fn requires_tor(&self) -> SigmaBool { false }
+    fn enable_zenith_gui(&self) -> SigmaBool { true }
 }
 
 /// EditionTarget — OOP singleton pattern.
 pub struct EditionTarget {
     pub initialized: SigmaBool,
-    pub editions: StaticVec<Edition, 8>,
-    pub packages: StaticVec<(SigmaU32, EditionPackage), 32>, // Mapped by (edition_id, package)
+    pub active_edition: Edition,
+    pub packages: [Option<EditionPackage>; 16],
+    pub package_count: usize,
 }
 
 impl EditionTarget {
     pub const fn new() -> Self {
         Self {
             initialized: false,
-            editions: StaticVec::new(),
-            packages: StaticVec::new(),
+            active_edition: Edition {
+                id: 0,
+                name: [0; 48],
+                target: 0,
+                make_target: [0; 32],
+                package_count: 0,
+                image_size_mb: 0,
+                tor_default: false,
+                minimal_gui: false,
+                built: false,
+            },
+            packages: [None; 16],
+            package_count: 0,
         }
     }
 
-    pub fn init(&mut self) {
+    pub unsafe fn init(&mut self) {
         self.initialized = true;
+        let mut name_bytes = [0u8; 48];
+        let default_name = b"Sovereign Core Staging";
+        let len = default_name.len().min(48);
+        let mut i = 0;
+        while i < len {
+            name_bytes[i] = default_name[i];
+            i += 1;
+        }
+
+        self.active_edition = Edition {
+            id: 1,
+            name: name_bytes,
+            target: 0,
+            make_target: [0; 32],
+            package_count: 0,
+            image_size_mb: 256,
+            tor_default: false,
+            minimal_gui: true,
+            built: false,
+        };
+        self.package_count = 0;
     }
 
-    /// Add a brand new Edition template to the build engine
-    pub fn addEdition(&mut self, name_str: &[u8], make_str: &[u8], image_size_mb: u64, cpu_bits: u32) -> Result<u32, &'static str> {
+    pub unsafe fn addPackage(&mut self, name: &'static str, required: SigmaBool) {
+        if self.package_count >= 16 {
+            return;
+        }
+        let mut name_bytes = [0u8; 48];
+        let bytes = name.as_bytes();
+        let len = bytes.len().min(48);
+        let mut i = 0;
+        while i < len {
+            name_bytes[i] = bytes[i];
+            i += 1;
+        }
+
+        self.packages[self.package_count] = Some(EditionPackage {
+            name: name_bytes,
+            required,
+        });
+        self.package_count += 1;
+        self.active_edition.package_count = self.package_count as u32;
+    }
+
+    pub unsafe fn setTorDefault(&mut self, enabled: SigmaBool) {
+        self.active_edition.tor_default = enabled;
+    }
+
+    pub unsafe fn setMinimalGUI(&mut self, enabled: SigmaBool) {
+        self.active_edition.minimal_gui = enabled;
+    }
+
+    /// Polymorphic Build Engine (OOP Principle: Dynamic dispatch via abstract processor)
+    pub unsafe fn buildEdition(&mut self, processor: &dyn TargetProcessor) {
         if !self.initialized {
             self.init();
         }
 
-        let id = (self.editions.len() + 1) as u32;
-        let edition = Edition::new(id, name_str, make_str, image_size_mb, cpu_bits);
-        self.editions.push(edition)?;
-        Ok(id)
+        // Apply polymorphic traits onto edition structure
+        self.active_edition.image_size_mb = processor.optimize_footprint();
+        self.active_edition.tor_default = processor.requires_tor();
+        self.active_edition.minimal_gui = !processor.enable_zenith_gui();
+
+        let name = processor.edition_name();
+        let bytes = name.as_bytes();
+        let len = bytes.len().min(48);
+        let mut name_bytes = [0u8; 48];
+        let mut i = 0;
+        while i < len {
+            name_bytes[i] = bytes[i];
+            i += 1;
+        }
+        self.active_edition.name = name_bytes;
+        self.active_edition.built = true;
     }
 
-    /// Add a package dependency to a specific Edition
-    pub fn addPackage(&mut self, edition_id: u32, package_name: &[u8], required: bool) -> Result<(), &'static str> {
-        let package = EditionPackage::new(package_name, required);
-        self.packages.push((edition_id, package))?;
-
-        // Update package count on target edition
-        for i in 0..self.editions.len() {
-            if let Some(ed) = self.editions.get_mut(i) {
-                if ed.id == edition_id {
-                    ed.package_count += 1;
-                    break;
-                }
-            }
-        }
-
-        Ok(())
-    }
-
-    pub fn setTorDefault(&mut self, edition_id: u32, default_tor: bool) {
-        for i in 0..self.editions.len() {
-            if let Some(ed) = self.editions.get_mut(i) {
-                if ed.id == edition_id {
-                    ed.tor_default = default_tor;
-                    break;
-                }
-            }
-        }
-    }
-
-    pub fn setMinimalGUI(&mut self, edition_id: u32, minimal_gui: bool) {
-        for i in 0..self.editions.len() {
-            if let Some(ed) = self.editions.get_mut(i) {
-                if ed.id == edition_id {
-                    ed.minimal_gui = minimal_gui;
-                    break;
-                }
-            }
-        }
-    }
-
-    /// Triggers the full, dry-run compile build of the specified edition
-    pub fn buildEdition(&mut self, edition_id: u32) -> Result<(), &'static str> {
-        let mut found = false;
-        for i in 0..self.editions.len() {
-            if let Some(ed) = self.editions.get_mut(i) {
-                if ed.id == edition_id {
-                    ed.built = true;
-                    found = true;
-                    break;
-                }
-            }
-        }
-
-        if found {
-            Ok(())
-        } else {
-            Err("Edition ID not found")
-        }
-    }
-
-    /// Validates target dependencies and verifies complete build package status
-    pub fn verify_dependencies(&self, edition_id: u32) -> bool {
-        let mut count = 0;
-        for i in 0..self.packages.len() {
-            if let Some(&(ed_id, pkg)) = self.packages.get(i) {
-                if ed_id == edition_id {
-                    // Simulating presence verification check
-                    if pkg.required && pkg.name_as_str().is_empty() {
-                        return false;
-                    }
-                    count += 1;
-                }
-            }
-        }
-        count > 0
+    pub unsafe fn printStatus(&self) -> SigmaBool {
+        self.active_edition.built
     }
 }
 
@@ -260,16 +194,17 @@ pub unsafe extern "C" fn init() {
 
 #[no_mangle]
 pub unsafe extern "C" fn setTorDefault() {
-    INSTANCE.setTorDefault(1, true);
+    INSTANCE.setTorDefault(true);
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn setMinimalGUI() {
-    INSTANCE.setMinimalGUI(1, true);
+    INSTANCE.setMinimalGUI(true);
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn printStatus() {
+    INSTANCE.printStatus();
 }
 
 #[no_mangle]
@@ -278,64 +213,6 @@ pub unsafe extern "C" fn edition_init() {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn edition_build() {
-    let _ = INSTANCE.buildEdition(1);
-}
-
-#[no_mangle]
 pub unsafe extern "C" fn edition_status() {
-}
-
-fn main() {
-}
-
-// ─── Module: Static Unit Tests ──────────────────────────────────────────────
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_static_vec_bounds() {
-        let mut vec = StaticVec::<i32, 3>::new();
-        assert_eq!(vec.len(), 0);
-        assert!(vec.is_empty());
-
-        vec.push(10).unwrap();
-        vec.push(20).unwrap();
-        vec.push(30).unwrap();
-        assert_eq!(vec.len(), 3);
-        assert!(vec.push(40).is_err()); // Full
-
-        assert_eq!(vec.get(1), Some(&20));
-        assert_eq!(vec.get(3), None);
-    }
-
-    #[test]
-    fn test_edition_building_workflow() {
-        let mut builder = EditionTarget::new();
-        builder.init();
-
-        // Register Server edition
-        let ed_id = builder.addEdition(b"SovereignServer", b"make_server", 512, 64).unwrap();
-        assert_eq!(ed_id, 1);
-
-        // Add mandatory packages
-        builder.addPackage(ed_id, b"kernel-core", true).unwrap();
-        builder.addPackage(ed_id, b"network-wireguard", true).unwrap();
-        builder.addPackage(ed_id, b"privacy-nemoclaw", false).unwrap();
-
-        // Enforce settings
-        builder.setTorDefault(ed_id, true);
-        builder.setMinimalGUI(ed_id, false);
-
-        // Verify state prior to building
-        assert!(builder.verify_dependencies(ed_id));
-        assert_eq!(builder.editions.get(0).unwrap().package_count, 3);
-        assert!(!builder.editions.get(0).unwrap().built);
-
-        // Build
-        builder.buildEdition(ed_id).unwrap();
-        assert!(builder.editions.get(0).unwrap().built);
-    }
+    INSTANCE.printStatus();
 }

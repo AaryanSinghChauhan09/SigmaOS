@@ -7,15 +7,12 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
-pub mod advanced_app_absorber;
 pub mod tmux;
+pub mod mind_map;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
-};
-pub use mind_map::{
-    MindMapCreator, MindMapLayout, MindMapNode, NodeShape, NodeStyle, RelationshipConnection,
 };
 pub use notes::{
     ContentType, Folder, InMemoryNoteStorage, Note, NoteError, NoteSearchResult, NoteStorage,
@@ -45,4 +42,7 @@ pub use terminal::{
 };
 pub use tmux::{
     SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+};
+pub use mind_map::{
+    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
 };

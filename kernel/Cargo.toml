@@ -25,6 +25,3 @@ lto = true      # Link-time optimization
 codegen-units = 1 # Single codegen unit
 strip = true    # Strip symbols
 overflow-checks = false # Disable for performance
-
-[build]
-target = "x86_64-unknown-none"

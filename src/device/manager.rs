@@ -90,12 +90,6 @@ pub struct SimpleDeviceManager {
     pub next_id: AtomicUsize,
 }
 
-impl Default for SimpleDeviceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl SimpleDeviceManager {
     pub fn new() -> Self {
         SimpleDeviceManager {
@@ -181,7 +175,9 @@ impl DeviceDriver for SimpleDeviceDriver {
     }
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        buffer.fill(0u8);
+        for i in 0..buffer.len() {
+            buffer[i] = 0u8;
+        }
         Ok(buffer.len())
     }
 
@@ -205,12 +201,6 @@ pub struct SimpleDeviceHotplug {
     pub enabled: AtomicUsize,
     pub added_devices: Vec<DeviceID>,
     pub removed_devices: Vec<DeviceID>,
-}
-
-impl Default for SimpleDeviceHotplug {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleDeviceHotplug {

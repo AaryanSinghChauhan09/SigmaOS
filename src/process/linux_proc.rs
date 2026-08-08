@@ -265,7 +265,7 @@ impl ProcFileSystem {
 
     /// Re-parent orphans when a parent exits, and clean up / turn to zombie.
     /// If parent has already waited, we fully reap. Otherwise, turns to zombie.
-    pub fn exit_process(&mut self, pid: usize, exit_code: i32) -> Result<(), String> {
+    pub fn exit_process(&mut self, pid: usize, _exit_code: i32) -> Result<(), String> {
         if pid == 1 {
             return Err("Cannot exit system init process (PID 1)".to_string());
         }
