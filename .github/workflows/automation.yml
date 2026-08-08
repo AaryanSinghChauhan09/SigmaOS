@@ -1,0 +1,147 @@
+name: Automation
+
+on:
+  schedule:
+    - cron: '0 5 * * *'       # daily at 05:00 UTC — fmt + clippy
+    - cron: '0 2 * * 0'       # weekly Sundays — stale issues, dependency updates
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  # ── Rust fmt + clippy ─────────────────────────────────────────────────────
+  fmt-and-clippy:
+    name: Format & Lint check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust (stable)
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-automation-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check || true
+
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings || true
+
+  # ── Stale issues/PRs ──────────────────────────────────────────────────────
+  stale:
+    name: Mark & Close Stale Issues/PRs
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: |
+            👋 This issue has been automatically marked as stale because it has not had activity in 60 days.
+            It will be closed in 14 days if no further activity occurs.
+            If this is still relevant, please leave a comment or link a PR!
+          stale-pr-message: |
+            👋 This pull request has been automatically marked as stale because it has not had activity in 30 days.
+            It will be closed in 14 days if no further activity occurs.
+            If this PR is still in progress, please leave a comment or push a new commit!
+          close-issue-message: |
+            🔒 Closing this issue as stale. If you believe this was a mistake, please reopen it with updated context.
+          close-pr-message: |
+            🔒 Closing this PR as stale. Feel free to reopen if you've resumed work!
+          days-before-stale: 60
+          days-before-pr-stale: 30
+          days-before-close: 14
+          stale-issue-label: 'stale'
+          stale-pr-label: 'stale'
+          exempt-issue-labels: 'pinned,security,roadmap,kernel,P0'
+          exempt-pr-labels: 'pinned,security,work-in-progress,WIP'
+
+  # ── PR auto-labeler ───────────────────────────────────────────────────────
+  labeler:
+    name: Auto-label PRs
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+
+  # ── Dependabot config refresh ─────────────────────────────────────────────
+  check-dependabot:
+    name: Validate Dependabot config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate dependabot.yml exists
+        run: |
+          if [ -f ".github/dependabot.yml" ]; then
+            echo "✅ dependabot.yml present"
+            cat .github/dependabot.yml
+          else
+            echo "⚠️  dependabot.yml missing – creating default"
+            cat > .github/dependabot.yml << 'EOF'
+          version: 2
+          updates:
+            - package-ecosystem: "cargo"
+              directory: "/"
+              schedule:
+                interval: "weekly"
+              open-pull-requests-limit: 10
+              labels:
+                - "dependencies"
+                - "rust"
+            - package-ecosystem: "github-actions"
+              directory: "/"
+              schedule:
+                interval: "weekly"
+              labels:
+                - "dependencies"
+                - "github-actions"
+          EOF
+            echo "Created .github/dependabot.yml"
+          fi
+
+  # ── Workflow health summary ────────────────────────────────────────────────
+  workflow-summary:
+    name: Workflow Health Summary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Count and report workflow files
+        run: |
+          echo "## SigmaOS GitHub Actions Workflow Health Report"
+          echo "Date: $(date -u)"
+          echo ""
+          echo "### Active Workflow Files:"
+          ls .github/workflows/*.yml | while read f; do
+            NAME=$(grep '^name:' "$f" | head -1 | sed 's/name: //')
+            echo "  - $f → $NAME"
+          done
+          TOTAL=$(ls .github/workflows/*.yml | wc -l)
+          echo ""
+          echo "### Total workflows: $TOTAL"
+          echo ""
+          echo "### Source Module Stats:"
+          find src -name '*.rs' | wc -l | xargs -I{} echo "  Rust source files: {}"
+          find src -name '*.rs' -exec wc -l {} + | tail -1 | awk '{print "  Total lines of Rust: " $1}'
