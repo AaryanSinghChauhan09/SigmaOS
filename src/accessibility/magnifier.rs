@@ -1,15 +1,17 @@
+use crate::klib::Vec;
 /// OOP-based Screen Magnifier for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 826
 /// Implements screen magnification and zoom
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 pub type MagnifierID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MagnifierError { Success = 0, NotFound = 1 }
+pub enum MagnifierError {
+    Success = 0,
+    NotFound = 1,
+}
 
 pub trait Magnifier {
     fn id(&self) -> MagnifierID;
@@ -37,17 +39,25 @@ impl SimpleMagnifier {
 }
 
 impl Magnifier for SimpleMagnifier {
-    fn id(&self) -> MagnifierID { self.id }
-    fn zoom_level(&self) -> f32 { (self.zoom_level.load(Ordering::SeqCst) as f32) / 100.0 }
-    
-    fn set_zoom_level(&mut self, level: f32) {
-        self.zoom_level.store((level * 100.0) as usize, Ordering::SeqCst);
+    fn id(&self) -> MagnifierID {
+        self.id
     }
-    
-    fn follow_cursor(&self) -> bool { self.follow_cursor.load(Ordering::SeqCst) == 1 }
-    
+    fn zoom_level(&self) -> f32 {
+        (self.zoom_level.load(Ordering::SeqCst) as f32) / 100.0
+    }
+
+    fn set_zoom_level(&mut self, level: f32) {
+        self.zoom_level
+            .store((level * 100.0) as usize, Ordering::SeqCst);
+    }
+
+    fn follow_cursor(&self) -> bool {
+        self.follow_cursor.load(Ordering::SeqCst) == 1
+    }
+
     fn set_follow_cursor(&mut self, follow: bool) {
-        self.follow_cursor.store(if follow { 1 } else { 0 }, Ordering::SeqCst);
+        self.follow_cursor
+            .store(if follow { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 
@@ -79,7 +89,7 @@ impl MagnifierManager for SimpleMagnifierManager {
         self.magnifiers.push(Some(Box::new(magnifier)));
         Ok(id)
     }
-    
+
     fn destroy_magnifier(&mut self, id: MagnifierID) -> Result<(), MagnifierError> {
         for magnifier_option in &mut self.magnifiers {
             if let Some(ref magnifier) = *magnifier_option {
@@ -91,11 +101,13 @@ impl MagnifierManager for SimpleMagnifierManager {
         }
         Err(MagnifierError::NotFound)
     }
-    
+
     fn get_magnifier(&self, id: MagnifierID) -> Option<&dyn Magnifier> {
         for magnifier_option in &self.magnifiers {
             if let Some(ref magnifier) = *magnifier_option {
-                if magnifier.id() == id { return Some(magnifier.as_ref()); }
+                if magnifier.id() == id {
+                    return Some(magnifier.as_ref());
+                }
             }
         }
         None
@@ -126,14 +138,17 @@ impl SimpleColorFilter {
 impl ColorFilter for SimpleColorFilter {
     fn enable_filter(&mut self, filter_type: u8) {
         self.enabled.store(1, Ordering::SeqCst);
-        self.filter_type.store(filter_type as usize, Ordering::SeqCst);
+        self.filter_type
+            .store(filter_type as usize, Ordering::SeqCst);
     }
-    
+
     fn disable_filter(&mut self) {
         self.enabled.store(0, Ordering::SeqCst);
     }
-    
-    fn is_filter_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
+
+    fn is_filter_enabled(&self) -> bool {
+        self.enabled.load(Ordering::SeqCst) == 1
+    }
 }
 
 #[cfg(test)]
