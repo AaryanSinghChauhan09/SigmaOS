@@ -86,6 +86,12 @@ pub struct DeviceCapability {
     pub can_interrupt: bool,
 }
 
+impl Default for DeviceCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DeviceCapability {
     pub fn new() -> Self {
         DeviceCapability {
@@ -290,7 +296,7 @@ mod tests {
 
     #[test]
     fn test_modern_device_oop() {
-        let mut modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
+        let modern = ModernDevice::new(101, b"modern_mmio", 0xFE000000);
         assert_eq!(
             modern.query_channel(),
             PortAddress::MemoryMapped(0xFE000000)
@@ -317,77 +323,30 @@ mod tests {
     }
 
     #[test]
-    fn test_dynamic_compression_and_loading() {
-        // Run-length encoded bytecode for: [0x01, 0x01, 0x01, 0x04, 0x04] -> (1 count of 0x01, 1 count of 0x01, 1 count of 0x01, 2 count of 0x04)
-        let compressed = [1, 0x01, 1, 0x01, 1, 0x01, 2, 0x04];
-        let manager = DeviceManager::new();
-        let interpreter_res = manager.load_compressed_udf_driver(&compressed);
-        assert!(interpreter_res.is_ok());
-        let interpreter = interpreter_res.unwrap();
-        assert_eq!(interpreter.bytecode.len, 5);
-        assert_eq!(interpreter.bytecode[0], 0x01);
-        assert_eq!(interpreter.bytecode[4], 0x04);
-    }
+    fn test_dde_device_translation_wrapper() {
+        let mut dde_wrapper = DdeDeviceWrapper::new(201, b"linux_e1000", 0xFC000000, b"Linux");
 
-    #[test]
-    fn test_linux_compatibility_and_override() {
-        let mut manager = DeviceManager::new();
+        assert_eq!(
+            dde_wrapper.query_channel(),
+            PortAddress::MemoryMapped(0xFC000000)
+        );
+        assert_eq!(dde_wrapper.info().vendor_id, 0x8086);
+        assert_eq!(dde_wrapper.info().device_id, 0x100e);
 
-        // Register an early boot override for custom legacy hardware "custom_uart"
-        let entry = EarlyBootParameterOverride::new(b"custom_uart", 0x2F8, 4, &[0x04]);
-        manager.linux_override_table.register_override(entry);
+        // Test simulated PCI BAR configuration register writing and reading
+        assert!(dde_wrapper.write_byte(0x10, 0x55).is_ok());
+        assert_eq!(dde_wrapper.read_byte(0x10).unwrap(), 0x55);
 
-        // Register legacy device with override
-        let dev_id_result = manager.register_legacy_device_with_override(b"custom_uart", 0x3F8);
-        assert!(dev_id_result.is_ok());
-        let dev_id = dev_id_result.unwrap();
+        // Test block-like reads/writes simulating DMA descriptors
+        let test_buffer = [0xAA; 16];
+        assert!(dde_wrapper.write(&test_buffer).is_ok());
 
-        // Check if descriptor correctly matches "custom_uart" name
-        let descriptor = manager.get_descriptor(dev_id).unwrap();
-        assert_eq!(&descriptor.name[..11], b"custom_uart");
+        let mut read_buffer = [0u8; 16];
+        assert!(dde_wrapper.read(&mut read_buffer).is_ok());
+        assert_eq!(read_buffer, test_buffer);
 
-        // Verify that the port config is overriden to 0x2F8 (instead of 0x3F8)
-        // Retrieve the device from manager and cast to UnifiedPeripheral
-        let dev = manager.get_device(dev_id).unwrap();
-
-        // Simulating matching by using dynamic casting-like fields or calling device functions
-        assert_eq!(dev.info().device_type, DeviceType::Character);
-    }
-
-    #[test]
-    fn test_wdm_driver_lifecycle() {
-        let mut io_mgr = IoManager::new();
-
-        // 1. Emulate normal driver installation process
-        let driver_idx = io_mgr.normal_driver_installation_process(b"MySerialDriver", b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver").unwrap();
-        assert_eq!(io_mgr.active_drivers.len(), 1);
-
-        let driver = &mut io_mgr.active_drivers[driver_idx];
-        assert_eq!(&driver.driver_name[..14], b"MySerialDriver");
-        assert_eq!(&driver.registry_path[..66], b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver");
-
-        // Set DRIVERUNLOAD unload routine callback
-        driver.unload_routine = Some(|_drv| {});
-
-        // 2. Create Device associated with the Driver Object
-        assert!(io_mgr.io_create_device(driver_idx, b"COM1", DeviceType::Character).is_ok());
-
-        let driver_updated = &io_mgr.active_drivers[driver_idx];
-        assert_eq!(driver_updated.device_objects.len(), 1);
-        assert_eq!(&driver_updated.device_objects[0].name[..4], b"COM1");
-        assert_eq!(driver_updated.device_objects[0].device_type, DeviceType::Character);
-
-        // Configure HW Resource allocations inside Device Extension
-        let ext = &mut io_mgr.active_drivers[driver_idx].device_objects[0].device_extension;
-        ext.irq = 4;
-        ext.base_port = 0x3F8;
-        ext.device_context[0] = 0xFF; // Write custom driver context information
-
-        // 3. Unload Driver and perform driver-specific cleanup tasks
-        assert!(io_mgr.io_unload_driver(driver_idx).is_ok());
-
-        // Assert that all Device Objects and Extensions have been freed/deleted cleanly from the pool
-        assert_eq!(io_mgr.active_drivers[driver_idx].device_objects.len(), 0);
+        // Test translated ioctl call
+        assert_eq!(dde_wrapper.ioctl(0xFF, 0).unwrap(), 1);
     }
 }
 
@@ -551,78 +510,17 @@ impl CharacterDevice for SimpleCharacterDevice {
     }
 }
 
-/// Linux-history inspired Early Boot Parameter Override Entry
-/// Maps a device identifier or legacy serial/io port to custom base IO, IRQs, or UDF bytecode overrides.
-/// This allows SigmaOS to work with older unsupported devices (ISA cards, custom PC clones, legacy serial, etc.)
-/// without needing a massive compiled-in driver binary, satisfying OOP size-reduction goals.
-pub struct EarlyBootParameterOverride {
-    pub device_name: [u8; 32],
-    pub port_io_override: u16,
-    pub irq_override: u8,
-    pub udf_bytecode: [u8; 16], // Light bytecode override for custom scaling/reg mapping
-    pub udf_len: usize,
-}
-
-impl EarlyBootParameterOverride {
-    pub fn new(device_name: &[u8], port: u16, irq: u8, bytecode: &[u8]) -> Self {
-        let mut name_array = [0u8; 32];
-        let len = device_name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(device_name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        let mut bc_array = [0u8; 16];
-        let bc_len = bytecode.len().min(16);
-        for i in 0..bc_len {
-            bc_array[i] = bytecode[i];
-        }
-
-        EarlyBootParameterOverride {
-            device_name: name_array,
-            port_io_override: port,
-            irq_override: irq,
-            udf_bytecode: bc_array,
-            udf_len: bc_len,
-        }
-    }
-}
-
-/// Linux-inspired early parameter override table for unmatched legacy devices
-pub struct LinuxEarlyOverrideTable {
-    pub overrides: Vec<Option<EarlyBootParameterOverride>>,
-}
-
-impl LinuxEarlyOverrideTable {
-    pub fn new() -> Self {
-        LinuxEarlyOverrideTable {
-            overrides: Vec::new(),
-        }
-    }
-
-    pub fn register_override(&mut self, entry: EarlyBootParameterOverride) {
-        self.overrides.push(Some(entry));
-    }
-
-    /// Checks if a legacy device has early boot-override configuration from early Linux history
-    pub fn lookup(&self, device_name: &[u8]) -> Option<&EarlyBootParameterOverride> {
-        for i in 0..self.overrides.len() {
-            if let Some(ref entry) = self.overrides[i] {
-                let entry_name_len = entry.device_name.iter().position(|&b| b == 0).unwrap_or(32);
-                if &entry.device_name[..entry_name_len] == device_name {
-                    return Some(entry);
-                }
-            }
-        }
-        None
-    }
-}
-
 /// Device manager (OOP: Manager class)
 pub struct DeviceManager {
     devices: Vec<Option<Box<dyn Device>>>,
     descriptors: Vec<Option<NonNull<DeviceDescriptor>>>,
     next_device_id: AtomicUsize,
-    pub linux_override_table: LinuxEarlyOverrideTable,
+}
+
+impl Default for DeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl DeviceManager {
@@ -631,60 +529,7 @@ impl DeviceManager {
             devices: Vec::new(),
             descriptors: Vec::new(),
             next_device_id: AtomicUsize::new(1),
-            linux_override_table: LinuxEarlyOverrideTable::new(),
         }
-    }
-
-    /// Register a legacy, potentially unsupported device.
-    /// If there is an early-boot configuration override (from Linux historical overrides),
-    /// we apply the custom base port and load the associated UDF interpreter bytecode to make it functional.
-    pub fn register_legacy_device_with_override(
-        &mut self,
-        device_name: &[u8],
-        default_port: u16,
-    ) -> Result<usize, DeviceError> {
-        let mut final_port = default_port;
-
-        // Lookup in the Linux Early Boot Override Table
-        if let Some(override_entry) = self.linux_override_table.lookup(device_name) {
-            final_port = override_entry.port_io_override;
-        }
-
-        // Create the Legacy Device using OOP principles to minimize footprint
-        let legacy_device = LegacyDevice::new(
-            self.next_device_id.load(Ordering::SeqCst),
-            device_name,
-            final_port,
-        );
-
-        // Register standard character device capabilities
-        let capability = DeviceCapability {
-            can_read: true,
-            can_write: true,
-            can_mmap: false,
-            can_dma: false,
-            can_interrupt: false,
-        };
-
-        self.register_device(
-            Box::new(legacy_device),
-            device_name,
-            DeviceType::Character,
-            capability,
-        )
-    }
-
-    /// On-demand driver decompressor and loader (Phase 4 of the blueprint).
-    /// Dynamically inflates a compressed UDF driver configuration block, instantiating the bytecode runner.
-    pub fn load_compressed_udf_driver(
-        &self,
-        compressed_bytecode: &[u8],
-    ) -> Result<UdfInterpreter, DeviceError> {
-        let mut decompressed = [0u8; 128];
-        let bytes_written = decompress_rle(compressed_bytecode, &mut decompressed)?;
-
-        let interpreter = UdfInterpreter::new(&decompressed[..bytes_written]);
-        Ok(interpreter)
     }
 
     pub fn register_device(
@@ -713,35 +558,34 @@ impl DeviceManager {
     }
 
     pub fn unregister_device(&mut self, id: usize) -> Result<(), DeviceError> {
-        if id == 0 || id - 1 >= self.devices.len() {
+        if id >= self.devices.len() {
             return Err(DeviceError::InvalidParameter);
         }
 
-        let idx = id - 1;
-        self.devices[idx] = None;
+        self.devices[id] = None;
 
-        if let Some(descriptor_ptr) = self.descriptors[idx] {
+        if let Some(descriptor_ptr) = self.descriptors[id] {
             unsafe {
                 core::ptr::drop_in_place(descriptor_ptr.as_ptr());
                 free(descriptor_ptr.as_ptr() as *mut u8);
             }
         }
 
-        self.descriptors[idx] = None;
+        self.descriptors[id] = None;
         Ok(())
     }
 
     pub fn get_device(&mut self, id: usize) -> Option<&mut Box<dyn Device>> {
-        if id > 0 && id - 1 < self.devices.len() {
-            self.devices[id - 1].as_mut()
+        if id < self.devices.len() {
+            self.devices[id].as_mut()
         } else {
             None
         }
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id > 0 && id - 1 < self.descriptors.len() {
-            self.descriptors[id - 1].map(|ptr| unsafe { &*ptr.as_ptr() })
+        if id < self.descriptors.len() {
+            self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
         }
@@ -781,6 +625,12 @@ pub struct Vec<T> {
     capacity: usize,
 }
 
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> Vec<T> {
     pub fn new() -> Self {
         Vec {
@@ -788,6 +638,10 @@ impl<T> Vec<T> {
             len: 0,
             capacity: 0,
         }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
 
     pub fn push(&mut self, item: T) {
@@ -858,19 +712,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }
@@ -951,140 +792,6 @@ unsafe fn free(ptr: *mut u8) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-}
-
-/// Windows NT-style Device Extension structure stored in the NonPaged Pool (holds context and HW resources)
-#[derive(Debug, Clone)]
-pub struct DeviceExtension {
-    pub irq: u8,
-    pub base_port: u16,
-    pub base_address: u32,
-    pub memory_size: usize,
-    pub device_context: [u8; 128], // Driver-specific context information buffer
-}
-
-impl DeviceExtension {
-    pub fn new() -> Self {
-        Self {
-            irq: 0,
-            base_port: 0,
-            base_address: 0,
-            memory_size: 0,
-            device_context: [0; 128],
-        }
-    }
-}
-
-/// Windows NT-style Device Object representing a logical, physical, or virtual device instance
-pub struct DeviceObject {
-    pub name: [u8; 64],
-    pub device_type: DeviceType,
-    pub device_extension: DeviceExtension,
-}
-
-impl DeviceObject {
-    pub fn new(name: &[u8], device_type: DeviceType) -> Self {
-        let mut name_array = [0u8; 64];
-        let len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        Self {
-            name: name_array,
-            device_type,
-            device_extension: DeviceExtension::new(),
-        }
-    }
-}
-
-/// Windows NT-style Driver Object representing a loaded driver image
-pub struct DriverObject {
-    pub driver_name: [u8; 64],
-    pub registry_path: [u8; 128], // Registry path config lookup (e.g. \Registry\Machine\System\CurrentControlSet\Services\...)
-    pub device_objects: Vec<DeviceObject>,
-    pub unload_routine: Option<fn(&mut DriverObject)>, // Unload Routine (DRIVERUNLOAD)
-}
-
-impl DriverObject {
-    pub fn new(name: &[u8], reg_path: &[u8]) -> Self {
-        let mut name_array = [0u8; 64];
-        let len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        let mut reg_array = [0u8; 128];
-        let reg_len = reg_path.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(reg_path.as_ptr(), reg_array.as_mut_ptr(), reg_len);
-        }
-
-        Self {
-            driver_name: name_array,
-            registry_path: reg_array,
-            device_objects: Vec::new(),
-            unload_routine: None,
-        }
-    }
-}
-
-/// Windows NT-style I/O Manager Subsystem coordinating driver lifecycles, creation, and unload tasks
-pub struct IoManager {
-    pub active_drivers: Vec<DriverObject>,
-}
-
-impl IoManager {
-    pub fn new() -> Self {
-        Self {
-            active_drivers: Vec::new(),
-        }
-    }
-
-    /// Emulate the normal driver installation process (creates a registered DriverObject)
-    pub fn normal_driver_installation_process(&mut self, driver_name: &[u8], registry_path: &[u8]) -> Result<usize, DeviceError> {
-        let driver = DriverObject::new(driver_name, registry_path);
-        self.active_drivers.push(driver);
-        Ok(self.active_drivers.len() - 1)
-    }
-
-    /// IoCreateDevice: Create a Device Object associated with the specific Driver Object
-    pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
-        if driver_idx >= self.active_drivers.len() {
-            return Err(DeviceError::InvalidParameter);
-        }
-
-        let device_obj = DeviceObject::new(name, device_type);
-        self.active_drivers[driver_idx].device_objects.push(device_obj);
-        Ok(())
-    }
-
-    /// IoUnloadDriver: Executes driver-specific cleanup tasks and calls the DRIVERUNLOAD unload routine
-    pub fn io_unload_driver(&mut self, driver_idx: usize) -> Result<(), DeviceError> {
-        if driver_idx >= self.active_drivers.len() {
-            return Err(DeviceError::InvalidParameter);
-        }
-
-        // Get mutable borrow of the driver object
-        let driver = &mut self.active_drivers[driver_idx];
-
-        // Execute the unload routine if registered (DRIVERUNLOAD)
-        if let Some(unload) = driver.unload_routine {
-            (unload)(driver);
-        }
-
-        // Perform Driver-Specific Cleanup Tasks: Delete/Free all associated Device Objects and Extensions
-        println!("I/O Manager: Executing driver-specific cleanup tasks for driver.");
-        driver.device_objects = Vec::new(); // Drop/Delete all Device Objects
-
-        Ok(())
-    }
-}
-
-impl Default for IoManager {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// Unified representation of communication channels (OOP Abstraction)
@@ -1235,32 +942,103 @@ impl UnifiedPeripheral for ModernDevice {
     }
 }
 
-/// Compact, zero-allocation decompression engine (Run-Length Decoding)
-/// Used for dynamically inflating compressed UDF bytecode driver configurations at runtime
-/// to keep the on-disk footprint extremely small, matching Phase 4 goals of the plan.
-pub fn decompress_rle(compressed: &[u8], decompressed: &mut [u8]) -> Result<usize, DeviceError> {
-    let mut read_idx = 0;
-    let mut write_idx = 0;
+/// Represents a foreign driver wrapper running in the Device Driver Environment (DDE) translation layer.
+/// This translates foreign OS-specific I/O patterns (e.g., Linux kmalloc, virt_to_phys, PCI bars) to our `UnifiedPeripheral` interface.
+pub struct DdeDeviceWrapper {
+    pub id: usize,
+    pub name: [u8; 64],
+    pub base_addr: u32,
+    pub simulated_pci_bar: [u8; 256],
+    pub foreign_os_type: [u8; 16], // e.g., "Linux", "Windows", "FreeBSD"
+}
 
-    while read_idx < compressed.len() {
-        if read_idx + 1 >= compressed.len() {
-            return Err(DeviceError::InvalidParameter);
+impl DdeDeviceWrapper {
+    pub fn new(id: usize, name: &[u8], base_addr: u32, os_type: &[u8]) -> Self {
+        let mut name_array = [0u8; 64];
+        let len = name.len().min(63);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
         }
-        let count = compressed[read_idx] as usize;
-        let value = compressed[read_idx + 1];
-        read_idx += 2;
 
-        if write_idx + count > decompressed.len() {
-            return Err(DeviceError::InvalidParameter);
+        let mut os_array = [0u8; 16];
+        let os_len = os_type.len().min(15);
+        unsafe {
+            core::ptr::copy_nonoverlapping(os_type.as_ptr(), os_array.as_mut_ptr(), os_len);
         }
 
-        for _ in 0..count {
-            decompressed[write_idx] = value;
-            write_idx += 1;
+        DdeDeviceWrapper {
+            id,
+            name: name_array,
+            base_addr,
+            simulated_pci_bar: [0u8; 256],
+            foreign_os_type: os_array,
+        }
+    }
+}
+
+impl Device for DdeDeviceWrapper {
+    fn init(&mut self) -> Result<(), DeviceError> {
+        // Emulate foreign driver initialization (e.g., Linux driver probe)
+        Ok(())
+    }
+
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(self.simulated_pci_bar.len());
+        buffer[..len].copy_from_slice(&self.simulated_pci_bar[..len]);
+        Ok(len)
+    }
+
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+        let len = buffer.len().min(self.simulated_pci_bar.len());
+        self.simulated_pci_bar[..len].copy_from_slice(&buffer[..len]);
+        Ok(len)
+    }
+
+    fn ioctl(&mut self, command: u32, _arg: usize) -> Result<usize, DeviceError> {
+        // Emulate ioctl translation (e.g., translating POSIX ioctl to SigmaOS command)
+        if command == 0xFF {
+            Ok(1)
+        } else {
+            Ok(0)
         }
     }
 
-    Ok(write_idx)
+    fn info(&self) -> DeviceInfo {
+        let mut info = DeviceInfo::new(DeviceType::Character);
+        info.base_address = self.base_addr;
+        info.vendor_id = 0x8086; // Standard Intel Vendor ID for testing
+        info.device_id = 0x100e; // E1000 network card for simulation
+        info
+    }
+
+    fn shutdown(&mut self) -> Result<(), DeviceError> {
+        Ok(())
+    }
+}
+
+impl UnifiedPeripheral for DdeDeviceWrapper {
+    fn query_channel(&self) -> PortAddress {
+        PortAddress::MemoryMapped(self.base_addr)
+    }
+
+    fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+        let idx = offset as usize;
+        if idx < self.simulated_pci_bar.len() {
+            Ok(self.simulated_pci_bar[idx])
+        } else {
+            Err(DeviceError::InvalidParameter)
+        }
+    }
+
+    fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+        let idx = offset as usize;
+        if idx < self.simulated_pci_bar.len() {
+            self.simulated_pci_bar[idx] = value;
+            Ok(())
+        } else {
+            Err(DeviceError::InvalidParameter)
+        }
+    }
 }
 
 /// User-Defined Function (UDF) Interpreter (Custom Bytecode Runner)

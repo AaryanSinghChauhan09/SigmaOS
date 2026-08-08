@@ -11,8 +11,6 @@ pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
-    Storage = 3,
-    Input = 4,
 }
 
 #[repr(usize)]
@@ -37,7 +35,6 @@ pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
     UnloadFailed = 2,
-    ProbeFailed = 3,
 }
 
 #[repr(C)]
@@ -54,18 +51,6 @@ impl SimpleDriver {
             driver_type,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
-    }
-
-    pub fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-
-    pub fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
-
-    pub fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
     }
 }
 
@@ -98,9 +83,16 @@ pub trait DriverFramework {
     fn get_driver(&self, id: DriverID) -> Option<&dyn Driver>;
 }
 
+#[allow(dead_code)]
 pub struct SimpleDriverFramework {
     drivers: Vec<Option<Box<dyn Driver>>>,
     next_id: AtomicUsize,
+}
+
+impl Default for SimpleDriverFramework {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SimpleDriverFramework {
@@ -150,6 +142,12 @@ impl DriverFramework for SimpleDriverFramework {
     }
 }
 
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -163,6 +161,9 @@ impl<T> Vec<T> {
             len: 0,
             capacity: 0,
         }
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
     pub fn push(&mut self, item: T) {
         unsafe {
@@ -208,19 +209,6 @@ impl<T> Vec<T> {
             }
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }

@@ -8,8 +8,11 @@ pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
 pub mod verifier;
+pub mod rpm_compat;
+pub mod universal_adapter;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
+pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
 pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
@@ -18,6 +21,9 @@ pub use universal_adapter::{
     AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
 };
 pub use verifier::CryptoVerifier;
+pub use universal_adapter::{
+    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

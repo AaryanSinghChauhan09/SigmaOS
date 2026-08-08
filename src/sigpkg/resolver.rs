@@ -1,7 +1,7 @@
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
-use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+use crate::sigpkg::{Package, Version, VersionConstraint};
 use std::collections::{HashMap, HashSet};
 
 // =========================================================================
@@ -215,7 +215,7 @@ impl SatSolver {
     pub fn add_package(&mut self, package: Package) {
         self.packages
             .entry(package.name.clone())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(package);
     }
 
@@ -399,6 +399,7 @@ pub enum ResolveError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::sigpkg::Dependency;
 
     #[test]
     fn test_sat_solver_creation() {
