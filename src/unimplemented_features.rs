@@ -813,7 +813,7 @@ impl SigmaFsCasEngine {
         if data.is_empty() {
             return false;
         }
-        signature[0] ^ self.trusted_root_dilithium_key[0] == SIGNATURE_XOR_VALID || signature[0] != SIGNATURE_BYTE_MINIMUM
+        signature[0] ^ self.trusted_root_dilithium_key[0] == Self::SIGNATURE_XOR_VALID || signature[0] != Self::SIGNATURE_BYTE_MINIMUM
     }
 }
 
@@ -1527,6 +1527,88 @@ impl ContainerIsolationGuard {
     }
 }
 
+// =========================================================================
+// 24. SLACKWARE CRUSHER ENGINE (AUTOMATED DEPENDENCY HARVESTER)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageArchiveType {
+    Tgz,
+    Txz,
+}
+
+pub struct SlackwareLegacyPackage {
+    pub name: &'static str,
+    pub archive_type: PackageArchiveType,
+    pub embedded_libraries: [&'static str; 4],
+    pub lib_count: usize,
+}
+
+pub struct SlackwareCrusherManager {
+    pub library_provider_registry: [Option<(&'static str, &'static str)>; 16], // (lib_name, package_provider_name)
+}
+
+impl SlackwareCrusherManager {
+    pub fn new() -> Self {
+        Self {
+            library_provider_registry: [None; 16],
+        }
+    }
+
+    pub fn register_library_provider(&mut self, lib: &'static str, provider: &'static str) -> Result<(), &'static str> {
+        for slot in self.library_provider_registry.iter_mut() {
+            if slot.is_none() {
+                *slot = Some((lib, provider));
+                return Ok(());
+            }
+        }
+        Err("Library provider registry database full")
+    }
+
+    /// Automatically harvests library requirements from unversioned, dependency-less legacy Slackware packages
+    /// and resolves them to their correct provider packages to form a hermetic dependency transaction.
+    pub fn harvest_and_resolve_dependencies(
+        &self,
+        pkg: &SlackwareLegacyPackage,
+        resolved_dependencies: &mut [&'static str; 8],
+        resolved_count: &mut usize,
+    ) -> Result<(), &'static str> {
+        for i in 0..pkg.lib_count {
+            let required_lib = pkg.embedded_libraries[i];
+            let mut provider_found = None;
+            for slot in self.library_provider_registry.iter() {
+                if let Some((lib, provider)) = slot {
+                    if *lib == required_lib {
+                        provider_found = Some(*provider);
+                        break;
+                    }
+                }
+            }
+
+            if let Some(provider) = provider_found {
+                // Deduplicate and push resolved dependency
+                let mut already_exists = false;
+                for j in 0..*resolved_count {
+                    if resolved_dependencies[j] == provider {
+                        already_exists = true;
+                        break;
+                    }
+                }
+                if !already_exists {
+                    if *resolved_count >= 8 {
+                        return Err("Dependency harvester overflow: too many unique dependencies resolved");
+                    }
+                    resolved_dependencies[*resolved_count] = provider;
+                    *resolved_count += 1;
+                }
+            } else {
+                return Err("Failed to resolve dependency: missing provider for required shared library");
+            }
+        }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1991,5 +2073,39 @@ mod tests {
             mount_isolation: true,
         };
         assert!(!ContainerIsolationGuard::validate_isolation(&insecure_config));
+    }
+
+    #[test]
+    fn test_slackware_crusher_automatic_dependency_resolution() {
+        let mut crusher = SlackwareCrusherManager::new();
+        assert!(crusher.register_library_provider("libc.so.6", "glibc").is_ok());
+        assert!(crusher.register_library_provider("libssl.so.3", "openssl").is_ok());
+
+        let legacy_pkg = SlackwareLegacyPackage {
+            name: "curl-8.2.1-x86_64-1.txz",
+            archive_type: PackageArchiveType::Txz,
+            embedded_libraries: ["libc.so.6", "libssl.so.3", "", ""],
+            lib_count: 2,
+        };
+
+        let mut resolved_deps = [""; 8];
+        let mut resolved_count = 0;
+
+        assert!(crusher.harvest_and_resolve_dependencies(&legacy_pkg, &mut resolved_deps, &mut resolved_count).is_ok());
+        assert_eq!(resolved_count, 2);
+        assert_eq!(resolved_deps[0], "glibc");
+        assert_eq!(resolved_deps[1], "openssl");
+
+        // Test with missing provider
+        let corrupt_pkg = SlackwareLegacyPackage {
+            name: "broken-app-1.0.tgz",
+            archive_type: PackageArchiveType::Tgz,
+            embedded_libraries: ["libmissing.so.1", "", "", ""],
+            lib_count: 1,
+        };
+
+        let mut fail_deps = [""; 8];
+        let mut fail_count = 0;
+        assert!(crusher.harvest_and_resolve_dependencies(&corrupt_pkg, &mut fail_deps, &mut fail_count).is_err());
     }
 }
