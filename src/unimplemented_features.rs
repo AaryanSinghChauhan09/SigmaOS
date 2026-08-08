@@ -1993,3 +1993,247 @@ mod tests {
         assert!(!ContainerIsolationGuard::validate_isolation(&insecure_config));
     }
 }
+
+// =========================================================================
+// 24. KALI-SLAYING SOVEREIGN SECURITY & FORENSIC SUITE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PortStatus {
+    Open,
+    Closed,
+    Filtered,
+}
+
+pub struct SovereignAuditor {
+    pub target_ip: [u8; 4],
+    pub ports_map: [Option<(u16, PortStatus)>; 8],
+}
+
+impl SovereignAuditor {
+    pub fn new(ip: [u8; 4]) -> Self {
+        Self {
+            target_ip: ip,
+            ports_map: [None; 8],
+        }
+    }
+
+    pub fn register_scan_result(&mut self, port: u16, status: PortStatus) -> Result<(), &'static str> {
+        for slot in self.ports_map.iter_mut() {
+            if slot.is_none() {
+                *slot = Some((port, status));
+                return Ok(());
+            }
+        }
+        Err("Audit scanning port log is full")
+    }
+
+    pub fn query_port(&self, port: u16) -> PortStatus {
+        for slot in self.ports_map.iter() {
+            if let Some((p, status)) = slot {
+                if *p == port {
+                    return *status;
+                }
+            }
+        }
+        PortStatus::Closed
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VulnerabilityClass {
+    SqlInjection,
+    BufferOverflow,
+    OutdatedLibrary,
+}
+
+pub struct SecurityAssessmentEngine {
+    pub audits: [Option<(VulnerabilityClass, &'static str)>; 4],
+    pub remediated_count: usize,
+}
+
+impl SecurityAssessmentEngine {
+    pub fn new() -> Self {
+        Self {
+            audits: [None; 4],
+            remediated_count: 0,
+        }
+    }
+
+    pub fn log_vulnerability(&mut self, class: VulnerabilityClass, name: &'static str) -> Result<(), &'static str> {
+        for slot in self.audits.iter_mut() {
+            if slot.is_none() {
+                *slot = Some((class, name));
+                return Ok(());
+            }
+        }
+        Err("Audit logging space exhausted")
+    }
+
+    pub fn apply_patch_mitigation(&mut self, name: &'static str) -> bool {
+        for slot in self.audits.iter_mut() {
+            if let Some((_, vulnerability)) = slot {
+                if *vulnerability == name {
+                    *slot = None;
+                    self.remediated_count += 1;
+                    return true;
+                }
+            }
+        }
+        false
+    }
+}
+
+pub struct ParallelHashCracker {
+    pub alphabet: &'static [u8],
+}
+
+impl ParallelHashCracker {
+    pub fn new(alphabet: &'static [u8]) -> Self {
+        Self { alphabet }
+    }
+
+    pub fn simple_checksum_hash(&self, data: &[u8]) -> u32 {
+        let mut hash: u32 = 5381;
+        for &byte in data {
+            hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u32);
+        }
+        hash
+    }
+
+    pub fn brute_force_match(&self, target_hash: u32, max_len: usize) -> Option<Vec<u8>> {
+        let mut candidate = Vec::new();
+        if self.dfs_crack(target_hash, &mut candidate, max_len) {
+            Some(candidate)
+        } else {
+            None
+        }
+    }
+
+    fn dfs_crack(&self, target_hash: u32, candidate: &mut Vec<u8>, max_len: usize) -> bool {
+        if self.simple_checksum_hash(candidate) == target_hash {
+            return true;
+        }
+        if candidate.len() >= max_len {
+            return false;
+        }
+
+        for &char_byte in self.alphabet {
+            candidate.push(char_byte);
+            if self.dfs_crack(target_hash, candidate, max_len) {
+                return true;
+            }
+            candidate.pop();
+        }
+        false
+    }
+}
+
+pub struct SovereignPacketSniffer {
+    pub monitored_count: u64,
+}
+
+impl SovereignPacketSniffer {
+    pub fn new() -> Self {
+        Self { monitored_count: 0 }
+    }
+
+    pub fn parse_and_sniff(&mut self, frame: &[u8]) -> Result<&'static str, &'static str> {
+        if frame.len() < 14 {
+            return Err("Runt frame: too short for Ethernet header");
+        }
+        self.monitored_count += 1;
+
+        let ethertype = ((frame[12] as u16) << 8) | (frame[13] as u16);
+        match ethertype {
+            0x0800 => Ok("IPv4 Packet Sniffed"),
+            0x86DD => Ok("IPv6 Packet Sniffed"),
+            _ => Ok("Alternative Protocol Sniffed"),
+        }
+    }
+}
+
+pub struct ForensicMemoryScanner {
+    pub signatures_database: [&'static [u8]; 2],
+}
+
+impl ForensicMemoryScanner {
+    pub fn new() -> Self {
+        Self {
+            signatures_database: [
+                b"MALWARE_SIGNATURE_A",
+                b"ROGUE_INSTRUCTION_SET",
+            ],
+        }
+    }
+
+    pub fn scan_virtual_segment(&self, segment_dump: &[u8]) -> Option<&'static [u8]> {
+        for &signature in &self.signatures_database {
+            if segment_dump.windows(signature.len()).any(|window| window == signature) {
+                return Some(signature);
+            }
+        }
+        None
+    }
+}
+
+#[cfg(test)]
+mod kali_slaying_tests {
+    use super::*;
+
+    #[test]
+    fn test_sovereign_auditor_scanning() {
+        let mut auditor = SovereignAuditor::new([192, 168, 1, 1]);
+        assert!(auditor.register_scan_result(80, PortStatus::Open).is_ok());
+        assert!(auditor.register_scan_result(443, PortStatus::Filtered).is_ok());
+
+        assert_eq!(auditor.query_port(80), PortStatus::Open);
+        assert_eq!(auditor.query_port(443), PortStatus::Filtered);
+        assert_eq!(auditor.query_port(22), PortStatus::Closed);
+    }
+
+    #[test]
+    fn test_vulnerability_assessment_and_mitigation() {
+        let mut engine = SecurityAssessmentEngine::new();
+        assert!(engine.log_vulnerability(VulnerabilityClass::SqlInjection, "Web Login SQLi").is_ok());
+        assert!(engine.log_vulnerability(VulnerabilityClass::BufferOverflow, "SSH Buffer Overflow").is_ok());
+
+        assert!(engine.apply_patch_mitigation("Web Login SQLi"));
+        assert_eq!(engine.remediated_count, 1);
+
+        // Assert SQLi is remediated/patched from database
+        assert_eq!(engine.audits[0], None);
+    }
+
+    #[test]
+    fn test_parallel_hash_cracking() {
+        let alphabet = b"abc";
+        let cracker = ParallelHashCracker::new(alphabet);
+        let secret = b"cab";
+        let hash = cracker.simple_checksum_hash(secret);
+
+        let cracked = cracker.brute_force_match(hash, 3).unwrap();
+        assert_eq!(cracked, secret);
+    }
+
+    #[test]
+    fn test_sovereign_packet_sniffer() {
+        let mut sniffer = SovereignPacketSniffer::new();
+        let mut eth_frame = [0u8; 16];
+        eth_frame[12] = 0x08; eth_frame[13] = 0x00; // IPv4
+
+        let protocol = sniffer.parse_and_sniff(&eth_frame).unwrap();
+        assert_eq!(protocol, "IPv4 Packet Sniffed");
+        assert_eq!(sniffer.monitored_count, 1);
+    }
+
+    #[test]
+    fn test_forensic_memory_scanning() {
+        let scanner = ForensicMemoryScanner::new();
+        let dump_safe = b"SAFE_DATA_STREAM_CLEAN";
+        assert_eq!(scanner.scan_virtual_segment(dump_safe), None);
+
+        let dump_infected = b"CLEAN_PREFIX_MALWARE_SIGNATURE_A_CLEAN_SUFFIX";
+        assert_eq!(scanner.scan_virtual_segment(dump_infected), Some(b"MALWARE_SIGNATURE_A"[..].as_ref()));
+    }
+}
