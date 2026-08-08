@@ -1,23 +1,5 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
 /// Custom File I/O for SigmaOS
 /// Implements file operations without relying on std::fs
@@ -48,7 +30,6 @@ pub struct FileFlags {
 }
 
 impl FileFlags {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         FileFlags {
             read: false,
@@ -89,7 +70,6 @@ pub struct Capability {
 }
 
 impl Capability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Capability {
             read: false,
@@ -136,7 +116,6 @@ pub struct FileManager {
 }
 
 impl FileManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut manager = FileManager {
             next_fd: AtomicUsize::new(3), // Start after stdin, stdout, stderr
@@ -207,49 +186,6 @@ impl FileManager {
         ptr::write(fd_ptr, duplicated);
         self.open_files[target_fd] = Some(NonNull::new_unchecked(fd_ptr));
         true
-    }
-
-    /// Dynamically redirects standard streams to other open file descriptors (dup2 equivalent in Linux)
-    pub unsafe fn redirect_stream(&mut self, src_fd: usize, dst_fd: usize) -> Result<(), ()> {
-        if src_fd >= self.max_fds || dst_fd >= self.max_fds {
-            return Err(());
-        }
-
-        if src_fd == dst_fd {
-            return Ok(());
-        }
-
-        // Retrieve source file descriptor pointer
-        let src_ptr_opt = self.open_files[src_fd];
-        if src_ptr_opt.is_none() {
-            return Err(());
-        }
-        let src_ptr = src_ptr_opt.unwrap();
-
-        // Close dst_fd if currently open
-        if let Some(dst_ptr) = self.open_files[dst_fd] {
-            ptr::drop_in_place(dst_ptr.as_ptr());
-            free(dst_ptr.as_ptr() as *mut u8);
-            self.open_files[dst_fd] = None;
-        }
-
-        // Allocate a new copy of FileDescriptor for dst_fd
-        let new_desc = FileDescriptor {
-            fd: AtomicUsize::new(dst_fd),
-            flags: (*src_ptr.as_ptr()).flags,
-            offset: AtomicUsize::new((*src_ptr.as_ptr()).offset.load(Ordering::SeqCst)),
-            capability: (*src_ptr.as_ptr()).capability,
-        };
-
-        let dst_ptr_new = alloc(core::mem::size_of::<FileDescriptor>()) as *mut FileDescriptor;
-        if dst_ptr_new.is_null() {
-            return Err(());
-        }
-
-        ptr::write(dst_ptr_new, new_desc);
-        self.open_files[dst_fd] = Some(NonNull::new_unchecked(dst_ptr_new));
-
-        Ok(())
     }
 
     /// Open a file
@@ -385,36 +321,28 @@ impl FileManager {
     }
 
     /// Check capability for file access
-    fn check_capability(&self, _path: &[u8]) -> Capability {
+    fn check_capability(&self, path: &[u8]) -> Capability {
         // In a real implementation, this would check against the capability system
         // For now, return full capability
         Capability::full()
     }
 
     /// System call for reading (placeholder)
-    unsafe fn sys_read(&self, fd: usize, buffer: *mut u8, size: usize, _offset: usize) -> isize {
-        if fd == 0 {
-            // Mock stdin read: fill buffer with space and return 1
-            if !buffer.is_null() && size > 0 {
-                *buffer = b' ';
-                return 1;
-            }
-            return 0;
-        }
+    unsafe fn sys_read(&self, fd: usize, buffer: *mut u8, size: usize, offset: usize) -> isize {
+        // In a real implementation, this would make a syscall to read from file
+        // For now, return 0
         0
     }
 
     /// System call for writing (placeholder)
-    unsafe fn sys_write(&self, fd: usize, _buffer: *const u8, size: usize, _offset: usize) -> isize {
-        if fd == 1 || fd == 2 {
-            // Mock stdout / stderr write: simulate console print by returning written size
-            return size as isize;
-        }
+    unsafe fn sys_write(&self, fd: usize, buffer: *const u8, size: usize, offset: usize) -> isize {
+        // In a real implementation, this would make a syscall to write to file
+        // For now, return 0
         0
     }
 
     /// System call for getting file size (placeholder)
-    unsafe fn sys_get_size(&self, _fd: usize) -> isize {
+    unsafe fn sys_get_size(&self, fd: usize) -> isize {
         // In a real implementation, this would make a syscall to get file size
         // For now, return 0
         0

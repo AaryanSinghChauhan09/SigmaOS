@@ -62,6 +62,7 @@ pub struct SovereignPipe {
     pub ring_buffer: Vec<Vec<u8>>, // Zero-copy circular structured chunks
     pub max_capacity: usize,
     pub bytes_transferred: u64,
+    pub non_blocking: bool,
 }
 
 impl SovereignPipe {
@@ -73,12 +74,40 @@ impl SovereignPipe {
             ring_buffer: Vec::new(),
             max_capacity: capacity,
             bytes_transferred: 0,
+            non_blocking: false,
         }
+    }
+
+    /// Set non-blocking mode (mimics O_NONBLOCK flag on Linux pipes)
+    pub fn set_non_blocking(&mut self, non_blocking: bool) {
+        self.non_blocking = non_blocking;
+    }
+
+    /// Resize capacity dynamically (mimics F_SETPIPE_SZ fcntl command)
+    pub fn resize_capacity(&mut self, new_capacity: usize) -> Result<(), IpcError> {
+        if new_capacity < self.ring_buffer.len() {
+            return Err(IpcError::InvalidMessage);
+        }
+        self.max_capacity = new_capacity;
+        Ok(())
+    }
+
+    /// Checks if pipe has data to read (mimics POLLIN)
+    pub fn can_read(&self) -> bool {
+        !self.ring_buffer.is_empty()
+    }
+
+    /// Checks if pipe has space to write (mimics POLLOUT)
+    pub fn can_write(&self) -> bool {
+        self.ring_buffer.len() < self.max_capacity
     }
 
     /// Structured write operation with dynamic backpressure (returns Err if capacity reached)
     pub fn write_structure(&mut self, payload: Vec<u8>) -> Result<(), IpcError> {
         if self.ring_buffer.len() >= self.max_capacity {
+            if self.non_blocking {
+                return Err(IpcError::WouldBlock);
+            }
             return Err(IpcError::ChannelFull);
         }
         self.bytes_transferred += payload.len() as u64;
@@ -86,13 +115,16 @@ impl SovereignPipe {
         Ok(())
     }
 
-    /// Structured read operation (returns None if pipe is empty)
-    pub fn read_structure(&mut self) -> Option<Vec<u8>> {
+    /// Structured read operation (returns None or WouldBlock error)
+    pub fn read_structure(&mut self) -> Result<Option<Vec<u8>>, IpcError> {
         if self.ring_buffer.is_empty() {
-            None
+            if self.non_blocking {
+                return Err(IpcError::WouldBlock);
+            }
+            Ok(None)
         } else {
             // Read in FIFO order (circular ring style)
-            Some(self.ring_buffer.remove(0))
+            Ok(Some(self.ring_buffer.remove(0)))
         }
     }
 
@@ -334,6 +366,7 @@ pub enum IpcError {
     ChannelFull,
     PermissionDenied,
     InvalidMessage,
+    WouldBlock,
 }
 
 #[cfg(test)]
@@ -376,12 +409,16 @@ mod tests {
     fn test_sovereign_pipes_vs_linux_pipes() {
         let mut pipe = SovereignPipe::new(1, 101, 102, 10);
 
+        assert!(pipe.can_write());
+        assert!(!pipe.can_read());
+
         // Write structured frames
         pipe.write_structure(vec![1, 2, 3]).unwrap();
         pipe.write_structure(vec![10, 20, 30]).unwrap();
         pipe.write_structure(vec![4, 5, 6]).unwrap();
 
         assert_eq!(pipe.ring_buffer.len(), 3);
+        assert!(pipe.can_read());
 
         // Run user-defined filter on structured stream
         pipe.filter_stream(|payload| payload[0] < 10);
@@ -390,14 +427,21 @@ mod tests {
         assert_eq!(pipe.ring_buffer.len(), 2);
 
         // Read structures back in FIFO order
-        let r1 = pipe.read_structure().unwrap();
+        let r1 = pipe.read_structure().unwrap().unwrap();
         assert_eq!(r1, vec![1, 2, 3]);
 
-        let r2 = pipe.read_structure().unwrap();
+        let r2 = pipe.read_structure().unwrap().unwrap();
         assert_eq!(r2, vec![4, 5, 6]);
 
-        let r3 = pipe.read_structure();
+        let r3 = pipe.read_structure().unwrap();
         assert!(r3.is_none());
+
+        // Test non-blocking mode & dynamic resizing
+        pipe.set_non_blocking(true);
+        assert_eq!(pipe.read_structure().unwrap_err(), IpcError::WouldBlock);
+
+        pipe.resize_capacity(20).unwrap();
+        assert_eq!(pipe.max_capacity, 20);
     }
 
     #[test]
