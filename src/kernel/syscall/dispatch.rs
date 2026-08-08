@@ -4,7 +4,10 @@
 
 #![no_std]
 
+pub mod ioctl_helper;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use ioctl_helper::{IoctlCommand, validate_ioctl_buffer};
 
 #[repr(C)]
 pub struct SyscallDispatcher {
@@ -60,6 +63,7 @@ pub const SYS_RMDIR: usize = 27;
 pub const SYS_UNLINK: usize = 28;
 pub const SYS_RENAME: usize = 29;
 pub const SYS_CHMOD: usize = 30;
+pub const SYS_IOCTL: usize = 31;
 
 impl SyscallDispatcher {
     pub fn new() -> Self {
@@ -107,6 +111,7 @@ impl SyscallDispatcher {
         dispatcher.register(SYS_UNLINK, sys_unlink as usize);
         dispatcher.register(SYS_RENAME, sys_rename as usize);
         dispatcher.register(SYS_CHMOD, sys_chmod as usize);
+        dispatcher.register(SYS_IOCTL, sys_ioctl as usize);
 
         dispatcher
     }
@@ -136,11 +141,6 @@ impl SyscallDispatcher {
             return -1;
         }
 
-        // Call handler function
-        // In real implementation, would call the function pointer
-        // let syscall_fn: fn(&mut SyscallContext) -> isize = core::mem::transmute(handler);
-        // let result = syscall_fn(ctx);
-        
         let result = self.default_handler(ctx, number);
         
         if result < 0 {
@@ -161,6 +161,24 @@ impl SyscallDispatcher {
                 // Return fake PID
                 ctx.return_value.store(1, Ordering::SeqCst);
                 1
+            }
+            SYS_IOCTL => {
+                // Emulate direct ioctl dispatching
+                let fd = ctx.get_arg(0);
+                let request = ctx.get_arg(1) as u32;
+                let arg_ptr = ctx.get_arg(2);
+
+                let cmd = IoctlCommand::decode(request);
+
+                // Safe boundary check (arbitrary 16MB user limit for stub simulation)
+                if validate_ioctl_buffer(&cmd, arg_ptr, 0x1000000).is_err() {
+                    ctx.error_code.store(14, Ordering::SeqCst); // EFAULT (Bad Address)
+                    return -1;
+                }
+
+                // Stub success: return 0
+                ctx.return_value.store(0, Ordering::SeqCst);
+                0
             }
             _ => {
                 ctx.error_code.store(38, Ordering::SeqCst); // ENOSYS
@@ -466,4 +484,38 @@ extern "C" fn sys_chmod(ctx: &mut SyscallContext) -> isize {
     let pathname = ctx.get_arg(0);
     let mode = ctx.get_arg(1);
     0
+}
+
+extern "C" fn sys_ioctl(ctx: &mut SyscallContext) -> isize {
+    let fd = ctx.get_arg(0);
+    let request = ctx.get_arg(1);
+    let argp = ctx.get_arg(2);
+    0
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_syscall_dispatcher_ioctl() {
+        let dispatcher = SyscallDispatcher::new();
+        assert_eq!(dispatcher.call_count(), 0);
+
+        // Test ioctl with valid parameters
+        let raw_req = ioctl_helper::IoctlCommand::encode(ioctl_helper::IoctlDirection::Read, b'x', 2, 4);
+        let mut ctx = SyscallContext::new(SYS_IOCTL, [3, raw_req as usize, 0x10000, 0, 0, 0]);
+        let res = dispatcher.dispatch(&mut ctx);
+
+        assert_eq!(res, 0); // Should return success 0
+        assert_eq!(dispatcher.call_count(), 1);
+        assert_eq!(dispatcher.error_count(), 0);
+
+        // Test ioctl triggering safety violation (e.g. out of boundary buffer)
+        let mut mal_ctx = SyscallContext::new(SYS_IOCTL, [3, raw_req as usize, 0x1F00000, 0, 0, 0]);
+        let mal_res = dispatcher.dispatch(&mut mal_ctx);
+
+        assert_eq!(mal_res, -1);
+        assert_eq!(dispatcher.error_count(), 1);
+    }
 }
