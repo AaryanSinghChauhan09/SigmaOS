@@ -3,8 +3,20 @@ pub mod ipc;
 pub mod memory;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod self_healing;
+pub mod udkf;
+pub mod breakthrough;
 
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use self_healing::{
+    SovereignSelfHealingKernel,
+};
+pub use breakthrough::{
+    SovereignKernelModuleSystem, SovereignKernelModule, ModuleState, SigmaSignal, ProcessProvenanceNode, PredictiveScheduler, AdaptiveRoot, ThreatLevel,
+};
+pub use udkf::{
+    UdkfHook, UserDefinedKernelFunctions,
+};

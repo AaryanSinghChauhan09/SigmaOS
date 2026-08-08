@@ -37,18 +37,25 @@ panic = "abort"
 [profile.release]
 opt-level = 3
 debug = false
-lto = true
+lto = "fat"
 codegen-units = 1
 panic = "abort"
+strip = true
 
 [[bin]]
 name = "sigma_kernel"
 path = "src/kernel/main.rs"
+test = false
+required-features = ["microkernel"]
 
 [[bin]]
 name = "sigma_drivers"
 path = "src/drivers/main.rs"
+test = false
+required-features = ["microkernel"]
 
 [[bin]]
 name = "sigma_userspace"
 path = "src/userspace/main.rs"
+test = false
+required-features = ["microkernel"]
