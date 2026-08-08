@@ -58,7 +58,7 @@ pub unsafe extern "C" fn sort_init() -> SigmaI32 {
 /// Add line to sort
 #[no_mangle]
 pub unsafe extern "C" fn sort_add_line(line: *const u8) -> SigmaI32 {
-    if !SORT_INITIALIZED || line.isnull() || SORT_LINE_COUNT >= MAX_LINES as SigmaU32 {
+    if !SORT_INITIALIZED || line.is_null() || SORT_LINE_COUNT >= MAX_LINES as SigmaU32 {
         return -1;
     }
     
@@ -140,7 +140,7 @@ pub unsafe extern "C" fn sort_get_lines(
     output: *mut u8,
     max_output: SigmaU32,
 ) -> SigmaU32 {
-    if !SORT_INITIALIZED || output.isnull() {
+    if !SORT_INITIALIZED || output.is_null() {
         return 0;
     }
     

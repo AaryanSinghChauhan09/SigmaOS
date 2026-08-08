@@ -48,7 +48,7 @@ pub unsafe extern "C" fn cut_add_range(
     end: SigmaU32,
     options: *mut CutOptions,
 ) -> SigmaI32 {
-    if !CUT_INITIALIZED || options.isnull() {
+    if !CUT_INITIALIZED || options.is_null() {
         return -1;
     }
     
@@ -72,7 +72,7 @@ pub unsafe extern "C" fn cut_set_delimiter(
     delimiter: *const u8,
     options: *mut CutOptions,
 ) -> SigmaI32 {
-    if !CUT_INITIALIZED || delimiter.isnull() || options.isnull() {
+    if !CUT_INITIALIZED || delimiter.is_null() || options.is_null() {
         return -1;
     }
     
@@ -95,7 +95,7 @@ pub unsafe extern "C" fn cut_bytes(
     max_output: SigmaU32,
     options: CutOptions,
 ) -> SigmaI32 {
-    if !CUT_INITIALIZED || input.isnull() || output.isnull() {
+    if !CUT_INITIALIZED || input.is_null() || output.is_null() {
         return -1;
     }
     
@@ -129,7 +129,7 @@ pub unsafe extern "C" fn cut_characters(
     max_output: SigmaU32,
     options: CutOptions,
 ) -> SigmaI32 {
-    if !CUT_INITIALIZED || input.isnull() || output.isnull() {
+    if !CUT_INITIALIZED || input.is_null() || output.is_null() {
         return -1;
     }
     
@@ -145,7 +145,7 @@ pub unsafe extern "C" fn cut_fields(
     max_output: SigmaU32,
     options: CutOptions,
 ) -> SigmaI32 {
-    if !CUT_INITIALIZED || input.isnull() || output.isnull() {
+    if !CUT_INITIALIZED || input.is_null() || output.is_null() {
         return -1;
     }
     
@@ -231,7 +231,7 @@ pub unsafe extern "C" fn cut_process_file(
     output_file: *const u8,
     options: CutOptions,
 ) -> SigmaI32 {
-    if !CUT_INITIALIZED || input_file.isnull() {
+    if !CUT_INITIALIZED || input_file.is_null() {
         return -1;
     }
     
