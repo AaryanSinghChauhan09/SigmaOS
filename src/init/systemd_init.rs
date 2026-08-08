@@ -10,6 +10,11 @@ pub type UnitID = usize;
 pub enum UnitType {
     Service,
     Target,
+    Socket,
+    Timer,
+    Path,
+    Mount,
+    Device,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -19,6 +24,35 @@ pub enum UnitState {
     Activating,
     Deactivating,
     Failed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RestartPolicy {
+    No,
+    Always,
+    OnFailure,
+}
+
+#[derive(Debug, Clone)]
+pub struct JournalEntry {
+    pub unit_id: UnitID,
+    pub message: [u8; 64],
+    pub from_state: UnitState,
+    pub to_state: UnitState,
+}
+
+impl JournalEntry {
+    pub fn new(unit_id: UnitID, msg: &[u8], from_state: UnitState, to_state: UnitState) -> Self {
+        let mut msg_arr = [0u8; 64];
+        let len = msg.len().min(63);
+        msg_arr[..len].copy_from_slice(&msg[..len]);
+        JournalEntry {
+            unit_id,
+            message: msg_arr,
+            from_state,
+            to_state,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -31,6 +65,15 @@ pub struct SystemdUnit {
     pub wants: Vec<UnitID>,
     pub before: Vec<UnitID>,
     pub after: Vec<UnitID>,
+    pub conflicts: Vec<UnitID>,
+    pub binds_to: Vec<UnitID>,
+    pub part_of: Vec<UnitID>,
+    pub restart_policy: RestartPolicy,
+    pub restart_count: usize,
+    pub startup_time_ms: u64,
+    pub duration_ms: u64,
+    pub is_enabled: bool,
+    pub triggered_unit: Option<UnitID>,
 }
 
 impl SystemdUnit {
@@ -47,6 +90,15 @@ impl SystemdUnit {
             wants: Vec::new(),
             before: Vec::new(),
             after: Vec::new(),
+            conflicts: Vec::new(),
+            binds_to: Vec::new(),
+            part_of: Vec::new(),
+            restart_policy: RestartPolicy::No,
+            restart_count: 0,
+            startup_time_ms: 0,
+            duration_ms: 0,
+            is_enabled: true,
+            triggered_unit: None,
         }
     }
 }
@@ -54,6 +106,7 @@ impl SystemdUnit {
 pub struct SystemdEngine {
     pub units: Vec<SystemdUnit>,
     pub current_target: AtomicUsize, // stores UnitID of active target
+    pub journal: Vec<JournalEntry>,
 }
 
 impl Default for SystemdEngine {
@@ -67,25 +120,35 @@ impl SystemdEngine {
         SystemdEngine {
             units: Vec::new(),
             current_target: AtomicUsize::new(0),
-<<<<<<< HEAD
-        };
-
-        // Pre-register standard Ubuntu-style target system nodes
-        engine.register_unit(SystemdUnit::new(9001, b"poweroff.target", UnitType::Target));
-        engine.register_unit(SystemdUnit::new(9002, b"reboot.target", UnitType::Target));
-        engine.register_unit(SystemdUnit::new(9003, b"emergency.target", UnitType::Target));
-
-        engine
-||||||| 23ef22a4a
             journal: Vec::new(),
         }
-=======
-        }
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
     }
 
     pub fn register_unit(&mut self, unit: SystemdUnit) {
         self.units.push(unit);
+    }
+
+    pub fn find_unit(&self, id: UnitID) -> Option<&SystemdUnit> {
+        for unit in &self.units {
+            if unit.id == id {
+                return Some(unit);
+            }
+        }
+        None
+    }
+
+    pub fn find_unit_mut(&mut self, id: UnitID) -> Option<&mut SystemdUnit> {
+        for unit in &mut self.units {
+            if unit.id == id {
+                return Some(unit);
+            }
+        }
+        None
+    }
+
+    pub fn log_journal(&mut self, unit_id: UnitID, message: &[u8], from_state: UnitState, to_state: UnitState) {
+        let entry = JournalEntry::new(unit_id, message, from_state, to_state);
+        self.journal.push(entry);
     }
 
     pub fn isolate_target(&mut self, target_id: UnitID) -> Result<(), &'static str> {
@@ -143,22 +206,7 @@ impl SystemdEngine {
     pub fn get_active_target_id(&self) -> usize {
         self.current_target.load(Ordering::SeqCst)
     }
-}
 
-<<<<<<< HEAD
-    /// Ubuntu-style restart control
-    pub fn restart_unit(&mut self, unit_id: UnitID) -> Result<(), &'static str> {
-        for i in 0..self.units.len() {
-            if self.units[i].id == unit_id {
-                self.units[i].state = UnitState::Deactivating;
-                self.units[i].state = UnitState::Inactive;
-                self.units[i].state = UnitState::Activating;
-                self.units[i].state = UnitState::Active;
-                return Ok(());
-            }
-        }
-        Err("Unit not found")
-||||||| 23ef22a4a
     // Topological sorting with cycle detection
     pub fn topological_sort(&self, unit_ids: &Vec<UnitID>) -> Result<Vec<UnitID>, &'static str> {
         let mut sorted = Vec::new();
@@ -479,19 +527,6 @@ impl SystemdEngine {
     }
 }
 
-    /// Ubuntu-style restart control
-    pub fn restart_unit(&mut self, unit_id: UnitID) -> Result<(), &'static str> {
-        for i in 0..self.units.len() {
-            if self.units[i].id == unit_id {
-                self.units[i].state = UnitState::Deactivating;
-                self.units[i].state = UnitState::Inactive;
-                self.units[i].state = UnitState::Activating;
-                self.units[i].state = UnitState::Active;
-                return Ok(());
-            }
-        }
-        Err("Unit not found")
-=======
 pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T: Clone> Clone for Vec<T> {
@@ -509,7 +544,6 @@ impl<T: Clone> Clone for Vec<T> {
 impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_list().entries(self.iter()).finish()
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
     }
 }
 
@@ -530,8 +564,22 @@ impl<T> Vec<T> {
             }
         }
     }
-<<<<<<< HEAD
-||||||| 23ef22a4a
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn iter(&self) -> VecIter<'_, T> {
+        VecIter { vec: self, index: 0 }
+    }
+    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
+        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+    }
+    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
+        for i in 0..self.len {
+            unsafe {
+                if &*self.data.add(i) == item { return true; }
+            }
+        }
+        false
+    }
     pub fn remove_item(&mut self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
             unsafe {
@@ -666,128 +714,6 @@ unsafe fn free(ptr: *mut u8) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-=======
-    pub fn len(&self) -> usize { self.len }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
-        for i in 0..self.len {
-            unsafe {
-                if &*self.data.add(i) == item { return true; }
-            }
-        }
-        false
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
 
 #[cfg(test)]
@@ -831,30 +757,6 @@ mod tests {
             }
         }
     }
-<<<<<<< HEAD
-
-    #[test]
-    fn test_ubuntu_systemd_controls_and_targets() {
-        let mut engine = SystemdEngine::new();
-
-        // Verify standard Ubuntu target state registration
-        assert_eq!(engine.get_unit_status(9001).unwrap(), UnitState::Inactive); // poweroff.target
-        assert_eq!(engine.get_unit_status(9002).unwrap(), UnitState::Inactive); // reboot.target
-        assert_eq!(engine.get_unit_status(9003).unwrap(), UnitState::Inactive); // emergency.target
-
-        // Verify service reload on inactive fails
-        let mut service = SystemdUnit::new(420, b"nginx.service", UnitType::Service);
-        engine.register_unit(service);
-        assert!(engine.reload_unit(420).is_err());
-
-        // Restart transitions state
-        assert!(engine.restart_unit(420).is_ok());
-        assert_eq!(engine.get_unit_status(420).unwrap(), UnitState::Active);
-
-        // Reload succeeds on active service
-        assert!(engine.reload_unit(420).is_ok());
-    }
-||||||| 23ef22a4a
 
     #[test]
     fn test_systemd_topological_sort_and_cycle_detection() {
@@ -991,6 +893,4 @@ mod tests {
         assert_eq!(blame[1].0, 1);
         assert_eq!(blame[1].1, 500);
     }
-=======
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
