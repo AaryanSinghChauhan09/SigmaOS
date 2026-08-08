@@ -1,11 +1,22 @@
-[package]
-name = "sigmaos"
-version = "0.1.0"
-edition = "2021"
-authors = ["SigmaOS Team"]
-description = "SigmaOS - Sovereign, AI-Native Operating System"
-license = "MIT OR GPL-2.0"
-repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+[workspace]
+resolver = "2"
+members = [
+    "kabi",
+    "kernel",
+    "sdk/driver",
+    "sigma-sh",
+    "suites/S03_Orchestrator",
+    "userland/agent",
+    "userland/coreutils",
+    "userland/sigpkg",
+    "sigma_pkg_registry",
+    "userland/system_api/control_center",
+    "userland/system_api/ai_integration",
+    "userland/system_api/dev_studio",
+    "userland/ui/design_system",
+    "userland/system_api/common",
+]
+default-members = ["kernel"]
 
 [dependencies]
 # Core dependencies (minimal as per SigmaOS philosophy)
@@ -30,9 +41,10 @@ wasm = []
 browser = ["wasm"]
 
 [profile.dev]
-opt-level = 0
-debug = true
-panic = "abort"
+opt-level    = 1
+debug        = true
+overflow-checks = true
+panic        = "abort"
 
 [profile.release]
 opt-level = 3
