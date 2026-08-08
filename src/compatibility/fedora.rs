@@ -1,13 +1,18 @@
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 
-use std::collections::HashMap;
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::format;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
 pub struct DnfPackageResolver {
-    pub packages: HashMap<String, Vec<String>>, // pkg_name -> dependencies
-    pub installed: HashMap<String, String>,      // pkg_name -> version
+    pub packages: BTreeMap<String, Vec<String>>, // pkg_name -> dependencies
+    pub installed: BTreeMap<String, String>,      // pkg_name -> version
     pub repodata_synced: bool,
     pub signatures_verified: bool,
 }
@@ -15,8 +20,8 @@ pub struct DnfPackageResolver {
 impl DnfPackageResolver {
     pub fn new() -> Self {
         DnfPackageResolver {
-            packages: HashMap::new(),
-            installed: HashMap::new(),
+            packages: BTreeMap::new(),
+            installed: BTreeMap::new(),
             repodata_synced: false,
             signatures_verified: false,
         }
@@ -50,7 +55,7 @@ impl DnfPackageResolver {
         }
 
         let mut install_order = Vec::new();
-        let mut visited = HashMap::new();
+        let mut visited = BTreeMap::new();
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
 
@@ -65,7 +70,7 @@ impl DnfPackageResolver {
         &self,
         name: &str,
         order: &mut Vec<String>,
-        visited: &mut HashMap<String, bool>,
+        visited: &mut BTreeMap<String, bool>,
     ) -> Result<(), String> {
         if let Some(&in_progress) = visited.get(name) {
             if in_progress {
@@ -88,6 +93,12 @@ impl DnfPackageResolver {
         }
 
         Ok(())
+    }
+}
+
+impl Default for DnfPackageResolver {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -183,18 +194,24 @@ impl KojiBuildServer {
     }
 }
 
+impl Default for KojiBuildServer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// BodhiUpdateTriage mimics Fedora's update triage system (Bodhi).
 /// It handles community feedback, accumulates karma, and gates the transition to stable.
 pub struct BodhiUpdateTriage {
-    pub updates: HashMap<String, i32>, // update_id -> karma
-    pub stable_gated: HashMap<String, bool>, // update_id -> is_gated
+    pub updates: BTreeMap<String, i32>, // update_id -> karma
+    pub stable_gated: BTreeMap<String, bool>, // update_id -> is_gated
 }
 
 impl BodhiUpdateTriage {
     pub fn new() -> Self {
         BodhiUpdateTriage {
-            updates: HashMap::new(),
-            stable_gated: HashMap::new(),
+            updates: BTreeMap::new(),
+            stable_gated: BTreeMap::new(),
         }
     }
 
@@ -222,158 +239,413 @@ impl BodhiUpdateTriage {
     }
 }
 
-/// Represents a single Sigma Change Proposal (SCP) tracking technology additions.
+impl Default for BodhiUpdateTriage {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// NEW FEDORA CORE PARITY SYSTEMS
+// =========================================================================
+
+/// Zones for the Fedora zone-based FirewallD emulator.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum FirewalldZone {
+    Public,
+    Work,
+    Home,
+    Trusted,
+    Drop,
+}
+
+/// Rich rule definition for granular firewall policies.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SigmaChangeProposal {
-    pub id: String,
-    pub owner: String,
-    pub status: String,
-    pub self_contained: bool,
-    pub summary: String,
-    pub benefit: String,
+pub struct RichRule {
+    pub family: String,
+    pub source: String,
+    pub service: String,
+    pub action: String,
 }
 
-/// Tracks, gates, and updates technological transitions within SigmaOS, inspired by Fedora's Change Process.
-pub struct SigmaChangeProcessEngine {
-    pub proposals: HashMap<String, SigmaChangeProposal>,
+/// FirewalldZoneManager emulates Fedora's firewalld zone management.
+pub struct FirewalldZoneManager {
+    pub active_zone: FirewalldZone,
+    pub default_zone: FirewalldZone,
+    pub allowed_services: BTreeMap<FirewalldZone, Vec<String>>,
+    pub rich_rules: Vec<RichRule>,
+    pub runtime_rules: Vec<String>,
+    pub permanent_rules: Vec<String>,
 }
 
-impl SigmaChangeProcessEngine {
+impl FirewalldZoneManager {
     pub fn new() -> Self {
-        SigmaChangeProcessEngine {
-            proposals: HashMap::new(),
+        let mut allowed = BTreeMap::new();
+        allowed.insert(FirewalldZone::Public, vec!["ssh".to_string(), "dhcpv6-client".to_string()]);
+        allowed.insert(FirewalldZone::Home, vec!["ssh".to_string(), "mdns".to_string(), "samba-client".to_string()]);
+        allowed.insert(FirewalldZone::Trusted, vec!["all".to_string()]);
+
+        Self {
+            active_zone: FirewalldZone::Public,
+            default_zone: FirewalldZone::Public,
+            allowed_services: allowed,
+            rich_rules: Vec::new(),
+            runtime_rules: Vec::new(),
+            permanent_rules: Vec::new(),
         }
     }
 
-    pub fn submit_proposal(&mut self, proposal: SigmaChangeProposal) {
-        self.proposals.insert(proposal.id.clone(), proposal);
+    pub fn set_default_zone(&mut self, zone: FirewalldZone) {
+        self.default_zone = zone;
+        self.active_zone = zone;
     }
 
-    pub fn update_proposal_status(&mut self, id: &str, status: &str) -> Result<String, String> {
-        if let Some(prop) = self.proposals.get_mut(id) {
-            prop.status = status.to_string();
-            Ok(prop.status.clone())
+    pub fn allow_service(&mut self, zone: FirewalldZone, service: &str, permanent: bool) {
+        if let Some(services) = self.allowed_services.get_mut(&zone) {
+            if !services.contains(&service.to_string()) {
+                services.push(service.to_string());
+            }
         } else {
-            Err("Proposal not found".to_string())
+            let mut services = Vec::new();
+            services.push(service.to_string());
+            self.allowed_services.insert(zone, services);
         }
-    }
 
-    pub fn get_proposals(&self) -> &HashMap<String, SigmaChangeProposal> {
-        &self.proposals
-    }
-}
-
-/// Handles release channels, Rawhide rolling transitions, and updates mimicking Fedora Rawhide fast-track.
-pub struct SigmaNextChannel {
-    pub active_channel: String,
-    pub rollback_snapshots: Vec<String>,
-    pub package_version: String,
-}
-
-impl SigmaNextChannel {
-    pub fn new() -> Self {
-        SigmaNextChannel {
-            active_channel: "stable".to_string(),
-            rollback_snapshots: Vec::new(),
-            package_version: "1.0.0".to_string(),
+        let rule_desc = format!("allow:{:?}:{}", zone, service);
+        if permanent {
+            self.permanent_rules.push(rule_desc.clone());
         }
+        self.runtime_rules.push(rule_desc);
     }
 
-    pub fn set_channel(&mut self, channel: &str) {
-        self.active_channel = channel.to_string();
+    pub fn add_rich_rule(&mut self, rule: RichRule) {
+        self.rich_rules.push(rule);
     }
 
-    pub fn trigger_update(&mut self) -> Result<(usize, String), String> {
-        if self.active_channel == "sigma.next" {
-            // Save rollback snapshot
-            self.rollback_snapshots.push(self.package_version.clone());
-            self.package_version = "1.1.0-rawhide".to_string();
-            Ok((87, "sigma.next rolling Rawhide update complete".to_string()))
-        } else {
-            Ok((0, "No rolling updates available for stable channel".to_string()))
+    pub fn is_traffic_allowed(&self, zone: FirewalldZone, service: &str) -> bool {
+        if zone == FirewalldZone::Trusted {
+            return true;
         }
+        if zone == FirewalldZone::Drop {
+            return false;
+        }
+
+        if let Some(services) = self.allowed_services.get(&zone) {
+            if services.contains(&service.to_string()) || services.contains(&"all".to_string()) {
+                return true;
+            }
+        }
+
+        for rich in &self.rich_rules {
+            if rich.service == service && rich.action == "accept" {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    pub fn reload(&mut self) {
+        self.runtime_rules = self.permanent_rules.clone();
     }
 }
 
-/// ALU Status Flags (mimicking x86 EFLAGS and ARM CPSR/PSTATE inside Fedora packaging and reliability suites)
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub struct FedoraAluFlags {
-    pub carry: bool,
-    pub zero: bool,
-    pub sign: bool,
-    pub overflow: bool,
+impl Default for FirewalldZoneManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-/// Fedora-inspired High-Reliability Arithmetic Logic Unit (ALU) Emulator.
-/// Restores mathematical stability constraints and saturated DSP boundaries to critical subsystems.
-pub struct FedoraAlu {
-    pub flags: FedoraAluFlags,
+/// Represents calculated disk partition layouts during installation.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PartitionLayout {
+    pub mount_point: String,
+    pub size_gb: u64,
+    pub filesystem: String,
+    pub lvm_group: Option<String>,
 }
 
-impl FedoraAlu {
+/// AnacondaKickstartInstaller emulates Fedora's Anaconda Installer with KS parsing.
+pub struct AnacondaKickstartInstaller {
+    pub kickstart_parsed: bool,
+    pub root_password_set: bool,
+    pub timezone: String,
+    pub selected_packages: Vec<String>,
+    pub partitions: Vec<PartitionLayout>,
+    pub dry_run_success: bool,
+}
+
+impl AnacondaKickstartInstaller {
     pub fn new() -> Self {
         Self {
-            flags: FedoraAluFlags::default(),
+            kickstart_parsed: false,
+            root_password_set: false,
+            timezone: "UTC".to_string(),
+            selected_packages: Vec::new(),
+            partitions: Vec::new(),
+            dry_run_success: false,
         }
     }
 
-    /// Reset status flags
-    pub fn reset_flags(&mut self) {
-        self.flags = FedoraAluFlags::default();
-    }
+    pub fn parse_kickstart(&mut self, config_content: &str) -> Result<(), &'static str> {
+        if config_content.is_empty() {
+            return Err("Empty kickstart profile");
+        }
 
-    /// Updates common Zero and Sign flags
-    fn update_zero_sign(&mut self, result: u64) {
-        self.flags.zero = result == 0;
-        self.flags.sign = (result as i64) < 0;
-    }
-
-    /// 64-bit Addition with Carry and Overflow detection (x86 ADD parity)
-    pub fn add(&mut self, op1: u64, op2: u64) -> u64 {
-        let (res, carry) = op1.overflowing_add(op2);
-        self.flags.carry = carry;
-
-        let sign1 = (op1 as i64) < 0;
-        let sign2 = (op2 as i64) < 0;
-        let sign_res = (res as i64) < 0;
-        self.flags.overflow = (sign1 == sign2) && (sign1 != sign_res);
-
-        self.update_zero_sign(res);
-        res
-    }
-
-    /// 64-bit Subtraction with Carry (Borrow) and Overflow (x86 SUB parity)
-    pub fn sub(&mut self, op1: u64, op2: u64) -> u64 {
-        let (res, carry) = op1.overflowing_sub(op2);
-        self.flags.carry = carry;
-
-        let sign1 = (op1 as i64) < 0;
-        let sign2 = (op2 as i64) < 0;
-        let sign_res = (res as i64) < 0;
-        self.flags.overflow = (sign1 != sign2) && (sign1 != sign_res);
-
-        self.update_zero_sign(res);
-        res
-    }
-
-    /// Saturated 64-bit Addition (ARM NEON / DSP parity)
-    /// Prevents standard overflow warping by clamping results to numeric bounds
-    pub fn saturated_add(&mut self, op1: i64, op2: i64) -> i64 {
-        match op1.checked_add(op2) {
-            Some(res) => {
-                self.flags.overflow = false;
-                self.update_zero_sign(res as u64);
-                res
+        for line in config_content.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with('#') || trimmed.is_empty() {
+                continue;
             }
-            None => {
-                self.flags.overflow = true;
-                let res = if op1 > 0 { i64::MAX } else { i64::MIN };
-                self.update_zero_sign(res as u64);
-                res
+
+            if trimmed.starts_with("timezone") {
+                let parts: Vec<&str> = trimmed.split_whitespace().collect();
+                if parts.len() > 1 {
+                    self.timezone = parts[1].to_string();
+                }
+            } else if trimmed.starts_with("rootpw") {
+                self.root_password_set = true;
+            } else if trimmed.starts_with("part") {
+                let parts: Vec<&str> = trimmed.split_whitespace().collect();
+                if parts.len() >= 3 {
+                    let mount = parts[1].to_string();
+                    let mut size = 0;
+                    let mut fstype = "xfs".to_string();
+                    let mut lvm = None;
+
+                    for opt in &parts[2..] {
+                        if opt.starts_with("--size=") {
+                            size = opt["--size=".len()..].parse::<u64>().unwrap_or(0);
+                        } else if opt.starts_with("--fstype=") {
+                            fstype = opt["--fstype=".len()..].to_string();
+                        } else if opt.starts_with("--lvmgroup=") {
+                            lvm = Some(opt["--lvmgroup=".len()..].to_string());
+                        }
+                    }
+
+                    self.partitions.push(PartitionLayout {
+                        mount_point: mount,
+                        size_gb: size / 1024,
+                        filesystem: fstype,
+                        lvm_group: lvm,
+                    });
+                }
             }
         }
+
+        self.kickstart_parsed = true;
+        Ok(())
+    }
+
+    pub fn add_selected_packages(&mut self, packages: Vec<&str>) {
+        for pkg in packages {
+            self.selected_packages.push(pkg.to_string());
+        }
+    }
+
+    pub fn validate_and_preflight(&mut self) -> Result<bool, &'static str> {
+        if !self.kickstart_parsed {
+            return Err("Kickstart profile not parsed");
+        }
+        if !self.root_password_set {
+            return Err("Security failure: root password is not defined in Kickstart");
+        }
+        if self.partitions.is_empty() {
+            return Err("Storage layout configuration is missing");
+        }
+
+        self.dry_run_success = true;
+        Ok(true)
     }
 }
+
+impl Default for AnacondaKickstartInstaller {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// COPR compilation build job metadata.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CoprBuildJob {
+    pub job_id: u64,
+    pub username: String,
+    pub project_name: String,
+    pub srpm_package: String,
+    pub build_status: String,
+}
+
+/// CoprUserRepoBuilder emulates Fedora's COPR user repository builder.
+pub struct CoprUserRepoBuilder {
+    pub projects: BTreeMap<String, Vec<String>>,
+    pub active_jobs: Vec<CoprBuildJob>,
+    pub job_counter: u64,
+}
+
+impl CoprUserRepoBuilder {
+    pub fn new() -> Self {
+        Self {
+            projects: BTreeMap::new(),
+            active_jobs: Vec::new(),
+            job_counter: 0,
+        }
+    }
+
+    pub fn create_project(&mut self, username: &str, project_name: &str) -> Result<String, &'static str> {
+        let key = format!("{}/{}", username, project_name);
+        if self.projects.contains_key(&key) {
+            return Err("Project already exists");
+        }
+        self.projects.insert(key.clone(), Vec::new());
+        Ok(key)
+    }
+
+    pub fn submit_build(
+        &mut self,
+        username: &str,
+        project_name: &str,
+        srpm: &str,
+    ) -> Result<u64, &'static str> {
+        let key = format!("{}/{}", username, project_name);
+        if !self.projects.contains_key(&key) {
+            return Err("Target COPR project not found");
+        }
+
+        self.job_counter += 1;
+        let job = CoprBuildJob {
+            job_id: self.job_counter,
+            username: username.to_string(),
+            project_name: project_name.to_string(),
+            srpm_package: srpm.to_string(),
+            build_status: "Pending".to_string(),
+        };
+
+        self.active_jobs.push(job);
+        Ok(self.job_counter)
+    }
+
+    pub fn process_build_jobs(&mut self) -> usize {
+        let mut completed = 0;
+        for job in &mut self.active_jobs {
+            if job.build_status == "Pending" {
+                job.build_status = "Success".to_string();
+                let key = format!("{}/{}", job.username, job.project_name);
+                if let Some(pkgs) = self.projects.get_mut(&key) {
+                    let rpm_name = job.srpm_package.replace(".src.rpm", ".x86_64.rpm");
+                    pkgs.push(rpm_name);
+                }
+                completed += 1;
+            }
+        }
+        completed
+    }
+}
+
+impl Default for CoprUserRepoBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Identifies FreeIPA registered user properties in LDAP directory.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IpaUser {
+    pub uid: String,
+    pub given_name: String,
+    pub member_of_groups: Vec<String>,
+}
+
+/// Host-Based Access Control Rule in FreeIPA Policy Management.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HbacRule {
+    pub rule_name: String,
+    pub source_users: Vec<String>,
+    pub target_hosts: Vec<String>,
+    pub allowed_services: Vec<String>,
+    pub enabled: bool,
+}
+
+/// FreeIpaDirectoryService emulates Identity, Policy, and Audit directory services.
+pub struct FreeIpaDirectoryService {
+    pub domain_realm: String,
+    pub directory_users: BTreeMap<String, IpaUser>,
+    pub hbac_rules: Vec<HbacRule>,
+    pub issued_kerberos_tickets: BTreeMap<String, u64>,
+}
+
+impl FreeIpaDirectoryService {
+    pub fn new(realm: &str) -> Self {
+        Self {
+            domain_realm: realm.to_string(),
+            directory_users: BTreeMap::new(),
+            hbac_rules: Vec::new(),
+            issued_kerberos_tickets: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_user(&mut self, uid: &str, name: &str, groups: Vec<&str>) {
+        let ipa_user = IpaUser {
+            uid: uid.to_string(),
+            given_name: name.to_string(),
+            member_of_groups: groups.iter().map(|s| s.to_string()).collect(),
+        };
+        self.directory_users.insert(uid.to_string(), ipa_user);
+    }
+
+    pub fn acquire_kerberos_ticket(&mut self, uid: &str, current_time: u64) -> Result<(), &'static str> {
+        if !self.directory_users.contains_key(uid) {
+            return Err("User identity not found in LDAP directory");
+        }
+        self.issued_kerberos_tickets.insert(uid.to_string(), current_time + 36000);
+        Ok(())
+    }
+
+    pub fn verify_kerberos_ticket(&self, uid: &str, current_time: u64) -> bool {
+        if let Some(&expiration) = self.issued_kerberos_tickets.get(uid) {
+            current_time < expiration
+        } else {
+            false
+        }
+    }
+
+    pub fn add_hbac_rule(&mut self, rule: HbacRule) {
+        self.hbac_rules.push(rule);
+    }
+
+    pub fn validate_access(&self, uid: &str, host: &str, service: &str) -> bool {
+        let user_opt = self.directory_users.get(uid);
+        if user_opt.is_none() {
+            return false;
+        }
+        let user = user_opt.unwrap();
+
+        for rule in &self.hbac_rules {
+            if !rule.enabled {
+                continue;
+            }
+
+            let user_matches = rule.source_users.contains(&uid.to_string())
+                || rule.source_users.contains(&"all".to_string())
+                || user.member_of_groups.iter().any(|g| rule.source_users.contains(g));
+
+            let host_matches = rule.target_hosts.contains(&host.to_string())
+                || rule.target_hosts.contains(&"all".to_string());
+
+            let service_matches = rule.allowed_services.contains(&service.to_string())
+                || rule.allowed_services.contains(&"all".to_string());
+
+            if user_matches && host_matches && service_matches {
+                return true;
+            }
+        }
+
+        false
+    }
+}
+
+// =========================================================================
+// UNIT TESTS MODULE
+// =========================================================================
 
 #[cfg(test)]
 mod tests {
@@ -439,116 +711,109 @@ mod tests {
     }
 
     #[test]
-    fn test_sigma_change_process() {
-        let mut engine = SigmaChangeProcessEngine::new();
-        let proposal = SigmaChangeProposal {
-            id: "SCP-001".to_string(),
-            owner: "@kernel-team".to_string(),
-            status: "FinalBeta".to_string(),
-            self_contained: true,
-            summary: "Enable THP for all anonymous mappings >1MB".to_string(),
-            benefit: "8-15% speedup in compilation and database workloads".to_string(),
-        };
+    fn test_firewalld_zone_manager() {
+        let mut fwm = FirewalldZoneManager::new();
+        assert_eq!(fwm.active_zone, FirewalldZone::Public);
 
-        engine.submit_proposal(proposal.clone());
-        assert_eq!(engine.get_proposals().len(), 1);
-        assert_eq!(engine.get_proposals().get("SCP-001").unwrap(), &proposal);
+        // Standard rules
+        assert!(fwm.is_traffic_allowed(FirewalldZone::Public, "ssh"));
+        assert!(!fwm.is_traffic_allowed(FirewalldZone::Public, "http"));
 
-        let new_status = engine.update_proposal_status("SCP-001", "Completed").unwrap();
-        assert_eq!(new_status, "Completed");
-        assert_eq!(engine.get_proposals().get("SCP-001").unwrap().status, "Completed");
+        // Add service to home zone
+        fwm.allow_service(FirewalldZone::Home, "http", true);
+        assert!(fwm.is_traffic_allowed(FirewalldZone::Home, "http"));
+        assert_eq!(fwm.permanent_rules.len(), 1);
 
-        assert!(engine.update_proposal_status("SCP-002", "Completed").is_err());
+        // Set default zone to home
+        fwm.set_default_zone(FirewalldZone::Home);
+        assert_eq!(fwm.active_zone, FirewalldZone::Home);
+
+        // Add rich rule
+        fwm.add_rich_rule(RichRule {
+            family: "ipv4".to_string(),
+            source: "192.168.1.50".to_string(),
+            service: "postgresql".to_string(),
+            action: "accept".to_string(),
+        });
+        assert!(fwm.is_traffic_allowed(FirewalldZone::Home, "postgresql"));
+
+        // Test reload
+        fwm.reload();
+        assert_eq!(fwm.runtime_rules, fwm.permanent_rules);
     }
 
     #[test]
-    fn test_sigma_next_channel() {
-        let mut channel = SigmaNextChannel::new();
-        assert_eq!(channel.active_channel, "stable");
-        assert_eq!(channel.package_version, "1.0.0");
+    fn test_anaconda_kickstart_installer() {
+        let mut installer = AnacondaKickstartInstaller::new();
+        let ks_content = "
+            # Kickstart file for Fedora
+            timezone America/New_York
+            rootpw --iscrypted $6$rounds=4096$salt
+            part / --fstype=xfs --size=20480 --lvmgroup=vg_root
+            part /home --fstype=ext4 --size=10240 --lvmgroup=vg_home
+        ";
 
-        // stable channel should not trigger rolling rawhide updates
-        let (updated, msg) = channel.trigger_update().unwrap();
-        assert_eq!(updated, 0);
-        assert_eq!(msg, "No rolling updates available for stable channel");
+        assert!(installer.parse_kickstart(ks_content).is_ok());
+        assert_eq!(installer.timezone, "America/New_York");
+        assert!(installer.root_password_set);
+        assert_eq!(installer.partitions.len(), 2);
+        assert_eq!(installer.partitions[0].mount_point, "/");
+        assert_eq!(installer.partitions[0].size_gb, 20); // 20480 / 1024
+        assert_eq!(installer.partitions[0].filesystem, "xfs");
+        assert_eq!(installer.partitions[0].lvm_group, Some("vg_root".to_string()));
 
-        // switch to rawhide fast-track (sigma.next)
-        channel.set_channel("sigma.next");
-        assert_eq!(channel.active_channel, "sigma.next");
-
-        let (updated_next, msg_next) = channel.trigger_update().unwrap();
-        assert_eq!(updated_next, 87);
-        assert_eq!(msg_next, "sigma.next rolling Rawhide update complete");
-        assert_eq!(channel.package_version, "1.1.0-rawhide");
-        assert_eq!(channel.rollback_snapshots, vec!["1.0.0".to_string()]);
+        // Preflight checklist
+        assert!(installer.validate_and_preflight().unwrap());
+        assert!(installer.dry_run_success);
     }
 
     #[test]
-    fn test_fedora_alu_addition() {
-        let mut alu = FedoraAlu::new();
-        assert_eq!(alu.flags, FedoraAluFlags::default());
+    fn test_copr_user_repo_builder() {
+        let mut copr = CoprUserRepoBuilder::new();
+        let repo_key = copr.create_project("jules", "my-fast-tool").unwrap();
+        assert_eq!(repo_key, "jules/my-fast-tool");
 
-        // Simple addition
-        let r1 = alu.add(10, 20);
-        assert_eq!(r1, 30);
-        assert!(!alu.flags.carry);
-        assert!(!alu.flags.zero);
-        assert!(!alu.flags.sign);
-        assert!(!alu.flags.overflow);
+        // Submit builds
+        let job_id = copr.submit_build("jules", "my-fast-tool", "my-tool-1.0.src.rpm").unwrap();
+        assert_eq!(job_id, 1);
+        assert_eq!(copr.active_jobs[0].build_status, "Pending");
 
-        // Addition causing zero and sign
-        let r2 = alu.add(0xFFFF_FFFF_FFFF_FFFF, 1);
-        assert_eq!(r2, 0);
-        assert!(alu.flags.carry);
-        assert!(alu.flags.zero);
-        assert!(!alu.flags.sign);
-        assert!(!alu.flags.overflow);
+        // Process jobs
+        let processed_count = copr.process_build_jobs();
+        assert_eq!(processed_count, 1);
+        assert_eq!(copr.active_jobs[0].build_status, "Success");
 
-        // Sign test
-        let r3 = alu.add(0, 0x8000_0000_0000_0000);
-        assert_eq!(r3, 0x8000_0000_0000_0000);
-        assert!(!alu.flags.carry);
-        assert!(!alu.flags.zero);
-        assert!(alu.flags.sign);
-        assert!(!alu.flags.overflow);
-
-        // Overflow test: positive + positive = negative
-        let r4 = alu.add(0x7FFF_FFFF_FFFF_FFFF, 1);
-        assert_eq!(r4, 0x8000_0000_0000_0000);
-        assert!(!alu.flags.carry);
-        assert!(!alu.flags.zero);
-        assert!(alu.flags.sign);
-        assert!(alu.flags.overflow);
+        // Ensure RPM got placed in project artifacts
+        let artifacts = copr.projects.get("jules/my-fast-tool").unwrap();
+        assert_eq!(artifacts[0], "my-tool-1.0.x86_64.rpm");
     }
 
     #[test]
-    fn test_fedora_alu_subtraction() {
-        let mut alu = FedoraAlu::new();
-        let r1 = alu.sub(10, 20);
-        assert_eq!(r1, 0xFFFF_FFFF_FFFF_FFF6);
-        assert!(alu.flags.carry); // Borrow occurred
-        assert!(!alu.flags.zero);
-        assert!(alu.flags.sign);
-        assert!(!alu.flags.overflow);
-    }
+    fn test_freeipa_directory_service() {
+        let mut ipa = FreeIpaDirectoryService::new("FEDORA.LOCAL");
+        assert_eq!(ipa.domain_realm, "FEDORA.LOCAL");
 
-    #[test]
-    fn test_fedora_alu_saturated_math() {
-        let mut alu = FedoraAlu::new();
+        // Register user with groups
+        ipa.register_user("alice", "Alice Liddell", vec!["admins", "developers"]);
+        assert!(ipa.directory_users.contains_key("alice"));
 
-        // Simple saturated add
-        let r1 = alu.saturated_add(10, 20);
-        assert_eq!(r1, 30);
-        assert!(!alu.flags.overflow);
+        // Acquire and verify Kerberos ticket
+        assert!(ipa.acquire_kerberos_ticket("alice", 1700000000).is_ok());
+        assert!(ipa.verify_kerberos_ticket("alice", 1700005000));
+        assert!(!ipa.verify_kerberos_ticket("alice", 1700050000)); // Expired
 
-        // Overflow saturated add
-        let r2 = alu.saturated_add(i64::MAX, 1);
-        assert_eq!(r2, i64::MAX);
-        assert!(alu.flags.overflow);
+        // Host Based Access Control (HBAC) rule setup
+        ipa.add_hbac_rule(HbacRule {
+            rule_name: "admin_ssh_rule".to_string(),
+            source_users: vec!["admins".to_string()],
+            target_hosts: vec!["all".to_string()],
+            allowed_services: vec!["ssh".to_string()],
+            enabled: true,
+        });
 
-        // Underflow saturated add
-        let r3 = alu.saturated_add(i64::MIN, -1);
-        assert_eq!(r3, i64::MIN);
-        assert!(alu.flags.overflow);
+        // Verify authorized access
+        assert!(ipa.validate_access("alice", "srv-01.fedora.local", "ssh"));
+        // Alice is not in group corresponding to target services/rules not covering http
+        assert!(!ipa.validate_access("alice", "srv-01.fedora.local", "http"));
     }
 }
