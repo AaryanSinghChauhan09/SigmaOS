@@ -111,7 +111,7 @@ pub unsafe extern "C" fn mount_fs(
         mounted: true,
     };
     
-    if !source.isnull() {
+    if !source.is_null() {
         for i in 0..255 {
             let byte = *source.add(i);
             if byte == 0 { break; }
@@ -119,7 +119,7 @@ pub unsafe extern "C" fn mount_fs(
         }
     }
     
-    if !target.isnull() {
+    if !target.is_null() {
         for i in 0..255 {
             let byte = *target.add(i);
             if byte == 0 { break; }
@@ -127,7 +127,7 @@ pub unsafe extern "C" fn mount_fs(
         }
     }
     
-    if !fstype.isnull() {
+    if !fstype.is_null() {
         for i in 0..31 {
             let byte = *fstype.add(i);
             if byte == 0 { break; }
@@ -144,7 +144,7 @@ pub unsafe extern "C" fn mount_fs(
 /// Unmount filesystem
 #[no_mangle]
 pub unsafe extern "C" fn umount(target: *const u8) -> SigmaI32 {
-    if !MOUNT_INITIALIZED || target.isnull() {
+    if !MOUNT_INITIALIZED || target.is_null() {
         return -1;
     }
     
@@ -181,7 +181,7 @@ pub unsafe extern "C" fn umount(target: *const u8) -> SigmaI32 {
 /// List mounted filesystems
 #[no_mangle]
 pub unsafe extern "C" fn mount_list(entries: *mut MountEntry, max_count: SigmaU32) -> SigmaU32 {
-    if !MOUNT_INITIALIZED || entries.isnull() {
+    if !MOUNT_INITIALIZED || entries.is_null() {
         return 0;
     }
     

@@ -50,7 +50,7 @@ pub unsafe extern "C" fn wc_count(
     result: *mut WcResult,
     options: WcOptions,
 ) -> SigmaI32 {
-    if !WC_INITIALIZED || file_path.isnull() || result.isnull() {
+    if !WC_INITIALIZED || file_path.is_null() || result.is_null() {
         return -1;
     }
     
@@ -101,7 +101,7 @@ pub unsafe extern "C" fn wc_count_multiple(
     total: *mut WcResult,
     _options: WcOptions,
 ) -> SigmaI32 {
-    if !WC_INITIALIZED || files.isnull() || results.isnull() || total.isnull() {
+    if !WC_INITIALIZED || files.is_null() || results.is_null() || total.is_null() {
         return -1;
     }
     
@@ -115,7 +115,7 @@ pub unsafe extern "C" fn wc_count_multiple(
     
     for i in 0..file_count as usize {
         let file = *files.add(i);
-        if file.isnull() {
+        if file.is_null() {
             continue;
         }
         
@@ -151,7 +151,7 @@ pub unsafe extern "C" fn wc_count_string(
     result: *mut WcResult,
     options: WcOptions,
 ) -> SigmaI32 {
-    if !WC_INITIALIZED || input.isnull() || result.isnull() {
+    if !WC_INITIALIZED || input.is_null() || result.is_null() {
         return -1;
     }
     

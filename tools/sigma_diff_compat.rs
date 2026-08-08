@@ -73,7 +73,7 @@ pub unsafe extern "C" fn diff_compare(
     file2: *const u8,
     _options: DiffOptions,
 ) -> SigmaI32 {
-    if !DIFF_INITIALIZED || file1.isnull() || file2.isnull() {
+    if !DIFF_INITIALIZED || file1.is_null() || file2.is_null() {
         return -1;
     }
     
@@ -119,7 +119,7 @@ pub unsafe extern "C" fn diff_get_hunks(
     hunks: *mut DiffHunk,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !DIFF_INITIALIZED || hunks.isnull() {
+    if !DIFF_INITIALIZED || hunks.is_null() {
         return 0;
     }
     
@@ -147,7 +147,7 @@ pub unsafe extern "C" fn diff_identical(
     file1: *const u8,
     file2: *const u8,
 ) -> SigmaBool {
-    if !DIFF_INITIALIZED || file1.isnull() || file2.isnull() {
+    if !DIFF_INITIALIZED || file1.is_null() || file2.is_null() {
         return false;
     }
     

@@ -63,7 +63,7 @@ pub unsafe extern "C" fn zip_create(
     file_count: SigmaU32,
     _options: ZipOptions,
 ) -> SigmaI32 {
-    if !ZIP_INITIALIZED || archive_name.isnull() || files.isnull() {
+    if !ZIP_INITIALIZED || archive_name.is_null() || files.is_null() {
         return -1;
     }
     
@@ -81,7 +81,7 @@ pub unsafe extern "C" fn zip_create(
         }
         
         let file = *files.add(i);
-        if file.isnull() {
+        if file.is_null() {
             continue;
         }
         
@@ -112,7 +112,7 @@ pub unsafe extern "C" fn zip_extract(
     archive_name: *const u8,
     _options: ZipOptions,
 ) -> SigmaI32 {
-    if !ZIP_INITIALIZED || archive_name.isnull() {
+    if !ZIP_INITIALIZED || archive_name.is_null() {
         return -1;
     }
     
@@ -132,7 +132,7 @@ pub unsafe extern "C" fn zip_list(
     entries: *mut ZipEntry,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !ZIP_INITIALIZED || archive_name.isnull() || entries.isnull() {
+    if !ZIP_INITIALIZED || archive_name.is_null() || entries.is_null() {
         return 0;
     }
     
@@ -153,7 +153,7 @@ pub unsafe extern "C" fn zip_list(
 pub unsafe extern "C" fn zip_add_file(
     file_name: *const u8,
 ) -> SigmaI32 {
-    if !ZIP_INITIALIZED || file_name.isnull() || ZIP_ENTRY_COUNT >= MAX_ZIP_ENTRIES as SigmaU32 {
+    if !ZIP_INITIALIZED || file_name.is_null() || ZIP_ENTRY_COUNT >= MAX_ZIP_ENTRIES as SigmaU32 {
         return -1;
     }
     

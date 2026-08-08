@@ -42,7 +42,7 @@ pub unsafe extern "C" fn chmod_init() -> SigmaI32 {
 /// Change file mode
 #[no_mangle]
 pub unsafe extern "C" fn chmod_set(path: *const u8, mode: SigmaU32) -> SigmaI32 {
-    if !CHMOD_INITIALIZED || path.isnull() {
+    if !CHMOD_INITIALIZED || path.is_null() {
         return -1;
     }
     
@@ -95,7 +95,7 @@ pub unsafe extern "C" fn chmod_set(path: *const u8, mode: SigmaU32) -> SigmaI32 
 /// Get file mode
 #[no_mangle]
 pub unsafe extern "C" fn chmod_get(path: *const u8, mode: *mut SigmaU32) -> SigmaI32 {
-    if !CHMOD_INITIALIZED || path.isnull() || mode.isnull() {
+    if !CHMOD_INITIALIZED || path.is_null() || mode.is_null() {
         return -1;
     }
     
@@ -128,7 +128,7 @@ pub unsafe extern "C" fn chmod_get(path: *const u8, mode: *mut SigmaU32) -> Sigm
 /// Recursive chmod
 #[no_mangle]
 pub unsafe extern "C" fn chmod_recursive(path: *const u8, mode: SigmaU32) -> SigmaI32 {
-    if !CHMOD_INITIALIZED || path.isnull() {
+    if !CHMOD_INITIALIZED || path.is_null() {
         return -1;
     }
     
@@ -146,7 +146,7 @@ pub unsafe extern "C" fn chmod_parse_symbolic(
     current_mode: SigmaU32,
     new_mode: *mut SigmaU32,
 ) -> SigmaI32 {
-    if !CHMOD_INITIALIZED || symbolic.isnull() || new_mode.isnull() {
+    if !CHMOD_INITIALIZED || symbolic.is_null() || new_mode.is_null() {
         return -1;
     }
     

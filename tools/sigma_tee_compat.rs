@@ -38,7 +38,7 @@ pub unsafe extern "C" fn tee_init() -> SigmaI32 {
 /// Add output file
 #[no_mangle]
 pub unsafe extern "C" fn tee_add_output_file(file_path: *const u8) -> SigmaI32 {
-    if !TEE_INITIALIZED || file_path.isnull() || TEE_FILE_COUNT >= MAX_OUTPUT_FILES as SigmaU32 {
+    if !TEE_INITIALIZED || file_path.is_null() || TEE_FILE_COUNT >= MAX_OUTPUT_FILES as SigmaU32 {
         return -1;
     }
     
@@ -62,7 +62,7 @@ pub unsafe extern "C" fn tee_process(
     max_output: SigmaU32,
     _options: TeeOptions,
 ) -> SigmaI32 {
-    if !TEE_INITIALIZED || input.isnull() || output.isnull() {
+    if !TEE_INITIALIZED || input.is_null() || output.is_null() {
         return -1;
     }
     

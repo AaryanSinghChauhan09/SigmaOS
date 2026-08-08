@@ -41,7 +41,7 @@ pub unsafe extern "C" fn tr_translate(
     set2: *const u8,
     options: TrOptions,
 ) -> SigmaI32 {
-    if !TR_INITIALIZED || input.isnull() || output.isnull() || set1.isnull() || set2.isnull() {
+    if !TR_INITIALIZED || input.is_null() || output.is_null() || set1.is_null() || set2.is_null() {
         return -1;
     }
     
@@ -103,7 +103,7 @@ pub unsafe extern "C" fn tr_delete(
     max_output: SigmaU32,
     set1: *const u8,
 ) -> SigmaI32 {
-    if !TR_INITIALIZED || input.isnull() || output.isnull() || set1.isnull() {
+    if !TR_INITIALIZED || input.is_null() || output.is_null() || set1.is_null() {
         return -1;
     }
     
@@ -124,7 +124,7 @@ pub unsafe extern "C" fn tr_squeeze(
     max_output: SigmaU32,
     set1: *const u8,
 ) -> SigmaI32 {
-    if !TR_INITIALIZED || input.isnull() || output.isnull() || set1.isnull() {
+    if !TR_INITIALIZED || input.is_null() || output.is_null() || set1.is_null() {
         return -1;
     }
     

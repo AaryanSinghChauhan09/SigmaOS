@@ -42,7 +42,7 @@ pub unsafe extern "C" fn xargs_init() -> SigmaI32 {
 /// Add argument
 #[no_mangle]
 pub unsafe extern "C" fn xargs_add_arg(arg: *const u8) -> SigmaI32 {
-    if !XARGS_INITIALIZED || arg.isnull() || XARGS_ARG_COUNT >= MAX_ARGS as SigmaU32 {
+    if !XARGS_INITIALIZED || arg.is_null() || XARGS_ARG_COUNT >= MAX_ARGS as SigmaU32 {
         return -1;
     }
     
@@ -63,7 +63,7 @@ pub unsafe extern "C" fn xargs_parse_input(
     input: *const u8,
     delimiter: *const u8,
 ) -> SigmaI32 {
-    if !XARGS_INITIALIZED || input.isnull() || delimiter.isnull() {
+    if !XARGS_INITIALIZED || input.is_null() || delimiter.is_null() {
         return -1;
     }
     
@@ -131,7 +131,7 @@ pub unsafe extern "C" fn xargs_build_command(
     max_output: SigmaU32,
     options: XargsOptions,
 ) -> SigmaI32 {
-    if !XARGS_INITIALIZED || command.isnull() || output.isnull() {
+    if !XARGS_INITIALIZED || command.is_null() || output.is_null() {
         return -1;
     }
     
@@ -189,7 +189,7 @@ pub unsafe extern "C" fn xargs_get_args(
     args: *mut *const u8,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !XARGS_INITIALIZED || args.isnull() {
+    if !XARGS_INITIALIZED || args.is_null() {
         return 0;
     }
     

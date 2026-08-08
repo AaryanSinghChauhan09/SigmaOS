@@ -41,7 +41,7 @@ pub unsafe extern "C" fn tail_lines(
     max_output: SigmaU32,
     line_count: SigmaU32,
 ) -> SigmaI32 {
-    if !TAIL_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !TAIL_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     
@@ -80,7 +80,7 @@ pub unsafe extern "C" fn tail_bytes(
     max_output: SigmaU32,
     byte_count: SigmaU32,
 ) -> SigmaI32 {
-    if !TAIL_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !TAIL_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     
@@ -107,7 +107,7 @@ pub unsafe extern "C" fn tail_follow(
     output: *mut u8,
     _max_output: SigmaU32,
 ) -> SigmaI32 {
-    if !TAIL_INITIALIZED || file_path.isnull() || output.isnull() {
+    if !TAIL_INITIALIZED || file_path.is_null() || output.is_null() {
         return -1;
     }
     
@@ -129,7 +129,7 @@ pub unsafe extern "C" fn tail_multiple(
     max_output: SigmaU32,
     options: TailOptions,
 ) -> SigmaI32 {
-    if !TAIL_INITIALIZED || files.isnull() || output.isnull() {
+    if !TAIL_INITIALIZED || files.is_null() || output.is_null() {
         return -1;
     }
     
@@ -141,7 +141,7 @@ pub unsafe extern "C" fn tail_multiple(
         }
         
         let file = *files.add(i);
-        if file.isnull() {
+        if file.is_null() {
             continue;
         }
         
