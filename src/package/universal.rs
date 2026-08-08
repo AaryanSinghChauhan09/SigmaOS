@@ -265,6 +265,20 @@ impl Default for DependencyResolver {
     }
 }
 
+/// Transactional history representing a history of installed and removed packages
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub transactions: Vec<String>,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        Self {
+            transactions: Vec::new(),
+        }
+    }
+}
+
 /// Package snapshot representing a saved system state of installed packages
 #[derive(Debug, Clone)]
 pub struct PackageSnapshot {
@@ -282,6 +296,8 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
+    pub snapshots: HashMap<usize, PackageSnapshot>,
+    pub next_snapshot_id: usize,
 }
 
 impl UniversalPackageManager {
@@ -293,6 +309,8 @@ impl UniversalPackageManager {
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
+            snapshots: HashMap::new(),
+            next_snapshot_id: 1,
         };
 
         manager.add_default_adapters();
@@ -441,9 +459,9 @@ impl UniversalPackageManager {
             .clone();
 
         // 1. Identify and uninstall packages currently installed but not in the snapshot
-        let mut to_uninstall = Vec::new();
+        let mut to_uninstall: Vec<String> = Vec::new();
         for pkg_name in self.installed_packages.keys() {
-            if !snapshot.installed_packages.contains_key(pkg_name) {
+            if !snapshot.installed_packages.contains_key(pkg_name.as_str()) {
                 to_uninstall.push(pkg_name.clone());
             }
         }
@@ -453,9 +471,9 @@ impl UniversalPackageManager {
         }
 
         // 2. Identify and reinstall packages in the snapshot but not currently installed
-        let mut to_install = Vec::new();
+        let mut to_install: Vec<String> = Vec::new();
         for (pkg_name, _) in &snapshot.installed_packages {
-            if !self.installed_packages.contains_key(pkg_name) {
+            if !self.installed_packages.contains_key(pkg_name.as_str()) {
                 to_install.push(pkg_name.clone());
             }
         }

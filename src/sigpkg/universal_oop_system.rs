@@ -20,8 +20,53 @@
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::{HashMap, Arc};
+
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
+#[cfg(feature = "standalone_test")]
+use std::sync::Arc;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+#[cfg(feature = "standalone_test")]
+impl Version {
+    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+        Self { major, minor, patch }
+    }
+    pub fn parse(s: &str) -> Result<Self, &'static str> {
+        let mut parts = s.split('.');
+        let major = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        let minor = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        let patch = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        Ok(Self::new(major, minor, patch))
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Dependency {
+    pub name: String,
+    pub version_constraint: VersionConstraint,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum VersionConstraint {
+    Any,
+}
+
+#[cfg(feature = "standalone_test")]
+pub struct Package;
 
 // ============================================================================
 // Core Abstractions (OOP Interface Layer)
@@ -137,7 +182,7 @@ impl BaseAdapter {
 
     pub fn execute_hooks(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.user_hooks {
-            hook.execute(package)?;
+            UserDefinedHook::execute(hook.as_ref(), package)?;
         }
         Ok(())
     }
@@ -1952,13 +1997,14 @@ impl PackageParserFactory {
     }
 
     pub fn get_parser(&self, format: PackageFormat) -> Option<&dyn IPackageParser> {
-        self.parsers.get(&format).map(|p| p.as_ref())
+        self.parsers.get::<PackageFormat>(&format).map(|p| p.as_ref())
     }
 
     pub fn auto_detect_parser(&self, data: &[u8]) -> Option<&dyn IPackageParser> {
         for parser in self.parsers.values() {
-            if parser.can_parse(data) {
-                return Some(parser.as_ref());
+            let p_ref: &dyn IPackageParser = parser.as_ref();
+            if p_ref.can_parse(data) {
+                return Some(p_ref);
             }
         }
         None
@@ -1998,7 +2044,7 @@ impl UniversalPackageManager {
 
     pub fn execute_hook_chain(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.global_hooks {
-            hook.execute(package)?;
+            UserDefinedHook::execute(hook.as_ref(), package)?;
         }
         Ok(())
     }
@@ -2033,7 +2079,7 @@ impl UniversalPackageManager {
 
         // Check dependencies
         for dep in package.dependencies() {
-            if !self.installed_packages.contains_key(&dep.name) {
+            if !self.installed_packages.contains_key::<str>(&dep.name) {
                 return Err(InstallError::MissingDependency(dep.name.clone()));
             }
         }
@@ -2052,7 +2098,7 @@ impl UniversalPackageManager {
 
     /// Get installed package
     pub fn get_package(&self, name: &str) -> Option<&dyn IPackage> {
-        self.installed_packages.get(name).map(|p| p.as_ref())
+        self.installed_packages.get::<str>(name).map(|p| p.as_ref())
     }
 
     /// List all installed packages
@@ -2082,6 +2128,63 @@ pub enum InstallError {
     PackageAlreadyInstalled(String),
     DependencyConflict(String),
     InstallFailed(String),
+}
+
+/// Trait for package translation across different major Linux distribution formats.
+/// Uses OOP design principles to translate unified package metadata.
+pub trait UniversalPackageTranslator {
+    fn translate(&self, package: &dyn IPackage, target_format: PackageFormat) -> Result<Box<dyn IPackage>, TranslateError>;
+}
+
+/// Dynamic error types during package conversion.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TranslateError {
+    UnsupportedTargetFormat(PackageFormat),
+    TranslationFailed(String),
+}
+
+/// Concrete Strategy Pattern implementation of UniversalPackageTranslator
+pub struct SigmaPackageTranslator;
+
+impl SigmaPackageTranslator {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl Default for SigmaPackageTranslator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl UniversalPackageTranslator for SigmaPackageTranslator {
+    fn translate(&self, package: &dyn IPackage, target_format: PackageFormat) -> Result<Box<dyn IPackage>, TranslateError> {
+        let meta = package.metadata();
+        let new_meta = PackageMetadata {
+            name: meta.name.clone(),
+            version: meta.version.clone(),
+            description: format!("Translated from {:?} to {:?}: {}", package.format(), target_format, meta.description),
+            license: meta.license.clone(),
+            maintainer: meta.maintainer.clone(),
+            homepage: meta.homepage.clone(),
+            architecture: meta.architecture.clone(),
+            checksum: meta.checksum.clone(),
+            size: meta.size,
+            install_date: meta.install_date,
+            pqc_signature: meta.pqc_signature.clone(),
+            gpg_key_id: meta.gpg_key_id.clone(),
+            supported_architectures: meta.supported_architectures.clone(),
+        };
+
+        let dependencies = package.dependencies().to_vec();
+
+        Ok(Box::new(StandardPackage {
+            metadata: new_meta,
+            dependencies,
+            format: target_format,
+        }))
+    }
 }
 
 #[cfg(test)]
@@ -2381,5 +2484,35 @@ Description: Hook test";
 
         let package = adapter.parse(deb_data).unwrap();
         assert_eq!(package.name(), "original-hooked");
+    }
+
+    #[test]
+    fn test_universal_translator() {
+        let original_package = StandardPackage {
+            metadata: PackageMetadata {
+                name: "test-lib".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Original description".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Deb,
+        };
+
+        let translator = SigmaPackageTranslator::new();
+        let translated = translator.translate(&original_package, PackageFormat::Rpm).unwrap();
+
+        assert_eq!(translated.name(), "test-lib");
+        assert_eq!(translated.format(), PackageFormat::Rpm);
+        assert!(translated.metadata().description.contains("Translated from Deb to Rpm"));
     }
 }
