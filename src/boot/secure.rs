@@ -188,8 +188,11 @@ impl UefiDatabase {
         // First check the revocation database (dbx) - blacklisted keys must fail immediately
         for slot in &self.keys {
             if let Some(ref db_key) = slot {
-                if db_key.key_id == key_id && db_key.hash == *hash && db_key.is_revoked {
-                    return Err(SecureBootError::Revoked);
+                if db_key.key_id == key_id && db_key.is_revoked {
+                    // Use timing-attack resilient constant-time comparison for cryptographic signature verification
+                    if constant_time_compare(&db_key.hash, hash) {
+                        return Err(SecureBootError::Revoked);
+                    }
                 }
             }
         }
@@ -197,14 +200,28 @@ impl UefiDatabase {
         // Second check the authorized signature database (db)
         for slot in &self.keys {
             if let Some(ref db_key) = slot {
-                if db_key.key_id == key_id && db_key.hash == *hash && !db_key.is_revoked {
-                    return Ok(true);
+                if db_key.key_id == key_id && !db_key.is_revoked {
+                    // Use timing-attack resilient constant-time comparison for cryptographic signature verification
+                    if constant_time_compare(&db_key.hash, hash) {
+                        return Ok(true);
+                    }
                 }
             }
         }
 
         Ok(false)
     }
+}
+
+/// A timing-attack resilient, constant-time byte array comparison helper.
+/// Returns true if `a` and `b` are identical, executing in constant time independent of the values.
+#[inline(never)]
+pub fn constant_time_compare(a: &[u8; 32], b: &[u8; 32]) -> bool {
+    let mut result = 0u8;
+    for i in 0..32 {
+        result |= a[i] ^ b[i];
+    }
+    result == 0
 }
 
 // ==========================================
