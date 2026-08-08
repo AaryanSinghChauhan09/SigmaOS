@@ -247,17 +247,24 @@ impl UniversalPackageAdapter {
                 version_constraint: VersionConstraint::Any,
             });
         }
-
-        Ok(Package {
-            name: name.to_string(),
-            version: parsed_ver,
-            description: desc.to_string(),
+        Ok(Package::new(
+            crate::klib::String::from(name),
+            parsed_ver,
+            crate::klib::String::from(desc),
             dependencies,
-            checksum: format!("SHA256:{}", name),
+            crate::klib::String::from(&format!("SHA256:{}", name)),
+        ))
         })
     }
 }
 
+=======
+            format!("SHA256:{}", name),
+        ))
+    }
+}
+
+>>>>>>> origin/jules-12039768019242344345-034693dc
 impl Default for UniversalPackageAdapter {
     fn default() -> Self {
         Self::new()
