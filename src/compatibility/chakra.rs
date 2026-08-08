@@ -1,3 +1,4 @@
+// SigmaOS Distro Compatibility Layer
 // SigmaOS Chakra Linux Parity Engine Shard
 // Zero-dependency, #![no_std] compliant, zero-allocation
 
