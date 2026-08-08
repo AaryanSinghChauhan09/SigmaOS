@@ -1,9 +1,5 @@
 #![no_std]
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -305,10 +301,6 @@ impl SimpleKeyring {
             capability,
         }
     }
-
-    pub fn store_secret(&mut self, secret: Box<dyn Secret>) -> Result<SecretID, SecretError> {
-        <Self as Keyring>::add_secret(self, secret)
-    }
 }
 
 impl Keyring for SimpleKeyring {
@@ -333,8 +325,8 @@ impl Keyring for SimpleKeyring {
         let mut index = None;
         let mut secret_type = SecretType::Password;
 
-        for i in 0..self.secrets.len() {
-            if let Some(Some(ref secret)) = self.secrets.get(i) {
+        for (i, secret_option) in self.secrets.iter().enumerate() {
+            if let Some(ref secret) = *secret_option {
                 if secret.id() == id {
                     index = Some(i);
                     secret_type = secret.secret_type();
@@ -344,7 +336,6 @@ impl Keyring for SimpleKeyring {
         }
 
         if let Some(i) = index {
-            // Remove secret without logging sensitive data
             self.secrets.remove(i);
             self.stats.total_secrets -= 1;
             self.stats.by_type[secret_type as usize] -= 1;
@@ -355,8 +346,8 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret(&self, id: SecretID) -> Option<&dyn Secret> {
-        for i in 0..self.secrets.len() {
-            if let Some(Some(ref secret)) = self.secrets.get(i) {
+        for secret_option in &self.secrets {
+            if let Some(ref secret) = *secret_option {
                 if secret.id() == id {
                     return Some(secret.as_ref());
                 }
@@ -366,14 +357,10 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        let len = self.secrets.len();
-        for i in 0..len {
-            let ptr = &mut self.secrets[i] as *mut Option<Box<dyn Secret>>;
-            unsafe {
-                if let Some(ref mut secret) = *ptr {
-                    if secret.id() == id {
-                        return Some(secret);
-                    }
+        for secret_option in &mut self.secrets {
+            if let Some(ref mut secret) = *secret_option {
+                if secret.id() == id {
+                    return Some(secret);
                 }
             }
         }
@@ -382,8 +369,8 @@ impl Keyring for SimpleKeyring {
 
     fn list_secrets(&self) -> Vec<SecretID> {
         let mut ids = Vec::new();
-        for i in 0..self.secrets.len() {
-            if let Some(Some(ref secret)) = self.secrets.get(i) {
+        for secret_option in &self.secrets {
+            if let Some(ref secret) = *secret_option {
                 ids.push(secret.id());
             }
         }
@@ -394,8 +381,8 @@ impl Keyring for SimpleKeyring {
         let mut stats = self.stats;
         stats.encrypted_secrets = 0;
 
-        for i in 0..self.secrets.len() {
-            if let Some(Some(ref secret)) = self.secrets.get(i) {
+        for secret_option in &self.secrets {
+            if let Some(ref secret) = *secret_option {
                 if secret.info().is_encrypted {
                     stats.encrypted_secrets += 1;
                 }
@@ -411,15 +398,45 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_simple_keyring() {
-        let cap = KeyringCapability::full();
-        let mut keyring = SimpleKeyring::new(cap);
-        let secret_cap = SecretCapability::full();
-        let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
-        let id = keyring.add_secret(Box::new(secret)).unwrap();
-        assert_eq!(id, 1);
+    fn test_simple_secret_encryption_decryption() {
+        let capability = SecretCapability::full();
+        let mut secret = SimpleSecret::new(101, b"db_password", SecretType::Password, capability);
+        secret.set_data(b"super_secret_value");
 
-        let retrieved = keyring.get_secret(1).unwrap();
-        assert_eq!(retrieved.name(), b"TestSecret");
+        assert_eq!(secret.id(), 101);
+        assert_eq!(secret.name(), b"db_password");
+        assert_eq!(secret.secret_type(), SecretType::Password);
+        assert_eq!(secret.get_data(), b"super_secret_value");
+
+        let key = b"my_encryption_key";
+        secret.encrypt(key).unwrap();
+        assert!(secret.info().is_encrypted);
+        assert_ne!(secret.get_data(), b"super_secret_value");
+
+        secret.decrypt(key).unwrap();
+        assert!(!secret.info().is_encrypted);
+        assert_eq!(secret.get_data(), b"super_secret_value");
+    }
+
+    #[test]
+    fn test_simple_keyring() {
+        let keyring_cap = KeyringCapability::full();
+        let mut keyring = SimpleKeyring::new(keyring_cap);
+
+        let capability = SecretCapability::full();
+        let secret = SimpleSecret::new(101, b"db_password", SecretType::Password, capability);
+
+        let id = keyring.add_secret(Box::new(secret)).unwrap();
+        assert_eq!(id, 101);
+
+        assert!(keyring.get_secret(101).is_some());
+        assert_eq!(keyring.list_secrets().len(), 1);
+
+        let stats = keyring.stats();
+        assert_eq!(stats.total_secrets, 1);
+        assert_eq!(stats.encrypted_secrets, 0);
+
+        keyring.remove_secret(101).unwrap();
+        assert_eq!(keyring.stats().total_secrets, 0);
     }
 }

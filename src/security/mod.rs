@@ -1,14 +1,22 @@
-// SigmaOS Security Subsystem
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
+
+pub mod audit;
 pub mod capability;
-pub mod hardening;
+pub mod integrity;
+pub mod mac;
+pub mod obfuscator;
+pub mod phantom;
+pub mod pki;
 pub mod pledge;
+pub mod secrets;
+pub mod securelevels;
+pub mod unveil;
 pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
-};
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
-};
+pub use obfuscator::{SovereignCodeHardener, SovereignThreatDetector};
+pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
+pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};

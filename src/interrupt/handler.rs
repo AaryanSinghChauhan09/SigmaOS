@@ -7,51 +7,35 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
 /// Interrupt number
 pub type InterruptNumber = u8;
 
-/// Standard x86/x64 Exceptions and Hardware Interrupt vectors
-#[repr(u32)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ExceptionVector {
-    DivideByZero = 0,
-    Debug = 1,
-    NonMaskableInterrupt = 2,
-    Breakpoint = 3,
-    Overflow = 4,
-    BoundRangeExceeded = 5,
-    InvalidOpcode = 6,
-    DeviceNotAvailable = 7,
-    DoubleFault = 8,
-    CoprocessorSegmentOverrun = 9,
-    InvalidTSS = 10,
-    SegmentNotPresent = 11,
-    StackSegmentFault = 12,
-    GeneralProtectionFault = 13,
-    PageFault = 14,
-    X87FloatingPointException = 16,
-    AlignmentCheck = 17,
-    MachineCheck = 18,
-    SIMDFloatingPointException = 19,
-    VirtualizationException = 20,
-    SecurityException = 30,
-    SpuriousInterrupt = 39,
+/// Interrupt vector (0-255)
+pub type InterruptVector = u8;
+
+/// Interrupt handler trait (OOP interface)
+pub trait InterruptHandler {
+    /// Handle interrupt
+    fn handle(&mut self, interrupt: InterruptNumber) -> InterruptResult;
+    /// Enable interrupt
+    fn enable(&mut self, interrupt: InterruptNumber) -> Result<(), InterruptError>;
+    /// Disable interrupt
+    fn disable(&mut self, interrupt: InterruptNumber) -> Result<(), InterruptError>;
+    /// Get handler info
+    fn info(&self) -> InterruptHandlerInfo;
 }
 
+/// Interrupt result
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptResult {
     Handled = 0,
     Ignored = 1,
-    ChainNext = 2,
+    Deferred = 2,
     Error = 3,
 }
 
-/// Models the complete x86_64 General Purpose and Segment CPU Register Set
+/// Interrupt error types
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptError {
@@ -63,9 +47,12 @@ pub enum InterruptError {
     HandlerNotFound = 5,
 }
 
-pub trait InterruptHandler {
-    fn id(&self) -> InterruptNumber;
-    fn handle(&mut self, regs: &mut RegisterSet) -> InterruptResult;
+/// Interrupt handler info
+#[repr(C)]
+pub struct InterruptHandlerInfo {
+    pub handler_type: HandlerType,
+    pub priority: Priority,
+    pub capability: HandlerCapability,
 }
 
 impl InterruptHandlerInfo {
@@ -92,7 +79,7 @@ pub enum HandlerType {
     Custom = 7,
 }
 
-/// Priority level (standard interrupt task priority)
+/// Priority level
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
@@ -226,8 +213,10 @@ impl InterruptDescriptor {
 
 /// Simple interrupt handler (OOP: Concrete handler class)
 pub struct SimpleInterruptHandler {
-    pub vector: InterruptNumber,
-    pub trigger_count: u32,
+    pub handler_type: HandlerType,
+    pub priority: Priority,
+    pub capability: HandlerCapability,
+    pub handle_count: AtomicUsize,
 }
 
 impl SimpleInterruptHandler {
@@ -237,8 +226,10 @@ impl SimpleInterruptHandler {
         capability: HandlerCapability,
     ) -> Self {
         SimpleInterruptHandler {
-            vector,
-            trigger_count: 0,
+            handler_type,
+            priority,
+            capability,
+            handle_count: AtomicUsize::new(0),
         }
     }
 }
@@ -248,21 +239,26 @@ impl InterruptHandler for SimpleInterruptHandler {
         self.handle_count.fetch_add(1, Ordering::SeqCst);
         InterruptResult::Handled
     }
-}
 
-/// Dynamic descriptor tracking interrupt routing
-pub struct InterruptDescriptor {
-    pub vector: InterruptNumber,
-    pub enabled: AtomicBool,
-    pub masked: AtomicBool,
-}
+    fn enable(&mut self, _interrupt: InterruptNumber) -> Result<(), InterruptError> {
+        if !self.capability.can_enable {
+            return Err(InterruptError::PermissionDenied);
+        }
+        Ok(())
+    }
 
-impl InterruptDescriptor {
-    pub fn new(vector: InterruptNumber) -> Self {
-        InterruptDescriptor {
-            vector,
-            enabled: AtomicBool::new(true),
-            masked: AtomicBool::new(false),
+    fn disable(&mut self, _interrupt: InterruptNumber) -> Result<(), InterruptError> {
+        if !self.capability.can_disable {
+            return Err(InterruptError::PermissionDenied);
+        }
+        Ok(())
+    }
+
+    fn info(&self) -> InterruptHandlerInfo {
+        InterruptHandlerInfo {
+            handler_type: self.handler_type,
+            priority: self.priority,
+            capability: self.capability,
         }
     }
 }
@@ -285,19 +281,17 @@ pub trait InterruptController {
     fn disable_interrupt(&mut self, interrupt: InterruptNumber) -> Result<(), InterruptError>;
     /// Get controller statistics
     fn stats(&self) -> InterruptStats;
-    /// Get custom descriptor priority
-    fn get_priority(&self, interrupt: InterruptNumber) -> Option<Priority>;
 }
 
 /// Interrupt statistics
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InterruptStats {
-    pub total_interrupts_dispatched: u64,
-    pub spurious_count: u64,
-    pub double_faults: u64,
-    pub page_faults: u64,
-    pub gpf_faults: u64,
+    pub total_interrupts: u64,
+    pub handled_interrupts: u64,
+    pub ignored_interrupts: u64,
+    pub error_interrupts: u64,
+    pub handler_counts: [u64; 256],
 }
 
 impl InterruptStats {
@@ -472,228 +466,53 @@ impl InterruptController for PIC {
     fn stats(&self) -> InterruptStats {
         self.stats
     }
-
-    fn get_priority(&self, interrupt: InterruptNumber) -> Option<Priority> {
-        if let Some(ref descriptor) = self.descriptors[interrupt as usize] {
-            if let Some(handler_index) = descriptor.handler {
-                if let Some(Some(ref handler)) = self.handlers.get(handler_index) {
-                    return Some(handler.info().priority);
-                }
-            }
-        }
-        None
-    }
 }
 
-// =========================================================================
-// Advanced Interrupt Time Sequence Logging, Preemption, Nesting
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TraceEventType {
-    InterruptArrived,
-    InterruptDispatched,
-    InterruptPreempted,
-    InterruptCompleted,
-    InterruptDeferred,
-    InterruptFlushed,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct InterruptTrace {
-    pub timestamp: u64,
-    pub event_type: TraceEventType,
-    pub interrupt_number: InterruptNumber,
-    pub priority: Priority,
-}
-
-/// Advanced Interrupt manager supporting CLI/STI, Nesting, Preemption and ETW/ftrace Time Sequencing
+/// Interrupt manager (OOP: Manager class)
 pub struct InterruptManager {
-    pub controllers: Vec<Option<Box<dyn InterruptController>>>,
-    pub active_controller: AtomicUsize,
-    // Conforming x86/ARM/Linux kernel additions
-    pub global_interrupts_enabled: AtomicBool,
-    pub execution_stack: Vec<InterruptNumber>,
-    pub pending_queue: Vec<InterruptNumber>,
-    pub trace_log: Vec<InterruptTrace>,
-    pub trace_counter: AtomicUsize,
+    controllers: Vec<Option<Box<dyn InterruptController>>>,
+    active_controller: AtomicUsize,
 }
 
 impl InterruptManager {
     pub fn new() -> Self {
-        let mut descriptors = Vec::new();
-        for i in 0..256 {
-            descriptors.push(InterruptDescriptor::new(i as u32));
-        }
-
         InterruptManager {
             controllers: Vec::new(),
             active_controller: AtomicUsize::new(0),
-            global_interrupts_enabled: AtomicBool::new(true),
-            execution_stack: Vec::new(),
-            pending_queue: Vec::new(),
-            trace_log: Vec::new(),
-            trace_counter: AtomicUsize::new(0),
         }
     }
 
-    pub fn register_handler(&mut self, handler: Box<dyn InterruptHandler>) {
-        self.handlers.push(handler);
+    pub fn add_controller(&mut self, controller: Box<dyn InterruptController>) -> usize {
+        let index = self.controllers.len();
+        self.controllers.push(Some(controller));
+        index
     }
 
-    /// Verifies if a virtual memory address is canonical under AMD64 architecture (bits 48 to 63 must sign-extend bit 47)
-    pub fn is_canonical_address(address: u64) -> bool {
-        let sign_bit = (address >> 47) & 1;
-        let upper_bits = address >> 48;
-        if sign_bit == 0 {
-            upper_bits == 0
-        } else {
-            upper_bits == 0xFFFF
-        }
+    pub fn set_active_controller(&self, index: usize) {
+        self.active_controller.store(index, Ordering::SeqCst);
     }
 
-    /// Simulates standard hardware CLI (Disable Interrupts)
-    pub fn cli(&self) {
-        self.global_interrupts_enabled.store(false, Ordering::SeqCst);
-    }
-
-    /// Simulates standard hardware STI (Enable Interrupts) with deferred queue flushing
-    pub fn sti(&mut self) {
-        self.global_interrupts_enabled.store(true, Ordering::SeqCst);
-        let timestamp = self.trace_counter.fetch_add(1, Ordering::SeqCst) as u64;
-
-        // Flush deferred pending interrupts
-        if !self.pending_queue.is_empty() {
-            println!("[interrupt-manager] Re-enabled global interrupts (STI). Flushing pending queue...");
-
-            // Re-order pending queue by priority descending (standard APIC/GIC behavior)
-            let mut ordered_pending = Vec::new();
-            while let Some(irq) = self.pending_queue.pop() {
-                ordered_pending.push(irq);
-            }
-
-            let manager_ptr = self as *mut Self;
-            for irq in ordered_pending {
-                unsafe {
-                    let trace_evt = InterruptTrace {
-                        timestamp,
-                        event_type: TraceEventType::InterruptFlushed,
-                        interrupt_number: irq,
-                        priority: (*manager_ptr).get_irq_priority(irq).unwrap_or(Priority::Normal),
-                    };
-                    (*manager_ptr).trace_log.push(trace_evt);
-                    (*manager_ptr).dispatch_interrupt(irq);
-                }
-            }
-        }
-    }
-
-    pub fn get_irq_priority(&self, interrupt: InterruptNumber) -> Option<Priority> {
+    pub fn dispatch_interrupt(&mut self, interrupt: InterruptNumber) -> InterruptResult {
         let active = self.active_controller.load(Ordering::SeqCst);
         if active < self.controllers.len() {
-            if let Some(ref controller) = self.controllers[active] {
-                return controller.get_priority(interrupt);
-            }
-        }
-        None
-    }
-
-    /// Advanced stateful Priority-conforming preemption and nesting dispatch loop
-    pub fn dispatch_interrupt(&mut self, interrupt: InterruptNumber) -> InterruptResult {
-        let timestamp = self.trace_counter.fetch_add(1, Ordering::SeqCst) as u64;
-        let priority = self.get_irq_priority(interrupt).unwrap_or(Priority::Normal);
-
-        // Record arrival trace
-        self.trace_log.push(InterruptTrace {
-            timestamp,
-            event_type: TraceEventType::InterruptArrived,
-            interrupt_number: interrupt,
-            priority,
-        });
-
-        // 1. If global interrupts are globally disabled (CLI), queue it as pending
-        if !self.global_interrupts_enabled.load(Ordering::SeqCst) {
-            println!("[interrupt-manager] Globally disabled. Deferring IRQ #{} to pending queue.", interrupt);
-            self.pending_queue.push(interrupt);
-            self.trace_log.push(InterruptTrace {
-                timestamp,
-                event_type: TraceEventType::InterruptDeferred,
-                interrupt_number: interrupt,
-                priority,
-            });
-            return InterruptResult::Deferred;
-        }
-
-        // 2. Priority task masking / preemption checking
-        let mut should_preempt = true;
-        if let Some(&current_running_irq) = self.execution_stack.last() {
-            let current_priority = self.get_irq_priority(current_running_irq).unwrap_or(Priority::Normal);
-            if priority <= current_priority {
-                // Task priority register (TPR) rejects preemption. Defer to pending queue.
-                println!(
-                    "[interrupt-manager] Rejecting preemption: incoming IRQ #{} priority ({:?}) <= current IRQ #{} priority ({:?})",
-                    interrupt, priority, current_running_irq, current_priority
-                );
-                self.pending_queue.push(interrupt);
-                self.trace_log.push(InterruptTrace {
-                    timestamp,
-                    event_type: TraceEventType::InterruptDeferred,
-                    interrupt_number: interrupt,
-                    priority,
-                });
-                return InterruptResult::Deferred;
+            if let Some(ref mut controller) = self.controllers[active] {
+                controller.dispatch(interrupt)
             } else {
-                // High-priority interrupt preempts/nests lower-priority active interrupt
-                println!(
-                    "[interrupt-manager] NESTING/PREEMPTION: incoming IRQ #{} ({:?}) preempts active IRQ #{} ({:?})",
-                    interrupt, priority, current_running_irq, current_priority
-                );
-                self.trace_log.push(InterruptTrace {
-                    timestamp,
-                    event_type: TraceEventType::InterruptPreempted,
-                    interrupt_number: current_running_irq,
-                    priority: current_priority,
-                });
-            }
-        }
-
-        // 3. Dispatch the interrupt
-        self.execution_stack.push(interrupt);
-        self.trace_log.push(InterruptTrace {
-            timestamp,
-            event_type: TraceEventType::InterruptDispatched,
-            interrupt_number: interrupt,
-            priority,
-        });
-
-        let active = self.active_controller.load(Ordering::SeqCst);
-        let result = if active < self.controllers.len() {
-            let controllers_ptr = &mut self.controllers as *mut Vec<Option<Box<dyn InterruptController>>>;
-            unsafe {
-                if let Some(Some(ref mut controller)) = (*controllers_ptr).get_mut(active) {
-                    controller.dispatch(interrupt)
-                } else {
-                    InterruptResult::Error
-                }
+                InterruptResult::Error
             }
         } else {
             InterruptResult::Error
-        };
-
-        // 4. Complete interrupt and pop context
-        self.execution_stack.pop();
-        self.trace_log.push(InterruptTrace {
-            timestamp,
-            event_type: TraceEventType::InterruptCompleted,
-            interrupt_number: interrupt,
-            priority,
-        });
-
-        result
+        }
     }
 
-    pub fn get_stats(&self) -> InterruptStats {
-        self.stats
+    pub fn get_stats(&self) -> Vec<InterruptStats> {
+        let mut stats = Vec::new();
+        for controller_option in &self.controllers {
+            if let Some(ref controller) = *controller_option {
+                stats.push(controller.stats());
+            }
+        }
+        stats
     }
 }
 

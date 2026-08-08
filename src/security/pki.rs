@@ -1,9 +1,5 @@
 #![no_std]
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
 /// OOP-based PKI System for SigmaOS
 /// Based on Ideas-999-Structured: Security & Sovereignty Item 552
 /// Implements certificate management and PKI operations
@@ -150,8 +146,8 @@ impl PKIManager for SimplePKIManager {
     }
 
     fn revoke_certificate(&mut self, id: CertificateID) -> Result<(), PKIError> {
-        for i in 0..self.certificates.len() {
-            if let Some(Some(ref cert)) = self.certificates.get(i) {
+        for cert_option in &self.certificates {
+            if let Some(ref cert) = *cert_option {
                 if cert.id() == id {
                     self.revoked.push(id);
                     return Ok(());
@@ -218,11 +214,9 @@ impl CRL for SimpleCRL {
     }
 
     fn is_revoked(&self, cert_id: CertificateID) -> bool {
-        for i in 0..self.revoked.len() {
-            if let Some(&(id, _)) = self.revoked.get(i) {
-                if id == cert_id {
-                    return true;
-                }
+        for &(id, _) in &self.revoked {
+            if id == cert_id {
+                return true;
             }
         }
         false
@@ -238,13 +232,45 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_simple_certificate() {
+        let cert =
+            SimpleCertificate::new(101, CertificateType::EndEntity, b"SigmaUser", b"SigmaRoot");
+        assert_eq!(cert.id(), 101);
+        assert_eq!(cert.certificate_type(), CertificateType::EndEntity);
+        assert_eq!(cert.subject(), b"SigmaUser");
+        assert_eq!(cert.issuer(), b"SigmaRoot");
+        assert!(cert.is_valid());
+    }
+
+    #[test]
     fn test_simple_pki_manager() {
         let mut manager = SimplePKIManager::new();
-        let cert = SimpleCertificate::new(1, CertificateType::Root, b"Subject", b"Issuer");
-        let id = manager.issue_certificate(Box::new(cert)).unwrap();
-        assert_eq!(id, 1);
+        let cert = Box::new(SimpleCertificate::new(
+            101,
+            CertificateType::EndEntity,
+            b"SigmaUser",
+            b"SigmaRoot",
+        ));
 
-        let retrieved = manager.get_certificate(1).unwrap();
-        assert_eq!(retrieved.subject(), b"Subject");
+        let id = manager.issue_certificate(cert).unwrap();
+        assert_eq!(id, 101);
+
+        assert!(manager.verify_certificate(101, 1).unwrap());
+
+        manager.revoke_certificate(101).unwrap();
+        assert!(!manager.verify_certificate(101, 1).unwrap());
+    }
+
+    #[test]
+    fn test_simple_crl() {
+        let mut crl = SimpleCRL::new();
+        assert!(!crl.is_revoked(101));
+
+        crl.add_to_crl(101, 1);
+        assert!(crl.is_revoked(101));
+
+        let current_crl = crl.get_crl();
+        assert_eq!(current_crl.len(), 1);
+        assert_eq!(current_crl[0], (101, 1));
     }
 }

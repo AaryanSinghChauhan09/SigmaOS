@@ -1,6 +1,5 @@
 #![no_std]
 
-use core::mem;
 /// OOP-based Mandatory Access Control for SigmaOS
 /// Implements MAC using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -395,8 +394,8 @@ impl MACEngine for SimpleMACEngine {
         }
 
         let mut index = None;
-        for i in 0..self.contexts.len() {
-            if let Some(Some(ref context)) = self.contexts.get(i) {
+        for (i, context_option) in self.contexts.iter().enumerate() {
+            if let Some(ref context) = *context_option {
                 if context.id == id {
                     index = Some(i);
                     break;
@@ -454,18 +453,44 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_simple_mac_engine() {
-        let cap = EngineCapability::full();
-        let mut engine = SimpleMACEngine::new(cap);
-        let ctx_id = engine.create_context(
-            SecurityLevel::Medium,
-            SecurityDomain::System,
-            ContextCapability::full(),
-        ).unwrap();
+    fn test_security_context_and_mls_policy() {
+        let capability = ContextCapability::full();
+        let context =
+            SecurityContext::new(1, SecurityLevel::Medium, SecurityDomain::User, capability);
+
+        assert_eq!(context.id, 1);
+        assert_eq!(context.level, SecurityLevel::Medium);
+        assert!(context.capability.can_read);
+
         let policy_cap = PolicyCapability::full();
         let policy = MLSPolicy::new(SecurityLevel::Medium, policy_cap);
+        assert!(policy.check(&context, SecurityOperation::Read));
+
+        let high_policy = MLSPolicy::new(SecurityLevel::High, policy_cap);
+        assert!(!high_policy.check(&context, SecurityOperation::Read));
+    }
+
+    #[test]
+    fn test_simple_mac_engine() {
+        let engine_cap = EngineCapability::full();
+        let mut engine = SimpleMACEngine::new(engine_cap);
+
+        let context_cap = ContextCapability::full();
+        let context_id = engine
+            .create_context(SecurityLevel::Medium, SecurityDomain::User, context_cap)
+            .unwrap();
+        assert_eq!(context_id, 1);
+
+        let policy_cap = PolicyCapability::full();
+        let policy = MLSPolicy::new(SecurityLevel::High, policy_cap);
         engine.register_policy(Box::new(policy)).unwrap();
 
-        assert!(engine.check_access(ctx_id, SecurityOperation::Read));
+        assert!(!engine.check_access(1, SecurityOperation::Read));
+
+        let stats = engine.stats();
+        assert_eq!(stats.total_contexts, 1);
+        assert_eq!(stats.total_policies, 1);
+        assert_eq!(stats.access_checks, 1);
+        assert_eq!(stats.access_denied, 1);
     }
 }

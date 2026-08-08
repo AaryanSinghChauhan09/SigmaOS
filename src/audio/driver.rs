@@ -1,13 +1,16 @@
-use crate::klib::Vec;
-/// OOP-based Audio Driver for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 71
-/// Implements audio device management and playback
+// OOP-based Audio Driver for SigmaOS
+// Implements audio device management and playback under `#![no_std]`.
+
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AudioDeviceID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioType {
     Playback = 0,
     Capture = 1,
@@ -15,7 +18,7 @@ pub enum AudioType {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioError {
     Success = 0,
     NotFound = 1,
@@ -31,7 +34,6 @@ pub trait AudioDevice {
     fn initialize(&mut self) -> Result<(), AudioError>;
 }
 
-#[repr(C)]
 pub struct SimpleAudioDevice {
     pub id: AudioDeviceID,
     pub name: [u8; 64],
@@ -43,9 +45,8 @@ impl SimpleAudioDevice {
     pub fn new(id: AudioDeviceID, name: &[u8], audio_type: AudioType, sample_rate: u32) -> Self {
         let mut name_array = [0u8; 64];
         let name_len = name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+
         SimpleAudioDevice {
             id,
             name: name_array,
@@ -89,7 +90,6 @@ pub trait AudioManager {
     fn list_devices(&self) -> Vec<AudioDeviceID>;
 }
 
-#[repr(C)]
 pub struct SimpleAudioManager {
     pub devices: Vec<Option<Box<dyn AudioDevice>>>,
     pub next_id: AtomicUsize,
@@ -101,6 +101,12 @@ impl SimpleAudioManager {
             devices: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAudioManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -157,7 +163,6 @@ pub trait AudioMixer {
     fn mute(&mut self, device_id: AudioDeviceID, muted: bool) -> Result<(), AudioError>;
 }
 
-#[repr(C)]
 pub struct SimpleAudioMixer {
     pub volumes: Vec<(AudioDeviceID, AtomicUsize, AtomicUsize)>,
 }
@@ -167,6 +172,12 @@ impl SimpleAudioMixer {
         SimpleAudioMixer {
             volumes: Vec::new(),
         }
+    }
+}
+
+impl Default for SimpleAudioMixer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -219,7 +230,6 @@ pub trait AudioStream {
     fn read_samples(&mut self, stream_id: usize, buffer: &mut [u8]) -> Result<usize, AudioError>;
 }
 
-#[repr(C)]
 pub struct SimpleAudioStream {
     pub streams: Vec<(usize, AudioDeviceID, u8, u32)>,
     pub next_id: AtomicUsize,
@@ -231,6 +241,12 @@ impl SimpleAudioStream {
             streams: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAudioStream {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -252,5 +268,24 @@ impl AudioStream for SimpleAudioStream {
 
     fn read_samples(&mut self, _stream_id: usize, _buffer: &mut [u8]) -> Result<usize, AudioError> {
         Ok(0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_audio_driver_lifecycle() {
+        let mut manager = SimpleAudioManager::new();
+        let device = SimpleAudioDevice::new(12, b"SovereignHeadphones", AudioType::Playback, 48000);
+
+        manager.register_device(Box::new(device)).unwrap();
+        assert_eq!(manager.list_devices().len(), 1);
+
+        let default_dev = manager.get_default_playback().unwrap();
+        assert_eq!(default_dev.id(), 12);
+        assert_eq!(default_dev.name(), b"SovereignHeadphones");
+        assert_eq!(default_dev.sample_rate(), 48000);
     }
 }
