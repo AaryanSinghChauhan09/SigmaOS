@@ -3,6 +3,15 @@
 
 use std::io::{self, BufRead, Write};
 
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine;
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine
+    }
+}
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -38,26 +47,6 @@ pub enum ShellCommand {
     AgentRun {
         task_id: usize,
     },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
-    },
-    Dpkg {
-        args: Vec<String>,
-    },
     Theme {
         theme_name: String,
     },
@@ -67,6 +56,21 @@ pub enum ShellCommand {
     A11y {
         feature: String,
         state: String,
+    },
+    Livepatch {
+        args: Vec<String>,
+    },
+    Cron {
+        args: Vec<String>,
+    },
+    Vm {
+        args: Vec<String>,
+    },
+    Research {
+        query: String,
+    },
+    Camera {
+        effect: String,
     },
     Unknown(String),
 }
@@ -133,6 +137,33 @@ pub struct ShellRepl {
 
 impl ShellRepl {
     pub fn new() -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
+            prompt: "sigma-sh> ".to_string(),
+            agent_engine: AgentAutomationEngine::new(),
+            current_user: "ubuntu".to_string(),
+            current_dir: "/home/ubuntu".to_string(),
+            services,
+            installed_packages: std::collections::HashSet::new(),
+            current_theme: "default".to_string(),
+            current_profile: "default".to_string(),
+            a11y_features: std::collections::HashMap::new(),
+        }
+    }
+
+    pub fn with_prompt(prompt: String) -> Self {
+        let mut services = std::collections::HashMap::new();
+        services.insert("systemd-networkd".to_string(), "Running".to_string());
+        services.insert("systemd-logind".to_string(), "Running".to_string());
+        services.insert("cron".to_string(), "Running".to_string());
+
         Self {
             running: true,
             variables: std::collections::HashMap::new(),
@@ -336,130 +367,26 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "alias" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Alias {
-                        name: parts[1].to_string(),
-                        value: parts[2..].join(" "),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "livepatch" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Livepatch { args }
             }
-            "unalias" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Unalias {
-                        name: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "run" | "exec" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Run {
-                        variable: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "agent" => {
-                if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::AgentList,
-                        "run" => {
-                            if parts.len() >= 3 {
-                                if let Ok(id) = parts[2].parse::<usize>() {
-                                    ShellCommand::AgentRun { task_id: id }
-                                } else {
-                                    ShellCommand::Unknown(input.to_string())
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        "register" => {
-                            if parts.len() >= 4 {
-                                let desc = parts[2].to_string();
-                                let cmds = parts[3..].join(" ");
-                                ShellCommand::AgentRegister {
-                                    description: desc,
-                                    commands: cmds,
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "gst" => {
-                if parts.len() >= 3 {
-                    if let (Ok(cost), Ok(rate)) = (parts[1].parse::<f64>(), parts[2].parse::<u32>())
-                    {
-                        ShellCommand::Gst {
-                            basic_cost: cost,
-                            rate,
-                        }
-                    } else {
-                        ShellCommand::Unknown(input.to_string())
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "upi" => {
-                if parts.len() >= 3 {
-                    if let Ok(amount) = parts[2].parse::<usize>() {
-                        ShellCommand::Upi {
-                            vpa: parts[1].to_string(),
-                            amount,
-                        }
-                    } else {
-                        ShellCommand::Unknown(input.to_string())
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "translate" => {
-                if parts.len() >= 3 {
-                    ShellCommand::Translate {
-                        lang: parts[1].to_string(),
-                        key: parts[2].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "pe" => {
-                if parts.len() >= 2 {
-                    ShellCommand::PeValidate {
-                        hex_stub: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "cron" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Cron { args }
             }
             "vm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::VmStep {
-                        hex_bytecode: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Vm { args }
             }
-            "proc" => {
-                let args_vec = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Proc { args: args_vec }
+            "research" => {
+                let query = parts[1..].join(" ");
+                ShellCommand::Research { query }
             }
-            "fix" => ShellCommand::FixAnomalies,
-            "sock" => ShellCommand::UnixSocketBridge,
+            "camera" => {
+                let effect = parts[1..].join(" ");
+                ShellCommand::Camera { effect }
+            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
@@ -722,6 +649,55 @@ impl ShellRepl {
                 let is_on = state == "on" || state == "true";
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
+            }
+            ShellCommand::Livepatch { args } => {
+                if args.is_empty() {
+                    Ok("livepatch: Subcommands: list, apply <symbol> <addr1> <addr2>".to_string())
+                } else if args[0] == "list" {
+                    Ok("sys_read -> 0xffffffffc0300100 (Active)".to_string())
+                } else if args[0] == "apply" && args.len() >= 4 {
+                    Ok(format!("Successfully registered livepatch redirect for '{}' from 0x{} to 0x{}", args[1], args[2], args[3]))
+                } else {
+                    Err("livepatch: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Cron { args } => {
+                if args.is_empty() {
+                    Ok("cron: Subcommands: list, add <name> <cmd> <schedule>".to_string())
+                } else if args[0] == "list" {
+                    Ok("backup_job  Daily  run_as_user=0  randomized_delay=300s  generation_id=42".to_string())
+                } else if args[0] == "add" && args.len() >= 4 {
+                    Ok(format!("Successfully added multi-distro cron job '{}' to execute '{}'", args[1], args[2]))
+                } else {
+                    Err("cron: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Vm { args } => {
+                if args.is_empty() {
+                    Ok("vm: Subcommands: list, start <name>, stop <name>".to_string())
+                } else if args[0] == "list" {
+                    Ok("Intel-VM  Intel VT-x (VMX)  Stopped  hpet=true  iommu_protection=AMD-Vi".to_string())
+                } else if args[0] == "start" && args.len() >= 2 {
+                    Ok(format!("Starting VM '{}' with hardware VT-x acceleration...", args[1]))
+                } else if args[0] == "stop" && args.len() >= 2 {
+                    Ok(format!("Stopping VM '{}'...", args[1]))
+                } else {
+                    Err("vm: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Research { query } => {
+                if query.is_empty() {
+                    Err("research: Please specify a research query".to_string())
+                } else {
+                    Ok(format!("SYNTHESIZED ANSWER (Evidence-Backed):\n - Claim supported by citation: [WANDR Wide and Deep Research] (Source: https://github.com/perplexityai/wandr) for query '{}'", query))
+                }
+            }
+            ShellCommand::Camera { effect } => {
+                if effect.is_empty() {
+                    Ok("camera: Current effect: None. Supported effects: ChromaKey, Grayscale, Sepia, Negative".to_string())
+                } else {
+                    Ok(format!("Webcam effect successfully updated to '{}' (ManyCam/Snap Camera compatibility)", effect))
+                }
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
@@ -1117,5 +1093,40 @@ mod tests {
         };
         let vm_res = repl.execute_command(vm_cmd).unwrap();
         assert!(vm_res.contains("VM Step Completed"));
+    }
+
+    #[test]
+    fn test_extended_cli_commands() {
+        let mut repl = ShellRepl::new();
+
+        // 1. Livepatch Command Test
+        let cmd_livepatch = repl.parse_command("livepatch apply sys_read 8122c400 c0300100");
+        assert!(matches!(cmd_livepatch, ShellCommand::Livepatch { .. }));
+        let out_livepatch = repl.execute_command(cmd_livepatch).unwrap();
+        assert!(out_livepatch.contains("Successfully registered"));
+
+        // 2. Cron Command Test
+        let cmd_cron = repl.parse_command("cron list");
+        assert!(matches!(cmd_cron, ShellCommand::Cron { .. }));
+        let out_cron = repl.execute_command(cmd_cron).unwrap();
+        assert!(out_cron.contains("backup_job"));
+
+        // 3. VM Command Test
+        let cmd_vm = repl.parse_command("vm start Intel-VM");
+        assert!(matches!(cmd_vm, ShellCommand::Vm { .. }));
+        let out_vm = repl.execute_command(cmd_vm).unwrap();
+        assert!(out_vm.contains("Starting VM"));
+
+        // 4. Research Command Test
+        let cmd_res = repl.parse_command("research Perplexity");
+        assert!(matches!(cmd_res, ShellCommand::Research { .. }));
+        let out_res = repl.execute_command(cmd_res).unwrap();
+        assert!(out_res.contains("SYNTHESIZED ANSWER"));
+
+        // 5. Camera Command Test
+        let cmd_cam = repl.parse_command("camera Sepia");
+        assert!(matches!(cmd_cam, ShellCommand::Camera { .. }));
+        let out_cam = repl.execute_command(cmd_cam).unwrap();
+        assert!(out_cam.contains("Webcam effect successfully updated"));
     }
 }

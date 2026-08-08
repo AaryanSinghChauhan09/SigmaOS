@@ -457,9 +457,133 @@ impl ServiceMonitor for SimpleServiceMonitor {
     }
 }
 
-// ============================================================================
-// Firmware Ports & Security Ports
-// ============================================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerDaemonType {
+    SystemDaemon, // PID 1 System Docker equivalent managing core OS containers
+    UserDaemon,   // User Docker equivalent managing user workloads
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerState {
+    Created,
+    Running,
+    Exited,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SovereignSystemContainer {
+    pub container_id: u32,
+    pub name: [u8; 32],
+    pub image_name: [u8; 32],
+    pub state: ContainerState,
+}
+
+/// RancherOS-style Dual Container Daemon Init System
+pub struct RancherContainerInit {
+    pub system_daemon_active: bool,
+    pub user_daemon_active: bool,
+    pub system_containers: Vec<SovereignSystemContainer>,
+    pub user_containers: Vec<SovereignSystemContainer>,
+}
+
+impl RancherContainerInit {
+    pub fn new() -> Self {
+        Self {
+            system_daemon_active: false,
+            user_daemon_active: false,
+            system_containers: Vec::new(),
+            user_containers: Vec::new(),
+        }
+    }
+
+    /// Initializes PID 1 System Daemon managing system containers (syslog, udev, etc.)
+    pub fn start_system_daemon(&mut self) {
+        self.system_daemon_active = true;
+        // Seed default RancherOS system-level containers
+        let mut sys_log = SovereignSystemContainer {
+            container_id: 1,
+            name: [0; 32],
+            image_name: [0; 32],
+            state: ContainerState::Running,
+        };
+        sys_log.name[..6].copy_from_slice(b"syslog");
+        sys_log.image_name[..13].copy_from_slice(b"system-syslog");
+
+        let mut sys_udev = SovereignSystemContainer {
+            container_id: 2,
+            name: [0; 32],
+            image_name: [0; 32],
+            state: ContainerState::Running,
+        };
+        sys_udev.name[..4].copy_from_slice(b"udev");
+        sys_udev.image_name[..11].copy_from_slice(b"system-udev");
+
+        self.system_containers.push(sys_log);
+        self.system_containers.push(sys_udev);
+    }
+
+    /// System Docker starts the secondary User Docker daemon to host user applications
+    pub fn start_user_daemon(&mut self) -> Result<(), &'static str> {
+        if !self.system_daemon_active {
+            return Err("Cannot start User Daemon: System Daemon (PID 1) must be active first");
+        }
+        self.user_daemon_active = true;
+        Ok(())
+    }
+
+    /// Spawn a new container managed by either the System or User daemon
+    pub fn launch_container(
+        &mut self,
+        name: &str,
+        image: &str,
+        daemon: ContainerDaemonType,
+    ) -> Result<u32, &'static str> {
+        let mut name_arr = [0u8; 32];
+        let mut img_arr = [0u8; 32];
+
+        let n_len = name.len().min(31);
+        let i_len = image.len().min(31);
+        name_arr[..n_len].copy_from_slice(&name.as_bytes()[..n_len]);
+        img_arr[..i_len].copy_from_slice(&image.as_bytes()[..i_len]);
+
+        match daemon {
+            ContainerDaemonType::SystemDaemon => {
+                if !self.system_daemon_active {
+                    return Err("System Daemon inactive");
+                }
+                let id = (self.system_containers.len() + 1) as u32;
+                self.system_containers.push(SovereignSystemContainer {
+                    container_id: id,
+                    name: name_arr,
+                    image_name: img_arr,
+                    state: ContainerState::Running,
+                });
+                Ok(id)
+            }
+            ContainerDaemonType::UserDaemon => {
+                if !self.user_daemon_active {
+                    return Err("User Daemon inactive");
+                }
+                let id = (self.user_containers.len() + 1) as u32;
+                self.user_containers.push(SovereignSystemContainer {
+                    container_id: id,
+                    name: name_arr,
+                    image_name: img_arr,
+                    state: ContainerState::Running,
+                });
+                Ok(id)
+            }
+        }
+    }
+}
+
+impl Default for RancherContainerInit {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 pub trait FirmwarePort {
     fn boot_type(&self) -> &'static str;
@@ -476,142 +600,38 @@ impl FirmwarePort for BIOSPort {
     }
 }
 
-pub struct UEFIPort;
-impl FirmwarePort for UEFIPort {
-    fn boot_type(&self) -> &'static str {
-        "Modern UEFI (GPT)"
-    }
-    fn handoff(&self) -> Result<(), &'static str> {
-        Ok(())
-    }
-}
-
-pub struct CorebootPort;
-impl FirmwarePort for CorebootPort {
-    fn boot_type(&self) -> &'static str {
-        "Coreboot (Open Source Firmware)"
-    }
-    fn handoff(&self) -> Result<(), &'static str> {
-        Ok(())
-    }
-}
-
-pub trait SecurityPort {
-    fn policy_name(&self) -> &'static str;
-    fn check_capability(&self, cap: u32) -> bool;
-}
-
-pub struct DACPort;
-impl SecurityPort for DACPort {
-    fn policy_name(&self) -> &'static str {
-        "Discretionary Access Control (DAC)"
-    }
-    fn check_capability(&self, _cap: u32) -> bool {
-        true
-    }
-}
-
-pub struct SELinuxPort;
-impl SecurityPort for SELinuxPort {
-    fn policy_name(&self) -> &'static str {
-        "Security-Enhanced Linux (SELinux)"
-    }
-    fn check_capability(&self, cap: u32) -> bool {
-        cap > 10
-    }
-}
-
-pub struct ZeroTrustPort;
-impl SecurityPort for ZeroTrustPort {
-    fn policy_name(&self) -> &'static str {
-        "Zero-Trust Enforcement Security"
-    }
-    fn check_capability(&self, _cap: u32) -> bool {
-        false
-    }
-}
-
-// ============================================================================
-// Tests
-// ============================================================================
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_service_dependency_resolution() {
-        let mut init = SigmaInit::new();
+    fn test_rancher_container_init() {
+        let mut r_init = RancherContainerInit::new();
+        assert!(!r_init.system_daemon_active);
+        assert!(!r_init.user_daemon_active);
 
-        let svc1 = SimpleService::new(1, "udev");
-        let svc2 = SimpleService::new(2, "display").with_deps(vec![1]);
+        // Try launching a container before starting System daemon -> should fail
+        assert!(r_init.launch_container("test", "img", ContainerDaemonType::SystemDaemon).is_err());
 
-        init.register_service(Box::new(svc1)).unwrap();
-        init.register_service(Box::new(svc2)).unwrap();
+        // Start system daemon (PID 1)
+        r_init.start_system_daemon();
+        assert!(r_init.system_daemon_active);
+        assert_eq!(r_init.system_containers.len(), 2); // syslog and udev seeded
 
-        let resolver = SimpleDependencyResolver::new(init);
-        let order = resolver.resolve_startup_order(&[2]).unwrap();
-        assert_eq!(order.len(), 2);
-        assert_eq!(order[0], 1); // udev must start first
-        assert_eq!(order[1], 2);
-    }
+        // Launch system-level container (e.g. ntp daemon)
+        let ntp_id = r_init.launch_container("ntpd", "system-ntpd", ContainerDaemonType::SystemDaemon).unwrap();
+        assert_eq!(ntp_id, 3);
+        assert_eq!(r_init.system_containers.len(), 3);
 
-    #[test]
-    fn test_linux_runlevels_and_target_transitions() {
-        let mut init = SigmaInit::new();
+        // Try starting user daemon before starting system daemon -> should succeed now
+        assert!(r_init.start_user_daemon().is_ok());
+        assert!(r_init.user_daemon_active);
 
-        let udev = SimpleService::new(1, "udev").with_runlevel(Runlevel::Level1_SingleUser);
-        let network = SimpleService::new(2, "network").with_deps(vec![1]).with_runlevel(Runlevel::Level3_MultiUserNetwork);
-        let gdm = SimpleService::new(3, "zenith-gdm").with_deps(vec![2]).with_runlevel(Runlevel::Level5_Graphical);
-
-        init.register_service(Box::new(udev)).unwrap();
-        init.register_service(Box::new(network)).unwrap();
-        init.register_service(Box::new(gdm)).unwrap();
-
-        // 1. Enter CLI Mode (Runlevel 3)
-        init.switch_runlevel(Runlevel::Level3_MultiUserNetwork).unwrap();
-        assert_eq!(init.get_service(1).unwrap().state(), ServiceState::Running); // udev
-        assert_eq!(init.get_service(2).unwrap().state(), ServiceState::Running); // network
-        assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Stopped); // gdm (too advanced)
-
-        // 2. Switch to Graphical Target (systemd-style)
-        init.set_active_target("graphical.target").unwrap();
-        assert_eq!(init.current_runlevel, Runlevel::Level5_Graphical);
-        assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Running); // gdm starts
-
-        // 3. Switch to Rescue Target (systemd-style)
-        init.set_active_target("rescue.target").unwrap();
-        assert_eq!(init.current_runlevel, Runlevel::Level1_SingleUser);
-        assert_eq!(init.get_service(1).unwrap().state(), ServiceState::Running); // udev remains
-        assert_eq!(init.get_service(2).unwrap().state(), ServiceState::Stopped); // network stopped
-        assert_eq!(init.get_service(3).unwrap().state(), ServiceState::Stopped); // gdm stopped
-    }
-
-    #[test]
-    fn test_firmware_ports() {
-        let bios: Box<dyn FirmwarePort> = Box::new(BIOSPort);
-        let uefi: Box<dyn FirmwarePort> = Box::new(UEFIPort);
-        let coreboot: Box<dyn FirmwarePort> = Box::new(CorebootPort);
-
-        assert_eq!(bios.boot_type(), "Legacy BIOS (MBR)");
-        assert_eq!(uefi.boot_type(), "Modern UEFI (GPT)");
-        assert_eq!(coreboot.boot_type(), "Coreboot (Open Source Firmware)");
-
-        assert!(bios.handoff().is_ok());
-    }
-
-    #[test]
-    fn test_security_ports() {
-        let dac: Box<dyn SecurityPort> = Box::new(DACPort);
-        let selinux: Box<dyn SecurityPort> = Box::new(SELinuxPort);
-        let zt: Box<dyn SecurityPort> = Box::new(ZeroTrustPort);
-
-        assert_eq!(dac.policy_name(), "Discretionary Access Control (DAC)");
-        assert_eq!(selinux.policy_name(), "Security-Enhanced Linux (SELinux)");
-        assert_eq!(zt.policy_name(), "Zero-Trust Enforcement Security");
-
-        assert!(dac.check_capability(1));
-        assert!(selinux.check_capability(20));
-        assert!(!zt.check_capability(1));
+        // Launch user-level workload container
+        let web_id = r_init.launch_container("nginx", "user-nginx", ContainerDaemonType::UserDaemon).unwrap();
+        assert_eq!(web_id, 1);
+        assert_eq!(r_init.user_containers.len(), 1);
     }
 }

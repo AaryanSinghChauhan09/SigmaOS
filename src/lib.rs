@@ -37,12 +37,17 @@ pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
+pub mod legal;
 pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
 pub mod process;
 pub mod productivity;
+pub mod thread;
+pub mod process;
+pub mod tools;
+pub mod remote;
 pub mod resilience;
 pub mod security;
 pub mod shell;
@@ -87,9 +92,30 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
-    ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator,
+    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime, CorebootGatewayMesh,
+    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
+    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
+    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
+    LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
+    PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, TargetPlatform,
+    TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
+    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
+    Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
+    PageAccessMode, MemoryArch, PageTableEntry, PageDirectory, DeferredProcedureCall,
+    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
+    UmsThreadState, UmsContext, SovereignKernelInternals,
+    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
+    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
+    VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
+    ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+};
+pub use container::{
+    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
+    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
+    SimpleContainer, SimpleContainerRuntime,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -133,6 +159,12 @@ pub use productivity::{
     SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
     TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
+pub use legal::{
+    ComplianceCert as LegalComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+    GlobalStandard, ComplianceStatus as LegalComplianceStatus, RegulatoryControl, InternationalComplianceTracker,
+    LabourLawConfig, StatutoryPayrollBreakdown, LabourLawCompliance, StatutoryFiling,
+    StatutoryFilingDashboard,
+};
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
@@ -156,9 +188,21 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-pub use toolchain::self_host::{ToolchainError, CompilerConfig, SelfHostingManager};
-pub use arch::cpu_sys::{
-    SegmentType as CpuSegmentType, GdtDescriptor as CpuGdtDescriptor, IdtGate as CpuIdtGate,
-    VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
-    FastSyscallDispatcher as CpuFastSyscallDispatcher,
+
+pub use thread::management::{
+    ThreadID, ThreadState as LibThreadState, ThreadAlertableState, Thread, ThreadError, SimpleThread, ThreadManager, SimpleThreadManager,
+};
+
+pub use process::spawn::{
+    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
+    CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
+};
+
+pub use tools::{
+    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode, NodeState as LibNodeState,
+    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
+    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, UserIdentity as LibUserIdentity,
+    SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
+    SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
+    SovereignIsWebsiteDown,
 };

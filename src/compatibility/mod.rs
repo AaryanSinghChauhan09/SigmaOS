@@ -7,7 +7,7 @@ pub mod relay_nexus;
 pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
-pub mod freedos;
+pub mod cross_platform_kernel;
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -59,30 +59,15 @@ pub use solid_kernel::{
     ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
 };
 
-pub use wasm_sandbox::{
-    WasmState, WasmModule, WasmSandboxEngine,
+pub use cross_platform_kernel::{
+    PageAccessMode, MemoryArch, TranslationEntry, PageDirectory, DeferredProcedureCall,
+    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
+    UmsThreadState, UmsContext, SovereignKernelInternals,
 };
 
-pub use absorb_tools::{
-    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
-    DpllSatSolver, CasObject, ContentAddressedStorage,
-};
-
-pub use tiny_core::{
-    TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
-};
-
-pub use apache_ossie::{
-    MetricAggregation, OssieMetric, OssieDimension, OssieRelationship, OssieCatalog,
-    SemanticRow, OssieInterpreter, OssieOntology,
-};
-
-pub use sovereign_suite::{
-    EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
-    FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
-};
-
-pub use gentoo::{
-    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
-    EbuildPackage, PortageEngine,
+pub use historic_linux::{
+    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
+    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
+    VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
+    ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
 };
