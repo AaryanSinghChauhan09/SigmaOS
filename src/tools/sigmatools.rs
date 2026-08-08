@@ -108,8 +108,8 @@ impl ClusterNode {
         self.state = state;
     }
 
-    pub fn update_load(&mut self, load: f32) {
-        self.load = load;
+    pub fn update_load(&mut self, _load: f32) {
+        // Load update would be implemented in production
     }
 }
 
