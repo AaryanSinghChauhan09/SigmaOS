@@ -2043,7 +2043,7 @@ impl LinuxMintEnhancements {
         self.mint_update_manager.check_updates();
     }
 
-    pub fn apply_mint_theme(&mut self, theme: &str) {
+    pub fn apply_mint_theme(&mut self, _theme: &str) {
         // Apply Mint-specific theming
     }
 }
@@ -2293,7 +2293,7 @@ impl OpenSuseZypper {
         self.cache_updated = true;
     }
 
-    pub fn install_package(&mut self, package: &str) -> Result<(), SuseError> {
+    pub fn install_package(&mut self, _package: &str) -> Result<(), SuseError> {
         if !self.cache_updated {
             return Err(SuseError::CacheNotUpdated);
         }
