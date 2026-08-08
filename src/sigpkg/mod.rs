@@ -9,8 +9,7 @@ pub mod resolver;
 pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
-pub mod universal_adapter;
-pub mod importer;
+pub mod verifier;
 
 pub use importer::{
     DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
@@ -122,24 +121,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }

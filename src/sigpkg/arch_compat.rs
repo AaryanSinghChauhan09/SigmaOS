@@ -39,7 +39,46 @@ impl AurHelper {
         Ok(build_queue)
     }
 
-    fn dfs_resolve(
+    pub fn register_remote(&mut self, name: &str, version: Version) {
+        self.remote_repository.insert(name.to_string(), version);
+    }
+
+    /// Checks for available package updates in the rolling release stream
+    pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
+        let mut updates = Vec::new();
+        for (pkg_name, installed_ver) in &self.installed_packages {
+            if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
+                if remote_ver > installed_ver {
+                    updates.push((pkg_name.clone(), *installed_ver, *remote_ver));
+                }
+            }
+        }
+        updates.sort_by(|a, b| a.0.cmp(&b.0));
+        updates
+    }
+}
+
+impl Default for RollingSyncManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Emulates parsing Pacman local database states (/var/lib/pacman/local)
+#[derive(Debug, Clone)]
+pub struct PacmanDbAdapter {
+    pub pacman_db_path: String,
+}
+
+impl PacmanDbAdapter {
+    pub fn new(db_path: &str) -> Self {
+        Self {
+            pacman_db_path: db_path.to_string(),
+        }
+    }
+
+    /// Parses Pacman formatted `/var/lib/pacman/local/pkg/desc` file into S-PKG Package metadata
+    pub fn import_legacy_pacman_package(
         &self,
         name: &str,
         queue: &mut Vec<String>,

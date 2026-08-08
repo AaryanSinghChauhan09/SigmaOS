@@ -39,3 +39,6 @@ pub use apm::{
 pub use debian::{
     DebControl, DebPackage, AptSource, DpkgStatusEntry, parse_sources_list, parse_dpkg_status,
 };
+pub use debian::{
+    DebControl, DebPackage, AptSource, DpkgStatusEntry, parse_sources_list, parse_dpkg_status,
+};

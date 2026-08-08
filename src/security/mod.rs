@@ -1,7 +1,12 @@
 // SigmaOS Security Subsystem
 pub mod capability;
 pub mod pledge;
-pub mod qubes_isolation;
+pub mod vulnerability;
+pub mod clipboard;
+pub mod intrusion;
+pub mod password;
+pub mod parrot_linux;
+pub mod selinux;
 
 pub use parrot_linux::{
     AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,

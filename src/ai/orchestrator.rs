@@ -271,19 +271,10 @@ impl AgentCommunication for SimpleAgentCommunication {
         }
     }
 
-    /// Add a dialogue turn context string and prune old turns once exceeding limit (FIFO)
-    pub fn append_context(&mut self, text: &[u8]) {
-        let mut entry = [0u8; 128];
-        let len = text.len().min(127);
-        unsafe {
-            core::ptr::copy_nonoverlapping(text.as_ptr(), entry.as_mut_ptr(), len);
-        }
-
-        self.history.push(entry);
-
-        // Slide window by removing the oldest context if exceeding max lines limit
-        while self.history.len > self.max_lines {
-            self.history.remove(0);
-        }
+    fn broadcast(&mut self, from: AgentID, message: &[u8]) {
+        let mut msg_array = [0u8; 256];
+        let msg_len = message.len().min(255);
+        msg_array[..msg_len].copy_from_slice(&message[..msg_len]);
+        self.messages.push((from, 0, msg_array));
     }
 }

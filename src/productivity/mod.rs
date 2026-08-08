@@ -1,15 +1,14 @@
 // SigmaOS Productivity Module
 pub mod gamification;
 pub mod media;
-pub mod mind_map;
 pub mod notes;
 pub mod screen_recorder;
 pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
+pub mod advanced_app_absorber;
 pub mod tmux;
-pub mod linux_bsd_tools;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -45,6 +44,5 @@ pub use terminal::{
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
 pub use tmux::{
-    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
+    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
-pub use linux_bsd_tools::{TopCommand, ProcessTaskInfo, IfconfigCommand, NetworkInterface, PingCommand, PingResult};

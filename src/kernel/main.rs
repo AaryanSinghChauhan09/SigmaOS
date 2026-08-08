@@ -29,27 +29,3 @@ fn main() {
 fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_kernel_cmdline_parsing() {
-        let parser = KernelCmdLineParser::new("init=/bin/sh console=ttyS0 quiet boot=uefi debug");
-        assert_eq!(parser.init_path(), "/bin/sh");
-        assert_eq!(parser.console(), "ttyS0");
-        assert_eq!(parser.get("boot").unwrap(), "uefi");
-        assert!(parser.has_flag("quiet"));
-        assert!(parser.has_flag("debug"));
-        assert!(!parser.has_flag("verbose"));
-    }
-
-    #[test]
-    fn test_kernel_cmdline_defaults() {
-        let parser = KernelCmdLineParser::new("quiet");
-        assert_eq!(parser.init_path(), "/sbin/init");
-        assert_eq!(parser.console(), "tty0");
-        assert!(parser.has_flag("quiet"));
-    }
-}

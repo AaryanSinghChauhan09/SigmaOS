@@ -461,21 +461,8 @@ impl CommandRegistry for SimpleCommandRegistry {
         None
     }
 
-    fn get_mut(&mut self, name: &[u8]) -> Option<&mut dyn ShellCommand> {
-        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
-        let trimmed_name = &name[..name_len];
-        for command_option in &mut *self.commands {
-            if let Some(ref mut command) = command_option {
-                if command.name() == trimmed_name {
-                    return Some(command.as_mut());
-                }
-            }
-        }
-        None
-    }
-
-    fn list(&self) -> Vec<&[u8]> {
-        let mut names = Vec::new();
+    fn list(&self) -> ShellVec<&[u8]> {
+        let mut names = ShellVec::new();
         for command_option in &*self.commands {
             if let Some(ref command) = command_option {
                 names.push(command.name());
@@ -845,8 +832,8 @@ impl CommandHistory for SimpleCommandHistory {
         }
     }
 
-    fn list(&self) -> Vec<&[u8]> {
-        let mut commands = Vec::new();
+    fn list(&self) -> ShellVec<&[u8]> {
+        let mut commands = ShellVec::new();
         for cmd in &*self.history {
             let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);

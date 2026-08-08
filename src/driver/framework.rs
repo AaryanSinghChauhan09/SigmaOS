@@ -1,6 +1,4 @@
 use core::mem;
-/// OOP-based Driver Framework for SigmaOS
-/// Based on Driver Management Roadmap (OOP-based)
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type DriverID = usize;
@@ -8,10 +6,10 @@ pub type DriverID = usize;
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverType {
-    Storage = 0,
-    Network = 1,
-    Graphics = 2,
-    Input = 3,
+    Block = 0,
+    Char = 1,
+    Network = 2,
+    Storage = 3,
 }
 
 #[repr(usize)]
@@ -60,8 +58,6 @@ pub trait Driver {
     fn dependencies(&self) -> &'static [DriverType];
 }
 
-// Specialized Polymorphic Subclasses (Traits)
-
 pub trait StorageDriver: Driver {
     fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
@@ -90,7 +86,7 @@ pub struct SimpleStorageDriver {
 
 impl SimpleStorageDriver {
     pub fn new(id: DriverID) -> Self {
-        Self {
+        SimpleStorageDriver {
             id,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
@@ -296,20 +292,21 @@ impl SimpleDriverFramework {
         }
     }
 
-    /// Verifies if all declared dependencies for a driver are active in the system
     fn verify_dependencies(&self, driver: &dyn Driver) -> bool {
-        let deps = driver.dependencies();
-        for &dep in deps {
-            let mut found = false;
-            for driver_option in self.drivers.iter() {
-                if let Some(ref d) = *driver_option {
-                    if d.driver_type() == dep && d.state() == DriverState::Active {
-                        found = true;
+        for &dep in driver.dependencies() {
+            let mut dep_found = false;
+            for option_d in self.drivers.iter() {
+                if let Some(ref d) = *option_d {
+                    // Check if matching driver is loaded
+                    let dt = d.driver_type() as usize;
+                    let dep_t = dep as usize;
+                    if dt == dep_t && d.state() == DriverState::Active {
+                        dep_found = true;
                         break;
                     }
                 }
             }
-            if !found {
+            if !dep_found {
                 return false;
             }
         }

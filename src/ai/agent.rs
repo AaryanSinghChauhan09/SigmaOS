@@ -141,6 +141,20 @@ impl AgentCapability {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AgentCapability {
+    pub value: u64,
+}
+
+impl AgentCapability {
+    pub fn full() -> Self {
+        AgentCapability { value: !0 }
+    }
+    pub fn none() -> Self {
+        AgentCapability { value: 0 }
+    }
+}
+
 /// Simple AI agent (OOP: Concrete agent class)
 #[repr(C)]
 pub struct SimpleAIAgent {
@@ -415,6 +429,11 @@ pub trait AIAgentManager {
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
     fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError>;
     fn stats(&self) -> AIStats;
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct AIStats {
+    pub failed_requests: usize,
 }
 
 #[derive(Debug, Clone, Copy)]

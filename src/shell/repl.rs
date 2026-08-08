@@ -47,6 +47,26 @@ pub enum ShellCommand {
     AgentRun {
         task_id: usize,
     },
+    Pwd,
+    WhoAmI,
+    Su {
+        username: String,
+        password: Option<String>,
+    },
+    Cat {
+        filename: String,
+    },
+    Systemctl {
+        action: String,
+        service: String,
+    },
+    Apt {
+        subcommand: String,
+        package: Option<String>,
+    },
+    Dpkg {
+        args: Vec<String>,
+    },
     Theme {
         theme_name: String,
     },
@@ -56,21 +76,6 @@ pub enum ShellCommand {
     A11y {
         feature: String,
         state: String,
-    },
-    Livepatch {
-        args: Vec<String>,
-    },
-    Cron {
-        args: Vec<String>,
-    },
-    Vm {
-        args: Vec<String>,
-    },
-    Research {
-        query: String,
-    },
-    Camera {
-        effect: String,
     },
     Unknown(String),
 }
@@ -137,28 +142,6 @@ pub struct ShellRepl {
 
 impl ShellRepl {
     pub fn new() -> Self {
-        let mut services = std::collections::HashMap::new();
-        services.insert("systemd-networkd".to_string(), "Running".to_string());
-        services.insert("systemd-logind".to_string(), "Running".to_string());
-        services.insert("cron".to_string(), "Running".to_string());
-
-        Self {
-            running: true,
-            variables: std::collections::HashMap::new(),
-            aliases: std::collections::HashMap::new(),
-            prompt: "sigma-sh> ".to_string(),
-            agent_engine: AgentAutomationEngine::new(),
-            current_user: "ubuntu".to_string(),
-            current_dir: "/home/ubuntu".to_string(),
-            services,
-            installed_packages: std::collections::HashSet::new(),
-            current_theme: "default".to_string(),
-            current_profile: "default".to_string(),
-            a11y_features: std::collections::HashMap::new(),
-        }
-    }
-
-    pub fn with_prompt(prompt: String) -> Self {
         let mut services = std::collections::HashMap::new();
         services.insert("systemd-networkd".to_string(), "Running".to_string());
         services.insert("systemd-logind".to_string(), "Running".to_string());
@@ -649,55 +632,6 @@ impl ShellRepl {
                 let is_on = state == "on" || state == "true";
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
-            }
-            ShellCommand::Livepatch { args } => {
-                if args.is_empty() {
-                    Ok("livepatch: Subcommands: list, apply <symbol> <addr1> <addr2>".to_string())
-                } else if args[0] == "list" {
-                    Ok("sys_read -> 0xffffffffc0300100 (Active)".to_string())
-                } else if args[0] == "apply" && args.len() >= 4 {
-                    Ok(format!("Successfully registered livepatch redirect for '{}' from 0x{} to 0x{}", args[1], args[2], args[3]))
-                } else {
-                    Err("livepatch: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Cron { args } => {
-                if args.is_empty() {
-                    Ok("cron: Subcommands: list, add <name> <cmd> <schedule>".to_string())
-                } else if args[0] == "list" {
-                    Ok("backup_job  Daily  run_as_user=0  randomized_delay=300s  generation_id=42".to_string())
-                } else if args[0] == "add" && args.len() >= 4 {
-                    Ok(format!("Successfully added multi-distro cron job '{}' to execute '{}'", args[1], args[2]))
-                } else {
-                    Err("cron: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Vm { args } => {
-                if args.is_empty() {
-                    Ok("vm: Subcommands: list, start <name>, stop <name>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Intel-VM  Intel VT-x (VMX)  Stopped  hpet=true  iommu_protection=AMD-Vi".to_string())
-                } else if args[0] == "start" && args.len() >= 2 {
-                    Ok(format!("Starting VM '{}' with hardware VT-x acceleration...", args[1]))
-                } else if args[0] == "stop" && args.len() >= 2 {
-                    Ok(format!("Stopping VM '{}'...", args[1]))
-                } else {
-                    Err("vm: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Research { query } => {
-                if query.is_empty() {
-                    Err("research: Please specify a research query".to_string())
-                } else {
-                    Ok(format!("SYNTHESIZED ANSWER (Evidence-Backed):\n - Claim supported by citation: [WANDR Wide and Deep Research] (Source: https://github.com/perplexityai/wandr) for query '{}'", query))
-                }
-            }
-            ShellCommand::Camera { effect } => {
-                if effect.is_empty() {
-                    Ok("camera: Current effect: None. Supported effects: ChromaKey, Grayscale, Sepia, Negative".to_string())
-                } else {
-                    Ok(format!("Webcam effect successfully updated to '{}' (ManyCam/Snap Camera compatibility)", effect))
-                }
             }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {

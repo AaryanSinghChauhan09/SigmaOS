@@ -26,6 +26,15 @@ impl PageSize {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum PageTableLevel {
+    PML4 = 0,
+    PDPT = 1,
+    PD = 2,
+    PT = 3,
+}
+
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageTableLevel { PML4 = 0, PDPT = 1, PD = 2, PT = 3 }
 

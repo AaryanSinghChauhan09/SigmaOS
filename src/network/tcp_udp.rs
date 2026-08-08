@@ -18,12 +18,29 @@ pub enum Protocol { TCP = 0, UDP = 1 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TCPState { Closed = 0, Listen = 1, SynSent = 2, SynReceived = 3, Established = 4, FinWait1 = 5, FinWait2 = 6, CloseWait = 7, Closing = 8, TimeWait = 9 }
+pub enum TCPState {
+    Closed = 0,
+    Listen = 1,
+    SynSent = 2,
+    SynReceived = 3,
+    Established = 4,
+    FinWait1 = 5,
+    FinWait2 = 6,
+    CloseWait = 7,
+    Closing = 8,
+    TimeWait = 9,
+}
 
 /// Network Errors
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NetworkError { Success = 0, InvalidSocket = 1, ConnectionFailed = 2, SendFailed = 3 }
+pub enum NetworkError {
+    Success = 0,
+    InvalidSocket = 1,
+    ConnectionFailed = 2,
+    SendFailed = 3,
+    InvalidParameter = 4,
+}
 
 pub trait Socket {
     fn id(&self) -> SocketID;
@@ -46,7 +63,6 @@ pub enum SocketOption {
     SndBuf,
 }
 
-/// Simple Socket structure with actual atomic option fields (fixes undefined fields)
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
@@ -115,10 +131,10 @@ impl BsdSocket for SimpleSocket {
 
     fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
         match opt {
-            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst) as usize),
-            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst) as usize),
-            SocketOption::RcvBuf => Ok(self.rcv_buf.load(Ordering::SeqCst) as usize),
-            SocketOption::SndBuf => Ok(self.snd_buf.load(Ordering::SeqCst) as usize),
+            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
+            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
+            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
+            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
         }
     }
 }
@@ -237,8 +253,8 @@ pub trait CongestionControl {
 
 /// RFC-5681 TCP Reno Congestion Control Engine
 pub struct RenoCongestionControl {
-    pub cwnd: u32,
-    pub ssthresh: u32,
+    pub cwnd: AtomicUsize,
+    pub ssthresh: AtomicUsize,
 }
 
 impl RenoCongestionControl {
@@ -275,9 +291,9 @@ impl CongestionControl for RenoCongestionControl {
 
 /// BBR (Bottleneck Bandwidth and RTT) Congestion Control Engine
 pub struct BBRCongestionControl {
-    pub cwnd: u32,
-    pub bw_estimate: u32,
-    pub rtt_min_ms: u32,
+    pub cwnd: AtomicUsize,
+    pub bw_estimate: AtomicUsize,
+    pub rtt_min: AtomicUsize,
 }
 
 impl BBRCongestionControl {
@@ -593,6 +609,11 @@ pub struct SimpleNetworkStack {
     pub sockets: Vec<Option<alloc::boxed::Box<dyn Socket>>>,
     pub next_id: AtomicUsize,
     pub firewall: SimpleFirewall,
+    pub congestion: RenoCongestionControl,
+    // Linux Stack Additions
+    pub netfilter: NetfilterFirewall,
+    pub routing_table: RoutingTable,
+    pub interfaces: Vec<NetworkInterface>,
 }
 
 impl SimpleNetworkStack {
