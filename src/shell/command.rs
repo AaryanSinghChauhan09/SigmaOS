@@ -714,11 +714,9 @@ impl CommandHistory for SimpleCommandHistory {
     }
 }
 
+#[cfg(target_os = "none")]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
@@ -745,8 +743,6 @@ impl<T> core::ops::DerefMut for Vec<T> {
     }
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 impl<T> Vec<T> {
     pub fn new() -> Self {
