@@ -1,16 +1,14 @@
-#![no_std]
-#![no_main]
+/// OOP-based User Authentication & Root Privilege Escalation for SigmaOS
+/// Inspired by standard Linux user administration and security policies (e.g. /etc/sudoers, Wheel group, Root ID 0)
+/// Integrates seamlessly with Security Hardening Audit Trails.
 
-/// OOP-based User Authentication for SigmaOS
-/// Based on Roadmap Item 13: User authentication
-
+use crate::klib::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type UserID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UserState { Active = 0, Inactive = 1, Locked = 2 }
 
 pub trait User {
@@ -18,10 +16,13 @@ pub trait User {
     fn username(&self) -> &[u8];
     fn state(&self) -> UserState;
     fn authenticate(&mut self, password: &[u8]) -> Result<bool, AuthError>;
+    fn is_root(&self) -> bool; // Checks if the user holds root administrative privileges (UID == 0)
+    fn is_sudo_authorized(&self) -> bool; // Checks if the user is in the wheel/sudoers group
+    fn set_sudo_authorized(&mut self, authorized: bool);
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AuthError { Success = 0, InvalidCredentials = 1, AccountLocked = 2 }
 
 #[repr(C)]
@@ -30,6 +31,7 @@ pub struct SimpleUser {
     pub username: [u8; 32],
     pub password_hash: [u8; 64],
     pub state: AtomicUsize,
+    pub in_sudo_group: core::sync::atomic::AtomicBool,
 }
 
 impl SimpleUser {
@@ -47,6 +49,7 @@ impl SimpleUser {
             username: name_array,
             password_hash: hash_array,
             state: AtomicUsize::new(UserState::Active as usize),
+            in_sudo_group: core::sync::atomic::AtomicBool::new(false),
         }
     }
 }
@@ -57,10 +60,25 @@ impl User for SimpleUser {
         let len = self.username.iter().position(|&b| b == 0).unwrap_or(32);
         &self.username[..len]
     }
-    fn state(&self) -> UserState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> UserState {
+        match self.state.load(Ordering::SeqCst) {
+            0 => UserState::Active,
+            1 => UserState::Inactive,
+            _ => UserState::Locked,
+        }
+    }
     fn authenticate(&mut self, _password: &[u8]) -> Result<bool, AuthError> {
         if self.state() == UserState::Locked { return Err(AuthError::AccountLocked); }
         Ok(true)
+    }
+    fn is_root(&self) -> bool {
+        self.id == 0 // Root holds supreme UID 0 in standard Linux systems
+    }
+    fn is_sudo_authorized(&self) -> bool {
+        self.in_sudo_group.load(Ordering::SeqCst)
+    }
+    fn set_sudo_authorized(&mut self, authorized: bool) {
+        self.in_sudo_group.store(authorized, Ordering::SeqCst);
     }
 }
 
@@ -68,15 +86,21 @@ pub trait AuthService {
     fn register_user(&mut self, user: Box<dyn User>) -> Result<UserID, AuthError>;
     fn authenticate_user(&mut self, username: &[u8], password: &[u8]) -> Result<bool, AuthError>;
     fn get_user(&self, id: UserID) -> Option<&dyn User>;
+    fn check_sudo_escalation(&mut self, user_id: UserID, audit_trail: &mut crate::security::HardenedAuditTrail) -> bool;
 }
 
 pub struct SimpleAuthService {
     users: Vec<Option<Box<dyn User>>>,
-    next_id: AtomicUsize,
 }
 
 impl SimpleAuthService {
-    pub fn new() -> Self { SimpleAuthService { users: Vec::new(), next_id: AtomicUsize::new(1) } }
+    pub fn new() -> Self { SimpleAuthService { users: Vec::new() } }
+}
+
+impl Default for SimpleAuthService {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl AuthService for SimpleAuthService {
@@ -101,31 +125,62 @@ impl AuthService for SimpleAuthService {
         }
         None
     }
-}
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+    /// Validates and logs privilege escalation (Linux /etc/sudoers wheel group simulation)
+    fn check_sudo_escalation(&mut self, user_id: UserID, audit_trail: &mut crate::security::HardenedAuditTrail) -> bool {
+        if let Some(user) = self.get_user(user_id) {
+            if user.is_root() || user.is_sudo_authorized() {
+                // Log successful privilege escalation to the cryptographically hash-chained ledger!
+                audit_trail.append_log(user_id as u64, crate::security::Permission::ProcessExec, true);
+                return true;
             }
         }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+        // Log unauthorized escalation attempt violation!
+        audit_trail.append_log(user_id as u64, crate::security::Permission::ProcessExec, false);
+        false
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_user_creation_and_root_uid() {
+        let root = SimpleUser::new(0, b"root", b"root_hash");
+        let tc = SimpleUser::new(1000, b"tc", b"tc_hash");
+
+        assert!(root.is_root());
+        assert!(!tc.is_root());
+    }
+
+    #[test]
+    fn test_sudo_wheel_privilege_escalation() {
+        let mut service = SimpleAuthService::new();
+        let mut audit = crate::security::HardenedAuditTrail::new();
+
+        let root = SimpleUser::new(0, b"root", b"r");
+        let mut tc = SimpleUser::new(1000, b"tc", b"t");
+        let guest = SimpleUser::new(1001, b"guest", b"g");
+
+        // Authorize tc for sudoers wheel group
+        tc.set_sudo_authorized(true);
+
+        service.register_user(Box::new(root)).unwrap();
+        service.register_user(Box::new(tc)).unwrap();
+        service.register_user(Box::new(guest)).unwrap();
+
+        // Root is allowed to execute administrative actions
+        assert!(service.check_sudo_escalation(0, &mut audit));
+
+        // tc (sudoers member) is allowed to escalate privileges
+        assert!(service.check_sudo_escalation(1000, &mut audit));
+
+        // guest is denied escalation privilege
+        assert!(!service.check_sudo_escalation(1001, &mut audit));
+
+        // Verify audit trail recorded everything securely with valid cryptographic chain hashes
+        assert_eq!(audit.logs.len(), 3);
+        assert!(audit.verify_integrity());
+    }
+}
