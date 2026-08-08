@@ -5,7 +5,7 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::klib::HashMap;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(test)]
 use std::sync::atomic::{AtomicUsize, Ordering};
