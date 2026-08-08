@@ -6,6 +6,7 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+#[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(test)]
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -220,256 +221,200 @@ impl DeviceObject {
     }
 }
 
-impl KernelObject for DeviceObject {
-    fn name(&self) -> &str {
-        self.base.name()
-    }
-    fn set_name(&mut self, name: &str) {
-        self.base.set_name(name);
-    }
-    fn parent(&self) -> Option<&dyn KernelObject> {
-        self.base.parent()
-    }
-    fn set_parent(&mut self, parent: Option<&dyn KernelObject>) {
-        self.base.set_parent(parent);
-    }
-    fn children(&self) -> Vec<&dyn KernelObject> {
-        self.base.children()
-    }
-    fn add_child(&mut self, child: &dyn KernelObject) {
-        self.base.add_child(child);
-    }
-    fn remove_child(&mut self, child_name: &str) -> Option<Box<dyn KernelObject>> {
-        self.base.remove_child(child_name)
-    }
-    fn kref(&self) -> &KRef {
-        self.base.kref()
-    }
-    fn as_any(&self) -> &dyn core::any::Any {
-        self
-    }
-    fn as_any_mut(&mut self) -> &mut dyn core::any::Any {
-        self
-    }
-    fn sysfs_attrs(&self) -> Vec<&str> {
-        self.base.sysfs_attrs()
-    }
-    fn sysfs_show(&self, attr: &str) -> Option<String> {
-        self.base.sysfs_show(attr)
-    }
-    fn sysfs_store(&mut self, attr: &str, value: &str) -> Result<(), ObjectError> {
-        self.base.sysfs_store(attr, value)
-    }
-}
-
-// =========================================================================
-// ADVANCED OBJECT MANAGER STRUCTURES
-// =========================================================================
+// ==========================================
+// Windows NT-Style Object Manager Subsystem
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ObpObjectType {
+pub enum NtObjectType {
     Directory,
-    SymbolicLink,
     Device,
+    SymbolicLink,
     Driver,
-    Adapter,
-    Process,
+    Section,
 }
 
-pub struct SymbolicLink {
-    pub base: KObject,
-    pub target_path: String,
+#[derive(Clone, Debug)]
+pub struct NtObject {
+    pub name: String,
+    pub object_type: NtObjectType,
+    pub target_path: Option<String>, // Symbolic link pointing to real object
 }
 
-impl SymbolicLink {
-    pub fn new(name: &str, target: &str) -> Self {
-        Self {
-            base: KObject::new(name),
-            target_path: target.to_string(),
+#[derive(Clone)]
+pub struct NtObjectDirectory {
+    pub name: String,
+    pub objects: HashMap<String, NtObject>,
+    pub subdirectories: HashMap<String, NtObjectDirectory>,
+}
+
+pub struct NtObjectManager {
+    pub root: NtObjectDirectory,
+}
+
+impl NtObjectManager {
+    pub fn new() -> Self {
+        let mut root = NtObjectDirectory {
+            name: String::from("\\"),
+            objects: HashMap::new(),
+            subdirectories: HashMap::new(),
+        };
+        // Pre-populate standard Windows-style directories
+        root.subdirectories.insert(
+            String::from("Device"),
+            NtObjectDirectory {
+                name: String::from("Device"),
+                objects: HashMap::new(),
+                subdirectories: HashMap::new(),
+            },
+        );
+        root.subdirectories.insert(
+            String::from("DosDevices"),
+            NtObjectDirectory {
+                name: String::from("DosDevices"),
+                objects: HashMap::new(),
+                subdirectories: HashMap::new(),
+            },
+        );
+        NtObjectManager { root }
+    }
+
+    /// Insert an object into the object manager namespace at a specific path (e.g. "\Device\Keyboard")
+    pub fn insert_object(&mut self, path: &str, obj: NtObject) -> Result<(), &'static str> {
+        let parts: Vec<&str> = path.split('\\').filter(|s| !s.is_empty()).collect();
+        if parts.is_empty() {
+            return Err("Invalid path");
         }
-    }
-}
 
-pub struct ObpDirectory {
-    pub base: KObject,
-    pub directory_type: ObpObjectType,
-    pub members: HashMap<String, *const dyn KernelObject>,
-}
-
-unsafe impl Send for ObpDirectory {}
-unsafe impl Sync for ObpDirectory {}
-
-impl ObpDirectory {
-    pub fn new(name: &str) -> Self {
-        Self {
-            base: KObject::new(name),
-            directory_type: ObpObjectType::Directory,
-            members: HashMap::new(),
+        let mut current_dir = &mut self.root;
+        for i in 0..parts.len() - 1 {
+            let part = parts[i];
+            if !current_dir.subdirectories.contains_key(part) {
+                current_dir.subdirectories.insert(
+                    part.to_string(),
+                    NtObjectDirectory {
+                        name: part.to_string(),
+                        objects: HashMap::new(),
+                        subdirectories: HashMap::new(),
+                    },
+                );
+            }
+            current_dir = current_dir.subdirectories.get_mut(part).unwrap();
         }
+
+        let name = parts.last().unwrap().to_string();
+        current_dir.objects.insert(name, obj);
+        Ok(())
     }
 
-    pub fn insert_object(&mut self, name: String, obj: *const dyn KernelObject) {
-        self.members.insert(name, obj);
-    }
+    /// Retrieve an object by its absolute path, resolving symbolic links/aliases recursively
+    pub fn lookup_object(&self, path: &str) -> Option<NtObject> {
+        let parts: Vec<&str> = path.split('\\').filter(|s| !s.is_empty()).collect();
+        if parts.is_empty() {
+            return None;
+        }
 
-    pub fn lookup_object(&self, name: &str) -> Option<*const dyn KernelObject> {
-        self.members.get(name).copied()
+        let mut current_dir = &self.root;
+        for i in 0..parts.len() - 1 {
+            let part = parts[i];
+            current_dir = current_dir.subdirectories.get(part)?;
+        }
+
+        let name = *parts.last().unwrap();
+        let obj = current_dir.objects.get(name)?;
+
+        if obj.object_type == NtObjectType::SymbolicLink {
+            if let Some(ref target) = obj.target_path {
+                return self.lookup_object(target);
+            }
+        }
+        Some(obj.clone())
     }
 }
 
-impl KernelObject for ObpDirectory {
-    fn name(&self) -> &str {
-        self.base.name()
-    }
-    fn set_name(&mut self, name: &str) {
-        self.base.set_name(name);
-    }
-    fn parent(&self) -> Option<&dyn KernelObject> {
-        self.base.parent()
-    }
-    fn set_parent(&mut self, parent: Option<&dyn KernelObject>) {
-        self.base.set_parent(parent);
-    }
-    fn children(&self) -> Vec<&dyn KernelObject> {
-        self.base.children()
-    }
-    fn add_child(&mut self, child: &dyn KernelObject) {
-        self.base.add_child(child);
-    }
-    fn remove_child(&mut self, child_name: &str) -> Option<Box<dyn KernelObject>> {
-        self.base.remove_child(child_name)
-    }
-    fn kref(&self) -> &KRef {
-        self.base.kref()
-    }
-    fn as_any(&self) -> &dyn core::any::Any {
-        self
-    }
-    fn as_any_mut(&mut self) -> &mut dyn core::any::Any {
-        self
-    }
-    fn sysfs_attrs(&self) -> Vec<&str> {
-        self.base.sysfs_attrs()
-    }
-    fn sysfs_show(&self, attr: &str) -> Option<String> {
-        self.base.sysfs_show(attr)
-    }
-    fn sysfs_store(&mut self, attr: &str, value: &str) -> Result<(), ObjectError> {
-        self.base.sysfs_store(attr, value)
+impl Default for NtObjectManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-/// Non-Paged Pool Memory Tracker (WDK-inspired physical pinned memory)
+// ==========================================
+// Windows-inspired Non-Paged Pool Memory & Driver Loading Subsystem
+// ==========================================
+
 pub struct NonPagedPoolMemory {
-    pub base_address: usize,
-    pub allocated_size: usize,
-    pub offsets: HashMap<String, usize>,
+    pub total_bytes: usize,
+    pub allocated_bytes: usize,
+    pub allocations: HashMap<u64, usize>, // Addr -> size
+    next_free_addr: u64,
 }
 
 impl NonPagedPoolMemory {
-    pub fn new(base: usize, size: usize) -> Self {
-        Self {
-            base_address: base,
-            allocated_size: size,
-            offsets: HashMap::new(),
+    pub fn new(capacity: usize) -> Self {
+        NonPagedPoolMemory {
+            total_bytes: capacity,
+            allocated_bytes: 0,
+            allocations: HashMap::new(),
+            next_free_addr: 0xFFFF_C000_0000_0000, // Non-paged pool canonical base (x64)
         }
     }
 
-    pub fn allocate_block(&mut self, tag: &str, size: usize) -> Result<usize, ObjectError> {
-        let mut current_total = 0;
-        for &val in self.offsets.values() {
-            current_total += val;
+    pub fn allocate(&mut self, size: usize) -> Result<u64, &'static str> {
+        if self.allocated_bytes + size > self.total_bytes {
+            return Err("OUT_OF_NON_PAGED_POOL_MEMORY");
         }
-        if current_total + size > self.allocated_size {
-            return Err(ObjectError::CapabilityDenied); // Out of pool capacity
-        }
-        let address = self.base_address + current_total;
-        self.offsets.insert(tag.to_string(), size);
-        Ok(address)
+        let addr = self.next_free_addr;
+        self.allocations.insert(addr, size);
+        self.allocated_bytes += size;
+        self.next_free_addr += size as u64;
+        Ok(addr)
+    }
+
+    pub fn free(&mut self, addr: u64) -> Result<(), &'static str> {
+        let size = self.allocations.remove(&addr).ok_or("Invalid memory address")?;
+        self.allocated_bytes -= size;
+        Ok(())
     }
 }
 
-/// Driver specific structure registering entry & unload contexts
-pub struct DriverEntryContext {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DriverState {
+    Loaded,
+    Running,
+    Unloaded,
+}
+
+pub struct DriverEntry {
     pub driver_name: String,
-    pub driver_entry_address: usize,
-    pub unload_routine: Option<fn(context_address: usize) -> Result<(), ObjectError>>,
-    pub is_loaded: bool,
+    pub registry_path: String,
+    pub non_paged_pool_addr: u64,
+    pub driver_size: usize,
+    pub state: DriverState,
 }
 
-impl DriverEntryContext {
-    pub fn new(name: &str, entry_addr: usize) -> Self {
-        Self {
+impl DriverEntry {
+    pub fn new(name: &str, registry_path: &str, pool: &mut NonPagedPoolMemory, size: usize) -> Result<Self, &'static str> {
+        let addr = pool.allocate(size)?;
+        Ok(DriverEntry {
             driver_name: name.to_string(),
-            driver_entry_address: entry_addr,
-            unload_routine: None,
-            is_loaded: false,
-        }
+            registry_path: registry_path.to_string(),
+            non_paged_pool_addr: addr,
+            driver_size: size,
+            state: DriverState::Loaded,
+        })
     }
 
-    pub fn load_driver(&mut self, unload: fn(usize) -> Result<(), ObjectError>) -> Result<(), ObjectError> {
-        self.unload_routine = Some(unload);
-        self.is_loaded = true;
+    pub fn start(&mut self) {
+        self.state = DriverState::Running;
+    }
+
+    pub fn unload(&mut self, pool: &mut NonPagedPoolMemory) -> Result<(), &'static str> {
+        if self.state == DriverState::Unloaded {
+            return Err("Driver already unloaded");
+        }
+        pool.free(self.non_paged_pool_addr)?;
+        self.state = DriverState::Unloaded;
         Ok(())
-    }
-
-    /// Dynamic unloading helper
-    pub fn unload_driver(&mut self) -> Result<(), ObjectError> {
-        if !self.is_loaded {
-            return Err(ObjectError::NotFound);
-        }
-        if let Some(unload) = self.unload_routine {
-            (unload)(self.driver_entry_address)?;
-        }
-        self.is_loaded = false;
-        Ok(())
-    }
-}
-
-/// Central Object Manager maintaining root namespace directories and symbolic links
-pub struct ObpObjectManager {
-    pub root_dir: ObpDirectory,
-    pub symbolic_links: HashMap<String, String>,
-    pub memory_pool: NonPagedPoolMemory,
-}
-
-impl ObpObjectManager {
-    pub fn new() -> Self {
-        let mut root = ObpDirectory::new("\\");
-
-        // Setup standard object directories: \Device, \DosDevices, \Driver
-        let dev_dir = Box::into_raw(Box::new(ObpDirectory::new("Device")));
-        let dos_dir = Box::into_raw(Box::new(ObpDirectory::new("DosDevices")));
-        let drv_dir = Box::into_raw(Box::new(ObpDirectory::new("Driver")));
-
-        root.insert_object("Device".to_string(), dev_dir);
-        root.insert_object("DosDevices".to_string(), dos_dir);
-        root.insert_object("Driver".to_string(), drv_dir);
-
-        Self {
-            root_dir: root,
-            symbolic_links: HashMap::new(),
-            memory_pool: NonPagedPoolMemory::new(0xFFFF800000000000, 1024 * 1024), // 1MB pool at high address canonical space
-        }
-    }
-
-    pub fn register_symbolic_link(&mut self, alias: &str, real_path: &str) {
-        self.symbolic_links.insert(alias.to_string(), real_path.to_string());
-    }
-
-    /// Resolve symbolic link alias path to the real kernel object path
-    pub fn resolve_path(&self, path: &str) -> String {
-        if let Some(real_path) = self.symbolic_links.get(path) {
-            real_path.clone()
-        } else {
-            path.to_string()
-        }
-    }
-}
-
-impl Default for ObpObjectManager {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -477,80 +422,71 @@ impl Default for ObpObjectManager {
 mod tests {
     use super::*;
 
-    static mut MOCK_UNLOAD_CALLED: bool = false;
-    fn mock_unload_routine(context_address: usize) -> Result<(), ObjectError> {
-        if context_address == 0xBAADF00D {
-            unsafe {
-                MOCK_UNLOAD_CALLED = true;
-            }
-            Ok(())
-        } else {
-            Err(ObjectError::CapabilityDenied)
-        }
+    #[test]
+    fn test_nt_object_manager_directories_and_symlinks() {
+        let mut manager = NtObjectManager::new();
+
+        // 1. Create a real device object and insert it into \Device\Keyboard
+        let keyboard_dev = NtObject {
+            name: String::from("Keyboard"),
+            object_type: NtObjectType::Device,
+            target_path: None,
+        };
+        manager.insert_object("\\Device\\Keyboard", keyboard_dev).unwrap();
+
+        // 2. Create a symbolic link in \DosDevices\KeyboardAlias pointing to \Device\Keyboard
+        let keyboard_link = NtObject {
+            name: String::from("KeyboardAlias"),
+            object_type: NtObjectType::SymbolicLink,
+            target_path: Some(String::from("\\Device\\Keyboard")),
+        };
+        manager.insert_object("\\DosDevices\\KeyboardAlias", keyboard_link).unwrap();
+
+        // 3. Look up \DosDevices\KeyboardAlias and verify it resolves to the real Keyboard Device object
+        let resolved = manager.lookup_object("\\DosDevices\\KeyboardAlias").unwrap();
+        assert_eq!(resolved.name, "Keyboard");
+        assert_eq!(resolved.object_type, NtObjectType::Device);
     }
 
     #[test]
-    fn test_obp_directory_lookup_and_traversal() {
-        let mut dev_dir = ObpDirectory::new("Device");
-        let disk = DeviceObject::new("HarddiskVolume1", 0x1111, 0x2222);
-        let disk_ptr = Box::into_raw(Box::new(disk));
+    fn test_non_paged_pool_allocation() {
+        let mut pool = NonPagedPoolMemory::new(1024);
+        assert_eq!(pool.allocated_bytes, 0);
 
-        dev_dir.insert_object("HarddiskVolume1".to_string(), disk_ptr);
+        let addr1 = pool.allocate(256).unwrap();
+        assert_eq!(addr1, 0xFFFF_C000_0000_0000);
+        assert_eq!(pool.allocated_bytes, 256);
 
-        let retrieved = dev_dir.lookup_object("HarddiskVolume1").unwrap();
-        unsafe {
-            let dev_obj = &*retrieved;
-            assert_eq!(dev_obj.name(), "HarddiskVolume1");
-        }
+        let addr2 = pool.allocate(512).unwrap();
+        assert_eq!(addr2, 0xFFFF_C000_0000_0100);
+        assert_eq!(pool.allocated_bytes, 768);
 
-        // Clean up Box memory
-        unsafe {
-            let _ = Box::from_raw(disk_ptr as *mut DeviceObject);
-        }
-    }
+        // Allocating beyond capacity should fail
+        assert!(pool.allocate(512).is_err());
 
-    #[test]
-    fn test_symbolic_link_resolution() {
-        let mut manager = ObpObjectManager::new();
-
-        // Create symbolic link: \DosDevices\C: pointing to real object \Device\HarddiskVolume1
-        manager.register_symbolic_link("\\DosDevices\\C:", "\\Device\\HarddiskVolume1");
-
-        let resolved = manager.resolve_path("\\DosDevices\\C:");
-        assert_eq!(resolved, "\\Device\\HarddiskVolume1");
-
-        let unlinked = manager.resolve_path("\\Device\\HarddiskVolume1");
-        assert_eq!(unlinked, "\\Device\\HarddiskVolume1"); // remains original
-    }
-
-    #[test]
-    fn test_non_paged_pool_allocation_audits() {
-        let mut pool = NonPagedPoolMemory::new(0xFFFF800000000000, 1024);
-
-        let tag1_addr = pool.allocate_block("IrpBuffer", 256).unwrap();
-        assert_eq!(tag1_addr, 0xFFFF800000000000);
-
-        let tag2_addr = pool.allocate_block("DpcContext", 512).unwrap();
-        assert_eq!(tag2_addr, 0xFFFF800000000100); // 0 + 256
-
-        // Try allocating beyond 1024 capacity
-        assert!(pool.allocate_block("Overflow", 512).is_err());
+        // Free allocation
+        pool.free(addr1).unwrap();
+        assert_eq!(pool.allocated_bytes, 512);
     }
 
     #[test]
     fn test_driver_entry_and_dynamic_unloading() {
-        let mut driver_ctx = DriverEntryContext::new("SovereignFileShim", 0xBAADF00D);
-        assert_eq!(driver_ctx.driver_name, "SovereignFileShim");
-        assert!(!driver_ctx.is_loaded);
+        let mut pool = NonPagedPoolMemory::new(4096);
+        let mut driver = DriverEntry::new(
+            "AcpiBattery",
+            "\\Registry\\Machine\\System\\CurrentControlSet\\Services\\AcpiBattery",
+            &mut pool,
+            2048,
+        ).unwrap();
 
-        driver_ctx.load_driver(mock_unload_routine).unwrap();
-        assert!(driver_ctx.is_loaded);
+        assert_eq!(driver.state, DriverState::Loaded);
+        assert_eq!(driver.non_paged_pool_addr, 0xFFFF_C000_0000_0000);
 
-        driver_ctx.unload_driver().unwrap();
-        assert!(!driver_ctx.is_loaded);
+        driver.start();
+        assert_eq!(driver.state, DriverState::Running);
 
-        unsafe {
-            assert!(MOCK_UNLOAD_CALLED);
-        }
+        driver.unload(&mut pool).unwrap();
+        assert_eq!(driver.state, DriverState::Unloaded);
+        assert_eq!(pool.allocated_bytes, 0);
     }
 }

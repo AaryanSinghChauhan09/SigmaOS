@@ -142,6 +142,30 @@ pub struct SnapPackage {
     pub confinement: String, // classic, strict
 }
 
+/// An Arch User Repository (AUR) package representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AurPackage {
+    pub name: String,
+    pub pkgbuild_url: String,
+    pub dependencies: Vec<String>,
+}
+
+/// A Flatpak sandboxed application representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FlatpakPackage {
+    pub app_id: String,
+    pub runtime_version: String,
+    pub sandbox_permissions: Vec<String>,
+}
+
+/// A Snap sandboxed application representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SnapPackage {
+    pub name: String,
+    pub channel: String, // stable, beta, edge
+    pub confinement: String, // classic, strict
+}
+
 /// Hardware GPU types detected on the system bus
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuType {

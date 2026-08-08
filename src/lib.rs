@@ -93,7 +93,20 @@ pub use filesystem::{
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
-    ModuleLoadError as LkmLoadError, KernelModule as LkmModule, LkmLoader, KpatchPatch, KpatchManager,
+};
+pub use klib::{
+    paging::{PageTableEntry, SimplePageTableEntry, PageTable, SimplePageTable, VirtualMemoryManager, SimpleVMM, ProcessMemory, SimpleProcessMemory},
+    buddy_allocator::{BlockID, Block, SimpleBuddyAllocator},
+    uvm::{UvmPmap, UvmAmap, UvmPageLoan, UvmError},
+};
+pub use network::{
+    EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
+    TcpStack, TcpState, NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
+    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
+    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
+    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
+    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
+    ClearLinuxFlowLoadBalancer,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
