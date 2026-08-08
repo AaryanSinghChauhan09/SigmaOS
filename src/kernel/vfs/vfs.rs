@@ -1,8 +1,10 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::format;
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -361,10 +363,192 @@ impl FilesystemMetadata {
     }
 }
 
+// ==========================================
+// 5. Sovereign Advanced Mount Manager (Linux-inspired)
+// ==========================================
+
+/// Standard Linux-inspired mount flags
+pub const MS_RDONLY: u32 = 1;       // Mount read-only
+pub const MS_NOSUID: u32 = 2;       // Ignore suid and sgid bits
+pub const MS_NODEV: u32 = 4;        // Disallow access to device special files
+pub const MS_NOEXEC: u32 = 8;       // Disallow program execution
+pub const MS_REMOUNT: u32 = 32;     // Alter flags of a mounted FS
+pub const MS_BIND: u32 = 4096;      // Create a bind mount
+pub const MS_MOVE: u32 = 8192;      // Move a subtree
+
+/// Standard Linux-inspired mount propagation modes
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MountPropagation {
+    Shared,
+    Private,
+    Slave,
+}
+
+/// Represents an active mount entry in the mount table (fstab-inspired)
+#[derive(Debug, Clone)]
+pub struct ActiveMountEntry {
+    pub spec_device_uuid: String,
+    pub mount_point: String,
+    pub fstype: String,
+    pub flags: u32,
+    pub propagation: MountPropagation,
+    pub pass_no: u32,
+}
+
+/// Highly robust Linux-inspired Mount Manager
+pub struct SovereignMountManager {
+    pub active_mount_table: BTreeMap<String, ActiveMountEntry>, // maps mount point to entry
+    pub fstab_config: BTreeMap<String, String>,                 // raw lines of /etc/fstab configuration
+    pub automount_triggers: BTreeMap<String, String>,           // maps device UUID to auto-mount target
+}
+
+impl SovereignMountManager {
+    pub fn new() -> Self {
+        Self {
+            active_mount_table: BTreeMap::new(),
+            fstab_config: BTreeMap::new(),
+            automount_triggers: BTreeMap::new(),
+        }
+    }
+
+    /// Parses a standard Linux /etc/fstab entry line (e.g. "UUID=1234-ABCD /mnt/data ext4 rw,nosuid,nodev 0 2")
+    pub fn parse_and_register_fstab_entry(&mut self, line: &str) -> Result<(), &'static str> {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() < 4 {
+            return Err("Invalid fstab entry: expected at least 4 standard fields");
+        }
+
+        let device_uuid = parts[0].to_string();
+        let mount_point = parts[1].to_string();
+        let fstype = parts[2].to_string();
+        let options = parts[3];
+
+        let mut flags = 0u32;
+        for opt in options.split(',') {
+            match opt {
+                "ro" | "rdonly" => flags |= MS_RDONLY,
+                "nosuid" => flags |= MS_NOSUID,
+                "nodev" => flags |= MS_NODEV,
+                "noexec" => flags |= MS_NOEXEC,
+                _ => {}
+            }
+        }
+
+        let entry = ActiveMountEntry {
+            spec_device_uuid: device_uuid.clone(),
+            mount_point: mount_point.clone(),
+            fstype,
+            flags,
+            propagation: MountPropagation::Private,
+            pass_no: parts.get(5).and_then(|&s| s.parse().ok()).unwrap_or(0),
+        };
+
+        self.active_mount_table.insert(mount_point, entry);
+        self.fstab_config.insert(device_uuid, line.to_string());
+        Ok(())
+    }
+
+    /// Implements Bind Mount operations (MS_BIND) and Namespace Propagation settings
+    pub fn execute_bind_mount(&mut self, source_dir: &str, target_dir: &str, propagation: MountPropagation) -> Result<(), &'static str> {
+        if source_dir.is_empty() || target_dir.is_empty() {
+            return Err("Source and target paths cannot be empty");
+        }
+
+        let entry = ActiveMountEntry {
+            spec_device_uuid: format!("BIND_SRC:{}", source_dir),
+            mount_point: target_dir.to_string(),
+            fstype: "bind".to_string(),
+            flags: MS_BIND,
+            propagation,
+            pass_no: 0,
+        };
+
+        self.active_mount_table.insert(target_dir.to_string(), entry);
+        Ok(())
+    }
+
+    /// Automount (autofs) lookup on-demand triggers
+    pub fn handle_automount_lookup(&mut self, accessed_path: &str) -> Option<String> {
+        for (trigger_path, dev_uuid) in &self.automount_triggers {
+            if accessed_path.starts_with(trigger_path.as_str()) {
+                // Auto-mount triggered! Create active entry
+                let entry = ActiveMountEntry {
+                    spec_device_uuid: dev_uuid.clone(),
+                    mount_point: trigger_path.clone(),
+                    fstype: "auto".to_string(),
+                    flags: 0,
+                    propagation: MountPropagation::Shared,
+                    pass_no: 0,
+                };
+                self.active_mount_table.insert(trigger_path.clone(), entry);
+                return Some(format!("Auto-mount triggered successfully for path '{}' mapping to UUID '{}'", accessed_path, dev_uuid));
+            }
+        }
+        None
+    }
+}
+
+impl Default for SovereignMountManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct MntOperations {}
 
 impl MntOperations {
     pub fn compare(_mnt1: &VfsMount, _mnt2: &VfsMount) -> bool {
         false
+    }
+}
+
+#[cfg(test)]
+mod mount_tests {
+    use super::*;
+
+    #[test]
+    fn test_fstab_parsing() {
+        let mut manager = SovereignMountManager::new();
+        let fstab_line = "UUID=6789-EFGH /mnt/test ext4 rw,nosuid,nodev 0 2";
+        assert!(manager.parse_and_register_fstab_entry(fstab_line).is_ok());
+
+        let entry = manager.active_mount_table.get("/mnt/test").unwrap();
+        assert_eq!(entry.spec_device_uuid, "UUID=6789-EFGH");
+        assert_eq!(entry.fstype, "ext4");
+        assert_eq!(entry.pass_no, 2);
+
+        // Flags should contain NOSUID and NODEV
+        assert_ne!(entry.flags & MS_NOSUID, 0);
+        assert_ne!(entry.flags & MS_NODEV, 0);
+        assert_eq!(entry.flags & MS_RDONLY, 0);
+    }
+
+    #[test]
+    fn test_bind_mount() {
+        let mut manager = SovereignMountManager::new();
+        assert!(manager.execute_bind_mount("/home/user", "/mnt/home", MountPropagation::Shared).is_ok());
+
+        let entry = manager.active_mount_table.get("/mnt/home").unwrap();
+        assert_eq!(entry.spec_device_uuid, "BIND_SRC:/home/user");
+        assert_eq!(entry.fstype, "bind");
+        assert_eq!(entry.flags, MS_BIND);
+        assert_eq!(entry.propagation, MountPropagation::Shared);
+    }
+
+    #[test]
+    fn test_automount() {
+        let mut manager = SovereignMountManager::new();
+        manager.automount_triggers.insert("/media/usb".to_string(), "UUID=USB-9999".to_string());
+
+        // Prior to lookup, no active mount entry exists
+        assert!(!manager.active_mount_table.contains_key("/media/usb"));
+
+        // Trigger lookup
+        let res = manager.handle_automount_lookup("/media/usb/photos/pic.jpg");
+        assert!(res.is_some());
+        assert!(res.unwrap().contains("UUID=USB-9999"));
+
+        // Active mount entry should now exist
+        assert!(manager.active_mount_table.contains_key("/media/usb"));
     }
 }
