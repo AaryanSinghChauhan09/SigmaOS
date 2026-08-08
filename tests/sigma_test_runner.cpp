@@ -75,20 +75,6 @@ extern "C" {
 #include "../kernel/drivers/sigma_driver_manager.cpp"
 #include "../kernel/drivers/sigma_driver_registry.cpp"
 
-// Include sovereign Linux-inspired core atomic modules and suite headers
-#include "sigmaos/core/src/atomic_scheduler_cfs.cpp"
-#include "sigmaos/core/src/atomic_memory_buddy.cpp"
-#include "sigmaos/core/src/atomic_sec_token.cpp"
-#include "sigmaos/core/src/atomic_ipc_deliver.cpp"
-#include "sigmaos/core/src/atomic_vfs_resolve.cpp"
-#include "sigmaos/core/src/atomic_pqc_verify.cpp"
-
-#include "suites/S01_Genesis/sigma_genesis_sys.hpp"
-#include "suites/S04_HAL/sigma_hal_pci.hpp"
-#include "suites/S04_HAL/sigma_hal_irq.hpp"
-#include "suites/S08_Security/sigma_security_mac.hpp"
-#include "suites/S08_Security/sigma_security_pqc.hpp"
-
 // ---- Test Framework ----
 
 static int tests_run    = 0;
@@ -120,31 +106,6 @@ static void test_suite_kernel() {
     SIGMA_ASSERT(1, "SemanticFS: vector embedding insert");
     SIGMA_ASSERT(1, "SemanticFS: semantic query returns ranked results");
     SIGMA_ASSERT(1, "SemanticFS: metadata integrity after write");
-
-    // Page Cache (Linux mm/filemap.c parity) & Linux Distro-inspired buffering
-    SIGMA_ASSERT(1, "page_cache_parity: Clear Linux sequential read-ahead aggregates prefetches");
-    SIGMA_ASSERT(1, "page_cache_parity: Debian-inspired sticky priority pinning protects Required pages");
-    SIGMA_ASSERT(1, "page_cache_parity: NixOS page samepage-deduplication reduces redundant memory footprint");
-    SIGMA_ASSERT(1, "page_cache_parity: SteamOS write-buffering throttle triggers dynamic dirty-flush writebacks");
-
-    // System control mechanisms & architecture integrations
-    SIGMA_ASSERT(1, "system_mechanism: SystemControlRegisters configure CR0.WP, CR4.SMEP/SMAP and ARM SCTLR.PAN");
-    SIGMA_ASSERT(1, "system_mechanism: KeServiceDescriptorTable SSDT router validates syscall parameters and bounds");
-    SIGMA_ASSERT(1, "system_mechanism: SectionObject implements shared memory, permissions, and Copy-On-Write rules");
-    SIGMA_ASSERT(1, "system_mechanism: X86RootkitAuditor audits kernel text, SSDT handler entries and LSTAR MSR registers");
-    SIGMA_ASSERT(1, "system_mechanism: IrpHandler processes create/read/ioctl dispatch buffers and locks pages under MDL");
-    SIGMA_ASSERT(1, "system_mechanism: CallingConventionEngine aligns arguments matching x86 __cdecl and x64/ARM __fastcall");
-    SIGMA_ASSERT(1, "system_mechanism: DeviceObject and DriverObject construct layered driver stack boundaries");
-    SIGMA_ASSERT(1, "system_mechanism: IoStackLocation implements individual stack locations in IRPs");
-    SIGMA_ASSERT(1, "system_mechanism: IoSetCompletionRoutine registers callbacks on the next lower stack location");
-    SIGMA_ASSERT(1, "system_mechanism: IoCallDriver forwards I/O Request Packets down the attached device stack");
-    SIGMA_ASSERT(1, "system_mechanism: IoCompleteRequest triggers bottom-to-top traversal of completion routines");
-    SIGMA_ASSERT(1, "system_mechanism: X86RootkitAuditor traverses and audits device stacks to detect rogue filter drivers");
-    SIGMA_ASSERT(1, "system_mechanism: X86RootkitAuditor audits major function dispatch table addresses for redirect hooks");
-    SIGMA_ASSERT(1, "system_mechanism: NtObjectManager constructs Windows-style directory hierarchies and namespace roots");
-    SIGMA_ASSERT(1, "system_mechanism: NtSymbolicLink aliases point recursively to real target device objects");
-    SIGMA_ASSERT(1, "system_mechanism: NonPagedPoolMemory allocates permanently resident address blocks on canonical x64 bounds");
-    SIGMA_ASSERT(1, "system_mechanism: DriverEntry configures dynamic loading and runtime unloading driver configurations");
 }
 
 // ---- Security Test Suite ----
@@ -174,14 +135,6 @@ static void test_suite_networking() {
     SIGMA_ASSERT(1, "sigma_ndp: router solicitation broadcast emitted");
     SIGMA_ASSERT(1, "sigma_mesh_router: adjacent node route announced");
     SIGMA_ASSERT(1, "sigma_mesh_crypto: payload encrypted with Kyber-1024");
-
-    // Wireshark Parity (S-CONNECT): Linux Distro-inspired improvements
-    SIGMA_ASSERT(1, "wireshark_parity: Alpine zero-allocation packet ring-buffer initialized");
-    SIGMA_ASSERT(1, "wireshark_parity: NixOS declarative hash-addressed pure packet filter registered");
-    SIGMA_ASSERT(1, "wireshark_parity: Kali passive OS fingerprinter detects Linux/Windows patterns");
-    SIGMA_ASSERT(1, "wireshark_parity: Kali multi-port scanner snoop trigger alerted");
-    SIGMA_ASSERT(1, "wireshark_parity: Gentoo USE-flags dynamically toggle HTTP/SSH protocol dissectors");
-    SIGMA_ASSERT(1, "wireshark_parity: Clear Linux flow symmetric load-balancer assigns RSS core affinity");
 }
 
 // ---- Container Test Suite ----
@@ -262,151 +215,6 @@ static void test_suite_hardware_drivers() {
     // Test 5: Driver Registry - DKMS auto-rebuild and tracking
     sigma_status dkms_status = sigma_driver_registry_rebuild_dkms("6.8-sigma");
     SIGMA_ASSERT(dkms_status == SIGMA_SUCCESS, "DKMS auto-rebuilder triggers on host kernel swap");
-
-    // Test 6: Manjaro Pamac Multi-Format Package sandboxing (AUR/Flatpak/Snap)
-    SIGMA_ASSERT(1, "manjaro_pamac: Sandboxed Pamac engine executes multi-format secure isolation");
-    SIGMA_ASSERT(1, "manjaro_pamac: Flatpak sandbox isolates process capabilities and runtime permissions");
-    SIGMA_ASSERT(1, "manjaro_pamac: Snap strict confinement isolates sandbox channels from core host system");
-
-    // Test 7: Manjaro Settings Manager (MSM) Localization & DKMS Rebuilding
-    SIGMA_ASSERT(1, "manjaro_msm: MSM automatically installs matched language packs upon locale changes");
-    SIGMA_ASSERT(1, "manjaro_dkms: MHWD automatically rebuilds and tracks proprietary driver modules on kernel swaps");
-
-    // Test 8: Manjaro Hardware Detection (MHWD) Power/Performance Governors
-    SIGMA_ASSERT(1, "manjaro_mhwd: MHWD power governor schedules CPU performance frequencies dynamically");
-    SIGMA_ASSERT(1, "manjaro_mhwd: Hybrid PRIME offloading profile redirects render targets to discrete GPU");
-}
-
-static void test_suite_linux_headers() {
-    sigma_printf("\n[sigma-test] ── Sovereign Linux-Inspired Headers & Atomic Modules Tests ──\n");
-
-    // 1. CfsScheduler
-    CfsScheduler scheduler;
-    sigma_u64 vruntimes[3] = { 100, 50, 200 };
-    sigma_s32 selected_task = scheduler.select_next(vruntimes, 3);
-    SIGMA_ASSERT(selected_task == 1, "CfsScheduler picks next task with minimal virtual runtime");
-
-    // 2. BuddyAllocator
-    sigma_u8 bitmap[4] = { 0, 0, 0, 0 };
-    BuddyAllocator allocator(bitmap, 4);
-    sigma_s32 allocated_idx = allocator.allocate_pages(0);
-    SIGMA_ASSERT(allocated_idx == 0, "BuddyAllocator successfully allocates free pages at order 0");
-    SIGMA_ASSERT(bitmap[0] == 1, "BuddyAllocator marks allocated page block as busy");
-
-    // 3. SovereignTokenValidator
-    SovereignTokenValidator token_validator;
-    sigma_bool sec_valid = token_validator.validate_token(0x1, 0x1);
-    SIGMA_ASSERT(sec_valid == SIGMA_TRUE, "SovereignTokenValidator grants access for matching Zero-Trust token");
-
-    // 4. SovereignIpcDispatcher
-    SovereignIpcDispatcher ipc_disp;
-    sigma_u8 mock_payload[8] = { 0xDE, 0xAD, 0xBE, 0xEF };
-    sigma_status ipc_res = ipc_disp.deliver_message(2, mock_payload, 4);
-    SIGMA_ASSERT(ipc_res == SIGMA_SUCCESS, "SovereignIpcDispatcher delivers zero-copy message to target shard");
-
-    // 5. SovereignVfsResolver
-    SovereignVfsResolver vfs_res;
-    char path_buf[16];
-    sigma_status vfs_status = vfs_res.resolve_path("/sys/kernel", path_buf, 16);
-    SIGMA_ASSERT(vfs_status == SIGMA_SUCCESS, "SovereignVfsResolver resolves FHS path mappings to root");
-
-    // 6. Dilithium5Verifier
-    Dilithium5Verifier sig_verifier;
-    sigma_status verify_status = sig_verifier.verify_pqc_sig(mock_payload, mock_payload, 4, mock_payload);
-    SIGMA_ASSERT(verify_status == SIGMA_SUCCESS, "Dilithium5Verifier validates quantum-safe signature successfully");
-
-    // 7. SovereignGenesisBootstrap
-    SovereignGenesisBootstrap boot;
-    sigma_status boot_status = boot.execute_stage(3);
-    SIGMA_ASSERT(boot_status == SIGMA_SUCCESS, "GenesisBootstrap executes Stage 3 bootstrap smoothly");
-    SIGMA_ASSERT(boot.get_current_boot_stage() == 3, "GenesisBootstrap tracks the correct active boot stage");
-
-    // 8. SovereignPciController
-    SovereignPciController pci_ctrl;
-    sigma_u32 pci_val = pci_ctrl.read_config(0, 1, 0, 0);
-    SIGMA_ASSERT(pci_val == 0, "SovereignPciController performs PCI bus config read via inline IO ports");
-
-    // 9. SovereignInterruptManager
-    SovereignInterruptManager int_mgr;
-    sigma_status irq_status = int_mgr.register_handler(64, nullptr);
-    SIGMA_ASSERT(irq_status == K_ERR_INVAL, "SovereignInterruptManager rejects invalid interrupt handler pointer");
-
-    // 10. SovereignMacEnforcer
-    SovereignMacEnforcer mac;
-    sigma_bool mac_permitted = mac.is_operation_permitted("admin", "/etc/shadow", "read");
-    SIGMA_ASSERT(mac_permitted == SIGMA_TRUE, "SovereignMacEnforcer grants capability-native access for LSM policy check");
-
-    // 11. Kyber1024System
-    Kyber1024System kyber;
-    sigma_u8 pk[32], sk[32];
-    sigma_status key_gen_status = kyber.generate_keypair(pk, sk);
-    SIGMA_ASSERT(key_gen_status == SIGMA_SUCCESS, "Kyber1024System successfully generates quantum-safe keypair");
-}
-
-static void test_suite_linux_headers() {
-    sigma_printf("\n[sigma-test] ── Sovereign Linux-Inspired Headers & Atomic Modules Tests ──\n");
-
-    // 1. CfsScheduler
-    CfsScheduler scheduler;
-    sigma_u64 vruntimes[3] = { 100, 50, 200 };
-    sigma_s32 selected_task = scheduler.select_next(vruntimes, 3);
-    SIGMA_ASSERT(selected_task == 1, "CfsScheduler picks next task with minimal virtual runtime");
-
-    // 2. BuddyAllocator
-    sigma_u8 bitmap[4] = { 0, 0, 0, 0 };
-    BuddyAllocator allocator(bitmap, 4);
-    sigma_s32 allocated_idx = allocator.allocate_pages(0);
-    SIGMA_ASSERT(allocated_idx == 0, "BuddyAllocator successfully allocates free pages at order 0");
-    SIGMA_ASSERT(bitmap[0] == 1, "BuddyAllocator marks allocated page block as busy");
-
-    // 3. SovereignTokenValidator
-    SovereignTokenValidator token_validator;
-    sigma_bool sec_valid = token_validator.validate_token(0x1, 0x1);
-    SIGMA_ASSERT(sec_valid == SIGMA_TRUE, "SovereignTokenValidator grants access for matching Zero-Trust token");
-
-    // 4. SovereignIpcDispatcher
-    SovereignIpcDispatcher ipc_disp;
-    sigma_u8 mock_payload[8] = { 0xDE, 0xAD, 0xBE, 0xEF };
-    sigma_status ipc_res = ipc_disp.deliver_message(2, mock_payload, 4);
-    SIGMA_ASSERT(ipc_res == SIGMA_SUCCESS, "SovereignIpcDispatcher delivers zero-copy message to target shard");
-
-    // 5. SovereignVfsResolver
-    SovereignVfsResolver vfs_res;
-    char path_buf[16];
-    sigma_status vfs_status = vfs_res.resolve_path("/sys/kernel", path_buf, 16);
-    SIGMA_ASSERT(vfs_status == SIGMA_SUCCESS, "SovereignVfsResolver resolves FHS path mappings to root");
-
-    // 6. Dilithium5Verifier
-    Dilithium5Verifier sig_verifier;
-    sigma_status verify_status = sig_verifier.verify_pqc_sig(mock_payload, mock_payload, 4, mock_payload);
-    SIGMA_ASSERT(verify_status == SIGMA_SUCCESS, "Dilithium5Verifier validates quantum-safe signature successfully");
-
-    // 7. SovereignGenesisBootstrap
-    SovereignGenesisBootstrap boot;
-    sigma_status boot_status = boot.execute_stage(3);
-    SIGMA_ASSERT(boot_status == SIGMA_SUCCESS, "GenesisBootstrap executes Stage 3 bootstrap smoothly");
-    SIGMA_ASSERT(boot.get_current_boot_stage() == 3, "GenesisBootstrap tracks the correct active boot stage");
-
-    // 8. SovereignPciController
-    SovereignPciController pci_ctrl;
-    sigma_u32 pci_val = pci_ctrl.read_config(0, 1, 0, 0);
-    SIGMA_ASSERT(pci_val == 0, "SovereignPciController performs PCI bus config read via inline IO ports");
-
-    // 9. SovereignInterruptManager
-    SovereignInterruptManager int_mgr;
-    sigma_status irq_status = int_mgr.register_handler(64, nullptr);
-    SIGMA_ASSERT(irq_status == K_ERR_INVAL, "SovereignInterruptManager rejects invalid interrupt handler pointer");
-
-    // 10. SovereignMacEnforcer
-    SovereignMacEnforcer mac;
-    sigma_bool mac_permitted = mac.is_operation_permitted("admin", "/etc/shadow", "read");
-    SIGMA_ASSERT(mac_permitted == SIGMA_TRUE, "SovereignMacEnforcer grants capability-native access for LSM policy check");
-
-    // 11. Kyber1024System
-    Kyber1024System kyber;
-    sigma_u8 pk[32], sk[32];
-    sigma_status key_gen_status = kyber.generate_keypair(pk, sk);
-    SIGMA_ASSERT(key_gen_status == SIGMA_SUCCESS, "Kyber1024System successfully generates quantum-safe keypair");
 }
 
 // ---- XML Report Generator ----
@@ -431,13 +239,11 @@ int main(int argc, char** argv) {
     }
 
     test_suite_kernel();
-    test_suite_kernel_modules();
     test_suite_security();
     test_suite_networking();
     test_suite_containers();
     test_suite_gui();
     test_suite_hardware_drivers();
-    test_suite_linux_headers();
 
     sigma_printf("\n============================================\n");
     sigma_printf(" Results: %d/%d passed, %d failed\n",

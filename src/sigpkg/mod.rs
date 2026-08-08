@@ -20,6 +20,9 @@ pub use verifier::CryptoVerifier;
 pub use universal_adapter::{
     AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
 };
+pub use importer::{
+    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -78,6 +81,24 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
 }
 
 /// Package dependency
