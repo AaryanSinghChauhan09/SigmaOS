@@ -54,11 +54,11 @@ pub struct CpuRegisters {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Irql {
-    PassiveLevel = 0,  // User/normal thread execution
-    ApcLevel = 1,      // Asynchronous Procedure Calls
-    DispatchLevel = 2, // Scheduler/DPC execution, No paging allowed!
-    Dirql = 3,         // Device Interrupt Request Level
-    HighLevel = 4,     // Hardware profiling/high priority halts
+    PassiveLevel = 0,   // User/normal thread execution
+    ApcLevel = 1,       // Asynchronous Procedure Calls
+    DispatchLevel = 2,  // Scheduler/DPC execution, No paging allowed!
+    Dirql = 3,          // Device Interrupt Request Level
+    HighLevel = 4,      // Hardware profiling/high priority halts
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -95,9 +95,7 @@ impl LookasideList {
     }
 
     pub fn alloc_block(&mut self) -> Vec<u8> {
-        self.cached_blocks
-            .pop()
-            .unwrap_or_else(|| vec![0u8; self.block_size])
+        self.cached_blocks.pop().unwrap_or_else(|| vec![0u8; self.block_size])
     }
 
     pub fn free_block(&mut self, block: Vec<u8>) {
@@ -267,9 +265,7 @@ impl ArchitectureEngine {
 
         // Enable paging levels and enter Long Mode (64-bit AMD64/x64)
         self.init_state = ProcessorInitState::LongMode;
-        println!(
-            "[arch] PML4 paging directories enabled. Entered 64-bit Long Mode (EFER.LME set)."
-        );
+        println!("[arch] PML4 paging directories enabled. Entered 64-bit Long Mode (EFER.LME set).");
 
         self.init_state = ProcessorInitState::Ready;
         println!("[arch] BSP Core initialized successfully. Ready to schedule.");
@@ -321,11 +317,7 @@ impl ArchitectureEngine {
     }
 
     /// Simulates task switch / context-switching of thread registers and CR3 (PML4) directories
-    pub fn context_switch_threads(
-        &mut self,
-        from_idx: usize,
-        to_idx: usize,
-    ) -> Result<(), &'static str> {
+    pub fn context_switch_threads(&mut self, from_idx: usize, to_idx: usize) -> Result<(), &'static str> {
         let pcb = self.running_pcb.as_mut().ok_or("No active PCB loaded")?;
         if from_idx >= pcb.thread_list.len() || to_idx >= pcb.thread_list.len() {
             return Err("Invalid thread index bounds");

@@ -9,7 +9,10 @@ pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
 
-pub use gpu::{GpuCommand, GpuDriver, GpuError};
+pub use gpu::{
+    DrmError, DrmPlaneType, GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
+    GpuResetState, GpuShader, ShaderStage,
+};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;

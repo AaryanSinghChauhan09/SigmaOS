@@ -96,8 +96,9 @@ pub use driver::windows_compat::{
     WDFREQUEST, WDF_DRIVER_CONFIG, WDF_IO_QUEUE_CONFIG,
 };
 pub use drivers::{
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    DrmError, DrmPlaneType, GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
+    GpuResetState, GpuShader, HidError, HidKeyboardEvent, HidReportType, InputDriver, InputEvent,
+    InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType, ShaderStage,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
 };
