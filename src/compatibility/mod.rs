@@ -10,6 +10,11 @@ pub mod absorb_tools;
 pub mod tiny_core;
 pub mod apache_ossie;
 pub mod sovereign_suite;
+pub mod fedora;
+pub mod bsd;
+pub mod innovations;
+pub mod india_professional_tools;
+pub mod debian;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -46,7 +51,7 @@ pub use relay_nexus::{
 
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
-    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus as SolidSigmaFSPlusPlus,
 };
 
 pub use wasm_sandbox::{
@@ -70,4 +75,28 @@ pub use apache_ossie::{
 pub use sovereign_suite::{
     EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
+};
+
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    FirewalldZone, RichRule, FirewalldZoneManager, PartitionLayout, AnacondaKickstartInstaller,
+    CoprBuildJob, CoprUserRepoBuilder, IpaUser, HbacRule, FreeIpaDirectoryService,
+};
+
+pub use bsd::{
+    BsdJail, FreeBsdJailManager, OpenBsdSysctlKernelMib,
+};
+
+pub use innovations::{
+    WorkloadCategory, SigmaScheduler, UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingOS,
+};
+
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper, PMWaniHotspotController,
+    DigiYatraPassScanner, IrctcPnrTracker,
+};
+
+pub use debian::{
+    SysVinitRunlevel, SysVinitManager, AptPackageMetadata, AptRepositorySynchronizer,
+    AlternativeProvider, DebianAlternativesSystem, DebootstrapEngine,
 };

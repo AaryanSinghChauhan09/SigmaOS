@@ -56,6 +56,15 @@ pub use compatibility::{
     SemanticRow, OssieInterpreter, OssieOntology,
     EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
     FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    FirewalldZone, RichRule, FirewalldZoneManager, PartitionLayout, AnacondaKickstartInstaller,
+    CoprBuildJob, CoprUserRepoBuilder, IpaUser, HbacRule, FreeIpaDirectoryService,
+    BsdJail, FreeBsdJailManager, OpenBsdSysctlKernelMib,
+    WorkloadCategory, SigmaScheduler, UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingOS,
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper, PMWaniHotspotController,
+    DigiYatraPassScanner, IrctcPnrTracker,
+    SysVinitRunlevel, SysVinitManager, AptPackageMetadata, AptRepositorySynchronizer,
+    AlternativeProvider, DebianAlternativesSystem, DebootstrapEngine,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
