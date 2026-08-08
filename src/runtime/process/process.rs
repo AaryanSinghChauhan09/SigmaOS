@@ -380,19 +380,6 @@ impl ProcessManager {
         }
     }
 
-    /// Reparents any orphan children of a terminating parent process to the init process (PID 1),
-    /// taking inspiration from standard Linux/BSD kernel process tree managers.
-    pub unsafe fn reparent_orphans(&mut self, parent_pid: ProcessID) {
-        for slot in &self.processes {
-            if let Some(ptr) = slot {
-                let p = &mut *ptr.as_ptr();
-                if p.ppid == parent_pid {
-                    p.ppid = 1; // Reparent to init process (PID 1)
-                }
-            }
-        }
-    }
-
     pub unsafe fn terminate_process(&mut self, pid: ProcessID, exit_code: usize) -> bool {
         if pid >= 256 {
             return false;
@@ -406,38 +393,9 @@ impl ProcessManager {
 
             process.set_state(ProcessState::Terminated);
             process.set_exit_code(exit_code);
-
-            // Linux/BSD inspired reparenting of orphan children to the init process (PID 1)
-            self.reparent_orphans(pid);
             true
         } else {
             false
-        }
-    }
-
-    /// Linux/BSD inspired nice value priority adjustment (renice).
-    /// Nice values must remain in range [-20, 19].
-    /// Only superusers (UID 0) are authorized to decrease a nice value (increase scheduling priority).
-    pub unsafe fn renice_process(&mut self, caller_uid: u32, target_pid: ProcessID, new_nice: i32) -> Result<(), &'static str> {
-        if target_pid >= 256 {
-            return Err("Invalid process PID");
-        }
-        if new_nice < -20 || new_nice > 19 {
-            return Err("Nice value out of bounds (must be in range [-20, 19])");
-        }
-
-        if let Some(process_ptr) = self.processes[target_pid] {
-            let process = &mut *process_ptr.as_ptr();
-
-            // If decreasing nice value (higher priority), required superuser (UID 0) privilege
-            if new_nice < process.nice && caller_uid != 0 {
-                return Err("Permission denied: only root (UID 0) can decrease nice value");
-            }
-
-            process.nice = new_nice;
-            Ok(())
-        } else {
-            Err("Process not found")
         }
     }
 
@@ -761,22 +719,6 @@ mod tests {
             assert_eq!(table[0].name, "kernel-task");
             assert_eq!(table[0].uid, 0);
             assert_eq!(table[0].gid, 0);
-
-            // Test 1: Nice value / privilege checks
-            // Non-root (UID 500) trying to decrease nice (increase execution priority) -> Error
-            assert!(manager.renice_process(500, pid, -10).is_err());
-            // Non-root (UID 500) trying to increase nice (lower priority) -> Allowed
-            assert!(manager.renice_process(500, pid, 15).is_ok());
-            // Root (UID 0) can do anything
-            assert!(manager.renice_process(0, pid, -15).is_ok());
-
-            // Test 2: Reparent orphans to init (PID 1) upon parent termination
-            let child_pid = manager.create_process(pid, cap).unwrap();
-            assert_eq!(manager.get_parent_pid(child_pid).unwrap(), pid);
-
-            // Terminating the parent process should trigger reparenting
-            manager.terminate_process(pid, 0);
-            assert_eq!(manager.get_parent_pid(child_pid).unwrap(), 1);
         }
     }
 }
