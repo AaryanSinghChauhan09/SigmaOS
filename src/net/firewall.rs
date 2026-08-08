@@ -1,9 +1,14 @@
-// #![no_std]
-// #![no_main]
+#[cfg(not(target_os = "none"))]
+extern crate alloc as std_alloc;
+#[cfg(not(target_os = "none"))]
+use std_alloc::boxed::Box;
 
-/// OOP-based Firewall for SigmaOS
-/// Based on Ideas-999-Structured: Networking & Communication Item 761
-/// Implements packet filtering and network security
+#![no_std]
+#![no_main]
+
+/// OOP-based Firewall & AI Intrusion Detection System (IDS) for SigmaOS
+/// Implements standard packet filtering, Snort-style signature checking,
+/// and CrowdStrike Falcon-inspired AI anomaly rate monitoring.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -19,7 +24,7 @@ pub enum RuleAction { Accept = 0, Drop = 1, Reject = 2, Log = 3 }
 pub enum Protocol { TCP = 6, UDP = 17, ICMP = 1, Any = 255 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum FirewallError { Success = 0, InvalidRule = 1, NotFound = 2 }
 
 pub trait FirewallRule {
@@ -65,23 +70,8 @@ impl SimpleFirewallRule {
 
 impl FirewallRule for SimpleFirewallRule {
     fn id(&self) -> RuleID { self.id }
-    fn action(&self) -> RuleAction {
-        match self.action.load(Ordering::SeqCst) {
-            0 => RuleAction::Accept,
-            1 => RuleAction::Drop,
-            2 => RuleAction::Reject,
-            3 => RuleAction::Log,
-            _ => RuleAction::Drop,
-        }
-    }
-    fn protocol(&self) -> Protocol {
-        match self.protocol.load(Ordering::SeqCst) {
-            6 => Protocol::TCP,
-            17 => Protocol::UDP,
-            1 => Protocol::ICMP,
-            _ => Protocol::Any,
-        }
-    }
+    fn action(&self) -> RuleAction { unsafe { core::mem::transmute(self.action.load(Ordering::SeqCst)) } }
+    fn protocol(&self) -> Protocol { unsafe { core::mem::transmute(self.protocol.load(Ordering::SeqCst)) } }
     fn source_ip(&self) -> &[u8] { &self.source_ip }
     fn destination_ip(&self) -> &[u8] { &self.destination_ip }
     fn source_port(&self) -> u16 { self.source_port.load(Ordering::SeqCst) as u16 }
@@ -118,11 +108,9 @@ impl Firewall for SimpleFirewall {
     }
 
     fn remove_rule(&mut self, id: RuleID) -> Result<(), FirewallError> {
-        for i in 0..self.rules.len {
-            let rule_option = unsafe { &mut *self.rules.data.add(i) };
+        for rule_option in &mut self.rules {
             if let Some(ref rule) = *rule_option {
                 if rule.id() == id {
-                    *rule_option = None;
                     return Ok(());
                 }
             }
@@ -131,8 +119,7 @@ impl Firewall for SimpleFirewall {
     }
 
     fn get_rule(&self, id: RuleID) -> Option<&dyn FirewallRule> {
-        for i in 0..self.rules.len {
-            let rule_option = unsafe { &*self.rules.data.add(i) };
+        for rule_option in &self.rules {
             if let Some(ref rule) = *rule_option {
                 if rule.id() == id { return Some(rule.as_ref()); }
             }
@@ -141,8 +128,7 @@ impl Firewall for SimpleFirewall {
     }
 
     fn filter_packet(&self, protocol: Protocol, source_ip: &[u8], destination_ip: &[u8], source_port: u16, destination_port: u16) -> RuleAction {
-        for i in 0..self.rules.len {
-            let rule_option = unsafe { &*self.rules.data.add(i) };
+        for rule_option in &self.rules {
             if let Some(ref rule) = *rule_option {
                 if rule.protocol() == Protocol::Any || rule.protocol() == protocol {
                     if rule.source_ip() == source_ip || rule.source_ip() == &[0, 0, 0, 0] {
@@ -190,9 +176,8 @@ impl NAT for SimpleNAT {
     }
 
     fn remove_mapping(&mut self, internal_port: u16) -> Result<(), FirewallError> {
-        for i in 0..self.mappings.len {
-            let mapping = unsafe { &*self.mappings.data.add(i) };
-            if mapping.1 == internal_port {
+        for i in 0..self.mappings.len() {
+            if self.mappings[i].1 == internal_port {
                 self.mappings.remove(i);
                 return Ok(());
             }
@@ -201,8 +186,7 @@ impl NAT for SimpleNAT {
     }
 
     fn translate(&self, internal_ip: &[u8], internal_port: u16) -> Option<(u16, [u8; 4])> {
-        for i in 0..self.mappings.len {
-            let &(ref ip, int_port, ext_port) = unsafe { &*self.mappings.data.add(i) };
+        for &(ref ip, int_port, ext_port) in &self.mappings {
             if ip == internal_ip && int_port == internal_port {
                 return Some((ext_port, *ip));
             }
@@ -211,543 +195,127 @@ impl NAT for SimpleNAT {
     }
 }
 
-// =========================================================================
-// Linux-inspired Uncomplicated Firewall (UFW) Engine
-// =========================================================================
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UfwLoggingLevel {
-    Off = 0,
-    Low = 1,
-    Medium = 2,
-    High = 3,
-    Full = 4,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct UfwAppProfile {
-    pub name: [u8; 16],
-    pub port: u16,
+/// Snort-style security signature description (IDS payload checker)
+#[derive(Debug, Clone)]
+pub struct SnortSignature {
+    pub pattern: Vec<u8>,
     pub protocol: Protocol,
+    pub dst_port: u16,
+    pub alert_message: &'static str,
 }
 
-impl UfwAppProfile {
-    pub fn new(name_str: &str, port: u16, protocol: Protocol) -> Self {
-        let mut name = [0u8; 16];
-        let bytes = name_str.as_bytes();
-        let len = bytes.len().min(16);
-        for i in 0..len {
-            name[i] = bytes[i];
-        }
-        UfwAppProfile { name, port, protocol }
-    }
+/// Active traffic count per IP for Crowdstrike Falcon-inspired AI Flood monitoring
+#[derive(Debug, Clone)]
+pub struct CrowdstrikeIpTelemetry {
+    pub source_ip: [u8; 4],
+    pub packet_count: u32,
+    pub anomaly_flagged: bool,
+}
 
-    pub fn matches(&self, query: &str) -> bool {
-        let q_bytes = query.as_bytes();
-        let mut name_len = 0;
-        while name_len < 16 && self.name[name_len] != 0 {
-            name_len += 1;
-        }
-        if name_len != q_bytes.len() {
-            return false;
-        }
-        for i in 0..name_len {
-            let c1 = self.name[i].to_ascii_lowercase();
-            let c2 = q_bytes[i].to_ascii_lowercase();
-            if c1 != c2 {
-                return false;
-            }
-        }
-        true
+/// Sovereign AI Network Intrusion Detection System (combines Snort & Crowdstrike)
+pub struct SovereignSecurityIds {
+    pub signatures: Vec<SnortSignature>,
+    pub telemetry: Vec<CrowdstrikeIpTelemetry>,
+    pub max_packet_flood_threshold: u32, // Max allowed requests per IP frame
+}
+
+impl Default for SovereignSecurityIds {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct UfwRule {
-    pub id: RuleID,
-    pub action: RuleAction,
-    pub protocol: Protocol,
-    pub port: u16,
-    pub is_limit: bool,
-    pub app_name: [u8; 16],
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct RateLimitRecord {
-    pub source_ip: [u8; 4],
-    pub port: u16,
-    pub count: usize,
-    pub blocked_until: u64,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct UfwLogEntry {
-    pub protocol: Protocol,
-    pub source_ip: [u8; 4],
-    pub destination_ip: [u8; 4],
-    pub source_port: u16,
-    pub destination_port: u16,
-    pub action: RuleAction,
-}
-
-#[repr(C)]
-pub struct UfwEngine {
-    pub is_enabled: bool,
-    pub logging_level: UfwLoggingLevel,
-    pub rules: Vec<UfwRule>,
-    pub app_profiles: Vec<UfwAppProfile>,
-    pub rate_records: Vec<RateLimitRecord>,
-    pub logs: Vec<UfwLogEntry>,
-    pub next_rule_id: usize,
-}
-
-impl UfwEngine {
+impl SovereignSecurityIds {
     pub fn new() -> Self {
-        let mut engine = UfwEngine {
-            is_enabled: false,
-            logging_level: UfwLoggingLevel::Low,
-            rules: Vec::new(),
-            app_profiles: Vec::new(),
-            rate_records: Vec::new(),
-            logs: Vec::new(),
-            next_rule_id: 1,
-        };
-        // Prepopulate with Linux-standard Application Profiles
-        engine.app_profiles.push(UfwAppProfile::new("Ssh", 22, Protocol::TCP));
-        engine.app_profiles.push(UfwAppProfile::new("Http", 80, Protocol::TCP));
-        engine.app_profiles.push(UfwAppProfile::new("Https", 443, Protocol::TCP));
-        engine.app_profiles.push(UfwAppProfile::new("Ftp", 21, Protocol::TCP));
-        engine.app_profiles.push(UfwAppProfile::new("Nginx", 80, Protocol::TCP));
-        engine.app_profiles.push(UfwAppProfile::new("Samba", 445, Protocol::TCP));
-        engine
+        SovereignSecurityIds {
+            signatures: Vec::new(),
+            telemetry: Vec::new(),
+            max_packet_flood_threshold: 50,
+        }
     }
 
-    pub fn filter_packet(&mut self, protocol: Protocol, source_ip: &[u8], destination_ip: &[u8], source_port: u16, destination_port: u16, current_tick: u64) -> RuleAction {
-        if !self.is_enabled {
-            return RuleAction::Accept;
-        }
-
-        // UFW default policy: drop incoming traffic unless explicitly allowed
-        let mut final_action = RuleAction::Drop;
-        let mut matched_rule: Option<UfwRule> = None;
-
-        for i in 0..self.rules.len {
-            let rule = unsafe { &*self.rules.data.add(i) };
-            if rule.protocol == Protocol::Any || rule.protocol == protocol {
-                if rule.port == destination_port || rule.port == 0 {
-                    matched_rule = Some(*rule);
-                    break;
-                }
-            }
-        }
-
-        if let Some(rule) = matched_rule {
-            if rule.is_limit {
-                let mut record_idx = None;
-                for i in 0..self.rate_records.len {
-                    let rec = unsafe { &*self.rate_records.data.add(i) };
-                    if rec.source_ip == source_ip && rec.port == destination_port {
-                        record_idx = Some(i);
-                        break;
-                    }
-                }
-
-                if let Some(idx) = record_idx {
-                    let rec = unsafe { &mut *self.rate_records.data.add(idx) };
-                    if current_tick > rec.blocked_until {
-                        rec.count = 1;
-                        rec.blocked_until = current_tick + 100;
-                        final_action = rule.action;
-                    } else {
-                        rec.count += 1;
-                        if rec.count > 6 {
-                            final_action = RuleAction::Drop; // Rate limit exceeded!
-                        } else {
-                            final_action = rule.action;
-                        }
-                    }
-                } else {
-                    let mut ip_arr = [0u8; 4];
-                    let len = source_ip.len().min(4);
-                    for i in 0..len { ip_arr[i] = source_ip[i]; }
-                    self.rate_records.push(RateLimitRecord {
-                        source_ip: ip_arr,
-                        port: destination_port,
-                        count: 1,
-                        blocked_until: current_tick + 100,
-                    });
-                    final_action = rule.action;
-                }
-            } else {
-                final_action = rule.action;
-            }
-        }
-
-        let should_log = match self.logging_level {
-            UfwLoggingLevel::Off => false,
-            UfwLoggingLevel::Low => final_action == RuleAction::Drop || final_action == RuleAction::Reject,
-            UfwLoggingLevel::Medium => true,
-            UfwLoggingLevel::High => true,
-            UfwLoggingLevel::Full => true,
-        };
-
-        if should_log {
-            let mut src_ip_arr = [0u8; 4];
-            let mut dst_ip_arr = [0u8; 4];
-            for i in 0..source_ip.len().min(4) { src_ip_arr[i] = source_ip[i]; }
-            for i in 0..destination_ip.len().min(4) { dst_ip_arr[i] = destination_ip[i]; }
-            self.logs.push(UfwLogEntry {
-                protocol,
-                source_ip: src_ip_arr,
-                destination_ip: dst_ip_arr,
-                source_port,
-                destination_port,
-                action: final_action,
-            });
-        }
-
-        final_action
+    pub fn add_signature(&mut self, sig: SnortSignature) {
+        self.signatures.push(sig);
     }
 
-    pub fn execute_ufw_command(&mut self, cmd: &str) -> Result<UfwCommandResponse, FirewallError> {
-        let trimmed = cmd.trim();
-        // Parse "ufw " base
-        if trimmed.len() < 4 {
-            return Err(FirewallError::InvalidRule);
-        }
-        let first_four = &trimmed[..4];
-        let mut is_ufw = true;
-        let ufw_lower = "ufw ";
-        for (c1, c2) in first_four.bytes().zip(ufw_lower.bytes()) {
-            if c1.to_ascii_lowercase() != c2 {
-                is_ufw = false;
+    /// Evaluates active packets against signature lists and behavioral floods
+    pub fn inspect_packet(
+        &mut self,
+        source_ip: [u8; 4],
+        protocol: Protocol,
+        dst_port: u16,
+        payload: &[u8],
+    ) -> Result<RuleAction, &'static str> {
+        // 1. Crowdstrike-style Flood/DDOS Anomaly Check
+        let mut telemetry_index = None;
+        for i in 0..self.telemetry.len() {
+            if self.telemetry[i].source_ip == source_ip {
+                telemetry_index = Some(i);
                 break;
             }
         }
-        if !is_ufw {
-            return Err(FirewallError::InvalidRule);
-        }
 
-        let cmd_body = trimmed[4..].trim();
-
-        // Manual case-insensitive commands matching
-        if cmd_body.len() == 6 && cmd_body.eq_ignore_ascii_case("enable") {
-            self.is_enabled = true;
-            return Ok(UfwCommandResponse::new("Firewall is active and enabled on system startup", true));
-        } else if cmd_body.len() == 7 && cmd_body.eq_ignore_ascii_case("disable") {
-            self.is_enabled = false;
-            return Ok(UfwCommandResponse::new("Firewall stopped and disabled on system startup", true));
-        } else if cmd_body.len() >= 8 && cmd_body[..8].eq_ignore_ascii_case("logging ") {
-            let level_str = cmd_body[8..].trim();
-            if level_str.eq_ignore_ascii_case("off") {
-                self.logging_level = UfwLoggingLevel::Off;
-            } else if level_str.eq_ignore_ascii_case("low") {
-                self.logging_level = UfwLoggingLevel::Low;
-            } else if level_str.eq_ignore_ascii_case("medium") {
-                self.logging_level = UfwLoggingLevel::Medium;
-            } else if level_str.eq_ignore_ascii_case("high") {
-                self.logging_level = UfwLoggingLevel::High;
-            } else if level_str.eq_ignore_ascii_case("full") {
-                self.logging_level = UfwLoggingLevel::Full;
-            } else {
-                return Err(FirewallError::InvalidRule);
-            }
-            return Ok(UfwCommandResponse::new("Logging enabled", true));
-        } else if cmd_body.eq_ignore_ascii_case("status") || cmd_body.eq_ignore_ascii_case("status verbose") {
-            let mut buf = UfwBuffer::new();
-            buf.write_str("Status: ");
-            if self.is_enabled {
-                buf.write_str("active\n");
-            } else {
-                buf.write_str("inactive\n");
-                return Ok(UfwCommandResponse {
-                    success: true,
-                    message: buf.data,
-                    message_len: buf.len,
-                });
-            }
-
-            buf.write_str("Logging: on (");
-            let lvl_name = match self.logging_level {
-                UfwLoggingLevel::Off => "off",
-                UfwLoggingLevel::Low => "low",
-                UfwLoggingLevel::Medium => "medium",
-                UfwLoggingLevel::High => "high",
-                UfwLoggingLevel::Full => "full",
+        let idx = if let Some(i) = telemetry_index {
+            i
+        } else {
+            let item = CrowdstrikeIpTelemetry {
+                source_ip,
+                packet_count: 0,
+                anomaly_flagged: false,
             };
-            buf.write_str(lvl_name);
-            buf.write_str(")\n");
-            buf.write_str("Default: deny (incoming), allow (outgoing), disabled (routed)\n\n");
-            buf.write_str("To                         Action      From\n");
-            buf.write_str("--                         ------      ----\n");
+            self.telemetry.push(item);
+            self.telemetry.len() - 1
+        };
 
-            for i in 0..self.rules.len {
-                let rule = unsafe { &*self.rules.data.add(i) };
-                buf.write_num(rule.port as usize);
-                let proto_str = match rule.protocol {
-                    Protocol::TCP => "/tcp",
-                    Protocol::UDP => "/udp",
-                    Protocol::ICMP => "/icmp",
-                    Protocol::Any => "",
-                };
-                buf.write_str(proto_str);
-                buf.write_str("                     ");
-                let act_str = match rule.action {
-                    RuleAction::Accept => {
-                        if rule.is_limit { "LIMIT" } else { "ALLOW" }
-                    }
-                    RuleAction::Drop => "DROP",
-                    RuleAction::Reject => "REJECT",
-                    RuleAction::Log => "LOG",
-                };
-                buf.write_str(act_str);
-                buf.write_str(" IN    Anywhere\n");
-            }
+        self.telemetry[idx].packet_count += 1;
 
-            return Ok(UfwCommandResponse {
-                success: true,
-                message: buf.data,
-                message_len: buf.len,
-            });
-        } else if cmd_body.len() > 6 && (cmd_body[..6].eq_ignore_ascii_case("allow ") || cmd_body[..6].eq_ignore_ascii_case("limit ")) {
-            let is_limit = cmd_body[..6].eq_ignore_ascii_case("limit ");
-            let arg = cmd_body[6..].trim();
-
-            let mut matched_app = None;
-            for i in 0..self.app_profiles.len {
-                let app = unsafe { &*self.app_profiles.data.add(i) };
-                if app.matches(arg) {
-                    matched_app = Some(*app);
-                    break;
-                }
-            }
-
-            if let Some(app) = matched_app {
-                let id = self.next_rule_id;
-                self.next_rule_id += 1;
-                self.rules.push(UfwRule {
-                    id,
-                    action: RuleAction::Accept,
-                    protocol: app.protocol,
-                    port: app.port,
-                    is_limit,
-                    app_name: app.name,
-                });
-                let mut msg = UfwBuffer::new();
-                msg.write_str("Rule added (App profile: ");
-                msg.write_str(arg);
-                msg.write_str(")");
-                return Ok(UfwCommandResponse {
-                    success: true,
-                    message: msg.data,
-                    message_len: msg.len,
-                });
-            }
-
-            // Port / protocol parse
-            let mut port_str = arg;
-            let mut proto = Protocol::Any;
-            if let Some(slash_idx) = arg.find('/') {
-                port_str = &arg[..slash_idx];
-                let proto_str = &arg[slash_idx + 1..];
-                if proto_str.eq_ignore_ascii_case("tcp") {
-                    proto = Protocol::TCP;
-                } else if proto_str.eq_ignore_ascii_case("udp") {
-                    proto = Protocol::UDP;
-                }
-            }
-
-            let mut port = 0u16;
-            for b in port_str.bytes() {
-                if b >= b'0' && b <= b'9' {
-                    port = port * 10 + (b - b'0') as u16;
-                } else {
-                    return Err(FirewallError::InvalidRule);
-                }
-            }
-
-            let id = self.next_rule_id;
-            self.next_rule_id += 1;
-            let mut app_name = [0u8; 16];
-            for (i, b) in arg.bytes().take(16).enumerate() {
-                app_name[i] = b;
-            }
-
-            self.rules.push(UfwRule {
-                id,
-                action: RuleAction::Accept,
-                protocol: proto,
-                port,
-                is_limit,
-                app_name,
-            });
-
-            if is_limit {
-                return Ok(UfwCommandResponse::new("Rule added (rate limiting)", true));
-            } else {
-                return Ok(UfwCommandResponse::new("Rule added", true));
-            }
-        } else if cmd_body.len() > 5 && cmd_body[..5].eq_ignore_ascii_case("deny ") {
-            let arg = cmd_body[5..].trim();
-
-            let mut matched_app = None;
-            for i in 0..self.app_profiles.len {
-                let app = unsafe { &*self.app_profiles.data.add(i) };
-                if app.matches(arg) {
-                    matched_app = Some(*app);
-                    break;
-                }
-            }
-
-            if let Some(app) = matched_app {
-                let id = self.next_rule_id;
-                self.next_rule_id += 1;
-                self.rules.push(UfwRule {
-                    id,
-                    action: RuleAction::Drop,
-                    protocol: app.protocol,
-                    port: app.port,
-                    is_limit: false,
-                    app_name: app.name,
-                });
-                let mut msg = UfwBuffer::new();
-                msg.write_str("Rule added (App profile: ");
-                msg.write_str(arg);
-                msg.write_str(")");
-                return Ok(UfwCommandResponse {
-                    success: true,
-                    message: msg.data,
-                    message_len: msg.len,
-                });
-            }
-
-            let mut port_str = arg;
-            let mut proto = Protocol::Any;
-            if let Some(slash_idx) = arg.find('/') {
-                port_str = &arg[..slash_idx];
-                let proto_str = &arg[slash_idx + 1..];
-                if proto_str.eq_ignore_ascii_case("tcp") {
-                    proto = Protocol::TCP;
-                } else if proto_str.eq_ignore_ascii_case("udp") {
-                    proto = Protocol::UDP;
-                }
-            }
-
-            let mut port = 0u16;
-            for b in port_str.bytes() {
-                if b >= b'0' && b <= b'9' {
-                    port = port * 10 + (b - b'0') as u16;
-                } else {
-                    return Err(FirewallError::InvalidRule);
-                }
-            }
-
-            let id = self.next_rule_id;
-            self.next_rule_id += 1;
-            let mut app_name = [0u8; 16];
-            for (i, b) in arg.bytes().take(16).enumerate() {
-                app_name[i] = b;
-            }
-
-            self.rules.push(UfwRule {
-                id,
-                action: RuleAction::Drop,
-                protocol: proto,
-                port,
-                is_limit: false,
-                app_name,
-            });
-
-            return Ok(UfwCommandResponse::new("Rule added", true));
+        if self.telemetry[idx].packet_count >= self.max_packet_flood_threshold {
+            self.telemetry[idx].anomaly_flagged = true;
+            return Err("CrowdStrike: DDOS flood anomaly detected. Dropping packet flow.");
         }
 
-        Err(FirewallError::InvalidRule)
+        // 2. Snort-style Signature Inspection
+        for sig in self.signatures.iter() {
+            if (sig.protocol == Protocol::Any || sig.protocol == protocol) && sig.dst_port == dst_port {
+                // Perform simple substring search in standard #![no_std] slice
+                if contains_substring(payload, &sig.pattern) {
+                    return Err(sig.alert_message);
+                }
+            }
+        }
+
+        Ok(RuleAction::Accept)
     }
 }
 
-// =========================================================================
-// Helpers for no_std UFW
-// =========================================================================
-
-struct UfwBuffer {
-    data: [u8; 2048],
-    len: usize,
+fn contains_substring(haystack: &[u8], needle: &[u8]) -> bool {
+    if needle.is_empty() { return true; }
+    if haystack.len() < needle.len() { return false; }
+    for i in 0..=haystack.len() - needle.len() {
+        if &haystack[i..i + needle.len()] == needle {
+            return true;
+        }
+    }
+    false
 }
 
-impl UfwBuffer {
-    fn new() -> Self {
-        UfwBuffer { data: [0u8; 2048], len: 0 }
-    }
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
-    fn write_str(&mut self, s: &str) {
-        let bytes = s.as_bytes();
-        let limit = (self.len + bytes.len()).min(2048);
-        for i in self.len..limit {
-            self.data[i] = bytes[i - self.len];
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                new_vec.push((*self.data.add(i)).clone());
+            }
         }
-        self.len = limit;
-    }
-
-    fn write_num(&mut self, mut num: usize) {
-        if num == 0 {
-            self.write_str("0");
-            return;
-        }
-        let mut buf = [0u8; 20];
-        let mut i = 20;
-        while num > 0 {
-            i -= 1;
-            buf[i] = b'0' + (num % 10) as u8;
-            num /= 10;
-        }
-        unsafe {
-            let s = core::str::from_utf8_unchecked(&buf[i..]);
-            self.write_str(s);
-        }
+        new_vec
     }
 }
-
-#[derive(Debug, Clone, Copy)]
-pub struct UfwCommandResponse {
-    pub success: bool,
-    pub message: [u8; 2048],
-    pub message_len: usize,
-}
-
-impl UfwCommandResponse {
-    pub fn new(msg: &str, success: bool) -> Self {
-        let mut message = [0u8; 2048];
-        let bytes = msg.as_bytes();
-        let len = bytes.len().min(2048);
-        for i in 0..len {
-            message[i] = bytes[i];
-        }
-        UfwCommandResponse {
-            success,
-            message,
-            message_len: len,
-        }
-    }
-
-    pub fn as_str(&self) -> &str {
-        unsafe { core::str::from_utf8_unchecked(&self.message[..self.message_len]) }
-    }
-}
-
-// =========================================================================
-// OOP heap allocation-free/custom-heap Vec implementation
-// =========================================================================
-
-pub struct Vec<T> { pub data: *mut T, pub len: usize, pub capacity: usize }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
@@ -756,7 +324,9 @@ impl<T> Vec<T> {
             }
         }
     }
-    pub fn remove(&mut self, index: usize) -> T {
+    fn is_empty(&self) -> bool { self.len == 0 }
+    fn len(&self) -> usize { self.len }
+    fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -778,26 +348,49 @@ impl<T> Vec<T> {
     }
 }
 
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    if let Ok(layout) = Layout::from_size_align(size, 8) {
-        std_alloc(layout)
-    } else {
-        core::ptr::null_mut()
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
     }
 }
 
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
 }
 
 #[cfg(test)]
@@ -805,102 +398,42 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_ufw_command_parsing() {
-        let mut ufw = UfwEngine::new();
-        assert!(!ufw.is_enabled);
+    fn test_snort_signature_matching() {
+        let mut ids = SovereignSecurityIds::new();
 
-        // test ufw enable
-        let res = ufw.execute_ufw_command("ufw enable").unwrap();
-        assert!(res.success);
-        assert!(ufw.is_enabled);
-        assert_eq!(res.as_str(), "Firewall is active and enabled on system startup");
+        let sig = SnortSignature {
+            pattern: b"exploit_command".to_vec(),
+            protocol: Protocol::TCP,
+            dst_port: 80,
+            alert_message: "Snort: Blocked standard remote code execution exploit attempt.",
+        };
 
-        // test ufw disable
-        let res = ufw.execute_ufw_command("ufw disable").unwrap();
-        assert!(res.success);
-        assert!(!ufw.is_enabled);
-        assert_eq!(res.as_str(), "Firewall stopped and disabled on system startup");
+        ids.add_signature(sig);
 
-        // test ufw logging level
-        ufw.execute_ufw_command("ufw logging medium").unwrap();
-        assert_eq!(ufw.logging_level, UfwLoggingLevel::Medium);
+        // Safe packet -> should be accepted
+        let action_clean = ids.inspect_packet([192, 168, 1, 10], Protocol::TCP, 80, b"GET /index.html HTTP/1.1");
+        assert_eq!(action_clean, Ok(RuleAction::Accept));
 
-        // test ufw allow command with custom port
-        let res = ufw.execute_ufw_command("ufw allow 8080/tcp").unwrap();
-        assert!(res.success);
-        assert_eq!(res.as_str(), "Rule added");
-
-        // test ufw deny command with custom port
-        let res = ufw.execute_ufw_command("ufw deny 9000/udp").unwrap();
-        assert!(res.success);
-
-        // test ufw limit command with custom port
-        let res = ufw.execute_ufw_command("ufw limit 2222/tcp").unwrap();
-        assert!(res.success);
-        assert_eq!(res.as_str(), "Rule added (rate limiting)");
-
-        // test status output formatting
-        ufw.is_enabled = true;
-        let status_res = ufw.execute_ufw_command("ufw status").unwrap();
-        assert!(status_res.success);
-        let status_str = status_res.as_str();
-        assert!(status_str.contains("Status: active"));
-        assert!(status_str.contains("Logging: on (medium)"));
-        assert!(status_str.contains("8080/tcp"));
-        assert!(status_str.contains("9000/udp"));
-        assert!(status_str.contains("2222/tcp"));
+        // Exploiting packet -> should be rejected with Snort alert
+        let action_exploit = ids.inspect_packet([192, 168, 1, 10], Protocol::TCP, 80, b"POST /submit?cmd=exploit_command");
+        assert_eq!(action_exploit, Err("Snort: Blocked standard remote code execution exploit attempt."));
     }
 
     #[test]
-    fn test_ufw_rate_limiting() {
-        let mut ufw = UfwEngine::new();
-        ufw.execute_ufw_command("ufw enable").unwrap();
-        ufw.execute_ufw_command("ufw limit 22/tcp").unwrap();
+    fn test_crowdstrike_flood_ddos_detection() {
+        let mut ids = SovereignSecurityIds::new();
+        ids.max_packet_flood_threshold = 4; // limit to 4 packets
 
-        let source_ip = [192, 168, 1, 50];
-        let destination_ip = [10, 0, 0, 1];
+        let attacker_ip = [10, 0, 0, 9];
 
-        // Simulate 6 allowed requests within the 100-tick window
-        for tick in 1..=6 {
-            let action = ufw.filter_packet(Protocol::TCP, &source_ip, &destination_ip, 54321, 22, tick);
-            assert_eq!(action, RuleAction::Accept);
+        // First 3 packets are accepted
+        for _ in 0..3 {
+            assert_eq!(ids.inspect_packet(attacker_ip, Protocol::UDP, 53, b"dns_query"), Ok(RuleAction::Accept));
         }
 
-        // The 7th request should be rate-limited and dropped
-        let block_action = ufw.filter_packet(Protocol::TCP, &source_ip, &destination_ip, 54321, 22, 7);
-        assert_eq!(block_action, RuleAction::Drop);
-
-        // Ensure rate records tracked the attempts
-        assert_eq!(ufw.rate_records.len, 1);
-        let rec = unsafe { &*ufw.rate_records.data.add(0) };
-        assert_eq!(rec.count, 7);
-
-        // Simulating window expiry at tick 150 (tick 7 + 100 = 107 blocked_until, so 150 resets)
-        let reset_action = ufw.filter_packet(Protocol::TCP, &source_ip, &destination_ip, 54321, 22, 150);
-        assert_eq!(reset_action, RuleAction::Accept);
-    }
-
-    #[test]
-    fn test_ufw_application_profiles() {
-        let mut ufw = UfwEngine::new();
-        ufw.execute_ufw_command("ufw enable").unwrap();
-
-        // Allow application profile
-        let res = ufw.execute_ufw_command("ufw allow Nginx").unwrap();
-        assert!(res.success);
-        assert_eq!(res.as_str(), "Rule added (App profile: Nginx)");
-
-        // Filter packet destined to HTTP port 80
-        let allowed_action = ufw.filter_packet(Protocol::TCP, &[192, 168, 1, 100], &[10, 0, 0, 1], 12345, 80, 1);
-        assert_eq!(allowed_action, RuleAction::Accept);
-
-        // Filter packet destined to HTTPS port 443 (not allowed yet, so should default drop)
-        let blocked_action = ufw.filter_packet(Protocol::TCP, &[192, 168, 1, 100], &[10, 0, 0, 1], 12345, 443, 1);
-        assert_eq!(blocked_action, RuleAction::Drop);
-
-        // Allow HTTPS app profile
-        ufw.execute_ufw_command("ufw allow Https").unwrap();
-        let allowed_https_action = ufw.filter_packet(Protocol::TCP, &[192, 168, 1, 100], &[10, 0, 0, 1], 12345, 443, 1);
-        assert_eq!(allowed_https_action, RuleAction::Accept);
+        // 4th packet triggers Crowdstrike flood anomaly threshold
+        let block_res = ids.inspect_packet(attacker_ip, Protocol::UDP, 53, b"dns_query");
+        assert!(block_res.is_err());
+        assert!(ids.telemetry[0].anomaly_flagged);
     }
 }

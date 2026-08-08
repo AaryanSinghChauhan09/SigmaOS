@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 use crate::kernel::scheduler::{Priority, Process, ProcessState};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::time::Duration;
@@ -29,26 +11,15 @@ pub struct ProcessLifecycleManager {
     processes: HashMap<u64, Process>,
     parent_map: HashMap<u64, u64>, // child -> parent
     exit_codes: HashMap<u64, i32>,
-    pub group_ids: HashMap<u64, u32>,
-    pub session_ids: HashMap<u64, u32>,
-    pub threads_counts: HashMap<u64, usize>,
-    pub vmsizes: HashMap<u64, usize>,
-    pub vmrsss: HashMap<u64, usize>,
     next_pid: AtomicUsize,
 }
 
 impl ProcessLifecycleManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ProcessLifecycleManager {
             processes: HashMap::new(),
             parent_map: HashMap::new(),
             exit_codes: HashMap::new(),
-            group_ids: HashMap::new(),
-            session_ids: HashMap::new(),
-            threads_counts: HashMap::new(),
-            vmsizes: HashMap::new(),
-            vmrsss: HashMap::new(),
             next_pid: AtomicUsize::new(100),
         }
     }
@@ -68,15 +39,6 @@ impl ProcessLifecycleManager {
 
         self.processes.insert(child_pid, child);
         self.parent_map.insert(child_pid, parent_pid);
-
-        // Copy parent's process group & session, initialize thread counts and VM sizes as in Linux distros
-        let parent_group = self.group_ids.get(&parent_pid).copied().unwrap_or(1000);
-        let parent_session = self.session_ids.get(&parent_pid).copied().unwrap_or(1000);
-        self.group_ids.insert(child_pid, parent_group);
-        self.session_ids.insert(child_pid, parent_session);
-        self.threads_counts.insert(child_pid, 1);
-        self.vmsizes.insert(child_pid, 4096); // Standard virtual memory layout size
-        self.vmrsss.insert(child_pid, 512);   // Resident set size
 
         Ok(child_pid)
     }
@@ -103,11 +65,6 @@ impl ProcessLifecycleManager {
                 let code = self.exit_codes.remove(&child_pid).unwrap_or(0);
                 self.processes.remove(&child_pid);
                 self.parent_map.remove(&child_pid);
-                self.group_ids.remove(&child_pid);
-                self.session_ids.remove(&child_pid);
-                self.threads_counts.remove(&child_pid);
-                self.vmsizes.remove(&child_pid);
-                self.vmrsss.remove(&child_pid);
                 Ok(code)
             }
             Some(_) => Err("Process still running"),
@@ -116,13 +73,7 @@ impl ProcessLifecycleManager {
     }
 
     pub fn register_process(&mut self, process: Process) {
-        let pid = process.pid;
-        self.processes.insert(pid, process);
-        self.group_ids.insert(pid, 1000);
-        self.session_ids.insert(pid, 1000);
-        self.threads_counts.insert(pid, 1);
-        self.vmsizes.insert(pid, 4096);
-        self.vmrsss.insert(pid, 512);
+        self.processes.insert(process.pid, process);
     }
 
     pub fn get_process(&self, pid: u64) -> Option<&Process> {
@@ -264,10 +215,6 @@ mod tests {
         let child = manager.get_process(child_pid).unwrap();
         assert_eq!(child.name, "init_forked");
 
-        // Verify standard UNIX process attributes emulated correctly
-        assert_eq!(manager.group_ids.get(&child_pid), Some(&1000));
-        assert_eq!(manager.threads_counts.get(&child_pid), Some(&1));
-
         manager.exec(child_pid, "sh").unwrap();
         assert_eq!(manager.get_process(child_pid).unwrap().name, "sh");
 
@@ -276,7 +223,6 @@ mod tests {
         manager.exit(child_pid, 42).unwrap();
         assert_eq!(manager.waitpid(child_pid).unwrap(), 42);
         assert!(manager.get_process(child_pid).is_none());
-        assert!(manager.group_ids.get(&child_pid).is_none());
     }
 
     #[test]
@@ -349,292 +295,4 @@ mod tests {
         assert_eq!(teb.stack_base, 0xFFFFF000);
         assert_eq!(teb.thread_local_storage_ptr, 0x800000);
     }
-
-    #[test]
-    fn test_sovereign_kernel_process_and_thread_structures() {
-        let kproc = KProcess {
-            directory_table_base: 0x1F000,
-            affinity_mask: 0x0F, // Core 0-3
-            kernel_time_ms: 120,
-            user_time_ms: 80,
-            capability_mask: 0xDEADBEEF,
-        };
-
-        let eproc = EProcess {
-            pcb: kproc,
-            unique_process_id: 101,
-            parent_process_id: 1,
-            image_file_name: *b"sigma_sh\0\0\0\0\0\0\0\0",
-            peb_address: 0x7FFF0000,
-            exit_status: 0,
-            active_threads_count: 1,
-        };
-
-        assert_eq!(eproc.pcb.directory_table_base, 0x1F000);
-        assert_eq!(eproc.unique_process_id, 101);
-        assert_eq!(eproc.peb_address, 0x7FFF0000);
-
-        let kthread = KThread {
-            kernel_stack_top: 0xFFFFF000,
-            kernel_stack_bottom: 0xFFFFB000,
-            priority: 8,
-            state: ShardExecutionState::Ready,
-            context_x64: X86_64Context::default(),
-            context_arm: Arm64Context::default(),
-            cpu_id: 0,
-        };
-
-        let ethread = EThread {
-            tcb: kthread,
-            unique_thread_id: 501,
-            process_id: 101,
-            start_address: 0x400000,
-            teb_address: 0x7FFE0000,
-        };
-
-        assert_eq!(ethread.unique_thread_id, 501);
-        assert_eq!(ethread.tcb.priority, 8);
-        assert_eq!(ethread.teb_address, 0x7FFE0000);
-    }
-
-    #[test]
-    fn test_process_thread_user_environment_blocks() {
-        let peb = ProcessEnvironmentBlock {
-            image_base_address: 0x400000,
-            loader_data_address: 0x500000,
-            process_parameters_address: 0x600000,
-            heap_base_address: 0x700000,
-            number_of_processors: 4,
-            session_id: 1,
-        };
-
-        let teb = ThreadEnvironmentBlock {
-            stack_limit: 0xFFFFB000,
-            stack_base: 0xFFFFF000,
-            thread_local_storage_ptr: 0x800000,
-            exception_list_address: 0x900000,
-        };
-
-        assert_eq!(peb.image_base_address, 0x400000);
-        assert_eq!(peb.number_of_processors, 4);
-        assert_eq!(teb.stack_base, 0xFFFFF000);
-        assert_eq!(teb.thread_local_storage_ptr, 0x800000);
-    }
-<<<<<<< HEAD
-
-    #[test]
-    fn test_sovereign_kernel_process_and_thread_structures() {
-        let kproc = KProcess {
-            directory_table_base: 0x1F000,
-            affinity_mask: 0x0F, // Core 0-3
-            kernel_time_ms: 120,
-            user_time_ms: 80,
-            capability_mask: 0xDEADBEEF,
-        };
-
-        let eproc = EProcess {
-            pcb: kproc,
-            unique_process_id: 101,
-            parent_process_id: 1,
-            image_file_name: *b"sigma_sh\0\0\0\0\0\0\0\0",
-            peb_address: 0x7FFF0000,
-            exit_status: 0,
-            active_threads_count: 1,
-        };
-
-        assert_eq!(eproc.pcb.directory_table_base, 0x1F000);
-        assert_eq!(eproc.unique_process_id, 101);
-        assert_eq!(eproc.peb_address, 0x7FFF0000);
-
-        let kthread = KThread {
-            kernel_stack_top: 0xFFFFF000,
-            kernel_stack_bottom: 0xFFFFB000,
-            priority: 8,
-            state: ShardExecutionState::Ready,
-            context_x64: X86_64Context::default(),
-            context_arm: Arm64Context::default(),
-            cpu_id: 0,
-        };
-
-        let ethread = EThread {
-            tcb: kthread,
-            unique_thread_id: 501,
-            process_id: 101,
-            start_address: 0x400000,
-            teb_address: 0x7FFE0000,
-        };
-
-        assert_eq!(ethread.unique_thread_id, 501);
-        assert_eq!(ethread.tcb.priority, 8);
-        assert_eq!(ethread.teb_address, 0x7FFE0000);
-    }
-
-    #[test]
-    fn test_process_thread_user_environment_blocks() {
-        let peb = ProcessEnvironmentBlock {
-            image_base_address: 0x400000,
-            loader_data_address: 0x500000,
-            process_parameters_address: 0x600000,
-            heap_base_address: 0x700000,
-            number_of_processors: 4,
-            session_id: 1,
-        };
-
-        let teb = ThreadEnvironmentBlock {
-            stack_limit: 0xFFFFB000,
-            stack_base: 0xFFFFF000,
-            thread_local_storage_ptr: 0x800000,
-            exception_list_address: 0x900000,
-        };
-
-        assert_eq!(peb.image_base_address, 0x400000);
-        assert_eq!(peb.number_of_processors, 4);
-        assert_eq!(teb.stack_base, 0xFFFFF000);
-        assert_eq!(teb.thread_local_storage_ptr, 0x800000);
-    }
-
-    #[test]
-    fn test_sovereign_kernel_process_and_thread_structures() {
-        let kproc = KProcess {
-            directory_table_base: 0x1F000,
-            affinity_mask: 0x0F, // Core 0-3
-            kernel_time_ms: 120,
-            user_time_ms: 80,
-            capability_mask: 0xDEADBEEF,
-        };
-
-        let eproc = EProcess {
-            pcb: kproc,
-            unique_process_id: 101,
-            parent_process_id: 1,
-            image_file_name: *b"sigma_sh\0\0\0\0\0\0\0\0",
-            peb_address: 0x7FFF0000,
-            exit_status: 0,
-            active_threads_count: 1,
-        };
-
-        assert_eq!(eproc.pcb.directory_table_base, 0x1F000);
-        assert_eq!(eproc.unique_process_id, 101);
-        assert_eq!(eproc.peb_address, 0x7FFF0000);
-
-        let kthread = KThread {
-            kernel_stack_top: 0xFFFFF000,
-            kernel_stack_bottom: 0xFFFFB000,
-            priority: 8,
-            state: ShardExecutionState::Ready,
-            context_x64: X86_64Context::default(),
-            context_arm: Arm64Context::default(),
-            cpu_id: 0,
-        };
-
-        let ethread = EThread {
-            tcb: kthread,
-            unique_thread_id: 501,
-            process_id: 101,
-            start_address: 0x400000,
-            teb_address: 0x7FFE0000,
-        };
-
-        assert_eq!(ethread.unique_thread_id, 501);
-        assert_eq!(ethread.tcb.priority, 8);
-        assert_eq!(ethread.teb_address, 0x7FFE0000);
-    }
-
-    #[test]
-    fn test_process_thread_user_environment_blocks() {
-        let peb = ProcessEnvironmentBlock {
-            image_base_address: 0x400000,
-            loader_data_address: 0x500000,
-            process_parameters_address: 0x600000,
-            heap_base_address: 0x700000,
-            number_of_processors: 4,
-            session_id: 1,
-        };
-
-        let teb = ThreadEnvironmentBlock {
-            stack_limit: 0xFFFFB000,
-            stack_base: 0xFFFFF000,
-            thread_local_storage_ptr: 0x800000,
-            exception_list_address: 0x900000,
-        };
-
-        assert_eq!(peb.image_base_address, 0x400000);
-        assert_eq!(peb.number_of_processors, 4);
-        assert_eq!(teb.stack_base, 0xFFFFF000);
-        assert_eq!(teb.thread_local_storage_ptr, 0x800000);
-    }
-||||||| 23ef22a4a
-
-    #[test]
-    fn test_sovereign_kernel_process_and_thread_structures() {
-        let kproc = KProcess {
-            directory_table_base: 0x1F000,
-            affinity_mask: 0x0F, // Core 0-3
-            kernel_time_ms: 120,
-            user_time_ms: 80,
-            capability_mask: 0xDEADBEEF,
-        };
-
-        let eproc = EProcess {
-            pcb: kproc,
-            unique_process_id: 101,
-            parent_process_id: 1,
-            image_file_name: *b"sigma_sh\0\0\0\0\0\0\0\0",
-            peb_address: 0x7FFF0000,
-            exit_status: 0,
-            active_threads_count: 1,
-        };
-
-        assert_eq!(eproc.pcb.directory_table_base, 0x1F000);
-        assert_eq!(eproc.unique_process_id, 101);
-        assert_eq!(eproc.peb_address, 0x7FFF0000);
-
-        let kthread = KThread {
-            kernel_stack_top: 0xFFFFF000,
-            kernel_stack_bottom: 0xFFFFB000,
-            priority: 8,
-            state: ShardExecutionState::Ready,
-            context_x64: X86_64Context::default(),
-            context_arm: Arm64Context::default(),
-            cpu_id: 0,
-        };
-
-        let ethread = EThread {
-            tcb: kthread,
-            unique_thread_id: 501,
-            process_id: 101,
-            start_address: 0x400000,
-            teb_address: 0x7FFE0000,
-        };
-
-        assert_eq!(ethread.unique_thread_id, 501);
-        assert_eq!(ethread.tcb.priority, 8);
-        assert_eq!(ethread.teb_address, 0x7FFE0000);
-    }
-
-    #[test]
-    fn test_process_thread_user_environment_blocks() {
-        let peb = ProcessEnvironmentBlock {
-            image_base_address: 0x400000,
-            loader_data_address: 0x500000,
-            process_parameters_address: 0x600000,
-            heap_base_address: 0x700000,
-            number_of_processors: 4,
-            session_id: 1,
-        };
-
-        let teb = ThreadEnvironmentBlock {
-            stack_limit: 0xFFFFB000,
-            stack_base: 0xFFFFF000,
-            thread_local_storage_ptr: 0x800000,
-            exception_list_address: 0x900000,
-        };
-
-        assert_eq!(peb.image_base_address, 0x400000);
-        assert_eq!(peb.number_of_processors, 4);
-        assert_eq!(teb.stack_base, 0xFFFFF000);
-        assert_eq!(teb.thread_local_storage_ptr, 0x800000);
-    }
-=======
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }

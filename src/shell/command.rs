@@ -716,17 +716,10 @@ impl CommandHistory for SimpleCommandHistory {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-<<<<<<< HEAD
 pub #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 struct Vec<T> {
-||||||| 23ef22a4a
-pub struct Vec<T> {
-=======
-#[cfg(target_os = "none")]
-pub struct Vec<T> {
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
     data: *mut T,
     len: usize,
     capacity: usize,

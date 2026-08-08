@@ -181,7 +181,6 @@ impl SimpleShell {
         shell
     }
 
-<<<<<<< HEAD
     pub fn set_alias(&mut self, name: &[u8], target: &[u8]) {
         self.aliases.set(name, target);
     }
@@ -217,55 +216,9 @@ impl Shell for SimpleShell {
                 if !in_arg {
                     start = i;
                     in_arg = true;
-||||||| 23ef22a4a
-    /// Filter journal logs matching severity.
-    pub fn query_logs(&self, min_level: LogLevel) -> Vec<LogEntry> {
-        let mut results = Vec::new();
-        for item in &self.buffer {
-            if let Some(ref entry) = item {
-                if entry.level >= min_level {
-                    results.push(entry.clone());
-=======
-    pub fn set_alias(&mut self, name: &[u8], target: &[u8]) {
-        self.aliases.set(name, target);
-    }
-
-    pub fn unset_alias(&mut self, name: &[u8]) {
-        self.aliases.unset(name);
-    }
-
-    pub fn get_alias(&self, name: &[u8]) -> Option<&[u8]> {
-        self.aliases.get(name)
-    }
-}
-
-impl Shell for SimpleShell {
-    fn register_command(&mut self, command: Box<dyn ShellCommand>) -> Result<CommandID, ShellError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        self.commands.push(Some(command));
-        Ok(id)
-    }
-
-    fn execute_line(&mut self, line: &[u8]) -> Result<(), ShellError> {
-        let mut args = Vec::new();
-        let mut start = 0;
-        let mut in_arg = false;
-
-        for (i, &byte) in line.iter().enumerate() {
-            if byte == b' ' || byte == b'\t' || byte == b'\n' {
-                if in_arg {
-                    args.push(&line[start..i]);
-                    in_arg = false;
-                }
-            } else {
-                if !in_arg {
-                    start = i;
-                    in_arg = true;
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
                 }
             }
         }
-<<<<<<< HEAD
         
         if in_arg {
             args.push(&line[start..line.len()]);
@@ -280,80 +233,6 @@ impl Shell for SimpleShell {
             alias_target
         } else {
             args[0]
-||||||| 23ef22a4a
-        results.sort_by_key(|e| e.timestamp_ms);
-        results
-    }
-}
-
-// ==========================================
-// 4. CRON SYSTEM (sigma-cron)
-// ==========================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CronScheduleType {
-    Interval(Duration),
-    Hourly,
-    Daily,
-    Weekly,
-    Reboot,
-}
-
-pub struct CronJob {
-    pub job_id: usize,
-    pub schedule_type: CronScheduleType,
-    pub interval: Duration,
-    pub last_run: Duration,
-    pub command: String,
-    pub enabled: bool,
-    pub last_run_success: bool,
-    pub output_log: String,
-}
-
-pub struct SigmaCron {
-    pub jobs: Vec<CronJob>,
-}
-
-impl SigmaCron {
-    pub fn new() -> Self {
-        Self { jobs: Vec::new() }
-    }
-
-    pub fn schedule_job(&mut self, id: usize, interval: Duration, command: &str) {
-        self.jobs.push(CronJob {
-            job_id: id,
-            schedule_type: CronScheduleType::Interval(interval),
-            interval,
-            last_run: Duration::ZERO,
-            command: command.to_string(),
-            enabled: true,
-            last_run_success: false,
-            output_log: String::new(),
-        });
-    }
-
-    pub fn schedule_profile_job(&mut self, id: usize, profile: CronScheduleType, command: &str) {
-        let interval = match profile {
-            CronScheduleType::Interval(d) => d,
-            CronScheduleType::Hourly => Duration::from_secs(3600),
-            CronScheduleType::Daily => Duration::from_secs(86400),
-            CronScheduleType::Weekly => Duration::from_secs(604800),
-            CronScheduleType::Reboot => Duration::ZERO,
-=======
-
-        if in_arg {
-            args.push(&line[start..line.len()]);
-        }
-
-        if args.is_empty() {
-            return Ok(());
-        }
-
-        // 1. Resolve Command Aliases (udev/bash inspiration)
-        let resolved_cmd_name = if let Some(alias_target) = self.get_alias(args[0]) {
-            alias_target
-        } else {
-            args[0]
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
         };
 
         // 2. Perform Environment Variable Expansion (e.g. $USER -> sovereign)
@@ -370,7 +249,6 @@ impl SigmaCron {
             }
         }
 
-<<<<<<< HEAD
         let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
         
         for cmd_option in &mut self.commands {
@@ -378,28 +256,8 @@ impl SigmaCron {
                 if cmd.name() == resolved_cmd_name {
                     return cmd.execute(&cmd_args);
                 }
-||||||| 23ef22a4a
-    /// Trigger enabled jobs whose timing parameters have elapsed.
-    pub fn tick_jobs(&mut self, current_time: Duration) -> Vec<String> {
-        let mut triggered_commands = Vec::new();
-        for job in &mut self.jobs {
-            if job.enabled && current_time >= job.last_run + job.interval {
-                job.last_run = current_time;
-                job.last_run_success = true;
-                job.output_log = "Scheduled cron execution successful".to_string();
-                triggered_commands.push(job.command.clone());
-=======
-        let cmd_args: Vec<&[u8]> = expanded_args.to_vec();
-
-        for cmd_option in &mut self.commands {
-            if let Some(ref mut cmd) = *cmd_option {
-                if cmd.name() == resolved_cmd_name {
-                    return cmd.execute(&cmd_args);
-                }
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
             }
         }
-<<<<<<< HEAD
         
         Err(ShellError::CommandNotFound)
     }
@@ -415,25 +273,6 @@ impl SigmaCron {
             self.prompt[i] = prompt[i];
         }
         self.prompt_len.store(len, Ordering::SeqCst);
-||||||| 23ef22a4a
-        triggered_commands
-=======
-
-        Err(ShellError::CommandNotFound)
-    }
-
-    fn get_prompt(&self) -> &[u8] {
-        let len = self.prompt_len.load(Ordering::SeqCst);
-        &self.prompt[..len]
-    }
-
-    fn set_prompt(&mut self, prompt: &[u8]) {
-        let len = prompt.len().min(63);
-        for i in 0..len {
-            self.prompt[i] = prompt[i];
-        }
-        self.prompt_len.store(len, Ordering::SeqCst);
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
     }
 }
 
@@ -483,7 +322,6 @@ impl ShellHistory for SimpleShellHistory {
     fn get_last(&self) -> Option<&[u8]>;
 }
 
-<<<<<<< HEAD
 impl SimpleShellHistory {
     fn get_last_impl(&self) -> Option<&[u8]> {
         if self.history.is_empty() {
@@ -545,105 +383,14 @@ impl ShellEnvironment for SimpleShellEnvironment {
                 self.values[i] = value_entry;
                 self.value_lengths[i] = value_len;
                 return;
-||||||| 23ef22a4a
-    /// Authorize a command delegate strictly based on capability matrices.
-    pub fn check_authority(&self, username: &str, required: Privilege) -> bool {
-        for (user, priv_item) in &self.user_capabilities {
-            if user == username && *priv_item == required {
-                return true;
-=======
-    fn get(&self, index: usize) -> Option<&[u8]> {
-        if index >= self.history.len() {
-            return None;
-        }
-        let len = self.lengths[index];
-        Some(&self.history[index][..len])
-    }
-
-    fn get_last(&self) -> Option<&[u8]>;
-}
-
-impl SimpleShellHistory {
-    fn get_last_impl(&self) -> Option<&[u8]> {
-        if self.history.is_empty() {
-            return None;
-        }
-        let index = self.history.len() - 1;
-        self.get(index)
-    }
-}
-
-impl ShellHistory for SimpleShellHistory {
-    fn get_last(&self) -> Option<&[u8]> {
-        self.get_last_impl()
-    }
-}
-
-pub trait ShellEnvironment {
-    fn set(&mut self, key: &[u8], value: &[u8]);
-    fn get(&self, key: &[u8]) -> Option<&[u8]>;
-    fn unset(&mut self, key: &[u8]);
-}
-
-#[repr(C)]
-pub struct SimpleShellEnvironment {
-    pub keys: Vec<[u8; 64]>,
-    pub values: Vec<[u8; 256]>,
-    pub key_lengths: Vec<usize>,
-    pub value_lengths: Vec<usize>,
-}
-
-impl SimpleShellEnvironment {
-    pub fn new() -> Self {
-        SimpleShellEnvironment {
-            keys: Vec::new(),
-            values: Vec::new(),
-            key_lengths: Vec::new(),
-            value_lengths: Vec::new(),
-        }
-    }
-}
-
-impl ShellEnvironment for SimpleShellEnvironment {
-    fn set(&mut self, key: &[u8], value: &[u8]) {
-        let key_len = key.len().min(63);
-        let value_len = value.len().min(255);
-
-        let mut key_entry = [0u8; 64];
-        let mut value_entry = [0u8; 256];
-
-        for i in 0..key_len {
-            key_entry[i] = key[i];
-        }
-        for i in 0..value_len {
-            value_entry[i] = value[i];
-        }
-
-        for i in 0..self.keys.len() {
-            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
-                self.values[i] = value_entry;
-                self.value_lengths[i] = value_len;
-                return;
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
             }
         }
-<<<<<<< HEAD
         
         self.keys.push(key_entry);
         self.values.push(value_entry);
         self.key_lengths.push(key_len);
         self.value_lengths.push(value_len);
-||||||| 23ef22a4a
-        false
-=======
-
-        self.keys.push(key_entry);
-        self.values.push(value_entry);
-        self.key_lengths.push(key_len);
-        self.value_lengths.push(value_len);
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
     }
-<<<<<<< HEAD
     
     fn get(&self, key: &[u8]) -> Option<&[u8]> {
         let key_len = key.len();
@@ -666,48 +413,6 @@ impl ShellEnvironment for SimpleShellEnvironment {
                 self.value_lengths.remove(i);
                 return;
             }
-||||||| 23ef22a4a
-}
-
-// ==========================================
-// 6. SOVEREIGN DOCS (sigma-doc / tldr)
-// ==========================================
-pub struct SigmaDoc {
-    pub topic: String,
-    pub description: String,
-    pub examples: Vec<String>,
-}
-
-impl SigmaDoc {
-    pub fn new(topic: &str, description: &str) -> Self {
-        Self {
-            topic: topic.to_string(),
-            description: description.to_string(),
-            examples: Vec::new(),
-=======
-
-    fn get(&self, key: &[u8]) -> Option<&[u8]> {
-        let key_len = key.len();
-        for i in 0..self.keys.len() {
-            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
-                let value_len = self.value_lengths[i];
-                return Some(&self.values[i][..value_len]);
-            }
-        }
-        None
-    }
-
-    fn unset(&mut self, key: &[u8]) {
-        let key_len = key.len();
-        for i in 0..self.keys.len() {
-            if self.key_lengths[i] == key_len && &self.keys[i][..key_len] == key {
-                self.keys.remove(i);
-                self.values.remove(i);
-                self.key_lengths.remove(i);
-                self.value_lengths.remove(i);
-                return;
-            }
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
         }
     }
 }
