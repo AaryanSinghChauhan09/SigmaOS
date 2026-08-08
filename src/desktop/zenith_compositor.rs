@@ -37,6 +37,8 @@
 
 #![allow(dead_code)]
 
+#![allow(dead_code)]
+
 use sigma_types::{CapabilityToken, Result};
 
 #[cfg(not(test))]
