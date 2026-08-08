@@ -509,4 +509,48 @@ SigmaOS uses a structured three-stage execution roadmap to migrate core computat
 
 ---
 
+## 🌌 SECTION VII: Native Safe-Rust Implementations of Consolidated Planned & Unimplemented Repository & Wiki Specifications
+
+To guarantee that the user never needs to descend into legacy Linux or BSD environments, SigmaOS fully integrates every planned but previously unimplemented specification from the GitHub repository and wiki natively into safe-Rust kernel/userland systems. These consolidated features provide native, zero-dependency, and high-performance equivalents to the most advanced capabilities of modern enterprise distros:
+
+### 1. S-BOOT Secure Firmware & SPSC Lock-Free Command Rings (Linux `kfifo` & UEFI Parity)
+*   **Architecture & Design:** Bypassing standard BIOS and GRUB, the native `S-BOOT` firmware interfaces with PCI Bus Scanners (`PciBusScanner`) and maps system devices natively. Low-latency communication is managed by single-producer single-consumer lock-free SPSC ring buffers (`SovereignRingBuffer`) directly modeled on Linux `kfifo`, ensuring lockless driver command dispatch with zero memory allocation or CPU stall cycles.
+*   **Legacy Defeat:** Completely obsoletes complex GRUB, device trees, and heavy systemd boot overhead by booting straight into capability-gated Rust microkernel execution within microseconds.
+
+### 2. High-Performance Hardware Adapters & Storage Controllers (PCIe Gen5 NVMe, Wi-Fi 7, & SSDFS Parity)
+*   **Architecture & Design:** Monolithic kernels compile millions of lines of custom driver code. SigmaOS consolidates these into polymorphic drivers (e.g. `PcieGen5NvmeDriver` and `Ufs4StorageDriver`) using log-structured virtual blocks with Copy-on-Write (CoW) page snapshotting. Network interface cards use high-throughput `Wifi7Adapter` driver rings that process frames directly into `S-CONNECT` ring buffers.
+*   **Legacy Defeat:** Eliminates legacy Linux kernel panic vulnerabilities caused by buggy C-based drivers, providing hardware-isolated memory pages and bounds-checked DMA.
+
+### 3. Out-of-Band Hardware Telemetry & Automated Self-Healing (IPMI & Systemd Parity)
+*   **Architecture & Design:** Server administration traditionally relies on slow background daemons and IPMI kernel modules. SigmaOS integrates real-time telemetry, thermal logging, and hardware alert monitoring directly into the microkernel via the `SelfHealingModule`. If anomalous behavioral entropy or corrupted memory blocks are detected, the system performs online self-healing and transaction rollbacks automatically.
+*   **Legacy Defeat:** Obsoletes bloated service monitors and user-space watchdog daemons by handling health audits inline within the kernel task loop.
+
+### 4. Advanced eBPF Virtual Machine & Packet Verifier (Linux eBPF & XDP Parity)
+*   **Architecture & Design:** SigmaOS features an in-kernel, memory-safe, and dependency-free eBPF compiler, verifier, and interpreter. The bytecode verifier analyzes packet filter structures to prevent backward jumps and infinite loops, compiling security rules directly into native CPU execution loops for real-time packet processing.
+*   **Legacy Defeat:** Replaces complex and heavy monolithic Linux `nftables` or BSD `pf` rulesets with verified, hardware-accelerated sandboxed filters running directly on network cards.
+
+### 5. Double-Buffered Atomic Modesetting & Frame Composite Pipeline (DRM/KMS Parity)
+*   **Architecture & Design:** Display and creative pipelines on legacy systems are bogged down by X11, Wayland, or heavy BSD line disciplines. SigmaOS features native DRM/KMS display mode timing structures (`DrmModeInfo`) and atomic page flipping pipelines. Screen recorders and creative canvas tools record frames directly into double-buffered command structures (`GpuCommandBuffer`) mapped to shared physical RAM pages.
+*   **Legacy Defeat:** Delivers near-zero frame blitting and video compositing latency, completely eliminating screen tearing and userspace composition overhead.
+
+---
+
+## 📦 SECTION VIII: Containerization & Virtualization Advancements Inspired by Linux & BSD Distros
+
+To deliver enterprise-grade execution isolation and achieve direct parity with legacy systems, SigmaOS's virtual machine (`src/virtualization/vm_manager.rs`) and container manager (`src/virtualization/container.rs`) subsystems are built using direct architectural inspirations from specialized Linux and BSD distributions:
+
+### 1. FreeBSD Jail & BSD Securelevels Isolation Parity
+*   **Design Inspiration:** FreeBSD Jails provide a highly lightweight, directory-chrooted virtual environment sharing the host kernel but isolating the directory tree, processes, and network sockets.
+*   **SigmaOS Implementation:** Implements strict path and process isolation layers inspired directly by FreeBSD `Jails` (`src/security/jails.rs`) and `Securelevels` (`src/security/securelevels.rs`). This allows sandboxed containers to execute natively within S-SHARDS without the performance degradation of hypervisor emulation, capability-gating file access, raw sockets, and process signaling.
+
+### 2. Linux Namespaces & CGroups Resource Throttle Parity
+*   **Design Inspiration:** Linux namespaces and control groups (cgroups) isolate process namespaces, IPC channels, mounts, and network devices, while capping memory, CPU, and disk I/O.
+*   **SigmaOS Implementation:** The native container manager (`src/virtualization/container.rs`) implements lightweight virtual namespace tables capping memory limits, virtual network ports, and CPU execution rings. CPU core pinning (`cpu_pinning_cores`) and hugepages management (`hugepages_enabled`) map container threads directly to target hardware processors to bypass OS dispatch latency.
+
+### 3. High-Performance QEMU/KVM PCIe VFIO Device Passthrough
+*   **Design Inspiration:** Modern enterprise hypervisors use KVM kernel modules and VFIO (Virtual Function I/O) driver configurations to expose direct hardware registers (GPUs, network adapters) to guest virtual machines.
+*   **SigmaOS Implementation:** Exposes native configuration structures supporting `vfio_pci_passthrough_address` to bypass virtual emulation entirely, streaming memory-mapped PCIe registers direct-to-VM pipelines.
+
+---
+
 ### 👑 The Sovereign OS Paradigm: Absolute Computational Autonomy. Zero External Dependencies. Complete Control.
