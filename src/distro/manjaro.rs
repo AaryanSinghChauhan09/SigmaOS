@@ -118,6 +118,30 @@ pub struct SnapPackage {
     pub confinement: String, // classic, strict
 }
 
+/// An Arch User Repository (AUR) package representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AurPackage {
+    pub name: String,
+    pub pkgbuild_url: String,
+    pub dependencies: Vec<String>,
+}
+
+/// A Flatpak sandboxed application representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FlatpakPackage {
+    pub app_id: String,
+    pub runtime_version: String,
+    pub sandbox_permissions: Vec<String>,
+}
+
+/// A Snap sandboxed application representation
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SnapPackage {
+    pub name: String,
+    pub channel: String, // stable, beta, edge
+    pub confinement: String, // classic, strict
+}
+
 /// Hardware GPU types detected on the system bus
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuType {
@@ -256,6 +280,40 @@ impl MhwdDkmsRebuilder {
     }
 }
 
+||||||| 68c19dfa6
+/// Manjaro-inspired: Dynamic Kernel Module Support (DKMS) auto-module rebuilder on host kernel swaps
+#[derive(Debug, Clone)]
+pub struct MhwdDkmsRebuilder {
+    pub registered_modules: Vec<String>,
+    pub compiled_modules_for_kernels: HashMap<String, Vec<String>>,
+}
+
+impl MhwdDkmsRebuilder {
+    pub fn new() -> Self {
+        Self {
+            registered_modules: Vec::new(),
+            compiled_modules_for_kernels: HashMap::new(),
+        }
+    }
+
+    pub fn register_module(&mut self, module_name: &str) {
+        if !self.registered_modules.contains(&module_name.to_string()) {
+            self.registered_modules.push(module_name.to_string());
+        }
+    }
+
+    /// Rebuilds and recompiles registered modules dynamically for target kernel version
+    pub fn trigger_rebuild(&mut self, kernel_version: &str) -> usize {
+        let mut compiled = Vec::new();
+        for module in &self.registered_modules {
+            compiled.push(module.clone());
+        }
+        let count = compiled.len();
+        self.compiled_modules_for_kernels.insert(kernel_version.to_string(), compiled);
+        count
+    }
+}
+
 /// Manjaro Settings Manager (MSM) Kernel Switcher
 #[derive(Debug, Clone)]
 pub struct ManjaroKernelSwitcher {
@@ -390,6 +448,29 @@ impl PamacPackageManager {
     pub fn install_snap(&mut self, app: SnapPackage) {
         self.installed_snaps.insert(app.name.clone(), app);
     }
+||||||| 68c19dfa6
+
+    /// Pamac-unified: Simulates user-space secure sandbox compilation and installation of an AUR package
+    pub fn build_and_install_aur(&mut self, pkg: AurPackage) -> Result<(), &'static str> {
+        // First resolve dependencies in user-space
+        for dep in &pkg.dependencies {
+            if !self.installed_packages.contains_key(dep) && !self.installed_aur_packages.contains_key(dep) {
+                return Err("Missing required AUR build dependency.");
+            }
+        }
+        self.installed_aur_packages.insert(pkg.name.clone(), pkg);
+        Ok(())
+    }
+
+    /// Pamac-unified: Install sandboxed Flatpak package
+    pub fn install_flatpak(&mut self, app: FlatpakPackage) {
+        self.installed_flatpaks.insert(app.app_id.clone(), app);
+    }
+
+    /// Pamac-unified: Install sandboxed Snap package
+    pub fn install_snap(&mut self, app: SnapPackage) {
+        self.installed_snaps.insert(app.name.clone(), app);
+    }
 }
 
 impl Default for PamacPackageManager {
@@ -457,6 +538,141 @@ impl MsmLanguagePackInstaller {
             .language_packs
             .get(locale)
             .ok_or("Locale not found in language pack index.")?;
+        let mut count = 0;
+        for pack in packs {
+            if !self.installed_packs.contains(pack) {
+                self.installed_packs.push(pack.clone());
+                count += 1;
+            }
+        }
+        Ok(count)
+    }
+}
+
+impl Default for MsmLanguagePackInstaller {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Advanced Hardware Power/Performance Profiles managed via MHWD
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PowerProfile {
+    Performance,
+    Balanced,
+    PowerSaver,
+    HybridOnDemand,
+}
+
+/// MHWD Power Governor - configures CPU/GPU parameters and prime render offloading profiles
+#[derive(Debug, Clone)]
+pub struct MhwdPowerGovernor {
+    pub current_profile: PowerProfile,
+    pub prime_offload_enabled: bool,
+    pub target_cpu_freq_mhz: u32,
+    pub pci_power_suspended: bool,
+}
+
+impl MhwdPowerGovernor {
+    pub fn new() -> Self {
+        Self {
+            current_profile: PowerProfile::Balanced,
+            prime_offload_enabled: false,
+            target_cpu_freq_mhz: 2400,
+            pci_power_suspended: false,
+        }
+    }
+
+    pub fn set_profile(&mut self, profile: PowerProfile) {
+        self.current_profile = profile;
+        match profile {
+            PowerProfile::Performance => {
+                self.target_cpu_freq_mhz = 4800;
+                self.pci_power_suspended = false;
+            }
+            PowerProfile::Balanced => {
+                self.target_cpu_freq_mhz = 2400;
+                self.pci_power_suspended = false;
+            }
+            PowerProfile::PowerSaver => {
+                self.target_cpu_freq_mhz = 1200;
+                self.pci_power_suspended = true;
+            }
+            PowerProfile::HybridOnDemand => {
+                self.target_cpu_freq_mhz = 3200;
+                self.pci_power_suspended = false;
+            }
+        }
+    }
+
+    pub fn toggle_prime_offload(&mut self, enable: bool) {
+        self.prime_offload_enabled = enable;
+    }
+}
+
+impl Default for MhwdPowerGovernor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+||||||| 68c19dfa6
+/// MSM Localization Pack Installer - handles dynamic localization files and system dictionaries
+#[derive(Debug, Clone)]
+pub struct MsmLanguagePackInstaller {
+    pub language_packs: HashMap<String, Vec<String>>,
+    pub installed_packs: Vec<String>,
+}
+
+impl MsmLanguagePackInstaller {
+    pub fn new() -> Self {
+        let mut language_packs = HashMap::new();
+        language_packs.insert(
+            "de_DE".to_string(),
+            vec![
+                "firefox-i18n-de".to_string(),
+                "manjaro-settings-manager-langpack-de".to_string(),
+                "aspell-de".to_string(),
+            ],
+        );
+        language_packs.insert(
+            "fr_FR".to_string(),
+            vec![
+                "firefox-i18n-fr".to_string(),
+                "manjaro-settings-manager-langpack-fr".to_string(),
+                "aspell-fr".to_string(),
+            ],
+        );
+        language_packs.insert(
+            "es_ES".to_string(),
+            vec![
+                "firefox-i18n-es-es".to_string(),
+                "manjaro-settings-manager-langpack-es".to_string(),
+                "aspell-es".to_string(),
+            ],
+        );
+        language_packs.insert(
+            "ja_JP".to_string(),
+            vec![
+                "firefox-i18n-ja".to_string(),
+                "manjaro-settings-manager-langpack-ja".to_string(),
+                "fcitx-mozc".to_string(),
+            ],
+        );
+
+        Self {
+            language_packs,
+            installed_packs: Vec::new(),
+        }
+    }
+
+    pub fn register_language_pack(&mut self, locale: &str, packages: Vec<String>) {
+        self.language_packs.insert(locale.to_string(), packages);
+    }
+
+    /// Installs packages corresponding to the given system locale
+    pub fn install_packs_for_locale(&mut self, locale: &str) -> Result<usize, &'static str> {
+        let packs = self.language_packs.get(locale).ok_or("Locale not found in language pack index.")?;
         let mut count = 0;
         for pack in packs {
             if !self.installed_packs.contains(pack) {
@@ -649,6 +865,8 @@ mod tests {
             .langpack_installer
             .installed_packs
             .contains(&"firefox-i18n-de".to_string()));
+||||||| 68c19dfa6
+        assert!(msm.langpack_installer.installed_packs.contains(&"firefox-i18n-de".to_string()));
 
         msm.configure_thermal_profile(true);
         assert_eq!(msm.optimal_thermal_fan_speed_rpm, 4500);
@@ -731,5 +949,78 @@ mod tests {
         assert!(installer
             .installed_packs
             .contains(&"fcitx-mozc".to_string()));
+||||||| 68c19dfa6
+        assert_eq!(msm.power_governor.current_profile, PowerProfile::Performance);
+        assert_eq!(msm.power_governor.target_cpu_freq_mhz, 4800);
+    }
+
+    #[test]
+    fn test_mhwd_power_governor() {
+        let mut gov = MhwdPowerGovernor::new();
+        assert_eq!(gov.current_profile, PowerProfile::Balanced);
+
+        gov.set_profile(PowerProfile::PowerSaver);
+        assert_eq!(gov.target_cpu_freq_mhz, 1200);
+        assert!(gov.pci_power_suspended);
+
+        gov.toggle_prime_offload(true);
+        assert!(gov.prime_offload_enabled);
+    }
+
+    #[test]
+    fn test_pamac_aur_and_sandboxes() {
+        let mut pamac = PamacPackageManager::new();
+        let aur_pkg = AurPackage {
+            name: "spotify".to_string(),
+            pkgbuild_url: "https://aur.archlinux.org/spotify.git".to_string(),
+            dependencies: vec!["libcurl".to_string()],
+        };
+
+        // Installing without resolved dependency should fail
+        let res = pamac.build_and_install_aur(aur_pkg.clone());
+        assert!(res.is_err());
+
+        // Now install the dependency
+        pamac.installed_packages.insert("libcurl".to_string(), "8.2.1-1".to_string());
+        pamac.build_and_install_aur(aur_pkg).unwrap();
+        assert!(pamac.installed_aur_packages.contains_key("spotify"));
+
+        // Flatpak install
+        let flat_app = FlatpakPackage {
+            app_id: "org.gimp.GIMP".to_string(),
+            runtime_version: "23.08".to_string(),
+            sandbox_permissions: vec!["--share=ipc".to_string()],
+        };
+        pamac.install_flatpak(flat_app);
+        assert!(pamac.installed_flatpaks.contains_key("org.gimp.GIMP"));
+
+        // Snap install
+        let snap_app = SnapPackage {
+            name: "vlc".to_string(),
+            channel: "stable".to_string(),
+            confinement: "strict".to_string(),
+        };
+        pamac.install_snap(snap_app);
+        assert!(pamac.installed_snaps.contains_key("vlc"));
+    }
+
+    #[test]
+    fn test_mhwd_dkms_rebuilder() {
+        let mut dkms = MhwdDkmsRebuilder::new();
+        dkms.register_module("nvidia-proprietary");
+        dkms.register_module("virtualbox-host-dkms");
+
+        let compiled_count = dkms.trigger_rebuild("6.23-rc3");
+        assert_eq!(compiled_count, 2);
+        let modules = dkms.compiled_modules_for_kernels.get("6.23-rc3").unwrap();
+        assert!(modules.contains(&"nvidia-proprietary".to_string()));
+    }
+
+    #[test]
+    fn test_msm_language_packs() {
+        let mut installer = MsmLanguagePackInstaller::new();
+        let registered_count = installer.install_packs_for_locale("ja_JP").unwrap();
+        assert_eq!(registered_count, 3);
+        assert!(installer.installed_packs.contains(&"fcitx-mozc".to_string()));
     }
 }

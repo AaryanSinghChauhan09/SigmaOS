@@ -135,6 +135,28 @@ pub use logging::{
     ConsoleLogTarget, FileLogTarget, LogError, LogLevel, LogTarget, LoggerCapability,
     MemoryLogTarget, NetworkLogTarget, SimpleUnifiedLogger, TargetCapability, TargetInfo,
     TargetType, UnifiedLogEntry, UnifiedLogStats, UnifiedLogger,
+||||||| 68c19dfa6
+pub use klib::{
+    paging::{PageTableEntry, SimplePageTableEntry, PageTable, SimplePageTable, VirtualMemoryManager, SimpleVMM, ProcessMemory, SimpleProcessMemory},
+    buddy_allocator::{BlockID, Block, SimpleBuddyAllocator},
+    uvm::{UvmPmap, UvmAmap, UvmPageLoan, UvmError},
+};
+pub use network::{
+    EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
+    TcpStack, TcpState,
+pub use klib::{
+    paging::{PageTableEntry, SimplePageTableEntry, PageTable, SimplePageTable, VirtualMemoryManager, SimpleVMM, ProcessMemory, SimpleProcessMemory},
+    buddy_allocator::{BlockID, Block, SimpleBuddyAllocator},
+    uvm::{UvmPmap, UvmAmap, UvmPageLoan, UvmError},
+};
+pub use network::{
+    EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
+    TcpStack, TcpState, NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
+    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
+    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
+    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
+    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
+    ClearLinuxFlowLoadBalancer,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{

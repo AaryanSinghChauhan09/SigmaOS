@@ -10,6 +10,14 @@
 extern crate alloc;
 use crate::klib::Vec;
 use alloc::string::String;
+||||||| 68c19dfa6
+use crate::klib::{Vec, String};
+#[cfg(not(test))]
+use crate::klib::{Vec, String};
+#[cfg(test)]
+use std::vec::Vec;
+#[cfg(test)]
+use std::string::String;
 
 // ─── 1. ARCH LINUX: Pacman-style rolling dependency resolver ──────────────────
 /// Arch-inspired: topological sort for package dependency resolution with cycle detection
@@ -375,6 +383,8 @@ pub struct RunitService {
     pub restart_count: u32,
     pub max_restarts: u32,
     pub log_enabled: bool,
+    pub dependencies: Vec<String>,
+    pub logs: Vec<String>,
 }
 
 impl RunitService {
@@ -386,6 +396,28 @@ impl RunitService {
             max_restarts: 5,
             log_enabled: true,
         }
+||||||| 68c19dfa6
+        Self { name, status: ServiceStatus::Down, restart_count: 0, max_restarts: 5, log_enabled: true }
+        Self {
+            name,
+            status: ServiceStatus::Down,
+            restart_count: 0,
+            max_restarts: 5,
+            log_enabled: true,
+            dependencies: Vec::new(),
+            logs: Vec::new(),
+        }
+    }
+
+    pub fn with_dependency(mut self, dep: String) -> Self {
+        self.dependencies.push(dep);
+        self
+    }
+
+    pub fn log_event(&mut self, msg: &str) {
+        if self.log_enabled {
+            self.logs.push(String::from(msg));
+        }
     }
 
     pub fn start(&mut self, pid: u32) {
@@ -394,19 +426,27 @@ impl RunitService {
             pid,
             uptime_secs: 0,
         };
+||||||| 68c19dfa6
+        self.status = ServiceStatus::Up { pid, uptime_secs: 0 };
+        self.status = ServiceStatus::Up { pid, uptime_secs: 0 };
+        self.log_event("Service started successfully");
     }
 
     pub fn stop(&mut self) {
         self.status = ServiceStatus::Finishing;
         self.status = ServiceStatus::Down;
+        self.log_event("Service stopped cleanly");
     }
 
     pub fn crash_and_restart(&mut self, new_pid: u32) {
         self.restart_count += 1;
+        self.log_event("Service crash event detected");
         if self.restart_count > self.max_restarts {
             self.status = ServiceStatus::Failed;
+            self.log_event("Service failed: maximum restart limit exceeded");
         } else {
             self.start(new_pid);
+            self.log_event("Service restarted automatically");
         }
     }
 
@@ -416,7 +456,7 @@ impl RunitService {
 }
 
 pub struct RunitSupervisor {
-    services: Vec<RunitService>,
+    pub services: Vec<RunitService>,
 }
 
 impl RunitSupervisor {
@@ -447,6 +487,40 @@ impl RunitSupervisor {
             .filter(|s| s.status == ServiceStatus::Failed)
             .map(|s| s.name.as_str())
             .collect()
+    }
+
+    /// Supervise all services, recursively starting satisfied dependencies or restarting crashed nodes
+    pub fn supervise_and_heal(&mut self) -> usize {
+        let mut changes = 0;
+        let n = self.services.len();
+
+        // Temporarily take clone of names to check which dependencies are currently in the 'Up' state
+        let mut up_names = Vec::new();
+        for s in &self.services {
+            if let ServiceStatus::Up { .. } = s.status {
+                up_names.push(s.name.clone());
+            }
+        }
+
+        for i in 0..n {
+            let mut satisfied = true;
+            for dep in &self.services[i].dependencies {
+                if !up_names.iter().any(|name| name == dep) {
+                    satisfied = false;
+                    break;
+                }
+            }
+
+            if satisfied && self.services[i].status == ServiceStatus::Down {
+                // Dependency is satisfied, auto-boot this service
+                let name = self.services[i].name.clone();
+                let pid = 2000 + i as u32;
+                self.services[i].start(pid);
+                self.services[i].log_event("Booted by supervisor dependency trigger");
+                changes += 1;
+            }
+        }
+        changes
     }
 }
 
@@ -748,9 +822,30 @@ mod tests {
     #[test]
     fn test_runit_supervisor() {
         let mut sv = RunitSupervisor::new();
-        sv.register(RunitService::new(String::from("sshd")));
-        sv.get_mut("sshd").unwrap().start(1234);
+        let net_svc = RunitService::new(String::from("network"));
+        let ssh_svc = RunitService::new(String::from("sshd"))
+            .with_dependency(String::from("network"));
+
+        sv.register(net_svc);
+        sv.register(ssh_svc);
+
+        // Intially, up_count should be 0 since both are Down
+        assert_eq!(sv.up_count(), 0);
+
+        // Run supervision. Only "network" has no dependencies and should heal/auto-start
+        let changes = sv.supervise_and_heal();
+        assert_eq!(changes, 1);
         assert_eq!(sv.up_count(), 1);
+        assert_eq!(sv.get_mut("network").unwrap().status, ServiceStatus::Up { pid: 2000, uptime_secs: 0 });
+
+        // Second run. Now "network" is up, so "sshd"'s dependency is satisfied. It should auto-start
+        let changes2 = sv.supervise_and_heal();
+        assert_eq!(changes2, 1);
+        assert_eq!(sv.up_count(), 2);
+        assert_eq!(sv.get_mut("sshd").unwrap().status, ServiceStatus::Up { pid: 2001, uptime_secs: 0 });
+
+        // Verify logs are preserved
+        assert!(sv.get_mut("sshd").unwrap().logs.iter().any(|log| log.as_str().contains("Service started successfully")));
     }
 
     #[test]
