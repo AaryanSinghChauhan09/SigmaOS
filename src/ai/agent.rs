@@ -165,6 +165,10 @@ pub struct SimpleAIAgent {
     pub patterns: Vec<Pattern>,
     pub mcp_tools: Vec<(String, String)>,
     pub prompt_optim_weight: f32,
+    pub active_agent: AtomicUsize,
+    pub can_register: bool,
+    pub can_unregister: bool,
+    pub can_process: bool,
 }
 
 /// Pattern for intent matching
@@ -220,11 +224,24 @@ impl SimpleAIAgent {
             patterns: Vec::new(),
             mcp_tools: Vec::new(),
             prompt_optim_weight: 0.5,
+            active_agent: AtomicUsize::new(0),
+            can_register: true,
+            can_unregister: true,
+            can_process: true,
         }
     }
 
     pub fn add_pattern(&mut self, pattern: Pattern) {
         self.patterns.push(pattern);
+    }
+
+    pub fn register_mcp_tool(&mut self, name: String, description: String) {
+        self.mcp_tools.push((name, description));
+    }
+
+    pub fn optimize_prompt_weights(&mut self) -> f32 {
+        self.prompt_optim_weight = 0.95;
+        0.95
     }
 
     unsafe fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
@@ -413,7 +430,7 @@ impl AIAgent for SimpleAIAgent {
             version: self.version,
             total_intents: self.patterns.len(),
             execution_count: AtomicUsize::new(self.execution_count.load(Ordering::SeqCst)),
-            capability: self.capability,
+            capability: AgentCapability::new(),
         }
     }
 }
@@ -426,6 +443,7 @@ pub trait AIAgentManager {
     fn unregister_agent(&mut self, id: usize) -> Result<(), AIError>;
     /// Get agent
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
+    fn process(&mut self, input: &[u8]) -> Result<Vec<u8>, AIError>;
     fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError>;
     fn stats(&self) -> AIStats;
 }
@@ -463,15 +481,19 @@ impl AIStats {
 
 /// Simple AI agent manager (OOP: Concrete manager class)
 pub struct SimpleAIAgentManager {
-    pub agents: Vec<Box<dyn AIAgent>>,
+    pub agents: Vec<Option<Box<dyn AIAgent>>>,
     pub stats: AIStats,
+    pub active_agent: AtomicUsize,
+    pub capability: AgentCapability,
 }
 
 impl SimpleAIAgentManager {
     pub fn new() -> Self {
         SimpleAIAgentManager {
             agents: Vec::new(),
-            stats: AIStats { failed_requests: 0 },
+            stats: AIStats::new(),
+            active_agent: AtomicUsize::new(0),
+            capability: AgentCapability::full(),
         }
     }
 }
