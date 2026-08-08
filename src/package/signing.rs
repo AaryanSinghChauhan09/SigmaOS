@@ -1,38 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
 extern crate alloc;
 
-extern crate alloc;
-
-<<<<<<< HEAD
-extern crate alloc;
-
-extern crate alloc;
-
-||||||| 23ef22a4a
-extern crate alloc;
-
-=======
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 /// OOP-based Package Signing & Attestation for SigmaOS
 /// Based on Ideas-999-Structured: Package, Build & Reproducibility Item 10
 /// Implements provenance metadata and supply-chain attestations
@@ -145,7 +115,6 @@ pub struct SimplePackageAttestation {
 }
 
 impl SimplePackageAttestation {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimplePackageAttestation {
             keys: Vec::new(),
@@ -229,7 +198,6 @@ pub struct SimpleKeyManager {
 }
 
 impl SimpleKeyManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleKeyManager {
             keys: Vec::new(),
@@ -280,7 +248,6 @@ pub struct SimpleSupplyChainAttestation {
 }
 
 impl SimpleSupplyChainAttestation {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleSupplyChainAttestation {
             builders: Vec::new(),

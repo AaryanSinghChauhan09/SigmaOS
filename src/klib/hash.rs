@@ -4,28 +4,19 @@
 #![no_std]
 
 /// Simple hash function for strings (DJB2 algorithm)
-/// Optimised by Bolt ⚡: redirects to simple_hash which utilizes a 4-byte unrolled chunk loop to maximize instruction pipelining.
 pub fn djb2_hash(s: &str) -> u64 {
-    simple_hash(s.as_bytes())
+    let mut hash: u64 = 5381;
+    for byte in s.bytes() {
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
+    }
+    hash
 }
 
 /// Simple hash function for byte arrays
-/// Optimised by Bolt ⚡: Process 4-byte chunks in a single unrolled loop iteration
-/// to reduce loop overhead, branch predictions, and maximize instruction-level parallelism.
 pub fn simple_hash(data: &[u8]) -> u64 {
     let mut hash: u64 = 5381;
-    let chunks = data.chunks_exact(4);
-    let remainder = chunks.remainder();
-
-    for chunk in chunks {
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(chunk[0] as u64);
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(chunk[1] as u64);
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(chunk[2] as u64);
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(chunk[3] as u64);
-    }
-
-    for &byte in remainder {
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(byte as u64);
+    for &byte in data {
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
     }
     hash
 }
@@ -36,32 +27,15 @@ pub fn xor_hash(value: u64) -> u64 {
 }
 
 /// Simple FNV-1a hash implementation
-/// Optimised by Bolt ⚡: Process 4-byte chunks in a single unrolled loop iteration
-/// to reduce loop overhead, branch predictions, and maximize instruction-level parallelism.
 pub fn fnv1a_hash(data: &[u8]) -> u64 {
     const FNV_OFFSET_BASIS: u64 = 14695981039346656037;
     const FNV_PRIME: u64 = 1099511628211;
 
     let mut hash = FNV_OFFSET_BASIS;
-    let chunks = data.chunks_exact(4);
-    let remainder = chunks.remainder();
-
-    for chunk in chunks {
-        hash ^= chunk[0] as u64;
-        hash = hash.wrapping_mul(FNV_PRIME);
-        hash ^= chunk[1] as u64;
-        hash = hash.wrapping_mul(FNV_PRIME);
-        hash ^= chunk[2] as u64;
-        hash = hash.wrapping_mul(FNV_PRIME);
-        hash ^= chunk[3] as u64;
-        hash = hash.wrapping_mul(FNV_PRIME);
-    }
-
-    for &byte in remainder {
+    for &byte in data {
         hash ^= byte as u64;
         hash = hash.wrapping_mul(FNV_PRIME);
     }
-
     hash
 }
 
@@ -76,8 +50,7 @@ impl SimpleHasher {
     }
 
     pub fn write(&mut self, byte: u8) {
-        // Optimised by Bolt ⚡: Removed redundant second hashing step of the same byte to cut hashing CPU cycles in half.
-        self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(byte as u64);
+        self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
     }
 
     pub fn finish(&self) -> u64 {
@@ -97,18 +70,8 @@ impl core::hash::Hasher for SimpleHasher {
     }
 
     fn write(&mut self, bytes: &[u8]) {
-        let chunks = bytes.chunks_exact(4);
-        let remainder = chunks.remainder();
-
-        for chunk in chunks {
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(chunk[0] as u64);
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(chunk[1] as u64);
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(chunk[2] as u64);
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(chunk[3] as u64);
-        }
-
-        for &byte in remainder {
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(byte as u64);
+        for &byte in bytes {
+            self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
         }
     }
 }
@@ -120,9 +83,7 @@ pub fn combine_hashes(a: u64, b: u64) -> u64 {
 
 #[cfg(test)]
 mod tests {
-    extern crate std;
     use super::*;
-    use std::vec;
 
     #[test]
     fn test_djb2_hash() {
@@ -188,45 +149,5 @@ mod tests {
 
         let hash3 = xor_hash(54321);
         assert_ne!(hash1, hash3);
-    }
-
-    #[test]
-    fn test_hash_unrolled_correctness() {
-        // Assert that unrolled simple_hash produces identical results to non-unrolled
-        fn simple_hash_reference(data: &[u8]) -> u64 {
-            let mut hash: u64 = 5381;
-            for &byte in data {
-                hash = (hash << 5).wrapping_add(hash).wrapping_add(byte as u64);
-            }
-            hash
-        }
-
-        fn fnv1a_hash_reference(data: &[u8]) -> u64 {
-            const FNV_OFFSET_BASIS: u64 = 14695981039346656037;
-            const FNV_PRIME: u64 = 1099511628211;
-            let mut hash = FNV_OFFSET_BASIS;
-            for &byte in data {
-                hash ^= byte as u64;
-                hash = hash.wrapping_mul(FNV_PRIME);
-            }
-            hash
-        }
-
-        let test_cases = vec![
-            b"".as_slice(),
-            b"a".as_slice(),
-            b"ab".as_slice(),
-            b"abc".as_slice(),
-            b"abcd".as_slice(),
-            b"abcde".as_slice(),
-            b"abcdefgh".as_slice(),
-            b"abcdefghi".as_slice(),
-            b"this is a much longer sentence to test unrolled loop structures thoroughly!".as_slice(),
-        ];
-
-        for data in test_cases {
-            assert_eq!(simple_hash(data), simple_hash_reference(data));
-            assert_eq!(fnv1a_hash(data), fnv1a_hash_reference(data));
-        }
     }
 }

@@ -1,31 +1,12 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 extern crate alloc;
 
-use crate::filesystem::smart_symlink::{SmartSymlink, SymlinkResolverRule};
-use crate::klib::Vec;
-use alloc::boxed::Box;
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
+use alloc::boxed::Box;
 
 pub type FilesystemID = usize;
 
@@ -242,7 +223,6 @@ pub struct SimpleFilesystemManager {
 }
 
 impl SimpleFilesystemManager {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleFilesystemManager {
             filesystems: Vec::new(),
@@ -282,3 +262,8 @@ impl FilesystemManager for SimpleFilesystemManager {
         ids
     }
 }
+
+pub struct LegacyLinuxRule;
+pub struct LinuxPersonaRule;
+pub struct SmartSymlink;
+pub struct SymlinkResolverRule;

@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 use crate::klib::HashMap;
 
 /// Disaster rescue environment setup (inspired by SystemRescue and Rescuezilla).
@@ -77,7 +59,6 @@ pub struct LiveDebugger {
 }
 
 impl LiveDebugger {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_patches: HashMap::new(),
@@ -284,9 +265,6 @@ mod tests {
         let rolled_back_count = backup.rollback_to_snapshot(1, &mut current_state).unwrap();
         assert_eq!(rolled_back_count, 2);
         assert_eq!(current_state.len(), 2);
-        assert_eq!(
-            current_state.get("/home/jules/code.rs").unwrap(),
-            &"hash2".to_string()
-        );
+        assert_eq!(current_state.get("/home/jules/code.rs").unwrap(), &"hash2".to_string());
     }
 }

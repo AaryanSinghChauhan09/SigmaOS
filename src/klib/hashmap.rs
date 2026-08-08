@@ -30,17 +30,8 @@ pub struct VacantEntry<'a, K, V> {
 impl<'a, K, V> Entry<'a, K, V>
 where
     K: Eq + Hash + Clone,
+    V: Clone,
 {
-    pub fn or_insert(self, default: V) -> &'a mut V {
-        match self {
-            Entry::Occupied(entry) => entry.value,
-            Entry::Vacant(entry) => {
-                entry.map.insert(entry.key.clone(), default);
-                entry.map.get_mut(&entry.key).unwrap()
-            }
-        }
-    }
-
     pub fn or_insert_with<F>(self, default: F) -> &'a mut V
     where
         F: FnOnce() -> V,
@@ -217,9 +208,12 @@ where
         }
     }
 
-    pub fn values_mut(&mut self) -> HashMapValuesMut<'_, K, V> {
-        HashMapValuesMut {
-            iter: self.iter_mut(),
+    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
+        if self.capacity == 0 || self.buckets.is_empty() {
+            if self.capacity == 0 {
+                self.capacity = 16;
+            }
+            self.resize_buckets();
         }
         let hash = self.hash_key(&key);
         if let Some(ref mut bucket) = self.buckets[hash] {
