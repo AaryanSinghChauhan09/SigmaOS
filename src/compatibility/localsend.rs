@@ -1,3 +1,4 @@
+// SigmaOS Distro Compatibility Layer
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -70,6 +71,7 @@ pub struct LocalSendFileMetadata {
 }
 
 /// LocalSend File Transfer Session
+#[derive(Debug, Clone)]
 pub struct LocalSendSession {
     pub session_id: String,
     pub files: HashMap<String, LocalSendFileMetadata>,
