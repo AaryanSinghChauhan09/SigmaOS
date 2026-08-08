@@ -20,6 +20,9 @@ pub use verifier::CryptoVerifier;
 pub use universal_adapter::{
     AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
 };
+pub use importer::{
+    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
+};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
