@@ -87,7 +87,7 @@ impl Workflow {
 /// Manager for Workflow resources
 #[derive(Debug)]
 pub struct WorkflowStep {
-    resources: Vec<Workflow>,
+    resources: alloc::vec::Vec<Workflow>,
     initialized: bool,
 }
 
@@ -95,7 +95,7 @@ impl WorkflowStep {
     /// Create a new WorkflowStep
     pub fn new() -> Self {
         Self {
-            resources: Vec::new(),
+            resources: alloc::vec::Vec::new(),
             initialized: false,
         }
     }
@@ -111,19 +111,21 @@ impl WorkflowStep {
         if !self.initialized {
             return Err(WorkflowError::NotSupported);
         }
-        let id = self.resources.len() as u64;
+        let id: u64 = self.resources.len() as u64;
         self.resources.push(resource);
         Ok(id)
     }
     
     /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&Workflow> {
-        self.resources.get(id as usize)
+        let res: &[Workflow] = &self.resources;
+        res.get(id as usize)
     }
     
     /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut Workflow> {
-        self.resources.get_mut(id as usize)
+        let res: &mut [Workflow] = &mut self.resources;
+        res.get_mut(id as usize)
     }
     
     /// List all resources
@@ -139,7 +141,8 @@ impl WorkflowStep {
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> WorkflowResult<()> {
         self.initialized = false;
-        self.resources.clear();
+        let res: &mut alloc::vec::Vec<Workflow> = &mut self.resources;
+        res.clear();
         Ok(())
     }
 }
@@ -147,6 +150,105 @@ impl WorkflowStep {
 impl Default for WorkflowStep {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Categories of system workflows
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WorkflowCategory {
+    Deployment,
+    Security,
+    ContinuousIntegration,
+    Automation,
+    Pages,
+    General,
+}
+
+/// A specific system workflow instance with a category and state
+#[derive(Debug, Clone)]
+pub struct SystemWorkflow {
+    pub id: u64,
+    pub name: String,
+    pub category: WorkflowCategory,
+    pub status: String,
+    pub active: bool,
+}
+
+impl SystemWorkflow {
+    pub fn new(id: u64, name: &str, category: WorkflowCategory) -> Self {
+        Self {
+            id,
+            name: name.into(),
+            category,
+            status: "Idle".into(),
+            active: false,
+        }
+    }
+
+    pub fn trigger(&mut self) -> WorkflowResult<&str> {
+        self.active = true;
+        self.status = match self.category {
+            WorkflowCategory::Deployment => "Deploying release artifacts...",
+            WorkflowCategory::Security => "Executing security audit scan...",
+            WorkflowCategory::ContinuousIntegration => "Running CI quality gates...",
+            WorkflowCategory::Automation => "Triggering scheduled background automation...",
+            WorkflowCategory::Pages => "Publishing static documentation pages...",
+            WorkflowCategory::General => "Executing general workflow task...",
+        }.into();
+        Ok(&self.status)
+    }
+
+    pub fn complete(&mut self) -> WorkflowResult<()> {
+        self.active = false;
+        self.status = "Success".into();
+        Ok(())
+    }
+
+    pub fn fail(&mut self, reason: &str) -> WorkflowResult<()> {
+        self.active = false;
+        self.status = alloc::format!("Failed: {}", reason);
+        Ok(())
+    }
+}
+
+/// Unified Registry managing all category-specific system workflows
+#[derive(Debug, Default)]
+pub struct SystemWorkflowRegistry {
+    pub workflows: alloc::vec::Vec<SystemWorkflow>,
+}
+
+impl SystemWorkflowRegistry {
+    pub fn new() -> Self {
+        Self {
+            workflows: alloc::vec::Vec::new(),
+        }
+    }
+
+    pub fn register(&mut self, name: &str, category: WorkflowCategory) -> u64 {
+        let id: u64 = self.workflows.len() as u64;
+        self.workflows.push(SystemWorkflow::new(id, name, category));
+        id
+    }
+
+    pub fn get_by_category(&self, category: WorkflowCategory) -> alloc::vec::Vec<&SystemWorkflow> {
+        let mut list: alloc::vec::Vec<&SystemWorkflow> = alloc::vec::Vec::new();
+        for w in &self.workflows {
+            if w.category == category {
+                list.push(w);
+            }
+        }
+        list
+    }
+
+    pub fn trigger_all_by_category(&mut self, category: WorkflowCategory) -> WorkflowResult<usize> {
+        let mut count = 0;
+        for w in &mut self.workflows {
+            if w.category == category {
+                w.trigger()?;
+                count += 1;
+            }
+        }
+        Ok(count)
     }
 }
 
@@ -171,4 +273,35 @@ mod tests {
         assert_eq!(id, 0);
         assert!(manager.get(0).is_some());
     }
+
+    #[test]
+    fn test_system_workflow_categories() {
+        let mut registry = SystemWorkflowRegistry::new();
+        let dep_id = registry.register("ProdDeploy", WorkflowCategory::Deployment);
+        let sec_id = registry.register("SecAudit", WorkflowCategory::Security);
+        let ci_id = registry.register("QualityGate", WorkflowCategory::ContinuousIntegration);
+        let auto_id = registry.register("CleanupTask", WorkflowCategory::Automation);
+        let pages_id = registry.register("BuildDocs", WorkflowCategory::Pages);
+
+        let w_len: usize = registry.workflows.len();
+        assert_eq!(w_len, 5);
+
+        // Verify deployment trigger
+        let triggered = registry.trigger_all_by_category(WorkflowCategory::Deployment).unwrap();
+        assert_eq!(triggered, 1);
+        assert!(registry.workflows[dep_id as usize].active);
+        assert_eq!(registry.workflows[dep_id as usize].status, "Deploying release artifacts...");
+
+        // Complete the deployment
+        registry.workflows[dep_id as usize].complete().unwrap();
+        assert!(!registry.workflows[dep_id as usize].active);
+        assert_eq!(registry.workflows[dep_id as usize].status, "Success");
+
+        // Verify Pages filter
+        let pages_workflows = registry.get_by_category(WorkflowCategory::Pages);
+        assert_eq!(pages_workflows.len(), 1);
+        assert_eq!(pages_workflows[0].name, "BuildDocs");
+    }
 }
+
+

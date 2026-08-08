@@ -44,6 +44,8 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod workflow;
+
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -126,6 +128,10 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
+pub use workflow::{
+    Workflow, WorkflowError, WorkflowResult, WorkflowStep, WorkflowCategory, SystemWorkflow, SystemWorkflowRegistry,
+};
+
 
 pub mod init {
     pub mod systemd_init;
