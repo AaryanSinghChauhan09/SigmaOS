@@ -17,6 +17,17 @@ pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
 
+pub use improvements::{
+    RollingReleaseChannel, RollingPackage, BtrfsVolumeManager, BtrfsSubvolume, SystemSnapshotManager,
+    SystemSnapshot, DeclarativeSystemConfig, ServiceConfig, UserConfig, BootConfig, NixStyleStorePath,
+    AtomicUpgradeEngine, EphemeralSessionManager, EncryptedPersistentStorage, PenTestToolRegistry,
+    PenTestTool, MinimalRuntime, OpenRcStyleInit, InitService, BoreSchedulerConfig, Task,
+    BoreScheduler, OptimizedKernelProfile, GarudaBtrfsLayout, SnapperIntegration, SnapperConfig,
+    SigmaDistroEngine, DebianAptPackageManager, CpuPerformanceGovernor, CpuGovernorType,
+    DirtyBlockFlusher, DirtyPageRecord, TransparentHugePageManager, PageFrame, ZramCompressedSwapDevice,
+    ZramPage,
+};
+
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
     ManjaroKernelRelease, ManjaroKernelSwitcher,

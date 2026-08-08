@@ -2,32 +2,42 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod linux_compat;
-pub mod importer;
 pub mod pacman;
 pub mod recipe;
 pub mod resolver;
+pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
+pub mod universal_adapter;
 pub mod verifier;
 
 pub use linux_compat::{
     DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
     TranslatedMetadata, TranslatorError,
 };
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
+pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
+pub use universal_adapter::{
+    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
+};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Version {
-    major: u64,
-    minor: u64,
-    patch: u64,
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+impl core::fmt::Display for Version {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
 }
 
 impl Version {
@@ -74,17 +84,47 @@ pub enum ParseError {
 /// Package metadata
 #[derive(Debug, Clone)]
 pub struct Package {
-    pub name: String,
+    pub name: crate::klib::String,
     pub version: Version,
-    pub description: String,
+    pub description: crate::klib::String,
     pub dependencies: Vec<Dependency>,
-    pub checksum: String,
+    pub checksum: crate::klib::String,
+    pub mirrors: Vec<crate::klib::String>,
+    pub signing_keys: Vec<crate::klib::String>,
+    pub licenses: Vec<crate::klib::String>,
+    pub maintainers: Vec<crate::klib::String>,
+    pub changelogs: Vec<crate::klib::String>,
+    pub source: crate::klib::String,
+}
+
+impl Package {
+    pub fn new(
+        name: crate::klib::String,
+        version: Version,
+        description: crate::klib::String,
+        dependencies: Vec<Dependency>,
+        checksum: crate::klib::String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+            mirrors: Vec::new(),
+            signing_keys: Vec::new(),
+            licenses: Vec::new(),
+            maintainers: Vec::new(),
+            changelogs: Vec::new(),
+            source: crate::klib::String::new(),
+        }
+    }
 }
 
 /// Package dependency
 #[derive(Debug, Clone)]
 pub struct Dependency {
-    pub name: String,
+    pub name: crate::klib::String,
     pub version_constraint: VersionConstraint,
 }
 

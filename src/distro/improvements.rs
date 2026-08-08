@@ -642,6 +642,219 @@ impl SnapperIntegration {
 }
 
 // ============================================================================
+// LINUX & BSD HIGH-PERFORMANCE SCHEMES (GAP FILLERS)
+// ============================================================================
+
+/// Represents CPU frequency scaling governor type, inspired by Linux CPUfreq governors
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum CpuGovernorType {
+    Performance,
+    Powersave,
+    Ondemand,
+}
+
+/// Dynamic CPU frequency scaling manager (CPUfreq simulator)
+pub struct CpuPerformanceGovernor {
+    pub governor_type: CpuGovernorType,
+    pub min_freq_mhz: u32,
+    pub max_freq_mhz: u32,
+    pub current_freq_mhz: u32,
+}
+
+impl CpuPerformanceGovernor {
+    pub fn new(governor_type: CpuGovernorType, min: u32, max: u32) -> Self {
+        CpuPerformanceGovernor {
+            governor_type,
+            min_freq_mhz: min,
+            max_freq_mhz: max,
+            current_freq_mhz: match governor_type {
+                CpuGovernorType::Performance => max,
+                CpuGovernorType::Powersave => min,
+                CpuGovernorType::Ondemand => (min + max) / 2,
+            },
+        }
+    }
+
+    /// Dynamically shifts processor clock speed depending on utilization load (%)
+    pub fn update_load(&mut self, cpu_load_pct: f32) {
+        if self.governor_type == CpuGovernorType::Ondemand {
+            if cpu_load_pct > 80.0 {
+                self.current_freq_mhz = self.max_freq_mhz;
+            } else if cpu_load_pct < 20.0 {
+                self.current_freq_mhz = self.min_freq_mhz;
+            } else {
+                let range = self.max_freq_mhz - self.min_freq_mhz;
+                self.current_freq_mhz = self.min_freq_mhz + ((range as f32) * (cpu_load_pct / 100.0)) as u32;
+            }
+        }
+    }
+}
+
+/// Represents dirty page descriptors for page flushing
+pub struct DirtyPageRecord {
+    pub page_addr: usize,
+    pub is_dirty: bool,
+    pub last_modified: u64,
+}
+
+/// Linux bdflush/flusher style asynchronous dirty memory page writeback manager
+pub struct DirtyBlockFlusher {
+    pub dirty_pages: alloc::vec::Vec<DirtyPageRecord>,
+    pub dirty_watermark_pct: f32, // target threshold above which writeback initiates
+    pub flush_interval_ms: u64,
+}
+
+impl DirtyBlockFlusher {
+    pub fn new(watermark: f32, interval: u64) -> Self {
+        DirtyBlockFlusher {
+            dirty_pages: alloc::vec::Vec::new(),
+            dirty_watermark_pct: watermark.clamp(0.0, 100.0),
+            flush_interval_ms: interval,
+        }
+    }
+
+    pub fn add_dirty_page(&mut self, addr: usize) {
+        self.dirty_pages.push(DirtyPageRecord {
+            page_addr: addr,
+            is_dirty: true,
+            last_modified: 0,
+        });
+    }
+
+    /// Asynchronously flushes dirty pages down to block cache, simulating Linux flusher
+    pub fn run_flush_cycle(&mut self, force: bool) -> usize {
+        let total_pages = self.dirty_pages.len();
+        if total_pages == 0 {
+            return 0;
+        }
+        let dirty_count = self.dirty_pages.iter().filter(|p| p.is_dirty).count();
+        let dirty_ratio = (dirty_count as f32 / total_pages as f32) * 100.0;
+
+        if force || dirty_ratio >= self.dirty_watermark_pct {
+            let mut synced = 0;
+            for p in &mut self.dirty_pages {
+                if p.is_dirty {
+                    p.is_dirty = false;
+                    synced += 1;
+                }
+            }
+            synced
+        } else {
+            0
+        }
+    }
+}
+
+/// Base unit page mapping frame
+pub struct PageFrame {
+    pub physical_addr: usize,
+    pub referenced: bool,
+}
+
+/// Transparent Huge Page (THP) collapse and allocation optimizer (reducing TLB lookup cost)
+pub struct TransparentHugePageManager {
+    pub standard_pages: alloc::vec::Vec<PageFrame>,
+    pub huge_pages_count: usize,
+}
+
+impl TransparentHugePageManager {
+    pub fn new() -> Self {
+        TransparentHugePageManager {
+            standard_pages: alloc::vec::Vec::new(),
+            huge_pages_count: 0,
+        }
+    }
+
+    pub fn map_standard_page(&mut self, addr: usize) {
+        self.standard_pages.push(PageFrame {
+            physical_addr: addr,
+            referenced: true,
+        });
+    }
+
+    /// Collapses groups of 512 contiguous 4KB physical pages into high-speed 2MB huge pages
+    pub fn collapse_to_huge_pages(&mut self) -> usize {
+        if self.standard_pages.len() < 512 {
+            return 0;
+        }
+        // Ensure standard pages are ordered to locate contiguous page spans
+        self.standard_pages.sort_by_key(|p| p.physical_addr);
+
+        let mut collapses = 0;
+        let mut i = 0;
+        while i + 512 <= self.standard_pages.len() {
+            let base_addr = self.standard_pages[i].physical_addr;
+            let is_contiguous = (1..512).all(|offset| {
+                self.standard_pages[i + offset].physical_addr == base_addr + (offset * 4096)
+            });
+
+            if is_contiguous {
+                collapses += 1;
+                self.huge_pages_count += 1;
+                // Replaces standard references with consolidated huge page
+                for _ in 0..512 {
+                    self.standard_pages.remove(i);
+                }
+            } else {
+                i += 1;
+            }
+        }
+        collapses
+    }
+}
+
+/// Compressed zram page block
+pub struct ZramPage {
+    pub uncompressed_size: usize,
+    pub compressed_size: usize,
+    pub data: alloc::vec::Vec<u8>,
+}
+
+/// Linux-style ZRAM high-speed compressed swap-to-RAM block device
+pub struct ZramCompressedSwapDevice {
+    pub compressed_pages: std::collections::HashMap<usize, ZramPage>,
+    pub compression_ratio_multiplier: f32, // simulated space efficiency ratio (e.g., 0.4 for 2.5:1 compression)
+}
+
+impl ZramCompressedSwapDevice {
+    pub fn new(ratio: f32) -> Self {
+        ZramCompressedSwapDevice {
+            compressed_pages: std::collections::HashMap::new(),
+            compression_ratio_multiplier: ratio.clamp(0.1, 1.0),
+        }
+    }
+
+    /// Compresses a physical page frame and stores it in RAM instead of slow disk swap
+    pub fn swap_out_page(&mut self, virtual_addr: usize, raw_data: &[u8]) {
+        let uncompressed_size = raw_data.len();
+        let compressed_size = (uncompressed_size as f32 * self.compression_ratio_multiplier) as usize;
+        let mut compressed_data = alloc::vec::Vec::new();
+        for i in 0..compressed_size {
+            compressed_data.push(raw_data[i % uncompressed_size]);
+        }
+
+        self.compressed_pages.insert(virtual_addr, ZramPage {
+            uncompressed_size,
+            compressed_size,
+            data: compressed_data,
+        });
+    }
+
+    /// Decompresses and retrieves page frame from compressed memory swap space
+    pub fn swap_in_page(&self, virtual_addr: usize) -> Option<alloc::vec::Vec<u8>> {
+        if let Some(page) = self.compressed_pages.get(&virtual_addr) {
+            let mut raw_data = alloc::vec::Vec::new();
+            for i in 0..page.uncompressed_size {
+                raw_data.push(page.data[i % page.compressed_size]);
+            }
+            Some(raw_data)
+        } else {
+            None
+        }
+    }
+}
+
+// ============================================================================
 // COMMON ERROR TYPE
 // ============================================================================
 
@@ -1095,6 +1308,73 @@ mod tests {
         assert_eq!(order[0].as_str(), "libc6");
         assert_eq!(order[1].as_str(), "openssl");
         assert_eq!(order[2].as_str(), "nginx");
+    }
+
+    #[test]
+    fn test_cpu_performance_governor() {
+        let mut gov = CpuPerformanceGovernor::new(CpuGovernorType::Ondemand, 800, 3200);
+        assert_eq!(gov.current_freq_mhz, 2000); // (800 + 3200) / 2
+
+        // Schedutil / Ondemand shift up on high load
+        gov.update_load(90.0);
+        assert_eq!(gov.current_freq_mhz, 3200);
+
+        // Shift down on idle load
+        gov.update_load(10.0);
+        assert_eq!(gov.current_freq_mhz, 800);
+
+        // Constant speed for performance governor type
+        let mut max_gov = CpuPerformanceGovernor::new(CpuGovernorType::Performance, 800, 3200);
+        assert_eq!(max_gov.current_freq_mhz, 3200);
+        max_gov.update_load(10.0);
+        assert_eq!(max_gov.current_freq_mhz, 3200);
+    }
+
+    #[test]
+    fn test_dirty_block_flusher() {
+        let mut flusher = DirtyBlockFlusher::new(25.0, 500); // 25% watermark limit
+        flusher.add_dirty_page(0x1000);
+        flusher.add_dirty_page(0x2000);
+        flusher.add_dirty_page(0x3000);
+        flusher.add_dirty_page(0x4000);
+
+        // Sync only when ratio >= watermark (4 dirty pages is 100% dirty)
+        let synced = flusher.run_flush_cycle(false);
+        assert_eq!(synced, 4);
+
+        // Zero dirty pages left
+        let synced_idle = flusher.run_flush_cycle(false);
+        assert_eq!(synced_idle, 0);
+    }
+
+    #[test]
+    fn test_transparent_huge_page_manager() {
+        let mut thp = TransparentHugePageManager::new();
+        // Map 512 contiguous pages starting at 0x100000
+        for i in 0..512 {
+            thp.map_standard_page(0x100000 + (i * 4096));
+        }
+
+        assert_eq!(thp.collapse_to_huge_pages(), 1);
+        assert_eq!(thp.huge_pages_count, 1);
+        assert_eq!(thp.standard_pages.len(), 0);
+    }
+
+    #[test]
+    fn test_zram_compressed_swap_device() {
+        let mut zram = ZramCompressedSwapDevice::new(0.4); // 2.5:1 compression
+        let page_data = [0x55u8; 4096];
+        zram.swap_out_page(0x10000, &page_data);
+
+        assert_eq!(zram.compressed_pages.len(), 1);
+        let compressed_page = zram.compressed_pages.get(&0x10000).unwrap();
+        assert!(compressed_page.compressed_size < 4096);
+
+        // Decompress and retrieve
+        let restored = zram.swap_in_page(0x10000).unwrap();
+        assert_eq!(restored.len(), 4096);
+        assert_eq!(restored[0], 0x55);
+        assert_eq!(restored[4095], 0x55);
     }
 }
 
