@@ -1,5 +1,3 @@
-use super::vec::Vec;
-use core::mem;
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
 /// Implements 2^n page frames with free list per order, split/coalesce
@@ -65,7 +63,7 @@ impl SimpleBuddyAllocator {
             Vec::new(),
         ];
         let mut blocks = Vec::new();
-        let mut next_id = AtomicUsize::new(1);
+        let next_id = AtomicUsize::new(0);
 
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
@@ -92,13 +90,13 @@ impl BuddyAllocator for SimpleBuddyAllocator {
             if !self.free_lists[current_order].is_empty() {
                 let block_id = self.free_lists[current_order].remove(0);
 
-                while current_order > order {
+                if current_order > order {
                     let new_order = current_order - 1;
                     let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
 
-                    let mut left_block = Block::new(new_order);
-                    let mut right_block = Block::new(new_order);
+                    let left_block = Block::new(new_order);
+                    let right_block = Block::new(new_order);
 
                     if let Some(ref mut parent) = self.blocks[block_id] {
                         parent.left.store(left_id, Ordering::SeqCst);
@@ -206,8 +204,8 @@ impl MemoryPool for SimpleBuddyAllocator {
 
     fn get_used_frames(&self) -> usize {
         let mut used = 0;
-        for i in 0..self.blocks.len() {
-            if let Some(ref block) = self.blocks[i] {
+        for block_option in &self.blocks {
+            if let Some(ref block) = *block_option {
                 if block.free.load(Ordering::SeqCst) == 0 {
                     used += 1;
                 }
@@ -238,6 +236,8 @@ impl MemoryPool for SimpleBuddyAllocator {
         (free_blocks as f64) / (free as f64)
     }
 }
+
+pub use crate::klib::vec::Vec;
 
 #[cfg(test)]
 mod tests {
