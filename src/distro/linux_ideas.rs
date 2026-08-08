@@ -7,9 +7,12 @@
 #![allow(unused_imports)]
 #![allow(clippy::new_without_default)]
 
-extern crate alloc;
-use alloc::string::String;
-use crate::klib::Vec;
+#[cfg(not(test))]
+use crate::klib::{Vec, String};
+#[cfg(test)]
+use std::vec::Vec;
+#[cfg(test)]
+use std::string::String;
 
 // ─── 1. ARCH LINUX: Pacman-style rolling dependency resolver ──────────────────
 /// Arch-inspired: topological sort for package dependency resolution with cycle detection
@@ -319,29 +322,55 @@ pub struct RunitService {
     pub restart_count: u32,
     pub max_restarts: u32,
     pub log_enabled: bool,
+    pub dependencies: Vec<String>,
+    pub logs: Vec<String>,
 }
 
 impl RunitService {
     pub fn new(name: String) -> Self {
-        Self { name, status: ServiceStatus::Down, restart_count: 0, max_restarts: 5, log_enabled: true }
+        Self {
+            name,
+            status: ServiceStatus::Down,
+            restart_count: 0,
+            max_restarts: 5,
+            log_enabled: true,
+            dependencies: Vec::new(),
+            logs: Vec::new(),
+        }
+    }
+
+    pub fn with_dependency(mut self, dep: String) -> Self {
+        self.dependencies.push(dep);
+        self
+    }
+
+    pub fn log_event(&mut self, msg: &str) {
+        if self.log_enabled {
+            self.logs.push(String::from(msg));
+        }
     }
 
     pub fn start(&mut self, pid: u32) {
         self.status = ServiceStatus::Starting;
         self.status = ServiceStatus::Up { pid, uptime_secs: 0 };
+        self.log_event("Service started successfully");
     }
 
     pub fn stop(&mut self) {
         self.status = ServiceStatus::Finishing;
         self.status = ServiceStatus::Down;
+        self.log_event("Service stopped cleanly");
     }
 
     pub fn crash_and_restart(&mut self, new_pid: u32) {
         self.restart_count += 1;
+        self.log_event("Service crash event detected");
         if self.restart_count > self.max_restarts {
             self.status = ServiceStatus::Failed;
+            self.log_event("Service failed: maximum restart limit exceeded");
         } else {
             self.start(new_pid);
+            self.log_event("Service restarted automatically");
         }
     }
 
@@ -351,7 +380,7 @@ impl RunitService {
 }
 
 pub struct RunitSupervisor {
-    services: Vec<RunitService>,
+    pub services: Vec<RunitService>,
 }
 
 impl RunitSupervisor {
@@ -373,6 +402,40 @@ impl RunitSupervisor {
             .map(|s| s.name.as_str())
             .collect()
     }
+
+    /// Supervise all services, recursively starting satisfied dependencies or restarting crashed nodes
+    pub fn supervise_and_heal(&mut self) -> usize {
+        let mut changes = 0;
+        let n = self.services.len();
+
+        // Temporarily take clone of names to check which dependencies are currently in the 'Up' state
+        let mut up_names = Vec::new();
+        for s in &self.services {
+            if let ServiceStatus::Up { .. } = s.status {
+                up_names.push(s.name.clone());
+            }
+        }
+
+        for i in 0..n {
+            let mut satisfied = true;
+            for dep in &self.services[i].dependencies {
+                if !up_names.iter().any(|name| name == dep) {
+                    satisfied = false;
+                    break;
+                }
+            }
+
+            if satisfied && self.services[i].status == ServiceStatus::Down {
+                // Dependency is satisfied, auto-boot this service
+                let name = self.services[i].name.clone();
+                let pid = 2000 + i as u32;
+                self.services[i].start(pid);
+                self.services[i].log_event("Booted by supervisor dependency trigger");
+                changes += 1;
+            }
+        }
+        changes
+    }
 }
 
 // ─── 8. OPENSUSE: YaST-style system configuration manager ────────────────────
@@ -392,28 +455,14 @@ impl YastConfigStore {
     pub fn new() -> Self { Self { entries: Vec::new() } }
 
     pub fn set(&mut self, key: &str, val: ConfigValue) {
-        for i in 0..self.entries.len() {
-            let entry = &mut self.entries[i];
-            if entry.0.as_str() == key {
-                entry.1 = val;
-                return;
-            }
+        for (k, v) in self.entries.iter_mut() {
+            if k.as_str() == key { *v = val; return; }
         }
-        let k = key.to_string();
-        self.entries.push((k, val));
-        let mut k = String::new();
-        for &b in key.as_bytes() { k.push(b); }
-        self.entries.push((k, val));
+        self.entries.push((String::from(key), val));
     }
 
     pub fn get(&self, key: &str) -> Option<&ConfigValue> {
-        for i in 0..self.entries.len() {
-            let entry = &self.entries[i];
-            if entry.0.as_str() == key {
-                return Some(&entry.1);
-            }
-        }
-        None
+        self.entries.iter().find(|(k, _)| k.as_str() == key).map(|(_, v)| v)
     }
 
     pub fn get_bool(&self, key: &str) -> Option<bool> {
@@ -426,21 +475,18 @@ impl YastConfigStore {
 
     pub fn serialize(&self) -> String {
         let mut out = String::new();
-        for i in 0..self.entries.len() {
-            let entry = &self.entries[i];
-            let k = &entry.0;
-            let v = &entry.1;
+        for (k, v) in &self.entries {
             out.push_str(k.as_str());
             out.push_str(" = ");
             match v {
-                ConfigValue::Bool(b) => out.push_str(if b { "true" } else { "false" }),
-                ConfigValue::Int(i) => { let s = format_int(i); out.push_str(&s); }
+                ConfigValue::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
+                ConfigValue::Int(i) => { let s = format_int(*i); out.push_str(&s); }
                 ConfigValue::Text(t) => { out.push('"'); out.push_str(t.as_str()); out.push('"'); }
                 ConfigValue::List(l) => {
                     out.push('[');
-                    for j in 0..l.len() {
-                        if j > 0 { out.push_str(", "); }
-                        out.push_str(l[j].as_str());
+                    for (i, item) in l.iter().enumerate() {
+                        if i > 0 { out.push_str(", "); }
+                        out.push_str(item.as_str());
                     }
                     out.push(']');
                 }
@@ -561,9 +607,7 @@ mod tests {
     fn test_dep_resolver() {
         let mut r = NativeDependencyResolver::new();
         r.add_package(String::from("libssl"), Vec::new());
-        let mut deps = Vec::new();
-        deps.push(String::from("libssl"));
-        r.add_package(String::from("curl"), deps);
+        r.add_package(String::from("curl"), vec![String::from("libssl")]);
         let order = r.resolve_order().unwrap();
         assert_eq!(order[0].as_str(), "libssl");
         assert_eq!(order[1].as_str(), "curl");
@@ -602,9 +646,30 @@ mod tests {
     #[test]
     fn test_runit_supervisor() {
         let mut sv = RunitSupervisor::new();
-        sv.register(RunitService::new(String::from("sshd")));
-        sv.get_mut("sshd").unwrap().start(1234);
+        let net_svc = RunitService::new(String::from("network"));
+        let ssh_svc = RunitService::new(String::from("sshd"))
+            .with_dependency(String::from("network"));
+
+        sv.register(net_svc);
+        sv.register(ssh_svc);
+
+        // Intially, up_count should be 0 since both are Down
+        assert_eq!(sv.up_count(), 0);
+
+        // Run supervision. Only "network" has no dependencies and should heal/auto-start
+        let changes = sv.supervise_and_heal();
+        assert_eq!(changes, 1);
         assert_eq!(sv.up_count(), 1);
+        assert_eq!(sv.get_mut("network").unwrap().status, ServiceStatus::Up { pid: 2000, uptime_secs: 0 });
+
+        // Second run. Now "network" is up, so "sshd"'s dependency is satisfied. It should auto-start
+        let changes2 = sv.supervise_and_heal();
+        assert_eq!(changes2, 1);
+        assert_eq!(sv.up_count(), 2);
+        assert_eq!(sv.get_mut("sshd").unwrap().status, ServiceStatus::Up { pid: 2001, uptime_secs: 0 });
+
+        // Verify logs are preserved
+        assert!(sv.get_mut("sshd").unwrap().logs.iter().any(|log| log.as_str().contains("Service started successfully")));
     }
 
     #[test]
