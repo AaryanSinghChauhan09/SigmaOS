@@ -1,8 +1,8 @@
 // SigmaOS Accessibility Module
 pub mod framework;
-pub mod screenreader;
-pub mod magnifier;
 pub mod keyboard;
+pub mod magnifier;
+pub mod screenreader;
 
 pub use framework::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -10,13 +10,16 @@ pub use framework::{
 };
 
 pub use screenreader::{
-    VoiceID, VoiceGender, SimpleVoice, Voice, ScreenReader, SimpleScreenReader, BrailleDisplay, SimpleBrailleDisplay,
+    BrailleDisplay, ScreenReader, SimpleBrailleDisplay, SimpleScreenReader, SimpleVoice, Voice,
+    VoiceGender, VoiceID,
 };
 
 pub use magnifier::{
-    MagnifierID, Magnifier, SimpleMagnifier, MagnifierManager, SimpleMagnifierManager, ColorFilter, SimpleColorFilter,
+    ColorFilter, Magnifier, MagnifierID, MagnifierManager, SimpleColorFilter, SimpleMagnifier,
+    SimpleMagnifierManager,
 };
 
 pub use keyboard::{
-    KeyID, KeyType, VirtualKey, SimpleVirtualKey, OnScreenKeyboard, SimpleOnScreenKeyboard, StickyKeys, SimpleStickyKeys,
+    KeyID, KeyType, OnScreenKeyboard, SimpleOnScreenKeyboard, SimpleStickyKeys, SimpleVirtualKey,
+    StickyKeys, VirtualKey,
 };
