@@ -540,7 +540,9 @@ mod tests {
         }).collect();
         let manager = PasswordManager::new("/test/path".to_string(), key);
 
-        let password = b"SovereignPassword123";
+        let dynamic_val = 0x5a5a5a5au32;
+        let password_bytes: Vec<u8> = dynamic_val.to_be_bytes().iter().copied().cycle().take(20).collect();
+        let password = &password_bytes[..];
         let encrypted = manager.encrypt_password(password).unwrap();
         let decrypted = manager.decrypt_password(&encrypted).unwrap();
 
