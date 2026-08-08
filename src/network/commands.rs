@@ -203,7 +203,7 @@ pub enum ConnectionState {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ConntrackEntry {
     pub src_ip: u32,
-    pub _src_port: u16,
+    pub src_port: u16,
     pub dest_ip: u32,
     pub dest_port: u16,
     pub protocol: NetworkProtocol,
@@ -421,7 +421,7 @@ impl IptablesEngine {
         &self,
         rule: &IptablesRule,
         src_ip: u32,
-        _src_port: u16,
+        src_port: u16,
         dest_ip: u32,
         dest_port: u16,
         protocol: NetworkProtocol,
@@ -472,7 +472,7 @@ pub enum FirewallAction {
 
 pub trait FirewallFilterRule: Sync {
     fn name(&self) -> &'static str;
-    fn evaluate_packet(&self, _source_ip: u32, dest_port: u16) -> FirewallAction;
+    fn evaluate_packet(&self, source_ip: u32, dest_port: u16) -> FirewallAction;
 }
 
 pub struct UfwDefaultRule;

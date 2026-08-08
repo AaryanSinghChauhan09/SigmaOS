@@ -180,7 +180,7 @@ impl Tcb {
             priority: 8, // Default normal priority
             registers,
             stack_base: rsp as usize,
-            stack_limit: rsp.saturating_sub(0x100000) as usize, // 1MB stack
+            stack_limit: (rsp - 0x100000) as usize, // 1MB stack
         }
     }
 }

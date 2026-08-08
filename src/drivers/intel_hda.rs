@@ -94,7 +94,7 @@ impl IntelHdaDriver {
         }
     }
 
-    unsafe fn read_reg32(&self, _offset: u16) -> u32 {
+    unsafe fn read_reg32(&self, offset: u16) -> u32 {
         #[cfg(target_os = "none")]
         {
             read_volatile((self.mmio_base + offset as usize) as *const u32)
@@ -109,14 +109,14 @@ impl IntelHdaDriver {
         }
     }
 
-    unsafe fn write_reg32(&self, _offset: u16, _value: u32) {
+    unsafe fn write_reg32(&self, offset: u16, value: u32) {
         #[cfg(target_os = "none")]
         {
             write_volatile((self.mmio_base + offset as usize) as *mut u32, value);
         }
     }
 
-    unsafe fn read_reg16(&self, _offset: u16) -> u16 {
+    unsafe fn read_reg16(&self, offset: u16) -> u16 {
         #[cfg(target_os = "none")]
         {
             read_volatile((self.mmio_base + offset as usize) as *const u16)
@@ -127,14 +127,14 @@ impl IntelHdaDriver {
         }
     }
 
-    unsafe fn write_reg16(&self, _offset: u16, _value: u16) {
+    unsafe fn write_reg16(&self, offset: u16, value: u16) {
         #[cfg(target_os = "none")]
         {
             write_volatile((self.mmio_base + offset as usize) as *mut u16, value);
         }
     }
 
-    unsafe fn read_reg8(&self, _offset: u16) -> u8 {
+    unsafe fn read_reg8(&self, offset: u16) -> u8 {
         #[cfg(target_os = "none")]
         {
             read_volatile((self.mmio_base + offset as usize) as *const u8)
@@ -145,7 +145,7 @@ impl IntelHdaDriver {
         }
     }
 
-    unsafe fn write_reg8(&self, _offset: u16, _value: u8) {
+    unsafe fn write_reg8(&self, offset: u16, value: u8) {
         #[cfg(target_os = "none")]
         {
             write_volatile((self.mmio_base + offset as usize) as *mut u8, value);
