@@ -1,33 +1,19 @@
-# feature request
-
 ---
-name: Feature Request / New Shard
-about: Propose a new Sovereign Shard or architectural improvement
-title: "[SHARD] <SovereignNewName>: <short description>"
-labels: enhancement, new-shard
+name: Feature Request
+about: Suggest an idea for SigmaOS
+title: ''
+labels: enhancement
 assignees: ''
 ---
 
-## Shard Name
+## Is your feature request related to a problem? Please describe.
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-<!-- e.g. SovereignQuantumCache -->
+## Describe the solution you'd like
+A clear and concise description of what you want to happen.
 
-## Problem Statement
+## Describe alternatives you've considered
+A clear and concise description of any alternative solutions or features you've considered.
 
-<!-- What gap does this close? Reference MISSING_COMPONENTS.md if applicable -->
-
-## Proposed Solution
-
-<!-- Describe the sovereign singleton design and USP -->
-
-## Linux Equivalent
-
-<!-- What does this replace? e.g. `systemctl`, `/proc`, `iptables` -->
-
-## Algorithm / USP
-
-<!-- Name the algorithm (e.g. QREP, UMSM, ZBT) and explain its advantage -->
-
-## Dependencies
-
-<!-- Which existing shards does this require? -->
+## Additional context
+Add any other context or screenshots about the feature request here.
