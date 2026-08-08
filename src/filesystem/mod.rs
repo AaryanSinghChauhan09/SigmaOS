@@ -8,6 +8,9 @@ pub mod support;
 pub mod tmpfs;
 pub mod vfs;
 pub mod defragmenter;
+pub mod legacy_fs;
+pub mod sigma_fs;
+pub mod smart_symlink;
 
 pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{
@@ -15,6 +18,7 @@ pub use archive::{
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
 };
 pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
+pub use defragmenter::{ClusterState, DefragStats, DiskDefragmenter, FragmentedFile};
 pub use disk_usage::{
     AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
     DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
@@ -28,3 +32,15 @@ pub use support::{
     SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use legacy_fs::{
+    LegacyFsType, LegacyFSAdapter,
+};
+pub use sigma_fs::{
+    FileBlock, SigmaFS,
+    SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+    SigmaDisasterRecoveryCleaner,
+    SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio,
+};
+pub use smart_symlink::{
+    SymlinkError, SmartSymlink,
+};

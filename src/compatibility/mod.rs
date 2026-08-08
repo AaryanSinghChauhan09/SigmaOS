@@ -7,6 +7,14 @@ pub mod legacy_adapters;
 pub mod india_professional_tools;
 pub mod canonical;
 pub mod fedora;
+pub mod cross_platform;
+pub mod india_stack;
+pub mod jehanne;
+pub mod mint_linux;
+pub mod reactos;
+pub mod interim;
+pub mod historic_linux;
+pub mod freedos;
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};
@@ -26,6 +34,7 @@ pub use cross_platform::{
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
 };
 pub use india_stack_localization::{IndianLanguage, LocalizationManager, LocalizationProvider};
+pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
 
 pub use historic_linux::{
     Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
@@ -33,15 +42,25 @@ pub use historic_linux::{
     VintagePackageConverter, VintageVirtualizationSandbox,
 };
 
+pub use jehanne::{
+    ComputeNode, DistributedComputeHandoff, JehanneError, JehanneNamespace, NamespaceBindEntry,
+    Plan9pMessage, Plan9pMsgType,
+};
+
 pub use mint_linux::{
     MintUpdateLevel, MintUpdatePackage, MintUpdateManager, MintBackupTool,
     MintAppMetadata, MintSoftwareManager, MintReportAlertSeverity, MintReportAlert,
-    MintReportSystem,
+    MintReportSystem, MintUpdateItem, SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor,
 };
 
 pub use chimera_linux::{
     DinitServiceState, DinitService, DinitServiceManager, BsdUserlandCompat,
     ApkPackageMetadata, ApkPackageStore,
+};
+
+pub use reactos::{
+    NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
+    RegistryHive,
 };
 
 pub use relay_nexus::{
@@ -64,3 +83,5 @@ pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
 };
+
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};

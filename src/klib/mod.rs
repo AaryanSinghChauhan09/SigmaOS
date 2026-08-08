@@ -1,15 +1,10 @@
-// Core Library Collection Modules for SigmaOS
-pub mod async_runtime;
-pub mod error;
-pub mod isa;
-pub mod store;
+// SigmaOS Kernel Library
 pub mod vec;
 pub mod buddy_allocator;
 pub mod paging;
-pub mod error;
+pub mod uvm;
 
-pub use async_runtime::{AsyncExecutor, Task};
-pub use error::{CryptoError, FsError, KernelError, NetError, SecurityError, SigmaError};
-pub use isa::{CpuIsaAssessor, IsaLevel};
-pub use store::{Reducer, Store, Subscriber};
 pub use vec::Vec;
+
+#[cfg(not(target_os = "none"))]
+pub use std::collections::HashMap;

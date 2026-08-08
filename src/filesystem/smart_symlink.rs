@@ -3,18 +3,28 @@
 // Beats traditional Linux symlinks through context-awareness, infinite-recursion safety, and dynamic self-healing.
 // Improved with dynamic env-var expansion, chroot-escape sandbox protection, and multi-lib target ABI routing.
 
-use crate::compatibility::{KernelPersona, SyscallAbi};
+use crate::klib::Vec;
+use crate::kernel::KernelPersona;
 use core::cell::RefCell;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 const MAX_SYMLINK_RECURSION: usize = 8;
 const MAX_FALLBACK_PATHS: usize = 4;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SymlinkError {
+    InfiniteLoop,
+    NotFound,
+    InvalidPath,
+    ContextRejected,
+}
+
 /// User-Defined Resolver Rule (User Defined Functions)
 /// Evaluates custom environmental rules to dynamically point to different directories or versions
 pub trait SymlinkResolverRule {
     fn name(&self) -> &'static str;
     fn evaluate(&self, persona: KernelPersona) -> bool;
+    fn is_legacy(&self) -> bool;
 }
 
 pub struct LinuxPersonaRule;
@@ -29,7 +39,11 @@ impl SymlinkResolverRule for LinuxPersonaRule {
             | KernelPersona::Linux_4_x
             | KernelPersona::Linux_5_x
             | KernelPersona::Linux_6_x => true,
+            _ => false,
         }
+    }
+    fn is_legacy(&self) -> bool {
+        false
     }
 }
 
@@ -44,14 +58,16 @@ impl SymlinkResolverRule for LegacyLinuxRule {
             _ => false,
         }
     }
+    fn is_legacy(&self) -> bool {
+        true
+    }
 }
 
 /// Dynamic Smart Symlink Object
 pub struct SmartSymlink {
     pub name: &'static str,
     pub primary_target: &'static str,
-    pub fallback_targets: [&'static str; MAX_FALLBACK_PATHS],
-    pub fallback_count: usize,
+    pub fallback_targets: Vec<&'static str>,
     pub self_healing_active: AtomicBool,
     pub resolution_counter: RefCell<usize>,
 }
@@ -59,12 +75,11 @@ pub struct SmartSymlink {
 unsafe impl Sync for SmartSymlink {}
 
 impl SmartSymlink {
-    pub const fn new(name: &'static str, primary_target: &'static str) -> Self {
+    pub fn new(name: &'static str, primary_target: &'static str) -> Self {
         Self {
             name,
             primary_target,
-            fallback_targets: [""; MAX_FALLBACK_PATHS],
-            fallback_count: 0,
+            fallback_targets: Vec::new(),
             self_healing_active: AtomicBool::new(true),
             resolution_counter: RefCell::new(0),
         }
@@ -72,9 +87,8 @@ impl SmartSymlink {
 
     /// Adds fallback paths used by the self-healing engine if primary targets are missing
     pub fn add_fallback_target(&mut self, target: &'static str) -> bool {
-        if self.fallback_count < MAX_FALLBACK_PATHS {
-            self.fallback_targets[self.fallback_count] = target;
-            self.fallback_count += 1;
+        if self.fallback_targets.len() < MAX_FALLBACK_PATHS {
+            self.fallback_targets.push(target);
             true
         } else {
             false
@@ -142,16 +156,13 @@ impl SmartSymlink {
 
     /// Improvement 3: Multi-Lib Architecture Routing
     /// Routes the symlink path to /lib32 or /lib64 automatically depending on the active ABI
-    pub fn resolve_multi_lib_routing(&self, syscall_abi: SyscallAbi) -> &'static str {
-        match syscall_abi {
-            SyscallAbi::Oabi_32 => {
-                // Route to legacy 32-bit library directory (multi-lib parity)
-                "/lib32/libc.so"
-            }
-            SyscallAbi::Eabi_64 => {
-                // Route to modern 64-bit library directory
-                "/lib64/libc.so"
-            }
+    pub fn resolve_multi_lib_routing(&self, is_32bit: bool) -> &'static str {
+        if is_32bit {
+            // Route to legacy 32-bit library directory (multi-lib parity)
+            "/lib32/libc.so"
+        } else {
+            // Route to modern 64-bit library directory
+            "/lib64/libc.so"
         }
     }
 
@@ -161,7 +172,7 @@ impl SmartSymlink {
         primary_exists: bool,
         fallback_existence: &[bool],
         rule: &dyn SymlinkResolverRule,
-    ) -> Result<&'static str, &'static str> {
+    ) -> Result<&'static str, SymlinkError> {
         // 1. Evaluate Context Rule (User-Defined Functions / Persona alignment)
         let is_valid_context = rule.evaluate(persona);
         if !is_valid_context {
@@ -170,12 +181,10 @@ impl SmartSymlink {
                 rule.name()
             );
             // Fallback immediately to a generic safe path if available
-            if self.fallback_count > 0 {
+            if !self.fallback_targets.is_empty() {
                 return Ok(self.fallback_targets[0]);
             }
-            return Err(
-                "ContextRejected: No fallback paths valid for the active kernel persona context.",
-            );
+            return Err(SymlinkError::ContextRejected);
         }
 
         // 2. Resolve primary target
@@ -186,9 +195,8 @@ impl SmartSymlink {
         // 3. Trigger Self-Healing (Solver) if primary target is broken
         if self.self_healing_active.load(Ordering::SeqCst) {
             println!("SmartSymlink: Primary target '{}' is missing. Self-healing solver searching fallbacks...", self.primary_target);
-            for i in 0..self.fallback_count {
-                let target_exists = fallback_existence.get(i).copied().unwrap_or(false);
-                if target_exists {
+            for (i, &target_exists) in fallback_existence.iter().enumerate() {
+                if target_exists && i < self.fallback_targets.len() {
                     println!(
                         "SmartSymlink: Solver self-healed path to active target: '{}'",
                         self.fallback_targets[i]
@@ -198,7 +206,7 @@ impl SmartSymlink {
             }
         }
 
-        Err("ENOENT: Symlink is totally orphaned. No targets exist.")
+        Err(SymlinkError::NotFound)
     }
 
     /// Smart symlink resolution resolving targets conditionally using User-Defined Functions
@@ -210,13 +218,13 @@ impl SmartSymlink {
         fallback_existence: &[bool],
         rule: &dyn SymlinkResolverRule,
         next_link: Option<&SmartSymlink>,
-    ) -> Result<&'static str, &'static str> {
+    ) -> Result<&'static str, SymlinkError> {
         let current_depth = {
             let mut depth = self.resolution_counter.borrow_mut();
             *depth += 1;
             if *depth > MAX_SYMLINK_RECURSION {
                 *depth = 0; // reset
-                return Err("ELOOP: Infinite loop or excessive recursion detected in symlink path resolution.");
+                return Err(SymlinkError::InfiniteLoop);
             }
             *depth
         };
