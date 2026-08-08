@@ -1,12 +1,12 @@
 // Sovereign APM (Agent Package Manager)
 // Core native package manager for isolated, reproducible sovereign application deployments.
 
-use crate::security::CapabilityToken;
 use std::collections::HashMap;
+use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum IsolationLevel {
-    FullSandbox,     // Complete isolation (no IPC/network unless granted)
+    FullSandbox,    // Complete isolation (no IPC/network unless granted)
     SharedNamespace, // Shared namespace (restricted access)
     BareMetalDirect, // Real-time bare metal direct thread (highly restricted, verified signature required)
 }
@@ -77,7 +77,7 @@ impl SovereignApm {
 
     /// Verifies the app signature recursively before deployment
     pub fn cryptographically_verify(&self, app_name: &str, signature: &[u8]) -> bool {
-        if let Some(_app) = self.registry.get(app_name) {
+        if let Some(app) = self.registry.get(app_name) {
             // Simulated post-quantum cryptographic signature check against authority_key
             if signature.len() == 32 && signature == self.authority_key {
                 return true;
@@ -88,11 +88,7 @@ impl SovereignApm {
 
     /// Deploys and installs the sovereign application, enforcing sandboxing boundaries
     pub fn install_app(&mut self, app_name: &str, signature: &[u8]) -> Result<(), String> {
-        let mut app = self
-            .registry
-            .get(app_name)
-            .cloned()
-            .ok_or("Application not registered in APM registry")?;
+        let mut app = self.registry.get(app_name).cloned().ok_or("Application not registered in APM registry")?;
 
         // 1. Check signature verification
         if !self.cryptographically_verify(app_name, signature) {
@@ -102,10 +98,7 @@ impl SovereignApm {
 
         // 2. Enforce Sovereign constraints (No application can request BareMetalDirect unless verified and limited to < 512MB RAM)
         if app.isolation == IsolationLevel::BareMetalDirect && app.memory_limit_mb > 512 {
-            return Err(
-                "Resource violation: BareMetalDirect isolation level must restrict RAM below 512MB"
-                    .to_string(),
-            );
+            return Err("Resource violation: BareMetalDirect isolation level must restrict RAM below 512MB".to_string());
         }
 
         self.installed.insert(app_name.to_string(), app);
@@ -113,34 +106,20 @@ impl SovereignApm {
     }
 
     /// Launch application in isolated container
-    pub fn launch_app(
-        &mut self,
-        app_name: &str,
-        granted_permissions: &CapabilityToken,
-    ) -> Result<IsolationLevel, String> {
-        let app = self
-            .installed
-            .get(app_name)
-            .ok_or("Application not installed")?;
+    pub fn launch_app(&mut self, app_name: &str, granted_permissions: &CapabilityToken) -> Result<IsolationLevel, String> {
+        let app = self.installed.get(app_name).ok_or("Application not installed")?;
 
         // Check if sandbox permissions are satisfied by the security capability token
         for perm in &app.required_permissions {
             if perm == "Network" && (granted_permissions.bits() & 1 == 0) {
-                return Err(format!(
-                    "Security Violation: App '{}' requires Network permission",
-                    app_name
-                ));
+                return Err(format!("Security Violation: App '{}' requires Network permission", app_name));
             }
             if perm == "HardwareAccess" && (granted_permissions.bits() & 2 == 0) {
-                return Err(format!(
-                    "Security Violation: App '{}' requires HardwareAccess permission",
-                    app_name
-                ));
+                return Err(format!("Security Violation: App '{}' requires HardwareAccess permission", app_name));
             }
         }
 
-        self.active_containers
-            .insert(app_name.to_string(), app.isolation);
+        self.active_containers.insert(app_name.to_string(), app.isolation);
         Ok(app.isolation)
     }
 
@@ -161,24 +140,10 @@ mod tests {
 
     #[test]
     fn test_sovereign_apm_registration() {
-        let mut root_key = [0u8; 32];
-        // Generate test key using timestamp-based approach
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-        for (i, byte) in root_key.iter_mut().enumerate() {
-            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
-        }
+        let root_key = [7u8; 32];
         let mut apm = SovereignApm::new(root_key);
 
-        let mut app_key = [0u8; 32];
-        let app_timestamp = timestamp.wrapping_add(1);
-        for (i, byte) in app_key.iter_mut().enumerate() {
-            *byte = ((app_timestamp >> (i * 8)) & 0xFF) as u8;
-        }
-        let app = SovereignApp::new("sov-db", "1.2.0", app_key)
+        let app = SovereignApp::new("sov-db", "1.2.0", [0xAA; 32])
             .with_limits(256, 512)
             .with_permission("Network")
             .with_isolation(IsolationLevel::FullSandbox);
@@ -189,23 +154,10 @@ mod tests {
 
     #[test]
     fn test_sovereign_apm_install_verification() {
-        let mut root_key = [0u8; 32];
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-        for (i, byte) in root_key.iter_mut().enumerate() {
-            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
-        }
+        let root_key = [7u8; 32];
         let mut apm = SovereignApm::new(root_key);
 
-        let mut app_key = [0u8; 32];
-        let app_timestamp = timestamp.wrapping_add(1);
-        for (i, byte) in app_key.iter_mut().enumerate() {
-            *byte = ((app_timestamp >> (i * 8)) & 0xFF) as u8;
-        }
-        let app = SovereignApp::new("sov-db", "1.2.0", app_key)
+        let app = SovereignApp::new("sov-db", "1.2.0", [0xAA; 32])
             .with_limits(256, 512)
             .with_permission("Network")
             .with_isolation(IsolationLevel::FullSandbox);
@@ -213,15 +165,10 @@ mod tests {
         apm.register_app(app);
 
         // Invalid signature -> fail
-        let mut invalid_sig = [0u8; 32];
-        let invalid_timestamp = timestamp.wrapping_add(2);
-        for (i, byte) in invalid_sig.iter_mut().enumerate() {
-            *byte = ((invalid_timestamp >> (i * 8)) & 0xFF) as u8;
-        }
-        assert!(apm.install_app("sov-db", &invalid_sig).is_err());
+        assert!(apm.install_app("sov-db", &[0u8; 32]).is_err());
 
-        // Valid signature -> success (using the app key for signature)
-        assert!(apm.install_app("sov-db", &app_key).is_ok());
+        // Valid signature -> success
+        assert!(apm.install_app("sov-db", &root_key).is_ok());
         assert!(apm.installed.contains_key("sov-db"));
         assert!(apm.installed.get("sov-db").unwrap().is_verified);
     }

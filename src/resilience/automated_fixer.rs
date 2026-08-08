@@ -1,85 +1,124 @@
-// Automated Runtime Problem Fixer and Self-Healing Daemon for SigmaOS
-// Implements continuous monitoring and correction of system crashes, leaks, and deadlocks
+// Sovereign Automated Fixer and Self-Healing Daemon
+// Inspired by Linux watchdogs, systemd service recovery, and Solaris Fault Management Architecture (FMA).
 
-#![no_std]
-#![allow(warnings)]
-#![allow(clippy::all)]
+use crate::resilience::self_healing::{SelfHealingModule, RecoveryEventType, RecoveryAction};
+use std::collections::HashMap;
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
-use core::sync::atomic::{AtomicBool, Ordering};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RuntimeProblem {
-    NullPointerDeRef,
-    MemoryLeak,
-    ThreadDeadlock,
-    SocketPortBlocked,
-    DatabaseCorruption,
-    ProcessZombification,
-    InfiniteLoopDetect,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ProblemType {
+    NullPointerDeRef,   // Invalid address dereference
+    MemoryLeak,         // Growing heap consumption
+    ThreadDeadlock,     // Cyclic thread dependencies
+    SocketPortBlocked,  // TCP/UDP port collision
+    DatabaseCorruption, // Inconsistent system configuration files
+    ProcessZombification, // Dead process un-reaped by parent
+    InfiniteLoopDetect, // Monopolizing quantum thread execution
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FixStrategy {
-    RestartDriver,
-    ReallocateMemory,
-    KillProcess,
-    ClearPort,
-    RestoreBackupSnapshot,
-    ReconnectStack,
+pub enum RemediationAction {
+    RemapPage,          // Remap virtual page frame
+    TriggerGc,          // Sweep and clean heap memory
+    RestartProcess,     // Restart target thread/process ID
+    FlushPort,          // Release and re-bind blocked port
+    RollbackCheckpoint, // Revert to safe system snapshot checkpoint
+    ReapZombie,         // Reap zombie process
+    ThrottleThread,     // Throttle monopolizing CPU thread
+}
+
+pub struct FixerStats {
+    pub total_problems_detected: usize,
+    pub successful_fixes: usize,
+    pub last_resolved: Option<ProblemType>,
 }
 
 pub struct AutomatedFixerDaemon {
-    pub detected_problems: Vec<RuntimeProblem>,
-    pub fixed_problems: Vec<RuntimeProblem>,
-    pub auto_healing: AtomicBool,
+    pub stats: FixerStats,
+    pub allowed_auto_remediations: Vec<RemediationAction>,
 }
 
 impl AutomatedFixerDaemon {
     pub fn new() -> Self {
         Self {
-            detected_problems: Vec::new(),
-            fixed_problems: Vec::new(),
-            auto_healing: AtomicBool::new(true),
+            stats: FixerStats {
+                total_problems_detected: 0,
+                successful_fixes: 0,
+                last_resolved: None,
+            },
+            allowed_auto_remediations: vec![
+                RemediationAction::RemapPage,
+                RemediationAction::TriggerGc,
+                RemediationAction::RestartProcess,
+                RemediationAction::FlushPort,
+                RemediationAction::RollbackCheckpoint,
+                RemediationAction::ReapZombie,
+                RemediationAction::ThrottleThread,
+            ],
         }
     }
 
-    pub fn detect_and_fix(&mut self, problem: RuntimeProblem) -> Result<FixStrategy, &'static str> {
-        self.detected_problems.push(problem);
+    /// Detect runtime anomaly and invoke self-healing orchestration to execute corrective action
+    pub fn detect_and_fix(
+        &mut self,
+        problem: ProblemType,
+        target_id: usize,
+        self_healing: &mut SelfHealingModule,
+    ) -> Result<RemediationAction, &'static str> {
+        self.stats.total_problems_detected += 1;
 
-        if !self.auto_healing.load(Ordering::SeqCst) {
-            return Err("Auto-healing is currently disabled!");
-        }
-
-        let strategy = match problem {
-            RuntimeProblem::NullPointerDeRef => FixStrategy::RestartDriver,
-            RuntimeProblem::MemoryLeak => FixStrategy::ReallocateMemory,
-            RuntimeProblem::ThreadDeadlock => FixStrategy::KillProcess,
-            RuntimeProblem::SocketPortBlocked => FixStrategy::ClearPort,
-            RuntimeProblem::DatabaseCorruption => FixStrategy::RestoreBackupSnapshot,
-            RuntimeProblem::ProcessZombification => FixStrategy::KillProcess,
-            RuntimeProblem::InfiniteLoopDetect => FixStrategy::KillProcess,
+        let action = match problem {
+            ProblemType::NullPointerDeRef => {
+                // Remap zero page
+                RemediationAction::RemapPage
+            }
+            ProblemType::MemoryLeak => {
+                // Clear system cache & collect blocks
+                let mut context = HashMap::new();
+                context.insert("memory_leak".to_string(), target_id.to_string());
+                self_healing.handle_event(RecoveryEventType::MemoryExhaustion, context);
+                RemediationAction::TriggerGc
+            }
+            ProblemType::ThreadDeadlock => {
+                // Kill and restart deadlocked process
+                let mut context = HashMap::new();
+                context.insert("deadlock_pid".to_string(), target_id.to_string());
+                self_healing.handle_event(RecoveryEventType::ProcessCrash, context);
+                RemediationAction::RestartProcess
+            }
+            ProblemType::SocketPortBlocked => {
+                // Flush blocked TCP port
+                let mut context = HashMap::new();
+                context.insert("blocked_port".to_string(), target_id.to_string());
+                self_healing.handle_event(RecoveryEventType::NetworkFailure, context);
+                RemediationAction::FlushPort
+            }
+            ProblemType::DatabaseCorruption => {
+                // Rollback to latest configuration checkpoint snapshot
+                if let Some(snap) = self_healing.snapshots.first() {
+                    let id = snap.id.clone();
+                    self_healing.rollback_to_snapshot(&id).map_err(|_| "Rollback failed")?;
+                    RemediationAction::RollbackCheckpoint
+                } else {
+                    return Err("Remediation aborted: No available system snapshot checkpoints");
+                }
+            }
+            ProblemType::ProcessZombification => {
+                // Reap dead zombie process
+                RemediationAction::ReapZombie
+            }
+            ProblemType::InfiniteLoopDetect => {
+                // Throttle execution slice
+                RemediationAction::ThrottleThread
+            }
         };
 
-        self.fixed_problems.push(problem);
-        Ok(strategy)
-    }
-
-    pub fn toggle_auto_healing(&self, enabled: bool) {
-        self.auto_healing.store(enabled, Ordering::SeqCst);
-    }
-
-    pub fn get_unresolved_count(&self) -> usize {
-        self.detected_problems.len() - self.fixed_problems.len()
-    }
-}
-
-impl Default for AutomatedFixerDaemon {
-    fn default() -> Self {
-        Self::new()
+        if self.allowed_auto_remediations.contains(&action) {
+            self.stats.successful_fixes += 1;
+            self.stats.last_resolved = Some(problem);
+            Ok(action)
+        } else {
+            Err("Action not permitted by security daemon policies")
+        }
     }
 }
 
@@ -88,26 +127,49 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_daemon_self_healing_flows() {
+    fn test_daemon_creation() {
+        let daemon = AutomatedFixerDaemon::new();
+        assert_eq!(daemon.stats.total_problems_detected, 0);
+        assert_eq!(daemon.stats.successful_fixes, 0);
+        assert!(daemon.stats.last_resolved.is_none());
+    }
+
+    #[test]
+    fn test_null_pointer_remediation() {
         let mut daemon = AutomatedFixerDaemon::new();
-        assert!(daemon.auto_healing.load(Ordering::SeqCst));
+        let mut self_healing = SelfHealingModule::new();
 
-        // Test resolving deadlocks
-        let strategy = daemon
-            .detect_and_fix(RuntimeProblem::ThreadDeadlock)
-            .unwrap();
-        assert_eq!(strategy, FixStrategy::KillProcess);
-        assert_eq!(daemon.get_unresolved_count(), 0);
+        let res = daemon.detect_and_fix(ProblemType::NullPointerDeRef, 0, &mut self_healing);
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap(), RemediationAction::RemapPage);
+        assert_eq!(daemon.stats.total_problems_detected, 1);
+        assert_eq!(daemon.stats.successful_fixes, 1);
+        assert_eq!(daemon.stats.last_resolved, Some(ProblemType::NullPointerDeRef));
+    }
 
-        // Test resolving blocked ports
-        let strategy = daemon
-            .detect_and_fix(RuntimeProblem::SocketPortBlocked)
-            .unwrap();
-        assert_eq!(strategy, FixStrategy::ClearPort);
+    #[test]
+    fn test_deadlock_remediation() {
+        let mut daemon = AutomatedFixerDaemon::new();
+        let mut self_healing = SelfHealingModule::new();
 
-        // Disable auto-healing
-        daemon.toggle_auto_healing(false);
-        assert!(daemon.detect_and_fix(RuntimeProblem::MemoryLeak).is_err());
-        assert_eq!(daemon.get_unresolved_count(), 1); // MemoryLeak remains unresolved
+        let res = daemon.detect_and_fix(ProblemType::ThreadDeadlock, 120, &mut self_healing);
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap(), RemediationAction::RestartProcess);
+    }
+
+    #[test]
+    fn test_database_corruption_remediation() {
+        let mut daemon = AutomatedFixerDaemon::new();
+        let mut self_healing = SelfHealingModule::new();
+
+        // No checkpoints -> should fail
+        let res = daemon.detect_and_fix(ProblemType::DatabaseCorruption, 0, &mut self_healing);
+        assert!(res.is_err());
+
+        // Create a checkpoint snapshot -> should succeed
+        self_healing.create_snapshot("PostgreSQL safe state".to_string());
+        let res_2 = daemon.detect_and_fix(ProblemType::DatabaseCorruption, 0, &mut self_healing);
+        assert!(res_2.is_ok());
+        assert_eq!(res_2.unwrap(), RemediationAction::RollbackCheckpoint);
     }
 }

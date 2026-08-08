@@ -1,8 +1,7 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
-// Enhanced with standard Linux-conforming Hard Link reference counting
 
-use crate::security::CapabilityToken;
+use crate::security::{CapabilityToken, Permission};
 use std::collections::HashMap;
 
 /// File type
@@ -53,7 +52,6 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    pub hard_links_count: u32, // standard Linux reference links counter
 }
 
 impl Inode {
@@ -68,7 +66,6 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            hard_links_count: 1, // Default initial link
         }
     }
 }
@@ -94,10 +91,11 @@ impl FileDescriptor {
 /// Virtual Filesystem
 pub struct VirtualFilesystem {
     pub inodes: HashMap<u64, Inode>,
-    pub next_inode_id: u64,
-    pub root_inode: u64,
-    pub file_descriptors: HashMap<u64, FileDescriptor>,
-    pub next_fd: u64,
+    next_inode_id: u64,
+    root_inode: u64,
+    file_descriptors: HashMap<u64, FileDescriptor>,
+    next_fd: u64,
+    pub directory_paths: HashMap<String, u64>,
 }
 
 impl VirtualFilesystem {
@@ -108,14 +106,31 @@ impl VirtualFilesystem {
             root_inode: 0,
             file_descriptors: HashMap::new(),
             next_fd: 0,
+            directory_paths: HashMap::new(),
         };
 
         // Create root directory
         let root = Inode::new(0, FileType::Directory, 0);
         fs.inodes.insert(0, root);
         fs.root_inode = 0;
+        fs.directory_paths.insert("/".to_string(), 0);
 
         fs
+    }
+
+    /// Seed the filesystem with standard Linux-inspired directory hierarchies (/bin, /etc, /var, /home, /sys, /proc, /dev, /tmp)
+    pub fn seed_standard_hierarchy(&mut self) -> Result<(), FsError> {
+        let directories = [
+            "/bin", "/etc", "/var", "/home", "/sys", "/proc", "/dev", "/tmp", "/boot", "/root",
+            "/opt",
+        ];
+
+        for &dir in &directories {
+            let inode_id = self.create_file(FileType::Directory, 0)?;
+            self.directory_paths.insert(dir.to_string(), inode_id);
+        }
+
+        Ok(())
     }
 
     pub fn create_file(&mut self, file_type: FileType, owner: u64) -> Result<u64, FsError> {
@@ -126,33 +141,6 @@ impl VirtualFilesystem {
         self.inodes.insert(inode_id, inode);
 
         Ok(inode_id)
-    }
-
-    /// Linux-parity Hard Link creator: points a new reference to an existing inode
-    pub fn link_inode(&mut self, old_inode_id: u64) -> Result<(), FsError> {
-        let inode = self.inodes.get_mut(&old_inode_id).ok_or(FsError::NotFound)?;
-
-        // Linux FHS constraint: prevent directory hard links to avoid circular loops
-        if inode.file_type == FileType::Directory {
-            return Err(FsError::IsDirectory);
-        }
-
-        inode.hard_links_count += 1;
-        Ok(())
-    }
-
-    /// Linux-parity Unlink handler: decrements reference links, freeing storage only when count hits 0
-    pub fn unlink_inode(&mut self, inode_id: u64) -> Result<u32, FsError> {
-        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
-
-        if inode.hard_links_count > 1 {
-            inode.hard_links_count -= 1;
-            Ok(inode.hard_links_count)
-        } else {
-            // Reference link hit 0, fully free the physical Inode from VFS metadata
-            self.inodes.remove(&inode_id);
-            Ok(0)
-        }
     }
 
     pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
@@ -195,7 +183,7 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
+        let new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
@@ -242,6 +230,20 @@ impl VirtualFilesystem {
         inode.modified = 0; // In production, actual timestamp
 
         Ok(bytes_written)
+    }
+
+    pub fn read_file_gated(&mut self, fd: u64, buffer: &mut [u8], gate: &CapabilityToken) -> Result<usize, FsError> {
+        if !gate.has_permission(Permission::FileRead) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.read_file(fd, buffer)
+    }
+
+    pub fn write_file_gated(&mut self, fd: u64, buffer: &[u8], gate: &CapabilityToken) -> Result<usize, FsError> {
+        if !gate.has_permission(Permission::FileWrite) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.write_file(fd, buffer)
     }
 
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
@@ -305,7 +307,6 @@ mod tests {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         assert!(vfs.inodes.contains_key(&inode_id));
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 1);
     }
 
     #[test]
@@ -314,6 +315,20 @@ mod tests {
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         let fd = vfs.open_file(inode_id, 0).unwrap();
         assert!(vfs.close_file(fd).is_ok());
+    }
+
+    #[test]
+    fn test_standard_hierarchy_seeding() {
+        let mut vfs = VirtualFilesystem::new();
+        assert!(vfs.seed_standard_hierarchy().is_ok());
+
+        assert!(vfs.directory_paths.contains_key("/bin"));
+        assert!(vfs.directory_paths.contains_key("/etc"));
+        assert!(vfs.directory_paths.contains_key("/home"));
+
+        let bin_inode_id = vfs.directory_paths.get("/bin").unwrap();
+        let bin_inode = vfs.get_inode(*bin_inode_id).unwrap();
+        assert_eq!(bin_inode.file_type, FileType::Directory);
     }
 
     #[test]
@@ -328,25 +343,29 @@ mod tests {
     }
 
     #[test]
-    fn test_linux_hard_links_flow() {
+    fn test_gated_read_write() {
         let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 101).unwrap();
+        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
+        let fd = vfs.open_file(inode_id, 0).unwrap();
 
-        // Link same inode twice (creating hard links)
-        assert!(vfs.link_inode(inode_id).is_ok());
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 2);
+        let data = b"secured content";
+        let empty_gate = CapabilityToken::new();
 
-        // Attempting to hard link directory should fail (avoid loops)
-        assert!(vfs.link_inode(0).is_err()); // Root is directory
+        // Write without permission -> fail
+        assert!(vfs.write_file_gated(fd, data, &empty_gate).is_err());
 
-        // Unlink first hard link
-        let count = vfs.unlink_inode(inode_id).unwrap();
-        assert_eq!(count, 1);
-        assert!(vfs.inodes.contains_key(&inode_id)); // Inode still exists
+        // Write with permission -> success
+        let write_gate = CapabilityToken::new().allow_write("/home");
+        let written = vfs.write_file_gated(fd, data, &write_gate).unwrap();
+        assert_eq!(written, data.len());
 
-        // Unlink second hard link
-        let count = vfs.unlink_inode(inode_id).unwrap();
-        assert_eq!(count, 0);
-        assert!(!vfs.inodes.contains_key(&inode_id)); // Inode fully freed
+        // Read without permission -> fail
+        let mut buf = vec![0u8; data.len()];
+        assert!(vfs.read_file_gated(fd, &mut buf, &empty_gate).is_err());
+
+        // Read with permission -> success
+        let read_gate = CapabilityToken::new().allow_read("/var/www");
+        let read_bytes = vfs.read_file_gated(fd, &mut buf, &read_gate).unwrap();
+        assert_eq!(read_bytes, data.len());
     }
 }

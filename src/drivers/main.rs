@@ -1,16 +1,7 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
-||||||| 23ef22a4a
-// SigmaOS Drivers Main Entry Point
-#![allow(warnings)]
-#![allow(clippy::all)]
-// SigmaOS Drivers Main Entry Point
 #![cfg_attr(target_os = "none", no_std)]
 #![cfg_attr(target_os = "none", no_main)]
-#![allow(clippy::all, unused)]
-
-#[cfg(target_os = "none")]
-use core::panic::PanicInfo;
 
 // SigmaOS Drivers Main Entry Point
 
