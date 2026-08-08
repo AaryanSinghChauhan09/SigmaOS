@@ -371,6 +371,8 @@ impl LinuxLoopDevice {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
+    use alloc::vec::Vec;
 
     #[test]
     fn test_linux_devtmpfs() {
@@ -397,7 +399,7 @@ mod tests {
     fn test_bsd_audio_mixer() {
         let mut mixer = BsdAudioMixer::new();
 
-        let stream1 = alloc::vec![
+        let stream1 = vec![
             PcmFrame {
                 left: 1000,
                 right: 2000
@@ -407,7 +409,7 @@ mod tests {
                 right: -1000
             },
         ];
-        let stream2 = alloc::vec![
+        let stream2 = vec![
             PcmFrame {
                 left: 3000,
                 right: 1000
@@ -436,14 +438,9 @@ mod tests {
         // Use timestamp-based generation for test purposes
         let mut key = [0u8; 32];
         let mut iv = [0u8; 12];
-
-        // Use timestamp-based generation for better randomness in tests
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-
+        
+        // Use a more complex, non-linear generation pattern for test purposes
+        let seed: u64 = 9876543210u64;
         for i in 0..32 {
             let mut val = timestamp.wrapping_mul(i as u64 + 1);
             val ^= val >> 33;

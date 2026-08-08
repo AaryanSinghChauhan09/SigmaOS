@@ -53,15 +53,45 @@ impl SimpleRandomGenerator {
     pub fn new(id: RNGID) -> Self {
         let mut initial_seed = 12345_usize;
 
-        // 1. Hardware entropy mixing via RDTSC Time Stamp Counter if on x86_64
+        // 1. Hardware RNG (RDRAND) if available on x86_64 / x86, falling back to RDTSC
+        let mut hw_entropy: usize = 0;
+        let mut hw_success = false;
+
         #[cfg(target_arch = "x86_64")]
         unsafe {
-            initial_seed ^= core::arch::x86_64::_rdtsc() as usize;
+            let mut val: u64 = 0;
+            if core::arch::x86_64::_rdrand64_step(&mut val) == 1 {
+                hw_entropy = val as usize;
+                hw_success = true;
+            }
+        }
+
+        #[cfg(target_arch = "x86")]
+        unsafe {
+            let mut val: u32 = 0;
+            if core::arch::x86::_rdrand32_step(&mut val) == 1 {
+                hw_entropy = val as usize;
+                hw_success = true;
+            }
+        }
+
+        if hw_success {
+            initial_seed = initial_seed ^ hw_entropy;
+        } else {
+            // Fallback to RDTSC Time Stamp Counter if hardware RNG is not present
+            #[cfg(target_arch = "x86_64")]
+            unsafe {
+                initial_seed = initial_seed ^ (core::arch::x86_64::_rdtsc() as usize);
+            }
+            #[cfg(target_arch = "x86")]
+            unsafe {
+                initial_seed = initial_seed ^ (core::arch::x86::_rdtsc() as usize);
+            }
         }
 
         // 2. Dynamic pointer-derived ASLR and unique ID context mixing
         let aslr_offset = id ^ (id.wrapping_mul(31));
-        initial_seed ^= aslr_offset;
+        initial_seed = initial_seed ^ aslr_offset;
 
         SimpleRandomGenerator {
             id,
@@ -76,10 +106,53 @@ impl RandomGenerator for SimpleRandomGenerator {
 
     fn next_byte(&mut self) -> Result<u8, RNGError> {
         let counter = self.counter.fetch_add(1, Ordering::SeqCst);
-        let state = self.state.load(Ordering::SeqCst);
+        let mut state = self.state.load(Ordering::SeqCst);
+
+        // Mix in hardware RNG on every generation step if available
+        let mut hw_byte: u8 = 0;
+        let mut hw_success = false;
+
+        #[cfg(target_arch = "x86_64")]
+        unsafe {
+            let mut val: u64 = 0;
+            if core::arch::x86_64::_rdrand64_step(&mut val) == 1 {
+                hw_byte = (val & 0xFF) as u8;
+                hw_success = true;
+                state = state ^ (val as usize);
+            }
+        }
+
+        #[cfg(target_arch = "x86")]
+        unsafe {
+            let mut val: u32 = 0;
+            if core::arch::x86::_rdrand32_step(&mut val) == 1 {
+                hw_byte = (val & 0xFF) as u8;
+                hw_success = true;
+                state = state ^ (val as usize);
+            }
+        }
+
+        if !hw_success {
+            // Fallback RDTSC mixing
+            #[cfg(target_arch = "x86_64")]
+            unsafe {
+                let rdtsc_val = core::arch::x86_64::_rdtsc();
+                hw_byte = (rdtsc_val & 0xFF) as u8;
+                state = state ^ (rdtsc_val as usize);
+            }
+            #[cfg(target_arch = "x86")]
+            unsafe {
+                let rdtsc_val = core::arch::x86::_rdtsc();
+                hw_byte = (rdtsc_val & 0xFF) as u8;
+                state = state ^ (rdtsc_val as usize);
+            }
+        }
+
         let result = ((state.wrapping_mul(1103515245).wrapping_add(12345) + counter) % 256) as u8;
+        let final_result = result ^ hw_byte;
+
         self.state.store(state.wrapping_mul(1103515245).wrapping_add(12345), Ordering::SeqCst);
-        Ok(result)
+        Ok(final_result)
     }
 
     fn next_u32(&mut self) -> Result<u32, RNGError> {

@@ -42,8 +42,12 @@ pub mod power {
 pub mod observability {
     pub mod profiler;
 }
-pub mod ai;
-pub mod arch;
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+    pub mod next_gen;
+    pub mod wandr;
+}
 pub mod boot;
 pub mod toolchain;
 pub mod scheduler {
@@ -153,9 +157,28 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-pub use toolchain::self_host::{ToolchainError, CompilerConfig, SelfHostingManager};
-pub use arch::cpu_sys::{
-    SegmentType as CpuSegmentType, GdtDescriptor as CpuGdtDescriptor, IdtGate as CpuIdtGate,
-    VirtualMemoryRegion as CpuVirtualMemoryRegion, ProcessorInitSuite as CpuProcessorInitSuite,
-    FastSyscallDispatcher as CpuFastSyscallDispatcher,
+
+pub mod init {
+    pub mod systemd_init;
+}
+pub use init::systemd_init::{
+    SystemdEngine, SystemdUnit, UnitState, UnitType,
+};
+
+pub use ai::next_gen::{
+    WorkloadType, AdaptiveKernelPersona, PredictiveSyscallTranslator, DeviceTargetType,
+    AiTask, AiScheduler, EnergyGovernorMode, EnergyAwareScheduler, ModelType,
+    AIModel, MultiModelOrchestrator,
+};
+pub use ai::wandr::{
+    WandrTask, WandrDocument, ResearchResult, WandrEvaluator, SigmaWandrAgent, WandrResearchAgent,
+};
+
+pub mod virt;
+pub use virt::hypervisor::{
+    Guest, GuestID, GuestState, Hypervisor, HypervisorError, SimpleGuest, SimpleHypervisor,
+    VirtualizationGeneration,
+};
+pub use virt::microvm::{
+    MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
 };
