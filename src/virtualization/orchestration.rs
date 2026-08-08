@@ -1,25 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Built-in Virtualization Support
 // KVM/QEMU, Docker, and Kubernetes orchestration preconfigured
+// Enhanced with Linux (KVM) and FreeBSD (bhyve) inspired VFIO passthrough and VirtIO memory ballooning.
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 /// Virtualization technology
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,11 +15,6 @@ pub enum VirtualizationTech {
     LXC,
     LXD,
     VirtualBox,
-    Xen,
-    Firecracker,
-    Nomad,
-    DockerSwarm,
-    K3s,
 }
 
 /// VM state
@@ -46,6 +24,30 @@ pub enum VmState {
     Stopped,
     Paused,
     Error,
+}
+
+/// Represents a physical PCIe device bound via VFIO (Virtual Function I/O) device passthrough
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct VfioDevice {
+    pub pci_address: String,   // Format: "0000:01:00.0"
+    pub vendor_id: u16,
+    pub device_id: u16,
+    pub bound_to_guest: bool,
+}
+
+/// VirtIO Memory Ballooning controls - dynamically adjusting guest memory allocations
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MemoryBalloon {
+    pub current_balloon_mb: u32, // RAM reclaimed by host (inflated balloon)
+    pub target_balloon_mb: u32,
+}
+
+/// Overcommit policies representing resource allocation safety thresholds
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OvercommitPolicy {
+    Conservative, // Allocation <= Physical (No overcommit)
+    Moderate,     // Allocation <= 1.5x Physical (Standard Linux/BSD)
+    Aggressive,   // Allocation <= 3x Physical (High-density cloud clusters)
 }
 
 /// Virtual machine configuration
@@ -60,6 +62,9 @@ pub struct VirtualMachine {
     pub state: VmState,
     pub network_config: HashMap<String, String>,
     pub storage_paths: Vec<String>,
+    // Newly added KVM/bhyve components
+    pub vfio_devices: Vec<VfioDevice>,
+    pub balloon: MemoryBalloon,
 }
 
 impl VirtualMachine {
@@ -74,6 +79,8 @@ impl VirtualMachine {
             state: VmState::Stopped,
             network_config: HashMap::new(),
             storage_paths: Vec::new(),
+            vfio_devices: Vec::new(),
+            balloon: MemoryBalloon { current_balloon_mb: 0, target_balloon_mb: 0 },
         }
     }
 
@@ -92,6 +99,40 @@ impl VirtualMachine {
     pub fn with_storage(mut self, path: String) -> Self {
         self.storage_paths.push(path);
         self
+    }
+
+    /// Attach a physical PCIe device directly to the guest using VFIO passthrough (near-zero latency)
+    pub fn attach_vfio_device(&mut self, mut dev: VfioDevice) {
+        dev.bound_to_guest = true;
+        self.vfio_devices.push(dev);
+    }
+
+    /// Detach a physical PCIe device from the guest
+    pub fn detach_vfio_device(&mut self, pci_address: &str) -> Option<VfioDevice> {
+        let idx = self.vfio_devices.iter().position(|d| d.pci_address == pci_address)?;
+        let mut dev = self.vfio_devices.remove(idx);
+        dev.bound_to_guest = false;
+        Some(dev)
+    }
+
+    /// Inflate memory balloon: Guest driver releases memory (RAM returned to Host pool)
+    pub fn inflate_balloon(&mut self, reclaim_mb: u32) -> Result<u32, &'static str> {
+        if reclaim_mb >= self.memory_mb {
+            return Err("Cannot inflate balloon beyond total VM memory capacity");
+        }
+        self.balloon.current_balloon_mb = reclaim_mb;
+        Ok(self.get_effective_memory_mb())
+    }
+
+    /// Deflate memory balloon: Host returns memory back to guest driver
+    pub fn deflate_balloon(&mut self) -> u32 {
+        self.balloon.current_balloon_mb = 0;
+        self.get_effective_memory_mb()
+    }
+
+    /// Get actual memory currently consumed by guest (Total minus inflated balloon size)
+    pub fn get_effective_memory_mb(&self) -> u32 {
+        self.memory_mb.saturating_sub(self.balloon.current_balloon_mb)
     }
 
     pub fn start(&mut self) -> Result<(), VirtualizationError> {
@@ -326,6 +367,8 @@ pub struct VirtualizationOrchestrator {
     pub kubernetes_pods: HashMap<String, KubernetesPod>,
     pub enabled_technologies: Vec<VirtualizationTech>,
     pub resource_pool: ResourcePool,
+    // Newly added KVM/bhyve control parameters
+    pub overcommit_policy: OvercommitPolicy,
 }
 
 /// Resource pool for virtualization
@@ -392,7 +435,6 @@ impl ResourcePool {
 }
 
 impl VirtualizationOrchestrator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut orchestrator = Self {
             virtual_machines: HashMap::new(),
@@ -406,6 +448,7 @@ impl VirtualizationOrchestrator {
                 VirtualizationTech::Kubernetes,
             ],
             resource_pool: ResourcePool::new(16, 32768, 1000), // 16 CPUs, 32GB RAM, 1TB disk
+            overcommit_policy: OvercommitPolicy::Moderate,
         };
 
         orchestrator.initialize_default_configs();
@@ -414,9 +457,41 @@ impl VirtualizationOrchestrator {
 
     fn initialize_default_configs(&mut self) {
         // Preconfigure common virtualization settings
-        println!("Initializing KVM/QEMU/Xen/Firecracker configuration");
-        println!("Initializing Docker/Podman/LXC/LXD configuration");
-        println!("Initializing Kubernetes/Nomad/DockerSwarm/K3s orchestration");
+        println!("Initializing KVM/QEMU configuration");
+        println!("Initializing Docker/Podman configuration");
+        println!("Initializing Kubernetes orchestration");
+    }
+
+    /// Dynamic overcommit rebalancing algorithm (Linux/KVM style):
+    /// Analyzes current active VM balloons and policy thresholds, reclaiming memory from idle balloons
+    /// to accommodate newly mapped container workloads under resource constraints!
+    pub fn rebalance_overcommitted_resources(&mut self) -> u32 {
+        let multiplier = match self.overcommit_policy {
+            OvercommitPolicy::Conservative => 1.0,
+            OvercommitPolicy::Moderate => 1.5,
+            OvercommitPolicy::Aggressive => 3.0,
+        };
+
+        let virtual_total_memory_mb = (self.resource_pool.total_memory_mb as f64 * multiplier) as u32;
+        let mut total_reclaimed_mb = 0;
+
+        // If allocated memory exceeds virtual totals, trigger balloon inflation in running guests!
+        if self.resource_pool.allocated_memory_mb > virtual_total_memory_mb {
+            let overflow_mb = self.resource_pool.allocated_memory_mb - virtual_total_memory_mb;
+
+            // Inflate balloons of active guests to reclaim memory
+            for vm in self.virtual_machines.values_mut() {
+                if vm.state == VmState::Running && vm.balloon.current_balloon_mb == 0 {
+                    let target_inflate = overflow_mb.min(512); // Reclaim up to 512MB per VM
+                    if vm.inflate_balloon(target_inflate).is_ok() {
+                        total_reclaimed_mb += target_inflate;
+                        self.resource_pool.allocated_memory_mb = self.resource_pool.allocated_memory_mb.saturating_sub(target_inflate);
+                    }
+                }
+            }
+        }
+
+        total_reclaimed_mb
     }
 
     pub fn add_virtual_machine(&mut self, vm: VirtualMachine) -> Result<(), VirtualizationError> {
@@ -578,6 +653,7 @@ mod tests {
     fn test_orchestrator_creation() {
         let orchestrator = VirtualizationOrchestrator::new();
         assert_eq!(orchestrator.enabled_technologies.len(), 5);
+        assert_eq!(orchestrator.overcommit_policy, OvercommitPolicy::Moderate);
     }
 
     #[test]
@@ -590,6 +666,7 @@ mod tests {
         .with_resources(2, 2048, 20);
         assert_eq!(vm.cpus, 2);
         assert_eq!(vm.memory_mb, 2048);
+        assert_eq!(vm.vfio_devices.len(), 0);
     }
 
     #[test]
@@ -666,5 +743,59 @@ mod tests {
         assert_eq!(modern_strat.generation(), "Modern");
         assert!(modern_strat.supports_live_migration());
         assert!(modern_strat.execute_start("web-pod-v2").is_ok());
+    }
+
+    #[test]
+    fn test_kvm_bhyve_vfio_and_ballooning() {
+        let mut vm = VirtualMachine::new(
+            "gpu_guest".to_string(),
+            "GPU Gaming Guest".to_string(),
+            VirtualizationTech::KVM,
+        ).with_resources(4, 8192, 100);
+
+        // Test PCIe device passthrough binding via VFIO
+        let gpu_dev = VfioDevice {
+            pci_address: "0000:01:00.0".to_string(),
+            vendor_id: 0x10DE, // NVIDIA
+            device_id: 0x1C03, // GTX 1060
+            bound_to_guest: false,
+        };
+        vm.attach_vfio_device(gpu_dev);
+        assert_eq!(vm.vfio_devices.len(), 1);
+        assert!(vm.vfio_devices[0].bound_to_guest);
+
+        // Test VirtIO Memory Balloon inflation (reclaims guest RAM back to Host)
+        let effective_ram = vm.inflate_balloon(2048).unwrap();
+        assert_eq!(effective_ram, 6144); // 8192 - 2048
+        assert_eq!(vm.get_effective_memory_mb(), 6144);
+
+        // Detach VFIO device
+        let detached = vm.detach_vfio_device("0000:01:00.0").unwrap();
+        assert!(!detached.bound_to_guest);
+        assert_eq!(vm.vfio_devices.len(), 0);
+
+        // Test deflation
+        assert_eq!(vm.deflate_balloon(), 8192);
+    }
+
+    #[test]
+    fn test_orchestrator_resource_overcommits() {
+        let mut orchestrator = VirtualizationOrchestrator::new();
+        orchestrator.overcommit_policy = OvercommitPolicy::Moderate; // 1.5x Virtual total memory
+        orchestrator.resource_pool.allocated_memory_mb = 50000; // Artificially set allocated memory above 32GB * 1.5 = 49152MB limit
+
+        let mut vm = VirtualMachine::new(
+            "vm_to_reclaim".to_string(),
+            "VM to Reclaim".to_string(),
+            VirtualizationTech::KVM,
+        ).with_resources(2, 4096, 50);
+        vm.start().unwrap(); // Must be running to inflate balloon
+
+        orchestrator.virtual_machines.insert(vm.id.clone(), vm);
+
+        // Trigger dynamic overcommit rebalancing
+        let reclaimed = orchestrator.rebalance_overcommitted_resources();
+        assert_eq!(reclaimed, 512); // Reclaimed 512MB from our active VM balloon
+        assert_eq!(orchestrator.virtual_machines["vm_to_reclaim"].get_effective_memory_mb(), 3584); // 4096 - 512
     }
 }

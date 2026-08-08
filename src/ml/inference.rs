@@ -1,25 +1,18 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based ML Inference Engine for SigmaOS
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 926
 /// Implements neural network inference and model loading
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use crate::klib::Vec;
 
 pub type ModelID = usize;
 
-#[repr(usize)]
-#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModelType { NeuralNetwork = 0, DecisionTree = 1, SVM = 2, Transformer = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MLError { Success = 0, ModelNotFound = 1, InvalidInput = 2, InferenceFailed = 3 }
 
 pub trait MLModel {
@@ -57,7 +50,14 @@ impl SimpleMLModel {
 
 impl MLModel for SimpleMLModel {
     fn id(&self) -> ModelID { self.id }
-    fn model_type(&self) -> ModelType { unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst) as u32) } }
+    fn model_type(&self) -> ModelType {
+        match self.model_type.load(Ordering::SeqCst) {
+            0 => ModelType::NeuralNetwork,
+            1 => ModelType::DecisionTree,
+            2 => ModelType::SVM,
+            _ => ModelType::Transformer,
+        }
+    }
     fn input_size(&self) -> usize { self.input_size.load(Ordering::SeqCst) }
     fn output_size(&self) -> usize { self.output_size.load(Ordering::SeqCst) }
 
@@ -115,6 +115,7 @@ impl InferenceEngine for SimpleInferenceEngine {
         for model_option in &mut self.models {
             if let Some(ref model) = *model_option {
                 if model.id() == id {
+                    *model_option = None;
                     return Ok(());
                 }
             }
@@ -162,8 +163,12 @@ impl SimpleTensor {
         for _ in 0..size {
             data.push(0.0);
         }
+        let mut shape_vec = Vec::new();
+        for &dim in shape {
+            shape_vec.push(dim);
+        }
         SimpleTensor {
-            shape: shape.to_vec(),
+            shape: shape_vec,
             data,
         }
     }
@@ -183,8 +188,11 @@ impl Tensor for SimpleTensor {
             return Err(MLError::InvalidInput);
         }
 
-        self.shape = new_shape.to_vec();
+        let mut shape_vec = Vec::new();
+        for &dim in new_shape {
+            shape_vec.push(dim);
+        }
+        self.shape = shape_vec;
         Ok(())
     }
 }
-
