@@ -182,7 +182,7 @@ impl PKIManager for SimplePKIManager {
         _issuer_id: CertificateID,
     ) -> Result<bool, PKIError> {
         if let Some(cert) = self.get_certificate(id) {
-            if self.revoked.contains(id) {
+            if self.revoked.contains(&id) {
                 return Ok(false);
             }
             Ok(cert.is_valid())

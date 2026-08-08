@@ -30,8 +30,17 @@ pub struct VacantEntry<'a, K, V> {
 impl<'a, K, V> Entry<'a, K, V>
 where
     K: Eq + Hash + Clone,
-    V: Clone,
 {
+    pub fn or_insert(self, default: V) -> &'a mut V {
+        match self {
+            Entry::Occupied(entry) => entry.value,
+            Entry::Vacant(entry) => {
+                entry.map.insert(entry.key.clone(), default);
+                entry.map.get_mut(&entry.key).unwrap()
+            }
+        }
+    }
+
     pub fn or_insert_with<F>(self, default: F) -> &'a mut V
     where
         F: FnOnce() -> V,
