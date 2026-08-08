@@ -3,10 +3,11 @@
 
 use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
-/// CPU register context saved during a context switch
-#[derive(Debug, Clone, Copy, Default)]
+/// CPU register context saved during a context switch (Linux pt_regs / BSD trapframe style)
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 #[repr(C)]
 pub struct CpuContext {
+    // General Purpose Registers (GPRs)
     pub rax: u64,
     pub rbx: u64,
     pub rcx: u64,
@@ -25,6 +26,35 @@ pub struct CpuContext {
     pub r15: u64,
     pub rip: u64,
     pub rflags: u64,
+
+    // Segment Registers
+    pub cs: u16,
+    pub ds: u16,
+    pub es: u16,
+    pub fs: u16,
+    pub gs: u16,
+    pub ss: u16,
+
+    // Control Registers
+    pub cr0: u64,
+    pub cr2: u64,
+    pub cr3: u64,
+    pub cr4: u64,
+
+    // Debug Registers (Hardware Breakpoints)
+    pub dr0: u64,
+    pub dr1: u64,
+    pub dr2: u64,
+    pub dr3: u64,
+    pub dr6: u64,
+    pub dr7: u64,
+
+    // Model-Specific Registers (MSRs) for Fast System Calls and TLS
+    pub star: u64,
+    pub lstar: u64,
+    pub sfmask: u64,
+    pub fs_base: u64,
+    pub gs_base: u64,
 }
 
 impl CpuContext {
@@ -36,6 +66,41 @@ impl CpuContext {
     pub fn save_from(&mut self, rsp: u64, rip: u64) {
         self.rsp = rsp;
         self.rip = rip;
+    }
+
+    /// Write values to Control Registers
+    pub fn set_control_register(&mut self, index: usize, value: u64) -> Result<(), &'static str> {
+        match index {
+            0 => { self.cr0 = value; Ok(()) }
+            2 => { self.cr2 = value; Ok(()) }
+            3 => { self.cr3 = value; Ok(()) }
+            4 => { self.cr4 = value; Ok(()) }
+            _ => Err("Invalid control register index"),
+        }
+    }
+
+    /// Read values from Control Registers
+    pub fn get_control_register(&self, index: usize) -> Result<u64, &'static str> {
+        match index {
+            0 => Ok(self.cr0),
+            2 => Ok(self.cr2),
+            3 => Ok(self.cr3),
+            4 => Ok(self.cr4),
+            _ => Err("Invalid control register index"),
+        }
+    }
+
+    /// Write values to Model-Specific Registers (MSRs)
+    pub fn set_msr_register(&mut self, msr_id: u32, value: u64) -> Result<(), &'static str> {
+        // Mock MSR register IDs (0xC0000080+ are standard x86-64 MSRs)
+        match msr_id {
+            0xC0000081 => { self.star = value; Ok(()) }
+            0xC0000082 => { self.lstar = value; Ok(()) }
+            0xC0000084 => { self.sfmask = value; Ok(()) }
+            0xC0000100 => { self.fs_base = value; Ok(()) }
+            0xC0000101 => { self.gs_base = value; Ok(()) }
+            _ => Err("Unknown MSR register ID"),
+        }
     }
 }
 
@@ -156,7 +221,7 @@ impl RoundRobinScheduler {
             let slice = entry.time_slice_ticks(self.config.time_slice);
             let yielding = entry.yield_requested;
             entry.yield_requested = false;
-            yielding || (entry.cpu_time_used % slice == 0)
+            yielding || entry.cpu_time_used.is_multiple_of(slice)
         };
 
         if needs_switch {

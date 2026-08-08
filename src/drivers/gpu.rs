@@ -7,6 +7,18 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
+extern crate alloc;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
 use crate::security::CapabilityToken;
 
 extern crate alloc;
@@ -44,14 +56,6 @@ pub enum GpuCommand {
     SimulateHang, // Simulated faulty command to trigger Timeout Detection & Recovery (TDR)
 }
 
-/// Vulkan-inspired Shader stages
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ShaderStage {
-    Vertex,
-    Fragment,
-    Compute,
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DrmModeInfo {
     pub hdisplay: u16,
@@ -60,56 +64,44 @@ pub struct DrmModeInfo {
     pub name: String,
 }
 
-/// Vulkan-inspired Pipeline state representing render settings
 #[derive(Debug, Clone)]
-pub struct GpuPipeline {
-    pub id: usize,
-    pub vertex_shader: Option<GpuShader>,
-    pub fragment_shader: Option<GpuShader>,
-    pub depth_test_enabled: bool,
-    pub blend_enabled: bool,
-    pub viewport_width: u32,
-    pub viewport_height: u32,
+pub struct DrmPlane {
+    pub id: u32,
+    pub plane_type: DrmPlaneType,
+    pub possible_crtcs: u32, // bitmask of supported CRTC IDs
+    pub crtc_id: Option<u32>,
+    pub fb_id: Option<u32>,
+    pub src_x: u32,
+    pub src_y: u32,
+    pub src_w: u32,
+    pub src_h: u32,
+    pub crtc_x: i32,
+    pub crtc_y: i32,
+    pub crtc_w: u32,
+    pub crtc_h: u32,
 }
 
-/// Recorded command buffer mimicking Vulkan vkCommandBuffer
 #[derive(Debug, Clone)]
-pub struct GpuCommandBuffer {
-    pub commands: Vec<GpuCommand>,
-    pub is_recorded: bool,
+pub struct DrmEncoder {
+    pub id: u32,
+    pub encoder_type: u32, // HDMI, DP, TMDS, etc.
+    pub possible_crtcs: u32,
+    pub crtc_id: Option<u32>,
 }
 
-impl GpuCommandBuffer {
-    pub fn new() -> Self {
-        Self {
-            commands: Vec::new(),
-            is_recorded: false,
-        }
-    }
-
-    pub fn begin_recording(&mut self) {
-        self.commands.clear();
-        self.is_recorded = false;
-    }
-
-    pub fn record_command(&mut self, cmd: GpuCommand) {
-        if !self.is_recorded {
-            self.commands.push(cmd);
-        }
-    }
-
-    pub fn end_recording(&mut self) {
-        self.is_recorded = true;
-    }
+#[derive(Debug, Clone)]
+pub struct DrmFramebuffer {
+    pub id: u32,
+    pub width: u32,
+    pub height: u32,
+    pub active: bool,
 }
 
-/// Telemetry and reset counters for self-healing GPU hangs (TDR)
-#[derive(Debug, Clone, Copy, Default)]
-pub struct GpuResetState {
-    pub last_reset_timestamp: u64,
-    pub total_hangs_recovered: usize,
-    pub pipeline_reconstructed_count: usize,
-    pub is_hardware_ready: bool,
+#[derive(Debug, Clone)]
+pub struct DrmConnector {
+    pub id: u32,
+    pub connected: bool,
+    pub modes: Vec<DrmModeInfo>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

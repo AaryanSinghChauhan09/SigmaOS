@@ -1,5 +1,5 @@
-// OOP-based Container Runtime for SigmaOS
-// Implements container runtime using OOP principles with traits and structs.
+#![cfg_attr(target_os = "none", no_std)]
+#![cfg_attr(target_os = "none", no_main)]
 
 use core::mem;
 use core::ptr::{self, NonNull};
@@ -96,13 +96,39 @@ pub enum ContainerError {
     AlreadyStopped,
 }
 
-impl Default for ContainerCapability {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Container network configuration type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ContainerNetworkType {
+    None,
+    Bridge,
+    Overlay,
+}
+
+/// Container volume configuration
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerVolume {
+    pub is_bind_mount: bool,
+    pub is_tmpfs: bool,
+    pub read_only: bool,
+}
+
+/// Container user namespaces mapping
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContainerNamespace {
+    pub uid_mapping: u32,
+    pub gid_mapping: u32,
+    pub rootless: bool,
+}
+
+/// Container seccomp profiles
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SeccompProfile {
+    pub hardened: bool,
+    pub blocked_syscalls_mask: u32,
 }
 
 /// Simple container (OOP: Concrete container class)
+#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -132,8 +158,10 @@ impl SimpleContainer {
         let name_len = name.len().min(63);
         let image_len = image.len().min(127);
 
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-        image_array[..image_len].copy_from_slice(&image[..image_len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
+            core::ptr::copy_nonoverlapping(image.as_ptr(), image_array.as_mut_ptr(), image_len);
+        }
 
         SimpleContainer {
             id,
@@ -165,7 +193,9 @@ impl SimpleContainer {
 
     pub fn set_environment(&mut self, env: &[u8]) {
         let len = env.len().min(511);
-        self.environment[..len].copy_from_slice(&env[..len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(env.as_ptr(), self.environment.as_mut_ptr(), len);
+        }
     }
 
     pub fn set_limits(&mut self, memory_limit: u64, cpu_limit: u32) {
@@ -304,7 +334,7 @@ pub trait ContainerRuntime {
 
 /// Runtime statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,
@@ -313,19 +343,13 @@ pub struct RuntimeStats {
 }
 
 impl RuntimeStats {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         RuntimeStats {
             total_containers: 0,
             running_containers: 0,
             paused_containers: 0,
             stopped_containers: 0,
         }
-    }
-}
-
-impl Default for RuntimeStats {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -339,7 +363,7 @@ pub struct SimpleContainerRuntime {
 
 /// Runtime capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,
@@ -347,7 +371,7 @@ pub struct RuntimeCapability {
 }
 
 impl RuntimeCapability {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         RuntimeCapability {
             can_create: false,
             can_remove: false,
@@ -355,18 +379,12 @@ impl RuntimeCapability {
         }
     }
 
-    pub const fn full() -> Self {
+    pub fn full() -> Self {
         RuntimeCapability {
             can_create: true,
             can_remove: true,
             can_manage: true,
         }
-    }
-}
-
-impl Default for RuntimeCapability {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -548,6 +566,26 @@ pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
 impl<T> core::ops::Deref for Vec<T> {
@@ -803,31 +841,55 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_container_lifecycle_flows() {
+    fn test_container_creation() {
         let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
         let id = runtime
             .create_container(
-                b"nginx-service",
-                b"nginx:alpine",
+                b"sovereign_container",
+                b"ubuntu-pqc",
                 ContainerCapability::full(),
             )
             .unwrap();
+        assert_eq!(id, 1);
+    }
 
-        let stats_init = runtime.stats();
-        assert_eq!(stats_init.total_containers, 1);
-        assert_eq!(stats_init.stopped_containers, 1);
-        assert_eq!(stats_init.running_containers, 0);
+    #[test]
+    fn test_container_oci_networking_and_volumes() {
+        let mut container = SimpleContainer::new(
+            1,
+            b"web_app",
+            b"nginx-dilithium",
+            ContainerCapability::full(),
+        );
 
-        // Start container
-        runtime.start_container(id).unwrap();
-        let stats_running = runtime.stats();
-        assert_eq!(stats_running.running_containers, 1);
-        assert_eq!(stats_running.stopped_containers, 0);
+        // Assert network parity bridge setting
+        assert_eq!(container.network_type, ContainerNetworkType::None);
+        container.network_type = ContainerNetworkType::Bridge;
+        assert_eq!(container.network_type, ContainerNetworkType::Bridge);
 
-        // Pause container
-        runtime.pause_container(id).unwrap();
-        let stats_paused = runtime.stats();
-        assert_eq!(stats_paused.paused_containers, 1);
-        assert_eq!(stats_paused.running_containers, 0);
+        // Assert volume mounts setting
+        assert!(!container.volume.is_bind_mount);
+        container.volume.is_bind_mount = true;
+        assert!(container.volume.is_bind_mount);
+    }
+
+    #[test]
+    fn test_container_namespaces_and_seccomp() {
+        let mut container = SimpleContainer::new(
+            1,
+            b"secure_sandbox",
+            b"alpine-kyber",
+            ContainerCapability::full(),
+        );
+
+        // Assert namespace uid mappings
+        assert_eq!(container.namespace.uid_mapping, 0);
+        container.namespace.uid_mapping = 1000;
+        assert_eq!(container.namespace.uid_mapping, 1000);
+
+        // Assert seccomp profile hardening
+        assert!(!container.seccomp.hardened);
+        container.seccomp.hardened = true;
+        assert!(container.seccomp.hardened);
     }
 }

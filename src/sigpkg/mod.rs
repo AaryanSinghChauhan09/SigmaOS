@@ -1,7 +1,9 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
-pub mod arch_compat;
+pub mod linux_compat;
+pub mod importer;
+pub mod pacman;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
@@ -9,31 +11,25 @@ pub mod store;
 pub mod transaction;
 pub mod verifier;
 
-pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-pub use spec::{
-    AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
-    PackageDependency, PackageError as SpecPackageError, PackageInfo, PackageManager as SpecPackageManager, PackageStats, PackageVersion,
-    PacmanPackageAdapter, SimplePackage, SimplePackageManager, SnapPackageAdapter,
-    NixPackageAdapter, EbuildPackageAdapter, ApkPackageAdapter, FlatpakPackageAdapter,
-    TxzPackageAdapter, XbpsPackageAdapter,
-    CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
-    UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
+pub use importer::{
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
 };
+pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
+pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
+pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
-pub use verifier::CryptoVerifier;
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use universal_adapter::{
-    PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
-    DebAdapter, RpmAdapter, PacmanAdapter,
+    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
 };
-pub use universal_oop_system::{
-    IPackage, IPackageParser, PackageFormat, PackageMetadata,
-    PackageParserFactory, UniversalPackageManager,
-    DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError, InstallError, HookError,
+pub use verifier::CryptoVerifier;
+pub use universal_adapter::{
+    AptDebManifest, PacmanPkgbuild, SnapcraftManifest, FlatpakManifest, UniversalPackageAdapter,
+};
+pub use importer::{
+    PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
 };
 
 /// Package version using SemVer
@@ -59,29 +55,29 @@ impl Version {
         }
     }
 
-    /// Parses version input safely with a zero-allocation, stateless next() token iterator over '.' separators
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        let mut parts = version_str.split('.');
-
-        let major_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-        let minor_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-        let patch_str = parts.next().ok_or(ParseError::InvalidFormat)?;
-
-        if parts.next().is_some() {
+        let parts: Vec<&str> = version_str.split('.').collect();
+        if parts.len() != 3 {
             return Err(ParseError::InvalidFormat);
         }
 
-        let major = major_str
+        let major = parts[0]
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let minor = minor_str
+        let minor = parts[1]
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
-        let patch = patch_str
+        let patch = parts[2]
             .parse::<u64>()
             .map_err(|_| ParseError::InvalidNumber)?;
 
         Ok(Version::new(major, minor, patch))
+    }
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
@@ -137,7 +133,7 @@ pub struct Dependency {
 }
 
 /// Version constraint
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),
@@ -170,5 +166,40 @@ mod tests {
         let v1 = Version::new(1, 2, 3);
         let v2 = Version::new(1, 2, 4);
         assert!(v1 < v2);
+    }
+
+    #[test]
+    fn test_package_rich_metadata_and_pqc_trust() {
+        let mut pkg = Package::new(
+            "linux-rt-kernel".to_string(),
+            Version::new(6, 9, 3),
+            "Real-time preempt-rt microkernel variant for SigmaOS".to_string(),
+            Vec::new(),
+            "sha256:d83d102e3b74".to_string(),
+        );
+
+        // Populate rich metadata standard fields
+        pkg.licenses.push("GPL-2.0-only".to_string());
+        pkg.maintainers
+            .push("Sovereign Maintainers <maintainers@sigmaos.dev>".to_string());
+        pkg.mirrors
+            .push("https://mirrors.sigmaos.org/pkgs/".to_string());
+        pkg.signing_keys
+            .push("dilithium5:pubkey_root_ca".to_string());
+        pkg.changelogs
+            .push("v6.9.3: RT preemption schedulers stabilization".to_string());
+
+        assert_eq!(pkg.name, "linux-rt-kernel");
+        assert_eq!(pkg.licenses[0], "GPL-2.0-only");
+        assert_eq!(
+            pkg.maintainers[0],
+            "Sovereign Maintainers <maintainers@sigmaos.dev>"
+        );
+        assert_eq!(pkg.mirrors[0], "https://mirrors.sigmaos.org/pkgs/");
+        assert_eq!(pkg.signing_keys[0], "dilithium5:pubkey_root_ca");
+        assert_eq!(
+            pkg.changelogs[0],
+            "v6.9.3: RT preemption schedulers stabilization"
+        );
     }
 }

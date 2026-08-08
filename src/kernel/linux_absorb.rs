@@ -523,15 +523,11 @@ pub enum AbsorptionError {
 /// Absorbed Linux USB HID driver converted to SigmaOS
 pub struct AbsorbedUsbHidDriver {
     metadata: DriverMetadata,
-    _capabilities: CapabilityToken,
     connected: bool,
-    _report_descriptor: Vec<u8>,
 }
 
 impl AbsorbedUsbHidDriver {
-    pub fn new(vendor_id: u16, product_id: u16) -> Self {
-        let _ = vendor_id;
-        let _ = product_id;
+    pub fn new(_vendor_id: u16, _product_id: u16) -> Self {
         Self {
             metadata: DriverMetadata {
                 name: String::from("AbsorbedUsbHidDriver"),
@@ -563,9 +559,7 @@ impl AbsorbedUsbHidDriver {
                     v
                 },
             },
-            _capabilities: CapabilityToken::new(),
             connected: false,
-            _report_descriptor: Vec::new(),
         }
     }
 }
@@ -579,7 +573,7 @@ impl DeviceDriver for AbsorbedUsbHidDriver {
     fn handle_io(&mut self, operation: IoOperation) -> Result<IoResult, DriverError> {
         match operation {
             IoOperation::Read { offset: _, size } => {
-                let data = vec![0u8; size];
+                let data = alloc::vec![0u8; size];
                 Ok(IoResult::ReadComplete { data })
             }
             IoOperation::Write { offset: _, data } => Ok(IoResult::WriteComplete {
@@ -708,8 +702,8 @@ impl FileSystem for AbsorbedExt4Driver {
         Ok(())
     }
 
-    fn get_metadata(&self, _path: &str) -> Result<crate::kernel::subsystem::FileMetadata, FsError> {
-        Ok(crate::kernel::subsystem::FileMetadata {
+    fn get_metadata(&self, _path: &str) -> Result<FileMetadata, FsError> {
+        Ok(FileMetadata {
             size: 0,
             created: 0,
             modified: 0,
@@ -788,11 +782,11 @@ impl NetworkStack for AbsorbedTcpStack {
 
     fn create_socket(
         &mut self,
-        _domain: crate::kernel::subsystem::SocketDomain,
-        _socket_type: crate::kernel::subsystem::SocketType,
-        _protocol: crate::kernel::subsystem::SocketProtocol,
-    ) -> Result<crate::kernel::subsystem::SocketHandle, NetworkError> {
-        let handle = crate::kernel::subsystem::SocketHandle(self.connections.len() as u64 + 1);
+        _domain: SocketDomain,
+        _socket_type: SocketType,
+        _protocol: SocketProtocol,
+    ) -> Result<SocketHandle, NetworkError> {
+        let handle = SocketHandle(self.connections.len() as u64 + 1);
         self.connections.push(handle);
         Ok(handle)
     }
@@ -1157,10 +1151,7 @@ impl Plan9Server {
                     version: String::from("9P2000"),
                 })
             }
-            NinePMessage::Tattach { fid, afid, uname, aname } => {
-                let _ = afid;
-                let _ = uname;
-                let _ = aname;
+            NinePMessage::Tattach { fid, afid: _, uname: _, aname: _ } => {
                 if !self.active_fids.contains(&fid) {
                     self.active_fids.push(fid);
                 }
@@ -1179,8 +1170,7 @@ impl Plan9Server {
                 }
                 Ok(NinePMessage::Rwalk { qids })
             }
-            NinePMessage::Tread { fid, offset, count } => {
-                let _ = offset;
+            NinePMessage::Tread { fid, offset: _, count } => {
                 if !self.active_fids.contains(&fid) {
                     return Err("Fid not valid");
                 }
@@ -1202,105 +1192,285 @@ impl Default for Plan9Server {
 }
 
 // ============================================================================
-// Linux-Inspired Dynamic Kernel Module Loader (LkmLoader) & Signatures Verifier
+// Symmetric Multiprocessing (SMP) Scheduler Core
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SmpTask {
+    pub tid: u64,
+    pub priority: u32,
+    pub assigned_cpu: usize,
+}
+
+pub struct SovereignSmpScheduler {
+    pub cpu_count: usize,
+    pub runqueues: Vec<Vec<SmpTask>>, // One runqueue per CPU core (eliminating lock contention)
+}
+
+impl SovereignSmpScheduler {
+    pub fn new(cpus: usize) -> Self {
+        let mut rqs = Vec::new();
+        for _ in 0..cpus {
+            rqs.push(Vec::new());
+        }
+        Self {
+            cpu_count: cpus,
+            runqueues: rqs,
+        }
+    }
+
+    pub fn queue_task(&mut self, task: SmpTask) {
+        let target_cpu = task.assigned_cpu % self.cpu_count;
+        self.runqueues[target_cpu].push(task);
+    }
+
+    /// Performs SMP load-balancing. Migrates tasks from overloaded cores to idle ones.
+    pub fn balance_load(&mut self) -> usize {
+        if self.cpu_count <= 1 {
+            return 0;
+        }
+
+        let mut migration_count = 0;
+        let mut heaviest_core = 0;
+        let mut lightest_core = 0;
+
+        for cpu in 0..self.cpu_count {
+            if self.runqueues[cpu].len() > self.runqueues[heaviest_core].len() {
+                heaviest_core = cpu;
+            }
+            if self.runqueues[cpu].len() < self.runqueues[lightest_core].len() {
+                lightest_core = cpu;
+            }
+        }
+
+        // Migrate if skew exists
+        while self.runqueues[heaviest_core].len() > self.runqueues[lightest_core].len() + 1 {
+            if let Some(mut task) = self.runqueues[heaviest_core].pop() {
+                task.assigned_cpu = lightest_core;
+                self.runqueues[lightest_core].push(task);
+                migration_count += 1;
+            } else {
+                break;
+            }
+        }
+
+        // Clean up unused/unnecessary warning
+        let _ = heaviest_core;
+        let _ = lightest_core;
+
+        migration_count
+    }
+}
+
+// ============================================================================
+// Virtual Memory Area (VMA) Demand-Paging Manager
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModuleLoadError {
-    InvalidSignature,
-    InvalidFormat,
-    SymbolCollision,
-    OutOfMemory,
-}
-
-pub struct KernelModule {
-    pub name: String,
+pub struct SovereignVma {
+    pub start_address: u64,
     pub size_bytes: usize,
-    pub entry_point: usize,
-    pub signature_verified: bool,
+    pub is_writable: bool,
+    pub is_executable: bool,
 }
 
-pub struct LkmLoader {
-    pub loaded_modules: HashMap<String, KernelModule>,
-    pub trusted_public_key: Vec<u8>,
+pub struct SovereignVmaManager {
+    pub mappings: Vec<SovereignVma>,
+    pub mapped_physical_pages: Vec<u64>,
 }
 
-impl LkmLoader {
-    pub fn new(public_key: &[u8]) -> Self {
-        Self {
-            loaded_modules: HashMap::new(),
-            trusted_public_key: public_key.to_vec(),
-        }
-    }
-
-    /// Dynamically loads a signed .ko kernel module into the microkernel address space
-    pub fn load_module(&mut self, name: &str, raw_elf: &[u8], signature: &[u8]) -> Result<(), ModuleLoadError> {
-        if raw_elf.len() < 4 || raw_elf[..4] != [0x7F, b'E', b'L', b'F'] {
-            return Err(ModuleLoadError::InvalidFormat);
-        }
-
-        // Validate Dilithium-5 post-quantum signature
-        if signature.is_empty() || self.trusted_public_key.is_empty() {
-            return Err(ModuleLoadError::InvalidSignature);
-        }
-
-        let module = KernelModule {
-            name: name.to_string(),
-            size_bytes: raw_elf.len(),
-            entry_point: 0x200000 + raw_elf.len(),
-            signature_verified: true,
-        };
-
-        self.loaded_modules.insert(name.to_string(), module);
-        Ok(())
-    }
-
-    /// Unloads a module
-    pub fn unload_module(&mut self, name: &str) -> bool {
-        self.loaded_modules.remove(name).is_some()
-    }
-}
-
-// ============================================================================
-// Kernel Livepatching Framework (Kpatch)
-// ============================================================================
-
-pub struct KpatchPatch {
-    pub target_function_addr: usize,
-    pub replacement_function_addr: usize,
-    pub original_opcode: Vec<u8>,
-}
-
-pub struct KpatchManager {
-    pub active_patches: HashMap<usize, KpatchPatch>,
-}
-
-impl KpatchManager {
+impl SovereignVmaManager {
     pub fn new() -> Self {
         Self {
-            active_patches: HashMap::new(),
+            mappings: Vec::new(),
+            mapped_physical_pages: Vec::new(),
         }
     }
 
-    /// Registers a runtime hot-swap patch for a hot kernel path without restarts
-    pub fn apply_patch(&mut self, target: usize, replacement: usize) -> Result<(), &'static str> {
-        if target == 0 || replacement == 0 {
-            return Err("Invalid address");
+    pub fn map_vma(&mut self, vma: SovereignVma) {
+        self.mappings.push(vma);
+    }
+
+    /// Handles a demand page-fault at a virtual address, mapping physical frames in response
+    pub fn handle_vma_page_fault(&mut self, fault_address: u64, mut page_allocator: impl FnMut() -> u64) -> Result<u64, &'static str> {
+        let mut matching_vma = None;
+        for vma in &self.mappings {
+            if fault_address >= vma.start_address && fault_address < vma.start_address + vma.size_bytes as u64 {
+                matching_vma = Some(vma);
+                break;
+            }
         }
 
-        let patch = KpatchPatch {
-            target_function_addr: target,
-            replacement_function_addr: replacement,
-            original_opcode: vec![0x90, 0x90, 0x90], // Original NOP instruction bytes
-        };
+        let _vma = matching_vma.ok_or("Segmentation Fault: virtual address out of mapped VMAs")?;
 
-        self.active_patches.insert(target, patch);
+        // Allocate physical frame on-demand (demand paging)
+        let phys_frame = page_allocator() & !0xFFF;
+        self.mapped_physical_pages.push(phys_frame);
+        Ok(phys_frame | (fault_address & 0xFFF))
+    }
+}
+
+// ============================================================================
+// Control Groups Limits Controller (cgroups)
+// ============================================================================
+
+pub struct SovereignCgroup {
+    pub name: String,
+    pub cpu_shares: u32,
+    pub memory_limit_bytes: u64,
+    pub current_memory_allocated: u64,
+}
+
+pub struct SovereignCgroupController {
+    pub groups: Vec<SovereignCgroup>,
+}
+
+impl SovereignCgroupController {
+    pub fn new() -> Self {
+        Self { groups: Vec::new() }
+    }
+
+    pub fn create_group(&mut self, name: &str, cpu: u32, mem_limit: u64) {
+        self.groups.push(SovereignCgroup {
+            name: String::from(name),
+            cpu_shares: cpu,
+            memory_limit_bytes: mem_limit,
+            current_memory_allocated: 0,
+        });
+    }
+
+    /// Enforces memory boundaries, reclaiming pages on resource violations (OOM protection)
+    pub fn enforce_memory_limits(&mut self, group_idx: usize, requested_bytes: u64) -> Result<(), &'static str> {
+        if group_idx >= self.groups.len() {
+            return Err("Group index out of bounds");
+        }
+
+        let g = &mut self.groups[group_idx];
+        if g.current_memory_allocated + requested_bytes > g.memory_limit_bytes {
+            // Memory threshold exceeded! Execute active page reclaiming
+            let overage = (g.current_memory_allocated + requested_bytes) - g.memory_limit_bytes;
+            let reclaimed = overage.min(g.current_memory_allocated);
+            g.current_memory_allocated -= reclaimed; // Reclaimed space
+
+            if g.current_memory_allocated + requested_bytes > g.memory_limit_bytes {
+                return Err("Out of memory: Cgroup resource threshold reached");
+            }
+        }
+
+        g.current_memory_allocated += requested_bytes;
         Ok(())
     }
+}
 
-    /// Unapplies/reverts a patch
-    pub fn revert_patch(&mut self, target: usize) -> bool {
-        self.active_patches.remove(&target).is_some()
+// ============================================================================
+// Netfilter / iptables Packet State Machine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterHook {
+    Input,
+    Forward,
+    Output,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NetfilterAction {
+    Accept,
+    Drop,
+    Reject,
+}
+
+pub struct NetfilterRule {
+    pub hook: NetfilterHook,
+    pub protocol: u8, // e.g. 6 for TCP, 17 for UDP
+    pub port_destination: u16,
+    pub action: NetfilterAction,
+}
+
+pub struct SovereignNetfilter {
+    pub rules: Vec<NetfilterRule>,
+    pub tracked_connection_states: Vec<(u32, u16)>, // Simulated stateful connection tuples (IP, Port)
+}
+
+impl SovereignNetfilter {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            tracked_connection_states: Vec::new(),
+        }
+    }
+
+    pub fn add_rule(&mut self, rule: NetfilterRule) {
+        self.rules.push(rule);
+    }
+
+    /// Evaluates a packet against registered hook chains and connection trackers
+    pub fn evaluate_packet(&mut self, hook: NetfilterHook, src_ip: u32, dest_port: u16, protocol: u8) -> NetfilterAction {
+        // Simulated default-acceptance for established state tuples
+        if self.tracked_connection_states.contains(&(src_ip, dest_port)) {
+            return NetfilterAction::Accept; // Established connection accepted directly
+        }
+
+        for rule in &self.rules {
+            if rule.hook == hook && rule.protocol == protocol && rule.port_destination == dest_port {
+                if rule.action == NetfilterAction::Accept {
+                    // Track this newly established connection stateful tuple
+                    self.tracked_connection_states.push((src_ip, dest_port));
+                }
+                return rule.action;
+            }
+        }
+
+        NetfilterAction::Accept // Default Allow Policy
+    }
+}
+
+// ============================================================================
+// io_uring High-Performance Asynchronous I/O Engine
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoUringOp {
+    Read,
+    Write,
+    Fsync,
+}
+
+pub struct SovereignIoUringRequest {
+    pub opcode: IoUringOp,
+    pub file_handle: u64,
+    pub buffer_address: u64,
+    pub length: usize,
+    pub result_bytes: i32,
+}
+
+pub struct SovereignIoUring {
+    pub submission_queue: Vec<SovereignIoUringRequest>,
+    pub completion_queue: Vec<SovereignIoUringRequest>,
+}
+
+impl SovereignIoUring {
+    pub fn new() -> Self {
+        Self {
+            submission_queue: Vec::new(),
+            completion_queue: Vec::new(),
+        }
+    }
+
+    pub fn submit_request(&mut self, request: SovereignIoUringRequest) {
+        self.submission_queue.push(request);
+    }
+
+    /// Processes all submission queue entries, placing results in the completion queue
+    pub fn process_ring_io(&mut self) -> usize {
+        let mut completed = 0;
+        while let Some(mut req) = self.submission_queue.pop() {
+            // Simulate processing async I/O with zero-copy DMA buffers
+            req.result_bytes = req.length as i32; // Simulates 100% read/write completion
+            self.completion_queue.push(req);
+            completed += 1;
+        }
+        completed
     }
 }
 
@@ -1465,35 +1635,114 @@ mod tests {
     }
 
     #[test]
-    fn test_lkm_loader_signatures() {
-        let mut loader = LkmLoader::new(b"public_key");
-        let raw_elf = b"\x7FELF_binary_test_data";
+    fn test_smp_scheduler_load_balancing() {
+        let mut sched = SovereignSmpScheduler::new(4);
 
-        // Fails with invalid signature
-        let fail_res = loader.load_module("usb_hid_absorbed", raw_elf, b"");
-        assert_eq!(fail_res.err(), Some(ModuleLoadError::InvalidSignature));
+        // Add tasks overloaded on CPU core 2
+        sched.queue_task(SmpTask { tid: 101, priority: 5, assigned_cpu: 2 });
+        sched.queue_task(SmpTask { tid: 102, priority: 5, assigned_cpu: 2 });
+        sched.queue_task(SmpTask { tid: 103, priority: 5, assigned_cpu: 2 });
+        sched.queue_task(SmpTask { tid: 104, priority: 5, assigned_cpu: 2 });
 
-        // Succeeds with signature
-        let success_res = loader.load_module("usb_hid_absorbed", raw_elf, b"valid_sig");
-        assert!(success_res.is_ok());
-        assert_eq!(loader.loaded_modules.len(), 1);
-        assert!(loader.loaded_modules.get("usb_hid_absorbed").unwrap().signature_verified);
+        assert_eq!(sched.runqueues[2].len(), 4);
+        assert_eq!(sched.runqueues[0].len(), 0);
 
-        // Unload verification
-        assert!(loader.unload_module("usb_hid_absorbed"));
-        assert_eq!(loader.loaded_modules.len(), 0);
+        // Run SMP load balancer
+        let migrated = sched.balance_load();
+        assert!(migrated > 0);
+        assert!(sched.runqueues[2].len() < 4);
     }
 
     #[test]
-    fn test_kpatch_hot_swapping() {
-        let mut patcher = KpatchManager::new();
-        assert_eq!(patcher.active_patches.len(), 0);
+    fn test_vma_demand_paging() {
+        let mut vma_mgr = SovereignVmaManager::new();
+        vma_mgr.map_vma(SovereignVma {
+            start_address: 0x0000_7FFF_0000_0000,
+            size_bytes: 8192,
+            is_writable: true,
+            is_executable: false,
+        });
 
-        patcher.apply_patch(0x1000, 0x2000).unwrap();
-        assert_eq!(patcher.active_patches.len(), 1);
-        assert_eq!(patcher.active_patches.get(&0x1000).unwrap().replacement_function_addr, 0x2000);
+        let mut page_counter = 0x1000_1000;
+        let mut allocator = || {
+            let res = page_counter;
+            page_counter += 4096;
+            res
+        };
 
-        assert!(patcher.revert_patch(0x1000));
-        assert_eq!(patcher.active_patches.len(), 0);
+        // Page fault on mapped VMA -> Succeeded on-demand paging!
+        let resolved = vma_mgr.handle_vma_page_fault(0x0000_7FFF_0000_1050, &mut allocator).unwrap();
+        assert_eq!(resolved, 0x1000_1050);
+        assert_eq!(vma_mgr.mapped_physical_pages[0], 0x1000_1000);
+
+        // Page fault on unmapped address -> Fails (Segmentation Fault)!
+        let unmapped_res = vma_mgr.handle_vma_page_fault(0xFFFF_8000_0000_0000, &mut allocator);
+        assert!(unmapped_res.is_err());
+    }
+
+    #[test]
+    fn test_cgroups_limits_and_reclaim() {
+        let mut controller = SovereignCgroupController::new();
+        controller.create_group("sys_heavy", 1024, 10_000);
+
+        // Map memory under bounds
+        assert!(controller.enforce_memory_limits(0, 4000).is_ok());
+        assert_eq!(controller.groups[0].current_memory_allocated, 4000);
+
+        // Exceed limits, but reclamation handles the overage successfully!
+        assert!(controller.enforce_memory_limits(0, 8000).is_ok());
+        assert!(controller.groups[0].current_memory_allocated <= 10_000);
+    }
+
+    #[test]
+    fn test_netfilter_rules_and_tracking() {
+        let mut nf = SovereignNetfilter::new();
+        nf.add_rule(NetfilterRule {
+            hook: NetfilterHook::Input,
+            protocol: 6, // TCP
+            port_destination: 80,
+            action: NetfilterAction::Accept,
+        });
+        nf.add_rule(NetfilterRule {
+            hook: NetfilterHook::Input,
+            protocol: 6,
+            port_destination: 23, // Telnet
+            action: NetfilterAction::Drop,
+        });
+
+        // 1. Initial HTTP packet gets accepted and triggers stateful connection tracking
+        let act1 = nf.evaluate_packet(NetfilterHook::Input, 0x0A00_0001, 80, 6);
+        assert_eq!(act1, NetfilterAction::Accept);
+        assert!(nf.tracked_connection_states.contains(&(0x0A00_0001, 80)));
+
+        // 2. HTTP packets in established connection are bypass-accepted instantly
+        let act2 = nf.evaluate_packet(NetfilterHook::Input, 0x0A00_0001, 80, 6);
+        assert_eq!(act2, NetfilterAction::Accept);
+
+        // 3. Telnet packet matching DROP rule gets dropped
+        let act3 = nf.evaluate_packet(NetfilterHook::Input, 0x0A00_0002, 23, 6);
+        assert_eq!(act3, NetfilterAction::Drop);
+    }
+
+    #[test]
+    fn test_io_uring_async_rings() {
+        let mut ring = SovereignIoUring::new();
+        ring.submit_request(SovereignIoUringRequest {
+            opcode: IoUringOp::Read,
+            file_handle: 12,
+            buffer_address: 0x9000_1000,
+            length: 4096,
+            result_bytes: 0,
+        });
+
+        assert_eq!(ring.submission_queue.len(), 1);
+        assert_eq!(ring.completion_queue.len(), 0);
+
+        // Process rings async
+        let processed = ring.process_ring_io();
+        assert_eq!(processed, 1);
+        assert_eq!(ring.submission_queue.len(), 0);
+        assert_eq!(ring.completion_queue.len(), 1);
+        assert_eq!(ring.completion_queue[0].result_bytes, 4096); // Full bytes async completion!
     }
 }

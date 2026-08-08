@@ -1,5 +1,5 @@
-// OOP-based AI Agent Framework for SigmaOS
-// Implements AI agent using OOP principles with traits and structs.
+#![no_std]
+#![no_main]
 
 extern crate alloc;
 use alloc::vec::Vec;
@@ -21,36 +21,54 @@ pub enum IntentType {
 }
 
 /// Intent (OOP: Intent object)
+#[repr(C)]
 pub struct Intent {
     pub intent_type: IntentType,
     pub confidence: f32,
-    pub command: String,
-    pub parameters: String,
+    pub command: [u8; 256],
+    pub parameters: [u8; 512],
 }
 
 impl Intent {
     pub fn new(intent_type: IntentType, command: &[u8]) -> Self {
         let mut command_array = [0u8; 256];
         let cmd_len = command.len().min(255);
-        command_array[..cmd_len].copy_from_slice(&command[..cmd_len]);
+
+        unsafe {
+            core::ptr::copy_nonoverlapping(command.as_ptr(), command_array.as_mut_ptr(), cmd_len);
+        }
 
         Intent {
             intent_type,
             confidence: 0.0,
-            command: command.to_string(),
-            parameters: String::new(),
+            command: command_array,
+            parameters: [0; 512],
         }
     }
 
     pub fn set_parameters(&mut self, parameters: &[u8]) {
         let len = parameters.len().min(511);
-        self.parameters[..len].copy_from_slice(&parameters[..len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(parameters.as_ptr(), self.parameters.as_mut_ptr(), len);
+        }
     }
+}
+
+/// AI agent trait (OOP interface)
+pub trait AIAgent {
+    /// Parse natural language input
+    fn parse(&mut self, input: &[u8]) -> Result<Intent, AIError>;
+    /// Execute intent
+    fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError>;
+    /// Learn from feedback
+    fn learn(&mut self, input: &[u8], feedback: bool);
+    /// Get agent info
+    fn info(&self) -> AgentInfo;
 }
 
 /// AI error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum AIError {
     Success = 0,
     ParseFailed = 1,
@@ -61,11 +79,12 @@ pub enum AIError {
 }
 
 /// Agent info
+#[repr(C)]
 pub struct AgentInfo {
     pub name: [u8; 64],
     pub version: (u32, u32, u32),
     pub total_intents: usize,
-    pub execution_count: usize,
+    pub execution_count: AtomicUsize,
     pub capability: AgentCapability,
 }
 
@@ -75,21 +94,15 @@ impl AgentInfo {
             name: [0; 64],
             version: (1, 0, 0),
             total_intents: 0,
-            execution_count: 0,
+            execution_count: AtomicUsize::new(0),
             capability: AgentCapability::new(),
         }
     }
 }
 
-impl Default for AgentInfo {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Agent capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct AgentCapability {
     pub can_parse: bool,
     pub can_execute: bool,
@@ -97,7 +110,7 @@ pub struct AgentCapability {
 }
 
 impl AgentCapability {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         AgentCapability {
             can_parse: false,
             can_execute: false,
@@ -105,7 +118,7 @@ impl AgentCapability {
         }
     }
 
-    pub const fn full() -> Self {
+    pub fn full() -> Self {
         AgentCapability {
             can_parse: true,
             can_execute: true,
@@ -114,9 +127,17 @@ impl AgentCapability {
     }
 }
 
-impl Default for AgentCapability {
-    fn default() -> Self {
-        Self::new()
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AgentCapability {
+    pub value: u64,
+}
+
+impl AgentCapability {
+    pub fn full() -> Self {
+        AgentCapability { value: !0 }
+    }
+    pub fn none() -> Self {
+        AgentCapability { value: 0 }
     }
 }
 
@@ -135,8 +156,9 @@ impl AgentCapability {
 }
 
 /// Simple AI agent (OOP: Concrete agent class)
+#[repr(C)]
 pub struct SimpleAIAgent {
-    pub name: String,
+    pub name: [u8; 64],
     pub version: (u32, u32, u32),
     pub execution_count: AtomicUsize,
     pub capability: AgentCapability,
@@ -162,8 +184,18 @@ impl Pattern {
         let pattern_len = pattern.len().min(127);
         let template_len = template.len().min(255);
 
-        pattern_array[..pattern_len].copy_from_slice(&pattern[..pattern_len]);
-        template_array[..template_len].copy_from_slice(&template[..template_len]);
+        unsafe {
+            core::ptr::copy_nonoverlapping(
+                pattern.as_ptr(),
+                pattern_array.as_mut_ptr(),
+                pattern_len,
+            );
+            core::ptr::copy_nonoverlapping(
+                template.as_ptr(),
+                template_array.as_mut_ptr(),
+                template_len,
+            );
+        }
 
         Pattern {
             pattern: pattern_array,
@@ -196,13 +228,24 @@ impl SimpleAIAgent {
         self.patterns.push(pattern);
     }
 
-    fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
-        for pattern in &self.patterns {
+    unsafe fn match_pattern(&self, input: &[u8]) -> Option<&Pattern> {
+        for i in 0..self.patterns.len() {
+            let pattern = &self.patterns[i];
             let pattern_len = pattern.pattern.iter().position(|&b| b == 0).unwrap_or(128);
             let pattern_str = &pattern.pattern[..pattern_len];
 
-            if input.len() >= pattern_len && &input[..pattern_len] == pattern_str {
-                return Some(pattern);
+            if input.len() >= pattern_len {
+                let mut matches = true;
+                for i in 0..pattern_len {
+                    if input[i] != pattern_str[i] {
+                        matches = false;
+                        break;
+                    }
+                }
+
+                if matches {
+                    return Some(pattern);
+                }
             }
         }
         None
@@ -319,36 +362,50 @@ impl AIAgent for SimpleAIAgent {
             return Err(AIError::PermissionDenied);
         }
 
-        if input.is_empty() {
+        if input.len() == 0 {
             return Err(AIError::InvalidInput);
         }
 
-        if let Some(pattern) = self.match_pattern(input) {
-            let template_len = pattern.template.iter().position(|&b| b == 0).unwrap_or(256);
-            let mut intent = Intent::new(pattern.intent_type, &pattern.template[..template_len]);
-            intent.confidence = 1.0;
-            Ok(intent)
-        } else {
-            // Default to information query if no pattern matches
-            let mut intent = Intent::new(IntentType::InformationQuery, input);
-            intent.confidence = 0.5;
-            Ok(intent)
+        unsafe {
+            if let Some(pattern) = self.match_pattern(input) {
+                let mut intent = Intent::new(pattern.intent_type, &pattern.template);
+                intent.confidence = 1.0;
+                Ok(intent)
+            } else {
+                // Default to information query if no pattern matches
+                let mut intent = Intent::new(IntentType::InformationQuery, input);
+                intent.confidence = 0.5;
+                Ok(intent)
+            }
         }
     }
 
     fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError> {
+        if !self.capability.can_execute {
+            return Err(AIError::PermissionDenied);
+        }
+
         self.execution_count.fetch_add(1, Ordering::SeqCst);
 
+        // In a real implementation, this would execute the actual command
+        // For now, return a simulated response
         let mut response = Vec::new();
         let success_msg = b"Command executed successfully";
-        response.extend_from_slice(success_msg);
+
+        for byte in success_msg {
+            response.push(*byte);
+        }
+
         Ok(response)
     }
 
-    fn learn(&mut self, _input: &[u8], _feedback: bool) {
+    fn learn(&mut self, input: &[u8], feedback: bool) {
         if !self.capability.can_learn {
             return;
         }
+
+        // In a real implementation, this would update the model
+        // For now, this is a placeholder
     }
 
     fn info(&self) -> AgentInfo {
@@ -356,7 +413,7 @@ impl AIAgent for SimpleAIAgent {
             name: self.name,
             version: self.version,
             total_intents: self.patterns.len(),
-            execution_count: self.execution_count.load(Ordering::SeqCst),
+            execution_count: AtomicUsize::new(self.execution_count.load(Ordering::SeqCst)),
             capability: self.capability,
         }
     }
@@ -364,7 +421,11 @@ impl AIAgent for SimpleAIAgent {
 
 /// AI agent manager trait (OOP interface)
 pub trait AIAgentManager {
+    /// Register agent
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError>;
+    /// Unregister agent
+    fn unregister_agent(&mut self, id: usize) -> Result<(), AIError>;
+    /// Get agent
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
     fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError>;
     fn stats(&self) -> AIStats;
@@ -375,9 +436,14 @@ pub struct AIStats {
     pub failed_requests: usize,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct AIStats {
+    pub failed_requests: usize,
+}
+
 /// AI statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub struct AIStats {
     pub total_agents: usize,
     pub total_requests: u64,
@@ -386,19 +452,13 @@ pub struct AIStats {
 }
 
 impl AIStats {
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         AIStats {
             total_agents: 0,
             total_requests: 0,
             successful_requests: 0,
             failed_requests: 0,
         }
-    }
-}
-
-impl Default for AIStats {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -409,7 +469,7 @@ pub struct SimpleAIAgentManager {
 }
 
 impl SimpleAIAgentManager {
-    pub fn new() -> Self {
+    pub fn new(capability: ManagerCapability) -> Self {
         SimpleAIAgentManager {
             agents: Vec::new(),
             stats: AIStats { failed_requests: 0 },
@@ -425,13 +485,38 @@ impl Default for SimpleAIAgentManager {
 
 impl AIAgentManager for SimpleAIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError> {
+        if !self.capability.can_register {
+            return Err(AIError::PermissionDenied);
+        }
+
         let id = self.agents.len();
-        self.agents.push(agent);
+        self.agents.push(Some(agent));
+        self.stats.total_agents += 1;
         Ok(id)
     }
 
+    fn unregister_agent(&mut self, id: usize) -> Result<(), AIError> {
+        if !self.capability.can_unregister {
+            return Err(AIError::PermissionDenied);
+        }
+
+        if id < self.agents.len() {
+            self.agents[id] = None;
+            self.stats.total_agents -= 1;
+            Ok(())
+        } else {
+            Err(AIError::InvalidInput)
+        }
+    }
+
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent> {
-        self.agents.get(id).map(|a| a.as_ref())
+        if id < self.agents.len() {
+            if let Some(ref agent) = self.agents[id] {
+                let r: &dyn AIAgent = agent.as_ref();
+                return Some(r);
+            }
+        }
+        None
     }
 
     fn process(&mut self, input: &[u8]) -> Result<Vec<u8>, AIError> {
@@ -442,20 +527,16 @@ impl AIAgentManager for SimpleAIAgentManager {
         self.stats.total_requests += 1;
 
         let active = self.active_agent.load(Ordering::SeqCst);
-        if active < self.agents.len() {
-            if let Some(ref mut agent) = self.agents[active] {
-                let intent = agent.parse(input)?;
+        if let Some(ref mut agent) = self.agents[active] {
+            let agent_mut: &mut dyn AIAgent = agent.as_mut();
+            let intent = agent_mut.parse(input)?;
 
-                if let Ok(response) = agent.execute(&intent) {
-                    self.stats.successful_requests += 1;
-                    Ok(response)
-                } else {
-                    self.stats.failed_requests += 1;
-                    Err(AIError::ExecutionFailed)
-                }
+            if let Ok(response) = agent_mut.execute(&intent) {
+                self.stats.successful_requests += 1;
+                Ok(response)
             } else {
                 self.stats.failed_requests += 1;
-                Err(AIError::InvalidInput)
+                Err(AIError::ExecutionFailed)
             }
         } else {
             self.stats.failed_requests += 1;
@@ -480,6 +561,7 @@ mod tests {
         assert_eq!(intent.command, "sys_exec");
         assert_eq!(intent.parameters, "run diagnostic check");
     }
+}
 
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
@@ -490,6 +572,7 @@ mod tests {
         let opt_score = agent.optimize_prompt_weights();
         assert_eq!(opt_score, 0.95);
     }
+}
 
     #[test]
     fn test_ai_agent_manager_process() {

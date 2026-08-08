@@ -19,6 +19,8 @@ impl PageTableFlags {
     pub const USER_ACCESSIBLE: u64 = 1 << 2;
     pub const WRITE_THROUGH: u64 = 1 << 3;
     pub const NO_CACHE: u64 = 1 << 4;
+    pub const HUGE_PAGE: u64 = 1 << 7;  // Page Size (PS) flag for huge pages
+    pub const COW: u64 = 1 << 9;        // Copy-On-Write flag
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -71,34 +73,114 @@ impl VirtualMemoryManagerV2 {
     pub unsafe fn new(pml4_phys_addr: u64) -> Self {
         Self {
             pml4_table: NonNull::new_unchecked(pml4_phys_addr as *mut PageTable),
+            tlb_invalidations: core::sync::atomic::AtomicUsize::new(0),
+            tlb_flushes: core::sync::atomic::AtomicUsize::new(0),
+            is_5level_enabled: false,
         }
     }
 
+    /// Simulate TLB invalidation for a specific virtual page address.
+    pub fn invlpg(&self, _virt_addr: u64) {
+        self.tlb_invalidations.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
+    }
+
+    /// Simulate a complete TLB flush across all mapping caches.
+    pub fn flush_tlb_all(&self) {
+        self.tlb_flushes.fetch_add(1, core::sync::atomic::Ordering::SeqCst);
+    }
+
     /// Translates a virtual address to its corresponding physical address by walking PML4 -> PDPT -> PD -> PT
+    /// Supports 5-Level virtual memory paging matching PML5/P4D indexes when enabled.
+    /// Also supports Huge Pages translation (2MB/1GB).
     pub unsafe fn translate(&self, virt_addr: u64) -> Option<u64> {
+        let mut root_addr = self.pml4_table.as_ptr() as u64;
+
+        if self.is_5level_enabled {
+            // PML5 level translation (bits 48-56 of virtual address)
+            let pml5_index = ((virt_addr >> 48) & 0x1FF) as usize;
+            let pml5 = &*(root_addr as *const PageTable);
+            let pml5_entry = &pml5.entries[pml5_index];
+            root_addr = pml5_entry.physical_frame()?;
+        }
+
         let pml4_index = ((virt_addr >> 39) & 0x1FF) as usize;
         let pdpt_index = ((virt_addr >> 30) & 0x1FF) as usize;
         let pd_index = ((virt_addr >> 21) & 0x1FF) as usize;
         let pt_index = ((virt_addr >> 12) & 0x1FF) as usize;
-        let page_offset = virt_addr & 0xFFF;
 
-        let pml4 = self.pml4_table.as_ref();
+        let pml4 = &*(root_addr as *const PageTable);
         let pml4_entry = &pml4.entries[pml4_index];
         let pdpt_addr = pml4_entry.physical_frame()?;
 
         let pdpt = &*(pdpt_addr as *const PageTable);
         let pdpt_entry = &pdpt.entries[pdpt_index];
+
+        // 1GB Huge Page translation
+        if pdpt_entry.flags().0 & PageTableFlags::HUGE_PAGE != 0 {
+            let page_offset = virt_addr & 0x3FFF_FFFF; // 1GB offset mask
+            return Some(pdpt_entry.physical_frame()? + page_offset);
+        }
+
         let pd_addr = pdpt_entry.physical_frame()?;
 
         let pd = &*(pd_addr as *const PageTable);
         let pd_entry = &pd.entries[pd_index];
+
+        // 2MB Huge Page translation
+        if pd_entry.flags().0 & PageTableFlags::HUGE_PAGE != 0 {
+            let page_offset = virt_addr & 0x1F_FFFF; // 2MB offset mask
+            return Some(pd_entry.physical_frame()? + page_offset);
+        }
+
         let pt_addr = pd_entry.physical_frame()?;
 
         let pt = &*(pt_addr as *const PageTable);
         let pt_entry = &pt.entries[pt_index];
         let frame_addr = pt_entry.physical_frame()?;
+        let page_offset = virt_addr & 0xFFF;
 
         Some(frame_addr + page_offset)
+    }
+
+    /// Simulate a Page Fault resolution trigger. If it encounters a write on a COW-gated page,
+    /// it resolves the violation by copying the page frame on-the-fly.
+    pub unsafe fn handle_page_fault(&mut self, fault_addr: u64, is_write: bool) -> Result<u64, &'static str> {
+        let pml4_index = ((fault_addr >> 39) & 0x1FF) as usize;
+        let pdpt_index = ((fault_addr >> 30) & 0x1FF) as usize;
+        let pd_index = ((fault_addr >> 21) & 0x1FF) as usize;
+        let pt_index = ((fault_addr >> 12) & 0x1FF) as usize;
+
+        let pml4 = self.pml4_table.as_mut();
+        let pml4_entry = &mut pml4.entries[pml4_index];
+        let pdpt_addr = pml4_entry.physical_frame().ok_or("PF: PDPT missing")?;
+
+        let pdpt = &mut *(pdpt_addr as *mut PageTable);
+        let pdpt_entry = &mut pdpt.entries[pdpt_index];
+        let pd_addr = pdpt_entry.physical_frame().ok_or("PF: PD missing")?;
+
+        let pd = &mut *(pd_addr as *mut PageTable);
+        let pd_entry = &mut pd.entries[pd_index];
+        let pt_addr = pd_entry.physical_frame().ok_or("PF: PT missing")?;
+
+        let pt = &mut *(pt_addr as *mut PageTable);
+        let pt_entry = &mut pt.entries[pt_index];
+
+        let flags = pt_entry.flags();
+        if is_write && (flags.0 & PageTableFlags::COW != 0) {
+            // Copy-On-Write page-fault triggering!
+            let old_frame = pt_entry.physical_frame().ok_or("PF: Frame missing")?;
+            let new_frame = old_frame + 0x1000_0000; // mock copy reallocation offset
+
+            let mut new_flags = flags.0;
+            new_flags &= !PageTableFlags::COW;       // Clear COW flag
+            new_flags |= PageTableFlags::WRITABLE;   // Enable write permission
+
+            pt_entry.set_frame(new_frame, PageTableFlags(new_flags));
+            self.invlpg(fault_addr);
+            return Ok(new_frame);
+        }
+
+        Err("Page fault cannot be resolved as COW")
     }
 
     /// Maps a virtual page to a physical frame
@@ -270,82 +352,6 @@ impl MemoryDescriptorList {
     }
 }
 
-// =========================================================================
-// S-MM PAGE DIRECTORY CONTROLLER
-// Enhanced memory management controller for physical frame allocation
-// =========================================================================
-
-pub const PAGE_SIZE_BYTES: usize = 4096;
-pub const MAX_PHYSICAL_FRAMES: usize = 128;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SimplePageTableEntry {
-    pub physical_frame_idx: usize,
-    pub is_present: bool,
-    pub is_writable: bool,
-}
-
-pub struct PagingController {
-    pub physical_bitmap: [bool; MAX_PHYSICAL_FRAMES],
-    pub page_directory: [Option<SimplePageTableEntry>; 256],
-}
-
-impl PagingController {
-    pub fn new() -> Self {
-        Self {
-            physical_bitmap: [false; MAX_PHYSICAL_FRAMES],
-            page_directory: [None; 256],
-        }
-    }
-
-    pub fn map_page(
-        &mut self,
-        virtual_page_idx: usize,
-        is_writable: bool,
-    ) -> Result<usize, &'static str> {
-        if virtual_page_idx >= 256 {
-            return Err("Virtual address range is out of bounds");
-        }
-        if self.page_directory[virtual_page_idx].is_some() {
-            return Err("Virtual page is already mapped");
-        }
-
-        if let Some(frame_idx) = self.allocate_physical_frame() {
-            let entry = SimplePageTableEntry {
-                physical_frame_idx: frame_idx,
-                is_present: true,
-                is_writable,
-            };
-            self.page_directory[virtual_page_idx] = Some(entry);
-            Ok(frame_idx)
-        } else {
-            Err("Out of physical memory frames")
-        }
-    }
-
-    pub fn unmap_page(&mut self, virtual_page_idx: usize) -> Result<(), &'static str> {
-        if virtual_page_idx >= 256 {
-            return Err("Virtual address range is out of bounds");
-        }
-        if let Some(entry) = self.page_directory[virtual_page_idx].take() {
-            self.physical_bitmap[entry.physical_frame_idx] = false;
-            Ok(())
-        } else {
-            Err("Virtual page is not mapped")
-        }
-    }
-
-    fn allocate_physical_frame(&mut self) -> Option<usize> {
-        for (idx, is_allocated) in self.physical_bitmap.iter_mut().enumerate() {
-            if !*is_allocated {
-                *is_allocated = true;
-                return Some(idx);
-            }
-        }
-        None
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -468,99 +474,5 @@ mod tests {
         assert!(!mdl.is_mapped);
         mdl.unlock();
         assert!(!mdl.is_locked);
-    }
-
-    #[test]
-    fn test_paging_controller_initialization() {
-        let controller = PagingController::new();
-        assert_eq!(controller.physical_bitmap.len(), MAX_PHYSICAL_FRAMES);
-        assert_eq!(controller.page_directory.len(), 256);
-    }
-
-    #[test]
-    fn test_paging_controller_map_page() {
-        let mut controller = PagingController::new();
-        
-        // Map a writable page
-        let frame_idx = controller.map_page(0, true).unwrap();
-        assert!(controller.physical_bitmap[frame_idx]);
-        assert!(controller.page_directory[0].is_some());
-        
-        let entry = controller.page_directory[0].unwrap();
-        assert_eq!(entry.physical_frame_idx, frame_idx);
-        assert!(entry.is_present);
-        assert!(entry.is_writable);
-    }
-
-    #[test]
-    fn test_paging_controller_map_readonly_page() {
-        let mut controller = PagingController::new();
-        
-        // Map a read-only page
-        let frame_idx = controller.map_page(1, false).unwrap();
-        let entry = controller.page_directory[1].unwrap();
-        assert!(!entry.is_writable);
-    }
-
-    #[test]
-    fn test_paging_controller_unmap_page() {
-        let mut controller = PagingController::new();
-        
-        // Map a page
-        let frame_idx = controller.map_page(0, true).unwrap();
-        assert!(controller.page_directory[0].is_some());
-        
-        // Unmap the page
-        controller.unmap_page(0).unwrap();
-        assert!(controller.page_directory[0].is_none());
-        assert!(!controller.physical_bitmap[frame_idx]);
-    }
-
-    #[test]
-    fn test_paging_controller_double_map_error() {
-        let mut controller = PagingController::new();
-        
-        // Map a page
-        controller.map_page(0, true).unwrap();
-        
-        // Try to map the same page again (should fail)
-        let result = controller.map_page(0, true);
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Virtual page is already mapped");
-    }
-
-    #[test]
-    fn test_paging_controller_out_of_bounds() {
-        let mut controller = PagingController::new();
-        
-        // Try to map a page outside the valid range
-        let result = controller.map_page(256, true);
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Virtual address range is out of bounds");
-    }
-
-    #[test]
-    fn test_paging_controller_unmap_nonexistent_page() {
-        let mut controller = PagingController::new();
-        
-        // Try to unmap a page that doesn't exist
-        let result = controller.unmap_page(0);
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Virtual page is not mapped");
-    }
-
-    #[test]
-    fn test_paging_controller_physical_frame_exhaustion() {
-        let mut controller = PagingController::new();
-        
-        // Map all available physical frames (using different virtual pages)
-        for i in 0..MAX_PHYSICAL_FRAMES {
-            controller.map_page(i, true).unwrap();
-        }
-        
-        // Try to map one more page with a different virtual page index within bounds (should fail due to physical frame exhaustion)
-        let result = controller.map_page(MAX_PHYSICAL_FRAMES + 1, true);
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err(), "Out of physical memory frames");
     }
 }

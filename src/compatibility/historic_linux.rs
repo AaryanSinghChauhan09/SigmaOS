@@ -1,8 +1,22 @@
+#[cfg(not(test))]
 use crate::driver::device::DdeDeviceWrapper;
+
+#[cfg(test)]
+pub struct DdeDeviceWrapper {
+    pub simulated_pci_bar: [u8; 256],
+}
+#[cfg(test)]
+impl DdeDeviceWrapper {
+    pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
+        Self { simulated_pci_bar: [0; 256] }
+    }
+}
+
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::driver::device::DdeDeviceWrapper;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxEra {
@@ -47,8 +61,8 @@ impl HistoricSyscallEmulator for Era0_11SyscallEmulator {
         // Early Linux used EAX for syscall number, EBX, ECX, EDX for arguments
         match state.eax {
             0 => Err(HistoricError::SyscallNotImplemented), // sys_setup
-            1 => Ok(42),                                    // sys_exit (dummy code)
-            2 => Ok(101),                                   // sys_fork (simulated pid)
+            1 => Ok(42), // sys_exit (dummy code)
+            2 => Ok(101), // sys_fork (simulated pid)
             3 => {
                 // sys_read(fd, buf, count)
                 let count = state.edx;
@@ -248,37 +262,6 @@ pub enum HistoricError {
     MemoryAccessViolation,
     InvalidIoPortAccess,
     UnsupportedPackageFormat,
-    LfsBuildFailure,
-}
-
-/// Simulated LFS Stage 1 and 2 Toolchain builder
-pub struct LfsToolchainBuilder {
-    pub current_stage: u8,
-}
-
-impl LfsToolchainBuilder {
-    pub fn new() -> Self {
-        Self { current_stage: 1 }
-    }
-
-    pub fn execute_bootstrap_stage(&mut self, stage: u8) -> Result<&'static str, HistoricError> {
-        if stage > 3 {
-            return Err(HistoricError::LfsBuildFailure);
-        }
-        self.current_stage = stage;
-        match stage {
-            1 => Ok("LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"),
-            2 => Ok("LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"),
-            3 => Ok("LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"),
-            _ => Err(HistoricError::LfsBuildFailure),
-        }
-    }
-}
-
-impl Default for LfsToolchainBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 /// os-tutorial: 16-bit real mode to 32-bit protected mode CPU transition simulator
@@ -446,10 +429,10 @@ mod tests {
     fn test_era_emulation_read() {
         let emu = Era0_11SyscallEmulator;
         let mut state = HistoricalCpuState {
-            eax: 3,      // sys_read
-            ebx: 0,      // stdin
+            eax: 3, // sys_read
+            ebx: 0, // stdin
             ecx: 0x1000, // buffer
-            edx: 12,     // count
+            edx: 12, // count
             ..Default::default()
         };
         let bytes_read = emu.emulate_syscall(&mut state).unwrap();
@@ -461,7 +444,7 @@ mod tests {
         let emu = Era1_0SyscallEmulator::new();
         let mut state = HistoricalCpuState {
             eax: 102, // sys_socketcall
-            ebx: 1,   // socket()
+            ebx: 1, // socket()
             ..Default::default()
         };
         let fd = emu.emulate_syscall(&mut state).unwrap();

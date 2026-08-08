@@ -1,5 +1,3 @@
-#![allow(clippy::useless_format)]
-
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
 

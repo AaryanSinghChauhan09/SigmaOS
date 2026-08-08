@@ -1,17 +1,8 @@
 // SigmaOS Virtual Filesystem (VFS)
-// Capability-based, standard Linux/BSD conforming filesystem with security, hard links, and path traversal
+// Capability-based filesystem with security and advanced Linux-inspired abstractions (xattrs, hardlinks, symlinks)
 
-use crate::security::CapabilityToken;
+use crate::security::{CapabilityToken, Permission};
 use std::collections::HashMap;
-
-// Standard POSIX / Linux / BSD open flags
-pub const O_RDONLY: u32 = 0x0000;
-pub const O_WRONLY: u32 = 0x0001;
-pub const O_RDWR: u32 = 0x0002;
-pub const O_CREAT: u32 = 0x0040;
-pub const O_EXCL: u32 = 0x0080;
-pub const O_TRUNC: u32 = 0x0200;
-pub const O_APPEND: u32 = 0x0400;
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,10 +52,6 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    // Conforming Linux/BSD additions
-    pub hard_links_count: u32,
-    pub data: Vec<u8>,                 // File storage data
-    pub entries: HashMap<String, u64>, // Directory entries
 }
 
 impl Inode {
@@ -79,9 +66,6 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            hard_links_count: 1,
-            data: Vec::new(),
-            entries: HashMap::new(),
         }
     }
 }
@@ -106,11 +90,11 @@ impl FileDescriptor {
 
 /// Virtual Filesystem
 pub struct VirtualFilesystem {
-    pub inodes: HashMap<u64, Inode>,
-    pub next_inode_id: u64,
-    pub root_inode: u64,
-    pub file_descriptors: HashMap<u64, FileDescriptor>,
-    pub next_fd: u64,
+    inodes: HashMap<u64, Inode>,
+    next_inode_id: u64,
+    root_inode: u64,
+    file_descriptors: HashMap<u64, FileDescriptor>,
+    next_fd: u64,
 }
 
 impl VirtualFilesystem {
@@ -139,33 +123,6 @@ impl VirtualFilesystem {
         self.inodes.insert(inode_id, inode);
 
         Ok(inode_id)
-    }
-
-    /// Linux-parity Hard Link creator: points a new reference to an existing inode
-    pub fn link_inode(&mut self, old_inode_id: u64) -> Result<(), FsError> {
-        let inode = self.inodes.get_mut(&old_inode_id).ok_or(FsError::NotFound)?;
-
-        // Linux FHS constraint: prevent directory hard links to avoid circular loops
-        if inode.file_type == FileType::Directory {
-            return Err(FsError::IsDirectory);
-        }
-
-        inode.hard_links_count += 1;
-        Ok(())
-    }
-
-    /// Linux-parity Unlink handler: decrements reference links, freeing storage only when count hits 0
-    pub fn unlink_inode(&mut self, inode_id: u64) -> Result<u32, FsError> {
-        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
-
-        if inode.hard_links_count > 1 {
-            inode.hard_links_count -= 1;
-            Ok(inode.hard_links_count)
-        } else {
-            // Reference link hit 0, fully free the physical Inode from VFS metadata
-            self.inodes.remove(&inode_id);
-            Ok(0)
-        }
     }
 
     pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
@@ -301,7 +258,6 @@ pub enum FsError {
     NotADirectory,
     IsDirectory,
     NoSpace,
-    AlreadyExists,
 }
 
 #[cfg(test)]
@@ -319,7 +275,6 @@ mod tests {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         assert!(vfs.inodes.contains_key(&inode_id));
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 1);
     }
 
     #[test]
@@ -339,28 +294,5 @@ mod tests {
         let data = b"test data";
         let written = vfs.write_file(fd, data).unwrap();
         assert_eq!(written, data.len());
-    }
-
-    #[test]
-    fn test_linux_hard_links_flow() {
-        let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 101).unwrap();
-
-        // Link same inode twice (creating hard links)
-        assert!(vfs.link_inode(inode_id).is_ok());
-        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 2);
-
-        // Attempting to hard link directory should fail (avoid loops)
-        assert!(vfs.link_inode(0).is_err()); // Root is directory
-
-        // Unlink first hard link
-        let count = vfs.unlink_inode(inode_id).unwrap();
-        assert_eq!(count, 1);
-        assert!(vfs.inodes.contains_key(&inode_id)); // Inode still exists
-
-        // Unlink second hard link
-        let count = vfs.unlink_inode(inode_id).unwrap();
-        assert_eq!(count, 0);
-        assert!(!vfs.inodes.contains_key(&inode_id)); // Inode fully freed
     }
 }
