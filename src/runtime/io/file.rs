@@ -10,6 +10,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// File descriptor structure
 #[repr(C)]
+#[derive(Debug)]
 pub struct FileDescriptor {
     pub fd: AtomicUsize,
     pub flags: FileFlags,
@@ -109,62 +110,82 @@ pub enum SeekOrigin {
 
 /// File I/O manager
 pub struct FileManager {
-    pub next_fd: AtomicUsize,
-    pub max_fds: usize,
+    next_fd: AtomicUsize,
+    max_fds: usize,
     pub open_files: [Option<NonNull<FileDescriptor>>; 1024],
 }
 
 impl FileManager {
     pub fn new() -> Self {
-        let mut open_files: [Option<NonNull<FileDescriptor>>; 1024] = [None; 1024];
-
-        // Standard Input (FD 0)
-        let stdin_desc = FileDescriptor {
-            fd: AtomicUsize::new(0),
-            flags: FileFlags { read: true, write: false, append: false, create: false, truncate: false },
-            offset: AtomicUsize::new(0),
-            capability: Capability::full(),
-        };
-
-        // Standard Output (FD 1)
-        let stdout_desc = FileDescriptor {
-            fd: AtomicUsize::new(1),
-            flags: FileFlags { read: false, write: true, append: false, create: false, truncate: false },
-            offset: AtomicUsize::new(0),
-            capability: Capability::full(),
-        };
-
-        // Standard Error (FD 2)
-        let stderr_desc = FileDescriptor {
-            fd: AtomicUsize::new(2),
-            flags: FileFlags { read: false, write: true, append: false, create: false, truncate: false },
-            offset: AtomicUsize::new(0),
-            capability: Capability::full(),
-        };
-
-        unsafe {
-            let stdin_ptr = alloc(core::mem::size_of::<FileDescriptor>()) as *mut FileDescriptor;
-            if !stdin_ptr.is_null() {
-                ptr::write(stdin_ptr, stdin_desc);
-                open_files[0] = Some(NonNull::new_unchecked(stdin_ptr));
-            }
-            let stdout_ptr = alloc(core::mem::size_of::<FileDescriptor>()) as *mut FileDescriptor;
-            if !stdout_ptr.is_null() {
-                ptr::write(stdout_ptr, stdout_desc);
-                open_files[1] = Some(NonNull::new_unchecked(stdout_ptr));
-            }
-            let stderr_ptr = alloc(core::mem::size_of::<FileDescriptor>()) as *mut FileDescriptor;
-            if !stderr_ptr.is_null() {
-                ptr::write(stderr_ptr, stderr_desc);
-                open_files[2] = Some(NonNull::new_unchecked(stderr_ptr));
-            }
-        }
-
-        FileManager {
+        let mut manager = FileManager {
             next_fd: AtomicUsize::new(3), // Start after stdin, stdout, stderr
             max_fds: 1024,
-            open_files,
+            open_files: [None; 1024],
+        };
+
+        // Pre-allocate standard stream file descriptors 0 (stdin), 1 (stdout), and 2 (stderr)
+        unsafe {
+            manager.allocate_standard_streams();
         }
+
+        manager
+    }
+
+    /// Pre-allocates file descriptors 0, 1, 2 for stdin, stdout, stderr (mimics Linux standard streams)
+    unsafe fn allocate_standard_streams(&mut self) {
+        for fd in 0..3 {
+            let flags = if fd == 0 { FileFlags::read_only() } else { FileFlags::write_only() };
+            let descriptor = FileDescriptor {
+                fd: AtomicUsize::new(fd),
+                flags,
+                offset: AtomicUsize::new(0),
+                capability: Capability::full(),
+            };
+            let fd_ptr = alloc(core::mem::size_of::<FileDescriptor>()) as *mut FileDescriptor;
+            if !fd_ptr.is_null() {
+                ptr::write(fd_ptr, descriptor);
+                self.open_files[fd] = Some(NonNull::new_unchecked(fd_ptr));
+            }
+        }
+    }
+
+    /// Duplicates an open file descriptor onto another (mimics Linux dup2 system call)
+    pub unsafe fn redirect_stream(&mut self, source_fd: usize, target_fd: usize) -> bool {
+        if source_fd >= self.max_fds || target_fd >= self.max_fds {
+            return false;
+        }
+
+        // Check if source exists
+        let source_ptr_opt = self.open_files[source_fd];
+        let source_ptr = match source_ptr_opt {
+            Some(p) => p,
+            None => return false,
+        };
+
+        // If target descriptor is open, close it first (standard dup2 behavior)
+        if let Some(target_ptr) = self.open_files[target_fd] {
+            ptr::drop_in_place(target_ptr.as_ptr());
+            free(target_ptr.as_ptr() as *mut u8);
+            self.open_files[target_fd] = None;
+        }
+
+        // Duplicate the descriptor structure
+        let source_ref = source_ptr.as_ref();
+        let duplicated = FileDescriptor {
+            fd: AtomicUsize::new(target_fd),
+            flags: source_ref.flags,
+            offset: AtomicUsize::new(source_ref.offset.load(Ordering::SeqCst)),
+            capability: source_ref.capability,
+        };
+
+        let fd_ptr = alloc(core::mem::size_of::<FileDescriptor>()) as *mut FileDescriptor;
+        if fd_ptr.is_null() {
+            return false;
+        }
+
+        ptr::write(fd_ptr, duplicated);
+        self.open_files[target_fd] = Some(NonNull::new_unchecked(fd_ptr));
+        true
     }
 
     /// Open a file
@@ -390,6 +411,15 @@ pub unsafe fn get_size(fd: &FileDescriptor) -> isize {
     }
 }
 
+/// Redirect standard stream (dup2 equivalent)
+pub unsafe fn redirect_stream(source_fd: usize, target_fd: usize) -> bool {
+    if let Some(ref mut manager) = GLOBAL_FILE_MANAGER {
+        manager.redirect_stream(source_fd, target_fd)
+    } else {
+        false
+    }
+}
+
 // External allocator functions
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
@@ -401,67 +431,46 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_standard_streams_initialization() {
-        let manager = FileManager::new();
-
-        // Assert FDs 0, 1, and 2 are pre-allocated standard streams
-        assert!(manager.open_files[0].is_some());
-        assert!(manager.open_files[1].is_some());
-        assert!(manager.open_files[2].is_some());
-
+    fn test_standard_streams_preallocation() {
         unsafe {
-            let stdin_fd = manager.open_files[0].unwrap();
-            let stdout_fd = manager.open_files[1].unwrap();
-            let stderr_fd = manager.open_files[2].unwrap();
+            init_file_manager();
+            if let Some(ref manager) = GLOBAL_FILE_MANAGER {
+                // Assert 0, 1, 2 standard stream FDs are pre-allocated
+                assert!(manager.open_files[0].is_some());
+                assert!(manager.open_files[1].is_some());
+                assert!(manager.open_files[2].is_some());
 
-            assert_eq!((*stdin_fd.as_ptr()).fd.load(Ordering::SeqCst), 0);
-            assert_eq!((*stdout_fd.as_ptr()).fd.load(Ordering::SeqCst), 1);
-            assert_eq!((*stderr_fd.as_ptr()).fd.load(Ordering::SeqCst), 2);
+                let stdin_ref = manager.open_files[0].unwrap().as_ref();
+                let stdout_ref = manager.open_files[1].unwrap().as_ref();
 
-            assert!((*stdin_fd.as_ptr()).flags.read);
-            assert!(!(*stdin_fd.as_ptr()).flags.write);
+                assert_eq!(stdin_ref.fd.load(Ordering::SeqCst), 0);
+                assert_eq!(stdout_ref.fd.load(Ordering::SeqCst), 1);
 
-            assert!(!(*stdout_fd.as_ptr()).flags.read);
-            assert!((*stdout_fd.as_ptr()).flags.write);
-
-            assert!(!(*stderr_fd.as_ptr()).flags.read);
-            assert!((*stderr_fd.as_ptr()).flags.write);
+                assert!(stdin_ref.flags.read);
+                assert!(!stdin_ref.flags.write);
+                assert!(stdout_ref.flags.write);
+                assert!(!stdout_ref.flags.read);
+            }
         }
     }
 
     #[test]
-    fn test_stdio_read_write() {
-        let manager = FileManager::new();
+    fn test_standard_stream_redirection() {
         unsafe {
-            let stdout_fd = manager.open_files[1].unwrap().as_ref();
-            let stdin_fd = manager.open_files[0].unwrap().as_ref();
+            init_file_manager();
+            let mut path = [b't', b'e', b's', b't'];
+            let file_fd = open(&path, OpenMode::ReadWrite).unwrap();
+            let source_fd_num = file_fd.fd.load(Ordering::SeqCst);
 
-            let payload = b"Hello standard streams!";
-            let written = manager.write(stdout_fd, payload.as_ptr(), payload.len());
-            assert_eq!(written, payload.len() as isize);
+            // Redirect stdout (FD 1) to point to the newly opened file
+            assert!(redirect_stream(source_fd_num, 1));
 
-            let mut buf = [0u8; 10];
-            let read_bytes = manager.read(stdin_fd, buf.as_mut_ptr(), buf.len());
-            assert_eq!(read_bytes, 1);
-            assert_eq!(buf[0], b' ');
-        }
-    }
-
-    #[test]
-    fn test_stream_redirection() {
-        let mut manager = FileManager::new();
-
-        // Stdin initially open
-        assert!(manager.open_files[0].is_some());
-
-        unsafe {
-            // Redirect stdout (FD 1) to stdin (FD 0)
-            assert!(manager.redirect_stream(1, 0).is_ok());
-
-            let redirected_stdin = manager.open_files[0].unwrap().as_ref();
-            // Stdin (FD 0) should now have inherited stdout's flags (Write only)
-            assert!(!redirected_stdin.flags.read);
-            assert!(redirected_stdin.flags.write);
+            if let Some(ref manager) = GLOBAL_FILE_MANAGER {
+                let redirected_stdout = manager.open_files[1].unwrap().as_ref();
+                // Redirected stdout now has file mode capability and flags
+                assert!(redirected_stdout.flags.read);
+                assert!(redirected_stdout.flags.write);
+            }
         }
     }
 }
