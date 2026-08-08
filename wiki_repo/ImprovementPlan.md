@@ -47,6 +47,23 @@ To elevate SigmaOS tools into competitor-grade production utilities, we model ou
 
 ---
 
+## 🔄 CO-DESIGNING CO-ABSORBED PACKAGE SNAPSHOTS & TRANSACTIONAL ROLLBACKS
+
+To prevent system corruption and provide bulletproof recovery systems, SigmaOS adapts transaction and rollback patterns inspired by industry-leading Linux/BSD package environments:
+
+### A. NixOS / Nix-Style Generation Checkpoints
+*   *Design Implementation:* Package manager transactions are tracked under a strictly ordered, incremental generation map (`store_generations: HashMap<u32, Vec<String>>` inside `universal_engine.rs`).
+*   *Atomic Pointer Promotion:* Similar to NixOS generation profiles, upgrading or removing a package is atomic ($O(1)$) because the active system environment is symlinked directly to the current generation pointer.
+*   *Instant Reversion:* If a package transaction fails, the engine instantly discards the partial transaction, retaining active system retaining pointers unchanged and completely avoiding half-installed file configurations.
+
+### B. Btrfs-Inspired Copy-on-Write (CoW) Snapshots & Snapper / Timeshift integration
+*   *Design Implementation:* Implement transactional rollbacks utilizing our internal `BtrfsSnapshot` and `CowSnapshotManager` subsystems.
+*   *Subvolume Isolation:* System-wide configuration profiles and package stores are partitioned into isolated directory subvolumes.
+*   *Transactional Logging:* Before any `sigpkg` upgrade cycle, our automated hook calls `create_cow_snapshot` to log the current checksum and layout state.
+*   *Unified Rollback Command:* On system degradation, running `sigma-rollback` triggers `rollback_to_snapshot`, which replays transaction files backwards to restore directories to previous pristine sectors, surpassing classical Ubuntu `apt` restore cycles in reliability and speed.
+
+---
+
 ## 🛡️ DEFEATING KALI LINUX & PARROT SECURITY OS: SOVEREIGN CYBERSECURITY TOOLING
 
 To establish absolute dominance over traditional offensive toolsets and live forensic distros (Kali Linux, Parrot Security OS, Tails, and DEFT), SigmaOS incorporates native, zero-dependency, safe implementations of advanced cybersecurity mechanisms:
