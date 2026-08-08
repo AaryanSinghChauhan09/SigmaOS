@@ -1,40 +1,132 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod security;
-pub mod sigpkg;
-pub mod kernel;
-pub mod network;
-pub mod filesystem;
-pub mod drivers;
+pub mod accessibility;
+pub mod ai;
+pub mod automation;
+pub mod compatibility;
+pub mod crash;
+pub mod customization;
+pub mod dashboard;
 pub mod device;
 pub mod driver;
-pub mod shell;
-pub mod dashboard;
-pub mod accessibility;
-pub mod customization;
-pub mod automation;
-pub mod resilience;
-pub mod productivity;
+pub mod drivers;
+pub mod filesystem;
+pub mod gpu;
+pub mod kernel;
+pub mod klib;
+pub mod ml;
+pub mod network;
 pub mod orchestration;
 pub mod package;
-pub mod compatibility;
+pub mod process;
+pub mod productivity;
+pub mod resilience;
+pub mod security;
+pub mod shell;
+pub mod sigpkg;
 pub mod virtualization;
 
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
-pub use sigpkg::{SatSolver, ContentAddressedStore, CryptoVerifier, Transaction, PackageRecipe, BuildSystem, RecipeManager, RecipeError};
-pub use kernel::{Scheduler, Process, Priority, ProcessState, BuddyAllocator, MemoryBlock, PAGE_SIZE, IpcManager, Channel, Message, IpcError, RoundRobinScheduler, RoundRobinConfig, SchedulerError};
-pub use network::{TcpStack, TcpConnection, TcpSegment, TcpState, TcpError};
-pub use filesystem::{VirtualFilesystem, Inode, FileDescriptor, FileType, FilePermissions, FsError};
-pub use drivers::{GpuDriver, GpuCommand, GpuError, StorageDriver, StorageCommand, StorageType, StorageError, NetworkDriver, NetworkCommand, NetworkType, NetworkError, InputDriver, InputEvent, InputType, UsbHidDriver, HidKeyboardEvent, HidReportType, HidError, VesaDriver, VesaModeInfo, VesaError};
-pub use shell::{ShellRepl, ShellCommand};
-pub use dashboard::{UnifiedDashboard, DashboardWidget, MetricData, MetricType, WidgetType, SystemMonitor};
-pub use accessibility::{AccessibilityFramework, AccessibilityProfile, AccessibilitySetting, AccessibilityCategory, AccessibilityFeature, AccessibilityError};
-pub use customization::{CustomizationEngine, Routine, Condition, Action, Theme, TriggerType, CustomizationError};
-pub use automation::{AiOptimizer, OptimizationRecommendation, SystemState, OptimizationCategory, OptimizationError, SystemAutomationManager, SystemAutomationRule, SystemAction, SystemEventType, PerformanceProfile, SystemPrediction, PredictiveModel, AutomationError};
-pub use resilience::{SelfHealingModule, RecoveryRule, RecoveryAction, SystemSnapshot, RecoveryEventType, ResilienceError};
-pub use productivity::{GamifiedProductivity, Achievement, Goal, PomodoroTimer, ProductivityScore, AchievementType, PomodoroState};
-pub use orchestration::{CrossDeviceOrchestrator, ConnectedDevice, SmartHomeDevice, AutomationRule as CrossDeviceAutomationRule, DeviceType as CrossDeviceType, ConnectionStatus, DeviceCapability, AutomationTrigger, CrossDeviceAction, OrchestrationError};
-pub use package::{UniversalPackageManager, UnifiedPackage, PackageFormat, PackageSource, PackageAdapter, DependencyResolver, ConflictResolution, PackageError};
-pub use compatibility::{CompatibilityManager, ApplicationBinary, TranslationLayer, ContainerRuntime, TargetPlatform, BinaryFormat, CompatibilityMode, CompatibilityError};
-pub use virtualization::{VirtualizationOrchestrator, VirtualMachine, Container, KubernetesPod, VirtualizationTech, VmState, ResourcePool, VirtualizationError};
+pub use accessibility::{
+    AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
+    AccessibilityProfile, AccessibilitySetting,
+};
+pub use ai::{
+    agent::{AIAgent, AIAgentManager, AIError, AIStats, SimpleAIAgent, SimpleAIAgentManager},
+    orchestrator::{ContextWindowPruner, DeviceTarget, LocalLlmOrchestrator, OrchestratorError},
+};
+pub use automation::{
+    AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
+    OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
+    SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
+};
+pub use compatibility::{
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
+    JehanneError, JehanneNamespace, MintBackupTool, MintSoftwareManager, MintUpdateItem,
+    MintUpdateLevel, MintUpdateManager, MockUPIService, MultilingualSupport, NamespaceBindEntry,
+    NtHandle, NtObjectManager, NtObjectType, NtStatus, Plan9pMessage, Plan9pMsgType,
+    PortableExecutableLoader, RegistryHive, SoftwareMeta, TargetPlatform, TranslationLayer,
+    WindowCoordinates, ZenithDisplayCompositor, SovereignNamespaceType, SovereignNamespaceIsolation,
+    SovereignSeccompFilter, FreeBsdJail, SovereignSandboxCoordinator,
+};
+pub use crash::{
+    CpuRegisterDump, OopsReport, PiiAnonymizer, CrashReporter,
+};
+pub use customization::{
+    Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use dashboard::{
+    DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use drivers::{
+    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
+    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
+    VesaModeInfo,
+};
+pub use gpu::{
+    GpuFrameFormat, GpuRecordedFrame, GpuRecorderStats, GpuScreenRecorder,
+};
+pub use filesystem::{
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+};
+pub use kernel::{
+    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
+    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    NumaTask, LockFreeTaskQueue, NumaNode, NumaScheduler,
+};
+pub use klib::{
+    paging::{PageTableEntry, SimplePageTableEntry, PageTable, SimplePageTable, VirtualMemoryManager, SimpleVMM, ProcessMemory, SimpleProcessMemory},
+    buddy_allocator::{BlockID, Block, SimpleBuddyAllocator},
+    uvm::{UvmPmap, UvmAmap, UvmPageLoan, UvmError},
+};
+pub use network::{
+    EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
+    TcpStack, TcpState, UnixSocketAddress, UnixSocketState, UnixSocketConn, UnixSocketRegistry,
+};
+pub use orchestration::{
+    AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
+    ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
+    DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
+};
+pub use package::{
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager, SovereignApp, SovereignApm,
+    SovereignIsolationLevel,
+};
+pub use process::{
+    NiceValue as LinuxNiceValue, CGroup as LinuxCGroup, PidNamespace as LinuxPidNamespace,
+    LinuxProcessEntry, LinuxProcessState, LinuxSignal, ProcFileSystem, SysfsAttribute,
+    LoopDevice, SysfsRegistry,
+};
+pub use productivity::{
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore,
+};
+pub use resilience::{
+    RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
+    SystemSnapshot, SovereignProblemType, SovereignRemediationAction, SovereignFixerStats,
+    AutomatedFixerDaemon,
+};
+pub use security::{
+    CapabilityGate, CapabilityToken, CronDaemon, CronJob, DefaultDenyNetworkPolicy, DmesgLog,
+    FirewallRule, IptablesFirewall, KaliError, NemoClawError, OpenShellAgentSandbox, Permission,
+    PledgeManager, PledgePromise, PluggableAuthenticationModule, PrivacyRouter,
+    SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer, TmuxPane,
+};
+pub use shell::{ShellCommand, ShellRepl};
+pub use sigpkg::{
+    BuildSystem, ContentAddressedStore, CryptoVerifier, DebianPackageTranslator,
+    LinuxPackageCompatManager, LinuxPackageType, MakePkgEngine, PackageRecipe, PacmanError,
+    PacmanManager, PkgBuildScript, RecipeError, RecipeManager, RpmPackageTranslator, SatSolver,
+    Transaction, TranslatedMetadata, TranslatorError,
+};
+pub use virtualization::{
+    Container, DeterministicError, DeterministicHypervisor, DeterministicVirtualMachine,
+    KubernetesPod, ResourcePool, VirtualCpuContext, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmExecutionSnapshot, VmState,
+};
