@@ -8,6 +8,7 @@ pub mod transaction;
 pub mod verifier;
 pub mod rpm_compat;
 pub mod universal_adapter;
+pub mod arch_compat;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
