@@ -604,9 +604,7 @@ impl Irp {
 
     /// Sets a completion routine on the next lower stack location (IoSetCompletionRoutine)
     pub fn set_completion_routine(&mut self, routine: IoCompletionRoutine) -> Result<(), &'static str> {
-        if self.current_stack_index == 0 {
-            // Keep it permissive for single-layered, but validate bounds
-        }
+        let _ = self.current_stack_index; // Currently unused but kept for future bounds validation
         self.completion_routine = Some(routine);
         Ok(())
     }
