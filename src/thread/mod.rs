@@ -7,9 +7,9 @@
 #![allow(unused_imports)]
 
 extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
 use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::fmt;
 
 /// Error type for the Thread module
@@ -65,19 +65,19 @@ impl Thread {
             enabled: false,
         }
     }
-    
+
     /// Enable this resource
     pub fn enable(&mut self) -> ThreadResult<()> {
         self.enabled = true;
         Ok(())
     }
-    
+
     /// Disable this resource
     pub fn disable(&mut self) -> ThreadResult<()> {
         self.enabled = false;
         Ok(())
     }
-    
+
     /// Check if enabled
     pub fn is_enabled(&self) -> bool {
         self.enabled
@@ -99,13 +99,13 @@ impl Mutex {
             initialized: false,
         }
     }
-    
+
     /// Initialize the Thread subsystem
     pub fn init(&mut self) -> ThreadResult<()> {
         self.initialized = true;
         Ok(())
     }
-    
+
     /// Add a resource
     pub fn add(&mut self, resource: Thread) -> ThreadResult<u64> {
         if !self.initialized {
@@ -115,27 +115,27 @@ impl Mutex {
         self.resources.push(resource);
         Ok(id)
     }
-    
+
     /// Get resource by ID
     pub fn get(&self, id: u64) -> Option<&Thread> {
         self.resources.get(id as usize)
     }
-    
+
     /// Get mutable resource by ID
     pub fn get_mut(&mut self, id: u64) -> Option<&mut Thread> {
         self.resources.get_mut(id as usize)
     }
-    
+
     /// List all resources
     pub fn list(&self) -> &[Thread] {
         &self.resources
     }
-    
+
     /// Check if initialized
     pub fn is_initialized(&self) -> bool {
         self.initialized
     }
-    
+
     /// Shutdown the subsystem
     pub fn shutdown(&mut self) -> ThreadResult<()> {
         self.initialized = false;
@@ -153,7 +153,7 @@ impl Default for Mutex {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_thread_manager_init() {
         let mut manager = Mutex::new();
@@ -161,7 +161,7 @@ mod tests {
         assert!(manager.init().is_ok());
         assert!(manager.is_initialized());
     }
-    
+
     #[test]
     fn test_thread_resource_add() {
         let mut manager = Mutex::new();

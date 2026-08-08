@@ -17,8 +17,12 @@ impl SovereignSelfHealingKernel {
             hot_patches_applied: 0,
         };
         // Baseline hashes
-        kernel.integrity_hashes.insert("/boot/kernel".to_string(), "pristine_hash_111".to_string());
-        kernel.integrity_hashes.insert("/sbin/init".to_string(), "pristine_hash_222".to_string());
+        kernel
+            .integrity_hashes
+            .insert("/boot/kernel".to_string(), "pristine_hash_111".to_string());
+        kernel
+            .integrity_hashes
+            .insert("/sbin/init".to_string(), "pristine_hash_222".to_string());
         kernel
     }
 

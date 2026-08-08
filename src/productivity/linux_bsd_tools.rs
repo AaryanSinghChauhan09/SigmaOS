@@ -40,11 +40,13 @@ impl TopCommand {
 
     /// Simulates sorting processes by CPU or Memory RSS (htop sorting)
     pub fn sort_by_cpu(&mut self) {
-        self.processes.sort_by(|a, b| b.cpu_usage_pct.partial_cmp(&a.cpu_usage_pct).unwrap());
+        self.processes
+            .sort_by(|a, b| b.cpu_usage_pct.partial_cmp(&a.cpu_usage_pct).unwrap());
     }
 
     pub fn sort_by_memory(&mut self) {
-        self.processes.sort_by(|a, b| b.memory_rss_bytes.cmp(&a.memory_rss_bytes));
+        self.processes
+            .sort_by(|a, b| b.memory_rss_bytes.cmp(&a.memory_rss_bytes));
     }
 }
 
@@ -123,7 +125,9 @@ impl PingCommand {
 
         // Simulate network latency calculations using a linear congruential generator
         for _ in 0..count {
-            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            seed = seed
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             let latency = 5.0f32 + (seed % 45) as f32; // Latency between 5ms and 50ms
             rtt_sum += latency;
         }

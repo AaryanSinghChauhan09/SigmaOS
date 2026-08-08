@@ -1,4 +1,5 @@
 // SigmaOS Kernel Module
+pub mod breakthrough;
 pub mod breakthroughs;
 pub mod ipc;
 pub mod memory;
@@ -7,10 +8,17 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod self_healing;
+pub mod udkf;
 
+pub use breakthrough::{
+    AdaptiveRoot, ModuleState, PredictiveScheduler, ProcessProvenanceNode, SigmaSignal,
+    SovereignKernelModule, SovereignKernelModuleSystem, ThreatLevel,
+};
 pub use breakthroughs::{
-    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
-    UniversalAbiTranslator, UserDefinedKernelFunctions,
+    AiNativeRuntime, DeterministicReplayEngine, DynamicKernelPersonalitySwitcher,
+    EnergyAwareScheduler, InterruptRatePredictor, KernelPersonalityMode, PrivacyFirstSandbox,
+    SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
@@ -23,5 +31,9 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
+pub use roundrobin::{
+    RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError,
+};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use self_healing::SovereignSelfHealingKernel;
+pub use udkf::{UdkfHook, UserDefinedKernelFunctions};

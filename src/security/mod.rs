@@ -1,14 +1,22 @@
-// SigmaOS Security Subsystem
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
+
 pub mod capability;
-pub mod hardening;
+pub mod kali_stack;
+pub mod nemoclaw;
 pub mod pledge;
 pub mod vulnerability;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use hardening::{
-    secure_zeroize, AuditLogEntry, HardenedAuditTrail, IntrusionMonitor, IntrusionSeverity,
+pub use kali_stack::{
+    CronDaemon, CronJob, DmesgLog, FirewallRule, IptablesFirewall, KaliError,
+    PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
+    TmuxPane,
 };
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
+pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, SecurityScanner, VulnerabilityClass, VulnerabilityReport,
+    CIPipelineIntegration, ExploitPayload, PenetrationAssistant, ScanReport, ScanSummary, Severity,
+    SimpleCIPipelineIntegration, SimpleScanReport, SimpleVulnerability, SimpleVulnerabilityScanner,
+    Vulnerability, VulnerabilityScanner,
 };

@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-||||||| 23ef22a4a
-// OOP-based Filesystem Support for SigmaOS
-// Based on Ideas-999-Structured: Core System Item 7
-// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs.
-// Features advanced read-only ext4 traversal metadata structures inspired by Linux & BSD.
-
-#![cfg_attr(target_os = "none", no_std)]
-#![cfg_attr(target_os = "none", no_main)]
-
-=======
 #![allow(clippy::new_without_default)]
 #![allow(clippy::manual_memcpy)]
 #![allow(clippy::manual_strip)]
@@ -27,26 +16,16 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 extern crate alloc;
 
-<<<<<<< HEAD
-||||||| 23ef22a4a
-use alloc::string::{String, ToString};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::filesystem::smart_symlink::{SmartSymlink, SymlinkResolverRule};
 use crate::klib::Vec;
 use alloc::boxed::Box;
-=======
-use crate::klib::Vec;
-use alloc::boxed::Box;
->>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 use core::mem;
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
-use alloc::boxed::Box;
 
 pub type FilesystemID = usize;
 
@@ -263,6 +242,7 @@ pub struct SimpleFilesystemManager {
 }
 
 impl SimpleFilesystemManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SimpleFilesystemManager {
             filesystems: Vec::new(),
@@ -302,8 +282,3 @@ impl FilesystemManager for SimpleFilesystemManager {
         ids
     }
 }
-
-pub struct LegacyLinuxRule;
-pub struct LinuxPersonaRule;
-pub struct SmartSymlink;
-pub struct SymlinkResolverRule;

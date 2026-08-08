@@ -1,18 +1,21 @@
 // #![no_std]
 // #![no_main]
 
+use core::mem;
 /// SigmaOS Breakthrough Futuristic Systems
 /// Inspired by user comparative roadmap and future-focused design patterns.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 // =========================================================================
 // 1. Hot-Pluggable Kernel Module System with PQC and AI Tuning
 // =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ModuleState { Unloaded, Loaded, Active }
+pub enum ModuleState {
+    Unloaded,
+    Loaded,
+    Active,
+}
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -31,8 +34,12 @@ impl SovereignKernelModule {
         let mut dependency = [0u8; 32];
         let n_bytes = name_str.as_bytes();
         let d_bytes = dependency_str.as_bytes();
-        for i in 0..n_bytes.len().min(31) { name[i] = n_bytes[i]; }
-        for i in 0..d_bytes.len().min(31) { dependency[i] = d_bytes[i]; }
+        for i in 0..n_bytes.len().min(31) {
+            name[i] = n_bytes[i];
+        }
+        for i in 0..d_bytes.len().min(31) {
+            dependency[i] = d_bytes[i];
+        }
         SovereignKernelModule {
             name,
             version,
@@ -111,7 +118,8 @@ impl SovereignKernelModuleSystem {
 
             if dep_name_len > 0 {
                 // Dependency is non-empty, must verify it is active
-                let dep_str = unsafe { core::str::from_utf8_unchecked(&m.dependency[..dep_name_len]) };
+                let dep_str =
+                    unsafe { core::str::from_utf8_unchecked(&m.dependency[..dep_name_len]) };
                 let mut dep_active = false;
                 for j in 0..self.modules.len {
                     let dm = unsafe { &*self.modules.data.add(j) };
@@ -226,7 +234,10 @@ impl PredictiveScheduler {
         }
         let avg = sum / self.history_count as u32;
         // Simple predictive heuristic: if demand was rising, predict a spike
-        if self.history_count >= 2 && self.history_demand[self.history_count - 1] > self.history_demand[self.history_count - 2] {
+        if self.history_count >= 2
+            && self.history_demand[self.history_count - 1]
+                > self.history_demand[self.history_count - 2]
+        {
             avg.saturating_add(avg / 4) // +25% anticipated spike
         } else {
             avg
@@ -240,7 +251,11 @@ impl PredictiveScheduler {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ThreatLevel { Secure = 0, Suspicious = 1, Compromised = 2 }
+pub enum ThreatLevel {
+    Secure = 0,
+    Suspicious = 1,
+    Compromised = 2,
+}
 
 #[repr(C)]
 pub struct AdaptiveRoot {
@@ -293,13 +308,25 @@ impl AdaptiveRoot {
 // OOP heap allocation-free/custom-heap Vec implementation
 // =========================================================================
 
-pub struct Vec<T> { pub data: *mut T, pub len: usize, pub capacity: usize }
+pub struct Vec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
@@ -317,11 +344,19 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -360,7 +395,7 @@ extern "C" {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::init::sigma_init::{SigmaInit, SimpleService, Service, InitSystem, ServiceState};
+    use crate::init::sigma_init::{InitSystem, Service, ServiceState, SigmaInit, SimpleService};
 
     #[test]
     fn test_pqc_module_verification() {

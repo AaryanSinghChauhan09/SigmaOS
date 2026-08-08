@@ -1,14 +1,14 @@
 use crate::klib::vec::Vec;
 /// OOP-based Paging + Virtual Memory for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 7-8
-/// Implements 4-level page tables, PML4, userspace isolation, page fault handling
+/// Implements 4-level page tables, PML4, userspace isolation, Copy-On-Write (COW), and page fault handling.
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageTableLevel {
     PML4 = 0,
     PDPT = 1,
@@ -17,7 +17,7 @@ pub enum PageTableLevel {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageFaultError {
     Success = 0,
     NotPresent = 1,
@@ -26,7 +26,7 @@ pub enum PageFaultError {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrivilegeLevel {
     Kernel = 0,
     User = 3,
@@ -41,6 +41,8 @@ pub trait PageTableEntry {
     fn set_writable(&mut self, writable: bool);
     fn set_user_accessible(&mut self, user: bool);
     fn set_physical_address(&mut self, addr: PhysicalAddress);
+    fn is_cow(&self) -> bool;
+    fn set_cow(&mut self, cow: bool);
 }
 
 #[repr(C)]
@@ -51,6 +53,7 @@ pub struct SimplePageTableEntry {
     pub physical_addr: AtomicUsize,
     pub accessed: AtomicUsize,
     pub dirty: AtomicUsize,
+    pub cow: AtomicUsize, // Copy-On-Write (COW) indicator flag
 }
 
 impl Default for SimplePageTableEntry {
@@ -68,6 +71,7 @@ impl SimplePageTableEntry {
             physical_addr: AtomicUsize::new(0),
             accessed: AtomicUsize::new(0),
             dirty: AtomicUsize::new(0),
+            cow: AtomicUsize::new(0),
         }
     }
 }
@@ -100,6 +104,12 @@ impl PageTableEntry for SimplePageTableEntry {
     fn set_physical_address(&mut self, addr: PhysicalAddress) {
         self.physical_addr
             .store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
+    }
+    fn is_cow(&self) -> bool {
+        self.cow.load(Ordering::SeqCst) == 1
+    }
+    fn set_cow(&mut self, cow: bool) {
+        self.cow.store(if cow { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 
@@ -161,6 +171,7 @@ pub trait VirtualMemoryManager {
         virt: VirtualAddress,
         error_code: usize,
     ) -> Result<(), PageFaultError>;
+    fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError>; // Enables Linux/BSD Copy-On-Write
 }
 
 pub struct SimpleVMM {
@@ -379,8 +390,8 @@ impl VirtualMemoryManager for SimpleVMM {
             let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
 
             if let Some(ref pd) = self.pd_tables[pd_idx_in_vec] {
-                let pd_entry = pd.get_entry_ref(pd_idx);
-                if !pd_entry.is_present() {
+                let pd_entry_ref = pd.get_entry_ref(pd_idx);
+                if !pd_entry_ref.is_present() {
                     return None;
                 }
 
@@ -400,13 +411,109 @@ impl VirtualMemoryManager for SimpleVMM {
         None
     }
 
+    /// Overloaded to handle custom Linux/BSD-grade Copy-On-Write (COW) and demand paging exceptions
     fn handle_page_fault(
         &mut self,
         virt: VirtualAddress,
-        _error_code: usize,
+        error_code: usize,
     ) -> Result<(), PageFaultError> {
-        let phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
-        self.map_page(virt, phys, true, true)
+        let pml4_idx = self.get_pml4_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
+        let pd_idx = self.get_pd_index(virt);
+        let pt_idx = self.get_pt_index(virt);
+
+        // Check if there is an active COW page entry at this address
+        let mut is_cow_fault = false;
+        if self.pml4.get_entry(pml4_idx).is_present() {
+            if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
+                if pdpt.get_entry(pdpt_idx).is_present() {
+                    let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+                    let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+                    if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+                        if pd.get_entry(pd_idx).is_present() {
+                            let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
+                            let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+                            if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
+                                let entry = pt.get_entry(pt_idx);
+                                if entry.is_present() && entry.is_cow() && error_code == 2 {
+                                    is_cow_fault = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if is_cow_fault {
+            // 1. Copy-On-Write (COW) Fault Handler:
+            // Allocate a brand-new distinct physical page frame, copy contents, map it as writable, and clear the COW bit
+            let new_phys_frame = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+
+            if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
+                let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+                let _pd_idx_in_vec_local = (pdpt_phys / 4096) * 512 + pdpt_idx;
+                if let Some(ref mut _pd) = self.pd_tables[_pd_idx_in_vec_local] {
+                    let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
+                    let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+                    if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
+                        let entry = pt.get_entry(pt_idx);
+                        entry.set_physical_address(new_phys_frame);
+                        entry.set_writable(true); // make writable again!
+                        entry.set_cow(false); // clear COW flag!
+                    }
+                }
+            }
+            Ok(())
+        } else {
+            // 2. Standard Demand Paging: Allocate a zeroed page frame on demand
+            let phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+            self.map_page(virt, phys, true, true)
+        }
+    }
+
+    /// Marks a virtual page as Read-only and sets the Copy-on-Write (COW) bit flag
+    fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<(), PageFaultError> {
+        let pml4_idx = self.get_pml4_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
+        let pd_idx = self.get_pd_index(virt);
+        let pt_idx = self.get_pt_index(virt);
+
+        if !self.pml4.get_entry(pml4_idx).is_present() {
+            return Err(PageFaultError::NotPresent);
+        }
+
+        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pml4_idx];
+        if let Some(ref mut pdpt) = pdpt_table {
+            if !pdpt.get_entry(pdpt_idx).is_present() {
+                return Err(PageFaultError::NotPresent);
+            }
+
+            let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+            let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+
+            let pd_table: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
+            if let Some(ref mut pd) = pd_table {
+                if !pd.get_entry(pd_idx).is_present() {
+                    return Err(PageFaultError::NotPresent);
+                }
+
+                let pd_phys = pdpt.get_entry(pdpt_idx).get_physical_address();
+                let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+
+                let pt_table: &mut Option<SimplePageTable> = &mut self.pt_tables[pt_idx_in_vec];
+                if let Some(ref mut pt) = pt_table {
+                    let entry = pt.get_entry(pt_idx);
+                    if entry.is_present() {
+                        entry.set_writable(false); // Map as Read-only to trigger a page fault on write
+                        entry.set_cow(true); // Enable COW tracking
+                        return Ok(());
+                    }
+                }
+            }
+        }
+
+        Err(PageFaultError::NotPresent)
     }
 }
 
@@ -522,5 +629,54 @@ mod tests {
             .is_ok());
 
         assert!(pm.destroy_address_space(space_id).is_ok());
+    }
+
+    #[test]
+    fn test_linux_copy_on_write_paging() {
+        let mut vmm = SimpleVMM::new();
+        let virt = 0x5000_2000;
+        let original_phys = 0x9000_0000;
+
+        // 1. Initial mapping as writable and present
+        vmm.map_page(virt, original_phys, true, true).unwrap();
+        assert_eq!(vmm.get_physical(virt).unwrap(), original_phys);
+
+        // 2. Mark the page as Copy-on-Write (COW) (maps it read-only, sets the COW bit)
+        vmm.mark_copy_on_write(virt).unwrap();
+
+        // Verify it is now read-only and marked as COW
+        let pml4_idx = vmm.get_pml4_index(virt);
+        let pdpt_idx = vmm.get_pdpt_index(virt);
+        let pd_idx = vmm.get_pd_index(virt);
+        let pt_idx = vmm.get_pt_index(virt);
+
+        let pdpt_phys = vmm.pml4.get_entry(pml4_idx).get_physical_address();
+        let _pd_idx_in_vec_local = (pdpt_phys / 4096) * 512 + pdpt_idx;
+        let pd_phys = vmm.pdpt_tables[pml4_idx]
+            .as_ref()
+            .unwrap()
+            .get_entry_ref(pdpt_idx)
+            .get_physical_address();
+        let pt_idx_in_vec = (pd_phys / 4096) * 512 + pd_idx;
+
+        let entry = vmm.pt_tables[pt_idx_in_vec]
+            .as_ref()
+            .unwrap()
+            .get_entry_ref(pt_idx);
+        assert!(!entry.is_writable());
+        assert!(entry.is_cow());
+
+        // 3. Simulate a Write page fault (error_code = 2 represents write violation on read-only page)
+        vmm.handle_page_fault(virt, 2).unwrap();
+
+        // 4. Verify that the COW handler successfully resolved the fault:
+        // Allocated a new distinct physical page frame, restored writable permissions, and cleared the COW bit!
+        let resolved_entry = vmm.pt_tables[pt_idx_in_vec]
+            .as_ref()
+            .unwrap()
+            .get_entry_ref(pt_idx);
+        assert!(resolved_entry.is_writable());
+        assert!(!resolved_entry.is_cow());
+        assert_ne!(resolved_entry.get_physical_address(), original_phys); // Allocated a distinct frame!
     }
 }

@@ -306,9 +306,9 @@ impl RecordingBackend for BandicamGpuBackend {
 
         RecordingProgress {
             duration_seconds: duration,
-            frames_captured: duration * 60,          // Bandicam high-refresh 60 FPS recording
-            file_size_bytes: duration * 256 * 1024,  // 256KB per second (highly efficient GPU NVENC compression)
-            current_bitrate_mbps: 2.0,               // highly efficient compression ratio
+            frames_captured: duration * 60, // Bandicam high-refresh 60 FPS recording
+            file_size_bytes: duration * 256 * 1024, // 256KB per second (highly efficient GPU NVENC compression)
+            current_bitrate_mbps: 2.0,              // highly efficient compression ratio
         }
     }
 
@@ -491,7 +491,10 @@ mod tests {
 
     #[test]
     fn test_bandicam_gpu_backend() {
-        let backend = BandicamGpuBackend::new(GpuEncoderType::NvidiaNvenc, BandicamCaptureMode::GameHookOpenGL);
+        let backend = BandicamGpuBackend::new(
+            GpuEncoderType::NvidiaNvenc,
+            BandicamCaptureMode::GameHookOpenGL,
+        );
         assert_eq!(backend.name(), "Bandicam GPU Accelerator");
         assert_eq!(backend.encoder, GpuEncoderType::NvidiaNvenc);
         assert_eq!(backend.capture_mode, BandicamCaptureMode::GameHookOpenGL);

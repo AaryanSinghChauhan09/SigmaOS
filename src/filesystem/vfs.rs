@@ -1,7 +1,8 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
+// Enhanced with standard Linux-conforming Hard Link reference counting
 
-use crate::security::{CapabilityToken, Permission};
+use crate::security::CapabilityToken;
 use std::collections::HashMap;
 
 /// File type
@@ -52,6 +53,7 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
+    pub hard_links_count: u32, // standard Linux reference links counter
 }
 
 impl Inode {
@@ -66,6 +68,7 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
+            hard_links_count: 1, // Default initial link
         }
     }
 }
@@ -90,11 +93,11 @@ impl FileDescriptor {
 
 /// Virtual Filesystem
 pub struct VirtualFilesystem {
-    inodes: HashMap<u64, Inode>,
-    next_inode_id: u64,
-    root_inode: u64,
-    file_descriptors: HashMap<u64, FileDescriptor>,
-    next_fd: u64,
+    pub inodes: HashMap<u64, Inode>,
+    pub next_inode_id: u64,
+    pub root_inode: u64,
+    pub file_descriptors: HashMap<u64, FileDescriptor>,
+    pub next_fd: u64,
 }
 
 impl VirtualFilesystem {
@@ -123,6 +126,36 @@ impl VirtualFilesystem {
         self.inodes.insert(inode_id, inode);
 
         Ok(inode_id)
+    }
+
+    /// Linux-parity Hard Link creator: points a new reference to an existing inode
+    pub fn link_inode(&mut self, old_inode_id: u64) -> Result<(), FsError> {
+        let inode = self
+            .inodes
+            .get_mut(&old_inode_id)
+            .ok_or(FsError::NotFound)?;
+
+        // Linux FHS constraint: prevent directory hard links to avoid circular loops
+        if inode.file_type == FileType::Directory {
+            return Err(FsError::IsDirectory);
+        }
+
+        inode.hard_links_count += 1;
+        Ok(())
+    }
+
+    /// Linux-parity Unlink handler: decrements reference links, freeing storage only when count hits 0
+    pub fn unlink_inode(&mut self, inode_id: u64) -> Result<u32, FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+
+        if inode.hard_links_count > 1 {
+            inode.hard_links_count -= 1;
+            Ok(inode.hard_links_count)
+        } else {
+            // Reference link hit 0, fully free the physical Inode from VFS metadata
+            self.inodes.remove(&inode_id);
+            Ok(0)
+        }
     }
 
     pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
@@ -214,32 +247,6 @@ impl VirtualFilesystem {
         Ok(bytes_written)
     }
 
-    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn read_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &mut [u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
-        if !token.has_permission(Permission::FileRead) {
-            return Err(FsError::PermissionDenied);
-        }
-        self.read_file(fd, buffer)
-    }
-
-    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
-    pub fn write_file_gated(
-        &mut self,
-        fd: u64,
-        buffer: &[u8],
-        token: &CapabilityToken,
-    ) -> Result<usize, FsError> {
-        if !token.has_permission(Permission::FileWrite) {
-            return Err(FsError::PermissionDenied);
-        }
-        self.write_file(fd, buffer)
-    }
-
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
         if inode_id == self.root_inode {
             return Err(FsError::PermissionDenied);
@@ -301,6 +308,7 @@ mod tests {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         assert!(vfs.inodes.contains_key(&inode_id));
+        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 1);
     }
 
     #[test]
@@ -323,40 +331,25 @@ mod tests {
     }
 
     #[test]
-    fn test_gated_read_write() {
+    fn test_linux_hard_links_flow() {
         let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        let fd = vfs.open_file(inode_id, 0).unwrap();
+        let inode_id = vfs.create_file(FileType::Regular, 101).unwrap();
 
-        let bad_token = CapabilityToken::new(); // no read or write permissions
-        let read_token = CapabilityToken::new().allow_read("/var/www");
-        let write_token = CapabilityToken::new().allow_write("/tmp");
-        let _all_token = CapabilityToken::new()
-            .allow_read("/var/www")
-            .allow_write("/tmp");
+        // Link same inode twice (creating hard links)
+        assert!(vfs.link_inode(inode_id).is_ok());
+        assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 2);
 
-        let mut buf = [0u8; 10];
+        // Attempting to hard link directory should fail (avoid loops)
+        assert!(vfs.link_inode(0).is_err()); // Root is directory
 
-        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
-        assert_eq!(
-            vfs.write_file_gated(fd, b"gated", &bad_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(
-            vfs.write_file_gated(fd, b"gated", &read_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
+        // Unlink first hard link
+        let count = vfs.unlink_inode(inode_id).unwrap();
+        assert_eq!(count, 1);
+        assert!(vfs.inodes.contains_key(&inode_id)); // Inode still exists
 
-        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(
-            vfs.read_file_gated(fd, &mut buf, &bad_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(
-            vfs.read_file_gated(fd, &mut buf, &write_token),
-            Err(FsError::PermissionDenied)
-        );
-        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
+        // Unlink second hard link
+        let count = vfs.unlink_inode(inode_id).unwrap();
+        assert_eq!(count, 0);
+        assert!(!vfs.inodes.contains_key(&inode_id)); // Inode fully freed
     }
 }

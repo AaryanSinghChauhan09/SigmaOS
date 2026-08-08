@@ -18,10 +18,14 @@
 
 // SigmaOS Dashboard Module
 pub mod accessibility_gamification;
+pub mod accessibility_gamification;
 pub mod control_center;
 pub mod monitor;
 pub mod process;
 
+pub use accessibility_gamification::{
+    AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
+};
 pub use accessibility_gamification::{
     AccessibilityOverlay, ColorFilter, GamifiedProductivityTracker, Trophy,
 };

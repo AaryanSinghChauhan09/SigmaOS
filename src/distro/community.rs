@@ -18,9 +18,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-
-use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::HashMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RepoSecurityLevel {
