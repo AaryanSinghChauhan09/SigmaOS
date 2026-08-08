@@ -73,6 +73,24 @@ impl<T> Vec<T> {
         }
     }
 
+    /// Returns an optional reference to the element at the given index
+    pub fn get(&self, index: usize) -> Option<&T> {
+        if index < self.len {
+            unsafe { Some(&*self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
+    /// Returns an optional mutable reference to the element at the given index
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        if index < self.len {
+            unsafe { Some(&mut *self.data.add(index)) }
+        } else {
+            None
+        }
+    }
+
     /// Checks if the vector contains an item matching a predicate
     pub fn contains<F>(&self, mut f: F) -> bool
     where

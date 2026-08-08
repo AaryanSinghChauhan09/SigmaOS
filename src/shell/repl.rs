@@ -3,6 +3,23 @@
 
 use std::io::{self, BufRead, Write};
 
+/// Minimal agent automation engine stub — full implementation in src/ai/orchestrator.rs
+/// Provides a placeholder so the shell REPL compiles while orchestrator is being built
+pub struct AgentAutomationEngine {
+    pub active: bool,
+}
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine { active: true }
+    }
+}
+
+impl Default for AgentAutomationEngine {
+    fn default() -> Self { Self::new() }
+}
+
+
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -302,6 +319,61 @@ impl ShellRepl {
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
+            }
+            "echo" => {
+                let message = if parts.len() >= 2 {
+                    parts[1..].join(" ")
+                } else {
+                    String::new()
+                };
+                ShellCommand::Echo { message }
+            }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm { filename: parts[1].to_string() }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "su" => {
+                let username = if parts.len() >= 2 {
+                    parts[1].to_string()
+                } else {
+                    "root".to_string()
+                };
+                let password = if parts.len() >= 3 {
+                    Some(parts[2].to_string())
+                } else {
+                    None
+                };
+                ShellCommand::Su { username, password }
+            }
+            "cat" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Cat { filename: parts[1..].join(" ") }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "systemctl" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Systemctl {
+                        action: parts[1].to_string(),
+                        service: parts[2].to_string(),
+                    }
+                } else if parts.len() == 2 {
+                    ShellCommand::Systemctl {
+                        action: parts[1].to_string(),
+                        service: String::new(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "apt" => {
+                let subcommand = if parts.len() >= 2 { parts[1].to_string() } else { String::new() };
+                let package = if parts.len() >= 3 { Some(parts[2].to_string()) } else { None };
+                ShellCommand::Apt { subcommand, package }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }

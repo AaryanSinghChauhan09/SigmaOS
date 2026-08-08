@@ -3,6 +3,8 @@
 
 /// Local LLM Orchestrator for SigmaOS
 /// Dynamically schedules models, checks device bounds, and prunes context windows.
+extern crate alloc as alloc_crate;
+use alloc_crate::alloc::{alloc as alloc_fn, dealloc, Layout};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[repr(C)]
@@ -204,18 +206,19 @@ impl<T> Vec<T> {
         }
     }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let size  = core::mem::size_of::<T>();
+        let align = core::mem::align_of::<T>();
+        if size == 0 { self.capacity = usize::MAX; return; }
+        let new_layout = Layout::from_size_align_unchecked(new_capacity * size, align);
+        let new_data = alloc_fn(new_layout) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
             }
             if self.capacity > 0 {
-                free(self.data as *mut u8);
+                let old_layout = Layout::from_size_align_unchecked(self.capacity * size, align);
+                dealloc(self.data as *mut u8, old_layout);
             }
             self.data = new_data;
             self.capacity = new_capacity;
