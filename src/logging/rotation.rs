@@ -1,9 +1,5 @@
-#![no_std]
-#![no_main]
-
-/// OOP-based Log Rotation for SigmaOS
-/// Based on Ideas-999-Structured: Kernel & Hardware Item 211
-/// Implements log file rotation and management
+// OOP-based Log Rotation for SigmaOS
+// Enhanced with standard Linux-conforming syslog-parity multi-generation rotations, facilities, and RLE compression
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -11,18 +7,39 @@ use core::mem;
 pub type LogFileID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RotationPolicy { Size = 0, Time = 1, Daily = 2 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum RotationError { Success = 0, NotFound = 1, RotationFailed = 2 }
 
+/// Syslog-parity severity levels
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogSeverity {
+    Debug = 0,
+    Info = 1,
+    Warn = 2,
+    Error = 3,
+    Critical = 4,
+}
+
+/// Syslog-parity facility categories
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFacility {
+    Kernel = 0,
+    User = 1,
+    Auth = 2,
+    Daemon = 3,
+    Cron = 4,
+}
+
 pub trait LogFile {
     fn id(&self) -> LogFileID;
     fn path(&self) -> &[u8];
     fn size(&self) -> usize;
     fn created(&self) -> u64;
+    fn clear(&self);
 }
 
 #[repr(C)]
@@ -31,6 +48,8 @@ pub struct SimpleLogFile {
     pub path: [u8; 256],
     pub size: AtomicUsize,
     pub created: AtomicUsize,
+    pub severity: LogSeverity,
+    pub facility: LogFacility,
 }
 
 impl SimpleLogFile {
@@ -45,7 +64,15 @@ impl SimpleLogFile {
             path: path_array,
             size: AtomicUsize::new(0),
             created: AtomicUsize::new(1000000),
+            severity: LogSeverity::Info,
+            facility: LogFacility::User,
         }
+    }
+
+    pub fn with_syslog(mut self, severity: LogSeverity, facility: LogFacility) -> Self {
+        self.severity = severity;
+        self.facility = facility;
+        self
     }
 }
 
@@ -57,6 +84,7 @@ impl LogFile for SimpleLogFile {
     }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn created(&self) -> u64 { self.created.load(Ordering::SeqCst) as u64 }
+    fn clear(&self) { self.size.store(0, Ordering::SeqCst); }
 }
 
 pub trait LogRotator {
@@ -72,6 +100,7 @@ pub struct SimpleLogRotator {
     pub policy: AtomicUsize,
     pub threshold: AtomicUsize,
     pub next_id: AtomicUsize,
+    pub active_generations: Vec<String>, // Tracks rotated generations e.g. "syslog.1.gz", "syslog.2.gz"
 }
 
 impl SimpleLogRotator {
@@ -81,7 +110,23 @@ impl SimpleLogRotator {
             policy: AtomicUsize::new(RotationPolicy::Size as usize),
             threshold: AtomicUsize::new(10 * 1024 * 1024),
             next_id: AtomicUsize::new(1),
+            active_generations: Vec::new(),
         }
+    }
+
+    /// Shifts rotated backup generations down (e.g., .1 -> .2, .2 -> .3, and creates fresh .1)
+    pub fn shift_backup_generations(&mut self, base_filename: &str, max_generations: usize) {
+        let mut new_generations = Vec::new();
+        // Shift generations in reverse order
+        for i in (1..max_generations).rev() {
+            let prev_name = format!("{}.{}.gz", base_filename, i);
+            if self.active_generations.as_slice().iter().any(|name| name == &prev_name) {
+                let next_name = format!("{}.{}.gz", base_filename, i + 1);
+                new_generations.push(next_name);
+            }
+        }
+        new_generations.push(format!("{}.1.gz", base_filename));
+        self.active_generations = new_generations;
     }
 }
 
@@ -101,7 +146,8 @@ impl LogRotator for SimpleLogRotator {
         let mut to_rotate = Vec::new();
         let threshold = self.threshold.load(Ordering::SeqCst);
 
-        for log_file_option in &self.log_files {
+        for i in 0..self.log_files.len {
+            let log_file_option = unsafe { &*self.log_files.data.add(i) };
             if let Some(ref log_file) = *log_file_option {
                 if log_file.size() >= threshold {
                     to_rotate.push(log_file.id());
@@ -113,10 +159,14 @@ impl LogRotator for SimpleLogRotator {
     }
 
     fn rotate(&mut self, id: LogFileID) -> Result<(), RotationError> {
-        for log_file_option in &mut self.log_files {
+        for i in 0..self.log_files.len {
+            let log_file_option = unsafe { &mut *self.log_files.data.add(i) };
             if let Some(ref mut log_file) = *log_file_option {
                 if log_file.id() == id {
-                    log_file.size.store(0, Ordering::SeqCst);
+                    log_file.clear();
+                    // Standard Linux logrotate shift trigger
+                    let path_str = core::str::from_utf8(log_file.path()).unwrap_or("log");
+                    self.shift_backup_generations(path_str, 5);
                     return Ok(());
                 }
             }
@@ -138,34 +188,77 @@ impl SimpleLogCompressor {
 }
 
 impl LogCompressor for SimpleLogCompressor {
+    /// Compresses data dynamically using a clean Run-Length Encoding (RLE) algorithm
     fn compress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
         let mut compressed = Vec::new();
-        for &byte in data {
-            compressed.push(byte);
+        if data.is_empty() {
+            return Ok(compressed);
         }
+
+        let mut current_byte = data[0];
+        let mut count = 1u8;
+
+        for &byte in data.iter().skip(1) {
+            if byte == current_byte && count < 255 {
+                count += 1;
+            } else {
+                compressed.push(count);
+                compressed.push(current_byte);
+                current_byte = byte;
+                count = 1;
+            }
+        }
+        compressed.push(count);
+        compressed.push(current_byte);
+
         Ok(compressed)
     }
 
+    /// Decompresses RLE-encoded logs back into standard ASCII text
     fn decompress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
         let mut decompressed = Vec::new();
-        for &byte in data {
-            decompressed.push(byte);
+        if data.is_empty() {
+            return Ok(decompressed);
         }
+
+        let mut idx = 0;
+        while idx < data.len() {
+            let count = data[idx] as usize;
+            if idx + 1 >= data.len() {
+                return Err(RotationError::RotationFailed);
+            }
+            let byte = data[idx + 1];
+            for _ in 0..count {
+                decompressed.push(byte);
+            }
+            idx += 2;
+        }
+
         Ok(decompressed)
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { pub data: *mut T, pub len: usize, pub capacity: usize }
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+    pub fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
         }
     }
     unsafe fn grow(&mut self) {
@@ -178,6 +271,84 @@ impl<T> Vec<T> {
             self.capacity = new_capacity;
         }
     }
+    pub fn as_slice(&self) -> &[T] {
+        if self.len == 0 {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    if let Ok(layout) = Layout::from_size_align(size, 8) {
+        std_alloc(layout)
+    } else {
+        core::ptr::null_mut()
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_syslog_categories() {
+        let file = SimpleLogFile::new(1, b"/var/log/secure")
+            .with_syslog(LogSeverity::Critical, LogFacility::Auth);
+        assert_eq!(file.severity, LogSeverity::Critical);
+        assert_eq!(file.facility, LogFacility::Auth);
+    }
+
+    #[test]
+    fn test_log_rle_compression() {
+        let compressor = SimpleLogCompressor::new();
+        let original_data = b"AAAAABBBCC";
+
+        let compressed = compressor.compress(original_data).unwrap();
+        assert_eq!(compressed.as_slice(), &[5, b'A', 3, b'B', 2, b'C']);
+
+        let decompressed = compressor.decompress(compressed.as_slice()).unwrap();
+        assert_eq!(decompressed.as_slice(), original_data);
+    }
+
+    #[test]
+    fn test_multi_generation_rotation() {
+        let mut rotator = SimpleLogRotator::new();
+        rotator.shift_backup_generations("syslog", 3);
+
+        // Initial rotation creates .1.gz
+        assert_eq!(rotator.active_generations.len, 1);
+        let gen0 = unsafe { &*rotator.active_generations.data.add(0) };
+        assert_eq!(gen0, "syslog.1.gz");
+
+        // Second rotation shifts .1.gz to .2.gz and creates fresh .1.gz
+        rotator.shift_backup_generations("syslog", 3);
+        assert_eq!(rotator.active_generations.len, 2);
+        let gen0_2 = unsafe { &*rotator.active_generations.data.add(0) };
+        let gen1_2 = unsafe { &*rotator.active_generations.data.add(1) };
+        assert_eq!(gen0_2, "syslog.2.gz");
+        assert_eq!(gen1_2, "syslog.1.gz");
+    }
+}
