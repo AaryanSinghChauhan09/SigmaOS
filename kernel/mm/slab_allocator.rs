@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// SigmaOS: Slab Allocator (kmalloc)
 /// Phase G Blocker #3: Slab allocator (kmalloc)
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.

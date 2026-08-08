@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// SigmaOS: x86-64 Page Table Walker
 /// Phase G Blocker #4: x86-64 page table walker
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.

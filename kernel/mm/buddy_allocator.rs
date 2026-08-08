@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 /// SigmaOS: Buddy Physical Memory Allocator
 /// Phase G Blocker #2: Buddy physical allocator

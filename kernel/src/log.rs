@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// SigmaOS: Kernel Logging System
 /// Provides structured logging with different log levels
 

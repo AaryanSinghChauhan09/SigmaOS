@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /// SigmaOS: Round-Robin Scheduler Implementation
 /// Phase G Blocker #1: Round-robin scheduler
 /// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
