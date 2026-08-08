@@ -1,15 +1,10 @@
-#![cfg_attr(target_os = "none", no_std)]
-#![cfg_attr(target_os = "none", no_main)]
+// OOP-based Container Runtime for SigmaOS
+// Implements container runtime using OOP principles with traits and structs.
 
 extern crate alloc;
-use alloc::string::String;
-use alloc::boxed::Box;
 
-use core::mem;
-/// OOP-based Container Runtime for SigmaOS
-/// Implements container runtime using OOP principles with traits and structs
-/// No dependency on external container frameworks
-/// Based on Roadmap Item 17: Container runtime support
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Container ID
@@ -89,7 +84,7 @@ impl ContainerInfo {
 
 /// Container capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ContainerCapability {
     pub can_start: bool,
     pub can_stop: bool,
@@ -98,7 +93,7 @@ pub struct ContainerCapability {
 }
 
 impl ContainerCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         ContainerCapability {
             can_start: false,
             can_stop: false,
@@ -107,7 +102,7 @@ impl ContainerCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         ContainerCapability {
             can_start: true,
             can_stop: true,
@@ -117,118 +112,13 @@ impl ContainerCapability {
     }
 }
 
-/// Container network configuration type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ContainerNetworkType {
-    None,
-    Bridge,
-    Overlay,
-}
-
-/// Container volume configuration
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerVolume {
-    pub is_bind_mount: bool,
-    pub is_tmpfs: bool,
-    pub read_only: bool,
-}
-
-/// Container user namespaces mapping
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ContainerNamespace {
-    pub uid_mapping: u32,
-    pub gid_mapping: u32,
-    pub rootless: bool,
-}
-
-impl ContainerNamespace {
-    pub fn map_uid(&self, container_uid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_uid == 0 {
-                Ok(self.uid_mapping)
-            } else {
-                Ok(self.uid_mapping + container_uid)
-            }
-        } else {
-            Ok(container_uid)
-        }
-    }
-
-    pub fn map_gid(&self, container_gid: u32) -> Result<u32, &'static str> {
-        if self.rootless {
-            if container_gid == 0 {
-                Ok(self.gid_mapping)
-            } else {
-                Ok(self.gid_mapping + container_gid)
-            }
-        } else {
-            Ok(container_gid)
-        }
-    }
-}
-
-/// Container seccomp profiles
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SeccompProfile {
-    pub hardened: bool,
-    pub blocked_syscalls_mask: u32,
-}
-
-impl SeccompProfile {
-    pub fn is_syscall_blocked(&self, syscall_id: u32) -> bool {
-        if !self.hardened {
-            return false;
-        }
-        if syscall_id < 32 {
-            (self.blocked_syscalls_mask & (1 << syscall_id)) != 0
-        } else {
-            false
-        }
-    }
-}
-
-/// Linux OverlayFS Layer Stacking (Ubuntu/Debian-style overlay)
-#[derive(Debug, Clone)]
-pub struct OverlayFS {
-    pub lower_dirs: alloc::vec::Vec<String>,
-    pub upper_dir: String,
-    pub work_dir: String,
-    pub mounted: bool,
-}
-
-impl OverlayFS {
-    pub fn new(lower_dirs: alloc::vec::Vec<String>, upper_dir: String, work_dir: String) -> Self {
-        Self {
-            lower_dirs,
-            upper_dir,
-            work_dir,
-            mounted: false,
-        }
-    }
-
-    pub fn mount(&mut self) -> Result<(), &'static str> {
-        if self.lower_dirs.is_empty() {
-            return Err("OverlayFS mount failed: lower_dirs cannot be empty");
-        }
-        if self.upper_dir.is_empty() || self.work_dir.is_empty() {
-            return Err("OverlayFS mount failed: upper_dir and work_dir must be specified");
-        }
-        self.mounted = true;
-        println!(
-            "OverlayFS mounted successfully: lowerdirs={:?}, upperdir={}, workdir={}",
-            self.lower_dirs, self.upper_dir, self.work_dir
-        );
-        Ok(())
-    }
-
-    pub fn umount(&mut self) {
-        self.mounted = false;
-        println!("OverlayFS unmounted successfully.");
+impl Default for ContainerCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 /// Simple container (OOP: Concrete container class)
-#[repr(C)]
 pub struct SimpleContainer {
     pub id: ContainerID,
     pub name: [u8; 64],
@@ -239,24 +129,9 @@ pub struct SimpleContainer {
     pub cpu_limit: u32,
     pub capability: ContainerCapability,
     pub environment: [u8; 512],
-    pub network_type: ContainerNetworkType,
-    pub volume: ContainerVolume,
-    pub namespace: ContainerNamespace,
-    pub seccomp: SeccompProfile,
 }
 
 impl SimpleContainer {
-    pub fn execute_syscall(&self, syscall_id: u32) -> Result<(), ContainerError> {
-        if self.seccomp.is_syscall_blocked(syscall_id) {
-            println!(
-                "Container Seccomp Violation: Syscall {} is strictly prohibited by security profile",
-                syscall_id
-            );
-            return Err(ContainerError::PermissionDenied);
-        }
-        Ok(())
-    }
-
     pub fn new(
         id: ContainerID,
         name: &[u8],
@@ -269,10 +144,8 @@ impl SimpleContainer {
         let name_len = name.len().min(63);
         let image_len = image.len().min(127);
 
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(image.as_ptr(), image_array.as_mut_ptr(), image_len);
-        }
+        name_array[..name_len].copy_from_slice(&name[..name_len]);
+        image_array[..image_len].copy_from_slice(&image[..image_len]);
 
         SimpleContainer {
             id,
@@ -284,29 +157,12 @@ impl SimpleContainer {
             cpu_limit: 0,
             capability,
             environment: [0; 512],
-            network_type: ContainerNetworkType::None,
-            volume: ContainerVolume {
-                is_bind_mount: false,
-                is_tmpfs: false,
-                read_only: false,
-            },
-            namespace: ContainerNamespace {
-                uid_mapping: 0,
-                gid_mapping: 0,
-                rootless: false,
-            },
-            seccomp: SeccompProfile {
-                hardened: false,
-                blocked_syscalls_mask: 0,
-            },
         }
     }
 
     pub fn set_environment(&mut self, env: &[u8]) {
         let len = env.len().min(511);
-        unsafe {
-            core::ptr::copy_nonoverlapping(env.as_ptr(), self.environment.as_mut_ptr(), len);
-        }
+        self.environment[..len].copy_from_slice(&env[..len]);
     }
 
     pub fn set_limits(&mut self, memory_limit: u64, cpu_limit: u32) {
@@ -445,7 +301,7 @@ pub trait ContainerRuntime {
 
 /// Runtime statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeStats {
     pub total_containers: usize,
     pub running_containers: usize,
@@ -454,13 +310,19 @@ pub struct RuntimeStats {
 }
 
 impl RuntimeStats {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         RuntimeStats {
             total_containers: 0,
             running_containers: 0,
             paused_containers: 0,
             stopped_containers: 0,
         }
+    }
+}
+
+impl Default for RuntimeStats {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -474,7 +336,7 @@ pub struct SimpleContainerRuntime {
 
 /// Runtime capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RuntimeCapability {
     pub can_create: bool,
     pub can_remove: bool,
@@ -482,7 +344,7 @@ pub struct RuntimeCapability {
 }
 
 impl RuntimeCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         RuntimeCapability {
             can_create: false,
             can_remove: false,
@@ -490,12 +352,18 @@ impl RuntimeCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         RuntimeCapability {
             can_create: true,
             can_remove: true,
             can_manage: true,
         }
+    }
+}
+
+impl Default for RuntimeCapability {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -536,7 +404,7 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
         let mut index = None;
         for (i, container_option) in self.containers.iter().enumerate() {
-            if let Some(ref container) = container_option {
+            if let Some(ref container) = *container_option {
                 if container.id() == id {
                     index = Some(i);
                     break;
@@ -634,8 +502,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
     }
 
     fn get_container(&self, id: ContainerID) -> Option<&dyn Container> {
-        for container_option in &*self.containers {
-            if let Some(ref container) = container_option {
+        for container_option in &self.containers {
+            if let Some(ref container) = *container_option {
                 if container.id() == id {
                     return Some(container.as_ref());
                 }
@@ -646,8 +514,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
     fn list_containers(&self) -> Vec<ContainerID> {
         let mut ids = Vec::new();
-        for container_option in &*self.containers {
-            if let Some(ref container) = container_option {
+        for container_option in &self.containers {
+            if let Some(ref container) = *container_option {
                 ids.push(container.id());
             }
         }
@@ -661,8 +529,8 @@ impl ContainerRuntime for SimpleContainerRuntime {
 
 impl SimpleContainerRuntime {
     fn get_container_mut(&mut self, id: ContainerID) -> Option<&mut Box<dyn Container>> {
-        for container_option in &mut *self.containers {
-            if let Some(ref mut container) = container_option {
+        for container_option in &mut self.containers {
+            if let Some(ref mut container) = *container_option {
                 if container.id() == id {
                     return Some(container);
                 }
@@ -672,220 +540,36 @@ impl SimpleContainerRuntime {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    #[allow(dead_code)]
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
 
     #[test]
-    fn test_container_creation() {
+    fn test_container_lifecycle_flows() {
         let mut runtime = SimpleContainerRuntime::new(RuntimeCapability::full());
         let id = runtime
             .create_container(
-                b"sovereign_container",
-                b"ubuntu-pqc",
+                b"nginx-service",
+                b"nginx:alpine",
                 ContainerCapability::full(),
             )
             .unwrap();
-        assert_eq!(id, 1);
-    }
 
-    #[test]
-    fn test_container_oci_networking_and_volumes() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"web_app",
-            b"nginx-dilithium",
-            ContainerCapability::full(),
-        );
+        let stats_init = runtime.stats();
+        assert_eq!(stats_init.total_containers, 1);
+        assert_eq!(stats_init.stopped_containers, 1);
+        assert_eq!(stats_init.running_containers, 0);
 
-        // Assert network parity bridge setting
-        assert_eq!(container.network_type, ContainerNetworkType::None);
-        container.network_type = ContainerNetworkType::Bridge;
-        assert_eq!(container.network_type, ContainerNetworkType::Bridge);
+        // Start container
+        runtime.start_container(id).unwrap();
+        let stats_running = runtime.stats();
+        assert_eq!(stats_running.running_containers, 1);
+        assert_eq!(stats_running.stopped_containers, 0);
 
-        // Assert volume mounts setting
-        assert!(!container.volume.is_bind_mount);
-        container.volume.is_bind_mount = true;
-        assert!(container.volume.is_bind_mount);
-    }
-
-    #[test]
-    fn test_container_namespaces_and_seccomp() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"secure_sandbox",
-            b"alpine-kyber",
-            ContainerCapability::full(),
-        );
-
-        // Assert namespace uid mappings
-        assert_eq!(container.namespace.uid_mapping, 0);
-        container.namespace.uid_mapping = 1000;
-        assert_eq!(container.namespace.uid_mapping, 1000);
-
-        // Assert seccomp profile hardening
-        assert!(!container.seccomp.hardened);
-        container.seccomp.hardened = true;
-        assert!(container.seccomp.hardened);
-    }
-
-    #[test]
-    fn test_overlayfs_stacking() {
-        let mut overlay = OverlayFS::new(
-            vec!["/lower1".to_string(), "/lower2".to_string()],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(!overlay.mounted);
-        assert!(overlay.mount().is_ok());
-        assert!(overlay.mounted);
-        overlay.umount();
-        assert!(!overlay.mounted);
-
-        // Mount failure on empty lowerdirs
-        let mut invalid_overlay = OverlayFS::new(
-            vec![],
-            "/upper".to_string(),
-            "/work".to_string(),
-        );
-        assert!(invalid_overlay.mount().is_err());
-    }
-
-    #[test]
-    fn test_rootless_user_namespace_mapping() {
-        let ns = ContainerNamespace {
-            uid_mapping: 1000,
-            gid_mapping: 1000,
-            rootless: true,
-        };
-
-        // Container root (UID 0) maps to host unprivileged user (UID 1000)
-        assert_eq!(ns.map_uid(0).unwrap(), 1000);
-        assert_eq!(ns.map_gid(0).unwrap(), 1000);
-
-        // Regular container users offset accordingly
-        assert_eq!(ns.map_uid(10).unwrap(), 1010);
-    }
-
-    #[test]
-    fn test_hardened_seccomp_syscall_filtering() {
-        let mut container = SimpleContainer::new(
-            1,
-            b"hardened_ct",
-            b"alpine",
-            ContainerCapability::full(),
-        );
-        container.seccomp = SeccompProfile {
-            hardened: true,
-            blocked_syscalls_mask: 1 << 0, // Block sys_mount (syscall 0)
-        };
-
-        // Allowed syscall (e.g. syscall 1)
-        assert!(container.execute_syscall(1).is_ok());
-
-        // Prohibited syscall (syscall 0)
-        assert_eq!(
-            container.execute_syscall(0).unwrap_err(),
-            ContainerError::PermissionDenied
-        );
+        // Pause container
+        runtime.pause_container(id).unwrap();
+        let stats_paused = runtime.stats();
+        assert_eq!(stats_paused.paused_containers, 1);
+        assert_eq!(stats_paused.running_containers, 0);
     }
 }

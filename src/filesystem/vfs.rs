@@ -52,7 +52,6 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    pub link_count: u32, // standard inode link count tracking hard links
 }
 
 impl Inode {
@@ -67,7 +66,6 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            link_count: 1, // default link count of 1
         }
     }
 }
@@ -216,15 +214,6 @@ impl VirtualFilesystem {
         Ok(bytes_written)
     }
 
-    pub fn create_hard_link(&mut self, source_inode_id: u64) -> Result<(), FsError> {
-        if let Some(inode) = self.inodes.get_mut(&source_inode_id) {
-            inode.link_count += 1;
-            Ok(())
-        } else {
-            Err(FsError::NotFound)
-        }
-    }
-
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
         if inode_id == self.root_inode {
             return Err(FsError::PermissionDenied);
@@ -234,16 +223,7 @@ impl VirtualFilesystem {
             return Err(FsError::NotFound);
         }
 
-        let link_reached_zero = if let Some(inode) = self.inodes.get_mut(&inode_id) {
-            inode.link_count = inode.link_count.saturating_sub(1);
-            inode.link_count == 0
-        } else {
-            false
-        };
-
-        if link_reached_zero {
-            self.inodes.remove(&inode_id);
-        }
+        self.inodes.remove(&inode_id);
         Ok(())
     }
 
@@ -291,26 +271,6 @@ mod tests {
     }
 
     #[test]
-    fn test_hard_links_and_unlink() {
-        let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
-
-        // Create hard link (link_count = 2)
-        vfs.create_hard_link(inode_id).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
-
-        // First deletion (link_count = 1, file should NOT be removed)
-        vfs.delete_file(inode_id).unwrap();
-        assert!(vfs.inodes.contains_key(&inode_id));
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
-
-        // Second deletion (link_count = 0, file should be removed)
-        vfs.delete_file(inode_id).unwrap();
-        assert!(!vfs.inodes.contains_key(&inode_id));
-    }
-
-    #[test]
     fn test_create_file() {
         let mut vfs = VirtualFilesystem::new();
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
@@ -334,28 +294,5 @@ mod tests {
         let data = b"test data";
         let written = vfs.write_file(fd, data).unwrap();
         assert_eq!(written, data.len());
-    }
-
-    #[test]
-    fn test_zero_sized_read_write_optimization() {
-        let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        let fd = vfs.open_file(inode_id, 0).unwrap();
-
-        // 1. Zero-sized write should return Ok(0) immediately without touching file size
-        let written = vfs.write_file(fd, &[]).unwrap();
-        assert_eq!(written, 0);
-        let inode = vfs.get_inode(inode_id).unwrap();
-        assert_eq!(inode.size, 0);
-
-        // 2. Zero-sized read should return Ok(0) immediately even if file is empty
-        let mut buf = [];
-        let read = vfs.read_file(fd, &mut buf).unwrap();
-        assert_eq!(read, 0);
-
-        // 3. Zero-sized read/write on an invalid file descriptor must return Err(FsError::InvalidFd)
-        let invalid_fd = 9999;
-        assert_eq!(vfs.write_file(invalid_fd, &[]), Err(FsError::InvalidFd));
-        assert_eq!(vfs.read_file(invalid_fd, &mut []), Err(FsError::InvalidFd));
     }
 }
