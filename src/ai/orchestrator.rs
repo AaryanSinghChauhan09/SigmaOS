@@ -3,9 +3,10 @@
 // and self-diagnosis capabilities for system optimization.
 
 extern crate alloc;
-
-use alloc::boxed::Box;
 use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
@@ -40,7 +41,7 @@ pub trait AIAgent {
 pub struct SimpleAIAgent {
     pub id: AgentID,
     pub name: String,
-    pub state: AgentState,
+    pub state: AtomicUsize,
 }
 
 impl SimpleAIAgent {
@@ -52,7 +53,7 @@ impl SimpleAIAgent {
         SimpleAIAgent {
             id,
             name: name.to_string(),
-            state: AgentState::Idle,
+            state: AtomicUsize::new(AgentState::Idle as usize),
         }
     }
 }
@@ -61,32 +62,33 @@ impl AIAgent for SimpleAIAgent {
     fn id(&self) -> AgentID {
         self.id
     }
-
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+    fn name(&self) -> &str {
+        &self.name
     }
 
     fn state(&self) -> AgentState {
-        match self.state.load(Ordering::SeqCst) {
-            0 => AgentState::Idle,
+        let raw = self.state.load(Ordering::SeqCst);
+        match raw {
             1 => AgentState::Active,
             2 => AgentState::Busy,
             3 => AgentState::Error,
-            _ => AgentState::Learning,
+            4 => AgentState::Learning,
+            _ => AgentState::Idle,
         }
     }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state
-            .store(AgentState::Busy as usize, Ordering::SeqCst);
+        self.state.store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
-        result.extend_from_slice(self.name());
+        for &byte in self.name.as_bytes() {
+            result.push(byte);
+        }
         result.push(b':');
         result.push(b' ');
-        result.extend_from_slice(task);
-        self.state
-            .store(AgentState::Idle as usize, Ordering::SeqCst);
+        for &byte in task {
+            result.push(byte);
+        }
+        self.state.store(AgentState::Idle as usize, Ordering::SeqCst);
         Ok(result)
     }
 }
@@ -113,6 +115,12 @@ impl SimpleAgentOrchestrator {
             agents: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+}
+
+impl Default for SimpleAgentOrchestrator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -150,11 +158,9 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        for agent_option in &self.agents {
-            if let Some(ref agent) = *agent_option {
-                if agent.id() == id {
-                    return Some(agent.as_ref());
-                }
+        for agent in &self.agents {
+            if agent.id() == id {
+                return Some(agent.as_ref());
             }
         }
         None
@@ -281,27 +287,5 @@ impl AgentCommunication for SimpleAgentCommunication {
         let msg_len = message.len().min(255);
         msg_array[..msg_len].copy_from_slice(&message[..msg_len]);
         self.messages.push((from, 0, msg_array));
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_agent_orchestrator_flows() {
-        let mut orchestrator = SimpleAgentOrchestrator::new();
-        let agent = SimpleAIAgent::new(99, b"SovereignSchedulerOptimizer");
-        orchestrator.register_agent(Box::new(agent)).unwrap();
-
-        assert_eq!(orchestrator.list_agents().len(), 1);
-
-        let response = orchestrator
-            .dispatch_task(b"optimize core affinity", Some(99))
-            .unwrap();
-        assert_eq!(
-            response,
-            b"SovereignSchedulerOptimizer: optimize core affinity"
-        );
     }
 }

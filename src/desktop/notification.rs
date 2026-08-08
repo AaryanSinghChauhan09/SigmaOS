@@ -1,39 +1,23 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
 
 /// OOP-based Desktop Notification for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 746
 /// Implements notification system and alerts
 
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type NotificationID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NotificationUrgency { Low = 0, Normal = 1, Critical = 2 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NotificationError { Success = 0, NotFound = 1 }
 
 pub trait Notification {
@@ -86,7 +70,14 @@ impl Notification for SimpleNotification {
         let len = self.body.iter().position(|&b| b == 0).unwrap_or(512);
         &self.body[..len]
     }
-    fn urgency(&self) -> NotificationUrgency { unsafe { core::mem::transmute(self.urgency.load(Ordering::SeqCst)) } }
+    fn urgency(&self) -> NotificationUrgency {
+        let raw = self.urgency.load(Ordering::SeqCst);
+        match raw {
+            1 => NotificationUrgency::Normal,
+            2 => NotificationUrgency::Critical,
+            _ => NotificationUrgency::Low,
+        }
+    }
     fn app_name(&self) -> &[u8] {
         let len = self.app_name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.app_name[..len]
@@ -127,6 +118,7 @@ impl NotificationManager for SimpleNotificationManager {
         for notification_option in &mut self.notifications {
             if let Some(ref notification) = *notification_option {
                 if notification.id() == id {
+                    *notification_option = None;
                     return Ok(());
                 }
             }
@@ -157,13 +149,13 @@ impl NotificationManager for SimpleNotificationManager {
 pub trait DoNotDisturb {
     fn enable_dnd(&mut self, enabled: bool);
     fn is_dnd_enabled(&self) -> bool;
-    def set_dnd_exceptions(&mut self, app_name: &[u8]);
+    fn set_dnd_exceptions(&mut self, app_name: &[u8]);
 }
 
 #[repr(C)]
 pub struct SimpleDoNotDisturb {
     pub enabled: AtomicUsize,
-    pub exceptions: Vec<[u8; ]>,
+    pub exceptions: Vec<[u8; 64]>,
 }
 
 impl SimpleDoNotDisturb {
@@ -193,72 +185,57 @@ impl DoNotDisturb for SimpleDoNotDisturb {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloc::boxed::Box;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+    #[test]
+    fn test_simple_notification_creation() {
+        let notif = SimpleNotification::new(101, b"Hello", b"World", NotificationUrgency::Critical, b"TestApp");
+        assert_eq!(notif.id(), 101);
+        assert_eq!(notif.title(), b"Hello");
+        assert_eq!(notif.body(), b"World");
+        assert_eq!(notif.urgency(), NotificationUrgency::Critical);
+        assert_eq!(notif.app_name(), b"TestApp");
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    #[test]
+    fn test_simple_notification_manager() {
+        let mut manager = SimpleNotificationManager::new();
+        let notif1 = SimpleNotification::new(1, b"Title 1", b"Body 1", NotificationUrgency::Low, b"App 1");
+        let notif2 = SimpleNotification::new(2, b"Title 2", b"Body 2", NotificationUrgency::Normal, b"App 2");
+
+        assert_eq!(manager.show_notification(Box::new(notif1)).unwrap(), 1);
+        assert_eq!(manager.show_notification(Box::new(notif2)).unwrap(), 2);
+
+        let active = manager.get_active_notifications();
+        assert_eq!(active.len(), 2);
+        assert!(active.contains(&1));
+        assert!(active.contains(&2));
+
+        let retrieved = manager.get_notification(1).unwrap();
+        assert_eq!(retrieved.title(), b"Title 1");
+
+        assert!(manager.dismiss_notification(1).is_ok());
+        assert!(manager.get_notification(1).is_none());
+        assert_eq!(manager.get_active_notifications().len(), 1);
+        assert_eq!(manager.dismiss_notification(99), Err(NotificationError::NotFound));
     }
-}
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    #[test]
+    fn test_simple_do_not_disturb() {
+        let mut dnd = SimpleDoNotDisturb::new();
+        assert!(!dnd.is_dnd_enabled());
 
+        dnd.enable_dnd(true);
+        assert!(dnd.is_dnd_enabled());
 
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
+        dnd.set_dnd_exceptions(b"ExceptionApp");
+        assert_eq!(dnd.exceptions.len(), 1);
 
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        let mut expected = [0u8; 64];
+        expected[..12].copy_from_slice(b"ExceptionApp");
+        assert_eq!(dnd.exceptions[0], expected);
     }
 }

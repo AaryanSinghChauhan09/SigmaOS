@@ -4,6 +4,9 @@ pub mod error;
 pub mod isa;
 pub mod store;
 pub mod vec;
+pub mod buddy_allocator;
+pub mod paging;
+pub mod error;
 
 pub use async_runtime::{AsyncExecutor, Task};
 pub use error::{CryptoError, FsError, KernelError, NetError, SecurityError, SigmaError};

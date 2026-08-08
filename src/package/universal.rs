@@ -280,8 +280,8 @@ pub struct UniversalPackageManager {
     pub adapters: HashMap<PackageFormat, PackageAdapter>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
-    pub snapshots: HashMap<usize, PackageSnapshot>,
-    pub next_snapshot_id: usize,
+    pub transaction_history: TransactionalHistory,
+    pub metadata_cache: HashMap<String, UnifiedPackage>,
 }
 
 impl UniversalPackageManager {
@@ -291,8 +291,8 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
-            snapshots: HashMap::new(),
-            next_snapshot_id: 1,
+            transaction_history: TransactionalHistory::new(),
+            metadata_cache: HashMap::new(),
         };
 
         manager.add_default_adapters();

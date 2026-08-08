@@ -60,7 +60,7 @@ impl X86_64HAL {
     /// PCI enumeration for x86_64
     pub fn enumerate_pci(&self) -> Result<(), DriverError> {
         // Scan PCI configuration space
-        for bus in 0..=255u8 {
+        for bus in 0..=255 {
             for device in 0..32 {
                 for function in 0..8 {
                     let vendor_id = self.read_pci_config(bus, device, function, 0x00);

@@ -17,8 +17,50 @@ pub enum BuildSystem {
     Ninja,
 }
 
-/// Package recipe
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecipeError {
+    InvalidFormat,
+    MissingField,
+    SignatureMismatch,
+    DependencyConflict,
+    InvalidName,
+    InvalidSource,
+    InvalidHash,
+    NoBuildCommands,
+    InvalidRecipe,
+    NotFound,
+    InvalidSyntax,
+    SerializationError,
+}
+
+pub struct RecipeManager {
+    pub recipes: Vec<PackageRecipe>,
+}
+
+impl RecipeManager {
+    pub fn new() -> Self {
+        RecipeManager {
+            recipes: Vec::new(),
+        }
+    }
+
+    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
+        self.recipes.push(recipe);
+        Ok(())
+    }
+
+    pub fn list_recipes(&self) -> &Vec<PackageRecipe> {
+        &self.recipes
+    }
+}
+
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Declarative package recipes.
 pub struct PackageRecipe {
     pub name: String,
     pub version: Version,
@@ -39,7 +81,7 @@ pub struct PackageRecipe {
 
 impl PackageRecipe {
     pub fn new(name: String, version: Version) -> Self {
-        Self {
+        PackageRecipe {
             name,
             version,
             description: String::new(),
@@ -51,8 +93,8 @@ impl PackageRecipe {
             install_commands: Vec::new(),
             environment: HashMap::new(),
             pkgrel: 1,
-            arch: "x86_64".to_string(),
-            license_spdx: "GPL".to_string(),
+            arch: String::new(),
+            license_spdx: String::new(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
         }
@@ -151,62 +193,8 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
+            BuildSystem::Custom => "make custom".to_string(),
         }
-    }
-}
-
-/// Recipe errors
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RecipeError {
-    InvalidName,
-    InvalidSource,
-    InvalidHash,
-    NoBuildCommands,
-    DependencyConflict,
-    BuildFailed,
-}
-
-/// Recipe manager
-pub struct RecipeManager {
-    recipes: HashMap<String, PackageRecipe>,
-}
-
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self {
-            recipes: HashMap::new(),
-        }
-    }
-
-    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
-        recipe.validate()?;
-        let key = format!("{}@{}", recipe.name, recipe.version);
-        self.recipes.insert(key, recipe);
-        Ok(())
-    }
-
-    pub fn get_recipe(&self, name: &str, version: &Version) -> Option<&PackageRecipe> {
-        let key = format!("{}@{}", name, version);
-        self.recipes.get(&key)
-    }
-
-    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
-        self.recipes.values().collect()
-    }
-
-    pub fn find_by_name(&self, name: &str) -> Vec<&PackageRecipe> {
-        self.recipes.values().filter(|r| r.name == name).collect()
-    }
-
-    pub fn remove_recipe(&mut self, name: &str, version: &Version) {
-        let key = format!("{}@{}", name, version);
-        self.recipes.remove(&key);
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

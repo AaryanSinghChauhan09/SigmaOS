@@ -58,11 +58,20 @@ impl DinitServiceManager {
         }
     }
 
-    pub fn get_service_dependencies(&self, name: &str) -> Vec<String> {
-        if let Some(service) = self.services.iter().find(|s| s.name == name) {
-            service.dependencies.clone()
-        } else {
-            Vec::new()
+        self.services[idx].state = DinitServiceState::Starting;
+
+        // Recursively start dependencies first (Dinit logic)
+        let deps = self.services[idx].dependencies.clone();
+        for dep in &deps {
+            let mut dep_len = 32;
+            for i in 0..32 {
+                if dep[i] == 0 {
+                    dep_len = i;
+                    break;
+                }
+            }
+            let dep_name = &dep[..dep_len];
+            self.start_service(dep_name)?;
         }
     }
 }

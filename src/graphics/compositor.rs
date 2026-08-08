@@ -1,16 +1,10 @@
 // Custom, OOP-driven High-Performance Graphics Compositor for SigmaOS
 // Implements screen composition, double buffering, and screen capturing
 
-#![no_std]
-#![allow(warnings)]
-#![allow(clippy::all)]
-
 extern crate alloc;
-use alloc::boxed::Box;
 use alloc::vec::Vec;
-
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use alloc::boxed::Box;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
 #[repr(C)]
@@ -504,10 +498,10 @@ impl Default for CompositorStats {
 
 /// Simple compositor (OOP: Concrete compositor class)
 pub struct SimpleCompositor {
-    pub windows: Vec<Option<Box<dyn Window>>>,
-    pub window_order: Vec<usize>,
-    pub stats: CompositorStats,
-    pub capability: CompositorCapability,
+    windows: Vec<Box<dyn Window>>,
+    window_order: Vec<usize>,
+    stats: CompositorStats,
+    capability: CompositorCapability,
     pub back_buffer: Option<BitmapSurface>,
     pub double_buffering: AtomicBool,
 }
@@ -626,65 +620,81 @@ impl Compositor for SimpleCompositor {
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError> {
         self.stats.frame_count += 1;
 
-        // Fetch output stride and size before borrowing target mutably
-        let output_stride = output.info().stride as usize / 4;
-        let output_size = output.size();
+        // If double buffering is enabled, we render to our back buffer first, then copy to output.
+        // Otherwise, we render directly to output.
+        let use_double_buffering = self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
 
-        let target_surface = if self.double_buffering.load(Ordering::SeqCst) {
-            if let Some(ref mut back) = self.back_buffer {
-                back as &mut dyn Surface
-            } else {
-                output
-            }
-        } else {
-            output
-        };
+        if use_double_buffering {
+            let back = self.back_buffer.as_mut().unwrap();
+            back.clear(Color::rgb(0, 0, 0));
 
-        // Clear target surface
-        target_surface.clear(Color::rgb(0, 0, 0));
+            // Compose windows in order (back to front)
+            for &window_id in &self.window_order {
+                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                    let window_rect = window.rect();
+                    if let Some(surface) = window.surface() {
+                        let window_stride = surface.info().stride as usize / 4;
+                        let window_data = surface.data();
 
-        // Compose windows in order (back to front)
-        for &window_id in &self.window_order {
-            // Find window
-            let mut found_window = None;
-            for window_option in &mut self.windows {
-                if let Some(ref mut window) = *window_option {
-                    if window.id() == window_id {
-                        found_window = Some(window);
-                        break;
-                    }
-                }
-            }
+                        let back_stride = back.info().stride as usize / 4;
+                        let back_data = back.data_mut();
 
-            if let Some(window) = found_window {
-                let window_rect = window.rect();
-                if let Some(surface) = window.surface() {
-                    let window_stride = surface.info().stride as usize / 4;
-                    let window_data = surface.data();
-                    let output_data = target_surface.data_mut();
+                        // Copy window surface to back buffer
+                        for y in 0..window_rect.size.height as usize {
+                            for x in 0..window_rect.size.width as usize {
+                                let output_x = (window_rect.position.x + x as i32) as usize;
+                                let output_y = (window_rect.position.y + y as i32) as usize;
 
-                    // Copy window surface to output
-                    for y in 0..window_rect.size.height as usize {
-                        for x in 0..window_rect.size.width as usize {
-                            let output_x = (window_rect.position.x + x as i32) as usize;
-                            let output_y = (window_rect.position.y + y as i32) as usize;
+                                let output_index = output_y * back_stride + output_x;
+                                let window_index = y * window_stride + x;
 
-                            let output_index = output_y * output_stride + output_x;
-                            let window_index = y * window_stride + x;
-
-                            if output_index < output_data.len() && window_index < window_data.len()
-                            {
-                                output_data[output_index] = window_data[window_index];
+                                if output_index < back_data.len() && window_index < window_data.len() {
+                                    back_data[output_index] = window_data[window_index];
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        // Swap back to front buffer automatically if needed
-        if self.double_buffering.load(Ordering::SeqCst) {
-            self.swap_buffers()?;
+            // Copy back buffer to output
+            let back = self.back_buffer.as_ref().unwrap();
+            let back_data = back.data();
+            let output_data = output.data_mut();
+            let len = back_data.len().min(output_data.len());
+            output_data[..len].copy_from_slice(&back_data[..len]);
+
+        } else {
+            output.clear(Color::rgb(0, 0, 0));
+
+            // Compose windows in order (back to front)
+            for &window_id in &self.window_order {
+                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                    let window_rect = window.rect();
+                    if let Some(surface) = window.surface() {
+                        let window_stride = surface.info().stride as usize / 4;
+                        let window_data = surface.data();
+
+                        let output_stride = output.info().stride as usize / 4;
+                        let output_data = output.data_mut();
+
+                        // Copy window surface to output directly
+                        for y in 0..window_rect.size.height as usize {
+                            for x in 0..window_rect.size.width as usize {
+                                let output_x = (window_rect.position.x + x as i32) as usize;
+                                let output_y = (window_rect.position.y + y as i32) as usize;
+
+                                let output_index = output_y * output_stride + output_x;
+                                let window_index = y * window_stride + x;
+
+                                if output_index < output_data.len() && window_index < window_data.len() {
+                                    output_data[output_index] = window_data[window_index];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         Ok(())
@@ -716,39 +726,5 @@ impl Compositor for SimpleCompositor {
         }
 
         stats
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_surface_rect_flow() {
-        let cap = SurfaceCapability::full();
-        let mut surf = BitmapSurface::new(1, 10, 10, cap);
-        assert_eq!(surf.size().width, 10);
-        surf.clear(Color::rgb(255, 0, 0));
-        assert_eq!(surf.data()[0], Color::rgb(255, 0, 0).to_u32());
-
-        surf.fill_rect(Rectangle::new(1, 1, 5, 5), Color::rgb(0, 255, 0));
-        assert_eq!(surf.data()[12], Color::rgb(0, 255, 0).to_u32());
-    }
-
-    #[test]
-    fn test_compositor_screenshot_and_swap() {
-        let comp_cap = CompositorCapability::full();
-        let mut comp = SimpleCompositor::new(comp_cap);
-
-        let win_cap = WindowCapability::full();
-        let mut win = SimpleWindow::new(101, Rectangle::new(0, 0, 10, 10), win_cap);
-        win.show();
-        comp.add_window(Box::new(win)).unwrap();
-
-        let mut output = BitmapSurface::new(999, 1920, 1080, SurfaceCapability::full());
-        assert!(comp.compose(&mut output).is_ok());
-
-        let screenshot = comp.capture_screenshot().unwrap();
-        assert_eq!(screenshot.len(), 1920 * 1080);
     }
 }

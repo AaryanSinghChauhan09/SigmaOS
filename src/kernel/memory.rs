@@ -13,22 +13,42 @@ pub struct MemoryBlock {
     pub size: usize,
 }
 
-/// Buddy allocator for memory management
+use core::ptr::NonNull;
+
+pub struct Zone {
+    pub present_pages: u64,
+}
+
+pub struct Page {
+    pub flags: AtomicUsize,
+    pub count: AtomicUsize,
+    pub mapping: Option<usize>,
+    pub index: u64,
+    pub private: Option<usize>,
+    pub zone: Option<*const Zone>,
+}
+
+impl Page {
+    pub fn dec_ref(&self) -> bool {
+        self.count.fetch_sub(1, Ordering::SeqCst) == 1
+    }
+}
+
 pub struct BuddyAllocator {
-    free_lists: [Vec<MemoryBlock>; 12], // 2^0 to 2^11 pages (4KB to 8MB)
+    pub free_lists: [Vec<MemoryBlock>; 12],
+    pub free_pages: usize,
+    pub total_pages: usize,
+    pub zones: Vec<Zone>,
 }
 
 impl BuddyAllocator {
     pub fn new() -> Self {
         Self {
             free_lists: Default::default(),
+            free_pages: 0,
+            total_pages: 0,
+            zones: Vec::new(),
         }
-    }
-
-    pub fn with_memory(base_addr: usize, size: usize) -> Self {
-        let mut allocator = Self::new();
-        allocator.initialize_memory(base_addr, size);
-        allocator
     }
 
     pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {

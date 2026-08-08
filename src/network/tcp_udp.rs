@@ -10,18 +10,16 @@ use alloc::boxed::Box;
 use alloc::vec::Vec;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;
 
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Protocol {
-    TCP = 0,
-    UDP = 1,
-}
+pub enum Protocol { TCP = 0, UDP = 1 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
@@ -36,13 +34,14 @@ pub enum TCPState {
     TimeWait = 9,
 }
 
-#[repr(usize)]
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetworkError {
     Success = 0,
     InvalidSocket = 1,
     ConnectionFailed = 2,
     SendFailed = 3,
+    InvalidParameter = 4,
 }
 
 pub trait Socket {
@@ -50,6 +49,20 @@ pub trait Socket {
     fn protocol(&self) -> Protocol;
     fn local_port(&self) -> Port;
     fn remote_port(&self) -> Port;
+}
+
+/// Linux BSD Socket Option Interface
+pub trait BsdSocket: Socket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SocketOption {
+    ReuseAddr,
+    TcpNoDelay,
+    RcvBuf,
+    SndBuf,
 }
 
 pub struct SimpleSocket {
@@ -92,6 +105,35 @@ impl Socket for SimpleSocket {
     }
     fn remote_port(&self) -> Port {
         self.remote_port.load(Ordering::SeqCst) as Port
+    }
+}
+
+impl BsdSocket for SimpleSocket {
+    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => {
+                self.reuse_addr.store(val, Ordering::SeqCst);
+            }
+            SocketOption::TcpNoDelay => {
+                self.tcp_nodelay.store(val, Ordering::SeqCst);
+            }
+            SocketOption::RcvBuf => {
+                self.rcvbuf.store(val, Ordering::SeqCst);
+            }
+            SocketOption::SndBuf => {
+                self.sndbuf.store(val, Ordering::SeqCst);
+            }
+        }
+        Ok(())
+    }
+
+    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
+        match opt {
+            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
+            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
+            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
+            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
+        }
     }
 }
 
@@ -205,8 +247,8 @@ pub trait CongestionControl {
 }
 
 pub struct RenoCongestionControl {
-    pub cwnd: u32,
-    pub ssthresh: u32,
+    pub cwnd: AtomicUsize,
+    pub ssthresh: AtomicUsize,
 }
 
 impl RenoCongestionControl {
@@ -251,9 +293,9 @@ impl CongestionControl for RenoCongestionControl {
 }
 
 pub struct BBRCongestionControl {
-    pub cwnd: u32,
-    pub bw_estimate: u32,
-    pub rtt_min_ms: u32,
+    pub cwnd: AtomicUsize,
+    pub bw_estimate: AtomicUsize,
+    pub rtt_min: AtomicUsize,
 }
 
 impl BBRCongestionControl {
@@ -380,6 +422,11 @@ pub struct SimpleNetworkStack {
     pub sockets: Vec<Box<dyn Socket>>,
     pub next_id: AtomicU32,
     pub firewall: SimpleFirewall,
+    pub congestion: RenoCongestionControl,
+    // Linux Stack Additions
+    pub netfilter: NetfilterFirewall,
+    pub routing_table: RoutingTable,
+    pub interfaces: Vec<NetworkInterface>,
 }
 
 impl SimpleNetworkStack {

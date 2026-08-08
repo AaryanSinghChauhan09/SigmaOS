@@ -283,3 +283,113 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 }
 
+/// Simple Vec implementation for no_std execution
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    pub fn get(&self, index: usize) -> T {
+        if self.data.is_null() || index >= self.len {
+            panic!("Access of invalid pointer");
+        }
+        unsafe { core::ptr::read(self.data.add(index)) }
+    }
+
+    pub fn clone(&self) -> Vec<T> {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                let item = core::ptr::read(self.data.add(i));
+                new_vec.push(item);
+            }
+        }
+        new_vec
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
+        }
+    }
+}
+
+impl<T> core::ops::Index<usize> for Vec<T> {
+    type Output = T;
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &*self.data.add(index) }
+    }
+}
+
+impl<T> core::ops::IndexMut<usize> for Vec<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
+        unsafe { &mut *self.data.add(index) }
+    }
+}
+
+impl<T> Vec<T> {
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
