@@ -62,7 +62,7 @@ pub unsafe extern "C" fn ssh_connect(
     username: *const u8,
     options: SshOptions,
 ) -> SigmaI32 {
-    if !SSH_INITIALIZED || host.isnull() || username.isnull() {
+    if !SSH_INITIALIZED || host.is_null() || username.is_null() {
         return -1;
     }
     
@@ -73,6 +73,7 @@ pub unsafe extern "C" fn ssh_connect(
     // 4. Authenticate (key or password)
     // 5. Establish encrypted channel
     
+    let _ = options;
     for i in 0..255 {
         let byte = *host.add(i);
         if byte == 0 { break; }
@@ -111,7 +112,7 @@ pub unsafe extern "C" fn ssh_execute(
     output: *mut u8,
     max_output: SigmaU32,
 ) -> SigmaI32 {
-    if !SSH_INITIALIZED || !SSH_CONNECTION.connected || command.isnull() || output.isnull() {
+    if !SSH_INITIALIZED || !SSH_CONNECTION.connected || command.is_null() || output.is_null() {
         return -1;
     }
     
@@ -137,7 +138,7 @@ pub unsafe extern "C" fn ssh_upload(
     local_path: *const u8,
     remote_path: *const u8,
 ) -> SigmaI32 {
-    if !SSH_INITIALIZED || !SSH_CONNECTION.connected || local_path.isnull() || remote_path.isnull() {
+    if !SSH_INITIALIZED || !SSH_CONNECTION.connected || local_path.is_null() || remote_path.is_null() {
         return -1;
     }
     
@@ -155,7 +156,7 @@ pub unsafe extern "C" fn ssh_download(
     remote_path: *const u8,
     local_path: *const u8,
 ) -> SigmaI32 {
-    if !SSH_INITIALIZED || !SSH_CONNECTION.connected || remote_path.isnull() || local_path.isnull() {
+    if !SSH_INITIALIZED || !SSH_CONNECTION.connected || remote_path.is_null() || local_path.is_null() {
         return -1;
     }
     
