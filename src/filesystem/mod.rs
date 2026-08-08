@@ -7,7 +7,6 @@ pub mod manager;
 pub mod support;
 pub mod vfs;
 
-pub use defragmenter::{ClusterState, FragmentedFile, DefragStats, DiskDefragmenter};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
@@ -23,7 +22,6 @@ pub use manager::{
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
 pub use support::{
-    Filesystem, FilesystemError, FilesystemManager, FilesystemType, LegacyLinuxRule,
-    LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
+    Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem, SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};

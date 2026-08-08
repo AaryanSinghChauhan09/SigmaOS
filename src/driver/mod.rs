@@ -19,5 +19,4 @@ pub use irp_system::{
     METHOD_BUFFERED, METHOD_IN_DIRECT, METHOD_OUT_DIRECT, METHOD_NEITHER,
     IoManager, DriverEntry, OpaqueDriverExtension,
     ObjectManager, ObjectType, NonPagedPool, RootkitDetector, IrpParameters,
-    SystemCallbackRegistry, IoStackLocation, RootkitHookDetector,
 };

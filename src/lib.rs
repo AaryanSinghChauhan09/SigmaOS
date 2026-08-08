@@ -24,31 +24,8 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
-pub mod graphics {
-    pub mod compositor;
-    pub mod paint;
-    pub mod video;
-}
-pub mod hardware {
-    pub mod compatibility;
-    pub mod win32;
-}
-pub mod power {
-    pub mod governor;
-}
-pub mod observability {
-    pub mod profiler;
-}
-pub mod ai;
-pub mod arch;
-pub mod boot;
-pub mod toolchain;
-pub mod scheduler {
-    pub mod numa_scheduler;
-}
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -60,23 +37,14 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime,
-    CorebootGatewayMesh, DACConstellation, DotMatrixMesh, DriverArchiveGridV2, EosLogTool,
-    EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, FhsConventionStatus, FileAlmanacHub,
-    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
-    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
-    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, LsbProfile, Mirror as EosMirror, NetworkAlmanacHub, NetworkArchiveGridV2,
-    PeripheralArchiveMesh, PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation,
-    SecurityConstellation, StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub,
-    TapeMesh, TargetPlatform, TranslationLayer, UEFIGatewayMesh, WelcomeTab as EosWelcomeTab,
-    YayAurHelper, ZeroTrustConstellation,
-};
-pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
+    ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
+    JehanneError, JehanneNamespace, MintBackupTool, MintSoftwareManager, MintUpdateItem,
+    MintUpdateLevel, MintUpdateManager, MockUPIService, MultilingualSupport, NamespaceBindEntry,
+    NtHandle, NtObjectManager, NtObjectType, NtStatus, Plan9pMessage, Plan9pMsgType,
+    PortableExecutableLoader, RegistryHive, SoftwareMeta, TargetPlatform, TranslationLayer,
+    WindowCoordinates, ZenithDisplayCompositor,
+    InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -89,6 +57,13 @@ pub use drivers::{
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+};
+pub use driver::{
+    Irp, DriverObject, DeviceObject, IoStatus, IoStatusBlock, Apc, Dpc, Minifilter,
+    IRP_MJ_CREATE, IRP_MJ_CLOSE, IRP_MJ_READ, IRP_MJ_WRITE, IRP_MJ_DEVICE_CONTROL,
+    METHOD_BUFFERED, METHOD_IN_DIRECT, METHOD_OUT_DIRECT, METHOD_NEITHER,
+    IoManager, DriverEntry, OpaqueDriverExtension,
+    ObjectManager, ObjectType, NonPagedPool, RootkitDetector, IrpParameters,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -133,27 +108,21 @@ pub use power::{
     TlpPowerManager,
 };
 pub use productivity::{
-    Achievement, AchievementType, AegisubEngine, GamifiedProductivity, Goal, PomodoroState,
-    PomodoroTimer, ProductivityScore, SubtitleEditEngine, SubtitleEntry, SubtitleFormat,
-};
-pub use remote::{
-    FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
-    RemoteShell, SessionID, SessionState, ShellError, ShellID, ShellManager, SigmaRendezvous,
-    SimpleFileTransfer, SimpleRemoteDesktop, SimpleRemoteSession, SimpleScreenSharing,
-    SimpleShellManager,
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore,
+    TopCommand, ProcessTaskInfo, IfconfigCommand, NetworkInterface, PingCommand, PingResult,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
 pub use security::{
-    CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
-    IsolationError, Permission, PledgeManager, PledgePromise,
-};
-pub use shell::{
-    CommandError as ShellCommandError, CronJob, LogEntry, LogLevel, Privilege, Service,
-    ShellCommand, ShellRepl, ShellSession, SigmaCoreUtils, SigmaCron, SigmaDoc, SigmaInit,
-    SigmaLog, SigmaPriv, SimpleShellSession,
+    CapabilityGate, CapabilityToken, CronDaemon, CronJob, DefaultDenyNetworkPolicy, DmesgLog,
+    FirewallRule, IptablesFirewall, KaliError, NemoClawError, OpenShellAgentSandbox, Permission,
+    PledgeManager, PledgePromise, PluggableAuthenticationModule, PrivacyRouter,
+    SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer, TmuxPane,
+    PenetrationAssistant, ExploitPayload, Vulnerability, VulnerabilityScanner, SimpleVulnerability,
+    SimpleVulnerabilityScanner, Severity, ScanSummary, ScanReport,
 };
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, DebPackageImporter, PackageImporter,

@@ -14,6 +14,8 @@ pub use selinux::{
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use qubes_isolation::{
-    DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, Severity, Vulnerability, SimpleVulnerability,
+    VulnerabilityScanner, SimpleVulnerabilityScanner, ScanSummary, ScanReport,
+    SimpleScanReport, CIPipelineIntegration, SimpleCIPipelineIntegration,
 };

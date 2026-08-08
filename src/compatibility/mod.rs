@@ -1,10 +1,11 @@
 // SigmaOS Compatibility Module
 pub mod constellation_mesh;
 pub mod cross_platform;
-pub mod endeavour;
-pub mod hopper_lab;
-pub mod legacy_adapters;
-pub mod standards;
+pub mod india_stack;
+pub mod jehanne;
+pub mod mint_linux;
+pub mod reactos;
+pub mod interim;
 
 pub use constellation_mesh::{
     BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
@@ -106,3 +107,4 @@ pub use legacy_adapters::{
 pub use standards::{
     FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };
+pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};

@@ -32,6 +32,8 @@ pub mod structures;
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
+    DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
+    KernelPersonalityMode,
 };
 pub use breakthroughs_v2::{
     AdaptiveInitSystem, AdaptiveInitTarget, AiDrivenDaemon, CrossModeMultiplexer,
