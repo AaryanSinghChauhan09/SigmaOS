@@ -1766,7 +1766,7 @@ pub enum SolusError {
 pub struct ZorinWineManager {
     pub wine_installed: bool,
     pub wine_prefix: alloc::string::String,
-    pub windows_apps: alloc::vec::vec::Vec<alloc::string::String>>,
+    pub windows_apps: alloc::vec::Vec<alloc::string::String>,
 }
 
 impl ZorinWine {
@@ -1959,7 +1959,7 @@ pub enum MxError {
 
 /// MX Package Installer-inspired system.
 pub struct MxPackageInstaller {
-    pub available_packages: alloc::vec::alloc::string::Vec<alloc::string::String>>,
+    pub available_packages: alloc::vec::Vec<alloc::string::String>,
     pub installed_packages: alloc::vec::Vec<alloc::string::String>,
     pub auto_update_check: bool,
 }
