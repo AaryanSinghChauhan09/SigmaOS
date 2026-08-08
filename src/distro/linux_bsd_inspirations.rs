@@ -6,8 +6,8 @@
 #![cfg_attr(target_os = "none", no_main)]
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 // ==========================================
 // 1. ARCH LINUX INSPIRATIONS
@@ -42,29 +42,31 @@ impl ArchDependencyResolver {
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, &'static str> {
         let mut resolved = Vec::new();
         let mut unresolved = Vec::new();
-        
+
         unresolved.push(package_name.to_string());
-        
+
         while let Some(current) = unresolved.pop() {
             if resolved.contains(&current) {
                 continue;
             }
-            
+
             // Find package
-            let pkg = self.packages.iter()
+            let pkg = self
+                .packages
+                .iter()
                 .find(|p| p.name == current || p.provides.contains(&current))
                 .ok_or("Package not found")?;
-            
+
             // Resolve dependencies first
             for dep in &pkg.dependencies {
                 if !resolved.contains(dep) {
                     unresolved.push(dep.clone());
                 }
             }
-            
+
             resolved.push(pkg.name.clone());
         }
-        
+
         Ok(resolved)
     }
 }
@@ -142,9 +144,7 @@ pub struct NixStyleStore {
 
 impl NixStyleStore {
     pub fn new(store_path: String) -> Self {
-        Self {
-            store_path,
-        }
+        Self { store_path }
     }
 
     /// Generate content address (SHA-256 hash)
@@ -181,9 +181,7 @@ pub struct AptPinStore {
 
 impl AptPinStore {
     pub fn new() -> Self {
-        Self {
-            pins: Vec::new(),
-        }
+        Self { pins: Vec::new() }
     }
 
     pub fn add_pin(&mut self, pin: PinRule) {
@@ -191,7 +189,8 @@ impl AptPinStore {
     }
 
     pub fn get_package_priority(&self, package: &str) -> i32 {
-        self.pins.iter()
+        self.pins
+            .iter()
             .filter(|p| p.package == package)
             .map(|p| p.priority)
             .max()

@@ -202,7 +202,8 @@ mod tests {
         let mut aegisub = SigmaSupportSubtitleSync::new();
         assert_eq!(aegisub.font_name, "Arial");
 
-        let body = aegisub.parse_ass_styling_tags("{\\fnHelvetica\\fs28\\c&H00FFFF&}Welcome to SigmaOS");
+        let body =
+            aegisub.parse_ass_styling_tags("{\\fnHelvetica\\fs28\\c&H00FFFF&}Welcome to SigmaOS");
         assert_eq!(body, "Welcome to SigmaOS");
         assert_eq!(aegisub.font_name, "Helvetica");
         assert_eq!(aegisub.font_size, 28);

@@ -130,7 +130,10 @@ impl VirtualFilesystem {
 
     /// Linux-parity Hard Link creator: points a new reference to an existing inode
     pub fn link_inode(&mut self, old_inode_id: u64) -> Result<(), FsError> {
-        let inode = self.inodes.get_mut(&old_inode_id).ok_or(FsError::NotFound)?;
+        let inode = self
+            .inodes
+            .get_mut(&old_inode_id)
+            .ok_or(FsError::NotFound)?;
 
         // Linux FHS constraint: prevent directory hard links to avoid circular loops
         if inode.file_type == FileType::Directory {

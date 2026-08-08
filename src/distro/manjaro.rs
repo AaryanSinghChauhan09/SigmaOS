@@ -42,7 +42,7 @@ pub struct FlatpakPackage {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SnapPackage {
     pub name: String,
-    pub channel: String, // stable, beta, edge
+    pub channel: String,     // stable, beta, edge
     pub confinement: String, // classic, strict
 }
 
@@ -66,7 +66,7 @@ pub struct FlatpakPackage {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SnapPackage {
     pub name: String,
-    pub channel: String, // stable, beta, edge
+    pub channel: String,     // stable, beta, edge
     pub confinement: String, // classic, strict
 }
 
@@ -90,7 +90,7 @@ pub struct FlatpakPackage {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SnapPackage {
     pub name: String,
-    pub channel: String, // stable, beta, edge
+    pub channel: String,     // stable, beta, edge
     pub confinement: String, // classic, strict
 }
 
@@ -226,7 +226,8 @@ impl MhwdDkmsRebuilder {
             compiled.push(module.clone());
         }
         let count = compiled.len();
-        self.compiled_modules_for_kernels.insert(kernel_version.to_string(), compiled);
+        self.compiled_modules_for_kernels
+            .insert(kernel_version.to_string(), compiled);
         count
     }
 }
@@ -346,7 +347,9 @@ impl PamacPackageManager {
     pub fn build_and_install_aur(&mut self, pkg: AurPackage) -> Result<(), &'static str> {
         // First resolve dependencies in user-space
         for dep in &pkg.dependencies {
-            if !self.installed_packages.contains_key(dep) && !self.installed_aur_packages.contains_key(dep) {
+            if !self.installed_packages.contains_key(dep)
+                && !self.installed_aur_packages.contains_key(dep)
+            {
                 return Err("Missing required AUR build dependency.");
             }
         }
@@ -426,7 +429,10 @@ impl MsmLanguagePackInstaller {
 
     /// Installs packages corresponding to the given system locale
     pub fn install_packs_for_locale(&mut self, locale: &str) -> Result<usize, &'static str> {
-        let packs = self.language_packs.get(locale).ok_or("Locale not found in language pack index.")?;
+        let packs = self
+            .language_packs
+            .get(locale)
+            .ok_or("Locale not found in language pack index.")?;
         let mut count = 0;
         for pack in packs {
             if !self.installed_packs.contains(pack) {
@@ -615,11 +621,17 @@ mod tests {
 
         msm.set_language("de_DE.UTF-8").unwrap();
         assert_eq!(msm.system_language, "de_DE.UTF-8");
-        assert!(msm.langpack_installer.installed_packs.contains(&"firefox-i18n-de".to_string()));
+        assert!(msm
+            .langpack_installer
+            .installed_packs
+            .contains(&"firefox-i18n-de".to_string()));
 
         msm.configure_thermal_profile(true);
         assert_eq!(msm.optimal_thermal_fan_speed_rpm, 4500);
-        assert_eq!(msm.power_governor.current_profile, PowerProfile::Performance);
+        assert_eq!(
+            msm.power_governor.current_profile,
+            PowerProfile::Performance
+        );
         assert_eq!(msm.power_governor.target_cpu_freq_mhz, 4800);
     }
 
@@ -650,7 +662,9 @@ mod tests {
         assert!(res.is_err());
 
         // Now install the dependency
-        pamac.installed_packages.insert("libcurl".to_string(), "8.2.1-1".to_string());
+        pamac
+            .installed_packages
+            .insert("libcurl".to_string(), "8.2.1-1".to_string());
         pamac.build_and_install_aur(aur_pkg).unwrap();
         assert!(pamac.installed_aur_packages.contains_key("spotify"));
 
@@ -690,6 +704,8 @@ mod tests {
         let mut installer = MsmLanguagePackInstaller::new();
         let registered_count = installer.install_packs_for_locale("ja_JP").unwrap();
         assert_eq!(registered_count, 3);
-        assert!(installer.installed_packs.contains(&"fcitx-mozc".to_string()));
+        assert!(installer
+            .installed_packs
+            .contains(&"fcitx-mozc".to_string()));
     }
 }

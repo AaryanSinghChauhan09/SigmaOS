@@ -28,7 +28,6 @@ pub use linux_translation::{
 };
 pub use store::{SigmaSoftwareStore, SoftwareRegistryEntry, GLOBAL_SOFTWARE_STORE};
 pub use universal::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError,
-    PackageFormat, PackageSource,
-    UnifiedPackage, UniversalPackageManager,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };

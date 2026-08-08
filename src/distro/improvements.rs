@@ -20,7 +20,6 @@
 // Each section implements concepts adapted from a specific distribution's innovations.
 
 #[allow(dead_code)]
-
 // ============================================================================
 // ARCH LINUX — Rolling Release Model, Minimal Base
 // ============================================================================
@@ -64,9 +63,15 @@ impl MinimalBaseInstaller {
     }
 
     pub fn install_base(&mut self) {
-        let base = ["sigmaos-base", "sigmaos-linux-kernel", "sigmaos-util-linux", "sigmaos-glibc"];
+        let base = [
+            "sigmaos-base",
+            "sigmaos-linux-kernel",
+            "sigmaos-util-linux",
+            "sigmaos-glibc",
+        ];
         for pkg in &base {
-            self.installed_packages.push(alloc::string::String::from(*pkg));
+            self.installed_packages
+                .push(alloc::string::String::from(*pkg));
         }
         self.total_size_kb = 512 * 1024; // ~512 MB
     }
@@ -364,7 +369,9 @@ pub enum PenTestCategory {
 impl PenTestToolRegistry {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut registry = PenTestToolRegistry { tools: alloc::vec::Vec::new() };
+        let mut registry = PenTestToolRegistry {
+            tools: alloc::vec::Vec::new(),
+        };
         registry.register_default_tools();
         registry
     }
@@ -487,8 +494,8 @@ pub struct BoreSchedulerConfig {
 impl BoreSchedulerConfig {
     pub fn default_desktop() -> Self {
         BoreSchedulerConfig {
-            burst_time_ns: 8_000_000,  // 8ms burst
-            base_slice_ns: 4_000_000,  // 4ms base slice
+            burst_time_ns: 8_000_000, // 8ms burst
+            base_slice_ns: 4_000_000, // 4ms base slice
             cache_aware: true,
             hpc_mode: false,
         }
@@ -520,7 +527,10 @@ pub struct BoreScheduler {
 
 impl BoreScheduler {
     pub fn new(config: BoreSchedulerConfig) -> Self {
-        BoreScheduler { config, run_queue: alloc::vec::Vec::new() }
+        BoreScheduler {
+            config,
+            run_queue: alloc::vec::Vec::new(),
+        }
     }
 
     pub fn enqueue(&mut self, task: Task) {
@@ -529,7 +539,9 @@ impl BoreScheduler {
 
     /// Pick the task with minimum virtual runtime (CFS-like) adjusted by burst score.
     pub fn pick_next(&mut self) -> Option<&Task> {
-        self.run_queue.iter().min_by_key(|t| t.vruntime.wrapping_add(t.burst_score))
+        self.run_queue
+            .iter()
+            .min_by_key(|t| t.vruntime.wrapping_add(t.burst_score))
     }
 
     pub fn update_burst_score(&mut self, pid: u32, delta_ns: u64) {
@@ -766,16 +778,26 @@ impl DebianAptPackageManager {
     }
 
     /// Verifies in-memory GPG signature of APT Release lists
-    pub fn verify_release_gpg(&mut self, release_data: &[u8], signature: &[u8], key_fingerprint: &str) -> bool {
+    pub fn verify_release_gpg(
+        &mut self,
+        release_data: &[u8],
+        signature: &[u8],
+        key_fingerprint: &str,
+    ) -> bool {
         if release_data.is_empty() || signature.is_empty() {
             return false;
         }
-        self.verified_gpg_keys.push(alloc::string::String::from(key_fingerprint));
+        self.verified_gpg_keys
+            .push(alloc::string::String::from(key_fingerprint));
         true
     }
 
     /// Resolves full recursive installation dependency tree for a parsed .deb package control file
-    pub fn resolve_installation_order(&self, target: &DebControlFile, database: &[DebControlFile]) -> Result<alloc::vec::Vec<alloc::string::String>, ReleaseError> {
+    pub fn resolve_installation_order(
+        &self,
+        target: &DebControlFile,
+        database: &[DebControlFile],
+    ) -> Result<alloc::vec::Vec<alloc::string::String>, ReleaseError> {
         let mut order = alloc::vec::Vec::new();
         let mut visited = alloc::vec::Vec::new();
         self.resolve_deps_recursive(target, database, &mut order, &mut visited)?;
@@ -913,7 +935,11 @@ impl SwapSpaceManager {
 
     /// Swaps in/reloads a page frame from the swap partition back into physical memory
     pub fn swap_in_page(&mut self, virtual_address: u64) -> Result<(), ReleaseError> {
-        if let Some(pos) = self.swap_slots.iter().position(|s| s.virtual_address == virtual_address && s.active) {
+        if let Some(pos) = self
+            .swap_slots
+            .iter()
+            .position(|s| s.virtual_address == virtual_address && s.active)
+        {
             self.swap_slots[pos].active = false;
             Ok(())
         } else {
@@ -1137,7 +1163,11 @@ impl SnapPackageManager {
         }
     }
 
-    pub fn install_snap(&mut self, name: &str, confinement: SnapConfinement) -> Result<(), SnapError> {
+    pub fn install_snap(
+        &mut self,
+        name: &str,
+        confinement: SnapConfinement,
+    ) -> Result<(), SnapError> {
         let snap = SnapPackage {
             name: alloc::string::String::from(name),
             version: alloc::string::String::from("1.0.0"),
@@ -1319,7 +1349,8 @@ impl SelinuxManager {
     }
 
     pub fn set_boolean(&mut self, name: &str, value: bool) {
-        self.booleans.insert(alloc::string::String::from(name), value);
+        self.booleans
+            .insert(alloc::string::String::from(name), value);
     }
 
     pub fn get_boolean(&self, name: &str) -> Option<bool> {
@@ -1375,8 +1406,12 @@ impl SystemdServiceManager {
     }
 
     pub fn enable_service(&mut self, name: &str) {
-        if !self.enabled_services.contains(&alloc::string::String::from(name)) {
-            self.enabled_services.push(alloc::string::String::from(name));
+        if !self
+            .enabled_services
+            .contains(&alloc::string::String::from(name))
+        {
+            self.enabled_services
+                .push(alloc::string::String::from(name));
         }
     }
 }
@@ -1395,7 +1430,8 @@ pub enum SystemdError {
 /// Portage-inspired package management with USE flags.
 pub struct PortagePackageManager {
     pub use_flags: alloc::collections::HashSet<alloc::string::String>,
-    pub installed_packages: alloc::collections::HashMap<alloc::string::String, alloc::string::String>,
+    pub installed_packages:
+        alloc::collections::HashMap<alloc::string::String, alloc::string::String>,
     pub world_file: alloc::vec::Vec<alloc::string::String>,
 }
 
@@ -1422,7 +1458,7 @@ impl PortagePackageManager {
     }
 
     pub fn add_to_world(&mut self, package: &str) {
-        self.world_file.push( alloc::string::String::from(package));
+        self.world_file.push(alloc::string::String::from(package));
     }
 }
 
@@ -1619,7 +1655,8 @@ impl PamacManager {
     }
 
     pub fn install_pacman_pkg(&mut self, package: &str) -> Result<(), PamacError> {
-        self.pacman_packages.push(alloc::string::String::from(package));
+        self.pacman_packages
+            .push(alloc::string::String::from(package));
         Ok(())
     }
 
@@ -1766,7 +1803,7 @@ pub enum SolusError {
 pub struct ZorinWineManager {
     pub wine_installed: bool,
     pub wine_prefix: alloc::string::String,
-    pub windows_apps: alloc::vec::vec::Vec<alloc::string::String>>,
+    pub windows_apps: alloc::vec::Vec<alloc::string::String>,
 }
 
 impl ZorinWine {
@@ -1959,7 +1996,7 @@ pub enum MxError {
 
 /// MX Package Installer-inspired system.
 pub struct MxPackageInstaller {
-    pub available_packages: alloc::vec::alloc::string::Vec<alloc::string::String>>,
+    pub available_packages: alloc::vec::Vec<alloc::string::String>,
     pub installed_packages: alloc::vec::Vec<alloc::string::String>,
     pub auto_update_check: bool,
 }
@@ -1974,10 +2011,14 @@ impl MxPackageInstaller {
     }
 
     pub fn install_package(&mut self, package: &str) -> Result<(), MxInstallError> {
-        if !self.available_packages.contains(&alloc::string::String::from(package)) {
+        if !self
+            .available_packages
+            .contains(&alloc::string::String::from(package))
+        {
             return Err(MxInstallError::PackageNotFound);
         }
-        self.installed_packages.push(alloc::string::String::from(package));
+        self.installed_packages
+            .push(alloc::string::String::from(package));
         Ok(())
     }
 }
@@ -2212,24 +2253,68 @@ impl LinuxDistroCompatibilityEngine {
     /// Get compatibility report for a specific distro.
     pub fn get_compatibility_report(&self, distro: &str) -> alloc::string::String {
         match distro {
-            "arch" => alloc::format!("Arch Linux compatibility: {}%", 
-                if self.arch_linux.pacman_compatibility { "95%" } else { "0%" }),
-            "fedora" => alloc::format!("Fedora compatibility: {}%", 
-                if self.fedora.systemd_integration { "90%" } else { "0%" }),
-            "ubuntu" => alloc::format!("Ubuntu compatibility: {}%", 
-                if self.ubuntu.apt_compatibility { "95%" } else { "0%" }),
-            "gentoo" => alloc::format!("Gentoo compatibility: {}%", 
-                if self.gentoo.custom_compile { "85%" } else { "0%" }),
+            "arch" => alloc::format!(
+                "Arch Linux compatibility: {}%",
+                if self.arch_linux.pacman_compatibility {
+                    "95%"
+                } else {
+                    "0%"
+                }
+            ),
+            "fedora" => alloc::format!(
+                "Fedora compatibility: {}%",
+                if self.fedora.systemd_integration {
+                    "90%"
+                } else {
+                    "0%"
+                }
+            ),
+            "ubuntu" => alloc::format!(
+                "Ubuntu compatibility: {}%",
+                if self.ubuntu.apt_compatibility {
+                    "95%"
+                } else {
+                    "0%"
+                }
+            ),
+            "gentoo" => alloc::format!(
+                "Gentoo compatibility: {}%",
+                if self.gentoo.custom_compile {
+                    "85%"
+                } else {
+                    "0%"
+                }
+            ),
             "mint" => alloc::format!("Linux Mint compatibility: 90%"),
-            "opensuse" => alloc::format!("openSUSE compatibility: {}%", 
-                if self.opensuse.btrfs_default { "88%" } else { "0%" }),
-            "rhel" => alloc::format!("RHEL compatibility: {}%", 
-                if self.rhel.rpm_compatibility { "92%" } else { "0%" }),
-            "manjaro" => alloc::format!("Manjaro compatibility: {}%", 
-                if self.manjaro.aur_helper { "93%" } else { "0%" }),
+            "opensuse" => alloc::format!(
+                "openSUSE compatibility: {}%",
+                if self.opensuse.btrfs_default {
+                    "88%"
+                } else {
+                    "0%"
+                }
+            ),
+            "rhel" => alloc::format!(
+                "RHEL compatibility: {}%",
+                if self.rhel.rpm_compatibility {
+                    "92%"
+                } else {
+                    "0%"
+                }
+            ),
+            "manjaro" => alloc::format!(
+                "Manjaro compatibility: {}%",
+                if self.manjaro.aur_helper { "93%" } else { "0%" }
+            ),
             "solus" => alloc::format!("Solus compatibility: 87%"),
-            "zorin" => alloc::format!("Zorin OS compatibility: {}%", 
-                if self.zorin.beginner_friendly { "95%" } else { "0%" }),
+            "zorin" => alloc::format!(
+                "Zorin OS compatibility: {}%",
+                if self.zorin.beginner_friendly {
+                    "95%"
+                } else {
+                    "0%"
+                }
+            ),
             "deepin" => alloc::format!("Deepin compatibility: 85%"),
             "mx" => alloc::format!("MX Linux compatibility: 90%"),
             _ => alloc::string::String::from("Unknown distro"),

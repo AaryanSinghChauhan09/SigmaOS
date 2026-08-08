@@ -4,12 +4,10 @@ pub mod enterprise;
 pub mod tcp;
 
 pub use analyzer::{
-    NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
-    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
-    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
-    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
-    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
-    ClearLinuxFlowLoadBalancer,
+    AlertSeverity, AlertType, AlpineZeroAllocCaptureBuffer, AnalysisStrategy, BandwidthAnalysis,
+    ClearLinuxFlowLoadBalancer, ConnectionInfo, ConnectionState, GentooUseFlagsDissector,
+    KaliPacketFingerprinter, KaliSnoopAnalysis, NetworkTrafficAnalyzer, NixDeclarativeFilter,
+    Protocol, SecurityAnalysis, TrafficAlert, TrafficPacket, TrafficStatistics,
 };
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};

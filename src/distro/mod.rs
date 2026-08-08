@@ -17,11 +17,6 @@ pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
 
-pub use manjaro::{
-    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease, ManjaroKernelSwitcher,
-    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
-};
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
     HardwareCertificationProgram, HardwareProfile, HardwareRegressionSuite, QAStagedRelease,
@@ -44,27 +39,29 @@ pub use enterprise::{
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
 pub use linux_bsd_inspirations::{
-    ArchDependencyResolver, FreeBSDJail, NixStyleStore, OpenBSDPledge,
-    AptPinStore, OpenRCService, PinRule, PackageNode,
+    AptPinStore, ArchDependencyResolver, FreeBSDJail, NixStyleStore, OpenBSDPledge, OpenRCService,
+    PackageNode, PinRule,
+};
+pub use manjaro::{
+    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
+    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
 };
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
-    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
-    LivepatchPatch, LivepatchManager,
+    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
+    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
+    TimeTravelEngine,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
 };
 pub use specialized::{
-    CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
-    MpiCommunicator, AptCacheSimulator, DpkgMultiArch, DebianPolicyEnforcer,
-    ThreeTierReleaseModel, DebianSocialContract, FreezeBasedStabilization,
+    AptCacheSimulator, CanFrame, DebianPolicyEnforcer, DebianSocialContract, DpkgMultiArch,
+    EcuController, EduChallenge, EduPlayground, FreezeBasedStabilization, HpcClusterJob,
+    HpcJobState, MpiCommunicator, ThreeTierReleaseModel,
 };
-pub use tiny_core::{
-    TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-};
+pub use tiny_core::{AppsAuditTool, TczExtensionManager, TinyCoreMode, TinyCoreRAMEngine};
 pub use transformation_engine::{
-    AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,
-    ForensicReadinessAuditor, GlobalComplianceDashboard, DeveloperToolkitConverter,
-    IotDeviceMeshOrchestrator, IotMeshDevice,
+    AccessibilityOverlayManager, AutomationRoutineController, DeveloperToolkitConverter,
+    ForensicReadinessAuditor, GlobalComplianceDashboard, IotDeviceMeshOrchestrator, IotMeshDevice,
+    RoutineTrigger, SmartRoutine,
 };

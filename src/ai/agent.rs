@@ -53,7 +53,11 @@ impl Intent {
     pub fn with_parameters(mut self, params: &[u8]) -> Self {
         let param_len = params.len().min(511);
         unsafe {
-            core::ptr::copy_nonoverlapping(params.as_ptr(), self.parameters.as_mut_ptr(), param_len);
+            core::ptr::copy_nonoverlapping(
+                params.as_ptr(),
+                self.parameters.as_mut_ptr(),
+                param_len,
+            );
         }
         self
     }
@@ -327,7 +331,10 @@ impl AIAgent for SimpleAIAgent {
         let input_str = unsafe { core::str::from_utf8_unchecked(input) };
         if input_str.contains("run") || input_str.contains("exec") {
             Ok(Intent::new(IntentType::SystemCommand, b"sys_exec").with_parameters(input))
-        } else if input_str.contains("read") || input_str.contains("write") || input_str.contains("file") {
+        } else if input_str.contains("read")
+            || input_str.contains("write")
+            || input_str.contains("file")
+        {
             Ok(Intent::new(IntentType::FileOperation, b"file_io").with_parameters(input))
         } else if input_str.contains("get") || input_str.contains("network") {
             Ok(Intent::new(IntentType::NetworkRequest, b"net_req").with_parameters(input))
@@ -470,10 +477,7 @@ mod tests {
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
         let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
-        agent.register_mcp_tool(
-            b"fetch_weather",
-            b"MCP weather fetcher",
-        );
+        agent.register_mcp_tool(b"fetch_weather", b"MCP weather fetcher");
         assert_eq!(agent.mcp_tools.len(), 1);
 
         let opt_score = agent.optimize_prompt_weights();
@@ -486,7 +490,9 @@ mod tests {
         let agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         let id = manager.register_agent(Box::new(agent)).unwrap();
 
-        let response = manager.process_request(id, b"read file /etc/hosts").unwrap();
+        let response = manager
+            .process_request(id, b"read file /etc/hosts")
+            .unwrap();
         let response_str = unsafe { core::str::from_utf8_unchecked(&response) };
         assert_eq!(response_str, "Command executed successfully");
     }

@@ -1,11 +1,10 @@
 /// Sovereign Dependency-Aware Parallel Service Activation & Boot Optimizer for SigmaOS
 /// Replaces traditional linear initialization with a topological-sort dependency scheduler, drastically improving boot speed (defeating systemd).
-
 extern crate alloc;
 
-use alloc::vec::Vec;
 use alloc::boxed::Box;
 use alloc::string::String;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type ServiceID = usize;
@@ -103,9 +102,11 @@ impl BootService for SimpleBootService {
     }
 
     fn activate(&mut self) -> bool {
-        self.status.store(ServiceStatus::Activating as u32, Ordering::SeqCst);
+        self.status
+            .store(ServiceStatus::Activating as u32, Ordering::SeqCst);
         // Simulate successful activation
-        self.status.store(ServiceStatus::Active as u32, Ordering::SeqCst);
+        self.status
+            .store(ServiceStatus::Active as u32, Ordering::SeqCst);
         true
     }
 }
@@ -260,7 +261,13 @@ mod tests {
 
     #[test]
     fn test_boot_service_activation() {
-        let mut service = SimpleBootService::new(1, "syslog", ServicePriority::Critical, ServiceCategory::System, Vec::new());
+        let mut service = SimpleBootService::new(
+            1,
+            "syslog",
+            ServicePriority::Critical,
+            ServiceCategory::System,
+            Vec::new(),
+        );
         assert_eq!(service.status(), ServiceStatus::Inactive);
         assert!(service.activate());
         assert_eq!(service.status(), ServiceStatus::Active);
@@ -271,11 +278,29 @@ mod tests {
         let mut optimizer = BootOptimizer::new();
 
         // 1. syslog (no dependencies)
-        let s1 = SimpleBootService::new(1, "syslog", ServicePriority::Critical, ServiceCategory::System, Vec::new());
+        let s1 = SimpleBootService::new(
+            1,
+            "syslog",
+            ServicePriority::Critical,
+            ServiceCategory::System,
+            Vec::new(),
+        );
         // 2. udev (depends on syslog)
-        let s2 = SimpleBootService::new(2, "udev", ServicePriority::High, ServiceCategory::System, alloc::vec![1]);
+        let s2 = SimpleBootService::new(
+            2,
+            "udev",
+            ServicePriority::High,
+            ServiceCategory::System,
+            alloc::vec![1],
+        );
         // 3. network (depends on udev)
-        let s3 = SimpleBootService::new(3, "network", ServicePriority::Normal, ServiceCategory::Network, alloc::vec![2]);
+        let s3 = SimpleBootService::new(
+            3,
+            "network",
+            ServicePriority::Normal,
+            ServiceCategory::Network,
+            alloc::vec![2],
+        );
 
         optimizer.add_service(Box::new(s3));
         optimizer.add_service(Box::new(s1));
@@ -290,8 +315,20 @@ mod tests {
         let mut optimizer = BootOptimizer::new();
 
         // A depends on B, B depends on A
-        let s1 = SimpleBootService::new(1, "serviceA", ServicePriority::Normal, ServiceCategory::Userland, alloc::vec![2]);
-        let s2 = SimpleBootService::new(2, "serviceB", ServicePriority::Normal, ServiceCategory::Userland, alloc::vec![1]);
+        let s1 = SimpleBootService::new(
+            1,
+            "serviceA",
+            ServicePriority::Normal,
+            ServiceCategory::Userland,
+            alloc::vec![2],
+        );
+        let s2 = SimpleBootService::new(
+            2,
+            "serviceB",
+            ServicePriority::Normal,
+            ServiceCategory::Userland,
+            alloc::vec![1],
+        );
 
         optimizer.add_service(Box::new(s1));
         optimizer.add_service(Box::new(s2));
@@ -303,8 +340,20 @@ mod tests {
     #[test]
     fn test_boot_telemetry_aggregation() {
         let mut optimizer = BootOptimizer::new();
-        let s1 = SimpleBootService::new(1, "syslog", ServicePriority::Critical, ServiceCategory::System, Vec::new());
-        let s2 = SimpleBootService::new(2, "network", ServicePriority::Normal, ServiceCategory::Network, Vec::new());
+        let s1 = SimpleBootService::new(
+            1,
+            "syslog",
+            ServicePriority::Critical,
+            ServiceCategory::System,
+            Vec::new(),
+        );
+        let s2 = SimpleBootService::new(
+            2,
+            "network",
+            ServicePriority::Normal,
+            ServiceCategory::Network,
+            Vec::new(),
+        );
 
         optimizer.add_service(Box::new(s1));
         optimizer.add_service(Box::new(s2));

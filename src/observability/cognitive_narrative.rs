@@ -31,7 +31,9 @@ impl CognitiveOSNarrator {
                 story.push_str(&pid.to_string());
                 story.push_str(" because it requested ");
                 story.push_str(details);
-                story.push_str(" of memory, exceeding our dynamic Multi-Gen LRU allocation limits. ");
+                story.push_str(
+                    " of memory, exceeding our dynamic Multi-Gen LRU allocation limits. ",
+                );
                 story.push_str("This was done to protect other active applications from crashing.");
             }
             SystemEvent::MemoryReallocated => {
@@ -46,7 +48,9 @@ impl CognitiveOSNarrator {
                 story.push_str(&pid.to_string());
                 story.push_str(" from accessing ");
                 story.push_str(details);
-                story.push_str(" because it did not possess the required Capability Token permissions.");
+                story.push_str(
+                    " because it did not possess the required Capability Token permissions.",
+                );
             }
             SystemEvent::ThreadPreempted => {
                 story.push_str("System narrative: To ensure high responsiveness, I temporarily paused process ");
@@ -86,10 +90,12 @@ impl AdaptiveComplianceGater {
                 scrubbed.push_str("[SCRUBBED_ID]");
             }
             // Mask IP addresses
-            else if word.contains('.') && word.split('.').count() == 4 && word.split('.').all(|s| s.parse::<u8>().is_ok()) {
+            else if word.contains('.')
+                && word.split('.').count() == 4
+                && word.split('.').all(|s| s.parse::<u8>().is_ok())
+            {
                 scrubbed.push_str("[SCRUBBED_IP]");
-            }
-            else {
+            } else {
                 scrubbed.push_str(word);
             }
         }
@@ -148,7 +154,7 @@ impl GenerativeConfigParser {
     /// Parse natural-language intent and map to system configuration parameters
     pub fn parse_intent(prompt: &str) -> (usize, i8) {
         let mut target_bytes = 4096; // default 4KB
-        let mut priority_nice = 0;   // default balanced nice
+        let mut priority_nice = 0; // default balanced nice
 
         if prompt.contains("maximum memory") || prompt.contains("huge storage") {
             target_bytes = 1024 * 1024; // 1MB allocation
@@ -237,7 +243,8 @@ mod tests {
 
     #[test]
     fn test_cognitive_narratives() {
-        let story = CognitiveOSNarrator::generate_narrative(SystemEvent::ProcessKilledOom, 1024, "500MB");
+        let story =
+            CognitiveOSNarrator::generate_narrative(SystemEvent::ProcessKilledOom, 1024, "500MB");
         assert!(story.contains("terminate"));
         assert!(story.contains("1024"));
         assert!(story.contains("500MB"));

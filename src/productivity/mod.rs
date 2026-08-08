@@ -18,6 +18,7 @@
 
 // SigmaOS Productivity Module
 pub mod gamification;
+pub mod linux_bsd_tools;
 pub mod media;
 pub mod mind_map;
 pub mod notes;
@@ -27,11 +28,13 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod tmux;
-pub mod linux_bsd_tools;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+};
+pub use linux_bsd_tools::{
+    IfconfigCommand, NetworkInterface, PingCommand, PingResult, ProcessTaskInfo, TopCommand,
 };
 pub use mind_map::{
     MindMapCreator, MindMapLayout, MindMapNode, NodeShape, NodeStyle, RelationshipConnection,
@@ -65,4 +68,3 @@ pub use terminal::{
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
-pub use linux_bsd_tools::{TopCommand, ProcessTaskInfo, IfconfigCommand, NetworkInterface, PingCommand, PingResult};

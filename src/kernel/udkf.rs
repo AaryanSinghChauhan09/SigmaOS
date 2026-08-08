@@ -20,7 +20,8 @@ impl UserDefinedKernelFunctions {
     }
 
     pub fn register_function(&mut self, hook: UdkfHook, script_bytecode: &str) {
-        self.registered_scripts.push((hook, script_bytecode.to_string()));
+        self.registered_scripts
+            .push((hook, script_bytecode.to_string()));
     }
 
     pub fn execute_hook(&self, hook: UdkfHook, input_val: u32) -> u32 {

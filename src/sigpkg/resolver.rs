@@ -16,7 +16,10 @@ pub struct Literal {
 
 impl Literal {
     pub fn new(var_id: usize, is_positive: bool) -> Self {
-        Literal { var_id, is_positive }
+        Literal {
+            var_id,
+            is_positive,
+        }
     }
 }
 
@@ -32,12 +35,19 @@ pub struct DpllSolver {
 
 impl DpllSolver {
     pub fn new(clauses: Vec<Clause>, num_variables: usize) -> Self {
-        DpllSolver { clauses, num_variables }
+        DpllSolver {
+            clauses,
+            num_variables,
+        }
     }
 
     /// Evaluates a clause under the current assignment.
     /// Returns Some(true) if satisfied, Some(false) if unsatisfied (conflict), or None if unresolved.
-    pub fn evaluate_clause(&self, clause: &Clause, assignment: &HashMap<usize, bool>) -> Option<bool> {
+    pub fn evaluate_clause(
+        &self,
+        clause: &Clause,
+        assignment: &HashMap<usize, bool>,
+    ) -> Option<bool> {
         let mut has_unassigned = false;
         for lit in &clause.literals {
             if let Some(&val) = assignment.get(&lit.var_id) {
@@ -145,7 +155,11 @@ impl DpllSolver {
         self.solve_recursive(&mut assignment, 0)
     }
 
-    fn solve_recursive(&self, assignment: &mut HashMap<usize, bool>, next_var: usize) -> Option<HashMap<usize, bool>> {
+    fn solve_recursive(
+        &self,
+        assignment: &mut HashMap<usize, bool>,
+        next_var: usize,
+    ) -> Option<HashMap<usize, bool>> {
         // Step 1: Unit Propagation & Pure Literal Elimination
         let mut local_assignment = assignment.clone();
         if self.unit_propagate(&mut local_assignment).is_err() {
@@ -281,26 +295,36 @@ impl SatSolver {
         let mut target_lits = Vec::new();
         for p in &all_packages {
             if p.name == package_name && self.satisfies_constraint(&p.version, version_constraint) {
-                let id = *pkg_to_var.get(&format!("{}#{}", p.name, p.version)).unwrap();
+                let id = *pkg_to_var
+                    .get(&format!("{}#{}", p.name, p.version))
+                    .unwrap();
                 target_lits.push(Literal::new(id, true));
             }
         }
         if target_lits.is_empty() {
             return Err(ResolveError::NoMatchingVersion(package_name.to_string()));
         }
-        clauses.push(Clause { literals: target_lits });
+        clauses.push(Clause {
+            literals: target_lits,
+        });
 
         // B. If a package is installed, its dependencies must also be satisfied (NOT P or D1_v1 or D1_v2)
         for p in &all_packages {
-            let p_id = *pkg_to_var.get(&format!("{}#{}", p.name, p.version)).unwrap();
+            let p_id = *pkg_to_var
+                .get(&format!("{}#{}", p.name, p.version))
+                .unwrap();
 
             for dep in &p.dependencies {
                 let mut dep_lits = Vec::new();
                 dep_lits.push(Literal::new(p_id, false)); // NOT P
 
                 for cand in &all_packages {
-                    if cand.name == dep.name && self.satisfies_constraint(&cand.version, &dep.version_constraint) {
-                        let c_id = *pkg_to_var.get(&format!("{}#{}", cand.name, cand.version)).unwrap();
+                    if cand.name == dep.name
+                        && self.satisfies_constraint(&cand.version, &dep.version_constraint)
+                    {
+                        let c_id = *pkg_to_var
+                            .get(&format!("{}#{}", cand.name, cand.version))
+                            .unwrap();
                         dep_lits.push(Literal::new(c_id, true)); // cand_v
                     }
                 }
@@ -436,11 +460,11 @@ mod tests {
     fn test_circular_dependency_detection() {
         let mut solver = SatSolver::new();
 
-        let pkg_a = Package {
-            name: "A".to_string(),
-            version: Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: vec![Dependency {
+        let pkg_a = Package::new(
+            "A".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            vec![Dependency {
                 name: "B".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
@@ -468,8 +492,12 @@ mod tests {
     fn test_dpll_solving() {
         // Setup simple CNF: (v0 or v1) and (-v0 or -v1)
         let clauses = vec![
-            Clause { literals: vec![Literal::new(0, true), Literal::new(1, true)] },
-            Clause { literals: vec![Literal::new(0, false), Literal::new(1, false)] },
+            Clause {
+                literals: vec![Literal::new(0, true), Literal::new(1, true)],
+            },
+            Clause {
+                literals: vec![Literal::new(0, false), Literal::new(1, false)],
+            },
         ];
         let dpll = DpllSolver::new(clauses, 2);
         let assignment = dpll.solve().unwrap();

@@ -297,7 +297,8 @@ impl FloppyDiskDevice {
         }
         let mut sectors = Vec::new();
         // Standard floppy disk has 2880 sectors of 512 bytes each
-        for _ in 0..10 { // Seed 10 sectors for testing efficiency
+        for _ in 0..10 {
+            // Seed 10 sectors for testing efficiency
             sectors.push([0xAA; 512]);
         }
         FloppyDiskDevice {
@@ -332,7 +333,8 @@ impl Device for FloppyDiskDevice {
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
         match command {
-            0xF001 => { // Turn motor off/on
+            0xF001 => {
+                // Turn motor off/on
                 self.motor_on = arg != 0;
                 Ok(0)
             }
@@ -548,7 +550,8 @@ impl Device for AdLibSoundDevice {
     }
     fn ioctl(&mut self, command: u32, arg: usize) -> Result<usize, DeviceError> {
         match command {
-            0xC001 => { // Set active synth voice
+            0xC001 => {
+                // Set active synth voice
                 self.active_voice = arg as u32;
                 Ok(0)
             }
@@ -598,7 +601,8 @@ impl Device for IsaBusDevice {
     }
     fn ioctl(&mut self, command: u32, _arg: usize) -> Result<usize, DeviceError> {
         match command {
-            0xB001 => { // Query detected devices count
+            0xB001 => {
+                // Query detected devices count
                 Ok(self.device_count)
             }
             _ => Err(DeviceError::NotSupported),

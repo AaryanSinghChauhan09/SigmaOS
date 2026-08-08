@@ -11,7 +11,7 @@ pub struct FileBlock {
 pub struct SigmaFS {
     pub file_blocks: HashMap<String, FileBlock>, // content-addressed block deduplication
     pub semantic_index: HashMap<String, String>, // search terms -> file names
-    pub audit_trail_hashes: Vec<String>, // Tamper-evident SHA-256 blockchain hash ledger
+    pub audit_trail_hashes: Vec<String>,         // Tamper-evident SHA-256 blockchain hash ledger
 }
 
 impl SigmaFS {
@@ -35,10 +35,13 @@ impl SigmaFS {
         let content_hash = format!("block-hash-{}", sum);
 
         if !self.file_blocks.contains_key(&content_hash) {
-            self.file_blocks.insert(content_hash.clone(), FileBlock {
-                hash: content_hash.clone(),
-                content: content.to_vec(),
-            });
+            self.file_blocks.insert(
+                content_hash.clone(),
+                FileBlock {
+                    hash: content_hash.clone(),
+                    content: content.to_vec(),
+                },
+            );
         }
 
         // Write blockchain audit trail block
@@ -53,7 +56,8 @@ impl SigmaFS {
 
         // Map semantic terms for search (simulated NLP indexer)
         if file_name.contains("report") {
-            self.semantic_index.insert("finance".to_string(), file_name.to_string());
+            self.semantic_index
+                .insert("finance".to_string(), file_name.to_string());
         }
 
         Ok(content_hash)
@@ -85,7 +89,9 @@ impl SigmaFhsRouter {
         rules.insert(".bin".to_string(), "/bin".to_string());
         rules.insert(".log".to_string(), "/var/log".to_string());
         rules.insert(".so".to_string(), "/lib".to_string());
-        SigmaFhsRouter { routing_rules: rules }
+        SigmaFhsRouter {
+            routing_rules: rules,
+        }
     }
 
     /// Dynamically routes paths, bypassing rigid static Linux FHS mappings
@@ -361,18 +367,25 @@ impl SigmaFsCow {
     }
 
     pub fn write_block_cow(&mut self, filename: &str, logical: u64, physical: u64) {
-        let pointers = self.block_allocations.entry(filename.to_string()).or_insert(Vec::new());
+        let pointers = self
+            .block_allocations
+            .entry(filename.to_string())
+            .or_insert(Vec::new());
         // CoW logic: update existing logical mapping to new physical block on-the-fly
         if let Some(p) = pointers.iter_mut().find(|pt| pt.logical_addr == logical) {
             p.physical_addr = physical;
         } else {
-            pointers.push(CowBlockPointer { logical_addr: logical, physical_addr: physical });
+            pointers.push(CowBlockPointer {
+                logical_addr: logical,
+                physical_addr: physical,
+            });
         }
     }
 
     pub fn create_cow_snapshot(&mut self, snap_id: &str) {
         // Save current block mapping tree states (ZFS/btrfs transaction tree copy)
-        self.snapshots.insert(snap_id.to_string(), self.block_allocations.clone());
+        self.snapshots
+            .insert(snap_id.to_string(), self.block_allocations.clone());
     }
 }
 
@@ -399,11 +412,14 @@ impl SigmaFsVolume {
 
     pub fn create_volume_group(&mut self, vg_name: &str, disks: Vec<&str>, size_mb: u64) {
         let disks_str: Vec<String> = disks.iter().map(|d| d.to_string()).collect();
-        self.volume_groups.insert(vg_name.to_string(), LogicalVolume {
-            name: vg_name.to_string(),
-            physical_disks: disks_str,
-            total_size_mb: size_mb,
-        });
+        self.volume_groups.insert(
+            vg_name.to_string(),
+            LogicalVolume {
+                name: vg_name.to_string(),
+                physical_disks: disks_str,
+                total_size_mb: size_mb,
+            },
+        );
     }
 
     pub fn query_volume_capacity_mb(&self, vg_name: &str) -> Option<u64> {
@@ -545,8 +561,12 @@ mod tests {
     #[test]
     fn test_sigma_fs_deduplication() {
         let mut fs = SigmaFS::new();
-        let hash1 = fs.write_file_block("report-q1.txt", b"REVENUE_STABLE").unwrap();
-        let hash2 = fs.write_file_block("report-q2.txt", b"REVENUE_STABLE").unwrap();
+        let hash1 = fs
+            .write_file_block("report-q1.txt", b"REVENUE_STABLE")
+            .unwrap();
+        let hash2 = fs
+            .write_file_block("report-q2.txt", b"REVENUE_STABLE")
+            .unwrap();
 
         // Identical contents must map to the same content hash (deduplicated)
         assert_eq!(hash1, hash2);
@@ -556,7 +576,8 @@ mod tests {
     #[test]
     fn test_sigma_fs_semantic_and_audit() {
         let mut fs = SigmaFS::new();
-        fs.write_file_block("financial_report.csv", b"SALES_GROWTH_15_PERCENT").unwrap();
+        fs.write_file_block("financial_report.csv", b"SALES_GROWTH_15_PERCENT")
+            .unwrap();
 
         let found = fs.semantic_search("finance").unwrap();
         assert_eq!(found, "financial_report.csv");
@@ -593,7 +614,10 @@ mod tests {
         ns.write_isolated_file("app.py", b"print('hello lts')".to_vec());
 
         assert_eq!(ns.bind_mounts.len(), 1);
-        assert_eq!(ns.read_isolated_file("app.py").unwrap(), &b"print('hello lts')".to_vec());
+        assert_eq!(
+            ns.read_isolated_file("app.py").unwrap(),
+            &b"print('hello lts')".to_vec()
+        );
     }
 
     #[test]
@@ -612,9 +636,17 @@ mod tests {
     #[test]
     fn test_sigma_disaster_recovery_cleaner() {
         let mut cleaner = SigmaDisasterRecoveryCleaner::new();
-        cleaner.register_target_file("/home/user/.cache/thumbnails/thumb.png", "SystemCache", 4096);
+        cleaner.register_target_file(
+            "/home/user/.cache/thumbnails/thumb.png",
+            "SystemCache",
+            4096,
+        );
         cleaner.register_target_file("/var/log/httpd/access.log", "TemporaryLogs", 204800);
-        cleaner.register_target_file("/home/user/.mozilla/firefox/places.sqlite", "BrowserHistory", 1024000);
+        cleaner.register_target_file(
+            "/home/user/.mozilla/firefox/places.sqlite",
+            "BrowserHistory",
+            1024000,
+        );
 
         assert_eq!(cleaner.targets.len(), 3);
 
@@ -654,7 +686,12 @@ mod tests {
         cow.create_cow_snapshot("snap_t0");
         assert!(cow.snapshots.contains_key("snap_t0"));
 
-        let snap_blocks = cow.snapshots.get("snap_t0").unwrap().get("rootfs.img").unwrap();
+        let snap_blocks = cow
+            .snapshots
+            .get("snap_t0")
+            .unwrap()
+            .get("rootfs.img")
+            .unwrap();
         assert_eq!(snap_blocks[1].physical_addr, 4096);
     }
 

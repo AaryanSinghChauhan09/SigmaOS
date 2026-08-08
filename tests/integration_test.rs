@@ -7,15 +7,20 @@ use std::collections::HashMap;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sigmaos::filesystem::sigma_fs::{JournalState, RaidLevel};
     use sigmaos::compatibility::canonical::{
-        ZorinAppearanceSwitcher, ZorinLayoutPreset, ZorinConnectHub, ZorinWineLayer, ZorinLiteOptimizer,
-        SigmaEcosystemInit, FhsRunlevel, SigmaEcosystemProfiler, GraphicPresetMode,
-        SigmaOnboardingWelcome, SigmaOnboardingLog,
+        FhsRunlevel, GraphicPresetMode, SigmaEcosystemInit, SigmaEcosystemProfiler,
+        SigmaOnboardingLog, SigmaOnboardingWelcome, ZorinAppearanceSwitcher, ZorinConnectHub,
+        ZorinLayoutPreset, ZorinLiteOptimizer, ZorinWineLayer,
     };
-    use sigmaos::productivity::media::{SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, SubtitleFormat};
-    use sigmaos::power::governor::{SigmaSupportResourceOptimizer, SigmaSupportPriorityOptimizer};
-    use sigmaos::logging::rotation::{SimpleLogFile, LogSeverity, LogFacility, SimpleLogRotator, SimpleLogCompressor, LogCompressor};
+    use sigmaos::filesystem::sigma_fs::{JournalState, RaidLevel};
+    use sigmaos::logging::rotation::{
+        LogCompressor, LogFacility, LogSeverity, SimpleLogCompressor, SimpleLogFile,
+        SimpleLogRotator,
+    };
+    use sigmaos::power::governor::{SigmaSupportPriorityOptimizer, SigmaSupportResourceOptimizer};
+    use sigmaos::productivity::media::{
+        SigmaSupportSubtitleEdit, SigmaSupportSubtitleSync, SubtitleFormat,
+    };
 
     #[test]
     fn test_system_integration() {
@@ -23,7 +28,9 @@ mod tests {
         // 1. Composable FHS & Storage Replacements (ext4, btrfs, ZFS, LVM, mdadm, LUKS, VirtIO)
         // =========================================================================
         let mut fs = SigmaFS::new();
-        let block_hash = fs.write_file_block("financial_report.csv", b"SALES_DATA_X").unwrap();
+        let block_hash = fs
+            .write_file_block("financial_report.csv", b"SALES_DATA_X")
+            .unwrap();
         assert!(fs.verify_audit_trail_integrity());
 
         // FHS Routing
@@ -38,7 +45,10 @@ mod tests {
         let mut ns = SigmaFhsNamespace::new("sandboxed-user-ns");
         ns.bind_directory("/var/lib");
         ns.write_isolated_file("index.html", b"<h1>Sovereign</h1>".to_vec());
-        assert_eq!(ns.read_isolated_file("index.html").unwrap(), &b"<h1>Sovereign</h1>".to_vec());
+        assert_eq!(
+            ns.read_isolated_file("index.html").unwrap(),
+            &b"<h1>Sovereign</h1>".to_vec()
+        );
 
         // FHS Access Auditor
         let mut auditor = SigmaFhsAuditor::new();
@@ -98,7 +108,8 @@ mod tests {
         // =========================================================================
         // 3. Syslog-parity multi-generation rotations, facilities, and RLE compression
         // =========================================================================
-        let log_file = SimpleLogFile::new(10, b"/var/log/cron").with_syslog(LogSeverity::Warn, LogFacility::Cron);
+        let log_file = SimpleLogFile::new(10, b"/var/log/cron")
+            .with_syslog(LogSeverity::Warn, LogFacility::Cron);
         assert_eq!(log_file.severity, LogSeverity::Warn);
         assert_eq!(log_file.facility, LogFacility::Cron);
 
@@ -132,7 +143,14 @@ mod tests {
         assert_eq!(volumes[0].name, "rust.001");
 
         let mut flameshot = FlameshotAnnotator::new(1920, 1080);
-        flameshot.draw_annotation(AnnotationShape::Arrow, 10, 10, 50, 50, ColorRgba::new(0, 0, 255, 255));
+        flameshot.draw_annotation(
+            AnnotationShape::Arrow,
+            10,
+            10,
+            50,
+            50,
+            ColorRgba::new(0, 0, 255, 255),
+        );
 
         let mut obs = ObsStudioMixer::new("Scene A");
         obs.add_video_source("Display", 1.0, false);
@@ -157,7 +175,10 @@ mod tests {
         assert!((peak - 0.665).abs() < 1e-5);
 
         let mut irfan = IrfanViewEngine::new();
-        assert_eq!(irfan.batch_format_convert(&["img1.png", "img2.png"], "BMP"), 2);
+        assert_eq!(
+            irfan.batch_format_convert(&["img1.png", "img2.png"], "BMP"),
+            2
+        );
 
         // =========================================================================
         // 5. Zorin OS, antiX, and EndeavourOS Parity Features
@@ -168,7 +189,10 @@ mod tests {
 
         let mut zorin_conn = ZorinConnectHub::new();
         zorin_conn.pair_new_device("tab-12", "Sovereign Tablet");
-        assert_eq!(zorin_conn.push_notification_to_all_devices("Test", "Zorin connect alert"), 1);
+        assert_eq!(
+            zorin_conn.push_notification_to_all_devices("Test", "Zorin connect alert"),
+            1
+        );
 
         let mut wine = ZorinWineLayer::new("~/.wine");
         assert!(wine.launch_windows_executable("game.exe").is_ok());

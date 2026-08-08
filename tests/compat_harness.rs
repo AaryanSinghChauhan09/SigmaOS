@@ -51,7 +51,9 @@ impl PosixTranslator {
         map.insert(3, "sys_close");
         map.insert(57, "sys_fork");
         map.insert(59, "sys_execve");
-        Self { registered_calls: map }
+        Self {
+            registered_calls: map,
+        }
     }
 
     /// Translates POSIX syscall code to sovereign internal API names
@@ -89,7 +91,10 @@ mod tests {
         // 2. Mock PE EXE binary buffer
         let mut pe_data = [0u8; 64];
         pe_data[0..2].copy_from_slice(&PE_MAGIC);
-        assert_eq!(BinaryLoader::detect_format(&pe_data), BinaryFormat::Pe32Plus);
+        assert_eq!(
+            BinaryLoader::detect_format(&pe_data),
+            BinaryFormat::Pe32Plus
+        );
 
         // 3. Mock WebAssembly module buffer
         let mut wasm_data = [0u8; 64];
@@ -97,7 +102,10 @@ mod tests {
         assert_eq!(BinaryLoader::detect_format(&wasm_data), BinaryFormat::Wasm);
 
         // 4. Unknown buffer
-        assert_eq!(BinaryLoader::detect_format(b"RANDOM_DATA"), BinaryFormat::Unknown);
+        assert_eq!(
+            BinaryLoader::detect_format(b"RANDOM_DATA"),
+            BinaryFormat::Unknown
+        );
     }
 
     #[test]
