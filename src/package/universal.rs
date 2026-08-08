@@ -269,7 +269,27 @@ impl Default for DependencyResolver {
     }
 }
 
+<<<<<<< HEAD
 /// Transactional package manager checkpoint
+||||||| bb639d483
+/// Package snapshot representing a saved system state of installed packages
+=======
+/// Transactional history representing a history of installed and removed packages
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub transactions: Vec<String>,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        Self {
+            transactions: Vec::new(),
+        }
+    }
+}
+
+/// Package snapshot representing a saved system state of installed packages
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 #[derive(Debug, Clone)]
 pub struct PackageCheckpoint {
     pub checkpoint_id: usize,
@@ -333,6 +353,8 @@ pub struct UniversalPackageManager {
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub transaction_history: TransactionalHistory,
     pub metadata_cache: HashMap<String, UnifiedPackage>,
+    pub snapshots: HashMap<usize, PackageSnapshot>,
+    pub next_snapshot_id: usize,
 }
 
 impl UniversalPackageManager {
@@ -344,6 +366,8 @@ impl UniversalPackageManager {
             installed_packages: HashMap::new(),
             transaction_history: TransactionalHistory::new(),
             metadata_cache: HashMap::new(),
+            snapshots: HashMap::new(),
+            next_snapshot_id: 1,
         };
 
         manager.add_default_adapters();
@@ -474,6 +498,154 @@ impl UniversalPackageManager {
     pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
         self.packages.get(name)
     }
+<<<<<<< HEAD
+||||||| bb639d483
+
+    /// Create a snapshot of currently installed packages state
+    pub fn create_snapshot(&mut self, description: String) -> usize {
+        let id = self.next_snapshot_id;
+        self.next_snapshot_id += 1;
+
+        let snapshot = PackageSnapshot {
+            id,
+            description,
+            timestamp: 0,
+            installed_packages: self.installed_packages.clone(),
+        };
+
+        self.snapshots.insert(id, snapshot);
+        id
+    }
+
+    /// Delete a package snapshot
+    pub fn delete_snapshot(&mut self, id: usize) -> Result<(), PackageError> {
+        if self.snapshots.remove(&id).is_none() {
+            return Err(PackageError::PackageNotFound(format!("Snapshot ID {}", id)));
+        }
+        Ok(())
+    }
+
+    /// List all package snapshots
+    pub fn list_snapshots(&self) -> Vec<(usize, String)> {
+        let mut list = Vec::new();
+        for (id, snap) in &self.snapshots {
+            list.push((*id, snap.description.clone()));
+        }
+        list.sort_by_key(|&(id, _)| id);
+        list
+    }
+
+    /// Rollback the active package state exactly to a previously saved snapshot
+    pub fn rollback_to_snapshot(&mut self, id: usize) -> Result<(), PackageError> {
+        let snapshot = self
+            .snapshots
+            .get(&id)
+            .ok_or_else(|| PackageError::PackageNotFound(format!("Snapshot ID {}", id)))?
+            .clone();
+
+        // 1. Identify and uninstall packages currently installed but not in the snapshot
+        let mut to_uninstall = Vec::new();
+        for pkg_name in self.installed_packages.keys() {
+            if !snapshot.installed_packages.contains_key(pkg_name) {
+                to_uninstall.push(pkg_name.clone());
+            }
+        }
+
+        for pkg_name in to_uninstall {
+            self.remove(&pkg_name)?;
+        }
+
+        // 2. Identify and reinstall packages in the snapshot but not currently installed
+        let mut to_install = Vec::new();
+        for (pkg_name, _) in &snapshot.installed_packages {
+            if !self.installed_packages.contains_key(pkg_name) {
+                to_install.push(pkg_name.clone());
+            }
+        }
+
+        for pkg_name in to_install {
+            self.install(&pkg_name)?;
+        }
+
+        // 3. Sync full installed_packages state exactly with the snapshot
+        self.installed_packages = snapshot.installed_packages;
+
+        Ok(())
+    }
+=======
+
+    /// Create a snapshot of currently installed packages state
+    pub fn create_snapshot(&mut self, description: String) -> usize {
+        let id = self.next_snapshot_id;
+        self.next_snapshot_id += 1;
+
+        let snapshot = PackageSnapshot {
+            id,
+            description,
+            timestamp: 0,
+            installed_packages: self.installed_packages.clone(),
+        };
+
+        self.snapshots.insert(id, snapshot);
+        id
+    }
+
+    /// Delete a package snapshot
+    pub fn delete_snapshot(&mut self, id: usize) -> Result<(), PackageError> {
+        if self.snapshots.remove(&id).is_none() {
+            return Err(PackageError::PackageNotFound(format!("Snapshot ID {}", id)));
+        }
+        Ok(())
+    }
+
+    /// List all package snapshots
+    pub fn list_snapshots(&self) -> Vec<(usize, String)> {
+        let mut list = Vec::new();
+        for (id, snap) in &self.snapshots {
+            list.push((*id, snap.description.clone()));
+        }
+        list.sort_by_key(|&(id, _)| id);
+        list
+    }
+
+    /// Rollback the active package state exactly to a previously saved snapshot
+    pub fn rollback_to_snapshot(&mut self, id: usize) -> Result<(), PackageError> {
+        let snapshot = self
+            .snapshots
+            .get(&id)
+            .ok_or_else(|| PackageError::PackageNotFound(format!("Snapshot ID {}", id)))?
+            .clone();
+
+        // 1. Identify and uninstall packages currently installed but not in the snapshot
+        let mut to_uninstall: Vec<String> = Vec::new();
+        for pkg_name in self.installed_packages.keys() {
+            if !snapshot.installed_packages.contains_key(pkg_name.as_str()) {
+                to_uninstall.push(pkg_name.clone());
+            }
+        }
+
+        for pkg_name in to_uninstall {
+            self.remove(&pkg_name)?;
+        }
+
+        // 2. Identify and reinstall packages in the snapshot but not currently installed
+        let mut to_install: Vec<String> = Vec::new();
+        for (pkg_name, _) in &snapshot.installed_packages {
+            if !self.installed_packages.contains_key(pkg_name.as_str()) {
+                to_install.push(pkg_name.clone());
+            }
+        }
+
+        for pkg_name in to_install {
+            self.install(&pkg_name)?;
+        }
+
+        // 3. Sync full installed_packages state exactly with the snapshot
+        self.installed_packages = snapshot.installed_packages;
+
+        Ok(())
+    }
+>>>>>>> origin/jules-14967948003256892231-7e7b3d2e
 }
 
 impl Default for UniversalPackageManager {
