@@ -5,18 +5,16 @@ pub mod mint_linux;
 pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod cross_platform_kernel;
-
-pub use legacy_adapters::{
-    KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
-    APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
-    WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
-    LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
-    GLOBAL_WORKLOAD_OPTIMIZER,
-};
-pub use freedos::{ConfigSysSetting, TsrProgram, FatDirectoryEntry, FreeDosEmulator};
+pub mod wasm_sandbox;
+pub mod absorb_tools;
+pub mod tiny_core;
+pub mod apache_ossie;
+pub mod sovereign_suite;
+pub mod fedora;
+pub mod bsd;
+pub mod innovations;
+pub mod india_professional_tools;
+pub mod debian;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat,
@@ -56,7 +54,7 @@ pub use relay_nexus::{
 
 pub use solid_kernel::{
     IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
-    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus as SolidSigmaFSPlusPlus,
 };
 
 pub use cross_platform_kernel::{
@@ -70,4 +68,28 @@ pub use historic_linux::{
     Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
     VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
     ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+};
+
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    FirewalldZone, RichRule, FirewalldZoneManager, PartitionLayout, AnacondaKickstartInstaller,
+    CoprBuildJob, CoprUserRepoBuilder, IpaUser, HbacRule, FreeIpaDirectoryService,
+};
+
+pub use bsd::{
+    BsdJail, FreeBsdJailManager, OpenBsdSysctlKernelMib,
+};
+
+pub use innovations::{
+    WorkloadCategory, SigmaScheduler, UniversalAbiTranslator, SigmaFsPlusPlus, SelfHealingOS,
+};
+
+pub use india_professional_tools::{
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper, PMWaniHotspotController,
+    DigiYatraPassScanner, IrctcPnrTracker,
+};
+
+pub use debian::{
+    SysVinitRunlevel, SysVinitManager, AptPackageMetadata, AptRepositorySynchronizer,
+    AlternativeProvider, DebianAlternativesSystem, DebootstrapEngine,
 };

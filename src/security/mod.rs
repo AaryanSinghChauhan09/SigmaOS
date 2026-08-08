@@ -2,11 +2,8 @@
 pub mod capability;
 pub mod pledge;
 pub mod vulnerability;
-pub mod clipboard;
-pub mod intrusion;
-pub mod password;
-pub mod parrot_linux;
-pub mod selinux;
+pub mod hardening;
+pub mod defensive_audit;
 
 pub use parrot_linux::{
     AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
@@ -23,6 +20,4 @@ pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport
 pub use hardening::{
     secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
 };
-pub use deobfuscation::{
-    ArchInstruction, CpuArch, InstructionType, AbstractValue, DisassemblerCallback, MetasmEmulator, DeobfuscationEngine,
-};
+pub use defensive_audit::{DefensiveAuditSystem, ForensicBlock, MaliciousSignature};

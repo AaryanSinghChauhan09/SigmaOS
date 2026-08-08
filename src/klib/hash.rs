@@ -6,7 +6,11 @@
 /// Simple hash function for strings (DJB2 algorithm)
 /// Optimised by Bolt ⚡: redirects to simple_hash which utilizes a 4-byte unrolled chunk loop to maximize instruction pipelining.
 pub fn djb2_hash(s: &str) -> u64 {
-    simple_hash(s.as_bytes())
+    let mut hash: u64 = 5381;
+    for byte in s.bytes() {
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
+    }
+    hash
 }
 
 /// Simple hash function for byte arrays
@@ -14,18 +18,8 @@ pub fn djb2_hash(s: &str) -> u64 {
 /// to reduce loop overhead, branch predictions, and maximize instruction-level parallelism.
 pub fn simple_hash(data: &[u8]) -> u64 {
     let mut hash: u64 = 5381;
-    let chunks = data.chunks_exact(4);
-    let remainder = chunks.remainder();
-
-    for chunk in chunks {
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(chunk[0] as u64);
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(chunk[1] as u64);
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(chunk[2] as u64);
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(chunk[3] as u64);
-    }
-
-    for &byte in remainder {
-        hash = (hash << 5).wrapping_add(hash).wrapping_add(byte as u64);
+    for &byte in data {
+        hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u64);
     }
     hash
 }
@@ -76,8 +70,7 @@ impl SimpleHasher {
     }
 
     pub fn write(&mut self, byte: u8) {
-        // Optimised by Bolt ⚡: Removed redundant second hashing step of the same byte to cut hashing CPU cycles in half.
-        self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(byte as u64);
+        self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
     }
 
     pub fn finish(&self) -> u64 {
@@ -97,18 +90,8 @@ impl core::hash::Hasher for SimpleHasher {
     }
 
     fn write(&mut self, bytes: &[u8]) {
-        let chunks = bytes.chunks_exact(4);
-        let remainder = chunks.remainder();
-
-        for chunk in chunks {
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(chunk[0] as u64);
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(chunk[1] as u64);
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(chunk[2] as u64);
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(chunk[3] as u64);
-        }
-
-        for &byte in remainder {
-            self.state = (self.state << 5).wrapping_add(self.state).wrapping_add(byte as u64);
+        for &byte in bytes {
+            self.state = self.state.wrapping_shl(5).wrapping_add(self.state).wrapping_add(byte as u64);
         }
     }
 }
