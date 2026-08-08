@@ -150,7 +150,197 @@ To ensure SigmaOS transcends the performance limits of bloated legacy monolithic
 
 ---
 
-## 📋 SigmaOS 100-Item Future Development Roadmap
+## 🛠️ Market-Inspired Architectural Foundations
+
+SigmaOS fuses the unique strengths of the world's leading operating systems:
+
+```
+                  +-------------------------------------------------+
+                  |                 SIGMAOS HYBRID                  |
+                  +-------------------------------------------------+
+                    /        |              |             |        \
+                   /         |              |             |         \
+                  v          v              v             v          v
+   +------------------+ +----------+ +-------------+ +---------+ +-----------+
+   |   WINDOWS NT     | |  macOS   | |    LINUX    | |   BSD   | |  ANDROID  |
+   +------------------+ +----------+ +-------------+ +---------+ +-----------+
+   | - WDM Drivers    | | - Mach   | | - cgroups   | | - Pledge| | - Binder  |
+   | - Paged pools    | |   IPC    | | - OverlayFS | | - Unveil| | - Fine-   |
+   | - Registry       | | - Sandbox| | - Namespaces| | - Jails | |   grained |
+   |   Configuration  | |   Seals  | |   VFS       | |         | |   Perms   |
+   +------------------+ +----------+ +-------------+ +---------+ +-----------+
+```
+
+### 1. Windows NT-Style Subsystems
+* **Driver Object Model (WDM):** An I/O Manager (`IoManager`) overseeing unified `DriverObject`, `DeviceObject`, and `DeviceExtension` states, ensuring strict object tracking and driver-specific cleanup.
+* **Pool Memory Management:** Division of kernel memory into swappable `Paged` pools and resident `NonPaged` pools, using standard 4-character Pool Tags to detect memory leaks.
+* **Central Registry Database:** A hierarchical configuration backend for drivers, permissions, and system variables, avoiding raw files for core boot structures.
+
+### 2. macOS & iOS-Style Subsystems
+* **Mach IPC Portals:** Zero-copy, capability-backed messaging channels passing structured IPC data and port capabilities across task boundaries without overhead.
+* **Application Sandboxing Seals:** Cryptographic signing of binaries coupled with explicit capability seals, isolating applications from the base OS and user data.
+
+### 3. Linux & Android-Style Subsystems
+* **Ecosystem Translation & Containers:** OverlayFS stacked filesystems, rootless unprivileged user namespaces (UID/GID translation), and Android Binder-like transaction systems.
+* **Ecosystem Adapters:** Seamless translation interfaces for **Nix** (hermetic storage), **Portage** (micro-architecture target compiling), **Alpine APK**, **Apt/Deb**, and **Flatpak** into native capability gates.
+
+### 4. BSD-Style Hardening
+* **Pledge & Unveil:** System-call restriction tables dynamically activated by processes to restrict their own execution surface area (e.g., calling `pledge("stdio rpath")` to lose networking capabilities permanently).
+* **Jails:** Resource-isolated virtual virtualization environments with independent networks and read-only host-root access.
+
+---
+
+## 📊 High-Level Comparison & Target Parity
+
+| Feature Subsystem | SigmaOS (Current) | Linux Distros (Ubuntu/Arch) | Windows 11 | macOS Sonoma | Android 14 / KaiOS | SigmaOS Target |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Kernel & Scheduling** | EEVDF Core, BORE Burst-Sensing scheduler | Completely Fair Scheduler / EEVDF | NT Priority Levels | Mach Thread Ports | Linux CFS | **EEVDF BORE (Self-tuning AI/Compute Workloads)** |
+| **Driver Framework** | Windows-style WDM (`IoManager`, `DeviceExtension`) | Linux Monolithic Modules | Windows Driver Foundation (WDF) | DriverKit (User-space C++) | HAL / Linux Kernels | **Hybrid User-Space DriverKit / Kernel WDM** |
+| **Memory Allocation** | NT Tagged `Paged`/`NonPaged` Pools | Buddy & Slab (SLUB) | NT Heap & VirtualAlloc | Zone Allocator | jemalloc / Ashmem | **Pristine Tagged Pool Allocator with Paging** |
+| **Networking** | Partial TCP/UDP, TLS 1.3 PSK 0-RTT | Mature TCP/IP, Multipath TCP | Full Enterprise Stack | NetworkExtension | Low-power mobile network stacks | **TLS 1.3 resump. + PQC Secured TCP/IP stack** |
+| **Sandboxing & Sec.** | Capability Gates, Seccomp, Jails | SELinux, AppArmor, Jails | AppContainer, Virtualization | App Sandbox, TCC | SELinux + Android Permissions | **Sovereign Capability-Gate + Pledge/Unveil** |
+| **Package Management** | Universal Adapters, Content-Addressed | apt, pacman, flatpak | WinGet, MS Store | Mac App Store, Homebrew | Google Play, KaiStore | **Sovereign Multi-Format Hermetic Storage** |
+
+---
+
+## 🚀 Execution Roadmap
+
+### Phase 1: Core Subsystem Hardening (Current to Next 6 Months)
+1. **Stabilize TLS & Low-Latency Networking:**
+   * Fully integrate modern TLS 1.3 PSK 0-RTT session ticket resumption with native TCP/UDP sockets.
+   * Expand capability-gate permission guards to cover IPv4/IPv6 socket creation.
+2. **Expand the WDM Driver Tree:**
+   * Build out USB HID (Keyboard/Mouse) and basic Framebuffer graphics drivers using the new `DriverObject` standard.
+   * Connect driver rollbacks to the Sovereign Self-Healing subsystem to handle device-initialization failures gracefully.
+3. **PQC & Sandboxed Package Management:**
+   * Productionize the universal package manager translation engine to seamlessly ingest Apt, Flatpak, and Snapcraft files, mapping their permissions directly to SigmaOS capabilities.
+
+### Phase 2: Graphic/UI Composition & IPC Boost (Months 6 to 12)
+1. **Zenith Desktop Compositor:**
+   * Develop a GPU-accelerated window compositor leveraging Mach-style zero-copy IPC ports to transfer framebuffers between applications and the window manager.
+2. **Unified Virtual Filesystem (SigmaFS):**
+   * Integrate Ubuntu-style OverlayFS stacking to mount container runtimes efficiently.
+   * Implement a transactional metadata journal to prevent partition corruption upon power failure.
+3. **Process Pledge & Unveil Hooks:**
+   * Embed lightweight OpenBSD-inspired system-call filters directly into the kernel task runner, enabling applications to restrict their own access dynamically.
+
+### Phase 3: Regional Dominance & OEM Bundling (Months 12 to 24)
+1. **India-First Compliance Stack:**
+   * Integrate local ecosystem services (UPI transaction APIs, Aadhaar authentication modules, GST compliance tools).
+   * Provide native, performant multi-lingual localization across the entire userland and virtual console system.
+2. **OEM Partnerships & Low-Cost Hardware Optimization:**
+   * Partner with device makers to bundle SigmaOS as the default OS on affordable, energy-efficient ARM and RISC-V laptops.
+   * Optimize the kernel scheduler for asymmetrical big.LITTLE architectures to maximize battery life.
+3. **Secure Workstation AI Orchestration:**
+   * Integrate secure, local LLM execution pipelines within sandboxed, rootless namespaces.
+   * Expose a native AI-agent automation API, positioning SigmaOS as the leading environment for developers and secure enterprise workloads.
+
+---
+
+## ⚠️ Key Mitigation Strategies
+
+* **The Driver Gap:** Overcome standard hardware-compatibility hurdles by creating virtual translation wrappers for generic Linux kernel driver models.
+* **Developer Friction:** Provide robust developer tools (SDKs, compilers, documentation) alongside seamless packaging translation adaptors (like the native Flatpak parser) to minimize onboarding effort.
+* **Security vs. Usability:** Maintain a smooth user experience by presenting granular capability gates as simple, intuitive system prompts (similar to macOS TCC or Android permission dialogs).
+
+---
+
+## 🛠️ Market-Inspired Architectural Foundations
+
+SigmaOS fuses the unique strengths of the world's leading operating systems:
+
+```
+                  +-------------------------------------------------+
+                  |                 SIGMAOS HYBRID                  |
+                  +-------------------------------------------------+
+                    /        |              |             |        \
+                   /         |              |             |         \
+                  v          v              v             v          v
+   +------------------+ +----------+ +-------------+ +---------+ +-----------+
+   |   WINDOWS NT     | |  macOS   | |    LINUX    | |   BSD   | |  ANDROID  |
+   +------------------+ +----------+ +-------------+ +---------+ +-----------+
+   | - WDM Drivers    | | - Mach   | | - cgroups   | | - Pledge| | - Binder  |
+   | - Paged pools    | |   IPC    | | - OverlayFS | | - Unveil| | - Fine-   |
+   | - Registry       | | - Sandbox| | - Namespaces| | - Jails | |   grained |
+   |   Configuration  | |   Seals  | |   VFS       | |         | |   Perms   |
+   +------------------+ +----------+ +-------------+ +---------+ +-----------+
+```
+
+### 1. Windows NT-Style Subsystems
+* **Driver Object Model (WDM):** An I/O Manager (`IoManager`) overseeing unified `DriverObject`, `DeviceObject`, and `DeviceExtension` states, ensuring strict object tracking and driver-specific cleanup.
+* **Pool Memory Management:** Division of kernel memory into swappable `Paged` pools and resident `NonPaged` pools, using standard 4-character Pool Tags to detect memory leaks.
+* **Central Registry Database:** A hierarchical configuration backend for drivers, permissions, and system variables, avoiding raw files for core boot structures.
+
+### 2. macOS & iOS-Style Subsystems
+* **Mach IPC Portals:** Zero-copy, capability-backed messaging channels passing structured IPC data and port capabilities across task boundaries without overhead.
+* **Application Sandboxing Seals:** Cryptographic signing of binaries coupled with explicit capability seals, isolating applications from the base OS and user data.
+
+### 3. Linux & Android-Style Subsystems
+* **Ecosystem Translation & Containers:** OverlayFS stacked filesystems, rootless unprivileged user namespaces (UID/GID translation), and Android Binder-like transaction systems.
+* **Ecosystem Adapters:** Seamless translation interfaces for **Nix** (hermetic storage), **Portage** (micro-architecture target compiling), **Alpine APK**, **Apt/Deb**, and **Flatpak** into native capability gates.
+
+### 4. BSD-Style Hardening
+* **Pledge & Unveil:** System-call restriction tables dynamically activated by processes to restrict their own execution surface area (e.g., calling `pledge("stdio rpath")` to lose networking capabilities permanently).
+* **Jails:** Resource-isolated virtual virtualization environments with independent networks and read-only host-root access.
+
+---
+
+## 📊 High-Level Comparison & Target Parity
+
+| Feature Subsystem | SigmaOS (Current) | Linux Distros (Ubuntu/Arch) | Windows 11 | macOS Sonoma | Android 14 / KaiOS | SigmaOS Target |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Kernel & Scheduling** | EEVDF Core, BORE Burst-Sensing scheduler | Completely Fair Scheduler / EEVDF | NT Priority Levels | Mach Thread Ports | Linux CFS | **EEVDF BORE (Self-tuning AI/Compute Workloads)** |
+| **Driver Framework** | Windows-style WDM (`IoManager`, `DeviceExtension`) | Linux Monolithic Modules | Windows Driver Foundation (WDF) | DriverKit (User-space C++) | HAL / Linux Kernels | **Hybrid User-Space DriverKit / Kernel WDM** |
+| **Memory Allocation** | NT Tagged `Paged`/`NonPaged` Pools | Buddy & Slab (SLUB) | NT Heap & VirtualAlloc | Zone Allocator | jemalloc / Ashmem | **Pristine Tagged Pool Allocator with Paging** |
+| **Networking** | Partial TCP/UDP, TLS 1.3 PSK 0-RTT | Mature TCP/IP, Multipath TCP | Full Enterprise Stack | NetworkExtension | Low-power mobile network stacks | **TLS 1.3 resump. + PQC Secured TCP/IP stack** |
+| **Sandboxing & Sec.** | Capability Gates, Seccomp, Jails | SELinux, AppArmor, Jails | AppContainer, Virtualization | App Sandbox, TCC | SELinux + Android Permissions | **Sovereign Capability-Gate + Pledge/Unveil** |
+| **Package Management** | Universal Adapters, Content-Addressed | apt, pacman, flatpak | WinGet, MS Store | Mac App Store, Homebrew | Google Play, KaiStore | **Sovereign Multi-Format Hermetic Storage** |
+
+---
+
+## 🚀 Execution Roadmap
+
+### Phase 1: Core Subsystem Hardening (Current to Next 6 Months)
+1. **Stabilize TLS & Low-Latency Networking:**
+   * Fully integrate modern TLS 1.3 PSK 0-RTT session ticket resumption with native TCP/UDP sockets.
+   * Expand capability-gate permission guards to cover IPv4/IPv6 socket creation.
+2. **Expand the WDM Driver Tree:**
+   * Build out USB HID (Keyboard/Mouse) and basic Framebuffer graphics drivers using the new `DriverObject` standard.
+   * Connect driver rollbacks to the Sovereign Self-Healing subsystem to handle device-initialization failures gracefully.
+3. **PQC & Sandboxed Package Management:**
+   * Productionize the universal package manager translation engine to seamlessly ingest Apt, Flatpak, and Snapcraft files, mapping their permissions directly to SigmaOS capabilities.
+
+### Phase 2: Graphic/UI Composition & IPC Boost (Months 6 to 12)
+1. **Zenith Desktop Compositor:**
+   * Develop a GPU-accelerated window compositor leveraging Mach-style zero-copy IPC ports to transfer framebuffers between applications and the window manager.
+2. **Unified Virtual Filesystem (SigmaFS):**
+   * Integrate Ubuntu-style OverlayFS stacking to mount container runtimes efficiently.
+   * Implement a transactional metadata journal to prevent partition corruption upon power failure.
+3. **Process Pledge & Unveil Hooks:**
+   * Embed lightweight OpenBSD-inspired system-call filters directly into the kernel task runner, enabling applications to restrict their own access dynamically.
+
+### Phase 3: Regional Dominance & OEM Bundling (Months 12 to 24)
+1. **India-First Compliance Stack:**
+   * Integrate local ecosystem services (UPI transaction APIs, Aadhaar authentication modules, GST compliance tools).
+   * Provide native, performant multi-lingual localization across the entire userland and virtual console system.
+2. **OEM Partnerships & Low-Cost Hardware Optimization:**
+   * Partner with device makers to bundle SigmaOS as the default OS on affordable, energy-efficient ARM and RISC-V laptops.
+   * Optimize the kernel scheduler for asymmetrical big.LITTLE architectures to maximize battery life.
+3. **Secure Workstation AI Orchestration:**
+   * Integrate secure, local LLM execution pipelines within sandboxed, rootless namespaces.
+   * Expose a native AI-agent automation API, positioning SigmaOS as the leading environment for developers and secure enterprise workloads.
+
+---
+
+## ⚠️ Key Mitigation Strategies
+
+* **The Driver Gap:** Overcome standard hardware-compatibility hurdles by creating virtual translation wrappers for generic Linux kernel driver models.
+* **Developer Friction:** Provide robust developer tools (SDKs, compilers, documentation) alongside seamless packaging translation adaptors (like the native Flatpak parser) to minimize onboarding effort.
+* **Security vs. Usability:** Maintain a smooth user experience by presenting granular capability gates as simple, intuitive system prompts (similar to macOS TCC or Android permission dialogs).
+
+---
+
+## 🚀 SigmaOS 100-Item Future Development Roadmap
 
 Comprehensive 100-item roadmap organized into six strategic categories. Each item is a concise, actionable initiative contributors can pick up, prioritize, and track.
 
@@ -658,229 +848,3 @@ cap_grant(PID, CAP_NET_SOCKET | CAP_FS_READ | CAP_STDIO);
   * Rust: rustup + cargo pre-installed
   * Go, Python, Node.js: version managers bundled
   * C/C++: Clang/LLVM with LTO support by default
-* **IDE & debugging infrastructure**
-  * VSCode-like UI integrated into OS
-  * GDB/LLDB with pretty-printers for common types
-  * eBPF debugger for kernel-space tracing
-
-##### 5.2.2 Container & Cloud Tools
-* **Docker compatibility layer**
-  * Buildkit integration for container builds
-  * Registry authentication (Docker Hub, private registries)
-* **Kubernetes support**
-  * kubeadm bootstrap with pre-configured CNI
-  * Helm package manager pre-installed
-
----
-
-### 📈 PHASE 6: PERFORMANCE OPTIMIZATION & TUNING (Months 31-36)
-
-#### 6.1 Benchmarking & Profiling
-##### 6.1.1 Comprehensive Benchmark Suite
-* **Baseline measurements**
-  * Context switch latency: target < 0.5μs (reference: Linux < 1μs)
-  * System call overhead: target < 100ns (reference: Linux ~100ns)
-  * Memory allocation latency: target < 1μs
-  * Disk I/O latency: target < 1ms (NVMe)
-* **Real-world workload profiling**
-  * Application startup time comparison vs Ubuntu/Fedora/macOS
-  * Compilation speed (C/C++/Rust projects)
-  * Virtual machine density (containers per core)
-  * Network throughput & latency
-
-##### 6.1.2 Performance Monitoring & Telemetry
-* **Built-in performance dashboard**
-* **Real-time CPU/memory/disk/network graphs**
-* **Historical trend analysis**
-* **Per-process profiling** (cache misses, page faults)
-* *Inspiration:* Linux perf, htop, iotop, nethogs
-
-#### 6.2 CPU & Memory Optimization
-##### 6.2.1 CPU Cache Optimization
-* **Kernel page layout optimization**
-  * Group frequently accessed kernel structures together
-  * Minimize cache line thrashing
-  * Profile-guided optimization (PGO) during build
-  * Target: 5-15% reduction in cache misses
-* **Branch prediction optimization**
-  * Reorder code paths for branch predictor efficiency
-  * Reduce misprediction rate in hot loops
-  * LLVM's `#pragma GCC optimize` directives
-
-##### 6.2.2 Memory Bandwidth Optimization
-* **NUMA-aware memory allocation**
-  * Prefer local NUMA node memory
-  * Automatic memory migration on idle cores
-  * *Inspiration:* Linux numactl, FreeBSD's NUMA support
-* **Transparent huge pages (THP)**
-  * Automatic promotion to 2MB/1GB pages
-  * Reduce TLB misses
-  * *Inspiration:* Linux THP, FreeBSD's superpages
-
-#### 6.3 I/O Stack Optimization
-##### 6.3.1 Disk I/O Tuning
-* **Elevator algorithm selection**
-  * Use deadline scheduler for SSD (no seek penalty)
-  * Use deadline for HDD (minimize seek time)
-  * Async I/O with io_uring (reference: Linux 5.1+)
-* **Filesystem tuning**
-  * Optimal block size (4KB vs 8KB vs 16KB)
-  * Journal mode (ordered, data, writeback)
-  * Commit interval optimization
-
-##### 6.3.2 Network Stack Optimization
-* **TCP window scaling**
-  * Increase TCP receive window for high-bandwidth links
-  * `TCP_NODELAY` for interactive applications
-  * TCP flow control tuning
-* **NIC offload features**
-  * TSO (TCP Segment Offload)
-  * GRO (Generic Receive Offload)
-  * Checksum offloading
-
----
-
-## 📊 SUCCESS METRICS & KPIs
-
-| Metric | Target | Measurement | Reference |
-| :--- | :--- | :--- | :--- |
-| **Boot Time** | < 2.5s | BIOS POST to login prompt | Ubuntu: ~4-5s |
-| **Context Switch** | < 0.5μs | perf measurement | Linux: < 1μs |
-| **Syscall Overhead** | < 100ns | empty syscall invocation | Linux: ~100ns |
-| **Disk Random Read IOPS**| > 50K | fio benchmark (4K blocks) | NVMe typical: 30-100K |
-| **Network Throughput** | > 8 Gbps | iperf3 (10GbE) | Reference: 10G limit |
-| **Memory Allocation** | < 1μs | malloc/free latency | glibc: ~1-2μs |
-| **Package Install** | < 5s | smallest utility | apt: 10-15s |
-| **Code Coverage** | > 85% | kernel + userland | Linux kernel: ~75% |
-| **Security Patches** | < 24h | CVE response time | Fedora: ~7 days avg |
-| **Uptime (MTBF)** | > 1 year | reliability testing | Enterprise target |
-| **CPU Efficiency** | -20% power | watts per FLOP | vs Ubuntu |
-| **Memory Footprint** | < 200MB | full OS boot | Ubuntu minimal: ~500MB |
-
----
-
-## 🔧 IMPLEMENTATION ROADMAP (Detailed Timeline)
-
-### Q1 2026: Phase 1 Foundation Hardening
-* **Week 1-4:** Microkernel Phase G completion, scheduler optimization
-* **Week 5-8:** SigmaFS 2.0 design & prototype, CoW implementation
-* **Week 9-12:** Fuzzing harness setup, kernel API testing
-
-### Q2 2026: Phase 2 Security
-* **Week 13-16:** Kyber-1024 & Dilithium-5 integration, post-quantum crypto
-* **Week 17-20:** TPM 2.0 boot, secure boot chain
-* **Week 21-24:** KASI (kernel address space isolation), fuzzing expansion
-
-### Q3 2026: Phase 3 Usability
-* **Week 25-28:** Sigma Package Manager design, `.spkg` format
-* **Week 29-32:** Zenith desktop environment, profile system
-* **Week 33-36:** `sigma-coreutils`, CLI tool optimization
-
-### Q4 2026: Phase 4 AI
-* **Week 37-40:** SigmaAgent NLP-to-command translation
-* **Week 41-44:** Local LLM integration (Mistral 7B)
-* **Week 45-48:** Predictive maintenance agent, hardware telemetry
-
-### Q1-Q2 2027: Phase 5 Ecosystem
-* Media suite (`SigmaCut`, `SigmaDraw`) development
-* Container runtime OCI compliance
-* Developer environment zero-setup
-
-### Q3-Q4 2027: Phase 6 Performance
-* Comprehensive benchmark suite
-* CPU/memory optimization (PGO, NUMA)
-* I/O stack tuning (`io_uring`, NIC offloads)
-
----
-
-## 🎯 COMPETITIVE DIFFERENTIATION VS LINUX/BSD
-
-| Feature | SigmaOS Target | Linux Status | BSD Status |
-| :--- | :--- | :--- | :--- |
-| **Post-Quantum Crypto** | Native, mandatory | Experimental | Experimental |
-| **Boot Time** | < 2.5s | 4-8s typical | 3-6s typical |
-| **Memory Footprint** | < 200MB | 400-800MB | 300-600MB |
-| **AI Integration** | Native shell | via plugins | via plugins |
-| **Unified UX** | Multi-profile | Fragmented | Fragmented |
-| **Container Performance**| < 100ms spawn | ~150-200ms | ~150-200ms |
-| **Security Hardening** | Capability-based | LSM-based | pledge/unveil |
-| **Reproducible Builds** | 100% | ~60% (Debian) | ~10% (OpenBSD ports) |
-| **Package Rollback** | Atomic transactions | Limited | Manual |
-| **Power Efficiency** | -20% vs Linux | Baseline | -5% vs Linux |
-
----
-
-## 📚 REFERENCE INSPIRATIONS
-
-### Linux Distributions
-* **Arch Linux:** KISS principle, rolling releases, community.
-* **Void Linux:** `xbps` simplicity, `systemd`-free.
-* **Alpine Linux:** `musl` libc, minimal footprint.
-* **Clear Linux:** microarchitecture tuning, performance.
-* **Fedora/RHEL:** release cycle, stability.
-* **NixOS:** purely functional packages, reproducibility.
-* **Debian:** stability, testing suites.
-
-### BSD Systems
-* **OpenBSD:** pledge/unveil capability model, security.
-* **FreeBSD:** UVM (memory management), ports system.
-* **NetBSD:** portability, clean architecture.
-* **HardenedBSD:** security-focused hardening.
-
-### Technologies to Absorb
-* **Linux kernel:** POSIX compliance, device drivers, scheduler.
-* **systemd:** service management, predictable boot.
-* **DPDK:** high-speed packet processing.
-* **Firecracker:** lightweight virtualization.
-* **containerd:** container runtime.
-* **Mesa/Vulkan:** GPU acceleration.
-* **LLVM/Clang:** compiler infrastructure.
-* **Rust standard library:** memory safety patterns.
-
----
-
-## 🚀 CRITICAL SUCCESS FACTORS
-
-1. **Focus on Performance & Reliability:** Every feature must improve speed or stability, never compromise.
-2. **Security by Default:** Capability-based model applied everywhere, not bolted on.
-3. **Reproducible Builds:** Enable users to verify binary authenticity.
-4. **Minimal Dependencies:** Zero-dependency userland utilities for bootability.
-5. **Community Engagement:** Transparent roadmap, weekly progress updates.
-6. **Test-Driven Development:** > 85% code coverage, fuzzing on all APIs.
-7. **Backward Compatibility:** Support Linux binaries (via syscall emulation if needed).
-
----
-
-## 🛠️ Implementation Guidelines
-
-### 1. Documentation Requirements
-* For every technical task, add a corresponding `.md` in the repo.
-* Update the Wiki immediately after completion.
-* Include implementation status, dependencies, and testing instructions.
-
-### 2. Branch Policy
-* Consolidate work into `main`.
-* Use feature branches locally.
-* Enforce PR reviews and CI before merging.
-* Maintain single `main` branch policy.
-
-### 3. Quality Standards
-* All implementations must be in Rust with `no_std` and C ABI compatibility.
-* Reduce dependency on predefined functions and libraries.
-* Follow Linux distro best practices from Arch, Ubuntu, Fedora, Gentoo, Kali, Debian.
-* Prioritize performance, speed, capabilities, ease of use, features, functions, tools, UI, and UX.
-
----
-
-## 📈 Metric Goals for Distro-Parity
-
-To measure our progress toward full parity with legacy Linux distributions, the SigmaOS project tracks the following core milestones:
-
-| Target Area | Metric | Current Status | Phase I Target | Phase II Target | Phase III Target |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Community** | Active contributors | Solo / Early-stage | 50+ | 500+ | 5000+ |
-| **Governance**| Signed builds & ISOs | Unsigned / Manual | Verified build farm | Fully signed LTS | Reproducible images |
-| **a11y** | WCAG Compliance | Basic | AA Compliant | AAA Compliant | Fully compliant defaults|
-| **Apps** | Bundled applications| Minimal shell utils | Text editor + terminal| Media players + IDE | Office suite + CAD |
-| **Cloud** | Container runtime | Mock virtualization | Sandboxed containers| OCI‑compliant engine| Kubernetes scale orchestration|
-| **Hardware** | Supported architectures| x86_64 only | x86_64 bare-metal | ARM64 Support | RISC‑V bare-metal |

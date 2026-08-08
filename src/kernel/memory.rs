@@ -1,8 +1,9 @@
 // SigmaOS Kernel Memory Management
 // Implements buddy allocator and paging
 
-use core::ptr::NonNull;
-use core::sync::atomic::{AtomicUsize, Ordering};
+extern crate alloc;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -12,6 +13,99 @@ pub const PAGE_SIZE: usize = 4096;
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
+}
+
+use core::ptr::NonNull;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PoolType {
+    Paged,    // Swappable (virtual pages can be swapped out to disk)
+    NonPaged, // Always resident in physical memory (for critical drivers and ISRs)
+}
+
+#[derive(Debug, Clone)]
+pub struct PoolBlock {
+    pub addr: usize,
+    pub size: usize,
+    pub pool_type: PoolType,
+    pub tag: [u8; 4], // 4-character driver tag (standard Windows NT Pool Tag, e.g. "File")
+}
+
+pub struct KernelPoolManager {
+    pub paged_pool: Vec<PoolBlock>,
+    pub non_paged_pool: Vec<PoolBlock>,
+    pub total_paged_bytes: usize,
+    pub total_non_paged_bytes: usize,
+}
+
+impl KernelPoolManager {
+    pub fn new() -> Self {
+        Self {
+            paged_pool: Vec::new(),
+            non_paged_pool: Vec::new(),
+            total_paged_bytes: 0,
+            total_non_paged_bytes: 0,
+        }
+    }
+
+    /// Allocate a block from the specific kernel pool with a pool tag (Inspired by Windows NT ExAllocatePoolWithTag)
+    pub fn allocate_pool(&mut self, pool_type: PoolType, size: usize, tag: &[u8; 4]) -> Result<PoolBlock, &'static str> {
+        if size == 0 {
+            return Err("Cannot allocate 0-byte pool block");
+        }
+
+        // Emulate allocating pool virtual address range
+        let addr = match pool_type {
+            PoolType::Paged => 0xD000_0000 + self.total_paged_bytes,
+            PoolType::NonPaged => 0xF000_0000 + self.total_non_paged_bytes,
+        };
+
+        let block = PoolBlock {
+            addr,
+            size,
+            pool_type,
+            tag: *tag,
+        };
+
+        match pool_type {
+            PoolType::Paged => {
+                self.paged_pool.push(block.clone());
+                self.total_paged_bytes += size;
+            }
+            PoolType::NonPaged => {
+                self.non_paged_pool.push(block.clone());
+                self.total_non_paged_bytes += size;
+            }
+        }
+
+        println!(
+            "Windows NT Pool Alloc: Allocated {:?} pool block of {} bytes with tag '{}' at address 0x{:X}",
+            pool_type, size, core::str::from_utf8(tag).unwrap_or("????"), addr
+        );
+
+        Ok(block)
+    }
+
+    /// Free a block from the kernel pool (Inspired by Windows NT ExFreePool)
+    pub fn free_pool(&mut self, addr: usize) -> Result<(), &'static str> {
+        if let Some(pos) = self.paged_pool.iter().position(|b| b.addr == addr) {
+            let block = self.paged_pool.remove(pos);
+            self.total_paged_bytes -= block.size;
+            Ok(())
+        } else if let Some(pos) = self.non_paged_pool.iter().position(|b| b.addr == addr) {
+            let block = self.non_paged_pool.remove(pos);
+            self.total_non_paged_bytes -= block.size;
+            Ok(())
+        } else {
+            Err("Invalid pool address; double free or corruption detected")
+        }
+    }
+}
+
+impl Default for KernelPoolManager {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub struct Zone {
@@ -33,12 +127,6 @@ impl Page {
     }
 }
 
-#[derive(Clone)]
-pub struct BuddyAllocatorCheckpoint {
-    free_lists: [Vec<MemoryBlock>; 12],
-}
-
-/// Buddy allocator for memory management
 pub struct BuddyAllocator {
     pub free_lists: [Vec<MemoryBlock>; 12],
     pub free_pages: usize,
@@ -47,16 +135,6 @@ pub struct BuddyAllocator {
 }
 
 impl BuddyAllocator {
-    pub fn create_checkpoint(&self) -> BuddyAllocatorCheckpoint {
-        BuddyAllocatorCheckpoint {
-            free_lists: self.free_lists.clone(),
-        }
-    }
-
-    pub fn restore_checkpoint(&mut self, checkpoint: BuddyAllocatorCheckpoint) {
-        self.free_lists = checkpoint.free_lists;
-    }
-
     pub fn new() -> Self {
         Self {
             free_lists: Default::default(),
@@ -72,10 +150,7 @@ impl BuddyAllocator {
 
         if order < 12 {
             if let Some(addr) = NonNull::new(base_addr as *mut u8) {
-                let block = MemoryBlock {
-                    addr,
-                    size,
-                };
+                let block = MemoryBlock { addr, size };
                 self.free_lists[order].push(block);
             }
         }
@@ -149,13 +224,15 @@ impl BuddyAllocator {
     }
 
     fn calculate_order(&self, pages: usize) -> usize {
-        let mut order = 0;
-        let mut size = 1;
-        while size < pages {
-            size *= 2;
-            order += 1;
+        // Bolt Optimization: Replace O(n) linear search loop with O(1) branchless bitwise operations.
+        // On modern hardware, next_power_of_two() and trailing_zeros() map directly to specialized
+        // CPU instructions (e.g., LZCNT/TZCNT/BSR), enabling nanosecond-level execution speeds and supporting HW acceleration.
+        if pages <= 1 {
+            0
+        } else {
+            let next_pow = pages.next_power_of_two();
+            next_pow.trailing_zeros() as usize
         }
-        order
     }
 
     fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
@@ -193,7 +270,8 @@ impl BuddyAllocator {
         }
 
         let block_addr = block.addr.as_ptr() as usize;
-        let buddy_addr = block_addr ^ (1 << (order + 12)); // Calculate buddy address
+        // Calculate buddy address by XORing with block size (standard buddy system)
+        let buddy_addr = block_addr ^ block.size;
         let buddy_size = block.size * 2;
 
         // Find buddy in free list
@@ -210,9 +288,9 @@ impl BuddyAllocator {
                 buddy_addr
             };
 
-            if let Some(addr) = NonNull::new(merged_addr as *mut u8) {
+            if let Some(non_null) = NonNull::new(merged_addr as *mut u8) {
                 Ok(MemoryBlock {
-                    addr,
+                    addr: non_null,
                     size: buddy_size,
                 })
             } else {
@@ -308,11 +386,33 @@ impl PageTable {
 /// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
     pub root_directory: NonNull<PageTable>,
+    pub buddy_allocator: BuddyAllocator,
 }
 
 impl VirtualMemoryManager {
     pub fn new(root_directory: NonNull<PageTable>) -> Self {
-        Self { root_directory }
+        Self {
+            root_directory,
+            buddy_allocator: BuddyAllocator::new(),
+        }
+    }
+
+    pub fn with_allocator(root_directory: NonNull<PageTable>, allocator: BuddyAllocator) -> Self {
+        Self {
+            root_directory,
+            buddy_allocator: allocator,
+        }
+    }
+
+    /// Allocate pages using buddy allocator (wires alloc_pages to VMM)
+    pub fn alloc_pages(&mut self, num_pages: usize) -> Option<MemoryBlock> {
+        let size = num_pages * PAGE_SIZE;
+        self.buddy_allocator.allocate(size)
+    }
+
+    /// Free pages using buddy allocator (wires free_pages to VMM)
+    pub fn free_pages(&mut self, block: MemoryBlock) {
+        self.buddy_allocator.deallocate(block);
     }
 
     /// Translates a virtual address into a physical address
@@ -380,6 +480,9 @@ mod tests {
         assert_eq!(allocator.calculate_order(1), 0);
         assert_eq!(allocator.calculate_order(2), 1);
         assert_eq!(allocator.calculate_order(4), 2);
+        assert_eq!(allocator.calculate_order(5), 3);
+        assert_eq!(allocator.calculate_order(8), 3);
+        assert_eq!(allocator.calculate_order(9), 4);
     }
 
     #[test]
@@ -418,20 +521,35 @@ mod tests {
     }
 
     #[test]
-    fn test_checkpoint_restore() {
-        let mut allocator = BuddyAllocator::new();
-        allocator.initialize_memory(0x1000, 4096);
-        assert_eq!(allocator.get_free_memory(), 4096);
+    fn test_windows_nt_pool_allocator() {
+        let mut pool_manager = KernelPoolManager::new();
 
-        // Save state
-        let checkpoint = allocator.create_checkpoint();
+        // Allocate Paged Pool Block with Tag 'File'
+        let paged_block = pool_manager.allocate_pool(PoolType::Paged, 1024, b"File").unwrap();
+        assert_eq!(paged_block.size, 1024);
+        assert_eq!(paged_block.pool_type, PoolType::Paged);
+        assert_eq!(&paged_block.tag, b"File");
+        assert_eq!(pool_manager.total_paged_bytes, 1024);
 
-        // Pretend an allocation fails/changes state
-        let block = allocator.allocate(4096).unwrap();
-        assert_eq!(allocator.get_free_memory(), 0);
+        // Allocate NonPaged Pool Block with Tag 'Net '
+        let non_paged_block = pool_manager.allocate_pool(PoolType::NonPaged, 2048, b"Net ").unwrap();
+        assert_eq!(non_paged_block.size, 2048);
+        assert_eq!(non_paged_block.pool_type, PoolType::NonPaged);
+        assert_eq!(&non_paged_block.tag, b"Net ");
+        assert_eq!(pool_manager.total_non_paged_bytes, 2048);
 
-        // Restore baseline checkpoint
-        allocator.restore_checkpoint(checkpoint);
-        assert_eq!(allocator.get_free_memory(), 4096);
+        // Verify Address Separation
+        assert!(paged_block.addr != non_paged_block.addr);
+
+        // Free Paged Pool Block
+        assert!(pool_manager.free_pool(paged_block.addr).is_ok());
+        assert_eq!(pool_manager.total_paged_bytes, 0);
+
+        // Free NonPaged Pool Block
+        assert!(pool_manager.free_pool(non_paged_block.addr).is_ok());
+        assert_eq!(pool_manager.total_non_paged_bytes, 0);
+
+        // Double Free (Should Fail)
+        assert!(pool_manager.free_pool(paged_block.addr).is_err());
     }
 }
