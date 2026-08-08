@@ -66,6 +66,8 @@ pub mod observability {
 pub mod ai {
     pub mod agent;
     pub mod orchestrator;
+    pub mod next_gen;
+    pub mod wandr;
 }
 pub mod boot;
 pub mod toolchain {
@@ -173,10 +175,6 @@ pub use init::systemd_init::{
     SystemdEngine, SystemdUnit, UnitState, UnitType,
 };
 
-pub mod ai {
-    pub mod next_gen;
-    pub mod wandr;
-}
 pub use ai::next_gen::{
     WorkloadType, AdaptiveKernelPersona, PredictiveSyscallTranslator, DeviceTargetType,
     AiTask, AiScheduler, EnergyGovernorMode, EnergyAwareScheduler, ModelType,

@@ -226,6 +226,8 @@ impl OpenBsdCryptoDevice {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
+    use alloc::vec::Vec;
 
     #[test]
     fn test_linux_devtmpfs() {
@@ -252,7 +254,7 @@ mod tests {
     fn test_bsd_audio_mixer() {
         let mut mixer = BsdAudioMixer::new();
 
-        let stream1 = alloc::vec![
+        let stream1 = vec![
             PcmFrame {
                 left: 1000,
                 right: 2000
@@ -262,7 +264,7 @@ mod tests {
                 right: -1000
             },
         ];
-        let stream2 = alloc::vec![
+        let stream2 = vec![
             PcmFrame {
                 left: 3000,
                 right: 1000
@@ -293,7 +295,7 @@ mod tests {
         let mut iv = [0u8; 12];
         
         // Use a more complex, non-linear generation pattern for test purposes
-        let seed: u64 = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos() as u64;
+        let seed: u64 = 9876543210u64;
         for i in 0..32 {
             let mut val = seed.wrapping_mul(i as u64 + 1);
             val ^= val >> 33;
