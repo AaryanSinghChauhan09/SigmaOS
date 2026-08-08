@@ -1,8 +1,11 @@
 /// Systemd-Grade Init and Target State Engine for SigmaOS
 /// Provides robust target dependency graphs, wants/requires properties,
 /// and target states to defeat Fedora's Systemd initialization.
+/// Enhanced with standard Ubuntu-style target states (reboot.target, poweroff.target,
+/// emergency.target) and structured service controls (reload, restart, status checks).
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type UnitID = usize;
 
@@ -64,10 +67,17 @@ impl Default for SystemdEngine {
 
 impl SystemdEngine {
     pub fn new() -> Self {
-        SystemdEngine {
+        let mut engine = SystemdEngine {
             units: Vec::new(),
             current_target: AtomicUsize::new(0),
-        }
+        };
+
+        // Pre-register standard Ubuntu-style target system nodes
+        engine.register_unit(SystemdUnit::new(9001, b"poweroff.target", UnitType::Target));
+        engine.register_unit(SystemdUnit::new(9002, b"reboot.target", UnitType::Target));
+        engine.register_unit(SystemdUnit::new(9003, b"emergency.target", UnitType::Target));
+
+        engine
     }
 
     pub fn register_unit(&mut self, unit: SystemdUnit) {
@@ -76,33 +86,34 @@ impl SystemdEngine {
 
     pub fn isolate_target(&mut self, target_id: UnitID) -> Result<(), &'static str> {
         let mut target_idx = None;
-        for (i, unit) in self.units.iter().enumerate() {
-            if unit.id == target_id && unit.unit_type == UnitType::Target {
+        for i in 0..self.units.len() {
+            if self.units[i].id == target_id && self.units[i].unit_type == UnitType::Target {
                 target_idx = Some(i);
                 break;
             }
         }
 
-        let _idx = target_idx.ok_or("Target unit not found")?;
+        let idx = target_idx.ok_or("Target unit not found")?;
 
         // In Systemd, isolating a target starts that target and all its dependencies,
         // and deactivates units not required/wanted by it.
-        self.units[_idx].state = UnitState::Activating;
+        self.units[idx].state = UnitState::Activating;
 
         // Collect all required/wanted units recursively
         let mut active_set = Vec::new();
         self.collect_dependencies(target_id, &mut active_set);
 
         // Deactivate units not in active_set
-        for unit in &mut self.units {
-            if !active_set.contains(&unit.id) && unit.id != target_id {
-                unit.state = UnitState::Inactive;
-            } else if active_set.contains(&unit.id) {
-                unit.state = UnitState::Active;
+        for i in 0..self.units.len() {
+            let unit_id = self.units[i].id;
+            if !active_set.contains(&unit_id) && unit_id != target_id {
+                self.units[i].state = UnitState::Inactive;
+            } else if active_set.contains(&unit_id) {
+                self.units[i].state = UnitState::Active;
             }
         }
 
-        self.units[_idx].state = UnitState::Active;
+        self.units[idx].state = UnitState::Active;
         self.current_target.store(target_id, Ordering::SeqCst);
         Ok(())
     }
@@ -112,13 +123,16 @@ impl SystemdEngine {
             return;
         }
 
-        for unit in &self.units {
+        for i in 0..self.units.len() {
+            let unit = &self.units[i];
             if unit.id == unit_id {
-                for &req in &unit.requires {
+                for j in 0..unit.requires.len() {
+                    let req = unit.requires[j];
                     set.push(req);
                     self.collect_dependencies(req, set);
                 }
-                for &want in &unit.wants {
+                for j in 0..unit.wants.len() {
+                    let want = unit.wants[j];
                     set.push(want);
                     self.collect_dependencies(want, set);
                 }
@@ -129,165 +143,44 @@ impl SystemdEngine {
     pub fn get_active_target_id(&self) -> usize {
         self.current_target.load(Ordering::SeqCst)
     }
-}
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T: Clone> Clone for Vec<T> {
-    fn clone(&self) -> Self {
-        let mut new_vec = Vec::new();
-        for i in 0..self.len {
-            unsafe {
-                new_vec.push((*self.data.add(i)).clone());
+    /// Ubuntu-style restart control
+    pub fn restart_unit(&mut self, unit_id: UnitID) -> Result<(), &'static str> {
+        for i in 0..self.units.len() {
+            if self.units[i].id == unit_id {
+                self.units[i].state = UnitState::Deactivating;
+                self.units[i].state = UnitState::Inactive;
+                self.units[i].state = UnitState::Activating;
+                self.units[i].state = UnitState::Active;
+                return Ok(());
             }
         }
-        new_vec
+        Err("Unit not found")
     }
-}
 
-impl<T: core::fmt::Debug> core::fmt::Debug for Vec<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_list().entries(self.iter()).finish()
-    }
-}
-
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+    /// Ubuntu-style reload control
+    pub fn reload_unit(&mut self, unit_id: UnitID) -> Result<(), &'static str> {
+        for i in 0..self.units.len() {
+            if self.units[i].id == unit_id {
+                if self.units[i].state != UnitState::Active {
+                    return Err("Cannot reload inactive unit");
+                }
+                // Simulate configuration reloading safely
+                return Ok(());
             }
         }
+        Err("Unit not found")
     }
-    pub fn len(&self) -> usize { self.len }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
-    }
-    pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
-    }
-    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
-        for i in 0..self.len {
-            unsafe {
-                if &*self.data.add(i) == item { return true; }
+
+    /// Retrieve active status of a supervised service unit
+    pub fn get_unit_status(&self, unit_id: UnitID) -> Option<UnitState> {
+        for i in 0..self.units.len() {
+            if self.units[i].id == unit_id {
+                return Some(self.units[i].state);
             }
         }
-        false
+        None
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * core::mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = VecIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = VecIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-pub struct VecIter<'a, T> {
-    vec: &'a Vec<T>,
-    index: usize,
-}
-
-impl<'a, T> Iterator for VecIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.vec.len() {
-            let item = unsafe { &*self.vec.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-pub struct VecIterMut<'a, T> {
-    data: *mut T,
-    len: usize,
-    index: usize,
-    _marker: core::marker::PhantomData<&'a mut T>,
-}
-
-impl<'a, T> Iterator for VecIterMut<'a, T> {
-    type Item = &'a mut T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            let item = unsafe { &mut *self.data.add(self.index) };
-            self.index += 1;
-            Some(item)
-        } else {
-            None
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
 
 #[cfg(test)]
@@ -323,12 +216,35 @@ mod tests {
         assert_eq!(engine.get_active_target_id(), 100);
 
         // dependencies should be active
-        for unit in &engine.units {
+        for i in 0..engine.units.len() {
+            let unit = &engine.units[i];
             if unit.id == 200 || unit.id == 300 || unit.id == 100 {
                 assert_eq!(unit.state, UnitState::Active);
             } else if unit.id == 400 {
                 assert_eq!(unit.state, UnitState::Inactive);
             }
         }
+    }
+
+    #[test]
+    fn test_ubuntu_systemd_controls_and_targets() {
+        let mut engine = SystemdEngine::new();
+
+        // Verify standard Ubuntu target state registration
+        assert_eq!(engine.get_unit_status(9001).unwrap(), UnitState::Inactive); // poweroff.target
+        assert_eq!(engine.get_unit_status(9002).unwrap(), UnitState::Inactive); // reboot.target
+        assert_eq!(engine.get_unit_status(9003).unwrap(), UnitState::Inactive); // emergency.target
+
+        // Verify service reload on inactive fails
+        let mut service = SystemdUnit::new(420, b"nginx.service", UnitType::Service);
+        engine.register_unit(service);
+        assert!(engine.reload_unit(420).is_err());
+
+        // Restart transitions state
+        assert!(engine.restart_unit(420).is_ok());
+        assert_eq!(engine.get_unit_status(420).unwrap(), UnitState::Active);
+
+        // Reload succeeds on active service
+        assert!(engine.reload_unit(420).is_ok());
     }
 }
