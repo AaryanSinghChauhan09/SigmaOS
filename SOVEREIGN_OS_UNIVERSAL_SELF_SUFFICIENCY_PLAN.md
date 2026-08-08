@@ -535,4 +535,22 @@ To guarantee that the user never needs to descend into legacy Linux or BSD envir
 
 ---
 
+## 📦 SECTION VIII: Containerization & Virtualization Advancements Inspired by Linux & BSD Distros
+
+To deliver enterprise-grade execution isolation and achieve direct parity with legacy systems, SigmaOS's virtual machine (`src/virtualization/vm_manager.rs`) and container manager (`src/virtualization/container.rs`) subsystems are built using direct architectural inspirations from specialized Linux and BSD distributions:
+
+### 1. FreeBSD Jail & BSD Securelevels Isolation Parity
+*   **Design Inspiration:** FreeBSD Jails provide a highly lightweight, directory-chrooted virtual environment sharing the host kernel but isolating the directory tree, processes, and network sockets.
+*   **SigmaOS Implementation:** Implements strict path and process isolation layers inspired directly by FreeBSD `Jails` (`src/security/jails.rs`) and `Securelevels` (`src/security/securelevels.rs`). This allows sandboxed containers to execute natively within S-SHARDS without the performance degradation of hypervisor emulation, capability-gating file access, raw sockets, and process signaling.
+
+### 2. Linux Namespaces & CGroups Resource Throttle Parity
+*   **Design Inspiration:** Linux namespaces and control groups (cgroups) isolate process namespaces, IPC channels, mounts, and network devices, while capping memory, CPU, and disk I/O.
+*   **SigmaOS Implementation:** The native container manager (`src/virtualization/container.rs`) implements lightweight virtual namespace tables capping memory limits, virtual network ports, and CPU execution rings. CPU core pinning (`cpu_pinning_cores`) and hugepages management (`hugepages_enabled`) map container threads directly to target hardware processors to bypass OS dispatch latency.
+
+### 3. High-Performance QEMU/KVM PCIe VFIO Device Passthrough
+*   **Design Inspiration:** Modern enterprise hypervisors use KVM kernel modules and VFIO (Virtual Function I/O) driver configurations to expose direct hardware registers (GPUs, network adapters) to guest virtual machines.
+*   **SigmaOS Implementation:** Exposes native configuration structures supporting `vfio_pci_passthrough_address` to bypass virtual emulation entirely, streaming memory-mapped PCIe registers direct-to-VM pipelines.
+
+---
+
 ### 👑 The Sovereign OS Paradigm: Absolute Computational Autonomy. Zero External Dependencies. Complete Control.
