@@ -143,6 +143,10 @@ pub use kernel::{
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
     IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+    PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE,
+    SignalDispatcher, SovereignSignal,
+    PagingController, SimplePageTableEntry, PAGE_SIZE_BYTES, MAX_PHYSICAL_FRAMES,
+    SovereignIpcBus, IpcTransactionMessage, MAX_IPC_MESSAGE_SIZE, IPC_QUEUE_CAPACITY,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
@@ -207,6 +211,7 @@ pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
     AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
     KaliSniffer, PentestAssistant, SecureWipeTool, IntrusionSeverity, IntrusionAlert, SigmaIDS,
+    CapabilitySandboxEnforcer, SandboxCapabilityToken, PORT_ALLOW_TCP, PORT_ALLOW_SSL,
 };
 pub use init::{
     Runlevel, ServiceState as InitServiceState, InitError, Service as InitService, SimpleService as InitSimpleService,

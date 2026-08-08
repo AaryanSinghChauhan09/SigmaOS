@@ -12,9 +12,10 @@ pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
 pub mod breakthroughs;
-pub mod ipc;
 pub mod linux_absorb;
 pub mod subsystem;
+pub mod pci_scanner;
+pub mod signal_dispatcher;
 
 pub use crate::boot::firmware::{
     BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
@@ -41,3 +42,7 @@ pub use policy_mechanism::{
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use virtual_cpu::{CpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU};
+pub use pci_scanner::{PciBusScanner, PciClass, PciDevice, PCI_MAX_BUS, PCI_MAX_DEVICE};
+pub use signal_dispatcher::{SignalDispatcher, SovereignSignal};
+pub use paging::{PagingController, SimplePageTableEntry, PAGE_SIZE_BYTES, MAX_PHYSICAL_FRAMES};
+pub use ipc::{SovereignIpcBus, IpcTransactionMessage, MAX_IPC_MESSAGE_SIZE, IPC_QUEUE_CAPACITY};

@@ -18,6 +18,7 @@ pub mod intrusion;
 pub mod password;
 pub mod parrot_linux;
 pub mod selinux;
+pub mod capability_sandbox;
 
 pub use parrot_linux::{
     AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
@@ -34,3 +35,4 @@ pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel}
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+pub use capability_sandbox::{CapabilitySandboxEnforcer, SandboxCapabilityToken, PORT_ALLOW_TCP, PORT_ALLOW_SSL};
