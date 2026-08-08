@@ -29,6 +29,9 @@ use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 use alloc::format;
+||||||| 65885484f
+use alloc::format;
+use alloc::string::ToString;
 
 /// Documentation format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -100,9 +103,36 @@ impl DocGenerator {
         match format {
             DocFormat::Markdown => self.generate_markdown(),
             DocFormat::Html => self.generate_html(),
-            DocFormat::Pdf => Err("PDF generation not yet implemented".to_string()),
+            DocFormat::Pdf => self.generate_pdf(),
             DocFormat::AsciiDoc => self.generate_asciidoc(),
         }
+    }
+
+    /// Generate PDF documentation (Simulated PDF document layout structure)
+    fn generate_pdf(&self) -> Result<String, String> {
+        let mut output = String::new();
+        output.push_str("%PDF-1.4\n");
+        output.push_str("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        output.push_str("2 0 obj\n<< /Type /Pages /Kids [ 3 0 R ] /Count 1 >>\nendobj\n");
+
+        let mut content_stream = String::new();
+        content_stream.push_str("BT /F1 12 Tf 50 700 Td ");
+
+        // Sort entries by order and stream text labels
+        let mut sorted_entries = self.entries.clone();
+        sorted_entries.sort_by_key(|e| e.order);
+
+        for entry in &sorted_entries {
+            content_stream.push_str(&format!("({}) Tj T* ", entry.title));
+        }
+        content_stream.push_str("ET");
+
+        output.push_str("3 0 obj\n<< /Type /Page /Parent 2 0 R /Contents 4 0 R >>\nendobj\n");
+        output.push_str(&format!("4 0 obj\n<< /Length {} >>\nstream\n{}\nendstream\nendobj\n", content_stream.len(), content_stream));
+        output.push_str("xref\n0 5\n0000000000 65535 f\n");
+        output.push_str("trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n%%EOF");
+
+        Ok(output)
     }
 
     /// Generate Markdown documentation
@@ -460,5 +490,24 @@ mod tests {
         assert_eq!(indexer.pages.len(), 3);
         let pledge_page = indexer.compile_man_page("pledge", Some(2)).unwrap();
         assert!(pledge_page.contains("stdio rpath"));
+    }
+||||||| 65885484f
+
+    #[test]
+    fn test_pdf_generation() {
+        let mut generator = DocGenerator::new();
+        generator.add_entry(DocEntry::new(
+            "Architecture Guide".to_string(),
+            "Guide detail content".to_string(),
+            SectionType::Architecture,
+            1,
+        ));
+
+        let result = generator.generate(DocFormat::Pdf);
+        assert!(result.is_ok());
+        let pdf = result.unwrap();
+        assert!(pdf.starts_with("%PDF-1.4"));
+        assert!(pdf.contains("Architecture Guide"));
+        assert!(pdf.ends_with("%%EOF"));
     }
 }

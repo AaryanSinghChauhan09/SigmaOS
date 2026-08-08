@@ -162,12 +162,14 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
-        let mut resolved = Vec::new();
-        let mut to_visit = vec![package_name.to_string()];
-        let mut visited = std::collections::HashSet::new();
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
+        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+        to_visit.push(package_name.to_string());
+        let mut visited = std::collections::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
+            let current: String = current;
             if visited.contains(&current) {
                 continue;
             }
@@ -176,6 +178,7 @@ impl DependencyResolver {
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
+                    let dep: &String = dep;
                     if !visited.contains(dep) {
                         to_visit.push(dep.clone());
                     }
@@ -197,6 +200,8 @@ impl DependencyResolver {
                 if let (Some(pkg1), Some(pkg2)) =
                     (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
                 {
+                    let pkg1: &UnifiedPackage = pkg1;
+                    let pkg2: &UnifiedPackage = pkg2;
                     if pkg1.has_conflict_with(pkg2) {
                         conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
                     }
@@ -281,6 +286,106 @@ pub struct PackageSnapshot {
 }
 
 /// Universal package manager with transaction-safe snapshots & rollback mechanisms
+||||||| 65885484f
+/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub checkpoints: Vec<PackageCheckpoint>,
+    pub next_checkpoint_id: usize,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        TransactionalHistory {
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 1,
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        let mut keys = Vec::new();
+        for key in installed.keys() {
+            keys.push(key.clone());
+        }
+
+        self.checkpoints.push(PackageCheckpoint {
+            checkpoint_id: id,
+            installed_keys: keys,
+        });
+
+        id
+    }
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        for i in 0..self.checkpoints.len() {
+            if self.checkpoints[i].checkpoint_id == id {
+                return Some(&self.checkpoints[i]);
+            }
+        }
+        None
+    }
+}
+
+impl Default for TransactionalHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Universal package manager
+/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
+#[derive(Debug, Clone)]
+pub struct TransactionalHistory {
+    pub checkpoints: Vec<PackageCheckpoint>,
+    pub next_checkpoint_id: usize,
+}
+
+impl TransactionalHistory {
+    pub fn new() -> Self {
+        TransactionalHistory {
+            checkpoints: Vec::new(),
+            next_checkpoint_id: 1,
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
+        for key in installed.keys() {
+            let key: &String = key;
+            keys.push(key.clone());
+        }
+
+        self.checkpoints.push(PackageCheckpoint {
+            checkpoint_id: id,
+            installed_keys: keys,
+        });
+
+        id
+    }
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        for i in 0..self.checkpoints.len() {
+            if self.checkpoints[i].checkpoint_id == id {
+                return Some(&self.checkpoints[i]);
+            }
+        }
+        None
+    }
+}
+
+impl Default for TransactionalHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, PackageAdapter>,
@@ -371,6 +476,7 @@ impl UniversalPackageManager {
                 // Find appropriate adapter
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
+                        let adapter: &PackageAdapter = adapter;
                         adapter.install(package)?;
                         break;
                     }
@@ -389,6 +495,7 @@ impl UniversalPackageManager {
         if let Some(package) = self.installed_packages.get(package_name) {
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
                     adapter.remove(package)?;
                     break;
                 }
@@ -402,6 +509,7 @@ impl UniversalPackageManager {
         if let Some(package) = self.installed_packages.get(package_name) {
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
                     adapter.update(package)?;
                     break;
                 }

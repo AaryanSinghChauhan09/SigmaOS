@@ -63,6 +63,21 @@ impl SigmaSoftwareStore {
                     }
                     return Ok(());
                 }
+||||||| 65885484f
+    pub fn check_for_updates(&mut self) -> usize {
+        self.pending_updates.clear();
+        for (name, app) in &self.catalog {
+            if app.is_installed && app.version != "1.5.0" {
+                // Assume latest stable is 1.5.0
+                self.pending_updates.push(name.clone());
+    pub fn check_for_updates(&mut self) -> usize {
+        self.pending_updates.clear();
+        for (name, app) in &self.catalog {
+            let name: &String = name;
+            let app: &StoreApp = app;
+            if app.is_installed && app.version != "1.5.0" {
+                // Assume latest stable is 1.5.0
+                self.pending_updates.push(name.clone());
             }
         }
         Err("ENOENT: Package not registered in the Software Store.")
