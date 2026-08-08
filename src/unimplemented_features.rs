@@ -1609,6 +1609,570 @@ impl SlackwareCrusherManager {
     }
 }
 
+// =========================================================================
+// 25. IOKIT DRIVER MATCHING GRAPH (MACOS/IOS STYLE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct IokitService {
+    pub name: &'static str,
+    pub class_name: &'static str,
+    pub provider_class: &'static str,
+    pub is_matched: bool,
+}
+
+pub struct IokitRegistry {
+    pub registered_services: [Option<IokitService>; 8],
+}
+
+impl IokitRegistry {
+    pub fn new() -> Self {
+        Self {
+            registered_services: [None; 8],
+        }
+    }
+
+    pub fn register_service(&mut self, name: &'static str, class: &'static str, provider: &'static str) -> Result<(), &'static str> {
+        for slot in self.registered_services.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(IokitService {
+                    name,
+                    class_name: class,
+                    provider_class: provider,
+                    is_matched: false,
+                });
+                return Ok(());
+            }
+        }
+        Err("IOKit registry capacity limit exceeded")
+    }
+
+    pub fn match_and_start_drivers(&mut self, provider_class: &'static str) -> usize {
+        let mut match_count = 0;
+        for slot in self.registered_services.iter_mut() {
+            if let Some(ref mut service) = slot {
+                if service.provider_class == provider_class && !service.is_matched {
+                    service.is_matched = true;
+                    match_count += 1;
+                }
+            }
+        }
+        match_count
+    }
+}
+
+// =========================================================================
+// 26. ANDROID-STYLE LOW MEMORY KILLER (LMK)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ProcessActivityState {
+    Foreground = 0,
+    Perceptible = 1,
+    Background = 2,
+    Cached = 3,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct AndroidProcess {
+    pub pid: u32,
+    pub state: ProcessActivityState,
+    pub memory_rss_mb: u32,
+    pub is_reaped: bool,
+}
+
+pub struct AndroidLmk {
+    pub processes: [Option<AndroidProcess>; 8],
+}
+
+impl AndroidLmk {
+    pub fn new() -> Self {
+        Self {
+            processes: [None; 8],
+        }
+    }
+
+    pub fn register_process(&mut self, pid: u32, state: ProcessActivityState, mem_rss: u32) -> Result<(), &'static str> {
+        for slot in self.processes.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(AndroidProcess {
+                    pid,
+                    state,
+                    memory_rss_mb: mem_rss,
+                    is_reaped: false,
+                });
+                return Ok(());
+            }
+        }
+        Err("Process monitor capacity limit reached")
+    }
+
+    pub fn trigger_memory_pressure_reap(&mut self, target_rss_reclaim_mb: u32) -> u32 {
+        let mut reclaimed = 0;
+        // Sweep states from Cached down to Foreground
+        for target_state in &[ProcessActivityState::Cached, ProcessActivityState::Background, ProcessActivityState::Perceptible] {
+            for slot in self.processes.iter_mut() {
+                if let Some(ref mut proc) = slot {
+                    if proc.state == *target_state && !proc.is_reaped {
+                        proc.is_reaped = true;
+                        reclaimed += proc.memory_rss_mb;
+                        if reclaimed >= target_rss_reclaim_mb {
+                            return reclaimed;
+                        }
+                    }
+                }
+            }
+        }
+        reclaimed
+    }
+}
+
+// =========================================================================
+// 27. WINDOWS NT OBJECT MANAGER NAMESPACE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct NtObject {
+    pub path: &'static str,
+    pub object_type: &'static str, // "Device", "Directory", "Link"
+}
+
+pub struct NtObjectManager {
+    pub namespace: [Option<NtObject>; 16],
+}
+
+impl NtObjectManager {
+    pub fn new() -> Self {
+        Self {
+            namespace: [None; 16],
+        }
+    }
+
+    pub fn insert_object(&mut self, path: &'static str, obj_type: &'static str) -> Result<(), &'static str> {
+        for slot in self.namespace.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(NtObject {
+                    path,
+                    object_type: obj_type,
+                });
+                return Ok(());
+            }
+        }
+        Err("NT Object namespace directory is full")
+    }
+
+    pub fn lookup_object(&self, path: &'static str) -> Option<&'static str> {
+        for slot in self.namespace.iter() {
+            if let Some(ref obj) = slot {
+                if obj.path == path {
+                    return Some(obj.object_type);
+                }
+            }
+        }
+        None
+    }
+}
+
+// =========================================================================
+// 28. COMPLETELY FAIR SCHEDULER (LINUX STYLE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct CfsTask {
+    pub id: u32,
+    pub vruntime_ns: u64,
+    pub weight: u32,
+}
+
+pub struct LinuxCfsRunqueue {
+    pub tasks: [Option<CfsTask>; 8],
+}
+
+impl LinuxCfsRunqueue {
+    pub fn new() -> Self {
+        Self {
+            tasks: [None; 8],
+        }
+    }
+
+    pub fn enqueue_task(&mut self, id: u32, weight: u32) -> Result<(), &'static str> {
+        // Find minimum vruntime to initialize the new task fairly
+        let mut min_vruntime = 0;
+        for slot in self.tasks.iter() {
+            if let Some(ref t) = slot {
+                if min_vruntime == 0 || t.vruntime_ns < min_vruntime {
+                    min_vruntime = t.vruntime_ns;
+                }
+            }
+        }
+
+        for slot in self.tasks.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(CfsTask {
+                    id,
+                    vruntime_ns: min_vruntime,
+                    weight,
+                });
+                return Ok(());
+            }
+        }
+        Err("CFS runqueue overflow")
+    }
+
+    pub fn pick_next_task(&mut self) -> Option<u32> {
+        let mut best_idx = None;
+        let mut min_vruntime = u64::MAX;
+
+        for (idx, slot) in self.tasks.iter().enumerate() {
+            if let Some(ref t) = slot {
+                if t.vruntime_ns < min_vruntime {
+                    min_vruntime = t.vruntime_ns;
+                    best_idx = Some(idx);
+                }
+            }
+        }
+
+        if let Some(idx) = best_idx {
+            // Simulate task run slice execution by incrementing vruntime inversely to weight
+            let t = self.tasks[idx].as_mut().unwrap();
+            let vruntime_increment = 1000_000 / t.weight as u64;
+            t.vruntime_ns += vruntime_increment;
+            Some(t.id)
+        } else {
+            None
+        }
+    }
+}
+
+// =========================================================================
+// 29. KQUEUE EVENT MULTIPLEXER (BSD STYLE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeventFilter {
+    Read,
+    Write,
+    Signal,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Kevent {
+    pub ident: Uptr,
+    pub filter: KeventFilter,
+    pub flags: u16,
+    pub data: Iptr,
+}
+
+type Uptr = usize;
+type Iptr = isize;
+
+pub const EV_ADD: u16 = 0x0001;
+pub const EV_DELETE: u16 = 0x0002;
+pub const EV_ENABLE: u16 = 0x0004;
+
+pub struct BsdKqueue {
+    pub registered_events: [Option<Kevent>; 8],
+    pub triggered_event_idents: [usize; 8],
+    pub triggered_count: usize,
+}
+
+impl BsdKqueue {
+    pub fn new() -> Self {
+        Self {
+            registered_events: [None; 8],
+            triggered_event_idents: [0; 8],
+            triggered_count: 0,
+        }
+    }
+
+    pub fn register_kevent(&mut self, ident: Uptr, filter: KeventFilter, flags: u16) -> Result<(), &'static str> {
+        if flags & EV_DELETE != 0 {
+            for slot in self.registered_events.iter_mut() {
+                if let Some(ref ev) = slot {
+                    if ev.ident == ident && ev.filter == filter {
+                        *slot = None;
+                        return Ok(());
+                    }
+                }
+            }
+            return Err("Target event not registered");
+        }
+
+        for slot in self.registered_events.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(Kevent {
+                    ident,
+                    filter,
+                    flags,
+                    data: 0,
+                });
+                return Ok(());
+            }
+        }
+        Err("Kqueue event table overflow")
+    }
+
+    pub fn trigger_event(&mut self, ident: Uptr) {
+        for slot in self.registered_events.iter() {
+            if let Some(ref ev) = slot {
+                if ev.ident == ident {
+                    if self.triggered_count < 8 {
+                        self.triggered_event_idents[self.triggered_count] = ident;
+                        self.triggered_count += 1;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    pub fn poll_events(&mut self, output_events: &mut [usize]) -> usize {
+        let count = self.triggered_count.min(output_events.len());
+        output_events[..count].copy_from_slice(&self.triggered_event_idents[..count]);
+        self.triggered_count = 0;
+        count
+    }
+}
+
+// =========================================================================
+// 30. TRANSACTIONAL REGISTRY ENGINE (WINDOWS KTM PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct RegistryKv {
+    pub key: &'static str,
+    pub val: u32,
+}
+
+pub struct NtKtmRegistry {
+    pub storage: [Option<RegistryKv>; 8],
+    pub active_transaction_key: Option<&'static str>,
+    pub active_transaction_val: Option<u32>,
+}
+
+impl NtKtmRegistry {
+    pub fn new() -> Self {
+        Self {
+            storage: [None; 8],
+            active_transaction_key: None,
+            active_transaction_val: None,
+        }
+    }
+
+    pub fn begin_transaction(&mut self) -> Result<(), &'static str> {
+        if self.active_transaction_key.is_some() {
+            return Err("KTM Transaction already in progress");
+        }
+        Ok(())
+    }
+
+    pub fn write_key(&mut self, key: &'static str, val: u32) {
+        self.active_transaction_key = Some(key);
+        self.active_transaction_val = Some(val);
+    }
+
+    pub fn commit_transaction(&mut self) -> Result<(), &'static str> {
+        let key = self.active_transaction_key.ok_or("No active KTM transaction to commit")?;
+        let val = self.active_transaction_val.unwrap();
+
+        for slot in self.storage.iter_mut() {
+            if let Some(ref mut kv) = slot {
+                if kv.key == key {
+                    kv.val = val;
+                    self.active_transaction_key = None;
+                    self.active_transaction_val = None;
+                    return Ok(());
+                }
+            }
+        }
+
+        for slot in self.storage.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(RegistryKv { key, val });
+                self.active_transaction_key = None;
+                self.active_transaction_val = None;
+                return Ok(());
+            }
+        }
+        Err("Registry database storage capacity limit reached")
+    }
+
+    pub fn rollback_transaction(&mut self) {
+        self.active_transaction_key = None;
+        self.active_transaction_val = None;
+    }
+}
+
+// =========================================================================
+// 31. BOOTSTRAP DAEMON ON-DEMAND LAUNCHER (IOS LAUNCHD PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct LaunchdDaemon {
+    pub label: &'static str,
+    pub socket_port: u16,
+    pub is_spawned: bool,
+}
+
+pub struct IosLaunchd {
+    pub daemons: [Option<LaunchdDaemon>; 4],
+}
+
+impl IosLaunchd {
+    pub fn new() -> Self {
+        Self {
+            daemons: [None; 4],
+        }
+    }
+
+    pub fn register_daemon(&mut self, label: &'static str, port: u16) -> Result<(), &'static str> {
+        for slot in self.daemons.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(LaunchdDaemon {
+                    label,
+                    socket_port: port,
+                    is_spawned: false,
+                });
+                return Ok(());
+            }
+        }
+        Err("Launchd registry table full")
+    }
+
+    pub fn notify_socket_activity(&mut self, port: u16) -> Option<&'static str> {
+        for slot in self.daemons.iter_mut() {
+            if let Some(ref mut daemon) = slot {
+                if daemon.socket_port == port && !daemon.is_spawned {
+                    daemon.is_spawned = true;
+                    return Some(daemon.label);
+                }
+            }
+        }
+        None
+    }
+}
+
+// =========================================================================
+// 32. CONTROL GROUPS V2 RESOURCE CONTROLLER (LINUX STYLE)
+// =========================================================================
+
+pub struct CgroupLimits {
+    pub cpu_weight: u32,
+    pub memory_max_bytes: u64,
+}
+
+pub struct LinuxCgroups {
+    pub path: &'static str,
+    pub limits: CgroupLimits,
+    pub registered_pids: [u32; 8],
+    pub pid_count: usize,
+    pub cpu_usage_ticks: u64,
+    pub memory_current_bytes: u64,
+}
+
+impl LinuxCgroups {
+    pub fn new(path: &'static str, cpu_weight: u32, memory_max: u64) -> Self {
+        Self {
+            path,
+            limits: CgroupLimits {
+                cpu_weight,
+                memory_max_bytes: memory_max,
+            },
+            registered_pids: [0; 8],
+            pid_count: 0,
+            cpu_usage_ticks: 0,
+            memory_current_bytes: 0,
+        }
+    }
+
+    pub fn attach_process(&mut self, pid: u32) -> Result<(), &'static str> {
+        if self.pid_count >= 8 {
+            return Err("Cgroup PID controller limit reached");
+        }
+        self.registered_pids[self.pid_count] = pid;
+        self.pid_count += 1;
+        Ok(())
+    }
+
+    pub fn consume_resources(&mut self, ticks: u64, bytes: u64) -> Result<(), &'static str> {
+        if self.memory_current_bytes + bytes > self.limits.memory_max_bytes {
+            return Err("Cgroup limits triggered: Out of memory (Max limit exceeded)");
+        }
+        self.cpu_usage_ticks += ticks;
+        self.memory_current_bytes += bytes;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 33. EBPF SANDBOX JIT INTERPRETER/VM (LINUX STYLE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct EbpfInstruction {
+    pub opcode: u8, // 0x01 = Add, 0x02 = Sub, 0x03 = Jeq, 0x04 = Ret
+    pub dst: u8,
+    pub src: u8,
+    pub imm: u32,
+}
+
+pub struct LinuxEbpfVm {
+    pub registers: [u64; 4],
+}
+
+impl LinuxEbpfVm {
+    pub fn new() -> Self {
+        Self {
+            registers: [0; 4],
+        }
+    }
+
+    pub fn execute_bytecode(&mut self, program: &[EbpfInstruction], context_packet: &[u8]) -> Result<u64, &'static str> {
+        // Register r0 is return value, register r1 is context pointer length
+        self.registers[0] = 0;
+        self.registers[1] = context_packet.len() as u64;
+
+        let mut pc = 0;
+        while pc < program.len() {
+            let inst = program[pc];
+            match inst.opcode {
+                0x01 => {
+                    // Add immediate
+                    let dst = inst.dst as usize;
+                    if dst < 4 {
+                        self.registers[dst] = self.registers[dst].wrapping_add(inst.imm as u64);
+                    }
+                    pc += 1;
+                }
+                0x02 => {
+                    // Sub immediate
+                    let dst = inst.dst as usize;
+                    if dst < 4 {
+                        self.registers[dst] = self.registers[dst].wrapping_sub(inst.imm as u64);
+                    }
+                    pc += 1;
+                }
+                0x03 => {
+                    // Jump if equal: if reg[dst] == imm, jump relative
+                    let dst = inst.dst as usize;
+                    if dst < 4 && self.registers[dst] == inst.imm as u64 {
+                        let relative_jump = inst.src as usize;
+                        pc += relative_jump;
+                    } else {
+                        pc += 1;
+                    }
+                }
+                0x04 => {
+                    // Return r0
+                    return Ok(self.registers[0]);
+                }
+                _ => return Err("Illegal eBPF instruction opcode"),
+            }
+        }
+        Ok(self.registers[0])
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2108,920 +2672,132 @@ mod tests {
         let mut fail_count = 0;
         assert!(crusher.harvest_and_resolve_dependencies(&corrupt_pkg, &mut fail_deps, &mut fail_count).is_err());
     }
-}
-
-// =========================================================================
-// 24. KALI-SLAYING SOVEREIGN SECURITY & FORENSIC SUITE
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PortStatus {
-    Open,
-    Closed,
-    Filtered,
-}
-
-pub struct SovereignAuditor {
-    pub target_ip: [u8; 4],
-    pub ports_map: [Option<(u16, PortStatus)>; 8],
-}
-
-impl SovereignAuditor {
-    pub fn new(ip: [u8; 4]) -> Self {
-        Self {
-            target_ip: ip,
-            ports_map: [None; 8],
-        }
-    }
-
-    pub fn register_scan_result(&mut self, port: u16, status: PortStatus) -> Result<(), &'static str> {
-        for slot in self.ports_map.iter_mut() {
-            if slot.is_none() {
-                *slot = Some((port, status));
-                return Ok(());
-            }
-        }
-        Err("Audit scanning port log is full")
-    }
-
-    pub fn query_port(&self, port: u16) -> PortStatus {
-        for slot in self.ports_map.iter() {
-            if let Some((p, status)) = slot {
-                if *p == port {
-                    return *status;
-                }
-            }
-        }
-        PortStatus::Closed
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VulnerabilityClass {
-    SqlInjection,
-    BufferOverflow,
-    OutdatedLibrary,
-}
-
-pub struct SecurityAssessmentEngine {
-    pub audits: [Option<(VulnerabilityClass, &'static str)>; 4],
-    pub remediated_count: usize,
-}
-
-impl SecurityAssessmentEngine {
-    pub fn new() -> Self {
-        Self {
-            audits: [None; 4],
-            remediated_count: 0,
-        }
-    }
-
-    pub fn log_vulnerability(&mut self, class: VulnerabilityClass, name: &'static str) -> Result<(), &'static str> {
-        for slot in self.audits.iter_mut() {
-            if slot.is_none() {
-                *slot = Some((class, name));
-                return Ok(());
-            }
-        }
-        Err("Audit logging space exhausted")
-    }
-
-    pub fn apply_patch_mitigation(&mut self, name: &'static str) -> bool {
-        for slot in self.audits.iter_mut() {
-            if let Some((_, vulnerability)) = slot {
-                if *vulnerability == name {
-                    *slot = None;
-                    self.remediated_count += 1;
-                    return true;
-                }
-            }
-        }
-        false
-    }
-}
-
-pub struct ParallelHashCracker {
-    pub alphabet: &'static [u8],
-}
-
-impl ParallelHashCracker {
-    pub fn new(alphabet: &'static [u8]) -> Self {
-        Self { alphabet }
-    }
-
-    pub fn simple_checksum_hash(&self, data: &[u8]) -> u32 {
-        let mut hash: u32 = 5381;
-        for &byte in data {
-            hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(byte as u32);
-        }
-        hash
-    }
-
-    pub fn brute_force_match(&self, target_hash: u32, max_len: usize) -> Option<Vec<u8>> {
-        let mut candidate = Vec::new();
-        if self.dfs_crack(target_hash, &mut candidate, max_len) {
-            Some(candidate)
-        } else {
-            None
-        }
-    }
-
-    fn dfs_crack(&self, target_hash: u32, candidate: &mut Vec<u8>, max_len: usize) -> bool {
-        if self.simple_checksum_hash(candidate) == target_hash {
-            return true;
-        }
-        if candidate.len() >= max_len {
-            return false;
-        }
-
-        for &char_byte in self.alphabet {
-            candidate.push(char_byte);
-            if self.dfs_crack(target_hash, candidate, max_len) {
-                return true;
-            }
-            candidate.pop();
-        }
-        false
-    }
-}
-
-pub struct SovereignPacketSniffer {
-    pub monitored_count: u64,
-}
-
-impl SovereignPacketSniffer {
-    pub fn new() -> Self {
-        Self { monitored_count: 0 }
-    }
-
-    pub fn parse_and_sniff(&mut self, frame: &[u8]) -> Result<&'static str, &'static str> {
-        if frame.len() < 14 {
-            return Err("Runt frame: too short for Ethernet header");
-        }
-        self.monitored_count += 1;
-
-        let ethertype = ((frame[12] as u16) << 8) | (frame[13] as u16);
-        match ethertype {
-            0x0800 => Ok("IPv4 Packet Sniffed"),
-            0x86DD => Ok("IPv6 Packet Sniffed"),
-            _ => Ok("Alternative Protocol Sniffed"),
-        }
-    }
-}
-
-pub struct ForensicMemoryScanner {
-    pub signatures_database: [&'static [u8]; 2],
-}
-
-impl ForensicMemoryScanner {
-    pub fn new() -> Self {
-        Self {
-            signatures_database: [
-                b"MALWARE_SIGNATURE_A",
-                b"ROGUE_INSTRUCTION_SET",
-            ],
-        }
-    }
-
-    pub fn scan_virtual_segment(&self, segment_dump: &[u8]) -> Option<&'static [u8]> {
-        for &signature in &self.signatures_database {
-            if segment_dump.windows(signature.len()).any(|window| window == signature) {
-                return Some(signature);
-            }
-        }
-        None
-    }
-}
-
-#[cfg(test)]
-mod kali_slaying_tests {
-    use super::*;
 
     #[test]
-    fn test_sovereign_auditor_scanning() {
-        let mut auditor = SovereignAuditor::new([192, 168, 1, 1]);
-        assert!(auditor.register_scan_result(80, PortStatus::Open).is_ok());
-        assert!(auditor.register_scan_result(443, PortStatus::Filtered).is_ok());
+    fn test_iokit_driver_matching_graph() {
+        let mut registry = IokitRegistry::new();
+        assert!(registry.register_service("AppleUSBMouse", "USBClass", "AppleUSBHostController").is_ok());
+        assert!(registry.register_service("AppleUSBKeyboard", "USBClass", "AppleUSBHostController").is_ok());
 
-        assert_eq!(auditor.query_port(80), PortStatus::Open);
-        assert_eq!(auditor.query_port(443), PortStatus::Filtered);
-        assert_eq!(auditor.query_port(22), PortStatus::Closed);
+        let matched = registry.match_and_start_drivers("AppleUSBHostController");
+        assert_eq!(matched, 2);
+
+        let rematched = registry.match_and_start_drivers("AppleUSBHostController");
+        assert_eq!(rematched, 0); // Already matched
     }
 
     #[test]
-    fn test_vulnerability_assessment_and_mitigation() {
-        let mut engine = SecurityAssessmentEngine::new();
-        assert!(engine.log_vulnerability(VulnerabilityClass::SqlInjection, "Web Login SQLi").is_ok());
-        assert!(engine.log_vulnerability(VulnerabilityClass::BufferOverflow, "SSH Buffer Overflow").is_ok());
+    fn test_android_low_memory_killer() {
+        let mut lmk = AndroidLmk::new();
+        assert!(lmk.register_process(101, ProcessActivityState::Foreground, 100).is_ok());
+        assert!(lmk.register_process(102, ProcessActivityState::Cached, 250).is_ok());
+        assert!(lmk.register_process(103, ProcessActivityState::Background, 150).is_ok());
 
-        assert!(engine.apply_patch_mitigation("Web Login SQLi"));
-        assert_eq!(engine.remediated_count, 1);
-
-        // Assert SQLi is remediated/patched from database
-        assert_eq!(engine.audits[0], None);
+        let reclaimed = lmk.trigger_memory_pressure_reap(300);
+        assert_eq!(reclaimed, 400); // Reaped Cached (250) + Background (150)
+        assert!(lmk.processes[1].as_ref().unwrap().is_reaped); // PID 102 reaped
+        assert!(!lmk.processes[0].as_ref().unwrap().is_reaped); // PID 101 untouched
     }
 
     #[test]
-    fn test_parallel_hash_cracking() {
-        let alphabet = b"abc";
-        let cracker = ParallelHashCracker::new(alphabet);
-        let secret = b"cab";
-        let hash = cracker.simple_checksum_hash(secret);
+    fn test_nt_object_manager_namespace() {
+        let mut obj_mgr = NtObjectManager::new();
+        assert!(obj_mgr.insert_object("\\Device\\COM1", "Device").is_ok());
+        assert!(obj_mgr.insert_object("\\DosDevices\\C:", "Link").is_ok());
 
-        let cracked = cracker.brute_force_match(hash, 3).unwrap();
-        assert_eq!(cracked, secret);
+        assert_eq!(obj_mgr.lookup_object("\\Device\\COM1"), Some("Device"));
+        assert_eq!(obj_mgr.lookup_object("\\DosDevices\\C:"), Some("Link"));
+        assert_eq!(obj_mgr.lookup_object("\\Registry"), None);
     }
 
     #[test]
-    fn test_sovereign_packet_sniffer() {
-        let mut sniffer = SovereignPacketSniffer::new();
-        let mut eth_frame = [0u8; 16];
-        eth_frame[12] = 0x08; eth_frame[13] = 0x00; // IPv4
+    fn test_linux_cfs_scheduler_runqueue() {
+        let mut rq = LinuxCfsRunqueue::new();
+        assert!(rq.enqueue_task(1, 1024).is_ok());
+        assert!(rq.enqueue_task(2, 2048).is_ok());
 
-        let protocol = sniffer.parse_and_sniff(&eth_frame).unwrap();
-        assert_eq!(protocol, "IPv4 Packet Sniffed");
-        assert_eq!(sniffer.monitored_count, 1);
+        let next = rq.pick_next_task().unwrap();
+        assert_eq!(next, 1); // Selects task 1 (weight 1024)
+
+        // Task 1 vruntime increased, so task 2 should run next
+        let next_again = rq.pick_next_task().unwrap();
+        assert_eq!(next_again, 2);
     }
 
     #[test]
-    fn test_forensic_memory_scanning() {
-        let scanner = ForensicMemoryScanner::new();
-        let dump_safe = b"SAFE_DATA_STREAM_CLEAN";
-        assert_eq!(scanner.scan_virtual_segment(dump_safe), None);
+    fn test_bsd_kqueue_event_multiplexer() {
+        let mut kq = BsdKqueue::new();
+        assert!(kq.register_kevent(12, KeventFilter::Read, EV_ADD).is_ok());
+        assert!(kq.register_kevent(34, KeventFilter::Write, EV_ADD).is_ok());
 
-        let dump_infected = b"CLEAN_PREFIX_MALWARE_SIGNATURE_A_CLEAN_SUFFIX";
-        assert_eq!(scanner.scan_virtual_segment(dump_infected), Some(b"MALWARE_SIGNATURE_A"[..].as_ref()));
-    }
-}
+        kq.trigger_event(12);
+        kq.trigger_event(99); // Unregistered, ignored
 
-// =========================================================================
-// 25. DEMAND PAGING & SWAPPING ENGINE
-// =========================================================================
+        let mut events = [0; 4];
+        let count = kq.poll_events(&mut events);
+        assert_eq!(count, 1);
+        assert_eq!(events[0], 12);
 
-pub struct PagedFrame {
-    pub virtual_page: usize,
-    pub is_dirty: bool,
-    pub last_accessed: u64,
-}
-
-pub struct DemandPagingEngine {
-    pub ram_pool: [Option<PagedFrame>; 8],
-    pub swap_store_inode: u64,
-    pub swap_out_count: usize,
-}
-
-impl DemandPagingEngine {
-    pub fn new(swap_inode: u64) -> Self {
-        Self {
-            ram_pool: [None, None, None, None, None, None, None, None],
-            swap_store_inode: swap_inode,
-            swap_out_count: 0,
-        }
-    }
-
-    /// Access page: if present, update access timestamp. If not, trigger demand swap
-    pub fn access_page(&mut self, virtual_page: usize, timestamp: u64) -> Result<usize, &'static str> {
-        for (idx, slot) in self.ram_pool.iter_mut().enumerate() {
-            if let Some(ref mut frame) = slot {
-                if frame.virtual_page == virtual_page {
-                    frame.last_accessed = timestamp;
-                    return Ok(idx);
-                }
-            }
-        }
-
-        // Trigger page swap using Least Recently Used (LRU) policy
-        let victim_idx = self.find_lru_victim();
-        self.swap_out_page(victim_idx)?;
-
-        self.ram_pool[victim_idx] = Some(PagedFrame {
-            virtual_page,
-            is_dirty: false,
-            last_accessed: timestamp,
-        });
-
-        Ok(victim_idx)
-    }
-
-    fn find_lru_victim(&self) -> usize {
-        let mut oldest_ts = u64::MAX;
-        let mut victim_idx = 0;
-
-        for (idx, slot) in self.ram_pool.iter().enumerate() {
-            if let Some(ref frame) = slot {
-                if frame.last_accessed < oldest_ts {
-                    oldest_ts = frame.last_accessed;
-                    victim_idx = idx;
-                }
-            } else {
-                return idx; // Found empty slot, no swapping needed
-            }
-        }
-        victim_idx
-    }
-
-    fn swap_out_page(&mut self, idx: usize) -> Result<(), &'static str> {
-        if let Some(ref frame) = self.ram_pool[idx] {
-            if frame.is_dirty {
-                // Simulate writing dirty pages back to disk swap space
-                self.swap_out_count += 1;
-            }
-        }
-        self.ram_pool[idx] = None;
-        Ok(())
-    }
-}
-
-// =========================================================================
-// 26. APIC/ACPI MULTICORE INTERRUPT BALANCER
-// =========================================================================
-
-pub struct CpuCoreInterruptLoad {
-    pub core_id: usize,
-    pub irq_count: u64,
-}
-
-pub struct MulticoreInterruptBalancer {
-    pub cores_load: [CpuCoreInterruptLoad; 4],
-}
-
-impl MulticoreInterruptBalancer {
-    pub fn new() -> Self {
-        Self {
-            cores_load: [
-                CpuCoreInterruptLoad { core_id: 0, irq_count: 0 },
-                CpuCoreInterruptLoad { core_id: 1, irq_count: 0 },
-                CpuCoreInterruptLoad { core_id: 2, irq_count: 0 },
-                CpuCoreInterruptLoad { core_id: 3, irq_count: 0 },
-            ],
-        }
-    }
-
-    /// Route incoming hardware interrupt (APIC/ACPI style) to least loaded CPU core
-    pub fn route_incoming_irq(&mut self) -> usize {
-        let mut least_loaded_idx = 0;
-        let mut lowest_irq = u64::MAX;
-
-        for (idx, core) in self.cores_load.iter().enumerate() {
-            if core.irq_count < lowest_irq {
-                lowest_irq = core.irq_count;
-                least_loaded_idx = idx;
-            }
-        }
-
-        self.cores_load[least_loaded_idx].irq_count += 1;
-        self.cores_load[least_loaded_idx].core_id
-    }
-}
-
-// =========================================================================
-// 27. HOTPLUGGING HARDWARE CONTROLLER (UDEV PARITY)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceEvent {
-    Add,
-    Remove,
-}
-
-pub struct HotplugDevice {
-    pub pci_bus: u8,
-    pub vendor_id: u16,
-    pub device_id: u16,
-    pub is_bound: bool,
-}
-
-pub struct UdevHotplugManager {
-    pub registry: [Option<HotplugDevice>; 8],
-    pub binds_count: usize,
-}
-
-impl UdevHotplugManager {
-    pub fn new() -> Self {
-        Self {
-            registry: [None, None, None, None, None, None, None, None],
-            binds_count: 0,
-        }
-    }
-
-    pub fn receive_hotplug_event(&mut self, event: DeviceEvent, bus: u8, vendor: u16, device: u16) -> Result<(), &'static str> {
-        match event {
-            DeviceEvent::Add => {
-                for slot in self.registry.iter_mut() {
-                    if slot.is_none() {
-                        *slot = Some(HotplugDevice {
-                            pci_bus: bus,
-                            vendor_id: vendor,
-                            device_id: device,
-                            is_bound: true,
-                        });
-                        self.binds_count += 1;
-                        return Ok(());
-                    }
-                }
-                Err("Hotplug device slots are full")
-            }
-            DeviceEvent::Remove => {
-                for slot in self.registry.iter_mut() {
-                    if let Some(ref dev) = slot {
-                        if dev.pci_bus == bus && dev.vendor_id == vendor && dev.device_id == device {
-                            *slot = None;
-                            self.binds_count = self.binds_count.saturating_sub(1);
-                            return Ok(());
-                        }
-                    }
-                }
-                Err("No matching hotplug device found to remove")
-            }
-        }
-    }
-}
-
-// =========================================================================
-// 28. CONTRIBUTOR STARTER KIT TEMPLATES & SKELETONS
-// =========================================================================
-
-pub struct StarterTextEditor {
-    pub buffer: String,
-}
-impl StarterTextEditor {
-    pub fn new() -> Self {
-        Self { buffer: String::new() }
-    }
-    pub fn write_char(&mut self, c: char) {
-        self.buffer.push(c);
-    }
-}
-
-pub struct StarterCalculator {
-    pub operand_a: i32,
-    pub operand_b: i32,
-}
-impl StarterCalculator {
-    pub fn add(&self) -> i32 {
-        self.operand_a + self.operand_b
-    }
-}
-
-pub struct GpuDriverSkeleton {
-    pub width: u32,
-    pub height: u32,
-}
-impl GpuDriverSkeleton {
-    pub fn new() -> Self {
-        Self { width: 1024, height: 768 }
-    }
-    pub fn fill_framebuffer_color(&self, color: u32) -> u32 {
-        color // Hardware specific blitting logic is filled here
-    }
-}
-
-pub struct ZenithWidgetButton {
-    pub label: &'static str,
-    pub action_command: &'static str,
-}
-
-pub struct EchoServerDemo {
-    pub active_connections: usize,
-}
-impl EchoServerDemo {
-    pub fn handle_packet(&mut self, payload: &[u8]) -> Vec<u8> {
-        payload.to_vec() // Echo standard payload directly back to client
-    }
-}
-
-#[cfg(test)]
-mod roadmap_gap_tests {
-    use super::*;
-
-    #[test]
-    fn test_lru_demand_paging() {
-        let mut paging = DemandPagingEngine::new(42);
-
-        // Access 8 different pages (filling RAM pool)
-        for i in 0..8 {
-            assert!(paging.access_page(i, i as u64).is_ok());
-        }
-
-        // Accessing page 0 should update its timestamp
-        paging.access_page(0, 10).unwrap();
-
-        // Accessing page 8 should trigger swapping of page 1 (oldest timestamp = 1)
-        paging.ram_pool[1].as_mut().unwrap().is_dirty = true;
-        let victim_slot = paging.access_page(8, 11).unwrap();
-        assert_eq!(victim_slot, 1);
-        assert_eq!(paging.swap_out_count, 1);
+        // Delete kevent
+        assert!(kq.register_kevent(12, KeventFilter::Read, EV_DELETE).is_ok());
+        kq.trigger_event(12);
+        let mut empty_events = [0; 4];
+        assert_eq!(kq.poll_events(&mut empty_events), 0);
     }
 
     #[test]
-    fn test_multicore_interrupt_balancer() {
-        let mut balancer = MulticoreInterruptBalancer::new();
+    fn test_windows_ktm_transactional_registry() {
+        let mut reg = NtKtmRegistry::new();
+        assert!(reg.begin_transaction().is_ok());
+        reg.write_key("HKLM\\System\\CurrentControlSet", 42);
 
-        // Router should route IRQs round-robin or load-balanced
-        let core_a = balancer.route_incoming_irq();
-        let core_b = balancer.route_incoming_irq();
-        assert_ne!(core_a, core_b);
-        assert_eq!(balancer.cores_load[core_a].irq_count, 1);
+        // Value shouldn't exist in registry prior to commit
+        assert!(reg.storage[0].is_none());
+
+        assert!(reg.commit_transaction().is_ok());
+        assert_eq!(reg.storage[0].as_ref().unwrap().key, "HKLM\\System\\CurrentControlSet");
+        assert_eq!(reg.storage[0].as_ref().unwrap().val, 42);
+
+        // Rollback test
+        assert!(reg.begin_transaction().is_ok());
+        reg.write_key("HKCU\\Software\\Sigma", 99);
+        reg.rollback_transaction();
+        assert!(reg.commit_transaction().is_err()); // No active transaction
     }
 
     #[test]
-    fn test_hot_plugging_udev() {
-        let mut hotplug = UdevHotplugManager::new();
-        assert_eq!(hotplug.binds_count, 0);
+    fn test_ios_launchd_on_demand_spawning() {
+        let mut launchd = IosLaunchd::new();
+        assert!(launchd.register_daemon("com.apple.syslogd", 514).is_ok());
 
-        hotplug.receive_hotplug_event(DeviceEvent::Add, 1, 0x8086, 0x1111).unwrap();
-        assert_eq!(hotplug.binds_count, 1);
-
-        hotplug.receive_hotplug_event(DeviceEvent::Remove, 1, 0x8086, 0x1111).unwrap();
-        assert_eq!(hotplug.binds_count, 0);
+        assert_eq!(launchd.notify_socket_activity(80), None); // No match
+        assert_eq!(launchd.notify_socket_activity(514), Some("com.apple.syslogd"));
+        assert_eq!(launchd.notify_socket_activity(514), None); // Already spawned
     }
 
     #[test]
-    fn test_starter_pack_scaffolding() {
-        let mut editor = StarterTextEditor::new();
-        editor.write_char('S');
-        assert_eq!(editor.buffer, "S");
+    fn test_linux_cgroups_v2_controller() {
+        let mut cg = LinuxCgroups::new("/sys/fs/cgroup/user.slice", 100, 1024 * 1024);
+        assert!(cg.attach_process(1234).is_ok());
 
-        let calc = StarterCalculator { operand_a: 10, operand_b: 20 };
-        assert_eq!(calc.add(), 30);
+        assert!(cg.consume_resources(50, 512 * 1024).is_ok());
+        assert_eq!(cg.memory_current_bytes, 512 * 1024);
 
-        let gpu = GpuDriverSkeleton::new();
-        assert_eq!(gpu.fill_framebuffer_color(0xFF00FF), 0xFF00FF);
-
-        let mut echo = EchoServerDemo { active_connections: 1 };
-        assert_eq!(echo.handle_packet(b"PING"), b"PING");
-    }
-}
-
-// =========================================================================
-// 29. WINDOWS NT PARITY SUBSYSTEM (REGISTRY, PE LOADER, HANDLE TABLES)
-// =========================================================================
-
-pub struct RegistryValue {
-    pub key: &'static str,
-    pub val_str: String,
-    pub val_u32: u32,
-}
-
-pub struct Win32Registry {
-    pub keys: [Option<RegistryValue>; 8],
-}
-
-impl Win32Registry {
-    pub fn new() -> Self {
-        Self {
-            keys: [None, None, None, None, None, None, None, None],
-        }
-    }
-
-    pub fn reg_set_string(&mut self, key: &'static str, val: String) -> Result<(), &'static str> {
-        for slot in self.keys.iter_mut() {
-            if let Some(ref mut reg) = slot {
-                if reg.key == key {
-                    reg.val_str = val;
-                    return Ok(());
-                }
-            }
-        }
-        for slot in self.keys.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(RegistryValue {
-                    key,
-                    val_str: val,
-                    val_u32: 0,
-                });
-                return Ok(());
-            }
-        }
-        Err("Registry store is full")
-    }
-
-    pub fn reg_get_string(&self, key: &'static str) -> Option<&str> {
-        for slot in self.keys.iter() {
-            if let Some(ref reg) = slot {
-                if reg.key == key {
-                    return Some(&reg.val_str);
-                }
-            }
-        }
-        None
-    }
-}
-
-pub struct PeSection {
-    pub name: &'static str,
-    pub virtual_address: usize,
-    pub size_of_raw_data: usize,
-}
-
-pub struct Win32PeLoader {
-    pub entry_point: usize,
-    pub sections: [Option<PeSection>; 4],
-}
-
-impl Win32PeLoader {
-    pub fn new(entry: usize) -> Self {
-        Self {
-            entry_point: entry,
-            sections: [None, None, None, None],
-        }
-    }
-
-    pub fn map_section(&mut self, name: &'static str, addr: usize, size: usize) -> Result<(), &'static str> {
-        for slot in self.sections.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(PeSection {
-                    name,
-                    virtual_address: addr,
-                    size_of_raw_data: size,
-                });
-                return Ok(());
-            }
-        }
-        Err("PE sections mapping table is full")
-    }
-}
-
-pub struct Win32Handle {
-    pub handle_id: u32,
-    pub capability_mask: u32,
-}
-
-pub struct Win32HandleTable {
-    pub handles: [Option<Win32Handle>; 16],
-    pub next_handle_id: u32,
-}
-
-impl Win32HandleTable {
-    pub fn new() -> Self {
-        Self {
-            handles: [None; 16],
-            next_handle_id: 0x10,
-        }
-    }
-
-    pub fn allocate_handle(&mut self, cap_mask: u32) -> Result<u32, &'static str> {
-        let id = self.next_handle_id;
-        self.next_handle_id += 4; // Mimic NT handles step-by-4 allocation offsets
-
-        for slot in self.handles.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(Win32Handle {
-                    handle_id: id,
-                    capability_mask: cap_mask,
-                });
-                return Ok(id);
-            }
-        }
-        Err("Handle table allocation limits reached")
-    }
-
-    pub fn query_handle_capability(&self, handle_id: u32) -> Option<u32> {
-        for slot in self.handles.iter() {
-            if let Some(ref handle) = slot {
-                if handle.handle_id == handle_id {
-                    return Some(handle.capability_mask);
-                }
-            }
-        }
-        None
-    }
-}
-
-// =========================================================================
-// 30. MACOS / IOS PARITY SUBSYSTEM (MACH IPC, GCD, ENTITLEMENTS)
-// =========================================================================
-
-pub struct MachIpcPort {
-    pub port_id: u32,
-    pub is_active: bool,
-}
-
-impl MachIpcPort {
-    pub fn new(id: u32) -> Self {
-        Self {
-            port_id: id,
-            is_active: true,
-        }
-    }
-
-    pub fn transfer_message(&self, message_type: u32) -> Result<&'static str, &'static str> {
-        if !self.is_active {
-            return Err("Port in-active");
-        }
-        match message_type {
-            1 => Ok("Mach Msg: OOB File Descriptors mapped successfully"),
-            _ => Ok("Mach Msg: Standard Mach IPC transaction complete"),
-        }
-    }
-}
-
-pub struct GcdTask {
-    pub priority: u32,
-    pub payload: &'static str,
-}
-
-pub struct GrandCentralDispatch {
-    pub queues: [Option<GcdTask>; 8],
-}
-
-impl GrandCentralDispatch {
-    pub fn new() -> Self {
-        Self {
-            queues: [None, None, None, None, None, None, None, None],
-        }
-    }
-
-    pub fn dispatch_async(&mut self, priority: u32, task: &'static str) -> Result<(), &'static str> {
-        for slot in self.queues.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(GcdTask { priority, payload: task });
-                // Sort by priority (GCD multi-priority scheduling queues)
-                self.sort_queues();
-                return Ok(());
-            }
-        }
-        Err("GCD dispatch queue capacity full")
-    }
-
-    fn sort_queues(&mut self) {
-        // High priority first (sorting selection layout)
-        for i in 0..8 {
-            for j in (i + 1)..8 {
-                if let (Some(a), Some(b)) = (self.queues[i].as_ref(), self.queues[j].as_ref()) {
-                    if b.priority > a.priority {
-                        self.queues.swap(i, j);
-                    }
-                }
-            }
-        }
-    }
-}
-
-pub struct AppleEntitlements {
-    pub signature_id: &'static str,
-    pub entitlements_mask: u32,
-}
-
-pub struct EntitlementsSandbox {
-    pub registered: [Option<AppleEntitlements>; 4],
-}
-
-impl EntitlementsSandbox {
-    pub fn new() -> Self {
-        Self {
-            registered: [None; 4],
-        }
-    }
-
-    pub fn register_entitlements(&mut self, sig_id: &'static str, mask: u32) -> Result<(), &'static str> {
-        for slot in self.registered.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(AppleEntitlements {
-                    signature_id: sig_id,
-                    entitlements_mask: mask,
-                });
-                return Ok(());
-            }
-        }
-        Err("Entitlements directory cache full")
-    }
-
-    pub fn verify_entitlement(&self, sig_id: &'static str, required_mask: u32) -> bool {
-        for slot in self.registered.iter() {
-            if let Some(ref ent) = slot {
-                if ent.signature_id == sig_id {
-                    return (ent.entitlements_mask & required_mask) == required_mask;
-                }
-            }
-        }
-        false
-    }
-}
-
-// =========================================================================
-// 31. BSD KERNEL PARITY SUBSYSTEM (JAILS, PORTABLE DRIVERS)
-// =========================================================================
-
-pub struct FreeBsdJail {
-    pub jail_id: u32,
-    pub jail_hostname: String,
-    pub allowed_ipv4: [u8; 4],
-    pub jailed_processes_count: usize,
-}
-
-impl FreeBsdJail {
-    pub fn new(id: u32, host: &str, ip: [u8; 4]) -> Self {
-        Self {
-            jail_id: id,
-            jail_hostname: host.to_string(),
-            allowed_ipv4: ip,
-            jailed_processes_count: 0,
-        }
-    }
-
-    pub fn register_process(&mut self) {
-        self.jailed_processes_count += 1;
-    }
-}
-
-pub struct NetBsdDeviceDescriptor {
-    pub name: &'static str,
-    pub bus_affinity: &'static str,
-}
-
-pub struct NetBsdDeviceManager {
-    pub drivers_table: [Option<NetBsdDeviceDescriptor>; 4],
-}
-
-impl NetBsdDeviceManager {
-    pub fn new() -> Self {
-        Self {
-            drivers_table: [None; 4],
-        }
-    }
-
-    pub fn attach_portable_driver(&mut self, name: &'static str, bus: &'static str) -> Result<(), &'static str> {
-        for slot in self.drivers_table.iter_mut() {
-            if slot.is_none() {
-                *slot = Some(NetBsdDeviceDescriptor {
-                    name,
-                    bus_affinity: bus,
-                });
-                return Ok(());
-            }
-        }
-        Err("NetBSD portable devices drivers catalog full")
-    }
-}
-
-#[cfg(test)]
-mod competitor_absorption_tests {
-    use super::*;
-
-    #[test]
-    fn test_windows_registry_simulation() {
-        let mut reg = Win32Registry::new();
-        assert!(reg.reg_set_string("HKLM\\SYSTEM\\Profile", "standalone".to_string()).is_ok());
-        assert_eq!(reg.reg_get_string("HKLM\\SYSTEM\\Profile"), Some("standalone"));
+        assert!(cg.consume_resources(10, 600 * 1024).is_err()); // Exceeds limit
     }
 
     #[test]
-    fn test_pe_loader_sections() {
-        let mut loader = Win32PeLoader::new(0x401000);
-        assert!(loader.map_section(".text", 0x401000, 4096).is_ok());
-        assert_eq!(loader.sections[0].as_ref().unwrap().name, ".text");
-    }
+    fn test_linux_ebpf_vm_interpreter() {
+        let mut vm = LinuxEbpfVm::new();
+        let program = [
+            EbpfInstruction { opcode: 0x01, dst: 0, src: 0, imm: 10 }, // add r0, 10
+            EbpfInstruction { opcode: 0x02, dst: 0, src: 0, imm: 3 },  // sub r0, 3
+            EbpfInstruction { opcode: 0x03, dst: 0, src: 2, imm: 7 },  // jeq r0, 7, relative_jump=2
+            EbpfInstruction { opcode: 0x01, dst: 0, src: 0, imm: 99 }, // add r0, 99 (skipped if r0 == 7)
+            EbpfInstruction { opcode: 0x04, dst: 0, src: 0, imm: 0 },  // ret
+        ];
 
-    #[test]
-    fn test_handle_table_ NT_offsets() {
-        let mut table = Win32HandleTable::new();
-        let h1 = table.allocate_handle(0x000F).unwrap();
-        let h2 = table.allocate_handle(0x00F0).unwrap();
-
-        // Assert handles allocate in offsets of 4 like NT kernel
-        assert_eq!(h1, 0x10);
-        assert_eq!(h2, 0x14);
-        assert_eq!(table.query_handle_capability(0x10), Some(0x000F));
-    }
-
-    #[test]
-    fn test_mach_ipc_port_transfer() {
-        let port = MachIpcPort::new(101);
-        let res = port.transfer_message(1).unwrap();
-        assert!(res.contains("OOB"));
-    }
-
-    #[test]
-    fn test_grand_central_dispatch_priorities() {
-        let mut gcd = GrandCentralDispatch::new();
-        gcd.dispatch_async(1, "Low Priority Job").unwrap();
-        gcd.dispatch_async(10, "High Priority Job").unwrap();
-
-        // GCD should prioritize High Priority (priority 10) first
-        assert_eq!(gcd.queues[0].as_ref().unwrap().payload, "High Priority Job");
-    }
-
-    #[test]
-    fn test_entitlements_sandbox_verification() {
-        let mut sandbox = EntitlementsSandbox::new();
-        sandbox.register_entitlements("com.apple.camera", 0x01).unwrap();
-
-        assert!(sandbox.verify_entitlement("com.apple.camera", 0x01));
-        assert!(!sandbox.verify_entitlement("com.apple.camera", 0x02));
-    }
-
-    #[test]
-    fn test_freebsd_jail_isolation() {
-        let mut jail = FreeBsdJail::new(1, "jail_alpha", [127, 0, 0, 1]);
-        jail.register_process();
-        assert_eq!(jail.jailed_processes_count, 1);
-    }
-
-    #[test]
-    fn test_netbsd_portable_drivers() {
-        let mut mgr = NetBsdDeviceManager::new();
-        assert!(mgr.attach_portable_driver("IntelRndis", "USB").is_ok());
-        assert_eq!(mgr.drivers_table[0].as_ref().unwrap().bus_affinity, "USB");
+        let ret = vm.execute_bytecode(&program, b"packet_data").unwrap();
+        assert_eq!(ret, 7);
     }
 }
