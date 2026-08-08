@@ -18,32 +18,31 @@
 
 // SigmaOS Kernel Module
 pub mod breakthroughs;
+pub mod breakthroughs_v2;
+pub mod exports;
 pub mod ipc;
 pub mod memory;
-pub mod object;
-pub mod performance;
-pub mod sched;
-pub mod vfs;
-pub mod roundrobin;
-pub mod scheduler;
 pub mod meta;
 pub mod paging;
 pub mod policy_mechanism;
-pub mod breakthroughs;
-pub mod ipc;
-pub mod linux_absorb;
-pub mod subsystem;
+pub mod roundrobin;
+pub mod scheduler;
+pub mod structures;
 
-pub use crate::boot::firmware::{
-    BootLoader, BootParams, FirmwareInterface, Initramfs, KernelCommandLine, SetupHeader,
+pub use breakthroughs::{
+    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
-pub use bus::{Bus, PciBus, UsableBus};
-pub use crate::container::runtime::oci::{
-    Container, ContainerManager, ContainerState, NamespaceConfig, NamespaceSet, OciSpec,
-    ResourceConfig, Runtime,
+pub use breakthroughs_v2::{
+    AdaptiveInitSystem, AdaptiveInitTarget, AiDrivenDaemon, CrossModeMultiplexer,
+    DiagnosticSeverity, MultiplexerDisplayMode, NeuroSymbolicEngine, PersonaManager,
+    ProgrammableRootPersona, ProvenanceBlock, ProvenanceChainVerifier,
+    SelfOptimizingShellBuiltin, TemporalFileSystem,
 };
-pub use device::{Device, DeviceBinding, DeviceManager, DeviceType, DriverError, DriverMetadata};
-pub use driver::{Driver, DriverRegistration, DriverRegistry};
+pub use exports::{
+    KernelSymbol, KernelSymbolType, KldModule, SymbolRegistry, SysInitItem, SysInitOrchestrator,
+    SysInitPriority,
+};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use linux_absorb::{
     AbsorbedBuddyAllocator, AbsorbedCfsScheduler, AbsorbedDriverInfo, AbsorbedExt4Driver,
@@ -51,27 +50,6 @@ pub use linux_absorb::{
     ConversionRuleType, LinuxAbsorptionEngine, SecurityHardeningLevel, SecurityPolicy,
     SecurityRestriction, ModuleLoadError, KernelModule, LkmLoader, KpatchPatch, KpatchManager,
 };
-pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
-pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use meta::{
-    MetaKernel, KernelPersona, KernelPlugin, KernelPluginManager, MicroDriver,
-    ABIManager, NetPod, KernelGraph, LegacyScheduler,
-};
-pub use paging::{
-    PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2,
-};
-pub use policy_mechanism::{
-    ResourceBroker, PolicyManager, ProtectionDomain, InterruptMechanism, FastPathIpc,
-    PrivilegeLevel, PolicyError,
-};
-pub use breakthroughs::{
-    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
-    UniversalAbiTranslator, UserDefinedKernelFunctions,
-    DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
-    KernelPersonalityMode,
-};
-pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use meta::{
     ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
@@ -82,6 +60,9 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use numa_scheduler::{NumaTask, LockFreeTaskQueue, NumaNode, NumaScheduler};
+pub use structures::{
+    Apc, ApcMode, ApcQueue, CircularDoublyLinkedList, CpuContext,
+    SequencedSinglyLinkedList, SinglyLinkedList, SystemThread, ThreadState, WorkItem,
+};

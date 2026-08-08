@@ -1,6 +1,7 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod importer;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
@@ -9,6 +10,9 @@ pub mod transaction;
 pub mod universal_adapter;
 pub mod importer;
 
+pub use importer::{
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
+};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
@@ -118,24 +122,6 @@ impl Package {
     }
 }
 
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
-}
-
 /// Package dependency
 #[derive(Debug, Clone)]
 pub struct Dependency {
@@ -177,5 +163,40 @@ mod tests {
         let v1 = Version::new(1, 2, 3);
         let v2 = Version::new(1, 2, 4);
         assert!(v1 < v2);
+    }
+
+    #[test]
+    fn test_package_rich_metadata_and_pqc_trust() {
+        let mut pkg = Package::new(
+            "linux-rt-kernel".to_string(),
+            Version::new(6, 9, 3),
+            "Real-time preempt-rt microkernel variant for SigmaOS".to_string(),
+            Vec::new(),
+            "sha256:d83d102e3b74".to_string(),
+        );
+
+        // Populate rich metadata standard fields
+        pkg.licenses.push("GPL-2.0-only".to_string());
+        pkg.maintainers
+            .push("Sovereign Maintainers <maintainers@sigmaos.dev>".to_string());
+        pkg.mirrors
+            .push("https://mirrors.sigmaos.org/pkgs/".to_string());
+        pkg.signing_keys
+            .push("dilithium5:pubkey_root_ca".to_string());
+        pkg.changelogs
+            .push("v6.9.3: RT preemption schedulers stabilization".to_string());
+
+        assert_eq!(pkg.name, "linux-rt-kernel");
+        assert_eq!(pkg.licenses[0], "GPL-2.0-only");
+        assert_eq!(
+            pkg.maintainers[0],
+            "Sovereign Maintainers <maintainers@sigmaos.dev>"
+        );
+        assert_eq!(pkg.mirrors[0], "https://mirrors.sigmaos.org/pkgs/");
+        assert_eq!(pkg.signing_keys[0], "dilithium5:pubkey_root_ca");
+        assert_eq!(
+            pkg.changelogs[0],
+            "v6.9.3: RT preemption schedulers stabilization"
+        );
     }
 }

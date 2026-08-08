@@ -461,8 +461,21 @@ impl CommandRegistry for SimpleCommandRegistry {
         None
     }
 
-    fn list(&self) -> ShellVec<&[u8]> {
-        let mut names = ShellVec::new();
+    fn get_mut(&mut self, name: &[u8]) -> Option<&mut dyn ShellCommand> {
+        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
+        let trimmed_name = &name[..name_len];
+        for command_option in &mut *self.commands {
+            if let Some(ref mut command) = command_option {
+                if command.name() == trimmed_name {
+                    return Some(command.as_mut());
+                }
+            }
+        }
+        None
+    }
+
+    fn list(&self) -> Vec<&[u8]> {
+        let mut names = Vec::new();
         for command_option in &*self.commands {
             if let Some(ref command) = command_option {
                 names.push(command.name());
@@ -832,8 +845,8 @@ impl CommandHistory for SimpleCommandHistory {
         }
     }
 
-    fn list(&self) -> ShellVec<&[u8]> {
-        let mut commands = ShellVec::new();
+    fn list(&self) -> Vec<&[u8]> {
+        let mut commands = Vec::new();
         for cmd in &*self.history {
             let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
@@ -843,13 +856,31 @@ impl CommandHistory for SimpleCommandHistory {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
+pub struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
 }
 
 impl<T> core::ops::Deref for Vec<T> {

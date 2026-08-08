@@ -10,7 +10,6 @@ pub struct MetaKernel {
     personas: Vec<KernelPersona>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct KernelPersona {
     pub name: &'static str,
     pub api_version: &'static str,

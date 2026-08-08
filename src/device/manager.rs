@@ -242,12 +242,6 @@ impl DeviceHotplug for SimpleDeviceHotplug {
     }
 }
 
-impl<T> Default for Vec<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -261,9 +255,6 @@ impl<T> Vec<T> {
             len: 0,
             capacity: 0,
         }
-    }
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
     }
     pub fn push(&mut self, item: T) {
         unsafe {

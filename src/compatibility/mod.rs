@@ -1,21 +1,19 @@
 // SigmaOS Compatibility Module
+pub mod constellation_mesh;
 pub mod cross_platform;
-pub mod historic_linux;
-pub mod mint_linux;
-pub mod chimera_linux;
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod wasm_sandbox;
-pub mod absorb_tools;
-pub mod tiny_core;
-pub mod apache_ossie;
-pub mod sovereign_suite;
-pub mod fedora;
-pub mod bsd;
-pub mod innovations;
-pub mod india_professional_tools;
-pub mod debian;
+pub mod endeavour;
+pub mod hopper_lab;
+pub mod legacy_adapters;
+pub mod standards;
 
+pub use constellation_mesh::{
+    BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
+    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
+    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid,
+    LegacyCCodexGrid, LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2,
+    PeripheralArchiveMesh, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+    StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
+};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, BinaryFormat as CrossPlatformBinaryFormat,
     CompatibilityError, CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
@@ -92,4 +90,19 @@ pub use india_professional_tools::{
 pub use debian::{
     SysVinitRunlevel, SysVinitManager, AptPackageMetadata, AptRepositorySynchronizer,
     AlternativeProvider, DebianAlternativesSystem, DebootstrapEngine,
+};
+pub use endeavour::{
+    EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
+    YayAurHelper,
+};
+pub use hopper_lab::{
+    CustomizabilityLayer, DesktopPreset, ExperimentalKernelWasm, HoppingDocumentation,
+    InitServiceManager, ReleaseEngine, ReleaseStream, SandboxedExperimentLab, SigmaHubAUR,
+};
+pub use legacy_adapters::{
+    LegacyDriverAdapter, LegacyFSAdapter, LegacyKernelAdapter, LegacyPackageAdapter,
+    LegacyProtocolAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+};
+pub use standards::{
+    FhsConventionStatus, LsbProfile, PosixComplianceLevel, StandardsComplianceManager,
 };

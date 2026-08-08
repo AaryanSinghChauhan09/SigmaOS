@@ -1,4 +1,3 @@
-// SigmaOS Distro Compatibility Layer
 // EndeavourOS Parity Engines for SigmaOS
 // This module implements user-centric distro utilities inspired by EndeavourOS,
 // such as the Welcome assistant, Reflector mirror ranking, update notifier daemon,
