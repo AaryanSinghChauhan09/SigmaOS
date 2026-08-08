@@ -8,19 +8,8 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
-pub mod boot_init;
-pub mod dde;
-pub mod even_more_devices;
-pub mod flipper_gpio_sensor;
 
-pub mod ch340_usb;
-pub mod e1000_nic;
-pub mod intel_hda;
-pub mod nvme_storage;
-
-pub use gpu::{
-    GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline, GpuShader, ShaderStage,
-};
+pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;

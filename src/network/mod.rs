@@ -1,20 +1,8 @@
 // SigmaOS Network Stack Module
-pub mod stack;
-pub mod analyzer;
 pub mod enterprise;
 pub mod tcp;
-pub mod tcp_udp;
-pub mod ring_buffer_stack;
+pub mod unix_sockets;
 
-pub use analyzer::{
-    NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
-    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
-    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
-    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
-    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
-    ClearLinuxFlowLoadBalancer,
-};
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-pub use sync::{CloudSyncManager, ConflictResolution, SyncConfig, SyncCredentials, SyncError, SyncItem, SyncItemType, SyncProvider, SyncResult, SyncStatus};
-pub use torrent::{PeerInfo, TorrentClient, TorrentError, TorrentState};
+pub use unix_sockets::{UnixSocketAddress, UnixSocketState, UnixSocketConn, UnixSocketRegistry};

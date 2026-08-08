@@ -6,6 +6,7 @@ pub mod kali_stack;
 pub mod nemoclaw;
 pub mod pledge;
 pub mod vulnerability;
+pub mod obfuscation;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use kali_stack::{
@@ -15,8 +16,4 @@ pub use kali_stack::{
 };
 pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{
-    ExploitPayload, PenetrationAssistant, Severity, Vulnerability, SimpleVulnerability,
-    VulnerabilityScanner, SimpleVulnerabilityScanner, ScanSummary, ScanReport,
-    SimpleScanReport, CIPipelineIntegration, SimpleCIPipelineIntegration,
-};
+pub use vulnerability::{ExploitPayload, PenetrationAssistant};

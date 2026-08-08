@@ -2,6 +2,7 @@
 // Implements buddy allocator and paging
 
 use core::ptr::NonNull;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -12,8 +13,6 @@ pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
 }
-
-use core::ptr::NonNull;
 
 pub struct Zone {
     pub present_pages: u64,
@@ -34,6 +33,12 @@ impl Page {
     }
 }
 
+#[derive(Clone)]
+pub struct BuddyAllocatorCheckpoint {
+    free_lists: [Vec<MemoryBlock>; 12],
+}
+
+/// Buddy allocator for memory management
 pub struct BuddyAllocator {
     pub free_lists: [Vec<MemoryBlock>; 12],
     pub free_pages: usize,
@@ -42,6 +47,16 @@ pub struct BuddyAllocator {
 }
 
 impl BuddyAllocator {
+    pub fn create_checkpoint(&self) -> BuddyAllocatorCheckpoint {
+        BuddyAllocatorCheckpoint {
+            free_lists: self.free_lists.clone(),
+        }
+    }
+
+    pub fn restore_checkpoint(&mut self, checkpoint: BuddyAllocatorCheckpoint) {
+        self.free_lists = checkpoint.free_lists;
+    }
+
     pub fn new() -> Self {
         Self {
             free_lists: Default::default(),
@@ -400,5 +415,23 @@ mod tests {
         // Verify we can allocate the same blocks again successfully
         let block_retry = allocator.allocate(4096).unwrap();
         assert_eq!(block_retry.size, 4096);
+    }
+
+    #[test]
+    fn test_checkpoint_restore() {
+        let mut allocator = BuddyAllocator::new();
+        allocator.initialize_memory(0x1000, 4096);
+        assert_eq!(allocator.get_free_memory(), 4096);
+
+        // Save state
+        let checkpoint = allocator.create_checkpoint();
+
+        // Pretend an allocation fails/changes state
+        let block = allocator.allocate(4096).unwrap();
+        assert_eq!(allocator.get_free_memory(), 0);
+
+        // Restore baseline checkpoint
+        allocator.restore_checkpoint(checkpoint);
+        assert_eq!(allocator.get_free_memory(), 4096);
     }
 }

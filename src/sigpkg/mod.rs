@@ -2,7 +2,6 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod linux_compat;
-pub mod importer;
 pub mod pacman;
 pub mod recipe;
 pub mod resolver;
@@ -14,7 +13,6 @@ pub use linux_compat::{
     DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
     TranslatedMetadata, TranslatorError,
 };
-pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
@@ -79,24 +77,6 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
-        }
-    }
 }
 
 /// Package dependency

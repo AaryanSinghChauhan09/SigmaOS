@@ -33,6 +33,7 @@ pub struct Process {
     pub virtual_runtime: u64,  // EEVDF vruntime (ticks)
     pub virtual_deadline: u64, // EEVDF virtual deadline
     pub time_slice: Duration,
+    pub edf_deadline: Option<u64>,
 }
 
 impl Process {
@@ -46,6 +47,7 @@ impl Process {
             virtual_runtime: 0,
             virtual_deadline: 0,
             time_slice: Duration::from_millis(10),
+            edf_deadline: None,
         }
     }
 
@@ -59,11 +61,21 @@ impl Process {
         }
     }
 
-    pub fn update_virtual_deadline(&mut self, system_vtime: u64) {
-        let weight = self.get_weight();
-        // deadline = vruntime + (q / w) where q is time slice slice equivalent ticks (10)
-        let q = 10;
-        self.virtual_deadline = self.virtual_runtime + (q / weight).max(1);
+    pub fn with_edf(mut self, deadline: u64) -> Self {
+        self.edf_deadline = Some(deadline);
+        self
+    }
+
+    pub fn update_virtual_deadline(&mut self, current_time: u64) {
+        // EEVDF virtual deadline calculation
+        let weight = match self.priority {
+            Priority::Idle => 1024,
+            Priority::Low => 512,
+            Priority::Normal => 256,
+            Priority::High => 128,
+            Priority::Realtime => 64,
+        };
+        self.virtual_deadline = current_time + (1000 / weight);
     }
 }
 
@@ -252,5 +264,23 @@ mod tests {
 
         // High priority must have a tighter/earlier virtual deadline for the same vruntime!
         assert!(p2.virtual_deadline < p1.virtual_deadline);
+    }
+
+    #[test]
+    fn test_edf_scheduling() {
+        let mut scheduler = Scheduler::new();
+
+        // Add normal EEVDF task
+        let p1 = Process::new(1, "normal-task".to_string(), Priority::Normal);
+        scheduler.add_process(p1);
+
+        // Add hard real-time EDF task with a deadline of 20 ticks
+        let p2 = Process::new(2, "realtime-task".to_string(), Priority::Normal).with_edf(20);
+        scheduler.add_process(p2);
+
+        // Even if virtual deadlines aren't reached or EEVDF is bypassed, the EDF task is prioritized
+        let scheduled = scheduler.schedule();
+        assert!(scheduled.is_some());
+        assert_eq!(scheduled.unwrap().pid, 2);
     }
 }

@@ -14,20 +14,20 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod gpu;
 pub mod kernel;
 pub mod klib;
 pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
+pub mod process;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
-pub mod unimplemented_features;
-pub mod unimplemented_tools;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -49,8 +49,8 @@ pub use compatibility::{
     MintUpdateLevel, MintUpdateManager, MockUPIService, MultilingualSupport, NamespaceBindEntry,
     NtHandle, NtObjectManager, NtObjectType, NtStatus, Plan9pMessage, Plan9pMsgType,
     PortableExecutableLoader, RegistryHive, SoftwareMeta, TargetPlatform, TranslationLayer,
-    WindowCoordinates, ZenithDisplayCompositor,
-    InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats,
+    WindowCoordinates, ZenithDisplayCompositor, SovereignNamespaceType, SovereignNamespaceIsolation,
+    SovereignSeccompFilter, FreeBsdJail, SovereignSandboxCoordinator,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -64,12 +64,8 @@ pub use drivers::{
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
 };
-pub use driver::{
-    Irp, DriverObject, DeviceObject, IoStatus, IoStatusBlock, Apc, Dpc, Minifilter,
-    IRP_MJ_CREATE, IRP_MJ_CLOSE, IRP_MJ_READ, IRP_MJ_WRITE, IRP_MJ_DEVICE_CONTROL,
-    METHOD_BUFFERED, METHOD_IN_DIRECT, METHOD_OUT_DIRECT, METHOD_NEITHER,
-    IoManager, DriverEntry, OpaqueDriverExtension,
-    ObjectManager, ObjectType, NonPagedPool, RootkitDetector, IrpParameters,
+pub use gpu::{
+    GpuFrameFormat, GpuRecordedFrame, GpuRecorderStats, GpuScreenRecorder,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -77,6 +73,7 @@ pub use filesystem::{
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    NumaTask, LockFreeTaskQueue, NumaNode, NumaScheduler,
 };
 pub use klib::{
     paging::{PageTableEntry, SimplePageTableEntry, PageTable, SimplePageTable, VirtualMemoryManager, SimpleVMM, ProcessMemory, SimpleProcessMemory},
@@ -85,12 +82,7 @@ pub use klib::{
 };
 pub use network::{
     EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, TcpConnection, TcpError, TcpSegment,
-    TcpStack, TcpState, NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
-    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
-    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
-    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
-    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
-    ClearLinuxFlowLoadBalancer,
+    TcpStack, TcpState, UnixSocketAddress, UnixSocketState, UnixSocketConn, UnixSocketRegistry,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -99,24 +91,27 @@ pub use orchestration::{
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    PackageSource, UnifiedPackage, UniversalPackageManager, SovereignApp, SovereignApm,
+    SovereignIsolationLevel,
+};
+pub use process::{
+    NiceValue as LinuxNiceValue, CGroup as LinuxCGroup, PidNamespace as LinuxPidNamespace,
+    LinuxProcessEntry, LinuxProcessState, LinuxSignal, ProcFileSystem,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
-    TopCommand, ProcessTaskInfo, IfconfigCommand, NetworkInterface, PingCommand, PingResult,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
-    SystemSnapshot,
+    SystemSnapshot, SovereignProblemType, SovereignRemediationAction, SovereignFixerStats,
+    AutomatedFixerDaemon,
 };
 pub use security::{
     CapabilityGate, CapabilityToken, CronDaemon, CronJob, DefaultDenyNetworkPolicy, DmesgLog,
     FirewallRule, IptablesFirewall, KaliError, NemoClawError, OpenShellAgentSandbox, Permission,
     PledgeManager, PledgePromise, PluggableAuthenticationModule, PrivacyRouter,
     SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer, TmuxPane,
-    PenetrationAssistant, ExploitPayload, Vulnerability, VulnerabilityScanner, SimpleVulnerability,
-    SimpleVulnerabilityScanner, Severity, ScanSummary, ScanReport,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{

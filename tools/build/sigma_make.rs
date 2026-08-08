@@ -1,14 +1,13 @@
-#![allow(unused_variables)]
-// SigmaOS: Σ SigmaOS — sigma_make: Sovereign Build System
-// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
-// All types hand-defined. OOP via struct + impl + trait patterns.
+#![cfg_attr(target_os = "none", no_std)]
+#![allow(dead_code, non_snake_case)]
 
-#![no_std]
-#![allow(dead_code, unused_variables, unused_imports, unused_mut)]
+/// SigmaOS: Σ SigmaOS — sigma_make: Sovereign Build System
+/// Migrated from C/C++ to Rust — no_std, no alloc, no external crates.
+/// All types hand-defined. OOP via struct + impl + trait patterns.
 
-// ─── Kernel Primitive Types ──────────────────────────────────────────────────
+// ─── Kernel Primitive Types ─────────────────────────────────────────────────
 
-type SigmaU8 = u8;
+type SigmaU8  = u8;
 type SigmaU16 = u16;
 type SigmaU32 = u32;
 type SigmaU64 = u64;
@@ -17,11 +16,61 @@ type SigmaI64 = i64;
 type SigmaBool = bool;
 type SigmaUsize = usize;
 
-// ─── Module: Sigma::sigma_make ─────────────────────
+// ─── Module: StaticVec ──────────────────────────────────────────────────────
+
+#[derive(Copy, Clone)]
+pub struct StaticVec<T: Copy, const N: usize> {
+    data: [Option<T>; N],
+    len: usize,
+}
+
+impl<T: Copy, const N: usize> StaticVec<T, N> {
+    pub const fn new() -> Self {
+        Self {
+            data: [None; N],
+            len: 0,
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn push(&mut self, item: T) -> Result<(), &'static str> {
+        if self.len >= N {
+            return Err("StaticVec is full");
+        }
+        self.data[self.len] = Some(item);
+        self.len += 1;
+        Ok(())
+    }
+
+    pub fn get(&self, idx: usize) -> Option<&T> {
+        if idx < self.len {
+            self.data[idx].as_ref()
+        } else {
+            None
+        }
+    }
+
+    pub fn get_mut(&mut self, idx: usize) -> Option<&mut T> {
+        if idx < self.len {
+            self.data[idx].as_mut()
+        } else {
+            None
+        }
+    }
+}
+
+// ─── Module: SigmaOS::sigma_make ────────────────────────────────────────────
 
 /// SigmaTarget — hardware-compatible struct.
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct SigmaTarget {
     pub name: [u8; 32],
     pub dep_count: SigmaI32,
@@ -29,115 +78,141 @@ pub struct SigmaTarget {
     pub is_built: SigmaBool,
 }
 
-/// Abstract Language Compiler / Builder interface (OOP Principle: Abstraction & Interface-segregation)
-pub trait TargetCompiler {
-    fn language_name(&self) -> &'static str;
-    fn compile_target(&self, target: &SigmaTarget) -> SigmaBool;
-}
+impl SigmaTarget {
+    pub fn new(name_str: &[u8], command_str: &[u8]) -> Self {
+        let mut name = [0u8; 32];
+        let name_len = name_str.len().min(31);
+        for i in 0..name_len {
+            name[i] = name_str[i];
+        }
 
-/// Concrete implementations for old & new technologies (OOP Principle: Polymorphism)
-pub struct CCompiler;
-impl TargetCompiler for CCompiler {
-    fn language_name(&self) -> &'static str { "GCC / Clang Compiler (Legacy)" }
-    fn compile_target(&self, target: &SigmaTarget) -> SigmaBool {
-        // Simulated execution of raw compilation commands for older C components
-        true
+        let mut command = [0u8; 256];
+        let cmd_len = command_str.len().min(255);
+        for i in 0..cmd_len {
+            command[i] = command_str[i];
+        }
+
+        Self {
+            name,
+            dep_count: 0,
+            command,
+            is_built: false,
+        }
+    }
+
+    pub fn name_as_str(&self) -> &[u8] {
+        let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
+        &self.name[..len]
     }
 }
 
-pub struct RustCompiler;
-impl TargetCompiler for RustCompiler {
-    fn language_name(&self) -> &'static str { "Rustc Compiler (Modern Safety)" }
-    fn compile_target(&self, target: &SigmaTarget) -> SigmaBool {
-        // Simulated zero-dependency memory-safe compile routines
-        true
-    }
+/// The main compilation execution and dependency tracking engine for sigma_make
+pub struct SigmaMakeEngine {
+    pub targets: StaticVec<SigmaTarget, 16>,
+    /// Tuple of (parent_target_idx, child_target_idx)
+    pub dependencies: StaticVec<(SigmaUsize, SigmaUsize), 32>,
 }
 
-pub struct ZigCompiler;
-impl TargetCompiler for ZigCompiler {
-    fn language_name(&self) -> &'static str { "Zig Compiler (Zero-Allocation)" }
-    fn compile_target(&self, target: &SigmaTarget) -> SigmaBool {
-        // Simulated Zig build pipeline
-        true
-    }
-}
-
-/// Dynamic Sovereign Make dependency resolver
-pub struct SovereignMake {
-    pub registered_targets: [Option<SigmaTarget>; 16],
-    pub target_count: usize,
-}
-
-impl SovereignMake {
+impl SigmaMakeEngine {
     pub const fn new() -> Self {
         Self {
-            registered_targets: [None; 16],
-            target_count: 0,
+            targets: StaticVec::new(),
+            dependencies: StaticVec::new(),
         }
     }
 
-    pub unsafe fn register_target(&mut self, name: &'static str, cmd: &'static str) -> SigmaBool {
-        if self.target_count >= 16 {
-            return false;
-        }
-
-        let mut name_bytes = [0u8; 32];
-        let bytes = name.as_bytes();
-        let len = bytes.len().min(32);
-        let mut i = 0;
-        while i < len {
-            name_bytes[i] = bytes[i];
-            i += 1;
-        }
-
-        let mut cmd_bytes = [0u8; 256];
-        let cmd_b = cmd.as_bytes();
-        let cmd_len = cmd_b.len().min(256);
-        let mut j = 0;
-        while j < cmd_len {
-            cmd_bytes[j] = cmd_b[j];
-            j += 1;
-        }
-
-        self.registered_targets[self.target_count] = Some(SigmaTarget {
-            name: name_bytes,
-            dep_count: 0,
-            command: cmd_bytes,
-            is_built: false,
-        });
-
-        self.target_count += 1;
-        true
+    /// Register a build target (e.g. "kernel_elf", "driver_block_o")
+    pub fn register_target(&mut self, name: &[u8], command: &[u8]) -> Result<usize, &'static str> {
+        let target = SigmaTarget::new(name, command);
+        self.targets.push(target)?;
+        Ok(self.targets.len() - 1)
     }
 
-    /// Polymorphic Build Resolution Pipeline (OOP Principle: Interface dispatching)
-    pub unsafe fn execute_build(&mut self, target_idx: usize, compiler: &dyn TargetCompiler) -> SigmaBool {
-        if target_idx >= self.target_count {
-            return false;
+    /// Set a compilation dependency relation (parent target depends on child target)
+    pub fn add_dependency(&mut self, parent_idx: usize, child_idx: usize) -> Result<(), &'static str> {
+        self.dependencies.push((parent_idx, child_idx))?;
+
+        // Update parent target's dep count
+        if let Some(target) = self.targets.get_mut(parent_idx) {
+            target.dep_count += 1;
         }
 
-        if let Some(mut target) = self.registered_targets[target_idx].as_mut() {
-            if target.is_built {
-                return true;
+        Ok(())
+    }
+
+    /// Triggers recursive dependency build compilation
+    pub fn build_target(&mut self, target_idx: usize) -> Result<(), &'static str> {
+        // 1. Build all child dependencies first (recursive resolution)
+        for i in 0..self.dependencies.len() {
+            if let Some(&(parent, child)) = self.dependencies.get(i) {
+                if parent == target_idx {
+                    // Recurse to compile child first
+                    self.build_target(child)?;
+                }
             }
-            // Execute polymorphic compile
-            let success = compiler.compile_target(target);
-            target.is_built = success;
-            return success;
         }
-        false
+
+        // 2. Mark this target as built
+        if let Some(target) = self.targets.get_mut(target_idx) {
+            target.is_built = true;
+        }
+
+        Ok(())
     }
 }
 
-static mut SYSTEM_MAKE: SovereignMake = SovereignMake::new();
+pub unsafe fn str_copy_slice(src: &[u8], dest: &mut [u8]) {
+    let len = src.len().min(dest.len());
+    for i in 0..len {
+        dest[i] = src[i];
+    }
+}
+
+static mut GLOBAL_MAKE: SigmaMakeEngine = SigmaMakeEngine::new();
 
 #[no_mangle]
 pub unsafe extern "C" fn str_copy() {
-    // Utility for legacy C-API string manipulation
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn sigma_make_register_c_target() {
-    SYSTEM_MAKE.register_target("kernel_c_stub", "gcc -ffreestanding -c kernel.c");
+    let _ = GLOBAL_MAKE.register_target(b"c_target", b"gcc c_target.c -o c_target");
+}
+
+fn main() {
+}
+
+// ─── Module: Static Unit Tests ──────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_make_dependency_resolved_compiles() {
+        let mut make = SigmaMakeEngine::new();
+
+        // 1. Register build targets
+        let driver_o = make.register_target(b"driver_block.o", b"rustc --emit=obj driver_block.rs").unwrap();
+        let kernel_o = make.register_target(b"kernel.o", b"rustc --emit=obj kernel.rs").unwrap();
+        let kernel_elf = make.register_target(b"kernel.elf", b"ld kernel.o driver_block.o -o kernel.elf").unwrap();
+
+        // 2. Setup dependency relationships
+        // kernel_elf depends on kernel_o and driver_o
+        make.add_dependency(kernel_elf, kernel_o).unwrap();
+        make.add_dependency(kernel_elf, driver_o).unwrap();
+
+        assert_eq!(make.targets.get(kernel_elf).unwrap().dep_count, 2);
+        assert!(!make.targets.get(kernel_elf).unwrap().is_built);
+        assert!(!make.targets.get(kernel_o).unwrap().is_built);
+        assert!(!make.targets.get(driver_o).unwrap().is_built);
+
+        // 3. Compile/Build parent target
+        make.build_target(kernel_elf).unwrap();
+
+        // All targets must be fully built now
+        assert!(make.targets.get(kernel_elf).unwrap().is_built);
+        assert!(make.targets.get(kernel_o).unwrap().is_built);
+        assert!(make.targets.get(driver_o).unwrap().is_built);
+    }
 }

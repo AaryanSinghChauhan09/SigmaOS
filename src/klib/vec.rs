@@ -1,6 +1,13 @@
+#![no_std]
+#![no_main]
+
 use core::mem;
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
 
 impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
@@ -27,18 +34,42 @@ impl<T> Default for Vec<T> {
 }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
     pub fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity { self.grow(); }
+            if self.len >= self.capacity {
+                self.grow();
+            }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn len(&self) -> usize { self.len }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
+
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            self.len -= 1;
+            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
 
     pub fn as_slice(&self) -> &[T] {
         if self.len == 0 {
@@ -56,21 +87,40 @@ impl<T> Vec<T> {
         }
     }
 
-    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
+    pub fn contains(&self, item: &T) -> bool
+    where
+        T: PartialEq,
+    {
         for i in 0..self.len {
             unsafe {
-                if &*self.data.add(i) == item { return true; }
+                if &*self.data.add(i) == item {
+                    return true;
+                }
             }
         }
         false
     }
+
     pub fn iter(&self) -> VecIter<'_, T> {
-        VecIter { vec: self, index: 0 }
+        VecIter {
+            vec: self,
+            index: 0,
+        }
     }
+
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
-        VecIterMut { data: self.data, len: self.len, index: 0, _marker: core::marker::PhantomData }
+        VecIterMut {
+            data: self.data,
+            len: self.len,
+            index: 0,
+            _marker: core::marker::PhantomData,
+        }
     }
+
     pub fn remove(&mut self, index: usize) -> T {
+        if index >= self.len {
+            panic!("index out of bounds");
+        }
         unsafe {
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
@@ -80,21 +130,34 @@ impl<T> Vec<T> {
             item
         }
     }
-    pub fn retain<F>(&mut self, mut f: F) where F: FnMut(&T) -> bool {
+
+    pub fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
         let mut write_idx = 0;
         for i in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(i);
-                if f(item) {
-                    if write_idx != i {
-                        core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
+            let item = &self[i];
+            if f(item) {
+                if write_idx != i {
+                    unsafe {
+                        core::ptr::copy_nonoverlapping(
+                            self.data.add(i),
+                            self.data.add(write_idx),
+                            1,
+                        );
                     }
-                    write_idx += 1;
+                }
+                write_idx += 1;
+            } else {
+                unsafe {
+                    core::ptr::drop_in_place(self.data.add(i));
                 }
             }
         }
         self.len = write_idx;
     }
+
     unsafe fn grow(&mut self) {
         let size = mem::size_of::<T>();
         if size == 0 {
@@ -105,7 +168,9 @@ impl<T> Vec<T> {
         let align = mem::align_of::<T>();
         let new_data = alloc(new_capacity * size, align) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
             if self.capacity > 0 && !self.data.is_null() {
                 free(self.data as *mut u8, self.capacity * size, align);
             }
@@ -117,7 +182,7 @@ impl<T> Vec<T> {
 
 impl<T> core::ops::Index<usize> for Vec<T> {
     type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
+    fn index(&self, index: usize) -> &T {
         if index >= self.len {
             panic!("index out of bounds");
         }
@@ -126,7 +191,7 @@ impl<T> core::ops::Index<usize> for Vec<T> {
 }
 
 impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+    fn index_mut(&mut self, index: usize) -> &mut T {
         if index >= self.len {
             panic!("index out of bounds");
         }
@@ -201,7 +266,11 @@ impl<T> Drop for Vec<T> {
             let size = mem::size_of::<T>();
             if size > 0 && !self.data.is_null() {
                 unsafe {
-                    free(self.data as *mut u8, self.capacity * size, mem::align_of::<T>());
+                    free(
+                        self.data as *mut u8,
+                        self.capacity * size,
+                        mem::align_of::<T>(),
+                    );
                 }
             }
         }

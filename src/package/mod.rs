@@ -20,6 +20,7 @@
 pub mod linux_translation;
 pub mod store;
 pub mod universal;
+pub mod apm;
 
 pub use linux_translation::{
     DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
@@ -31,4 +32,7 @@ pub use universal::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError,
     PackageFormat, PackageSource,
     UnifiedPackage, UniversalPackageManager,
+};
+pub use apm::{
+    SovereignApp, SovereignApm, IsolationLevel as SovereignIsolationLevel,
 };
