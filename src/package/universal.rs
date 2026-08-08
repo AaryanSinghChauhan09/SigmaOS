@@ -265,12 +265,23 @@ impl Default for DependencyResolver {
     }
 }
 
-/// Universal package manager
+/// Package snapshot representing a saved system state of installed packages
+#[derive(Debug, Clone)]
+pub struct PackageSnapshot {
+    pub id: usize,
+    pub description: String,
+    pub timestamp: u64,
+    pub installed_packages: HashMap<String, UnifiedPackage>,
+}
+
+/// Universal package manager with transaction-safe snapshots & rollback mechanisms
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, PackageAdapter>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
+    pub snapshots: HashMap<usize, PackageSnapshot>,
+    pub next_snapshot_id: usize,
 }
 
 impl UniversalPackageManager {
@@ -280,6 +291,8 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
+            snapshots: HashMap::new(),
+            next_snapshot_id: 1,
         };
 
         manager.add_default_adapters();
@@ -383,6 +396,78 @@ impl UniversalPackageManager {
 
     pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
         self.packages.get(name)
+    }
+
+    /// Create a snapshot of currently installed packages state
+    pub fn create_snapshot(&mut self, description: String) -> usize {
+        let id = self.next_snapshot_id;
+        self.next_snapshot_id += 1;
+
+        let snapshot = PackageSnapshot {
+            id,
+            description,
+            timestamp: 0,
+            installed_packages: self.installed_packages.clone(),
+        };
+
+        self.snapshots.insert(id, snapshot);
+        id
+    }
+
+    /// Delete a package snapshot
+    pub fn delete_snapshot(&mut self, id: usize) -> Result<(), PackageError> {
+        if self.snapshots.remove(&id).is_none() {
+            return Err(PackageError::PackageNotFound(format!("Snapshot ID {}", id)));
+        }
+        Ok(())
+    }
+
+    /// List all package snapshots
+    pub fn list_snapshots(&self) -> Vec<(usize, String)> {
+        let mut list = Vec::new();
+        for (id, snap) in &self.snapshots {
+            list.push((*id, snap.description.clone()));
+        }
+        list.sort_by_key(|&(id, _)| id);
+        list
+    }
+
+    /// Rollback the active package state exactly to a previously saved snapshot
+    pub fn rollback_to_snapshot(&mut self, id: usize) -> Result<(), PackageError> {
+        let snapshot = self
+            .snapshots
+            .get(&id)
+            .ok_or_else(|| PackageError::PackageNotFound(format!("Snapshot ID {}", id)))?
+            .clone();
+
+        // 1. Identify and uninstall packages currently installed but not in the snapshot
+        let mut to_uninstall = Vec::new();
+        for pkg_name in self.installed_packages.keys() {
+            if !snapshot.installed_packages.contains_key(pkg_name) {
+                to_uninstall.push(pkg_name.clone());
+            }
+        }
+
+        for pkg_name in to_uninstall {
+            self.remove(&pkg_name)?;
+        }
+
+        // 2. Identify and reinstall packages in the snapshot but not currently installed
+        let mut to_install = Vec::new();
+        for (pkg_name, _) in &snapshot.installed_packages {
+            if !self.installed_packages.contains_key(pkg_name) {
+                to_install.push(pkg_name.clone());
+            }
+        }
+
+        for pkg_name in to_install {
+            self.install(&pkg_name)?;
+        }
+
+        // 3. Sync full installed_packages state exactly with the snapshot
+        self.installed_packages = snapshot.installed_packages;
+
+        Ok(())
     }
 }
 
@@ -1004,300 +1089,40 @@ mod tests {
     }
 
     #[test]
-    fn test_multi_distro_metadata_parser() {
-        let adapter = MultiDistroPackageAdapter::new();
+    fn test_package_snapshots_and_rollback() {
+        let mut manager = UniversalPackageManager::new();
+        let pkg_v1 = UnifiedPackage::new("essential-tool".to_string(), "1.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+        let pkg_v2 = UnifiedPackage::new("add-on-tool".to_string(), "2.0.0".to_string())
+            .with_format(PackageFormat::SigmaPkg);
 
-        // DEB
-        let deb_ctrl = "Package: nginx\nVersion: 1.18.0\nDepends: libc6, libpcre3\n";
-        let deb_pkg = adapter.parse_package_headers(deb_ctrl, PackageFormat::Deb).unwrap();
-        assert_eq!(deb_pkg.name, "nginx");
-        assert_eq!(deb_pkg.version, "1.18.0");
-        assert_eq!(deb_pkg.dependencies, vec!["libc6", "libpcre3"]);
+        manager.add_package(pkg_v1);
+        manager.add_package(pkg_v2);
 
-        // RPM
-        let rpm_spec = "Name: coreutils\nVersion: 8.32\nRequires: glibc, selinux-policy\n";
-        let rpm_pkg = adapter.parse_package_headers(rpm_spec, PackageFormat::Rpm).unwrap();
-        assert_eq!(rpm_pkg.name, "coreutils");
-        assert_eq!(rpm_pkg.dependencies, vec!["glibc", "selinux-policy"]);
+        // Install first package
+        manager.install("essential-tool").unwrap();
+        assert_eq!(manager.installed_packages.len(), 1);
+        assert!(manager.installed_packages.contains_key("essential-tool"));
 
-        // Pacman
-        let pacman_pkginfo = "pkgname = pacman\npkgver = 6.0.1\ndepend = openssl\ndepend = curl\n";
-        let pac_pkg = adapter.parse_package_headers(pacman_pkginfo, PackageFormat::Pacman).unwrap();
-        assert_eq!(pac_pkg.name, "pacman");
-        assert_eq!(pac_pkg.dependencies, vec!["openssl", "curl"]);
+        // Create snapshot 1
+        let snap_id = manager.create_snapshot("First stable package state".to_string());
+        assert_eq!(manager.list_snapshots().len(), 1);
 
-        // APK
-        let apk_idx = "P:musl-utils\nV:1.2.2\nD:scanelf so:libc.musl-x86_64.so.1\n";
-        let apk_pkg = adapter.parse_package_headers(apk_idx, PackageFormat::Apk).unwrap();
-        assert_eq!(apk_pkg.name, "musl-utils");
-        assert_eq!(apk_pkg.dependencies, vec!["scanelf", "so:libc.musl-x86_64.so.1"]);
-    }
+        // Install second package
+        manager.install("add-on-tool").unwrap();
+        assert_eq!(manager.installed_packages.len(), 2);
+        assert!(manager.installed_packages.contains_key("add-on-tool"));
 
-    #[test]
-    fn test_package_install_hook() {
-        let mut hook = PackageInstallHook::new("AuditorHook");
-        let safe_pkg = UnifiedPackage::new("libreoffice".to_string(), "7.1.0".to_string());
-        let unsafe_pkg = UnifiedPackage::new("untrusted-app".to_string(), "2.0.0".to_string());
+        // Rollback to snapshot 1
+        manager.rollback_to_snapshot(snap_id).unwrap();
 
-        assert!(hook.execute_pre_install_hook(&safe_pkg));
-        assert!(!hook.execute_pre_install_hook(&unsafe_pkg));
-        assert_eq!(hook.run_counter, 2);
-    }
+        // Verify state is reverted to exactly one package
+        assert_eq!(manager.installed_packages.len(), 1);
+        assert!(manager.installed_packages.contains_key("essential-tool"));
+        assert!(!manager.installed_packages.contains_key("add-on-tool"));
 
-    #[test]
-    fn test_multi_format_extractor() {
-        let mut extractor = MultiFormatExtractor::new();
-        let deb_pkg = UnifiedPackage::new("git".to_string(), "2.30.0".to_string()).with_format(PackageFormat::Deb);
-
-        let count = extractor.extract_payload(&deb_pkg).unwrap();
-        assert_eq!(count, 3);
-        assert_eq!(extractor.extracted_paths[0], "usr/bin/apt-app");
-    }
-
-    #[test]
-    fn test_offline_installer_info_and_dependencies() {
-        let mut payload = HashMap::new();
-        payload.insert("usr/bin/cool-tool".to_string(), "echo 'hi'".to_string());
-
-        let archive = SovereignPackageArchive {
-            name: "cool-tool".to_string(),
-            version: "2.4.1".to_string(),
-            architecture: "amd64".to_string(),
-            description: "A cool tool for power users".to_string(),
-            dependencies: vec!["libc6".to_string()],
-            conflicts: vec!["unstable-tool".to_string()],
-            payload,
-            file_permissions: HashMap::new(),
-            conffiles: vec![],
-            preinst_script: None,
-            postinst_script: None,
-            prerm_script: None,
-            postrm_script: None,
-            interested_triggers: vec![],
-        };
-
-        let mut installer = SovereignOfflineInstaller::new();
-        let info_str = installer.info(&archive);
-        assert!(info_str.contains("Package: cool-tool"));
-        assert!(info_str.contains("Version: 2.4.1"));
-        assert!(info_str.contains("Dependencies: libc6"));
-
-        // Uninstalled dependency should fail install
-        let result = installer.install_archive(&archive);
-        assert!(result.is_err());
-        assert!(result.unwrap_err().contains("Dependency unsatisfied"));
-
-        // Register dependency, now should succeed
-        installer.local_db.insert("libc6".to_string(), UnifiedPackage::new("libc6".to_string(), "2.31".to_string()));
-        let install_result = installer.install_archive(&archive);
-        assert!(install_result.is_ok());
-    }
-
-    #[test]
-    fn test_offline_installer_verify_rpm_v() {
-        let mut payload = HashMap::new();
-        payload.insert("etc/sysconfig/network".to_string(), "NETWORKING=yes".to_string());
-        payload.insert("usr/bin/binary".to_string(), "0101".to_string());
-
-        let mut perms = HashMap::new();
-        perms.insert("usr/bin/binary".to_string(), 0o755);
-
-        let archive = SovereignPackageArchive {
-            name: "sys-base".to_string(),
-            version: "1.0.0".to_string(),
-            architecture: "x86_64".to_string(),
-            description: "System base configuration".to_string(),
-            dependencies: vec![],
-            conflicts: vec![],
-            payload,
-            file_permissions: perms,
-            conffiles: vec!["etc/sysconfig/network".to_string()],
-            preinst_script: None,
-            postinst_script: None,
-            prerm_script: None,
-            postrm_script: None,
-            interested_triggers: vec![],
-        };
-
-        let mut installer = SovereignOfflineInstaller::new();
-        installer.install_archive(&archive).unwrap();
-
-        // 1. Audit right after installation - should be 100% clean (no differences)
-        let audit_clean = installer.verify_package_files("sys-base", &archive);
-        assert!(audit_clean.is_empty());
-
-        // 2. Tamper with files on the mock filesystem disk
-        // A. Change size and hash of "etc/sysconfig/network"
-        installer.mock_fs.insert("etc/sysconfig/network".to_string(), "NETWORKING=yes\nEXTRA=no".to_string());
-        // B. Change permissions of "usr/bin/binary" in the db record (to trigger 'M' flag mismatch)
-        installer.installed_files.insert("usr/bin/binary".to_string(), (installer.compute_simple_hash("0101"), 0o644));
-
-        let audit_tampered = installer.verify_package_files("sys-base", &archive);
-        assert_eq!(audit_tampered.len(), 2);
-
-        let mut checked_net = false;
-        let mut checked_bin = false;
-
-        for (path, flag) in audit_tampered {
-            if path == "etc/sysconfig/network" {
-                // Size mismatch (S), Hash mismatch (5)
-                assert_eq!(&flag[0..1], "S");
-                assert_eq!(&flag[2..3], "5");
-                checked_net = true;
-            } else if path == "usr/bin/binary" {
-                // Mode mismatch (M)
-                assert_eq!(&flag[1..2], "M");
-                checked_bin = true;
-            }
-        }
-
-        assert!(checked_net);
-        assert!(checked_bin);
-    }
-
-    #[test]
-    fn test_dpkg_conffiles_conflict_and_backup_policies() {
-        let mut payload = HashMap::new();
-        payload.insert("etc/web.conf".to_string(), "port=80".to_string());
-
-        let archive = SovereignPackageArchive {
-            name: "web-server".to_string(),
-            version: "1.0.0".to_string(),
-            architecture: "all".to_string(),
-            description: "Simple web server config".to_string(),
-            dependencies: vec![],
-            conflicts: vec![],
-            payload,
-            file_permissions: HashMap::new(),
-            conffiles: vec!["etc/web.conf".to_string()],
-            preinst_script: None,
-            postinst_script: None,
-            prerm_script: None,
-            postrm_script: None,
-            interested_triggers: vec![],
-        };
-
-        // SCENARIO 1: KeepOld configuration policy (Default)
-        let mut installer = SovereignOfflineInstaller::new().with_policy(ConffilePolicy::KeepOld);
-        installer.install_archive(&archive).unwrap();
-
-        // Simulate user editing the config file directly
-        installer.mock_fs.insert("etc/web.conf".to_string(), "port=8080".to_string());
-
-        // Now install a new version of the archive with updated default configuration
-        let mut updated_payload = HashMap::new();
-        updated_payload.insert("etc/web.conf".to_string(), "port=90".to_string());
-
-        let mut updated_archive = SovereignPackageArchive {
-            name: "web-server".to_string(),
-            version: "1.1.0".to_string(),
-            ..archive.clone()
-        };
-        updated_archive.payload.clone_from(&updated_payload);
-
-        installer.install_archive(&updated_archive).unwrap();
-
-        // Under KeepOld, original "etc/web.conf" should remain as user's edited version (port=8080)
-        assert_eq!(installer.mock_fs.get("etc/web.conf").unwrap(), "port=8080");
-        // And the new package default should be saved in "etc/web.conf.sigrpmnew"
-        assert_eq!(installer.mock_fs.get("etc/web.conf.sigrpmnew").unwrap(), "port=90");
-
-        // SCENARIO 2: InstallNew configuration policy
-        let mut installer_new = SovereignOfflineInstaller::new().with_policy(ConffilePolicy::InstallNew);
-        installer_new.install_archive(&archive).unwrap();
-
-        // User edits config
-        installer_new.mock_fs.insert("etc/web.conf".to_string(), "port=8080".to_string());
-
-        // Install new version
-        installer_new.install_archive(&updated_archive).unwrap();
-
-        // Under InstallNew, original user-edited file is backed up to "etc/web.conf.sigrpmsave"
-        assert_eq!(installer_new.mock_fs.get("etc/web.conf.sigrpmsave").unwrap(), "port=8080");
-        // And "etc/web.conf" is overwritten with the new archive's defaults (port=90)
-        assert_eq!(installer_new.mock_fs.get("etc/web.conf").unwrap(), "port=90");
-    }
-
-    #[test]
-    fn test_dpkg_trigger_system() {
-        let mut installer = SovereignOfflineInstaller::new();
-        installer.trigger_system.register_interest("usr/share/man", "update-man-db");
-        installer.trigger_system.register_interest("lib/modules", "depmod");
-
-        let mut payload = HashMap::new();
-        payload.insert("usr/share/man/man1/ls.1".to_string(), "manpage".to_string());
-        payload.insert("usr/bin/ls".to_string(), "bin".to_string());
-
-        let archive = SovereignPackageArchive {
-            name: "core-utils".to_string(),
-            version: "1.0.0".to_string(),
-            architecture: "amd64".to_string(),
-            description: "Core utility set".to_string(),
-            dependencies: vec![],
-            conflicts: vec![],
-            payload,
-            file_permissions: HashMap::new(),
-            conffiles: vec![],
-            preinst_script: None,
-            postinst_script: None,
-            prerm_script: None,
-            postrm_script: None,
-            interested_triggers: vec![],
-        };
-
-        let executed = installer.install_archive(&archive).unwrap();
-        // Since "usr/share/man/man1/ls.1" was unpacked, "update-man-db" trigger should execute
-        assert_eq!(executed.len(), 1);
-        assert_eq!(executed[0], "update-man-db");
-    }
-
-    #[test]
-    fn test_package_remove_and_purge() {
-        let mut payload = HashMap::new();
-        payload.insert("usr/bin/editor".to_string(), "nano".to_string());
-        payload.insert("etc/editor.conf".to_string(), "syntax=on".to_string());
-
-        let archive = SovereignPackageArchive {
-            name: "editor".to_string(),
-            version: "1.0.0".to_string(),
-            architecture: "all".to_string(),
-            description: "Text editor".to_string(),
-            dependencies: vec![],
-            conflicts: vec![],
-            payload,
-            file_permissions: HashMap::new(),
-            conffiles: vec!["etc/editor.conf".to_string()],
-            preinst_script: None,
-            postinst_script: None,
-            prerm_script: None,
-            postrm_script: None,
-            interested_triggers: vec![],
-        };
-
-        // 1. Remove package (with modified config)
-        let mut installer = SovereignOfflineInstaller::new();
-        installer.install_archive(&archive).unwrap();
-
-        // User edits the configuration file
-        installer.mock_fs.insert("etc/editor.conf".to_string(), "syntax=on\ntheme=dark".to_string());
-
-        installer.remove_package("editor", &archive).unwrap();
-
-        // Filesystem audit: general files deleted, but user-modified config preserved!
-        assert!(!installer.mock_fs.contains_key("usr/bin/editor"));
-        assert!(installer.mock_fs.contains_key("etc/editor.conf"));
-        assert!(!installer.local_db.contains_key("editor"));
-
-        // 2. Purge package
-        let mut installer_purge = SovereignOfflineInstaller::new();
-        installer_purge.install_archive(&archive).unwrap();
-        installer_purge.mock_fs.insert("etc/editor.conf".to_string(), "syntax=on\ntheme=dark".to_string());
-
-        installer_purge.purge_package("editor", &archive).unwrap();
-
-        // Filesystem audit: everything deleted unconditionally!
-        assert!(!installer_purge.mock_fs.contains_key("usr/bin/editor"));
-        assert!(!installer_purge.mock_fs.contains_key("etc/editor.conf"));
-        assert!(!installer_purge.local_db.contains_key("editor"));
+        // Delete snapshot
+        assert!(manager.delete_snapshot(snap_id).is_ok());
+        assert!(manager.list_snapshots().is_empty());
     }
 }

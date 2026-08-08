@@ -1,17 +1,9 @@
 // OOP-based Desktop Terminal for SigmaOS
 // Implements terminal emulator, tab multiplexing (tmux-inspiration), and command history/autocomplete.
 
-/// OOP-based Desktop Terminal for SigmaOS
-/// Implements terminal emulator, ANSI escape interpretation, and shell integration.
-/// Inspired by Alacritty, GNOME-Terminal, xterm, and tmux from Linux & BSD distributions.
-/// Implements terminal emulator, ANSI escape interpretation, and shell integration.
-/// Inspired by Alacritty, GNOME-Terminal, xterm, and tmux from Linux & BSD distributions.
-
 extern crate alloc;
+
 use alloc::boxed::Box;
-
-extern crate alloc;
-
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -21,7 +13,30 @@ pub type TabID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TerminalError { Success = 0, NotFound = 1, CommandFailed = 2 }
+pub enum TerminalError {
+    Success = 0,
+    NotFound = 1,
+    CommandFailed = 2,
+    TabLimitReached = 3,
+}
+
+/// A multiplexed terminal tab (tmux / tabbed emulator inspiration)
+#[derive(Debug, Clone)]
+pub struct TerminalTab {
+    pub id: TabID,
+    pub title: String,
+    pub working_directory: String,
+}
+
+impl TerminalTab {
+    pub fn new(id: TabID, title: &str, working_directory: &str) -> Self {
+        Self {
+            id,
+            title: String::from(title),
+            working_directory: String::from(working_directory),
+        }
+    }
+}
 
 pub trait Terminal {
     fn id(&self) -> TerminalID;
@@ -134,7 +149,11 @@ pub trait TerminalManager {
     fn create_terminal(&mut self, title: &[u8]) -> Result<TerminalID, TerminalError>;
     fn close_terminal(&mut self, id: TerminalID) -> Result<(), TerminalError>;
     fn get_terminal(&self, id: TerminalID) -> Option<&dyn Terminal>;
-    fn execute_command(&mut self, terminal_id: TerminalID, command: &[u8]) -> Result<Vec<u8>, TerminalError>;
+    fn execute_command(
+        &mut self,
+        terminal_id: TerminalID,
+        command: &[u8],
+    ) -> Result<Vec<u8>, TerminalError>;
 }
 
 pub struct SimpleTerminalManager {
@@ -166,11 +185,10 @@ impl TerminalManager for SimpleTerminalManager {
     }
 
     fn close_terminal(&mut self, id: TerminalID) -> Result<(), TerminalError> {
-        for terminal_option in &mut self.terminals {
-            if let Some(ref terminal) = *terminal_option {
-                let term_ref: &dyn Terminal = terminal.as_ref();
-                if term_ref.id() == id {
-                    *terminal_option = None;
+        for i in 0..self.terminals.len() {
+            if let Some(ref terminal) = self.terminals[i] {
+                if terminal.id() == id {
+                    self.terminals[i] = None;
                     return Ok(());
                 }
             }
@@ -181,8 +199,9 @@ impl TerminalManager for SimpleTerminalManager {
     fn get_terminal(&self, id: TerminalID) -> Option<&dyn Terminal> {
         for terminal_option in &self.terminals {
             if let Some(ref terminal) = *terminal_option {
-                let term_ref: &dyn Terminal = terminal.as_ref();
-                if term_ref.id() == id { return Some(term_ref); }
+                if terminal.id() == id {
+                    return Some(terminal.as_ref());
+                }
             }
         }
         None
@@ -271,289 +290,48 @@ impl ShellIntegration for SimpleShellIntegration {
     }
 }
 
-// ==============================================================================
-// 1. ANSI Escape Code Interpreter (SGR color and attribute parser)
-// ==============================================================================
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TextAttribute {
-    pub fg_color: u8, // ANSI 8-color model (e.g. 31=Red, 32=Green)
-    pub bg_color: u8, // ANSI 8-color model (e.g. 40=Black, 41=Red)
-    pub is_bold: bool,
-    pub is_blinking: bool,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-pub struct AnsiEscapeInterpreter {
-    pub active_attr: TextAttribute,
-}
+    #[test]
+    fn test_terminal_manager_and_execution() {
+        let mut manager = SimpleTerminalManager::new();
+        let term_id = manager.create_terminal(b"SigmaTerminal").unwrap();
 
-impl AnsiEscapeInterpreter {
-    pub fn new() -> Self {
-        Self {
-            active_attr: TextAttribute {
-                fg_color: 37, // White
-                bg_color: 40, // Black
-                is_bold: false,
-                is_blinking: false,
-            },
-        }
+        let terminal = manager.get_terminal(term_id).unwrap();
+        assert_eq!(terminal.title(), b"SigmaTerminal");
+        assert_eq!(terminal.working_directory(), b"/home/user");
+
+        // Executing command returning echo outputs
+        let output = manager.execute_command(term_id, b"ls -la").unwrap();
+        assert_eq!(output, b"ls -la\n");
     }
 
-    pub fn parse_escape_sequence(&mut self, code: &[u8]) -> bool {
-        // Parses SGR codes (Select Graphic Rendition) e.g., "\x1b[31;1m" (Bold Red)
-        if code.len() >= 3 && code[0] == b'\x1b' && code[1] == b'[' {
-            let last_byte = code[code.len() - 1];
-            if last_byte == b'm' {
-                // Simplistic parser for common ANSI colors
-                if code.contains(&b'1') {
-                    self.active_attr.is_bold = true;
-                }
-                if code.contains(&b'0') {
-                    self.active_attr.is_bold = false;
-                    self.active_attr.is_blinking = false;
-                }
-                if code.contains(&b'5') {
-                    self.active_attr.is_blinking = true;
-                }
-                // Foregrounds
-                if code.contains(&b'3') && code.contains(&b'1') { self.active_attr.fg_color = 31; } // Red
-                if code.contains(&b'3') && code.contains(&b'2') { self.active_attr.fg_color = 32; } // Green
-                return true;
-            }
-        }
-        false
-    }
-}
+    #[test]
+    fn test_terminal_multiplexing_and_autocomplete() {
+        let mut term = SimpleTerminal::new(1, b"Shell");
+        assert_eq!(term.tabs.len(), 1);
 
-impl Default for AnsiEscapeInterpreter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
+        // Create new tab
+        let tab_id = term.create_tab("Developer Shell").unwrap();
+        assert_eq!(tab_id, 2);
+        assert_eq!(term.tabs.len(), 2);
 
-// ==============================================================================
-// 2. Scrollback Buffer and History Grid
-// ==============================================================================
-#[derive(Clone, Copy)]
-pub struct TerminalCell {
-    pub glyph: char,
-    pub attribute: TextAttribute,
-}
+        // Switch active tab and modify working directory
+        term.switch_tab(1).unwrap();
+        assert_eq!(term.active_tab_index, 1);
+        term.set_working_directory(b"/home/user/workspace");
+        assert_eq!(term.working_directory(), b"/home/user/workspace");
 
-pub struct ScrollbackGrid {
-    pub lines: Vec<Vec<TerminalCell>>,
-    pub cursor_row: usize,
-    pub cursor_col: usize,
-    pub max_scrollback_lines: usize,
-}
+        // Push some history and retrieve autocompletes
+        term.history_push("cargo build --release");
+        term.history_push("cargo test");
+        term.history_push("make build");
 
-impl ScrollbackGrid {
-    pub fn new() -> Self {
-        Self {
-            lines: Vec::new(),
-            cursor_row: 0,
-            cursor_col: 0,
-            max_scrollback_lines: 1000,
-        }
-    }
-
-    pub fn write_character(&mut self, ch: char, attr: TextAttribute) {
-        if self.lines.is_empty() {
-            self.lines.push(Vec::new());
-        }
-        let row = self.lines.len() - 1;
-        self.lines[row].push(TerminalCell { glyph: ch, attribute: attr });
-        self.cursor_col += 1;
-
-        if ch == '\n' {
-            self.lines.push(Vec::new());
-            self.cursor_row += 1;
-            self.cursor_col = 0;
-        }
-
-        // Limit scrollback history
-        if self.lines.len() > self.max_scrollback_lines {
-            self.lines.remove(0);
-            if self.cursor_row > 0 {
-                self.cursor_row -= 1;
-            }
-        }
-    }
-}
-
-impl Default for ScrollbackGrid {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==============================================================================
-// 3. PTY (Pseudo-Terminal) Session Pair
-// ==============================================================================
-pub struct PtySessionPair {
-    pub master_fd: i32,
-    pub slave_fd: i32,
-    pub shell_path: [u8; 64],
-}
-
-impl PtySessionPair {
-    pub fn new(master: i32, slave: i32) -> Self {
-        let mut shell_arr = [0u8; 64];
-        let path = b"/bin/sigma-shell";
-        shell_arr[..path.len()].copy_from_slice(path);
-        Self {
-            master_fd: master,
-            slave_fd: slave,
-            shell_path: shell_arr,
-        }
-    }
-}
-
-// ==============================================================================
-// 4. UTF-8 Multi-byte Character Decoder
-// ==============================================================================
-pub struct Utf8Decoder {
-    pub expected_bytes: usize,
-    pub bytes_collected: Vec<u8>,
-}
-
-impl Utf8Decoder {
-    pub fn new() -> Self {
-        Self {
-            expected_bytes: 0,
-            bytes_collected: Vec::new(),
-        }
-    }
-
-    pub fn decode_byte(&mut self, b: u8) -> Option<char> {
-        if self.expected_bytes == 0 {
-            if b & 0x80 == 0 {
-                return Some(b as char); // Standard 1-byte ASCII
-            } else if b & 0xE0 == 0xC0 {
-                self.expected_bytes = 2;
-                self.bytes_collected.push(b);
-            } else if b & 0xF0 == 0xE0 {
-                self.expected_bytes = 3;
-                self.bytes_collected.push(b);
-            } else if b & 0xF8 == 0xF0 {
-                self.expected_bytes = 4;
-                self.bytes_collected.push(b);
-            }
-        } else {
-            self.bytes_collected.push(b);
-            if self.bytes_collected.len() == self.expected_bytes {
-                // Decode multi-byte into char
-                let ch = match self.expected_bytes {
-                    2 => {
-                        let c = (((self.bytes_collected[0] & 0x1F) as u32) << 6) | ((self.bytes_collected[1] & 0x3F) as u32);
-                        core::char::from_u32(c)
-                    }
-                    3 => {
-                        let c = (((self.bytes_collected[0] & 0x0F) as u32) << 12) | (((self.bytes_collected[1] & 0x3F) as u32) << 6) | ((self.bytes_collected[2] & 0x3F) as u32);
-                        core::char::from_u32(c)
-                    }
-                    _ => Some('?'),
-                };
-                self.expected_bytes = 0;
-                self.bytes_collected.clear();
-                return ch;
-            }
-        }
-        None
-    }
-}
-
-impl Default for Utf8Decoder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ==============================================================================
-// Vec Implementation
-// ==============================================================================
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            for i in index..self.len - 1 {
-                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
-            }
-            self.len -= 1;
-            item
-        }
-    }
-    pub fn len(&self) -> usize { self.len }
-    pub fn is_empty(&self) -> bool { self.len == 0 }
-    pub fn clear(&mut self) {
-        while self.len > 0 {
-            self.remove(0);
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        let suggs = term.get_suggestions("cargo");
+        assert_eq!(suggs.len(), 2);
+        assert_eq!(suggs[0], "cargo build --release");
+        assert_eq!(suggs[1], "cargo test");
     }
 }

@@ -1,17 +1,13 @@
 // SigmaOS Kernel Module
-pub mod architecture;
+pub mod bore;
 pub mod ipc;
 pub mod memory;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod object;
+pub mod virtual_cpu;
 
-pub use architecture::{
-    ArchitectureEngine, CpuRegisters, HardwareException,
-    InstructionCyclePhase as ArchInstructionCyclePhase, Irql, LookasideList, MemoryDescriptorList,
-    Pcb, PoolType, ProcessorInitState, Tcb, ThreadState,
-};
+pub use bore::{BoreScheduler, BoreTask};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use policy_mechanism::{
@@ -20,8 +16,4 @@ pub use policy_mechanism::{
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use structures::{
-    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
-    CpuArchitectureClass, EdfTask, LcgRandom, LotteryTask, SequencedSinglyLinkedList,
-    SinglyLinkedList, SystemThread, WorkItem,
-};
+pub use virtual_cpu::{CpuError, CpuMode, CpuRing, RegisterSet, SovereignVirtualCPU};

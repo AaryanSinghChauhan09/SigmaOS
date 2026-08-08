@@ -1,9 +1,9 @@
 // SigmaOS Network Stack Module
-pub mod commands;
+pub mod stack;
 pub mod tcp;
 pub mod tcp_udp;
-pub mod sync;
-pub mod torrent;
+pub mod wireless;
+pub mod zero_trust;
 
 pub use commands::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,

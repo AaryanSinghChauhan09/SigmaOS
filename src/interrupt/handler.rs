@@ -1,13 +1,11 @@
-/// Advanced High-Fidelity Interrupt & Exception Handler for SigmaOS
-/// Models standard x86/x64 CPU register states, AMD64 canonical address checks, exception ISR routers, and PIC/APIC controllers.
+// OOP-based Interrupt Handler for SigmaOS
+// Implements interrupt handling using OOP principles with traits and structs.
 
-/// OOP-based Interrupt Handler for SigmaOS
-/// Implements state-of-the-art priority-based interrupt nesting, preemption, global disablement queuing,
-/// and time sequence logging inspired by x86 APIC TPR, ARM GIC PMR, and Windows IRQLs.
+extern crate alloc;
 
-use core::ptr::{self, NonNull};
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use core::mem;
 
 extern crate alloc;
 use alloc::boxed::Box;
@@ -82,7 +80,7 @@ impl InterruptHandlerInfo {
 
 /// Handler type
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HandlerType {
     Hardware = 0,
     Software = 1,
@@ -106,7 +104,7 @@ pub enum Priority {
 
 /// Handler capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct HandlerCapability {
     pub can_enable: bool,
     pub can_disable: bool,
@@ -114,7 +112,7 @@ pub struct HandlerCapability {
 }
 
 impl HandlerCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         HandlerCapability {
             can_enable: false,
             can_disable: false,
@@ -122,7 +120,7 @@ impl HandlerCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         HandlerCapability {
             can_enable: true,
             can_disable: true,
@@ -131,8 +129,13 @@ impl HandlerCapability {
     }
 }
 
+impl Default for HandlerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Interrupt descriptor (OOP: Interrupt object)
-#[repr(C)]
 pub struct InterruptDescriptor {
     pub number: InterruptNumber,
     pub vector: InterruptVector,
@@ -144,7 +147,11 @@ pub struct InterruptDescriptor {
 }
 
 impl InterruptDescriptor {
-    pub fn new(number: InterruptNumber, vector: InterruptVector, capability: HandlerCapability) -> Self {
+    pub fn new(
+        number: InterruptNumber,
+        vector: InterruptVector,
+        capability: HandlerCapability,
+    ) -> Self {
         InterruptDescriptor {
             number,
             vector,
@@ -224,7 +231,11 @@ pub struct SimpleInterruptHandler {
 }
 
 impl SimpleInterruptHandler {
-    pub fn new(vector: InterruptNumber) -> Self {
+    pub fn new(
+        handler_type: HandlerType,
+        priority: Priority,
+        capability: HandlerCapability,
+    ) -> Self {
         SimpleInterruptHandler {
             vector,
             trigger_count: 0,
@@ -259,7 +270,11 @@ impl InterruptDescriptor {
 /// Interrupt controller trait (OOP interface)
 pub trait InterruptController {
     /// Register handler
-    fn register_handler(&mut self, handler: Box<dyn InterruptHandler>, interrupt: InterruptNumber) -> Result<(), InterruptError>;
+    fn register_handler(
+        &mut self,
+        handler: Box<dyn InterruptHandler>,
+        interrupt: InterruptNumber,
+    ) -> Result<(), InterruptError>;
     /// Unregister handler
     fn unregister_handler(&mut self, interrupt: InterruptNumber) -> Result<(), InterruptError>;
     /// Dispatch interrupt
@@ -276,7 +291,7 @@ pub trait InterruptController {
 
 /// Interrupt statistics
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct InterruptStats {
     pub total_interrupts_dispatched: u64,
     pub spurious_count: u64,
@@ -286,7 +301,7 @@ pub struct InterruptStats {
 }
 
 impl InterruptStats {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         InterruptStats {
             total_interrupts: 0,
             handled_interrupts: 0,
@@ -297,17 +312,23 @@ impl InterruptStats {
     }
 }
 
+impl Default for InterruptStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// PIC (Programmable Interrupt Controller) (OOP: Concrete controller class)
 pub struct PIC {
-    pub descriptors: [Option<InterruptDescriptor>; 256],
-    pub handlers: Vec<Option<Box<dyn InterruptHandler>>>,
-    pub stats: InterruptStats,
-    pub capability: ControllerCapability,
+    descriptors: Vec<Option<InterruptDescriptor>>,
+    handlers: Vec<Option<Box<dyn InterruptHandler>>>,
+    stats: InterruptStats,
+    capability: ControllerCapability,
 }
 
 /// Controller capability
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ControllerCapability {
     pub can_register: bool,
     pub can_unregister: bool,
@@ -315,7 +336,7 @@ pub struct ControllerCapability {
 }
 
 impl ControllerCapability {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         ControllerCapability {
             can_register: false,
             can_unregister: false,
@@ -323,7 +344,7 @@ impl ControllerCapability {
         }
     }
 
-    pub fn full() -> Self {
+    pub const fn full() -> Self {
         ControllerCapability {
             can_register: true,
             can_unregister: true,
@@ -332,17 +353,23 @@ impl ControllerCapability {
     }
 }
 
+impl Default for ControllerCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PIC {
     pub fn new(capability: ControllerCapability) -> Self {
-        let mut descriptors = [None; 256];
-        
+        let mut descriptors = Vec::new();
+
         // Initialize common interrupt descriptors
         for i in 0..256 {
-            descriptors[i] = Some(InterruptDescriptor::new(
+            descriptors.push(Some(InterruptDescriptor::new(
                 i as u8,
                 i as u8,
-                HandlerCapability::full()
-            ));
+                HandlerCapability::full(),
+            )));
         }
 
         PIC {
@@ -355,7 +382,11 @@ impl PIC {
 }
 
 impl InterruptController for PIC {
-    fn register_handler(&mut self, handler: Box<dyn InterruptHandler>, interrupt: InterruptNumber) -> Result<(), InterruptError> {
+    fn register_handler(
+        &mut self,
+        handler: Box<dyn InterruptHandler>,
+        interrupt: InterruptNumber,
+    ) -> Result<(), InterruptError> {
         if !self.capability.can_register {
             return Err(InterruptError::PermissionDenied);
         }
@@ -669,5 +700,27 @@ impl InterruptManager {
 impl Default for InterruptManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_interrupt_handling_and_dispatch() {
+        let mut pic = PIC::new(ControllerCapability::full());
+        let handler = SimpleInterruptHandler::new(
+            HandlerType::Keyboard,
+            Priority::Critical,
+            HandlerCapability::full(),
+        );
+
+        pic.register_handler(Box::new(handler), 33).unwrap();
+        pic.enable_interrupt(33).unwrap();
+
+        let res = pic.dispatch(33);
+        assert_eq!(res, InterruptResult::Handled);
+        assert_eq!(pic.stats().handled_interrupts, 1);
     }
 }
