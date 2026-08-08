@@ -36,5 +36,5 @@ unmerged = [
 for f in unmerged:
     try:
         resolve_file(f)
-    except Exception as e:
+    except OSError as e:
         print(f"Error on {f}: {e}")
