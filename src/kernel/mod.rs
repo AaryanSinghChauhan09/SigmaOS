@@ -1,5 +1,6 @@
 // SigmaOS Kernel Module
 pub mod breakthroughs;
+pub mod generation_manager;
 pub mod ipc;
 pub mod memory;
 pub mod meta;
@@ -17,6 +18,7 @@ pub use breakthroughs::{
     DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
     KernelPersonalityMode,
 };
+pub use generation_manager::{Generation, GenerationManager};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use meta::{
