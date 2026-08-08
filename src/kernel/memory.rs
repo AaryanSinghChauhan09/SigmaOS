@@ -21,48 +21,6 @@ pub struct Zone {
     pub present_pages: u64,
 }
 
-#[derive(Debug)]
-pub struct MemoryBlock {
-    pub addr: NonNull<u8>,
-    pub size: usize,
-}
-
-use core::ptr::NonNull;
-
-pub struct Zone {
-    pub present_pages: u64,
-}
-
-#[derive(Debug)]
-pub struct MemoryBlock {
-    pub addr: NonNull<u8>,
-    pub size: usize,
-}
-
-use core::ptr::NonNull;
-
-pub struct Zone {
-    pub present_pages: u64,
-}
-
-#[derive(Debug)]
-pub struct MemoryBlock {
-    pub addr: NonNull<u8>,
-    pub size: usize,
-}
-
-use core::ptr::NonNull;
-
-pub struct Zone {
-    pub present_pages: u64,
-}
-
-#[derive(Debug)]
-pub struct MemoryBlock {
-    pub addr: NonNull<u8>,
-    pub size: usize,
-}
-
 pub struct Page {
     pub flags: AtomicUsize,
     pub count: AtomicUsize,
@@ -72,19 +30,7 @@ pub struct Page {
     pub zone: Option<*const Zone>,
 }
 
-impl BuddyAllocator {
-    pub fn new() -> Self {
-        Self {
-            free_lists: Default::default(),
-        }
-    }
-
-    pub fn with_memory(base_addr: usize, size: usize) -> Self {
-        let mut allocator = Self::new();
-        allocator.initialize_memory(base_addr, size);
-        allocator
-    }
-
+impl Page {
     pub fn dec_ref(&self) -> bool {
         self.count.fetch_sub(1, Ordering::SeqCst) == 1
     }
