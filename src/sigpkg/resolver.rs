@@ -40,7 +40,7 @@ impl SatSolver {
     pub fn add_package(&mut self, package: Package) {
         self.packages
             .entry(package.name.clone())
-            .or_default()
+            .or_insert_with(|| Vec::new())
             .push(package);
     }
 
@@ -66,7 +66,7 @@ impl SatSolver {
         result: &mut Vec<Package>,
         visited: &mut HashSet<String>,
     ) -> Result<(), ResolveError> {
-        if visited.contains(package_name) {
+        if visited.contains(&package_name.to_string()) {
             return Ok(()); // Already processed
         }
         visited.insert(package_name.to_string());
@@ -134,7 +134,7 @@ impl SatSolver {
             }
         }
 
-        recursion_stack.remove(package_name);
+        recursion_stack.remove(&package_name.to_string());
         false
     }
 }

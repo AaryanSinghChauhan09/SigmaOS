@@ -1,15 +1,10 @@
-#![no_std]
-#![no_main]
-
-use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
-#![no_std]
-#![no_main]
-
 #[cfg(not(target_os = "none"))]
 extern crate alloc;
 #[cfg(not(target_os = "none"))]
 use alloc::vec::Vec;
+
+use core::mem;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// OOP-based Sovereign Scheduler for SigmaOS
 /// Based on Roadmap Item: Functional Kernel Scheduler Implementation (Critical Blocker)
@@ -243,12 +238,14 @@ impl RealTimeScheduler for SimpleRealTimeScheduler {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]

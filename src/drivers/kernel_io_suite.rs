@@ -29,6 +29,12 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::mem::MaybeUninit;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HidTokenType { Keyboard, Mouse, Joystick }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PrinterFormat { Text, PostScript, Pdf }
+
 
 
 

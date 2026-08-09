@@ -16,6 +16,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+
 // SigmaOS Custom String Library
 // Reduces dependency on predefined functions by implementing custom string operations
 
@@ -49,7 +51,7 @@ pub fn strcpy(dest: &mut str, src: &str) -> Result<(), ()> {
 }
 
 /// Custom string concatenation
-pub fn strcat(dest: &mut String, src: &str) {
+pub fn strcat(dest: &mut alloc::string::String, src: &str) {
     dest.push_str(src);
 }
 
@@ -69,12 +71,12 @@ pub fn atoi(s: &str) -> Result<i32, ()> {
 }
 
 /// Custom integer to string conversion
-pub fn itoa(mut n: i32) -> String {
+pub fn itoa(mut n: i32) -> alloc::string::String {
     if n == 0 {
-        return "0".to_string();
+        return alloc::string::String::from("0");
     }
 
-    let mut result = String::new();
+    let mut result = alloc::string::String::new();
     let negative = n < 0;
 
     if negative {
@@ -223,12 +225,12 @@ impl ToString for str {
 
 impl ToString for i32 {
     fn to_string(&self) -> String {
-        String::from_str(&itoa(*self))
+        String::from_str(itoa(*self).as_str())
     }
 }
 
 impl ToString for u32 {
     fn to_string(&self) -> String {
-        String::from_str(&itoa(*self as i32))
+        String::from_str(itoa(*self as i32).as_str())
     }
 }

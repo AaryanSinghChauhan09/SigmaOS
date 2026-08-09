@@ -549,11 +549,13 @@ impl NftConntrack {
             }
         }
 
+        let count = expired.len();
+
         for key in expired {
             self.connections.remove(&key);
         }
 
-        expired.len()
+        count
     }
 
     fn calculate_conn_key(&self, conn: &NftConnection) -> u64 {
@@ -738,7 +740,7 @@ impl NftablesManager {
 
     fn evaluate_rule(
         &self,
-        _rule: &NftRule,
+        rule: &NftRule,
         _src_addr: &str,
         _src_port: u16,
         _dst_addr: &str,

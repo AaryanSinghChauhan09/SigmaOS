@@ -66,3 +66,6 @@ pub use sovereign_suite::{
     CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
     ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
 };
+
+pub mod gentoo;
+pub use gentoo::{OpenRcManager, OpenRcService, OpenRcRunlevel};

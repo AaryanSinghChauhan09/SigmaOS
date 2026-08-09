@@ -504,23 +504,27 @@ impl PfFirewall {
         }
 
         // Evaluate rules in order
+        let mut final_action = self.default_action;
+        let mut final_keep_state = false;
+        let mut _final_log = false;
+
         for rule in &self.rules {
             if self.rule_matches(rule, &source_addr, source_port, &dest_addr, dest_port, protocol, direction, interface.as_deref()) {
-                if rule.options.log && self.log_enabled {
-                    // Log the packet match
-                }
-
-                if rule.options.keep_state && rule.action == PfAction::Pass {
-                    self.create_state(source_addr, source_port, dest_addr, dest_port, protocol, timestamp);
-                }
+                final_action = rule.action;
+                final_keep_state = rule.options.keep_state;
+                _final_log = rule.options.log;
 
                 if rule.options.quick {
-                    return rule.action;
+                    break;
                 }
             }
         }
 
-        self.default_action
+        if final_keep_state && final_action == PfAction::Pass {
+            self.create_state(source_addr, source_port, dest_addr, dest_port, protocol, timestamp);
+        }
+
+        final_action
     }
 
     fn rule_matches(
@@ -644,11 +648,13 @@ impl PfFirewall {
             }
         }
 
+        let count = expired.len();
+
         for key in expired {
             self.states.remove(&key);
         }
 
-        expired.len()
+        count
     }
 
     /// Get firewall statistics

@@ -626,12 +626,6 @@ impl Default for DeviceManager {
     }
 }
 
-impl Default for DeviceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {
