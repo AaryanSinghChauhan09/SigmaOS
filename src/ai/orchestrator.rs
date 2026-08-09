@@ -14,7 +14,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// and self-diagnosis capabilities for system optimization
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type AgentID = usize;
 use std::sync::atomic::{AtomicUsize, Ordering};
