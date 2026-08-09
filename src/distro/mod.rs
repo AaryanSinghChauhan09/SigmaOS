@@ -1,12 +1,7 @@
 // SigmaOS Distro/Ecosystem Maturity Module
-pub mod arch_parity;
-pub mod bsd_parity;
 pub mod certification;
-pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
-pub mod debian_parity;
-pub mod fedora_parity;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
@@ -15,17 +10,13 @@ pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
-pub mod transformation_engine;
+pub mod parity;
 
-pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
-pub use bsd_parity::{OpenBsdSecurity, ZfsManager, PortsManager, PfFirewall, BsdJail};
-pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
-pub use debian_parity::{DebianPackageManager, SnapPackageManager, DebianControl, UbuntuDesktopIntegration};
-pub use fedora_parity::{DnfPackageManager, RpmPackage, SelinuxPolicy, SystemdService};
-pub use manjaro::{
-    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
-    ManjaroKernelRelease, ManjaroKernelSwitcher,
-    PacmanMirror, PamacPackageManager, ManjaroSettingsManager,
+pub use parity::{
+    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
+    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
+    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -48,10 +39,14 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
+pub use manjaro::{
+    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
+    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
+};
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
-    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
-    LivepatchPatch, LivepatchManager,
+    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
+    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
+    TimeTravelEngine,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
@@ -63,9 +58,4 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
-};
-pub use transformation_engine::{
-    AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,
-    ForensicReadinessAuditor, GlobalComplianceDashboard, DeveloperToolkitConverter,
-    IotDeviceMeshOrchestrator, IotMeshDevice,
 };
