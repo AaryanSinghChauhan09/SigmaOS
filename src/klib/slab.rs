@@ -1,3 +1,5 @@
+extern crate alloc;
+
 // SigmaOS klib: Slab Allocator (like Linux SLUB/SLAB, FreeBSD UMA)
 // Custom memory allocator for fixed-size object allocation pools
 // No external dependencies - fully sovereign implementation
@@ -139,7 +141,7 @@ impl SlabCache {
     }
 
     /// Returns the number of free slots.
-    pub fn free(&self) -> usize {
+    pub fn free_slots(&self) -> usize {
         self.total - self.allocated()
     }
 

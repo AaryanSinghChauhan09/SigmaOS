@@ -219,7 +219,7 @@ impl VintageDriverTranslator {
         // Vintage drivers frequently accessed exact I/O ports directly (e.g. 0x3F8 for serial, 0x1F0 for IDE)
         if port == 0x3F8 || port == 0x1F0 {
             let idx = (port % 256) as usize;
-            self.wrapper.simulated_pci_bar[idx] = val as u32;
+            self.wrapper.simulated_pci_bar[idx] = val;
             Ok(())
         } else {
             Err(HistoricError::InvalidIoPortAccess)
@@ -276,7 +276,7 @@ impl TinyCoreEphemeralEngine {
         Ok(())
     }
 
-    pub fn write_to_volatile_overlay(&mut self, _file_path: &str, _data_len: usize) -> Result<usize, HistoricError> {
+    pub fn write_to_volatile_overlay(&mut self, _file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
         if self.persistence_enabled {
             return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
         }
