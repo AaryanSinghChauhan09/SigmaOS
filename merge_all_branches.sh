@@ -15,6 +15,7 @@ echo ""
 BRANCHES=(
   "doc/absorb_agents_repos-5960621972319753074"
   "feature/sigmaos-strategic-roadmap-14297109383819106955"
+  "feature/sigmaos-bolt-palette-sentinel-parity-12861902970884901261"
   "improve-package-manager-and-containers-15562379424742924660"
   "improve-sigmaos-systemd-2776481363129221438"
   "jules-109675230653822082-3f4e6804"

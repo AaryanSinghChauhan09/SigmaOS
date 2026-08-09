@@ -35,19 +35,6 @@ where
     }
 }
 
-impl<T> core::iter::FromIterator<T> for HashSet<T>
-where
-    T: Eq + core::hash::Hash + Clone,
-{
-    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        let mut set = HashSet::new();
-        for item in iter {
-            set.insert(item);
-        }
-        set
-    }
-}
-
 impl<T> HashSet<T>
 where
     T: Eq + core::hash::Hash + Clone,

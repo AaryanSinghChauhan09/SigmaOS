@@ -16,6 +16,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+
 // SigmaOS Custom String Library
 // Reduces dependency on predefined functions by implementing custom string operations
 
@@ -49,7 +51,7 @@ pub fn strcpy(dest: &mut str, src: &str) -> Result<(), ()> {
 }
 
 /// Custom string concatenation
-pub fn strcat(dest: &mut String, src: &str) {
+pub fn strcat(dest: &mut alloc::string::String, src: &str) {
     dest.push_str(src);
 }
 
@@ -69,12 +71,12 @@ pub fn atoi(s: &str) -> Result<i32, ()> {
 }
 
 /// Custom integer to string conversion
-pub fn itoa(mut n: i32) -> String {
+pub fn itoa(mut n: i32) -> alloc::string::String {
     if n == 0 {
-        return "0".to_string();
+        return alloc::string::String::from("0");
     }
 
-    let mut result = String::new();
+    let mut result = alloc::string::String::new();
     let negative = n < 0;
 
     if negative {
@@ -178,56 +180,32 @@ mod tests {
 }
 
 /// Simple String struct to replace std::string::String
-/// Uses custom implementation to reduce dependency on predefined libraries
+/// Note: This is a basic implementation - for production use, consider using alloc::string::String
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SigmaString {
-    bytes: Vec<u8>,
+pub struct String {
+    // Using alloc::vec::Vec for now - in Phase 2 we'll use klib::Vec
+    inner: alloc::string::String,
 }
 
-impl SigmaString {
+impl String {
     pub fn new() -> Self {
-        SigmaString {
-            bytes: Vec::new(),
+        String {
+            inner: alloc::string::String::new(),
         }
     }
 
     pub fn from_str(s: &str) -> Self {
-        let mut vec = Vec::new();
-        for byte in s.bytes() {
-            vec.push(byte);
+        String {
+            inner: alloc::string::String::from(s),
         }
-        SigmaString { bytes: vec }
     }
 
     pub fn as_str(&self) -> &str {
-        // SAFETY: We ensure that bytes are always valid UTF-8 by only pushing valid UTF-8 data
-        unsafe { core::str::from_utf8_unchecked(self.bytes.as_slice()) }
-    }
-
-    pub fn push(&mut self, c: char) {
-        let mut buf = [0u8; 4];
-        let len = c.encode_utf8(&mut buf).len();
-        for i in 0..len {
-            self.bytes.push(buf[i]);
-        }
-    }
-
-    pub fn push_str(&mut self, s: &str) {
-        for byte in s.bytes() {
-            self.bytes.push(byte);
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.bytes.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.bytes.is_empty()
+        self.inner.as_str()
     }
 }
 
-impl Default for SigmaString {
+impl Default for String {
     fn default() -> Self {
         Self::new()
     }
@@ -235,24 +213,24 @@ impl Default for SigmaString {
 
 /// ToString trait to replace std::string::ToString
 pub trait ToString {
-    fn to_string(&self) -> SigmaString;
+    fn to_string(&self) -> String;
 }
 
 // Implement ToString for common types
 impl ToString for str {
-    fn to_string(&self) -> SigmaString {
-        SigmaString::from_str(self)
+    fn to_string(&self) -> String {
+        String::from_str(self)
     }
 }
 
 impl ToString for i32 {
-    fn to_string(&self) -> SigmaString {
-        SigmaString::from_str(&itoa(*self))
+    fn to_string(&self) -> String {
+        String::from_str(itoa(*self).as_str())
     }
 }
 
 impl ToString for u32 {
-    fn to_string(&self) -> SigmaString {
-        SigmaString::from_str(&itoa(*self as i32))
+    fn to_string(&self) -> String {
+        String::from_str(itoa(*self as i32).as_str())
     }
 }

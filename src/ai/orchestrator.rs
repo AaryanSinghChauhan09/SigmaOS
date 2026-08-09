@@ -174,6 +174,7 @@ struct Vec<T> {
     pub capacity: usize,
 }
 
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {

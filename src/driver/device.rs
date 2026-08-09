@@ -517,12 +517,6 @@ pub struct DeviceManager {
     next_device_id: AtomicUsize,
 }
 
-impl Default for DeviceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl DeviceManager {
     pub fn new() -> Self {
         DeviceManager {

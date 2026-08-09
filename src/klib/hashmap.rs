@@ -67,7 +67,8 @@ where
     }
 
     fn resize_buckets(&mut self) {
-        self.buckets = Vec::new();
+        // Optimized by Bolt ⚡: pre-allocate with_capacity to eliminate O(log N) vector resizing overhead.
+        self.buckets = Vec::with_capacity(self.capacity);
         for _ in 0..self.capacity {
             self.buckets.push(None);
         }
