@@ -6,11 +6,12 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type DriverID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
+    Storage = 3,
 }
 
 #[repr(usize)]
@@ -58,13 +59,6 @@ pub trait Driver {
     fn dependencies(&self) -> &'static [DriverType];
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum DriverError {
-    Success = 0,
-    LoadFailed = 1,
-    UnloadFailed = 2,
-}
 
 pub trait StorageDriver: Driver {
     fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
@@ -92,29 +86,37 @@ pub struct SimpleStorageDriver {
     pub state: AtomicUsize,
 }
 
-impl SimpleDriver {
-    pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        SimpleDriver {
+impl SimpleStorageDriver {
+    pub fn new(id: DriverID) -> Self {
+        SimpleStorageDriver {
             id,
-            driver_type,
             state: AtomicUsize::new(DriverState::Unloaded as usize),
         }
     }
 }
 
-impl Driver for SimpleDriver {
+impl Driver for SimpleStorageDriver {
     fn id(&self) -> DriverID {
         self.id
     }
     fn driver_type(&self) -> DriverType {
-        self.driver_type
+        DriverType::Storage
     }
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
     fn load(&mut self) -> Result<(), DriverError> {
         self.state
-            .store(DriverState::Loaded as usize, Ordering::SeqCst);
+            .store(DriverState::Active as usize, Ordering::SeqCst);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
@@ -292,6 +294,24 @@ impl SimpleDriverFramework {
             drivers: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+
+    pub fn verify_dependencies(&self, driver: &dyn Driver) -> bool {
+        for &dep in driver.dependencies() {
+            let mut found = false;
+            for other_option in self.drivers.iter() {
+                if let Some(ref other) = *other_option {
+                    if other.driver_type() == dep {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if !found {
+                return false;
+            }
+        }
+        true
     }
 }
 

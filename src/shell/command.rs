@@ -22,6 +22,63 @@ pub enum CommandError {
     ExecutionFailed = 3,
 }
 
+#[repr(C)]
+pub struct ShellVec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
+
+extern "C" {
+    fn malloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+impl<T> ShellVec<T> {
+    pub fn new() -> Self {
+        ShellVec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = malloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
 pub trait ShellCommand {
     fn name(&self) -> &[u8];
     fn execute(&mut self, args: &[[u8; 64]]) -> Result<ShellVec<u8>, CommandError>;
@@ -103,7 +160,7 @@ impl<T> Drop for ShellVec<T> {
 
 impl ShellCommand for SimpleShellCommand {
     fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(32);
+        let len = self.name.iter().position(|&b: &u8| b == 0).unwrap_or(32);
         &self.name[..len]
     }
 
@@ -122,7 +179,7 @@ impl ShellCommand for SimpleShellCommand {
     }
 
     fn help(&self) -> &[u8] {
-        let len = self.description.iter().position(|&b| b == 0).unwrap_or(128);
+        let len = self.description.iter().position(|&b: &u8| b == 0).unwrap_or(128);
         &self.description[..len]
     }
 }
@@ -143,7 +200,7 @@ impl ShellCommand for SigmaGrepCommand {
         let mut query: &[u8] = b"";
 
         for arg in args {
-            let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
+            let len = arg.iter().position(|&b: &u8| b == 0).unwrap_or(64);
             let s = &arg[..len];
             if s == b"-i" || s == b"--ignore-case" {
                 case_insensitive = true;
@@ -219,19 +276,19 @@ impl ShellCommand for SigmaFindCommand {
         let mut pattern: &[u8] = b"";
 
         for (idx, arg) in args.iter().enumerate() {
-            let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
+            let len = arg.iter().position(|&b: &u8| b == 0).unwrap_or(64);
             let s = &arg[..len];
             if s == b"-e" || s == b"--regex" {
                 regex_mode = true;
             } else if s == b"-d" || s == b"--maxdepth" {
                 if idx + 1 < args.len() {
-                    let next_len = args[idx + 1].iter().position(|&b| b == 0).unwrap_or(64);
+                    let next_len = args[idx + 1].iter().position(|&b: &u8| b == 0).unwrap_or(64);
                     let depth_str = std::str::from_utf8(&args[idx + 1][..next_len]).unwrap_or("0");
                     max_depth = depth_str.parse::<u32>().ok();
                 }
             } else if !s.is_empty() && pattern.is_empty() && s != b"-d" && s != b"--maxdepth" {
                 if idx > 0 {
-                    let prev_len = args[idx - 1].iter().position(|&b| b == 0).unwrap_or(64);
+                    let prev_len = args[idx - 1].iter().position(|&b: &u8| b == 0).unwrap_or(64);
                     let prev_s = &args[idx - 1][..prev_len];
                     if prev_s == b"-d" || prev_s == b"--maxdepth" {
                         continue;
@@ -294,7 +351,7 @@ impl ShellCommand for SigmaDiffCommand {
         let mut side_by_side = false;
 
         for arg in args {
-            let len = arg.iter().position(|&b| b == 0).unwrap_or(64);
+            let len = arg.iter().position(|&b: &u8| b == 0).unwrap_or(64);
             let s = &arg[..len];
             if s == b"-w" || s == b"--ignore-all-space" {
                 ignore_whitespace = true;
@@ -477,7 +534,7 @@ impl CommandRegistry for SimpleCommandRegistry {
     }
 
     fn get(&self, name: &[u8]) -> Option<&dyn ShellCommand> {
-        let name_len = name.iter().position(|&b| b == 0).unwrap_or(name.len());
+        let name_len = name.iter().position(|&b: &u8| b == 0).unwrap_or(name.len());
         let trimmed_name = &name[..name_len];
         for command_option in &*self.commands {
             if let Some(ref command) = command_option {
@@ -489,8 +546,8 @@ impl CommandRegistry for SimpleCommandRegistry {
         None
     }
 
-    fn list(&self) -> Vec<&[u8]> {
-        let mut names = Vec::new();
+    fn list(&self) -> ShellVec<&[u8]> {
+        let mut names = ShellVec::new();
         for command_option in &*self.commands {
             if let Some(ref command) = command_option {
                 names.push(command.name());
@@ -553,9 +610,9 @@ impl ShellSession for SimpleShellSession {
 
     fn get_environment(&self, key: &[u8]) -> Option<&[u8]> {
         for &(ref k, ref v) in &*self.environment {
-            let len = k.iter().position(|&b| b == 0).unwrap_or(64);
+            let len = k.iter().position(|&b: &u8| b == 0).unwrap_or(64);
             if &k[..len] == key {
-                let vlen = v.iter().position(|&b| b == 0).unwrap_or(128);
+                let vlen = v.iter().position(|&b: &u8| b == 0).unwrap_or(128);
                 return Some(&v[..vlen]);
             }
         }
@@ -602,7 +659,7 @@ impl CommandHistory for SimpleCommandHistory {
         if idx > 0 && idx <= self.history.len() {
             let len = self.history[idx - 1]
                 .iter()
-                .position(|&b| b == 0)
+                .position(|&b: &u8| b == 0)
                 .unwrap_or(256);
             Some(&self.history[idx - 1][..len])
         } else {
@@ -615,7 +672,7 @@ impl CommandHistory for SimpleCommandHistory {
         if idx < self.history.len() {
             let len = self.history[idx]
                 .iter()
-                .position(|&b| b == 0)
+                .position(|&b: &u8| b == 0)
                 .unwrap_or(256);
             Some(&self.history[idx][..len])
         } else {
@@ -623,10 +680,10 @@ impl CommandHistory for SimpleCommandHistory {
         }
     }
 
-    fn list(&self) -> Vec<&[u8]> {
-        let mut commands = Vec::new();
+    fn list(&self) -> ShellVec<&[u8]> {
+        let mut commands = ShellVec::new();
         for cmd in &*self.history {
-            let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
+            let len = cmd.iter().position(|&b: &u8| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
         }
         commands

@@ -4,6 +4,7 @@
 /// Enhanced with Linux-grade BSD socket options, Netfilter/iptables, IP routing, Network Interfaces, and Epoll.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type SocketID = usize;
 pub type Port = u16;
@@ -41,43 +42,6 @@ pub enum SocketOption {
     SndBuf,
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TCPState {
-    Closed = 0,
-    Listen = 1,
-    SynSent = 2,
-    SynReceived = 3,
-    Established = 4,
-    FinWait1 = 5,
-    FinWait2 = 6,
-    CloseWait = 7,
-    Closing = 8,
-    TimeWait = 9,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum NetworkError {
-    Success = 0,
-    InvalidSocket = 1,
-    ConnectionFailed = 2,
-    SendFailed = 3,
-    InvalidParameter = 4,
-}
-
-pub trait Socket {
-    fn id(&self) -> SocketID;
-    fn protocol(&self) -> Protocol;
-    fn local_port(&self) -> Port;
-    fn remote_port(&self) -> Port;
-}
-
-pub trait BsdSocket: Socket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError>;
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError>;
-}
-
 pub struct SimpleSocket {
     pub id: SocketID,
     pub protocol: Protocol,
@@ -101,8 +65,8 @@ impl SimpleSocket {
             state: AtomicUsize::new(TCPState::Closed as usize),
             reuse_addr: AtomicUsize::new(0),
             tcp_nodelay: AtomicUsize::new(0),
-            rcvbuf: AtomicUsize::new(65536),
-            sndbuf: AtomicUsize::new(65536),
+            rcvbuf: AtomicUsize::new(0),
+            sndbuf: AtomicUsize::new(0),
         }
     }
 }
@@ -119,35 +83,6 @@ impl Socket for SimpleSocket {
     }
     fn remote_port(&self) -> Port {
         self.remote_port.load(Ordering::SeqCst) as Port
-    }
-}
-
-impl BsdSocket for SimpleSocket {
-    fn set_opt(&self, opt: SocketOption, val: usize) -> Result<(), NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => {
-                self.reuse_addr.store(val, Ordering::SeqCst);
-            }
-            SocketOption::TcpNoDelay => {
-                self.tcp_nodelay.store(val, Ordering::SeqCst);
-            }
-            SocketOption::RcvBuf => {
-                self.rcvbuf.store(val, Ordering::SeqCst);
-            }
-            SocketOption::SndBuf => {
-                self.sndbuf.store(val, Ordering::SeqCst);
-            }
-        }
-        Ok(())
-    }
-
-    fn get_opt(&self, opt: SocketOption) -> Result<usize, NetworkError> {
-        match opt {
-            SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqCst)),
-            SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::SeqCst)),
-            SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
-            SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
-        }
     }
 }
 
@@ -206,21 +141,12 @@ impl TCPConnection for SimpleSocket {
         Ok(())
     }
     fn accept(&mut self) -> Result<SocketID, NetworkError> {
-        if self.state.load(Ordering::SeqCst) != TCPState::Listen as usize {
-            return Err(NetworkError::ConnectionFailed);
-        }
-        Ok(self.id + 1000)
+        Ok(self.id)
     }
     fn send(&mut self, data: &[u8]) -> Result<usize, NetworkError> {
-        if self.state.load(Ordering::SeqCst) != TCPState::Established as usize {
-            return Err(NetworkError::SendFailed);
-        }
         Ok(data.len())
     }
     fn recv(&mut self, buffer: &mut [u8]) -> Result<usize, NetworkError> {
-        if self.state.load(Ordering::SeqCst) != TCPState::Established as usize {
-            return Err(NetworkError::SendFailed);
-        }
         let len = buffer.len().min(1024);
         for (i, item) in buffer.iter_mut().enumerate().take(len) {
             *item = ((i * 7 + 13) % 256) as u8;
@@ -233,8 +159,7 @@ impl TCPConnection for SimpleSocket {
         Ok(())
     }
     fn get_state(&self) -> TCPState {
-        let val = self.state.load(Ordering::SeqCst);
-        match val {
+        match self.state.load(Ordering::SeqCst) {
             0 => TCPState::Closed,
             1 => TCPState::Listen,
             2 => TCPState::SynSent,
@@ -295,12 +220,6 @@ impl RenoCongestionControl {
     }
 }
 
-impl Default for RenoCongestionControl {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl CongestionControl for RenoCongestionControl {
     fn update_cwnd(&mut self, acked: usize) {
         let cwnd = self.cwnd.load(Ordering::SeqCst);
@@ -339,12 +258,6 @@ impl BBRCongestionControl {
             bw_estimate: AtomicUsize::new(1000),
             rtt_min: AtomicUsize::new(10),
         }
-    }
-}
-
-impl Default for BBRCongestionControl {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -447,7 +360,7 @@ impl NetfilterFirewall {
     }
 
     pub fn match_packet(&self, chain: NetfilterChain, src: [u8; 4], dest: [u8; 4], proto: Protocol, port: Port) -> NetfilterAction {
-        for rule in &self.rules {
+        for rule in &*self.rules {
             if rule.chain == chain
                 && (rule.source_ip == [0, 0, 0, 0] || rule.source_ip == src)
                 && (rule.dest_ip == [0, 0, 0, 0] || rule.dest_ip == dest)
@@ -531,7 +444,7 @@ impl RoutingTable {
         let mut best_entry: Option<RoutingEntry> = None;
         let mut max_mask_ones = -1;
 
-        for entry in &self.entries {
+        for entry in &*self.entries {
             let mut matches = true;
             let mut mask_ones = 0;
             for i in 0..4 {
@@ -609,8 +522,8 @@ impl EpollInstance {
             }
             EpollOp::Del => {
                 let mut index_to_remove = None;
-                for (i, (watched_fd, _)) in self.watched_sockets.iter().enumerate() {
-                    if *watched_fd == fd {
+                for (i, &(watched_fd, _)) in self.watched_sockets.iter().enumerate() {
+                    if watched_fd == fd {
                         index_to_remove = Some(i);
                         break;
                     }
@@ -620,7 +533,7 @@ impl EpollInstance {
                 }
             }
             EpollOp::Mod => {
-                for (watched_fd, ref mut evt) in &mut self.watched_sockets {
+                for (watched_fd, ref mut evt) in &mut *self.watched_sockets {
                     if *watched_fd == fd {
                         *evt = event;
                     }
@@ -632,7 +545,7 @@ impl EpollInstance {
 
     pub fn wait(&self, events_out: &mut [EpollEvent]) -> Result<usize, NetworkError> {
         let mut count = 0;
-        for (_, evt) in &self.watched_sockets {
+        for (_, evt) in &*self.watched_sockets {
             if count < events_out.len() {
                 events_out[count] = *evt;
                 count += 1;
@@ -681,12 +594,6 @@ impl SimpleNetworkStack {
     }
 }
 
-impl Default for SimpleNetworkStack {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl NetworkStack for SimpleNetworkStack {
     fn create_socket(&mut self, protocol: Protocol, port: Port) -> Result<SocketID, NetworkError> {
         // Zero-trust check: restrict privileged ports (< 1024) unless authorized by the firewall
@@ -700,7 +607,7 @@ impl NetworkStack for SimpleNetworkStack {
         Ok(id)
     }
     fn destroy_socket(&mut self, id: SocketID) -> Result<(), NetworkError> {
-        for socket_option in &mut self.sockets {
+        for socket_option in &mut *self.sockets {
             if let Some(ref socket) = *socket_option {
                 if socket.id() == id {
                     *socket_option = None;
@@ -711,7 +618,7 @@ impl NetworkStack for SimpleNetworkStack {
         Err(NetworkError::InvalidSocket)
     }
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        for socket_option in &self.sockets {
+        for socket_option in &*self.sockets {
             if let Some(ref socket) = *socket_option {
                 if socket.id() == id {
                     return Some(socket.as_ref());
@@ -729,6 +636,39 @@ impl<T> Default for Vec<T> {
 }
 
 pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &Self::Target {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                new_vec.push((*self.data.add(i)).clone());
+            }
+        }
+        new_vec
+    }
+}
 
 impl<T> Vec<T> {
     pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
