@@ -1,10 +1,12 @@
 // SigmaOS Distro/Ecosystem Maturity Module
 pub mod arch_parity;
+pub mod bsd_parity;
 pub mod certification;
 pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
 pub mod debian_parity;
+pub mod fedora_parity;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
@@ -16,8 +18,10 @@ pub mod tiny_core;
 pub mod transformation_engine;
 
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
+pub use bsd_parity::{OpenBsdSecurity, ZfsManager, PortsManager, PfFirewall, BsdJail};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
 pub use debian_parity::{DebianPackageManager, SnapPackageManager, DebianControl, UbuntuDesktopIntegration};
+pub use fedora_parity::{DnfPackageManager, RpmPackage, SelinuxPolicy, SystemdService};
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
     ManjaroKernelRelease, ManjaroKernelSwitcher,
