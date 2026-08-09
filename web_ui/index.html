@@ -497,66 +497,214 @@ Select an administrative quick-action on the left.</pre>
             const title = document.getElementById('olivetin-cmd-title');
             const inputs = document.getElementById('olivetin-inputs');
 
+            // Clear inputs safely
+            while (inputs.firstChild) {
+                inputs.removeChild(inputs.firstChild);
+            }
+
             if (cmd === 'systemctl') {
                 title.innerText = 'Service Administration';
-                inputs.innerHTML = `
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem; flex-wrap: wrap;">
-                        <span>Action:</span>
-                        <select id="ot-service-action" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none;">
-                            <option value="restart">restart</option>
-                            <option value="start">start</option>
-                            <option value="stop">stop</option>
-                            <option value="status">status</option>
-                        </select>
-                        <span>Service:</span>
-                        <input type="text" id="ot-service-name" value="systemd-networkd" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none; width: 120px;">
-                        <button class="fm-btn" onclick="executeOliveTin()">Execute</button>
-                    </div>
-                `;
+                
+                // Create DOM elements safely
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.gap = '8px';
+                container.style.alignItems = 'center';
+                container.style.fontSize = '0.8rem';
+                container.style.flexWrap = 'wrap';
+
+                const actionLabel = document.createElement('span');
+                actionLabel.textContent = 'Action:';
+                container.appendChild(actionLabel);
+
+                const actionSelect = document.createElement('select');
+                actionSelect.id = 'ot-service-action';
+                actionSelect.style.background = '#18181b';
+                actionSelect.style.color = 'white';
+                actionSelect.style.border = '1px solid var(--border-glass)';
+                actionSelect.style.padding = '4px';
+                actionSelect.style.borderRadius = '4px';
+                actionSelect.style.outline = 'none';
+                
+                const actions = ['restart', 'start', 'stop', 'status'];
+                actions.forEach(action => {
+                    const option = document.createElement('option');
+                    option.value = action;
+                    option.textContent = action;
+                    actionSelect.appendChild(option);
+                });
+                container.appendChild(actionSelect);
+
+                const serviceLabel = document.createElement('span');
+                serviceLabel.textContent = 'Service:';
+                container.appendChild(serviceLabel);
+
+                const serviceInput = document.createElement('input');
+                serviceInput.type = 'text';
+                serviceInput.id = 'ot-service-name';
+                serviceInput.value = 'systemd-networkd';
+                serviceInput.style.background = '#18181b';
+                serviceInput.style.color = 'white';
+                serviceInput.style.border = '1px solid var(--border-glass)';
+                serviceInput.style.padding = '4px';
+                serviceInput.style.borderRadius = '4px';
+                serviceInput.style.outline = 'none';
+                serviceInput.style.width = '120px';
+                container.appendChild(serviceInput);
+
+                const executeBtn = document.createElement('button');
+                executeBtn.className = 'fm-btn';
+                executeBtn.textContent = 'Execute';
+                executeBtn.onclick = executeOliveTin;
+                container.appendChild(executeBtn);
+
+                inputs.appendChild(container);
             } else if (cmd === 'backup') {
                 title.innerText = 'Timeshift btrfs-COW Backup';
-                inputs.innerHTML = `
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem;">
-                        <span>Path:</span>
-                        <input type="text" id="ot-backup-path" value="/dev/sda1/snapshots" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none; flex: 1;">
-                        <button class="fm-btn" onclick="executeOliveTin()">Create Snapshot</button>
-                    </div>
-                `;
+                
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.gap = '8px';
+                container.style.alignItems = 'center';
+                container.style.fontSize = '0.8rem';
+
+                const pathLabel = document.createElement('span');
+                pathLabel.textContent = 'Path:';
+                container.appendChild(pathLabel);
+
+                const pathInput = document.createElement('input');
+                pathInput.type = 'text';
+                pathInput.id = 'ot-backup-path';
+                pathInput.value = '/dev/sda1/snapshots';
+                pathInput.style.background = '#18181b';
+                pathInput.style.color = 'white';
+                pathInput.style.border = '1px solid var(--border-glass)';
+                pathInput.style.padding = '4px';
+                pathInput.style.borderRadius = '4px';
+                pathInput.style.outline = 'none';
+                pathInput.style.flex = '1';
+                container.appendChild(pathInput);
+
+                const snapshotBtn = document.createElement('button');
+                snapshotBtn.className = 'fm-btn';
+                snapshotBtn.textContent = 'Create Snapshot';
+                snapshotBtn.onclick = executeOliveTin;
+                container.appendChild(snapshotBtn);
+
+                inputs.appendChild(container);
             } else if (cmd === 'compact') {
                 title.innerText = 'Memory Compaction & Defragmentation';
-                inputs.innerHTML = `
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem;">
-                        <span>Defrag Target:</span>
-                        <select id="ot-defrag-target" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none;">
-                            <option value="Slab">Slab Cache</option>
-                            <option value="Buddy">Buddy Allocator</option>
-                            <option value="Page">UVM Pages</option>
-                        </select>
-                        <button class="fm-btn" onclick="executeOliveTin()">Defragment</button>
-                    </div>
-                `;
+                
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.gap = '8px';
+                container.style.alignItems = 'center';
+                container.style.fontSize = '0.8rem';
+
+                const targetLabel = document.createElement('span');
+                targetLabel.textContent = 'Defrag Target:';
+                container.appendChild(targetLabel);
+
+                const targetSelect = document.createElement('select');
+                targetSelect.id = 'ot-defrag-target';
+                targetSelect.style.background = '#18181b';
+                targetSelect.style.color = 'white';
+                targetSelect.style.border = '1px solid var(--border-glass)';
+                targetSelect.style.padding = '4px';
+                targetSelect.style.borderRadius = '4px';
+                targetSelect.style.outline = 'none';
+                
+                const targets = ['Slab', 'Buddy', 'Page'];
+                targets.forEach(target => {
+                    const option = document.createElement('option');
+                    option.value = target;
+                    option.textContent = target === 'Slab' ? 'Slab Cache' : target === 'Buddy' ? 'Buddy Allocator' : 'UVM Pages';
+                    targetSelect.appendChild(option);
+                });
+                container.appendChild(targetSelect);
+
+                const defragBtn = document.createElement('button');
+                defragBtn.className = 'fm-btn';
+                defragBtn.textContent = 'Defragment';
+                defragBtn.onclick = executeOliveTin;
+                container.appendChild(defragBtn);
+
+                inputs.appendChild(container);
             } else if (cmd === 'security') {
                 title.innerText = 'Vulnerability CVE Scanner';
-                inputs.innerHTML = `
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem;">
-                        <span>Target Port/IP:</span>
-                        <input type="text" id="ot-sec-target" value="127.0.0.1:80" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none; width: 110px;">
-                        <button class="fm-btn" onclick="executeOliveTin()">Scan Ports</button>
-                    </div>
-                `;
+                
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.gap = '8px';
+                container.style.alignItems = 'center';
+                container.style.fontSize = '0.8rem';
+
+                const targetLabel = document.createElement('span');
+                targetLabel.textContent = 'Target Port/IP:';
+                container.appendChild(targetLabel);
+
+                const targetInput = document.createElement('input');
+                targetInput.type = 'text';
+                targetInput.id = 'ot-sec-target';
+                targetInput.value = '127.0.0.1:80';
+                targetInput.style.background = '#18181b';
+                targetInput.style.color = 'white';
+                targetInput.style.border = '1px solid var(--border-glass)';
+                targetInput.style.padding = '4px';
+                targetInput.style.borderRadius = '4px';
+                targetInput.style.outline = 'none';
+                targetInput.style.width = '110px';
+                container.appendChild(targetInput);
+
+                const scanBtn = document.createElement('button');
+                scanBtn.className = 'fm-btn';
+                scanBtn.textContent = 'Scan Ports';
+                scanBtn.onclick = executeOliveTin;
+                container.appendChild(scanBtn);
+
+                inputs.appendChild(container);
             } else if (cmd === 'autotune') {
                 title.innerText = 'Autonomic Kernel Tuning';
-                inputs.innerHTML = `
-                    <div style="display: flex; gap: 8px; align-items: center; font-size: 0.8rem;">
-                        <span>Scheduling Profile:</span>
-                        <select id="ot-tune-profile" style="background: #18181b; color: white; border: 1px solid var(--border-glass); padding: 4px; border-radius: 4px; outline: none;">
-                            <option value="Bolt">Bolt (High-throughput)</option>
-                            <option value="Autonomic">Autonomic (Energy Aware)</option>
-                            <option value="S-COMP">GDPR/HIPAA Secure Compliant</option>
-                        </select>
-                        <button class="fm-btn" onclick="executeOliveTin()">Tune Kernel</button>
-                    </div>
-                `;
+                
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.gap = '8px';
+                container.style.alignItems = 'center';
+                container.style.fontSize = '0.8rem';
+
+                const profileLabel = document.createElement('span');
+                profileLabel.textContent = 'Scheduling Profile:';
+                container.appendChild(profileLabel);
+
+                const profileSelect = document.createElement('select');
+                profileSelect.id = 'ot-tune-profile';
+                profileSelect.style.background = '#18181b';
+                profileSelect.style.color = 'white';
+                profileSelect.style.border = '1px solid var(--border-glass)';
+                profileSelect.style.padding = '4px';
+                profileSelect.style.borderRadius = '4px';
+                profileSelect.style.outline = 'none';
+                
+                const profiles = [
+                    {value: 'Bolt', text: 'Bolt (High-throughput)'},
+                    {value: 'Autonomic', text: 'Autonomic (Energy Aware)'},
+                    {value: 'S-COMP', text: 'GDPR/HIPAA Secure Compliant'}
+                ];
+                profiles.forEach(profile => {
+                    const option = document.createElement('option');
+                    option.value = profile.value;
+                    option.textContent = profile.text;
+                    profileSelect.appendChild(option);
+                });
+                container.appendChild(profileSelect);
+
+                const tuneBtn = document.createElement('button');
+                tuneBtn.className = 'fm-btn';
+                tuneBtn.textContent = 'Tune Kernel';
+                tuneBtn.onclick = executeOliveTin;
+                container.appendChild(tuneBtn);
+
+                inputs.appendChild(container);
             }
         }
 
@@ -722,12 +870,32 @@ Select an administrative quick-action on the left.</pre>
         // S-Office markdown previewer
         function translateMarkdown(val) {
             const preview = document.getElementById('office-preview');
-            // Quick regex translation of headers
-            let html = val
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                .replace(/^## (.*$)/gim, '<h2>$2</h2>')
-                .replace(/^- (.*$)/gim, '<li>$1</li>');
-            preview.innerHTML = html;
+            // Clear preview safely
+            while (preview.firstChild) {
+                preview.removeChild(preview.firstChild);
+            }
+            
+            // Safe DOM-based markdown translation
+            const lines = val.split('\n');
+            lines.forEach(line => {
+                if (line.startsWith('# ')) {
+                    const h1 = document.createElement('h1');
+                    h1.textContent = line.substring(2);
+                    preview.appendChild(h1);
+                } else if (line.startsWith('## ')) {
+                    const h2 = document.createElement('h2');
+                    h2.textContent = line.substring(3);
+                    preview.appendChild(h2);
+                } else if (line.startsWith('- ')) {
+                    const li = document.createElement('li');
+                    li.textContent = line.substring(2);
+                    preview.appendChild(li);
+                } else if (line.trim()) {
+                    const p = document.createElement('p');
+                    p.textContent = line;
+                    preview.appendChild(p);
+                }
+            });
         }
 
         function compileToPDF() {
@@ -736,7 +904,10 @@ Select an administrative quick-action on the left.</pre>
 
         function clearEditor() {
             document.getElementById('office-input').value = '';
-            document.getElementById('office-preview').innerHTML = '';
+            const preview = document.getElementById('office-preview');
+            while (preview.firstChild) {
+                preview.removeChild(preview.firstChild);
+            }
         }
 
         // S-Media synthesizer values
@@ -744,7 +915,7 @@ Select an administrative quick-action on the left.</pre>
         function toggleAudioSynthesis() {
             isAudioPlaying = !isAudioPlaying;
             const btn = document.getElementById('audio-toggle-btn');
-            btn.innerHTML = isAudioPlaying ? '🛑 Stop Audio Synth' : '🔊 Play Binaural Beats';
+            btn.textContent = isAudioPlaying ? '🛑 Stop Audio Synth' : '🔊 Play Binaural Beats';
         }
 
         function updateAudioParams() {

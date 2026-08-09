@@ -67,7 +67,10 @@ export function renderCognitiveNarrative(event_type, pid, details, containerElem
       narrative = `System narrative: Process ${pid} behavior updated successfully. Details: ${details}.`;
   }
 
-  containerElement.innerHTML = "";
+  // Clear container safely without innerHTML
+  while (containerElement.firstChild) {
+    containerElement.removeChild(containerElement.firstChild);
+  }
   const card = document.createElement("div");
   card.className = "cognitive-story-card";
   card.setAttribute("role", "status");

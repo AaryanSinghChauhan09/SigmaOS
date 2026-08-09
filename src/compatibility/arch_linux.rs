@@ -425,8 +425,8 @@ pub struct PamGate {
 impl PamGate {
     pub fn new() -> Self {
         let mut shadow = HashMap::new();
-        shadow.insert("root".to_string(), "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8".to_string());
-        shadow.insert("arch_user".to_string(), "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92".to_string());
+        // Empty shadow database for security - passwords set at runtime
+        // via proper password hashing (Argon2) in production
 
         let mut sudoers = Vec::new();
         sudoers.push("arch_user".to_string());
@@ -615,9 +615,9 @@ mod tests {
         // Unauthorized user
         assert!(!pam.sudo_authorized("malicious_user"));
 
-        // Login check
-        let root_pwd_hash = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8";
-        assert!(pam.pam_authenticate("root", root_pwd_hash));
+        // Login check with empty database should fail
+        assert!(!pam.login_check("root", "any_password"));
+        assert!(!pam.pam_authenticate("root", "any_password"));
     }
 
     #[test]

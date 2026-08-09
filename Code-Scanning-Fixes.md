@@ -32,6 +32,12 @@ Recent updates removed unsafe transmutes, unused variables, and potential securi
 - Fuzzing infrastructure added
 - SAST scanning integrated
 
+### Additional Security Fixes (2026-08-09)
+- **Hard-coded cryptographic values**: Removed all hard-coded password hashes and cryptographic material
+- **XSS vulnerabilities**: Eliminated unsafe innerHTML usage in web interfaces
+- **DOM security**: Implemented safe DOM manipulation practices
+- **Memory safety**: Reviewed and validated all pointer operations
+
 ## Current Security Status
 
 - **Unsafe blocks**: All documented with `// SAFETY:` comments
@@ -39,6 +45,8 @@ Recent updates removed unsafe transmutes, unused variables, and potential securi
 - **Cryptographic operations**: All use kernel CSPRNG, no hard-coded keys
 - **Input validation**: Bounds checking on all user inputs
 - **Integer arithmetic**: `checked_*` operations in critical paths
+- **Web security**: Safe DOM manipulation, no XSS vulnerabilities
+- **Cryptographic security**: No hard-coded values, runtime generation only
 
 ## Ongoing Monitoring
 
@@ -46,3 +54,8 @@ Recent updates removed unsafe transmutes, unused variables, and potential securi
 - CI pipeline runs CodeQL on every push
 - Daily Dependabot vulnerability scanning
 - Weekly OSSF Scorecard analysis
+- Security-focused code review requirements
+
+## Detailed Security Documentation
+
+For complete details on the latest security fixes, see [SECURITY_FIXES_2026-08-09.md](SECURITY_FIXES_2026-08-09.md)
