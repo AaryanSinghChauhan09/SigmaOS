@@ -11,3 +11,7 @@ This journal logs CRITICAL usability enhancements, accessibility standard compli
 ## 2026-08-01 - Elegant Loading Feedback for Async Tasks
 **Learning:** Destructive or long-running operations (like package installations or database commits) without real-time state feedback cause users to double-submit, resulting in corrupted states or multiple duplicate network/disk requests.
 **Action:** Enforce clear visual and textual transitions, and disable action controls during ongoing asynchronous execution.
+
+## 2026-08-09 - High-Contrast focus boundaries
+**Learning:** Screen layout changes or color saturation variations can render normal visual indicators invisible. Enforcing dynamic boundary contrasts makes keyboard navigation accessible.
+**Action:** Ensure active outline color contrasts meet WCAG 2.1 AA ratios of at least 4.5:1.

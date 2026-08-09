@@ -15,3 +15,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-01 - Avoiding Heap Allocations in Dependency Traversal
 **Learning:** Recursively traversing dependency trees with naive `to_visit: Vec<String>` structures incurs heavy heap reallocation and copy overhead if strings are cloned at every node visit. Storing references (`&str`) or using `to_visit` stacks with capacity pre-allocation dramatically cuts allocator stress during package dependency resolution.
 **Action:** Pre-allocate capacity for traversal stacks and use borrowed string references where lifetimes allow.
+
+## 2026-08-09 - Transitioning dynamic formatting out of hotpaths
+**Learning:** Performing dynamic formatting like `format!("...")` inside critical execution loops blocks register reuse and triggers standard allocator locks. Replacing them with pre-allocated trace buffers saves microsecond context processing times.
+**Action:** Always use static lifetime strings or write directly to static ring buffers in critical kernel tasks.

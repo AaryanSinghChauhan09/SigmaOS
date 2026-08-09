@@ -8,12 +8,12 @@ This guide outlines actionable steps and architectural patterns designed to sust
 ## 📅 Chronological Roadmap of Critical Remediations
 
 ### 1. Phase 1: Compile-Time Verification & Hotfixes (Priority: Immediate)
+*   **Scrub Git Conflict Lines:**
+    Deploy an automated conflict scrubber across the 100+ files currently contaminated with conflict headers and git markers (`|||||||`). This is a critical prerequisite to restoring compile-time diagnostics.
 *   **Resolve Firewall Borrow Mismatches:**
     Modify `src/network/pf_firewall.rs` and `src/network/nftables.rs` to clone transient connection parameters (`source_addr.clone()`, `dest_addr.clone()`) and calculate the state changes using scope blocks or temporary vectors to decouple borrow lifetimes from the parent `&self.rules` loop iteration.
 *   **Correct Custom Vec Scope Bounds:**
     Add `use core::mem;` or fully-qualify size queries with `core::mem::size_of::<T>()` inside the bare-metal allocator module within `src/scheduler/scheduler.rs`.
-*   **Verify Fixed Syntax Blockers:**
-    Validate that our compilation fixes for `src/network/enterprise.rs`, `src/distro/improvements.rs`, `src/shell/command.rs`, and `src/sigpkg/resolver.rs` have successfully resolved the primary build-blocking parser errors.
 
 ### 2. Phase 2: Structural Performance Tuning (Priority: High)
 *   **Transition to Zero-Allocation Loggers:**
@@ -23,7 +23,7 @@ This guide outlines actionable steps and architectural patterns designed to sust
 
 ### 3. Phase 3: Security & Compliance Integration (Priority: High)
 *   **Address ReDoS Risks in Desktop Node Tooling:**
-    Upgrade dependency `brace-expansion` inside `package.json` to `^2.0.1` and run lockfile synchronization to eliminate GHSA-mh99-v99m-4gvg.
+    Upgrade dependency `brace-expansion` inside `package.json` to `^2.0.1` and `nanoid` to `^3.3.17`, then run lockfile synchronization to eliminate vulnerabilities.
 *   **Add Pre-Commit Credentials Scanners:**
     Deploy a standard pre-commit hook targeting hardcoded credentials, test private keys, and API tokens to prevent accidental exposure of secret assets.
 
