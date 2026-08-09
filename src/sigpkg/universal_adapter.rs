@@ -378,3 +378,140 @@ mod tests {
         assert!(perms.contains(&Permission::FileWrite));
     }
 }
+
+/// RedHat/Yum RPM SPEC manifest structure
+#[derive(Debug, Clone)]
+pub struct RpmSpecManifest {
+    pub name: String,
+    pub version: String,
+    pub release: String,
+    pub summary: String,
+    pub license: String,
+    pub requires: Vec<String>, // Dependencies list
+}
+
+/// AppImage single-file containerized loop-mounted layout
+#[derive(Debug, Clone)]
+pub struct AppImageContainer {
+    pub file_name: String,
+    pub payload_offset_bytes: u64,
+    pub entry_point_cmd: String,
+    pub mounted: bool,
+}
+
+impl AppImageContainer {
+    pub fn new(file_name: &str, entry_point_cmd: &str) -> Self {
+        AppImageContainer {
+            file_name: file_name.to_string(),
+            payload_offset_bytes: 0x20000, // standard SquashFS offset
+            entry_point_cmd: entry_point_cmd.to_string(),
+            mounted: false,
+        }
+    }
+
+    /// Mounts the SquashFS payload of the AppImage dynamically (simulated)
+    pub fn mount_and_run(&mut self, mount_point: &str) -> Result<String, &'static str> {
+        if mount_point.is_empty() {
+            return Err("AppImage: Invalid mount point.");
+        }
+        self.mounted = true;
+        let mut exec_path = mount_point.to_string();
+        exec_path.push_str("/");
+        exec_path.push_str(&self.entry_point_cmd);
+        Ok(exec_path)
+    }
+}
+
+impl UniversalPackageAdapter {
+    /// Parses RedHat/Yum .spec files for RPM metadata translation
+    pub fn parse_rpm_spec(&self, text: &str) -> Result<RpmSpecManifest, &'static str> {
+        let mut name = String::new();
+        let mut version = String::new();
+        let mut release = String::new();
+        let mut summary = String::new();
+        let mut license = String::new();
+        let mut requires = Vec::new();
+
+        for line in text.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some(pos) = line.find(':') {
+                let key = line[..pos].trim();
+                let val = line[pos + 1..].trim();
+                match key {
+                    "Name" => name = val.to_string(),
+                    "Version" => version = val.to_string(),
+                    "Release" => release = val.to_string(),
+                    "Summary" => summary = val.to_string(),
+                    "License" => license = val.to_string(),
+                    "Requires" => {
+                        for req in val.split(',') {
+                            requires.push(req.trim().to_string());
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if name.is_empty() || version.is_empty() {
+            return Err("Invalid RPM spec file: missing Name or Version");
+        }
+
+        Ok(RpmSpecManifest {
+            name,
+            version,
+            release,
+            summary,
+            license,
+            requires,
+        })
+    }
+}
+
+#[cfg(test)]
+mod additional_adapter_tests {
+    use super::*;
+
+    #[test]
+    fn test_rpm_spec_parsing_and_native_translation() {
+        let adapter = UniversalPackageAdapter::new();
+        let spec_text = r#"
+            Name: custom_service
+            Version: 2.1
+            Release: 1%{?dist}
+            Summary: High performance backend service
+            License: GPL-3.0
+            Requires: bash, glibc >= 2.17
+        "#;
+
+        let parsed = adapter.parse_rpm_spec(spec_text).unwrap();
+        assert_eq!(parsed.name, "custom_service");
+        assert_eq!(parsed.version, "2.1");
+        assert_eq!(parsed.license, "GPL-3.0");
+        assert_eq!(parsed.requires.len(), 2);
+        assert_eq!(parsed.requires[0], "bash");
+
+        let native = adapter.translate_to_native_package(
+            &parsed.name,
+            &parsed.version,
+            &parsed.summary,
+            parsed.requires.as_slice(),
+        ).unwrap();
+
+        assert_eq!(native.name, "custom_service");
+        assert_eq!(native.version, Version::new(2, 1, 0));
+    }
+
+    #[test]
+    fn test_appimage_single_file_loop_mounting() {
+        let mut appimage = AppImageContainer::new("Vlc-3.0.18-x86_64.AppImage", "vlc");
+        assert!(!appimage.mounted);
+
+        let exec_path = appimage.mount_and_run("/tmp/.mount_vlc").unwrap();
+        assert_eq!(exec_path, "/tmp/.mount_vlc/vlc");
+        assert!(appimage.mounted);
+    }
+}
