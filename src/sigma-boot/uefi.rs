@@ -2,27 +2,9 @@
 //! Native UEFI PE32+ bootloader implementation in Rust
 //! Supports Secure Boot with PQC/Dilithium-5 certificates
 //! Multi-arch: x86_64, ARM64, RISC-V
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
 
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![no_main]
 
 use core::panic::PanicInfo;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -58,7 +40,6 @@ pub struct BootloaderMenu {
 }
 
 impl BootloaderMenu {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut entries = [None, None, None, None];
         // Distro-inspired default entries (Standard, LTS, Recovery, Rollback)
@@ -197,8 +178,9 @@ pub enum BootError {
     UnsupportedArchitecture,
 }
 
+#[cfg(target_os = "none")]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(_info: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
