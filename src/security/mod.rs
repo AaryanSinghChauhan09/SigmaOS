@@ -1,20 +1,22 @@
-// SigmaOS Security Subsystem
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
+
 pub mod capability;
-pub mod defensive_audit;
-pub mod parrot_parity;
+pub mod kali_stack;
+pub mod nemoclaw;
 pub mod pledge;
 pub mod vulnerability;
-pub mod hardening;
-pub mod deobfuscation;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use defensive_audit::{DefensiveAuditSystem, DefensiveAuditLogger, MemoryPagingAuditor, SandboxAuditor, SecurityAuditor, AuditError, AuditSeverity, ForensicBlock, MaliciousSignature, AuditEvent};
-pub use parrot_parity::{AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, SandboxPolicy, RoutingMode};
-pub use pledge::{PledgeError, PledgeManager, PledgePromise};
-pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
-pub use hardening::{
-    secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
+pub use kali_stack::{
+    CronDaemon, CronJob, DmesgLog, FirewallRule, IptablesFirewall, KaliError,
+    PluggableAuthenticationModule, SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer,
+    TmuxPane,
 };
-pub use deobfuscation::{
-    ArchInstruction, CpuArch, InstructionType, AbstractValue, DisassemblerCallback, MetasmEmulator, DeobfuscationEngine,
+pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
+pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
+pub use vulnerability::{
+    ExploitPayload, PenetrationAssistant, Severity, Vulnerability, SimpleVulnerability,
+    VulnerabilityScanner, SimpleVulnerabilityScanner, ScanSummary, ScanReport,
+    SimpleScanReport, CIPipelineIntegration, SimpleCIPipelineIntegration,
 };

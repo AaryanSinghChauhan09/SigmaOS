@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 // SigmaOS Windows/Linux-Inspired Advanced I/O and Driver subsystem (S-IRP)
 // Implements highly-flexible Windows-style IRPs, APCs, DPCs, Buffering Methods,
 // Driver & Device Objects, File System Minifilters, and Kernel Callbacks.
@@ -53,21 +52,9 @@ pub struct IoStatusBlock {
 /// Union Parameter member representing Windows-style IO_STACK_LOCATION parameters
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IrpParameters {
-    Read {
-        length: usize,
-        key: u32,
-        byte_offset: u64,
-    },
-    Write {
-        length: usize,
-        key: u32,
-        byte_offset: u64,
-    },
-    DeviceIoControl {
-        output_buffer_length: usize,
-        input_buffer_length: usize,
-        io_control_code: u32,
-    },
+    Read { length: usize, key: u32, byte_offset: u64 },
+    Write { length: usize, key: u32, byte_offset: u64 },
+    DeviceIoControl { output_buffer_length: usize, input_buffer_length: usize, io_control_code: u32 },
     None,
 }
 
@@ -142,8 +129,7 @@ impl DriverObject {
     ) {
         self.dispatch_table.insert(major_function, routine);
         // Track the raw address to allow the Rootkit Detector to verify integrity
-        self.original_dispatch_table
-            .insert(major_function, routine as usize);
+        self.original_dispatch_table.insert(major_function, routine as usize);
     }
 }
 
@@ -230,8 +216,7 @@ impl ObjectManager {
     }
 
     pub fn create_device_link(&mut self, path: &str, device_idx: usize) -> Result<(), IoStatus> {
-        self.objects
-            .insert(path.to_string(), ObjectType::Device { device_idx });
+        self.objects.insert(path.to_string(), ObjectType::Device { device_idx });
         Ok(())
     }
 
@@ -301,8 +286,7 @@ impl NonPagedPool {
 
     pub fn deallocate(&self, size: usize) {
         let current = self.allocated_bytes.load(Ordering::SeqCst);
-        self.allocated_bytes
-            .store(current.saturating_sub(size), Ordering::SeqCst);
+        self.allocated_bytes.store(current.saturating_sub(size), Ordering::SeqCst);
     }
 }
 
@@ -590,9 +574,7 @@ mod tests {
             assert!(MOCK_DPC_CALLED);
         }
 
-        manager
-            .callbacks
-            .register_process_callback(mock_process_callback);
+        manager.callbacks.register_process_callback(mock_process_callback);
         manager.callbacks.trigger_process_event(42, true);
         unsafe {
             assert!(MOCK_PROCESS_CREATION_NOTIFIED);
@@ -634,8 +616,7 @@ mod tests {
     fn test_object_manager_namespaces() {
         let mut om = ObjectManager::new();
         om.create_device_link("\\Device\\Serial0", 0).unwrap();
-        om.create_symbolic_link("\\DosDevices\\COM1", "\\Device\\Serial0")
-            .unwrap();
+        om.create_symbolic_link("\\DosDevices\\COM1", "\\Device\\Serial0").unwrap();
 
         let resolved = om.resolve_path("\\DosDevices\\COM1").unwrap();
         assert_eq!(resolved, "\\Device\\Serial0");
@@ -659,9 +640,7 @@ mod tests {
         assert!(!RootkitDetector::is_driver_compromised(&driver));
 
         // Maliciously swap dispatcher pointer (simulated Rootkit Hook)
-        driver
-            .dispatch_table
-            .insert(IRP_MJ_READ, |device, irp| IoStatus::Cancelled);
+        driver.dispatch_table.insert(IRP_MJ_READ, |device, irp| IoStatus::Cancelled);
 
         // Rootkit hook detected!
         assert!(RootkitDetector::is_driver_compromised(&driver));
