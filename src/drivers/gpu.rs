@@ -29,87 +29,6 @@ pub enum GpuCommand {
         text: String,
     },
     Present,
-    // Vulkan/Mesa inspired command entries
-    BindPipeline {
-        pipeline_id: usize,
-    },
-    DrawIndexed {
-        index_count: usize,
-        first_index: usize,
-    },
-    SimulateHang, // Simulated faulty command to trigger Timeout Detection & Recovery (TDR)
-}
-
-/// Vulkan-inspired Shader stages
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ShaderStage {
-    Vertex,
-    Fragment,
-    Compute,
-}
-
-#[derive(Debug, Clone)]
-pub struct GpuShader {
-    pub stage: ShaderStage,
-    pub source_hash: u64,
-}
-
-/// Vulkan-inspired Pipeline state representing render settings
-#[derive(Debug, Clone)]
-pub struct GpuPipeline {
-    pub id: usize,
-    pub vertex_shader: Option<GpuShader>,
-    pub fragment_shader: Option<GpuShader>,
-    pub depth_test_enabled: bool,
-    pub blend_enabled: bool,
-    pub viewport_width: u32,
-    pub viewport_height: u32,
-}
-
-/// Recorded command buffer mimicking Vulkan vkCommandBuffer
-#[derive(Debug, Clone)]
-pub struct GpuCommandBuffer {
-    pub commands: Vec<GpuCommand>,
-    pub is_recorded: bool,
-}
-
-impl GpuCommandBuffer {
-    pub fn new() -> Self {
-        Self {
-            commands: Vec::new(),
-            is_recorded: false,
-        }
-    }
-
-    pub fn begin_recording(&mut self) {
-        self.commands.clear();
-        self.is_recorded = false;
-    }
-
-    pub fn record_command(&mut self, cmd: GpuCommand) {
-        if !self.is_recorded {
-            self.commands.push(cmd);
-        }
-    }
-
-    pub fn end_recording(&mut self) {
-        self.is_recorded = true;
-    }
-}
-
-impl Default for GpuCommandBuffer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Telemetry and reset counters for self-healing GPU hangs (TDR)
-#[derive(Debug, Clone, Copy, Default)]
-pub struct GpuResetState {
-    pub last_reset_timestamp: u64,
-    pub total_hangs_recovered: usize,
-    pub pipeline_reconstructed_count: usize,
-    pub is_hardware_ready: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -195,11 +114,6 @@ pub struct GpuDriver {
     pub framebuffers: Vec<DrmFramebuffer>,
     pub next_object_id: u32,
     pub vblank_count: u64,
-
-    // Mesa/Vulkan-inspired state tracking
-    pub registered_pipelines: Vec<GpuPipeline>,
-    pub bound_pipeline_id: Option<usize>,
-    pub reset_state: GpuResetState,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -275,47 +189,7 @@ impl GpuDriver {
             framebuffers: Vec::new(),
             next_object_id: 1,
             vblank_count: 0,
-            registered_pipelines: Vec::new(),
-            bound_pipeline_id: None,
-            reset_state: GpuResetState {
-                last_reset_timestamp: 0,
-                total_hangs_recovered: 0,
-                pipeline_reconstructed_count: 0,
-                is_hardware_ready: true,
-            },
         }
-    }
-
-    pub fn register_pipeline(&mut self, pipeline: GpuPipeline) {
-        self.registered_pipelines.push(pipeline);
-    }
-
-    /// Submits a Vulkan-parity recorded command buffer to the graphics ring
-    pub fn submit_command_buffer(&mut self, buf: GpuCommandBuffer) -> Result<(), GpuError> {
-        if !buf.is_recorded {
-            return Err(GpuError::InvalidCommand);
-        }
-        for cmd in buf.commands {
-            if let Err(e) = self.execute_command(cmd) {
-                if e == GpuError::HardwareHang {
-                    self.recover_and_reset_gpu();
-                    return Err(GpuError::HardwareHang);
-                } else {
-                    return Err(e);
-                }
-            }
-        }
-        Ok(())
-    }
-
-    /// Self-healing DRM GPU recovery (TDR) mimicking Linux/DRM reset
-    pub fn recover_and_reset_gpu(&mut self) {
-        self.frame_buffer.fill(0x333333);
-        self.reset_state.total_hangs_recovered += 1;
-        self.reset_state.pipeline_reconstructed_count += self.registered_pipelines.len();
-        self.reset_state.last_reset_timestamp = 1716000000;
-        self.bound_pipeline_id = None;
-        self.reset_state.is_hardware_ready = true;
     }
 
     pub fn execute_command(&mut self, command: GpuCommand) -> Result<(), GpuError> {
@@ -346,36 +220,6 @@ impl GpuDriver {
             }
             GpuCommand::DrawText { .. } => {
                 // Text rendering simulation
-            }
-            GpuCommand::BindPipeline { pipeline_id } => {
-                let mut found = false;
-                for pipeline in &self.registered_pipelines {
-                    if pipeline.id == pipeline_id {
-                        self.bound_pipeline_id = Some(pipeline_id);
-                        found = true;
-                        break;
-                    }
-                }
-                if !found {
-                    return Err(GpuError::InvalidCommand);
-                }
-            }
-            GpuCommand::DrawIndexed { index_count, .. } => {
-                if self.bound_pipeline_id.is_none() {
-                    return Err(GpuError::InvalidCommand);
-                }
-                let color = if self.bound_pipeline_id == Some(1) {
-                    0xFF00FF
-                } else {
-                    0x00FFFF
-                };
-                for i in 0..index_count.min(self.frame_buffer.len()) {
-                    self.frame_buffer[i] = color;
-                }
-            }
-            GpuCommand::SimulateHang => {
-                self.reset_state.is_hardware_ready = false;
-                return Err(GpuError::HardwareHang);
             }
         }
         Ok(())
@@ -715,8 +559,6 @@ pub enum GpuError {
     InvalidCommand,
     OutOfBounds,
     PermissionDenied,
-    /// Triggered by GPU hang / TDR event; driver will attempt recovery
-    HardwareHang,
 }
 
 #[cfg(test)]

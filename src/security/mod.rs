@@ -1,22 +1,48 @@
-// SigmaOS Security Module
-// Capability-based security, pledge, and access control
+pub mod lsm;
 
 pub mod audit;
 pub mod capability;
+pub mod cleaner;
+pub mod forensics;
 pub mod integrity;
 pub mod mac;
-pub mod obfuscator;
 pub mod phantom;
 pub mod pki;
 pub mod pledge;
-pub mod secrets;
-pub mod securelevels;
-pub mod unveil;
 pub mod vulnerability;
+pub mod clipboard;
+pub mod intrusion;
+pub mod password;
+pub mod parrot_linux;
+pub mod selinux;
 
+pub use parrot_linux::{
+    AnonymityMode, AnonsurfEngine, RecoveredFile, ForensicsAuditTool, SniffedPacket,
+    KaliSniffer, PentestAssistant, SecureWipeTool, IntrusionSeverity, IntrusionAlert, SigmaIDS,
+};
+pub use selinux::{
+    SecurityPolicy, SecurityLabel, SecurityRule, SecurityContext, SelinuxPermission, ObjectType,
+    AppArmorProfile, AppArmorManager, AccessVectorCache, SelinuxBoolean, TypeTransitionRule,
+};
+pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use obfuscator::{SovereignCodeHardener, SovereignThreatDetector};
-pub use phantom::{CapabilityContext, KernelLevel, SecurityAdminLevel, UserLevel};
+pub use clipboard::{
+    ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
+    SecureClipboardManager, SecurityLevel, XorEncryption,
+};
+pub use integrity::{File, IntegrityError, IntegrityMonitor, IntegrityStatus, SimpleIntegrityMonitor};
+pub use intrusion::{
+    AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
+    IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
+};
+pub use mac::{MACEngine, MACPolicy, SecurityContext as MacSecurityContext, SimpleMACEngine};
+pub use password::{
+    BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
+    PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
+};
+pub use pki::{Certificate, PKIError, PKIManager};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use securelevels::{LinuxCapability, Securelevel, SovereignSecurelevelManager};
-pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
+pub use vulnerability::{
+    VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
+    PenetrationAssistant,
+};
