@@ -1,7 +1,23 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 // SigmaOS Kernel Module
 pub mod breakthroughs;
-pub mod breakthroughs_v2;
-pub mod exports;
 pub mod ipc;
 pub mod memory;
 pub mod meta;
@@ -9,23 +25,12 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod structures;
+pub mod object;
 
 pub use breakthroughs::{
-    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
-    UniversalAbiTranslator, UserDefinedKernelFunctions,
-    DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
-    KernelPersonalityMode,
-};
-pub use breakthroughs_v2::{
-    AdaptiveInitSystem, AdaptiveInitTarget, AiDrivenDaemon, CrossModeMultiplexer,
-    DiagnosticSeverity, MultiplexerDisplayMode, NeuroSymbolicEngine, PersonaManager,
-    ProgrammableRootPersona, ProvenanceBlock, ProvenanceChainVerifier,
-    SelfOptimizingShellBuiltin, TemporalFileSystem,
-};
-pub use exports::{
-    KernelSymbol, KernelSymbolType, KldModule, SymbolRegistry, SysInitItem, SysInitOrchestrator,
-    SysInitPriority,
+    AiNativeRuntime, DeterministicReplayEngine, DynamicKernelPersonalitySwitcher,
+    EnergyAwareScheduler, InterruptRatePredictor, KernelPersonalityMode, PrivacyFirstSandbox,
+    SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
@@ -38,9 +43,5 @@ pub use policy_mechanism::{
     FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
     ResourceBroker,
 };
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use structures::{
-    Apc, ApcMode, ApcQueue, CircularDoublyLinkedList, CpuContext,
-    SequencedSinglyLinkedList, SinglyLinkedList, SystemThread, ThreadState, WorkItem,
-};

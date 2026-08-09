@@ -27,8 +27,7 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod tmux;
-pub mod linux_bsd_tools;
-pub mod system_settings;
+pub mod editor;
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -66,5 +65,7 @@ pub use terminal::{
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
-pub use linux_bsd_tools::{TopCommand, ProcessTaskInfo, IfconfigCommand, NetworkInterface, PingCommand, PingResult};
-pub use system_settings::{UnifiedSettingsManager, UserAccount, DisplayPreference, InputDeviceSettings};
+pub use editor::{
+    CodeEditor, Document as EditorDocument, EditorConfig, EditorError, Language as EditorLanguage,
+    LspClient, SyntaxHighlighter,
+};
