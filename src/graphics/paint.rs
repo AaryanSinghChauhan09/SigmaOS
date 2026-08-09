@@ -1,8 +1,6 @@
 // SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)
 // Designed for high-performance raster image canvas and layer filtering
 
-use std::collections::HashMap;
-
 /// Image processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PhotoError {

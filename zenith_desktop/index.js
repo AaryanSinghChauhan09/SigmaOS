@@ -41,5 +41,15 @@ export function setAriaLabel(element, label) {
   }
 }
 
+/**
+ * Safely sets the text content of an element without reinterpreting it as HTML (XSS Protection).
+ * Bypasses risk of DOM text being reinterpreted as HTML via unsanitized innerHTML assignments.
+ */
+export function setSecureTextContent(element, text) {
+  if (element) {
+    element.textContent = text;
+  }
+}
+
 // Minimal dummy index file to export initialization and basic attributes
 export const version = "15.0.0";
