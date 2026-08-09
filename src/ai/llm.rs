@@ -512,7 +512,7 @@ impl SpeculativeDecodingEngine {
         draft_tokens: &[u32],
         target_token_probabilities: &[f32],
     ) -> (Vec<u32>, bool) {
-        let mut accepted = Vec::new();
+        let mut accepted = Vec::with_capacity(draft_tokens.len());
         let mut halt = false;
 
         for (i, &token) in draft_tokens.iter().enumerate() {
@@ -544,7 +544,8 @@ impl GrammarLogitsProcessor {
         }
     }
 
-    pub fn register_state_transitions(&mut self, state: usize, permissible_tokens: Vec<u32>) {
+    pub fn register_state_transitions(&mut self, state: usize, mut permissible_tokens: Vec<u32>) {
+        permissible_tokens.sort_unstable();
         self.allowed_state_transitions.push((state, permissible_tokens));
     }
 
@@ -559,10 +560,10 @@ impl GrammarLogitsProcessor {
         }
 
         if let Some(permissible) = allowed_tokens {
-            for i in 0..logits.len() {
+            for (i, logit) in logits.iter_mut().enumerate() {
                 let token_id = i as u32;
-                if !permissible.contains(&token_id) {
-                    logits[i] = -1e9; // Negate/mask out invalid token pathways
+                if permissible.binary_search(&token_id).is_err() {
+                    *logit = -1e9; // Negate/mask out invalid token pathways
                 }
             }
         }
