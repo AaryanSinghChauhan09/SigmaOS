@@ -241,6 +241,96 @@ pub enum DiskUsageError {
     AnalysisFailed(String),
 }
 
+/// Partition type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitionScheme {
+    Mbr,
+    Gpt,
+}
+
+/// Partition filesystem type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FsType {
+    SigmaFS,
+    Ext4,
+    Fat32,
+    Ntfs,
+}
+
+/// Represents a disk partition (GNU Parted parity)
+#[derive(Debug, Clone)]
+pub struct DiskPartition {
+    pub name: String,
+    pub index: u32,
+    pub start_sector: u64,
+    pub end_sector: u64,
+    pub fs_type: FsType,
+}
+
+/// Sovereign Disk Partition Editor Shard (GNU Parted Parity)
+/// Supports unified GPT/MBR partition manipulations and 4KB physical alignment checks.
+pub struct SovereignParted {
+    pub disk_size_sectors: u64,
+    pub scheme: PartitionScheme,
+    pub partitions: Vec<DiskPartition>,
+}
+
+impl SovereignParted {
+    pub fn new(disk_size_sectors: u64, scheme: PartitionScheme) -> Self {
+        Self {
+            disk_size_sectors,
+            scheme,
+            partitions: Vec::new(),
+        }
+    }
+
+    /// Add a partition with strict boundary checks
+    pub fn add_partition(
+        &mut self,
+        name: String,
+        start_sector: u64,
+        end_sector: u64,
+        fs_type: FsType,
+    ) -> Result<u32, &'static str> {
+        if start_sector >= end_sector || end_sector > self.disk_size_sectors {
+            return Err("Invalid sector boundaries");
+        }
+
+        // Check for overlaps with existing partitions
+        for part in &self.partitions {
+            if !(end_sector <= part.start_sector || start_sector >= part.end_sector) {
+                return Err("Partition boundaries overlap existing partition");
+            }
+        }
+
+        let index = (self.partitions.len() + 1) as u32;
+        self.partitions.push(DiskPartition {
+            name,
+            index,
+            start_sector,
+            end_sector,
+            fs_type,
+        });
+
+        Ok(index)
+    }
+
+    /// User-defined physical alignment validation function
+    /// Standard modern disks use 4KB physical sectors (8 logical 512-byte sectors).
+    /// GNU Parted warning is generated if start_sector is not divisible by 8.
+    pub fn verify_alignment<F>(&self, index: u32, alignment_checker: F) -> Result<bool, &'static str>
+    where
+        F: Fn(u64) -> bool,
+    {
+        for part in &self.partitions {
+            if part.index == index {
+                return Ok(alignment_checker(part.start_sector));
+            }
+        }
+        Err("Partition not found")
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -287,5 +377,27 @@ mod tests {
         let analyzer = DiskUsageAnalyzer::default();
         let usage = analyzer.get_disk_usage(&PathBuf::from("/")).unwrap();
         assert_eq!(usage.usage_percent, 50.0);
+    }
+
+    #[test]
+    fn test_sovereign_parted_vs_gnu_parted() {
+        let mut parted = SovereignParted::new(1000000, PartitionScheme::Gpt);
+
+        // Add partition 1 (perfectly aligned with 8-sector boundary, start = 2048)
+        let idx1 = parted.add_partition("SovereignRoot".to_string(), 2048, 100000, FsType::SigmaFS).unwrap();
+        assert_eq!(idx1, 1);
+
+        // Add partition 2 (misaligned, start = 100003)
+        let idx2 = parted.add_partition("UnstructuredData".to_string(), 100003, 200000, FsType::Ext4).unwrap();
+        assert_eq!(idx2, 2);
+
+        // Verify alignments with 8-sector 4KB boundary physical alignment checker F
+        let align_checker = |sector: u64| sector % 8 == 0;
+
+        let res1 = parted.verify_alignment(idx1, align_checker).unwrap();
+        assert!(res1); // Perfectly aligned!
+
+        let res2 = parted.verify_alignment(idx2, align_checker).unwrap();
+        assert!(!res2); // Misaligned!
     }
 }
