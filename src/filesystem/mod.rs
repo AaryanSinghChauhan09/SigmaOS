@@ -5,8 +5,10 @@ pub mod cow_snapshot;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
+pub mod tmpfs;
 pub mod vfs;
 
+pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
