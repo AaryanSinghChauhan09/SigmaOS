@@ -4,6 +4,7 @@ pub mod certification;
 pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
+pub mod debian_parity;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
@@ -16,6 +17,7 @@ pub mod transformation_engine;
 
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
+pub use debian_parity::{DebianPackageManager, SnapPackageManager, DebianControl, UbuntuDesktopIntegration};
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
     ManjaroKernelRelease, ManjaroKernelSwitcher,

@@ -1,7 +1,7 @@
 // SigmaOS Defensive Audit & Anomaly Detection Shunts
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-use crate::klib::{SigmaString, Vec};
+use crate::klib::{String, Vec};
 use core::cell::RefCell;
 
 const MAX_AUDIT_BLOCKS: usize = 16;
@@ -51,7 +51,7 @@ pub struct AuditEvent {
     pub timestamp_ms: u64,
     pub severity: AuditSeverity,
     pub process_id: u32,
-    pub description: SigmaString,
+    pub description: String,
 }
 
 /// Base OOP interface representing any security audit checker
@@ -207,12 +207,8 @@ impl DefensiveAuditSystem {
     pub fn check_payload_safety(&self, payload_data: &[u8]) -> bool {
         let score = self.evaluate_anomaly_score(payload_data);
 
-        if score >= self.security_score_threshold {
-            // In kernel environment, this would trigger quarantine
-            return false;
-        }
-
-        true
+        // In kernel environment, this would trigger quarantine
+        score < self.security_score_threshold
     }
 }
 
@@ -230,7 +226,7 @@ impl DefensiveAuditLogger {
         }
     }
 
-    pub fn log_event(&mut self, severity: AuditSeverity, pid: u32, desc: SigmaString) -> Result<(), AuditError> {
+    pub fn log_event(&mut self, severity: AuditSeverity, pid: u32, desc: String) -> Result<(), AuditError> {
         if self.logs.len() >= self.max_capacity {
             return Err(AuditError::LogBufferFull);
         }

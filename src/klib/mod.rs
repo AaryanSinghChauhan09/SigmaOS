@@ -7,6 +7,8 @@ pub mod error;
 pub mod isa;
 pub mod store;
 pub mod vec;
+pub mod string;
+pub mod rng;
 pub mod buddy_allocator;
 pub mod paging;
 pub mod hashmap;
@@ -22,9 +24,12 @@ pub mod time;
 pub mod math;
 pub mod uuid;
 pub mod conversion;
+pub mod io;
 
 // Re-exports
 pub use vec::Vec;
+pub use string::String;
+pub use rng::{SigmaRng, OsRng};
 pub use hashmap::{HashMap, Entry};
 pub use hashset::HashSet;
 pub use arc::Arc;
@@ -36,6 +41,7 @@ pub use vecdeque::VecDeque;
 pub use time::{Duration, Instant, monotonic_ms};
 pub use hash::{djb2_hash, simple_hash, fnv1a_hash, xor_hash, SimpleHasher, combine_hashes};
 pub use math::{abs, min, max, clamp, power, log2, sqrt};
+pub use io::{SigmaBuffer, SigmaFormatter, SigmaIoError};
 
 /// Format integer to string without std::fmt
 pub fn format_int(mut num: u64) -> alloc::string::String {

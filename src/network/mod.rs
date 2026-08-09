@@ -2,6 +2,7 @@
 pub mod ring_buffer_stack;
 pub mod tcp;
 pub mod tcp_udp;
+pub mod wireshark_parity;
 
 pub use ring_buffer_stack::{
     compute_checksum, IPv4Address, NetworkPacket, PacketRingBuffer, TcpSocket,
@@ -14,3 +15,4 @@ pub use tcp_udp::{
     FirewallTarget, FirewallChain, ConntrackState, FirewallRule, Firewall as IptablesFirewall,
     SimpleFirewall, ZeroCopy, ZeroCopyNetwork, NetworkStack as CoreNetworkStack, SimpleNetworkStack,
 };
+pub use wireshark_parity::{PacketCapture, ProtocolType, WiresharkPacket, ProtocolDissector, NetworkStatistics};
