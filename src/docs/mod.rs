@@ -2,37 +2,14 @@
 //!
 //! This module provides automatic documentation generation from source code,
 //! including API documentation, architecture diagrams, and user guides.
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
 
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
-use alloc::format;
-||||||| 65885484f
-use alloc::format;
-use alloc::string::ToString;
-||||||| 984d1301f
 use alloc::format;
 
 /// Documentation format
@@ -82,7 +59,6 @@ pub struct DocGenerator {
 }
 
 impl DocGenerator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),
@@ -105,36 +81,9 @@ impl DocGenerator {
         match format {
             DocFormat::Markdown => self.generate_markdown(),
             DocFormat::Html => self.generate_html(),
-            DocFormat::Pdf => self.generate_pdf(),
+            DocFormat::Pdf => Err("PDF generation not yet implemented".to_string()),
             DocFormat::AsciiDoc => self.generate_asciidoc(),
         }
-    }
-
-    /// Generate PDF documentation (Simulated PDF document layout structure)
-    fn generate_pdf(&self) -> Result<String, String> {
-        let mut output = String::new();
-        output.push_str("%PDF-1.4\n");
-        output.push_str("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
-        output.push_str("2 0 obj\n<< /Type /Pages /Kids [ 3 0 R ] /Count 1 >>\nendobj\n");
-
-        let mut content_stream = String::new();
-        content_stream.push_str("BT /F1 12 Tf 50 700 Td ");
-
-        // Sort entries by order and stream text labels
-        let mut sorted_entries = self.entries.clone();
-        sorted_entries.sort_by_key(|e| e.order);
-
-        for entry in &sorted_entries {
-            content_stream.push_str(&format!("({}) Tj T* ", entry.title));
-        }
-        content_stream.push_str("ET");
-
-        output.push_str("3 0 obj\n<< /Type /Page /Parent 2 0 R /Contents 4 0 R >>\nendobj\n");
-        output.push_str(&format!("4 0 obj\n<< /Length {} >>\nstream\n{}\nendstream\nendobj\n", content_stream.len(), content_stream));
-        output.push_str("xref\n0 5\n0000000000 65535 f\n");
-        output.push_str("trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n%%EOF");
-
-        Ok(output)
     }
 
     /// Generate Markdown documentation
@@ -313,7 +262,6 @@ pub struct ApiDocBuilder {
 }
 
 impl ApiDocBuilder {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut generator = DocGenerator::new();
         generator.add_metadata("title".to_string(), "SigmaOS API Documentation".to_string());
@@ -465,54 +413,6 @@ mod tests {
         assert_eq!(generator.get_entries().len(), 0);
         assert_eq!(generator.get_metadata().len(), 0);
     }
-
-    #[test]
-    fn test_sovereign_man_pages() {
-        let mut indexer = SovereignManPageIndexer::new();
-
-        // Check default pages registered
-        assert_eq!(indexer.pages.len(), 2);
-
-        // Compile sigpkg page
-        let compiled = indexer.compile_man_page("sigpkg", None).unwrap();
-        assert!(compiled.contains("NAME"));
-        assert!(compiled.contains("sigpkg"));
-        assert!(compiled.contains("SYNOPSIS"));
-        assert!(compiled.contains("sigma-vim"));
-
-        // Add custom manual page (Pledge)
-        indexer.register_man_page(ManPage {
-            name: "pledge".to_string(),
-            section: 2,
-            synopsis: "pledge(promises)".to_string(),
-            description: "Dropping execution capabilities statically.".to_string(),
-            examples: "pledge(\"stdio rpath\")".to_string(),
-        });
-
-        assert_eq!(indexer.pages.len(), 3);
-        let pledge_page = indexer.compile_man_page("pledge", Some(2)).unwrap();
-        assert!(pledge_page.contains("stdio rpath"));
-    }
-||||||| 65885484f
-
-    #[test]
-    fn test_pdf_generation() {
-        let mut generator = DocGenerator::new();
-        generator.add_entry(DocEntry::new(
-            "Architecture Guide".to_string(),
-            "Guide detail content".to_string(),
-            SectionType::Architecture,
-            1,
-        ));
-
-        let result = generator.generate(DocFormat::Pdf);
-        assert!(result.is_ok());
-        let pdf = result.unwrap();
-        assert!(pdf.starts_with("%PDF-1.4"));
-        assert!(pdf.contains("Architecture Guide"));
-        assert!(pdf.ends_with("%%EOF"));
-    }
-||||||| 984d1301f
 
     #[test]
     fn test_sovereign_man_pages() {
