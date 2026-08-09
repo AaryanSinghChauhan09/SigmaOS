@@ -631,4 +631,26 @@ To ensure maximum security and protect against side-channel, dictionary, and tim
 
 ---
 
+## 🛡️ SECTION XIII: Enterprise System Utilities & Core Diagnostic Tools Consolidated from GitHub Wiki
+
+To natively support all diagnostic, administrative, and maintenance utilities without requiring users to download external software, SigmaOS integrates zero-dependency, safe-Rust equivalents of all unimplemented wiki-specified system utilities, taking direct inspiration from modern competitors:
+
+### 1. Partitioning and Boundary Management (GParted & FIPS Parity)
+*   **The Design Inspiration:** GParted relies on heavy GTK libraries and external CLI tools (parted, fdisk) to manipulate partition tables and sector boundaries.
+*   **The SigmaOS Mastery:** Implements native sector-boundary allocation and GUID Partition Table (GPT) master table builders directly within the virtual file system. Boundary resizing, boot-sector reconstruction, and file system checking are performed as atomic transaction logs over memory-mapped block devices.
+
+### 2. Post-Quantum Secure Password Safes (KeePass Parity)
+*   **The Design Inspiration:** KeePass uses XML-based database encryption and local files to manage passwords, requiring external software installations.
+*   **The SigmaOS Mastery:** Integrates encrypted credential vaults (`src/security/secrets.rs`) natively into Zenith. Secrets are salted with `argon2id` and encrypted with Kyber-1024 / Dilithium-5 envelopes, mapped to hardware secure enclaves that dynamically zeroize memory pages upon user session logout to prevent RAM dumping.
+
+### 3. Forensic Analysis & Storage Block Zeroization (BleachBit, Sleuth Kit & Lynis Parity)
+*   **The Design Inspiration:** Forensic audits, system scanning, and secure shredding (BleachBit, Sleuth Kit, Lynis) rely on multiple separate, external packages in Linux/BSD.
+*   **The SigmaOS Mastery:** Features automated behavioral audit agents (`src/security/securelevels.rs`) and storage shredders natively inside `S-SECURE`. Deleted blocks are overwritten with randomized hardware-entropy patterns using a military-grade 7-pass zeroization loop, and the system runs real-time configuration auditer loops to report permission exposures.
+
+### 4. Zero-Copy Network Traffic Dissectors (Wireshark & tcpdump Parity)
+*   **The Design Inspiration:** Packet capture and analysis (Wireshark) in legacy systems depend on slow socket-polling, user-space buffer copying (libpcap), and heavy UI graphing layers.
+*   **The SigmaOS Mastery:** Network cards stream raw Ethernet frames directly into zero-copy circular buffers (`S-CONNECT`). Safe protocol dissecting occurs in real-time on-device, parsing headers natively into formatted text streams inside Zenith terminal shells with near-zero CPU context switching.
+
+---
+
 ### 👑 The Sovereign OS Paradigm: Absolute Computational Autonomy. Zero External Dependencies. Complete Control.
