@@ -69,3 +69,6 @@ path = "tools/build/sigma_make.rs"
 [[bin]]
 name = "sigmaos_setup_wizard"
 path = "tools/build/SigmaOSSetupWizard.rs"
+||||||| 43be3a7e8
+test = false
+required-features = ["microkernel"]
