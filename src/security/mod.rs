@@ -1,5 +1,6 @@
 // SigmaOS Security Subsystem
 pub mod capability;
+pub mod defensive_audit;
 pub mod parrot_parity;
 pub mod pledge;
 pub mod vulnerability;
@@ -7,6 +8,7 @@ pub mod hardening;
 pub mod deobfuscation;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
+pub use defensive_audit::{DefensiveAuditSystem, DefensiveAuditLogger, MemoryPagingAuditor, SandboxAuditor, SecurityAuditor, AuditError, AuditSeverity, ForensicBlock, MaliciousSignature, AuditEvent};
 pub use parrot_parity::{AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, SandboxPolicy, RoutingMode};
 pub use pledge::{PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{SecurityScanner, VulnerabilityClass, VulnerabilityReport, ExploitPayload, PenetrationAssistant};
