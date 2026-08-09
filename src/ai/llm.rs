@@ -6,6 +6,7 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec;
@@ -507,12 +508,13 @@ impl SpeculativeDecodingEngine {
 
     /// Verifies draft tokens against target model validation probabilities.
     /// Returns the subset of accepted speculative tokens and whether verification should halt.
+    /// Optimised by Bolt ⚡: pre-allocates vector capacity to completely eliminate vector reallocation overhead.
     pub fn validate_draft_tokens(
         &self,
         draft_tokens: &[u32],
         target_token_probabilities: &[f32],
     ) -> (Vec<u32>, bool) {
-        let mut accepted = Vec::new();
+        let mut accepted = Vec::with_capacity(draft_tokens.len());
         let mut halt = false;
 
         for (i, &token) in draft_tokens.iter().enumerate() {
@@ -544,11 +546,16 @@ impl GrammarLogitsProcessor {
         }
     }
 
-    pub fn register_state_transitions(&mut self, state: usize, permissible_tokens: Vec<u32>) {
+    /// Register state transitions with pre-sorting of permissible tokens
+    /// Optimised by Bolt ⚡: sorts the token list upon registration to enable high-speed O(log K) binary search lookup later.
+    pub fn register_state_transitions(&mut self, state: usize, mut permissible_tokens: Vec<u32>) {
+        permissible_tokens.sort_unstable();
         self.allowed_state_transitions.push((state, permissible_tokens));
     }
 
     /// Modifies logits array by setting non-permissible token scores to -infinity (-1e9)
+    /// Optimised by Bolt ⚡: uses O(log K) binary search instead of O(K) linear lookup,
+    /// reducing the complexity of the hot token generation masking loop from O(V * K) to O(V * log K).
     pub fn apply_grammar_mask(&self, current_state: usize, logits: &mut [f32]) {
         let mut allowed_tokens = None;
         for (state, tokens) in &self.allowed_state_transitions {
@@ -559,10 +566,10 @@ impl GrammarLogitsProcessor {
         }
 
         if let Some(permissible) = allowed_tokens {
-            for i in 0..logits.len() {
+            for (i, logit) in logits.iter_mut().enumerate() {
                 let token_id = i as u32;
-                if !permissible.contains(&token_id) {
-                    logits[i] = -1e9; // Negate/mask out invalid token pathways
+                if permissible.binary_search(&token_id).is_err() {
+                    *logit = -1e9; // Negate/mask out invalid token pathways
                 }
             }
         }
