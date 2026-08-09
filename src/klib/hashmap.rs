@@ -220,6 +220,7 @@ where
             for i in 0..bucket.len() {
                 if bucket[i].0 == key {
                     let val_ptr = &mut bucket[i].1 as *mut V;
+                    // SAFETY: val_ptr is a valid pointer to the value in the bucket
                     return Entry::Occupied(OccupiedEntry { value: unsafe { &mut *val_ptr }, _marker: core::marker::PhantomData });
                 }
             }
@@ -337,6 +338,7 @@ impl<'a, K, V> Iterator for HashMapIterMut<'a, K, V> {
             if let Some(ref mut bucket) = self.map.buckets[self.bucket_idx] {
                 if self.item_idx < bucket.len() {
                     unsafe {
+                        // SAFETY: item_idx < bucket.len() ensures valid pointer
                         let item_ptr = &mut bucket[self.item_idx] as *mut (K, V);
                         self.item_idx += 1;
                         return Some((&(*item_ptr).0, &mut (*item_ptr).1));

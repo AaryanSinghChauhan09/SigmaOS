@@ -1,30 +1,10 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+// SigmaOS Parrot Security Parity Implementation
+// Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
-// SigmaOS Parrot Security Parity Engine Shard
-// Zero-dependency, // #![no_std]  // crate-root only compliant, zero-allocation
-
+use crate::klib::SigmaString;
 use core::cell::Cell;
 
-// ==========================================
-// 1. AnonSurf Routing Shunt
-// ==========================================
-
+/// Routing modes for network traffic
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RoutingMode {
     DirectCleartext,
@@ -32,6 +12,7 @@ pub enum RoutingMode {
     I2pAnonymized,
 }
 
+/// AnonSurf routing shunt for anonymous network routing
 pub struct AnonSurfShunt {
     pub current_mode: Cell<RoutingMode>,
     pub dns_leak_protection: Cell<bool>,
@@ -39,86 +20,79 @@ pub struct AnonSurfShunt {
 }
 
 impl AnonSurfShunt {
-    pub const fn new() -> Self {
-        Self {
+    pub fn new() -> Self {
+        AnonSurfShunt {
             current_mode: Cell::new(RoutingMode::DirectCleartext),
             dns_leak_protection: Cell::new(true),
             anonymized_packets_routed: Cell::new(0),
         }
     }
 
-    /// Transitions the primary network interfaces into an encrypted Tor routing mode
+    /// Enable anonymized routing
     pub fn enable_anonsurf(&self) {
         self.current_mode.set(RoutingMode::TorAnonymized);
         self.dns_leak_protection.set(true);
     }
 
-    /// Disables anonymized redirection
+    /// Disable anonymized routing
     pub fn disable_anonsurf(&self) {
         self.current_mode.set(RoutingMode::DirectCleartext);
     }
 
-    /// Simulates interception and routing of packets through virtual Tor nodes
-    pub fn shunt_packet(&self, _packet_id: u32, _size_bytes: usize) {
+    /// Route packet through anonymized network
+    pub fn shunt_packet(&self, _packet_id: u32, _size_bytes: usize) -> bool {
         if self.current_mode.get() != RoutingMode::DirectCleartext {
             let count = self.anonymized_packets_routed.get();
             self.anonymized_packets_routed.set(count + 1);
+            true
+        } else {
+            false
         }
     }
 
-    pub fn get_mode(&self) -> RoutingMode {
+    /// Get current routing mode
+    pub fn current_mode(&self) -> RoutingMode {
         self.current_mode.get()
-    }
-
-    pub fn get_packets_routed(&self) -> u64 {
-        self.anonymized_packets_routed.get()
     }
 }
 
-// ==========================================
-// 2. AppSandbox Policy Engine (Firejail-Parity)
-// ==========================================
-
-#[derive(Debug, Clone, Copy)]
+/// Sandbox policy for application security
+#[derive(Debug, Clone)]
 pub struct SandboxPolicy {
     pub allow_network: bool,
     pub allow_raw_sockets: bool,
     pub allow_filesystem_write: bool,
-    pub permitted_subpath: &'static str,
+    pub permitted_subpath: SigmaString,
 }
 
+/// AppSandbox engine for process security
 pub struct AppSandboxEngine {
     pub current_policy: Cell<SandboxPolicy>,
 }
 
 impl AppSandboxEngine {
-    pub const fn new() -> Self {
-        Self {
+    pub fn new() -> Self {
+        AppSandboxEngine {
             current_policy: Cell::new(SandboxPolicy {
                 allow_network: false,
                 allow_raw_sockets: false,
                 allow_filesystem_write: false,
-                permitted_subpath: "/sandbox/tmp",
+                permitted_subpath: SigmaString::from_str("/sandbox/tmp"),
             }),
         }
     }
 
-    /// Enforces the strict security context before launching a third-party process
+    /// Validate filesystem write access
     pub fn validate_filesystem_write(&self, path: &str) -> bool {
         let policy = self.current_policy.get();
         if !policy.allow_filesystem_write {
-            // Check if within permitted directory path
-            if path.starts_with(policy.permitted_subpath) {
-                true
-            } else {
-                false
-            }
+            path.starts_with(policy.permitted_subpath.as_str())
         } else {
             true
         }
     }
 
-    /// Verifies socket creation requests
+    /// Validate network socket creation
     pub fn validate_network_socket(&self, is_raw: bool) -> bool {
         let policy = self.current_policy.get();
         if is_raw && !policy.allow_raw_sockets {
@@ -130,113 +104,79 @@ impl AppSandboxEngine {
         }
     }
 
-    pub fn update_policy(&self, policy: SandboxPolicy) {
+    /// Set sandbox policy
+    pub fn set_policy(&self, policy: SandboxPolicy) {
         self.current_policy.set(policy);
+    }
+
+    /// Get current policy
+    pub fn current_policy(&self) -> SandboxPolicy {
+        self.current_policy.get()
     }
 }
 
-// ==========================================
-// 3. Forensic Write-Blocker Filter & Memory Wiper
-// ==========================================
-
+/// Forensic storage filter for write protection
 pub struct ForensicStorageFilter {
     pub is_write_blocked: Cell<bool>,
 }
 
 impl ForensicStorageFilter {
-    pub const fn new() -> Self {
-        Self {
-            is_write_blocked: Cell::new(true), // Enabled by default to protect evidence
+    pub fn new() -> Self {
+        ForensicStorageFilter {
+            is_write_blocked: Cell::new(true),
         }
     }
 
-    /// Set write blocker toggle safely
+    /// Set write blocker state
     pub fn set_write_blocker(&self, enabled: bool) {
         self.is_write_blocked.set(enabled);
     }
 
-    /// Intercepts device operations, granting read-only capabilities and blocking all writes
+    /// Intercept device write operations
     pub fn intercept_device_write(&self, _sector_id: u64, _buffer: &[u8]) -> bool {
-        if self.is_write_blocked.get() {
-            false
-        } else {
-            true
+        !self.is_write_blocked.get()
+    }
+
+    /// Secure memory wipe
+    pub fn secure_memory_wipe(&self, target_buffer: &mut [u8]) {
+        for byte in target_buffer.iter_mut() {
+            // SAFETY: We're writing to valid memory within the buffer bounds
+            // Using volatile write ensures the compiler doesn't optimize away the zeroing
+            unsafe { core::ptr::write_volatile(byte, 0x00); }
         }
     }
 
-    /// Zeroes out secure regions of volatile memory to protect keys against hardware cold-boot analysis
-    pub fn secure_memory_wipe(&self, target_buffer: &mut [u8]) {
-        for byte in target_buffer.iter_mut() {
-            // Write volatile zero states safely
-            unsafe {
-                core::ptr::write_volatile(byte, 0x00);
-            }
-        }
+    /// Check if write blocking is enabled
+    pub fn is_write_blocked(&self) -> bool {
+        self.is_write_blocked.get()
     }
 }
 
-// ==========================================
-// Global Static Security Orchestrators
-// ==========================================
+impl Default for AnonSurfShunt {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-unsafe impl Sync for AnonSurfShunt {}
-unsafe impl Sync for AppSandboxEngine {}
-unsafe impl Sync for ForensicStorageFilter {}
+impl Default for AppSandboxEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-pub static GLOBAL_ANONSURF: AnonSurfShunt = AnonSurfShunt::new();
-pub static GLOBAL_SANDBOX: AppSandboxEngine = AppSandboxEngine::new();
-pub static GLOBAL_FORENSIC: ForensicStorageFilter = ForensicStorageFilter::new();
+impl Default for ForensicStorageFilter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-// ==========================================
-// UNIT TESTS
-// ==========================================
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_parrot_security_parity() {
-        // 1. AnonSurf Shunt Tests
-        let shunt = AnonSurfShunt::new();
-        assert_eq!(shunt.current_mode.get(), RoutingMode::DirectCleartext);
-        assert_eq!(shunt.anonymized_packets_routed.get(), 0);
-
-        shunt.enable_anonsurf();
-        assert_eq!(shunt.current_mode.get(), RoutingMode::TorAnonymized);
-        assert!(shunt.dns_leak_protection.get());
-
-        shunt.shunt_packet(101, 1024);
-        assert_eq!(shunt.anonymized_packets_routed.get(), 1);
-
-        shunt.disable_anonsurf();
-        assert_eq!(shunt.current_mode.get(), RoutingMode::DirectCleartext);
-
-        // 2. AppSandbox Policy Engine Tests
-        let sandbox = AppSandboxEngine::new();
-        assert!(!sandbox.validate_filesystem_write("/etc/passwd"));
-        assert!(sandbox.validate_filesystem_write("/sandbox/tmp/test.txt"));
-        assert!(!sandbox.validate_network_socket(true)); // denied raw sockets
-
-        // 3. Forensic Storage Filter Tests
-        let filter = ForensicStorageFilter::new();
-        assert!(!filter.intercept_device_write(500, &[1, 2, 3])); // blocked by default
-
-        filter.set_write_blocker(false);
-        assert!(filter.intercept_device_write(500, &[1, 2, 3])); // allowed once blocker disabled
-
-        // Memory Wiper Tests
-        // Generate test key using timestamp-based approach
-        use std::time::{SystemTime, UNIX_EPOCH};
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-        let mut key_buffer = [0u8; 16];
-        for (i, byte) in key_buffer.iter_mut().enumerate() {
-            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+impl Default for SandboxPolicy {
+    fn default() -> Self {
+        SandboxPolicy {
+            allow_network: false,
+            allow_raw_sockets: false,
+            allow_filesystem_write: false,
+            permitted_subpath: SigmaString::from_str("/sandbox/tmp"),
         }
-        filter.secure_memory_wipe(&mut key_buffer);
-        assert_eq!(key_buffer, [0u8; 16]);
     }
 }

@@ -6,6 +6,7 @@ impl<T: Clone> Clone for Vec<T> {
     fn clone(&self) -> Self {
         let mut new_vec = Vec::new();
         for i in 0..self.len {
+            // SAFETY: We're within bounds (i < self.len) and data is valid
             unsafe {
                 new_vec.push((*self.data.add(i)).clone());
             }
@@ -28,10 +29,19 @@ impl<T> Default for Vec<T> {
 
 impl<T> Vec<T> {
     pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+
+    pub fn from_slice(slice: &[T]) -> Self where T: Clone {
+        let mut vec = Vec::new();
+        for item in slice {
+            vec.push(item.clone());
+        }
+        vec
+    }
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
+                // SAFETY: We've ensured capacity > len, so data.add(self.len) is valid
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
@@ -44,6 +54,7 @@ impl<T> Vec<T> {
         if self.len == 0 {
             &[]
         } else {
+            // SAFETY: data is valid for self.len elements by construction
             unsafe { core::slice::from_raw_parts(self.data, self.len) }
         }
     }
@@ -52,12 +63,14 @@ impl<T> Vec<T> {
         if self.len == 0 {
             &mut []
         } else {
+            // SAFETY: data is valid for self.len elements by construction
             unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
 
     pub fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
+            // SAFETY: We're within bounds (i < self.len) and data is valid
             unsafe {
                 if &*self.data.add(i) == item { return true; }
             }
@@ -72,8 +85,10 @@ impl<T> Vec<T> {
     }
     pub fn remove(&mut self, index: usize) -> T {
         unsafe {
+            // SAFETY: index is checked by Index trait implementation before calling this
             let item = core::ptr::read(self.data.add(index));
             for i in index..self.len - 1 {
+                // SAFETY: Both indices are within bounds
                 core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
             }
             self.len -= 1;
@@ -84,9 +99,11 @@ impl<T> Vec<T> {
         let mut write_idx = 0;
         for i in 0..self.len {
             unsafe {
+                // SAFETY: i < self.len, so data.add(i) is valid
                 let item = &*self.data.add(i);
                 if f(item) {
                     if write_idx != i {
+                        // SAFETY: Both indices are within bounds
                         core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(write_idx), 1);
                     }
                     write_idx += 1;
@@ -99,8 +116,14 @@ impl<T> Vec<T> {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8, self.capacity * mem::size_of::<T>()); }
+            for i in 0..self.len { 
+                // SAFETY: i < self.len, both pointers are valid
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); 
+            }
+            if self.capacity > 0 { 
+                // SAFETY: data was allocated with this size
+                free(self.data as *mut u8, self.capacity * mem::size_of::<T>()); 
+            }
             self.data = new_data;
             self.capacity = new_capacity;
         }
@@ -153,6 +176,7 @@ impl<'a, T> Iterator for VecIter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.vec.len() {
+            // SAFETY: index < vec.len() ensures data.add(index) is valid
             let item = unsafe { &*self.vec.data.add(self.index) };
             self.index += 1;
             Some(item)
@@ -173,6 +197,7 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
     type Item = &'a mut T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.len {
+            // SAFETY: index < len ensures data.add(index) is valid
             let item = unsafe { &mut *self.data.add(self.index) };
             self.index += 1;
             Some(item)
@@ -186,10 +211,12 @@ impl<T> Drop for Vec<T> {
     fn drop(&mut self) {
         if self.capacity > 0 && !self.data.is_null() {
             for i in 0..self.len {
+                // SAFETY: i < self.len, so data.add(i) is valid for dropping
                 unsafe {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
             }
+            // SAFETY: data was allocated with this exact size
             unsafe {
                 free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
             }

@@ -178,32 +178,56 @@ mod tests {
 }
 
 /// Simple String struct to replace std::string::String
-/// Note: This is a basic implementation - for production use, consider using alloc::string::String
+/// Uses custom implementation to reduce dependency on predefined libraries
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct String {
-    // Using alloc::vec::Vec for now - in Phase 2 we'll use klib::Vec
-    inner: alloc::string::String,
+pub struct SigmaString {
+    bytes: Vec<u8>,
 }
 
-impl String {
+impl SigmaString {
     pub fn new() -> Self {
-        String {
-            inner: alloc::string::String::new(),
+        SigmaString {
+            bytes: Vec::new(),
         }
     }
 
     pub fn from_str(s: &str) -> Self {
-        String {
-            inner: alloc::string::String::from(s),
+        let mut vec = Vec::new();
+        for byte in s.bytes() {
+            vec.push(byte);
         }
+        SigmaString { bytes: vec }
     }
 
     pub fn as_str(&self) -> &str {
-        self.inner.as_str()
+        // SAFETY: We ensure that bytes are always valid UTF-8 by only pushing valid UTF-8 data
+        unsafe { core::str::from_utf8_unchecked(self.bytes.as_slice()) }
+    }
+
+    pub fn push(&mut self, c: char) {
+        let mut buf = [0u8; 4];
+        let len = c.encode_utf8(&mut buf).len();
+        for i in 0..len {
+            self.bytes.push(buf[i]);
+        }
+    }
+
+    pub fn push_str(&mut self, s: &str) {
+        for byte in s.bytes() {
+            self.bytes.push(byte);
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.bytes.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.bytes.is_empty()
     }
 }
 
-impl Default for String {
+impl Default for SigmaString {
     fn default() -> Self {
         Self::new()
     }
@@ -211,24 +235,24 @@ impl Default for String {
 
 /// ToString trait to replace std::string::ToString
 pub trait ToString {
-    fn to_string(&self) -> String;
+    fn to_string(&self) -> SigmaString;
 }
 
 // Implement ToString for common types
 impl ToString for str {
-    fn to_string(&self) -> String {
-        String::from_str(self)
+    fn to_string(&self) -> SigmaString {
+        SigmaString::from_str(self)
     }
 }
 
 impl ToString for i32 {
-    fn to_string(&self) -> String {
-        String::from_str(&itoa(*self))
+    fn to_string(&self) -> SigmaString {
+        SigmaString::from_str(&itoa(*self))
     }
 }
 
 impl ToString for u32 {
-    fn to_string(&self) -> String {
-        String::from_str(&itoa(*self as i32))
+    fn to_string(&self) -> SigmaString {
+        SigmaString::from_str(&itoa(*self as i32))
     }
 }
