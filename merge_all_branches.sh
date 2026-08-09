@@ -13,16 +13,23 @@ echo ""
 
 # List of branches to merge (ordered by improvement priority)
 BRANCHES=(
-  "feature/improve-kernel-headers-linux-inspired-5018644282529671678"
-  "improve-sshd-4453662879443076923"
-  "improve-installer-script-9830616872725964915"
-  "jules-driver-improvements-linux-inspired-5291856075380713095"
+  "doc/absorb_agents_repos-5960621972319753074"
+  "feature/sigmaos-strategic-roadmap-14297109383819106955"
+  "improve-package-manager-and-containers-15562379424742924660"
+  "improve-sigmaos-systemd-2776481363129221438"
+  "jules-109675230653822082-3f4e6804"
   "jules-13571719274074749109-6af93541"
-  "jules-2781770876213150319-18a8b4ea"
-  "jules-9523791895558632879-f4c1ad14"
-  "jules-3204690558743606025-06e1d059"
   "jules-14967948003256892231-7e7b3d2e"
-  "feature/distro-parity-organizational-frameworks-251993214289770317"
+  "jules-15532892492441614180-73ce6847"
+  "jules-17622072834113773464-03d7127e"
+  "jules-8362645389262009630-ccefedb8"
+  "jules-8602791727758673915-e41c2de9"
+  "jules-8725025787677827882-82aa0a51"
+  "jules-880081283500171861-1eb07604"
+  "jules-driver-improvements-linux-inspired-5291856075380713095"
+  "jules/universal-self-sufficiency-plan-15829100609448848944"
+  "main-9047891070536233720"
+  "universal-driver-support-18128281713178212708"
 )
 
 for branch in "${BRANCHES[@]}"; do

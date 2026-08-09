@@ -5,23 +5,12 @@
 /// No dependency on external package managers
 /// Based on Roadmap Item 21: Implement sigpkg spec
 extern crate alloc;
+#[cfg(test)]
+extern crate std;
+
 use alloc::boxed::Box;
 
 use core::mem;
-extern crate alloc;
-
-extern crate alloc;
-use alloc::boxed::Box;
-
-extern crate alloc;
-use alloc::boxed::Box;
-
-extern crate alloc;
-use alloc::boxed::Box;
-
-extern crate alloc;
-use alloc::boxed::Box;
-
 use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
@@ -615,9 +604,32 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     }
 }
 
+#[cfg(not(test))]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    let layout = std::alloc::Layout::from_size_align(size + 16, 8).unwrap();
+    let ptr = std::alloc::alloc(layout);
+    if ptr.is_null() {
+        return core::ptr::null_mut();
+    }
+    *(ptr as *mut usize) = size;
+    ptr.add(16)
+}
+
+#[cfg(test)]
+unsafe fn free(ptr: *mut u8) {
+    if ptr.is_null() {
+        return;
+    }
+    let real_ptr = ptr.sub(16);
+    let size = *(real_ptr as *mut usize);
+    let layout = std::alloc::Layout::from_size_align(size + 16, 8).unwrap();
+    std::alloc::dealloc(real_ptr, layout);
 }
 
 #[repr(C)]
@@ -979,5 +991,59 @@ pub struct SignedReleaseManifest {
 impl SignedReleaseManifest {
     pub fn is_trusted(&self) -> bool {
         self.signatures_obtained >= self.required_signatures
+    }
+}
+
+// ==============================================================================
+// 21. Clear Linux & LFS-style CPU-optimized binary target selector
+// ==============================================================================
+#[repr(C)]
+pub struct ClearLinuxCpuOptimizer;
+
+impl ClearLinuxCpuOptimizer {
+    /// Selects the most optimal target architecture suffix depending on host CPU capabilities
+    pub fn get_optimal_target_suffix(host_level: CpuArchLevel) -> &'static str {
+        match host_level {
+            CpuArchLevel::V1 => "",
+            CpuArchLevel::V2 => "v2",
+            CpuArchLevel::V3 => "v3",
+            CpuArchLevel::V4 => "v4",
+        }
+    }
+
+    /// Evaluates if a package's binary is fully compatible and optimized for the host CPU
+    pub fn is_compatible_and_optimized(pkg_arch_level: CpuArchLevel, host_level: CpuArchLevel) -> bool {
+        // A package compiled for level X is compatible if host_level >= X
+        (host_level as u32) >= (pkg_arch_level as u32)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    extern crate std;
+    use super::*;
+
+    #[test]
+    fn test_clear_linux_cpu_optimization() {
+        let v1_opt = ClearLinuxCpuOptimizer::get_optimal_target_suffix(CpuArchLevel::V1);
+        let v3_opt = ClearLinuxCpuOptimizer::get_optimal_target_suffix(CpuArchLevel::V3);
+        assert_eq!(v1_opt, "");
+        assert_eq!(v3_opt, "v3");
+
+        // Test compatibility: host level V3 dominates pkg level V2
+        assert!(ClearLinuxCpuOptimizer::is_compatible_and_optimized(CpuArchLevel::V2, CpuArchLevel::V3));
+        // host level V2 cannot run pkg level V4
+        assert!(!ClearLinuxCpuOptimizer::is_compatible_and_optimized(CpuArchLevel::V4, CpuArchLevel::V2));
+    }
+
+    #[test]
+    fn test_simple_package_and_manager() {
+        let mut pkg = SimplePackage::new(b"test-pkg", PackageVersion::new(1, 0, 0), PackageCapability::full());
+        assert_eq!(pkg.name(), b"test-pkg");
+        assert_eq!(pkg.version().major, 1);
+
+        let mut manager = SimplePackageManager::new(ManagerCapability::full());
+        manager.add_package(Box::new(pkg)).unwrap();
+        assert_eq!(manager.stats().total_packages, 1);
     }
 }
