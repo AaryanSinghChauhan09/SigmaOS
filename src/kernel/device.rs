@@ -92,6 +92,7 @@ pub enum DriverError {
     IoFailed,
     ShutdownFailed,
     CapabilityDenied,
+    AlreadyRegistered,
 }
 
 pub struct DeviceBinding {
@@ -148,10 +149,12 @@ impl DeviceManager {
     }
 
     pub fn find_device_mut(&mut self, name: &str) -> Option<&mut dyn Device> {
-        self.devices
-            .iter_mut()
-            .find(|d| d.name() == name)
-            .map(|d| d.as_mut())
+        for d in self.devices.iter_mut() {
+            if d.name() == name {
+                return Some(d.as_mut());
+            }
+        }
+        None
     }
 
     pub fn bind_driver(&mut self, device_name: &str, driver_name: &str) -> Result<(), DriverError> {
