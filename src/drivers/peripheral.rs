@@ -31,22 +31,22 @@ pub enum PowerState {
 pub trait PeripheralDevice {
     /// Returns the name or identifier of the device
     fn name(&self) -> &'static str;
-    
+
     /// Returns the generation category of the device
     fn generation(&self) -> DeviceGeneration;
-    
+
     /// Initializes the device, preparing it for I/O operations
     fn initialize(&mut self) -> Result<(), &'static str>;
-    
+
     /// Reads data from the device into the buffer
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str>;
-    
+
     /// Writes data to the device from the buffer
     fn write(&mut self, data: &[u8]) -> Result<usize, &'static str>;
-    
+
     /// Sets the power state of the device to optimize energy consumption
     fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str>;
-    
+
     /// Gracefully shuts down the device
     fn shutdown(&mut self) -> Result<(), &'static str>;
 }
@@ -66,7 +66,10 @@ impl PeripheralManager {
     }
 
     /// Registers a new peripheral device into the system.
-    pub fn register_device(&mut self, mut device: Box<dyn PeripheralDevice>) -> Result<(), &'static str> {
+    pub fn register_device(
+        &mut self,
+        mut device: Box<dyn PeripheralDevice>,
+    ) -> Result<(), &'static str> {
         device.initialize()?;
         self.devices.push(device);
         Ok(())
