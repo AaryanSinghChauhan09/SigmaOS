@@ -1,17 +1,8 @@
 // SigmaOS Virtual Filesystem (VFS)
-// Capability-based, standard Linux/BSD conforming filesystem with security, hard links, and path traversal
+// Capability-based filesystem with security
 
 use crate::security::CapabilityToken;
 use std::collections::HashMap;
-
-// Standard POSIX / Linux / BSD open flags
-pub const O_RDONLY: u32 = 0x0000;
-pub const O_WRONLY: u32 = 0x0001;
-pub const O_RDWR: u32 = 0x0002;
-pub const O_CREAT: u32 = 0x0040;
-pub const O_EXCL: u32 = 0x0080;
-pub const O_TRUNC: u32 = 0x0200;
-pub const O_APPEND: u32 = 0x0400;
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,10 +52,6 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    // Conforming Linux/BSD additions
-    pub hard_links_count: u32,
-    pub data: Vec<u8>,                 // File storage data
-    pub entries: HashMap<String, u64>, // Directory entries
 }
 
 impl Inode {
@@ -79,9 +66,6 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            hard_links_count: 1,
-            data: Vec::new(),
-            entries: HashMap::new(),
         }
     }
 }
@@ -180,27 +164,17 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
-        // Check file offset and file size
-        if file_descriptor.offset >= inode.size {
-            return Ok(0);
-        }
-
-        let remaining = (inode.size - file_descriptor.offset) as usize;
-        let bytes_to_read = buffer.len().min(remaining);
-
         // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
+        let new_offset = file_descriptor
             .offset
-            .checked_add(bytes_to_read as u64)
+            .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
 
-        // Read the actual bytes from storage data
-        let start = file_descriptor.offset as usize;
-        let end = start + bytes_to_read;
-        buffer[..bytes_to_read].copy_from_slice(&inode.data[start..end]);
+        // Simulate read (in production, actual file I/O)
+        let bytes_read = buffer.len().min(inode.size as usize);
+        file_descriptor.offset += bytes_read as u64;
 
-        file_descriptor.offset += bytes_to_read as u64;
-        Ok(bytes_to_read)
+        Ok(bytes_read)
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
@@ -219,37 +193,25 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
-        // If open flag O_APPEND is set, offset is moved to the end of the file before each write
-        if (file_descriptor.flags & O_APPEND) != 0 {
-            file_descriptor.offset = inode.size;
-        }
-
-        // Prevent integer overflow in size and offset calculation
+        // Prevent integer overflow in size calculation
         let _new_size = inode
             .size
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
-        let new_offset = file_descriptor
+        // Prevent integer overflow in offset calculation
+        let _new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
-        // Resize storage data buffer if offset + written bytes exceeds size (handling holes)
-        if new_offset > inode.size {
-            inode.data.resize(new_offset as usize, 0);
-            inode.size = new_offset;
-        }
+        // Simulate write (in production, actual file I/O)
+        let bytes_written = buffer.len();
+        inode.size += bytes_written as u64;
+        file_descriptor.offset += bytes_written as u64;
+        inode.modified = 0; // In production, actual timestamp
 
-        // Write the actual bytes into file storage data
-        let start = file_descriptor.offset as usize;
-        let end = start + buffer.len();
-        inode.data[start..end].copy_from_slice(buffer);
-
-        file_descriptor.offset = new_offset;
-        inode.modified = 1716000000; // Simulated timestamp
-
-        Ok(buffer.len())
+        Ok(bytes_written)
     }
 
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
@@ -257,20 +219,11 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
-        let mut should_delete = false;
-        if let Some(inode) = self.inodes.get_mut(&inode_id) {
-            if inode.hard_links_count > 1 {
-                inode.hard_links_count -= 1;
-            } else {
-                should_delete = true;
-            }
-        } else {
+        if !self.inodes.contains_key(&inode_id) {
             return Err(FsError::NotFound);
         }
 
-        if should_delete {
-            self.inodes.remove(&inode_id);
-        }
+        self.inodes.remove(&inode_id);
         Ok(())
     }
 
@@ -285,197 +238,8 @@ impl VirtualFilesystem {
             return Err(FsError::NotADirectory);
         }
 
-        // Return child inode list of the directory
-        let mut list: Vec<u64> = inode.entries.values().copied().collect();
-        list.sort();
-        Ok(list)
-    }
-
-    // =========================================================================
-    // Advanced Linux & BSD Inspired Path Traversal, O_CREAT, and Link Handling
-    // =========================================================================
-
-    /// Safe path canonicalization to prevent directory traversal (Sentinel 🛡️ Security)
-    pub fn canonicalize_path(&self, path: &str) -> Result<String, FsError> {
-        let mut stack = Vec::new();
-        let components: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
-
-        for component in components {
-            if component == "." {
-                continue;
-            } else if component == ".." {
-                if stack.is_empty() {
-                    return Err(FsError::PermissionDenied); // Prevent escaping root
-                }
-                stack.pop();
-            } else {
-                stack.push(component);
-            }
-        }
-
-        let mut result = String::new();
-        for comp in stack {
-            result.push('/');
-            result.push_str(comp);
-        }
-        if result.is_empty() {
-            result.push('/');
-        }
-        Ok(result)
-    }
-
-    /// Traverses and resolves a path name (e.g. "/var/log/syslog") to its Inode ID
-    pub fn resolve_path(&self, path: &str) -> Result<u64, FsError> {
-        let canonical = self.canonicalize_path(path)?;
-        if canonical.is_empty() {
-            return Err(FsError::NotFound);
-        }
-
-        let mut current_inode_id = self.root_inode;
-        let components: Vec<&str> = canonical.split('/').filter(|s| !s.is_empty()).collect();
-
-        for component in components {
-            let inode = self
-                .inodes
-                .get(&current_inode_id)
-                .ok_or(FsError::NotFound)?;
-            if inode.file_type != FileType::Directory {
-                return Err(FsError::NotADirectory);
-            }
-            if let Some(&next_id) = inode.entries.get(component) {
-                current_inode_id = next_id;
-            } else {
-                return Err(FsError::NotFound);
-            }
-        }
-
-        Ok(current_inode_id)
-    }
-
-    /// Open path with creation, exclusion, truncation, and append logic matching POSIX
-    pub fn open_path(&mut self, path: &str, flags: u32, owner: u64) -> Result<u64, FsError> {
-        let canonical = self.canonicalize_path(path)?;
-        // Resolve parent and target component
-        let mut parts: Vec<&str> = canonical.split('/').filter(|s| !s.is_empty()).collect();
-
-        let filename = parts.pop().ok_or(FsError::NotFound)?;
-        let mut parent_inode_id = self.root_inode;
-
-        if !parts.is_empty() {
-            let mut parent_path = String::new();
-            for part in parts {
-                parent_path.push('/');
-                parent_path.push_str(part);
-            }
-            parent_inode_id = self.resolve_path(&parent_path)?;
-        }
-
-        let parent_inode = self.inodes.get(&parent_inode_id).ok_or(FsError::NotFound)?;
-        if parent_inode.file_type != FileType::Directory {
-            return Err(FsError::NotADirectory);
-        }
-
-        let target_inode_id = parent_inode.entries.get(filename).copied();
-
-        let inode_id = match target_inode_id {
-            Some(id) => {
-                if (flags & O_CREAT) != 0 && (flags & O_EXCL) != 0 {
-                    return Err(FsError::AlreadyExists);
-                }
-                id
-            }
-            None => {
-                if (flags & O_CREAT) != 0 {
-                    let new_id = self.create_file(FileType::Regular, owner)?;
-                    // Link into parent directory
-                    let parent = self
-                        .inodes
-                        .get_mut(&parent_inode_id)
-                        .ok_or(FsError::NotFound)?;
-                    parent.entries.insert(filename.to_string(), new_id);
-                    new_id
-                } else {
-                    return Err(FsError::NotFound);
-                }
-            }
-        };
-
-        // Apply O_TRUNC if write permission is allowed
-        if (flags & O_TRUNC) != 0 {
-            let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
-            if !inode.permissions.write {
-                return Err(FsError::PermissionDenied);
-            }
-            inode.data.clear();
-            inode.size = 0;
-        }
-
-        self.open_file(inode_id, flags)
-    }
-
-    /// Link target path to link path (POSIX link/hard link logic)
-    pub fn link_inode(&mut self, target_path: &str, link_path: &str) -> Result<(), FsError> {
-        let target_id = self.resolve_path(target_path)?;
-
-        let link_str = link_path.to_string();
-        let mut parts: Vec<&str> = link_str.split('/').filter(|s| !s.is_empty()).collect();
-        let filename = parts.pop().ok_or(FsError::NotFound)?;
-        let mut parent_inode_id = self.root_inode;
-
-        if !parts.is_empty() {
-            let mut parent_path = String::new();
-            for part in parts {
-                parent_path.push('/');
-                parent_path.push_str(part);
-            }
-            parent_inode_id = self.resolve_path(&parent_path)?;
-        }
-
-        // Verify parent directory
-        let parent = self.inodes.get(&parent_inode_id).ok_or(FsError::NotFound)?;
-        if parent.file_type != FileType::Directory {
-            return Err(FsError::NotADirectory);
-        }
-        if parent.entries.contains_key(filename) {
-            return Err(FsError::AlreadyExists);
-        }
-
-        // Perform hard-linking
-        let parent_mut = self
-            .inodes
-            .get_mut(&parent_inode_id)
-            .ok_or(FsError::NotFound)?;
-        parent_mut.entries.insert(filename.to_string(), target_id);
-
-        let target_inode = self.inodes.get_mut(&target_id).ok_or(FsError::NotFound)?;
-        target_inode.hard_links_count += 1;
-
-        Ok(())
-    }
-
-    /// Unlinks (deletes directory entry) and decrements link count
-    pub fn unlink_inode(&mut self, path: &str) -> Result<(), FsError> {
-        let path_str = path.to_string();
-        let mut parts: Vec<&str> = path_str.split('/').filter(|s| !s.is_empty()).collect();
-        let filename = parts.pop().ok_or(FsError::NotFound)?;
-        let mut parent_inode_id = self.root_inode;
-
-        if !parts.is_empty() {
-            let mut parent_path = String::new();
-            for part in parts {
-                parent_path.push('/');
-                parent_path.push_str(part);
-            }
-            parent_inode_id = self.resolve_path(&parent_path)?;
-        }
-
-        let parent = self
-            .inodes
-            .get_mut(&parent_inode_id)
-            .ok_or(FsError::NotFound)?;
-        let target_id = parent.entries.remove(filename).ok_or(FsError::NotFound)?;
-
-        self.delete_file(target_id)
+        // Return all inodes (in production, actual directory listing)
+        Ok(self.inodes.keys().copied().collect())
     }
 }
 
@@ -494,7 +258,6 @@ pub enum FsError {
     NotADirectory,
     IsDirectory,
     NoSpace,
-    AlreadyExists,
 }
 
 #[cfg(test)]
@@ -505,19 +268,6 @@ mod tests {
     fn test_vfs_creation() {
         let vfs = VirtualFilesystem::new();
         assert!(vfs.inodes.contains_key(&0));
-    }
-
-    #[test]
-    fn test_path_traversal_mitigation() {
-        let vfs = VirtualFilesystem::new();
-
-        // Safe relative path should succeed
-        assert!(vfs.canonicalize_path("/foo/bar/../baz").is_ok());
-        assert_eq!(vfs.canonicalize_path("/foo/bar/../baz").unwrap(), "/foo/baz");
-
-        // Traversal above root should fail with PermissionDenied
-        assert_eq!(vfs.canonicalize_path("/../etc/shadow"), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.canonicalize_path("/foo/../../etc/shadow"), Err(FsError::PermissionDenied));
     }
 
     #[test]
