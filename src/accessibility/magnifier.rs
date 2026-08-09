@@ -1,17 +1,14 @@
-#![no_std]
-#![no_main]
-
 /// OOP-based Screen Magnifier for SigmaOS
 /// Based on Ideas-999-Structured: User Experience & Desktop Item 826
 /// Implements screen magnification and zoom
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
+use crate::klib::Vec;
 
 pub type MagnifierID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MagnifierError { Success = 0, NotFound = 1 }
 
 pub trait Magnifier {
@@ -87,6 +84,7 @@ impl MagnifierManager for SimpleMagnifierManager {
         for magnifier_option in &mut self.magnifiers {
             if let Some(ref magnifier) = *magnifier_option {
                 if magnifier.id() == id {
+                    *magnifier_option = None;
                     return Ok(());
                 }
             }
@@ -138,29 +136,26 @@ impl ColorFilter for SimpleColorFilter {
     fn is_filter_enabled(&self) -> bool { self.enabled.load(Ordering::SeqCst) == 1 }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+    #[test]
+    fn test_magnifier_manager() {
+        let mut manager = SimpleMagnifierManager::new();
+        let id = manager.create_magnifier().unwrap();
+        assert!(manager.get_magnifier(id).is_some());
+        assert_eq!(manager.get_magnifier(id).unwrap().zoom_level(), 2.0);
+
+        assert!(manager.destroy_magnifier(id).is_ok());
+        assert!(manager.get_magnifier(id).is_none());
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
+
+    #[test]
+    fn test_color_filter() {
+        let mut filter = SimpleColorFilter::new();
+        assert!(!filter.is_filter_enabled());
+        filter.enable_filter(3);
+        assert!(filter.is_filter_enabled());
     }
 }
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
