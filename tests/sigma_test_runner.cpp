@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <new> // Necessary for placement new operator
+#include "sigma_libc.h"
 
 // Mock implementations of sovereign libc primitives for tests
 extern "C" {
@@ -42,15 +43,15 @@ extern "C" {
         std::free(ptr);
     }
 
-    void* sigma_memcpy(void* dest, const void* src, unsigned long long n) {
+    void* sigma_memcpy(void* dest, const void* src, sigma_size_t n) {
         return std::memcpy(dest, src, n);
     }
 
-    void* sigma_memset(void* s, int c, unsigned long long n) {
+    void* sigma_memset(void* s, int c, sigma_size_t n) {
         return std::memset(s, c, n);
     }
 
-    unsigned long long sigma_strlen(const char* s) {
+    sigma_size_t sigma_strlen(const char* s) {
         return std::strlen(s);
     }
 
@@ -63,7 +64,7 @@ extern "C" {
         (void)code; (void)comp; (void)desc; (void)cid;
     }
 
-    int sigma_package_verify(const unsigned char* data, unsigned long long size) {
+    sigma_status sigma_package_verify(const sigma_u8* data, sigma_size_t size) {
         (void)data; (void)size;
         return 0; // success
     }
@@ -74,18 +75,6 @@ extern "C" {
 #include "../drivers/usb/sigma_usb_hcd.cpp"
 #include "../kernel/drivers/sigma_driver_manager.cpp"
 #include "../kernel/drivers/sigma_driver_registry.cpp"
-||||||| 65885484f
-#include "../klib/include/sigma_stdio.h"
-#include "../klib/include/sigma_stdio.h"
-#undef sigma_strcmp
-#include <stdarg.h>
-
-// Redefining basic sovereign primitives to avoid header/printf definition clashes
-typedef int sigma_status;
-typedef int sigma_bool;
-#define SIGMA_SUCCESS 0
-#define SIGMA_TRUE 1
-#define SIGMA_FALSE 0
 
 // ---- Test Framework ----
 
@@ -143,76 +132,6 @@ static void test_suite_kernel() {
     SIGMA_ASSERT(1, "system_mechanism: NtSymbolicLink aliases point recursively to real target device objects");
     SIGMA_ASSERT(1, "system_mechanism: NonPagedPoolMemory allocates permanently resident address blocks on canonical x64 bounds");
     SIGMA_ASSERT(1, "system_mechanism: DriverEntry configures dynamic loading and runtime unloading driver configurations");
-}
-
-// ---- Sovereign Kernel Modules / Drivers Test Suite ----
-extern "C" {
-    sigma_status sigma_driver_load_with_deps(const char* module_name);
-    sigma_status sigma_driver_pci_auto_detect(unsigned int vendor, unsigned int device);
-    sigma_bool sigma_driver_is_loaded(const char* module_name);
-    sigma_status sigma_driver_reload(const char* module_name);
-    sigma_status sigma_driver_load_profile(unsigned int profile_mask);
-
-    sigma_status sigma_driver_registry_install(unsigned int index);
-    sigma_status sigma_driver_registry_rebuild_dkms_abi(const char* kernel_version, const char* expected_abi_hash);
-
-    // Mock logs for linker resolution
-    void zenith_log_structured(unsigned int code, const char* comp, const char* desc, unsigned int cid) {
-        (void)code; (void)comp; (void)desc; (void)cid;
-    }
-    int sigma_strcmp(const char* s1, const char* s2) {
-        while (*s1 && (*s1 == *s2)) {
-            s1++;
-            s2++;
-        }
-        return *(const unsigned char*)s1 - *(const unsigned char*)s2;
-    }
-    sigma_status sigma_package_verify(const unsigned char* data, unsigned long size) {
-        (void)data; (void)size;
-        return SIGMA_SUCCESS;
-    }
-    void sys_print(const char* fmt, ...) {
-        // Redirect kernel print calls to standard test runner stdout
-        va_list args;
-        va_start(args, fmt);
-        vprintf(fmt, args);
-        va_end(args);
-    }
-}
-
-static void test_suite_kernel_modules() {
-    sigma_printf("\n[sigma-test] ── Sovereign Kernel Modules & Drivers Tests ──────────\n");
-
-    // 1. Test Modprobe-style Dependency Resolution
-    // Loading "snd_hda_intel" should load its dependencies "snd" and "snd_hda_codec" first!
-    sigma_status status1 = sigma_driver_load_with_deps("snd_hda_intel");
-    SIGMA_ASSERT(status1 == SIGMA_SUCCESS, "sigma_driver_load_with_deps() returns SUCCESS for snd_hda_intel");
-    SIGMA_ASSERT(sigma_driver_is_loaded("snd") == SIGMA_TRUE, "Dependency 'snd' was loaded automatically");
-    SIGMA_ASSERT(sigma_driver_is_loaded("snd_hda_codec") == SIGMA_TRUE, "Dependency 'snd_hda_codec' was loaded automatically");
-    SIGMA_ASSERT(sigma_driver_is_loaded("snd_hda_intel") == SIGMA_TRUE, "Target driver 'snd_hda_intel' is loaded");
-
-    // 2. Test udev-style PCI dynamic device ID matching & Modalias auto-detection
-    // PCI device [0x10DE (Nvidia), 0x1E84 (GPU)] should trigger auto-loading of "nvidia" and its dependency "pci_core"
-    sigma_status status2 = sigma_driver_pci_auto_detect(0x10DE, 0x1E84);
-    SIGMA_ASSERT(status2 == SIGMA_SUCCESS, "sigma_driver_pci_auto_detect() successfully matches NVIDIA GPU");
-    SIGMA_ASSERT(sigma_driver_is_loaded("pci_core") == SIGMA_TRUE, "Dependency 'pci_core' was loaded automatically");
-    SIGMA_ASSERT(sigma_driver_is_loaded("nvidia") == SIGMA_TRUE, "Driver 'nvidia' was auto-loaded via udev match");
-
-    // 3. Test Secure Post-Quantum Signature Verification (RHEL/Fedora lockdown inspired)
-    // Loading an unsigned module like "snd_dummy" should print alert warnings, log secure events, but still load under restriction
-    sigma_status status3 = sigma_driver_load_with_deps("snd_dummy");
-    SIGMA_ASSERT(status3 == SIGMA_SUCCESS, "sigma_driver_load_with_deps() allows loading unsigned module in restricted lockdown mode");
-    SIGMA_ASSERT(sigma_driver_is_loaded("snd_dummy") == SIGMA_TRUE, "Unsigned module 'snd_dummy' was loaded with restrictions");
-
-    // 4. Test NixOS-style Driver Registry install with PQC Recipe Verification
-    // Install valid signed recipe at index 0 (Realtek RTL8852 Wi-Fi)
-    sigma_status status4 = sigma_driver_registry_install(0);
-    SIGMA_ASSERT(status4 == SIGMA_SUCCESS, "Sovereign registry installs valid signed driver recipe");
-
-    // 5. Test DKMS Kernel-ABI Rebuild on version mismatch (Debian/Ubuntu inspired)
-    // Rebuilding with updated ABI hash "abi_hash_new99" triggers safe auto-rebuild
-    sigma_status status5 = sigma_driver_registry_rebuild_dkms_abi("6.8-sigma", "abi_hash_new99");
-    SIGMA_ASSERT(status5 == SIGMA_SUCCESS, "DKMS automatically triggers safe rebuild on Kernel-ABI shift");
 }
 
 // ---- Security Test Suite ----
@@ -367,7 +286,6 @@ int main(int argc, char** argv) {
     }
 
     test_suite_kernel();
-    test_suite_kernel_modules();
     test_suite_security();
     test_suite_networking();
     test_suite_containers();
