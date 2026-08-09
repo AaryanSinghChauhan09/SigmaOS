@@ -1,6 +1,8 @@
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
-// Enhanced with Fedora's standard SELinux Context & Policy Transition security engines.
+// Enhanced with Fedora's standard SELinux Context & Policy Transition security engines,
+// Fedora's systemd-preset automated service activation controller,
+// and Fedora's Anaconda automated installation Kickstart parser.
 
 use std::collections::HashMap;
 
@@ -484,6 +486,215 @@ impl SeLinuxEngine {
     }
 }
 
+// ==========================================================
+// Fedora systemd-preset Automated Service Activation Controller
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemdPresetState {
+    Enable,
+    Disable,
+    Ignore,
+}
+
+#[derive(Debug, Clone)]
+pub struct SystemdServicePreset {
+    pub service_pattern: String,
+    pub action: SystemdPresetState,
+}
+
+pub struct SystemdPresetConfigurator {
+    pub presets: Vec<SystemdServicePreset>,
+}
+
+impl SystemdPresetConfigurator {
+    pub fn new() -> Self {
+        let mut configurator = Self {
+            presets: Vec::new(),
+        };
+        configurator.load_default_presets();
+        configurator
+    }
+
+    fn load_default_presets(&mut self) {
+        // Simulates standard `/usr/lib/systemd/system-preset/99-default.preset` rules in Fedora
+        self.presets.push(SystemdServicePreset {
+            service_pattern: "sshd.service".to_string(),
+            action: SystemdPresetState::Enable,
+        });
+        self.presets.push(SystemdServicePreset {
+            service_pattern: "auditd.service".to_string(),
+            action: SystemdPresetState::Enable,
+        });
+        self.presets.push(SystemdServicePreset {
+            service_pattern: "debug-shell.service".to_string(),
+            action: SystemdPresetState::Disable,
+        });
+    }
+
+    /// Evaluates preset files to determine action for a newly registered service
+    pub fn evaluate_preset(&self, service_name: &str) -> SystemdPresetState {
+        for preset in &self.presets {
+            // Simple wildcard / exact match
+            if service_name == preset.service_pattern || preset.service_pattern == "*" {
+                return preset.action;
+            }
+        }
+        SystemdPresetState::Ignore
+    }
+
+    /// Dynamically loads a custom preset rule (e.g. from user config overrides)
+    pub fn add_custom_preset(&mut self, pattern: &str, action: SystemdPresetState) {
+        self.presets.insert(0, SystemdServicePreset {
+            service_pattern: pattern.to_string(),
+            action,
+        });
+    }
+}
+
+impl Default for SystemdPresetConfigurator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// Fedora Anaconda Installer & Kickstart Configurator
+// ==========================================================
+
+#[derive(Debug, Clone)]
+pub struct KickstartPartition {
+    pub mount_point: String,
+    pub fs_type: String,
+    pub size_mb: u64,
+}
+
+impl KickstartPartition {
+    pub fn new(mount: &str, fs: &str, size: u64) -> Self {
+        Self {
+            mount_point: mount.to_string(),
+            fs_type: fs.to_string(),
+            size_mb: size,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct KickstartConfig {
+    pub root_password_hash: String,
+    pub system_language: String,
+    pub keyboard_mapping: String,
+    pub selected_groups: Vec<String>,
+    pub partitions: Vec<KickstartPartition>,
+}
+
+pub struct AnacondaInstaller {
+    pub kickstart: Option<KickstartConfig>,
+    pub installation_successful: bool,
+    pub processed_steps: Vec<String>,
+}
+
+impl AnacondaInstaller {
+    pub fn new() -> Self {
+        Self {
+            kickstart: None,
+            installation_successful: false,
+            processed_steps: Vec::new(),
+        }
+    }
+
+    /// Loads and parses raw Anaconda kickstart scripts
+    pub fn load_kickstart_config(&mut self, ks_content: &str) -> Result<(), &'static str> {
+        let mut root_pass = String::new();
+        let mut lang = String::from("en_US.UTF-8");
+        let mut keymap = String::from("us");
+        let mut groups = Vec::new();
+        let mut partitions = Vec::new();
+
+        for line in ks_content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+
+            let parts: Vec<&str> = trimmed.split_whitespace().collect();
+            if parts.is_empty() {
+                continue;
+            }
+
+            match parts[0] {
+                "rootpw" if parts.len() > 1 => {
+                    root_pass = parts[1].to_string();
+                }
+                "lang" if parts.len() > 1 => {
+                    lang = parts[1].to_string();
+                }
+                "keyboard" if parts.len() > 1 => {
+                    keymap = parts[1].to_string();
+                }
+                "part" if parts.len() > 4 => {
+                    // format: part <mount> --fstype <fs> --size <size>
+                    let mount = parts[1];
+                    let mut fs = "ext4".to_string();
+                    let mut size = 1024;
+                    for i in 2..parts.len() {
+                        if parts[i] == "--fstype" && i + 1 < parts.len() {
+                            fs = parts[i + 1].to_string();
+                        } else if parts[i] == "--size" && i + 1 < parts.len() {
+                            size = parts[i + 1].parse::<u64>().unwrap_or(1024);
+                        }
+                    }
+                    partitions.push(KickstartPartition::new(mount, &fs, size));
+                }
+                group if group.starts_with('@') => {
+                    groups.push(group.to_string());
+                }
+                _ => {}
+            }
+        }
+
+        if root_pass.is_empty() {
+            return Err("Missing root password definition in kickstart config");
+        }
+
+        self.kickstart = Some(KickstartConfig {
+            root_password_hash: root_pass,
+            system_language: lang,
+            keyboard_mapping: keymap,
+            selected_groups: groups,
+            partitions,
+        });
+
+        Ok(())
+    }
+
+    /// Executes automated package and partition installations according to loaded kickstart policies (Anaconda simulation)
+    pub fn execute_automated_installation(&mut self) -> Result<String, &'static str> {
+        let ks = self.kickstart.as_ref().ok_or("No Kickstart configuration loaded")?;
+
+        self.processed_steps.push("Step 1: Set up locale and keyboard layouts".to_string());
+        self.processed_steps.push(format!("Step 2: Partitioning {} storage device segments", ks.partitions.len()));
+
+        for part in &ks.partitions {
+            self.processed_steps.push(format!("  -> Mounted {} on {} partition of {} MB", part.fs_type, part.mount_point, part.size_mb));
+        }
+
+        self.processed_steps.push(format!("Step 3: Installing {} group packages", ks.selected_groups.len()));
+        for group in &ks.selected_groups {
+            self.processed_steps.push(format!("  -> Installed pkg group: {}", group));
+        }
+
+        self.installation_successful = true;
+        Ok("SovereignAnaconda: Automated OS provisioning completed with 100% success!".to_string())
+    }
+}
+
+impl Default for AnacondaInstaller {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -679,5 +890,51 @@ mod tests {
         let passwd_exe = SeLinuxContext::new("system_u", "object_r", "passwd_exec_t", "s0");
         let transitioned = engine.validate_domain_transition(&user_sub, &passwd_exe).unwrap();
         assert_eq!(transitioned.context_type, "passwd_t");
+    }
+
+    #[test]
+    fn test_systemd_preset_configurator() {
+        let mut configurator = SystemdPresetConfigurator::new();
+        assert_eq!(configurator.evaluate_preset("sshd.service"), SystemdPresetState::Enable);
+        assert_eq!(configurator.evaluate_preset("debug-shell.service"), SystemdPresetState::Disable);
+        assert_eq!(configurator.evaluate_preset("nginx.service"), SystemdPresetState::Ignore);
+
+        // Custom override
+        configurator.add_custom_preset("nginx.service", SystemdPresetState::Enable);
+        assert_eq!(configurator.evaluate_preset("nginx.service"), SystemdPresetState::Enable);
+    }
+
+    #[test]
+    fn test_anaconda_kickstart_installer() {
+        let mut installer = AnacondaInstaller::new();
+
+        // Sample Fedora Kickstart script
+        let ks_script = "
+        # Kickstart configuration
+        rootpw $6$rounds=4096$secure_hash_here
+        lang en_US.UTF-8
+        keyboard us
+
+        # Partition layouts
+        part / --fstype ext4 --size 20480
+        part /boot --fstype ext3 --size 1024
+
+        # Selected package groups
+        @core
+        @base
+        ";
+
+        assert!(installer.load_kickstart_config(ks_script).is_ok());
+
+        let ks = installer.kickstart.as_ref().unwrap();
+        assert_eq!(ks.root_password_hash, "$6$rounds=4096$secure_hash_here");
+        assert_eq!(ks.system_language, "en_US.UTF-8");
+        assert_eq!(ks.partitions.len(), 2);
+        assert_eq!(ks.partitions[0].mount_point, "/");
+        assert_eq!(ks.partitions[1].size_mb, 1024);
+
+        let res = installer.execute_automated_installation().unwrap();
+        assert!(res.contains(" Automated OS provisioning completed"));
+        assert!(installer.installation_successful);
     }
 }
