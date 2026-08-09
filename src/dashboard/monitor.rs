@@ -129,7 +129,7 @@ impl UnifiedDashboard {
     }
 
     pub fn update_widget(&mut self, id: &str, data: MetricData) {
-        if let Some(widget) = self.widgets.get_mut(id) {
+        if let Some(widget) = self.widgets.get_mut::<str>(id) {
             widget.add_data_point(data);
         }
     }
@@ -137,7 +137,8 @@ impl UnifiedDashboard {
     pub fn get_system_summary(&self) -> HashMap<String, f64> {
         let mut summary = HashMap::new();
 
-        for (id, widget) in &self.widgets {
+        let iter: crate::klib::hashmap::HashMapIter<'_, String, DashboardWidget> = self.widgets.iter();
+        for (id, widget) in iter {
             if let Some(value) = widget.get_latest_value() {
                 summary.insert(id.clone(), value);
             }

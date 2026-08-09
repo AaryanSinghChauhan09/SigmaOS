@@ -1,5 +1,3 @@
-extern crate alloc;
-
 use core::mem;
 
 pub struct Vec<T> {
@@ -40,20 +38,6 @@ impl<T> Vec<T> {
             capacity: 0,
         }
     }
-
-    pub fn with_capacity(capacity: usize) -> Self {
-        if capacity == 0 {
-            Self::new()
-        } else {
-            let data = unsafe { extern_alloc(capacity * mem::size_of::<T>()) as *mut T };
-            Vec {
-                data,
-                len: 0,
-                capacity,
-            }
-        }
-    }
-
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity {
@@ -65,7 +49,6 @@ impl<T> Vec<T> {
             }
         }
     }
-
     pub fn pop(&mut self) -> Option<T> {
         if self.len == 0 {
             None
@@ -76,7 +59,6 @@ impl<T> Vec<T> {
             }
         }
     }
-
     pub fn insert(&mut self, index: usize, item: T) {
         if index > self.len {
             panic!("index out of bounds");
@@ -92,11 +74,9 @@ impl<T> Vec<T> {
             self.len += 1;
         }
     }
-
     pub fn len(&self) -> usize {
         self.len
     }
-
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
@@ -130,14 +110,12 @@ impl<T> Vec<T> {
         }
         false
     }
-
     pub fn iter(&self) -> VecIter<'_, T> {
         VecIter {
             vec: self,
             index: 0,
         }
     }
-
     pub fn iter_mut(&mut self) -> VecIterMut<'_, T> {
         VecIterMut {
             data: self.data,
@@ -146,7 +124,6 @@ impl<T> Vec<T> {
             _marker: core::marker::PhantomData,
         }
     }
-
     pub fn remove(&mut self, index: usize) -> T {
         unsafe {
             let item = core::ptr::read(self.data.add(index));
@@ -157,7 +134,6 @@ impl<T> Vec<T> {
             item
         }
     }
-
     pub fn retain<F>(&mut self, mut f: F)
     where
         F: FnMut(&T) -> bool,
@@ -180,14 +156,13 @@ impl<T> Vec<T> {
         }
         self.len = write_idx;
     }
-
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
         } else {
             self.capacity * 2
         };
-        let new_data = extern_alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
             for i in 0..self.len {
                 core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
@@ -293,7 +268,7 @@ impl<T> Drop for Vec<T> {
 
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
 #[cfg(not(target_os = "none"))]
-unsafe fn extern_alloc(size: usize) -> *mut u8 {
+unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
     let layout = Layout::from_size_align(size, 8).unwrap();
     std_alloc(layout)
@@ -312,9 +287,4 @@ unsafe fn free(ptr: *mut u8, size: usize) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8, size: usize);
-}
-
-#[cfg(target_os = "none")]
-unsafe fn extern_alloc(size: usize) -> *mut u8 {
-    alloc(size)
 }

@@ -23,8 +23,8 @@ pub use manager::{
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
 pub use support::{
-    Filesystem, FilesystemError, FilesystemManager, FilesystemType,
-    SimpleFilesystem, SimpleFilesystemManager,
+    Filesystem, FilesystemError, FilesystemManager, FilesystemType, LegacyLinuxRule,
+    LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager,
 };
-pub use smart_symlink::{SmartSymlink, SymlinkResolverRule, LegacyLinuxRule, LinuxPersonaRule};
+pub use smart_symlink::{SmartSymlink, SymlinkResolverRule};
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
