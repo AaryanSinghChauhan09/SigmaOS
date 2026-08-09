@@ -115,6 +115,12 @@ impl SigmaInit {
     pub fn disable_parallel_startup(&mut self) {
         self.parallel_startup.store(0, Ordering::SeqCst);
     }
+
+    pub fn restart_service(&mut self, id: ServiceID) -> Result<(), InitError> {
+        self.stop_service(id)?;
+        self.start_service(id)?;
+        Ok(())
+    }
 }
 
 impl InitSystem for SigmaInit {

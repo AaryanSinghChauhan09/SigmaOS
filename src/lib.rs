@@ -13,17 +13,14 @@ pub mod drivers;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
-pub mod legal;
 pub mod ml;
 pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod distro;
 pub mod package;
+pub mod performance;
 pub mod productivity;
-pub mod thread;
-pub mod process;
-pub mod tools;
 pub mod remote;
 pub mod resilience;
 pub mod security;
@@ -85,13 +82,8 @@ pub use compatibility::{
     TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
     EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
     Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
-    PageAccessMode, MemoryArch, PageTableEntry, PageDirectory, DeferredProcedureCall,
-    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
-    UmsThreadState, UmsContext, SovereignKernelInternals,
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
-    ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -109,10 +101,6 @@ pub use drivers::{
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
-    LegacyAudioAc97, ModernAudioIntelHda, ModernNvmeDriver, ModernUsbPrinterDriver,
-    ModernWifiDriver, TouchJingosDriver,
-    VirtioDeviceType, VirtioMmioHeader, VirtioBlkDriver, VirtioNetDriver, VirtioRngDriver,
-    E1000TxDescriptor, E1000RxDescriptor, IntelE1000Driver,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -135,6 +123,7 @@ pub use network::{
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
+    CognitiveOSNarrator, AdaptiveComplianceGater, SynestheticFeedbackEngine, GenerativeConfigParser, InterplanetaryDtnRoute, CollectiveSimulationNode,
 };
 pub use distro::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -177,12 +166,6 @@ pub use productivity::{
     SplitDirection as TmuxSplitDirection, LayoutPreset as TmuxLayoutPreset,
     TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
 };
-pub use legal::{
-    ComplianceCert as LegalComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
-    GlobalStandard, ComplianceStatus as LegalComplianceStatus, RegulatoryControl, InternationalComplianceTracker,
-    LabourLawConfig, StatutoryPayrollBreakdown, LabourLawCompliance, StatutoryFiling,
-    StatutoryFilingDashboard,
-};
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
@@ -203,22 +186,4 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-
-pub use thread::management::{
-    ThreadID, ThreadState as LibThreadState, ThreadAlertableState, Thread, ThreadError, SimpleThread, ThreadManager, SimpleThreadManager,
-};
-
-pub use process::spawn::{
-    ProcessID, ProcessState as LibProcessState, ProcessError, Process, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
-    CLONE_NEWNS, CLONE_NEWNET, CLONE_NEWPID,
-};
-
-pub use tools::{
-    AccessibilityFeature as LibAccessibilityFeature, ClusterNode as LibClusterNode, NodeState as LibNodeState,
-    SigmaAccess as LibSigmaAccess, SigmaCluster as LibSigmaCluster, SigmaDeploy as LibSigmaDeploy,
-    SigmaIdentity as LibSigmaIdentity, SigmaToolError as LibSigmaToolError, UserIdentity as LibUserIdentity,
-    SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
-    SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
-    SovereignIsWebsiteDown,
 };

@@ -1,44 +1,33 @@
 // SigmaOS Filesystem Module
-<<<<<<< HEAD
-pub mod configfs;
-pub mod proc;
-||||||| 0ddf2eac7
 pub mod archive;
-pub mod cow_snapshot;
-pub mod disk_usage;
-pub mod manager;
-pub mod support;
-=======
-pub mod archive;
-pub mod cow_snapshot;
 pub mod complete_filesystems;
+pub mod cow_snapshot;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
->>>>>>> origin/jules-523778995335499834-002b2189
+pub mod tmpfs;
 pub mod vfs;
-<<<<<<< HEAD
-||||||| 0ddf2eac7
-pub mod cow_snapshot;
-=======
-pub mod linux_package_parity;
->>>>>>> origin/jules-523778995335499834-002b2189
 
-pub use configfs::{ConfigFileNode, ConfigFileType, SovereignConfigFS};
-pub use proc::SovereignProcFS;
-pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-<<<<<<< HEAD
-||||||| 0ddf2eac7
-pub use cow_snapshot::{
-    CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
+pub use archive::{
+    ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
+    CompressionLevel, TarArchiveHandler, ZipArchiveHandler,
 };
-=======
 pub use complete_filesystems::{
-    FileSystem, FatFileSystem, FatVersion, NtfsFileSystem, ExFatFileSystem, BtrfsFileSystem, HfsPlusFileSystem, ExtFileSystem, ExtVersion,
+    BtrfsFileSystem, ExFatFileSystem, ExtFileSystem, ExtVersion, FatFileSystem, FatVersion,
+    FileSystem, HfsPlusFileSystem, NtfsFileSystem,
 };
-pub use linux_package_parity::{
-    LinuxFileType, LinuxFileMetadata, NixosGenerationManager, ArchSatSolver, AndroidSecurityEnforcer,
-    KaliSysTracer, BusyBoxMultiCallParser, TraceEvent, TraceSpan, PackageRecipe, SatVersion, CapabilityToken,
-    SysCommandType,
+pub use cow_snapshot::{CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState};
+pub use disk_usage::{
+    AnalysisMode, AnalysisStrategy, DeepAnalysisStrategy, DirectorySizeInfo, DiskUsageAnalyzer,
+    DiskUsageError, DiskUsageInfo, FileSizeInfo, QuickAnalysisStrategy,
 };
->>>>>>> origin/jules-523778995335499834-002b2189
+pub use manager::{
+    ClipboardOperation, FileItem, FileManager, FileManagerError, FileOperation,
+    FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
+};
+pub use support::{
+    Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem,
+    SimpleFilesystemManager,
+};
+pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};

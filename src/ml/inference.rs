@@ -5,17 +5,13 @@
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 926
 /// Implements neural network inference and model loading
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type ModelID = usize;
 
 #[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum ModelType { NeuralNetwork = 0, DecisionTree = 1, SVM = 2, Transformer = 3 }
 
 #[repr(C)]
@@ -57,7 +53,7 @@ impl SimpleMLModel {
 
 impl MLModel for SimpleMLModel {
     fn id(&self) -> ModelID { self.id }
-    fn model_type(&self) -> ModelType { unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst) as u32) } }
+    fn model_type(&self) -> ModelType { unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst)) } }
     fn input_size(&self) -> usize { self.input_size.load(Ordering::SeqCst) }
     fn output_size(&self) -> usize { self.output_size.load(Ordering::SeqCst) }
 
@@ -188,3 +184,39 @@ impl Tensor for SimpleTensor {
     }
 }
 
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+
+impl<T> Vec<T> {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity { self.grow(); }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+    fn to_vec(&self) -> Vec<T> {
+        let mut new_vec = Vec::new();
+        for i in 0..self.len {
+            unsafe {
+                let item = core::ptr::read(self.data.add(i));
+                new_vec.push(item);
+            }
+        }
+        new_vec
+    }
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
