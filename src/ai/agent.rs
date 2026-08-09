@@ -3,12 +3,11 @@
 // No dependency on external AI frameworks
 // Based on Roadmap Item 81: SigmaAI core agent
 
-use core::mem;
-/// OOP-based AI Agent Framework for SigmaOS
-/// Implements AI agent using OOP principles with traits and structs
-/// No dependency on external AI frameworks
-/// Based on Roadmap Item 81: SigmaAI core agent
-use core::ptr::{self, NonNull};
+extern crate alloc;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::boxed::Box;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
@@ -69,6 +68,7 @@ pub trait AIAgent {
     fn optimize_prompt_weights(&mut self) -> f32;
 }
 
+<<<<<<< HEAD
 #[derive(Debug, Clone, Copy)]
 pub struct AgentCapability;
 
@@ -83,6 +83,20 @@ pub struct AIStats {
     pub failed_requests: usize,
 }
 
+||||||| 0ddf2eac7
+=======
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AgentCapability {
+    pub can_execute: bool,
+}
+
+impl AgentCapability {
+    pub fn full() -> Self {
+        Self { can_execute: true }
+    }
+}
+
+>>>>>>> origin/jules-523778995335499834-002b2189
 /// Simple AI agent (OOP: Concrete agent class)
 pub struct SimpleAIAgent {
     pub name: String,
@@ -212,7 +226,8 @@ impl SimpleAIAgent {
         }
 
         // WiFi connection checks
-        if self.contains_bytes(input, b"connect") && self.contains_bytes(input, b"wifi") {
+        let has_wifi = self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi") || self.contains_bytes(input, b"Wifi");
+        if self.contains_bytes(input, b"connect") && has_wifi {
             let mut out = Vec::new();
             for &b in b"sigma-wifi connect --ssid Home" {
                 out.push(b);
@@ -317,11 +332,19 @@ impl AIAgent for SimpleAIAgent {
     }
 }
 
+/// AI Stats
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AIStats {
+    pub total_requests: usize,
+    pub failed_requests: usize,
+}
+
 /// AI agent manager trait (OOP interface)
 pub trait AIAgentManager {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<usize, AIError>;
     fn get_agent(&self, id: usize) -> Option<&dyn AIAgent>;
     fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError>;
+    fn stats(&self) -> AIStats;
 }
 
 pub struct SimpleAIAgentManager {
@@ -333,8 +356,19 @@ impl SimpleAIAgentManager {
     pub fn new() -> Self {
         SimpleAIAgentManager {
             agents: Vec::new(),
+<<<<<<< HEAD
             stats: AIStats { failed_requests: 0 },
+||||||| 0ddf2eac7
+=======
+            stats: AIStats { total_requests: 0, failed_requests: 0 },
+>>>>>>> origin/jules-523778995335499834-002b2189
         }
+    }
+}
+
+impl Default for SimpleAIAgentManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -354,8 +388,15 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 
     fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError> {
+<<<<<<< HEAD
         if id < self.agents.len() {
             let agent = &mut self.agents[id];
+||||||| 0ddf2eac7
+        if let Some(agent) = self.agents.get_mut(id) {
+=======
+        self.stats.total_requests += 1;
+        if let Some(agent) = self.agents.get_mut(id) {
+>>>>>>> origin/jules-523778995335499834-002b2189
             let intent = agent.parse(input)?;
             agent.execute(&intent)
         } else {
@@ -369,6 +410,7 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 }
 
+<<<<<<< HEAD
 pub struct Vec<T> {
     data: *mut T,
     len: usize,
@@ -463,6 +505,65 @@ impl<T> Drop for Vec<T> {
     }
 }
 
+||||||| 0ddf2eac7
+/// Simple Vec implementation for no_std
+struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+
+=======
+>>>>>>> origin/jules-523778995335499834-002b2189
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -493,8 +594,216 @@ mod tests {
         let id = manager.register_agent(Box::new(agent)).unwrap();
 
         let response = manager.process_request(id, "read file /etc/hosts").unwrap();
+<<<<<<< HEAD
         let response_str = std::str::from_utf8(&response).unwrap();
         assert!(response_str.contains("file_io"));
         assert!(response_str.contains("read file /etc/hosts"));
     }
 }
+||||||| 0ddf2eac7
+        let response_str = std::str::from_utf8(&response).unwrap();
+        assert!(response_str.contains("file_io"));
+        assert!(response_str.contains("read file /etc/hosts"));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ai_agent_basics() {
+        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
+        assert!(agent.version == (1, 0, 0));
+    }
+
+    #[test]
+    fn test_ai_natural_language_translations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let install_en = agent
+            .translate_natural_command(b"install libreoffice")
+            .unwrap();
+        assert_eq!(install_en, b"sigpkg install libreoffice");
+
+        let install_hi = agent
+            .translate_natural_command(b"libreoffice install karo")
+            .unwrap();
+        assert_eq!(install_hi, b"sigpkg install libreoffice");
+
+        let disk_usage = agent
+            .translate_natural_command(b"show my disk usage")
+            .unwrap();
+        assert_eq!(disk_usage, b"df -h");
+
+        let wifi_connect = agent
+            .translate_natural_command(b"connect to WiFi Home")
+            .unwrap();
+        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
+    }
+
+    #[test]
+    fn test_ai_safety_checks() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let dangerous_res = agent.perform_safety_check(b"rm -rf /");
+        assert!(dangerous_res.is_some());
+        assert!(dangerous_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
+        assert!(account_delete_res.is_some());
+        assert!(account_delete_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let safe_res = agent.perform_safety_check(b"ls -la /var/www");
+        assert!(safe_res.is_none());
+    }
+
+    #[test]
+    fn test_ai_command_explanations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
+        assert!(explanation.windows(8).any(|w| window_eq(w, b"Extracts")));
+    }
+
+    fn window_eq(a: &[u8], b: &[u8]) -> bool {
+        a == b
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ai_agent_basics() {
+        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
+        assert!(agent.version == (1, 0, 0));
+    }
+
+    #[test]
+    fn test_ai_natural_language_translations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let install_en = agent
+            .translate_natural_command(b"install libreoffice")
+            .unwrap();
+        assert_eq!(install_en, b"sigpkg install libreoffice");
+
+        let install_hi = agent
+            .translate_natural_command(b"libreoffice install karo")
+            .unwrap();
+        assert_eq!(install_hi, b"sigpkg install libreoffice");
+
+        let disk_usage = agent
+            .translate_natural_command(b"show my disk usage")
+            .unwrap();
+        assert_eq!(disk_usage, b"df -h");
+
+        let wifi_connect = agent
+            .translate_natural_command(b"connect to WiFi Home")
+            .unwrap();
+        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
+    }
+
+    #[test]
+    fn test_ai_safety_checks() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let dangerous_res = agent.perform_safety_check(b"rm -rf /");
+        assert!(dangerous_res.is_some());
+        assert!(dangerous_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
+        assert!(account_delete_res.is_some());
+        assert!(account_delete_res
+            .unwrap()
+            .windows(7)
+            .any(|w| window_eq(w, b"Warning")));
+
+        let safe_res = agent.perform_safety_check(b"ls -la /var/www");
+        assert!(safe_res.is_none());
+    }
+
+    #[test]
+    fn test_ai_command_explanations() {
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
+
+        let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
+        assert!(explanation.windows(8).any(|w| window_eq(w, b"Extracts")));
+    }
+
+    fn window_eq(a: &[u8], b: &[u8]) -> bool {
+        a == b
+    }
+}
+=======
+        let response_str = core::str::from_utf8(&response).unwrap();
+        assert!(response_str.contains("executed successfully"));
+    }
+
+    #[test]
+    fn test_ai_natural_language_translations() {
+        let agent = SimpleAIAgent::new("S-CLI", (1, 0, 0));
+
+        let install_en = agent
+            .translate_natural_command(b"install libreoffice")
+            .unwrap();
+        assert_eq!(install_en, b"sigpkg install libreoffice");
+
+        let install_hi = agent
+            .translate_natural_command(b"libreoffice install karo")
+            .unwrap();
+        assert_eq!(install_hi, b"sigpkg install libreoffice");
+
+        let disk_usage = agent
+            .translate_natural_command(b"show my disk usage")
+            .unwrap();
+        assert_eq!(disk_usage, b"df -h");
+
+        let wifi_connect = agent
+            .translate_natural_command(b"connect to WiFi Home")
+            .unwrap();
+        assert_eq!(wifi_connect, b"sigma-wifi connect --ssid Home");
+    }
+
+    #[test]
+    fn test_ai_safety_checks() {
+        let agent = SimpleAIAgent::new("S-CLI", (1, 0, 0));
+
+        let dangerous_res = agent.perform_safety_check(b"rm -rf /");
+        assert!(dangerous_res.is_some());
+        assert!(dangerous_res
+            .unwrap()
+            .windows(7)
+            .any(|w| w == b"Warning"));
+
+        let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
+        assert!(account_delete_res.is_some());
+        assert!(account_delete_res
+            .unwrap()
+            .windows(7)
+            .any(|w| w == b"Warning"));
+
+        let safe_res = agent.perform_safety_check(b"ls -la /var/www");
+        assert!(safe_res.is_none());
+    }
+
+    #[test]
+    fn test_ai_command_explanations() {
+        let agent = SimpleAIAgent::new("S-CLI", (1, 0, 0));
+
+        let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
+        assert!(explanation.windows(8).any(|w| w == b"Extracts"));
+    }
+}
+>>>>>>> origin/jules-523778995335499834-002b2189

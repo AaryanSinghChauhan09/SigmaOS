@@ -37,6 +37,81 @@ pub mod shell;
 pub mod sigpkg;
 pub mod ui;
 pub mod virtualization;
+<<<<<<< HEAD
+||||||| 0ddf2eac7
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+}
+pub mod boot {
+    pub mod firmware_bridge;
+    pub mod bridge_grid;
+}
+pub mod toolchain {
+    pub mod adapter;
+    pub mod capsule;
+    pub mod codex;
+    pub mod bootstrap;
+}
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
+=======
+pub mod unimplemented_tools;
+pub mod graphics {
+    pub mod compositor;
+    pub mod paint;
+    pub mod video;
+}
+pub mod hardware {
+    pub mod compatibility;
+    pub mod win32;
+}
+pub mod power {
+    pub mod governor;
+}
+pub mod observability {
+    pub mod profiler;
+}
+pub mod ai {
+    pub mod agent;
+    pub mod orchestrator;
+}
+pub mod boot {
+    pub mod firmware_bridge;
+    pub mod bridge_grid;
+}
+pub mod toolchain {
+    pub mod adapter;
+    pub mod capsule;
+    pub mod codex;
+    pub mod bootstrap;
+}
+pub mod scheduler {
+    pub mod numa_scheduler;
+}
+pub mod crypto {
+    pub mod vectorized_pqc;
+}
+>>>>>>> origin/jules-523778995335499834-002b2189
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -108,6 +183,7 @@ pub use drivers::{
     VesaModeInfo,
 };
 pub use filesystem::{
+<<<<<<< HEAD
     ConfigFileNode, ConfigFileType, FileDescriptor, FilePermissions, FileType, FsError, Inode,
     SovereignConfigFS, SovereignProcFS, VirtualFilesystem,
 };
@@ -128,6 +204,15 @@ pub use interrupt::{
     InterruptManager as HardwareInterruptManager, ScreenChar,
     SimpleInterruptHandler as SimpleHardwareInterruptHandler, TaskStateSegment, VGAColor,
     VGATextBuffer, GDT, IDT, PIC,
+||||||| 0ddf2eac7
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+=======
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    FileSystem, FatFileSystem, FatVersion, NtfsFileSystem, ExFatFileSystem, BtrfsFileSystem, HfsPlusFileSystem, ExtFileSystem, ExtVersion,
+    LinuxFileType, LinuxFileMetadata, NixosGenerationManager, ArchSatSolver, AndroidSecurityEnforcer,
+    KaliSysTracer, BusyBoxMultiCallParser, TraceEvent, TraceSpan, PackageRecipe, SatVersion, CapabilityToken,
+    SysCommandType,
+>>>>>>> origin/jules-523778995335499834-002b2189
 };
 pub use kernel::{
     BoreScheduler, BoreTask, BuddyAllocator, Channel, CpuError, CpuMode, CpuRing, IpcError,
@@ -170,11 +255,23 @@ pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
+<<<<<<< HEAD
 pub use security::{
     CapabilityGate, CapabilityToken, LinuxCapability, Permission, PledgeManager, PledgePromise,
     Securelevel, SovereignSecurelevelManager, UnveilManager, UnveilPermission, UnveilRestriction,
 };
 pub use shell::{ShellCommand, ShellRepl};
+||||||| 0ddf2eac7
+pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use shell::{ShellCommand, ShellRepl};
+=======
+pub use security::{
+    CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
+    RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
+    GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
+};
+pub use shell::{ShellCommand, ShellRepl, TerminalSession, UserDefinedFunction, AutoSuggestionEngine, AnsiColor};
+>>>>>>> origin/jules-523778995335499834-002b2189
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,

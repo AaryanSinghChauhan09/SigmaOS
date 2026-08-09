@@ -10,9 +10,14 @@ pub mod phantom;
 pub mod pki;
 pub mod pledge;
 pub mod vulnerability;
+<<<<<<< HEAD
 pub mod clipboard;
 pub mod intrusion;
 pub mod password;
+||||||| 0ddf2eac7
+=======
+pub mod parrot_parity;
+>>>>>>> origin/jules-523778995335499834-002b2189
 
 pub use audit::{AuditEvent, AuditLogger, SimpleAuditEvent, SimpleAuditLogger};
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
@@ -35,4 +40,8 @@ pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use vulnerability::{
     VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
     PenetrationAssistant,
+};
+pub use parrot_parity::{
+    RoutingMode, AnonSurfShunt, SandboxPolicy, AppSandboxEngine, ForensicStorageFilter,
+    GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
 };

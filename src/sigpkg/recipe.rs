@@ -60,6 +60,12 @@ impl Default for RecipeManager {
     }
 }
 
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Declarative package recipes.
 #[derive(Debug, Clone)]
 pub struct PackageRecipe {
@@ -84,6 +90,7 @@ impl PackageRecipe {
     pub fn new(name: String, version: Version) -> Self {
         PackageRecipe {
             name,
+<<<<<<< HEAD
             version,
             description: String::new(),
             build_system: BuildSystem::Cargo,
@@ -98,6 +105,31 @@ impl PackageRecipe {
             license_spdx: String::new(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
+||||||| 0ddf2eac7
+            version: Version {
+                major,
+                minor,
+                patch,
+            },
+            source_url: url,
+            checksum: [0; 32], // Stub checksum
+            dependencies,
+=======
+            version,
+            description: String::new(),
+            build_system: BuildSystem::Cargo,
+            dependencies: Vec::new(),
+            source_url: String::new(),
+            hash: String::new(),
+            build_commands: Vec::new(),
+            install_commands: Vec::new(),
+            environment: HashMap::new(),
+            pkgrel: 1,
+            arch: "x86_64".to_string(),
+            license_spdx: "MIT".to_string(),
+            prepare_commands: Vec::new(),
+            package_commands: Vec::new(),
+>>>>>>> origin/jules-523778995335499834-002b2189
         }
     }
 
@@ -185,11 +217,50 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
+<<<<<<< HEAD
             BuildSystem::Custom => "make custom_build".to_string(),
+||||||| 0ddf2eac7
+=======
+            BuildSystem::Custom => "make".to_string(),
+>>>>>>> origin/jules-523778995335499834-002b2189
         }
     }
 }
 
+<<<<<<< HEAD
+||||||| 0ddf2eac7
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildSystem {
+    Cargo,
+    CMake,
+    Make,
+    Custom,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecipeError {
+    NotFound,
+    InvalidSyntax,
+    SerializationError,
+}
+
+pub struct RecipeManager;
+
+impl RecipeManager {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+=======
+
+>>>>>>> origin/jules-523778995335499834-002b2189
 #[cfg(test)]
 mod tests {
     use super::*;

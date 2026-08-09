@@ -169,7 +169,7 @@ impl Default for SurfaceCapability {
 /// Bitmap surface (OOP: Concrete surface class)
 pub struct BitmapSurface {
     pub id: usize,
-    pub data: Vec<u32>,
+    pub data: std::vec::Vec<u32>,
     pub size: Size,
     pub stride: u32,
     pub capability: SurfaceCapability,
@@ -179,7 +179,7 @@ pub struct BitmapSurface {
 impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
         let size = (width * height) as usize;
-        let mut data = Vec::with_capacity(size);
+        let mut data = std::vec::Vec::with_capacity(size);
         data.resize(size, 0);
 
         BitmapSurface {
@@ -440,7 +440,7 @@ pub trait Compositor {
     /// Dynamic double buffering: Swap front and back display buffers
     fn swap_buffers(&mut self) -> Result<(), GraphicsError>;
     /// Captures a screenshot of the currently composed frame
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError>;
+    fn capture_screenshot(&self) -> Result<std::vec::Vec<u32>, GraphicsError>;
 }
 
 /// Graphics error types
@@ -487,8 +487,14 @@ pub struct SimpleCompositor {
     window_order: Vec<usize>,
     stats: CompositorStats,
     capability: CompositorCapability,
+<<<<<<< HEAD
     back_buffer: Option<BitmapSurface>,
     double_buffering: AtomicBool,
+||||||| 0ddf2eac7
+=======
+    pub back_buffer: Option<BitmapSurface>,
+    pub double_buffering: AtomicBool,
+>>>>>>> origin/jules-523778995335499834-002b2189
 }
 
 /// Compositor capability
@@ -625,11 +631,11 @@ impl Compositor for SimpleCompositor {
         for &window_id in &self.window_order {
             if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
                 let window_rect = window.rect();
-                let output_stride = output.info().stride as usize / 4;
+                let output_stride = target_surface.info().stride as usize / 4;
                 if let Some(surface) = window.surface() {
                     let window_stride = surface.info().stride as usize / 4;
                     let window_data = surface.data();
-                    let output_data = output.data_mut();
+                    let output_data = target_surface.data_mut();
 
                     // Copy window surface to output
                     for y in 0..window_rect.size.height as usize {
@@ -663,7 +669,7 @@ impl Compositor for SimpleCompositor {
         Ok(())
     }
 
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> {
+    fn capture_screenshot(&self) -> Result<std::vec::Vec<u32>, GraphicsError> {
         if let Some(ref back) = self.back_buffer {
             Ok(back.data.clone())
         } else {
@@ -678,3 +684,336 @@ impl Compositor for SimpleCompositor {
     }
 }
 
+<<<<<<< HEAD
+||||||| 0ddf2eac7
+impl<T> Vec<T> {
+    fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            core::ptr::copy(
+                self.data.add(index + 1),
+                self.data.add(index),
+                self.len - index - 1,
+            );
+            self.len -= 1;
+            item
+        }
+    }
+
+    fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
+        let mut write = 0;
+        for read in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(read);
+                if f(item) {
+                    if write != read {
+                        let item_copy = core::ptr::read(self.data.add(read));
+                        core::ptr::write(self.data.add(write), item_copy);
+                    }
+                    write += 1;
+                }
+            }
+        }
+        self.len = write;
+    }
+
+    fn insert(&mut self, index: usize, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if index < self.len {
+                core::ptr::copy(
+                    self.data.add(index),
+                    self.data.add(index + 1),
+                    self.len - index,
+                );
+            }
+
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
+    fn iter(&self) -> core::slice::Iter<'_, T> {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+
+    fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+
+    fn position<F>(&self, mut f: F) -> Option<usize>
+    where
+        F: FnMut(&T) -> bool,
+    {
+        for i in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(i);
+                if f(item) {
+                    return Some(i);
+                }
+            }
+        }
+        None
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+=======
+use core::mem;
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            core::ptr::copy(
+                self.data.add(index + 1),
+                self.data.add(index),
+                self.len - index - 1,
+            );
+            self.len -= 1;
+            item
+        }
+    }
+
+    fn retain<F>(&mut self, mut f: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
+        let mut write = 0;
+        for read in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(read);
+                if f(item) {
+                    if write != read {
+                        let item_copy = core::ptr::read(self.data.add(read));
+                        core::ptr::write(self.data.add(write), item_copy);
+                    }
+                    write += 1;
+                }
+            }
+        }
+        self.len = write;
+    }
+
+    fn insert(&mut self, index: usize, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if index < self.len {
+                core::ptr::copy(
+                    self.data.add(index),
+                    self.data.add(index + 1),
+                    self.len - index,
+                );
+            }
+
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+
+    fn iter(&self) -> core::slice::Iter<'_, T> {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+
+    fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+
+    fn position<F>(&self, mut f: F) -> Option<usize>
+    where
+        F: FnMut(&T) -> bool,
+    {
+        for i in 0..self.len {
+            unsafe {
+                let item = &*self.data.add(i);
+                if f(item) {
+                    return Some(i);
+                }
+            }
+        }
+        None
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
+>>>>>>> origin/jules-523778995335499834-002b2189
