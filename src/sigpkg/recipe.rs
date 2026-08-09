@@ -34,51 +34,23 @@ pub enum RecipeError {
 }
 
 pub struct RecipeManager {
-    pub recipes: HashMap<String, PackageRecipe>,
+    pub recipes: Vec<PackageRecipe>,
 }
 
 impl RecipeManager {
     pub fn new() -> Self {
-        let mut manager = Self {
-            recipes: HashMap::new(),
-        };
-        // Add distro-inspired standard package recipes
-        let neofetch = PackageRecipe::new("neofetch".to_string(), Version::new(7, 1, 0))
-            .with_description("A fast, highly customizable system info script".to_string())
-            .with_build_system(BuildSystem::Make)
-            .with_source("https://github.com/dylanaraps/neofetch".to_string(), "hash_neofetch".to_string())
-            .with_build_command("make build".to_string());
-        let curl = PackageRecipe::new("curl".to_string(), Version::new(8, 7, 1))
-            .with_description("Command line tool for transferring data with URLs".to_string())
-            .with_build_system(BuildSystem::CMake)
-            .with_source("https://curl.se/download/curl-8.7.1.tar.gz".to_string(), "hash_curl".to_string())
-            .with_build_command("cmake .".to_string());
-        let ripgrep = PackageRecipe::new("ripgrep".to_string(), Version::new(14, 1, 0))
-            .with_description("ripgrep recursively searches directories for a regex pattern".to_string())
-            .with_build_system(BuildSystem::Cargo)
-            .with_source("https://github.com/BurntSushi/ripgrep".to_string(), "hash_ripgrep".to_string())
-            .with_build_command("cargo build --release".to_string());
-        let almalinux_release = PackageRecipe::new("almalinux-release".to_string(), Version::new(9, 4, 0))
-            .with_description("AlmaLinux release file".to_string())
-            .with_build_system(BuildSystem::Custom)
-            .with_source("https://github.com/AlmaLinux/almalinux-release".to_string(), "hash_almalinux".to_string())
-            .with_build_command("echo 'Building AlmaLinux release'".to_string());
-
-        let _ = manager.add_recipe(neofetch);
-        let _ = manager.add_recipe(curl);
-        let _ = manager.add_recipe(ripgrep);
-        let _ = manager.add_recipe(almalinux_release);
-        manager
+        Self {
+            recipes: Vec::new(),
+        }
     }
 
     pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
-        recipe.validate()?;
-        self.recipes.insert(recipe.name.clone(), recipe);
+        self.recipes.push(recipe);
         Ok(())
     }
 
-    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
-        self.recipes.values().collect()
+    pub fn list_recipes(&self) -> Vec<PackageRecipe> {
+        self.recipes.clone()
     }
 }
 
@@ -89,6 +61,7 @@ impl Default for RecipeManager {
 }
 
 /// Declarative package recipes.
+#[derive(Debug, Clone)]
 pub struct PackageRecipe {
     pub name: String,
     pub version: Version,
@@ -121,8 +94,8 @@ impl PackageRecipe {
             install_commands: Vec::new(),
             environment: HashMap::new(),
             pkgrel: 1,
-            arch: "x86_64".to_string(),
-            license_spdx: "MIT".to_string(),
+            arch: String::new(),
+            license_spdx: String::new(),
             prepare_commands: Vec::new(),
             package_commands: Vec::new(),
         }
@@ -212,7 +185,7 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
-            BuildSystem::Custom => "custom_build_command".to_string(),
+            BuildSystem::Custom => "make custom_build".to_string(),
         }
     }
 }
@@ -262,8 +235,7 @@ mod tests {
             .with_build_command("cargo build".to_string());
 
         assert!(manager.add_recipe(recipe).is_ok());
-        // Includes 4 default distro-inspired recipes plus our test recipe
-        assert_eq!(manager.list_recipes().len(), 5);
+        assert_eq!(manager.list_recipes().len(), 1);
     }
 
     #[test]

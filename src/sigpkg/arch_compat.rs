@@ -92,7 +92,7 @@ impl RollingSyncManager {
 
     /// Checks for available package updates in the rolling release stream
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
-        let mut updates = Vec::new();
+        let mut updates: Vec<(String, Version, Version)> = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
                 if remote_ver > installed_ver {

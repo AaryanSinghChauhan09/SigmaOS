@@ -319,10 +319,11 @@ impl ZenithCompositor {
         let profile = self.config.profiles
             .iter()
             .find(|p| p.name == profile_name)
+            .cloned()
             .ok_or(CompositorError::ProfileNotFound(profile_name.to_string()))?;
         
         self.current_profile = Some(profile_name.to_string());
-        self.apply_profile(profile)?;
+        self.apply_profile(&profile)?;
         
         Ok(())
     }
@@ -451,13 +452,13 @@ impl ZenithCompositor {
 
     /// Switch theme
     pub fn switch_theme(&mut self, theme_name: &str) -> Result<(), CompositorError> {
-        let theme = self.config.theming.theme.name == theme_name
-            .then(|| &self.config.theming.theme)
-            .or_else(|| self.config.theming.custom_themes.iter().find(|t| t.name == theme_name))
+        let theme = (self.config.theming.theme.name == theme_name)
+            .then(|| self.config.theming.theme.clone())
+            .or_else(|| self.config.theming.custom_themes.iter().find(|t| t.name == theme_name).cloned())
             .ok_or(CompositorError::ThemeNotFound(theme_name.to_string()))?;
         
         self.current_theme = theme_name.to_string();
-        self.apply_theme(theme)?;
+        self.apply_theme(&theme)?;
         
         Ok(())
     }
@@ -727,6 +728,18 @@ pub enum CompositorError {
     ThemeNotFound(String),
     BackendError(String),
     RendererError(String),
+}
+
+impl From<AccessibilityError> for CompositorError {
+    fn from(err: AccessibilityError) -> Self {
+        CompositorError::InitializationFailed(format!("{:?}", err))
+    }
+}
+
+impl From<AIError> for CompositorError {
+    fn from(err: AIError) -> Self {
+        CompositorError::InitializationFailed(format!("{:?}", err))
+    }
 }
 
 /// Accessibility errors

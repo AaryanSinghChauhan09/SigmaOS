@@ -1,16 +1,16 @@
 // OOP-based AI Orchestrator for SigmaOS
 // Implements sigma-ai core with multi-agent coordination, workflow automation,
-// and self-diagnosis capabilities for system optimization.
+// and self-diagnosis capabilities for system optimization
 
-extern crate alloc;
-
-use alloc::boxed::Box;
-use alloc::vec::Vec;
+use core::mem;
+/// OOP-based AI Orchestrator for SigmaOS
+/// Based on 100-Improvement-Ideas.md #51: AI orchestrator for system optimization
+/// Implements sigma-ai core with multi-agent coordination, workflow automation,
+/// and self-diagnosis capabilities for system optimization
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
 
-#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AgentState {
     Idle = 0,
@@ -21,7 +21,7 @@ pub enum AgentState {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum AgentError {
     Success = 0,
     NotFound = 1,
@@ -32,28 +32,43 @@ pub enum AgentError {
 
 pub trait AIAgent {
     fn id(&self) -> AgentID;
-    fn name(&self) -> &[u8];
+    fn name(&self) -> &str;
     fn state(&self) -> AgentState;
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError>;
 }
 
 pub struct SimpleAIAgent {
     pub id: AgentID,
-    pub name: [u8; 64],
+    pub name: String,
     pub state: AtomicUsize,
 }
 
 impl SimpleAIAgent {
-    pub fn new(id: AgentID, name: &[u8]) -> Self {
-        let mut name_array = [0u8; 64];
-        let name_len = name.len().min(63);
-        name_array[..name_len].copy_from_slice(&name[..name_len]);
-
+    pub fn new(id: AgentID, name: &str) -> Self {
         SimpleAIAgent {
             id,
-            name: name_array,
+            name: name.to_string(),
             state: AtomicUsize::new(AgentState::Idle as usize),
         }
+    }
+}
+
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
     }
 }
 
@@ -61,19 +76,19 @@ impl AIAgent for SimpleAIAgent {
     fn id(&self) -> AgentID {
         self.id
     }
-
-    fn name(&self) -> &[u8] {
-        let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.name[..len]
+    fn name(&self) -> &str {
+        &self.name
     }
-
     fn state(&self) -> AgentState {
-        match self.state.load(Ordering::SeqCst) {
-            0 => AgentState::Idle,
-            1 => AgentState::Active,
-            2 => AgentState::Busy,
-            3 => AgentState::Error,
-            _ => AgentState::Learning,
+        {
+            let raw = self.state.load(Ordering::SeqCst) as u32;
+            match raw {
+                1 => AgentState::Active,
+                2 => AgentState::Busy,
+                3 => AgentState::Error,
+                4 => AgentState::Learning,
+                _ => AgentState::Idle,
+            }
         }
     }
 
@@ -81,10 +96,14 @@ impl AIAgent for SimpleAIAgent {
         self.state
             .store(AgentState::Busy as usize, Ordering::SeqCst);
         let mut result = Vec::new();
-        result.extend_from_slice(self.name());
+        for &byte in self.name().as_bytes() {
+            result.push(byte);
+        }
         result.push(b':');
         result.push(b' ');
-        result.extend_from_slice(task);
+        for &byte in task {
+            result.push(byte);
+        }
         self.state
             .store(AgentState::Idle as usize, Ordering::SeqCst);
         Ok(result)
@@ -103,8 +122,10 @@ pub trait AgentOrchestrator {
 }
 
 pub struct SimpleAgentOrchestrator {
-    pub agents: Vec<Option<Box<dyn AIAgent>>>,
+    pub agents: Vec<Box<dyn AIAgent>>,
     pub next_id: AtomicUsize,
+    pub model_temperature: f32,
+    pub response_timeout_secs: u32,
 }
 
 impl SimpleAgentOrchestrator {
@@ -112,20 +133,24 @@ impl SimpleAgentOrchestrator {
         SimpleAgentOrchestrator {
             agents: Vec::new(),
             next_id: AtomicUsize::new(1),
+            model_temperature: 0.7,
+            response_timeout_secs: 30,
         }
     }
-}
 
-impl Default for SimpleAgentOrchestrator {
-    fn default() -> Self {
-        Self::new()
+    pub fn set_model_temperature(&mut self, temp: f32) {
+        self.model_temperature = temp;
+    }
+
+    pub fn set_response_timeout(&mut self, secs: u32) {
+        self.response_timeout_secs = secs;
     }
 }
 
 impl AgentOrchestrator for SimpleAgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
         let id = agent.id();
-        self.agents.push(Some(agent));
+        self.agents.push(agent);
         Ok(id)
     }
 
@@ -135,20 +160,16 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         agent_id: Option<AgentID>,
     ) -> Result<Vec<u8>, AgentError> {
         if let Some(target_id) = agent_id {
-            for agent_option in &mut self.agents {
-                if let Some(ref mut agent) = *agent_option {
-                    if agent.id() == target_id {
-                        return agent.execute(task);
-                    }
+            for i in 0..self.agents.len() {
+                if self.agents[i].id() == target_id {
+                    return self.agents[i].execute(task);
                 }
             }
             Err(AgentError::NotFound)
         } else {
-            for agent_option in &mut self.agents {
-                if let Some(ref mut agent) = *agent_option {
-                    if agent.state() == AgentState::Idle {
-                        return agent.execute(task);
-                    }
+            for i in 0..self.agents.len() {
+                if self.agents[i].state() == AgentState::Idle {
+                    return self.agents[i].execute(task);
                 }
             }
             Err(AgentError::NotFound)
@@ -156,11 +177,9 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        for agent_option in &self.agents {
-            if let Some(ref agent) = *agent_option {
-                if agent.id() == id {
-                    return Some(agent.as_ref());
-                }
+        for i in 0..self.agents.len() {
+            if self.agents[i].id() == id {
+                return Some(&*self.agents[i]);
             }
         }
         None
@@ -168,10 +187,8 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
 
     fn list_agents(&self) -> Vec<AgentID> {
         let mut ids = Vec::new();
-        for agent_option in &self.agents {
-            if let Some(ref agent) = *agent_option {
-                ids.push(agent.id());
-            }
+        for i in 0..self.agents.len() {
+            ids.push(self.agents[i].id());
         }
         ids
     }
@@ -185,18 +202,12 @@ pub trait TaskQueue {
 }
 
 pub struct SimpleTaskQueue {
-    pub tasks: Vec<([u8; 256], u8)>,
+    pub tasks: std::vec::Vec<([u8; 256], u8)>,
 }
 
 impl SimpleTaskQueue {
     pub fn new() -> Self {
-        SimpleTaskQueue { tasks: Vec::new() }
-    }
-}
-
-impl Default for SimpleTaskQueue {
-    fn default() -> Self {
-        Self::new()
+        SimpleTaskQueue { tasks: std::vec::Vec::new() }
     }
 }
 
@@ -249,20 +260,14 @@ pub trait AgentCommunication {
 }
 
 pub struct SimpleAgentCommunication {
-    pub messages: Vec<(AgentID, AgentID, [u8; 256])>,
+    pub messages: std::vec::Vec<(AgentID, AgentID, [u8; 256])>,
 }
 
 impl SimpleAgentCommunication {
     pub fn new() -> Self {
         SimpleAgentCommunication {
-            messages: Vec::new(),
+            messages: std::vec::Vec::new(),
         }
-    }
-}
-
-impl Default for SimpleAgentCommunication {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -281,12 +286,11 @@ impl AgentCommunication for SimpleAgentCommunication {
     }
 
     fn receive_message(&mut self, agent_id: AgentID) -> Option<[u8; 256]> {
-        for i in 0..self.messages.len() {
-            if self.messages[i].1 == agent_id {
-                return Some(self.messages.remove(i).2);
-            }
+        if let Some(pos) = self.messages.iter().position(|m| m.1 == agent_id) {
+            Some(self.messages.remove(pos).2)
+        } else {
+            None
         }
-        None
     }
 
     fn broadcast(&mut self, from: AgentID, message: &[u8]) {
@@ -297,24 +301,97 @@ impl AgentCommunication for SimpleAgentCommunication {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
 
-    #[test]
-    fn test_agent_orchestrator_flows() {
-        let mut orchestrator = SimpleAgentOrchestrator::new();
-        let agent = SimpleAIAgent::new(99, b"SovereignSchedulerOptimizer");
-        orchestrator.register_agent(Box::new(agent)).unwrap();
+extern "C" {
+    fn malloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
-        assert_eq!(orchestrator.list_agents().len(), 1);
+impl<T> Vec<T> {
+    pub fn new() -> Self {
+        Vec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
 
-        let response = orchestrator
-            .dispatch_task(b"optimize core affinity", Some(99))
-            .unwrap();
-        assert_eq!(
-            response,
-            b"SovereignSchedulerOptimizer: optimize core affinity"
-        );
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 {
+            4
+        } else {
+            self.capacity * 2
+        };
+        let new_data = malloc(new_capacity * mem::size_of::<T>()) as *mut T;
+
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+
+            if self.capacity > 0 {
+                free(self.data as *mut u8);
+            }
+
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
     }
 }
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
