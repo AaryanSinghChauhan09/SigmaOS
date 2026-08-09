@@ -6,17 +6,13 @@ pub mod autogen;
 pub mod llm;
 pub mod orchestrator;
 pub mod sai;
+pub mod openclaw;
 pub mod system;
 pub mod voice;
-pub mod lift_engine;
-pub mod next_gen;
+pub mod open_computer;
 
-pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
-pub use next_gen::{
-    AdaptiveKernelPersona, WorkloadType, PredictiveSyscallTranslator, AiScheduler, AiTask,
-    DeviceTargetType, EnergyAwareScheduler, EnergyGovernorMode, MultiModelOrchestrator,
-    AIModel, ModelType, SigmaAgentRepl, TranslatedCommand, PredictiveMaintenanceAgent,
-    TelemetryData, OciContainerRuntime, OciContainerConfig, MicroVmHypervisor, MicroVmConfig,
+pub use openclaw::{
+    ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
 };
 
 pub use agent::{AIAgent, SimpleAIAgent};
@@ -42,4 +38,8 @@ pub use system::{
 pub use voice::{
     AudioFormat, RecognitionResult, SynthesisModel, SynthesisResult, VoiceAssistant, VoiceModel,
     VoiceRecognizer, VoiceSynthesizer,
+};
+pub use open_computer::{
+    OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
+    AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
 };
