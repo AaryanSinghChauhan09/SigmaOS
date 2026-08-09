@@ -124,6 +124,7 @@ pub mod observability;
 pub mod orchestration;
 pub mod distro;
 pub mod package;
+pub mod performance;
 pub mod productivity;
 pub mod thread;
 pub mod process;
@@ -244,6 +245,8 @@ pub use compatibility::{
     TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
     EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
     Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
@@ -283,6 +286,7 @@ pub use network::{
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
     SimpleObservabilityStack,
+    CognitiveOSNarrator, AdaptiveComplianceGater, SynestheticFeedbackEngine, GenerativeConfigParser, InterplanetaryDtnRoute, CollectiveSimulationNode,
 };
 pub use distro::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
