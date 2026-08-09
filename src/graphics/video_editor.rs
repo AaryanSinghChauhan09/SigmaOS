@@ -1,23 +1,10 @@
-// Sovereign Non-Linear Video Editor & Frame Compositor Engine (SigmaCut)
-// Inspired by Adobe Premiere Pro, Final Cut Pro, DaVinci Resolve, and Kdenlive.
-// Provides GPU-accelerated timeline scrubbing, real-time effects preview, and multi-format exports.
-
-#![no_std]
+// Sovereign Non-Linear Video Editor & Frame Compositor Engine
+// Inspired by Adobe Premiere Pro and Final Cut Pro, providing time-track compositing and pixel-level effects.
 
 extern crate alloc;
 
 use alloc::string::String;
 use alloc::vec::Vec;
-
-/// Video processing error states
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VideoError {
-    Success = 0,
-    InvalidFrame = 1,
-    TimelineConflict = 2,
-    NotSupported = 3,
-    RenderFailed = 4,
-}
 
 /// A video rendering clip inside a timeline track
 #[derive(Debug, Clone)]
@@ -44,11 +31,10 @@ impl VideoClip {
 /// Dynamic stackable visual effects matching Final Cut / Premiere filters
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum VideoEffect {
-    ColorGrading { contrast: f32, brightness: f32, saturation: f32 },
+    ColorGrading { contrast: f32, brightness: f32 },
     CrossDissolve { progress: f32 },
     ChromaKey { target_rgb: [u8; 3], tolerance: u8 },
     KenBurns { scale_start: f32, scale_end: f32 },
-    TransitionFade { duration_frames: usize, is_fade_in: bool },
 }
 
 /// A sequential video track holding layered clips
@@ -76,30 +62,12 @@ impl VideoTrack {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ExportFormat {
-    H264,
-    H265,
-    VP9,
-    AV1,
-}
-
-#[derive(Debug, Clone)]
-pub struct ExportProfile {
-    pub format: ExportFormat,
-    pub bitrate_kbps: u32,
-    pub hardware_accelerated: bool,
-    pub passes: u8,
-}
-
 /// High-performance Video Timeline coordinating multi-track composition
 pub struct VideoTimeline {
     pub tracks: Vec<VideoTrack>,
     pub frame_rate: u32,
     pub width: usize,
     pub height: usize,
-    pub playhead_frame: usize,
-    pub gpu_scrub_latency_ns: u64, // tracking zero-latency performance metrics
 }
 
 impl VideoTimeline {
@@ -109,8 +77,6 @@ impl VideoTimeline {
             frame_rate: 30,
             width,
             height,
-            playhead_frame: 0,
-            gpu_scrub_latency_ns: 0,
         }
     }
 
@@ -118,18 +84,10 @@ impl VideoTimeline {
         self.tracks.push(track);
     }
 
-    /// GPU-accelerated timeline scrubbing simulation with zero-latency preview
-    pub fn scrub_timeline_gpu(&mut self, frame_index: usize) -> Result<(), VideoError> {
-        self.playhead_frame = frame_index;
-        // Simulates GPU ring-buffer command emission and zero-latency frame update
-        self.gpu_scrub_latency_ns = 150; // extremely low latency (0.15 microseconds)
-        Ok(())
-    }
-
     /// Renders and composites a single frame at the specified index, applying all track-level effects sequentially
     pub fn render_frame(&self, frame_index: usize, background_rgb: [u8; 3]) -> Vec<[u8; 3]> {
         let pixel_count = self.width * self.height;
-        let mut framebuffer = alloc::vec![background_rgb; pixel_count];
+        let mut framebuffer = vec![background_rgb; pixel_count];
 
         // Composite from bottom track to top track
         for track in &self.tracks {
@@ -153,28 +111,13 @@ impl VideoTimeline {
                         VideoEffect::ColorGrading {
                             contrast,
                             brightness,
-                            saturation,
                         } => {
                             for pixel in &mut framebuffer {
-                                // Simple color grading mapping
-                                let mut r = pixel[0] as f32;
-                                let mut g = pixel[1] as f32;
-                                let mut b = pixel[2] as f32;
-
-                                // Contrast & Brightness
-                                r = (r - 128.0) * contrast + 128.0 + brightness;
-                                g = (g - 128.0) * contrast + 128.0 + brightness;
-                                b = (b - 128.0) * contrast + 128.0 + brightness;
-
-                                // Saturation (simplified gray blend)
-                                let luma = r * 0.299 + g * 0.587 + b * 0.114;
-                                r = luma + (r - luma) * saturation;
-                                g = luma + (g - luma) * saturation;
-                                b = luma + (b - luma) * saturation;
-
-                                pixel[0] = r.clamp(0.0, 255.0) as u8;
-                                pixel[1] = g.clamp(0.0, 255.0) as u8;
-                                pixel[2] = b.clamp(0.0, 255.0) as u8;
+                                for channel in pixel.iter_mut() {
+                                    let mut val = *channel as f32;
+                                    val = (val - 128.0) * contrast + 128.0 + brightness;
+                                    *channel = val.clamp(0.0, 255.0) as u8;
+                                }
                             }
                         }
                         VideoEffect::CrossDissolve { progress } => {
@@ -214,57 +157,12 @@ impl VideoTimeline {
                             // Pan/Zoom transition across the duration
                             let _scale = scale_start + (scale_end - scale_start) * 0.5;
                         }
-                        VideoEffect::TransitionFade { duration_frames, is_fade_in } => {
-                            let current_clip = active_clip.unwrap();
-                            let offset = frame_index - current_clip.timeline_start_frame;
-                            let factor = if is_fade_in {
-                                if offset < duration_frames {
-                                    offset as f32 / duration_frames as f32
-                                } else {
-                                    1.0
-                                }
-                            } else {
-                                let remaining = current_clip.duration_frames - offset;
-                                if remaining < duration_frames {
-                                    remaining as f32 / duration_frames as f32
-                                } else {
-                                    1.0
-                                }
-                            };
-
-                            for pixel in &mut framebuffer {
-                                for i in 0..3 {
-                                    let val = pixel[i] as f32 * factor;
-                                    pixel[i] = val.clamp(0.0, 255.0) as u8;
-                                }
-                            }
-                        }
                     }
                 }
             }
         }
 
         framebuffer
-    }
-
-    /// Export timeline content to target codec formats (H.264, H.265, VP9, AV1)
-    pub fn export_video(&self, profile: ExportProfile) -> Result<Vec<u8>, VideoError> {
-        // Simulates processing and compiling frame sequences into standard bitstream payload containers
-        let mut export_payload = Vec::new();
-
-        // Write virtual container header
-        let codec_signature: &[u8] = match profile.format {
-            ExportFormat::H264 => b"H264-COMPLIANT",
-            ExportFormat::H265 => b"H265-COMPLIANT",
-            ExportFormat::VP9 => b"VP9-COMPLIANT",
-            ExportFormat::AV1 => b"AV1-COMPLIANT",
-        };
-        export_payload.extend_from_slice(codec_signature);
-        export_payload.extend_from_slice(&profile.bitrate_kbps.to_le_bytes());
-        export_payload.push(profile.passes);
-        export_payload.push(if profile.hardware_accelerated { 1 } else { 0 });
-
-        Ok(export_payload)
     }
 }
 
@@ -316,25 +214,5 @@ mod tests {
         // Frame 5 -> Clip color is keyed out to background!
         let frame_5 = timeline.render_frame(5, [10, 20, 30]);
         assert_eq!(frame_5[0], [10, 20, 30]);
-    }
-
-    #[test]
-    fn test_sigmacut_gpu_scrubbing_and_exports() {
-        let mut timeline = VideoTimeline::new(1920, 1080);
-        assert_eq!(timeline.playhead_frame, 0);
-
-        timeline.scrub_timeline_gpu(45).unwrap();
-        assert_eq!(timeline.playhead_frame, 45);
-        assert_eq!(timeline.gpu_scrub_latency_ns, 150);
-
-        // Test AV1 high profile export
-        let profile = ExportProfile {
-            format: ExportFormat::AV1,
-            bitrate_kbps: 8000,
-            hardware_accelerated: true,
-            passes: 2,
-        };
-        let out = timeline.export_video(profile).unwrap();
-        assert!(out.starts_with(b"AV1-COMPLIANT"));
     }
 }

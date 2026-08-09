@@ -1,10 +1,9 @@
-// SigmaOS Process Management Module
+// SigmaOS Process Spawning & Signal Execution Subsystem Mod
+
 pub mod spawn;
-pub mod kernel_data;
 
 pub use spawn::{
-    Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
-};
-pub use kernel_data::{
-    ThreadWaitMode, ThreadState, MemoryDescriptorList, KThread, EThread, VasDescriptor, KProcess, EProcess, KPrcb, Kpcr, KernelDebuggerShim,
+    Process, ProcessError, ProcessGroup, ProcessID, ProcessSpawner, ProcessState, ProcessWaiter,
+    SignalHandlerFn, SimpleProcess, SimpleProcessGroup, SimpleProcessSpawner, SimpleProcessWaiter,
+    SIGINT, SIGKILL, SIGTERM, SIGUSR1,
 };

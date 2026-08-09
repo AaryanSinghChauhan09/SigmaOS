@@ -15,9 +15,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub enum LispVal {
     Atom(String),
     Number(i32),
-    String(String),
-    Char(char),
-    Bool(bool),
     List(Vec<LispVal>),
 }
 
@@ -33,28 +30,10 @@ impl InterimLispVM {
         }
     }
 
-    pub fn set_var(&mut self, name: String, val: LispVal) {
-        let mut index = None;
-        for i in 0..self.variables.len() {
-            if self.variables[i].0 == name {
-                index = Some(i);
-                break;
-            }
-        }
-        if let Some(idx) = index {
-            self.variables[idx].1 = val;
-        } else {
-            self.variables.push((name, val));
-        }
-    }
-
     /// Evaluates a Lisp expression inside the VM environment
     pub fn eval(&mut self, val: &LispVal) -> Result<LispVal, &'static str> {
         match val {
             LispVal::Number(n) => Ok(LispVal::Number(*n)),
-            LispVal::String(s) => Ok(LispVal::String(s.clone())),
-            LispVal::Char(c) => Ok(LispVal::Char(*c)),
-            LispVal::Bool(b) => Ok(LispVal::Bool(*b)),
             LispVal::Atom(s) => {
                 // Lookup variable in the association list
                 let mut found = None;
@@ -84,80 +63,23 @@ impl InterimLispVM {
                             }
                             if let LispVal::Atom(var_name) = &list[1] {
                                 let evaluated_val = self.eval(&list[2])?;
-                                self.set_var(var_name.clone(), evaluated_val.clone());
+                                // Update or insert in association list
+                                let mut index = None;
+                                for i in 0..self.variables.len() {
+                                    if &self.variables[i].0 == var_name {
+                                        index = Some(i);
+                                        break;
+                                    }
+                                }
+                                if let Some(idx) = index {
+                                    self.variables[idx].1 = evaluated_val.clone();
+                                } else {
+                                    self.variables
+                                        .push((var_name.clone(), evaluated_val.clone()));
+                                }
                                 Ok(evaluated_val)
                             } else {
                                 Err("Lisp: define target must be an atom name")
-                            }
-                        }
-                        "begin" => {
-                            let mut last = LispVal::Bool(false);
-                            for arg in list.iter().skip(1) {
-                                last = self.eval(arg)?;
-                            }
-                            Ok(last)
-                        }
-                        "if" => {
-                            if list.len() != 4 {
-                                return Err("Lisp: if expects condition, then, and else expressions");
-                            }
-                            let cond_val = self.eval(&list[1])?;
-                            let cond_bool = match cond_val {
-                                LispVal::Bool(b) => b,
-                                LispVal::Number(n) => n != 0,
-                                _ => true,
-                            };
-                            if cond_bool {
-                                self.eval(&list[2])
-                            } else {
-                                self.eval(&list[3])
-                            }
-                        }
-                        "while" => {
-                            if list.len() < 3 {
-                                return Err("Lisp: while expects condition and body expressions");
-                            }
-                            let mut last = LispVal::Bool(false);
-                            loop {
-                                let cond_val = self.eval(&list[1])?;
-                                let cond_bool = match cond_val {
-                                    LispVal::Bool(b) => b,
-                                    LispVal::Number(n) => n != 0,
-                                    _ => true,
-                                };
-                                if !cond_bool {
-                                    break;
-                                }
-                                for arg in list.iter().skip(2) {
-                                    last = self.eval(arg)?;
-                                }
-                            }
-                            Ok(last)
-                        }
-                        "for" => {
-                            if list.len() < 5 {
-                                return Err("Lisp: for expects variable, start, end, and body expressions");
-                            }
-                            if let LispVal::Atom(var_name) = &list[1] {
-                                let start_val = match self.eval(&list[2])? {
-                                    LispVal::Number(n) => n,
-                                    _ => return Err("Lisp: for expects numeric start value"),
-                                };
-                                let end_val = match self.eval(&list[3])? {
-                                    LispVal::Number(n) => n,
-                                    _ => return Err("Lisp: for expects numeric end value"),
-                                };
-
-                                let mut last = LispVal::Bool(false);
-                                for val in start_val..end_val {
-                                    self.set_var(var_name.clone(), LispVal::Number(val));
-                                    for arg in list.iter().skip(4) {
-                                        last = self.eval(arg)?;
-                                    }
-                                }
-                                Ok(last)
-                            } else {
-                                Err("Lisp: for variable must be an atom name")
                             }
                         }
                         "+" | "add" => {
@@ -188,20 +110,6 @@ impl InterimLispVM {
                                 }
                             }
                             Ok(LispVal::Number(diff))
-                        }
-                        "<" => {
-                            if list.len() != 3 {
-                                return Err("Lisp: < expects exactly 2 arguments");
-                            }
-                            let left = match self.eval(&list[1])? {
-                                LispVal::Number(n) => n,
-                                _ => return Err("Lisp: < expects numeric parameters"),
-                            };
-                            let right = match self.eval(&list[2])? {
-                                LispVal::Number(n) => n,
-                                _ => return Err("Lisp: < expects numeric parameters"),
-                            };
-                            Ok(LispVal::Bool(left < right))
                         }
                         _ => Err("Lisp: Unknown primitive operator"),
                     },
@@ -317,78 +225,6 @@ mod tests {
             LispVal::Number(5),
         ]);
         assert_eq!(vm.eval(&sub_expr).unwrap(), LispVal::Number(25));
-    }
-
-    #[test]
-    fn test_lisp_advanced_loops_blocks_and_conditionals() {
-        let mut vm = InterimLispVM::new();
-
-        // Test LispVal string and char types
-        let val_str = LispVal::String(String::from("SigmaOS"));
-        let val_char = LispVal::Char('Σ');
-        assert_eq!(vm.eval(&val_str).unwrap(), LispVal::String(String::from("SigmaOS")));
-        assert_eq!(vm.eval(&val_char).unwrap(), LispVal::Char('Σ'));
-
-        // Test begin block
-        let begin_expr = LispVal::List(vec![
-            LispVal::Atom(String::from("begin")),
-            LispVal::Number(1),
-            LispVal::Number(2),
-            LispVal::Number(3),
-        ]);
-        assert_eq!(vm.eval(&begin_expr).unwrap(), LispVal::Number(3));
-
-        // Test if-else conditional
-        let if_expr = LispVal::List(vec![
-            LispVal::Atom(String::from("if")),
-            LispVal::Bool(true),
-            LispVal::Number(100),
-            LispVal::Number(200),
-        ]);
-        assert_eq!(vm.eval(&if_expr).unwrap(), LispVal::Number(100));
-
-        // Test for loop: (for i 1 5 (define sum (+ sum i)))
-        vm.set_var(String::from("sum"), LispVal::Number(0));
-        let for_expr = LispVal::List(vec![
-            LispVal::Atom(String::from("for")),
-            LispVal::Atom(String::from("i")),
-            LispVal::Number(1),
-            LispVal::Number(5),
-            LispVal::List(vec![
-                LispVal::Atom(String::from("define")),
-                LispVal::Atom(String::from("sum")),
-                LispVal::List(vec![
-                    LispVal::Atom(String::from("add")),
-                    LispVal::Atom(String::from("sum")),
-                    LispVal::Atom(String::from("i")),
-                ]),
-            ]),
-        ]);
-        vm.eval(&for_expr).unwrap();
-        // 1 + 2 + 3 + 4 = 10
-        assert_eq!(vm.eval(&LispVal::Atom(String::from("sum"))).unwrap(), LispVal::Number(10));
-
-        // Test while loop: (while (< count 3) (define count (+ count 1)))
-        vm.set_var(String::from("count"), LispVal::Number(0));
-        let while_expr = LispVal::List(vec![
-            LispVal::Atom(String::from("while")),
-            LispVal::List(vec![
-                LispVal::Atom(String::from("<")),
-                LispVal::Atom(String::from("count")),
-                LispVal::Number(3),
-            ]),
-            LispVal::List(vec![
-                LispVal::Atom(String::from("define")),
-                LispVal::Atom(String::from("count")),
-                LispVal::List(vec![
-                    LispVal::Atom(String::from("add")),
-                    LispVal::Atom(String::from("count")),
-                    LispVal::Number(1),
-                ]),
-            ]),
-        ]);
-        vm.eval(&while_expr).unwrap();
-        assert_eq!(vm.eval(&LispVal::Atom(String::from("count"))).unwrap(), LispVal::Number(3));
     }
 
     #[test]
