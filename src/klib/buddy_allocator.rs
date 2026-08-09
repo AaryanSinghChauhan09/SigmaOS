@@ -8,19 +8,12 @@ pub type BlockID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum AllocError {
-    Success = 0,
-    OutOfMemory = 1,
-    InvalidBlock = 2,
-    Fragmentation = 3,
-}
+pub enum AllocError { Success = 0, OutOfMemory = 1, InvalidBlock = 2, Fragmentation = 3 }
 
 pub trait BuddyAllocator {
     fn allocate(&mut self, order: usize) -> Result<BlockID, AllocError>;
     fn free(&mut self, block_id: BlockID, order: usize) -> Result<(), AllocError>;
     fn get_free_count(&self, order: usize) -> usize;
-    /// Linux-inspired lazy reclamation: free a page cache item or unused clean page if OOM
-    fn reclaim_pages(&mut self, target_order: usize) -> Result<(), AllocError>;
 }
 
 #[repr(C)]
@@ -29,7 +22,6 @@ pub struct Block {
     pub free: AtomicUsize,
     pub left: AtomicUsize,
     pub right: AtomicUsize,
-    pub is_cache: AtomicUsize, // 1 if occupied by reclaimable page cache/buffers, 0 otherwise
 }
 
 impl Block {
@@ -39,7 +31,6 @@ impl Block {
             free: AtomicUsize::new(1),
             left: AtomicUsize::new(0),
             right: AtomicUsize::new(0),
-            is_cache: AtomicUsize::new(0),
         }
     }
 }
@@ -54,18 +45,9 @@ pub struct SimpleBuddyAllocator {
 impl SimpleBuddyAllocator {
     pub fn new(max_order: usize, _total_frames: usize) -> Self {
         let mut free_lists: [Vec<BlockID>; 12] = [
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
-            Vec::new(),
+            Vec::new(), Vec::new(), Vec::new(), Vec::new(),
+            Vec::new(), Vec::new(), Vec::new(), Vec::new(),
+            Vec::new(), Vec::new(), Vec::new(), Vec::new(),
         ];
         let mut blocks = Vec::new();
         let next_id = AtomicUsize::new(0);
@@ -75,7 +57,7 @@ impl SimpleBuddyAllocator {
         let initial_block = Block::new(initial_order);
         blocks.push(Some(initial_block));
         free_lists[initial_order].push(initial_block_id);
-
+        
         SimpleBuddyAllocator {
             max_order: AtomicUsize::new(max_order),
             free_lists,
@@ -86,148 +68,101 @@ impl SimpleBuddyAllocator {
 }
 
 impl BuddyAllocator for SimpleBuddyAllocator {
-    fn reclaim_pages(&mut self, target_order: usize) -> Result<(), AllocError> {
-        // Search for blocks allocated as is_cache, free them to satisfy target_order allocation
-        let mut found_reclaimable = None;
-        for (id, block_opt) in self.blocks.iter().enumerate() {
-            if let Some(block) = block_opt {
-                if block.free.load(Ordering::SeqCst) == 0 && block.is_cache.load(Ordering::SeqCst) == 1 {
-                    let order = block.order.load(Ordering::SeqCst);
-                    if order >= target_order {
-                        found_reclaimable = Some((id, order));
-                        break;
-                    }
-                }
-            }
-        }
-
-        if let Some((id, order)) = found_reclaimable {
-            // Free the cache page back to the allocator
-            self.free(id, order)?;
-            Ok(())
-        } else {
-            Err(AllocError::OutOfMemory)
-        }
-    }
-
     fn allocate(&mut self, order: usize) -> Result<BlockID, AllocError> {
         if order > self.max_order.load(Ordering::SeqCst) {
             return Err(AllocError::OutOfMemory);
         }
-
-        let mut retry_count = 0;
-        loop {
-            for current_order in order..=self.max_order.load(Ordering::SeqCst) {
-                if !self.free_lists[current_order].is_empty() {
-                    let block_id = self.free_lists[current_order].remove(0);
+        
+        for current_order in order..=self.max_order.load(Ordering::SeqCst) {
+            if !self.free_lists[current_order].is_empty() {
+                let block_id = self.free_lists[current_order].remove(0);
+                
+                if current_order > order {
+                    let new_order = current_order - 1;
+                    let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
+                    let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
                     
-                    if current_order > order {
-                        let new_order = current_order - 1;
-                        let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-                        let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-
-                        let left_block = Block::new(new_order);
-                        let right_block = Block::new(new_order);
-
-                        if let Some(ref mut parent) = self.blocks[block_id] {
-                            parent.left.store(left_id, Ordering::SeqCst);
-                            parent.right.store(right_id, Ordering::SeqCst);
-                            parent.free.store(0, Ordering::SeqCst);
-                        }
-
-                        while left_id >= self.blocks.len() {
-                            self.blocks.push(None);
-                        }
-                        while right_id >= self.blocks.len() {
-                            self.blocks.push(None);
-                        }
-
-                        self.blocks[left_id] = Some(left_block);
-                        self.blocks[right_id] = Some(right_block);
-
-                        self.free_lists[new_order].push(right_id);
-
-                        return Ok(left_id);
+                    let left_block = Block::new(new_order);
+                    let right_block = Block::new(new_order);
+                    
+                    if let Some(ref mut parent) = self.blocks[block_id] {
+                        parent.left.store(left_id, Ordering::SeqCst);
+                        parent.right.store(right_id, Ordering::SeqCst);
+                        parent.free.store(0, Ordering::SeqCst);
                     }
-
-                    if let Some(ref mut block) = self.blocks[block_id] {
-                        block.free.store(0, Ordering::SeqCst);
-                    }
-
-                    return Ok(block_id);
+                    
+                    while left_id >= self.blocks.len() { self.blocks.push(None); }
+                    while right_id >= self.blocks.len() { self.blocks.push(None); }
+                    
+                    self.blocks[left_id] = Some(left_block);
+                    self.blocks[right_id] = Some(right_block);
+                    
+                    self.free_lists[new_order].push(right_id);
+                    
+                    return Ok(left_id);
                 }
-            }
-
-            // If we are out of memory, try to reclaim cache pages (like Linux kswapd/lazy reclaim)
-            if retry_count == 0 {
-                if self.reclaim_pages(order).is_ok() {
-                    retry_count += 1;
-                    continue;
+                
+                if let Some(ref mut block) = self.blocks[block_id] {
+                    block.free.store(0, Ordering::SeqCst);
                 }
+                
+                return Ok(block_id);
             }
-            break;
         }
-
+        
         Err(AllocError::OutOfMemory)
     }
-
+    
     fn free(&mut self, block_id: BlockID, order: usize) -> Result<(), AllocError> {
         if block_id >= self.blocks.len() {
             return Err(AllocError::InvalidBlock);
         }
-
+        
         let mut current_id = block_id;
         let mut current_order = order;
-
+        
         loop {
             if let Some(ref mut block) = self.blocks[current_id] {
                 block.free.store(1, Ordering::SeqCst);
                 block.order.store(current_order, Ordering::SeqCst);
             }
-
+            
             let buddy_id = current_id ^ (1 << current_order);
-
+            
             if buddy_id >= self.blocks.len() {
                 self.free_lists[current_order].push(current_id);
                 return Ok(());
             }
-
+            
             let buddy_free = if let Some(ref buddy) = self.blocks[buddy_id] {
-                buddy.free.load(Ordering::SeqCst) == 1
-                    && buddy.order.load(Ordering::SeqCst) == current_order
+                buddy.free.load(Ordering::SeqCst) == 1 && buddy.order.load(Ordering::SeqCst) == current_order
             } else {
                 false
             };
-
+            
             if !buddy_free || current_order >= self.max_order.load(Ordering::SeqCst) {
                 self.free_lists[current_order].push(current_id);
                 return Ok(());
             }
-
-            let parent_id = if current_id < buddy_id {
-                current_id
-            } else {
-                buddy_id
-            };
-
+            
+            let parent_id = if current_id < buddy_id { current_id } else { buddy_id };
+            
             if let Some(ref mut buddy) = self.blocks[buddy_id] {
                 buddy.free.store(0, Ordering::SeqCst);
             }
             if let Some(ref mut block) = self.blocks[current_id] {
                 block.free.store(0, Ordering::SeqCst);
             }
-
+            
             self.free_lists[current_order].retain(|&id| id != buddy_id && id != current_id);
-
+            
             current_id = parent_id;
             current_order += 1;
         }
     }
-
+    
     fn get_free_count(&self, order: usize) -> usize {
-        if order >= 12 {
-            return 0;
-        }
+        if order >= 12 { return 0; }
         self.free_lists[order].len()
     }
 }
@@ -242,7 +177,7 @@ impl MemoryPool for SimpleBuddyAllocator {
     fn get_total_frames(&self) -> usize {
         self.blocks.len()
     }
-
+    
     fn get_used_frames(&self) -> usize {
         let mut used = 0;
         for block_option in &self.blocks {
@@ -254,26 +189,20 @@ impl MemoryPool for SimpleBuddyAllocator {
         }
         used
     }
-
+    
     fn get_fragmentation_ratio(&self) -> f64 {
         let total = self.get_total_frames();
-        if total == 0 {
-            return 0.0;
-        }
+        if total == 0 { return 0.0; }
         let used = self.get_used_frames();
         let free = total - used;
-        if free == 0 {
-            return 0.0;
-        }
-
+        if free == 0 { return 0.0; }
+        
         let mut free_blocks = 0;
         for i in 0..12 {
             free_blocks += self.free_lists[i].len();
         }
-
-        if free_blocks == 0 {
-            return 0.0;
-        }
+        
+        if free_blocks == 0 { return 0.0; }
         (free_blocks as f64) / (free as f64)
     }
 }
@@ -297,24 +226,6 @@ mod tests {
 
         assert!(allocator.free(block_1, 3).is_ok());
         assert!(allocator.free(block_2, 3).is_ok());
-    }
-
-    #[test]
-    fn test_lazy_reclaim() {
-        let mut allocator = SimpleBuddyAllocator::new(3, 8);
-
-        // Allocate all blocks
-        let b1 = allocator.allocate(2).unwrap();
-        let b2 = allocator.allocate(2).unwrap();
-
-        // Mark b1 as being used by page cache
-        if let Some(ref mut block) = allocator.blocks[b1] {
-            block.is_cache.store(1, Ordering::SeqCst);
-        }
-
-        // Next allocation of order 2 should fail due to OOM, but lazy reclaim should free b1 and succeed!
-        let b3 = allocator.allocate(2).unwrap();
-        assert_eq!(b3, b1);
     }
 
     #[test]

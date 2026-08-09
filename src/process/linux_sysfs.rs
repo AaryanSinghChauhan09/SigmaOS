@@ -1,126 +1,122 @@
-// Sovereign Sysfs (/sys) and Loopback Device Subsystem
-// Dynamic hardware attribute representation and loopback block overlay mounting inspired by Linux.
+/// Linux-grade Sysfs (/sys) Pseudo-Filesystem and Device Parameter Subsystem for SigmaOS
+/// Replicates structured system class, bus, kernel, and power supply telemetry in plain-text format.
 
-use std::collections::HashMap;
+use crate::klib::Vec;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SysfsPermission {
+    ReadOnly,
+    WriteOnly,
+    ReadWrite,
+}
+
+/// Represents a plain-text virtual attribute file in the sysfs hierarchy (e.g. /sys/kernel/secureboot)
 pub struct SysfsAttribute {
-    pub path: String,
-    pub value: String,
-    pub is_writable: bool,
+    pub path: [u8; 64],
+    pub value: [u8; 32],
+    pub permission: SysfsPermission,
 }
 
-#[derive(Debug, Clone)]
-pub struct LoopDevice {
-    pub dev_index: usize,          // e.g. /dev/loop0
-    pub backing_file_path: String, // backing image file path
-    pub offset: u64,
-    pub size_limit: u64,
-    pub is_read_only: bool,
-}
+impl SysfsAttribute {
+    pub fn new(path: &[u8], initial_val: &[u8], permission: SysfsPermission) -> Self {
+        let mut path_arr = [0u8; 64];
+        let mut val_arr = [0u8; 32];
 
-impl LoopDevice {
-    pub fn new(dev_index: usize, backing_file_path: &str) -> Self {
-        Self {
-            dev_index,
-            backing_file_path: backing_file_path.to_string(),
-            offset: 0,
-            size_limit: 0,
-            is_read_only: false,
+        path_arr[..path.len().min(63)].copy_from_slice(&path[..path.len().min(63)]);
+        val_arr[..initial_val.len().min(31)].copy_from_slice(&initial_val[..initial_val.len().min(31)]);
+
+        SysfsAttribute {
+            path: path_arr,
+            value: val_arr,
+            permission,
         }
+    }
+
+    pub fn path_len(&self) -> usize {
+        self.path.iter().position(|&b| b == 0).unwrap_or(64)
+    }
+
+    pub fn value_len(&self) -> usize {
+        self.value.iter().position(|&b| b == 0).unwrap_or(32)
+    }
+
+    pub fn read_value(&self) -> Result<&[u8], &'static str> {
+        if self.permission == SysfsPermission::WriteOnly {
+            return Err("Permission Denied: Write-only attribute");
+        }
+        Ok(&self.value[..self.value_len()])
+    }
+
+    pub fn write_value(&mut self, new_val: &[u8]) -> Result<(), &'static str> {
+        if self.permission == SysfsPermission::ReadOnly {
+            return Err("Permission Denied: Read-only attribute");
+        }
+        let len = new_val.len().min(31);
+        self.value = [0u8; 32];
+        self.value[..len].copy_from_slice(&new_val[..len]);
+        Ok(())
     }
 }
 
-pub struct SysfsRegistry {
-    pub attributes: HashMap<String, SysfsAttribute>,
-    pub loop_devices: HashMap<usize, LoopDevice>,
+/// Centralized manager for the virtual /sys directory hierarchy
+pub struct SysfsManager {
+    pub attributes: Vec<SysfsAttribute>,
 }
 
-impl SysfsRegistry {
+impl Default for SysfsManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl SysfsManager {
     pub fn new() -> Self {
-        let mut registry = Self {
-            attributes: HashMap::new(),
-            loop_devices: HashMap::new(),
+        let mut manager = SysfsManager {
+            attributes: Vec::new(),
         };
-
-        registry.seed_sysfs_defaults();
-        registry
+        manager.initialize_default_sys_tree();
+        manager
     }
 
-    fn seed_sysfs_defaults(&mut self) {
-        // 1. CPU online states
-        self.attributes.insert(
-            "sys/devices/system/cpu/cpu0/online".to_string(),
-            SysfsAttribute {
-                path: "sys/devices/system/cpu/cpu0/online".to_string(),
-                value: "1".to_string(),
-                is_writable: false,
-            },
-        );
-        self.attributes.insert(
-            "sys/devices/system/cpu/cpu1/online".to_string(),
-            SysfsAttribute {
-                path: "sys/devices/system/cpu/cpu1/online".to_string(),
-                value: "1".to_string(),
-                is_writable: true, // Writable to hot-unplug cores!
-            },
-        );
+    /// Pre-populate structured virtual endpoints mimicking common Linux sysfs structures
+    fn initialize_default_sys_tree(&mut self) {
+        // CPU status
+        self.register_attribute(b"/sys/devices/system/cpu/cpu0/online", b"1", SysfsPermission::ReadOnly);
+        self.register_attribute(b"/sys/devices/system/cpu/cpu0/microcode/version", b"0xdeadbeef", SysfsPermission::ReadOnly);
 
-        // 2. Battery status (Power supply class)
-        self.attributes.insert(
-            "sys/class/power_supply/BAT0/capacity".to_string(),
-            SysfsAttribute {
-                path: "sys/class/power_supply/BAT0/capacity".to_string(),
-                value: "84".to_string(), // 84% battery
-                is_writable: false,
-            },
-        );
-        self.attributes.insert(
-            "sys/class/power_supply/BAT0/status".to_string(),
-            SysfsAttribute {
-                path: "sys/class/power_supply/BAT0/status".to_string(),
-                value: "Discharging".to_string(),
-                is_writable: false,
-            },
-        );
+        // Power supply (battery telemetry)
+        self.register_attribute(b"/sys/class/power_supply/BAT0/capacity", b"98", SysfsPermission::ReadOnly);
+        self.register_attribute(b"/sys/class/power_supply/BAT0/status", b"Charging", SysfsPermission::ReadOnly);
+
+        // Kernel parameters
+        self.register_attribute(b"/sys/kernel/security/secureboot", b"1", SysfsPermission::ReadOnly);
+        self.register_attribute(b"/sys/module/sigma_kernel/parameters/debug_level", b"3", SysfsPermission::ReadWrite);
     }
 
-    /// Read dynamic hardware attribute from sysfs
-    pub fn read_attribute(&self, path: &str) -> Result<String, &'static str> {
-        let clean_path = path.trim_start_matches('/');
-        self.attributes
-            .get(clean_path)
-            .map(|attr| attr.value.clone())
-            .ok_or("sysfs attribute not found")
+    pub fn register_attribute(&mut self, path: &[u8], val: &[u8], perm: SysfsPermission) {
+        self.attributes.push(SysfsAttribute::new(path, val, perm));
     }
 
-    /// Write and update sysfs hardware parameters (e.g. hot-unplugging a CPU)
-    pub fn write_attribute(&mut self, path: &str, new_value: &str) -> Result<(), &'static str> {
-        let clean_path = path.trim_start_matches('/');
-        let attr = self.attributes.get_mut(clean_path).ok_or("sysfs attribute not found")?;
-        if !attr.is_writable {
-            return Err("Permission denied: sysfs attribute is read-only");
+    pub fn read_attribute(&self, path: &[u8]) -> Result<&[u8], &'static str> {
+        for i in 0..self.attributes.len() {
+            let attr = &self.attributes[i];
+            let len = attr.path_len();
+            if len == path.len() && &attr.path[..len] == path {
+                return attr.read_value();
+            }
         }
-        attr.value = new_value.to_string();
-        Ok(())
+        Err("Attribute path not found")
     }
 
-    /// Configure and mount a new loopback device /dev/loopX
-    pub fn mount_loop_device(&mut self, dev_index: usize, backing_file_path: &str) -> Result<(), &'static str> {
-        if self.loop_devices.contains_key(&dev_index) {
-            return Err("Loopback device index already in use");
+    pub fn write_attribute(&mut self, path: &[u8], new_val: &[u8]) -> Result<(), &'static str> {
+        for i in 0..self.attributes.len() {
+            let attr = &mut self.attributes[i];
+            let len = attr.path_len();
+            if len == path.len() && &attr.path[..len] == path {
+                return attr.write_value(new_val);
+            }
         }
-        let device = LoopDevice::new(dev_index, backing_file_path);
-        self.loop_devices.insert(dev_index, device);
-        Ok(())
-    }
-
-    /// Detach loopback device
-    pub fn detach_loop_device(&mut self, dev_index: usize) -> Result<(), &'static str> {
-        self.loop_devices
-            .remove(&dev_index)
-            .map(|_| ())
-            .ok_or("Loopback device not found")
+        Err("Attribute path not found")
     }
 }
 
@@ -129,37 +125,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_sysfs_read_write() {
-        let mut registry = SysfsRegistry::new();
+    fn test_sysfs_attribute_read_write() {
+        let mut attr = SysfsAttribute::new(b"/sys/kernel/test", b"hello", SysfsPermission::ReadWrite);
+        assert_eq!(attr.read_value().unwrap(), b"hello");
 
-        // 1. Read battery status
-        let bat = registry.read_attribute("/sys/class/power_supply/BAT0/capacity").unwrap();
-        assert_eq!(bat, "84");
-
-        // 2. Write to read-only attribute -> fails
-        assert!(registry.write_attribute("/sys/class/power_supply/BAT0/capacity", "90").is_err());
-
-        // 3. Write to writable attribute -> succeeds
-        assert!(registry.write_attribute("/sys/devices/system/cpu/cpu1/online", "0").is_ok());
-        let cpu_state = registry.read_attribute("/sys/devices/system/cpu/cpu1/online").unwrap();
-        assert_eq!(cpu_state, "0");
+        assert!(attr.write_value(b"world_mod").is_ok());
+        assert_eq!(attr.read_value().unwrap(), b"world_mod");
     }
 
     #[test]
-    fn test_loop_device_mount_lifecycle() {
-        let mut registry = SysfsRegistry::new();
+    fn test_sysfs_manager_tree_queries() {
+        let mut manager = SysfsManager::new();
 
-        // Mount a custom system overlay image
-        assert!(registry.mount_loop_device(0, "/var/images/ubuntu_root.img").is_ok());
-        // Duplicate mount index -> fails
-        assert!(registry.mount_loop_device(0, "/var/images/other.img").is_err());
+        // Query default pre-populated CPU online attribute
+        let cpu_online = manager.read_attribute(b"/sys/devices/system/cpu/cpu0/online").unwrap();
+        assert_eq!(cpu_online, b"1");
 
-        let dev = registry.loop_devices.get(&0).unwrap();
-        assert_eq!(dev.backing_file_path, "/var/images/ubuntu_root.img");
-        assert!(!dev.is_read_only);
+        // Query default Battery capacity
+        let bat_cap = manager.read_attribute(b"/sys/class/power_supply/BAT0/capacity").unwrap();
+        assert_eq!(bat_cap, b"98");
 
-        // Detach
-        assert!(registry.detach_loop_device(0).is_ok());
-        assert!(registry.loop_devices.get(&0).is_none());
+        // Write and Read mutable kernel parameter
+        assert!(manager.write_attribute(b"/sys/module/sigma_kernel/parameters/debug_level", b"5").is_ok());
+        let debug_level = manager.read_attribute(b"/sys/module/sigma_kernel/parameters/debug_level").unwrap();
+        assert_eq!(debug_level, b"5");
+
+        // Attempting to write to read-only attribute must fail
+        assert!(manager.write_attribute(b"/sys/class/power_supply/BAT0/capacity", b"50").is_err());
     }
 }

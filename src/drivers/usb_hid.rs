@@ -61,7 +61,11 @@ impl UsbHidDriver {
         self.event_buffer.push(event);
     }
 
-    pub fn send_report(&mut self, report_type: HidReportType, data: &[u8]) -> Result<(), HidError> {
+    pub fn send_report(
+        &mut self,
+        report_type: HidReportType,
+        _data: &[u8],
+    ) -> Result<(), HidError> {
         if !self.connected {
             return Err(HidError::NotConnected);
         }
