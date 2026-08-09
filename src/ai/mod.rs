@@ -8,6 +8,16 @@ pub mod orchestrator;
 pub mod sai;
 pub mod system;
 pub mod voice;
+pub mod lift_engine;
+pub mod next_gen;
+
+pub use lift_engine::{FieldType, ExtractionSchema, Citation, ExtractionResult, LiftError, DocumentExtractor};
+pub use next_gen::{
+    AdaptiveKernelPersona, WorkloadType, PredictiveSyscallTranslator, AiScheduler, AiTask,
+    DeviceTargetType, EnergyAwareScheduler, EnergyGovernorMode, MultiModelOrchestrator,
+    AIModel, ModelType, SigmaAgentRepl, TranslatedCommand, PredictiveMaintenanceAgent,
+    TelemetryData, OciContainerRuntime, OciContainerConfig, MicroVmHypervisor, MicroVmConfig,
+};
 
 pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{

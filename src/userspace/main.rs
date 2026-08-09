@@ -24,6 +24,3 @@ fn main() {}
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
-
-#[cfg(not(target_os = "none"))]
-fn main() {}
