@@ -9,6 +9,8 @@ pub use agent::{
     ManagerCapability, Pattern, SimpleAIAgent, SimpleAIAgentManager,
 };
 pub use orchestrator::{
-    LocalLlmOrchestrator, ModelResource, DeviceTarget, OrchestratorError, ContextWindowPruner,
+    AIAgent as OrchestratorAIAgent, AgentCommunication, AgentError, AgentID, AgentOrchestrator,
+    AgentState as OrchestratorAgentState, SimpleAIAgent as SimpleOrchestratorAgent,
+    SimpleAgentCommunication, SimpleAgentOrchestrator, SimpleTaskQueue, TaskQueue,
 };
 pub use wiki::{SovereignWikiEngine, WikiArticle};

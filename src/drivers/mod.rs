@@ -8,29 +8,8 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
-||||||| 984d1301f
-pub mod boot_init;
-pub mod dde;
-pub mod even_more_devices;
-pub mod flipper_gpio_sensor;
-pub mod boot_init;
-pub mod dde;
-pub mod flipper_gpio_sensor;
-pub mod legacy_audio_ac97;
-pub mod modern_audio_intel_hda;
-pub mod modern_nvme;
-pub mod modern_usb_printer;
-pub mod modern_wifi;
-pub mod touch_jingos;
-||||||| 43be3a7e8
-pub mod peripheral;
-pub mod legacy_keyboard;
-pub mod modern_usb;
 
-pub use gpu::{
-    DrmError, DrmPlaneType, GpuCommand, GpuCommandBuffer, GpuDriver, GpuError, GpuPipeline,
-    GpuResetState, GpuShader, ShaderStage,
-};
+pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
 pub use legacy_keyboard::LegacyKeyboard;
 pub use modern_usb::ModernUsbController;
@@ -39,13 +18,3 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
-pub use legacy_audio_ac97::LegacyAudioAc97;
-pub use modern_audio_intel_hda::ModernAudioIntelHda;
-pub use modern_nvme::ModernNvmeDriver;
-pub use modern_usb_printer::ModernUsbPrinterDriver;
-pub use modern_wifi::ModernWifiDriver;
-pub use touch_jingos::TouchJingosDriver;
-||||||| 43be3a7e8
-pub use peripheral::{PeripheralDevice, PeripheralManager, DeviceGeneration, PowerState};
-pub use legacy_keyboard::LegacyKeyboard;
-pub use modern_usb::ModernUsbController;

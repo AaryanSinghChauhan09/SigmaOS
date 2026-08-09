@@ -1,169 +1,201 @@
-// Sovereign Jail and Syscall Sandboxing Isolation Subsystem
-// Inspired by FreeBSD Jails, Linux Namespaces, and Linux seccomp-BPF filters.
+// Sovereign Sandboxing, FreeBSD Jails, and Linux-style Namespace Isolation for SigmaOS
+// Combines FreeBSD Jails, Linux Namespaces, and Linux Seccomp Syscall Filters into a unified microkernel sandboxing coordinator.
 
-use std::collections::HashSet;
+extern crate alloc;
+
+use alloc::boxed::Box;
+use alloc::string::String;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum NamespaceType {
-    Uts,     // Hostname / domain isolation
-    Net,     // Network stack isolation (VNET)
-    Pid,     // Process ID space isolation
-    Mount,   // Filesystem mount table isolation
-    User,    // User/Group ID virtualization
+    Uts,   // Hostname / domain isolation
+    Net,   // Loopback and virtual interfaces
+    Pid,   // Process ID isolation
+    Mount, // Separated virtual mount points
+    User,  // Isolated user-UID mappings
 }
 
-#[derive(Debug, Clone)]
-pub struct NamespaceIsolation {
-    pub active_types: HashSet<NamespaceType>,
-    pub virtual_hostname: String,
-    pub virtual_ip: String,
-    pub mapped_root: String,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SandboxError {
+    Success = 0,
+    JailLocked = 1,
+    SyscallBlocked = 2,
+    NamespaceViolation = 3,
+    InvalidParameter = 4,
 }
 
-impl NamespaceIsolation {
-    pub fn new() -> Self {
-        Self {
-            active_types: HashSet::new(),
-            virtual_hostname: "sigma-node".to_string(),
-            virtual_ip: "127.0.0.1".to_string(),
-            mapped_root: "/".to_string(),
-        }
-    }
-
-    pub fn isolate(&mut self, ns: NamespaceType) {
-        self.active_types.insert(ns);
-    }
-
-    pub fn is_isolated(&self, ns: NamespaceType) -> bool {
-        self.active_types.contains(&ns)
-    }
-}
-
-/// Linux seccomp-BPF inspired syscall filter whitelist.
-#[derive(Debug, Clone)]
-pub struct SeccompFilter {
-    pub allowed_syscalls: HashSet<u32>,
-    pub default_action_kill: bool,
-}
-
-impl SeccompFilter {
-    pub fn new() -> Self {
-        let mut filter = Self {
-            allowed_syscalls: HashSet::new(),
-            default_action_kill: true,
-        };
-        // By default, allow standard base lifecycle syscalls: read (3), write (4), exit (1)
-        filter.allow_syscall(1);
-        filter.allow_syscall(3);
-        filter.allow_syscall(4);
-        filter
-    }
-
-    pub fn allow_syscall(&mut self, syscall_num: u32) {
-        self.allowed_syscalls.insert(syscall_num);
-    }
-
-    pub fn deny_syscall(&mut self, syscall_num: u32) {
-        self.allowed_syscalls.remove(&syscall_num);
-    }
-
-    /// Evaluates if a syscall invocation is authorized by the BPF whitelist
-    pub fn evaluate_syscall(&self, syscall_num: u32) -> Result<(), &'static str> {
-        if self.allowed_syscalls.contains(&syscall_num) {
-            Ok(())
-        } else {
-            Err("SYS_SECCOMP_VIOLATION: System call blocked by BPF filter")
-        }
-    }
-}
-
-/// FreeBSD-inspired lightweight OS-level Virtualization Jail container.
+/// FreeBSD-inspired Jail containing processes inside a secure chroot and virtual network environment
 #[derive(Debug, Clone)]
 pub struct FreeBsdJail {
-    pub jail_id: usize,
-    pub name: String,
-    pub root_path: String,
-    pub ip_address: String,
-    pub isolated_pids: Vec<usize>,
-    pub namespaces: NamespaceIsolation,
-    pub seccomp: SeccompFilter,
+    pub jid: usize,
+    pub hostname: String,
+    pub chroot_path: String,
+    pub ip_whitelist: Vec<String>,
+    pub active: bool,
 }
 
 impl FreeBsdJail {
-    pub fn new(jail_id: usize, name: &str, root_path: &str, ip_address: &str) -> Self {
-        let mut namespaces = NamespaceIsolation::new();
-        // Fully isolate all namespaces by default for FreeBSD Jails
-        namespaces.isolate(NamespaceType::Uts);
-        namespaces.isolate(NamespaceType::Net);
-        namespaces.isolate(NamespaceType::Pid);
-        namespaces.isolate(NamespaceType::Mount);
-        namespaces.isolate(NamespaceType::User);
-        namespaces.virtual_hostname = name.to_string();
-        namespaces.virtual_ip = ip_address.to_string();
-        namespaces.mapped_root = root_path.to_string();
-
-        Self {
-            jail_id,
-            name: name.to_string(),
-            root_path: root_path.to_string(),
-            ip_address: ip_address.to_string(),
-            isolated_pids: Vec::new(),
-            namespaces,
-            seccomp: SeccompFilter::new(),
+    pub fn new(jid: usize, hostname: &str, chroot_path: &str) -> Self {
+        FreeBsdJail {
+            jid,
+            hostname: String::from(hostname),
+            chroot_path: String::from(chroot_path),
+            ip_whitelist: Vec::new(),
+            active: true,
         }
     }
 
-    /// Attach a process ID into this Jail
-    pub fn attach_pid(&mut self, pid: usize) {
-        self.isolated_pids.push(pid);
-    }
-
-    /// Checks if a file path can be accessed from within the Jail root directory bounds.
-    /// Prevents directory traversal attacks (jailbreaking).
-    pub fn validate_path_access(&self, requested_path: &str) -> bool {
-        if !self.namespaces.is_isolated(NamespaceType::Mount) {
-            return true;
-        }
-
-        // Must start with our jailed root_path
-        requested_path.starts_with(&self.root_path) && !requested_path.contains("../")
-    }
-
-    /// Evaluates a system call requested by an attached process.
-    pub fn filter_syscall(&self, pid: usize, syscall_num: u32) -> Result<(), &'static str> {
-        if !self.isolated_pids.contains(&pid) {
-            return Ok(()); // Not attached, skip filter
-        }
-
-        self.seccomp.evaluate_syscall(syscall_num)
+    pub fn with_ip(mut self, ip: &str) -> Self {
+        self.ip_whitelist.push(String::from(ip));
+        self
     }
 }
 
-/// Sovereign Sandbox Isolation Coordinator
+/// Linux-style Namespace Isolation for specific subsystem dimensions
+#[derive(Debug, Clone)]
+pub struct NamespaceIsolation {
+    pub ns_type: NamespaceType,
+    pub is_isolated: bool,
+    pub virtual_hostname: Option<String>,
+    pub mapped_uid_offset: usize,
+}
+
+impl NamespaceIsolation {
+    pub fn new(ns_type: NamespaceType) -> Self {
+        NamespaceIsolation {
+            ns_type,
+            is_isolated: true,
+            virtual_hostname: None,
+            mapped_uid_offset: 10000, // Offset unprivileged UIDs
+        }
+    }
+}
+
+/// Linux Seccomp-style Secure Computing System Call filter
+#[derive(Debug, Clone)]
+pub struct SeccompFilter {
+    pub allowed_syscalls: Vec<usize>,
+    pub audit_mode: bool,
+}
+
+impl SeccompFilter {
+    pub fn new(allowed: &[usize]) -> Self {
+        SeccompFilter {
+            allowed_syscalls: allowed.to_vec(),
+            audit_mode: false,
+        }
+    }
+
+    pub fn is_allowed(&self, syscall_num: usize) -> bool {
+        self.allowed_syscalls.contains(&syscall_num)
+    }
+}
+
+/// Sovereign Sandbox Coordinator orchestrating jail, namespaces, and seccomp filters
 pub struct SovereignSandboxCoordinator {
-    pub active_jails: Vec<FreeBsdJail>,
+    pub jail: Option<FreeBsdJail>,
+    pub namespaces: Vec<NamespaceIsolation>,
+    pub seccomp: Option<SeccompFilter>,
+    pub is_enforced: AtomicBool,
 }
 
 impl SovereignSandboxCoordinator {
     pub fn new() -> Self {
-        Self {
-            active_jails: Vec::new(),
+        SovereignSandboxCoordinator {
+            jail: None,
+            namespaces: Vec::new(),
+            seccomp: None,
+            is_enforced: AtomicBool::new(false),
         }
     }
 
-    pub fn spawn_jail(&mut self, name: &str, root_path: &str, ip_address: &str) -> usize {
-        let next_id = self.active_jails.len() + 1;
-        let jail = FreeBsdJail::new(next_id, name, root_path, ip_address);
-        self.active_jails.push(jail);
-        next_id
+    /// Creates and configures a pristine FreeBSD-inspired jail partition
+    pub fn configure_jail(&mut self, jid: usize, hostname: &str, chroot_path: &str) {
+        let jail = FreeBsdJail::new(jid, hostname, chroot_path);
+        self.jail = Some(jail);
     }
 
-    pub fn get_jail_mut(&mut self, jail_id: usize) -> Option<&mut FreeBsdJail> {
-        self.active_jails.iter_mut().find(|j| j.jail_id == jail_id)
+    /// Configures and activates specific Linux-style resource namespaces
+    pub fn isolate_namespace(&mut self, ns_type: NamespaceType, virtual_host: Option<&str>) {
+        let mut ns = NamespaceIsolation::new(ns_type);
+        if let Some(host) = virtual_host {
+            ns.virtual_hostname = Some(String::from(host));
+        }
+        self.namespaces.push(ns);
     }
 
-    pub fn get_jail(&self, jail_id: usize) -> Option<&FreeBsdJail> {
-        self.active_jails.iter().find(|j| j.jail_id == jail_id)
+    /// Configures strict Seccomp syscall filtering rules
+    pub fn configure_seccomp(&mut self, allowed_syscalls: &[usize]) {
+        self.seccomp = Some(SeccompFilter::new(allowed_syscalls));
+    }
+
+    /// Lock down and enforce the active sandbox environment (POLA)
+    pub fn enforce(&self) {
+        self.is_enforced.store(true, Ordering::SeqCst);
+    }
+
+    /// Validates system calls against the active Seccomp and Namespace restrictions
+    pub fn validate_syscall(&self, syscall_num: usize) -> Result<(), SandboxError> {
+        if !self.is_enforced.load(Ordering::Relaxed) {
+            return Ok(()); // Sandbox is not locked/active yet
+        }
+
+        // 1. Verify Seccomp constraints
+        if let Some(ref filter) = self.seccomp {
+            if !filter.is_allowed(syscall_num) {
+                return Err(SandboxError::SyscallBlocked);
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Validates UTS hostname queries inside isolated UTS Namespaces
+    pub fn query_hostname(&self, default_hostname: &str) -> String {
+        if let Some(ref uts_ns) = self
+            .namespaces
+            .iter()
+            .find(|n| n.ns_type == NamespaceType::Uts)
+        {
+            if let Some(ref virt_host) = uts_ns.virtual_hostname {
+                return virt_host.clone();
+            }
+        }
+        // Fall back to FreeBSD jail hostname
+        if let Some(ref jail) = self.jail {
+            return jail.hostname.clone();
+        }
+        String::from(default_hostname)
+    }
+
+    /// Validates IP binding targets inside network namespace constraints
+    pub fn validate_network_bind(&self, ip: &str) -> Result<(), SandboxError> {
+        if !self.is_enforced.load(Ordering::Relaxed) {
+            return Ok(());
+        }
+
+        // If net namespace is isolated, verify against the jail's IP whitelist
+        if let Some(_) = self
+            .namespaces
+            .iter()
+            .find(|n| n.ns_type == NamespaceType::Net)
+        {
+            if let Some(ref jail) = self.jail {
+                if !jail.ip_whitelist.contains(&String::from(ip)) {
+                    return Err(SandboxError::NamespaceViolation);
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for SovereignSandboxCoordinator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -172,79 +204,69 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_seccomp_bpf_filter() {
-        let mut filter = SeccompFilter::new();
+    fn test_freebsd_jail_creation_and_config() {
+        let mut sandbox = SovereignSandboxCoordinator::new();
+        sandbox.configure_jail(12, "web-jail", "/zones/web_root");
 
-        // Allowed default syscalls
-        assert!(filter.evaluate_syscall(1).is_ok()); // SYS_exit
-        assert!(filter.evaluate_syscall(3).is_ok()); // SYS_read
-
-        // Blocked raw socket syscall by default
-        assert!(filter.evaluate_syscall(41).is_err()); // SYS_socket
-
-        // Manually authorize socket syscall
-        filter.allow_syscall(41);
-        assert!(filter.evaluate_syscall(41).is_ok());
-
-        // Revoke write syscall
-        filter.deny_syscall(4);
-        assert!(filter.evaluate_syscall(4).is_err());
+        let jail = sandbox.jail.as_ref().unwrap();
+        assert_eq!(jail.jid, 12);
+        assert_eq!(jail.hostname, "web-jail");
+        assert_eq!(jail.chroot_path, "/zones/web_root");
+        assert!(jail.active);
     }
 
     #[test]
-    fn test_freebsd_jail_creation_and_attachment() {
-        let mut jail = FreeBsdJail::new(42, "secure-nginx", "/jails/secure-nginx", "10.0.0.5");
+    fn test_linux_uts_namespace_hostname_isolation() {
+        let mut sandbox = SovereignSandboxCoordinator::new();
 
-        assert_eq!(jail.jail_id, 42);
-        assert_eq!(jail.name, "secure-nginx");
-        assert_eq!(jail.root_path, "/jails/secure-nginx");
-        assert_eq!(jail.ip_address, "10.0.0.5");
+        // 1. Initially returns default host
+        assert_eq!(sandbox.query_hostname("sigma-host"), "sigma-host");
 
-        // Attach some process IDs
-        jail.attach_pid(2001);
-        jail.attach_pid(2002);
+        // 2. Configure FreeBSD jail -> returns jail hostname
+        sandbox.configure_jail(1, "jail-host", "/");
+        assert_eq!(sandbox.query_hostname("sigma-host"), "jail-host");
 
-        assert_eq!(jail.isolated_pids, vec![2001, 2002]);
+        // 3. Isolate UTS namespace -> returns virtual UTS hostname
+        sandbox.isolate_namespace(NamespaceType::Uts, Some("uts-isolated-host"));
+        assert_eq!(sandbox.query_hostname("sigma-host"), "uts-isolated-host");
     }
 
     #[test]
-    fn test_jail_path_traversal_gating() {
-        let jail = FreeBsdJail::new(1, "sandbox-app", "/var/sandbox", "192.168.1.100");
+    fn test_seccomp_syscall_filtering() {
+        let mut sandbox = SovereignSandboxCoordinator::new();
 
-        // Safe nested paths within jail root
-        assert!(jail.validate_path_access("/var/sandbox/config.json"));
-        assert!(jail.validate_path_access("/var/sandbox/html/index.html"));
+        // Allow only sys_read (0) and sys_write (1)
+        sandbox.configure_seccomp(&[0, 1]);
+        sandbox.enforce();
 
-        // Jailbreak traversal attacks (Should be gated/blocked!)
-        assert!(!jail.validate_path_access("/var/sandbox/../etc/passwd"));
-        assert!(!jail.validate_path_access("/etc/passwd"));
+        // sys_read and sys_write must be allowed
+        assert!(sandbox.validate_syscall(0).is_ok());
+        assert!(sandbox.validate_syscall(1).is_ok());
+
+        // sys_fork (12) must be blocked by seccomp
+        assert_eq!(
+            sandbox.validate_syscall(12),
+            Err(SandboxError::SyscallBlocked)
+        );
     }
 
     #[test]
-    fn test_jail_syscall_gating() {
-        let mut jail = FreeBsdJail::new(1, "sandbox-app", "/var/sandbox", "192.168.1.100");
-        jail.attach_pid(500);
+    fn test_net_namespace_ip_binding_restrictions() {
+        let mut sandbox = SovereignSandboxCoordinator::new();
+        sandbox.configure_jail(1, "jail1", "/");
+        // Add allowed local IP to whitelist
+        sandbox.jail = sandbox.jail.map(|j| j.with_ip("127.0.0.1"));
 
-        // Allowed syscall (SYS_read) -> success
-        assert!(jail.filter_syscall(500, 3).is_ok());
+        sandbox.isolate_namespace(NamespaceType::Net, None);
+        sandbox.enforce();
 
-        // Unallowed syscall (SYS_fork = 57) -> fails
-        assert!(jail.filter_syscall(500, 57).is_err());
+        // Binding to loopback whitelisted IP passes
+        assert!(sandbox.validate_network_bind("127.0.0.1").is_ok());
 
-        // Unattached process -> bypasses jail filter
-        assert!(jail.filter_syscall(999, 57).is_ok());
-    }
-
-    #[test]
-    fn test_sandbox_coordinator() {
-        let mut coordinator = SovereignSandboxCoordinator::new();
-        let jail_id = coordinator.spawn_jail("database-jail", "/jails/postgres", "10.1.1.1");
-
-        assert_eq!(jail_id, 1);
-
-        let jail = coordinator.get_jail(1).unwrap();
-        assert_eq!(jail.name, "database-jail");
-
-        assert!(coordinator.get_jail(99).is_none());
+        // Binding to unauthorized external IP fails
+        assert_eq!(
+            sandbox.validate_network_bind("192.168.1.100"),
+            Err(SandboxError::NamespaceViolation)
+        );
     }
 }

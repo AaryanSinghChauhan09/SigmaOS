@@ -7,5 +7,3 @@ pub use unified::{
     MemoryLogTarget, NetworkLogTarget, SimpleUnifiedLogger, TargetCapability, TargetInfo,
     TargetType, UnifiedLogEntry, UnifiedLogStats, UnifiedLogger,
 };
-||||||| 43be3a7e8
-pub mod rotation;

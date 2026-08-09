@@ -2,101 +2,22 @@
 pub mod chimera_linux;
 pub mod cross_platform;
 pub mod interim;
+pub mod jails;
+pub mod linuxulator;
 pub mod lubuntu;
 pub mod mint_linux;
-||||||| 68c19dfa6
-pub mod reactos;
-pub mod reactos;
-pub mod sigmawin;
-||||||| 984d1301f
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod india_stack_localization;
-pub mod legacy_adapters;
-pub mod cross_platform_kernel;
-||||||| 43be3a7e8
-pub mod linux_adapter;
-pub mod persona;
-pub mod abi_translator;
-pub mod lattice;
-pub mod prism;
-pub mod canonical;
-pub mod fedora;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
 pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
+pub use jails::{
+    FreeBsdJail, NamespaceIsolation, NamespaceType as JailNamespaceType,
+    SandboxError as JailSandboxError, SeccompFilter, SovereignSandboxCoordinator,
+};
+pub use linuxulator::{
+    Elf64Ehdr, Elf64Phdr, LinuxMemorySegment, LinuxProcessInstance, LinuxulatorError,
+    SovereignLinuxulator,
+};
 pub use lubuntu::{CpuGovernor, LubuntuHealthReport, LubuntuSystemManager, SystemPressure};
-||||||| 984d1301f
-
-pub use cross_platform_kernel::{
-    PageAccessMode, MemoryArch, TranslationEntry, PageDirectory, DeferredProcedureCall,
-    Kpcrb, Kpcr, Irql, IrqlController, IdtEntry, Idtr, SystemServiceTable,
-    UmsThreadState, UmsContext, SovereignKernelInternals,
-};
-
-pub use historic_linux::{
-    LinuxEra, HistoricalCpuState, HistoricSyscallEmulator, Era0_11SyscallEmulator,
-    Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
-    VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
-    ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
-};
-||||||| 43be3a7e8
-pub use linux_adapter::{
-    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
-};
-pub use persona::{
-    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
-};
-pub use abi_translator::{
-    CpuArchitecture, ABITranslator,
-};
-pub use lattice::{
-    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
-};
-pub use prism::{
-    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
-};
-pub use canonical::{
-    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
-};
-pub use fedora::{
-    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
-};
-
-pub mod debian;
-pub use debian::{
-    DebianChannel, AptRepositorySync, SysVRunlevel, SysVInitEngine,
-    AlternativeLink, DebianAlternativesSystem, DebootstrapEngine,
-};
-
-pub mod innovations;
-pub use innovations::{
-    WorkloadCategory, ISchedulerPolicy, MlAcceleratedPolicy, GreenComputingPolicy,
-    SigmaScheduler, ISyscallTranslator, LinuxTranslator, WindowsTranslator,
-    UniversalAbiTranslator, IFileSystemCore, ISemanticSearchPlugin, ICasDeduplicator,
-    SigmaFsPlusPlus, IRecoveryStrategy, RollbackRecovery, SelfHealingOS,
-};
-
-pub mod fedora;
-pub use fedora::{
-    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
-};
-
-pub mod india_professional_tools;
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, PMWaniHotspotController,
-    AyushFormularyHelper, DigiYatraPassScanner, IrctcPnrTracker,
-};
-
-pub mod india_stack;
-pub use india_stack::{MockUPIService, IndiaStackError};
-
-pub mod india_stack_localization;
-pub use india_stack_localization::{IndianLanguage, LocalizationProvider, LocalizationManager};

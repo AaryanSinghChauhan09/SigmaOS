@@ -6,17 +6,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type DriverID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DriverType {
-    Block = 0,
-    Char = 1,
-    Network = 2,
-    Storage = 3,
-    Input = 4,
-}
-||||||| 43be3a7e8
-#[derive(Debug, Clone, Copy)]
-pub enum DriverType { Block = 0, Char = 1, Network = 2 }
 #[derive(Debug, Clone, Copy)]
 pub enum DriverType {
     Block = 0,
@@ -46,14 +35,6 @@ pub enum DriverError {
     Success = 0,
     LoadFailed = 1,
     UnloadFailed = 2,
-    ProbeFailed = 3,
-}
-||||||| 43be3a7e8
-pub enum DriverError { Success = 0, LoadFailed = 1, UnloadFailed = 2 }
-pub enum DriverError {
-    Success = 0,
-    LoadFailed = 1,
-    UnloadFailed = 2,
 }
 
 #[repr(C)]
@@ -65,25 +46,6 @@ pub struct SimpleDriver {
 
 impl SimpleDriver {
     pub fn new(id: DriverID, driver_type: DriverType) -> Self {
-        SimpleDriver {
-            id,
-            driver_type,
-            state: AtomicUsize::new(DriverState::Unloaded as usize),
-        }
-    }
-
-    pub fn init(&mut self) -> Result<(), DriverError> {
-        Ok(())
-    }
-
-    pub fn probe(&mut self) -> Result<bool, DriverError> {
-        Ok(true)
-    }
-
-    pub fn shutdown(&mut self) -> Result<(), DriverError> {
-        Ok(())
-||||||| 43be3a7e8
-        SimpleDriver { id, driver_type, state: AtomicUsize::new(DriverState::Unloaded as usize) }
         SimpleDriver {
             id,
             driver_type,

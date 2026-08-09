@@ -42,6 +42,8 @@ pub struct RegisterSet {
     pub rbx: u64,
     pub rcx: u64,
     pub rdx: u64,
+    pub rdi: u64, // General Purpose / Destination Index (Syscall arg 1)
+    pub rsi: u64, // General Purpose / Source Index (Syscall arg 2)
     pub cr0: u64, // Control Register 0: Bit 0 is PE (Protection Enable), Bit 3 is TS (Task Switched)
     pub cr3: u64, // Control Register 3: Page Table Base Address
     pub cr4: u64, // Control Register 4: Os Support for SSE/XSAVE
@@ -80,6 +82,8 @@ impl SovereignVirtualCPU {
                 rbx: 0,
                 rcx: 0,
                 rdx: 0,
+                rdi: 0,
+                rsi: 0,
                 cr0: 0,
                 cr3: 0,
                 cr4: 0,

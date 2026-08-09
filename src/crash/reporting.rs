@@ -383,6 +383,8 @@ mod tests {
             rbx: 0xCAFEBABE,
             rcx: 0x1234,
             rdx: 0x5678,
+            rdi: 0,
+            rsi: 0,
             cr0: 0x80000011,
             cr3: 0x100000,
             cr4: 0,
