@@ -6,7 +6,6 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::format;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec;
@@ -508,7 +507,6 @@ impl SpeculativeDecodingEngine {
 
     /// Verifies draft tokens against target model validation probabilities.
     /// Returns the subset of accepted speculative tokens and whether verification should halt.
-    /// Optimised by Bolt ⚡: pre-allocates vector capacity to completely eliminate vector reallocation overhead.
     pub fn validate_draft_tokens(
         &self,
         draft_tokens: &[u32],
@@ -546,16 +544,12 @@ impl GrammarLogitsProcessor {
         }
     }
 
-    /// Register state transitions with pre-sorting of permissible tokens
-    /// Optimised by Bolt ⚡: sorts the token list upon registration to enable high-speed O(log K) binary search lookup later.
     pub fn register_state_transitions(&mut self, state: usize, mut permissible_tokens: Vec<u32>) {
         permissible_tokens.sort_unstable();
         self.allowed_state_transitions.push((state, permissible_tokens));
     }
 
     /// Modifies logits array by setting non-permissible token scores to -infinity (-1e9)
-    /// Optimised by Bolt ⚡: uses O(log K) binary search instead of O(K) linear lookup,
-    /// reducing the complexity of the hot token generation masking loop from O(V * K) to O(V * log K).
     pub fn apply_grammar_mask(&self, current_state: usize, logits: &mut [f32]) {
         let mut allowed_tokens = None;
         for (state, tokens) in &self.allowed_state_transitions {
