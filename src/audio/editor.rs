@@ -1,6 +1,7 @@
 /// Advanced Multi-Track Audio Editor & DSP Filter Suite for SigmaOS
 /// Replicates core features, mixing engines, and effects from Adobe Audition and Audacity
 /// Supports multi-track session mixing, gain panning, and professional DSP filter processing.
+
 use crate::klib::Vec;
 
 #[derive(Debug, Clone)]
@@ -157,10 +158,7 @@ pub struct EchoEffect {
 
 impl EchoEffect {
     pub fn new(delay_samples: usize, decay: f32) -> Self {
-        EchoEffect {
-            delay_samples,
-            decay,
-        }
+        EchoEffect { delay_samples, decay }
     }
 }
 
@@ -186,9 +184,7 @@ pub struct LowPassFilter {
 
 impl LowPassFilter {
     pub fn new(cutoff_factor: f32) -> Self {
-        LowPassFilter {
-            cutoff_factor: cutoff_factor.clamp(0.0, 1.0),
-        }
+        LowPassFilter { cutoff_factor: cutoff_factor.clamp(0.0, 1.0) }
     }
 }
 
@@ -226,6 +222,138 @@ impl AudioEffect for NoiseGateEffect {
             if sample.abs() < self.threshold {
                 *sample = 0.0;
             }
+        }
+    }
+}
+
+/// 3-Band Parametric Graphic Equalizer (Bass, Mid, Treble) shelving filters
+pub struct GraphicEqualizer {
+    pub bass_gain: f32,   // Decibel boost/cut for low frequencies
+    pub mid_gain: f32,    // Decibel boost/cut for mid frequencies
+    pub treble_gain: f32, // Decibel boost/cut for high frequencies
+}
+
+impl GraphicEqualizer {
+    pub fn new(bass: f32, mid: f32, treble: f32) -> Self {
+        GraphicEqualizer {
+            bass_gain: bass,
+            mid_gain: mid,
+            treble_gain: treble,
+        }
+    }
+
+    fn db_to_factor(db: f32) -> f32 {
+        let exponent = db / 20.0;
+        exponent.exp_m1() + 1.0
+    }
+}
+
+impl AudioEffect for GraphicEqualizer {
+    fn apply(&self, samples: &mut [f32]) {
+        let bass_factor = Self::db_to_factor(self.bass_gain);
+        let mid_factor = Self::db_to_factor(self.mid_gain);
+        let treble_factor = Self::db_to_factor(self.treble_gain);
+
+        // Simple frequency bands simulation using sliding average bands
+        if samples.len() < 3 {
+            return;
+        }
+
+        for i in 1..samples.len() - 1 {
+            let prev = samples[i - 1];
+            let curr = samples[i];
+            let next = samples[i + 1];
+
+            // Reconstruct pseudo-frequency bands via difference coefficients
+            let high_pass = (curr - (prev + next) / 2.0).clamp(-1.0, 1.0);
+            let low_pass = ((prev + curr + next) / 3.0).clamp(-1.0, 1.0);
+            let band_pass = (curr - low_pass - high_pass).clamp(-1.0, 1.0);
+
+            // Re-combine bands applying independent equalizer gains
+            let modified = low_pass * bass_factor + band_pass * mid_factor + high_pass * treble_factor;
+            samples[i] = modified.clamp(-1.0, 1.0);
+        }
+    }
+}
+
+/// Dynamic Range Compressor (Reduces peak dynamic levels above absolute threshold)
+pub struct DynamicRangeCompressor {
+    pub threshold_db: f32,  // Decibel compression threshold
+    pub ratio: f32,         // Compression ratio (e.g. 4.0 for 4:1 compression)
+}
+
+impl DynamicRangeCompressor {
+    pub fn new(threshold: f32, ratio: f32) -> Self {
+        DynamicRangeCompressor {
+            threshold_db: threshold,
+            ratio: ratio.max(1.0),
+        }
+    }
+
+    fn linear_threshold(&self) -> f32 {
+        let exponent = self.threshold_db / 20.0;
+        exponent.exp_m1() + 1.0
+    }
+}
+
+impl AudioEffect for DynamicRangeCompressor {
+    fn apply(&self, samples: &mut [f32]) {
+        let limit = self.linear_threshold();
+        for sample in samples.iter_mut() {
+            let abs_val = sample.abs();
+            if abs_val > limit {
+                // Compress excess peak gain: limit + (abs_val - limit) / ratio
+                let excess = abs_val - limit;
+                let compressed = limit + excess / self.ratio;
+                *sample = sample.signum() * compressed;
+            }
+        }
+    }
+}
+
+/// Pitch Shifter / Resampler Effect utilizing Linear Interpolation
+pub struct PitchShifter {
+    pub pitch_factor: f32, // Pitch scaling multiplier (0.5 for octave down, 2.0 for octave up)
+}
+
+impl PitchShifter {
+    pub fn new(pitch_factor: f32) -> Self {
+        PitchShifter {
+            pitch_factor: pitch_factor.max(0.1).min(10.0),
+        }
+    }
+}
+
+impl AudioEffect for PitchShifter {
+    fn apply(&self, samples: &mut [f32]) {
+        if samples.len() < 2 {
+            return;
+        }
+
+        let mut resampled = Vec::new();
+        let mut float_idx = 0.0f32;
+
+        while (float_idx as usize) < samples.len() - 1 {
+            let base_idx = float_idx as usize;
+            let frac = float_idx - (base_idx as f32);
+
+            let s1 = samples[base_idx];
+            let s2 = samples[base_idx + 1];
+
+            // Perform standard linear interpolation resample
+            let interpolated = s1 * (1.0 - frac) + s2 * frac;
+            resampled.push(interpolated);
+
+            float_idx += self.pitch_factor;
+        }
+
+        // Overwrite original samples buffer back
+        let copy_len = resampled.len().min(samples.len());
+        samples[..copy_len].copy_from_slice(&resampled.as_slice()[..copy_len]);
+
+        // Zero out remaining trailing samples if any
+        for i in copy_len..samples.len() {
+            samples[i] = 0.0;
         }
     }
 }
@@ -335,7 +463,8 @@ mod tests {
             .with_samples(&[0.5, 0.5, 0.5])
             .with_volume(1.2); // linear amplification
 
-        let track2 = AudioTrack::new(2, "Backing").with_samples(&[0.2, -0.2, 0.2]);
+        let track2 = AudioTrack::new(2, "Backing")
+            .with_samples(&[0.2, -0.2, 0.2]);
 
         session.add_track(track1);
         session.add_track(track2);
@@ -402,5 +531,28 @@ mod tests {
         AudioEditor::paste(&mut track, 1, clipboard.as_slice());
         assert_eq!(track.samples.len(), 4);
         assert_eq!(track.samples[2], 3.0);
+    }
+
+    #[test]
+    fn test_equalizer_filter() {
+        let mut samples = [0.5, -0.5, 0.5, -0.5, 0.5];
+        let eq = GraphicEqualizer::new(6.0, -3.0, 3.0); // Boost Bass and Treble, Cut Mids
+        eq.apply(&mut samples);
+        assert_eq!(samples.len(), 5);
+    }
+
+    #[test]
+    fn test_pitch_shifter_and_compressor() {
+        let mut samples = [1.0, -1.0, 1.0, -1.0];
+
+        // Dynamic Range Compressor
+        let comp = DynamicRangeCompressor::new(-6.0, 2.0); // Threshold at ~0.501, 2:1 ratio
+        comp.apply(&mut samples);
+        assert!(samples[0] < 1.0); // Signal was successfully compressed!
+
+        // Pitch Shifter (Octave Up: resamples to half length)
+        let pitch = PitchShifter::new(2.0);
+        pitch.apply(&mut samples);
+        assert_eq!(samples[2], 0.0); // Trait samples are correctly zeroed out
     }
 }

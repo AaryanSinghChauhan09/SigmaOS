@@ -1,45 +1,354 @@
-#![no_std]
+// SigmaOS Pledge and Unveil - Process Privilege Reduction Mechanisms
+// Inspired by OpenBSD's security sandboxing models but capability-based
 
-bitflags::bitflags! {
-    pub struct Promise: u32 {
-        const STDIO = 0b0000_0001;
-        const RPATH = 0b0000_0010;
-        const WPATH = 0b0000_0100;
-        const CPATH = 0b0000_1000;
-        const DPATH = 0b0001_0000;
-        const INET  = 0b0010_0000;
-        const UNIX  = 0b0100_0000;
-        const PROC  = 0b1000_0000;
+use crate::security::capability::{CapabilityGate, CapabilityToken, Permission};
+use crate::klib::Vec;
+use core::sync::atomic::{AtomicBool, Ordering};
+
+/// Pledge promise representing process permissions
+#[derive(Debug)]
+pub struct PledgePromise {
+    /// Allowed permissions
+    permissions: Vec<Permission>,
+    /// Whether pledge is active
+    active: AtomicBool,
+}
+
+impl Clone for PledgePromise {
+    fn clone(&self) -> Self {
+        Self {
+            permissions: self.permissions.clone(),
+            active: AtomicBool::new(self.active.load(Ordering::SeqCst)),
+        }
     }
 }
 
-pub struct ProcessPledge {
-    current_promises: Promise,
-    exec_promises: Option<Promise>,
-}
-
-impl ProcessPledge {
-    pub const fn new() -> Self {
-        ProcessPledge {
-            // Initially, no restrictions (or could default to all permissions depending on design)
-            current_promises: Promise::all(),
-            exec_promises: None,
+impl PledgePromise {
+    /// Create new pledge promise with specified permissions
+    pub fn new(permissions: Vec<Permission>) -> Self {
+        Self {
+            permissions,
+            active: AtomicBool::new(false),
         }
     }
 
-    pub fn pledge(&mut self, promises: Promise, exec_promises: Option<Promise>) -> Result<(), &'static str> {
-        // Can only reduce privileges, never increase
-        if !self.current_promises.contains(promises) {
-            return Err("Cannot increase privileges via pledge");
+    /// Activate the pledge (can only be done once)
+    pub fn activate(&self) -> Result<(), PledgeError> {
+        if self.active.load(Ordering::SeqCst) {
+            return Err(PledgeError::AlreadyActive);
         }
-        
-        self.current_promises = promises;
-        self.exec_promises = exec_promises;
-        
+        self.active.store(true, Ordering::SeqCst);
         Ok(())
     }
 
-    pub fn check_permission(&self, required: Promise) -> bool {
-        self.current_promises.contains(required)
+    /// Check if permission is allowed
+    pub fn allows(&self, permission: Permission) -> bool {
+        if !self.active.load(Ordering::SeqCst) {
+            return true; // Not activated yet, allow everything
+        }
+        self.permissions.contains(&permission)
+    }
+
+    /// Get all allowed permissions
+    pub fn permissions(&self) -> &[Permission] {
+        self.permissions.as_slice()
+    }
+}
+
+/// Pledge errors
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PledgeError {
+    AlreadyActive,
+    InvalidPermission,
+    Violation,
+}
+
+/// Represents an unveiled directory or file path with permitted permissions (OpenBSD style)
+pub struct UnveiledPath {
+    pub path: [u8; 64],
+    pub read: bool,
+    pub write: bool,
+    pub execute: bool,
+    pub create: bool,
+}
+
+impl UnveiledPath {
+    pub fn new(path: &[u8], permissions: &[u8]) -> Self {
+        let mut path_arr = [0u8; 64];
+        let len = path.len().min(63);
+        path_arr[..len].copy_from_slice(&path[..len]);
+
+        let mut read = false;
+        let mut write = false;
+        let mut execute = false;
+        let mut create = false;
+
+        for &b in permissions {
+            match b {
+                b'r' => read = true,
+                b'w' => write = true,
+                b'x' => execute = true,
+                b'c' => create = true,
+                _ => {}
+            }
+        }
+
+        UnveiledPath {
+            path: path_arr,
+            read,
+            write,
+            execute,
+            create,
+        }
+    }
+
+    /// Returns the length of the string path
+    pub fn path_len(&self) -> usize {
+        self.path.iter().position(|&b| b == 0).unwrap_or(64)
+    }
+
+    /// Checks if a requested path starts with this unveiled prefix
+    pub fn matches_prefix(&self, target_path: &[u8]) -> bool {
+        let len = self.path_len();
+        if target_path.len() < len {
+            return false;
+        }
+        &target_path[..len] == &self.path[..len]
+    }
+}
+
+/// Process pledge and unveil manager
+pub struct PledgeManager {
+    /// Current pledge promise
+    pledge: Option<PledgePromise>,
+    /// Capability gate for validation
+    gate: CapabilityGate,
+    /// Unveiled files/directories list (OpenBSD style)
+    pub unveiled_paths: Vec<UnveiledPath>,
+}
+
+impl PledgeManager {
+    /// Create new pledge manager
+    pub fn new() -> Self {
+        Self {
+            pledge: None,
+            gate: CapabilityGate::new(),
+            unveiled_paths: Vec::new(),
+        }
+    }
+
+    /// Set pledge promise for process
+    pub fn pledge(&mut self, promise: PledgePromise) -> Result<(), PledgeError> {
+        if self.pledge.is_some() {
+            return Err(PledgeError::AlreadyActive);
+        }
+        promise.activate()?;
+        self.pledge = Some(promise);
+
+        // Update capability gate based on pledge
+        if let Some(ref pledge) = self.pledge {
+            let mut token = CapabilityToken::new();
+            for &perm in pledge.permissions() {
+                match perm {
+                    Permission::NetworkTcp => token = token.allow_network("tcp", 0),
+                    Permission::NetworkUdp => token = token.allow_network("udp", 0),
+                    Permission::FileRead => token = token.allow_read("/"),
+                    Permission::FileWrite => token = token.allow_write("/tmp"),
+                    Permission::ProcessExec => token = token.allow_exec(),
+                    Permission::Ipc => token = token.allow_ipc(),
+                }
+            }
+            self.gate.set_capability(token);
+        }
+
+        Ok(())
+    }
+
+    /// Register an unveiled path with its permitted permission set (e.g. "rw")
+    pub fn unveil(&mut self, path: &[u8], permissions: &[u8]) {
+        self.unveiled_paths.push(UnveiledPath::new(path, permissions));
+    }
+
+    /// Validates requested path access.
+    /// Rules (OpenBSD spec):
+    /// 1. If no paths are unveiled, standard UNIX/Capability rules apply (allow path).
+    /// 2. If at least one path is unveiled, the namespace is locked down: any path that does NOT match an unveiled prefix is forbidden!
+    pub fn validate_path_access(&self, target_path: &[u8], is_write: bool) -> bool {
+        if self.unveiled_paths.is_empty() {
+            return true; // No unveil lockdown active
+        }
+
+        // Find the most specific (longest) matching prefix
+        let mut best_match: Option<&UnveiledPath> = None;
+        let mut best_len = 0;
+
+        for i in 0..self.unveiled_paths.len() {
+            let entry = &self.unveiled_paths[i];
+            if entry.matches_prefix(target_path) {
+                let len = entry.path_len();
+                if len > best_len {
+                    best_len = len;
+                    best_match = Some(entry);
+                }
+            }
+        }
+
+        if let Some(entry) = best_match {
+            if is_write {
+                entry.write
+            } else {
+                entry.read
+            }
+        } else {
+            false // Path is completely hidden / forbidden outside the unveiled namespace
+        }
+    }
+
+    /// Validate syscall against pledge
+    pub fn validate(&self, permission: Permission) -> Result<(), PledgeError> {
+        if let Some(ref pledge) = self.pledge {
+            if !pledge.allows(permission) {
+                return Err(PledgeError::Violation);
+            }
+        }
+        Ok(())
+    }
+
+    /// Get current capability gate
+    pub fn gate(&self) -> &CapabilityGate {
+        &self.gate
+    }
+}
+
+impl Default for PledgeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Common pledge promises
+pub mod promises {
+    use super::{Permission, PledgePromise};
+    use crate::klib::Vec;
+
+    /// Stdio promise - basic I/O only
+    pub fn stdio() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
+    }
+
+    /// Network promise - network access
+    pub fn network() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::NetworkTcp);
+        p.push(Permission::NetworkUdp);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
+    }
+
+    /// Exec promise - can execute processes
+    pub fn exec() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::ProcessExec);
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
+    }
+
+    /// IPC promise - inter-process communication
+    pub fn ipc() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Ipc);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
+    }
+
+    /// Full promise - all permissions
+    pub fn full() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::NetworkTcp);
+        p.push(Permission::NetworkUdp);
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        p.push(Permission::ProcessExec);
+        p.push(Permission::Ipc);
+        PledgePromise::new(p)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::promises::*;
+    use super::*;
+
+    #[test]
+    fn test_pledge_creation() {
+        let mut p = Vec::new();
+        p.push(Permission::FileRead);
+        let promise = PledgePromise::new(p);
+        assert!(!promise.active.load(Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_pledge_activation() {
+        let mut p = Vec::new();
+        p.push(Permission::FileRead);
+        let promise = PledgePromise::new(p);
+        assert!(promise.activate().is_ok());
+        assert!(promise.activate().is_err());
+    }
+
+    #[test]
+    fn test_pledge_permission_check() {
+        let mut p = Vec::new();
+        p.push(Permission::FileRead);
+        let promise = PledgePromise::new(p);
+        promise.activate().unwrap();
+        assert!(promise.allows(Permission::FileRead));
+        assert!(!promise.allows(Permission::FileWrite));
+    }
+
+    #[test]
+    fn test_pledge_manager() {
+        let mut manager = PledgeManager::new();
+        let promise = stdio();
+        assert!(manager.pledge(promise).is_ok());
+        assert!(manager.validate(Permission::FileRead).is_ok());
+        assert!(manager.validate(Permission::ProcessExec).is_err());
+    }
+
+    #[test]
+    fn test_common_promises() {
+        let stdio_promise = stdio();
+        assert!(stdio_promise.allows(Permission::FileRead));
+
+        let network_promise = network();
+        assert!(network_promise.allows(Permission::NetworkTcp));
+
+        let full_promise = full();
+        assert!(full_promise.allows(Permission::ProcessExec));
+    }
+
+    #[test]
+    fn test_openbsd_unveil_sandboxing() {
+        let mut manager = PledgeManager::new();
+
+        // 1. By default, with no unveiled paths, access is permitted
+        assert!(manager.validate_path_access(b"/etc/passwd", false));
+        assert!(manager.validate_path_access(b"/tmp/session.lock", true));
+
+        // 2. Unveil a specific read-only prefix and a read-write prefix
+        manager.unveil(b"/tmp", b"rw");
+        manager.unveil(b"/usr/local", b"r");
+
+        // 3. Namespace should be locked down: unrelated paths are blocked / hidden!
+        assert!(!manager.validate_path_access(b"/etc/passwd", false));
+
+        // 4. Mapped prefixes should satisfy requested read/write constraints
+        assert!(manager.validate_path_access(b"/tmp/file.txt", true));  // ReadWrite allowed
+        assert!(manager.validate_path_access(b"/usr/local/bin/rustc", false)); // Read allowed
+        assert!(!manager.validate_path_access(b"/usr/local/bin/rustc", true)); // Write rejected
     }
 }

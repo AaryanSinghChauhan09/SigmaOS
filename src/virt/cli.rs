@@ -370,8 +370,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
     }
 
     fn execute_command(&mut self, name: &[u8], args: &[u8]) -> Result<Vec<u8>, CLIError> {
-        for command_option in self.commands.iter_mut() {
-            if let Some(command) = command_option.as_mut() {
+        for command_option in &mut self.commands {
+            if let Some(ref mut command) = *command_option {
                 if command.name() == name {
                     return command.execute(args);
                 }
@@ -421,8 +421,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
             return Err(CLIError::PermissionDenied);
         }
 
-        for vm_option in self.vms.iter_mut() {
-            if let Some(vm) = vm_option.as_mut() {
+        for vm_option in &mut self.vms {
+            if let Some(ref mut vm) = *vm_option {
                 if vm.id() == id {
                     let result = vm.start();
                     if result.is_ok() {
@@ -440,8 +440,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
             return Err(CLIError::PermissionDenied);
         }
 
-        for vm_option in self.vms.iter_mut() {
-            if let Some(vm) = vm_option.as_mut() {
+        for vm_option in &mut self.vms {
+            if let Some(ref mut vm) = *vm_option {
                 if vm.id() == id {
                     let result = vm.stop();
                     if result.is_ok() {
@@ -456,8 +456,8 @@ impl VirtualizationCLI for SimpleVirtualizationCLI {
 
     fn list_vms(&self) -> Vec<VMID> {
         let mut ids = Vec::new();
-        for vm_option in self.vms.iter() {
-            if let Some(vm) = vm_option.as_ref() {
+        for vm_option in &self.vms {
+            if let Some(ref vm) = *vm_option {
                 ids.push(vm.id());
             }
         }
@@ -570,6 +570,24 @@ impl<T> core::ops::IndexMut<usize> for Vec<T> {
     }
 }
 
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = VecIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = VecIterMut<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
 pub struct VecIter<'a, T> {
     vec: &'a Vec<T>,
     index: usize,
@@ -626,16 +644,3 @@ extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
 }
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-

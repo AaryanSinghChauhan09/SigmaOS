@@ -12,6 +12,12 @@ pub struct CapabilityToken {
     bits: u64,
 }
 
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CapabilityToken {
     /// Create a new capability token with no permissions
     pub fn new() -> Self {
