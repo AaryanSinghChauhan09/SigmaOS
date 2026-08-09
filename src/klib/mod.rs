@@ -5,11 +5,13 @@ extern crate alloc;
 pub mod buddy_allocator;
 pub mod paging;
 pub mod vec;
+pub mod custom_allocator;
 pub mod time;
 pub mod math;
 pub mod uuid;
 pub mod hash;
 pub mod string;
+pub mod custom_string;
 pub mod arc;
 pub mod ring_buffer;
 pub mod linked_list;
@@ -27,6 +29,7 @@ pub mod vecdeque;
 
 // Re-exports
 pub use string::{String, ToString};
+pub use custom_string::SigmaString;
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};

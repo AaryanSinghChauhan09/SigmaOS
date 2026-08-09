@@ -2,7 +2,7 @@
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
 use crate::klib::SigmaString;
-use core::cell::Cell;
+use core::cell::{Cell, RefCell};
 
 /// Routing modes for network traffic
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,13 +67,13 @@ pub struct SandboxPolicy {
 
 /// AppSandbox engine for process security
 pub struct AppSandboxEngine {
-    pub current_policy: Cell<SandboxPolicy>,
+    pub current_policy: RefCell<SandboxPolicy>,
 }
 
 impl AppSandboxEngine {
     pub fn new() -> Self {
         AppSandboxEngine {
-            current_policy: Cell::new(SandboxPolicy {
+            current_policy: RefCell::new(SandboxPolicy {
                 allow_network: false,
                 allow_raw_sockets: false,
                 allow_filesystem_write: false,
@@ -84,7 +84,7 @@ impl AppSandboxEngine {
 
     /// Validate filesystem write access
     pub fn validate_filesystem_write(&self, path: &str) -> bool {
-        let policy = self.current_policy.get();
+        let policy = self.current_policy.borrow();
         if !policy.allow_filesystem_write {
             path.starts_with(policy.permitted_subpath.as_str())
         } else {
@@ -94,7 +94,7 @@ impl AppSandboxEngine {
 
     /// Validate network socket creation
     pub fn validate_network_socket(&self, is_raw: bool) -> bool {
-        let policy = self.current_policy.get();
+        let policy = self.current_policy.borrow();
         if is_raw && !policy.allow_raw_sockets {
             false
         } else if !is_raw && !policy.allow_network {
@@ -106,12 +106,12 @@ impl AppSandboxEngine {
 
     /// Set sandbox policy
     pub fn set_policy(&self, policy: SandboxPolicy) {
-        self.current_policy.set(policy);
+        *self.current_policy.borrow_mut() = policy;
     }
 
     /// Get current policy
     pub fn current_policy(&self) -> SandboxPolicy {
-        self.current_policy.get()
+        self.current_policy.borrow().clone()
     }
 }
 

@@ -77,6 +77,3 @@ pub use gentoo::{
     UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
     EbuildPackage, PortageEngine,
 };
-
-pub mod gentoo;
-pub use gentoo::{OpenRcManager, OpenRcService, OpenRcRunlevel};

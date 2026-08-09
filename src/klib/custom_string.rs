@@ -54,6 +54,12 @@ pub struct SigmaString {
 unsafe impl Send for SigmaString {}
 unsafe impl Sync for SigmaString {}
 
+impl Clone for SigmaString {
+    fn clone(&self) -> Self {
+        Self::from_str(self.as_str())
+    }
+}
+
 impl SigmaString {
     // ------------------------------------------------------------------
     // Construction

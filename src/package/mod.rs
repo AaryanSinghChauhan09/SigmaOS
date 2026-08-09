@@ -5,7 +5,7 @@ pub mod debian;
 
 pub use store::{SigmaSoftwareStore, StoreApp, StoreError};
 pub use universal::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageFormatAdapter as PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use debian::{

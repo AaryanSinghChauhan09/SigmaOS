@@ -9,6 +9,22 @@ pub mod tasks;
 pub mod terminal;
 pub mod tmux;
 pub mod mind_map;
+pub mod advanced_app_absorber;
+pub mod utility_suite;
+
+pub use utility_suite::{
+    FileIndexEntry, EverythingSearchEngine, TextTab, NotepadPlusPlusBuffer,
+    BrowserContainerType, BrowserTabInstance, SovereignBrowserEngine,
+    CompressionMethod, ArchiveVolume, SevenZipEngine,
+    AnnotationShape, ScreenshotAnnotation, FlameshotAnnotator,
+    VideoSourceLayer, ObsStudioMixer,
+    AudacityWaveEditor,
+    VlcCodecPipeline,
+    VideoTrackClip, DaVinciTimeline,
+    ItemAgeColor, OneCommanderFileGrid,
+    AppVolumeChannel, EarTrumpetVolumeMatrix,
+    ExifMetadata, IrfanViewEngine,
+};
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
