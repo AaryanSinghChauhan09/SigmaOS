@@ -324,7 +324,7 @@ impl AiOptimizationStrategy for MlOptimizer {
         }
     }
 
-    fn execute(&mut self, action: &SystemAction) -> Result<(), OptimizationError> {
+    fn execute(&mut self, _action: &SystemAction) -> Result<(), OptimizationError> {
         // Simulated action execution
         Ok(())
     }

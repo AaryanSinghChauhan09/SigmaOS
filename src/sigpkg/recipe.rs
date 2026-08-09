@@ -1,5 +1,6 @@
 // SigmaOS Package Recipes
 // Build recipes for package compilation and installation
+// Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
 use crate::sigpkg::{Dependency, Version};
 use std::collections::HashMap;
@@ -15,6 +16,24 @@ pub enum BuildSystem {
     Ninja,
 }
 
+/// Gentoo-inspired compilation optimization profiles (stages)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StageProfile {
+    Stage1Minimal,      // Basic fallback bootstrap flags (-O1, -mno-sse)
+    Stage2Bootstrap,    // Balanced standard optimization (-O2)
+    Stage3Optimized,    // Maximum architecture-targeted performance (-O3 -march=native -flto)
+}
+
+/// Gentoo-style Portage USE flags representing conditional package compilation features
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UseFlag {
+    Ssl,
+    Threads,
+    X11,
+    Gpu,
+    Sound,
+}
+
 /// Package recipe
 #[derive(Debug, Clone)]
 pub struct PackageRecipe {
@@ -28,6 +47,11 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
+
+    // Gentoo-inspired features
+    pub active_use_flags: Vec<UseFlag>,
+    pub compilation_profile: StageProfile,
+    pub conditional_dependencies: Vec<(UseFlag, Dependency)>, // Dependency unlocked ONLY if USE flag is active
 }
 
 impl PackageRecipe {
@@ -43,6 +67,9 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
+            active_use_flags: Vec::new(),
+            compilation_profile: StageProfile::Stage2Bootstrap,
+            conditional_dependencies: Vec::new(),
         }
     }
 
@@ -80,6 +107,46 @@ impl PackageRecipe {
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
         self
+    }
+
+    // Builder helpers for USE flags and compilation profiles
+    pub fn with_use_flag(mut self, flag: UseFlag) -> Self {
+        self.active_use_flags.push(flag);
+        self
+    }
+
+    pub fn with_compilation_profile(mut self, profile: StageProfile) -> Self {
+        self.compilation_profile = profile;
+        self
+    }
+
+    pub fn with_conditional_dependency(mut self, flag: UseFlag, dependency: Dependency) -> Self {
+        self.conditional_dependencies.push((flag, dependency));
+        self
+    }
+
+    pub fn is_use_active(&self, flag: UseFlag) -> bool {
+        self.active_use_flags.contains(&flag)
+    }
+
+    /// Evaluates and returns all active dependencies including conditional USE-flag targets
+    pub fn get_active_dependencies(&self) -> Vec<Dependency> {
+        let mut deps = self.dependencies.clone();
+        for (flag, dep) in self.conditional_dependencies.iter() {
+            if self.is_use_active(*flag) {
+                deps.push(dep.clone());
+            }
+        }
+        deps
+    }
+
+    /// Returns CFLAGS/CXXFLAGS compilation flags matching the active Stage Profile
+    pub fn get_stage_optimization_flags(&self) -> &'static str {
+        match self.compilation_profile {
+            StageProfile::Stage1Minimal => "-O1 -mno-sse2",
+            StageProfile::Stage2Bootstrap => "-O2 -pipe",
+            StageProfile::Stage3Optimized => "-O3 -march=native -flto=fat -funroll-loops",
+        }
     }
 
     pub fn validate(&self) -> Result<(), RecipeError> {
@@ -224,5 +291,41 @@ mod tests {
 
         let script = recipe.get_build_script();
         assert!(script.contains("cargo build"));
+    }
+
+    #[test]
+    fn test_portage_style_use_flags() {
+        let mut recipe = PackageRecipe::new("libcurl".to_string(), Version::new(8, 2, 1))
+            .with_source("https://example.com/curl".to_string(), "99aa88".to_string())
+            .with_build_command("make".to_string());
+
+        // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
+        let ssl_dependency = Dependency {
+            name: "openssl".to_string(),
+            version: Version::new(3, 0, 0),
+        };
+
+        recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);
+
+        // 1. By default, "Ssl" is inactive, so no conditional dependency is fetched
+        assert!(!recipe.is_use_active(UseFlag::Ssl));
+        assert_eq!(recipe.get_active_dependencies().len(), 0);
+
+        // 2. Toggle "Ssl" active
+        recipe = recipe.with_use_flag(UseFlag::Ssl);
+        assert!(recipe.is_use_active(UseFlag::Ssl));
+
+        let active_deps = recipe.get_active_dependencies();
+        assert_eq!(active_deps.len(), 1);
+        assert_eq!(active_deps[0].name, "openssl");
+    }
+
+    #[test]
+    fn test_portage_stage_optimization_flags() {
+        let mut recipe = PackageRecipe::new("kernel".to_string(), Version::new(6, 1, 0));
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O2 -pipe"); // default Stage2
+
+        recipe = recipe.with_compilation_profile(StageProfile::Stage3Optimized);
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O3 -march=native -flto=fat -funroll-loops");
     }
 }
