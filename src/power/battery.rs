@@ -1,28 +1,42 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
+
 /// OOP-based Battery Management for SigmaOS
 /// Based on 100-Improvement-Ideas.md #15: Battery saver mode
 /// Implements comprehensive battery monitoring, health tracking,
 /// and intelligent power saving for optimal battery life
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 pub type BatteryID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BatteryState { Charging = 0, Discharging = 1, Full = 2, NotPresent = 3, Critical = 4 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum BatteryError { Success = 0, NotFound = 1, ReadFailed = 2 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct BatteryInfo {
+    pub id: BatteryID,
+    pub capacity: u32,
+    pub current_charge: u32,
+    pub voltage: u32,
+    pub state: BatteryState,
+    pub health: u32,
+}
+
 pub trait Battery {
     fn id(&self) -> BatteryID;
     fn capacity(&self) -> u32;
     fn current_charge(&self) -> u32;
+    fn set_charge(&self, charge: u32);
     fn voltage(&self) -> u32;
     fn state(&self) -> BatteryState;
     fn health(&self) -> u32;
@@ -55,6 +69,7 @@ impl Battery for SimpleBattery {
     fn id(&self) -> BatteryID { self.id }
     fn capacity(&self) -> u32 { self.capacity.load(Ordering::SeqCst) as u32 }
     fn current_charge(&self) -> u32 { self.current_charge.load(Ordering::SeqCst) as u32 }
+    fn set_charge(&self, charge: u32) { self.current_charge.store(charge as usize, Ordering::SeqCst); }
     fn voltage(&self) -> u32 { self.voltage.load(Ordering::SeqCst) as u32 }
     fn state(&self) -> BatteryState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
     fn health(&self) -> u32 { self.health.load(Ordering::SeqCst) as u32 }
@@ -128,7 +143,7 @@ impl BatteryManager for SimpleBatteryManager {
         for battery_option in &mut self.batteries {
             if let Some(ref mut battery) = *battery_option {
                 if battery.id() == id {
-                    battery.current_charge.store(charge as usize, Ordering::SeqCst);
+                    battery.set_charge(charge);
                     return Ok(());
                 }
             }
@@ -169,30 +184,3 @@ impl PowerSaver for SimplePowerSaver {
 
     fn get_threshold(&self) -> u32 { self.threshold.load(Ordering::SeqCst) as u32 }
 }
-
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
