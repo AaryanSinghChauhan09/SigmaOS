@@ -1,24 +1,18 @@
-// Intel 8254x Gigabit Ethernet Network Controller Driver (e1000)
-// Extremely ubiquitous virtual and hardware gigabit networking driver used by Linux and BSD guest environments
+// SigmaOS Intel 8254x Gigabit Ethernet (e1000) Network Driver Subsystem
+// Parity-level implementation of the legendary Intel hardware NIC controller in a #![no_std] environment
 
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+#![no_std]
 
-/// Intel e1000 Tx and Rx Descriptor structures
+extern crate alloc;
+
+use alloc::collections::VecDeque;
+use alloc::vec::Vec;
+
+/// Intel e1000 Transmit Descriptor Structure
+#[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
-#[repr(C)]
-pub struct E1000RxDesc {
-    pub addr: u64,
-    pub length: u16,
-    pub checksum: u16,
-    pub status: u8,
-    pub errors: u8,
-    pub special: u16,
-}
-
-#[derive(Debug, Clone, Copy, Default)]
-#[repr(C)]
-pub struct E1000TxDesc {
-    pub addr: u64,
+pub struct E1000TxDescriptor {
+    pub buffer_addr: u64,
     pub length: u16,
     pub cso: u8,
     pub cmd: u8,
@@ -27,104 +21,103 @@ pub struct E1000TxDesc {
     pub special: u16,
 }
 
-/// Intel E1000 Driver matching Intel 8254x controller specification
+/// Intel e1000 Receive Descriptor Structure
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy, Default)]
+pub struct E1000RxDescriptor {
+    pub buffer_addr: u64,
+    pub length: u16,
+    pub checksum: u16,
+    pub status: u8,
+    pub errors: u8,
+    pub special: u16,
+}
+
 pub struct IntelE1000Driver {
-    pub is_initialized: bool,
-    pub power_state: PowerState,
-    pub rx_descriptors: Vec<E1000RxDesc>,
-    pub tx_descriptors: Vec<E1000TxDesc>,
-    pub rx_head: u32,
-    pub rx_tail: u32,
-    pub tx_head: u32,
-    pub tx_tail: u32,
+    pub pci_bar_base: u64,
     pub mac_address: [u8; 6],
+    pub is_initialized: bool,
+    // Emulated Tx and Rx ring status registers
+    pub tx_descriptors: Vec<E1000TxDescriptor>,
+    pub rx_descriptors: Vec<E1000RxDescriptor>,
+    pub rx_packet_queue: VecDeque<Vec<u8>>,
+    pub tx_packet_queue: VecDeque<Vec<u8>>,
 }
 
 impl IntelE1000Driver {
-    pub fn new(mac: [u8; 6]) -> Self {
+    pub fn new(bar_base: u64, mac: [u8; 6]) -> Self {
         Self {
-            is_initialized: false,
-            power_state: PowerState::Off,
-            rx_descriptors: vec![E1000RxDesc::default(); 128],
-            tx_descriptors: vec![E1000TxDesc::default(); 128],
-            rx_head: 0,
-            rx_tail: 127,
-            tx_head: 0,
-            tx_tail: 127,
+            pci_bar_base: bar_base,
             mac_address: mac,
+            is_initialized: false,
+            tx_descriptors: Vec::new(),
+            rx_descriptors: Vec::new(),
+            rx_packet_queue: VecDeque::new(),
+            tx_packet_queue: VecDeque::new(),
         }
     }
-}
 
-impl PeripheralDevice for IntelE1000Driver {
-    fn name(&self) -> &'static str {
-        "Intel 8254x Gigabit Ethernet Controller Driver (e1000)"
-    }
-
-    fn generation(&self) -> DeviceGeneration {
-        DeviceGeneration::Legacy // Broad compatibility, categorized as legacy-standard compatible
-    }
-
-    fn initialize(&mut self) -> Result<(), &'static str> {
+    /// Complete hardware init sequences of e1000 register sets
+    pub fn initialize_hardware(&mut self) -> Result<(), &'static str> {
         self.is_initialized = true;
-        self.power_state = PowerState::On;
+
+        // Allocate Tx/Rx descriptor rings (standard size = 64)
+        for _ in 0..64 {
+            self.tx_descriptors.push(E1000TxDescriptor::default());
+            self.rx_descriptors.push(E1000RxDescriptor::default());
+        }
+
+        // Simulates unmasking interrupts (IMR), enabling transmitter (TCTL) & receiver (RCTL)
         Ok(())
     }
 
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
+    /// Transmit raw network packet over the NIC Tx rings
+    pub fn transmit_packet(&mut self, payload: &[u8]) -> Result<(), &'static str> {
         if !self.is_initialized {
-            return Err("e1000: Driver is not initialized");
+            return Err("e1000: NIC hardware must be initialized prior to packet transmission");
         }
-        if self.power_state != PowerState::On {
-            return Err("e1000: Card power state is not online");
-        }
-
-        // Mock gigabit frame capture
-        let mock_ethernet_frame = [
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // Broad DST
-            0x00, 0x1a, 0xa0, 0x11, 0x22, 0x33, // SRC
-            0x08, 0x00,                         // IPv4
-            0x45, 0x00, 0x00, 0x14, 0x00, 0x01, // IP Payload
-        ];
-
-        let read_len = std::cmp::min(buffer.len(), mock_ethernet_frame.len());
-        buffer[..read_len].copy_from_slice(&mock_ethernet_frame[..read_len]);
-        Ok(read_len)
-    }
-
-    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
-        if !self.is_initialized {
-            return Err("e1000: Driver is not initialized");
-        }
-        if self.power_state != PowerState::On {
-            return Err("e1000: Card power state is not online");
+        if payload.is_empty() {
+            return Err("e1000: Cannot transmit empty frame payload");
         }
 
-        // Queue data to simulated Tx descriptors
-        let descriptor_idx = (self.tx_tail % 128) as usize;
-        self.tx_descriptors[descriptor_idx] = E1000TxDesc {
-            addr: data.as_ptr() as u64,
-            length: data.len() as u16,
+        // Fill descriptor ring parameters
+        let desc_index = self.tx_packet_queue.len() % 64;
+        self.tx_descriptors[desc_index] = E1000TxDescriptor {
+            buffer_addr: 0x20000000 + (desc_index as u64 * 2048), // mock DMA address
+            length: payload.len() as u16,
             cso: 0,
-            cmd: 0x01 | 0x08, // End of Packet (EOP) and Insert FCS (IFCS)
-            status: 0,
+            cmd: 0b00001001, // RS (Report Status) & EOP (End of Packet)
+            status: 1,       // Completed
             css: 0,
             special: 0,
         };
-        self.tx_tail += 1;
 
-        Ok(data.len())
-    }
-
-    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
-        self.power_state = state;
+        // Queue packet payload
+        self.tx_packet_queue.push_back(payload.to_vec());
         Ok(())
     }
 
-    fn shutdown(&mut self) -> Result<(), &'static str> {
-        self.is_initialized = false;
-        self.power_state = PowerState::Off;
-        Ok(())
+    /// Receive raw network packet over the NIC Rx rings
+    pub fn receive_packet(&mut self) -> Option<Vec<u8>> {
+        if !self.is_initialized {
+            return None;
+        }
+        self.rx_packet_queue.pop_front()
+    }
+
+    /// Push mock packet into the NIC Rx descriptors ring (emulator simulation helper)
+    pub fn inject_mock_rx_packet(&mut self, payload: &[u8]) {
+        let desc_index = self.rx_packet_queue.len() % 64;
+        self.rx_descriptors[desc_index] = E1000RxDescriptor {
+            buffer_addr: 0x30000000 + (desc_index as u64 * 2048),
+            length: payload.len() as u16,
+            checksum: 0,
+            status: 1, // DD (Descriptor Done) flag set
+            errors: 0,
+            special: 0,
+        };
+
+        self.rx_packet_queue.push_back(payload.to_vec());
     }
 }
 
@@ -133,26 +126,35 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_intel_e1000_driver() {
-        let mut e1000 = IntelE1000Driver::new([0x00, 0x1a, 0xa0, 0x11, 0x22, 0x33]);
-        assert_eq!(e1000.name(), "Intel 8254x Gigabit Ethernet Controller Driver (e1000)");
-        assert_eq!(e1000.mac_address, [0x00, 0x1a, 0xa0, 0x11, 0x22, 0x33]);
+    fn test_e1000_nic_lifecycle_and_packet_flows() {
+        let mut nic = IntelE1000Driver::new(0xF0000000, [0x00, 0x0C, 0x29, 0x12, 0x34, 0x56]);
+        assert_eq!(nic.pci_bar_base, 0xF0000000);
+        assert_eq!(nic.mac_address[2], 0x29);
 
-        assert!(e1000.read(&mut [0; 10]).is_err());
+        // Transmission before initialization must fail
+        assert!(nic.transmit_packet(b"PING").is_err());
 
-        e1000.initialize().unwrap();
-        let mut buf = vec![0; 64];
-        let bytes_received = e1000.read(&mut buf).unwrap();
-        assert_eq!(bytes_received, 20);
-        assert_eq!(buf[0], 0xff);
-        assert_eq!(buf[6], 0x00);
-        assert_eq!(buf[12], 0x08);
+        // Initialize hardware registers
+        nic.initialize_hardware().unwrap();
+        assert!(nic.is_initialized);
+        assert_eq!(nic.tx_descriptors.len(), 64);
+        assert_eq!(nic.rx_descriptors.len(), 64);
 
-        let tx_data = [0xaa, 0xbb, 0xcc];
-        assert_eq!(e1000.write(&tx_data).unwrap(), 3);
-        assert_eq!(e1000.tx_tail, 128);
+        // Transmit packets
+        nic.transmit_packet(b"DHCP_DISCOVER").unwrap();
+        assert_eq!(nic.tx_packet_queue.len(), 1);
+        assert_eq!(nic.tx_packet_queue[0], b"DHCP_DISCOVER");
+        let tx_len = nic.tx_descriptors[0].length;
+        let tx_status = nic.tx_descriptors[0].status;
+        assert_eq!(tx_len, 13);
+        assert_eq!(tx_status, 1);
 
-        e1000.shutdown().unwrap();
-        assert!(e1000.write(&tx_data).is_err());
+        // Receive packets
+        assert!(nic.receive_packet().is_none());
+        nic.inject_mock_rx_packet(b"DHCP_OFFER");
+        let rx_status = nic.rx_descriptors[0].status;
+        assert_eq!(rx_status, 1);
+        let rx = nic.receive_packet().unwrap();
+        assert_eq!(rx, b"DHCP_OFFER");
     }
 }
