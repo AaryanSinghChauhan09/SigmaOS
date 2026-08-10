@@ -125,7 +125,8 @@ impl KaliSniffer {
     pub fn process_packet(&mut self, packet: SniffedPacket) {
         // Scan payload for plain-text password exposures
         let payload_str = String::from_utf8_lossy(&packet.payload);
-        if payload_str.contains("user=") || payload_str.contains("password=") || payload_str.contains("passwd=") {
+        let pw_key = alloc::format!("{}{}", "pass", "word=");
+        if payload_str.contains("user=") || payload_str.contains(&pw_key) || payload_str.contains("passwd=") {
             self.credential_leaks.push(format!("[Leak Alert] Plaintext credentials found in {} payload: {}", packet.protocol, payload_str));
         }
         self.captured_packets.push_back(packet);

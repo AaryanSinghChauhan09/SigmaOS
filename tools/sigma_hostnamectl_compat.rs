@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Hostnamectl Compatibility
 //! System hostname management (hostnamectl command)

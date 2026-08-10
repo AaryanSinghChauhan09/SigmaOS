@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Fdisk Compatibility
 //! Disk partitioning (fdisk command)

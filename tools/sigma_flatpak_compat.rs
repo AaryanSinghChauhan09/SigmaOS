@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Flatpak Compatibility Layer
 //! Flatpak compatibility for Linux application distribution

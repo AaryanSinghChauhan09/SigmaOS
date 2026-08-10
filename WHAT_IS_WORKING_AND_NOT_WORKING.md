@@ -14,22 +14,19 @@ This document provides a comprehensive, highly technical, and mathematically pre
    - [E. Hardware Register Sets & Trapframe States](#e-hardware-register-sets--trapframe-states)
    - [F. CPU Exception Vectors & Privilege Traps](#f-cpu-exception-vectors--privilege-traps)
    - [G. Advanced Debugger Engine](#g-advanced-debugger-engine)
-   - [H. Advanced Pseudo-Terminal (PTY) Multiplexing](#h-advanced-pseudo-terminal-pty-multiplexing)
-   - [I. Secure Boot and Constant-Time Cryptographic Comparators](#i-secure-boot-and-constant-time-cryptographic-comparators)
-   - [J. eBPF Virtual Machine Compiler & bytecode Verifier](#j-ebpf-virtual-machine-compiler--bytecode-verifier)
-   - [K. Linux-inspired Btrfs Advanced Filesystem Simulation](#k-linux-inspired-btrfs-advanced-filesystem-simulation)
-3. [What's Not Working: Common Compiler Errors & Deep Diagnostic Analysis](#3-whats-not-working-common-compiler-errors--deep-diagnostic-analysis)
-   - [A. The Sizing Transmute Error (E0512) on Enums](#a-the-sizing-transmute-error-e0512-on-enums)
-   - [B. Non-Exhaustive Match Error (E0004) in REPL and Command Matchers](#b-non-exhaustive-match-error-e0004-in-repl-and-command-matchers)
-   - [C. Sigpkg Package Constructor & Missing Fields (E0034 / E0063)](#c-sigpkg-package-constructor--missing-fields-e0034--e0063)
-   - [D. Ownership, Borrow-Checker, & Lifetime Violations (E0382 / E0502) in packet filters](#d-ownership-borrow-checker--lifetime-violations-e0382--e0502-in-packet-filters)
-   - [E. Underscore Parameter Gaps & Spelling Mismatches (E0425)](#e-underscore-parameter-gaps--spelling-mismatches-e0425)
-   - [F. Type Inference & Closure Type Annotation Gaps (E0282)](#f-type-inference--closure-type-annotation-gaps-e0282)
-   - [G. Unresolved Module Dependency in App Absorber (E0433) for external uuid crate](#g-unresolved-module-dependency-in-app-absorber-e0433-for-external-uuid-crate)
-   - [H. Typographical Syntax Errors & Extra Angle Brackets in Distro Improvements](#h-typographical-syntax-errors--extra-angle-brackets-in-distro-improvements)
-   - [I. Target Configuration Attribute Placement Error in Shell Commands](#i-target-configuration-attribute-placement-error-in-shell-commands)
-   - [J. Duplicate Symbols & Implementation Redeclarations (E0428 / E0119)](#j-duplicate-symbols--implementation-redeclarations-e0428--e0119)
-   - [K. Paging and memory translation anomalies](#k-paging-and-memory-translation-anomalies)
+3. [What's Not Working: Active Compiler Errors & Deep Analysis](#3-whats-not-working-active-compiler-errors--deep-analysis)
+   - [A. Syntax Remnants & Merge Conflict Markers in Enterprise Networking](#a-syntax-remnants--merge-conflict-markers-in-enterprise-networking)
+   - [B. Typographical Syntax Errors & Extra Angle Brackets in Distro Improvements](#b-typographical-syntax-errors--extra-angle-brackets-in-distro-improvements)
+   - [C. Syntax Order Errors in Shell Commands](#c-syntax-order-errors-in-shell-commands)
+   - [D. Mismatched Struct Initializer & Delimiters in Package Solver](#d-mismatched-struct-initializer--delimiters-in-package-solver)
+   - [E. Unresolved klib Module Exports & Missing Symbol Paths](#e-unresolved-klib-module-exports--missing-symbol-paths)
+   - [F. Duplicate Symbol & Implementation Redeclarations](#f-duplicate-symbol--implementation-redeclarations)
+   - [G. Ownership, Borrow-Checker, & Lifetime Violations](#g-ownership-borrow-checker--lifetime-violations)
+   - [H. Missing Package Constructor & Struct Initializer Gaps](#h-missing-package-constructor--struct-initializer-gaps)
+   - [I. Type Mismatches & Closure Parameter Type Inference Gaps](#i-type-mismatches--closure-parameter-type-inference-gaps)
+   - [J. Underscore Parameter Gaps & Spelling Mismatches](#j-underscore-parameter-gaps--spelling-mismatches)
+   - [K. Unresolved Module Dependency in App Absorber](#k-unresolved-module-dependency-in-app-absorber)
+   - [L. Missing System Interface & Kernel Imports](#l-missing-system-interface--kernel-imports)
 4. [Executable Remediation Blueprints for AI Agents](#4-executable-remediation-blueprints-for-ai-agents)
 5. [AI Agent Verification Protocol](#5-ai-agent-verification-protocol)
 
@@ -39,7 +36,7 @@ This document provides a comprehensive, highly technical, and mathematically pre
 
 SigmaOS is designed as a sovereign, capability-gated, `#![no_std]` microkernel operating system written in safe, zero-dependency Rust.
 
-Rather than relying on monolithic, third-party libraries that bloat the kernel footprint and introduce potential security vulnerabilities, SigmaOS implements an elegant **Sovereign Lattice** architecture. Under this model, core OS microkernel tasks—such as CPU task scheduling, virtual memory paging, virtual filesystems (VFS), security enclaves, and application translators—communicate asynchronously over the **Sovereign Event Bus** utilizing secure capability tokens.
+Rather than relying on monolithic, third-party libraries that bloat the kernel footprint and open security vulnerabilities, SigmaOS implements an elegant **Sovereign Lattice** architecture. Under this model, core OS microkernel tasks—such as CPU task scheduling, virtual memory paging, virtual filesystems (VFS), security enclaves, and application translators—communicate asynchronously over the **Sovereign Event Bus** utilizing secure capability tokens.
 
 ---
 
@@ -56,7 +53,7 @@ The CPU scheduler (`src/scheduler/scheduler.rs`, `roundrobin.rs`, `numa_schedule
 ### B. PQC (Post-Quantum Cryptographic) Vault & Secure LCG
 Security operations (`src/security/vault.rs`, `password.rs`) implement quantum-resistant mechanisms:
 1. **PQC Signatures & Key Encapsulation**: Emulates Kyber-1024 asymmetric key exchange and Dilithium-5 digital watermarking signatures.
-2. **Deterministic LCG Randomness**: A platform-independent, warning-free random generator in a `#![no_std]` environment uses the following recurrence formula:
+2. **Deterministic LCG Randomness**: A platform-independent, warning-free random generator in `#![no_std]` environment uses the following recurrence formula:
    $$X_{n+1} = (X_n \times 6364136223846793005 + 1442695040888963407) \pmod{2^{64}}$$
    providing cryptographic salts, IVs, and password generations seeded via system nanosecond clocks.
 
@@ -91,139 +88,139 @@ SigmaOS implements a robust, professional debugging and runtime-inspection toolk
 - **DML (Debugger Markup Language) Renderer:** Parsers and strips standard Windbg DML tags (such as `<b>` or `<a>`) to render interactive links.
 - **`.printf` Scripting Command Parser:** High-fidelity formatter that interprets evaluation placeholders (`%x`, `%d`) from live register contexts.
 
-### H. Advanced Pseudo-Terminal (PTY) Multiplexing
-To support multi-session console utilities:
-- **PTY Pairing**: Coordinates master/slave pairs safely, routing raw keyboard input events to pts devices while writing stream outputs back to the master controller.
-- **Line Discipline Controller**: Translates character inputs based on raw versus cooked mode constants (`ICANON`, `ECHO`, `ISIG`) mimicking POSIX termios specifications.
-
-### I. Secure Boot and Constant-Time Cryptographic Comparators
-Mitigates side-channel timing attacks by performing comparisons of hash outputs, signature files, and firmware watermarks in strictly bounded, input-independent $O(1)$ constant time (`src/boot/secure.rs`). This guarantees timing uniformity and blocks secret-key extraction.
-
-### J. eBPF Virtual Machine Compiler & Bytecode Verifier
-A lightweight, in-kernel compiler, bytecode verifier, and interpreter to load dynamic packet filters cleanly at runtime (`src/compatibility/cross_platform.rs`). It performs control flow graph (CFG) analysis, checks for backward jump cycles to guarantee execution halts, verifies stack/register index bounds, and executes eBPF assembly bytecode natively.
-
-### K. Linux-inspired Btrfs Advanced Filesystem Simulation
-Features dynamic mount properties (`ssd`, `compress_force=zstd`, `autodefrag`), nested subvolume inheritance rules, incremental transaction log send/receive streaming pipelines, and background asynchronous discard operations to ensure peak storage performance and block-device lifespan optimization (`src/fs/btrfs.rs`).
-
 ---
 
-## 3. What's Not Working: Common Compiler Errors & Deep Diagnostic Analysis
+## 3. What's Not Working: Active Compiler Errors & Deep Analysis
 
 During branch consolidation and feature development, several compile errors may arise. Below is the complete diagnostic breakdown of these issues, why they occur, and how to resolve them.
 
-### A. The Sizing Transmute Error (E0512) on Enums
+### A. Syntax Remnants & Merge Conflict Markers in Enterprise Networking
 * **Symptoms:**
-  - `error[E0512]: cannot transmute between types of different sizes` inside neural net/inference or profiling targets.
+  - `error: unexpected closing delimiter: }` in `src/network/enterprise.rs`
+  - Missing struct and enum definitions like `AntiReplayWindow`, `VpnVirtualInterface`, `TlsState`, `TlsRecordType`, and `SovereignSslEngine` during testing.
 * **Why It Occurs:**
-  In Rust, `core::mem::transmute` is an intrinsic that reinterprets bits from a source type directly into a target type. It strictly requires the types to have **exactly identical** memory sizes. On 64-bit systems, `usize` is 64-bit (8 bytes). However, custom enums without an explicit representation default to a 32-bit layout (4 bytes). Transmuting a 64-bit `usize` into a 32-bit enum triggers compile-time panic `E0512`.
-* **Remediation:**
-  Do not use transmutes for raw conversions of atomic integer values. Implement direct match mappings, or use standard safe enums equipped with `#[repr(usize)]` to guarantee identical size alignment.
+  Git branch consolidation merged `jules-*` and `package-universal-*` branches automatically, leaving behind git merge conflict markers (e.g. `>>>>>>> origin/jules-...`, `=======`, etc.) and truncating several critical security structures and tests in `src/network/enterprise.rs`.
 
 ---
 
-### B. Non-Exhaustive Match Error (E0004) in REPL and Command Matchers
+### B. Typographical Syntax Errors & Extra Angle Brackets in Distro Improvements
 * **Symptoms:**
-  - `error[E0004]: non-exhaustive patterns: ... not covered` in `src/shell/repl.rs`.
+  - `error: unmatched angle bracket` in `src/distro/improvements.rs:1769` and `src/distro/improvements.rs:1962`
 * **Why It Occurs:**
-  The `ShellCommand` enum has been expanded with new variants (e.g. `Pwd`, `WhoAmI`, `Su`, etc.) to support more POSIX capabilities. Any existing match blocks that evaluate this enum must either match every single new variant or contain a default wildcard arm `_`.
-* **Remediation:**
-  Implement match handlers for all new variants, or supply a fallback wildcard `_` arm to maintain exhaustiveness compliance.
+  1. Typographical issues in struct field definitions added extra closing angle brackets (e.g., `alloc::vec::vec::Vec<alloc::string::String>>,`).
+  2. The type names used incorrect namespacing such as `alloc::vec::vec::Vec` instead of `alloc::vec::Vec`, or nested `alloc::string` inside `alloc::vec` as `alloc::vec::alloc::string::Vec`.
 
 ---
 
-### C. Sigpkg Package Constructor & Missing Fields (E0034 / E0063)
+### C. Syntax Order Errors in Shell Commands
 * **Symptoms:**
-  - `error[E0034]: multiple applicable items in scope`
-  - `error[E0063]: missing fields ... in initializer of ShellRepl`
+  - `error: visibility pub is not followed by an item` in `src/shell/command.rs:719`
+  - `error: expected item after attributes` in `src/shell/command.rs:718`
 * **Why It Occurs:**
-  1. `Package` has two conflicting `pub fn new` constructor declarations on `src/sigpkg/mod.rs` due to branch merge remnants.
-  2. The `ShellRepl` struct was augmented with several new capability fields (like `a11y_features`, `agent_engine`, `aliases`) but the constructors `new()` and `with_prompt()` were not updated to initialize them.
-* **Remediation:**
-  1. Remove duplicate constructors, maintaining a single clean, fully populated signature.
-  2. Update the `ShellRepl` struct initializers to populate default instances for all missing collection and manager fields.
+  A helper macro or manual refactoring placed the visibility qualifier `pub` in between target configuration attributes:
+  ```rust
+  #[derive(Debug, Clone, PartialEq, Eq)]
+  pub #[cfg(target_os = "none")]
+  #[cfg(target_os = "none")]
+  #[cfg(target_os = "none")]
+  struct Vec<T> {
+  ```
+  In Rust, visibility qualifiers must immediately precede the struct or item keyword.
 
 ---
 
-### D. Ownership, Borrow-Checker, & Lifetime Violations (E0382 / E0502) in Packet Filters
+### D. Mismatched Struct Initializer & Delimiters in Package Solver
 * **Symptoms:**
-  - `error[E0382]: borrow of moved value`
-  - `error[E0502]: cannot borrow *self as mutable because it is also borrowed as immutable` inside `pf_firewall.rs` or `nftables.rs`.
+  - `error: mismatched closing delimiter: )` in `src/sigpkg/resolver.rs:439`
 * **Why It Occurs:**
-  This is a classic violation of Rust's aliasability XOR mutability rules. When iterating over a collection (like `&self.rules` using an immutable borrow), calling helper methods like `self.create_state` inside the loop attempts to borrow `self` mutably, causing `E0502`. Additionally, parameters like address objects are passed by value inside loops, causing move errors (`E0382`) on subsequent iterations.
-* **Remediation:**
-  1. For state modifications, extract the required matched items/rules first, or record the matched indices into a separate temporary array, then perform the mutating `create_state` mutations *after* the immutable iteration loop completes.
-  2. Clone elements like address parameters (`addr.clone()`) to prevent resource exhaustion and ownership movement.
+  Inside the circular dependency detection test, `pkg_a` was declared using struct braces `{ ... }` but closed with parentheses `);` like a function call. It also had trailing raw unkeyed expressions inside the struct block.
 
 ---
 
-### E. Underscore Parameter Gaps & Spelling Mismatches (E0425)
+### E. Unresolved klib Module Exports & Missing Symbol Paths
 * **Symptoms:**
-  - `cannot find value data_len in this scope`
+  - `error[E0432]: unresolved import crate::klib::HashMap`
+  - `error[E0432]: unresolved import crate::klib::HashSet`
+  - `error[E0433]: failed to resolve: could not find String in klib`
+  - `error[E0432]: unresolved imports crate::klib::Duration, crate::klib::Instant`
+  - `error[E0432]: unresolved import crate::filesystem::smart_symlink`
 * **Why It Occurs:**
-  Function parameters are written with a leading underscore (e.g. `_data_len`) to suppress unused-variable warnings, but are then referenced in the function body without the underscore.
-* **Remediation:**
-  Ensure the spelling of parameters matches exactly between definition and usage.
+  The custom `#![no_std]` collections (`hashmap.rs`, `hashset.rs`, `string.rs`, `time.rs`, `smart_symlink.rs`) are fully implemented and present on disk under `src/klib/` and `src/filesystem/`. However, they were omitted from the module export lists in `src/klib/mod.rs` and `src/filesystem/mod.rs`. This makes them invisible to other modules trying to import them.
 
 ---
 
-### F. Type Inference & Closure Type Annotation Gaps (E0282)
+### F. Duplicate Symbol & Implementation Redeclarations
 * **Symptoms:**
-  - `error[E0282]: type annotations needed` inside dynamic collections or process iteration closures.
+  - `error[E0428]: the name backup is defined multiple times` in `src/resilience/mod.rs`
+  - `error[E0252]: the name SigmaTimeshift is defined multiple times` in `src/resilience/mod.rs`
+  - `error[E0119]: conflicting implementations of trait Default for type driver::device::DeviceManager` in `src/driver/device.rs`
+  - `error[E0592]: duplicate definitions with name with_prepare_command` and `with_pkgrel` in `src/sigpkg/recipe.rs`
 * **Why It Occurs:**
-  When chaining complex iterator sequences (e.g. `self.devices.values().filter(...)`), Rust's type-inference algorithm might fail if there are nested references or complex custom collection signatures.
-* **Remediation:**
-  Add explicit type annotations to closure parameter inputs (e.g., replace `|v| ...` with `|v: &ConnectedDevice| ...`).
+  1. In `src/resilience/mod.rs`, `pub mod backup;` is declared twice.
+  2. In `src/driver/device.rs`, `impl Default for DeviceManager` has two identical blocks.
+  3. In `src/sigpkg/recipe.rs`, builder-pattern methods `with_pkgrel` and `with_prepare_command` are defined twice inside the same `impl` block.
 
 ---
 
-### G. Unresolved Module Dependency in App Absorber (E0433) for External uuid Crate
+### G. Ownership, Borrow-Checker, & Lifetime Violations
 * **Symptoms:**
-  - `cannot find module or crate uuid in this scope`
+  - `error[E0382]: borrow of moved value: source_addr` in `src/network/pf_firewall.rs:508`
+  - `error[E0502]: cannot borrow *self as mutable because it is also borrowed as immutable` in `src/network/pf_firewall.rs:514`
+  - `error[E0382]: borrow of moved value: expired` in `src/network/pf_firewall.rs:651` / `src/network/nftables.rs:556`
 * **Why It Occurs:**
-  To maintain pure digital sovereignty and security compliance, external non-secure dependencies like `uuid` were removed from `Cargo.toml`. However, legacy application monitors or absorbers might still reference external crate calls like `uuid::Uuid::new_v4()`.
-* **Remediation:**
-  Refactor call sites to use SigmaOS's native, warning-free, zero-dependency UUID implementation at `crate::klib::uuid::Uuid::new()`.
+  1. Inside `pf_firewall.rs`, evaluating rules iterates over `&self.rules` (immutable borrow of `self`). Inside this loop, if a match occurs, `self.create_state` is invoked, attempting to mutate `self` via `&mut self`. This is a classic violation of Rust's aliasability XOR mutability rule.
+  2. The variables `source_addr` and `dest_addr` are passed by value into `create_state` inside a loop, which moves them on the first match. If the loop continues, subsequent iterations borrow the moved value.
+  3. The `expired` vector is moved by the `for key in expired` loop, making it unavailable for `expired.len()` at the return statement.
 
 ---
 
-### H. Typographical Syntax Errors & Extra Angle Brackets in Distro Improvements
+### H. Missing Package Constructor & Struct Initializer Gaps
 * **Symptoms:**
-  - `unmatched angle bracket`
+  - `error[E0599]: no function or associated item named new found for struct Package` in `src/sigpkg/universal_adapter.rs`
+  - `error[E0063]: missing fields a11y_features, agent_engine, aliases and 2 other fields in initializer of ShellRepl` inside `src/shell/repl.rs`
 * **Why It Occurs:**
-  Typographical syntax issues added extra trailing angle brackets during refactoring (e.g. `Vec<String>>,`).
-* **Remediation:**
-  Clean up redundant bracket characters and verify standard Rust generic bracket pairs.
+  1. `Package` in `src/sigpkg/mod.rs` lacks a constructor `pub fn new(...) -> Self` because it was not added to the `impl Package` block, leaving the universal package adapter unable to build instances.
+  2. The `ShellRepl` struct definition was updated with additional fields like `a11y_features`, `agent_engine`, `aliases`, `current_theme`, and `current_profile` to support advanced automation, but the corresponding `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors were not updated to initialize these fields.
 
 ---
 
-### I. Target Configuration Attribute Placement Error in Shell Commands
+### I. Type Mismatches & Closure Parameter Type Inference Gaps
 * **Symptoms:**
-  - `visibility pub is not followed by an item` in `src/shell/command.rs`.
+  - `error[E0282]: type annotations needed` in `src/dashboard/monitor.rs`
+  - `error[E0282]: type annotations needed` in `src/dashboard/process.rs:331`
+  - `error[E0282]: type annotations needed` in `src/orchestration/cross_device.rs:529`
 * **Why It Occurs:**
-  The `pub` visibility qualifier was placed between conditional target compilation attributes (e.g. `pub #[cfg(target_os = "none")] struct Vec`).
-* **Remediation:**
-  Place visibility qualifiers immediately before the item or struct keyword.
+  Rust's compiler is unable to infer types inside complex iterator chains (such as `.map(|v| v.as_slice())` or `.filter(|d| d.is_connected())`) when using custom types or traits with generic parameters. Explicitly typing the closure variables resolves this immediately.
 
 ---
 
-### J. Duplicate Symbols & Implementation Redeclarations (E0428 / E0119)
+### J. Underscore Parameter Gaps & Spelling Mismatches
 * **Symptoms:**
-  - `the name backup is defined multiple times`
-  - `conflicting implementations of trait Default`
+  - `error[E0425]: cannot find value data_len in this scope` in `src/compatibility/historic_linux.rs:283`
+  - `error[E0425]: cannot find value rule in this scope` in `src/network/nftables.rs:751`
+  - `error[E0308]: mismatched types: expected u8, found u32` in `src/compatibility/historic_linux.rs:222`
 * **Why It Occurs:**
-  Two identical module statements, default trait implementations, or builder methods exist in the same source block.
-* **Remediation:**
-  Consolidate and eliminate duplicate structural implementation blocks.
+  1. In `historic_linux.rs`, the parameter is named `_data_len` with a leading underscore to mark it as unused, but is then accessed as `data_len` inside the method body.
+  2. In `nftables.rs`, the parameter is named `_rule` with a leading underscore, but is accessed as `rule` when looping over expressions.
+  3. In `historic_linux.rs:222`, assigning `val as u32` to `simulated_pci_bar[idx]` fails because the array elements are `u8` rather than `u32`. Since `val` is already a `u8`, the cast `as u32` is both incorrect and redundant.
 
 ---
 
-### K. Paging and memory translation anomalies
+### K. Unresolved Module Dependency in App Absorber
 * **Symptoms:**
-  - Compiler errors related to conflicting paging traits, missing `is_cow`, `set_cow`, or structural page helpers inside `src/klib/paging.rs`.
+  - `error[E0433]: cannot find module or crate uuid in this scope` in `src/productivity/advanced_app_absorber.rs:69`
 * **Why It Occurs:**
-  During high-level optimization, multiple memory mapping structs redeclared overlapping helper functions or failed to inherit standard paging flags cleanly.
-* **Remediation:**
-  Ensure standard page flag helpers (`is_cow`, `set_cow`) are declared exactly once, and utilize native page table structures cleanly.
+  The `uuid` third-party library was removed from `Cargo.toml` as part of SigmaOS's pure self-sufficiency and digital sovereignty mandate. However, `advanced_app_absorber.rs` still references the external `uuid::Uuid::new_v4()` function.
+
+---
+
+### L. Missing System Interface & Kernel Imports
+* **Symptoms:**
+  - `error[E0432]: unresolved import kernel::SchedulerError` in `src/lib.rs`
+  - `error[E0432]: unresolved imports support::LegacyLinuxRule, support::LinuxPersonaRule` in `src/filesystem/mod.rs`
+  - `error[E0432]: unresolved imports vfs::FileDescriptor, vfs::FsError, vfs::VirtualFilesystem` in `src/filesystem/mod.rs`
+* **Why It Occurs:**
+  Overlapping namespace declarations and private visibilities in `support.rs` and `vfs.rs` prevent re-exporting these structures cleanly.
 
 ---
 
@@ -231,23 +228,11 @@ During branch consolidation and feature development, several compile errors may 
 
 Below are the exact code solutions and edits required to restore flawless compilation of the SigmaOS workspace.
 
-### 1. Resolve Target Configuration Attribute Order (`src/shell/command.rs`)
-Make sure target configurations are defined on their own lines before any `pub` keyword.
+### 1. Restore Enterprise Networking File (`src/network/enterprise.rs`)
+If the file contains merge conflict markers or is missing `VpnVirtualInterface` or `SovereignSslEngine`, restore the clean version of the file from commit `2b800249` or construct it cleanly.
 
-**Before:**
-```rust
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> { ... }
-```
-
-**After:**
-```rust
-#[cfg(target_os = "none")]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Vec<T> { ... }
+```bash
+git show 2b800249:src/network/enterprise.rs > src/network/enterprise.rs
 ```
 
 ---
@@ -287,7 +272,28 @@ pub struct MxPackageInstaller {
 
 ---
 
-### 3. Fix Package Solver Test Structure Initialization (`src/sigpkg/resolver.rs`)
+### 3. Fix Target Configuration Attribute Order (`src/shell/command.rs`)
+Make sure target configurations are defined on their own lines before any `pub` keyword.
+
+**Before:**
+```rust
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+struct Vec<T> { ... }
+```
+
+**After:**
+```rust
+#[cfg(target_os = "none")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Vec<T> { ... }
+```
+
+---
+
+### 4. Fix Package Solver Test Structure Initialization (`src/sigpkg/resolver.rs`)
 Change `pkg_a` initializer to use the standard associated function `Package::new(...)` instead of the broken struct literal syntax.
 
 **Before:**
@@ -320,7 +326,7 @@ Change `pkg_a` initializer to use the standard associated function `Package::new
 
 ---
 
-### 4. Expose Missing Custom Collections (`src/klib/mod.rs`)
+### 5. Fix `src/klib/mod.rs` (Exposing missing Custom Collections)
 Add the missing module declarations and re-exports:
 ```rust
 // SigmaOS Kernel Library
@@ -344,7 +350,7 @@ pub use uuid::Uuid;
 
 ---
 
-### 5. Expose Missing `smart_symlink` module (`src/filesystem/mod.rs`)
+### 6. Fix `src/filesystem/mod.rs` (Exposing missing `smart_symlink`)
 Add the module declaration:
 ```rust
 pub mod smart_symlink;
@@ -352,7 +358,7 @@ pub mod smart_symlink;
 
 ---
 
-### 6. Implement Package Constructor (`src/sigpkg/mod.rs`)
+### 7. Fix `src/sigpkg/mod.rs` (Implementing Package Constructor)
 Add the constructor to the `Package` struct:
 ```rust
 impl Package {
@@ -376,12 +382,29 @@ impl Package {
 
 ---
 
-### 7. Clean up Duplicate Builder Functions (`src/sigpkg/recipe.rs`)
-Remove any second duplicate definitions of `with_pkgrel` and `with_prepare_command` from the `impl Recipe` block.
+### 8. Fix `src/sigpkg/recipe.rs` (Removing duplicate builder functions)
+Remove the second duplicate definitions of `with_pkgrel` and `with_prepare_command` from the `impl Recipe` block.
 
 ---
 
-### 8. Resolve ShellRepl Struct Fields (`src/shell/repl.rs`)
+### 9. Fix `src/resilience/mod.rs` (Removing duplicate modules/imports)
+Ensure `pub mod backup;` is defined only once, and remove any duplicate `SigmaTimeshift` re-exports.
+
+---
+
+### 10. Fix `src/driver/device.rs` (Consolidating `Default` for `DeviceManager`)
+Remove the duplicate `impl Default for DeviceManager` block. Keep only one:
+```rust
+impl Default for DeviceManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+```
+
+---
+
+### 11. Fix `src/shell/repl.rs` (Resolving missing ShellRepl struct fields)
 Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to initialize the remaining fields:
 ```rust
         Self {
@@ -402,7 +425,7 @@ Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to 
 
 ---
 
-### 9. Solve Borrowing & Ownership issues (`src/network/pf_firewall.rs`)
+### 12. Fix `src/network/pf_firewall.rs` (Solving borrowing & ownership)
 1. **Borrow Conflict:**
    To safely call `create_state` while iterating over `&self.rules`, gather matched rule indices or a duplicate state request list inside the loop, and process them *after* the loop terminates. This decouples the immutable borrow from the mutable mutation.
 2. **Move Conflict:**
@@ -421,7 +444,7 @@ Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to 
 
 ---
 
-### 10. Historic Linux Spelling & Cast Correction (`src/compatibility/historic_linux.rs`)
+### 13. Fix `src/compatibility/historic_linux.rs` (Spelling & Cast Correction)
 1. Rename the parameter `_data_len` to `data_len` on line 279:
    ```rust
    pub fn write_to_volatile_overlay(&mut self, _file_path: &str, data_len: usize) -> Result<usize, HistoricError>
@@ -433,7 +456,22 @@ Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to 
 
 ---
 
-### 11. Zero-Dependency UUID Integration (`src/productivity/advanced_app_absorber.rs`)
+### 14. Fix `src/network/nftables.rs` (Parameter Matching & Expired Move)
+1. Rename the parameter `_rule` to `rule` on line 741:
+   ```rust
+   rule: &NftRule,
+   ```
+2. Iterate over the reference `&expired` in `cleanup_expired_states` on line 552:
+   ```rust
+   for key in &expired {
+       self.states.remove(key);
+   }
+   expired.len()
+   ```
+
+---
+
+### 15. Fix `src/productivity/advanced_app_absorber.rs` (Zero-Dependency UUID Integration)
 Replace standard `uuid::Uuid` call with the native `#![no_std]` sovereign UUID implementation:
 ```rust
 screenshot.cloud_url = Some(format!(
@@ -445,7 +483,7 @@ screenshot.cloud_url = Some(format!(
 
 ---
 
-### 12. Type Inference / Annotation Errors
+### 16. Fix Type Inference / Annotation Errors
 1. In `src/orchestration/cross_device.rs:529`, explicitly annotate types:
    ```rust
    self.devices.values().filter(|d: &&ConnectedDevice| d.is_connected()).collect()
