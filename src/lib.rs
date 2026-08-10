@@ -52,6 +52,7 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod testing;
+pub mod tools;
 pub mod virtualization;
 pub mod virt;
 pub mod wireless;
@@ -225,6 +226,21 @@ pub use wireless::{
     BluetoothAdapter, AdapterState, BluetoothProfile, BluetoothDevice,
     WiFiNetwork, WiFiSecurity, WiFiState, WiFiProfile, WiFiManager,
     WirelessManager, WirelessStats, WirelessError,
+};
+pub use tools::{
+    Command, Pipeline, Alias, EnvironmentVariable, Environment,
+    Job, JobState, SigmaShell, ShellError,
+    ServiceUnit, TargetUnit, Dependency, DependencyType, ServiceState, RestartPolicy,
+    InitSystem, InitError,
+    Session, SessionType, SessionState, Seat, UserSession, LoginManager,
+    Device, DeviceType, DeviceManager, SessionError,
+    BootEntry, GlobalSettings, GraphicsMode, BootConfiguration, Bootloader, BootloaderError,
+    CronJob, CronSchedule, CronDaemon, ScheduledJob, RunningJob, CronError,
+    SedPattern, SubstitutionRule, StreamEditor,
+    AwkPattern, AwkAction, TextProcessor,
+    GrepOptions, PatternSearch, TextProcessingError,
+    Archive, CompressionType, ArchiveManager,
+    GzipTool, BzipTool, XzTool, ArchiveError,
 };
 
 pub mod init {
