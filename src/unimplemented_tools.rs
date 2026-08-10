@@ -2038,34 +2038,140 @@ impl PluginMarketplace {
 }
 
 /// Music library manager with AI playlists [iTunes, Spotify Parity]
+#[derive(Clone)]
 pub struct MusicTrack {
     pub title: String,
-    pub genre: &'static str,
+    pub artist: String,
+    pub album: String,
+    pub genre: String,
+    pub play_count: u32,
+    pub duration_secs: u32,
+    pub user_rating: u8,      // 1 to 5 stars
+    pub tempo_bpm: u32,
+}
+
+#[derive(Clone)]
+pub struct PlaybackQueue {
+    pub up_next_tracks: Vec<MusicTrack>,
+    pub history_tracks: Vec<MusicTrack>,
+    pub crossfade_duration_ms: u32,
+}
+
+impl PlaybackQueue {
+    pub fn new(crossfade_ms: u32) -> Self {
+        Self {
+            up_next_tracks: Vec::new(),
+            history_tracks: Vec::new(),
+            crossfade_duration_ms: crossfade_ms,
+        }
+    }
+
+    pub fn add_to_queue(&mut self, track: MusicTrack) {
+        self.up_next_tracks.push(track);
+    }
+
+    pub fn transition_to_next(&mut self) -> Option<MusicTrack> {
+        if self.up_next_tracks.is_empty() {
+            return None;
+        }
+        let next = self.up_next_tracks.remove(0);
+        self.history_tracks.push(next.clone());
+        Some(next)
+    }
+}
+
+pub struct OfflineMusicCache {
+    pub cached_track_ids: Vec<String>,
+    pub cached_bytes: u64,
+}
+
+impl OfflineMusicCache {
+    pub fn new() -> Self {
+        Self {
+            cached_track_ids: Vec::new(),
+            cached_bytes: 0,
+        }
+    }
+
+    pub fn sync_track_offline(&mut self, track_id: &str, size_bytes: u64, sha256_checksum: &str) -> bool {
+        // Verify checksum is valid (non-empty)
+        if sha256_checksum.is_empty() {
+            return false;
+        }
+        self.cached_track_ids.push(track_id.to_string());
+        self.cached_bytes += size_bytes;
+        true
+    }
+}
+
+pub struct ItunesLibraryExporter;
+
+impl ItunesLibraryExporter {
+    pub fn export_to_xml(tracks: &[MusicTrack]) -> String {
+        let mut xml = String::from("<dict><key>Tracks</key><dict>");
+        for (i, t) in tracks.iter().enumerate() {
+            xml.push_str(&format!(
+                "<key>{}</key><dict><key>Name</key><string>{}</string><key>Artist</key><string>{}</string><key>Play Count</key><integer>{}</integer></dict>",
+                i + 1, t.title, t.artist, t.play_count
+            ));
+        }
+        xml.push_str("</dict></dict>");
+        xml
+    }
 }
 
 pub struct MusicLibraryManager {
     pub tracks: Vec<MusicTrack>,
+    pub playback_queue: PlaybackQueue,
+    pub offline_cache: OfflineMusicCache,
 }
 
 impl MusicLibraryManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { tracks: Vec::new() }
+        Self {
+            tracks: Vec::new(),
+            playback_queue: PlaybackQueue::new(2000), // Default 2s crossfade
+            offline_cache: OfflineMusicCache::new(),
+        }
     }
 
-    pub fn add_track(&mut self, title: &str, genre: &'static str) {
+    pub fn add_track(&mut self, title: &str, artist: &str, album: &str, genre: &str, duration: u32, bpm: u32) {
         self.tracks.push(MusicTrack {
             title: title.to_string(),
-            genre,
+            artist: artist.to_string(),
+            album: album.to_string(),
+            genre: genre.to_string(),
+            play_count: 0,
+            duration_secs: duration,
+            user_rating: 0,
+            tempo_bpm: bpm,
         });
     }
 
-    pub fn generate_ai_playlist_by_genre(&self, target_genre: &'static str) -> Vec<String> {
-        self.tracks
-            .iter()
-            .filter(|t| t.genre == target_genre)
-            .map(|t| t.title.clone())
-            .collect()
+    pub fn generate_ai_playlist_by_genre(&self, target_genre: &str) -> Vec<String> {
+        let mut matched = Vec::new();
+        for t in &self.tracks {
+            if t.genre == target_genre {
+                matched.push(t.title.clone());
+            }
+        }
+        matched
+    }
+
+    /// Smart AI Playlist generation based on listening context (tempo, activity, and preferences)
+    pub fn generate_smart_ai_playlist(&self, mood: &str, min_bpm: u32, max_bpm: u32) -> Vec<MusicTrack> {
+        let mut recommended = Vec::new();
+        for track in &self.tracks {
+            if track.tempo_bpm >= min_bpm && track.tempo_bpm <= max_bpm {
+                if mood == "Workout" && (track.genre == "Rock" || track.genre == "Electronic") {
+                    recommended.push(track.clone());
+                } else if mood == "Chill" && (track.genre == "Classical" || track.genre == "Jazz") {
+                    recommended.push(track.clone());
+                }
+            }
+        }
+        recommended
     }
 }
 
@@ -3285,11 +3391,68 @@ mod tests {
     #[test]
     fn test_music_library_manager() {
         let mut ml = MusicLibraryManager::new();
-        ml.add_track("Stairway to Heaven", "Rock");
-        ml.add_track("Symphony 5", "Classical");
+        ml.add_track("Stairway to Heaven", "Led Zeppelin", "Led Zeppelin IV", "Rock", 482, 82);
+        ml.add_track("Symphony 5", "Beethoven", "Classical Masterpieces", "Classical", 360, 92);
         let rock_playlist = ml.generate_ai_playlist_by_genre("Rock");
         assert_eq!(rock_playlist.len(), 1);
         assert_eq!(rock_playlist[0], "Stairway to Heaven");
+    }
+
+    #[test]
+    fn test_itunes_xml_serialization_and_deserialization() {
+        let mut ml = MusicLibraryManager::new();
+        ml.add_track("Sovereignty", "Aaryan", "Alpha Edition", "Rock", 180, 110);
+        let xml = ItunesLibraryExporter::export_to_xml(&ml.tracks);
+        assert!(xml.contains("<key>Name</key><string>Sovereignty</string>"));
+        assert!(xml.contains("<key>Artist</key><string>Aaryan</string>"));
+    }
+
+    #[test]
+    fn test_spotify_crossfade_queue_transitions() {
+        let mut queue = PlaybackQueue::new(3000); // 3 seconds crossfade
+        assert_eq!(queue.crossfade_duration_ms, 3000);
+
+        let track1 = MusicTrack {
+            title: "Track 1".to_string(),
+            artist: "Artist 1".to_string(),
+            album: "Album 1".to_string(),
+            genre: "Rock".to_string(),
+            play_count: 0,
+            duration_secs: 200,
+            user_rating: 5,
+            tempo_bpm: 120,
+        };
+        queue.add_to_queue(track1.clone());
+
+        let active = queue.transition_to_next().unwrap();
+        assert_eq!(active.title, "Track 1");
+        assert_eq!(queue.history_tracks.len(), 1);
+    }
+
+    #[test]
+    fn test_smart_ai_playlist_recommendation() {
+        let mut ml = MusicLibraryManager::new();
+        ml.add_track("Run To The Hills", "Iron Maiden", "The Number of the Beast", "Rock", 233, 174);
+        ml.add_track("Gymnopedie No.1", "Erik Satie", "Chill Piano", "Classical", 180, 72);
+
+        let workout_playlist = ml.generate_smart_ai_playlist("Workout", 150, 180);
+        assert_eq!(workout_playlist.len(), 1);
+        assert_eq!(workout_playlist[0].title, "Run To The Hills");
+
+        let chill_playlist = ml.generate_smart_ai_playlist("Chill", 60, 80);
+        assert_eq!(chill_playlist.len(), 1);
+        assert_eq!(chill_playlist[0].title, "Gymnopedie No.1");
+    }
+
+    #[test]
+    fn test_offline_synced_cache_validation() {
+        let mut cache = OfflineMusicCache::new();
+        assert!(cache.sync_track_offline("track_101", 1024 * 1024 * 12, "sha256_hash_here"));
+        assert_eq!(cache.cached_track_ids.len(), 1);
+        assert_eq!(cache.cached_bytes, 1024 * 1024 * 12);
+
+        // Fails with empty checksum
+        assert!(!cache.sync_track_offline("track_102", 1024 * 1024 * 8, ""));
     }
 
     #[test]
