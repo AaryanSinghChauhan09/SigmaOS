@@ -1,7 +1,8 @@
-// SigmaOS Polish-Parity Software Store & Update Manager (SigmaStore)
-// Designed for software installation, package upgrades, and security auditing
+// SigmaOS Software Store & Safety Scanner Shard
+// Zero-dependency, highly-optimized for low-end hardware
+// Evaluates package installations against security/safety scores and sandboxing requirements (Linux Mint Software Manager parity).
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StoreError {
@@ -66,16 +67,46 @@ impl SigmaSoftwareStore {
     pub fn check_for_updates(&mut self) -> usize {
         self.pending_updates.clear();
         for (name, app) in &self.catalog {
-            let name: &String = name;
-            let app: &StoreApp = app;
-            if app.is_installed && app.version != "1.5.0" {
-                // Assume latest stable is 1.5.0
+            if app.is_installed && app.version != "1.5.0" { // Assume latest stable is 1.5.0
                 self.pending_updates.push(name.clone());
             }
         }
         self.pending_updates.len()
     }
 }
+
+#[derive(Debug, Clone, Copy)]
+pub struct SoftwareRegistryEntry {
+    pub name: &'static str,
+    pub safety_score: usize, // 1 to 100
+    pub is_sandboxed: bool,  // Flatpak / Snap verification
+    pub update_available: bool,
+}
+
+pub struct SigmaSoftwareStoreStatic {
+    pub registry: [Option<SoftwareRegistryEntry>; 4],
+    pub auto_updates_enabled: bool,
+}
+
+pub static GLOBAL_SOFTWARE_STORE: SigmaSoftwareStoreStatic = SigmaSoftwareStoreStatic {
+    registry: [
+        Some(SoftwareRegistryEntry {
+            name: "firefox-developer",
+            safety_score: 95,
+            is_sandboxed: true,
+            update_available: true,
+        }),
+        Some(SoftwareRegistryEntry {
+            name: "vlc-player",
+            safety_score: 90,
+            is_sandboxed: true,
+            update_available: false,
+        }),
+        None,
+        None,
+    ],
+    auto_updates_enabled: true,
+};
 
 #[cfg(test)]
 mod tests {

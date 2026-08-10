@@ -176,7 +176,7 @@ impl SimpleSettingsCategory {
 impl SettingsCategory for SimpleSettingsCategory {
     fn get_category(&self, category: &[u8]) -> Vec<&dyn Setting> {
         let mut results = Vec::new();
-        for &(ref cat, ref ids) in &self.categories {
+        for &(ref _cat, ref ids) in &self.categories {
             let cat_len = cat.iter().position(|&b| b == 0).unwrap_or(64);
             if &cat[..cat_len] == category {
                 for &_id in ids {

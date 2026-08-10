@@ -37,14 +37,20 @@ mod tests {
 
     #[test]
     fn test_bridge_grid_uefi() {
-        let uefi_grid = UEFIBridgeGrid { gop_fb_width: 1920, gop_fb_height: 1080 };
+        let uefi_grid = UEFIBridgeGrid {
+            gop_fb_width: 1920,
+            gop_fb_height: 1080,
+        };
         let bridge = FirmwareBridgeGrid::Uefi(uefi_grid);
         assert!(bridge.is_graphic_output_ready());
     }
 
     #[test]
     fn test_bridge_grid_bios() {
-        let bios_grid = BIOSBridgeGrid { interrupt_13h_supported: true, legacy_mbr_offset: 0x7C00 };
+        let bios_grid = BIOSBridgeGrid {
+            interrupt_13h_supported: true,
+            legacy_mbr_offset: 0x7C00,
+        };
         let bridge = FirmwareBridgeGrid::Bios(bios_grid);
         assert!(!bridge.is_graphic_output_ready());
     }

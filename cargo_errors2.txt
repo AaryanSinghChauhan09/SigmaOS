@@ -1,0 +1,435 @@
+   Compiling sigmaos v0.1.0 (/app)
+error[E0432]: unresolved imports `crate::compatibility::KernelPersona`, `crate::compatibility::SyscallAbi`
+ --> src/filesystem/smart_symlink.rs:6:28
+  |
+6 | use crate::compatibility::{KernelPersona, SyscallAbi};
+  |                            ^^^^^^^^^^^^^  ^^^^^^^^^^ no `SyscallAbi` in `compatibility`
+  |                            |
+  |                            no `KernelPersona` in `compatibility`
+  |
+  = help: consider importing this struct through its public re-export instead:
+          crate::kernel::KernelPersona
+
+error[E0432]: unresolved imports `breakthroughs::DeterministicReplayEngine`, `breakthroughs::DynamicKernelPersonalitySwitcher`, `breakthroughs::InterruptRatePredictor`, `breakthroughs::KernelPersonalityMode`
+  --> src/kernel/mod.rs:21:5
+   |
+21 |     DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^ no `InterruptRatePredictor` in `kernel::breakthroughs`
+   |     |                          |
+   |     |                          no `DynamicKernelPersonalitySwitcher` in `kernel::breakthroughs`
+   |     no `DeterministicReplayEngine` in `kernel::breakthroughs`
+22 |     KernelPersonalityMode,
+   |     ^^^^^^^^^^^^^^^^^^^^^ no `KernelPersonalityMode` in `kernel::breakthroughs`
+
+error[E0433]: failed to resolve: could not find `custom_allocator` in `klib`
+   --> src/klib/custom_string.rs:445:51
+    |
+445 | ...ib::custom_allocator::SIGMA_ALLOCATOR, layout)
+    |        ^^^^^^^^^^^^^^^^ could not find `custom_allocator` in `klib`
+
+error[E0433]: failed to resolve: could not find `custom_allocator` in `klib`
+   --> src/klib/custom_string.rs:451:53
+    |
+451 | ...ib::custom_allocator::SIGMA_ALLOCATOR, ptr, layout)
+    |        ^^^^^^^^^^^^^^^^ could not find `custom_allocator` in `klib`
+
+warning: unused import: `DerefMut`
+ --> src/klib/arc.rs:7:24
+  |
+7 | use core::ops::{Deref, DerefMut};
+  |                        ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `PortAddress`
+ --> src/driver/universal_support.rs:7:82
+  |
+7 | ..., DeviceType, NetworkDevice, PortAddress,
+  |                                 ^^^^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+ --> src/driver/universal_support.rs:9:5
+  |
+9 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicBool`, `AtomicU64`, and `Ordering`
+  --> src/driver/universal_support.rs:12:26
+   |
+12 | use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+   |                          ^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+ --> src/driver/windows_compat.rs:9:5
+  |
+9 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: type `DRIVER_OBJECT` should have an upper camel case name
+  --> src/driver/windows_compat.rs:42:12
+   |
+42 | pub struct DRIVER_OBJECT {
+   |            ^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `DriverObject`
+   |
+   = note: `#[warn(non_camel_case_types)]` (part of `#[warn(nonstandard_style)]`) on by default
+
+warning: type `DEVICE_OBJECT` should have an upper camel case name
+  --> src/driver/windows_compat.rs:65:12
+   |
+65 | pub struct DEVICE_OBJECT {
+   |            ^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `DeviceObject`
+
+warning: type `IO_STACK_LOCATION` should have an upper camel case name
+  --> src/driver/windows_compat.rs:74:12
+   |
+74 | pub struct IO_STACK_LOCATION {
+   |            ^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `IoStackLocation`
+
+warning: type `KSPIN_LOCK` should have an upper camel case name
+   --> src/driver/windows_compat.rs:118:12
+    |
+118 | pub struct KSPIN_LOCK {
+    |            ^^^^^^^^^^ help: convert the identifier to upper camel case: `KspinLock`
+
+warning: type `WDF_DRIVER_CONFIG` should have an upper camel case name
+   --> src/driver/windows_compat.rs:167:12
+    |
+167 | pub struct WDF_DRIVER_CONFIG {
+    |            ^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `WdfDriverConfig`
+
+warning: type `WDFDEVICE_INIT` should have an upper camel case name
+   --> src/driver/windows_compat.rs:172:12
+    |
+172 | pub struct WDFDEVICE_INIT {
+    |            ^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `WdfdeviceInit`
+
+warning: type `WDF_IO_QUEUE_CONFIG` should have an upper camel case name
+   --> src/driver/windows_compat.rs:176:12
+    |
+176 | pub struct WDF_IO_QUEUE_CONFIG {
+    |            ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `WdfIoQueueConfig`
+
+warning: type `NDIS_MINIPORT_DRIVER_CHARACTERISTICS` should have an upper camel case name
+   --> src/driver/windows_compat.rs:187:12
+    |
+187 | pub struct NDIS_MINIPORT_DRIVER_CHARACTERISTICS {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `NdisMiniportDriverCharacteristics`
+
+warning: type `NDIS_HANDLE` should have an upper camel case name
+   --> src/driver/windows_compat.rs:198:10
+    |
+198 | pub type NDIS_HANDLE = PVOID;
+    |          ^^^^^^^^^^^ help: convert the identifier to upper camel case: `NdisHandle`
+
+warning: type `NDIS_PORT_NUMBER` should have an upper camel case name
+   --> src/driver/windows_compat.rs:199:10
+    |
+199 | pub type NDIS_PORT_NUMBER = ULONG;
+    |          ^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `NdisPortNumber`
+
+warning: type `NDIS_STATUS` should have an upper camel case name
+   --> src/driver/windows_compat.rs:200:10
+    |
+200 | pub type NDIS_STATUS = i32;
+    |          ^^^^^^^^^^^ help: convert the identifier to upper camel case: `NdisStatus`
+
+warning: type `NET_BUFFER_LIST` should have an upper camel case name
+   --> src/driver/windows_compat.rs:202:12
+    |
+202 | pub struct NET_BUFFER_LIST {
+    |            ^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `NetBufferList`
+
+warning: type `NDIS_OID_REQUEST` should have an upper camel case name
+   --> src/driver/windows_compat.rs:209:12
+    |
+209 | pub struct NDIS_OID_REQUEST {
+    |            ^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `NdisOidRequest`
+
+warning: type `HW_INITIALIZATION_DATA` should have an upper camel case name
+   --> src/driver/windows_compat.rs:219:12
+    |
+219 | pub struct HW_INITIALIZATION_DATA {
+    |            ^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `HwInitializationData`
+
+warning: type `PORT_CONFIGURATION_INFORMATION` should have an upper camel case name
+   --> src/driver/windows_compat.rs:230:12
+    |
+230 | pub struct PORT_CONFIGURATION_INFORMATION {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `PortConfigurationInformation`
+
+warning: type `SCSI_REQUEST_BLOCK` should have an upper camel case name
+   --> src/driver/windows_compat.rs:239:12
+    |
+239 | pub struct SCSI_REQUEST_BLOCK {
+    |            ^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `ScsiRequestBlock`
+
+warning: type `DXGKRNL_INTERFACE` should have an upper camel case name
+   --> src/driver/windows_compat.rs:255:12
+    |
+255 | pub struct DXGKRNL_INTERFACE {
+    |            ^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `DxgkrnlInterface`
+
+warning: type `DXGK_DEVICE_INFO` should have an upper camel case name
+   --> src/driver/windows_compat.rs:262:12
+    |
+262 | pub struct DXGK_DEVICE_INFO {
+    |            ^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `DxgkDeviceInfo`
+
+warning: type `DXGK_DISPLAY_INFORMATION` should have an upper camel case name
+   --> src/driver/windows_compat.rs:269:12
+    |
+269 | pub struct DXGK_DISPLAY_INFORMATION {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `DxgkDisplayInformation`
+
+warning: type `DXGKARG_ADDDEVICE` should have an upper camel case name
+   --> src/driver/windows_compat.rs:278:12
+    |
+278 | pub struct DXGKARG_ADDDEVICE {
+    |            ^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `DxgkargAdddevice`
+
+warning: type `DXGKARG_STARTDEVICE` should have an upper camel case name
+   --> src/driver/windows_compat.rs:284:12
+    |
+284 | pub struct DXGKARG_STARTDEVICE {
+    |            ^^^^^^^^^^^^^^^^^^^ help: convert the identifier to upper camel case: `DxgkargStartdevice`
+
+warning: unused imports: `AtomicBool`, `AtomicU32`, `AtomicU8`, `AtomicUsize`, and `Ordering`
+ --> src/kernel/architecture.rs:4:26
+  |
+4 | ...tomic::{AtomicBool, AtomicU32, AtomicU8, AtomicUsize, Ordering};
+  |            ^^^^^^^^^^  ^^^^^^^^^  ^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+ --> src/kernel/architecture.rs:7:5
+  |
+7 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `AtomicU32`
+ --> src/kernel/memory.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+  |                          ^^^^^^^^^
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/kernel/meta.rs:4:5
+  |
+4 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/kernel/meta.rs:5:26
+  |
+5 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `AtomicBool`
+ --> src/kernel/policy_mechanism.rs:4:26
+  |
+4 | use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^
+
+warning: unused import: `alloc::vec::Vec`
+ --> src/kernel/policy_mechanism.rs:8:5
+  |
+8 | use alloc::vec::Vec;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicU32`, `AtomicUsize`, and `Ordering`
+ --> src/kernel/structures.rs:5:38
+  |
+5 | use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+  |                                      ^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::string::String`
+ --> src/kernel/structures.rs:9:5
+  |
+9 | use alloc::string::String;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Duration`
+ --> src/productivity/screen_recorder.rs:5:17
+  |
+5 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> src/productivity/sigma_office.rs:17:5
+   |
+17 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+warning: unused import: `std::string::String`
+ --> src/security/capability.rs:4:5
+  |
+4 | use std::string::String;
+  |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::vec::Vec`
+ --> src/security/capability.rs:5:5
+  |
+5 | use std::vec::Vec;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `alloc::vec`
+   --> src/package/debian.rs:290:9
+    |
+290 |     use alloc::vec;
+    |         ^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/filesystem/support.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/klib/hash.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/klib/arc.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/filesystem/support.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/paging.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/package/debian.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: unused variable: `buffer`
+   --> src/driver/windows_compat.rs:618:24
+    |
+618 |     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    |                        ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `buffer`
+   --> src/driver/windows_compat.rs:661:34
+    |
+661 | ...eceive_packet(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceE...
+    |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `buffer`
+   --> src/driver/windows_compat.rs:694:24
+    |
+694 |     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    |                        ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `buffer`
+   --> src/driver/windows_compat.rs:698:25
+    |
+698 |     fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
+    |                         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: variable `saved_regs` is assigned to, but never used
+   --> src/kernel/architecture.rs:328:13
+    |
+328 |         let mut saved_regs = pcb.thread_list[from_idx].registers;
+    |             ^^^^^^^^^^^^^^
+    |
+    = note: consider using `_saved_regs` instead
+
+warning: unused variable: `target_regs`
+   --> src/kernel/architecture.rs:333:13
+    |
+333 |         let target_regs = pcb.thread_list[to_idx].registers;
+    |             ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_target_regs`
+
+warning: value assigned to `saved_regs` is never read
+   --> src/kernel/architecture.rs:329:9
+    |
+329 |         saved_regs.rax = 0xAA; // Simulated saved context values
+    |         ^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `font_size`
+   --> src/productivity/sigma_office.rs:405:43
+    |
+405 | ...ext(&self, text: &str, font_size: u32, position: (f32, f32)) -> Resu...
+    |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_font_size`
+
+warning: unused variable: `position`
+   --> src/productivity/sigma_office.rs:405:59
+    |
+405 | ... &str, font_size: u32, position: (f32, f32)) -> Result<Vec<u8>> {
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_position`
+
+warning: unused variable: `path`
+   --> src/productivity/sigma_office.rs:485:49
+    |
+485 | ...t(&self, doc_idx: usize, path: &str) -> Result<()> {
+    |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `path`
+   --> src/productivity/sigma_office.rs:495:37
+    |
+495 |     pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
+    |                                     ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+Some errors have detailed explanations: E0432, E0433.
+For more information about an error, try `rustc --explain E0432`.
+warning: unused variable: `arc2`
+   --> src/klib/arc.rs:136:13
+    |
+136 |         let arc2 = arc.clone();
+    |             ^^^^ help: if this is intentional, prefix it with an underscore: `_arc2`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sigmaos` (lib) generated 56 warnings (40 duplicates)
+error: could not compile `sigmaos` (lib) due to 4 previous errors; 56 warnings emitted
+warning: build failed, waiting for other jobs to finish...
+warning: `sigmaos` (lib) generated 56 warnings (16 duplicates)
+error: could not compile `sigmaos` (lib) due to 4 previous errors; 56 warnings emitted
+warning: unused variable: `buffer`
+   --> src/driver/windows_compat.rs:618:24
+    |
+618 |     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    |                        ^^^^^^ help: if this is intentional, prefix it with an underscore: `_buffer`
+
+warning: unused variable: `device`
+   --> src/driver/windows_compat.rs:851:22
+    |
+851 |     fn mock_irp_read(device: &mut DEVICE_OBJECT, irp: &mut IRP) -> NTST...
+    |                      ^^^^^^ help: if this is intentional, prefix it with an underscore: `_device`
+
+warning: unused variable: `device`
+   --> src/driver/windows_compat.rs:860:23
+    |
+860 |     fn mock_irp_write(device: &mut DEVICE_OBJECT, irp: &mut IRP) -> NTS...
+    |                       ^^^^^^ help: if this is intentional, prefix it with an underscore: `_device`
+
+warning: variable does not need to be mutable
+   --> src/driver/windows_compat.rs:907:13
+    |
+907 |         let mut adapter = WindowsDriverAdapter::new_wdm("NDISMiniport");
+    |             ----^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: `sigmaos` (lib test) generated 61 warnings (55 duplicates)
+error: could not compile `sigmaos` (lib test) due to 4 previous errors; 61 warnings emitted

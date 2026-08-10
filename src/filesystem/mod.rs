@@ -30,6 +30,8 @@ pub use support::{
 pub use smart_symlink::{SmartSymlink, SymlinkResolverRule, LegacyLinuxRule, LinuxPersonaRule};
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
 pub use sigma_fs::{
+    SovereignFhsHierarchy, SovereignFsJournal, DistributedSovereignFS, PqcFileEncryptor,
     SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
-    SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio,
+    JournalState, RaidLevel, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid,
+    SigmaFsCrypt, SigmaFsVirtio,
 };

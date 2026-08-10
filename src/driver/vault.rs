@@ -20,18 +20,31 @@ impl DriverArchiveVault {
             vault: HashMap::new(),
         };
         // Seed default driver vault entries
-        archive.register_driver(10, "ne2000_isa_nic".to_string(), "Linux 2.2 NIC".to_string(), vec!["isa_bus_device".to_string()]);
-        archive.register_driver(11, "ide_piix4_controller".to_string(), "Linux 2.4 IDE".to_string(), vec!["pci_express_bus".to_string()]);
+        archive.register_driver(
+            10,
+            "ne2000_isa_nic".to_string(),
+            "Linux 2.2 NIC".to_string(),
+            vec!["isa_bus_device".to_string()],
+        );
+        archive.register_driver(
+            11,
+            "ide_piix4_controller".to_string(),
+            "Linux 2.4 IDE".to_string(),
+            vec!["pci_express_bus".to_string()],
+        );
         archive
     }
 
     pub fn register_driver(&mut self, id: usize, name: String, lineage: String, deps: Vec<String>) {
-        self.vault.insert(id, VaultEntry {
+        self.vault.insert(
             id,
-            name,
-            lineage_version: lineage,
-            dependencies: deps,
-        });
+            VaultEntry {
+                id,
+                name,
+                lineage_version: lineage,
+                dependencies: deps,
+            },
+        );
     }
 
     pub fn query_driver(&self, id: usize) -> Option<&VaultEntry> {

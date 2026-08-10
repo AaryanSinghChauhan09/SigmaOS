@@ -131,13 +131,14 @@ impl DefensiveAuditSystem {
             payload_hash = payload_hash.wrapping_mul(16777619);
         }
 
+        let current_id = self.next_block_id.get();
+
         // Find previous block hash
-        let next_id = self.next_block_id.get();
-        let prev_hash = if next_id > 1 {
+        let prev_hash = if current_id > 1 {
             let mut found_prev = 0;
             for slot in ring.iter() {
                 if let Some(ref block) = slot {
-                    if block.id == next_id - 1 {
+                    if block.id == current_id - 1 {
                         found_prev = block.current_hash;
                         break;
                     }
@@ -149,7 +150,7 @@ impl DefensiveAuditSystem {
         };
 
         let mut block = ForensicBlock {
-            id: next_id,
+            id: current_id,
             timestamp,
             actor_uid,
             syscall_num,
@@ -161,10 +162,10 @@ impl DefensiveAuditSystem {
         block.current_hash = Self::calculate_block_hash(&block);
 
         // Store block in circular ring ledger buffer
-        let idx = (next_id as usize - 1) % MAX_AUDIT_BLOCKS;
+        let idx = (current_id as usize - 1) % MAX_AUDIT_BLOCKS;
         ring[idx] = Some(block);
 
-        self.next_block_id.set(next_id + 1);
+        self.next_block_id.set(current_id + 1);
 
         Ok(())
     }

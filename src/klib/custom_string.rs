@@ -301,6 +301,12 @@ impl Drop for SigmaString {
     }
 }
 
+impl Clone for SigmaString {
+    fn clone(&self) -> Self {
+        SigmaString::from_str(self.as_str())
+    }
+}
+
 // ------------------------------------------------------------------
 // Deref to &str
 // ------------------------------------------------------------------

@@ -1,5 +1,5 @@
 // SigmaOS Kernel Scheduler
-// Implements EEVDF (Earliest Eligible Virtual Deadline First) & EDF (Earliest Deadline First) hybrid real-time scheduler
+// Implements EEVDF (Earliest Eligible Virtual Deadline First) scheduler
 
 use core::time::Duration;
 
@@ -32,7 +32,7 @@ pub struct Process {
     pub runtime: Duration,
     pub virtual_deadline: u64,
     pub time_slice: Duration,
-    pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
+    pub edf_deadline: Option<u64>,
 }
 
 impl Process {
