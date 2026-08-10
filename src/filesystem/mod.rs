@@ -5,9 +5,11 @@ pub mod defragmenter;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
+pub mod tmpfs;
 pub mod vfs;
 pub mod smart_symlink;
 
+pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
     CompressionLevel, TarArchiveHandler, ZipArchiveHandler,

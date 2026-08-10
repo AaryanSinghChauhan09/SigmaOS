@@ -164,9 +164,177 @@ impl PacmanDbAdapter {
     }
 }
 
+/// Gentoo-style compile-time USE flag toggle configuration
+#[derive(Debug, Clone)]
+pub struct GentooUseFlag {
+    pub name: String,
+    pub is_enabled: bool,
+}
+
+/// Gentoo-style declarative ebuild package build recipe descriptor
+#[derive(Debug, Clone)]
+pub struct GentooEbuildPackage {
+    pub name: String,
+    pub version: Version,
+    pub use_flags: Vec<GentooUseFlag>,
+    pub configure_flags: Vec<String>,
+}
+
+/// Gentoo Portage-style source-build package compiler & optimizer engine
+pub struct PortageEbuildCompiler {
+    pub global_use_flags: HashMap<String, bool>,
+}
+
+impl PortageEbuildCompiler {
+    pub fn new() -> Self {
+        Self {
+            global_use_flags: HashMap::new(),
+        }
+    }
+
+    pub fn set_global_use_flag(&mut self, name: &str, enabled: bool) {
+        self.global_use_flags.insert(name.to_string(), enabled);
+    }
+
+    /// Evaluates if custom USE flags match global feature policies, and dynamically generates
+    /// the optimized compiler `./configure` target strings.
+    pub fn configure_and_compile(&self, ebuild: &mut GentooEbuildPackage) -> Result<Package, &'static str> {
+        let mut active_features = Vec::new();
+
+        // Harmonize ebuild use flags with system-wide global flags
+        for flag in &mut ebuild.use_flags {
+            if let Some(&global_state) = self.global_use_flags.get(&flag.name) {
+                flag.is_enabled = global_state;
+            }
+            if flag.is_enabled {
+                active_features.push(flag.name.clone());
+            }
+        }
+
+        // Generate dynamically optimized configure flags based on active features
+        for feature in &active_features {
+            let config_arg = format!("--enable-{}", feature);
+            if !ebuild.configure_flags.contains(&config_arg) {
+                ebuild.configure_flags.push(config_arg);
+            }
+        }
+
+        let description = format!(
+            "Compiled Gentoo ebuild package: {} with active features: {:?}",
+            ebuild.name, active_features
+        );
+
+        Ok(Package::new(
+            ebuild.name.clone(),
+            ebuild.version,
+            description,
+            Vec::new(),
+            "sha256_portage_compiled_source_binary".to_string(),
+        ))
+    }
+
+    /// Portage-style compiler native CPU microarchitecture optimization target level generator
+    pub fn get_optimized_target_cpu_level(&self, cpu_features: &[&str]) -> usize {
+        let mut level = 1; // Standard compatibility base level (x86_64-v1)
+        if cpu_features.contains(&"sse4.2") {
+            level = 2; // Level 2 (Intel Nehalem+)
+        }
+        if cpu_features.contains(&"avx2") {
+            level = 3; // Level 3 (Intel Haswell+)
+        }
+        if cpu_features.contains(&"avx512f") {
+            level = 4; // Level 4 (Intel Xeon/Skylake AVX512+)
+        }
+        level
+    }
+}
+
+impl Default for PortageEbuildCompiler {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Represents a Debian-style source package targeting sbuild compiler rules
+#[derive(Debug, Clone)]
+pub struct DebianSbuildPackage {
+    pub name: String,
+    pub version: Version,
+    pub build_depends: Vec<String>, // e.g. ["gcc", "make", "libc-dev"]
+}
+
+impl RollingSyncManager {
+    /// Validates if a Debian sbuild source package's build dependencies (Build-Depends)
+    /// are fully satisfied by currently installed system packages.
+    pub fn is_debian_sbuild_builddeps_satisfied(&self, package: &DebianSbuildPackage) -> bool {
+        for dep in &package.build_depends {
+            if !self.installed_packages.contains_key(dep) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_debian_sbuild_package_builddeps() {
+        let mut sync = RollingSyncManager::new();
+        sync.register_installed("gcc", Version::new(12, 2, 0));
+        sync.register_installed("make", Version::new(4, 3, 0));
+
+        let source_pkg = DebianSbuildPackage {
+            name: "coreutils".to_string(),
+            version: Version::new(9, 1, 0),
+            build_depends: vec!["gcc".to_string(), "make".to_string()],
+        };
+
+        // All build dependencies are installed
+        assert!(sync.is_debian_sbuild_builddeps_satisfied(&source_pkg));
+
+        // Missing dependency: "libc-dev"
+        let source_pkg_missing = DebianSbuildPackage {
+            name: "coreutils".to_string(),
+            version: Version::new(9, 1, 0),
+            build_depends: vec!["gcc".to_string(), "make".to_string(), "libc-dev".to_string()],
+        };
+        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&source_pkg_missing));
+    }
+
+    #[test]
+    fn test_gentoo_portage_compiler() {
+        let mut compiler = PortageEbuildCompiler::new();
+        compiler.set_global_use_flag("vulkan", true);
+        compiler.set_global_use_flag("x11", false); // Disabled wayland preference
+
+        let mut ebuild = GentooEbuildPackage {
+            name: "mpv-player".to_string(),
+            version: Version::new(0, 35, 0),
+            use_flags: vec![
+                GentooUseFlag { name: "vulkan".to_string(), is_enabled: false },
+                GentooUseFlag { name: "x11".to_string(), is_enabled: true },
+            ],
+            configure_flags: Vec::new(),
+        };
+
+        // Configure and compile - should override ebuild USE flags with global presets
+        let pkg = compiler.configure_and_compile(&mut ebuild).unwrap();
+        assert_eq!(pkg.name, "mpv-player");
+        assert!(pkg.description.contains("vulkan"));
+        assert!(!pkg.description.contains("x11"));
+
+        // Generated compilation configure arguments check
+        assert!(ebuild.configure_flags.contains(&"--enable-vulkan".to_string()));
+        assert!(!ebuild.configure_flags.contains(&"--enable-x11".to_string()));
+
+        // Native CPU target optimization checks
+        assert_eq!(compiler.get_optimized_target_cpu_level(&["sse4.2", "avx2"]), 3);
+        assert_eq!(compiler.get_optimized_target_cpu_level(&["avx512f", "avx2"]), 4);
+        assert_eq!(compiler.get_optimized_target_cpu_level(&[]), 1);
+    }
 
     #[test]
     fn test_aur_pkgbuild_compiler() {
