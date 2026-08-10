@@ -23,13 +23,7 @@
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::HashMap;
-#[cfg(not(feature = "standalone_test"))]
-#[cfg(target_os = "none")]
-use crate::klib::Arc;
-#[cfg(not(feature = "standalone_test"))]
-#[cfg(not(target_os = "none"))]
-use std::sync::Arc;
+use crate::klib::{HashMap, Arc};
 
 #[cfg(feature = "standalone_test")]
 use std::collections::HashMap;
@@ -188,7 +182,7 @@ impl BaseAdapter {
 
     pub fn execute_hooks(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.user_hooks {
-            hook.execute(package)?;
+            UserDefinedHook::execute(hook.as_ref(), package)?;
         }
         Ok(())
     }
@@ -585,10 +579,6 @@ impl EbuildAdapter {
         }
     }
 
-    pub fn format_name(&self) -> &'static str {
-        "ebuild"
-    }
-
     pub fn add_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
         self.base.add_hook(hook);
     }
@@ -704,10 +694,6 @@ impl ApkAdapter {
         }
     }
 
-    pub fn format_name(&self) -> &'static str {
-        "apk"
-    }
-
     pub fn add_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
         self.base.add_hook(hook);
     }
@@ -813,10 +799,6 @@ impl NixAdapter {
         Self {
             base: BaseAdapter::new(PackageFormat::Nix),
         }
-    }
-
-    pub fn format_name(&self) -> &'static str {
-        "nix"
     }
 
     pub fn add_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
@@ -2062,7 +2044,7 @@ impl UniversalPackageManager {
 
     pub fn execute_hook_chain(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.global_hooks {
-            hook.execute(package)?;
+            UserDefinedHook::execute(hook.as_ref(), package)?;
         }
         Ok(())
     }
@@ -2494,8 +2476,7 @@ Depends: kernel-base";
             }
         }
 
-        let hook: Arc<dyn UserDefinedHook> = Arc::new(CustomHook);
-        adapter.add_hook(hook);
+        adapter.add_hook(Arc::new(CustomHook));
 
         let deb_data = b"Package: original
 Version: 1.0.0

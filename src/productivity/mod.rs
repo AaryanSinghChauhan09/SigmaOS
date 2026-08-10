@@ -21,9 +21,6 @@ pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
 };
-pub use media::{
-    SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, SubtitleFormat,
-};
 pub use notes::{
     ContentType, Folder, InMemoryNoteStorage, Note, NoteError, NoteSearchResult, NoteStorage,
     NoteTakingApp, Notebook,

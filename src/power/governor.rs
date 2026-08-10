@@ -2,22 +2,11 @@
 // Implements cpufreq-compatible CpuGovernors, active frequency scaling cores,
 // TLP/powertop-compatible PCIe Active State Power Management (ASPM), and Energy-Aware Thread Balancers.
 
-#[cfg(target_os = "none")]
 extern crate alloc;
 
-#[cfg(target_os = "none")]
-use alloc::{
-    boxed::Box,
-    string::{String, ToString},
-    vec::Vec,
-};
-
-#[cfg(not(target_os = "none"))]
-use std::{
-    boxed::Box,
-    string::{String, ToString},
-    vec::Vec,
-};
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
@@ -208,74 +197,5 @@ mod tests {
         assert_eq!(balancer.boost_interactive_threads(true, 10), 14);
         // Batch background task gets throttled to save power
         assert_eq!(balancer.boost_interactive_threads(false, 10), 8);
-    }
-}
-
-// =========================================================================
-// Integration Test Support (Glary / SystemCare Parity)
-// =========================================================================
-
-pub struct ResourcePageBlock {
-    pub page_id: usize,
-    pub is_active: bool,
-    pub size_bytes: usize,
-}
-
-pub struct SigmaSupportResourceOptimizer {
-    pub registered_blocks: Vec<ResourcePageBlock>,
-    pub total_defragmentations_completed: usize,
-}
-
-impl SigmaSupportResourceOptimizer {
-    pub fn new() -> Self {
-        Self {
-            registered_blocks: Vec::new(),
-            total_defragmentations_completed: 0,
-        }
-    }
-
-    pub fn register_page_block(&mut self, id: usize, active: bool, size: usize) {
-        self.registered_blocks.push(ResourcePageBlock {
-            page_id: id,
-            is_active: active,
-            size_bytes: size,
-        });
-    }
-
-    pub fn execute_ram_defragmentation(&mut self) -> usize {
-        self.total_defragmentations_completed += 1;
-        // Simulates compacting exactly 1 inactive page block
-        1
-    }
-}
-
-pub struct RunningProcessPowerRecord {
-    pub pid: usize,
-    pub name: String,
-    pub current_cpu_usage: f64,
-}
-
-pub struct SigmaSupportPriorityOptimizer {
-    pub running_processes: Vec<RunningProcessPowerRecord>,
-}
-
-impl SigmaSupportPriorityOptimizer {
-    pub fn new() -> Self {
-        Self {
-            running_processes: Vec::new(),
-        }
-    }
-
-    pub fn register_running_process(&mut self, pid: usize, name: &str, _arg: usize) {
-        self.running_processes.push(RunningProcessPowerRecord {
-            pid,
-            name: name.to_string(),
-            current_cpu_usage: 0.0,
-        });
-    }
-
-    pub fn optimize_cpu_priorities(&self, _target: usize) -> usize {
-        // Reniced processes count
-        0
     }
 }

@@ -12,23 +12,12 @@ mod tests {
         SigmaOnboardingLog, SigmaOnboardingWelcome, ZorinAppearanceSwitcher, ZorinConnectHub,
         ZorinLayoutPreset, ZorinLiteOptimizer, ZorinWineLayer,
     };
-    use sigmaos::filesystem::sigma_fs::{
-        JournalState, RaidLevel, SigmaFS, SigmaFsJournal, SigmaFsCow, SigmaFsVolume,
-        SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio, SigmaFhsRouter, SigmaFhsHook,
-        SigmaFhsNamespace, SigmaFhsAuditor,
-    };
+    use sigmaos::filesystem::sigma_fs::{JournalState, RaidLevel};
     use sigmaos::logging::rotation::{
         LogCompressor, LogFacility, LogSeverity, SimpleLogCompressor, SimpleLogFile,
         SimpleLogRotator,
     };
     use sigmaos::power::governor::{SigmaSupportPriorityOptimizer, SigmaSupportResourceOptimizer};
-    use sigmaos::productivity::utility_suite::{
-        EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
-        CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
-        AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
-        ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
-    };
-    use sigmaos::graphics::paint::ColorRgba;
     use sigmaos::productivity::media::{
         SigmaSupportSubtitleEdit, SigmaSupportSubtitleSync, SubtitleFormat,
     };
@@ -107,14 +96,14 @@ mod tests {
         let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
         assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 1);
 
-        vfs.link_inode_by_id(inode_id).unwrap();
+        vfs.link_inode(inode_id).unwrap();
         assert_eq!(vfs.get_inode(inode_id).unwrap().hard_links_count, 2);
 
-        assert_eq!(vfs.unlink_inode_by_id(inode_id).unwrap(), 1);
-        assert!(vfs.contains_inode(inode_id));
+        assert_eq!(vfs.unlink_inode(inode_id).unwrap(), 1);
+        assert!(vfs.inodes.contains_key(&inode_id));
 
-        assert_eq!(vfs.unlink_inode_by_id(inode_id).unwrap(), 0);
-        assert!(!vfs.contains_inode(inode_id)); // fully freed
+        assert_eq!(vfs.unlink_inode(inode_id).unwrap(), 0);
+        assert!(!vfs.inodes.contains_key(&inode_id)); // fully freed
 
         // =========================================================================
         // 3. Syslog-parity multi-generation rotations, facilities, and RLE compression
@@ -308,7 +297,7 @@ mod tests {
     #[test]
     fn test_reliability_and_testing_suite() {
         use sigmaos::tracing::{SigmaTrace, TraceEvent};
-        use sigmaos::crash::{CrashPipeline, Anonymizer, SimpleCrashPipeline};
+        use sigmaos::crash::SimpleCrashPipeline;
 
         // 1. Tracepoint Spans & Observability tests
         let mut trace = SigmaTrace::new();

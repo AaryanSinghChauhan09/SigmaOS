@@ -477,36 +477,6 @@ impl VirtualFilesystem {
 
         self.delete_file(target_id)
     }
-
-    pub fn link_inode_by_id(&mut self, inode_id: u64) -> Result<(), FsError> {
-        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
-        inode.hard_links_count += 1;
-        Ok(())
-    }
-
-    pub fn unlink_inode_by_id(&mut self, inode_id: u64) -> Result<u32, FsError> {
-        let mut count = 0;
-        let mut should_delete = false;
-        if let Some(inode) = self.inodes.get_mut(&inode_id) {
-            if inode.hard_links_count > 1 {
-                inode.hard_links_count -= 1;
-                count = inode.hard_links_count;
-            } else {
-                should_delete = true;
-            }
-        } else {
-            return Err(FsError::NotFound);
-        }
-
-        if should_delete {
-            self.inodes.remove(&inode_id);
-        }
-        Ok(count)
-    }
-
-    pub fn contains_inode(&self, inode_id: u64) -> bool {
-        self.inodes.contains_key(&inode_id)
-    }
 }
 
 impl Default for VirtualFilesystem {

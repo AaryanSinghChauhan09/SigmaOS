@@ -9,9 +9,7 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod structures;
-pub mod virtual_cpu;
 
-pub use virtual_cpu::RegisterSet;
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,
     InstructionCyclePhase as ArchInstructionCyclePhase, Irql, LookasideList, MemoryDescriptorList,
