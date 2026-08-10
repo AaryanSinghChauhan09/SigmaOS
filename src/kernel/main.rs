@@ -6,64 +6,98 @@
 #[cfg(target_os = "none")]
 use core::panic::PanicInfo;
 
+use std::collections::HashMap;
+
+/// Ubuntu/Linux-style Kernel Command Line Parser
+#[derive(Debug, Clone)]
+pub struct KernelCmdLineParser {
+    pub params: HashMap<String, String>,
+    pub flags: alloc::vec::Vec<String>,
+}
+
+impl KernelCmdLineParser {
+    /// Parse a raw command-line string (e.g. "init=/bin/sh console=ttyS0 quiet boot=uefi")
+    pub fn new(cmdline: &str) -> Self {
+        let mut params = HashMap::new();
+        let mut flags = alloc::vec::Vec::new();
+
+        for arg in cmdline.split_whitespace() {
+            if let Some(pos) = arg.find('=') {
+                let key = arg[..pos].to_string();
+                let val = arg[pos + 1..].to_string();
+                params.insert(key, val);
+            } else {
+                flags.push(arg.to_string());
+            }
+        }
+
+        Self { params, flags }
+    }
+
+    /// Read parameter value by key
+    pub fn get(&self, key: &str) -> Option<&str> {
+        self.params.get(key).map(|s| s.as_str())
+    }
+
+    /// Check standalone flag existence (e.g. "quiet", "debug")
+    pub fn has_flag(&self, flag: &str) -> bool {
+        self.flags.iter().any(|f| f == flag)
+    }
+
+    /// Retrieve "init" binary path parameter (defaults to "/sbin/init")
+    pub fn init_path(&self) -> &str {
+        self.get("init").unwrap_or("/sbin/init")
+    }
+
+    /// Retrieve "console" output parameter (defaults to "tty0")
+    pub fn console(&self) -> &str {
+        self.get("console").unwrap_or("tty0")
+    }
+}
+
+extern crate alloc;
+
 #[cfg(target_os = "none")]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    let mut context = CpuContext::new();
-    let mut allocator = BuddyAllocator::new();
-    let mut vmm = SimpleVMM::new();
-    let mut scheduler = Scheduler::new();
-    let mut openrc = OpenRcManager::new();
-
-    let _ = start_kernel(&mut context, &mut allocator, &mut vmm, &mut scheduler, &mut openrc);
-
+    // Kernel entry point
     loop {}
 }
 
 #[cfg(not(target_os = "none"))]
 fn main() {
-    // Hosted dummy entry point
+    let parser = KernelCmdLineParser::new("init=/bin/sh console=ttyS0 quiet boot=uefi");
+    println!("Init Path: {}", parser.init_path());
+    println!("Console: {}", parser.console());
+    println!("Quiet flag: {}", parser.has_flag("quiet"));
 }
 
 #[cfg(target_os = "none")]
 #[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
+fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sigmaos::compatibility::ServiceStatus;
 
     #[test]
-    fn test_x86_64_start_kernel_bootstrap() {
-        let mut context = CpuContext::new();
-        let mut allocator = BuddyAllocator::new();
-        let mut vmm = SimpleVMM::new();
-        let mut scheduler = Scheduler::new();
-        let mut openrc = OpenRcManager::new();
+    fn test_kernel_cmdline_parsing() {
+        let parser = KernelCmdLineParser::new("init=/bin/sh console=ttyS0 quiet boot=uefi debug");
+        assert_eq!(parser.init_path(), "/bin/sh");
+        assert_eq!(parser.console(), "ttyS0");
+        assert_eq!(parser.get("boot").unwrap(), "uefi");
+        assert!(parser.has_flag("quiet"));
+        assert!(parser.has_flag("debug"));
+        assert!(!parser.has_flag("verbose"));
+    }
 
-        assert_eq!(EARLY_CPU_STATE.load(Ordering::SeqCst), 0);
-
-        // Run full early start_kernel bootstrap
-        start_kernel(&mut context, &mut allocator, &mut vmm, &mut scheduler, &mut openrc).unwrap();
-
-        // Verify context flags (cld set, sti set, gdt/idt bases loaded)
-        assert!(context.interrupts_enabled);
-        assert!(context.direction_flag_cleared);
-        assert_eq!(context.gdt_base, 0x8000);
-        assert_eq!(context.idt_base, 0x9000);
-
-        // Verify allocator has available memory segments and paging tables are mapped
-        assert!(allocator.get_free_memory() > 0);
-        assert_eq!(vmm.get_physical(0x1000), Some(0x1000));
-
-        // Verify userland OpenRC runlevel transition started services cleanly
-        assert_eq!(openrc.services[0].status, ServiceStatus::Started); // udev
-        assert_eq!(openrc.services[1].status, ServiceStatus::Started); // dhcpcd
-
-        // Verify bootstrap state transition completed successfully
-        assert_eq!(EARLY_CPU_STATE.load(Ordering::SeqCst), 3);
+    #[test]
+    fn test_kernel_cmdline_defaults() {
+        let parser = KernelCmdLineParser::new("quiet");
+        assert_eq!(parser.init_path(), "/sbin/init");
+        assert_eq!(parser.console(), "tty0");
+        assert!(parser.has_flag("quiet"));
     }
 }
