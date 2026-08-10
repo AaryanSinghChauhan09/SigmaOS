@@ -28,6 +28,7 @@ pub mod driver;
 pub mod drivers;
 pub mod kernel;
 pub mod network;
+pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub mod productivity;
@@ -88,6 +89,11 @@ pub use release::{
 pub use rt::{
     RealTimeTask, TaskState, SchedulingPolicy, LatencyMonitor, LatencyMeasurement,
     TimingAnalyzer, SigmaRT, RTStats, RTError,
+};
+pub use observability::{
+    Metric, MetricType, MetricsCollector, LogEntry, LogLevel, LogAggregator,
+    TraceSpan, TracingSystem, Dashboard, Panel, PanelType, SigmaObservability,
+    ObservabilityStats, ObservabilityError,
 };
 pub use testing::{
     TestSuite, TestCase, TestResult, TestSummary,
