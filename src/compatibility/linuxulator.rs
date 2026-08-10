@@ -208,7 +208,7 @@ impl SovereignLinuxulator {
     /// Emulates Linux x86_64 ABI:
     /// - Syscall Number: RAX
     /// - Arguments: RDI, RSI, RDX, R10, R8, R9
-    pub fn translate_and_dispatch(&mut self, pid: u64) -> Result<isize, LinuxulatorError> {
+    pub fn translate_and_dispatch(&mut self, _pid: u64) -> Result<isize, LinuxulatorError> {
         let process = self
             .processes
             .iter_mut()

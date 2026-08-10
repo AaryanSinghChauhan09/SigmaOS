@@ -80,14 +80,14 @@ impl AurClient {
     }
 
     /// Search for packages in AUR (simplified)
-    pub fn search(&self, query: &str) -> Vec<SigmaString> {
+    pub fn search(&self, _query: &str) -> Vec<SigmaString> {
         // In production, this would make actual HTTP requests to AUR
         // For now, return empty vector
         Vec::new()
     }
 
     /// Get package info from AUR (simplified)
-    pub fn get_info(&self, pkgname: &str) -> Option<PkgBuild> {
+    pub fn get_info(&self, _pkgname: &str) -> Option<PkgBuild> {
         // In production, this would fetch and parse .SRCINFO from AUR
         None
     }
@@ -124,7 +124,7 @@ impl SandboxedCompiler {
     }
 
     /// Compile package in sandboxed environment
-    pub fn compile_package(&self, pkgbuild: &PkgBuild) -> Result<(), SigmaString> {
+    pub fn compile_package(&self, _pkgbuild: &PkgBuild) -> Result<(), SigmaString> {
         if self.is_isolated.get() {
             // Simulate sandboxed compilation
             Ok(())
