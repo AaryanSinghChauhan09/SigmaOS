@@ -215,7 +215,6 @@ impl AiOptimizer {
                 .partial_cmp(&a.impact)
                 .unwrap_or(core::cmp::Ordering::Equal)
         });
-
         recommendations
     }
 

@@ -487,14 +487,8 @@ pub struct SimpleCompositor {
     window_order: Vec<usize>,
     stats: CompositorStats,
     capability: CompositorCapability,
-<<<<<<< HEAD
-    back_buffer: Option<BitmapSurface>,
-    double_buffering: AtomicBool,
-||||||| 0ddf2eac7
-=======
     pub back_buffer: Option<BitmapSurface>,
     pub double_buffering: AtomicBool,
->>>>>>> origin/jules-523778995335499834-002b2189
 }
 
 /// Compositor capability
@@ -684,134 +678,6 @@ impl Compositor for SimpleCompositor {
     }
 }
 
-<<<<<<< HEAD
-||||||| 0ddf2eac7
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-
-    fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(
-                self.data.add(index + 1),
-                self.data.add(index),
-                self.len - index - 1,
-            );
-            self.len -= 1;
-            item
-        }
-    }
-
-    fn retain<F>(&mut self, mut f: F)
-    where
-        F: FnMut(&T) -> bool,
-    {
-        let mut write = 0;
-        for read in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(read);
-                if f(item) {
-                    if write != read {
-                        let item_copy = core::ptr::read(self.data.add(read));
-                        core::ptr::write(self.data.add(write), item_copy);
-                    }
-                    write += 1;
-                }
-            }
-        }
-        self.len = write;
-    }
-
-    fn insert(&mut self, index: usize, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if index < self.len {
-                core::ptr::copy(
-                    self.data.add(index),
-                    self.data.add(index + 1),
-                    self.len - index,
-                );
-            }
-
-            core::ptr::write(self.data.add(index), item);
-            self.len += 1;
-        }
-    }
-
-    fn iter(&self) -> core::slice::Iter<'_, T> {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-
-    fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
-    }
-
-    fn position<F>(&self, mut f: F) -> Option<usize>
-    where
-        F: FnMut(&T) -> bool,
-    {
-        for i in 0..self.len {
-            unsafe {
-                let item = &*self.data.add(i);
-                if f(item) {
-                    return Some(i);
-                }
-            }
-        }
-        None
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-=======
 use core::mem;
 
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
@@ -1016,4 +882,3 @@ impl<T> Vec<T> {
         }
     }
 }
->>>>>>> origin/jules-523778995335499834-002b2189

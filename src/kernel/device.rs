@@ -149,26 +149,12 @@ impl DeviceManager {
     }
 
     pub fn find_device_mut(&mut self, name: &str) -> Option<&mut dyn Device> {
-<<<<<<< HEAD
-        for d in self.devices.iter_mut() {
-            if d.name() == name {
-                return Some(&mut **d);
-            }
-        }
-        None
-||||||| 0ddf2eac7
-        self.devices
-            .iter_mut()
-            .find(|d| d.name() == name)
-            .map(|d| d.as_mut())
-=======
         for d in self.devices.iter_mut() {
             if d.name() == name {
                 return Some(d.as_mut());
             }
         }
         None
->>>>>>> origin/jules-523778995335499834-002b2189
     }
 
     pub fn bind_driver(&mut self, device_name: &str, driver_name: &str) -> Result<(), DriverError> {

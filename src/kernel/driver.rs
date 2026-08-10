@@ -121,26 +121,12 @@ impl DriverRegistry {
     }
 
     pub fn find_driver_mut(&mut self, name: &str) -> Option<&mut dyn Driver> {
-<<<<<<< HEAD
-        for d in self.drivers.iter_mut() {
-            if d.driver.driver_name() == name {
-                return Some(&mut *d.driver);
-            }
-        }
-        None
-||||||| 0ddf2eac7
-        self.drivers
-            .iter_mut()
-            .find(|d| d.driver.driver_name() == name)
-            .map(|d| d.driver.as_mut())
-=======
         for d in self.drivers.iter_mut() {
             if d.driver.driver_name() == name {
                 return Some(d.driver.as_mut());
             }
         }
         None
->>>>>>> origin/jules-523778995335499834-002b2189
     }
 
     pub fn register_device(&mut self, device: Box<dyn Device>) -> Result<(), DriverError> {
@@ -156,41 +142,22 @@ impl DriverRegistry {
     }
 
     pub fn probe_and_bind(&mut self) -> Result<(), DriverError> {
-<<<<<<< HEAD
-        let mut bindings_to_apply = alloc::vec::Vec::new();
-||||||| 0ddf2eac7
-=======
         let mut bindings_to_perform = Vec::new();
->>>>>>> origin/jules-523778995335499834-002b2189
         for device in self.device_manager.devices() {
             for reg in &mut self.drivers {
                 if !reg.loaded && reg.driver.probe(device) {
                     if let Some(driver) = reg.driver.as_driver_impl_mut() {
                         driver.init()?;
-<<<<<<< HEAD
-                        bindings_to_apply.push((device.name().to_string(), reg.driver.driver_name().to_string()));
-||||||| 0ddf2eac7
-                        self.device_manager
-                            .bind_driver(device.name(), reg.driver.driver_name())?;
-=======
                         bindings_to_perform.push((device.name().to_string(), reg.driver.driver_name().to_string()));
->>>>>>> origin/jules-523778995335499834-002b2189
                         reg.loaded = true;
                         break;
                     }
                 }
             }
         }
-<<<<<<< HEAD
-        for (device_name, driver_name) in bindings_to_apply {
-            self.device_manager.bind_driver(&device_name, &driver_name)?;
-        }
-||||||| 0ddf2eac7
-=======
         for (dev_name, drv_name) in bindings_to_perform {
             self.device_manager.bind_driver(&dev_name, &drv_name)?;
         }
->>>>>>> origin/jules-523778995335499834-002b2189
         Ok(())
     }
 
