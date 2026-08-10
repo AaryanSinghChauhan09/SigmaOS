@@ -4,6 +4,7 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
+pub mod audit;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
@@ -37,6 +38,7 @@ pub use automation::{
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
+pub use audit::{AuditCollectorBus, GLOBAL_AUDIT_COLLECTOR};
 pub use compatibility::{
     APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
     AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, ApplicationBinary,
