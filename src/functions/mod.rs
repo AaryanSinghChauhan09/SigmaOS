@@ -4,6 +4,8 @@
 pub mod monitoring;
 pub mod network;
 pub mod security;
+pub mod storage;
+pub mod process;
 
 pub use monitoring::{
     JournalEntry, LogPriority, LogFilter, JournalViewer, ExportFormat, JournalError,
@@ -19,4 +21,14 @@ pub use security::{
     FirewallZone, PortRule, FirewallService, FirewallRule, RuleAction, FirewallManager,
     SELinuxMode, SELinuxBoolean, SELinuxContext, SELinuxManager,
     SSHKey, SSHKeyType, SSHKeyManager, AuthorizedKey, KnownHost, SecurityError,
+};
+pub use storage::{
+    BlockDevice, Partition, PartitionType, FilesystemInfo, BlockDeviceManager, DeviceStats,
+    Disk, PartitionTableType, PartitionTable, PartitionManager,
+    Filesystem, MountPoint, FilesystemManager, StorageError,
+};
+pub use process::{
+    Service, ServiceState, Socket, Timer, ServiceManager,
+    Process, Thread, FileDescriptor, ProcessManager,
+    KernelParam, SystemControl, ProcessError,
 };
