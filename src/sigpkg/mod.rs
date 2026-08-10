@@ -9,6 +9,9 @@ pub mod verifier;
 pub mod rpm_compat;
 pub mod universal_adapter;
 pub mod importer;
+pub mod repository_manager;
+pub mod transaction_log;
+pub mod declarative_build;
 
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
@@ -22,6 +25,9 @@ pub use universal_adapter::{
 pub use importer::{
     PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter,
 };
+pub use repository_manager::{Repository, RepositoryManager};
+pub use transaction_log::{TransactionEntry, TransactionLog, TransactionType, TransactionState};
+pub use declarative_build::{NixDerivation, BazelTarget, PackageReview, PackageRatingsRegistry, BazelBuildEngine, BazelRuleType};
 
 /// Package version using SemVer
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -41,6 +47,7 @@ impl Version {
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
+        use alloc::vec::Vec;
         let parts: Vec<&str> = version_str.split('.').collect();
         if parts.len() != 3 {
             return Err(ParseError::InvalidFormat);
