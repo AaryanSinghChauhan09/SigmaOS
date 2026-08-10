@@ -101,6 +101,7 @@ pub use orchestration::{
 };
 pub use distro::{
     PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
+    SovereignPreseedParser, PreseedVariable,
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,

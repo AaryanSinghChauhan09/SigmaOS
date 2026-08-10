@@ -97,5 +97,22 @@ mod tests {
         // Hang up (ATH)
         modem.write(b"ATH\r").unwrap();
         assert!(!modem.is_connected);
+
+        // 8. Debian-style Automated Preseed Installer (S-Preseed) Integration
+        let preseed = SovereignPreseedParser::new();
+        let preseed_content = r#"
+            # S-Preseed config
+            d-i passwd/user-fullname string Sovereign User
+            d-i netcfg/get_hostname string sigmaos-node
+            d-i pkgsel/include string nginx curl git
+        "#;
+        let count = preseed.parse_preseed_content(preseed_content);
+        assert_eq!(count, 3);
+
+        assert_eq!(preseed.get_value("passwd", "user-fullname").unwrap(), "Sovereign User");
+        assert_eq!(preseed.get_value("netcfg", "get_hostname").unwrap(), "sigmaos-node");
+        assert_eq!(preseed.get_value("pkgsel", "include").unwrap(), "nginx curl git");
+
+        assert!(preseed.execute_automated_installation());
     }
 }

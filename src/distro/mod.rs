@@ -13,8 +13,10 @@ pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
 pub mod transformation_engine;
+pub mod preseed;
 
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
+pub use preseed::{SovereignPreseedParser, PreseedVariable};
 pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
 pub use manjaro::{
     GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
