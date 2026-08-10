@@ -4,6 +4,11 @@
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::boxed::Box;
+
 pub type LogFileID = usize;
 
 #[repr(C)]
@@ -39,6 +44,7 @@ pub trait LogFile {
     fn path(&self) -> &[u8];
     fn size(&self) -> usize;
     fn created(&self) -> u64;
+    fn reset_size(&self);
 }
 
 #[repr(C)]
@@ -83,6 +89,7 @@ impl LogFile for SimpleLogFile {
     }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn created(&self) -> u64 { self.created.load(Ordering::SeqCst) as u64 }
+    fn reset_size(&self) { self.size.store(0, Ordering::SeqCst); }
 }
 
 pub trait LogRotator {
@@ -156,18 +163,26 @@ impl LogRotator for SimpleLogRotator {
     }
 
     fn rotate(&mut self, id: LogFileID) -> Result<(), RotationError> {
+        let mut path_to_shift = None;
         for log_file_option in &mut self.log_files {
             if let Some(ref mut log_file) = *log_file_option {
                 if log_file.id() == id {
-                    log_file.size.store(0, Ordering::SeqCst);
-                    // Standard Linux logrotate shift trigger
-                    let path_str = core::str::from_utf8(log_file.path()).unwrap_or("log");
-                    self.shift_backup_generations(path_str, 5);
-                    return Ok(());
+                    log_file.reset_size();
+                    // Use standard alloc::string::ToString
+                    use alloc::string::ToString;
+                    let path_str = core::str::from_utf8(log_file.path()).unwrap_or("log").to_string();
+                    path_to_shift = Some(path_str);
+                    break;
                 }
             }
         }
-        Err(RotationError::NotFound)
+
+        if let Some(path_str) = path_to_shift {
+            self.shift_backup_generations(&path_str, 5);
+            Ok(())
+        } else {
+            Err(RotationError::NotFound)
+        }
     }
 }
 
@@ -181,11 +196,9 @@ pub struct SimpleLogCompressor;
 
 impl SimpleLogCompressor {
     pub fn new() -> Self { SimpleLogCompressor }
-}
 
-impl LogCompressor for SimpleLogCompressor {
     /// Compresses data dynamically using a clean Run-Length Encoding (RLE) algorithm
-    fn compress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
+    pub fn compress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
         let mut compressed = Vec::new();
         if data.is_empty() {
             return Ok(compressed);
@@ -211,7 +224,7 @@ impl LogCompressor for SimpleLogCompressor {
     }
 
     /// Decompresses RLE-encoded logs back into standard ASCII text
-    fn decompress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
+    pub fn decompress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
         let mut decompressed = Vec::new();
         if data.is_empty() {
             return Ok(decompressed);
@@ -234,58 +247,14 @@ impl LogCompressor for SimpleLogCompressor {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+impl LogCompressor for SimpleLogCompressor {
+    fn compress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
+        self.compress(data)
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-    fn iter(&self) -> SliceIter<'_, T> {
-        SliceIter {
-            ptr: self.data,
-            end: unsafe { self.data.add(self.len) },
-            _marker: core::marker::PhantomData,
-        }
+    fn decompress(&self, data: &[u8]) -> Result<Vec<u8>, RotationError> {
+        self.decompress(data)
     }
 }
-
-struct SliceIter<'a, T> {
-    ptr: *const T,
-    end: *const T,
-    _marker: core::marker::PhantomData<&'a T>,
-}
-
-impl<'a, T> Iterator for SliceIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.ptr == self.end {
-            None
-        } else {
-            let result = unsafe { &*self.ptr };
-            self.ptr = unsafe { self.ptr.add(1) };
-            Some(result)
-        }
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
 
 #[cfg(test)]
 mod tests {

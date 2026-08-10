@@ -27,7 +27,16 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod tmux;
-pub mod mind_map;
+pub mod linux_bsd_tools;
+pub mod system_settings;
+pub mod utility_suite;
+
+pub use utility_suite::{
+    EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
+    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
+    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
+    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
+};
 
 pub use gamification::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
@@ -65,6 +74,5 @@ pub use terminal::{
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
-pub use mind_map::{
-    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
-};
+pub use linux_bsd_tools::{TopCommand, ProcessTaskInfo, IfconfigCommand, NetworkInterface, PingCommand, PingResult};
+pub use system_settings::{UnifiedSettingsManager, UserAccount, DisplayPreference, InputDeviceSettings};

@@ -26,6 +26,10 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod unimplemented_features;
+pub mod unimplemented_tools;
+pub mod logging;
+pub mod graphics;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -48,6 +52,15 @@ pub use compatibility::{
     NtHandle, NtObjectManager, NtObjectType, NtStatus, Plan9pMessage, Plan9pMsgType,
     PortableExecutableLoader, RegistryHive, SoftwareMeta, TargetPlatform, TranslationLayer,
     WindowCoordinates, ZenithDisplayCompositor,
+    InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats,
+    ZorinAppearanceSwitcher, ZorinLayoutPreset, ZorinConnectHub, ZorinWineLayer, ZorinLiteOptimizer,
+    SigmaEcosystemInit, FhsRunlevel, SigmaEcosystemProfiler, GraphicPresetMode,
+    SigmaOnboardingWelcome, SigmaOnboardingLog,
+    SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, SubtitleFormat,
+    SigmaSupportResourceOptimizer, SigmaSupportPriorityOptimizer,
+    BoreSchedulerGovernor, AnanicyManager, SchedPolicy, V4OptimizedPackageManager,
+    CachyInitramfs, CachyThpTuner, ThpMode, CachyKsmDaemon, KsmPageEntry,
+    CachyLatencyGovernor, GovernorPerformanceState, CachyMicroarchCompilerTuner,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -61,8 +74,18 @@ pub use drivers::{
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
 };
+pub use driver::{
+    Irp, DriverObject, DeviceObject, IoStatus, IoStatusBlock, Apc, Dpc, Minifilter,
+    IRP_MJ_CREATE, IRP_MJ_CLOSE, IRP_MJ_READ, IRP_MJ_WRITE, IRP_MJ_DEVICE_CONTROL,
+    METHOD_BUFFERED, METHOD_IN_DIRECT, METHOD_OUT_DIRECT, METHOD_NEITHER,
+    IoManager, DriverEntry, OpaqueDriverExtension,
+    ObjectManager, ObjectType, NonPagedPool, RootkitDetector, IrpParameters,
+};
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
+    SigmaDisasterRecoveryCleaner, SigmaFsJournal, SigmaFsCow, SigmaFsVolume,
+    SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio, FileBlock, RaidLevel, JournalState,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
@@ -89,6 +112,12 @@ pub use package::{
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+    TopCommand, ProcessTaskInfo, IfconfigCommand, NetworkInterface, PingCommand, PingResult,
+    UnifiedSettingsManager, UserAccount, DisplayPreference, InputDeviceSettings,
+    EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
+    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
+    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
+    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
@@ -99,6 +128,8 @@ pub use security::{
     FirewallRule, IptablesFirewall, KaliError, NemoClawError, OpenShellAgentSandbox, Permission,
     PledgeManager, PledgePromise, PluggableAuthenticationModule, PrivacyRouter,
     SudoPrivilegeEscalation, SwapSpaceManager, TmuxMultiplexer, TmuxPane,
+    PenetrationAssistant, ExploitPayload, Vulnerability, VulnerabilityScanner, SimpleVulnerability,
+    SimpleVulnerabilityScanner, Severity, ScanSummary, ScanReport,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
@@ -111,4 +142,9 @@ pub use virtualization::{
     Container, DeterministicError, DeterministicHypervisor, DeterministicVirtualMachine,
     KubernetesPod, ResourcePool, VirtualCpuContext, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmExecutionSnapshot, VmState,
+    DaemonlessContainer, K3osOrchestrator, ContainerState, RancherError,
 };
+pub use logging::{
+    SimpleLogFile, SimpleLogRotator, SimpleLogCompressor, LogSeverity, LogFacility,
+};
+pub use graphics::ColorRgba;
