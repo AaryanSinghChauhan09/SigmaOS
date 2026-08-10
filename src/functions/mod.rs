@@ -8,6 +8,9 @@ pub mod storage;
 pub mod process;
 pub mod user;
 pub mod update;
+pub mod logging;
+pub mod tuning;
+pub mod health;
 
 pub use monitoring::{
     JournalEntry, LogPriority, LogFilter, JournalViewer, ExportFormat, JournalError,
@@ -43,4 +46,19 @@ pub use update::{
     Package, Repository, PackageCache, PackageManager,
     Update, SecurityUpdate, SecuritySeverity, UpdateSchedule, UpdateManager,
     GPGKey, RepositoryManager, UpdateError,
+};
+pub use logging::{
+    LogFile, LogRule, LogAction, LogTarget, LogTargetType, LogManager, LogStats,
+    Journal, JournalFile, JournalManager,
+    LogPattern, PatternSeverity, LogAlert, LogAnalyzer, LogError,
+};
+pub use tuning::{
+    TuningProfile, CPUProfile, DiskProfile, NetworkProfile, PerformanceTuner,
+    IOClass, IOScheduler, IOTuner,
+    QDisc, QDiscType, TrafficClass, TrafficFilter, NetworkTuner, TuningError,
+};
+pub use health::{
+    HealthCheck, HealthCheckType, HealthStatus, SystemHealthStatus, HealthChecker,
+    DiagnosticModule, DiagnosticReport, DiagnosticsTool,
+    RecoveryMode, RecoveryOption, RecoveryTool, HealthError as HealthCheckError,
 };
