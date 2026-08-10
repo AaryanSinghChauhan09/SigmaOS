@@ -23,10 +23,9 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::collections::BTreeMap as HashMap;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::format;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigmaToolError {
@@ -108,8 +107,8 @@ impl ClusterNode {
         self.state = state;
     }
 
-    pub fn update_load(&mut self, _load: f32) {
-        // Load update would be implemented in production
+    pub fn update_load(&mut self, load: f32) {
+        self.load = load;
     }
 }
 
@@ -990,8 +989,8 @@ pub struct SovereignPasswordGenerator;
 impl SovereignPasswordGenerator {
     pub fn generate_secure_password(&self, length: usize, include_symbols: bool) -> String {
         let mut password = String::new();
-        let letters = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let symbols = b"!@#$%^&*()_+-=[]{}|;:,./?";
+        let letters: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let symbols: &[u8] = b"!@#$%^&*()_+-=[]{}|;:,./?";
 
         // Simple high-entropy pseudorandom mapping based on local timestamp variations
         let mut seed = length as u32 * 31;

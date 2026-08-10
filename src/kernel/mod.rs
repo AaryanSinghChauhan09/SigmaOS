@@ -25,6 +25,7 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod object;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
