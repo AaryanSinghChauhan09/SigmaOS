@@ -29,6 +29,7 @@ pub mod customization;
 pub mod dashboard;
 pub mod edge;
 pub mod filesystem;
+pub mod functions;
 pub mod graphics;
 pub mod hal;
 pub mod iot;
@@ -128,6 +129,14 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
     StoragePool, RaidLevel, Dataset, DatasetType, Snapshot, Zvol, SendStream, ReceiveStream,
     SigmaFSManager, FilesystemStats, SigmaFSError, CompressionAlgorithm,
+};
+pub use functions::{
+    JournalEntry, LogPriority, LogFilter, JournalViewer, ExportFormat, JournalError,
+    CpuStats, MemoryStats, ProcessInfo, IOStats, SystemMonitor, MonitorStats,
+    SystemInfo, HardwareInfo,
+    NetworkInterface, InterfaceState, IPAddress, AddressFamily, Route, Rule, RuleAction,
+    NetworkConfig, PingResult, TracerouteHop, NetworkDiagnostics, NetworkStats,
+    InterfaceStats, DriverInfo, LinkSettings, Duplex, EthTool, NetworkError,
 };
 pub use graphics::{
     GPU, GPUType, GPUState, GraphicsAPI, Renderer, Compositor,
