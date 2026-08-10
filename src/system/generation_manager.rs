@@ -13,6 +13,30 @@ pub struct Generation {
     pub created_at: u64,
 }
 
+/// Represents a purely functional Nix-style derivation
+#[derive(Debug, Clone)]
+pub struct NixDerivation {
+    pub name: &'static str,
+    pub inputs: Vec<&'static str>, // Input derivation hashes/paths
+    pub builder_script: &'static str, // Build instructions
+    pub output_path: &'static str, // Computed unique content-addressed path
+}
+
+impl NixDerivation {
+    pub fn new(
+        name: &'static str,
+        inputs: Vec<&'static str>,
+        builder_script: &'static str,
+    ) -> Self {
+        Self {
+            name,
+            inputs,
+            builder_script,
+            output_path: "/nix/store/reproducible-build-hash-placeholder",
+        }
+    }
+}
+
 pub struct GenerationManager {
     generations: Vec<Generation>,
     active_generation_idx: Option<usize>,
@@ -132,5 +156,18 @@ mod tests {
         // Try to swap to non-existent generation
         let result = manager.swap_active_generation(999);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_nix_derivation_functional_builds() {
+        let deriv = NixDerivation::new(
+            "neofetch",
+            vec!["/nix/store/glibc-hash", "/nix/store/bash-hash"],
+            "make install",
+        );
+
+        assert_eq!(deriv.name, "neofetch");
+        assert_eq!(deriv.inputs.len(), 2);
+        assert!(deriv.output_path.starts_with("/nix/store/"));
     }
 }

@@ -6,11 +6,12 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type DriverID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DriverType {
     Block = 0,
     Char = 1,
     Network = 2,
+    Storage = 3,
 }
 
 #[repr(usize)]
@@ -58,14 +59,6 @@ pub trait Driver {
     fn dependencies(&self) -> &'static [DriverType];
 }
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum DriverError {
-    Success = 0,
-    LoadFailed = 1,
-    UnloadFailed = 2,
-}
-
 pub trait StorageDriver: Driver {
     fn read_blocks(&mut self, block_idx: u64, buf: &mut [u8]) -> Result<usize, DriverError>;
     fn write_blocks(&mut self, block_idx: u64, buf: &[u8]) -> Result<usize, DriverError>;
@@ -87,8 +80,9 @@ pub trait InputDriver: Driver {
 
 // Concrete Driver Classes (OOP Implementation)
 
-pub struct SimpleStorageDriver {
+pub struct SimpleDriver {
     pub id: DriverID,
+    pub driver_type: DriverType,
     pub state: AtomicUsize,
 }
 
@@ -112,14 +106,70 @@ impl Driver for SimpleDriver {
     fn state(&self) -> DriverState {
         unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
     }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
     fn load(&mut self) -> Result<(), DriverError> {
-        self.state
-            .store(DriverState::Loaded as usize, Ordering::SeqCst);
+        self.set_state(DriverState::Active);
         Ok(())
     }
     fn unload(&mut self) -> Result<(), DriverError> {
-        self.state
-            .store(DriverState::Unloaded as usize, Ordering::SeqCst);
+        self.set_state(DriverState::Unloaded);
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        &[]
+    }
+}
+
+pub struct SimpleStorageDriver {
+    pub id: DriverID,
+    pub state: AtomicUsize,
+}
+
+impl SimpleStorageDriver {
+    pub fn new(id: DriverID) -> Self {
+        Self {
+            id,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+        }
+    }
+}
+
+impl Driver for SimpleStorageDriver {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        DriverType::Storage
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Active);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Unloaded);
         Ok(())
     }
     fn shutdown(&mut self) -> Result<(), DriverError> {
@@ -219,6 +269,74 @@ impl NetworkDriver for SimpleNetworkDriver {
     }
 }
 
+/// Standard Linux Driver Operations (file_operations parity)
+#[derive(Debug, Clone, Copy)]
+pub struct LinuxFileOperations {
+    pub open: fn() -> i32,
+    pub release: fn() -> i32,
+    pub read: fn(buf: &mut [u8]) -> i32,
+    pub write: fn(buf: &[u8]) -> i32,
+    pub ioctl: fn(cmd: u32, arg: u64) -> i32,
+}
+
+/// Linux Driver Compatibility Wrapper implementing SigmaOS OOP Driver trait
+pub struct LinuxDriverShim {
+    pub id: DriverID,
+    pub name: &'static str,
+    pub driver_type: DriverType,
+    pub state: AtomicUsize,
+    pub fops: LinuxFileOperations,
+}
+
+impl LinuxDriverShim {
+    pub fn new(id: DriverID, name: &'static str, driver_type: DriverType, fops: LinuxFileOperations) -> Self {
+        Self {
+            id,
+            name,
+            driver_type,
+            state: AtomicUsize::new(DriverState::Unloaded as usize),
+            fops,
+        }
+    }
+}
+
+impl Driver for LinuxDriverShim {
+    fn id(&self) -> DriverID {
+        self.id
+    }
+    fn driver_type(&self) -> DriverType {
+        self.driver_type
+    }
+    fn state(&self) -> DriverState {
+        unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) }
+    }
+    fn set_state(&self, state: DriverState) {
+        self.state.store(state as usize, Ordering::SeqCst);
+    }
+    fn init(&mut self) -> Result<(), DriverError> {
+        (self.fops.open)();
+        Ok(())
+    }
+    fn probe(&mut self) -> Result<bool, DriverError> {
+        Ok(true)
+    }
+    fn load(&mut self) -> Result<(), DriverError> {
+        self.set_state(DriverState::Active);
+        Ok(())
+    }
+    fn unload(&mut self) -> Result<(), DriverError> {
+        (self.fops.release)();
+        self.set_state(DriverState::Unloaded);
+        Ok(())
+    }
+    fn shutdown(&mut self) -> Result<(), DriverError> {
+        Ok(())
+    }
+    fn dependencies(&self) -> &'static [DriverType] {
+        &[]
+    }
+}
+
 // Hardware Abstraction (Bus Abstraction Classes)
 
 pub trait Bus {
@@ -276,8 +394,8 @@ pub trait DriverFramework {
 
 #[allow(dead_code)]
 pub struct SimpleDriverFramework {
-    drivers: Vec<Option<Box<dyn Driver>>>,
-    next_id: AtomicUsize,
+    pub drivers: Vec<Option<Box<dyn Driver>>>,
+    pub next_id: AtomicUsize,
 }
 
 impl Default for SimpleDriverFramework {
@@ -292,6 +410,24 @@ impl SimpleDriverFramework {
             drivers: Vec::new(),
             next_id: AtomicUsize::new(1),
         }
+    }
+
+    pub fn verify_dependencies(&self, driver: &dyn Driver) -> bool {
+        for &dep in driver.dependencies() {
+            let mut found = false;
+            for driver_option in self.drivers.iter() {
+                if let Some(ref d) = *driver_option {
+                    if d.driver_type() == dep && d.state() == DriverState::Active {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if !found {
+                return false;
+            }
+        }
+        true
     }
 }
 
@@ -498,4 +634,50 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    static mut OPEN_CALLED: i32 = 0;
+    static mut RELEASE_CALLED: i32 = 0;
+
+    fn mock_open() -> i32 {
+        unsafe { OPEN_CALLED += 1; }
+        0
+    }
+
+    fn mock_release() -> i32 {
+        unsafe { RELEASE_CALLED += 1; }
+        0
+    }
+
+    fn mock_read(_buf: &mut [u8]) -> i32 { 0 }
+    fn mock_write(_buf: &[u8]) -> i32 { 0 }
+    fn mock_ioctl(_cmd: u32, _arg: u64) -> i32 { 0 }
+
+    #[test]
+    fn test_linux_driver_shim() {
+        let fops = LinuxFileOperations {
+            open: mock_open,
+            release: mock_release,
+            read: mock_read,
+            write: mock_write,
+            ioctl: mock_ioctl,
+        };
+
+        let mut shim = LinuxDriverShim::new(42, "e1000", DriverType::Network, fops);
+        assert_eq!(shim.id(), 42);
+        assert_eq!(shim.driver_type(), DriverType::Network);
+
+        assert!(shim.init().is_ok());
+        unsafe { assert_eq!(OPEN_CALLED, 1); }
+
+        assert!(shim.load().is_ok());
+        assert_eq!(shim.state(), DriverState::Active);
+
+        assert!(shim.unload().is_ok());
+        unsafe { assert_eq!(RELEASE_CALLED, 1); }
+    }
 }

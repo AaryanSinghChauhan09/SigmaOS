@@ -277,7 +277,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
 
         let mut index = None;
         for (i, file_option) in self.files.iter().enumerate() {
-            if let Some(ref file) = *file_option {
+            if let Some(file) = file_option.as_ref() {
                 if file.id() == id {
                     index = Some(i);
                     break;
@@ -300,7 +300,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         }
 
         for file_option in &mut self.files {
-            if let Some(ref mut file) = *file_option {
+            if let Some(file) = file_option.as_mut() {
                 if file.id() == id {
                     let result = file.verify();
                     if let Ok(status) = result {
@@ -332,7 +332,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         let mut modified_files = Vec::new();
 
         for file_option in &mut self.files {
-            if let Some(ref mut file) = *file_option {
+            if let Some(file) = file_option.as_mut() {
                 let result = file.verify();
                 if let Ok(status) = result {
                     if status != IntegrityStatus::Valid {
@@ -359,7 +359,7 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
 
     fn get_file(&self, id: FileID) -> Option<&dyn File> {
         for file_option in &self.files {
-            if let Some(ref file) = *file_option {
+            if let Some(file) = file_option.as_ref() {
                 if file.id() == id {
                     return Some(file.as_ref());
                 }
@@ -372,9 +372,6 @@ impl IntegrityMonitor for SimpleIntegrityMonitor {
         self.stats
     }
 }
-
-pub struct IntegrityCheck;
-pub struct IntegrityVerifier;
 
 #[cfg(test)]
 mod tests {
