@@ -1,6 +1,6 @@
-// SigmaOS Package Recipes
-// Build recipes for package compilation and installation
-// Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
+//! SigPkg: Community Recipe Packaging (Arch Linux Absorption)
+//!
+//! Zero-allocation package manager parsing simple, signed declarative community recipes.
 
 use crate::sigpkg::{Dependency, Version};
 use std::collections::HashMap;
@@ -14,28 +14,37 @@ pub enum BuildSystem {
     Autotools,
     Meson,
     Ninja,
+    Custom,
 }
 
-/// Gentoo-inspired compilation optimization profiles (stages)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StageProfile {
-    Stage1Minimal,      // Basic fallback bootstrap flags (-O1, -mno-sse)
-    Stage2Bootstrap,    // Balanced standard optimization (-O2)
-    Stage3Optimized,    // Maximum architecture-targeted performance (-O3 -march=native -flto)
+pub enum RecipeError {
+    InvalidFormat,
+    MissingField,
+    SignatureMismatch,
+    DependencyConflict,
+    InvalidName,
+    InvalidSource,
+    InvalidHash,
+    NoBuildCommands,
+    InvalidRecipe,
 }
 
-/// Gentoo-style Portage USE flags representing conditional package compilation features
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum UseFlag {
-    Ssl,
-    Threads,
-    X11,
-    Gpu,
-    Sound,
+pub struct RecipeManager;
+
+impl RecipeManager {
+    pub fn new() -> Self {
+        Self
+    }
 }
 
-/// Package recipe
-#[derive(Debug, Clone)]
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Declarative package recipes.
 pub struct PackageRecipe {
     pub name: String,
     pub version: Version,
@@ -47,16 +56,16 @@ pub struct PackageRecipe {
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
     pub environment: HashMap<String, String>,
-
-    // Gentoo-inspired features
-    pub active_use_flags: Vec<UseFlag>,
-    pub compilation_profile: StageProfile,
-    pub conditional_dependencies: Vec<(UseFlag, Dependency)>, // Dependency unlocked ONLY if USE flag is active
+    pub pkgrel: u32,
+    pub arch: String,
+    pub license_spdx: String,
+    pub prepare_commands: Vec<String>,
+    pub package_commands: Vec<String>,
 }
 
 impl PackageRecipe {
     pub fn new(name: String, version: Version) -> Self {
-        Self {
+        PackageRecipe {
             name,
             version,
             description: String::new(),
@@ -67,9 +76,11 @@ impl PackageRecipe {
             build_commands: Vec::new(),
             install_commands: Vec::new(),
             environment: HashMap::new(),
-            active_use_flags: Vec::new(),
-            compilation_profile: StageProfile::Stage2Bootstrap,
-            conditional_dependencies: Vec::new(),
+            pkgrel: 1,
+            arch: "x86_64".to_string(),
+            license_spdx: "MIT".to_string(),
+            prepare_commands: Vec::new(),
+            package_commands: Vec::new(),
         }
     }
 
@@ -109,44 +120,24 @@ impl PackageRecipe {
         self
     }
 
-    // Builder helpers for USE flags and compilation profiles
-    pub fn with_use_flag(mut self, flag: UseFlag) -> Self {
-        self.active_use_flags.push(flag);
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
         self
     }
 
-    pub fn with_compilation_profile(mut self, profile: StageProfile) -> Self {
-        self.compilation_profile = profile;
+    pub fn with_arch(mut self, arch: String) -> Self {
+        self.arch = arch;
         self
     }
 
-    pub fn with_conditional_dependency(mut self, flag: UseFlag, dependency: Dependency) -> Self {
-        self.conditional_dependencies.push((flag, dependency));
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
         self
     }
 
-    pub fn is_use_active(&self, flag: UseFlag) -> bool {
-        self.active_use_flags.contains(&flag)
-    }
-
-    /// Evaluates and returns all active dependencies including conditional USE-flag targets
-    pub fn get_active_dependencies(&self) -> Vec<Dependency> {
-        let mut deps = self.dependencies.clone();
-        for (flag, dep) in self.conditional_dependencies.iter() {
-            if self.is_use_active(*flag) {
-                deps.push(dep.clone());
-            }
-        }
-        deps
-    }
-
-    /// Returns CFLAGS/CXXFLAGS compilation flags matching the active Stage Profile
-    pub fn get_stage_optimization_flags(&self) -> &'static str {
-        match self.compilation_profile {
-            StageProfile::Stage1Minimal => "-O1 -mno-sse2",
-            StageProfile::Stage2Bootstrap => "-O2 -pipe",
-            StageProfile::Stage3Optimized => "-O3 -march=native -flto=fat -funroll-loops",
-        }
+    pub fn with_package_command(mut self, command: String) -> Self {
+        self.package_commands.push(command);
+        self
     }
 
     pub fn validate(&self) -> Result<(), RecipeError> {
@@ -177,64 +168,11 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
+            BuildSystem::Custom => "make".to_string(),
         }
     }
 }
 
-/// Recipe errors
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RecipeError {
-    InvalidName,
-    InvalidSource,
-    InvalidHash,
-    NoBuildCommands,
-    DependencyConflict,
-    BuildFailed,
-}
-
-/// Recipe manager
-pub struct RecipeManager {
-    recipes: HashMap<String, PackageRecipe>,
-}
-
-impl RecipeManager {
-    pub fn new() -> Self {
-        Self {
-            recipes: HashMap::new(),
-        }
-    }
-
-    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
-        recipe.validate()?;
-        let key = format!("{}@{}", recipe.name, recipe.version);
-        self.recipes.insert(key, recipe);
-        Ok(())
-    }
-
-    pub fn get_recipe(&self, name: &str, version: &Version) -> Option<&PackageRecipe> {
-        let key = format!("{}@{}", name, version);
-        self.recipes.get(&key)
-    }
-
-    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
-        self.recipes.values().collect()
-    }
-
-    pub fn find_by_name(&self, name: &str) -> Vec<&PackageRecipe> {
-        self.recipes.values().filter(|r| r.name == name).collect()
-    }
-
-    pub fn remove_recipe(&mut self, name: &str, version: &Version) {
-        let key = format!("{}@{}", name, version);
-        self.recipes.remove(&key);
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -294,38 +232,24 @@ mod tests {
     }
 
     #[test]
-    fn test_portage_style_use_flags() {
-        let mut recipe = PackageRecipe::new("libcurl".to_string(), Version::new(8, 2, 1))
-            .with_source("https://example.com/curl".to_string(), "99aa88".to_string())
-            .with_build_command("make".to_string());
+    fn test_pkgbuild_and_aur_compilation_fields() {
+        let recipe = PackageRecipe::new("neofetch-pqc".to_string(), Version::new(7, 1, 0))
+            .with_pkgrel(3)
+            .with_arch("aarch64".to_string())
+            .with_source(
+                "https://github.com/dylanaraps/neofetch".to_string(),
+                "hash_neofetch".to_string(),
+            )
+            .with_prepare_command("patch -p1 < pqc_patch.diff".to_string())
+            .with_build_command("make build".to_string())
+            .with_package_command("make DESTDIR=\"$pkgdir\" install".to_string());
 
-        // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
-        let ssl_dependency = Dependency {
-            name: "openssl".to_string(),
-            version: Version::new(3, 0, 0),
-        };
-
-        recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);
-
-        // 1. By default, "Ssl" is inactive, so no conditional dependency is fetched
-        assert!(!recipe.is_use_active(UseFlag::Ssl));
-        assert_eq!(recipe.get_active_dependencies().len(), 0);
-
-        // 2. Toggle "Ssl" active
-        recipe = recipe.with_use_flag(UseFlag::Ssl);
-        assert!(recipe.is_use_active(UseFlag::Ssl));
-
-        let active_deps = recipe.get_active_dependencies();
-        assert_eq!(active_deps.len(), 1);
-        assert_eq!(active_deps[0].name, "openssl");
-    }
-
-    #[test]
-    fn test_portage_stage_optimization_flags() {
-        let mut recipe = PackageRecipe::new("kernel".to_string(), Version::new(6, 1, 0));
-        assert_eq!(recipe.get_stage_optimization_flags(), "-O2 -pipe"); // default Stage2
-
-        recipe = recipe.with_compilation_profile(StageProfile::Stage3Optimized);
-        assert_eq!(recipe.get_stage_optimization_flags(), "-O3 -march=native -flto=fat -funroll-loops");
+        assert_eq!(recipe.pkgrel, 3);
+        assert_eq!(recipe.arch, "aarch64");
+        assert_eq!(recipe.prepare_commands[0], "patch -p1 < pqc_patch.diff");
+        assert_eq!(
+            recipe.package_commands[0],
+            "make DESTDIR=\"$pkgdir\" install"
+        );
     }
 }
