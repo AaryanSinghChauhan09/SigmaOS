@@ -29,6 +29,7 @@ pub mod customization;
 pub mod dashboard;
 pub mod edge;
 pub mod filesystem;
+pub mod graphics;
 pub mod hal;
 pub mod iot;
 pub mod klib;
@@ -126,6 +127,10 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
     StoragePool, RaidLevel, Dataset, DatasetType, Snapshot, Zvol, SendStream, ReceiveStream,
     SigmaFSManager, FilesystemStats, SigmaFSError, CompressionAlgorithm,
+};
+pub use graphics::{
+    GPU, GPUType, GPUState, GraphicsAPI, Renderer, Compositor,
+    GraphicsManager, GraphicsStats, GraphicsError,
 };
 pub use hal::{
     HardwareDevice, DeviceClass, DeviceState, DeviceProperties, DeviceEvent, DeviceEventType,
