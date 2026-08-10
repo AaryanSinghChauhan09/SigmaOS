@@ -10,6 +10,16 @@ pub mod absorb_tools;
 pub mod tiny_core;
 pub mod apache_ossie;
 pub mod sovereign_suite;
+pub mod reactos;
+pub mod lubuntu;
+pub mod antix;
+pub mod bodhi_moksha;
+pub mod cachy_os;
+pub mod chakra;
+pub mod endeavour;
+pub mod garuda_zen;
+pub mod gentoo;
+pub mod localsend;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -120,3 +130,13 @@ pub use india_stack::{MockUPIService, IndiaStackError};
 
 pub mod india_stack_localization;
 pub use india_stack_localization::{IndianLanguage, LocalizationProvider, LocalizationManager};
+
+pub use lubuntu::{
+    CpuGovernor, SystemPressure, LubuntuHealthReport, LubuntuSystemManager,
+    LxqtSessionManager, LxqtSessionState, PcmanfmQtAdapter, FileNode,
+    DiscoverPackageAdapter, AptPackage, FeatherpadEditor, QTerminalEmulator, TerminalTab,
+    CalamaresInstallerShim, CalamaresStage
+};
+pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
+pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
+pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};
