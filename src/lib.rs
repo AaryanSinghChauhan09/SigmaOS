@@ -21,6 +21,7 @@ pub use audio::sigma_audio::{
 
 pub mod accessibility;
 pub mod automation;
+pub mod boot;
 pub mod compatibility;
 pub mod container;
 pub mod customization;
@@ -158,6 +159,9 @@ pub use package::{
 pub use power::{
     PowerProfile, BatteryState, Battery, ThermalZone, CPUGovernor,
     PowerProfileConfig, PowerManager, PowerStats, PowerError,
+};
+pub use boot::{
+    BootEntry, BootTheme, ThemeColors, BootManager, BootStats, BootError,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
