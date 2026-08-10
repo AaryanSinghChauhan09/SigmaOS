@@ -3,7 +3,7 @@ pub mod store;
 pub mod universal;
 pub mod debian;
 
-pub use store::SigmaSoftwareStore;
+pub use store::{SigmaSoftwareStore, StoreApp, StoreError};
 pub use universal::{
     ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,

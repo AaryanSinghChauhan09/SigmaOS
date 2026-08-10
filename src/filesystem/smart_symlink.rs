@@ -139,10 +139,6 @@ impl SmartSymlink {
                 // Route to legacy 32-bit library directory (multi-lib parity)
                 "/lib32/libc.so"
             }
-            SyscallAbi::Eabi_32 => {
-                // Route to 32-bit library directory
-                "/lib32/libc.so"
-            }
             SyscallAbi::Eabi_64 => {
                 // Route to modern 64-bit library directory
                 "/lib64/libc.so"

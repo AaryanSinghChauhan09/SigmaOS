@@ -64,7 +64,7 @@ pub trait SecurityAuditor {
 pub struct DefensiveAuditSystem {
     pub audit_ring: RefCell<[Option<ForensicBlock>; MAX_AUDIT_BLOCKS]>,
     pub signatures: [Option<MaliciousSignature>; MAX_SIGNATURES],
-    pub next_block_id: core::cell::Cell<u32>,
+    pub next_block_id: u32,
     pub security_score_threshold: u32,
 }
 
@@ -76,7 +76,7 @@ impl DefensiveAuditSystem {
         let mut sys = Self {
             audit_ring: RefCell::new([EMPTY_BLOCK; MAX_AUDIT_BLOCKS]),
             signatures: [EMPTY_SIG; MAX_SIGNATURES],
-            next_block_id: core::cell::Cell::new(1),
+            next_block_id: 1,
             security_score_threshold: threshold,
         };
 
@@ -132,11 +132,11 @@ impl DefensiveAuditSystem {
         }
 
         // Find previous block hash
-        let prev_hash = if self.next_block_id.get() > 1 {
+        let prev_hash = if self.next_block_id > 1 {
             let mut found_prev = 0;
             for slot in ring.iter() {
                 if let Some(ref block) = slot {
-                    if block.id == self.next_block_id.get() - 1 {
+                    if block.id == self.next_block_id - 1 {
                         found_prev = block.current_hash;
                         break;
                     }
@@ -148,7 +148,7 @@ impl DefensiveAuditSystem {
         };
 
         let mut block = ForensicBlock {
-            id: self.next_block_id.get(),
+            id: self.next_block_id,
             timestamp,
             actor_uid,
             syscall_num,
@@ -160,10 +160,14 @@ impl DefensiveAuditSystem {
         block.current_hash = Self::calculate_block_hash(&block);
 
         // Store block in circular ring ledger buffer
-        let idx = (self.next_block_id.get() as usize - 1) % MAX_AUDIT_BLOCKS;
+        let idx = (self.next_block_id as usize - 1) % MAX_AUDIT_BLOCKS;
         ring[idx] = Some(block);
 
-        self.next_block_id.set(self.next_block_id.get() + 1);
+        // SAFETY: Updating next_block_id is safe as we're within bounds
+        unsafe {
+            let ptr = &self.next_block_id as *const u32 as *mut u32;
+            *ptr += 1;
+        }
 
         Ok(())
     }

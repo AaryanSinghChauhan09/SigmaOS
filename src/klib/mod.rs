@@ -14,8 +14,6 @@ pub mod arc;
 pub mod ring_buffer;
 pub mod linked_list;
 pub mod slab;
-pub mod custom_string;
-pub mod custom_allocator;
 
 // Conditional compilation of other collection modules
 #[cfg(target_os = "none")]
@@ -31,7 +29,6 @@ pub mod vecdeque;
 pub use string::{String, ToString};
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
-pub use custom_string::SigmaString;
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
 

@@ -11,10 +11,6 @@ pub mod tiny_core;
 pub mod apache_ossie;
 pub mod sovereign_suite;
 pub mod gentoo;
-pub mod legacy_adapters;
-
-pub use legacy_adapters::SyscallAbi;
-pub use crate::kernel::KernelPersona;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,

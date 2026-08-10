@@ -95,7 +95,7 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter as PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use process::spawn::{
@@ -155,6 +155,3 @@ pub use virt::hypervisor::{
 pub use virt::microvm::{
     MicroVM, MicroVMState, SandboxManager, SandboxPolicy, SimpleMicroVM, SimpleSandboxManager,
 };
-
-pub mod unimplemented_features;
-pub mod unimplemented_tools;
