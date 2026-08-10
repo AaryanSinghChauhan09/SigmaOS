@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 //! SigmaOS Rsync Compatibility
 //! Rsync block-level delta-transfer synchronization engine
 //! Zero external dependencies

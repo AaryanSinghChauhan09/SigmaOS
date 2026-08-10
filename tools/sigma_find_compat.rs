@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Find Compatibility
 //! File search (find command)

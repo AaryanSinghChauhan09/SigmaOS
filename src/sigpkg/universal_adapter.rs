@@ -267,14 +267,13 @@ impl UniversalPackageAdapter {
             });
         }
 
-        Ok(Package {
-            name: name.to_string(),
-            version: parsed_ver,
-            description: desc.to_string(),
+        Ok(Package::new(
+            name.to_string(),
+            parsed_ver,
+            desc.to_string(),
             dependencies,
-            checksum: format!("SHA256:{}", name),
-            source: String::new(),
-        })
+            format!("SHA256:{}", name),
+        ))
     }
 }
 

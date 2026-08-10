@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Emerge Compatibility Layer
 //! Emerge compatibility for Gentoo Linux

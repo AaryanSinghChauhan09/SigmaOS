@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Ifconfig Compatibility
 //! Network interface configuration (ifconfig command)

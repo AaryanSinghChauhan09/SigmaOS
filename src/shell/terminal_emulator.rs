@@ -1,3 +1,230 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
+// (no_std only applicable at crate root - removed)
+
+extern crate alloc;
+
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnsiColor {
+    Default,
+    Black,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Magenta,
+    Cyan,
+    White,
+    Xterm256(u8),
+}
+
+/// Dynamic, user-defined shell function.
+/// Represents distros-parity scripting commands (e.g. `func() { cmd1; cmd2; }`)
+#[derive(Debug, Clone)]
+pub struct UserDefinedFunction {
+    pub name: String,
+    pub body_lines: Vec<String>,
+}
+
+impl UserDefinedFunction {
+    pub fn new(name: &str, body_lines: &[&str]) -> Self {
+        Self {
+            name: name.to_string(),
+            body_lines: body_lines.iter().map(|s| s.to_string()).collect(),
+        }
+    }
+
+    /// Interpolates positional parameters ($1, $2, $@, $#) inside function body lines.
+    pub fn interpolate(&self, args: &[&str]) -> Vec<String> {
+        let mut expanded = Vec::new();
+        let joined_args = args.join(" ");
+        let arg_count_str = args.len().to_string();
+
+        for line in &self.body_lines {
+            let mut newline = line.clone();
+            // Substitute $@ first
+            newline = newline.replace("$@", &joined_args);
+            // Substitute $#
+            newline = newline.replace("$#", &arg_count_str);
+
+            // Substitute positional arguments $1, $2, etc. (up to 9 for safety)
+            for (idx, arg) in args.iter().enumerate() {
+                let placeholder = alloc::format!("${}", idx + 1);
+                newline = newline.replace(&placeholder, arg);
+            }
+
+            expanded.push(newline);
+        }
+        expanded
+    }
+}
+
+/// Auto-Suggestion Engine matching/history index.
+/// Outclasses Linux shells by offering sub-second tab completions and predictive commands.
+#[derive(Debug, Clone)]
+pub struct AutoSuggestionEngine {
+    pub history: Vec<String>,
+    pub builtin_commands: Vec<String>,
+}
+
+impl AutoSuggestionEngine {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            history: Vec::new(),
+            builtin_commands: Vec::new(),
+        }
+    }
+
+    pub fn register_builtin(&mut self, cmd: &str) {
+        if !self.builtin_commands.iter().any(|c| c == cmd) {
+            self.builtin_commands.push(cmd.to_string());
+        }
+    }
+
+    pub fn add_history(&mut self, cmd: &str) {
+        if !cmd.trim().is_empty() {
+            // Keep history unique for prediction suggestions
+            self.history.retain(|c| c != cmd);
+            self.history.push(cmd.to_string());
+        }
+    }
+
+    /// Returns priority suggestions matching the prefix.
+    /// Priority goes: recent history matching prefix -> built-in commands.
+    pub fn get_suggestions(&self, prefix: &str) -> Vec<String> {
+        if prefix.is_empty() {
+            return Vec::new();
+        }
+        let mut results = Vec::new();
+
+        // 1. History matches (most recent first)
+        for cmd in self.history.iter().rev() {
+            if cmd.starts_with(prefix) && !results.contains(cmd) {
+                results.push(cmd.clone());
+            }
+        }
+
+        // 2. Builtin matches
+        for cmd in &self.builtin_commands {
+            if cmd.starts_with(prefix) && !results.contains(cmd) {
+                results.push(cmd.clone());
+            }
+        }
+
+        results
+    }
+}
+
+impl Default for AutoSuggestionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TerminalSession {
+    pub cursor_x: usize,
+    pub cursor_y: usize,
+    pub width: usize,
+    pub height: usize,
+    pub foreground: AnsiColor,
+    pub background: AnsiColor,
+    pub bold: bool,
+    pub scrollback: Vec<String>,
+    pub current_line: String,
+    pub aliases: BTreeMap<String, String>,
+    pub user_functions: BTreeMap<String, UserDefinedFunction>,
+    pub suggestion_engine: AutoSuggestionEngine,
+}
+
+impl TerminalSession {
+    pub fn new(width: usize, height: usize) -> Self {
+        let mut session = Self {
+            cursor_x: 0,
+            cursor_y: 0,
+            width,
+            height,
+            foreground: AnsiColor::Default,
+            background: AnsiColor::Default,
+            bold: false,
+            scrollback: Vec::new(),
+            current_line: String::new(),
+            aliases: BTreeMap::new(),
+            user_functions: BTreeMap::new(),
+            suggestion_engine: AutoSuggestionEngine::new(),
+        };
+
+        // Standard Linux distro utilities to beat
+        session.suggestion_engine.register_builtin("ls");
+        session.suggestion_engine.register_builtin("cd");
+        session.suggestion_engine.register_builtin("pwd");
+        session.suggestion_engine.register_builtin("echo");
+        session.suggestion_engine.register_builtin("systemctl");
+        session.suggestion_engine.register_builtin("apt");
+        session.suggestion_engine.register_builtin("sigpkg");
+
+        session
+    }
+
+    pub fn register_alias(&mut self, name: &str, value: &str) {
+        self.aliases.insert(name.to_string(), value.to_string());
+    }
+
+    /// Recursively expands aliases in the command to prevent circular reference locks.
+    pub fn expand_alias(&self, command: &str) -> String {
+        let mut current = command.trim().to_string();
+        let mut depth = 0;
+        let max_depth = 10;
+
+        while depth < max_depth {
+            let first_token = current.split_whitespace().next().unwrap_or("");
+            if let Some(alias_val) = self.aliases.get(first_token) {
+                let rest = if current.len() > first_token.len() {
+                    &current[first_token.len()..]
+                } else {
+                    ""
+                };
+                current = alloc::format!("{}{}", alias_val, rest);
+                depth += 1;
+            } else {
+                break;
+            }
+        }
+        current
+    }
+
+    pub fn register_user_function(&mut self, name: &str, body_lines: &[&str]) {
+        let func = UserDefinedFunction::new(name, body_lines);
+        self.user_functions.insert(name.to_string(), func);
+    }
+
+    /// Invokes a user-defined function with arguments.
+    /// Returns the fully interpolated list of command lines to run.
+    pub fn invoke_user_function(&self, name: &str, args: &[&str]) -> Option<Vec<String>> {
+        self.user_functions.get(name).map(|func| func.interpolate(args))
+    }
+
     // AI-NATIVE ORCHESTRATION & DEPENDENCIES HEALING PRIMITIVES
 
     /// AI-Native Execution Planning: formulates sequential command lines to satisfy a high-level goal
@@ -379,214 +606,7 @@ mod tests {
         assert_eq!(translated_bsd, "sigpkg install curl");
     }
 }
-||||||| 0ddf2eac7
 #![no_std]
-
-extern crate alloc;
-
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::collections::BTreeMap;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AnsiColor {
-    Default,
-    Black,
-    Red,
-    Green,
-    Yellow,
-    Blue,
-    Magenta,
-    Cyan,
-    White,
-    Xterm256(u8),
-}
-
-/// Dynamic, user-defined shell function.
-/// Represents distros-parity scripting commands (e.g. `func() { cmd1; cmd2; }`)
-#[derive(Debug, Clone)]
-pub struct UserDefinedFunction {
-    pub name: String,
-    pub body_lines: Vec<String>,
-}
-
-impl UserDefinedFunction {
-    pub fn new(name: &str, body_lines: &[&str]) -> Self {
-        Self {
-            name: name.to_string(),
-            body_lines: body_lines.iter().map(|s| s.to_string()).collect(),
-        }
-    }
-
-    /// Interpolates positional parameters ($1, $2, $@, $#) inside function body lines.
-    pub fn interpolate(&self, args: &[&str]) -> Vec<String> {
-        let mut expanded = Vec::new();
-        let joined_args = args.join(" ");
-        let arg_count_str = args.len().to_string();
-
-        for line in &self.body_lines {
-            let mut newline = line.clone();
-            // Substitute $@ first
-            newline = newline.replace("$@", &joined_args);
-            // Substitute $#
-            newline = newline.replace("$#", &arg_count_str);
-
-            // Substitute positional arguments $1, $2, etc. (up to 9 for safety)
-            for (idx, arg) in args.iter().enumerate() {
-                let placeholder = alloc::format!("${}", idx + 1);
-                newline = newline.replace(&placeholder, arg);
-            }
-
-            expanded.push(newline);
-        }
-        expanded
-    }
-}
-
-/// Auto-Suggestion Engine matching/history index.
-/// Outclasses Linux shells by offering sub-second tab completions and predictive commands.
-#[derive(Debug, Clone)]
-pub struct AutoSuggestionEngine {
-    pub history: Vec<String>,
-    pub builtin_commands: Vec<String>,
-}
-
-impl AutoSuggestionEngine {
-    pub fn new() -> Self {
-        Self {
-            history: Vec::new(),
-            builtin_commands: Vec::new(),
-        }
-    }
-
-    pub fn register_builtin(&mut self, cmd: &str) {
-        if !self.builtin_commands.iter().any(|c| c == cmd) {
-            self.builtin_commands.push(cmd.to_string());
-        }
-    }
-
-    pub fn add_history(&mut self, cmd: &str) {
-        if !cmd.trim().is_empty() {
-            // Keep history unique for prediction suggestions
-            self.history.retain(|c| c != cmd);
-            self.history.push(cmd.to_string());
-        }
-    }
-
-    /// Returns priority suggestions matching the prefix.
-    /// Priority goes: recent history matching prefix -> built-in commands.
-    pub fn get_suggestions(&self, prefix: &str) -> Vec<String> {
-        if prefix.is_empty() {
-            return Vec::new();
-        }
-        let mut results = Vec::new();
-
-        // 1. History matches (most recent first)
-        for cmd in self.history.iter().rev() {
-            if cmd.starts_with(prefix) && !results.contains(cmd) {
-                results.push(cmd.clone());
-            }
-        }
-
-        // 2. Builtin matches
-        for cmd in &self.builtin_commands {
-            if cmd.starts_with(prefix) && !results.contains(cmd) {
-                results.push(cmd.clone());
-            }
-        }
-
-        results
-    }
-}
-
-impl Default for AutoSuggestionEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct TerminalSession {
-    pub cursor_x: usize,
-    pub cursor_y: usize,
-    pub width: usize,
-    pub height: usize,
-    pub foreground: AnsiColor,
-    pub background: AnsiColor,
-    pub bold: bool,
-    pub scrollback: Vec<String>,
-    pub current_line: String,
-    pub aliases: BTreeMap<String, String>,
-    pub user_functions: BTreeMap<String, UserDefinedFunction>,
-    pub suggestion_engine: AutoSuggestionEngine,
-}
-
-impl TerminalSession {
-    pub fn new(width: usize, height: usize) -> Self {
-        let mut session = Self {
-            cursor_x: 0,
-            cursor_y: 0,
-            width,
-            height,
-            foreground: AnsiColor::Default,
-            background: AnsiColor::Default,
-            bold: false,
-            scrollback: Vec::new(),
-            current_line: String::new(),
-            aliases: BTreeMap::new(),
-            user_functions: BTreeMap::new(),
-            suggestion_engine: AutoSuggestionEngine::new(),
-        };
-
-        // Standard Linux distro utilities to beat
-        session.suggestion_engine.register_builtin("ls");
-        session.suggestion_engine.register_builtin("cd");
-        session.suggestion_engine.register_builtin("pwd");
-        session.suggestion_engine.register_builtin("echo");
-        session.suggestion_engine.register_builtin("systemctl");
-        session.suggestion_engine.register_builtin("apt");
-        session.suggestion_engine.register_builtin("sigpkg");
-
-        session
-    }
-
-    pub fn register_alias(&mut self, name: &str, value: &str) {
-        self.aliases.insert(name.to_string(), value.to_string());
-    }
-
-    /// Recursively expands aliases in the command to prevent circular reference locks.
-    pub fn expand_alias(&self, command: &str) -> String {
-        let mut current = command.trim().to_string();
-        let mut depth = 0;
-        let max_depth = 10;
-
-        while depth < max_depth {
-            let first_token = current.split_whitespace().next().unwrap_or("");
-            if let Some(alias_val) = self.aliases.get(first_token) {
-                let rest = if current.len() > first_token.len() {
-                    &current[first_token.len()..]
-                } else {
-                    ""
-                };
-                current = alloc::format!("{}{}", alias_val, rest);
-                depth += 1;
-            } else {
-                break;
-            }
-        }
-        current
-    }
-
-    pub fn register_user_function(&mut self, name: &str, body_lines: &[&str]) {
-        let func = UserDefinedFunction::new(name, body_lines);
-        self.user_functions.insert(name.to_string(), func);
-    }
-
-    /// Invokes a user-defined function with arguments.
-    /// Returns the fully interpolated list of command lines to run.
-    pub fn invoke_user_function(&self, name: &str, args: &[&str]) -> Option<Vec<String>> {
-        self.user_functions.get(name).map(|func| func.interpolate(args))
-    }
 
     // AI-NATIVE ORCHESTRATION & DEPENDENCIES HEALING PRIMITIVES
 

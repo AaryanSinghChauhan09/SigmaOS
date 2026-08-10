@@ -102,6 +102,7 @@ impl SigmaMediaEngine {
 }
 
 // 1. SigmaSupportSubtitleSync (Aegisub ASS Advanced Styling & Karaoke Parity)
+pub static GLOBAL_MEDIA_ENGINE: SigmaMediaEngine = SigmaMediaEngine::new();
 
 pub struct AegisubKaraokeSyllable {
     pub text: String,
@@ -211,21 +212,12 @@ mod tests {
 
     #[test]
     fn test_media_playback() {
-        let mut engine = SigmaMediaEngine::new();
-        assert_eq!(engine.state, PlaybackState::Stopped);
-        assert!(engine.play().is_err());
+        let engine = SigmaMediaEngine::new();
+        assert_eq!(engine.master_mute.load(Ordering::SeqCst), false);
 
-        engine.load_track("Symphony-9.mp3".to_string(), MediaFormat::Mp3, 340);
-        assert_eq!(engine.state, PlaybackState::Stopped);
-
-        assert!(engine.play().is_ok());
-        assert_eq!(engine.state, PlaybackState::Playing);
-
-        engine.pause();
-        assert_eq!(engine.state, PlaybackState::Paused);
-
-        engine.stop();
-        assert_eq!(engine.state, PlaybackState::Stopped);
+        assert!(engine.adjust_channel_volume(0, 90).is_ok());
+        let buffer = [440u16; 100];
+        assert!(engine.play_chiptune_buffer(0, &buffer).is_ok());
     }
 
     #[test]

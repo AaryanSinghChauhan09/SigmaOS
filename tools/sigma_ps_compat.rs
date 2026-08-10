@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Process Status Compatibility
 //! Process listing and monitoring (ps command)
