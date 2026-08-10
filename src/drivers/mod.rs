@@ -15,8 +15,15 @@ pub mod usb_hid;
 pub mod vesa;
 pub mod boot_init;
 pub mod dde;
-pub mod even_more_devices;
 pub mod flipper_gpio_sensor;
+pub mod legacy_audio_ac97;
+pub mod modern_audio_intel_hda;
+pub mod modern_nvme;
+pub mod modern_usb_printer;
+pub mod modern_wifi;
+pub mod touch_jingos;
+pub mod virtio;
+pub mod intel_e1000;
 
 pub use even_more_devices::*;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
@@ -32,3 +39,11 @@ pub use peripheral::{DeviceGeneration, PeripheralDevice, PeripheralManager, Powe
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+pub use legacy_audio_ac97::LegacyAudioAc97;
+pub use modern_audio_intel_hda::ModernAudioIntelHda;
+pub use modern_nvme::ModernNvmeDriver;
+pub use modern_usb_printer::ModernUsbPrinterDriver;
+pub use modern_wifi::ModernWifiDriver;
+pub use touch_jingos::TouchJingosDriver;
+pub use virtio::{VirtioDeviceType, VirtioMmioHeader, VirtioBlkDriver, VirtioNetDriver, VirtioRngDriver};
+pub use intel_e1000::{E1000TxDescriptor, E1000RxDescriptor, IntelE1000Driver};
