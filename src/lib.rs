@@ -18,6 +18,12 @@ pub mod network;
 pub mod orchestration;
 pub mod distro;
 pub mod package;
+
+pub use distro::{
+    SovereignEbpfEngine, EbpfInstruction, EbpfOpcode,
+    OpenBSDUnveil, NetBsdRumpRouter, RumpDriver, DriverContext,
+    GentooUseFlagsManager,
+};
 pub mod performance;
 pub mod productivity;
 pub mod resilience;
