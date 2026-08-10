@@ -102,7 +102,7 @@ impl NixosGenerationManager {
     }
 
     /// Perform a sub-millisecond, zero-copy atomic update/rollback by swapping root pointers
-    pub fn swap_active_generation(&mut self, generation_id: u32) -> Result<u64, &'static str> {
+    pub fn swap_active_generation(&mut self, _generation_id: u32) -> Result<u64, &'static str> {
         for (idx, gen) in self.generations.iter().enumerate() {
             if gen.id == generation_id {
                 self.active_generation_idx = Some(idx);

@@ -3,37 +3,6 @@
  * =========================================================================
  * Σ SIGMAOS DRIVER MANAGER & I/O MANAGER
  * =========================================================================
- * Central kernel-space driver lifecycle manager.
- *
- * Responsibilities:
- *   - Load / unload kernel modules by hardware profile.
- *   - Self-heal on driver failure (reload, fallback, or safe mode).
- *   - Report structured ZEN-DRIVER-xxxx codes via sigma_driver_codes.h.
- *   - Enforce hardware profiles: Standard / Gaming / IoT-ARM64 / Forensic.
- *   - Implement DAG Topological Sort (Kahn's Algorithm) for service and
- *     driver dependency loading to prevent resource deadlocks.
- *
- * Inspired by:
- *   - SteamOS: GPU driver recovery and gaming hardware tuning.
- *   - Raspberry Pi OS: ARM64 / eMMC / PWM driver selection.
- *   - Rescuezilla / SystemRescue: Fallback safe mode on driver crash.
- *   - Clear Linux: Performance-first driver configuration.
- *   - Fedora CoreOS: Cloud hardware and DKMS integration.
-||||||| 65885484f
- * Central kernel-space driver lifecycle manager.
- *
- * Responsibilities:
- *   - Load / unload kernel modules by hardware profile.
- *   - Self-heal on driver failure (reload, fallback, or safe mode).
- *   - Report structured ZEN-DRIVER-xxxx codes via sigma_driver_codes.h.
- *   - Enforce hardware profiles: Standard / Gaming / IoT-ARM64 / Forensic.
- *
- * Inspired by:
- *   - SteamOS: GPU driver recovery and gaming hardware tuning.
- *   - Raspberry Pi OS: ARM64 / eMMC / PWM driver selection.
- *   - Rescuezilla / SystemRescue: Fallback safe mode on driver crash.
- *   - Clear Linux: Performance-first driver configuration.
- *   - Fedora CoreOS: Cloud hardware and DKMS integration.
  * Central kernel-space driver lifecycle manager with Windows-inspired features:
  *   - Transparent DriverObject & DeviceObject structures.
  *   - DeviceExtension structure storing custom private driver context.
@@ -44,6 +13,8 @@
  *   - modprobe-style recursive module dependency resolution.
  *   - Fedora/RHEL-style Secure Module Signature verification (PQC Dilithium-5).
  *   - Self-heal on driver failure.
+ *   - Implement DAG Topological Sort (Kahn's Algorithm) for service and
+ *     driver dependency loading to prevent resource deadlocks.
  * =========================================================================
  */
 
@@ -62,10 +33,7 @@ namespace Sigma {
 namespace Drivers {
 
 // -------------------------------------------------------------------------
-// Driver Descriptor with explicit dependency tracking
-||||||| 65885484f
-// Driver Descriptor
-// Windows-Inspired Transparent Structures
+// Driver Object / Device Object / Device Extension
 // -------------------------------------------------------------------------
 
 struct DriverObject;
@@ -101,202 +69,158 @@ struct DriverObject {
 // Driver Descriptor
 // -------------------------------------------------------------------------
 struct DriverDescriptor {
-    const char*       module_name;    // e.g. "amdgpu", "r8169", "snd_hda_intel"
-    const char*       subsystem;      // "gpu" | "net" | "audio" | "storage" | "input" | "bus"
-||||||| 65885484f
-    const char*       subsystem;      // "gpu" | "net" | "audio" | "storage" | "input"
-    const char*       subsystem;      // "gpu" | "net" | "audio" | "storage" | "input" | "core"
-    const char*       chipset_hint;   // vendor/chipset this primarily targets
-    sigma_hw_profile_t profile_mask;  // profiles this driver is active under
-    bool              requires_fw;    // needs a firmware blob
-    sigma_u32         init_error;     // error code to fire on failure
-    sigma_u32         fallback_error; // error code if falling back
-    const char*       dependency_name;// Name of driver module this depends on, or SIGMA_NULL
-||||||| 65885484f
-
+    const char*        module_name;     // e.g. "amdgpu", "r8169", "snd_hda_intel"
+    const char*        subsystem;       // "gpu" | "net" | "audio" | "storage" | "input" | "bus" | "core" | "security" | "compute" | "coproc"
+    const char*        chipset_hint;    // vendor/chipset this primarily targets
+    sigma_hw_profile_t profile_mask;   // profiles this driver is active under
+    bool               requires_fw;     // needs a firmware blob
+    sigma_u32          init_error;      // error code to fire on failure
+    sigma_u32          fallback_error;  // error code if falling back
+    const char*        dependency_name; // Name of driver module this depends on for topological sort, or SIGMA_NULL
     // Linux-inspired improvements:
-    const char*       dependencies[4];// nullptr-terminated dependency modules
-    sigma_u32         vendor_id;      // PCI Vendor ID (0xFFFF for wildcard/non-PCI)
-    sigma_u32         device_id;      // PCI Device ID (0xFFFF for wildcard)
-    bool              is_signed_pqc;  // Is the module cryptographically signed with Dilithium-5?
+    const char*        dependencies[4]; // nullptr-terminated dependency modules for modprobe
+    sigma_u32          vendor_id;       // PCI Vendor ID (0xFFFF for wildcard/non-PCI)
+    sigma_u32          device_id;       // PCI Device ID (0xFFFF for wildcard)
+    bool               is_signed_pqc;   // Is the module cryptographically signed with Dilithium-5?
 };
 
 // -------------------------------------------------------------------------
 // Default driver table with rich dependency hierarchies (DAG)
 // Profiles are bitmasks: can OR multiple profiles together.
-||||||| 65885484f
-// Default driver table
-// Profiles are bitmasks: can OR multiple profiles together.
-// Default driver table
 // -------------------------------------------------------------------------
 static const DriverDescriptor g_driver_table[] = {
     // ---- Base Bus Drivers ---------------------------------------------------
     { "pci_bus",      "bus",     "PCI Express Root Bridge",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING | SIGMA_HW_PROFILE_SERVER | SIGMA_HW_PROFILE_FORENSIC | SIGMA_HW_PROFILE_IOT_ARM64),
-      false, ZEN_DRV_NET_INIT_FAILED, ZEN_DRV_NET_INIT_FAILED, SIGMA_NULL },
+      false, ZEN_DRV_NET_INIT_FAILED, ZEN_DRV_NET_INIT_FAILED, SIGMA_NULL,
+      { nullptr }, 0xFFFF, 0xFFFF, true },
 
     { "sound_core",   "audio",   "Sovereign Sound Core",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING | SIGMA_HW_PROFILE_FORENSIC | SIGMA_HW_PROFILE_IOT_ARM64),
-      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY, "pci_bus" },
+      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY, "pci_bus",
+      { "pci_bus", nullptr }, 0xFFFF, 0xFFFF, true },
 
-||||||| 65885484f
     // ---- Core Shards / Subsystems ----
     { "pci_core",     "core",    "PCI Express Root Complex",
-      SIGMA_HW_PROFILE_ALL, false, 0, 0,
+      SIGMA_HW_PROFILE_ALL, false, 0, 0, SIGMA_NULL,
       { nullptr }, 0xFFFF, 0xFFFF, true },
 
     { "mailbox",      "core",    "Broadcom Mailbox Controller",
-      SIGMA_HW_PROFILE_IOT_ARM64, false, 0, 0,
+      SIGMA_HW_PROFILE_IOT_ARM64, false, 0, 0, SIGMA_NULL,
       { nullptr }, 0xFFFF, 0xFFFF, true },
 
     { "cfg80211",     "core",    "Wireless Configuration Core",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING | SIGMA_HW_PROFILE_IOT_ARM64),
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { nullptr }, 0xFFFF, 0xFFFF, true },
 
     { "snd",          "core",    "Sovereign Sound Core",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING | SIGMA_HW_PROFILE_FORENSIC | SIGMA_HW_PROFILE_IOT_ARM64),
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { nullptr }, 0xFFFF, 0xFFFF, true },
 
     { "snd_hda_codec","core",    "High Definition Audio Codec Core",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING),
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { "snd", nullptr }, 0xFFFF, 0xFFFF, true },
 
     { "sdhci",        "core",    "SD Host Controller Interface",
-      SIGMA_HW_PROFILE_IOT_ARM64, false, 0, 0,
+      SIGMA_HW_PROFILE_IOT_ARM64, false, 0, 0, SIGMA_NULL,
       { nullptr }, 0xFFFF, 0xFFFF, true },
 
     // ---- GPU ----------------------------------------------------------------
     { "amdgpu",       "gpu",     "AMD Radeon",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING),
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA, "pci_bus" },
-||||||| 65885484f
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA },
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA,
+      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA, "pci_bus",
       { "pci_core", nullptr }, 0x1002, 0x731F, true },
 
     { "i915",         "gpu",     "Intel UHD/Iris",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_SERVER),
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA, "pci_bus" },
-||||||| 65885484f
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA },
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA,
+      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA, "pci_bus",
       { "pci_core", nullptr }, 0x8086, 0x9A49, true },
 
     { "nvidia",       "gpu",     "NVIDIA (proprietary)",
       (sigma_hw_profile_t)SIGMA_HW_PROFILE_GAMING,
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA, "pci_bus" },
-||||||| 65885484f
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA },
-      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA,
+      true,  ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA, "pci_bus",
       { "pci_core", nullptr }, 0x10DE, 0x1E84, true },
 
     { "vc4",          "gpu",     "Broadcom VC4 (RPi)",
       (sigma_hw_profile_t)SIGMA_HW_PROFILE_IOT_ARM64,
-      false, ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA, "pci_bus" },
-||||||| 65885484f
-      false, ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA },
-      false, ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA,
+      false, ZEN_DRV_GPU_INIT_FAILED, ZEN_DRV_GPU_FALLBACK_VGA, "pci_bus",
       { "mailbox", nullptr }, 0x14E4, 0x2711, true },
 
     // ---- Networking ---------------------------------------------------------
     { "r8169",        "net",     "Realtek Ethernet",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_SERVER),
-      false, ZEN_DRV_NET_REALTEK_ERR, ZEN_DRV_NET_INIT_FAILED, "pci_bus" },
-||||||| 65885484f
-      false, ZEN_DRV_NET_REALTEK_ERR, ZEN_DRV_NET_INIT_FAILED },
-      false, ZEN_DRV_NET_REALTEK_ERR, ZEN_DRV_NET_INIT_FAILED,
+      false, ZEN_DRV_NET_REALTEK_ERR, ZEN_DRV_NET_INIT_FAILED, "pci_bus",
       { "pci_core", nullptr }, 0x10EC, 0x8168, true },
 
     { "iwlwifi",      "net",     "Intel Wi-Fi",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING),
-      true,  ZEN_DRV_NET_INTEL_ERR,   ZEN_DRV_NET_INIT_FAILED, "pci_bus" },
-||||||| 65885484f
-      true,  ZEN_DRV_NET_INTEL_ERR,   ZEN_DRV_NET_INIT_FAILED },
-      true,  ZEN_DRV_NET_INTEL_ERR,   ZEN_DRV_NET_INIT_FAILED,
+      true,  ZEN_DRV_NET_INTEL_ERR,   ZEN_DRV_NET_INIT_FAILED, "pci_bus",
       { "pci_core", "cfg80211", nullptr }, 0x8086, 0x0084, true },
 
     { "brcmfmac",     "net",     "Broadcom Wi-Fi (RPi)",
       (sigma_hw_profile_t)SIGMA_HW_PROFILE_IOT_ARM64,
-      true,  ZEN_DRV_NET_BROADCOM_ERR,ZEN_DRV_NET_INIT_FAILED, "pci_bus" },
-||||||| 65885484f
-      true,  ZEN_DRV_NET_BROADCOM_ERR,ZEN_DRV_NET_INIT_FAILED },
-      true,  ZEN_DRV_NET_BROADCOM_ERR,ZEN_DRV_NET_INIT_FAILED,
+      true,  ZEN_DRV_NET_BROADCOM_ERR,ZEN_DRV_NET_INIT_FAILED, "pci_bus",
       { "cfg80211", nullptr }, 0x14E4, 0x43A3, true },
 
     // ---- Audio --------------------------------------------------------------
     { "snd_hda_intel","audio",   "Intel/AMD HDA",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING),
-      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY, "sound_core" },
-||||||| 65885484f
-      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY },
-      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY,
+      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY, "sound_core",
       { "pci_core", "snd_hda_codec", nullptr }, 0x8086, 0x2820, true },
 
     { "snd_dummy",    "audio",   "Dummy audio (Forensic/IoT)",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_FORENSIC | SIGMA_HW_PROFILE_IOT_ARM64),
-      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY, "sound_core" },
-||||||| 65885484f
-      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY },
-      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY,
+      false, ZEN_DRV_AUDIO_INIT_FAILED, ZEN_DRV_AUDIO_FALLBACK_DUMMY, "sound_core",
       { "snd", nullptr }, 0xFFFF, 0xFFFF, false }, // Unsigned module (demonstration of security warning)
 
     // ---- Storage ------------------------------------------------------------
     { "nvme",         "storage", "NVMe SSD",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_GAMING | SIGMA_HW_PROFILE_SERVER),
-      false, ZEN_DRV_STORAGE_NVME_ERR, ZEN_DRV_STORAGE_INIT_FAILED, "pci_bus" },
-||||||| 65885484f
-      false, ZEN_DRV_STORAGE_NVME_ERR, ZEN_DRV_STORAGE_INIT_FAILED },
-      false, ZEN_DRV_STORAGE_NVME_ERR, ZEN_DRV_STORAGE_INIT_FAILED,
+      false, ZEN_DRV_STORAGE_NVME_ERR, ZEN_DRV_STORAGE_INIT_FAILED, "pci_bus",
       { "pci_core", nullptr }, 0x144D, 0xA808, true },
 
     { "ahci",         "storage", "SATA AHCI",
       (sigma_hw_profile_t)(SIGMA_HW_PROFILE_STANDARD | SIGMA_HW_PROFILE_SERVER | SIGMA_HW_PROFILE_FORENSIC),
-      false, ZEN_DRV_STORAGE_SATA_ERR, ZEN_DRV_STORAGE_INIT_FAILED, "pci_bus" },
-||||||| 65885484f
-      false, ZEN_DRV_STORAGE_SATA_ERR, ZEN_DRV_STORAGE_INIT_FAILED },
-      false, ZEN_DRV_STORAGE_SATA_ERR, ZEN_DRV_STORAGE_INIT_FAILED,
+      false, ZEN_DRV_STORAGE_SATA_ERR, ZEN_DRV_STORAGE_INIT_FAILED, "pci_bus",
       { "pci_core", nullptr }, 0x8086, 0x2822, true },
 
     { "mmc_block",    "storage", "eMMC / SD (ARM64)",
       (sigma_hw_profile_t)SIGMA_HW_PROFILE_IOT_ARM64,
-      false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED, "pci_bus" },
-||||||| 65885484f
-      false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED },
-      false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED,
+      false, ZEN_DRV_STORAGE_EMMC_ERR, ZEN_DRV_STORAGE_INIT_FAILED, "pci_bus",
       { "sdhci", nullptr }, 0x11AB, 0x0100, true },
 
     // ---- Emerging & Accelerated Hardware (CISC/RISC AI accelerators & enclaves) ----
     { "google_tpu",   "compute", "Google TPU v4/v5 Tensor Engine",
       SIGMA_HW_PROFILE_SERVER,
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { "pci_core", nullptr }, 0x1AE0, 0x0056, true },
 
     { "graphcore_ipu","compute", "Graphcore Bow IPU Core",
       SIGMA_HW_PROFILE_SERVER,
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { "pci_core", nullptr }, 0x1E1A, 0x0010, true },
 
     { "fpga_mgr",     "coproc",  "Xilinx Alveo FPGA Core Manager",
       SIGMA_HW_PROFILE_SERVER,
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { "pci_core", nullptr }, 0x10EE, 0x5005, true },
 
     { "optane_dax",   "storage", "Intel Optane Persistent Memory DAX",
       SIGMA_HW_PROFILE_SERVER,
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { "pci_core", nullptr }, 0x8086, 0x2011, true },
 
     { "intel_tdx",    "security","Intel Trust Domain Extensions Enclave",
       SIGMA_HW_PROFILE_ALL,
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { nullptr }, 0xFFFF, 0xFFFF, true },
 
     { "amd_sev",      "security","AMD Secure Encrypted Virtualization Enclave",
       SIGMA_HW_PROFILE_ALL,
-      false, 0, 0,
+      false, 0, 0, SIGMA_NULL,
       { nullptr }, 0xFFFF, 0xFFFF, true },
 };
 
@@ -314,9 +238,6 @@ static DeviceObject g_device_pool[64];
 static sigma_u32    g_device_pool_count = 0;
 
 // -------------------------------------------------------------------------
-// DriverManager with linear-time zero-allocation DAG Topological Sorter
-||||||| 65885484f
-// DriverManager
 // IoManager & DriverManager Classes
 // -------------------------------------------------------------------------
 class IoManager {
@@ -560,7 +481,6 @@ public:
     /**
      * Load all drivers matching a given hardware profile.
      * Uses Kahn's topological sort on driver dependencies to satisfy loading constraints.
-||||||| 65885484f
      * Self-heals on failure; falls back gracefully.
      */
     sigma_status loadForProfile(sigma_hw_profile_t profile) {

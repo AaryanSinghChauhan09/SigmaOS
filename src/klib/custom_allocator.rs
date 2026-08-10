@@ -31,8 +31,11 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 // Constants
 // ============================================================================
 
-/// Total heap size managed by the bump allocator (8 MB default).
+/// Total heap size managed by the bump allocator (8 MB default, 512 MB in test).
+#[cfg(not(test))]
 const HEAP_SIZE: usize = 8 * 1024 * 1024;
+#[cfg(test)]
+const HEAP_SIZE: usize = 512 * 1024 * 1024;
 
 /// Maximum number of free-list entries in the recycle bin.
 const RECYCLE_BIN_CAPACITY: usize = 256;

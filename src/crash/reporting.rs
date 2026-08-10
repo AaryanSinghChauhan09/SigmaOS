@@ -89,7 +89,7 @@ impl CrashReport for SimpleCrashReport {
 }
 
 pub trait CoredumpCollector {
-    fn collect_coredump(&mut self, pid: usize) -> Result<CrashReportID, CrashError>;
+    fn collect_coredump(&mut self, _pid: usize) -> Result<CrashReportID, CrashError>;
     fn store_coredump(&mut self, report_id: CrashReportID, data: &[u8]) -> Result<(), CrashError>;
     fn get_coredump(&self, report_id: CrashReportID) -> Option<&[u8]>;
 }

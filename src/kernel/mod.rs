@@ -9,7 +9,9 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod structures;
+pub mod virtual_cpu;
 
+pub use virtual_cpu::RegisterSet;
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,
     InstructionCyclePhase as ArchInstructionCyclePhase, Irql, LookasideList, MemoryDescriptorList,
@@ -18,8 +20,6 @@ pub use architecture::{
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
-    DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
-    KernelPersonalityMode,
 };
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
