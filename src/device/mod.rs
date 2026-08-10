@@ -22,4 +22,8 @@ pub mod manager;
 pub use manager::{
     Device, DeviceClass, DeviceDriver, DeviceError, DeviceHotplug, DeviceID, DeviceManager,
     SimpleDevice, SimpleDeviceDriver, SimpleDeviceHotplug, SimpleDeviceManager,
+    BsdDeviceState, BsdDevice, BsdDriver, BsdAutoconfEngine,
+    MajorMinor, LinuxUdevRule, UdevNode, LinuxUdevEngine,
+    PowerState, LinuxDevicePowerManager,
+    DeviceResourceType, DeviceResource, DeviceResourceManager,
 };
