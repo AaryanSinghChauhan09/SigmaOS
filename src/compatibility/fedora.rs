@@ -1,18 +1,14 @@
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
+// Enhanced with SELinux Security, Systemd Presets, Saturated ALU, and Anaconda Kickstart Engines
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::format;
+use std::collections::HashMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
 pub struct DnfPackageResolver {
-    pub packages: BTreeMap<String, Vec<String>>, // pkg_name -> dependencies
-    pub installed: BTreeMap<String, String>,      // pkg_name -> version
+    pub packages: HashMap<String, Vec<String>>, // pkg_name -> dependencies
+    pub installed: HashMap<String, String>,      // pkg_name -> version
     pub repodata_synced: bool,
     pub signatures_verified: bool,
 }
@@ -20,8 +16,8 @@ pub struct DnfPackageResolver {
 impl DnfPackageResolver {
     pub fn new() -> Self {
         DnfPackageResolver {
-            packages: BTreeMap::new(),
-            installed: BTreeMap::new(),
+            packages: HashMap::new(),
+            installed: HashMap::new(),
             repodata_synced: false,
             signatures_verified: false,
         }
@@ -55,7 +51,7 @@ impl DnfPackageResolver {
         }
 
         let mut install_order = Vec::new();
-        let mut visited = BTreeMap::new();
+        let mut visited = HashMap::new();
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
 
@@ -70,7 +66,7 @@ impl DnfPackageResolver {
         &self,
         name: &str,
         order: &mut Vec<String>,
-        visited: &mut BTreeMap<String, bool>,
+        visited: &mut HashMap<String, bool>,
     ) -> Result<(), String> {
         if let Some(&in_progress) = visited.get(name) {
             if in_progress {
@@ -93,12 +89,6 @@ impl DnfPackageResolver {
         }
 
         Ok(())
-    }
-}
-
-impl Default for DnfPackageResolver {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -194,24 +184,18 @@ impl KojiBuildServer {
     }
 }
 
-impl Default for KojiBuildServer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// BodhiUpdateTriage mimics Fedora's update triage system (Bodhi).
 /// It handles community feedback, accumulates karma, and gates the transition to stable.
 pub struct BodhiUpdateTriage {
-    pub updates: BTreeMap<String, i32>, // update_id -> karma
-    pub stable_gated: BTreeMap<String, bool>, // update_id -> is_gated
+    pub updates: HashMap<String, i32>, // update_id -> karma
+    pub stable_gated: HashMap<String, bool>, // update_id -> is_gated
 }
 
 impl BodhiUpdateTriage {
     pub fn new() -> Self {
         BodhiUpdateTriage {
-            updates: BTreeMap::new(),
-            stable_gated: BTreeMap::new(),
+            updates: HashMap::new(),
+            stable_gated: HashMap::new(),
         }
     }
 
@@ -239,413 +223,343 @@ impl BodhiUpdateTriage {
     }
 }
 
-impl Default for BodhiUpdateTriage {
-    fn default() -> Self {
-        Self::new()
-    }
+/// SELinux (Security-Enhanced Linux) Context Model
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SeLinuxContext {
+    pub user: String,
+    pub role: String,
+    pub domain_type: String,
+    pub sensitivity: String,
 }
 
-// =========================================================================
-// NEW FEDORA CORE PARITY SYSTEMS
-// =========================================================================
-
-/// Zones for the Fedora zone-based FirewallD emulator.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum FirewalldZone {
-    Public,
-    Work,
-    Home,
-    Trusted,
-    Drop,
-}
-
-/// Rich rule definition for granular firewall policies.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RichRule {
-    pub family: String,
-    pub source: String,
-    pub service: String,
-    pub action: String,
-}
-
-/// FirewalldZoneManager emulates Fedora's firewalld zone management.
-pub struct FirewalldZoneManager {
-    pub active_zone: FirewalldZone,
-    pub default_zone: FirewalldZone,
-    pub allowed_services: BTreeMap<FirewalldZone, Vec<String>>,
-    pub rich_rules: Vec<RichRule>,
-    pub runtime_rules: Vec<String>,
-    pub permanent_rules: Vec<String>,
-}
-
-impl FirewalldZoneManager {
-    pub fn new() -> Self {
-        let mut allowed = BTreeMap::new();
-        allowed.insert(FirewalldZone::Public, vec!["ssh".to_string(), "dhcpv6-client".to_string()]);
-        allowed.insert(FirewalldZone::Home, vec!["ssh".to_string(), "mdns".to_string(), "samba-client".to_string()]);
-        allowed.insert(FirewalldZone::Trusted, vec!["all".to_string()]);
-
+impl SeLinuxContext {
+    pub fn new(user: &str, role: &str, domain_type: &str, sensitivity: &str) -> Self {
         Self {
-            active_zone: FirewalldZone::Public,
-            default_zone: FirewalldZone::Public,
-            allowed_services: allowed,
-            rich_rules: Vec::new(),
-            runtime_rules: Vec::new(),
-            permanent_rules: Vec::new(),
+            user: user.to_string(),
+            role: role.to_string(),
+            domain_type: domain_type.to_string(),
+            sensitivity: sensitivity.to_string(),
         }
     }
 
-    pub fn set_default_zone(&mut self, zone: FirewalldZone) {
-        self.default_zone = zone;
-        self.active_zone = zone;
-    }
-
-    pub fn allow_service(&mut self, zone: FirewalldZone, service: &str, permanent: bool) {
-        if let Some(services) = self.allowed_services.get_mut(&zone) {
-            if !services.contains(&service.to_string()) {
-                services.push(service.to_string());
-            }
-        } else {
-            let mut services = Vec::new();
-            services.push(service.to_string());
-            self.allowed_services.insert(zone, services);
+    /// Parses context string e.g. "unconfined_u:unconfined_r:unconfined_t:s0"
+    pub fn parse(context_str: &str) -> Result<Self, String> {
+        let parts: Vec<&str> = context_str.split(':').collect();
+        if parts.len() < 3 {
+            return Err("Invalid SELinux context format".to_string());
         }
+        Ok(Self {
+            user: parts[0].to_string(),
+            role: parts[1].to_string(),
+            domain_type: parts[2].to_string(),
+            sensitivity: if parts.len() >= 4 { parts[3].to_string() } else { "s0".to_string() },
+        })
+    }
 
-        let rule_desc = format!("allow:{:?}:{}", zone, service);
-        if permanent {
-            self.permanent_rules.push(rule_desc.clone());
+    pub fn to_string_representation(&self) -> String {
+        format!("{}:{}:{}:{}", self.user, self.role, self.domain_type, self.sensitivity)
+    }
+}
+
+/// SELinux Security Rule Entry
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SeLinuxPolicyRule {
+    pub source_type: String,
+    pub target_type: String,
+    pub class_name: String,
+    pub permission: String,
+    pub is_allowed: bool,
+}
+
+/// SELinux Policy Engine
+pub struct SeLinuxEngine {
+    pub rules: Vec<SeLinuxPolicyRule>,
+    pub current_context: SeLinuxContext,
+    pub enforcing_mode: bool,
+}
+
+impl SeLinuxEngine {
+    pub fn new(default_context: SeLinuxContext) -> Self {
+        Self {
+            rules: Vec::new(),
+            current_context: default_context,
+            enforcing_mode: true,
         }
-        self.runtime_rules.push(rule_desc);
     }
 
-    pub fn add_rich_rule(&mut self, rule: RichRule) {
-        self.rich_rules.push(rule);
+    pub fn add_rule(&mut self, source: &str, target: &str, class: &str, permission: &str, is_allowed: bool) {
+        self.rules.push(SeLinuxPolicyRule {
+            source_type: source.to_string(),
+            target_type: target.to_string(),
+            class_name: class.to_string(),
+            permission: permission.to_string(),
+            is_allowed,
+        });
     }
 
-    pub fn is_traffic_allowed(&self, zone: FirewalldZone, service: &str) -> bool {
-        if zone == FirewalldZone::Trusted {
+    /// Verifies access between source domain and target object domain
+    pub fn check_permission(&self, target_context: &SeLinuxContext, class: &str, permission: &str) -> bool {
+        if !self.enforcing_mode {
             return true;
         }
-        if zone == FirewalldZone::Drop {
-            return false;
-        }
 
-        if let Some(services) = self.allowed_services.get(&zone) {
-            if services.contains(&service.to_string()) || services.contains(&"all".to_string()) {
-                return true;
+        for rule in &self.rules {
+            if rule.source_type == self.current_context.domain_type
+                && rule.target_type == target_context.domain_type
+                && rule.class_name == class
+                && rule.permission == permission
+            {
+                return rule.is_allowed;
             }
         }
-
-        for rich in &self.rich_rules {
-            if rich.service == service && rich.action == "accept" {
-                return true;
-            }
-        }
-
         false
     }
 
-    pub fn reload(&mut self) {
-        self.runtime_rules = self.permanent_rules.clone();
+    /// Validates process domain transitions (e.g., from unconfined_t to secure_t on file execution)
+    pub fn validate_transition(&self, target_context: &SeLinuxContext) -> bool {
+        self.check_permission(target_context, "process", "transition")
     }
 }
 
-impl Default for FirewalldZoneManager {
-    fn default() -> Self {
-        Self::new()
-    }
+/// Systemd Preset service states
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemdPresetState {
+    Enable,
+    Disable,
+    Ignore,
 }
 
-/// Represents calculated disk partition layouts during installation.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PartitionLayout {
-    pub mount_point: String,
-    pub size_gb: u64,
-    pub filesystem: String,
-    pub lvm_group: Option<String>,
+/// Systemd service presets evaluator
+pub struct SystemdPresetConfigurator {
+    pub presets: HashMap<String, SystemdPresetState>,
 }
 
-/// AnacondaKickstartInstaller emulates Fedora's Anaconda Installer with KS parsing.
-pub struct AnacondaKickstartInstaller {
-    pub kickstart_parsed: bool,
-    pub root_password_set: bool,
-    pub timezone: String,
-    pub selected_packages: Vec<String>,
-    pub partitions: Vec<PartitionLayout>,
-    pub dry_run_success: bool,
-}
-
-impl AnacondaKickstartInstaller {
+impl SystemdPresetConfigurator {
     pub fn new() -> Self {
         Self {
-            kickstart_parsed: false,
-            root_password_set: false,
-            timezone: "UTC".to_string(),
-            selected_packages: Vec::new(),
-            partitions: Vec::new(),
-            dry_run_success: false,
+            presets: HashMap::new(),
         }
     }
 
-    pub fn parse_kickstart(&mut self, config_content: &str) -> Result<(), &'static str> {
-        if config_content.is_empty() {
-            return Err("Empty kickstart profile");
+    /// Evaluates preset configuration file lines (e.g., "enable sshd.service", "disable httpd.service")
+    pub fn parse_preset_line(&mut self, line: &str) {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            return;
         }
 
-        for line in config_content.lines() {
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.len() < 2 {
+            return;
+        }
+
+        let state = match parts[0] {
+            "enable" => SystemdPresetState::Enable,
+            "disable" => SystemdPresetState::Disable,
+            _ => SystemdPresetState::Ignore,
+        };
+
+        self.presets.insert(parts[1].to_string(), state);
+    }
+
+    pub fn get_preset_state(&self, service_name: &str) -> SystemdPresetState {
+        *self.presets.get(service_name).unwrap_or(&SystemdPresetState::Ignore)
+    }
+}
+
+/// Saturated High-Reliability Fedora ALU Flags
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct FedoraAluFlags {
+    pub zero: bool,
+    pub sign: bool,
+    pub carry: bool,
+    pub overflow: bool,
+}
+
+/// High-reliability emulation of ALU with flags and dynamic saturation
+pub struct FedoraAlu {
+    pub flags: FedoraAluFlags,
+}
+
+impl FedoraAlu {
+    pub fn new() -> Self {
+        Self {
+            flags: FedoraAluFlags::default(),
+        }
+    }
+
+    /// Saturated 32-bit addition with CPU flag simulation
+    pub fn add_saturated(&mut self, a: i32, b: i32) -> i32 {
+        let (res, overflow) = a.overflowing_add(b);
+        let res_saturated = if overflow {
+            if a > 0 { i32::MAX } else { i32::MIN }
+        } else {
+            res
+        };
+
+        self.flags = FedoraAluFlags {
+            zero: res_saturated == 0,
+            sign: res_saturated < 0,
+            carry: overflow,
+            overflow,
+        };
+        res_saturated
+    }
+
+    /// Saturated 32-bit subtraction with CPU flag simulation
+    pub fn sub_saturated(&mut self, a: i32, b: i32) -> i32 {
+        let (res, overflow) = a.overflowing_sub(b);
+        let res_saturated = if overflow {
+            if a > 0 { i32::MAX } else { i32::MIN }
+        } else {
+            res
+        };
+
+        self.flags = FedoraAluFlags {
+            zero: res_saturated == 0,
+            sign: res_saturated < 0,
+            carry: overflow,
+            overflow,
+        };
+        res_saturated
+    }
+}
+
+/// Anaconda automated Kickstart partition schema
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KickstartPartition {
+    pub mountpoint: String,
+    pub size_mb: u64,
+    pub fstype: String,
+}
+
+/// Anaconda kickstart file configuration schema
+pub struct KickstartConfig {
+    pub lang: String,
+    pub timezone: String,
+    pub root_password_hash: String,
+    pub partitions: Vec<KickstartPartition>,
+    pub packages: Vec<String>,
+    pub post_script: String,
+}
+
+/// Anaconda Automated OS Installer Parser
+pub struct AnacondaInstaller {
+    pub config: Option<KickstartConfig>,
+}
+
+impl AnacondaInstaller {
+    pub fn new() -> Self {
+        Self { config: None }
+    }
+
+    /// Simulates parsing an Anaconda Kickstart file
+    pub fn parse_kickstart(&mut self, content: &str) -> Result<(), &'static str> {
+        let mut lang = "en_US.UTF-8".to_string();
+        let mut timezone = "UTC".to_string();
+        let mut rootpw = "".to_string();
+        let mut partitions = Vec::new();
+        let mut packages = Vec::new();
+        let mut post_script = String::new();
+
+        let mut in_packages_block = false;
+        let mut in_post_block = false;
+
+        for line in content.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with('#') || trimmed.is_empty() {
+            if trimmed.is_empty() || trimmed.starts_with('#') {
                 continue;
             }
 
-            if trimmed.starts_with("timezone") {
-                let parts: Vec<&str> = trimmed.split_whitespace().collect();
-                if parts.len() > 1 {
-                    self.timezone = parts[1].to_string();
-                }
-            } else if trimmed.starts_with("rootpw") {
-                self.root_password_set = true;
-            } else if trimmed.starts_with("part") {
-                let parts: Vec<&str> = trimmed.split_whitespace().collect();
-                if parts.len() >= 3 {
-                    let mount = parts[1].to_string();
-                    let mut size = 0;
-                    let mut fstype = "xfs".to_string();
-                    let mut lvm = None;
+            if trimmed == "%packages" {
+                in_packages_block = true;
+                in_post_block = false;
+                continue;
+            } else if trimmed == "%post" {
+                in_packages_block = false;
+                in_post_block = true;
+                continue;
+            } else if trimmed == "%end" {
+                in_packages_block = false;
+                in_post_block = false;
+                continue;
+            }
 
-                    for opt in &parts[2..] {
-                        if opt.starts_with("--size=") {
-                            size = opt["--size=".len()..].parse::<u64>().unwrap_or(0);
-                        } else if opt.starts_with("--fstype=") {
-                            fstype = opt["--fstype=".len()..].to_string();
-                        } else if opt.starts_with("--lvmgroup=") {
-                            lvm = Some(opt["--lvmgroup=".len()..].to_string());
+            if in_packages_block {
+                packages.push(trimmed.to_string());
+            } else if in_post_block {
+                post_script.push_str(trimmed);
+                post_script.push('\n');
+            } else {
+                let parts: Vec<&str> = trimmed.split_whitespace().collect();
+                if parts.is_empty() {
+                    continue;
+                }
+                match parts[0] {
+                    "lang" => {
+                        if parts.len() > 1 {
+                            lang = parts[1].to_string();
                         }
                     }
-
-                    self.partitions.push(PartitionLayout {
-                        mount_point: mount,
-                        size_gb: size / 1024,
-                        filesystem: fstype,
-                        lvm_group: lvm,
-                    });
+                    "timezone" => {
+                        if parts.len() > 1 {
+                            timezone = parts[1].to_string();
+                        }
+                    }
+                    "rootpw" => {
+                        if parts.len() > 1 {
+                            rootpw = parts[1].to_string();
+                        }
+                    }
+                    "part" => {
+                        // format: part /boot --size=1024 --fstype=ext4
+                        if parts.len() >= 2 {
+                            let mount = parts[1].to_string();
+                            let mut size = 512;
+                            let mut fstype = "ext4".to_string();
+                            for &arg in &parts[2..] {
+                                if arg.starts_with("--size=") {
+                                    size = arg["--size=".len()..].parse::<u64>().unwrap_or(512);
+                                } else if arg.starts_with("--fstype=") {
+                                    fstype = arg["--fstype=".len()..].to_string();
+                                }
+                            }
+                            partitions.push(KickstartPartition {
+                                mountpoint: mount,
+                                size_mb: size,
+                                fstype,
+                            });
+                        }
+                    }
+                    _ => {}
                 }
             }
         }
 
-        self.kickstart_parsed = true;
+        self.config = Some(KickstartConfig {
+            lang,
+            timezone,
+            root_password_hash: rootpw,
+            partitions,
+            packages,
+            post_script,
+        });
+
         Ok(())
     }
 
-    pub fn add_selected_packages(&mut self, packages: Vec<&str>) {
-        for pkg in packages {
-            self.selected_packages.push(pkg.to_string());
-        }
-    }
-
-    pub fn validate_and_preflight(&mut self) -> Result<bool, &'static str> {
-        if !self.kickstart_parsed {
-            return Err("Kickstart profile not parsed");
-        }
-        if !self.root_password_set {
-            return Err("Security failure: root password is not defined in Kickstart");
-        }
-        if self.partitions.is_empty() {
-            return Err("Storage layout configuration is missing");
-        }
-
-        self.dry_run_success = true;
-        Ok(true)
-    }
-}
-
-impl Default for AnacondaKickstartInstaller {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// COPR compilation build job metadata.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CoprBuildJob {
-    pub job_id: u64,
-    pub username: String,
-    pub project_name: String,
-    pub srpm_package: String,
-    pub build_status: String,
-}
-
-/// CoprUserRepoBuilder emulates Fedora's COPR user repository builder.
-pub struct CoprUserRepoBuilder {
-    pub projects: BTreeMap<String, Vec<String>>,
-    pub active_jobs: Vec<CoprBuildJob>,
-    pub job_counter: u64,
-}
-
-impl CoprUserRepoBuilder {
-    pub fn new() -> Self {
-        Self {
-            projects: BTreeMap::new(),
-            active_jobs: Vec::new(),
-            job_counter: 0,
-        }
-    }
-
-    pub fn create_project(&mut self, username: &str, project_name: &str) -> Result<String, &'static str> {
-        let key = format!("{}/{}", username, project_name);
-        if self.projects.contains_key(&key) {
-            return Err("Project already exists");
-        }
-        self.projects.insert(key.clone(), Vec::new());
-        Ok(key)
-    }
-
-    pub fn submit_build(
-        &mut self,
-        username: &str,
-        project_name: &str,
-        srpm: &str,
-    ) -> Result<u64, &'static str> {
-        let key = format!("{}/{}", username, project_name);
-        if !self.projects.contains_key(&key) {
-            return Err("Target COPR project not found");
-        }
-
-        self.job_counter += 1;
-        let job = CoprBuildJob {
-            job_id: self.job_counter,
-            username: username.to_string(),
-            project_name: project_name.to_string(),
-            srpm_package: srpm.to_string(),
-            build_status: "Pending".to_string(),
-        };
-
-        self.active_jobs.push(job);
-        Ok(self.job_counter)
-    }
-
-    pub fn process_build_jobs(&mut self) -> usize {
-        let mut completed = 0;
-        for job in &mut self.active_jobs {
-            if job.build_status == "Pending" {
-                job.build_status = "Success".to_string();
-                let key = format!("{}/{}", job.username, job.project_name);
-                if let Some(pkgs) = self.projects.get_mut(&key) {
-                    let rpm_name = job.srpm_package.replace(".src.rpm", ".x86_64.rpm");
-                    pkgs.push(rpm_name);
-                }
-                completed += 1;
+    /// Simulates automated setup using Kickstart configurations
+    pub fn install_automated(&self) -> Result<usize, &'static str> {
+        if let Some(ref cfg) = self.config {
+            if cfg.partitions.is_empty() {
+                return Err("Anaconda: No partition schema defined in Kickstart config");
             }
-        }
-        completed
-    }
-}
-
-impl Default for CoprUserRepoBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Identifies FreeIPA registered user properties in LDAP directory.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct IpaUser {
-    pub uid: String,
-    pub given_name: String,
-    pub member_of_groups: Vec<String>,
-}
-
-/// Host-Based Access Control Rule in FreeIPA Policy Management.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct HbacRule {
-    pub rule_name: String,
-    pub source_users: Vec<String>,
-    pub target_hosts: Vec<String>,
-    pub allowed_services: Vec<String>,
-    pub enabled: bool,
-}
-
-/// FreeIpaDirectoryService emulates Identity, Policy, and Audit directory services.
-pub struct FreeIpaDirectoryService {
-    pub domain_realm: String,
-    pub directory_users: BTreeMap<String, IpaUser>,
-    pub hbac_rules: Vec<HbacRule>,
-    pub issued_kerberos_tickets: BTreeMap<String, u64>,
-}
-
-impl FreeIpaDirectoryService {
-    pub fn new(realm: &str) -> Self {
-        Self {
-            domain_realm: realm.to_string(),
-            directory_users: BTreeMap::new(),
-            hbac_rules: Vec::new(),
-            issued_kerberos_tickets: BTreeMap::new(),
-        }
-    }
-
-    pub fn register_user(&mut self, uid: &str, name: &str, groups: Vec<&str>) {
-        let ipa_user = IpaUser {
-            uid: uid.to_string(),
-            given_name: name.to_string(),
-            member_of_groups: groups.iter().map(|s| s.to_string()).collect(),
-        };
-        self.directory_users.insert(uid.to_string(), ipa_user);
-    }
-
-    pub fn acquire_kerberos_ticket(&mut self, uid: &str, current_time: u64) -> Result<(), &'static str> {
-        if !self.directory_users.contains_key(uid) {
-            return Err("User identity not found in LDAP directory");
-        }
-        self.issued_kerberos_tickets.insert(uid.to_string(), current_time + 36000);
-        Ok(())
-    }
-
-    pub fn verify_kerberos_ticket(&self, uid: &str, current_time: u64) -> bool {
-        if let Some(&expiration) = self.issued_kerberos_tickets.get(uid) {
-            current_time < expiration
+            Ok(cfg.packages.len())
         } else {
-            false
+            Err("Anaconda: Missing Kickstart configuration")
         }
-    }
-
-    pub fn add_hbac_rule(&mut self, rule: HbacRule) {
-        self.hbac_rules.push(rule);
-    }
-
-    pub fn validate_access(&self, uid: &str, host: &str, service: &str) -> bool {
-        let user_opt = self.directory_users.get(uid);
-        if user_opt.is_none() {
-            return false;
-        }
-        let user = user_opt.unwrap();
-
-        for rule in &self.hbac_rules {
-            if !rule.enabled {
-                continue;
-            }
-
-            let user_matches = rule.source_users.contains(&uid.to_string())
-                || rule.source_users.contains(&"all".to_string())
-                || user.member_of_groups.iter().any(|g| rule.source_users.contains(g));
-
-            let host_matches = rule.target_hosts.contains(&host.to_string())
-                || rule.target_hosts.contains(&"all".to_string());
-
-            let service_matches = rule.allowed_services.contains(&service.to_string())
-                || rule.allowed_services.contains(&"all".to_string());
-
-            if user_matches && host_matches && service_matches {
-                return true;
-            }
-        }
-
-        false
     }
 }
-
-// =========================================================================
-// UNIT TESTS MODULE
-// =========================================================================
 
 #[cfg(test)]
 mod tests {
@@ -711,109 +625,84 @@ mod tests {
     }
 
     #[test]
-    fn test_firewalld_zone_manager() {
-        let mut fwm = FirewalldZoneManager::new();
-        assert_eq!(fwm.active_zone, FirewalldZone::Public);
+    fn test_selinux_transitions() {
+        let src = SeLinuxContext::parse("unconfined_u:unconfined_r:unconfined_t:s0").unwrap();
+        assert_eq!(src.user, "unconfined_u");
+        assert_eq!(src.to_string_representation(), "unconfined_u:unconfined_r:unconfined_t:s0");
 
-        // Standard rules
-        assert!(fwm.is_traffic_allowed(FirewalldZone::Public, "ssh"));
-        assert!(!fwm.is_traffic_allowed(FirewalldZone::Public, "http"));
+        let mut engine = SeLinuxEngine::new(src);
+        let target = SeLinuxContext::new("system_u", "system_r", "secure_t", "s0");
 
-        // Add service to home zone
-        fwm.allow_service(FirewalldZone::Home, "http", true);
-        assert!(fwm.is_traffic_allowed(FirewalldZone::Home, "http"));
-        assert_eq!(fwm.permanent_rules.len(), 1);
+        // Permission denied initially
+        assert!(!engine.validate_transition(&target));
 
-        // Set default zone to home
-        fwm.set_default_zone(FirewalldZone::Home);
-        assert_eq!(fwm.active_zone, FirewalldZone::Home);
-
-        // Add rich rule
-        fwm.add_rich_rule(RichRule {
-            family: "ipv4".to_string(),
-            source: "192.168.1.50".to_string(),
-            service: "postgresql".to_string(),
-            action: "accept".to_string(),
-        });
-        assert!(fwm.is_traffic_allowed(FirewalldZone::Home, "postgresql"));
-
-        // Test reload
-        fwm.reload();
-        assert_eq!(fwm.runtime_rules, fwm.permanent_rules);
+        // Add allowing rule
+        engine.add_rule("unconfined_t", "secure_t", "process", "transition", true);
+        assert!(engine.validate_transition(&target));
     }
 
     #[test]
-    fn test_anaconda_kickstart_installer() {
-        let mut installer = AnacondaKickstartInstaller::new();
-        let ks_content = "
-            # Kickstart file for Fedora
+    fn test_systemd_preset_evaluator() {
+        let mut configurator = SystemdPresetConfigurator::new();
+        configurator.parse_preset_line("# This is a comment");
+        configurator.parse_preset_line("enable sshd.service");
+        configurator.parse_preset_line("disable firewalld.service");
+
+        assert_eq!(configurator.get_preset_state("sshd.service"), SystemdPresetState::Enable);
+        assert_eq!(configurator.get_preset_state("firewalld.service"), SystemdPresetState::Disable);
+        assert_eq!(configurator.get_preset_state("httpd.service"), SystemdPresetState::Ignore);
+    }
+
+    #[test]
+    fn test_fedora_saturated_alu() {
+        let mut alu = FedoraAlu::new();
+        let r1 = alu.add_saturated(i32::MAX - 10, 20);
+        assert_eq!(r1, i32::MAX);
+        assert!(alu.flags.overflow);
+        assert!(alu.flags.carry);
+
+        let r2 = alu.sub_saturated(i32::MIN + 5, 20);
+        assert_eq!(r2, i32::MIN);
+        assert!(alu.flags.overflow);
+        assert!(alu.flags.sign);
+    }
+
+    #[test]
+    fn test_anaconda_kickstart_parser() {
+        let ks_content = r#"
+            lang en_US.UTF-8
             timezone America/New_York
-            rootpw --iscrypted $6$rounds=4096$salt
-            part / --fstype=xfs --size=20480 --lvmgroup=vg_root
-            part /home --fstype=ext4 --size=10240 --lvmgroup=vg_home
-        ";
+            rootpw crypt_hash_here
 
-        assert!(installer.parse_kickstart(ks_content).is_ok());
-        assert_eq!(installer.timezone, "America/New_York");
-        assert!(installer.root_password_set);
-        assert_eq!(installer.partitions.len(), 2);
-        assert_eq!(installer.partitions[0].mount_point, "/");
-        assert_eq!(installer.partitions[0].size_gb, 20); // 20480 / 1024
-        assert_eq!(installer.partitions[0].filesystem, "xfs");
-        assert_eq!(installer.partitions[0].lvm_group, Some("vg_root".to_string()));
+            part /boot --size=1024 --fstype=ext4
+            part / --size=10240 --fstype=xfs
 
-        // Preflight checklist
-        assert!(installer.validate_and_preflight().unwrap());
-        assert!(installer.dry_run_success);
-    }
+            %packages
+            @core
+            vim
+            systemd
+            %end
 
-    #[test]
-    fn test_copr_user_repo_builder() {
-        let mut copr = CoprUserRepoBuilder::new();
-        let repo_key = copr.create_project("jules", "my-fast-tool").unwrap();
-        assert_eq!(repo_key, "jules/my-fast-tool");
+            %post
+            echo "automated setup finished"
+            %end
+        "#;
 
-        // Submit builds
-        let job_id = copr.submit_build("jules", "my-fast-tool", "my-tool-1.0.src.rpm").unwrap();
-        assert_eq!(job_id, 1);
-        assert_eq!(copr.active_jobs[0].build_status, "Pending");
+        let mut installer = AnacondaInstaller::new();
+        installer.parse_kickstart(ks_content).unwrap();
 
-        // Process jobs
-        let processed_count = copr.process_build_jobs();
-        assert_eq!(processed_count, 1);
-        assert_eq!(copr.active_jobs[0].build_status, "Success");
+        let cfg = installer.config.as_ref().unwrap();
+        assert_eq!(cfg.lang, "en_US.UTF-8");
+        assert_eq!(cfg.timezone, "America/New_York");
+        assert_eq!(cfg.root_password_hash, "crypt_hash_here");
+        assert_eq!(cfg.partitions.len(), 2);
+        assert_eq!(cfg.partitions[0].mountpoint, "/boot");
+        assert_eq!(cfg.partitions[0].size_mb, 1024);
+        assert_eq!(cfg.partitions[1].fstype, "xfs");
+        assert_eq!(cfg.packages.len(), 3);
+        assert_eq!(cfg.packages[1], "vim");
+        assert!(cfg.post_script.contains("automated setup finished"));
 
-        // Ensure RPM got placed in project artifacts
-        let artifacts = copr.projects.get("jules/my-fast-tool").unwrap();
-        assert_eq!(artifacts[0], "my-tool-1.0.x86_64.rpm");
-    }
-
-    #[test]
-    fn test_freeipa_directory_service() {
-        let mut ipa = FreeIpaDirectoryService::new("FEDORA.LOCAL");
-        assert_eq!(ipa.domain_realm, "FEDORA.LOCAL");
-
-        // Register user with groups
-        ipa.register_user("alice", "Alice Liddell", vec!["admins", "developers"]);
-        assert!(ipa.directory_users.contains_key("alice"));
-
-        // Acquire and verify Kerberos ticket
-        assert!(ipa.acquire_kerberos_ticket("alice", 1700000000).is_ok());
-        assert!(ipa.verify_kerberos_ticket("alice", 1700005000));
-        assert!(!ipa.verify_kerberos_ticket("alice", 1700050000)); // Expired
-
-        // Host Based Access Control (HBAC) rule setup
-        ipa.add_hbac_rule(HbacRule {
-            rule_name: "admin_ssh_rule".to_string(),
-            source_users: vec!["admins".to_string()],
-            target_hosts: vec!["all".to_string()],
-            allowed_services: vec!["ssh".to_string()],
-            enabled: true,
-        });
-
-        // Verify authorized access
-        assert!(ipa.validate_access("alice", "srv-01.fedora.local", "ssh"));
-        // Alice is not in group corresponding to target services/rules not covering http
-        assert!(!ipa.validate_access("alice", "srv-01.fedora.local", "http"));
+        assert_eq!(installer.install_automated().unwrap(), 3);
     }
 }
