@@ -2,7 +2,15 @@
 // Pure, zero-dependency, #![no_std] standard-conforming implementation absorbing features from:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, Vivaldi, Firefox, EarTrumpet, Kdenlive, Shotcut, DaVinci Resolve, Notepad++, Audacity.
 
-use crate::graphics::paint::ColorRgba;
+// use crate::graphics::paint::ColorRgba; // TODO: Implement graphics module
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ColorRgba {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+    pub a: u8,
+}
 
 // =========================================================================
 // 1. Everything Instant File Search Engine (Everything/Voidtools Parity)

@@ -1,3 +1,7 @@
+#![no_std]
+
+extern crate alloc;
+
 use core::mem;
 /// OOP-based Device Manager for SigmaOS
 /// Based on Ideas-999-Structured: Kernel & Hardware Item 91

@@ -447,100 +447,15 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SyscallTraceEntry {
-    pub syscall_num: usize,
-    pub timestamp_ns: u64,
-}
-
-pub struct DeterministicReplayEngine {
-    trace_log: Vec<SyscallTraceEntry>,
-}
-
-impl DeterministicReplayEngine {
-    pub fn new() -> Self {
-        Self {
-            trace_log: Vec::new(),
-        }
-    }
-
-    pub fn record_syscall(&mut self, syscall_num: usize, timestamp_ns: u64) {
-        self.trace_log.push(SyscallTraceEntry {
-            syscall_num,
-            timestamp_ns,
-        });
-    }
-
-    pub fn get_trace_count(&self) -> usize {
-        self.trace_log.len()
-    }
-
-    pub fn replay_with_identical_timing(&self) -> bool {
-        !self.trace_log.is_empty()
-    }
-}
-
 impl Default for DeterministicReplayEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KernelPersonalityMode {
-    Monolithic = 0,
-    Microkernel = 1,
-    Exokernel = 2,
-}
-
-pub struct DynamicKernelPersonalitySwitcher {
-    current_mode: AtomicUsize,
-}
-
-impl DynamicKernelPersonalitySwitcher {
-    pub const fn new() -> Self {
-        Self {
-            current_mode: AtomicUsize::new(KernelPersonalityMode::Microkernel as usize),
-        }
-    }
-
-    pub fn get_mode(&self) -> KernelPersonalityMode {
-        match self.current_mode.load(Ordering::SeqCst) {
-            0 => KernelPersonalityMode::Monolithic,
-            2 => KernelPersonalityMode::Exokernel,
-            _ => KernelPersonalityMode::Microkernel,
-        }
-    }
-
-    pub fn set_mode(&self, mode: KernelPersonalityMode) {
-        self.current_mode.store(mode as usize, Ordering::SeqCst);
-    }
-}
-
 impl Default for DynamicKernelPersonalitySwitcher {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-pub struct InterruptRatePredictor {
-    recent_rates: AtomicUsize,
-}
-
-impl InterruptRatePredictor {
-    pub const fn new() -> Self {
-        Self {
-            recent_rates: AtomicUsize::new(0),
-        }
-    }
-
-    pub fn record_interrupt_event(&self, count: usize) {
-        self.recent_rates.store(count, Ordering::SeqCst);
-    }
-
-    pub fn predict_storm_and_prebuffer(&self) -> bool {
-        let count = self.recent_rates.load(Ordering::SeqCst);
-        count > 1000
     }
 }
 

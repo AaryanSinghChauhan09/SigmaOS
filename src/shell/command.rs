@@ -17,17 +17,11 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(not(target_os = "none"))]
 extern "C" {
     fn malloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }
 
 #[cfg(not(target_os = "none"))]
 unsafe fn sys_alloc(size: usize) -> *mut u8 {
     malloc(size)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn sys_free(ptr: *mut u8) {
-    free(ptr)
 }
 
 #[cfg(target_os = "none")]
@@ -128,12 +122,6 @@ impl SimpleShellCommand {
             description: desc_array,
         }
     }
-}
-
-pub struct ShellVec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
 }
 
 // Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
