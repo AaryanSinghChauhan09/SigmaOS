@@ -1,4 +1,5 @@
 //! Arch Linux Parity and Compatibility Subsystem for SigmaOS
+//! Arch Linux Parity and Compatibility Subsystem for SigmaOS
 //! Implements a rich suite of Arch Linux abstractions and parities:
 //! - Virtual `/proc` and `/dev` filesystems
 //! - Pacman-style package engine with dependency checking and database locking
@@ -530,7 +531,214 @@ impl Default for SovereignEnvRegistry {
 }
 
 // ==========================================
-// 9. Integration Tests Module
+// 10. Yay & Paru AUR Helper Parity
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AurRepoStatus {
+    Cloned,
+    DependencyResolved,
+    Compiled,
+    Failed,
+}
+
+pub struct YayParuAdapter {
+    pub cached_aur_git_repos: HashMap<String, AurRepoStatus>,
+    pub search_query_cache: Vec<String>,
+}
+
+impl YayParuAdapter {
+    pub fn new() -> Self {
+        Self {
+            cached_aur_git_repos: HashMap::new(),
+            search_query_cache: Vec::new(),
+        }
+    }
+
+    pub fn clone_aur_repo(&mut self, pkgname: &str) -> Result<(), &'static str> {
+        if pkgname.is_empty() {
+            return Err("Empty package name");
+        }
+        self.cached_aur_git_repos.insert(pkgname.to_string(), AurRepoStatus::Cloned);
+        Ok(())
+    }
+
+    pub fn resolve_dependencies(&mut self, pkgname: &str) -> Result<(), &'static str> {
+        let status = self.cached_aur_git_repos.get_mut(pkgname).ok_or("Repo not cloned yet")?;
+        *status = AurRepoStatus::DependencyResolved;
+        Ok(())
+    }
+
+    pub fn trigger_makepkg(&mut self, pkgname: &str) -> Result<(), &'static str> {
+        let status = self.cached_aur_git_repos.get_mut(pkgname).ok_or("Repo not cloned yet")?;
+        if *status != AurRepoStatus::DependencyResolved {
+            return Err("Dependencies not resolved");
+        }
+        *status = AurRepoStatus::Compiled;
+        Ok(())
+    }
+}
+
+impl Default for YayParuAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 11. Reflector Mirror Selection Parity
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct ArchMirror {
+    pub url: String,
+    pub country: String,
+    pub protocol: String,
+    pub latency_ms: u32,
+}
+
+pub struct ReflectorMirrorlist {
+    pub mirrors: Vec<ArchMirror>,
+}
+
+impl ReflectorMirrorlist {
+    pub fn new() -> Self {
+        Self { mirrors: Vec::new() }
+    }
+
+    pub fn add_mirror(&mut self, url: &str, country: &str, protocol: &str, latency_ms: u32) {
+        self.mirrors.push(ArchMirror {
+            url: url.to_string(),
+            country: country.to_string(),
+            protocol: protocol.to_string(),
+            latency_ms,
+        });
+    }
+
+    pub fn filter_and_sort(&self, country: &str, protocol: &str) -> Vec<ArchMirror> {
+        let mut filtered = Vec::new();
+        for m in &self.mirrors {
+            if m.country == country && m.protocol == protocol {
+                filtered.push(m.clone());
+            }
+        }
+        let n = filtered.len();
+        for i in 0..n {
+            for j in 0..n - 1 - i {
+                if filtered[j].latency_ms > filtered[j+1].latency_ms {
+                    let temp = filtered[j].clone();
+                    filtered[j] = filtered[j+1].clone();
+                    filtered[j+1] = temp;
+                }
+            }
+        }
+        filtered
+    }
+}
+
+impl Default for ReflectorMirrorlist {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 12. Declarative Archinstall Framework Parity
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SubvolumeConfig {
+    pub name: String,
+    pub mountpoint: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArchinstallConfig {
+    pub target_disk: String,
+    pub btrfs_subvolumes: Vec<SubvolumeConfig>,
+    pub desktop_environment: String,
+    pub is_kernel_zen: bool,
+}
+
+pub struct ArchinstallParity {
+    pub active_config: Option<ArchinstallConfig>,
+    pub installation_progress_percent: u32,
+}
+
+impl ArchinstallParity {
+    pub fn new() -> Self {
+        Self {
+            active_config: None,
+            installation_progress_percent: 0,
+        }
+    }
+
+    pub fn load_profile(&mut self, config: ArchinstallConfig) {
+        self.active_config = Some(config);
+        self.installation_progress_percent = 0;
+    }
+
+    pub fn execute_step(&mut self) -> bool {
+        if self.active_config.is_none() {
+            return false;
+        }
+        if self.installation_progress_percent < 100 {
+            self.installation_progress_percent += 25;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for ArchinstallParity {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 13. Alternative Artix Init Bridges Parity
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ArtixInitSystemType {
+    OpenRc,
+    Runit,
+    S6,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ServiceState {
+    Stopped,
+    Started,
+    Supervised,
+}
+
+pub struct ArtixInitBridge {
+    pub init_type: ArtixInitSystemType,
+    pub active_services: HashMap<String, ServiceState>,
+}
+
+impl ArtixInitBridge {
+    pub fn new(init_type: ArtixInitSystemType) -> Self {
+        Self {
+            init_type,
+            active_services: HashMap::new(),
+        }
+    }
+
+    pub fn manage_service(&mut self, service: &str, state: ServiceState) {
+        self.active_services.insert(service.to_string(), state);
+    }
+
+    pub fn query_service_status(&self, service: &str) -> ServiceState {
+        self.active_services.get(service).cloned().unwrap_or(ServiceState::Stopped)
+    }
+}
+
+// ==========================================
+// 14. Integration Tests Module
 // ==========================================
 
 #[cfg(test)]
@@ -630,5 +838,68 @@ mod tests {
 
         env.unset_var("CUSTOM_VAR");
         assert!(env.get_var("CUSTOM_VAR").is_none());
+    }
+
+    #[test]
+    fn test_yay_paru_adapter() {
+        let mut adapter = YayParuAdapter::new();
+        assert!(adapter.clone_aur_repo("spotify").is_ok());
+        assert_eq!(adapter.clone_aur_repo(""), Err("Empty package name"));
+
+        assert_eq!(adapter.resolve_dependencies("nonexistent"), Err("Repo not cloned yet"));
+        assert!(adapter.resolve_dependencies("spotify").is_ok());
+
+        assert_eq!(adapter.trigger_makepkg("nonexistent"), Err("Repo not cloned yet"));
+        assert!(adapter.trigger_makepkg("spotify").is_ok());
+        assert_eq!(adapter.cached_aur_git_repos.get("spotify").unwrap(), &AurRepoStatus::Compiled);
+    }
+
+    #[test]
+    fn test_reflector_mirrorlist() {
+        let mut list = ReflectorMirrorlist::new();
+        list.add_mirror("https://mirror.us.com", "US", "HTTPS", 80);
+        list.add_mirror("https://mirror.us.fast.com", "US", "HTTPS", 20);
+        list.add_mirror("https://mirror.us.slow.com", "US", "HTTPS", 150);
+        list.add_mirror("https://mirror.de.com", "DE", "HTTPS", 50);
+
+        let filtered = list.filter_and_sort("US", "HTTPS");
+        assert_eq!(filtered.len(), 3);
+        assert_eq!(filtered[0].latency_ms, 20);
+        assert_eq!(filtered[1].latency_ms, 80);
+        assert_eq!(filtered[2].latency_ms, 150);
+    }
+
+    #[test]
+    fn test_archinstall_parity() {
+        let mut installer = ArchinstallParity::new();
+        assert!(!installer.execute_step());
+
+        let mut subs = Vec::new();
+        subs.push(SubvolumeConfig {
+            name: "root".to_string(),
+            mountpoint: "/".to_string(),
+        });
+
+        let config = ArchinstallConfig {
+            target_disk: "/dev/sda".to_string(),
+            btrfs_subvolumes: subs,
+            desktop_environment: "GNOME".to_string(),
+            is_kernel_zen: true,
+        };
+
+        installer.load_profile(config);
+        assert_eq!(installer.installation_progress_percent, 0);
+
+        assert!(installer.execute_step());
+        assert_eq!(installer.installation_progress_percent, 25);
+    }
+
+    #[test]
+    fn test_artix_init_bridge() {
+        let mut openrc = ArtixInitBridge::new(ArtixInitSystemType::OpenRc);
+        assert_eq!(openrc.query_service_status("dbus"), ServiceState::Stopped);
+
+        openrc.manage_service("dbus", ServiceState::Started);
+        assert_eq!(openrc.query_service_status("dbus"), ServiceState::Started);
     }
 }
