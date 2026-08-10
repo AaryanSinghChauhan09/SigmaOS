@@ -1,14 +1,17 @@
 // SigmaOS Compatibility Module
+pub mod cachy_os;
+pub mod chimera_linux;
 pub mod constellation_mesh;
 pub mod cross_platform;
 pub mod historic_linux;
-pub mod mint_linux;
-pub mod chimera_linux;
-pub mod relay_nexus;
-pub mod solid_kernel;
+pub mod india_professional_tools;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
-pub mod india_professional_tools;
+pub mod mint_linux;
+pub mod reactos;
+pub mod relay_nexus;
+pub mod sigmawin;
+pub mod solid_kernel;
 pub mod canonical;
 pub mod fedora;
 

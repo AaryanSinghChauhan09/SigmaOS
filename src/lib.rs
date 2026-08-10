@@ -119,6 +119,12 @@ pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
     RingTcpState, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
     ETHERNET_HEADER_LEN, IPV4_HEADER_LEN, TCP_HEADER_LEN, UDP_HEADER_LEN,
+    EnterpriseNetworkError, IPv6Address, SecureVpnTunnel, NetworkTrafficAnalyzer, TrafficPacket, Protocol, TrafficStatistics,
+    ConnectionInfo, ConnectionState, TrafficAlert, AlertType, AlertSeverity,
+    AnalysisStrategy, BandwidthAnalysis, SecurityAnalysis,
+    AlpineZeroAllocCaptureBuffer, NixDeclarativeFilter,
+    KaliPacketFingerprinter, KaliSnoopAnalysis, GentooUseFlagsDissector,
+    ClearLinuxFlowLoadBalancer,
 };
 pub use observability::{
     ObservabilityError, ObservabilityStack, SigmaDebug, SigmaMetrics, SigmaTrace,
