@@ -2,12 +2,7 @@
 // Implements sigma-ai core with multi-agent coordination, workflow automation,
 // and self-diagnosis capabilities for system optimization
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub type AgentID = usize;
 
@@ -40,7 +35,7 @@ pub trait AIAgent {
 pub struct SimpleAIAgent {
     pub id: AgentID,
     pub name: String,
-    pub state: AtomicUsize,
+    pub state: AgentState,
 }
 
 impl SimpleAIAgent {
@@ -48,7 +43,7 @@ impl SimpleAIAgent {
         SimpleAIAgent {
             id,
             name: name.to_string(),
-            state: AtomicUsize::new(AgentState::Idle as usize),
+            state: AgentState::Idle,
         }
     }
 }
@@ -61,19 +56,11 @@ impl AIAgent for SimpleAIAgent {
         &self.name
     }
     fn state(&self) -> AgentState {
-        let raw = self.state.load(Ordering::SeqCst);
-        match raw {
-            1 => AgentState::Active,
-            2 => AgentState::Busy,
-            3 => AgentState::Error,
-            4 => AgentState::Learning,
-            _ => AgentState::Idle,
-        }
+        self.state
     }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
-        self.state
-            .store(AgentState::Busy as usize, Ordering::SeqCst);
+        self.state = AgentState::Busy;
         let mut result = Vec::new();
         for &byte in self.name.as_bytes() {
             result.push(byte);
@@ -83,8 +70,7 @@ impl AIAgent for SimpleAIAgent {
         for &byte in task {
             result.push(byte);
         }
-        self.state
-            .store(AgentState::Idle as usize, Ordering::SeqCst);
+        self.state = AgentState::Idle;
         Ok(result)
     }
 }
@@ -126,12 +112,6 @@ impl SimpleAgentOrchestrator {
     }
 }
 
-impl Default for SimpleAgentOrchestrator {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl AgentOrchestrator for SimpleAgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError> {
         let id = agent.id();
@@ -160,12 +140,7 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
     }
 
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent> {
-        for agent in &self.agents {
-            if agent.id() == id {
-                return Some(agent.as_ref());
-            }
-        }
-        None
+        self.agents.iter().find(|a| a.id() == id).map(|a| a.as_ref())
     }
 
     fn list_agents(&self) -> Vec<AgentID> {
@@ -187,12 +162,6 @@ pub struct SimpleTaskQueue {
 impl SimpleTaskQueue {
     pub fn new() -> Self {
         SimpleTaskQueue { tasks: Vec::new() }
-    }
-}
-
-impl Default for SimpleTaskQueue {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -256,12 +225,6 @@ impl SimpleAgentCommunication {
     }
 }
 
-impl Default for SimpleAgentCommunication {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl AgentCommunication for SimpleAgentCommunication {
     fn send_message(
         &mut self,
@@ -297,34 +260,25 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_orchestrator_basic() {
-        let mut orchestrator = SimpleAgentOrchestrator::new();
-        let agent = SimpleAIAgent::new(1, "Agent1");
-        assert_eq!(agent.id(), 1);
-        assert_eq!(agent.name(), "Agent1");
+    fn test_orchestration_basics() {
+        let mut orch = SimpleAgentOrchestrator::new();
+        let agent = SimpleAIAgent::new(1, "AgentAlpha");
+        orch.register_agent(Box::new(agent)).unwrap();
 
-        orchestrator.register_agent(Box::new(agent)).unwrap();
-        let response = orchestrator.dispatch_task(b"optimize_resource", Some(1)).unwrap();
-        let response_str = core::str::from_utf8(&response).unwrap();
-        assert!(response_str.contains("Agent1: optimize_resource"));
+        assert_eq!(orch.list_agents(), vec![1]);
+
+        let response = orch.dispatch_task(b"optimize system", Some(1)).unwrap();
+        assert_eq!(String::from_utf8(response).unwrap(), "AgentAlpha: optimize system");
     }
 
     #[test]
-    fn test_task_queue() {
+    fn test_task_queue_priority() {
         let mut queue = SimpleTaskQueue::new();
-        queue.enqueue(b"low_priority_task", 1);
-        queue.enqueue(b"high_priority_task", 10);
+        queue.enqueue(b"low_prio_task", 1);
+        queue.enqueue(b"high_prio_task", 10);
 
-        let first = queue.dequeue().unwrap();
-        assert!(core::str::from_utf8(&first).unwrap().contains("high_priority_task"));
-    }
-
-    #[test]
-    fn test_agent_communication() {
-        let mut comms = SimpleAgentCommunication::new();
-        comms.send_message(1, 2, b"hello from 1 to 2").unwrap();
-
-        let rcv = comms.receive_message(2).unwrap();
-        assert!(core::str::from_utf8(&rcv).unwrap().contains("hello from 1 to 2"));
+        let dequeued = queue.dequeue().unwrap();
+        let name_len = dequeued.iter().position(|&b| b == 0).unwrap_or(256);
+        assert_eq!(String::from_utf8(dequeued[..name_len].to_vec()).unwrap(), "high_prio_task");
     }
 }

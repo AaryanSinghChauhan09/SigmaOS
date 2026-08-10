@@ -3,11 +3,10 @@
 
 use crate::kernel::scheduler::{Priority, Process, ProcessState};
 
-/// CPU register context saved during a context switch (Linux pt_regs / BSD trapframe style)
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+/// CPU register context saved during a context switch
+#[derive(Debug, Clone, Copy, Default)]
 #[repr(C)]
 pub struct CpuContext {
-    // General Purpose Registers (GPRs)
     pub rax: u64,
     pub rbx: u64,
     pub rcx: u64,
@@ -26,35 +25,6 @@ pub struct CpuContext {
     pub r15: u64,
     pub rip: u64,
     pub rflags: u64,
-
-    // Segment Registers
-    pub cs: u16,
-    pub ds: u16,
-    pub es: u16,
-    pub fs: u16,
-    pub gs: u16,
-    pub ss: u16,
-
-    // Control Registers
-    pub cr0: u64,
-    pub cr2: u64,
-    pub cr3: u64,
-    pub cr4: u64,
-
-    // Debug Registers (Hardware Breakpoints)
-    pub dr0: u64,
-    pub dr1: u64,
-    pub dr2: u64,
-    pub dr3: u64,
-    pub dr6: u64,
-    pub dr7: u64,
-
-    // Model-Specific Registers (MSRs) for Fast System Calls and TLS
-    pub star: u64,
-    pub lstar: u64,
-    pub sfmask: u64,
-    pub fs_base: u64,
-    pub gs_base: u64,
 }
 
 impl CpuContext {
@@ -67,41 +37,6 @@ impl CpuContext {
         self.rsp = rsp;
         self.rip = rip;
     }
-
-    /// Write values to Control Registers
-    pub fn set_control_register(&mut self, index: usize, value: u64) -> Result<(), &'static str> {
-        match index {
-            0 => { self.cr0 = value; Ok(()) }
-            2 => { self.cr2 = value; Ok(()) }
-            3 => { self.cr3 = value; Ok(()) }
-            4 => { self.cr4 = value; Ok(()) }
-            _ => Err("Invalid control register index"),
-        }
-    }
-
-    /// Read values from Control Registers
-    pub fn get_control_register(&self, index: usize) -> Result<u64, &'static str> {
-        match index {
-            0 => Ok(self.cr0),
-            2 => Ok(self.cr2),
-            3 => Ok(self.cr3),
-            4 => Ok(self.cr4),
-            _ => Err("Invalid control register index"),
-        }
-    }
-
-    /// Write values to Model-Specific Registers (MSRs)
-    pub fn set_msr_register(&mut self, msr_id: u32, value: u64) -> Result<(), &'static str> {
-        // Mock MSR register IDs (0xC0000080+ are standard x86-64 MSRs)
-        match msr_id {
-            0xC0000081 => { self.star = value; Ok(()) }
-            0xC0000082 => { self.lstar = value; Ok(()) }
-            0xC0000084 => { self.sfmask = value; Ok(()) }
-            0xC0000100 => { self.fs_base = value; Ok(()) }
-            0xC0000101 => { self.gs_base = value; Ok(()) }
-            _ => Err("Unknown MSR register ID"),
-        }
-    }
 }
 
 /// Extended process entry that includes context and yields tracking
@@ -111,15 +46,20 @@ pub struct ScheduledProcess {
     pub context: CpuContext,
     pub yield_requested: bool,
     pub cpu_time_used: u64,
+    pub ticks_since_run: u64,
+    pub original_priority: Priority,
 }
 
 impl ScheduledProcess {
     pub fn new(process: Process) -> Self {
+        let original_priority = process.priority;
         Self {
             process,
             context: CpuContext::new(),
             yield_requested: false,
             cpu_time_used: 0,
+            ticks_since_run: 0,
+            original_priority,
         }
     }
 
@@ -130,13 +70,17 @@ impl ScheduledProcess {
 
     /// Priority-based weight: higher priority gets a larger time slice multiplier
     pub fn time_slice_ticks(&self, base_slice: u64) -> u64 {
-        let multiplier: u64 = match self.process.priority {
+        let mut multiplier: u64 = match self.process.priority {
             Priority::Realtime => 8,
             Priority::High => 4,
             Priority::Normal => 2,
             Priority::Low => 1,
             Priority::Idle => 1, // Idle still gets a minimal slice
         };
+        // Dynamic boost if process has been starved (aged)
+        if self.ticks_since_run > 50 {
+            multiplier += 2;
+        }
         base_slice * multiplier
     }
 }
@@ -215,9 +159,28 @@ impl RoundRobinScheduler {
             return;
         }
 
+        // Safeguard current_index boundaries to prevent any out of bounds panic
+        if self.current_index >= self.processes.len() {
+            self.current_index = 0;
+        }
+
+        // Age other ready processes to prevent starvation (Linux/distro priority aging simulation)
+        for (i, entry) in self.processes.iter_mut().enumerate() {
+            if i != self.current_index && entry.process.state == ProcessState::Ready {
+                entry.ticks_since_run += 1;
+                // If extremely starved, temporarily promote priority to prevent starvation
+                if entry.ticks_since_run > 100 && entry.process.priority == Priority::Low {
+                    entry.process.priority = Priority::Normal;
+                }
+            }
+        }
+
         let needs_switch = {
             let entry = &mut self.processes[self.current_index];
             entry.cpu_time_used += 1;
+            entry.ticks_since_run = 0; // reset aging count
+            // Demote back to original priority after getting its turn
+            entry.process.priority = entry.original_priority;
             let slice = entry.time_slice_ticks(self.config.time_slice);
             let yielding = entry.yield_requested;
             entry.yield_requested = false;
@@ -334,10 +297,20 @@ mod tests {
     #[test]
     fn test_tick_switches_process() {
         let mut scheduler = RoundRobinScheduler::new();
-        let p1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let p2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        scheduler.add_process(p1).unwrap();
-        scheduler.add_process(p2).unwrap();
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
+
+        let initial_index = scheduler.current_index;
+        for _ in 0..15 {
+            scheduler.tick();
+        }
+        // After 15 ticks with 10ms time slice, index should change (and not cycle back to 0)
+        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(process1).unwrap();
+        scheduler.add_process(process2).unwrap();
 
         let initial_index = scheduler.current_index;
         // Normal priority multiplier is 2x base 10 = 20 ticks per slice
@@ -399,5 +372,29 @@ mod tests {
         assert!(scheduler
             .add_process(Process::new(3, "test3".to_string(), Priority::Normal))
             .is_err());
+    }
+
+    #[test]
+    fn test_priority_aging_and_demotion() {
+        let mut scheduler = RoundRobinScheduler::new();
+        let p1 = Process::new(1, "p1".to_string(), Priority::Normal);
+        let p2 = Process::new(2, "p2".to_string(), Priority::Low);
+        scheduler.add_process(p1).unwrap();
+        scheduler.add_process(p2).unwrap();
+
+        // Let p1 run and p2 age
+        for _ in 0..101 {
+            scheduler.tick();
+        }
+
+        // p2 should be aged and temporarily promoted to Priority::Normal
+        assert_eq!(scheduler.processes[1].process.priority, Priority::Normal);
+
+        // Switch to p2 and tick once to let it run
+        scheduler.current_index = 1;
+        scheduler.tick();
+
+        // After running, p2 should be demoted back to its original Priority::Low
+        assert_eq!(scheduler.processes[1].process.priority, Priority::Low);
     }
 }

@@ -3,11 +3,12 @@
 // No dependency on external AI frameworks
 // Based on Roadmap Item 81: SigmaAI core agent
 
-extern crate alloc;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use alloc::boxed::Box;
-
+use core::mem;
+/// OOP-based AI Agent Framework for SigmaOS
+/// Implements AI agent using OOP principles with traits and structs
+/// No dependency on external AI frameworks
+/// Based on Roadmap Item 81: SigmaAI core agent
+use core::ptr::{self, NonNull};
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Intent type
@@ -70,12 +71,12 @@ pub trait AIAgent {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AgentCapability {
-    pub can_execute: bool,
+    pub level: u32,
 }
 
 impl AgentCapability {
     pub fn full() -> Self {
-        Self { can_execute: true }
+        AgentCapability { level: 999 }
     }
 }
 
@@ -128,12 +129,13 @@ impl Pattern {
 }
 
 impl SimpleAIAgent {
-    pub fn new(name: &str, version: (u32, u32, u32)) -> Self {
+    pub fn new(name: &[u8], version: (u32, u32, u32), capability: AgentCapability) -> Self {
+        let name_str = std::str::from_utf8(name).unwrap_or("").to_string();
         SimpleAIAgent {
-            name: name.to_string(),
+            name: name_str,
             version,
             execution_count: AtomicUsize::new(0),
-            capability: AgentCapability::full(),
+            capability,
             patterns: Vec::new(),
             mcp_tools: Vec::new(),
             prompt_optim_weight: 0.5,
@@ -208,7 +210,7 @@ impl SimpleAIAgent {
         }
 
         // WiFi connection checks
-        let has_wifi = self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi") || self.contains_bytes(input, b"Wifi");
+        let has_wifi = self.contains_bytes(input, b"wifi") || self.contains_bytes(input, b"WiFi");
         if self.contains_bytes(input, b"connect") && has_wifi {
             let mut out = Vec::new();
             for &b in b"sigma-wifi connect --ssid Home" {
@@ -293,12 +295,10 @@ impl AIAgent for SimpleAIAgent {
     fn execute(&mut self, intent: &Intent) -> Result<Vec<u8>, AIError> {
         self.execution_count.fetch_add(1, Ordering::SeqCst);
         let mut response = Vec::new();
-        let success_msg = b"Command executed successfully";
-
-        for byte in success_msg {
-            response.push(*byte);
+        let formatted = format!("Command executed successfully: {} ({})", intent.command, intent.parameters);
+        for byte in formatted.bytes() {
+            response.push(byte);
         }
-
         Ok(response)
     }
 
@@ -314,10 +314,8 @@ impl AIAgent for SimpleAIAgent {
     }
 }
 
-/// AI Stats
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct AIStats {
-    pub total_requests: usize,
     pub failed_requests: usize,
 }
 
@@ -338,14 +336,8 @@ impl SimpleAIAgentManager {
     pub fn new() -> Self {
         SimpleAIAgentManager {
             agents: Vec::new(),
-            stats: AIStats { total_requests: 0, failed_requests: 0 },
+            stats: AIStats::default(),
         }
-    }
-}
-
-impl Default for SimpleAIAgentManager {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -361,7 +353,6 @@ impl AIAgentManager for SimpleAIAgentManager {
     }
 
     fn process_request(&mut self, id: usize, input: &str) -> Result<Vec<u8>, AIError> {
-        self.stats.total_requests += 1;
         if let Some(agent) = self.agents.get_mut(id) {
             let intent = agent.parse(input)?;
             agent.execute(&intent)
@@ -377,12 +368,12 @@ impl AIAgentManager for SimpleAIAgentManager {
 }
 
 #[cfg(test)]
-mod tests {
+mod tests_basics {
     use super::*;
 
     #[test]
     fn test_ai_agent_parsing() {
-        let mut agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         let intent = agent.parse("run diagnostic check").unwrap();
         assert_eq!(intent.intent_type, IntentType::SystemCommand);
         assert_eq!(intent.command, "sys_exec");
@@ -391,7 +382,7 @@ mod tests {
 
     #[test]
     fn test_ai_agent_mcp_and_optimization() {
-        let mut agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        let mut agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         agent.register_mcp_tool("fetch_weather".to_string(), "MCP weather fetcher".to_string());
         assert_eq!(agent.mcp_tools.len(), 1);
 
@@ -402,17 +393,29 @@ mod tests {
     #[test]
     fn test_ai_agent_manager_process() {
         let mut manager = SimpleAIAgentManager::new();
-        let agent = SimpleAIAgent::new("SigmaAI-Core", (1, 0, 0));
+        let agent = SimpleAIAgent::new(b"SigmaAI-Core", (1, 0, 0), AgentCapability::full());
         let id = manager.register_agent(Box::new(agent)).unwrap();
 
         let response = manager.process_request(id, "read file /etc/hosts").unwrap();
-        let response_str = core::str::from_utf8(&response).unwrap();
-        assert!(response_str.contains("executed successfully"));
+        let response_str = std::str::from_utf8(&response).unwrap();
+        assert!(response_str.contains("file_io"));
+        assert!(response_str.contains("read file /etc/hosts"));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ai_agent_basics() {
+        let agent = SimpleAIAgent::new(b"TestAgent", (1, 0, 0), AgentCapability::full());
+        assert!(agent.version == (1, 0, 0));
     }
 
     #[test]
     fn test_ai_natural_language_translations() {
-        let agent = SimpleAIAgent::new("S-CLI", (1, 0, 0));
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
 
         let install_en = agent
             .translate_natural_command(b"install libreoffice")
@@ -437,21 +440,21 @@ mod tests {
 
     #[test]
     fn test_ai_safety_checks() {
-        let agent = SimpleAIAgent::new("S-CLI", (1, 0, 0));
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
 
         let dangerous_res = agent.perform_safety_check(b"rm -rf /");
         assert!(dangerous_res.is_some());
         assert!(dangerous_res
             .unwrap()
             .windows(7)
-            .any(|w| w == b"Warning"));
+            .any(|w| window_eq(w, b"Warning")));
 
         let account_delete_res = agent.perform_safety_check(b"rm -rf /home/ravi/sigma-accounts/");
         assert!(account_delete_res.is_some());
         assert!(account_delete_res
             .unwrap()
             .windows(7)
-            .any(|w| w == b"Warning"));
+            .any(|w| window_eq(w, b"Warning")));
 
         let safe_res = agent.perform_safety_check(b"ls -la /var/www");
         assert!(safe_res.is_none());
@@ -459,9 +462,13 @@ mod tests {
 
     #[test]
     fn test_ai_command_explanations() {
-        let agent = SimpleAIAgent::new("S-CLI", (1, 0, 0));
+        let agent = SimpleAIAgent::new(b"S-CLI", (1, 0, 0), AgentCapability::full());
 
         let explanation = agent.explain_command(b"tar -xvf archive.tar.gz").unwrap();
-        assert!(explanation.windows(8).any(|w| w == b"Extracts"));
+        assert!(explanation.windows(8).any(|w| window_eq(w, b"Extracts")));
+    }
+
+    fn window_eq(a: &[u8], b: &[u8]) -> bool {
+        a == b
     }
 }
