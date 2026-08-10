@@ -2,6 +2,7 @@
 pub mod spawn;
 pub mod kernel_data;
 pub mod linux_sysfs;
+pub mod linux_proc;
 
 pub use spawn::{
     Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,

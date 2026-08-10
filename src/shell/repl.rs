@@ -5,7 +5,6 @@ use std::io::{self, BufRead, Write};
 
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
-
 impl AgentAutomationEngine {
     pub fn new() -> Self {
         AgentAutomationEngine
@@ -67,41 +66,29 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Livepatch {
-        args: Vec<String>,
+    Kill {
+        signal: Option<i32>,
+        pid: usize,
     },
-    Cron {
-        args: Vec<String>,
+    Nice {
+        nice_val: i32,
+        command_line: String,
     },
-    Vm {
-        args: Vec<String>,
+    Renice {
+        nice_val: i32,
+        pid: usize,
     },
-    Research {
-        query: String,
+    Pgrep {
+        pattern: String,
     },
-    Camera {
-        effect: String,
+    Pkill {
+        pattern: String,
     },
-    Grid {
-        args: Vec<String>,
-    },
-    Access {
-        args: Vec<String>,
-    },
-    Sysctl {
-        args: Vec<String>,
-    },
-    Patch {
-        args: Vec<String>,
-    },
-    Rescue {
-        args: Vec<String>,
-    },
-    Monitor {
-        args: Vec<String>,
-    },
-    Sandbox {
-        args: Vec<String>,
+    Top,
+    Vmstat,
+    Spawn {
+        name: String,
+        cmdline: String,
     },
     Unknown(String),
 }
@@ -120,6 +107,7 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
+    pub proc_fs: crate::process::linux_proc::ProcFileSystem,
 }
 
 impl ShellRepl {
@@ -142,6 +130,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            proc_fs: crate::process::linux_proc::ProcFileSystem::new(),
         }
     }
 
@@ -155,7 +144,7 @@ impl ShellRepl {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt: prompt,
+            prompt,
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
@@ -164,6 +153,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
+            proc_fs: crate::process::linux_proc::ProcFileSystem::new(),
         }
     }
 
@@ -206,7 +196,7 @@ impl ShellRepl {
         }
     }
 
-    fn parse_command(&self, input: &str) -> ShellCommand {
+    pub fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -222,6 +212,8 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "top" => ShellCommand::Top,
+            "vmstat" => ShellCommand::Vmstat,
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -240,25 +232,10 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "echo" => {
-                ShellCommand::Echo {
-                    message: parts[1..].join(" "),
-                }
-            }
             "rm" => {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {
                         filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password: parts.get(2).map(|s| s.to_string()),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -273,22 +250,48 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "echo" => {
+                ShellCommand::Echo {
+                    message: parts[1..].join(" "),
+                }
+            }
+            "su" => {
+                if parts.len() >= 2 {
+                    let password = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
+                    } else {
+                        None
+                    };
+                    ShellCommand::Su {
+                        username: parts[1].to_string(),
+                        password,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "systemctl" => {
                 if parts.len() >= 2 {
-                    ShellCommand::Systemctl {
-                        action: parts[1].to_string(),
-                        service: parts.get(2).unwrap_or(&"").to_string(),
-                    }
+                    let action = parts[1].to_string();
+                    let service = if parts.len() >= 3 {
+                        parts[2].to_string()
+                    } else {
+                        String::new()
+                    };
+                    ShellCommand::Systemctl { action, service }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
             "apt" => {
                 if parts.len() >= 2 {
-                    ShellCommand::Apt {
-                        subcommand: parts[1].to_string(),
-                        package: parts.get(2).map(|s| s.to_string()),
-                    }
+                    let subcommand = parts[1].to_string();
+                    let package = if parts.len() >= 3 {
+                        Some(parts[2].to_string())
+                    } else {
+                        None
+                    };
+                    ShellCommand::Apt { subcommand, package }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
@@ -340,80 +343,121 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "livepatch" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Livepatch { args }
+            "kill" => {
+                if parts.len() == 3 && parts[1].starts_with('-') {
+                    let sig_str = parts[1].trim_start_matches('-');
+                    let signal = sig_str.parse::<i32>().ok();
+                    let pid = parts[2].parse::<usize>().unwrap_or(0);
+                    ShellCommand::Kill { signal, pid }
+                } else if parts.len() == 2 {
+                    let pid = parts[1].parse::<usize>().unwrap_or(0);
+                    ShellCommand::Kill { signal: None, pid }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
-            "cron" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Cron { args }
+            "nice" => {
+                if parts.len() >= 4 && parts[1] == "-n" {
+                    let nice_val = parts[2].parse::<i32>().unwrap_or(0);
+                    let command_line = parts[3..].join(" ");
+                    ShellCommand::Nice { nice_val, command_line }
+                } else if parts.len() >= 3 && parts[1].parse::<i32>().is_ok() {
+                    let nice_val = parts[1].parse::<i32>().unwrap_or(0);
+                    let command_line = parts[2..].join(" ");
+                    ShellCommand::Nice { nice_val, command_line }
+                } else if parts.len() >= 2 {
+                    let command_line = parts[1..].join(" ");
+                    ShellCommand::Nice { nice_val: 10, command_line }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
-            "vm" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Vm { args }
+            "renice" => {
+                if parts.len() == 3 {
+                    let nice_val = parts[1].parse::<i32>().unwrap_or(0);
+                    let pid = parts[2].parse::<usize>().unwrap_or(0);
+                    ShellCommand::Renice { nice_val, pid }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
-            "research" => {
-                let query = parts[1..].join(" ");
-                ShellCommand::Research { query }
+            "pgrep" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Pgrep {
+                        pattern: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
-            "camera" => {
-                let effect = parts[1..].join(" ");
-                ShellCommand::Camera { effect }
+            "pkill" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Pkill {
+                        pattern: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
-            "grid" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Grid { args }
-            }
-            "access" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Access { args }
-            }
-            "sysctl" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Sysctl { args }
-            }
-            "patch" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Patch { args }
-            }
-            "rescue" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Rescue { args }
-            }
-            "monitor" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Monitor { args }
-            }
-            "sandbox" => {
-                let args = parts[1..].iter().map(|s| s.to_string()).collect();
-                ShellCommand::Sandbox { args }
+            "spawn" => {
+                if parts.len() >= 3 {
+                    let name = parts[1].to_string();
+                    let cmdline = parts[2..].join(" ");
+                    ShellCommand::Spawn { name, cmdline }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help         - Show this help message\n\
-                   ps           - List running processes\n\
-                   ls           - List files\n\
-                   pwd          - Print working directory\n\
-                   whoami       - Print current logged-in user\n\
-                   su <user>    - Switch user account (try 'su root' or 'su guest')\n\
-                   cat <file>   - Display file contents\n\
-                   systemctl    - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
-                   apt <cmd>    - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
-                   echo         - Print a message\n\
-                   set          - Set a variable\n\
-                   get          - Get a variable\n\
-                   exit         - Exit the shell"
+                   help                - Show this help message\n\
+                   ps                  - List running processes dynamically\n\
+                   ls                  - List files\n\
+                   pwd                 - Print working directory\n\
+                   whoami              - Print current logged-in user\n\
+                   su <user>           - Switch user account (try 'su root' or 'su guest')\n\
+                   cat <file>          - Display file contents\n\
+                   systemctl           - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
+                   apt <cmd>           - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
+                   echo                - Print a message\n\
+                   set                 - Set a variable\n\
+                   get                 - Get a variable\n\
+                   kill [-<sig>] <pid> - Send signal to a simulated process\n\
+                   nice <val> <cmd>    - Run a simulated command with modified nice priority\n\
+                   renice <val> <pid>  - Modify nice value of a simulated process\n\
+                   pgrep <pattern>     - Find simulated processes by name pattern\n\
+                   pkill <pattern>     - Signal simulated processes by name pattern\n\
+                   top                 - Display snapshot-style dynamic process monitor\n\
+                   vmstat              - Display virtual memory and CPU core statistics\n\
+                   spawn <name> <cmd>  - Spawn a custom simulated process\n\
+                   exit                - Exit the shell"
                 .to_string()),
-            ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
-                   1    sigma-sh    Running\n\
-                   2    systemd     Running\n\
-                   3    udevd       Running"
-                .to_string()),
+            ShellCommand::ListProcesses => {
+                let mut out = "PID   PPID  PGID  SID   NAME         STATE         NICE  CGROUP\n".to_string();
+                let mut sorted_pids: Vec<&usize> = self.proc_fs.processes.keys().collect();
+                sorted_pids.sort();
+                for pid in sorted_pids {
+                    if let Some(proc) = self.proc_fs.processes.get(pid) {
+                        out.push_str(&format!(
+                            "{:<5} {:<5} {:<5} {:<5} {:<12} {:<13} {:<5} {}\n",
+                            proc.pid,
+                            proc.ppid,
+                            proc.pgid,
+                            proc.sid,
+                            proc.name,
+                            proc.state.as_str(),
+                            proc.nice.value(),
+                            proc.cgroup_name
+                        ));
+                    }
+                }
+                Ok(out)
+            }
             ShellCommand::ListFiles => Ok("README.md\n\
                    Cargo.toml\n\
                    src/\n\
@@ -551,142 +595,6 @@ impl ShellRepl {
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
             }
-            ShellCommand::Livepatch { args } => {
-                if args.is_empty() {
-                    Ok("livepatch: Subcommands: list, apply <symbol> <addr1> <addr2>".to_string())
-                } else if args[0] == "list" {
-                    Ok("sys_read -> 0xffffffffc0300100 (Active)".to_string())
-                } else if args[0] == "apply" && args.len() >= 4 {
-                    Ok(format!("Successfully registered livepatch redirect for '{}' from 0x{} to 0x{}", args[1], args[2], args[3]))
-                } else {
-                    Err("livepatch: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Cron { args } => {
-                if args.is_empty() {
-                    Ok("cron: Subcommands: list, add <name> <cmd> <schedule>".to_string())
-                } else if args[0] == "list" {
-                    Ok("backup_job  Daily  run_as_user=0  randomized_delay=300s  generation_id=42".to_string())
-                } else if args[0] == "add" && args.len() >= 4 {
-                    Ok(format!("Successfully added multi-distro cron job '{}' to execute '{}'", args[1], args[2]))
-                } else {
-                    Err("cron: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Vm { args } => {
-                if args.is_empty() {
-                    Ok("vm: Subcommands: list, start <name>, stop <name>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Intel-VM  Intel VT-x (VMX)  Stopped  hpet=true  iommu_protection=AMD-Vi".to_string())
-                } else if args[0] == "start" && args.len() >= 2 {
-                    Ok(format!("Starting VM '{}' with hardware VT-x acceleration...", args[1]))
-                } else if args[0] == "stop" && args.len() >= 2 {
-                    Ok(format!("Stopping VM '{}'...", args[1]))
-                } else {
-                    Err("vm: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Research { query } => {
-                if query.is_empty() {
-                    Err("research: Please specify a research query".to_string())
-                } else {
-                    Ok(format!("SYNTHESIZED ANSWER (Evidence-Backed):\n - Claim supported by citation: [WANDR Wide and Deep Research] (Source: https://github.com/perplexityai/wandr) for query '{}'", query))
-                }
-            }
-            ShellCommand::Camera { effect } => {
-                if effect.is_empty() {
-                    Ok("camera: Current effect: None. Supported effects: ChromaKey, Grayscale, Sepia, Negative".to_string())
-                } else {
-                    Ok(format!("Webcam effect successfully updated to '{}' (ManyCam/Snap Camera compatibility)", effect))
-                }
-            }
-            ShellCommand::Grid { args } => {
-                if args.is_empty() {
-                    Ok("grid: Subcommands: list, add <id> <cores>, remove <id>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Node: node-1 (idle, 8 cores)\nNode: node-2 (busy, 16 cores)".to_string())
-                } else if args[0] == "add" && args.len() >= 3 {
-                    Ok(format!("grid: Node '{}' with {} CPU cores registered to cluster.", args[1], args[2]))
-                } else if args[0] == "remove" && args.len() >= 2 {
-                    Ok(format!("grid: Node '{}' removed from cluster.", args[1]))
-                } else {
-                    Err("grid: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Access { args } => {
-                if args.is_empty() {
-                    Ok("access: Subcommands: list, enable <feature>, disable <feature>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Accessibility Feature: ScreenReader (Disabled)\nAccessibility Feature: HighContrast (Enabled)".to_string())
-                } else if args[0] == "enable" && args.len() >= 2 {
-                    Ok(format!("access: Accessibility feature '{}' enabled.", args[1]))
-                } else if args[0] == "disable" && args.len() >= 2 {
-                    Ok(format!("access: Accessibility feature '{}' disabled.", args[1]))
-                } else {
-                    Err("access: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Sysctl { args } => {
-                if args.is_empty() {
-                    Ok("sysctl: Subcommands: list, query <param>, set <param>=<value>".to_string())
-                } else if args[0] == "list" {
-                    Ok("kern.maxproc = 1024\nnet.inet.tcp.sendspace = 32768\nhw.ncpu = 16".to_string())
-                } else if args[0] == "query" && args.len() >= 2 {
-                    Ok(format!("sysctl: {} = 1024", args[1]))
-                } else if args[0] == "set" && args.len() >= 2 {
-                    Ok(format!("sysctl: Parameter '{}' set successfully.", args[1]))
-                } else {
-                    Err("sysctl: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Patch { args } => {
-                if args.is_empty() {
-                    Ok("patch: Subcommands: list, apply <patch_hash> <signature>, rollback <patch_hash>".to_string())
-                } else if args[0] == "list" {
-                    Ok("Patch: patch_01 (Applied)\nPatch: patch_02 (Available)".to_string())
-                } else if args[0] == "apply" && args.len() >= 3 {
-                    Ok(format!("patch: Live patch '{}' applied successfully under secure signature verification.", args[1]))
-                } else if args[0] == "rollback" && args.len() >= 2 {
-                    Ok(format!("patch: Live patch '{}' rolled back.", args[1]))
-                } else {
-                    Err("patch: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Rescue { args } => {
-                if args.is_empty() {
-                    Ok("rescue: Subcommands: status, rollback <partition> <merkle_hash>".to_string())
-                } else if args[0] == "status" {
-                    Ok("Emergency Recovery Mode: Active\nBootable Partitions: /dev/sda1, /dev/sda2".to_string())
-                } else if args[0] == "rollback" && args.len() >= 3 {
-                    Ok(format!("rescue: Partition '{}' successfully rolled back to secure Merkle Root [{}].", args[1], args[2]))
-                } else {
-                    Err("rescue: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Monitor { args } => {
-                if args.is_empty() {
-                    Ok("monitor: Subcommands: telemetry, switch_latency, leaks".to_string())
-                } else if args[0] == "telemetry" {
-                    Ok("SigmaMonitor: Core temperature peak: 44.1 C (SIMD Accelerated)".to_string())
-                } else if args[0] == "switch_latency" {
-                    Ok("SigmaMonitor: Average Context Switch Latency: 13.375 ns".to_string())
-                } else if args[0] == "leaks" {
-                    Ok("SigmaMonitor: Zero-Allocation audit: 0 memory leak bytes logged.".to_string())
-                } else {
-                    Err("monitor: Invalid parameters".to_string())
-                }
-            }
-            ShellCommand::Sandbox { args } => {
-                if args.is_empty() {
-                    Ok("sandbox: Subcommands: create <pid> <profile>, check <pid>".to_string())
-                } else if args[0] == "create" && args.len() >= 3 {
-                    Ok(format!("sandbox: Zero-trust sandbox created for PID {} using '{}' execution profile.", args[1], args[2]))
-                } else if args[0] == "check" && args.len() >= 2 {
-                    Ok(format!("sandbox: PID {} is active sandboxed.", args[1]))
-                } else {
-                    Err("sandbox: Invalid parameters".to_string())
-                }
-            }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -696,6 +604,123 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
+            ShellCommand::Kill { signal, pid } => {
+                let raw_sig = signal.unwrap_or(15);
+                let native_sig = match raw_sig {
+                    9 => crate::process::linux_proc::LinuxSignal::SigKill,
+                    15 => crate::process::linux_proc::LinuxSignal::SigTerm,
+                    2 => crate::process::linux_proc::LinuxSignal::SigInt,
+                    _ => crate::process::linux_proc::LinuxSignal::SigTerm,
+                };
+                match self.proc_fs.send_signal(pid as i32, native_sig) {
+                    Ok(_) => Ok(format!("Sent signal {} to process {}", raw_sig, pid)),
+                    Err(e) => Err(format!("kill: failed to signal {}: {}", pid, e)),
+                }
+            }
+            ShellCommand::Nice { nice_val, command_line } => {
+                let parsed_inner = self.parse_command(&command_line);
+                match parsed_inner {
+                    ShellCommand::Spawn { name, cmdline } => {
+                        let nice_obj = crate::process::linux_proc::NiceValue::new(nice_val);
+                        let pid = self.proc_fs.spawn_process(&name, 1, nice_obj, "user.slice", &cmdline);
+                        Ok(format!("nice: Spawned process {} (PID {}) with nice priority {}", name, pid, nice_val))
+                    }
+                    _ => {
+                        // Simulate running standard command under nice
+                        let result = self.execute_command(parsed_inner)?;
+                        Ok(format!("nice ({}): {}", nice_val, result))
+                    }
+                }
+            }
+            ShellCommand::Renice { nice_val, pid } => {
+                if let Some(proc) = self.proc_fs.processes.get_mut(&pid) {
+                    proc.nice = crate::process::linux_proc::NiceValue::new(nice_val);
+                    Ok(format!("Successfully reniced process {} to {}", pid, nice_val))
+                } else {
+                    Err(format!("renice: process {} not found", pid))
+                }
+            }
+            ShellCommand::Pgrep { pattern } => {
+                let mut matches = Vec::new();
+                for proc in self.proc_fs.processes.values() {
+                    if proc.name.contains(&pattern) {
+                        matches.push(proc.pid.to_string());
+                    }
+                }
+                if matches.is_empty() {
+                    Ok(String::new())
+                } else {
+                    Ok(matches.join("\n"))
+                }
+            }
+            ShellCommand::Pkill { pattern } => {
+                let mut signaled = Vec::new();
+                let pids: Vec<usize> = self.proc_fs.processes.keys().copied().collect();
+                for pid in pids {
+                    let name = {
+                        if let Some(proc) = self.proc_fs.processes.get(&pid) {
+                            proc.name.clone()
+                        } else {
+                            continue;
+                        }
+                    };
+                    if name.contains(&pattern) {
+                        if self.proc_fs.send_signal(pid as i32, crate::process::linux_proc::LinuxSignal::SigTerm).is_ok() {
+                            signaled.push(format!("{} ({})", name, pid));
+                        }
+                    }
+                }
+                if signaled.is_empty() {
+                    Ok("No matching processes found to signal.".to_string())
+                } else {
+                    Ok(format!("Signaled processes: {}", signaled.join(", ")))
+                }
+            }
+            ShellCommand::Top => {
+                let mut out = String::new();
+                out.push_str(&format!(
+                    "Uptime: {} seconds | Cores: {} | Model: {}\n",
+                    self.proc_fs.system_uptime, self.proc_fs.cpu_cores, self.proc_fs.cpu_model
+                ));
+                let free_mem = self.proc_fs.total_memory - self.proc_fs.used_memory;
+                out.push_str(&format!(
+                    "Memory: {} kB total, {} kB used, {} kB free\n\n",
+                    self.proc_fs.total_memory / 1024, self.proc_fs.used_memory / 1024, free_mem / 1024
+                ));
+                out.push_str("PID   PPID  NAME         STATE         NICE  MEMORY_USAGE   CPU_TIME\n");
+                let mut sorted_pids: Vec<&usize> = self.proc_fs.processes.keys().collect();
+                sorted_pids.sort();
+                for pid in sorted_pids {
+                    if let Some(proc) = self.proc_fs.processes.get(pid) {
+                        out.push_str(&format!(
+                            "{:<5} {:<5} {:<12} {:<13} {:<5} {:<14} {}\n",
+                            proc.pid,
+                            proc.ppid,
+                            proc.name,
+                            proc.state.as_str(),
+                            proc.nice.value(),
+                            format!("{} B", proc.memory_usage),
+                            proc.cpu_time
+                        ));
+                    }
+                }
+                Ok(out)
+            }
+            ShellCommand::Vmstat => {
+                let free_kb = (self.proc_fs.total_memory - self.proc_fs.used_memory) / 1024;
+                let used_kb = self.proc_fs.used_memory / 1024;
+                let out = format!(
+                    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n\
+                     r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n\
+                     1  0      0 {:<8} 131072 2097152   0    0    42     0    0    0 15  5 80  0  0\n",
+                    free_kb
+                );
+                Ok(out)
+            }
+            ShellCommand::Spawn { name, cmdline } => {
+                let pid = self.proc_fs.spawn_process(&name, 1, crate::process::linux_proc::NiceValue::new(0), "user.slice", &cmdline);
+                Ok(format!("Spawned process {} (PID {}) successfully.", name, pid))
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -905,79 +930,55 @@ mod tests {
     }
 
     #[test]
-    fn test_extended_cli_commands() {
+    fn test_process_management_commands() {
         let mut repl = ShellRepl::new();
 
-        // 1. Livepatch Command Test
-        let cmd_livepatch = repl.parse_command("livepatch apply sys_read 8122c400 c0300100");
-        assert!(matches!(cmd_livepatch, ShellCommand::Livepatch { .. }));
-        let out_livepatch = repl.execute_command(cmd_livepatch).unwrap();
-        assert!(out_livepatch.contains("Successfully registered"));
+        // 1. Spawn a dynamic process
+        let spawn_out = repl.execute_command(ShellCommand::Spawn {
+            name: "test-daemon".to_string(),
+            cmdline: "/bin/test-daemon --run".to_string(),
+        }).unwrap();
+        assert!(spawn_out.contains("test-daemon"));
 
-        // 2. Cron Command Test
-        let cmd_cron = repl.parse_command("cron list");
-        assert!(matches!(cmd_cron, ShellCommand::Cron { .. }));
-        let out_cron = repl.execute_command(cmd_cron).unwrap();
-        assert!(out_cron.contains("backup_job"));
+        // 2. Query ps list and verify presence
+        let ps_out = repl.execute_command(ShellCommand::ListProcesses).unwrap();
+        assert!(ps_out.contains("test-daemon"));
 
-        // 3. VM Command Test
-        let cmd_vm = repl.parse_command("vm start Intel-VM");
-        assert!(matches!(cmd_vm, ShellCommand::Vm { .. }));
-        let out_vm = repl.execute_command(cmd_vm).unwrap();
-        assert!(out_vm.contains("Starting VM"));
+        // 3. Renice process
+        let renice_out = repl.execute_command(ShellCommand::Renice {
+            nice_val: -12,
+            pid: 3, // Default systemd: 1, kthreadd: 2, test-daemon: 3
+        }).unwrap();
+        assert!(renice_out.contains("reniced"));
+        assert!(repl.execute_command(ShellCommand::ListProcesses).unwrap().contains("-12"));
 
-        // 4. Research Command Test
-        let cmd_res = repl.parse_command("research Perplexity");
-        assert!(matches!(cmd_res, ShellCommand::Research { .. }));
-        let out_res = repl.execute_command(cmd_res).unwrap();
-        assert!(out_res.contains("SYNTHESIZED ANSWER"));
+        // 4. Test pgrep
+        let pgrep_out = repl.execute_command(ShellCommand::Pgrep {
+            pattern: "test".to_string(),
+        }).unwrap();
+        assert_eq!(pgrep_out.trim(), "3");
 
-        // 5. Camera Command Test
-        let cmd_cam = repl.parse_command("camera Sepia");
-        assert!(matches!(cmd_cam, ShellCommand::Camera { .. }));
-        let out_cam = repl.execute_command(cmd_cam).unwrap();
-        assert!(out_cam.contains("Webcam effect successfully updated"));
+        // 5. Test nice prefix runner
+        let nice_run_out = repl.execute_command(ShellCommand::Nice {
+            nice_val: 5,
+            command_line: "spawn nice-daemon nice_cmd".to_string(),
+        }).unwrap();
+        assert!(nice_run_out.contains("nice-daemon"));
+        assert!(repl.execute_command(ShellCommand::ListProcesses).unwrap().contains("nice-daemon"));
 
-        // 6. Grid Command Test
-        let cmd_grid = repl.parse_command("grid add node-3 8");
-        assert!(matches!(cmd_grid, ShellCommand::Grid { .. }));
-        let out_grid = repl.execute_command(cmd_grid).unwrap();
-        assert!(out_grid.contains("node-3"));
+        // 6. Test top snapshot
+        let top_out = repl.execute_command(ShellCommand::Top).unwrap();
+        assert!(top_out.contains("Memory:"));
+        assert!(top_out.contains("nice-daemon"));
 
-        // 7. Access Command Test
-        let cmd_access = repl.parse_command("access enable ScreenReader");
-        assert!(matches!(cmd_access, ShellCommand::Access { .. }));
-        let out_access = repl.execute_command(cmd_access).unwrap();
-        assert!(out_access.contains("ScreenReader"));
+        // 7. Test vmstat snapshot
+        let vmstat_out = repl.execute_command(ShellCommand::Vmstat).unwrap();
+        assert!(vmstat_out.contains("swpd"));
 
-        // 8. Sysctl Command Test
-        let cmd_sysctl = repl.parse_command("sysctl query kern.maxproc");
-        assert!(matches!(cmd_sysctl, ShellCommand::Sysctl { .. }));
-        let out_sysctl = repl.execute_command(cmd_sysctl).unwrap();
-        assert!(out_sysctl.contains("kern.maxproc"));
-
-        // 9. Patch Command Test
-        let cmd_patch = repl.parse_command("patch rollback patch_01");
-        assert!(matches!(cmd_patch, ShellCommand::Patch { .. }));
-        let out_patch = repl.execute_command(cmd_patch).unwrap();
-        assert!(out_patch.contains("rolled back"));
-
-        // 10. Rescue Command Test
-        let cmd_rescue = repl.parse_command("rescue rollback /dev/sda1 hash_val");
-        assert!(matches!(cmd_rescue, ShellCommand::Rescue { .. }));
-        let out_rescue = repl.execute_command(cmd_rescue).unwrap();
-        assert!(out_rescue.contains("/dev/sda1"));
-
-        // 11. Monitor Command Test
-        let cmd_monitor = repl.parse_command("monitor telemetry");
-        assert!(matches!(cmd_monitor, ShellCommand::Monitor { .. }));
-        let out_monitor = repl.execute_command(cmd_monitor).unwrap();
-        assert!(out_monitor.contains("SigmaMonitor"));
-
-        // 12. Sandbox Command Test
-        let cmd_sandbox = repl.parse_command("sandbox create 801 StrictBrowser");
-        assert!(matches!(cmd_sandbox, ShellCommand::Sandbox { .. }));
-        let out_sandbox = repl.execute_command(cmd_sandbox).unwrap();
-        assert!(out_sandbox.contains("StrictBrowser"));
+        // 8. Test pkill / kill
+        let pkill_out = repl.execute_command(ShellCommand::Pkill {
+            pattern: "nice-daemon".to_string(),
+        }).unwrap();
+        assert!(pkill_out.contains("nice-daemon"));
     }
 }
