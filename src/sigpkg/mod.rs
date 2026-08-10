@@ -8,6 +8,7 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod debian_defeater;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use spec::{
@@ -34,6 +35,11 @@ pub use universal_oop_system::{
     PackageParserFactory, UniversalPackageManager,
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
     UserDefinedHook, ParseError, InstallError, HookError,
+};
+pub use debian_defeater::{
+    MirrorNode, SovereignMirrorSelector, FileState, FileTransactionEntry,
+    SovereignTransactionManager, SandboxRule, SovereignSandboxEnforcer,
+    SovereignDeltaGenerator,
 };
 
 /// Package version using SemVer
@@ -119,24 +125,6 @@ impl Package {
             licenses: Vec::new(),
             maintainers: Vec::new(),
             changelogs: Vec::new(),
-        }
-    }
-}
-
-impl Package {
-    pub fn new(
-        name: String,
-        version: Version,
-        description: String,
-        dependencies: Vec<Dependency>,
-        checksum: String,
-    ) -> Self {
-        Self {
-            name,
-            version,
-            description,
-            dependencies,
-            checksum,
         }
     }
 }
