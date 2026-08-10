@@ -29,6 +29,7 @@ pub mod orchestration;
 pub mod package;
 pub mod productivity;
 pub mod resilience;
+pub mod release;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -74,6 +75,10 @@ pub use customization::{
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
+};
+pub use release::{
+    Release, ReleaseType, ReleaseStatus, ReleaseManager, ReleaseError,
+    VersionManager, VersionError,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
