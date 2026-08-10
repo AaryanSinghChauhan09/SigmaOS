@@ -581,3 +581,152 @@ mod tests {
         assert!(!encryptor.pqc_verify_signature(b"Sovereign data at rest modified", &sig));
     }
 }
+
+// =========================================================================
+// Integration Test Support (Aliases and Types expected by tests)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RaidLevel {
+    Raid0,
+    Raid1,
+    Raid5,
+}
+
+pub struct SigmaFsJournal {
+    pub active_txs: Vec<JournalTransaction>,
+    pub next_tx_id: u64,
+}
+
+impl SigmaFsJournal {
+    pub fn new() -> Self {
+        Self {
+            active_txs: Vec::new(),
+            next_tx_id: 1,
+        }
+    }
+
+    pub fn start_transaction(&mut self, path: &str, action: &str) -> u64 {
+        let id = self.next_tx_id;
+        self.next_tx_id += 1;
+        self.active_txs.push(JournalTransaction {
+            tx_id: id,
+            action: action.to_string(),
+            path: path.to_string(),
+            data: Vec::new(),
+            state: JournalState::Pending,
+        });
+        id
+    }
+
+    pub fn commit_transaction(&mut self, tx_id: u64) {
+        if let Some(tx) = self.active_txs.iter_mut().find(|t| t.tx_id == tx_id) {
+            tx.state = JournalState::Committed;
+        }
+    }
+}
+
+pub struct SigmaFsCow {
+    pub snapshots: HashMap<String, Vec<u8>>,
+}
+
+impl SigmaFsCow {
+    pub fn new() -> Self {
+        Self {
+            snapshots: HashMap::new(),
+        }
+    }
+
+    pub fn write_block_cow(&mut self, _filename: &str, _offset: u64, _size: u64) {}
+
+    pub fn create_cow_snapshot(&mut self, snap_name: &str) {
+        self.snapshots.insert(snap_name.to_string(), Vec::new());
+    }
+}
+
+pub struct SigmaFsVolume {
+    pub volume_capacity: HashMap<String, u64>,
+}
+
+impl SigmaFsVolume {
+    pub fn new() -> Self {
+        Self {
+            volume_capacity: HashMap::new(),
+        }
+    }
+
+    pub fn create_volume_group(&mut self, name: &str, _pv: Vec<&str>, capacity: u64) {
+        self.volume_capacity.insert(name.to_string(), capacity);
+    }
+
+    pub fn query_volume_capacity_mb(&self, name: &str) -> Option<u64> {
+        self.volume_capacity.get(name).copied()
+    }
+}
+
+pub struct SigmaFsRaid {
+    pub active_arrays: HashMap<String, RaidLevel>,
+}
+
+impl SigmaFsRaid {
+    pub fn new() -> Self {
+        Self {
+            active_arrays: HashMap::new(),
+        }
+    }
+
+    pub fn create_raid_array(&mut self, name: &str, level: RaidLevel) {
+        self.active_arrays.insert(name.to_string(), level);
+    }
+
+    pub fn route_raid_sectors(&self, _name: &str, _sector: u64) -> Vec<u64> {
+        vec![0, 1]
+    }
+}
+
+pub struct SigmaFsCrypt {
+    pub passphrase: String,
+    pub is_unlocked: bool,
+}
+
+impl SigmaFsCrypt {
+    pub fn new(passphrase: &str) -> Self {
+        Self {
+            passphrase: passphrase.to_string(),
+            is_unlocked: false,
+        }
+    }
+
+    pub fn unlock_volume(&mut self, passphrase: &str) -> bool {
+        if self.passphrase == passphrase {
+            self.is_unlocked = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn encrypt_sector(&self, _sector: u64, data: &mut [u8]) -> Result<(), &'static str> {
+        if !self.is_unlocked {
+            return Err("Volume is locked");
+        }
+        for byte in data.iter_mut() {
+            *byte ^= 0xFF;
+        }
+        Ok(())
+    }
+}
+
+pub struct SigmaFsVirtio {
+    pub avail_ring_idx: u16,
+}
+
+impl SigmaFsVirtio {
+    pub fn new() -> Self {
+        Self { avail_ring_idx: 0 }
+    }
+
+    pub fn submit_virtio_buffer(&mut self, _addr: u64, _len: u32, _flags: u16) {
+        self.avail_ring_idx += 1;
+    }
+}

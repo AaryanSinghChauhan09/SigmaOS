@@ -40,6 +40,7 @@ pub enum LibcVersion {
 pub enum SyscallAbi {
     Oabi_32,
     Eabi_32,
+    Eabi_64,
 }
 
 /// Matrix that maps old libc calls to modern equivalents

@@ -11,6 +11,9 @@ pub type EventID = usize;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogFormat { Json, Text, Binary }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LogFormat { Json, Text, Binary }
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventType {

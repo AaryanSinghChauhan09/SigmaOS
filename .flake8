@@ -1,0 +1,13 @@
+[flake8]
+ignore = E501
+exclude =
+    .git,
+    __pycache__,
+    node_modules,
+    apply_master_fixes_v3.py,
+    resolve_conflicts.py,
+    resolve_conflicts_v2.py,
+    fix_unused.py,
+    scripts,
+    scratch,
+    summarize_tests_11.py

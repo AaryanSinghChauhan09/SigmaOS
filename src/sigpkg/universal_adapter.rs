@@ -1,4 +1,6 @@
 use crate::security::Permission;
+pub use crate::sigpkg::universal_oop_system::{ApkAdapter, NixAdapter, EbuildAdapter};
+
 /// Universal Package Format Adapter for SigmaOS (Sovereign Packaging)
 /// Natively absorbs, parses, and translates package metadata formats from Apt (.deb),
 /// Yum/Rpm (.rpm/.spec), Pacman (PKGBUILD), Snap (snapcraft.yaml), and Flatpak (.json manifests).

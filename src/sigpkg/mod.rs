@@ -7,6 +7,7 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
+pub mod universal_oop_system;
 pub mod verifier;
 pub mod importer;
 

@@ -175,6 +175,7 @@ struct Vec<T> {
 }
 
 #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
 impl<T> Vec<T> {
     fn new() -> Self {
         Vec {

@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <new> // Necessary for placement new operator
+#include "../include/sigma_kernel_types.h"
 
 // Mock implementations of sovereign libc primitives for tests
 extern "C" {
@@ -34,7 +35,7 @@ extern "C" {
         va_end(args);
     }
 
-    void* sigma_malloc(unsigned long long size) {
+    void* sigma_malloc(sigma_size_t size) {
         return std::malloc(size);
     }
 
@@ -42,15 +43,15 @@ extern "C" {
         std::free(ptr);
     }
 
-    void* sigma_memcpy(void* dest, const void* src, unsigned long long n) {
+    void* sigma_memcpy(void* dest, const void* src, sigma_size_t n) {
         return std::memcpy(dest, src, n);
     }
 
-    void* sigma_memset(void* s, int c, unsigned long long n) {
+    void* sigma_memset(void* s, int c, sigma_size_t n) {
         return std::memset(s, c, n);
     }
 
-    unsigned long long sigma_strlen(const char* s) {
+    sigma_size_t sigma_strlen(const char* s) {
         return std::strlen(s);
     }
 
@@ -58,14 +59,14 @@ extern "C" {
         return std::strcmp(s1, s2);
     }
 
-    void zenith_log_structured(unsigned int code, const char* comp, const char* desc, unsigned int cid) {
+    void zenith_log_structured(sigma_u32 code, const char* comp, const char* desc, sigma_u32 cid) {
         // Mock logging
         (void)code; (void)comp; (void)desc; (void)cid;
     }
 
-    int sigma_package_verify(const unsigned char* data, unsigned long long size) {
+    sigma_status sigma_package_verify(const sigma_u8* data, sigma_size_t size) {
         (void)data; (void)size;
-        return 0; // success
+        return SIGMA_SUCCESS;
     }
 }
 
@@ -74,18 +75,6 @@ extern "C" {
 #include "../drivers/usb/sigma_usb_hcd.cpp"
 #include "../kernel/drivers/sigma_driver_manager.cpp"
 #include "../kernel/drivers/sigma_driver_registry.cpp"
-||||||| 65885484f
-#include "../klib/include/sigma_stdio.h"
-#include "../klib/include/sigma_stdio.h"
-#undef sigma_strcmp
-#include <stdarg.h>
-
-// Redefining basic sovereign primitives to avoid header/printf definition clashes
-typedef int sigma_status;
-typedef int sigma_bool;
-#define SIGMA_SUCCESS 0
-#define SIGMA_TRUE 1
-#define SIGMA_FALSE 0
 
 // ---- Test Framework ----
 
@@ -155,29 +144,6 @@ extern "C" {
 
     sigma_status sigma_driver_registry_install(unsigned int index);
     sigma_status sigma_driver_registry_rebuild_dkms_abi(const char* kernel_version, const char* expected_abi_hash);
-
-    // Mock logs for linker resolution
-    void zenith_log_structured(unsigned int code, const char* comp, const char* desc, unsigned int cid) {
-        (void)code; (void)comp; (void)desc; (void)cid;
-    }
-    int sigma_strcmp(const char* s1, const char* s2) {
-        while (*s1 && (*s1 == *s2)) {
-            s1++;
-            s2++;
-        }
-        return *(const unsigned char*)s1 - *(const unsigned char*)s2;
-    }
-    sigma_status sigma_package_verify(const unsigned char* data, unsigned long size) {
-        (void)data; (void)size;
-        return SIGMA_SUCCESS;
-    }
-    void sys_print(const char* fmt, ...) {
-        // Redirect kernel print calls to standard test runner stdout
-        va_list args;
-        va_start(args, fmt);
-        vprintf(fmt, args);
-        va_end(args);
-    }
 }
 
 static void test_suite_kernel_modules() {
