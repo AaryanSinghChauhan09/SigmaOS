@@ -340,6 +340,12 @@ impl PartialEq for SigmaString {
 
 impl Eq for SigmaString {}
 
+impl core::hash::Hash for SigmaString {
+    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
+        self.as_str().hash(state);
+    }
+}
+
 impl PartialEq<str> for SigmaString {
     fn eq(&self, other: &str) -> bool {
         self.as_str() == other

@@ -37,6 +37,7 @@ pub mod graphics;
 pub mod kernel;
 pub mod network;
 pub mod orchestration;
+pub mod distro;
 pub mod package;
 pub mod process;
 pub mod productivity;
@@ -94,6 +95,9 @@ pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
+};
+pub use distro::{
+    PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,

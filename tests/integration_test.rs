@@ -6,6 +6,7 @@ use sigmaos::kernel::scheduler::*;
 use sigmaos::package::store::*;
 use sigmaos::kernel::breakthroughs::*;
 use sigmaos::security::CapabilityToken;
+use sigmaos::distro::*;
 
 #[cfg(test)]
 mod tests {
@@ -45,5 +46,12 @@ mod tests {
         let sandbox = PrivacyFirstSandbox::new();
         let token = CapabilityToken::from_bits(0x0F);
         assert!(sandbox.validate_and_execute_secure_call(&token, 0x0C));
+
+        // 5. Arch Linux Parity (ALPM, PKGBUILD & AUR Client) Integration
+        let aur_client = AurClient::new();
+        let compiler = SandboxedCompiler::new();
+        let mut alpm_db = AlpmDatabase::new();
+        assert!(aur_client.download_and_compile_aur_package("yay-pqc", &compiler, &mut alpm_db).is_ok());
+        assert!(alpm_db.get_package("yay-pqc").is_some());
     }
 }
