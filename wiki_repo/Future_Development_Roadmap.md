@@ -3029,3 +3029,156 @@ To provide a concrete checklist for achieving universal self-sufficiency and tot
 98. [ ] **WCAG 2.1 screen reader:** Native screen-reading audio synthesizer.
 99. [ ] **Sovereign Wiki Engine:** Offline markdown documentation renderer.
 100. [ ] **Unified hot-patching engine:** Dilithium-5 signed Zero-Downtime Hot-Patching compiler.
+
+---
+
+# ⚔️ SECTION 25: UNIVERSAL BARE-METAL PLATFORM SYNTHESIS & NEXT-GENERATION NETWORK DEVICE INTERFACES
+
+To ensure that SigmaOS can dominate the entire software ecosystem and integrate seamlessly with both legacy platforms and bleeding-edge modern hardware, the system specifies freestanding, zero-dependency, and object-oriented driver specifications for next-generation network devices and device-broker layers.
+
+## 25.1 Next-Generation Network Interface Controller Specifications
+SigmaOS implements uniform, object-oriented abstractions that map hardware-specific ring buffers and DMA descriptor pools cleanly behind unified traits.
+
+### A. Intel E1000e Gigabit Ethernet Interface (`SovereignE1000e`)
+*   **DMA Ring Management:** Tracks physical transmitter and receiver rings dynamically under a lock-free, zero-copy architecture.
+*   **Asynchronous Packet Dispatch:** Packets are processed directly inside pre-allocated ring-buffer page frames. Application buffers are mapped into the network card's DMA descriptor ring, completely eliminating context-switching and intermediate buffer copy operations.
+
+```rust
+// Freestanding, zero-dependency descriptor representation
+pub struct E1000eTxDescriptor {
+    pub buffer_address: u64,
+    pub length: u16,
+    pub cso: u8,
+    pub cmd: u8,
+    pub status: u8,
+    pub css: u8,
+    pub special: u16,
+}
+
+pub trait SovereignE1000e {
+    fn initialize_tx_ring(&mut self, base_addr: u64, size: usize) -> Result<(), &'static str>;
+    fn transmit_packet(&mut self, buffer_addr: u64, len: u16) -> Result<(), &'static str>;
+}
+```
+
+### B. Realtek RTL8139 Fast Ethernet Interface (`SovereignRtl8139`)
+*   **Freestanding Packet Handler:** Maps legacy PCI registers, configuring physical transmit and receive buffers beneath the 4GB boundary.
+*   **Ring-Buffer Ingestion:** Leverages circular hardware arrays to capture frames natively with zero-allocation, updating driver read pointers via atomic IO port instructions.
+
+```rust
+pub struct Rtl8139Driver {
+    pub io_base: u16,
+    pub rx_buffer: [u8; 8192],
+    pub rx_offset: u32,
+}
+
+impl Rtl8139Driver {
+    pub const fn new(io_base: u16) -> Self {
+        Self {
+            io_base,
+            rx_buffer: [0; 8192],
+            rx_offset: 0,
+        }
+    }
+
+    pub fn receive_frame(&mut self) -> Result<u16, &'static str> {
+        // Read directly from the physical circular rx buffer
+        if self.rx_offset as usize >= self.rx_buffer.len() {
+            return Err("Receive buffer overrun");
+        }
+        let length = self.rx_buffer[self.rx_offset as usize] as u16;
+        self.rx_offset = (self.rx_offset + length as u32 + 4) % 8192;
+        Ok(length)
+    }
+}
+```
+
+### C. IEEE 802.11ax Wi-Fi Controller Interface (`SovereignWifiAx`)
+To extend clean-room wireless capabilities directly to bare-metal hardware:
+*   **Beacon/Probe Frame Parsing:** Parses wireless management frames natively without external stack dependencies.
+*   **WPA3 4-Way PMK/PTK Handshake:** Ephemeral quantum-secure credential exchange utilizing Dilithium-5 signatures for on-device wireless access points.
+
+---
+
+## 25.2 Unified Peripheral Broker Protocols
+*   **Legacy-to-Modern Shims:** Bridges older ISA/PIO ports with modern memory-mapped PCIe routing topologies.
+*   **Adaptive Bandwidth Allocation:** Embeds Quality of Service (QoS) logic directly into device dispatcher rings, prioritizing real-time storage reads and high-throughput network packets over standard batch compute workloads.
+
+---
+
+# ⚔️ SECTION 26: UNIFIED MULTI-ARCHITECTURE PROCESSOR ABSTRACTION & CPU FEATURE MANAGEMENT
+
+To secure complete technical superiority across different hardware landscapes, SigmaOS defines high-efficiency, zero-dependency, and object-oriented architectural interfaces for handling multi-architecture execution boundaries (x86, x64, and ARM).
+
+## 26.1 Unified CPU Feature Query & Register State Broker
+SigmaOS abstracts hardware-level registers and CPU features behind clean, multi-architecture traits that enable dynamic execution adjustment on bare-metal environments.
+
+### A. Intel/AMD x86 & x64 Abstraction (`SovereignCpuX64`)
+*   **CPUID Feature Identification:** Extracts advanced register capabilities (such as AVX-512, VAES, and Intel MPK) dynamically inside inline assembly blocks while preserving register allocation boundaries (such as preserving `rbx` via stack operations).
+*   **Control Register Transitions:** Standardizes access to CPU system registers (CR0, CR4, EFER, PAT) to enforce page write-protection, global page caching, and no-execute mappings.
+
+```rust
+// Control register mapping primitive
+pub struct X64ControlRegisters {
+    pub cr0: u64,
+    pub cr4: u64,
+    pub efer: u64,
+}
+
+pub trait SovereignCpuX64 {
+    fn read_cpuid(&self, leaf: u32, subleaf: u32) -> (u32, u32, u32, u32);
+    fn update_control_registers(&mut self, regs: X64ControlRegisters) -> Result<(), &'static str>;
+}
+```
+
+### B. ARM v8-A/v9-A Abstraction (`SovereignCpuArm`)
+To unify instruction execution paradigms on edge IoT targets:
+*   **System Control Register Management (SCTLR_EL1):** Dynamic activation of MMU caches, alignment checks, and hardware execution permissions (DEP/WXN) inside EL1 privilege rings.
+*   **Split Address Translation (TTBR0/TTBR1):** Emulates dual-era ARM memory mappings, isolating userspace and kernel-space tables seamlessly under a single memory architecture.
+
+```rust
+// ARM System Control State
+pub struct ArmSctlrState {
+    pub sctlr_el1: u64,
+    pub ttbr0_el1: u64,
+    pub ttbr1_el1: u64,
+}
+
+pub trait SovereignCpuArm {
+    fn initialize_system_registers(&mut self, state: ArmSctlrState) -> Result<(), &'static str>;
+}
+```
+
+## 26.2 Adaptive Micro-Architectural Thread Scheduling
+*   **Dynamic Thread Dispatch:** Adapts schedule timelines dynamically depending on target instruction pipelines, optimizing EEVDF schedules for fast statistical walks and zero thread starvations across heterogeneous x86/ARM hardware layouts.
+*   **Vector Register Context Restores:** Zero-allocation, thread-safe save and restore paths for AVX-512 and Neon vector registers on process context switches, minimizing scheduling register thrashing.
+
+---
+
+# ⚔️ SECTION 27: GENTOO LINUX PORTAGE & OPENRC RUNLEVEL DEFEATING ARCHITECTURES
+
+To completely dismantle the performance and customization superiority of source-based distributions like Gentoo Linux, SigmaOS incorporates native, freestanding, and zero-dependency parity layers mapped to our core capability systems.
+
+## 27.1 Portage-Grade Compilation & Use-Flag Optimization (`PortageEngine`)
+SigmaOS implements compiler-assisted target optimization frameworks matching Portage's flexibility with microkernel security.
+*   **Dynamic Use-Flag Management (`UseFlagManager`):** Manages local and global compiler feature bitmasks natively under `#![no_std]`. This restricts feature bloating by including only code paths specified inside our declarative state JSON graph.
+*   **Optimal Hardware Synthesis (`PortageEngine`):** Interrogates host CPU feature trees to dynamically feed optimal machine-code instruction subsets (e.g. AVX-512 vector pipelines) to compiler backends. Resolves and compiles source-level dependency graphs safely in sandboxeduserspace shards, preventing ambient compile-time exploits.
+
+```rust
+// Freestanding ebuild representation
+pub struct EbuildPackage {
+    pub name: [u8; 64],
+    pub version: [u8; 16],
+    pub compile_flags: [Option<[u8; 32]>; 8],
+}
+
+pub trait SovereignPortage {
+    fn parse_use_flags(&self, env: &[u8]) -> u64;
+    fn emerge_package(&mut self, ebuild: &EbuildPackage) -> Result<(), &'static str>;
+}
+```
+
+## 27.2 OpenRC Parallel Service Supervision (`OpenRcManager`)
+SigmaOS implements OpenRC-conforming parallel runlevel service supervision layers to handle complex system initialization states cleanly.
+*   **Dependency-Resolved Runlevels (`OpenRcRunlevel`):** Supports structured state transitions (SingleUser, MultiUser, Graphical) mapped to service status lifecycles.
+*   **Parallel Non-Blocking Startup:** A topological scheduler processes service dependency lists, starting non-conflicting service groups in concurrent threads across heterogeneous x86/ARM CPU dies, reducing total initialization latencies to sub-millisecond ranges.
