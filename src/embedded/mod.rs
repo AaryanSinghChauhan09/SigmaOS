@@ -78,12 +78,12 @@ impl PeripheralDevice for GpioDriver {
         Ok(())
     }
 
-    fn read(&self, address: u32) -> Result<u32, EmbeddedError> {
+    fn read(&self, _address: u32) -> Result<u32, EmbeddedError> {
         // TODO: Implement actual GPIO read
         Ok(0)
     }
 
-    fn write(&mut self, address: u32, value: u32) -> Result<(), EmbeddedError> {
+    fn write(&mut self, _address: u32, _value: u32) -> Result<(), EmbeddedError> {
         // TODO: Implement actual GPIO write
         self.configured_pins.set(self.configured_pins.get() + 1);
         Ok(())
@@ -115,7 +115,7 @@ impl PeripheralManager {
         ])
     }
 
-    pub fn load_driver(&self, peripheral: PeripheralType) -> Result<(), EmbeddedError> {
+    pub fn load_driver(&self, _peripheral: PeripheralType) -> Result<(), EmbeddedError> {
         // TODO: Implement actual driver loading
         self.active_drivers.set(self.active_drivers.get() + 1);
         Ok(())

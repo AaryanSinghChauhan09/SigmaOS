@@ -589,7 +589,7 @@ impl ZorinConnectHub {
     pub fn pair_new_device(&mut self, id: &str, name: &str) {
         self.devices.push((id.to_string(), name.to_string()));
     }
-    pub fn push_notification_to_all_devices(&self, title: &str, body: &str) -> usize {
+    pub fn push_notification_to_all_devices(&self, _title: &str, _body: &str) -> usize {
         self.devices.len()
     }
 }
@@ -611,7 +611,7 @@ impl ZorinWineLayer {
     pub fn check_wine_prefix_initialized(&self) -> bool {
         true
     }
-    pub fn launch_windows_executable(&self, filename: &str) -> Result<(), &'static str> {
+    pub fn launch_windows_executable(&self, _filename: &str) -> Result<(), &'static str> {
         Ok(())
     }
 }
