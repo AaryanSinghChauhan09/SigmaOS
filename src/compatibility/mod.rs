@@ -1,26 +1,11 @@
 // SigmaOS Compatibility Module
+pub mod cachy_os;
 pub mod cross_platform;
 pub mod india_stack;
 pub mod jehanne;
 pub mod mint_linux;
 pub mod reactos;
-pub mod interim;
-pub mod gap_closure;
-pub mod cachy_os;
-
-pub use gap_closure::{
-    ZorinAppearanceSwitcher, ZorinLayoutPreset, ZorinConnectHub, ZorinWineLayer, ZorinLiteOptimizer,
-    SigmaEcosystemInit, FhsRunlevel, SigmaEcosystemProfiler, GraphicPresetMode,
-    SigmaOnboardingWelcome, SigmaOnboardingLog,
-    SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, SubtitleFormat,
-    SigmaSupportResourceOptimizer, SigmaSupportPriorityOptimizer,
-};
-
-pub use cachy_os::{
-    BoreSchedulerGovernor, AnanicyManager, SchedPolicy, V4OptimizedPackageManager,
-    CachyInitramfs, CachyThpTuner, ThpMode, CachyKsmDaemon, KsmPageEntry,
-    CachyLatencyGovernor, GovernorPerformanceState, CachyMicroarchCompilerTuner,
-};
+pub mod sigmawin;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -39,4 +24,3 @@ pub use reactos::{
     NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
     RegistryHive,
 };
-pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
