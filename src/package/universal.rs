@@ -155,12 +155,14 @@ impl DependencyResolver {
         self.packages.insert(package.name.clone(), package);
     }
 
-    pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
-        let mut resolved = Vec::new();
-        let mut to_visit = vec![package_name.to_string()];
-        let mut visited = std::collections::HashSet::new();
+    pub fn resolve_dependencies(&self, package_name: &str) -> Result<std::vec::Vec<String>, PackageError> {
+        let mut resolved: std::vec::Vec<String> = std::vec::Vec::new();
+        let mut to_visit: std::vec::Vec<String> = std::vec::Vec::new();
+        to_visit.push(package_name.to_string());
+        let mut visited = std::collections::HashSet::<String>::new();
 
         while let Some(current) = to_visit.pop() {
+            let current: String = current;
             if visited.contains(&current) {
                 continue;
             }
@@ -169,6 +171,7 @@ impl DependencyResolver {
 
             if let Some(package) = self.packages.get(&current) {
                 for dep in &package.dependencies {
+                    let dep: &String = dep;
                     if !visited.contains(dep) {
                         to_visit.push(dep.clone());
                     }
@@ -190,6 +193,8 @@ impl DependencyResolver {
                 if let (Some(pkg1), Some(pkg2)) =
                     (self.packages.get(pkg1_name), self.packages.get(pkg2_name))
                 {
+                    let pkg1: &UnifiedPackage = pkg1;
+                    let pkg2: &UnifiedPackage = pkg2;
                     if pkg1.has_conflict_with(pkg2) {
                         conflicts.push((pkg1_name.clone(), pkg2_name.clone()));
                     }
@@ -290,8 +295,9 @@ impl TransactionalHistory {
         let id = self.next_checkpoint_id;
         self.next_checkpoint_id += 1;
 
-        let mut keys = Vec::new();
+        let mut keys: std::vec::Vec<String> = std::vec::Vec::new();
         for key in installed.keys() {
+            let key: &String = key;
             keys.push(key.clone());
         }
 
@@ -412,6 +418,7 @@ impl UniversalPackageManager {
                 // Find appropriate adapter
                 for format in &package.formats {
                     if let Some(adapter) = self.adapters.get(format) {
+                        let adapter: &PackageAdapter = adapter;
                         adapter.install(package)?;
                         break;
                     }
@@ -430,6 +437,7 @@ impl UniversalPackageManager {
         if let Some(package) = self.installed_packages.get(package_name) {
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
                     adapter.remove(package)?;
                     break;
                 }
@@ -443,6 +451,7 @@ impl UniversalPackageManager {
         if let Some(package) = self.installed_packages.get(package_name) {
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
+                    let adapter: &PackageAdapter = adapter;
                     adapter.update(package)?;
                     break;
                 }
