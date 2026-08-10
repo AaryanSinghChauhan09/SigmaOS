@@ -89,6 +89,7 @@ pub use filesystem::{
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process as KernelProcess,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    SovereignVirtualCPU, RegisterSet, ModelSpecificRegisters, CpuMode, CpuRing,
 };
 pub use network::{
     TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,

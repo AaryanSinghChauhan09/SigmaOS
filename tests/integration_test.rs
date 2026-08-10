@@ -3,6 +3,7 @@
 
 use sigmaos::filesystem::sigma_fs::*;
 use sigmaos::kernel::scheduler::*;
+use sigmaos::kernel::virtual_cpu::*;
 use sigmaos::package::store::*;
 use sigmaos::kernel::breakthroughs::*;
 use sigmaos::security::CapabilityToken;
@@ -114,5 +115,15 @@ mod tests {
         assert_eq!(preseed.get_value("pkgsel", "include").unwrap(), "nginx curl git");
 
         assert!(preseed.execute_automated_installation());
+
+        // 9. CPU Register & SWAPGS (Linux/BSD-style transition) Integration
+        let mut cpu = SovereignVirtualCPU::new();
+        cpu.msrs.gs_base = 0xFFFF800010002000;      // kernel base pointer
+        cpu.msrs.kernel_gs_base = 0x0000000000401000; // user base pointer
+
+        // Perform SWAPGS (simulating sysenter transition)
+        cpu.swapgs();
+        assert_eq!(cpu.msrs.gs_base, 0x0000000000401000);
+        assert_eq!(cpu.msrs.kernel_gs_base, 0xFFFF800010002000);
     }
 }

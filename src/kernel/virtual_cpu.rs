@@ -58,6 +58,9 @@ pub struct ModelSpecificRegisters {
     pub star: u64,   // Segment selector for SYSENTER/SYSEXIT
     pub lstar: u64,  // Target RIP for 64-bit SYSCALL
     pub sfmask: u64, // RFLAGS mask for SYSCALL
+    pub fs_base: u64, // Thread Local Storage (TLS) pointer (Linux/BSD standard)
+    pub gs_base: u64, // Per-CPU data block pointer
+    pub kernel_gs_base: u64, // Saved kernel GS base pointer (swapped on transition)
 }
 
 /// Sovereign Virtual CPU managing execution state and privilege boundaries
@@ -95,6 +98,9 @@ impl SovereignVirtualCPU {
                 star: 0,
                 lstar: 0,
                 sfmask: 0,
+                fs_base: 0,
+                gs_base: 0,
+                kernel_gs_base: 0,
             },
             stack_memory: vec![0; 128], // 128 stack frames
             fp_dirty: false,
@@ -241,6 +247,13 @@ impl SovereignVirtualCPU {
         self.registers.rip = handler_rip;
 
         Ok(())
+    }
+
+    /// Emulates the x86 `SWAPGS` instruction (Linux/BSD transition from user space to kernel space).
+    pub fn swapgs(&mut self) {
+        let temp = self.msrs.gs_base;
+        self.msrs.gs_base = self.msrs.kernel_gs_base;
+        self.msrs.kernel_gs_base = temp;
     }
 
     /// Lazily handles floating-point/vector register context switches (Linux/BSD style).

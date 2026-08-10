@@ -9,6 +9,7 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod structures;
+pub mod virtual_cpu;
 
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,
@@ -34,6 +35,7 @@ pub use policy_mechanism::{
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use virtual_cpu::{SovereignVirtualCPU, RegisterSet, ModelSpecificRegisters, CpuMode, CpuRing};
 pub use structures::{
     AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
     CpuArchitectureClass, EdfTask, LcgRandom, LotteryTask, SequencedSinglyLinkedList,
