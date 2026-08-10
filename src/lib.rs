@@ -33,6 +33,7 @@ pub mod release;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod testing;
 pub mod virtualization;
 
 pub use accessibility::{
@@ -79,6 +80,15 @@ pub use dashboard::{
 pub use release::{
     Release, ReleaseType, ReleaseStatus, ReleaseManager, ReleaseError,
     VersionManager, VersionError,
+};
+pub use testing::{
+    TestSuite, TestCase, TestResult, TestSummary,
+    UnitTestFramework, IntegrationTestFramework, PerformanceTestFramework,
+    SecurityTestFramework, FuzzingTestFramework,
+    Benchmark, BenchmarkResult, PerformanceSummary,
+    SecurityTest, SecurityTestResult, SecuritySummary, SecuritySeverity,
+    Fuzzer, FuzzerResult, FuzzingSummary,
+    OverallTestSummary,
 };
 pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
