@@ -16,10 +16,20 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Page Cache — absorbs Linux mm/filemap.c and mm/page-writeback.c
 /// Caches file data in memory pages, tracks dirty pages, writeback pressure
+
+#[cfg(not(test))]
+use crate::klib::HashMap;
+
+#[cfg(test)]
 use std::collections::HashMap;
+
+#[cfg(not(test))]
+use crate::klib::Vec;
+
+#[cfg(test)]
 use std::vec::Vec;
 
 pub const PAGE_SIZE: usize = 4096;

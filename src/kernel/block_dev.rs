@@ -20,8 +20,23 @@ use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 /// SigmaOS Block Device Layer
 /// Absorbs Linux block/genhd.c, bio.c, elevator.c, blk-mq.c
 /// Generic block I/O request queue with elevator sorting (C-SCAN / Deadline)
+
+#[cfg(not(test))]
+use crate::klib::{BTreeMap, VecDeque};
+
+#[cfg(test)]
 use std::collections::{BTreeMap, VecDeque};
-use std::string::{String, ToString};
+
+#[cfg(not(test))]
+use crate::klib::SigmaString as String;
+
+#[cfg(test)]
+use std::string::String;
+
+#[cfg(not(test))]
+use crate::klib::Vec;
+
+#[cfg(test)]
 use std::vec::Vec;
 
 pub const SECTOR_SIZE: usize = 512;
