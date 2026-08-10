@@ -1,3 +1,4 @@
+// SigmaOS Network Protocol Layer
 //! ICMP Ping (iputils-ping replication) Engine for SigmaOS
 //! Provides robust ICMP packet headers, internet standard 1s complement checksumming,
 //! ping statistics reporting, packet loss calculations, duplicate packet (DUP!) detection,

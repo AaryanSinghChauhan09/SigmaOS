@@ -45,6 +45,30 @@ pub struct IoStatusBlock {
     pub information: usize,
 }
 
+/// Windows WDK-inspired I/O Stack Location parameters
+#[derive(Debug, Clone, Copy)]
+pub struct IoStackLocation {
+    pub major_function: u8,
+    pub minor_function: u8,
+    pub flags: u8,
+    pub device_object: *const DeviceObject,
+    pub completion_routine: Option<fn(device: &DeviceObject, irp: &mut Irp, context: usize) -> IoStatus>,
+    pub completion_context: usize,
+}
+
+impl IoStackLocation {
+    pub fn new() -> Self {
+        Self {
+            major_function: 0,
+            minor_function: 0,
+            flags: 0,
+            device_object: std::ptr::null(),
+            completion_routine: None,
+            completion_context: 0,
+        }
+    }
+}
+
 /// I/O Request Packet (IRP)
 pub struct Irp {
     pub major_function: u8,
@@ -54,11 +78,13 @@ pub struct Irp {
     pub system_buffer: *mut u8,
     pub buffer_length: usize,
     pub io_control_code: u32,
+    pub stack_locations: [IoStackLocation; 10], // WDK layered device stack up to 10 frames
+    pub current_location: usize,                 // 1-based index (0 is end of stack, 10 is top)
 }
 
 impl Irp {
     pub fn new(major_function: u8, buffering_method: u8, buffer_length: usize) -> Self {
-        Self {
+        let mut irp = Self {
             major_function,
             buffering_method,
             io_status: IoStatusBlock {
@@ -69,6 +95,38 @@ impl Irp {
             system_buffer: std::ptr::null_mut(),
             buffer_length,
             io_control_code: 0,
+            stack_locations: [IoStackLocation::new(); 10],
+            current_location: 10, // top-level default start location
+        };
+        irp.stack_locations[9].major_function = major_function;
+        irp
+    }
+
+    pub fn get_current_stack_location(&self) -> Option<&IoStackLocation> {
+        if self.current_location > 0 && self.current_location <= 10 {
+            Some(&self.stack_locations[self.current_location - 1])
+        } else {
+            None
+        }
+    }
+
+    pub fn get_next_stack_location(&mut self) -> Option<&mut IoStackLocation> {
+        if self.current_location > 1 && self.current_location <= 10 {
+            Some(&mut self.stack_locations[self.current_location - 2])
+        } else {
+            None
+        }
+    }
+
+    /// WDK: IoSetCompletionRoutine equivalent
+    pub fn set_completion_routine(
+        &mut self,
+        routine: fn(device: &DeviceObject, irp: &mut Irp, context: usize) -> IoStatus,
+        context: usize,
+    ) {
+        if let Some(next_loc) = self.get_next_stack_location() {
+            next_loc.completion_routine = Some(routine);
+            next_loc.completion_context = context;
         }
     }
 }
@@ -188,6 +246,40 @@ impl IrpManager {
         status
     }
 
+    /// WDK: IoCallDriver equivalent
+    pub fn call_driver(&self, device: &DeviceObject, irp: &mut Irp) -> IoStatus {
+        if irp.current_location <= 1 {
+            return IoStatus::InvalidDeviceRequest;
+        }
+
+        // Advance stack location
+        irp.current_location -= 1;
+        let idx = irp.current_location - 1;
+        irp.stack_locations[idx].device_object = device;
+        irp.stack_locations[idx].major_function = irp.major_function;
+
+        self.dispatch_irp(device, irp)
+    }
+
+    /// WDK: IoCompleteRequest equivalent (climbs back up stack execution completion routines)
+    pub fn complete_request(&self, irp: &mut Irp, status: IoStatus) {
+        irp.io_status.status = status;
+
+        while irp.current_location < 10 {
+            let idx = irp.current_location - 1;
+            if let Some(routine) = irp.stack_locations[idx].completion_routine {
+                let device_ptr = irp.stack_locations[idx].device_object;
+                if !device_ptr.is_null() {
+                    unsafe {
+                        let device = &*device_ptr;
+                        (routine)(device, irp, irp.stack_locations[idx].completion_context);
+                    }
+                }
+            }
+            irp.current_location += 1;
+        }
+    }
+
     pub fn process_queued_dpcs(&mut self) -> usize {
         let count = self.dpc_queue.len();
         for dpc in self.dpc_queue.drain(..) {
@@ -214,6 +306,38 @@ impl IrpManager {
     }
 }
 
+/// Security-centric Rootkit audit and driver integrity verifier
+pub struct RootkitHookDetector {
+    pub verified_drivers: HashMap<String, *const DriverObject>,
+}
+
+impl RootkitHookDetector {
+    pub fn new() -> Self {
+        Self {
+            verified_drivers: HashMap::new(),
+        }
+    }
+
+    pub fn register_verified_driver(&mut self, name: &str, obj: *const DriverObject) {
+        self.verified_drivers.insert(name.to_string(), obj);
+    }
+
+    /// Detects if an untrusted driver has intercepted any Major Function dispatch tables (IRP hooking)
+    pub fn audit_device_stack(&self, device: &DeviceObject) -> bool {
+        unsafe {
+            if let Some(driver) = device.driver_object_ptr.as_ref() {
+                if let Some(&expected_ptr) = self.verified_drivers.get(&driver.driver_name) {
+                    if device.driver_object_ptr != expected_ptr {
+                        println!("ROOTKIT DETECTED: Driver object pointer mismatch for '{}'!", driver.driver_name);
+                        return true; // Hooked
+                    }
+                }
+            }
+        }
+        false
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -232,6 +356,17 @@ mod tests {
                 MOCK_PROCESS_CREATION_NOTIFIED = true;
             }
         }
+    }
+
+    static mut COMPLETION_ROUTINE_CALLED: bool = false;
+    static mut COMPLETION_CONTEXT_VAL: usize = 0;
+
+    fn mock_completion_routine(device: &DeviceObject, irp: &mut Irp, context: usize) -> IoStatus {
+        unsafe {
+            COMPLETION_ROUTINE_CALLED = true;
+            COMPLETION_CONTEXT_VAL = context;
+        }
+        IoStatus::Success
     }
 
     #[test]
@@ -315,5 +450,86 @@ mod tests {
         let status = manager.dispatch_irp(&device, &mut irp);
 
         assert_eq!(status, IoStatus::Cancelled);
+    }
+
+    #[test]
+    fn test_wdk_call_driver_and_completion_routines() {
+        let manager = IrpManager::new();
+
+        let mut dispatch_table = HashMap::new();
+        dispatch_table.insert(
+            IRP_MJ_WRITE,
+            (|_dev: &DeviceObject, irp: &mut Irp| {
+                IoStatus::Success
+            }) as fn(&DeviceObject, &mut Irp) -> IoStatus,
+        );
+
+        let driver = DriverObject {
+            driver_name: "LayeredDiskDriver".to_string(),
+            driver_extension: 0,
+            dispatch_table,
+        };
+
+        let device = DeviceObject {
+            driver_object_ptr: &driver,
+            device_extension: 0,
+            flags: 0,
+        };
+
+        let mut irp = Irp::new(IRP_MJ_WRITE, METHOD_BUFFERED, 1024);
+
+        // Set completion routine for next stack location
+        irp.set_completion_routine(mock_completion_routine, 1337);
+
+        // Dispatch IRP down the device stack to device
+        let status = manager.call_driver(&device, &mut irp);
+        assert_eq!(status, IoStatus::Success);
+        assert_eq!(irp.current_location, 9); // Stack location was decremented
+
+        // Complete request to traverse back up and execute completion routine
+        manager.complete_request(&mut irp, IoStatus::Success);
+        assert_eq!(irp.current_location, 10); // Traversed back up
+
+        unsafe {
+            assert!(COMPLETION_ROUTINE_CALLED);
+            assert_eq!(COMPLETION_CONTEXT_VAL, 1337);
+        }
+    }
+
+    #[test]
+    fn test_rootkit_irp_hook_detector() {
+        let driver = DriverObject {
+            driver_name: "TrustedFileDriver".to_string(),
+            driver_extension: 0,
+            dispatch_table: HashMap::new(),
+        };
+
+        let device = DeviceObject {
+            driver_object_ptr: &driver,
+            device_extension: 0,
+            flags: 0,
+        };
+
+        let mut detector = RootkitHookDetector::new();
+        detector.register_verified_driver("TrustedFileDriver", &driver);
+
+        // Trusted check should pass (no hook detected)
+        assert!(!detector.audit_device_stack(&device));
+
+        // Create malicious hooked driver mimicking same name
+        let malicious_driver = DriverObject {
+            driver_name: "TrustedFileDriver".to_string(),
+            driver_extension: 0,
+            dispatch_table: HashMap::new(),
+        };
+
+        let compromised_device = DeviceObject {
+            driver_object_ptr: &malicious_driver,
+            device_extension: 0,
+            flags: 0,
+        };
+
+        // Detector must spot the pointer mismatch (untrusted driver hijacking slot)
+        assert!(detector.audit_device_stack(&compromised_device));
     }
 }

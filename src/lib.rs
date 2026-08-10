@@ -25,6 +25,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod tools;
 pub mod virtualization;
 
 pub use accessibility::{
