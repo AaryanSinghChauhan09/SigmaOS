@@ -39,6 +39,7 @@ pub use universal_oop_system::{
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
     UserDefinedHook, ParseError, InstallError, HookError,
 };
+pub use universal_oop_system::{AppRating, AppReview, AppReviewStore};
 pub use verifier::CryptoVerifier;
 pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use declarative_build::{NixDerivation, BazelTarget, PackageReview, PackageRatingsRegistry, BazelBuildEngine, BazelRuleType};
