@@ -398,7 +398,8 @@ impl GamifiedProductivity {
     }
 
     pub fn update_goal(&mut self, id: &str, value: u64) {
-        if let Some(goal) = self.goals.get_mut(id) {
+        let goal_opt: Option<&mut Goal> = self.goals.get_mut(id);
+        if let Some(goal) = goal_opt {
             goal.update_progress(value);
             if goal.completed {
                 self.add_experience(100);
@@ -412,7 +413,8 @@ impl GamifiedProductivity {
     }
 
     pub fn update_achievement(&mut self, id: &str, value: u64) {
-        if let Some(achievement) = self.achievements.get_mut(id) {
+        let achievement_opt: Option<&mut Achievement> = self.achievements.get_mut(id);
+        if let Some(achievement) = achievement_opt {
             let was_unlocked = achievement.unlocked;
             achievement.update_progress(value);
 
