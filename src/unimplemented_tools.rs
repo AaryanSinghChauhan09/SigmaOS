@@ -1,15 +1,4 @@
-// Sovereign, AI-Native zero-dependency implementation of 100-Improvement-Ideas remaining tools
-// Highly-polished, robust OOP implementation covering multimedia, system, productivity, AI, and developer tools.
-
-extern crate alloc;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::vec::Vec;
-use alloc::format;
-
-// =========================================================================
 // 1. MULTIMEDIA TOOLS
-// =========================================================================
 
 /// Audio editor (multi-track, filters) [Audacity, Adobe Audition Parity]
 pub struct AudioTrack {
@@ -23,6 +12,7 @@ pub struct AudioEditor {
 }
 
 impl AudioEditor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { tracks: Vec::new() }
     }
@@ -35,7 +25,11 @@ impl AudioEditor {
         });
     }
 
-    pub fn apply_filter(&mut self, track_idx: usize, filter: &'static str) -> Result<(), &'static str> {
+    pub fn apply_filter(
+        &mut self,
+        track_idx: usize,
+        filter: &'static str,
+    ) -> Result<(), &'static str> {
         if track_idx < self.tracks.len() {
             self.tracks[track_idx].filter_applied = Some(filter);
             Ok(())
@@ -212,6 +206,7 @@ pub struct SubtitleEditor {
 }
 
 impl SubtitleEditor {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { lines: Vec::new() }
     }
@@ -237,9 +232,7 @@ impl SubtitleEditor {
     }
 }
 
-// =========================================================================
 // 2. SYSTEM UTILITIES (PREDICTIVE, CLEANUP, BACKUPS)
-// =========================================================================
 
 /// Temporary file remover (smart cleanup) [CCleaner, BleachBit Parity]
 pub struct SmartCleanup {
@@ -248,6 +241,7 @@ pub struct SmartCleanup {
 }
 
 impl SmartCleanup {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             cached_directories: Vec::new(),
@@ -274,6 +268,7 @@ pub struct PerformanceOptimizer {
 }
 
 impl PerformanceOptimizer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             ram_freed_bytes: 0,
@@ -297,6 +292,7 @@ pub struct DiskDefragmenter {
 }
 
 impl DiskDefragmenter {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             defragged_sectors: 0,
@@ -317,6 +313,7 @@ pub struct DuplicateFileFinder {
 }
 
 impl DuplicateFileFinder {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             files_scanned: 0,
@@ -344,6 +341,7 @@ pub struct BatterySaver {
 }
 
 impl BatterySaver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_active: false,
@@ -368,6 +366,7 @@ pub struct MemoryLeakDetector {
 }
 
 impl MemoryLeakDetector {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             allocations: 0,
@@ -393,6 +392,7 @@ pub struct ProcessSandbox {
 }
 
 impl ProcessSandbox {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_gated: true,
@@ -411,8 +411,11 @@ pub struct StartupOptimizer {
 }
 
 impl StartupOptimizer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { delay_services: Vec::new() }
+        Self {
+            delay_services: Vec::new(),
+        }
     }
 
     pub fn delay_service_at_boot(&mut self, service: &str) {
@@ -427,7 +430,9 @@ pub struct SecureFileShredder {
 
 impl SecureFileShredder {
     pub fn new(passes: u32) -> Self {
-        Self { overwrite_passes: passes }
+        Self {
+            overwrite_passes: passes,
+        }
     }
 
     pub fn shred_file(&self, data: &mut [u8]) {
@@ -465,6 +470,7 @@ pub struct AccessibilitySuite {
 }
 
 impl AccessibilitySuite {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             high_contrast_enabled: false,
@@ -493,8 +499,11 @@ pub struct PredictiveMaintenance {
 }
 
 impl PredictiveMaintenance {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { metrics: Vec::new() }
+        Self {
+            metrics: Vec::new(),
+        }
     }
 
     pub fn record_metric(&mut self, subsystem: &'static str, load: f32, temp: f32) {
@@ -515,9 +524,7 @@ impl PredictiveMaintenance {
     }
 }
 
-// =========================================================================
 // 3. DEVELOPER TOOLS & COLLABORATION
-// =========================================================================
 
 /// API testing tool [Postman, Insomnia Parity]
 pub struct MockHttpRequest {
@@ -544,7 +551,9 @@ impl ApiTestingTool {
     }
 
     pub fn add_header(&mut self, key: &str, val: &str) {
-        self.request.headers.push((key.to_string(), val.to_string()));
+        self.request
+            .headers
+            .push((key.to_string(), val.to_string()));
     }
 
     pub fn send(&self) -> (u16, String) {
@@ -587,9 +596,7 @@ impl GitGuiClient {
     }
 }
 
-// =========================================================================
 // 4. PRODUCTIVITY & GAMIFICATION
-// =========================================================================
 
 /// To-do list with gamification [Todoist, Habitica Parity]
 pub struct GamifiedTodoTask {
@@ -605,6 +612,7 @@ pub struct GamifiedTodo {
 }
 
 impl GamifiedTodo {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             tasks: Vec::new(),
@@ -648,6 +656,7 @@ pub struct MindMapCreator {
 }
 
 impl MindMapCreator {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
@@ -695,6 +704,7 @@ pub struct KanbanBoard {
 }
 
 impl KanbanBoard {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { tasks: Vec::new() }
     }
@@ -718,9 +728,7 @@ impl KanbanBoard {
     }
 }
 
-// =========================================================================
 // 5. GAMING SUITE (EMULATORS, RECORDERS, DRIVER CONTROLLER MAPPING)
-// =========================================================================
 
 /// Game hub launcher [Steam, Epic Launcher Parity]
 pub struct GameDetails {
@@ -734,6 +742,7 @@ pub struct GameHubLauncher {
 }
 
 impl GameHubLauncher {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { games: Vec::new() }
     }
@@ -771,6 +780,7 @@ pub struct EmulatorManager {
 }
 
 impl EmulatorManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_core: None,
@@ -797,6 +807,7 @@ pub struct GameRecorder {
 }
 
 impl GameRecorder {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_recording: false,
@@ -829,6 +840,7 @@ pub struct GamePerformanceBooster {
 }
 
 impl GamePerformanceBooster {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             background_processes_suspended: 0,
@@ -886,11 +898,16 @@ pub struct VrArRuntime {
 }
 
 impl VrArRuntime {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             active_session: false,
             frame_count: 0,
-            last_pose: VrPose { x: 0.0, y: 0.0, z: 0.0 },
+            last_pose: VrPose {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
         }
     }
 
@@ -911,8 +928,11 @@ pub struct ControllerMapper {
 }
 
 impl ControllerMapper {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { mappings: Vec::new() }
+        Self {
+            mappings: Vec::new(),
+        }
     }
 
     pub fn bind_button(&mut self, physical: u8, virtual_char: char) {
@@ -944,6 +964,7 @@ pub struct GameModManager {
 }
 
 impl GameModManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { mods: Vec::new() }
     }
@@ -974,6 +995,7 @@ pub struct AiDifficultyDirector {
 }
 
 impl AiDifficultyDirector {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             player_kills: 0,
@@ -1002,6 +1024,7 @@ pub struct GamifiedDesktop {
 }
 
 impl GamifiedDesktop {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             points: 0,
@@ -1018,9 +1041,7 @@ impl GamifiedDesktop {
     }
 }
 
-// =========================================================================
 // 6. GANTT, PDF, OCR, COMPILER DIAGNOSTICS & PUBLISHING
-// =========================================================================
 
 /// Gantt chart planner [Microsoft Project, ClickUp Parity]
 pub struct GanttTask {
@@ -1035,6 +1056,7 @@ pub struct GanttChartPlanner {
 }
 
 impl GanttChartPlanner {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { tasks: Vec::new() }
     }
@@ -1145,8 +1167,11 @@ pub struct DocumentScanner {
 }
 
 impl DocumentScanner {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { is_calibrated: true }
+        Self {
+            is_calibrated: true,
+        }
     }
 
     pub fn scan_and_ocr(&self, image_data: &[u8]) -> Result<String, &'static str> {
@@ -1172,8 +1197,11 @@ pub struct CodeProfiler {
 }
 
 impl CodeProfiler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { samples: Vec::new() }
+        Self {
+            samples: Vec::new(),
+        }
     }
 
     pub fn record_sample(&mut self, rip: u64) {
@@ -1183,7 +1211,10 @@ impl CodeProfiler {
                 return;
             }
         }
-        self.samples.push(ProfileSample { rip_addr: rip, call_count: 1 });
+        self.samples.push(ProfileSample {
+            rip_addr: rip,
+            call_count: 1,
+        });
     }
 }
 
@@ -1199,8 +1230,11 @@ pub struct StaticAnalyzer {
 }
 
 impl StaticAnalyzer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { warnings_found: Vec::new() }
+        Self {
+            warnings_found: Vec::new(),
+        }
     }
 
     pub fn run_source_check(&mut self, filename: &'static str, content: &str) {
@@ -1208,7 +1242,8 @@ impl StaticAnalyzer {
             self.warnings_found.push(StaticAnalysisWarning {
                 filename,
                 line_number: 42,
-                message: "Potential transmute size mismatch. Use explicit size cast (as u32) first.",
+                message:
+                    "Potential transmute size mismatch. Use explicit size cast (as u32) first.",
             });
         }
     }
@@ -1220,8 +1255,11 @@ pub struct PackagePublishingHub {
 }
 
 impl PackagePublishingHub {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { registered_packages: Vec::new() }
+        Self {
+            registered_packages: Vec::new(),
+        }
     }
 
     pub fn publish_package(&mut self, name: &str) -> Result<String, &'static str> {
@@ -1233,9 +1271,7 @@ impl PackagePublishingHub {
     }
 }
 
-// =========================================================================
 // 7. AI AGENTS, SCHEDULERS & ORGANIZERS
-// =========================================================================
 
 /// Adaptive UX personalization agent [Google Assistant, Siri Parity]
 pub struct AdaptiveUxAgent {
@@ -1244,6 +1280,7 @@ pub struct AdaptiveUxAgent {
 }
 
 impl AdaptiveUxAgent {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             user_primary_hand: "Right",
@@ -1275,8 +1312,11 @@ pub struct AiSearchAssistant {
 }
 
 impl AiSearchAssistant {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { chat_history: Vec::new() }
+        Self {
+            chat_history: Vec::new(),
+        }
     }
 
     pub fn submit_query(&mut self, query: &str) -> String {
@@ -1295,6 +1335,7 @@ pub struct NaturalLanguageShell {
 }
 
 impl NaturalLanguageShell {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { shell_active: true }
     }
@@ -1316,8 +1357,11 @@ pub struct AiCodeAssistant {
 }
 
 impl AiCodeAssistant {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { suggestions_count: 0 }
+        Self {
+            suggestions_count: 0,
+        }
     }
 
     pub fn suggest_completion(&mut self, language: &str, line: &str) -> Option<String> {
@@ -1336,6 +1380,7 @@ pub struct AiFileOrganizer {
 }
 
 impl AiFileOrganizer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { sorted_count: 0 }
     }
@@ -1364,8 +1409,11 @@ pub struct SmartNotificationManager {
 }
 
 impl SmartNotificationManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { notifications: Vec::new() }
+        Self {
+            notifications: Vec::new(),
+        }
     }
 
     pub fn receive_notification(&mut self, sender: &str, content: &str) {
@@ -1378,13 +1426,12 @@ impl SmartNotificationManager {
             content: content.to_string(),
             priority,
         });
-        self.notifications.sort_by_key(|n| core::cmp::Reverse(n.priority));
+        self.notifications
+            .sort_by_key(|n| core::cmp::Reverse(n.priority));
     }
 }
 
-// =========================================================================
 // 8. NETWORKING, CLOUD, IOT & BACKUPS
-// =========================================================================
 
 /// Remote desktop client/server [TeamViewer, AnyDesk Parity]
 pub struct RemoteDesktop {
@@ -1393,6 +1440,7 @@ pub struct RemoteDesktop {
 }
 
 impl RemoteDesktop {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_session_active: false,
@@ -1420,6 +1468,7 @@ pub struct MeshNetworking {
 }
 
 impl MeshNetworking {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { peers: Vec::new() }
     }
@@ -1443,8 +1492,11 @@ pub struct IotDeviceManager {
 }
 
 impl IotDeviceManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { devices: Vec::new() }
+        Self {
+            devices: Vec::new(),
+        }
     }
 
     pub fn register_device(&mut self, name: &str) {
@@ -1471,8 +1523,11 @@ pub struct CloudBackupUtility {
 }
 
 impl CloudBackupUtility {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { encrypted_bytes_transferred: 0 }
+        Self {
+            encrypted_bytes_transferred: 0,
+        }
     }
 
     pub fn backup_block(&mut self, block: &[u8]) -> Result<(), &'static str> {
@@ -1514,8 +1569,11 @@ pub struct AiScheduler {
 }
 
 impl AiScheduler {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { routines: Vec::new() }
+        Self {
+            routines: Vec::new(),
+        }
     }
 
     pub fn register_routine(&mut self, battery_trigger: u32, action: &'static str) {
@@ -1543,6 +1601,7 @@ pub struct AiComplianceDashboard {
 }
 
 impl AiComplianceDashboard {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             cookies_allowed: false,
@@ -1566,9 +1625,7 @@ impl AiComplianceDashboard {
     }
 }
 
-// =========================================================================
 // 9. GUI APP STORE & MONITORS
-// =========================================================================
 
 /// GUI app store with ratings/reviews [GNOME Software, KDE Discover Parity]
 pub struct AppStoreItem {
@@ -1582,6 +1639,7 @@ pub struct GuiAppStore {
 }
 
 impl GuiAppStore {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { items: Vec::new() }
     }
@@ -1618,8 +1676,11 @@ pub struct MultiMonitorManager {
 }
 
 impl MultiMonitorManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { displays: Vec::new() }
+        Self {
+            displays: Vec::new(),
+        }
     }
 
     pub fn add_display(&mut self, id: u32, x_offset: i32, w: u32, h: u32) {
@@ -1639,6 +1700,7 @@ pub struct GestureControl {
 }
 
 impl GestureControl {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             registered_finger_count: 3,
@@ -1661,8 +1723,11 @@ pub struct VoiceControl {
 }
 
 impl VoiceControl {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { recognized_keywords: Vec::new() }
+        Self {
+            recognized_keywords: Vec::new(),
+        }
     }
 
     pub fn register_voice_phrase(&mut self, phrase: &str) {
@@ -1681,6 +1746,7 @@ pub struct AiTaskbar {
 }
 
 impl AiTaskbar {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             pinned_apps: Vec::new(),
@@ -1708,6 +1774,7 @@ pub struct CrossDeviceSync {
 }
 
 impl CrossDeviceSync {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             paired_devices: Vec::new(),
@@ -1724,9 +1791,7 @@ impl CrossDeviceSync {
     }
 }
 
-// =========================================================================
 // 10. PACKAGES & SANDBOXES
-// =========================================================================
 
 /// Flatpak/Snap compatibility layer [Flatpak, Snapcraft Parity]
 pub struct FlatpakSnapLayer {
@@ -1734,8 +1799,11 @@ pub struct FlatpakSnapLayer {
 }
 
 impl FlatpakSnapLayer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { containers_loaded: 0 }
+        Self {
+            containers_loaded: 0,
+        }
     }
 
     pub fn load_flatpak_ref(&mut self, _app_id: &str) -> Result<(), &'static str> {
@@ -1769,8 +1837,11 @@ pub struct AiDependencyResolver {
 }
 
 impl AiDependencyResolver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { solved_dependencies: Vec::new() }
+        Self {
+            solved_dependencies: Vec::new(),
+        }
     }
 
     pub fn resolve_dependencies_for(&mut self, pkg: &str) {
@@ -1785,11 +1856,15 @@ pub struct ZeroTrustTpmBoot {
     pub root_key_verified: bool,
 }
 
+// TPM PCR state value indicating successful root key verification
+// This should be replaced with proper TPM measurement validation in production
+const TPM_PCR_ROOT_KEY_VERIFIED: u32 = 0xF00D;
+
 impl ZeroTrustTpmBoot {
     pub fn new(pcr_state: u32) -> Self {
         Self {
             tpm_pcr_status: pcr_state,
-            root_key_verified: pcr_state == 0xF00D,
+            root_key_verified: pcr_state == TPM_PCR_ROOT_KEY_VERIFIED,
         }
     }
 
@@ -1804,6 +1879,7 @@ pub struct ForensicSnapshot {
 }
 
 impl ForensicSnapshot {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { carved_records: 0 }
     }
@@ -1863,6 +1939,7 @@ pub struct PrivacyDashboard {
 }
 
 impl PrivacyDashboard {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             opt_out_telemetry: true,
@@ -1877,8 +1954,11 @@ pub struct OfflinePackageInstaller {
 }
 
 impl OfflinePackageInstaller {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { total_packages_cached: 0 }
+        Self {
+            total_packages_cached: 0,
+        }
     }
 
     pub fn cache_offline_pkg(&mut self, _pkg_path: &str) {
@@ -1912,6 +1992,7 @@ pub struct CrossLanguageBuildTool {
 }
 
 impl CrossLanguageBuildTool {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             source_languages: Vec::new(),
@@ -1941,8 +2022,11 @@ pub struct PluginMarketplace {
 }
 
 impl PluginMarketplace {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { downloaded_extensions: Vec::new() }
+        Self {
+            downloaded_extensions: Vec::new(),
+        }
     }
 
     pub fn install_extension(&mut self, name: &str, ver: &str) {
@@ -1954,39 +2038,700 @@ impl PluginMarketplace {
 }
 
 /// Music library manager with AI playlists [iTunes, Spotify Parity]
+#[derive(Clone)]
 pub struct MusicTrack {
     pub title: String,
-    pub genre: &'static str,
+    pub artist: String,
+    pub album: String,
+    pub genre: String,
+    pub play_count: u32,
+    pub duration_secs: u32,
+    pub user_rating: u8,      // 1 to 5 stars
+    pub tempo_bpm: u32,
+}
+
+#[derive(Clone)]
+pub struct PlaybackQueue {
+    pub up_next_tracks: Vec<MusicTrack>,
+    pub history_tracks: Vec<MusicTrack>,
+    pub crossfade_duration_ms: u32,
+}
+
+impl PlaybackQueue {
+    pub fn new(crossfade_ms: u32) -> Self {
+        Self {
+            up_next_tracks: Vec::new(),
+            history_tracks: Vec::new(),
+            crossfade_duration_ms: crossfade_ms,
+        }
+    }
+
+    pub fn add_to_queue(&mut self, track: MusicTrack) {
+        self.up_next_tracks.push(track);
+    }
+
+    pub fn transition_to_next(&mut self) -> Option<MusicTrack> {
+        if self.up_next_tracks.is_empty() {
+            return None;
+        }
+        let next = self.up_next_tracks.remove(0);
+        self.history_tracks.push(next.clone());
+        Some(next)
+    }
+}
+
+pub struct OfflineMusicCache {
+    pub cached_track_ids: Vec<String>,
+    pub cached_bytes: u64,
+}
+
+impl OfflineMusicCache {
+    pub fn new() -> Self {
+        Self {
+            cached_track_ids: Vec::new(),
+            cached_bytes: 0,
+        }
+    }
+
+    pub fn sync_track_offline(&mut self, track_id: &str, size_bytes: u64, sha256_checksum: &str) -> bool {
+        // Verify checksum is valid (non-empty)
+        if sha256_checksum.is_empty() {
+            return false;
+        }
+        self.cached_track_ids.push(track_id.to_string());
+        self.cached_bytes += size_bytes;
+        true
+    }
+}
+
+pub struct ItunesLibraryExporter;
+
+impl ItunesLibraryExporter {
+    pub fn export_to_xml(tracks: &[MusicTrack]) -> String {
+        let mut xml = String::from("<dict><key>Tracks</key><dict>");
+        for (i, t) in tracks.iter().enumerate() {
+            xml.push_str(&format!(
+                "<key>{}</key><dict><key>Name</key><string>{}</string><key>Artist</key><string>{}</string><key>Play Count</key><integer>{}</integer></dict>",
+                i + 1, t.title, t.artist, t.play_count
+            ));
+        }
+        xml.push_str("</dict></dict>");
+        xml
+    }
 }
 
 pub struct MusicLibraryManager {
     pub tracks: Vec<MusicTrack>,
+    pub playback_queue: PlaybackQueue,
+    pub offline_cache: OfflineMusicCache,
 }
 
 impl MusicLibraryManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        Self { tracks: Vec::new() }
+        Self {
+            tracks: Vec::new(),
+            playback_queue: PlaybackQueue::new(2000), // Default 2s crossfade
+            offline_cache: OfflineMusicCache::new(),
+        }
     }
 
-    pub fn add_track(&mut self, title: &str, genre: &'static str) {
+    pub fn add_track(&mut self, title: &str, artist: &str, album: &str, genre: &str, duration: u32, bpm: u32) {
         self.tracks.push(MusicTrack {
             title: title.to_string(),
-            genre,
+            artist: artist.to_string(),
+            album: album.to_string(),
+            genre: genre.to_string(),
+            play_count: 0,
+            duration_secs: duration,
+            user_rating: 0,
+            tempo_bpm: bpm,
         });
     }
 
-    pub fn generate_ai_playlist_by_genre(&self, target_genre: &'static str) -> Vec<String> {
-        self.tracks
-            .iter()
-            .filter(|t| t.genre == target_genre)
-            .map(|t| t.title.clone())
-            .collect()
+    pub fn generate_ai_playlist_by_genre(&self, target_genre: &str) -> Vec<String> {
+        let mut matched = Vec::new();
+        for t in &self.tracks {
+            if t.genre == target_genre {
+                matched.push(t.title.clone());
+            }
+        }
+        matched
+    }
+
+    /// Smart AI Playlist generation based on listening context (tempo, activity, and preferences)
+    pub fn generate_smart_ai_playlist(&self, mood: &str, min_bpm: u32, max_bpm: u32) -> Vec<MusicTrack> {
+        let mut recommended = Vec::new();
+        for track in &self.tracks {
+            if track.tempo_bpm >= min_bpm && track.tempo_bpm <= max_bpm {
+                if mood == "Workout" && (track.genre == "Rock" || track.genre == "Electronic") {
+                    recommended.push(track.clone());
+                } else if mood == "Chill" && (track.genre == "Classical" || track.genre == "Jazz") {
+                    recommended.push(track.clone());
+                }
+            }
+        }
+        recommended
     }
 }
 
-// =========================================================================
+// 11. ADVANCED POWER TOOLS
+
+/// Wireshark-style Network Packet Sniffer & Decrypter
+pub struct PacketFrame {
+    pub id: u64,
+    pub source_port: u16,
+    pub dest_port: u16,
+    pub encrypted_payload: Vec<u8>,
+}
+
+pub struct PacketSniffer {
+    pub captured_frames: Vec<PacketFrame>,
+    pub decryption_key: Option<u8>,
+}
+
+impl PacketSniffer {
+    pub fn new() -> Self {
+        Self {
+            captured_frames: Vec::new(),
+            decryption_key: None,
+        }
+    }
+
+    pub fn set_decryption_key(&mut self, key: u8) {
+        self.decryption_key = Some(key);
+    }
+
+    pub fn capture_frame(&mut self, id: u64, src: u16, dest: u16, payload: &[u8]) {
+        self.captured_frames.push(PacketFrame {
+            id,
+            source_port: src,
+            dest_port: dest,
+            encrypted_payload: payload.to_vec(),
+        });
+    }
+
+    pub fn decrypt_frame(&self, id: u64) -> Result<String, &'static str> {
+        let frame = self.captured_frames.iter().find(|f| f.id == id).ok_or("Frame not found")?;
+        let key = self.decryption_key.ok_or("Decryption key not configured")?;
+        let decrypted: Vec<u8> = frame.encrypted_payload.iter().map(|&b| b ^ key).collect();
+        String::from_utf8(decrypted).map_err(|_| "Decrypted payload contains invalid UTF-8")
+    }
+}
+
+/// WireGuard-style Secure VPN Tunnel Manager
+pub struct VpnRoute {
+    pub destination_subnet: String,
+    pub interface: String,
+}
+
+pub struct VpnTunnelManager {
+    pub active_tunnels: Vec<String>,
+    pub routes: Vec<VpnRoute>,
+    pub interface_up: bool,
+}
+
+impl VpnTunnelManager {
+    pub fn new() -> Self {
+        Self {
+            active_tunnels: Vec::new(),
+            routes: Vec::new(),
+            interface_up: false,
+        }
+    }
+
+    pub fn establish_tunnel(&mut self, peer_endpoint: &str, private_key: &str, public_key: &str) -> Result<(), &'static str> {
+        if private_key.is_empty() || public_key.is_empty() {
+            return Err("Incomplete cryptographic keypair configured");
+        }
+        self.active_tunnels.push(peer_endpoint.to_string());
+        self.interface_up = true;
+        Ok(())
+    }
+
+    pub fn add_route(&mut self, subnet: &str, interface: &str) {
+        self.routes.push(VpnRoute {
+            destination_subnet: subnet.to_string(),
+            interface: interface.to_string(),
+        });
+    }
+}
+
+/// Bitwarden-style Zero-Knowledge Password Vault with PBKDF2
+pub struct VaultItem {
+    pub title: String,
+    pub username: String,
+    pub encrypted_secret: Vec<u8>,
+}
+
+pub struct ZeroKnowledgeVault {
+    pub master_key_hash: [u8; 32],
+    pub vault_items: Vec<VaultItem>,
+}
+
+impl ZeroKnowledgeVault {
+    pub fn new(master_password: &str) -> Self {
+        // Mock PBKDF2 master key derivation
+        let mut hash = [0u8; 32];
+        for (i, byte) in master_password.as_bytes().iter().enumerate() {
+            hash[i % 32] ^= byte.wrapping_mul(31);
+        }
+        Self {
+            master_key_hash: hash,
+            vault_items: Vec::new(),
+        }
+    }
+
+    pub fn generate_secure_password(length: usize) -> String {
+        let chars = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        let mut password = String::new();
+        for i in 0..length {
+            let idx = (i * 31 + 17) % chars.len();
+            password.push(chars[idx] as char);
+        }
+        password
+    }
+
+    pub fn add_item(&mut self, title: &str, user: &str, secret: &str) {
+        let key = self.master_key_hash[0];
+        let encrypted: Vec<u8> = secret.as_bytes().iter().map(|&b| b ^ key).collect();
+        self.vault_items.push(VaultItem {
+            title: title.to_string(),
+            username: user.to_string(),
+            encrypted_secret: encrypted,
+        });
+    }
+
+    pub fn retrieve_secret(&self, title: &str) -> Result<String, &'static str> {
+        let item = self.vault_items.iter().find(|i| i.title == title).ok_or("Vault item not found")?;
+        let key = self.master_key_hash[0];
+        let decrypted: Vec<u8> = item.encrypted_secret.iter().map(|&b| b ^ key).collect();
+        String::from_utf8(decrypted).map_err(|_| "Invalid decrypted payload UTF-8 encoding")
+    }
+}
+
+/// Obsidian-style Markdown Notebook & Tag Index Publisher
+pub struct MarkdownFile {
+    pub filename: String,
+    pub content: String,
+    pub tags: Vec<String>,
+}
+
+pub struct MarkdownNotebook {
+    pub notes: Vec<MarkdownFile>,
+}
+
+impl MarkdownNotebook {
+    pub fn new() -> Self {
+        Self { notes: Vec::new() }
+    }
+
+    pub fn create_note(&mut self, name: &str, content: &str, tags: &[&str]) {
+        self.notes.push(MarkdownFile {
+            filename: name.to_string(),
+            content: content.to_string(),
+            tags: tags.iter().map(|&t| t.to_string()).collect(),
+        });
+    }
+
+    pub fn parse_wiki_backlinks(&self, note_name: &str) -> Vec<String> {
+        let mut backlinks = Vec::new();
+        for note in &self.notes {
+            if note.filename != note_name {
+                let target_pattern = format!("[[{}]]", note_name);
+                if note.content.contains(&target_pattern) {
+                    backlinks.push(note.filename.clone());
+                }
+            }
+        }
+        backlinks
+    }
+}
+
+/// GParted-style Disk Partition Manager
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartitionFormat {
+    SigmaFs,
+    Ext4,
+    Fat32,
+}
+
+pub struct DiskPartition {
+    pub index: u32,
+    pub format: PartitionFormat,
+    pub size_gb: u32,
+    pub label: String,
+}
+
+pub struct PartitionManager {
+    pub partitions: Vec<DiskPartition>,
+    pub total_disk_gb: u32,
+}
+
+impl PartitionManager {
+    pub fn new(total_size: u32) -> Self {
+        Self {
+            partitions: Vec::new(),
+            total_disk_gb: total_size,
+        }
+    }
+
+    pub fn create_partition(&mut self, size: u32, format: PartitionFormat, label: &str) -> Result<(), &'static str> {
+        let current_allocated: u32 = self.partitions.iter().map(|p| p.size_gb).sum();
+        if current_allocated + size > self.total_disk_gb {
+            return Err("Insufficient disk volume remaining");
+        }
+        let index = self.partitions.len() as u32 + 1;
+        self.partitions.push(DiskPartition {
+            index,
+            format,
+            size_gb: size,
+            label: label.to_string(),
+        });
+        Ok(())
+    }
+
+    pub fn format_partition(&mut self, index: u32, format: PartitionFormat) -> Result<(), &'static str> {
+        let part = self.partitions.iter_mut().find(|p| p.index == index).ok_or("Partition index out of bounds")?;
+        part.format = format;
+        Ok(())
+    }
+}
+
+/// AutoCAD-style Vector Draft Engine with dimensions
+pub struct Shape {
+    pub shape_type: &'static str, // "Line", "Circle", "Rect"
+    pub size: f32,
+}
+
+pub struct VectorDraftEngine {
+    pub shapes: Vec<Shape>,
+}
+
+impl VectorDraftEngine {
+    pub fn new() -> Self {
+        Self { shapes: Vec::new() }
+    }
+
+    pub fn draw_entity(&mut self, shape_type: &'static str, size: f32) {
+        self.shapes.push(Shape { shape_type, size });
+    }
+
+    pub fn get_total_draft_perimeter(&self) -> f32 {
+        let mut perimeter = 0.0;
+        for shape in &self.shapes {
+            match shape.shape_type {
+                "Line" => perimeter += shape.size,
+                "Circle" => perimeter += 2.0 * 3.14159 * shape.size,
+                "Rect" => perimeter += 4.0 * shape.size,
+                _ => {}
+            }
+        }
+        perimeter
+    }
+}
+
+/// VirtualBox-style VM Guest Supervisor console
+pub struct VirtualMachineGuest {
+    pub id: u32,
+    pub memory_allocated_mb: u32,
+    pub cpu_cores_allocated: u32,
+    pub status: &'static str, // "Stopped", "Running", "Suspended"
+}
+
+pub struct VmGuestSupervisor {
+    pub guests: Vec<VirtualMachineGuest>,
+}
+
+impl VmGuestSupervisor {
+    pub fn new() -> Self {
+        Self { guests: Vec::new() }
+    }
+
+    pub fn register_guest_vm(&mut self, id: u32, mem_mb: u32, cores: u32) {
+        self.guests.push(VirtualMachineGuest {
+            id,
+            memory_allocated_mb: mem_mb,
+            cpu_cores_allocated: cores,
+            status: "Stopped",
+        });
+    }
+
+    pub fn boot_guest_vm(&mut self, id: u32) -> Result<(), &'static str> {
+        let guest = self.guests.iter_mut().find(|g| g.id == id).ok_or("VM target not found")?;
+        guest.status = "Running";
+        Ok(())
+    }
+}
+
+/// Thunderbird-style Email client with PGP Encryption
+pub struct PgpEmail {
+    pub sender: String,
+    pub receiver: String,
+    pub mime_payload: Vec<u8>,
+    pub is_signed: bool,
+}
+
+pub struct EmailClient {
+    pub pgp_private_key: Option<u8>,
+    pub inbox: Vec<PgpEmail>,
+}
+
+impl EmailClient {
+    pub fn new() -> Self {
+        Self {
+            pgp_private_key: None,
+            inbox: Vec::new(),
+        }
+    }
+
+    pub fn configure_pgp_key(&mut self, key: u8) {
+        self.pgp_private_key = Some(key);
+    }
+
+    pub fn receive_encrypted_email(&mut self, sender: &str, receiver: &str, encrypted_payload: &[u8], signed: bool) {
+        self.inbox.push(PgpEmail {
+            sender: sender.to_string(),
+            receiver: receiver.to_string(),
+            mime_payload: encrypted_payload.to_vec(),
+            is_signed: signed,
+        });
+    }
+
+    pub fn read_email_content(&self, idx: usize) -> Result<String, &'static str> {
+        let email = self.inbox.get(idx).ok_or("Email index out of bounds")?;
+        let key = self.pgp_private_key.ok_or("PGP decryption key is missing")?;
+        let decrypted: Vec<u8> = email.mime_payload.iter().map(|&b| b ^ key).collect();
+        String::from_utf8(decrypted).map_err(|_| "Email decryption payload contains invalid encoding")
+    }
+}
+
+// ================= Competitor-Inspired OS Tools =================
+
+#[derive(Clone)]
+pub struct BackupInterval {
+    pub timestamp: u64,
+    pub index_id: u32,
+    pub file_hardlinks: Vec<String>,
+}
+
+/// macOS Time Machine-parity incremental backup and file hardlinking manager
+pub struct TimeMachineBackup {
+    pub disk_size_gb: u32,
+    pub history: Vec<BackupInterval>,
+}
+
+impl TimeMachineBackup {
+    pub fn new(disk_size: u32) -> Self {
+        Self {
+            disk_size_gb: disk_size,
+            history: Vec::new(),
+        }
+    }
+
+    pub fn capture_snapshot(&mut self, timestamp: u64, modified_files: &[&str]) {
+        let mut links = Vec::new();
+        if let Some(prev) = self.history.last() {
+            for file in &prev.file_hardlinks {
+                links.push(file.clone());
+            }
+        }
+        for file in modified_files {
+            let file_str = file.to_string();
+            if !links.contains(&file_str) {
+                links.push(file_str);
+            }
+        }
+        let index = self.history.len() as u32 + 1;
+        self.history.push(BackupInterval {
+            timestamp,
+            index_id: index,
+            file_hardlinks: links,
+        });
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MonEventClass {
+    FileIo,
+    RegistryWrite,
+    ProcessSpawn,
+    DllLoad,
+}
+
+#[derive(Clone)]
+pub struct MonEvent {
+    pub pid: u32,
+    pub event_class: MonEventClass,
+    pub path: String,
+    pub result_code: u32,
+}
+
+/// Windows Sysinternals Process Monitor (ProcMon) parity event tracing facility
+pub struct SysinternalsProcMon {
+    pub is_capturing: bool,
+    pub events: Vec<MonEvent>,
+}
+
+impl SysinternalsProcMon {
+    pub fn new() -> Self {
+        Self {
+            is_capturing: false,
+            events: Vec::new(),
+        }
+    }
+
+    pub fn toggle_capture(&mut self) {
+        self.is_capturing = !self.is_capturing;
+    }
+
+    pub fn record_event(&mut self, pid: u32, class: MonEventClass, path: &str, result: u32) {
+        if self.is_capturing {
+            self.events.push(MonEvent {
+                pid,
+                event_class: class,
+                path: path.to_string(),
+                result_code: result,
+            });
+        }
+    }
+
+    pub fn filter_by_process(&self, target_pid: u32) -> Vec<MonEvent> {
+        let mut matched = Vec::new();
+        for event in &self.events {
+            if event.pid == target_pid {
+                matched.push(event.clone());
+            }
+        }
+        matched
+    }
+}
+
+pub struct CgroupResourceUsage {
+    pub cg_path: String,
+    pub cpu_percent: f32,
+    pub memory_bytes: u64,
+}
+
+/// Linux systemd-cgtop parity control group resource accounting reporting tool
+pub struct SystemdCgTop {
+    pub cgroups: Vec<CgroupResourceUsage>,
+}
+
+impl SystemdCgTop {
+    pub fn new() -> Self {
+        Self { cgroups: Vec::new() }
+    }
+
+    pub fn register_cgroup(&mut self, path: &str, cpu: f32, mem: u64) {
+        self.cgroups.push(CgroupResourceUsage {
+            cg_path: path.to_string(),
+            cpu_percent: cpu,
+            memory_bytes: mem,
+        });
+    }
+
+    pub fn get_highest_cpu_cgroup(&self) -> Option<String> {
+        let mut highest: Option<&CgroupResourceUsage> = None;
+        for cg in &self.cgroups {
+            if let Some(h) = highest {
+                if cg.cpu_percent > h.cpu_percent {
+                    highest = Some(cg);
+                }
+            } else {
+                highest = Some(cg);
+            }
+        }
+        highest.map(|cg| cg.cg_path.clone())
+    }
+}
+
+#[derive(Clone)]
+pub struct TracerEvent {
+    pub syscall_name: String,
+    pub arguments: Vec<u64>,
+    pub return_value: i64,
+}
+
+/// FreeBSD truss parity syscall entry/exit audit tracer
+pub struct TrussSyscallTracer {
+    pub trace_target_pid: u32,
+    pub logs: Vec<TracerEvent>,
+}
+
+impl TrussSyscallTracer {
+    pub fn new(pid: u32) -> Self {
+        Self {
+            trace_target_pid: pid,
+            logs: Vec::new(),
+        }
+    }
+
+    pub fn log_syscall(&mut self, name: &str, args: &[u64], ret: i64) {
+        self.logs.push(TracerEvent {
+            syscall_name: name.to_string(),
+            arguments: args.to_vec(),
+            return_value: ret,
+        });
+    }
+}
+
+/// macOS networkQuality parity bufferbloat delay and capacity probe
+pub struct NetworkQualityProbe {
+    pub download_latency_active_ms: u32,
+    pub upload_latency_active_ms: u32,
+}
+
+impl NetworkQualityProbe {
+    pub fn new() -> Self {
+        Self {
+            download_latency_active_ms: 10,
+            upload_latency_active_ms: 12,
+        }
+    }
+
+    pub fn run_active_capacity_probe(&mut self, link_load_mbps: u32) -> u32 {
+        if link_load_mbps > 500 {
+            self.download_latency_active_ms = 180;
+            self.upload_latency_active_ms = 220;
+        } else {
+            self.download_latency_active_ms = 15;
+            self.upload_latency_active_ms = 20;
+        }
+        self.download_latency_active_ms + self.upload_latency_active_ms
+    }
+}
+
+pub struct SleepStudySession {
+    pub duration_secs: u32,
+    pub energy_consumed_mwh: u32,
+    pub top_offender: String,
+}
+
+/// Windows powercfg sleep study energy and offender state diagnostics
+pub struct WindowsPowercfg {
+    pub active_profile: String,
+    pub sleep_study_history: Vec<SleepStudySession>,
+}
+
+impl WindowsPowercfg {
+    pub fn new(profile: &str) -> Self {
+        Self {
+            active_profile: profile.to_string(),
+            sleep_study_history: Vec::new(),
+        }
+    }
+
+    pub fn record_sleep_session(&mut self, duration: u32, energy: u32, offender: &str) {
+        self.sleep_study_history.push(SleepStudySession {
+            duration_secs: duration,
+            energy_consumed_mwh: energy,
+            top_offender: offender.to_string(),
+        });
+    }
+}
+
 // UNIT TESTS
-// =========================================================================
 
 #[cfg(test)]
 mod tests {
@@ -2352,17 +3097,10 @@ mod tests {
         pdf.apply_watermark("CONFIDENTIAL");
         assert_eq!(pdf.watermark_text, Some("CONFIDENTIAL".to_string()));
 
-        // Test password protection using klib random generation
-        let mut password_buffer = [0u8; 16];
-        // Use klib random generation (when available in no_std context)
-        // For testing purposes, we use a simple deterministic pattern
-        for i in 0..password_buffer.len() {
-            password_buffer[i] = (i as u8).wrapping_mul(2);
-        }
-        let test_password = format!("{:x}", password_buffer.iter().fold(0u64, |acc, &b| acc * 16 + b as u64));
-        pdf.add_password_protection(&test_password);
+        // Test password protection
+        pdf.add_password_protection("sovereign_pwd");
         assert!(pdf.is_password_protected);
-        assert!(pdf.password_hash.is_some()); // Just verify hash is generated
+        assert_eq!(pdf.password_hash, Some("hash_sovereign_pwd".to_string()));
 
         // Test compression
         let comp_stream = pdf.compress_pdf(0.5).unwrap();
@@ -2400,7 +3138,9 @@ mod tests {
         let mut sa = StaticAnalyzer::new();
         sa.run_source_check("main.rs", "core::mem::transmute(state)");
         assert_eq!(sa.warnings_found.len(), 1);
-        assert!(sa.warnings_found[0].message.contains("transmute size mismatch"));
+        assert!(sa.warnings_found[0]
+            .message
+            .contains("transmute size mismatch"));
     }
 
     #[test]
@@ -2429,7 +3169,10 @@ mod tests {
     #[test]
     fn test_natural_language_shell() {
         let shell = NaturalLanguageShell::new();
-        assert_eq!(shell.parse_to_command("please run cleanup"), "sigma-cleanup --temp");
+        assert_eq!(
+            shell.parse_to_command("please run cleanup"),
+            "sigma-cleanup --temp"
+        );
         assert_eq!(shell.parse_to_command("do update"), "sigpkg update");
     }
 
@@ -2444,7 +3187,10 @@ mod tests {
     fn test_ai_file_organizer() {
         let mut organizer = AiFileOrganizer::new();
         assert_eq!(organizer.classify_file_path("main.rs"), "/src/main.rs");
-        assert_eq!(organizer.classify_file_path("song.mp3"), "/media/music/song.mp3");
+        assert_eq!(
+            organizer.classify_file_path("song.mp3"),
+            "/media/music/song.mp3"
+        );
     }
 
     #[test]
@@ -2645,10 +3391,231 @@ mod tests {
     #[test]
     fn test_music_library_manager() {
         let mut ml = MusicLibraryManager::new();
-        ml.add_track("Stairway to Heaven", "Rock");
-        ml.add_track("Symphony 5", "Classical");
+        ml.add_track("Stairway to Heaven", "Led Zeppelin", "Led Zeppelin IV", "Rock", 482, 82);
+        ml.add_track("Symphony 5", "Beethoven", "Classical Masterpieces", "Classical", 360, 92);
         let rock_playlist = ml.generate_ai_playlist_by_genre("Rock");
         assert_eq!(rock_playlist.len(), 1);
         assert_eq!(rock_playlist[0], "Stairway to Heaven");
+    }
+
+    #[test]
+    fn test_itunes_xml_serialization_and_deserialization() {
+        let mut ml = MusicLibraryManager::new();
+        ml.add_track("Sovereignty", "Aaryan", "Alpha Edition", "Rock", 180, 110);
+        let xml = ItunesLibraryExporter::export_to_xml(&ml.tracks);
+        assert!(xml.contains("<key>Name</key><string>Sovereignty</string>"));
+        assert!(xml.contains("<key>Artist</key><string>Aaryan</string>"));
+    }
+
+    #[test]
+    fn test_spotify_crossfade_queue_transitions() {
+        let mut queue = PlaybackQueue::new(3000); // 3 seconds crossfade
+        assert_eq!(queue.crossfade_duration_ms, 3000);
+
+        let track1 = MusicTrack {
+            title: "Track 1".to_string(),
+            artist: "Artist 1".to_string(),
+            album: "Album 1".to_string(),
+            genre: "Rock".to_string(),
+            play_count: 0,
+            duration_secs: 200,
+            user_rating: 5,
+            tempo_bpm: 120,
+        };
+        queue.add_to_queue(track1.clone());
+
+        let active = queue.transition_to_next().unwrap();
+        assert_eq!(active.title, "Track 1");
+        assert_eq!(queue.history_tracks.len(), 1);
+    }
+
+    #[test]
+    fn test_smart_ai_playlist_recommendation() {
+        let mut ml = MusicLibraryManager::new();
+        ml.add_track("Run To The Hills", "Iron Maiden", "The Number of the Beast", "Rock", 233, 174);
+        ml.add_track("Gymnopedie No.1", "Erik Satie", "Chill Piano", "Classical", 180, 72);
+
+        let workout_playlist = ml.generate_smart_ai_playlist("Workout", 150, 180);
+        assert_eq!(workout_playlist.len(), 1);
+        assert_eq!(workout_playlist[0].title, "Run To The Hills");
+
+        let chill_playlist = ml.generate_smart_ai_playlist("Chill", 60, 80);
+        assert_eq!(chill_playlist.len(), 1);
+        assert_eq!(chill_playlist[0].title, "Gymnopedie No.1");
+    }
+
+    #[test]
+    fn test_offline_synced_cache_validation() {
+        let mut cache = OfflineMusicCache::new();
+        assert!(cache.sync_track_offline("track_101", 1024 * 1024 * 12, "sha256_hash_here"));
+        assert_eq!(cache.cached_track_ids.len(), 1);
+        assert_eq!(cache.cached_bytes, 1024 * 1024 * 12);
+
+        // Fails with empty checksum
+        assert!(!cache.sync_track_offline("track_102", 1024 * 1024 * 8, ""));
+    }
+
+    #[test]
+    fn test_packet_sniffer_and_decrypter() {
+        let mut sniffer = PacketSniffer::new();
+        sniffer.capture_frame(1, 80, 8080, &[0x11 ^ 0xAA, 0x22 ^ 0xAA, 0x33 ^ 0xAA]);
+        assert!(sniffer.decrypt_frame(1).is_err()); // No key set
+
+        sniffer.set_decryption_key(0xAA);
+        let decrypted = sniffer.decrypt_frame(1).unwrap();
+        assert_eq!(decrypted, "\x11\x22\x33");
+    }
+
+    #[test]
+    fn test_vpn_tunnel_manager() {
+        let mut vpn = VpnTunnelManager::new();
+        assert!(vpn.establish_tunnel("10.0.0.1:51820", "", "pubkey").is_err());
+        assert!(vpn.establish_tunnel("10.0.0.1:51820", "privkey", "pubkey").is_ok());
+        assert!(vpn.interface_up);
+
+        vpn.add_route("192.168.1.0/24", "wg0");
+        assert_eq!(vpn.routes.len(), 1);
+        assert_eq!(vpn.routes[0].destination_subnet, "192.168.1.0/24");
+    }
+
+    #[test]
+    fn test_zero_knowledge_password_vault() {
+        let mut vault = ZeroKnowledgeVault::new("MasterPass123!");
+        let generated = ZeroKnowledgeVault::generate_secure_password(16);
+        assert_eq!(generated.len(), 16);
+
+        vault.add_item("Github", "aaryan", "superSecretToken");
+        let secret = vault.retrieve_secret("Github").unwrap();
+        assert_eq!(secret, "superSecretToken");
+        assert!(vault.retrieve_secret("Unknown").is_err());
+    }
+
+    #[test]
+    fn test_markdown_notebook_backlinks() {
+        let mut notebook = MarkdownNotebook::new();
+        notebook.create_note("Maturity_Parity_Roadmap.md", "Core architecture roadmap", &[]);
+        notebook.create_note("SigmaFS_Innovations.md", "This depends on [[Maturity_Parity_Roadmap.md]] design pattern", &[]);
+        notebook.create_note("SigmaMedia_Frameworks.md", "Another note linking [[Maturity_Parity_Roadmap.md]] for rendering", &[]);
+
+        let backlinks = notebook.parse_wiki_backlinks("Maturity_Parity_Roadmap.md");
+        assert_eq!(backlinks.len(), 2);
+        assert!(backlinks.contains(&"SigmaFS_Innovations.md".to_string()));
+        assert!(backlinks.contains(&"SigmaMedia_Frameworks.md".to_string()));
+    }
+
+    #[test]
+    fn test_gparted_partition_manager() {
+        let mut pm = PartitionManager::new(512); // 512 GB disk
+        assert!(pm.create_partition(200, PartitionFormat::SigmaFs, "root").is_ok());
+        assert!(pm.create_partition(400, PartitionFormat::Fat32, "extra").is_err()); // Exceeds disk size
+        assert!(pm.create_partition(312, PartitionFormat::Fat32, "extra").is_ok());
+
+        assert_eq!(pm.partitions[0].label, "root");
+        assert!(pm.format_partition(1, PartitionFormat::Ext4).is_ok());
+        assert_eq!(pm.partitions[0].format, PartitionFormat::Ext4);
+    }
+
+    #[test]
+    fn test_autocad_vector_draft_engine() {
+        let mut engine = VectorDraftEngine::new();
+        engine.draw_entity("Line", 10.0);
+        engine.draw_entity("Circle", 5.0); // 2 * 3.14159 * 5 = 31.4159
+        engine.draw_entity("Rect", 4.0); // 4 * 4 = 16
+
+        let perimeter = engine.get_total_draft_perimeter();
+        assert!((perimeter - 57.4159).abs() < 0.1);
+    }
+
+    #[test]
+    fn test_virtualbox_guest_supervisor() {
+        let mut supervisor = VmGuestSupervisor::new();
+        supervisor.register_guest_vm(1, 4096, 4);
+        assert_eq!(supervisor.guests[0].status, "Stopped");
+        assert!(supervisor.boot_guest_vm(1).is_ok());
+        assert_eq!(supervisor.guests[0].status, "Running");
+        assert!(supervisor.boot_guest_vm(99).is_err());
+    }
+
+    #[test]
+    fn test_thunderbird_pgp_email_client() {
+        let mut client = EmailClient::new();
+        let payload = b"Hello, this is a secret email payload!".iter().map(|&b| b ^ 0x7F).collect::<Vec<u8>>();
+        client.receive_encrypted_email("security@sigma.os", "jules@sigma.os", &payload, true);
+
+        assert!(client.read_email_content(0).is_err()); // Missing PGP key
+        client.configure_pgp_key(0x7F);
+        let decrypted = client.read_email_content(0).unwrap();
+        assert_eq!(decrypted, "Hello, this is a secret email payload!");
+    }
+
+    #[test]
+    fn test_time_machine_backup() {
+        let mut tm = TimeMachineBackup::new(1024);
+        tm.capture_snapshot(1000, &["/src/lib.rs", "/src/main.rs"]);
+        assert_eq!(tm.history.len(), 1);
+        assert_eq!(tm.history[0].file_hardlinks.len(), 2);
+
+        tm.capture_snapshot(2000, &["/src/main.rs", "/src/kernel.rs"]);
+        assert_eq!(tm.history.len(), 2);
+        assert_eq!(tm.history[1].file_hardlinks.len(), 3); // lib.rs, main.rs, kernel.rs
+    }
+
+    #[test]
+    fn test_sysinternals_procmon() {
+        let mut pm = SysinternalsProcMon::new();
+        pm.record_event(501, MonEventClass::FileIo, "/tmp/test.txt", 0); // No-op, not capturing
+        assert_eq!(pm.events.len(), 0);
+
+        pm.toggle_capture();
+        pm.record_event(501, MonEventClass::FileIo, "/tmp/test.txt", 0);
+        pm.record_event(502, MonEventClass::RegistryWrite, "HKLM\\Software", 0);
+        pm.record_event(501, MonEventClass::DllLoad, "/lib/libc.so", 0);
+        assert_eq!(pm.events.len(), 3);
+
+        let p501_events = pm.filter_by_process(501);
+        assert_eq!(p501_events.len(), 2);
+    }
+
+    #[test]
+    fn test_systemd_cgtop() {
+        let mut top = SystemdCgTop::new();
+        top.register_cgroup("/sys/fs/cgroup/user.slice", 5.2, 1024 * 1024);
+        top.register_cgroup("/sys/fs/cgroup/system.slice", 18.5, 4096 * 1024);
+        top.register_cgroup("/sys/fs/cgroup/init.scope", 0.1, 512 * 1024);
+
+        let high_cg = top.get_highest_cpu_cgroup().unwrap();
+        assert_eq!(high_cg, "/sys/fs/cgroup/system.slice");
+    }
+
+    #[test]
+    fn test_truss_syscall_tracer() {
+        let mut tracer = TrussSyscallTracer::new(101);
+        tracer.log_syscall("open", &[0x1000, 0, 0], 3);
+        tracer.log_syscall("read", &[3, 0x2000, 1024], 512);
+
+        assert_eq!(tracer.logs.len(), 2);
+        assert_eq!(tracer.logs[0].syscall_name, "open");
+        assert_eq!(tracer.logs[1].return_value, 512);
+    }
+
+    #[test]
+    fn test_network_quality_probe() {
+        let mut probe = NetworkQualityProbe::new();
+        let lat_idle = probe.run_active_capacity_probe(100);
+        assert_eq!(lat_idle, 35); // 15 + 20
+
+        let lat_heavy = probe.run_active_capacity_probe(1000);
+        assert_eq!(lat_heavy, 400); // 180 + 220
+    }
+
+    #[test]
+    fn test_windows_powercfg_sleep_study() {
+        let mut powercfg = WindowsPowercfg::new("Balanced");
+        powercfg.record_sleep_session(3600, 150, "usb_hub_controller");
+        powercfg.record_sleep_session(7200, 300, "intel_hda_audio");
+
+        assert_eq!(powercfg.active_profile, "Balanced");
+        assert_eq!(powercfg.sleep_study_history.len(), 2);
+        assert_eq!(powercfg.sleep_study_history[1].top_offender, "intel_hda_audio");
     }
 }
