@@ -52,6 +52,7 @@ pub mod shell;
 pub mod sigpkg;
 pub mod testing;
 pub mod virtualization;
+pub mod virt;
 pub mod wireless;
 
 pub use accessibility::{
@@ -206,6 +207,10 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use virt::{
+    EnhancedVirtualMachine, VMState as VirtVMState, VMSnapshot, VMSnapshotState,
+    VMTemplate, VirtualNetwork, EnhancedVirtManager, VirtStats, VirtError, HypervisorType,
 };
 pub use wireless::{
     BluetoothAdapter, AdapterState, BluetoothProfile, BluetoothDevice,
