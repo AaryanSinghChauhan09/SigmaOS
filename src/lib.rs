@@ -10,6 +10,7 @@ pub mod dashboard;
 pub mod device;
 pub mod driver;
 pub mod drivers;
+pub mod embedded;
 pub mod filesystem;
 pub mod kernel;
 pub mod klib;
@@ -68,6 +69,10 @@ pub use automation::{
     AiOptimizer, AutomationError, OptimizationCategory, OptimizationError,
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
+};
+pub use embedded::{
+    EmbeddedError, EmbeddedSubsystem, GpioDriver, HardwareAbstractionLayer, PeripheralDevice,
+    PeripheralManager, PeripheralType, PlatformProfile, GLOBAL_EMBEDDED_SUBSYSTEM,
 };
 pub use compatibility::{
     ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
