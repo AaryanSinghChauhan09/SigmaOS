@@ -33,9 +33,11 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod graphics;
 pub mod kernel;
 pub mod network;
 pub mod orchestration;
+pub mod distro;
 pub mod package;
 pub mod process;
 pub mod productivity;
@@ -79,7 +81,7 @@ pub use drivers::{
     GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
+    VesaModeInfo, DialupModemDriver,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
@@ -87,12 +89,20 @@ pub use filesystem::{
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process as KernelProcess,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    SovereignVirtualCPU, RegisterSet, ModelSpecificRegisters, CpuMode, CpuRing,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use network::{
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    OpenBsdPacketFilter, FilterRule, FilterAction, TrafficDirection, FirewallState,
+};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
+};
+pub use distro::{
+    PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
+    SovereignPreseedParser, PreseedVariable,
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,

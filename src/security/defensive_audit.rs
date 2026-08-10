@@ -1,8 +1,8 @@
 // SigmaOS Defensive Audit & Anomaly Detection Shunts
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-use crate::klib::{String, Vec};
-use core::cell::RefCell;
+use crate::klib::{SigmaString, Vec};
+use core::cell::{Cell, RefCell};
 
 const MAX_AUDIT_BLOCKS: usize = 16;
 const MAX_SIGNATURES: usize = 8;
@@ -51,7 +51,7 @@ pub struct AuditEvent {
     pub timestamp_ms: u64,
     pub severity: AuditSeverity,
     pub process_id: u32,
-    pub description: String,
+    pub description: SigmaString,
 }
 
 /// Base OOP interface representing any security audit checker
@@ -64,7 +64,7 @@ pub trait SecurityAuditor {
 pub struct DefensiveAuditSystem {
     pub audit_ring: RefCell<[Option<ForensicBlock>; MAX_AUDIT_BLOCKS]>,
     pub signatures: [Option<MaliciousSignature>; MAX_SIGNATURES],
-    pub next_block_id: u32,
+    pub next_block_id: Cell<u32>,
     pub security_score_threshold: u32,
 }
 
@@ -76,7 +76,7 @@ impl DefensiveAuditSystem {
         let mut sys = Self {
             audit_ring: RefCell::new([EMPTY_BLOCK; MAX_AUDIT_BLOCKS]),
             signatures: [EMPTY_SIG; MAX_SIGNATURES],
-            next_block_id: 1,
+            next_block_id: Cell::new(1),
             security_score_threshold: threshold,
         };
 
@@ -132,11 +132,12 @@ impl DefensiveAuditSystem {
         }
 
         // Find previous block hash
-        let prev_hash = if self.next_block_id > 1 {
+        let next_id = self.next_block_id.get();
+        let prev_hash = if next_id > 1 {
             let mut found_prev = 0;
             for slot in ring.iter() {
                 if let Some(ref block) = slot {
-                    if block.id == self.next_block_id - 1 {
+                    if block.id == next_id - 1 {
                         found_prev = block.current_hash;
                         break;
                     }
@@ -148,7 +149,7 @@ impl DefensiveAuditSystem {
         };
 
         let mut block = ForensicBlock {
-            id: self.next_block_id,
+            id: next_id,
             timestamp,
             actor_uid,
             syscall_num,
@@ -160,14 +161,10 @@ impl DefensiveAuditSystem {
         block.current_hash = Self::calculate_block_hash(&block);
 
         // Store block in circular ring ledger buffer
-        let idx = (self.next_block_id as usize - 1) % MAX_AUDIT_BLOCKS;
+        let idx = (next_id as usize - 1) % MAX_AUDIT_BLOCKS;
         ring[idx] = Some(block);
 
-        // SAFETY: Updating next_block_id is safe as we're within bounds
-        unsafe {
-            let ptr = &self.next_block_id as *const u32 as *mut u32;
-            *ptr += 1;
-        }
+        self.next_block_id.set(next_id + 1);
 
         Ok(())
     }
@@ -207,8 +204,12 @@ impl DefensiveAuditSystem {
     pub fn check_payload_safety(&self, payload_data: &[u8]) -> bool {
         let score = self.evaluate_anomaly_score(payload_data);
 
-        // In kernel environment, this would trigger quarantine
-        score < self.security_score_threshold
+        if score >= self.security_score_threshold {
+            // In kernel environment, this would trigger quarantine
+            return false;
+        }
+
+        true
     }
 }
 
@@ -226,7 +227,7 @@ impl DefensiveAuditLogger {
         }
     }
 
-    pub fn log_event(&mut self, severity: AuditSeverity, pid: u32, desc: String) -> Result<(), AuditError> {
+    pub fn log_event(&mut self, severity: AuditSeverity, pid: u32, desc: SigmaString) -> Result<(), AuditError> {
         if self.logs.len() >= self.max_capacity {
             return Err(AuditError::LogBufferFull);
         }
