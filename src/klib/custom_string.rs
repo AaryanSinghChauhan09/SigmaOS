@@ -264,7 +264,15 @@ impl SigmaString {
     pub fn clone(&self) -> SigmaString {
         SigmaString::from_str(self.as_str())
     }
+}
 
+impl Clone for SigmaString {
+    fn clone(&self) -> Self {
+        SigmaString::from_str(self.as_str())
+    }
+}
+
+impl SigmaString {
     /// Convert to a null-terminated C string view (allocated separately).
     pub fn to_cstring(&self) -> CStringView {
         let len = self.len + 1;

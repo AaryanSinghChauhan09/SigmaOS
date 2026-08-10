@@ -18,8 +18,6 @@ pub use architecture::{
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
     UniversalAbiTranslator, UserDefinedKernelFunctions,
-    DeterministicReplayEngine, DynamicKernelPersonalitySwitcher, InterruptRatePredictor,
-    KernelPersonalityMode,
 };
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};

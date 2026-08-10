@@ -74,19 +74,6 @@ extern "C" {
 #include "../drivers/usb/sigma_usb_hcd.cpp"
 #include "../kernel/drivers/sigma_driver_manager.cpp"
 #include "../kernel/drivers/sigma_driver_registry.cpp"
-||||||| 65885484f
-#include "../klib/include/sigma_stdio.h"
-#include "../klib/include/sigma_stdio.h"
-#undef sigma_strcmp
-#include <stdarg.h>
-
-// Redefining basic sovereign primitives to avoid header/printf definition clashes
-typedef int sigma_status;
-typedef int sigma_bool;
-#define SIGMA_SUCCESS 0
-#define SIGMA_TRUE 1
-#define SIGMA_FALSE 0
-
 // ---- Test Framework ----
 
 static int tests_run    = 0;
