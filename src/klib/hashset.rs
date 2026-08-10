@@ -28,7 +28,7 @@ where
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut set = f.debug_set();
-        for item in self.iter() {
+        for item in self.map.keys() {
             set.entry(item);
         }
         set.finish()

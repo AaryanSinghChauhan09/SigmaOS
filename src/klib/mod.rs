@@ -18,17 +18,12 @@ pub mod custom_allocator;
 
 // Conditional compilation of other collection modules
 #[cfg(target_os = "none")]
-pub mod hashmap;
-#[cfg(target_os = "none")]
-pub mod hashset;
-#[cfg(target_os = "none")]
 pub mod btreemap;
 #[cfg(target_os = "none")]
 pub mod vecdeque;
 
 // Re-exports
 pub use string::{String, ToString};
-pub use custom_string::SigmaString;
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
