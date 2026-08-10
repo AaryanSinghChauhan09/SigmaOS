@@ -8,6 +8,7 @@ pub mod hardening;
 pub mod deobfuscation;
 pub mod securelevels;
 pub mod pam;
+pub mod crypto_utils;
 
 pub use capability::{CapabilityGate, CapabilityToken, Permission};
 pub use defensive_audit::{

@@ -3,9 +3,13 @@
 
 extern crate alloc;
 
+#[cfg(not(target_os = "none"))]
+use std::collections::HashMap;
+#[cfg(target_os = "none")]
 use crate::klib::HashMap;
+
 use crate::security::crypto_utils::{constant_time_eq, hash_password_placeholder, SecureRandom};
-use alloc::string::{String, ToString};
+use alloc::string::{String as AllocString, ToString};
 use alloc::vec::Vec;
 
 /// Errors returned by the PAM subsystem
@@ -25,10 +29,10 @@ pub enum PamError {
 #[derive(Debug, Clone)]
 pub struct PamUser {
     pub uid: u32,
-    pub username: String,
+    pub username: AllocString,
     pub password_hash: [u8; 32],
     pub salt: [u8; 16],
-    pub primary_group: String,
+    pub primary_group: AllocString,
     pub is_locked: bool,
     pub failed_attempts: u32,
 }
@@ -37,8 +41,8 @@ pub struct PamUser {
 #[derive(Debug, Clone)]
 pub struct PamGroup {
     pub gid: u32,
-    pub name: String,
-    pub members: Vec<String>,
+    pub name: AllocString,
+    pub members: Vec<AllocString>,
 }
 
 /// Dynamic, pluggable service modules enforcing policy-driven authorization checks
@@ -97,8 +101,8 @@ impl PamModule for AccountTallyModule {
 
 /// Central registry managing user authentication, groups, and PAM configuration
 pub struct SovereignPamManager {
-    pub users: HashMap<String, PamUser>,
-    pub groups: HashMap<String, PamGroup>,
+    pub users: HashMap<AllocString, PamUser>,
+    pub groups: HashMap<AllocString, PamGroup>,
     pub modules: Vec<alloc::boxed::Box<dyn PamModule>>,
     pub next_uid: u32,
     pub next_gid: u32,
@@ -108,8 +112,8 @@ impl SovereignPamManager {
     /// Initialize a new PAM manager
     pub fn new() -> Self {
         Self {
-            users: HashMap::new(),
-            groups: HashMap::new(),
+            users: HashMap::<AllocString, PamUser>::new(),
+            groups: HashMap::<AllocString, PamGroup>::new(),
             modules: Vec::new(),
             next_uid: 1000,
             next_gid: 1000,
@@ -123,7 +127,7 @@ impl SovereignPamManager {
 
     /// Register a new user with secure password salting
     pub fn register_user(&mut self, username: &str, password: &str, primary_group: &str) -> Result<u32, PamError> {
-        if self.users.contains_key(username) {
+        if self.users.get(&username.to_string()).is_some() {
             return Err(PamError::UserAlreadyExists);
         }
 
@@ -172,7 +176,7 @@ impl SovereignPamManager {
 
     /// Create a system group
     pub fn create_group(&mut self, group_name: &str) -> Result<u32, PamError> {
-        if self.groups.contains_key(group_name) {
+        if self.groups.get(&group_name.to_string()).is_some() {
             return Err(PamError::GroupAlreadyExists);
         }
 
@@ -191,15 +195,15 @@ impl SovereignPamManager {
 
     /// Add a user to a group
     pub fn add_user_to_group(&mut self, username: &str, group_name: &str) -> Result<(), PamError> {
-        if !self.users.contains_key(username) {
+        if self.users.get(&username.to_string()).is_none() {
             return Err(PamError::UserNotFound);
         }
 
-        if !self.groups.contains_key(group_name) {
+        if self.groups.get(&group_name.to_string()).is_none() {
             self.create_group(group_name)?;
         }
 
-        if let Some(group) = self.groups.get_mut(group_name) {
+        if let Some(group) = self.groups.get_mut(&group_name.to_string()) {
             if !group.members.contains(&username.to_string()) {
                 group.members.push(username.to_string());
             }
@@ -211,7 +215,7 @@ impl SovereignPamManager {
     /// Authenticate a user credentials via stacked PAM verification
     pub fn authenticate(&mut self, username: &str, password: &str) -> Result<(), PamError> {
         // Retrieve the user
-        let user = self.users.get_mut(username).ok_or(PamError::UserNotFound)?;
+        let user = self.users.get_mut(&username.to_string()).ok_or(PamError::UserNotFound)?;
 
         // Validate account/lock state through stacked pam modules first
         for module in &self.modules {
@@ -241,7 +245,7 @@ impl SovereignPamManager {
 
     /// Check if a user is in a group
     pub fn is_member_of(&self, username: &str, group_name: &str) -> bool {
-        if let Some(group) = self.groups.get(group_name) {
+        if let Some(group) = self.groups.get(&group_name.to_string()) {
             group.members.contains(&username.to_string())
         } else {
             false

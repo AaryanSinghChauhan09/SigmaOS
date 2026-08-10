@@ -408,7 +408,7 @@ where
     V: Clone,
 {
     fn from(arr: [(K, V); N]) -> Self {
-        let mut map = Self::with_capacity(N);
+        let mut map = HashMap::with_capacity(N);
         for (k, v) in arr {
             map.insert(k, v);
         }
