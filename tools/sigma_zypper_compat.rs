@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Zypper Compatibility Layer
 //! Zypper compatibility for openSUSE/SUSE

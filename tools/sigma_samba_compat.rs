@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 //! SigmaOS Samba Compatibility
 //! Samba/SMB Protocol client and server utilities
 //! Zero external dependencies

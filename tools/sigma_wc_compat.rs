@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 #![allow(unused_variables)]
 //! SigmaOS Wc Compatibility
 //! Word, line, byte, and character count (wc command)
