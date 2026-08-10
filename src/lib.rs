@@ -29,6 +29,7 @@ pub mod customization;
 pub mod dashboard;
 pub mod edge;
 pub mod filesystem;
+pub mod hal;
 pub mod iot;
 pub mod klib;
 pub mod device;
@@ -124,6 +125,10 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
     StoragePool, RaidLevel, Dataset, DatasetType, Snapshot, Zvol, SendStream, ReceiveStream,
     SigmaFSManager, FilesystemStats, SigmaFSError, CompressionAlgorithm,
+};
+pub use hal::{
+    HardwareDevice, DeviceClass, DeviceState, DeviceProperties, DeviceEvent, DeviceEventType,
+    Subsystem, HALManager, HALStats, HALError,
 };
 pub use container::{
     Container, ContainerState, ContainerError, ContainerImage, ContainerRuntime,
