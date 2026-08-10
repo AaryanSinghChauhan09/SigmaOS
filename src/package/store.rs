@@ -1,7 +1,7 @@
 // SigmaOS Polish-Parity Software Store & Update Manager (SigmaStore)
 // Designed for software installation, package upgrades, and security auditing
 
-use crate::klib::HashMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StoreError {
@@ -66,10 +66,7 @@ impl SigmaSoftwareStore {
     pub fn check_for_updates(&mut self) -> usize {
         self.pending_updates.clear();
         for (name, app) in &self.catalog {
-            let name: &String = name;
-            let app: &StoreApp = app;
-            if app.is_installed && app.version != "1.5.0" {
-                // Assume latest stable is 1.5.0
+            if app.is_installed && app.version != "1.5.0" { // Assume latest stable is 1.5.0
                 self.pending_updates.push(name.clone());
             }
         }

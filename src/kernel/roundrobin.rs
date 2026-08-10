@@ -46,20 +46,15 @@ pub struct ScheduledProcess {
     pub context: CpuContext,
     pub yield_requested: bool,
     pub cpu_time_used: u64,
-    pub ticks_since_run: u64,
-    pub original_priority: Priority,
 }
 
 impl ScheduledProcess {
     pub fn new(process: Process) -> Self {
-        let original_priority = process.priority;
         Self {
             process,
             context: CpuContext::new(),
             yield_requested: false,
             cpu_time_used: 0,
-            ticks_since_run: 0,
-            original_priority,
         }
     }
 
@@ -70,17 +65,13 @@ impl ScheduledProcess {
 
     /// Priority-based weight: higher priority gets a larger time slice multiplier
     pub fn time_slice_ticks(&self, base_slice: u64) -> u64 {
-        let mut multiplier: u64 = match self.process.priority {
+        let multiplier: u64 = match self.process.priority {
             Priority::Realtime => 8,
             Priority::High => 4,
             Priority::Normal => 2,
             Priority::Low => 1,
             Priority::Idle => 1, // Idle still gets a minimal slice
         };
-        // Dynamic boost if process has been starved (aged)
-        if self.ticks_since_run > 50 {
-            multiplier += 2;
-        }
         base_slice * multiplier
     }
 }
@@ -159,32 +150,13 @@ impl RoundRobinScheduler {
             return;
         }
 
-        // Safeguard current_index boundaries to prevent any out of bounds panic
-        if self.current_index >= self.processes.len() {
-            self.current_index = 0;
-        }
-
-        // Age other ready processes to prevent starvation (Linux/distro priority aging simulation)
-        for (i, entry) in self.processes.iter_mut().enumerate() {
-            if i != self.current_index && entry.process.state == ProcessState::Ready {
-                entry.ticks_since_run += 1;
-                // If extremely starved, temporarily promote priority to prevent starvation
-                if entry.ticks_since_run > 100 && entry.process.priority == Priority::Low {
-                    entry.process.priority = Priority::Normal;
-                }
-            }
-        }
-
         let needs_switch = {
             let entry = &mut self.processes[self.current_index];
             entry.cpu_time_used += 1;
-            entry.ticks_since_run = 0; // reset aging count
-            // Demote back to original priority after getting its turn
-            entry.process.priority = entry.original_priority;
             let slice = entry.time_slice_ticks(self.config.time_slice);
             let yielding = entry.yield_requested;
             entry.yield_requested = false;
-            yielding || entry.cpu_time_used.is_multiple_of(slice)
+            yielding || (entry.cpu_time_used % slice == 0)
         };
 
         if needs_switch {
@@ -297,20 +269,10 @@ mod tests {
     #[test]
     fn test_tick_switches_process() {
         let mut scheduler = RoundRobinScheduler::new();
-        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        scheduler.add_process(process1).unwrap();
-        scheduler.add_process(process2).unwrap();
-
-        let initial_index = scheduler.current_index;
-        for _ in 0..15 {
-            scheduler.tick();
-        }
-        // After 15 ticks with 10ms time slice, index should change (and not cycle back to 0)
-        let process1 = Process::new(1, "test1".to_string(), Priority::Normal);
-        let process2 = Process::new(2, "test2".to_string(), Priority::Normal);
-        scheduler.add_process(process1).unwrap();
-        scheduler.add_process(process2).unwrap();
+        let p1 = Process::new(1, "test1".to_string(), Priority::Normal);
+        let p2 = Process::new(2, "test2".to_string(), Priority::Normal);
+        scheduler.add_process(p1).unwrap();
+        scheduler.add_process(p2).unwrap();
 
         let initial_index = scheduler.current_index;
         // Normal priority multiplier is 2x base 10 = 20 ticks per slice
@@ -372,29 +334,5 @@ mod tests {
         assert!(scheduler
             .add_process(Process::new(3, "test3".to_string(), Priority::Normal))
             .is_err());
-    }
-
-    #[test]
-    fn test_priority_aging_and_demotion() {
-        let mut scheduler = RoundRobinScheduler::new();
-        let p1 = Process::new(1, "p1".to_string(), Priority::Normal);
-        let p2 = Process::new(2, "p2".to_string(), Priority::Low);
-        scheduler.add_process(p1).unwrap();
-        scheduler.add_process(p2).unwrap();
-
-        // Let p1 run and p2 age
-        for _ in 0..101 {
-            scheduler.tick();
-        }
-
-        // p2 should be aged and temporarily promoted to Priority::Normal
-        assert_eq!(scheduler.processes[1].process.priority, Priority::Normal);
-
-        // Switch to p2 and tick once to let it run
-        scheduler.current_index = 1;
-        scheduler.tick();
-
-        // After running, p2 should be demoted back to its original Priority::Low
-        assert_eq!(scheduler.processes[1].process.priority, Priority::Low);
     }
 }
