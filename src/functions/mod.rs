@@ -6,6 +6,8 @@ pub mod network;
 pub mod security;
 pub mod storage;
 pub mod process;
+pub mod user;
+pub mod update;
 
 pub use monitoring::{
     JournalEntry, LogPriority, LogFilter, JournalViewer, ExportFormat, JournalError,
@@ -31,4 +33,14 @@ pub use process::{
     Service, ServiceState, Socket, Timer, ServiceManager,
     Process, Thread, FileDescriptor, ProcessManager,
     KernelParam, SystemControl, ProcessError,
+};
+pub use user::{
+    User, Group, UserGroup, UserManager,
+    PasswordPolicy, PasswordHash, HashAlgorithm, PasswordManager,
+    AuthModule, AuthMethod, AuthManager, UserError,
+};
+pub use update::{
+    Package, Repository, PackageCache, PackageManager,
+    Update, SecurityUpdate, SecuritySeverity, UpdateSchedule, UpdateManager,
+    GPGKey, RepositoryManager, UpdateError,
 };
