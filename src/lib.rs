@@ -110,6 +110,7 @@ pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
     VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
     PenetrationAssistant, secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
+    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
 };
 pub use security::hardening;
 pub use shell::{ShellCommand, ShellRepl};
