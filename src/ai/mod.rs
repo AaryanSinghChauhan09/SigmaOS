@@ -43,3 +43,4 @@ pub use open_computer::{
     OpenComputerVirtualMachine, MachineState, Qcow2Overlay, A11yWidget,
     AgentA11yInterface, HumanInTheLoopController, AgentMemoryInspector,
 };
+pub mod system_ai;

@@ -6,6 +6,7 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
+pub mod sigmafs;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -26,3 +27,7 @@ pub use support::{
     LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use sigmafs::{
+    StoragePool, RaidLevel, Dataset, DatasetType, Snapshot, Zvol, SendStream, ReceiveStream,
+    SigmaFSManager, FilesystemStats, FilesystemError as SigmaFSError, CompressionAlgorithm,
+};

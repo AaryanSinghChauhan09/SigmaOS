@@ -16,13 +16,14 @@ pub use audio::editor::{
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
+pub mod container;
 pub mod customization;
 pub mod dashboard;
+pub mod filesystem;
 pub mod klib;
 pub mod device;
 pub mod driver;
 pub mod drivers;
-pub mod filesystem;
 pub mod kernel;
 pub mod network;
 pub mod orchestration;
@@ -98,6 +99,12 @@ pub use drivers::{
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
+    StoragePool, RaidLevel, Dataset, DatasetType, Snapshot, Zvol, SendStream, ReceiveStream,
+    SigmaFSManager, FilesystemStats, SigmaFSError, CompressionAlgorithm,
+};
+pub use container::{
+    Container, ContainerState, ContainerError, ContainerImage, ContainerRuntime,
+    Pod, PortMapping, VolumeMount, ContainerNetwork, Volume, RuntimeStats, RestartPolicy,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
@@ -108,6 +115,9 @@ pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
+    Cluster, ClusterState, Node, NodeState, Pod, PodPhase, Service, ServiceType,
+    Deployment, DeploymentStrategy, ContainerSpec, ResourceRequirements, ContainerPort,
+    ServicePort, PodTemplate, Metadata, PodSpec, SigmaKube, ClusterStats,
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
