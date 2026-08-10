@@ -51,6 +51,7 @@ pub mod shell;
 pub mod sigpkg;
 pub mod testing;
 pub mod virtualization;
+pub mod wireless;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -200,6 +201,11 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use wireless::{
+    BluetoothAdapter, AdapterState, BluetoothProfile, BluetoothDevice,
+    WiFiNetwork, WiFiSecurity, WiFiState, WiFiProfile, WiFiManager,
+    WirelessManager, WirelessStats, WirelessError,
 };
 
 pub mod init {
