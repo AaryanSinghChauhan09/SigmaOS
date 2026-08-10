@@ -92,7 +92,7 @@ pub trait QuotaManager {
     fn delete_quota(&mut self, id: QuotaID) -> Result<(), QuotaError>;
     fn get_quota(&self, id: QuotaID) -> Option<&dyn Quota>;
     fn check_quota(&self, id: QuotaID, amount: u64) -> Result<(), QuotaError>;
-    def reset_usage(&mut self, id: QuotaID) -> Result<(), QuotaError>;
+    fn reset_usage(&mut self, id: QuotaID) -> Result<(), QuotaError>;
 }
 
 #[repr(C)]
