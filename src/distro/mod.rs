@@ -10,6 +10,7 @@ pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
+pub mod parity;
 
 pub use parity::{
     InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
