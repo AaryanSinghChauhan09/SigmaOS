@@ -4,13 +4,19 @@
 pub mod audio {
     pub mod driver;
     pub mod editor;
+    pub mod sigma_audio;
 }
 pub use audio::driver::{
-    AudioDeviceID, AudioType, AudioError, AudioDevice, SimpleAudioDevice, AudioManager,
+    AudioDeviceID, AudioType, AudioError as AudioDriverError, AudioDevice as AudioDriverDevice, SimpleAudioDevice, AudioManager,
     SimpleAudioManager, AudioMixer, SimpleAudioMixer, AudioStream, SimpleAudioStream,
 };
 pub use audio::editor::{
     AudioTrack, MultiTrackSession, AudioEffect, AmplifyEffect, EchoEffect, LowPassFilter, NoiseGateEffect, AudioEditor,
+};
+pub use audio::sigma_audio::{
+    AudioNode, AudioNodeType, AudioFormat, AudioLink, AudioGraph, GraphState,
+    AudioDevice, DeviceType, AudioProfile, AudioSession, SessionState,
+    SigmaAudio, AudioStats, AudioError as SigmaAudioError,
 };
 
 pub mod accessibility;
@@ -31,6 +37,7 @@ pub mod network;
 pub mod observability;
 pub mod orchestration;
 pub mod package;
+pub mod power;
 pub mod productivity;
 pub mod resilience;
 pub mod release;
@@ -147,6 +154,10 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+};
+pub use power::{
+    PowerProfile, BatteryState, Battery, ThermalZone, CPUGovernor,
+    PowerProfileConfig, PowerManager, PowerStats, PowerError,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
