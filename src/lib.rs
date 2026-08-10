@@ -19,7 +19,9 @@ pub mod compatibility;
 pub mod container;
 pub mod customization;
 pub mod dashboard;
+pub mod edge;
 pub mod filesystem;
+pub mod iot;
 pub mod klib;
 pub mod device;
 pub mod driver;
@@ -31,6 +33,7 @@ pub mod package;
 pub mod productivity;
 pub mod resilience;
 pub mod release;
+pub mod rt;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -82,6 +85,10 @@ pub use release::{
     Release, ReleaseType, ReleaseStatus, ReleaseManager, ReleaseError,
     VersionManager, VersionError,
 };
+pub use rt::{
+    RealTimeTask, TaskState, SchedulingPolicy, LatencyMonitor, LatencyMeasurement,
+    TimingAnalyzer, SigmaRT, RTStats, RTError,
+};
 pub use testing::{
     TestSuite, TestCase, TestResult, TestSummary,
     UnitTestFramework, IntegrationTestFramework, PerformanceTestFramework,
@@ -105,6 +112,14 @@ pub use filesystem::{
 pub use container::{
     Container, ContainerState, ContainerError, ContainerImage, ContainerRuntime,
     Pod, PortMapping, VolumeMount, ContainerNetwork, Volume, RuntimeStats, RestartPolicy,
+};
+pub use edge::{
+    EdgeNode, EdgeNodeState, EdgeApplication, EdgeAppState, EdgeGateway,
+    DataPipeline, SyncPolicyConfig, ConflictResolution, SigmaEdge, EdgeStats, EdgeError,
+};
+pub use iot::{
+    IoTDevice, DeviceState, IoTDeviceType, ProtocolType, TelemetryData,
+    IoTGateway, DataLake, DigitalTwin, TwinState, SigmaIoT, IoTStats, IoTError,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
