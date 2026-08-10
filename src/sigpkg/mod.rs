@@ -5,9 +5,14 @@ pub mod arch_compat;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
+pub mod universal_adapter;
+pub mod universal_oop_system;
 pub mod verifier;
+pub mod zero_alloc_resolver;
+pub mod declarative_build;
 pub mod debian_defeater;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
@@ -24,8 +29,6 @@ pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
-pub use verifier::CryptoVerifier;
-pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
 pub use universal_adapter::{
     PackageFormatAdapter, UniversalPackageManager as UniversalAdapterManager, AdapterError,
     DebAdapter, RpmAdapter, PacmanAdapter,
@@ -36,6 +39,9 @@ pub use universal_oop_system::{
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
     UserDefinedHook, ParseError, InstallError, HookError,
 };
+pub use verifier::CryptoVerifier;
+pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPENDENCIES};
+pub use declarative_build::{NixDerivation, BazelTarget, PackageReview, PackageRatingsRegistry, BazelBuildEngine, BazelRuleType};
 pub use debian_defeater::{
     MirrorNode, SovereignMirrorSelector, FileState, FileTransactionEntry,
     SovereignTransactionManager, SandboxRule, SovereignSandboxEnforcer,
