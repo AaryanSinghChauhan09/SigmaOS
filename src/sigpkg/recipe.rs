@@ -115,6 +115,15 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.build_commands.insert(0, command);
+        self
+    }
+
+    pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
+        self
+    }
+
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
         self

@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
 //! SigmaOS Digital Personal Data Protection (DPDP) Act, 2023 Compatibility
 //! Personal data consent, erasure compliance audits, and statutory penalty calculations
 //! Zero external dependencies

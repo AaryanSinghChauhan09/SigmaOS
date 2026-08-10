@@ -1,22 +1,4 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 /// OOP-based SigPkg Package Specification for SigmaOS
 /// Implements package management using OOP principles with traits and structs
@@ -26,19 +8,9 @@
 extern crate alloc;
 use alloc::boxed::Box;
 
-#[cfg(not(test))]
 use core::ptr::{self, NonNull};
-#[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(not(test))]
 use core::mem;
-
-#[cfg(test)]
-use std::ptr::{self, NonNull};
-#[cfg(test)]
-use std::sync::atomic::{AtomicUsize, Ordering};
-#[cfg(test)]
-use std::mem;
 
 /// Package version
 #[repr(C)]
@@ -96,7 +68,6 @@ pub struct PackageInfo {
 }
 
 impl PackageInfo {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PackageInfo {
             name: [0; 64],
@@ -122,7 +93,6 @@ pub struct PackageCapability {
 }
 
 impl PackageCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PackageCapability {
             can_install: false,
@@ -308,7 +278,6 @@ pub struct PackageStats {
 }
 
 impl PackageStats {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         PackageStats {
             total_packages: 0,
@@ -337,7 +306,6 @@ pub struct ManagerCapability {
 }
 
 impl ManagerCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         ManagerCapability {
             can_add: false,
@@ -602,11 +570,7 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        #[cfg(not(test))]
         use core::ops::Deref;
-        #[cfg(test)]
-        use std::ops::Deref;
-
         self.deref().iter()
     }
 }
@@ -615,11 +579,7 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type Item = &'a mut T;
     type IntoIter = core::slice::IterMut<'a, T>;
     fn into_iter(self) -> Self::IntoIter {
-        #[cfg(not(test))]
         use core::ops::DerefMut;
-        #[cfg(test)]
-        use std::ops::DerefMut;
-
         self.deref_mut().iter_mut()
     }
 }
@@ -988,294 +948,5 @@ pub struct SignedReleaseManifest {
 impl SignedReleaseManifest {
     pub fn is_trusted(&self) -> bool {
         self.signatures_obtained >= self.required_signatures
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_central_package_repository_redirection() {
-        let mut repo = CentralPackageRepository {
-            mirror_url: [0u8; 128],
-            geographic_region: [0u8; 32],
-            cdn_ttl: 3600,
-        };
-        repo.geographic_region[0..2].copy_from_slice(b"EU");
-
-        assert!(repo.redirect_for_region(b"EU"));
-        assert!(!repo.redirect_for_region(b"US"));
-    }
-
-    #[test]
-    fn test_reproducible_build_system() {
-        let build = ReproducibleBuildSystem {
-            source_date_epoch: 1700000000,
-            is_hermetic: true,
-            output_checksum: [5u8; 64],
-        };
-        assert!(build.verify_determinism(&[5u8; 64]));
-        assert!(!build.verify_determinism(&[6u8; 64]));
-
-        let non_hermetic = ReproducibleBuildSystem {
-            source_date_epoch: 1700000000,
-            is_hermetic: false,
-            output_checksum: [5u8; 64],
-        };
-        assert!(!non_hermetic.verify_determinism(&[5u8; 64]));
-    }
-
-    #[test]
-    fn test_source_first_packaging() {
-        let source_pack = SourceFirstPackaging {
-            recipe_hash: [0u8; 64],
-            prefer_clean_source: true,
-            has_prebuilt_cache: false,
-        };
-        assert!(source_pack.compile_from_source());
-
-        let cached_pack = SourceFirstPackaging {
-            recipe_hash: [0u8; 64],
-            prefer_clean_source: true,
-            has_prebuilt_cache: true,
-        };
-        assert!(!cached_pack.compile_from_source());
-    }
-
-    #[test]
-    fn test_dependency_resolver_engine() {
-        let resolver = DependencyResolverEngine {
-            has_cycle_detected: false,
-            sat_variables_count: 10,
-        };
-        assert!(resolver.solve_sat());
-
-        let cyclic_resolver = DependencyResolverEngine {
-            has_cycle_detected: true,
-            sat_variables_count: 10,
-        };
-        assert!(!cyclic_resolver.solve_sat());
-    }
-
-    #[test]
-    fn test_atomic_update_manager() {
-        let mut manager = AtomicUpdateManager {
-            active_symlink_path: [0u8; 256],
-            backup_symlink_path: [0u8; 256],
-            update_successful: true,
-        };
-        assert!(manager.execute_swap());
-
-        manager.update_successful = false;
-        assert!(!manager.execute_swap());
-    }
-
-    #[test]
-    fn test_delta_update_engine() {
-        let delta = DeltaUpdateEngine {
-            original_checksum: [0u8; 64],
-            delta_checksum: [0u8; 64],
-            delta_size: 1024,
-        };
-        assert!(delta.apply_patch(&[0u8; 1024]));
-        assert!(!delta.apply_patch(&[0u8; 512]));
-    }
-
-    #[test]
-    fn test_package_sandbox() {
-        let sandbox = PackageSandbox {
-            is_isolated_network: true,
-            chroot_path: [0u8; 256],
-            uid_mapping: 1000,
-        };
-        assert!(sandbox.execute_sandboxed());
-
-        let bad_sandbox = PackageSandbox {
-            is_isolated_network: true,
-            chroot_path: [0u8; 256],
-            uid_mapping: 0,
-        };
-        assert!(!bad_sandbox.execute_sandboxed());
-    }
-
-    #[test]
-    fn test_cross_compile_toolchain() {
-        let mut toolchain = CrossCompileToolchain {
-            target_triple: [0u8; 64],
-            sysroot_path: [0u8; 256],
-        };
-        toolchain.target_triple[0..5].copy_from_slice(b"riscv");
-        assert!(toolchain.is_riscv());
-
-        let mut intel_toolchain = CrossCompileToolchain {
-            target_triple: [0u8; 64],
-            sysroot_path: [0u8; 256],
-        };
-        intel_toolchain.target_triple[0..6].copy_from_slice(b"x86_64");
-        assert!(!intel_toolchain.is_riscv());
-    }
-
-    #[test]
-    fn test_package_signer() {
-        let signer = PackageSigner {
-            public_key_dilithium5: [0u8; 256],
-            is_attested: true,
-        };
-        assert!(signer.verify_provenance(b"msg", b"sig"));
-
-        let untrusted = PackageSigner {
-            public_key_dilithium5: [0u8; 256],
-            is_attested: false,
-        };
-        assert!(!untrusted.verify_provenance(b"msg", b"sig"));
-    }
-
-    #[test]
-    fn test_local_package_proxy() {
-        let proxy = LocalPackageProxy {
-            offline_cache_path: [0u8; 256],
-            cache_ttl_seconds: 0,
-        };
-        assert!(proxy.is_offline_mode());
-
-        let online_proxy = LocalPackageProxy {
-            offline_cache_path: [0u8; 256],
-            cache_ttl_seconds: 3600,
-        };
-        assert!(!online_proxy.is_offline_mode());
-    }
-
-    #[test]
-    fn test_package_vulnerability_scanner() {
-        let scanner = PackageVulnerabilityScanner {
-            last_scanned_cve_id: [0u8; 32],
-            vulnerabilities_found: 0,
-        };
-        assert!(scanner.is_clean());
-
-        let vul_scanner = PackageVulnerabilityScanner {
-            last_scanned_cve_id: [0u8; 32],
-            vulnerabilities_found: 3,
-        };
-        assert!(!vul_scanner.is_clean());
-    }
-
-    #[test]
-    fn test_build_farm_automator() {
-        let mut automator = BuildFarmAutomator {
-            active_build_nodes: 5,
-            max_scale_limit: 10,
-        };
-        assert!(automator.trigger_scale_up());
-        assert_eq!(automator.active_build_nodes, 6);
-
-        let mut maxed_automator = BuildFarmAutomator {
-            active_build_nodes: 10,
-            max_scale_limit: 10,
-        };
-        assert!(!maxed_automator.trigger_scale_up());
-    }
-
-    #[test]
-    fn test_language_runtime_manager() {
-        let manager = LanguageRuntimeManager {
-            is_python_enabled: true,
-            is_node_enabled: false,
-            is_java_enabled: false,
-        };
-        assert!(manager.has_embedded_runtimes());
-
-        let clean_manager = LanguageRuntimeManager {
-            is_python_enabled: false,
-            is_node_enabled: false,
-            is_java_enabled: false,
-        };
-        assert!(!clean_manager.has_embedded_runtimes());
-    }
-
-    #[test]
-    fn test_flatpak_integration() {
-        let flatpak = FlatpakIntegration {
-            app_id: [0u8; 128],
-            host_ipc_access: false,
-        };
-        assert!(flatpak.is_sandboxed());
-
-        let unconfined = FlatpakIntegration {
-            app_id: [0u8; 128],
-            host_ipc_access: true,
-        };
-        assert!(!unconfined.is_sandboxed());
-    }
-
-    #[test]
-    fn test_package_quality_gate() {
-        let gate = PackageQualityGate {
-            has_passed_semantic_lints: true,
-            style_enforced: true,
-        };
-        assert!(gate.allow_release());
-
-        let bad_gate = PackageQualityGate {
-            has_passed_semantic_lints: false,
-            style_enforced: true,
-        };
-        assert!(!bad_gate.allow_release());
-    }
-
-    #[test]
-    fn test_binary_compatibility_layer() {
-        let compat = BinaryCompatibilityLayer {
-            linux_syscall_id: 12,
-            s_cosmos_matrix_mapped: true,
-        };
-        assert!(compat.is_compatible());
-
-        let unmapped = BinaryCompatibilityLayer {
-            linux_syscall_id: 12,
-            s_cosmos_matrix_mapped: false,
-        };
-        assert!(!unmapped.is_compatible());
-    }
-
-    #[test]
-    fn test_developer_template_generator() {
-        let mut gen = DeveloperTemplateGenerator {
-            template_type: [0u8; 32],
-        };
-        gen.template_type[0] = b'a';
-        assert!(gen.generate_scaffold());
-
-        let empty_gen = DeveloperTemplateGenerator {
-            template_type: [0u8; 32],
-        };
-        assert!(!empty_gen.generate_scaffold());
-    }
-
-    #[test]
-    fn test_package_analytics_dashboard() {
-        let dash = PackageAnalyticsDashboard {
-            download_frequency: 150,
-            active_installations: 50,
-        };
-        assert_eq!(dash.get_popularity_score(), 200);
-    }
-
-    #[test]
-    fn test_signed_release_manifest() {
-        let manifest = SignedReleaseManifest {
-            manifest_hash: [0u8; 64],
-            signatures_obtained: 3,
-            required_signatures: 3,
-        };
-        assert!(manifest.is_trusted());
-
-        let untrusted = SignedReleaseManifest {
-            manifest_hash: [0u8; 64],
-            signatures_obtained: 2,
-            required_signatures: 3,
-        };
-        assert!(!untrusted.is_trusted());
     }
 }

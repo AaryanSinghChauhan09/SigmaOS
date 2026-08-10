@@ -1,12 +1,16 @@
 // SigmaOS Kernel Library
-pub mod buddy_allocator;
-pub mod collections;
-pub mod paging;
 pub mod vec;
-pub mod uuid;
-pub mod rand;
+pub mod buddy_allocator;
+pub mod paging;
+pub mod hashmap;
+pub mod hashset;
+pub mod btreemap;
+pub mod vecdeque;
+pub mod error;
+pub mod hash;
 
 pub use vec::Vec;
-pub use uuid::Uuid;
-pub use rand::{random_bytes, random_u32, random_u64, random_usize, random_range, XorShiftRng};
-pub use collections::{HashMap, HashSet, VecDeque, AtomicBool, AtomicUsize, AtomicU64, Ordering};
+pub use hashmap::{HashMap, Entry};
+pub use hashset::HashSet;
+pub use btreemap::BTreeMap;
+pub use vecdeque::VecDeque;
