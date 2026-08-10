@@ -90,12 +90,6 @@ pub struct SimpleDeviceManager {
     pub next_id: AtomicUsize,
 }
 
-impl Default for SimpleDeviceManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl SimpleDeviceManager {
     pub fn new() -> Self {
         SimpleDeviceManager {
@@ -181,7 +175,9 @@ impl DeviceDriver for SimpleDeviceDriver {
     }
 
     fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
-        buffer.fill(0u8);
+        for i in 0..buffer.len() {
+            buffer[i] = 0u8;
+        }
         Ok(buffer.len())
     }
 
@@ -205,12 +201,6 @@ pub struct SimpleDeviceHotplug {
     pub enabled: AtomicUsize,
     pub added_devices: Vec<DeviceID>,
     pub removed_devices: Vec<DeviceID>,
-}
-
-impl Default for SimpleDeviceHotplug {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl SimpleDeviceHotplug {
@@ -361,7 +351,57 @@ impl<'a, T> Iterator for VecIterMut<'a, T> {
     }
 }
 
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    if let Ok(layout) = Layout::from_size_align(size, 8) {
+        std_alloc(layout)
+    } else {
+        core::ptr::null_mut()
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free_layout(ptr: *mut u8, size: usize) {
+    use std::alloc::{dealloc, Layout};
+    if !ptr.is_null() && size > 0 {
+        if let Ok(layout) = Layout::from_size_align(size, 8) {
+            dealloc(ptr, layout);
+        }
+    }
+}
+
+#[cfg(target_os = "none")]
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(target_os = "none")]
+unsafe fn free_layout(ptr: *mut u8, _size: usize) {
+    free(ptr);
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() && self.capacity > 0 {
+            for i in 0..self.len {
+                unsafe {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+            }
+            unsafe {
+                let size = self.capacity * core::mem::size_of::<T>();
+                free_layout(self.data as *mut u8, size);
+            }
+            self.data = core::ptr::null_mut();
+            self.len = 0;
+            self.capacity = 0;
+        }
+    }
 }

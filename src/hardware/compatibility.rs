@@ -6,22 +6,10 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 pub type DeviceID = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceType {
-    GPU = 0,
-    WiFi = 1,
-    Printer = 2,
-    Chipset = 3,
-    Audio = 4,
-    Storage = 5,
-}
+pub enum DeviceType { GPU = 0, WiFi = 1, Printer = 2, Chipset = 3, Audio = 4, Storage = 5 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SupportStatus {
-    Supported = 0,
-    Partial = 1,
-    Unsupported = 2,
-    Unknown = 3,
-}
+pub enum SupportStatus { Supported = 0, Partial = 1, Unsupported = 2, Unknown = 3 }
 
 pub trait HardwareDevice {
     fn id(&self) -> DeviceID;
@@ -42,14 +30,7 @@ pub struct SimpleDevice {
 }
 
 impl SimpleDevice {
-    pub fn new(
-        id: DeviceID,
-        device_type: DeviceType,
-        vendor_id: u16,
-        device_id: u16,
-        name: &str,
-        status: SupportStatus,
-    ) -> Self {
+    pub fn new(id: DeviceID, device_type: DeviceType, vendor_id: u16, device_id: u16, name: &str, status: SupportStatus) -> Self {
         SimpleDevice {
             id,
             device_type,
@@ -62,31 +43,16 @@ impl SimpleDevice {
 }
 
 impl HardwareDevice for SimpleDevice {
-    fn id(&self) -> DeviceID {
-        self.id
-    }
-    fn device_type(&self) -> DeviceType {
-        self.device_type
-    }
-    fn vendor_id(&self) -> u16 {
-        self.vendor_id
-    }
-    fn device_id(&self) -> u16 {
-        self.device_id
-    }
-    fn name(&self) -> &str {
-        &self.name
-    }
-    fn support_status(&self) -> SupportStatus {
-        self.support_status
-    }
+    fn id(&self) -> DeviceID { self.id }
+    fn device_type(&self) -> DeviceType { self.device_type }
+    fn vendor_id(&self) -> u16 { self.vendor_id }
+    fn device_id(&self) -> u16 { self.device_id }
+    fn name(&self) -> &str { &self.name }
+    fn support_status(&self) -> SupportStatus { self.support_status }
 }
 
 pub trait HardwareCompatibilityManager {
-    fn add_device(
-        &mut self,
-        device: Box<dyn HardwareDevice>,
-    ) -> Result<DeviceID, CompatibilityError>;
+    fn add_device(&mut self, device: Box<dyn HardwareDevice>) -> Result<DeviceID, CompatibilityError>;
     fn remove_device(&mut self, id: DeviceID) -> Result<(), CompatibilityError>;
     fn get_device(&self, id: DeviceID) -> Option<&dyn HardwareDevice>;
     fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<DeviceID>;
@@ -116,73 +82,28 @@ impl SimpleCompatibilityMatrix {
     }
 
     pub fn seed_with_defaults(&mut self) {
-        let gpu1 = SimpleDevice::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            DeviceType::GPU,
-            0x10DE,
-            0x1C02,
-            "NVIDIA GeForce RTX 3060",
-            SupportStatus::Supported,
-        );
+        let gpu1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::GPU, 0x10DE, 0x1C02, "NVIDIA GeForce RTX 3060", SupportStatus::Supported);
         self.devices.push(Box::new(gpu1));
 
-        let gpu2 = SimpleDevice::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            DeviceType::GPU,
-            0x1002,
-            0x73DF,
-            "AMD Radeon RX 6800 XT",
-            SupportStatus::Supported,
-        );
+        let gpu2 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::GPU, 0x1002, 0x73DF, "AMD Radeon RX 6800 XT", SupportStatus::Supported);
         self.devices.push(Box::new(gpu2));
 
-        let wifi1 = SimpleDevice::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            DeviceType::WiFi,
-            0x8086,
-            0x2723,
-            "Intel Wi-Fi 6 AX200",
-            SupportStatus::Supported,
-        );
+        let wifi1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::WiFi, 0x8086, 0x2723, "Intel Wi-Fi 6 AX200", SupportStatus::Supported);
         self.devices.push(Box::new(wifi1));
 
-        let wifi2 = SimpleDevice::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            DeviceType::WiFi,
-            0x168C,
-            0x003A,
-            "Realtek RTL8852AE",
-            SupportStatus::Partial,
-        );
+        let wifi2 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::WiFi, 0x168C, 0x003A, "Realtek RTL8852AE", SupportStatus::Partial);
         self.devices.push(Box::new(wifi2));
 
-        let printer1 = SimpleDevice::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            DeviceType::Printer,
-            0x03F0,
-            0x4A17,
-            "HP LaserJet Pro M404n",
-            SupportStatus::Supported,
-        );
+        let printer1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::Printer, 0x03F0, 0x4A17, "HP LaserJet Pro M404n", SupportStatus::Supported);
         self.devices.push(Box::new(printer1));
 
-        let chipset1 = SimpleDevice::new(
-            self.next_id.fetch_add(1, Ordering::SeqCst),
-            DeviceType::Chipset,
-            0x8086,
-            0x1C02,
-            "Intel Z590",
-            SupportStatus::Supported,
-        );
+        let chipset1 = SimpleDevice::new(self.next_id.fetch_add(1, Ordering::SeqCst), DeviceType::Chipset, 0x8086, 0x1C02, "Intel Z590", SupportStatus::Supported);
         self.devices.push(Box::new(chipset1));
     }
 }
 
 impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
-    fn add_device(
-        &mut self,
-        device: Box<dyn HardwareDevice>,
-    ) -> Result<DeviceID, CompatibilityError> {
+    fn add_device(&mut self, device: Box<dyn HardwareDevice>) -> Result<DeviceID, CompatibilityError> {
         let id = device.id();
         self.devices.push(device);
         Ok(id)
@@ -198,30 +119,24 @@ impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
     }
 
     fn get_device(&self, id: DeviceID) -> Option<&dyn HardwareDevice> {
-        self.devices
-            .iter()
-            .find(|d| d.id() == id)
-            .map(|d| d.as_ref())
+        self.devices.iter().find(|d| d.id() == id).map(|d| d.as_ref())
     }
 
     fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<DeviceID> {
-        self.devices
-            .iter()
+        self.devices.iter()
             .find(|d| d.vendor_id() == vendor_id && d.device_id() == device_id)
             .map(|d| d.id())
     }
 
     fn list_by_type(&self, device_type: DeviceType) -> Vec<DeviceID> {
-        self.devices
-            .iter()
+        self.devices.iter()
             .filter(|d| d.device_type() == device_type)
             .map(|d| d.id())
             .collect()
     }
 
     fn list_supported(&self) -> Vec<DeviceID> {
-        self.devices
-            .iter()
+        self.devices.iter()
             .filter(|d| d.support_status() == SupportStatus::Supported)
             .map(|d| d.id())
             .collect()
@@ -229,12 +144,7 @@ impl HardwareCompatibilityManager for SimpleCompatibilityMatrix {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CompatibilityResult {
-    Healthy = 0,
-    Warning = 1,
-    Error = 2,
-    Unknown = 3,
-}
+pub enum CompatibilityResult { Healthy = 0, Warning = 1, Error = 2, Unknown = 3 }
 
 pub struct CompatibilityReport {
     pub results: Vec<(DeviceID, CompatibilityResult)>,
@@ -270,7 +180,7 @@ impl CompatibilityCheck for SimpleDiagnostics {
     }
 
     fn run_full_scan(&self) -> CompatibilityReport {
-        let mut results: Vec<(DeviceID, CompatibilityResult)> = Vec::new();
+        let mut results = Vec::new();
         for device in &self.matrix.devices {
             let result = self.check_device(device.id());
             results.push((device.id(), result));
