@@ -23,6 +23,7 @@ pub mod accessibility;
 pub mod automation;
 pub mod boot;
 pub mod compatibility;
+pub mod config;
 pub mod container;
 pub mod customization;
 pub mod dashboard;
@@ -40,6 +41,7 @@ pub mod orchestration;
 pub mod package;
 pub mod power;
 pub mod productivity;
+pub mod recovery;
 pub mod resilience;
 pub mod release;
 pub mod rt;
@@ -163,9 +165,17 @@ pub use power::{
 pub use boot::{
     BootEntry, BootTheme, ThemeColors, BootManager, BootStats, BootError,
 };
+pub use config::{
+    ConfigModule, ConfigState, SystemConfig, ConfigGeneration, ConfigManager,
+    ConfigStats, ConfigError,
+};
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
     ProductivityScore,
+};
+pub use recovery::{
+    RecoverySystemSnapshot, SnapshotType, Backup, BackupType, BackupCompression,
+    BackupSchedule, RecoveryManager, RecoveryStats, RecoveryError,
 };
 pub use resilience::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
