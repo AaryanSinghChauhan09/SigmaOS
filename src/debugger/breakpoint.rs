@@ -240,7 +240,7 @@ pub struct SimpleRegisterViewer {
 impl SimpleRegisterViewer {
     pub fn new() -> Self {
         let mut registers = Vec::new();
-        for _ in 0..16 {
+        for i in 0..16 {
             registers.push(0u64);
         }
         SimpleRegisterViewer { registers }
@@ -281,16 +281,12 @@ impl RegisterViewer for SimpleRegisterViewer {
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 struct Vec<T> {
     data: *mut T,
     len: usize,
     capacity: usize,
 }
 
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]
 #[cfg(target_os = "none")]

@@ -1,7 +1,7 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
 
-use crate::security::CapabilityToken;
+use crate::security::{CapabilityToken, Permission};
 use std::collections::HashMap;
 
 /// File type
@@ -52,7 +52,6 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    pub hard_links_count: u32,
 }
 
 impl Inode {
@@ -67,7 +66,6 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            hard_links_count: 1,
         }
     }
 }
@@ -167,7 +165,7 @@ impl VirtualFilesystem {
         }
 
         // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor
+        let _new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::InvalidFd)?;
@@ -216,6 +214,32 @@ impl VirtualFilesystem {
         Ok(bytes_written)
     }
 
+    /// Read file guarded behind explicit capability token permission validation (Phase 2.1)
+    pub fn read_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &mut [u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
+        if !token.has_permission(Permission::FileRead) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.read_file(fd, buffer)
+    }
+
+    /// Write file guarded behind explicit capability token permission validation (Phase 2.1)
+    pub fn write_file_gated(
+        &mut self,
+        fd: u64,
+        buffer: &[u8],
+        token: &CapabilityToken,
+    ) -> Result<usize, FsError> {
+        if !token.has_permission(Permission::FileWrite) {
+            return Err(FsError::PermissionDenied);
+        }
+        self.write_file(fd, buffer)
+    }
+
     pub fn delete_file(&mut self, inode_id: u64) -> Result<(), FsError> {
         if inode_id == self.root_inode {
             return Err(FsError::PermissionDenied);
@@ -231,23 +255,6 @@ impl VirtualFilesystem {
 
     pub fn get_inode(&self, inode_id: u64) -> Option<&Inode> {
         self.inodes.get(&inode_id)
-    }
-
-    pub fn link_inode(&mut self, inode_id: u64) -> Result<(), FsError> {
-        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
-        inode.hard_links_count += 1;
-        Ok(())
-    }
-
-    pub fn unlink_inode(&mut self, inode_id: u64) -> Result<u32, FsError> {
-        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
-        if inode.hard_links_count > 1 {
-            inode.hard_links_count -= 1;
-            Ok(inode.hard_links_count)
-        } else {
-            self.inodes.remove(&inode_id);
-            Ok(0)
-        }
     }
 
     pub fn list_directory(&self, inode_id: u64) -> Result<Vec<u64>, FsError> {
@@ -313,5 +320,43 @@ mod tests {
         let data = b"test data";
         let written = vfs.write_file(fd, data).unwrap();
         assert_eq!(written, data.len());
+    }
+
+    #[test]
+    fn test_gated_read_write() {
+        let mut vfs = VirtualFilesystem::new();
+        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
+        let fd = vfs.open_file(inode_id, 0).unwrap();
+
+        let bad_token = CapabilityToken::new(); // no read or write permissions
+        let read_token = CapabilityToken::new().allow_read("/var/www");
+        let write_token = CapabilityToken::new().allow_write("/tmp");
+        let _all_token = CapabilityToken::new()
+            .allow_read("/var/www")
+            .allow_write("/tmp");
+
+        let mut buf = [0u8; 10];
+
+        // Write should fail with bad_token and read_token, but succeed with write_token or all_token
+        assert_eq!(
+            vfs.write_file_gated(fd, b"gated", &bad_token),
+            Err(FsError::PermissionDenied)
+        );
+        assert_eq!(
+            vfs.write_file_gated(fd, b"gated", &read_token),
+            Err(FsError::PermissionDenied)
+        );
+        assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
+
+        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
+        assert_eq!(
+            vfs.read_file_gated(fd, &mut buf, &bad_token),
+            Err(FsError::PermissionDenied)
+        );
+        assert_eq!(
+            vfs.read_file_gated(fd, &mut buf, &write_token),
+            Err(FsError::PermissionDenied)
+        );
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
     }
 }

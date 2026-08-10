@@ -6,9 +6,6 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
-pub mod legacy_fs;
-pub mod sigma_fs;
-pub mod smart_symlink;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -25,19 +22,7 @@ pub use manager::{
     FileType as ManagerFileType, SortOrder, StandardFileOperation, ViewMode,
 };
 pub use support::{
-    Filesystem, FilesystemError, FilesystemManager, FilesystemType, SimpleFilesystem, SimpleFilesystemManager,
+    Filesystem, FilesystemError, FilesystemManager, FilesystemType, LegacyLinuxRule,
+    LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use legacy_fs::{
-    LegacyFsType, LegacyFSAdapter,
-};
-pub use sigma_fs::{
-    FileBlock, SigmaFS,
-    SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
-    SigmaDisasterRecoveryCleaner,
-    SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid, SigmaFsCrypt, SigmaFsVirtio,
-    RaidLevel, JournalState,
-};
-pub use smart_symlink::{
-    SymlinkError, SmartSymlink,
-};
