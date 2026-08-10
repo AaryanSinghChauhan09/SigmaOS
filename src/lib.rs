@@ -65,6 +65,7 @@ pub mod scheduler {
 pub mod crypto {
     pub mod vectorized_pqc;
 }
+pub mod cluster;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
