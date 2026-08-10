@@ -90,7 +90,10 @@ pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process as KernelProcess,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use network::{
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    OpenBsdPacketFilter, FilterRule, FilterAction, TrafficDirection, FirewallState,
+};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,

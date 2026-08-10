@@ -7,6 +7,7 @@ use sigmaos::package::store::*;
 use sigmaos::kernel::breakthroughs::*;
 use sigmaos::security::CapabilityToken;
 use sigmaos::distro::*;
+use sigmaos::network::*;
 
 #[cfg(test)]
 mod tests {
@@ -53,5 +54,28 @@ mod tests {
         let mut alpm_db = AlpmDatabase::new();
         assert!(aur_client.download_and_compile_aur_package("yay-pqc", &compiler, &mut alpm_db).is_ok());
         assert!(alpm_db.get_package("yay-pqc").is_some());
+
+        // 6. OpenBSD Packet Filter (PF) Stateful Firewall Integration
+        let pf = OpenBsdPacketFilter::new();
+        let rule = FilterRule {
+            id: 1,
+            action: FilterAction::Block,
+            direction: TrafficDirection::In,
+            interface: "em0".to_string(),
+            proto: "tcp".to_string(),
+            src_ip: "192.168.1.100".to_string(),
+            dst_ip: "*".to_string(),
+            src_port: None,
+            dst_port: Some(80),
+        };
+        pf.load_ruleset(vec![rule]);
+
+        // Stateful packet checking - rule says block
+        let action = pf.check_packet(TrafficDirection::In, "em0", "tcp", "192.168.1.100", "10.0.0.1", 1234, 80);
+        assert_eq!(action, FilterAction::Block);
+
+        // Packet with stateful pass (e.g. established connection on port 443)
+        let action_pass = pf.check_packet(TrafficDirection::In, "em0", "tcp", "192.168.1.50", "10.0.0.1", 1234, 443);
+        assert_eq!(action_pass, FilterAction::Pass);
     }
 }
