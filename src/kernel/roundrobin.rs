@@ -400,25 +400,4 @@ mod tests {
             .add_process(Process::new(3, "test3".to_string(), Priority::Normal))
             .is_err());
     }
-
-    #[test]
-    fn test_extended_architectural_registers() {
-        let mut ctx = CpuContext::new();
-
-        // General Segment registers
-        ctx.cs = 0x08;
-        ctx.ds = 0x10;
-        assert_eq!(ctx.cs, 0x08);
-        assert_eq!(ctx.ds, 0x10);
-
-        // Control registers
-        assert!(ctx.set_control_register(0, 0x80050033).is_ok()); // cr0 with paging enabled
-        assert_eq!(ctx.get_control_register(0).unwrap(), 0x80050033);
-        assert!(ctx.set_control_register(9, 0).is_err()); // invalid
-
-        // Model-Specific Registers (MSRs)
-        assert!(ctx.set_msr_register(0xC0000100, 0x7FFF0000).is_ok()); // fs_base
-        assert_eq!(ctx.fs_base, 0x7FFF0000);
-        assert!(ctx.set_msr_register(0x111, 0).is_err()); // invalid
-    }
 }

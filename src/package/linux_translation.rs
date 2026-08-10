@@ -3,7 +3,7 @@
 // Integrates foreign Linux package frameworks (.deb, .rpm, pacman) directly with the SigmaOS Driver system.
 
 use crate::driver::framework::{
-    DriverError, DriverID, DriverState, DriverType, SimpleDriver,
+    Driver, DriverError, DriverID, DriverState, DriverType, SimpleDriver,
 };
 use crate::package::PackageFormat;
 use core::sync::atomic::{AtomicBool, Ordering};
@@ -14,35 +14,6 @@ pub trait PackageTranslationUdf: Sync {
     fn name(&self) -> &'static str;
     fn translate_syscall(&self, foreign_num: u32) -> u32;
     fn translate_io_control(&self, command: u32) -> u32;
-}
-
-/// Linux-style bit-packed ioctl representation
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct DecodedIoctl {
-    pub direction: u8,
-    pub size: u16,
-    pub group: u8,
-    pub command_id: u8,
-}
-
-impl DecodedIoctl {
-    /// Decodes a packed 32-bit Linux ioctl code into its distinct components
-    pub fn parse(cmd: u32) -> Self {
-        Self {
-            direction: ((cmd >> 30) & 0x03) as u8,
-            size: ((cmd >> 16) & 0x3FFF) as u16,
-            group: ((cmd >> 8) & 0xFF) as u8,
-            command_id: (cmd & 0xFF) as u8,
-        }
-    }
-
-    /// Encodes structured fields back into a standard 32-bit packed ioctl code
-    pub fn encode(&self) -> u32 {
-        ((self.direction as u32 & 0x03) << 30) |
-        ((self.size as u32 & 0x3FFF) << 16) |
-        ((self.group as u32 & 0xFF) << 8) |
-        (self.command_id as u32 & 0xFF)
-    }
 }
 
 pub struct GenericLinuxTranslationUdf;
@@ -62,39 +33,12 @@ impl PackageTranslationUdf for GenericLinuxTranslationUdf {
         }
     }
 
-    /// Advanced Linux-inspired ioctl decoding and dynamic translation mapping
     fn translate_io_control(&self, command: u32) -> u32 {
-        let decoded = DecodedIoctl::parse(command);
-
-        // Handle common standard matched Linux ioctl numbers
-        if command == 0x5401 {
-            return 0x101; // TCGETS -> Native Serial Get
-        }
-        if command == 0x5402 {
-            return 0x102; // TCSETS -> Native Serial Set
-        }
-        if command == 0x5421 {
-            return 0x103; // FIONBIO -> Non-blocking socket configuration
-        }
-        if command == 0x125F {
-            return 0x104; // BLKGETSIZE -> Read block device bounds
-        }
-
-        // Otherwise, dynamically translate using decoded groups safely
-        match decoded.group {
-            b'T' => { // TTY / Serial group
-                0x100 + decoded.command_id as u32
-            }
-            b'f' => { // Filesystem / Socket group
-                0x200 + decoded.command_id as u32
-            }
-            0x12 => { // Block device group
-                0x300 + decoded.command_id as u32
-            }
-            _ => {
-                // Fallback translation
-                command ^ 0xDEAD
-            }
+        // Map generic Linux ioctl codes to SigmaOS equivalents
+        match command {
+            0x5401 => 0x101, // TCGETS -> native serial get
+            0x5402 => 0x102, // TCSETS -> native serial set
+            _ => command ^ 0xDEAD,
         }
     }
 }
@@ -104,76 +48,6 @@ pub trait LinuxDriverPackageTranslator {
     fn source_format(&self) -> PackageFormat;
     fn package_name(&self) -> &'static str;
     fn translate_to_driver(&self) -> SimpleDriver;
-}
-
-/// Polymorphic driver package translator that maps package installation to driver lifecycles
-pub struct PolymorphicDriverPackageAdapter {
-    pub name: &'static str,
-    pub format: PackageFormat,
-    pub driver_id: DriverID,
-    pub driver_type: DriverType,
-}
-
-impl PolymorphicDriverPackageAdapter {
-    pub fn new(
-        name: &'static str,
-        format: PackageFormat,
-        driver_id: DriverID,
-        driver_type: DriverType,
-    ) -> Self {
-        Self {
-            name,
-            format,
-            driver_id,
-            driver_type,
-        }
-    }
-
-    /// Simulate dynamic installation mapping package action to load native driver API
-    pub fn install_and_load_driver(&self) -> Result<SimpleDriver, DriverError> {
-        let mut driver = self.translate_to_driver();
-        println!(
-            "PolymorphicDriverPackageAdapter: Installing package {} and dynamically registering native driver ID {}.",
-            self.name, self.driver_id
-        );
-        driver.init()?;
-        if driver.probe()? {
-            driver.load()?;
-            println!("PolymorphicDriverPackageAdapter: Driver successfully transitioned state to Active.");
-            Ok(driver)
-        } else {
-            Err(DriverError::ProbeFailed)
-        }
-    }
-
-    /// Simulate dynamic uninstallation mapping package action to unload native driver API
-    pub fn unload_and_uninstall_driver(
-        &self,
-        driver: &mut SimpleDriver,
-    ) -> Result<(), DriverError> {
-        println!(
-            "PolymorphicDriverPackageAdapter: Uninstalling package {} and unloading driver ID {}.",
-            self.name, self.driver_id
-        );
-        driver.shutdown()?;
-        driver.unload()?;
-        println!("PolymorphicDriverPackageAdapter: Driver transitioned to Unloaded successfully.");
-        Ok(())
-    }
-}
-
-impl LinuxDriverPackageTranslator for PolymorphicDriverPackageAdapter {
-    fn source_format(&self) -> PackageFormat {
-        self.format
-    }
-
-    fn package_name(&self) -> &'static str {
-        self.name
-    }
-
-    fn translate_to_driver(&self) -> SimpleDriver {
-        SimpleDriver::new(self.driver_id, self.driver_type)
-    }
 }
 
 /// Concrete .deb (Debian/Ubuntu/Parrot/Mint) package translator
@@ -198,9 +72,9 @@ impl LinuxDriverPackageTranslator for DebPackageDriverTranslator {
             self.name, self.payload_size
         );
         let driver_type = if self.is_kernel_module {
-            DriverType::Storage
+            DriverType::Block
         } else {
-            DriverType::Input
+            DriverType::Char
         };
         SimpleDriver::new(9901, driver_type)
     }
@@ -231,7 +105,7 @@ impl LinuxDriverPackageTranslator for RpmPackageDriverTranslator {
                 "PackageTranslator: RPM signature is valid. Provisioning micro-driver bridge."
             );
         }
-        SimpleDriver::new(9902, DriverType::Input)
+        SimpleDriver::new(9902, DriverType::Char)
     }
 }
 
@@ -303,38 +177,3 @@ impl LinuxTranslationService {
 pub static GLOBAL_TRANSLATION_UDF: GenericLinuxTranslationUdf = GenericLinuxTranslationUdf;
 pub static GLOBAL_TRANSLATION_SERVICE: LinuxTranslationService =
     LinuxTranslationService::new(&GLOBAL_TRANSLATION_UDF);
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_linux_ioctl_parsing_and_encoding() {
-        // Standard layout test: Direction=2 (read), Size=256, Group='T', Command=10
-        let encoded_cmd = ((2u32) << 30) | ((256u32) << 16) | ((b'T' as u32) << 8) | 10;
-        let decoded = DecodedIoctl::parse(encoded_cmd);
-
-        assert_eq!(decoded.direction, 2);
-        assert_eq!(decoded.size, 256);
-        assert_eq!(decoded.group, b'T');
-        assert_eq!(decoded.command_id, 10);
-
-        assert_eq!(decoded.encode(), encoded_cmd);
-    }
-
-    #[test]
-    fn test_linux_ioctl_group_routing() {
-        let udf = GenericLinuxTranslationUdf;
-
-        // 1. TCGETS direct translation
-        assert_eq!(udf.translate_io_control(0x5401), 0x101);
-
-        // 2. TTY dynamic translation Group='T' (0x54), Command=5 -> 0x100 + 5 = 0x105
-        let tty_cmd = ((1u32) << 30) | ((4u32) << 16) | ((b'T' as u32) << 8) | 5;
-        assert_eq!(udf.translate_io_control(tty_cmd), 0x105);
-
-        // 3. Filesystem dynamic translation Group='f', Command=12 -> 0x200 + 12 = 0x20C
-        let fs_cmd = ((3u32) << 30) | ((8u32) << 16) | ((b'f' as u32) << 8) | 12;
-        assert_eq!(udf.translate_io_control(fs_cmd), 0x20C);
-    }
-}

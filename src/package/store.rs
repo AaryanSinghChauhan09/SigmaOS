@@ -1,5 +1,5 @@
 // SigmaOS Software Store & Safety Scanner Shard
-// Zero-dependency, highly-optimized for low-end hardware
+// Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
 // Evaluates package installations against security/safety scores and sandboxing requirements (Linux Mint Software Manager parity).
 
 use core::cell::RefCell;
