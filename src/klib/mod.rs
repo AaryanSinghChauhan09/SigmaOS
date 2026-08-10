@@ -7,6 +7,14 @@ pub mod paging;
 pub mod hashmap;
 pub mod hashset;
 pub mod uuid;
+pub mod hash;
+pub mod string;
+pub mod arc;
+pub mod ring_buffer;
+pub mod linked_list;
+pub mod slab;
+pub mod custom_string;
+pub mod custom_allocator;
 
 // Conditional compilation of other collection modules
 #[cfg(target_os = "none")]

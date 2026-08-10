@@ -12,6 +12,7 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod graphics;
 pub mod kernel;
 pub mod network;
 pub mod orchestration;
@@ -70,6 +71,7 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
     SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
 };
+pub use graphics::paint::ColorRgba;
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
     AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
@@ -92,12 +94,8 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DebPackageDriverTranslator, DependencyResolver, GenericLinuxTranslationUdf,
-    LinuxDriverPackageTranslator, LinuxTranslationService, PackageAdapter, PackageError,
-    PackageFormat, PackageSource, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, SigmaSoftwareStore, SoftwareRegistryEntry, UnifiedPackage,
-    UniversalPackageManager, GLOBAL_SOFTWARE_STORE, GLOBAL_TRANSLATION_SERVICE,
-    GLOBAL_TRANSLATION_UDF,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use performance::{
     AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CallGraph,
@@ -108,8 +106,11 @@ pub use performance::{
     GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
 };
 pub use productivity::{
-    Achievement, AchievementType, AudioChannel, GamifiedProductivity, Goal, PomodoroState,
-    PomodoroTimer, ProductivityScore, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE,
+    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
+    ProductivityScore, EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
+    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
+    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
+    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
 };
 pub use resilience::{
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,

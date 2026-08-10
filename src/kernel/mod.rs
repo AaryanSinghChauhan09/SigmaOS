@@ -12,6 +12,10 @@ pub use architecture::{
     InstructionCyclePhase as ArchInstructionCyclePhase, Irql, LookasideList, MemoryDescriptorList,
     Pcb, PoolType, ProcessorInitState, Tcb, ThreadState,
 };
+pub use breakthroughs::{
+    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
+    UniversalAbiTranslator, UserDefinedKernelFunctions,
+};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use policy_mechanism::{

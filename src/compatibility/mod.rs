@@ -3,7 +3,19 @@ pub mod antix;
 pub mod canonical;
 pub mod chakra;
 pub mod cross_platform;
+pub mod historic_linux;
+pub mod mint_linux;
+pub mod chimera_linux;
+pub mod relay_nexus;
+pub mod solid_kernel;
+pub mod wasm_sandbox;
+pub mod absorb_tools;
+pub mod tiny_core;
+pub mod apache_ossie;
+pub mod sovereign_suite;
+pub mod gentoo;
 pub mod legacy_adapters;
+pub mod canonical;
 
 pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
@@ -36,4 +48,37 @@ pub use canonical::{
     HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
     ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
     UnifiedAppStore, ZorinAppearanceSwitcher,
+};
+
+pub use solid_kernel::{
+    IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
+    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
+};
+
+pub use wasm_sandbox::{
+    WasmState, WasmModule, WasmSandboxEngine,
+};
+
+pub use absorb_tools::{
+    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
+    DpllSatSolver, CasObject, ContentAddressedStorage,
+};
+
+pub use tiny_core::{
+    TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
+};
+
+pub use apache_ossie::{
+    MetricAggregation, OssieMetric, OssieDimension, OssieRelationship, OssieCatalog,
+    SemanticRow, OssieInterpreter, OssieOntology,
+};
+
+pub use sovereign_suite::{
+    EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
+    FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
+};
+
+pub use gentoo::{
+    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
+    EbuildPackage, PortageEngine,
 };

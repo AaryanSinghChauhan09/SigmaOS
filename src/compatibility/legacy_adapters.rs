@@ -69,6 +69,7 @@ pub enum LibcVersion {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SyscallAbi {
     Oabi_32,
+    Eabi_32,
     Eabi_64,
 }
 
