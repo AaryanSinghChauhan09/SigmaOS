@@ -131,7 +131,11 @@ pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
     ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
 };
-pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+pub use network::{
+    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    VirtualSwitch, SwitchPort, PortType, FlowRule, FlowMatch, FlowAction,
+    SDNController, SDNControllerType, SigmaSDN, SDNStats, NetworkError as SDNError,
+};
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
     ConnectionStatus, CrossDeviceAction, CrossDeviceOrchestrator, DeviceCapability,
