@@ -9,16 +9,7 @@ use crate::klib::HashMap;
 #[cfg(test)]
 use std::collections::HashMap;
 
-#[cfg(not(test))]
-use crate::klib::SigmaString as String;
-
-#[cfg(test)]
-use std::string::String;
-
-#[cfg(not(test))]
-use crate::klib::Vec;
-
-#[cfg(test)]
+use std::string::{String, ToString};
 use std::vec::Vec;
 
 // ── Syscall numbers (Linux-compatible subset + SigmaOS extensions) ────────
