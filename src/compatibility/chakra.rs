@@ -1,3 +1,5 @@
+use core::sync::atomic::{AtomicBool, AtomicU8, Ordering};
+
 // 1. Akabei Bundle Resolver & Bundler
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

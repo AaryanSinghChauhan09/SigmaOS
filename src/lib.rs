@@ -22,6 +22,7 @@ pub mod package;
 pub mod performance;
 pub mod productivity;
 pub mod resilience;
+pub mod resource;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
