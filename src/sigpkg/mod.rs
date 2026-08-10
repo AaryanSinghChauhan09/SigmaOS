@@ -19,6 +19,7 @@ pub use transaction::Transaction;
 pub use universal_adapter::{
     AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
 };
+pub use universal_oop_system::{AppRating, AppReview, AppReviewStore};
 pub use verifier::CryptoVerifier;
 pub use importer::{PackageImporter, DebPackageImporter, RpmPackageImporter, PacmanPackageImporter};
 

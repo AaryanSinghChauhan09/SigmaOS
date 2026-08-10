@@ -1017,9 +1017,48 @@ impl IPackageParser for NixAdapter {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct AppRating {
+    pub stars: u32, // 1 to 5
+}
+
+#[derive(Debug, Clone)]
+pub struct AppReview {
+    pub author: String,
+    pub rating: AppRating,
+    pub comment: String,
+    pub timestamp: u64,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct AppReviewStore {
+    pub reviews: Vec<AppReview>,
+}
+
+impl AppReviewStore {
+    pub fn new() -> Self {
+        Self {
+            reviews: Vec::new(),
+        }
+    }
+
+    pub fn add_review(&mut self, review: AppReview) {
+        self.reviews.push(review);
+    }
+
+    pub fn average_rating(&self) -> f32 {
+        if self.reviews.is_empty() {
+            return 0.0;
+        }
+        let total_stars: u32 = self.reviews.iter().map(|r| r.rating.stars).sum();
+        total_stars as f32 / self.reviews.len() as f32
+    }
+}
+
 /// Flatpak package adapter
 pub struct FlatpakAdapter {
     base: BaseAdapter,
+    pub review_store: AppReviewStore,
 }
 
 impl FlatpakAdapter {
@@ -1027,6 +1066,7 @@ impl FlatpakAdapter {
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Flatpak),
+            review_store: AppReviewStore::new(),
         }
     }
 
@@ -1042,6 +1082,23 @@ impl FlatpakAdapter {
             return Err("Security Risk: Untrusted Flatpak requesting direct host access");
         }
         Ok(true)
+    }
+
+    pub fn add_review(&mut self, author: &str, stars: u32, comment: &str, timestamp: u64) -> Result<(), &'static str> {
+        if stars == 0 || stars > 5 {
+            return Err("Rating stars must be between 1 and 5");
+        }
+        self.review_store.add_review(AppReview {
+            author: author.to_string(),
+            rating: AppRating { stars },
+            comment: comment.to_string(),
+            timestamp,
+        });
+        Ok(())
+    }
+
+    pub fn get_average_rating(&self) -> f32 {
+        self.review_store.average_rating()
     }
 }
 
@@ -1137,6 +1194,7 @@ impl IPackageParser for FlatpakAdapter {
 /// Snap package adapter
 pub struct SnapAdapter {
     base: BaseAdapter,
+    pub review_store: AppReviewStore,
 }
 
 impl SnapAdapter {
@@ -1144,6 +1202,7 @@ impl SnapAdapter {
     pub fn new() -> Self {
         Self {
             base: BaseAdapter::new(PackageFormat::Snap),
+            review_store: AppReviewStore::new(),
         }
     }
 
@@ -1161,6 +1220,23 @@ impl SnapAdapter {
             );
         }
         Ok(true)
+    }
+
+    pub fn add_review(&mut self, author: &str, stars: u32, comment: &str, timestamp: u64) -> Result<(), &'static str> {
+        if stars == 0 || stars > 5 {
+            return Err("Rating stars must be between 1 and 5");
+        }
+        self.review_store.add_review(AppReview {
+            author: author.to_string(),
+            rating: AppRating { stars },
+            comment: comment.to_string(),
+            timestamp,
+        });
+        Ok(())
+    }
+
+    pub fn get_average_rating(&self) -> f32 {
+        self.review_store.average_rating()
     }
 }
 
@@ -2702,7 +2778,7 @@ buildInputs = [ glibc openssl ]";
 
     #[test]
     fn test_flatpak_adapter_parsing() {
-        let adapter = FlatpakAdapter::new();
+        let mut adapter = FlatpakAdapter::new();
         let flatpak_data = b"[Application]
 name=test-flatpak
 version=1.2.3
@@ -2714,10 +2790,38 @@ sdk=org.freedesktop.Sdk";
         assert_eq!(package.name(), "test-flatpak");
         assert_eq!(package.format(), PackageFormat::Flatpak);
         assert_eq!(package.dependencies().len(), 1);
+
+        // Test Flatpak ratings/reviews compatibility layer
+        assert_eq!(adapter.get_average_rating(), 0.0);
+        adapter.add_review("Alice", 5, "Amazing flatpak, fits perfectly in SigmaOS!", 1234567).unwrap();
+        adapter.add_review("Bob", 4, "Quite responsive, handles sandbox permissions beautifully.", 1234568).unwrap();
+        assert_eq!(adapter.get_average_rating(), 4.5);
+        assert!(adapter.add_review("Charlie", 6, "Excellent!", 1234569).is_err()); // Out of bounds stars
     }
 
     #[test]
     fn test_snap_adapter_parsing() {
+        let mut adapter = SnapAdapter::new();
+        let snap_data = b"name: test-snap
+version: 1.2.3
+summary: Snap package
+requires: core22";
+
+        assert!(adapter.can_parse(snap_data));
+        let package = adapter.parse(snap_data).unwrap();
+        assert_eq!(package.name(), "test-snap");
+        assert_eq!(package.format(), PackageFormat::Snap);
+        assert_eq!(package.dependencies().len(), 1);
+
+        // Test Snap ratings/reviews compatibility layer
+        assert_eq!(adapter.get_average_rating(), 0.0);
+        adapter.add_review("Alice", 5, "Extremely secure, fits perfectly in SigmaOS!", 1234567).unwrap();
+        adapter.add_review("Bob", 3, "Classic confinement could be tighter, but functionality is complete.", 1234568).unwrap();
+        assert_eq!(adapter.get_average_rating(), 4.0);
+    }
+
+    #[test]
+    fn test_snap_adapter_parsing_original() {
         let adapter = SnapAdapter::new();
         let snap_data = b"name: test-snap
 version: 1.2.3
