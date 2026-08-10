@@ -1,11 +1,12 @@
 // SigmaOS Filesystem Module
 pub mod archive;
 pub mod cow_snapshot;
+pub mod complete_filesystems;
 pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
-pub mod cow_snapshot;
+pub mod linux_package_parity;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -25,6 +26,11 @@ pub use support::{
     SimpleFilesystemManager,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use cow_snapshot::{
-    CowSnapshot, CowSnapshotManager, FileTransaction, SnapshotState,
+pub use complete_filesystems::{
+    FileSystem, FatFileSystem, FatVersion, NtfsFileSystem, ExFatFileSystem, BtrfsFileSystem, HfsPlusFileSystem, ExtFileSystem, ExtVersion,
+};
+pub use linux_package_parity::{
+    LinuxFileType, LinuxFileMetadata, NixosGenerationManager, ArchSatSolver, AndroidSecurityEnforcer,
+    KaliSysTracer, BusyBoxMultiCallParser, TraceEvent, TraceSpan, PackageRecipe, SatVersion, CapabilityToken,
+    SysCommandType,
 };
