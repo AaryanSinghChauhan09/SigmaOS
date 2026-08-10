@@ -15,33 +15,3 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
-||||||| 43be3a7e8
-// SigmaOS Package Module
-pub mod universal;
-// SigmaOS Package Module
-pub mod universal;
-pub mod store;
-
-// SigmaOS Package Module
-pub mod linux_translation;
-pub mod store;
-pub mod universal;
-pub mod debian;
-
-pub use linux_translation::{
-    DebPackageDriverTranslator, GenericLinuxTranslationUdf, LinuxDriverPackageTranslator,
-    LinuxTranslationService, PackageTranslationUdf, PacmanPackageDriverTranslator,
-    RpmPackageDriverTranslator, GLOBAL_TRANSLATION_SERVICE, GLOBAL_TRANSLATION_UDF,
-};
-pub use store::SigmaSoftwareStore;
-pub use universal::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
-};
-pub use debian::{
-    DebControl, DebPackage, AptSource, DpkgStatusEntry, parse_sources_list, parse_dpkg_status,
-};
-||||||| 43be3a7e8
-pub use store::{
-    StoreError, StoreApp, SigmaSoftwareStore,
-};
