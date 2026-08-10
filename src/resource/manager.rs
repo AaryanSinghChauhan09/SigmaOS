@@ -24,7 +24,7 @@
 /// No dependency on external resource frameworks
 
 use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use core::mem;
 
 /// Resource ID
@@ -256,6 +256,7 @@ pub trait ResourceManager {
 
 /// Resource statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct ResourceStats {
     pub total_resources: usize,
     pub acquired_resources: usize,
