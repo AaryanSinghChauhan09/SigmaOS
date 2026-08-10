@@ -967,6 +967,104 @@ impl Default for DamageTracker {
     }
 }
 
+// ==============================================================================
+// 1. Wayland-style Sub-surface (wl_subsurface)
+// ==============================================================================
+#[derive(Debug, Clone, Copy)]
+pub struct SubSurface {
+    pub id: u32,
+    pub parent_window_id: u32,
+    pub relative_offset_x: i32,
+    pub relative_offset_y: i32,
+    pub width: u32,
+    pub height: u32,
+}
+
+// ==============================================================================
+// 2. GNOME-style CursorTracker with Hot Corners
+// ==============================================================================
+pub struct CursorTracker {
+    pub x: i32,
+    pub y: i32,
+    pub last_hot_corner_triggered: u32, // 1 for Top-Left (Overview), 2 for Bottom-Right (Desktop Peek)
+}
+
+impl CursorTracker {
+    pub fn new() -> Self {
+        Self { x: 0, y: 0, last_hot_corner_triggered: 0 }
+    }
+
+    pub fn update_cursor(&mut self, x: i32, y: i32) -> u32 {
+        self.x = x;
+        self.y = y;
+        // Check Top-Left (0, 0) Overview mode trigger
+        if x == 0 && y == 0 {
+            self.last_hot_corner_triggered = 1;
+            return 1;
+        }
+        // Check Bottom-Right Peek Desktop trigger
+        if x == (SCREEN_WIDTH as i32 - 1) && y == (SCREEN_HEIGHT as i32 - 1) {
+            self.last_hot_corner_triggered = 2;
+            return 2;
+        }
+        0
+    }
+}
+
+impl Default for CursorTracker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==============================================================================
+// 3. KWin-style Vsync and Double Buffering Frame Supervisor
+// ==============================================================================
+pub struct VsyncController {
+    pub monitor_refresh_rate: u32, // e.g. 60Hz, 144Hz
+    pub frame_counter: u64,
+}
+
+impl VsyncController {
+    pub fn new(refresh_rate: u32) -> Self {
+        Self { monitor_refresh_rate: refresh_rate, frame_counter: 0 }
+    }
+
+    pub fn block_until_vsync_ticks(&mut self) -> bool {
+        self.frame_counter += 1;
+        true // Returns page swap trigger
+    }
+}
+
+// ==============================================================================
+// 4. wlroots-style Damage Tracking (Redrawing only altered rectangular areas)
+// ==============================================================================
+pub struct DamageTracker {
+    pub damaged_rects: Vec<Geometry>,
+}
+
+impl DamageTracker {
+    pub fn new() -> Self {
+        Self { damaged_rects: Vec::new() }
+    }
+
+    pub fn add_damage(&mut self, rect: Geometry) {
+        if self.damaged_rects.len() < 16 {
+            self.damaged_rects.push(rect);
+        }
+    }
+
+    pub fn clear_damage(&mut self) {
+        self.damaged_rects.clear();
+    }
+}
+
+impl Default for DamageTracker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

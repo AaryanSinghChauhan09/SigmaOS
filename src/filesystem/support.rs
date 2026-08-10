@@ -1,9 +1,10 @@
-extern crate alloc;
-
-use core::mem;
 /// OOP-based Filesystem Support for SigmaOS
 /// Based on Ideas-999-Structured: Core System Item 7
 /// Implements ext4, Btrfs, and ZFS with snapshot/rollback APIs
+
+extern crate alloc;
+
+use core::mem;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::klib::Vec;
 use alloc::boxed::Box;
@@ -242,8 +243,8 @@ impl FilesystemManager for SimpleFilesystemManager {
     }
 
     fn get_filesystem(&self, id: FilesystemID) -> Option<&dyn Filesystem> {
-        for i in 0..self.filesystems.len() {
-            if let Some(ref fs) = self.filesystems[i] {
+        for fs_option in &self.filesystems {
+            if let Some(ref fs) = *fs_option {
                 if fs.id() == id {
                     return Some(fs.as_ref());
                 }
@@ -254,16 +255,11 @@ impl FilesystemManager for SimpleFilesystemManager {
 
     fn list_filesystems(&self) -> Vec<FilesystemID> {
         let mut ids = Vec::new();
-        for i in 0..self.filesystems.len() {
-            if let Some(ref fs) = self.filesystems[i] {
+        for fs_option in &self.filesystems {
+            if let Some(ref fs) = *fs_option {
                 ids.push(fs.id());
             }
         }
         ids
     }
 }
-
-pub struct LegacyLinuxRule;
-pub struct LinuxPersonaRule;
-pub struct SmartSymlink;
-pub struct SymlinkResolverRule;

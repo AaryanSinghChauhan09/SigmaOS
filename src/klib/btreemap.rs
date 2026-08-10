@@ -12,6 +12,18 @@ where
     entries: Vec<(K, V)>,
 }
 
+impl<K, V> Clone for BTreeMap<K, V>
+where
+    K: PartialEq + Clone + Ord,
+    V: Clone,
+{
+    fn clone(&self) -> Self {
+        BTreeMap {
+            entries: self.entries.clone(),
+        }
+    }
+}
+
 impl<K, V> BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
