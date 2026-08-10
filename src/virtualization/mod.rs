@@ -1,13 +1,14 @@
 // SigmaOS Virtualization Module
+pub mod deterministic;
 pub mod orchestration;
-pub mod oci_pod;
+pub mod rancher;
 
+pub use deterministic::{
+    DeterministicError, DeterministicHypervisor, DeterministicVirtualMachine, VirtualCpuContext,
+    VmExecutionSnapshot,
+};
 pub use orchestration::{
-    Container, KubernetesPod, LegacyVirtualizationStrategy, ModernVirtualizationStrategy,
-    ResourcePool, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
-    VirtualizationStrategy, VirtualizationStrategyFactory, VirtualizationTech, VmState,
+    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-
-pub use oci_pod::{
-    ContainerConfig, OciPod, OciPodManager, PodState,
-};
+pub use rancher::{DaemonlessContainer, K3osOrchestrator, ContainerState, RancherError};

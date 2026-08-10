@@ -52,6 +52,7 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
+    pub hard_links_count: u32,
 }
 
 impl Inode {
@@ -66,6 +67,7 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
+            hard_links_count: 1,
         }
     }
 }
@@ -229,6 +231,23 @@ impl VirtualFilesystem {
 
     pub fn get_inode(&self, inode_id: u64) -> Option<&Inode> {
         self.inodes.get(&inode_id)
+    }
+
+    pub fn link_inode(&mut self, inode_id: u64) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.hard_links_count += 1;
+        Ok(())
+    }
+
+    pub fn unlink_inode(&mut self, inode_id: u64) -> Result<u32, FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        if inode.hard_links_count > 1 {
+            inode.hard_links_count -= 1;
+            Ok(inode.hard_links_count)
+        } else {
+            self.inodes.remove(&inode_id);
+            Ok(0)
+        }
     }
 
     pub fn list_directory(&self, inode_id: u64) -> Result<Vec<u64>, FsError> {
