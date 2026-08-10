@@ -1,8 +1,33 @@
 // SigmaOS Container Runtime
 // OOP-based container management with Docker and Podman support
+// Incorporating FreeBSD Jails (jail networking & IPC sandboxing) and Podman (rootless user namespaces) compatibility
 
 use std::collections::HashMap;
 use std::path::PathBuf;
+
+/// FreeBSD Jail-inspired security & network sandboxing configuration
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignJailConfig {
+    pub allow_raw_sockets: bool,
+    pub sysv_ipc_isolated: bool,
+    pub ip_address_bindings: Vec<String>,
+}
+
+impl SovereignJailConfig {
+    pub fn new() -> Self {
+        Self {
+            allow_raw_sockets: false,
+            sysv_ipc_isolated: true,
+            ip_address_bindings: Vec::new(),
+        }
+    }
+}
+
+impl Default for SovereignJailConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Container configuration
 #[derive(Debug, Clone)]
@@ -16,6 +41,10 @@ pub struct ContainerConfig {
     pub network_mode: NetworkMode,
     pub restart_policy: RestartPolicy,
     pub resource_limits: ResourceLimits,
+    // Podman-inspired rootless user namespace flag
+    pub is_rootless: bool,
+    // FreeBSD Jail-inspired network & capability configuration
+    pub jail_config: Option<SovereignJailConfig>,
 }
 
 /// Port mapping
@@ -635,6 +664,8 @@ mod tests {
                 memory_mb: 512,
                 memory_swap_mb: 1024,
             },
+            is_rootless: false,
+            jail_config: None,
         };
         assert_eq!(config.name, "Test Container");
     }
@@ -674,6 +705,8 @@ mod tests {
                 memory_mb: 512,
                 memory_swap_mb: 1024,
             },
+            is_rootless: false,
+            jail_config: None,
         };
         let container_id = manager.create_container(config).unwrap();
         assert!(!container_id.is_empty());
@@ -696,6 +729,8 @@ mod tests {
                 memory_mb: 512,
                 memory_swap_mb: 1024,
             },
+            is_rootless: false,
+            jail_config: None,
         };
         let container_id = manager.create_container(config).unwrap();
         manager.start_container(&container_id).unwrap();
@@ -720,6 +755,8 @@ mod tests {
                 memory_mb: 256,
                 memory_swap_mb: 512,
             },
+            is_rootless: false,
+            jail_config: None,
         };
 
         // Create & verify event logged
@@ -743,5 +780,38 @@ mod tests {
         let pruned = manager.prune_images();
         assert_eq!(pruned, 1);
         assert_eq!(manager.list_images().len(), 0);
+    }
+
+    #[test]
+    fn test_freebsd_jails_and_podman_rootless() {
+        let jail_cfg = SovereignJailConfig {
+            allow_raw_sockets: true,
+            sysv_ipc_isolated: false,
+            ip_address_bindings: vec!["192.168.1.100".to_string()],
+        };
+
+        let config = ContainerConfig {
+            name: "FreeBSD-Jail-Container".to_string(),
+            image: "alpine:latest".to_string(),
+            command: None,
+            env_vars: HashMap::new(),
+            ports: Vec::new(),
+            volumes: Vec::new(),
+            network_mode: NetworkMode::Bridge,
+            restart_policy: RestartPolicy::No,
+            resource_limits: ResourceLimits {
+                cpu_shares: 512,
+                memory_mb: 256,
+                memory_swap_mb: 512,
+            },
+            is_rootless: true,
+            jail_config: Some(jail_cfg.clone()),
+        };
+
+        assert!(config.is_rootless);
+        let jail = config.jail_config.unwrap();
+        assert!(jail.allow_raw_sockets);
+        assert!(!jail.sysv_ipc_isolated);
+        assert_eq!(jail.ip_address_bindings[0], "192.168.1.100");
     }
 }
