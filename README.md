@@ -9,6 +9,16 @@
 
 SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
 
+### Competitive Position
+
+SigmaOS is designed to compete head-on with major operating systems across every criterion:
+
+- **vs Linux Distributions**: Universal package management, post-quantum security, 10x lower memory footprint
+- **vs BSD Systems**: Future-proof quantum resistance, Rust memory safety, self-healing kernel modules
+- **vs Windows/macOS**: Zero telemetry, complete privacy control, true digital sovereignty
+
+**See [Competitive Development Master Plan](SIGMAOS_COMPETITIVE_DEVELOPMENT_MASTER_PLAN.md)** for comprehensive comparison matrices and measurable targets.
+
 ### Core Pillars
 
 - **Post-Quantum Cryptography**: Native Kyber-1024 KEM + Dilithium-5 signatures (NIST FIPS 203/204).
@@ -196,6 +206,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Repository Documentation
 
+- [Competitive Development Master Plan](SIGMAOS_COMPETITIVE_DEVELOPMENT_MASTER_PLAN.md) — Comprehensive roadmap for competing with Linux, BSD, and proprietary OS across all criteria
 - [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
 - [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
