@@ -3,7 +3,11 @@
 /// x86-64-v1/v2/v3/v4 microarchitecture optimization detector, and Cachy-Initramfs module loader.
 extern crate alloc;
 use alloc::vec::Vec;
+
+#[cfg(not(test))]
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+#[cfg(test)]
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 // ==========================================
 // 1. BORE (Burst-Oriented Response Enhancer)
