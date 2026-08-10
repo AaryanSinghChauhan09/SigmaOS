@@ -8,6 +8,7 @@ use sigmaos::kernel::breakthroughs::*;
 use sigmaos::security::CapabilityToken;
 use sigmaos::distro::*;
 use sigmaos::network::*;
+use sigmaos::drivers::*;
 
 #[cfg(test)]
 mod tests {
@@ -77,5 +78,24 @@ mod tests {
         // Packet with stateful pass (e.g. established connection on port 443)
         let action_pass = pf.check_packet(TrafficDirection::In, "em0", "tcp", "192.168.1.50", "10.0.0.1", 1234, 443);
         assert_eq!(action_pass, FilterAction::Pass);
+
+        // 7. Dial-up 56K Modem Legacy Peripheral Driver Integration
+        let mut modem = DialupModemDriver::new();
+        modem.initialize().unwrap();
+        assert_eq!(modem.name(), "U.S. Robotics 56K Dial-up Faxmodem");
+        assert_eq!(modem.generation(), DeviceGeneration::Legacy);
+
+        // Write ATDT command to dial
+        modem.write(b"ATDT 555-0199\r").unwrap();
+        assert!(modem.is_connected);
+
+        // Read response buffer
+        let mut resp = [0u8; 32];
+        let bytes_read = modem.read(&mut resp).unwrap();
+        assert_eq!(&resp[..bytes_read], b"CONNECT 56000\r\n");
+
+        // Hang up (ATH)
+        modem.write(b"ATH\r").unwrap();
+        assert!(!modem.is_connected);
     }
 }

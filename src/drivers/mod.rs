@@ -9,6 +9,7 @@ pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
 pub mod special_devices;
+pub mod dialup_modem;
 
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
@@ -20,3 +21,4 @@ pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 pub use special_devices::{NullDevice, ZeroDevice, RandomDevice, LoopDevice};
+pub use dialup_modem::DialupModemDriver;
