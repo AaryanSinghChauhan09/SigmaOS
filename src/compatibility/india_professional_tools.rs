@@ -181,9 +181,8 @@ impl PMWaniHotspotController {
     }
 
     pub fn register_pdo(&mut self, pdo_id: &str, location: &str) -> bool {
-        self.registered_pdos
-            .insert(pdo_id.to_string(), location.to_string())
-            .is_none()
+        self.registered_pdos.insert(pdo_id.to_string(), location.to_string());
+        true
     }
 
     pub fn get_trai_bandwidth_profile(&self, active_users: u32) -> &'static str {
@@ -217,9 +216,8 @@ impl DigiYatraPassScanner {
     }
 
     pub fn enroll_passenger(&mut self, passenger_id: &str, face_signature: &[u8]) -> bool {
-        self.passenger_faces
-            .insert(passenger_id.to_string(), face_signature.to_vec())
-            .is_none()
+        self.passenger_faces.insert(passenger_id.to_string(), face_signature.to_vec());
+        true
     }
 
     pub fn verify_passenger_boarding(&self, passenger_id: &str, scan_signature: &[u8]) -> bool {
