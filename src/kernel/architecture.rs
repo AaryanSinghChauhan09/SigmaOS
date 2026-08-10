@@ -335,7 +335,6 @@ impl ArchitectureEngine {
         }
     }
 }
-||||||| 43be3a7e8
 // SigmaOS Kernel Architecture, Processor Initialization, Pool Memory, MDLs, SSDT and IRQL Subsystem
 // Conforms to zero-dependency, #![no_std] compliant, priority-preemptive structures
 

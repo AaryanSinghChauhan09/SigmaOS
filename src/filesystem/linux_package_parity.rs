@@ -457,7 +457,6 @@ mod tests {
         assert_eq!(BusyBoxMultiCallParser::parse_multicall_invocation("sudo"), SysCommandType::Unsupported);
     }
 }
-||||||| 0ddf2eac7
 #![no_std]
 
 extern crate alloc;
