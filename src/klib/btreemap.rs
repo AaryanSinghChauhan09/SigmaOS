@@ -12,18 +12,6 @@ where
     entries: Vec<(K, V)>,
 }
 
-impl<K, V> Clone for BTreeMap<K, V>
-where
-    K: PartialEq + Clone + Ord,
-    V: Clone,
-{
-    fn clone(&self) -> Self {
-        BTreeMap {
-            entries: self.entries.clone(),
-        }
-    }
-}
-
 impl<K, V> BTreeMap<K, V>
 where
     K: PartialEq + Clone + Ord,
@@ -163,7 +151,7 @@ mod tests {
         map.insert(1, "a");
         map.insert(2, "b");
         
-        let items: std::vec::Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
-        assert_eq!(items, vec![(1, "a"), (2, "b"), (3, "c")]);
+        let items: Vec<(i32, &str)> = map.iter().map(|(&k, &v)| (k, v)).collect();
+        assert_eq!(items.as_slice(), &[(1, "a"), (2, "b"), (3, "c")]);
     }
 }

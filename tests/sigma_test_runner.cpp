@@ -17,7 +17,6 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <new> // Necessary for placement new operator
-#include "sigma_libc.h"
 
 // Mock implementations of sovereign libc primitives for tests
 extern "C" {
@@ -43,15 +42,15 @@ extern "C" {
         std::free(ptr);
     }
 
-    void* sigma_memcpy(void* dest, const void* src, sigma_size_t n) {
+    void* sigma_memcpy(void* dest, const void* src, unsigned long long n) {
         return std::memcpy(dest, src, n);
     }
 
-    void* sigma_memset(void* s, int c, sigma_size_t n) {
+    void* sigma_memset(void* s, int c, unsigned long long n) {
         return std::memset(s, c, n);
     }
 
-    sigma_size_t sigma_strlen(const char* s) {
+    unsigned long long sigma_strlen(const char* s) {
         return std::strlen(s);
     }
 
@@ -64,7 +63,7 @@ extern "C" {
         (void)code; (void)comp; (void)desc; (void)cid;
     }
 
-    sigma_status sigma_package_verify(const sigma_u8* data, sigma_size_t size) {
+    int sigma_package_verify(const unsigned char* data, unsigned long long size) {
         (void)data; (void)size;
         return 0; // success
     }
@@ -107,31 +106,6 @@ static void test_suite_kernel() {
     SIGMA_ASSERT(1, "SemanticFS: vector embedding insert");
     SIGMA_ASSERT(1, "SemanticFS: semantic query returns ranked results");
     SIGMA_ASSERT(1, "SemanticFS: metadata integrity after write");
-
-    // Page Cache (Linux mm/filemap.c parity) & Linux Distro-inspired buffering
-    SIGMA_ASSERT(1, "page_cache_parity: Clear Linux sequential read-ahead aggregates prefetches");
-    SIGMA_ASSERT(1, "page_cache_parity: Debian-inspired sticky priority pinning protects Required pages");
-    SIGMA_ASSERT(1, "page_cache_parity: NixOS page samepage-deduplication reduces redundant memory footprint");
-    SIGMA_ASSERT(1, "page_cache_parity: SteamOS write-buffering throttle triggers dynamic dirty-flush writebacks");
-
-    // System control mechanisms & architecture integrations
-    SIGMA_ASSERT(1, "system_mechanism: SystemControlRegisters configure CR0.WP, CR4.SMEP/SMAP and ARM SCTLR.PAN");
-    SIGMA_ASSERT(1, "system_mechanism: KeServiceDescriptorTable SSDT router validates syscall parameters and bounds");
-    SIGMA_ASSERT(1, "system_mechanism: SectionObject implements shared memory, permissions, and Copy-On-Write rules");
-    SIGMA_ASSERT(1, "system_mechanism: X86RootkitAuditor audits kernel text, SSDT handler entries and LSTAR MSR registers");
-    SIGMA_ASSERT(1, "system_mechanism: IrpHandler processes create/read/ioctl dispatch buffers and locks pages under MDL");
-    SIGMA_ASSERT(1, "system_mechanism: CallingConventionEngine aligns arguments matching x86 __cdecl and x64/ARM __fastcall");
-    SIGMA_ASSERT(1, "system_mechanism: DeviceObject and DriverObject construct layered driver stack boundaries");
-    SIGMA_ASSERT(1, "system_mechanism: IoStackLocation implements individual stack locations in IRPs");
-    SIGMA_ASSERT(1, "system_mechanism: IoSetCompletionRoutine registers callbacks on the next lower stack location");
-    SIGMA_ASSERT(1, "system_mechanism: IoCallDriver forwards I/O Request Packets down the attached device stack");
-    SIGMA_ASSERT(1, "system_mechanism: IoCompleteRequest triggers bottom-to-top traversal of completion routines");
-    SIGMA_ASSERT(1, "system_mechanism: X86RootkitAuditor traverses and audits device stacks to detect rogue filter drivers");
-    SIGMA_ASSERT(1, "system_mechanism: X86RootkitAuditor audits major function dispatch table addresses for redirect hooks");
-    SIGMA_ASSERT(1, "system_mechanism: NtObjectManager constructs Windows-style directory hierarchies and namespace roots");
-    SIGMA_ASSERT(1, "system_mechanism: NtSymbolicLink aliases point recursively to real target device objects");
-    SIGMA_ASSERT(1, "system_mechanism: NonPagedPoolMemory allocates permanently resident address blocks on canonical x64 bounds");
-    SIGMA_ASSERT(1, "system_mechanism: DriverEntry configures dynamic loading and runtime unloading driver configurations");
 }
 
 // ---- Security Test Suite ----
@@ -161,14 +135,6 @@ static void test_suite_networking() {
     SIGMA_ASSERT(1, "sigma_ndp: router solicitation broadcast emitted");
     SIGMA_ASSERT(1, "sigma_mesh_router: adjacent node route announced");
     SIGMA_ASSERT(1, "sigma_mesh_crypto: payload encrypted with Kyber-1024");
-
-    // Wireshark Parity (S-CONNECT): Linux Distro-inspired improvements
-    SIGMA_ASSERT(1, "wireshark_parity: Alpine zero-allocation packet ring-buffer initialized");
-    SIGMA_ASSERT(1, "wireshark_parity: NixOS declarative hash-addressed pure packet filter registered");
-    SIGMA_ASSERT(1, "wireshark_parity: Kali passive OS fingerprinter detects Linux/Windows patterns");
-    SIGMA_ASSERT(1, "wireshark_parity: Kali multi-port scanner snoop trigger alerted");
-    SIGMA_ASSERT(1, "wireshark_parity: Gentoo USE-flags dynamically toggle HTTP/SSH protocol dissectors");
-    SIGMA_ASSERT(1, "wireshark_parity: Clear Linux flow symmetric load-balancer assigns RSS core affinity");
 }
 
 // ---- Container Test Suite ----
@@ -249,19 +215,6 @@ static void test_suite_hardware_drivers() {
     // Test 5: Driver Registry - DKMS auto-rebuild and tracking
     sigma_status dkms_status = sigma_driver_registry_rebuild_dkms("6.8-sigma");
     SIGMA_ASSERT(dkms_status == SIGMA_SUCCESS, "DKMS auto-rebuilder triggers on host kernel swap");
-
-    // Test 6: Manjaro Pamac Multi-Format Package sandboxing (AUR/Flatpak/Snap)
-    SIGMA_ASSERT(1, "manjaro_pamac: Sandboxed Pamac engine executes multi-format secure isolation");
-    SIGMA_ASSERT(1, "manjaro_pamac: Flatpak sandbox isolates process capabilities and runtime permissions");
-    SIGMA_ASSERT(1, "manjaro_pamac: Snap strict confinement isolates sandbox channels from core host system");
-
-    // Test 7: Manjaro Settings Manager (MSM) Localization & DKMS Rebuilding
-    SIGMA_ASSERT(1, "manjaro_msm: MSM automatically installs matched language packs upon locale changes");
-    SIGMA_ASSERT(1, "manjaro_dkms: MHWD automatically rebuilds and tracks proprietary driver modules on kernel swaps");
-
-    // Test 8: Manjaro Hardware Detection (MHWD) Power/Performance Governors
-    SIGMA_ASSERT(1, "manjaro_mhwd: MHWD power governor schedules CPU performance frequencies dynamically");
-    SIGMA_ASSERT(1, "manjaro_mhwd: Hybrid PRIME offloading profile redirects render targets to discrete GPU");
 }
 
 // ---- XML Report Generator ----

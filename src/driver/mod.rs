@@ -1,21 +1,15 @@
 // SigmaOS Driver Module
 pub mod device;
 pub mod framework;
-pub mod simulation;
+pub mod grid;
 pub mod mapper;
 pub mod pods;
+pub mod simulation;
 pub mod vault;
-pub mod grid;
+pub mod shims;
 
-pub use mapper::{
-    MapperCategory, DriverMapper,
-};
-pub use pods::{
-    PodType, PeripheralPod,
-};
-pub use vault::{
-    VaultEntry, DriverArchiveVault,
-};
-pub use grid::{
-    GridSlotType, PeripheralArchiveGrid,
-};
+pub use grid::{GridSlotType, PeripheralArchiveGrid};
+pub use mapper::{DriverMapper, MapperCategory};
+pub use pods::{PeripheralPod, PodType};
+pub use vault::{DriverArchiveVault, VaultEntry};
+pub use shims::{IntelE1000Driver, HdaSampleRate, IntelHdaDriver, VirtioBlockOp, VirtioBlockRequest, VirtioBlockDriver};
