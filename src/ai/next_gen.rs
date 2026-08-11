@@ -361,27 +361,26 @@ impl SovereignResearchLattice {
         let mut results = Vec::new();
         let query_lower = query.to_lowercase();
         for i in 0..self.corpus.len() {
-            if let Some(doc) = self.corpus.get(i) {
-                let mut found = false;
-                // Check title
-                let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
-                if let Ok(t) = core::str::from_utf8(&doc.title[..title_len]) {
-                    if t.to_lowercase().contains(&query_lower) {
+            let doc = &self.corpus[i];
+            let mut found = false;
+            // Check title
+            let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
+            if let Ok(t) = core::str::from_utf8(&doc.title[..title_len]) {
+                if t.to_lowercase().contains(&query_lower) {
+                    found = true;
+                }
+            }
+            // Check content
+            if !found {
+                let content_len = doc.content.iter().position(|&b| b == 0).unwrap_or(512);
+                if let Ok(c) = core::str::from_utf8(&doc.content[..content_len]) {
+                    if c.to_lowercase().contains(&query_lower) {
                         found = true;
                     }
                 }
-                // Check content
-                if !found {
-                    let content_len = doc.content.iter().position(|&b| b == 0).unwrap_or(512);
-                    if let Ok(c) = core::str::from_utf8(&doc.content[..content_len]) {
-                        if c.to_lowercase().contains(&query_lower) {
-                            found = true;
-                        }
-                    }
-                }
-                if found {
-                    results.push(doc.id);
-                }
+            }
+            if found {
+                results.push(doc.id);
             }
         }
         results
@@ -399,33 +398,31 @@ impl SovereignResearchLattice {
         for &byte in header { output.push(byte); }
 
         for idx in 0..doc_ids.len() {
-            if let Some(&id) = doc_ids.get(idx) {
-                let mut found_doc = None;
-                for c_idx in 0..self.corpus.len() {
-                    if let Some(doc) = self.corpus.get(c_idx) {
-                        if doc.id == id {
-                            found_doc = Some(doc);
-                            break;
-                        }
-                    }
+            let id = doc_ids[idx];
+            let mut found_doc = None;
+            for c_idx in 0..self.corpus.len() {
+                let doc = &self.corpus[c_idx];
+                if doc.id == id {
+                    found_doc = Some(doc);
+                    break;
                 }
+            }
 
-                if let Some(doc) = found_doc {
-                    let cite_prefix = b" - Claim supported by citation: [";
-                    for &byte in cite_prefix { output.push(byte); }
+            if let Some(doc) = found_doc {
+                let cite_prefix = b" - Claim supported by citation: [";
+                for &byte in cite_prefix { output.push(byte); }
 
-                    let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
-                    for &byte in &doc.title[..title_len] { output.push(byte); }
+                let title_len = doc.title.iter().position(|&b| b == 0).unwrap_or(64);
+                for &byte in &doc.title[..title_len] { output.push(byte); }
 
-                    let url_prefix = b"] (Source: ";
-                    for &byte in url_prefix { output.push(byte); }
+                let url_prefix = b"] (Source: ";
+                for &byte in url_prefix { output.push(byte); }
 
-                    let url_len = doc.source_url.iter().position(|&b| b == 0).unwrap_or(128);
-                    for &byte in &doc.source_url[..url_len] { output.push(byte); }
+                let url_len = doc.source_url.iter().position(|&b| b == 0).unwrap_or(128);
+                for &byte in &doc.source_url[..url_len] { output.push(byte); }
 
-                    let end_bracket = b")\n";
-                    for &byte in end_bracket { output.push(byte); }
-                }
+                let end_bracket = b")\n";
+                for &byte in end_bracket { output.push(byte); }
             }
         }
 

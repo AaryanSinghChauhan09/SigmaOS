@@ -41,6 +41,14 @@ pub trait PageTableEntry {
     fn set_writable(&mut self, writable: bool);
     fn set_user_accessible(&mut self, user: bool);
     fn set_physical_address(&mut self, addr: PhysicalAddress);
+
+    // Competitor-inspired enhancements: Accessed, Dirty, and Huge Page bit tracking
+    fn is_accessed(&self) -> bool;
+    fn is_dirty(&self) -> bool;
+    fn clear_accessed(&mut self);
+    fn clear_dirty(&mut self);
+    fn is_huge(&self) -> bool;
+    fn set_huge(&mut self, huge: bool);
 }
 
 #[repr(C)]
@@ -51,6 +59,7 @@ pub struct SimplePageTableEntry {
     pub physical_addr: AtomicUsize,
     pub accessed: AtomicUsize,
     pub dirty: AtomicUsize,
+    pub huge: AtomicUsize,
 }
 
 impl Default for SimplePageTableEntry {
@@ -68,6 +77,7 @@ impl SimplePageTableEntry {
             physical_addr: AtomicUsize::new(0),
             accessed: AtomicUsize::new(0),
             dirty: AtomicUsize::new(0),
+            huge: AtomicUsize::new(0),
         }
     }
 }
@@ -100,6 +110,26 @@ impl PageTableEntry for SimplePageTableEntry {
     fn set_physical_address(&mut self, addr: PhysicalAddress) {
         self.physical_addr
             .store(addr & 0x000FFFFFFFFFF000, Ordering::SeqCst);
+    }
+
+    fn is_accessed(&self) -> bool {
+        self.accessed.load(Ordering::SeqCst) == 1
+    }
+    fn is_dirty(&self) -> bool {
+        self.dirty.load(Ordering::SeqCst) == 1
+    }
+    fn clear_accessed(&mut self) {
+        self.accessed.store(0, Ordering::SeqCst);
+    }
+    fn clear_dirty(&mut self) {
+        self.dirty.store(0, Ordering::SeqCst);
+    }
+    fn is_huge(&self) -> bool {
+        self.huge.load(Ordering::SeqCst) == 1
+    }
+    fn set_huge(&mut self, huge: bool) {
+        self.huge
+            .store(if huge { 1 } else { 0 }, Ordering::SeqCst);
     }
 }
 
@@ -160,6 +190,15 @@ pub trait VirtualMemoryManager {
         &mut self,
         virt: VirtualAddress,
         error_code: usize,
+    ) -> Result<(), PageFaultError>;
+
+    // Competitor-inspired optimization: Map 2MB Transparent Huge Page directly to bypass 4th level lookup
+    fn map_huge_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        user: bool,
+        writable: bool,
     ) -> Result<(), PageFaultError>;
 }
 
@@ -408,6 +447,83 @@ impl VirtualMemoryManager for SimpleVMM {
         let phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
         self.map_page(virt, phys, true, true)
     }
+
+    fn map_huge_page(
+        &mut self,
+        virt: VirtualAddress,
+        phys: PhysicalAddress,
+        user: bool,
+        writable: bool,
+    ) -> Result<(), PageFaultError> {
+        let pml4_idx = self.get_pml4_index(virt);
+        let pdpt_idx = self.get_pdpt_index(virt);
+        let pd_idx = self.get_pd_index(virt);
+
+        // Align physical address to 2MB boundary (2 * 1024 * 1024 = 0x200000)
+        let aligned_phys = phys & 0x000FFFFFFFFFF000 & !(0x200000 - 1);
+
+        let pml4_present = self.pml4.get_entry(pml4_idx).is_present();
+        if !pml4_present {
+            let pdpt_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+            let mut pdpt_entry = SimplePageTableEntry::new();
+            pdpt_entry.set_present(true);
+            pdpt_entry.set_writable(true);
+            pdpt_entry.set_user_accessible(false);
+            pdpt_entry.set_physical_address(pdpt_phys);
+
+            let pdpt_table = SimplePageTable::new(pdpt_phys);
+            while self.pdpt_tables.len() <= pml4_idx {
+                self.pdpt_tables.push(None);
+            }
+            self.pdpt_tables[pml4_idx] = Some(pdpt_table);
+            self.pml4.set_entry(pml4_idx, pdpt_entry);
+        }
+
+        let pdpt_idx_in_vec = pml4_idx;
+        let pdpt_table: &mut Option<SimplePageTable> = &mut self.pdpt_tables[pdpt_idx_in_vec];
+        let pdpt_present = if let Some(ref mut pdpt) = pdpt_table {
+            pdpt.get_entry(pdpt_idx).is_present()
+        } else {
+            false
+        };
+
+        let pdpt_phys = self.pml4.get_entry(pml4_idx).get_physical_address();
+        let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+
+        if !pdpt_present {
+            let pdpt_table_mut: &mut Option<SimplePageTable> =
+                &mut self.pdpt_tables[pdpt_idx_in_vec];
+            if let Some(ref mut pdpt) = pdpt_table_mut {
+                let pd_phys = self.next_table_addr.fetch_add(0x1000, Ordering::SeqCst);
+                let mut pd_entry = SimplePageTableEntry::new();
+                pd_entry.set_present(true);
+                pd_entry.set_writable(true);
+                pd_entry.set_user_accessible(false);
+                pd_entry.set_physical_address(pd_phys);
+
+                let pd_table = SimplePageTable::new(pd_phys);
+                while self.pd_tables.len() <= pd_idx_in_vec {
+                    self.pd_tables.push(None);
+                }
+                self.pd_tables[pd_idx_in_vec] = Some(pd_table);
+                pdpt.set_entry(pdpt_idx, pd_entry);
+            }
+        }
+
+        // Set entry directly in PD Table with Huge Page (Bit 7 / PS flag) set to 1
+        let pd_table_mut: &mut Option<SimplePageTable> = &mut self.pd_tables[pd_idx_in_vec];
+        if let Some(ref mut pd) = pd_table_mut {
+            let mut pd_entry = SimplePageTableEntry::new();
+            pd_entry.set_present(true);
+            pd_entry.set_writable(writable);
+            pd_entry.set_user_accessible(user);
+            pd_entry.set_huge(true); // Marks it as a 2MB Huge Page directly
+            pd_entry.set_physical_address(aligned_phys);
+            pd.set_entry(pd_idx, pd_entry);
+        }
+
+        Ok(())
+    }
 }
 
 pub trait ProcessMemory {
@@ -510,6 +626,43 @@ mod tests {
         // Unmap page
         assert!(vmm.unmap_page(virt).is_ok());
         assert!(vmm.get_physical(virt).is_none());
+    }
+
+    #[test]
+    fn test_vmm_huge_page_mapping() {
+        let mut vmm = SimpleVMM::new();
+        let virt = 0x4000_0000; // 1GB boundary (perfectly fits PD PT levels)
+        let phys = 0x8000_0000;
+
+        // Map as a 2MB huge page
+        assert!(vmm.map_huge_page(virt, phys, false, true).is_ok());
+
+        // Get PML4/PDPT/PD indexes
+        let pml4_idx = vmm.get_pml4_index(virt);
+        let pdpt_idx = vmm.get_pdpt_index(virt);
+        let pd_idx = vmm.get_pd_index(virt);
+
+        // Get the PD entry to check its huge attribute
+        let pdpt_phys = vmm.pml4.get_entry_ref(pml4_idx).get_physical_address();
+        let pd_idx_in_vec = (pdpt_phys / 4096) * 512 + pdpt_idx;
+        let pd_entry = vmm.pd_tables[pd_idx_in_vec].as_ref().unwrap().get_entry_ref(pd_idx);
+
+        assert!(pd_entry.is_huge());
+        assert!(pd_entry.is_present());
+        assert_eq!(pd_entry.get_physical_address(), phys);
+
+        // Test accessed and dirty bit sets/clears
+        let mut entry = SimplePageTableEntry::new();
+        entry.set_present(true);
+        entry.accessed.store(1, Ordering::SeqCst);
+        entry.dirty.store(1, Ordering::SeqCst);
+
+        assert!(entry.is_accessed());
+        assert!(entry.is_dirty());
+        entry.clear_accessed();
+        entry.clear_dirty();
+        assert!(!entry.is_accessed());
+        assert!(!entry.is_dirty());
     }
 
     #[test]

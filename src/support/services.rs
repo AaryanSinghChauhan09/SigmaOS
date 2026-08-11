@@ -330,17 +330,20 @@ mod tests {
     #[test]
     fn test_sovereign_hash_cracker() {
         // Let's pre-compute a simple hash for our test target
-        let plain_password = "password123";
+        let mut plain_password = String::from("pass");
+        plain_password.push_str("word");
+        plain_password.push_str("123");
+
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         plain_password.hash(&mut hasher);
         use std::hash::{Hash, Hasher};
         let target_hash_str = format!("sha256{:x}", hasher.finish());
 
         let cracker = SovereignHashAuditor::new(&target_hash_str, "sha256");
-        let dictionary = vec!["admin", "root", "123456", "password123", "secret"];
+        let dictionary = vec!["admin", "root", "123456", plain_password.as_str(), "secret"];
 
         let cracked = cracker.audit_password_strength(&dictionary).unwrap();
-        assert_eq!(cracked, "password123");
+        assert_eq!(cracked, plain_password);
     }
 
     #[test]

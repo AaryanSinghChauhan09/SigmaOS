@@ -80,6 +80,7 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
+    pub mirrors: Vec<String>,
 }
 
 impl Package {
@@ -96,6 +97,7 @@ impl Package {
             description,
             dependencies,
             checksum,
+            mirrors: Vec::new(),
         }
     }
 }
