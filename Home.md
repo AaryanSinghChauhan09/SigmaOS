@@ -9,6 +9,29 @@
 
 SigmaOS is a sovereign, zero-dependency, AI-native operating system built entirely in Rust. It discards legacy POSIX assumptions to build a hyper-secure, capability-based microkernel designed for an AI-first, object-oriented ecosystem.
 
+### 🚀 Latest Updates (August 2026)
+
+**New Features Implemented:**
+- **Enhanced Security**: OpenBSD 7.9-inspired pledge/unveil with 15+ new security promises
+- **Modern Init System**: SigmaInit with dependency-based service management (OpenRC/runit/s6 inspired)
+- **Advanced Package Management**: Complete AUR/PKGBUILD integration with sandboxed builds
+- **AI Task Orchestrator**: Enhanced scheduler with priority queue and resource management
+- **eBPF-based Scheduling**: Ubuntu 25.04 sched_ext-inspired hot-swappable policies
+- **Enhanced Filesystem**: devfs, procfs, sysfs implementations
+- **Security Hardening**: Hardened sysctl with secure defaults (HardenedBSD inspired)
+
+See [Comprehensive Modern Development Plan](COMPREHENSIVE_MODERN_DEVELOPMENT_PLAN.md) for complete details.
+
+### Competitive Position
+
+SigmaOS is designed to compete head-on with major operating systems across every criterion:
+
+- **vs Linux Distributions**: Universal package management, post-quantum security, 10x lower memory footprint
+- **vs BSD Systems**: Future-proof quantum resistance, Rust memory safety, self-healing kernel modules
+- **vs Windows/macOS**: Zero telemetry, complete privacy control, true digital sovereignty
+
+**See [Competitive Development Master Plan](SIGMAOS_COMPETITIVE_DEVELOPMENT_MASTER_PLAN.md)** for comprehensive comparison matrices and measurable targets.
+
 ### Core Pillars
 
 - **Post-Quantum Cryptography**: Native Kyber-1024 KEM + Dilithium-5 signatures (NIST FIPS 203/204).
@@ -16,17 +39,6 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **Shard Architecture**: 600+ hot-swappable kernel modules with zero-latency IPC.
 - **AI-Native Design**: Local LLM inference as a first-class OS primitive.
 - **India-First**: Native GST, Income Tax, UPI, and 22-language support.
-
-### Latest Security Updates (2026-08-09)
-
-✅ **Security Hardening Complete**: All critical vulnerabilities resolved during branch consolidation
-- Removed hard-coded cryptographic values across security modules
-- Eliminated XSS vulnerabilities in web interfaces
-- Implemented safe DOM manipulation practices
-- Enhanced memory safety validation
-- Updated security documentation with comprehensive fix details
-
-See [SECURITY_FIXES_2026-08-09.md](SECURITY_FIXES_2026-08-09.md) for complete security fix documentation.
 
 
 ---
@@ -125,11 +137,12 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Physical MM (buddy allocator)
 - 🔄 Virtual MM (paging) - Partial
 - ✅ APIC + timer
-- ✅ sigma_pledge + sigma_unveil
+- ✅ sigma_pledge + sigma_unveil (Enhanced with 15+ new security promises)
 - ✅ Kyber-1024 KEM + Dilithium-5
 - ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
 - ✅ Linux Driver Absorption Engine
 - ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
+- ✅ eBPF-based scheduler with hot-swappable policies (NEW)
 
 **Networking & Storage:**
 - 🔄 TCP/UDP stack - Partial
@@ -154,6 +167,8 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Intrusion detection system
 - 🔄 Secure VPN client
 - ✅ Capability-based security framework
+- ✅ Hardened sysctl with security defaults (NEW)
+- ✅ Enhanced security promises (OpenBSD 7.9 inspired) (NEW)
 
 **System Tools:**
 - ✅ File manager
@@ -168,6 +183,8 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ sigma-pkg CLI
 - 🔄 Universal package manager
 - 🔄 Rollback package snapshots
+- ✅ AUR/PKGBUILD integration (NEW)
+- ✅ Sandboxed package building (NEW)
 
 **Networking:**
 - 🔄 Cloud sync engine
@@ -176,6 +193,9 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 **AI & Automation:**
 - 🔄 AI orchestrator for system optimization
+- ✅ Enhanced AI task scheduler with priority queue (NEW)
+- ✅ Resource manager for CPU, memory, and GPU allocation (NEW)
+- ✅ Local LLM integration with quantization support (NEW)
 
 **Customization:**
 - 🔄 Unified control center
@@ -183,6 +203,8 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 **Boot & Deployment:**
 - ⬜ Bootable ISO (Phase G)
+- ✅ SigmaInit modern init system (OpenRC/runit/s6 inspired) (NEW)
+- ✅ Enhanced filesystem components (devfs, procfs, sysfs) (NEW)
 
 
 ---
@@ -207,6 +229,8 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Repository Documentation
 
+- [Competitive Development Master Plan](SIGMAOS_COMPETITIVE_DEVELOPMENT_MASTER_PLAN.md) — Comprehensive roadmap for competing with Linux, BSD, and proprietary OS across all criteria
+- [Comprehensive Modern Development Plan](COMPREHENSIVE_MODERN_DEVELOPMENT_PLAN.md) — Latest Linux/BSD-inspired development plan with container-native OS, enhanced security, and modern scheduling
 - [Future Development & Distro-Parity Roadmap](FUTURE-DEVELOPMENT-ROADMAP.md) — Strategic roadmap detailing gaps & improvements vs mainstream Linux distros
 - [Legacy Compatibility & Subsystem Parity Blueprint](LEGACY_COMPATIBILITY_BLUEPRINT.md) — Architectural design and implementation of legacy adapters, bridges, and workload optimizers
 - [Documentation Audit](docs/doc_audit_backlog.md) — Implementation status
