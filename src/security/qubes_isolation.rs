@@ -217,3 +217,23 @@ impl TemplateVmManager {
         }
     }
 }
+
+#[cfg(not(test))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    crate::klib::custom_allocator::alloc(size)
+}
+
+#[cfg(not(test))]
+unsafe fn free(ptr: *mut u8) {
+    crate::klib::custom_allocator::free(ptr)
+}
+
+#[cfg(test)]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    std::alloc::alloc(std::alloc::Layout::from_size_align(size, 8).unwrap())
+}
+
+#[cfg(test)]
+unsafe fn free(ptr: *mut u8) {
+    std::alloc::dealloc(ptr, std::alloc::Layout::from_size_align(1, 8).unwrap()) // placeholder size
+}
