@@ -1430,7 +1430,7 @@ pub enum SystemdError {
 
 /// Portage-inspired package management with USE flags.
 pub struct PortagePackageManager {
-    pub use_flags: std::collections::HashSet<alloc::string::String>,
+    pub use_flags: crate::klib::HashSet<alloc::string::String>,
     pub installed_packages:
         alloc::collections::BTreeMap<alloc::string::String, alloc::string::String>,
     pub world_file: alloc::vec::Vec<alloc::string::String>,
@@ -1439,7 +1439,7 @@ pub struct PortagePackageManager {
 impl PortagePackageManager {
     pub fn new() -> Self {
         PortagePackageManager {
-            use_flags: std::collections::HashSet::new(),
+            use_flags: crate::klib::HashSet::new(),
             installed_packages: alloc::collections::BTreeMap::new(),
             world_file: alloc::vec::Vec::new(),
         }
@@ -2130,7 +2130,7 @@ pub struct UbuntuFeatures {
 
 pub struct GentooFeatures {
     pub portage_manager: PortagePackageManager,
-    pub use_flags: std::collections::HashSet<alloc::string::String>,
+    pub use_flags: crate::klib::HashSet<alloc::string::String>,
     pub custom_compile: bool,
 }
 
@@ -2198,7 +2198,7 @@ impl LinuxDistroCompatibilityEngine {
             },
             gentoo: GentooFeatures {
                 portage_manager: PortagePackageManager::new(),
-                use_flags: std::collections::HashSet::new(),
+                use_flags: crate::klib::HashSet::new(),
                 custom_compile: true,
             },
             mint: LinuxMintEnhancements::new(),
