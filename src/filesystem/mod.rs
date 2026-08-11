@@ -6,8 +6,6 @@ pub mod disk_usage;
 pub mod manager;
 pub mod support;
 pub mod vfs;
-pub mod legacy_fs;
-pub mod sigma_fs;
 
 pub use archive::{
     ArchiveEntry, ArchiveError, ArchiveFormat, ArchiveHandler, ArchiveManager, ArchiveResult,
@@ -28,9 +26,3 @@ pub use support::{
     LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use legacy_fs::{
-    LegacyFsType, LegacyFSAdapter,
-};
-pub use sigma_fs::{
-    FileBlock, SigmaFS,
-};
