@@ -22,3 +22,4 @@ pub use gamification::{
     ProductivityScore,
 };
 pub use media::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
+pub use mind_map::{MindMapCreator, MindMapNode, RelationshipConnection, NodeStyle, MindMapLayout};

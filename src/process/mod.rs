@@ -2,6 +2,7 @@
 pub mod spawn;
 pub mod kernel_data;
 pub mod linux_sysfs;
+pub mod linux_proc;
 
 pub use spawn::{
     Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
@@ -11,4 +12,7 @@ pub use kernel_data::{
 };
 pub use linux_sysfs::{
     SysfsPermission, SysfsAttribute, SysfsManager,
+};
+pub use linux_proc::{
+    ProcFileSystem, LinuxProcessEntry, LinuxProcessState, NiceValue, CGroup, PidNamespace, LinuxThreadEntry, LinuxSignal, SchedPolicy,
 };
