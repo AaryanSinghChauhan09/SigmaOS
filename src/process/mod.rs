@@ -13,3 +13,6 @@ pub use kernel_data::{
 pub use linux_sysfs::{
     SysfsPermission, SysfsAttribute, SysfsManager,
 };
+pub use linux_proc::{
+    ProcFileSystem, LinuxProcessEntry, LinuxProcessState, NiceValue, CGroup, PidNamespace, LinuxThreadEntry, LinuxSignal, SchedPolicy,
+};
