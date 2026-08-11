@@ -7,6 +7,8 @@ extern crate alloc;
 
 use crate::klib::{Vec, String};
 
+pub mod bootc;
+
 /// Boot entry
 #[derive(Debug, Clone)]
 pub struct BootEntry {

@@ -6,8 +6,10 @@
 extern crate alloc;
 
 use crate::klib::{Vec, String};
-use alloc::vec::Vec;
-use alloc::string::String;
+
+// // pub mod compositor;
+// // pub mod paint;
+// // pub mod video;
 
 /// GPU type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

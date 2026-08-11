@@ -6,8 +6,6 @@
 extern crate alloc;
 
 use crate::klib::{Vec, String};
-use alloc::vec::Vec;
-use alloc::string::String;
 
 /// Compression type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

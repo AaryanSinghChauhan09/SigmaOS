@@ -1,19 +1,26 @@
-// SigmaTools Module
-// System suite for SigmaOS - SigmaDeploy, SigmaCluster, SigmaIdentity, SigmaAccess
+// SigmaOS Tools Module
+// System utilities and development tools
 
-pub mod sigmatools;
+pub mod feature_flags;
+pub mod archive;
+pub mod bootloader;
+pub mod cron;
+pub mod display_manager;
+pub mod editor;
+pub mod file_manager;
+pub mod init;
+pub mod installer;
+pub mod olivetin;
+pub mod powertoys;
+pub mod session;
+pub mod shell;
 pub mod sigma_core_utils;
+pub mod sigmatools;
+pub mod terminal;
+pub mod textproc;
+pub mod window_manager;
 
-pub use sigmatools::{
-    AccessibilityFeature, ClusterNode, NodeState, SigmaAccess, SigmaCluster, SigmaDeploy,
-    SigmaIdentity, SigmaToolError, UserIdentity,
-    TerminalError, AnsiColor, CliCommandTool, TerminalLineBuffer, AnsiTextCompositor,
-    SovereignDpkgEtcher, SovereignAptDuo, SovereignImeConvertCase, SovereignTableConverter,
-    SovereignWordCounter, SovereignTextFixer, SovereignImageToDataUri, SovereignKeyboardTester,
-    SovereignIsWebsiteDown,
-};
-pub use sigma_core_utils::{
-    SovereignLogger, SovereignLogLevel, SovereignCronScheduler, CronJob,
-    SovereignPrivilegeEngine, SovereignDocBrowser, SovereignCoreUtils,
-    SovereignShell, SovereignInitSystem, InitSupervisorType,
+pub use feature_flags::{
+    FeatureFlag, FeatureFlagConfig, FeatureProfile, FeatureFlagResolver,
+    MAX_FEATURE_FLAGS, init_default_flags, init_default_profiles, calculate_flag_hash,
 };
