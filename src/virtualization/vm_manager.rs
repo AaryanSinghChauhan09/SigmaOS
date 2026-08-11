@@ -1,7 +1,7 @@
 // SigmaOS Virtual Machine Manager
 // OOP-based VM management with hypervisor integration
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 /// VM configuration
@@ -89,15 +89,15 @@ pub trait HypervisorBackend {
 
 /// QEMU/KVM backend
 pub struct QemuBackend {
-    vms: BTreeMap<String, VmConfig>,
-    vm_states: BTreeMap<String, VmState>,
+    vms: HashMap<String, VmConfig>,
+    vm_states: HashMap<String, VmState>,
 }
 
 impl QemuBackend {
     pub fn new() -> Self {
         Self {
-            vms: BTreeMap::new(),
-            vm_states: BTreeMap::new(),
+            vms: HashMap::new(),
+            vm_states: HashMap::new(),
         }
     }
 }
@@ -195,15 +195,15 @@ impl HypervisorBackend for QemuBackend {
 
 /// VirtualBox backend
 pub struct VirtualBoxBackend {
-    vms: BTreeMap<String, VmConfig>,
-    vm_states: BTreeMap<String, VmState>,
+    vms: HashMap<String, VmConfig>,
+    vm_states: HashMap<String, VmState>,
 }
 
 impl VirtualBoxBackend {
     pub fn new() -> Self {
         Self {
-            vms: BTreeMap::new(),
-            vm_states: BTreeMap::new(),
+            vms: HashMap::new(),
+            vm_states: HashMap::new(),
         }
     }
 }
@@ -301,16 +301,16 @@ impl HypervisorBackend for VirtualBoxBackend {
 
 /// Intel VT-x hardware-accelerated hypervisor backend
 pub struct IntelVtxBackend {
-    vms: BTreeMap<String, VmConfig>,
-    vm_states: BTreeMap<String, VmState>,
+    vms: HashMap<String, VmConfig>,
+    vm_states: HashMap<String, VmState>,
     hpet_enabled: bool, // Fix for VBox/piix3 HPET compatibility
 }
 
 impl IntelVtxBackend {
     pub fn new() -> Self {
         Self {
-            vms: BTreeMap::new(),
-            vm_states: BTreeMap::new(),
+            vms: HashMap::new(),
+            vm_states: HashMap::new(),
             hpet_enabled: true, // Auto-enabled for robust piix3 chipsets
         }
     }
@@ -414,14 +414,14 @@ impl HypervisorBackend for IntelVtxBackend {
 
 /// AMD-Vi IOMMU protection manager for devices
 pub struct AmdViIommuManager {
-    pub devices_gated: BTreeMap<String, bool>,
+    pub devices_gated: HashMap<String, bool>,
     pub translation_table_active: bool,
 }
 
 impl AmdViIommuManager {
     pub fn new() -> Self {
         Self {
-            devices_gated: BTreeMap::new(),
+            devices_gated: HashMap::new(),
             translation_table_active: true,
         }
     }
@@ -438,8 +438,8 @@ impl AmdViIommuManager {
 /// OOP-based Virtual Machine Manager
 pub struct VmManager {
     backend: Box<dyn HypervisorBackend>,
-    vms: BTreeMap<String, VmConfig>,
-    snapshots: BTreeMap<String, VmSnapshot>,
+    vms: HashMap<String, VmConfig>,
+    snapshots: HashMap<String, VmSnapshot>,
     auto_start_enabled: bool,
 }
 
@@ -447,8 +447,8 @@ impl VmManager {
     pub fn new(backend: Box<dyn HypervisorBackend>) -> Self {
         Self {
             backend,
-            vms: BTreeMap::new(),
-            snapshots: BTreeMap::new(),
+            vms: HashMap::new(),
+            snapshots: HashMap::new(),
             auto_start_enabled: false,
         }
     }

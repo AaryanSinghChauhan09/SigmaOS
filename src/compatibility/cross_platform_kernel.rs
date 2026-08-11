@@ -5,7 +5,7 @@
 
 extern crate alloc;
 
-use alloc::collections::{BTreeMap as BTreeMap, VecDeque};
+use alloc::collections::{BTreeMap as HashMap, VecDeque};
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -58,7 +58,7 @@ pub struct PageDirectory {
     pub page_directory_base: u64, // CR3 on x86_64, TTBR0 on ARM64
     pub ttbr1_base: Option<u64>,  // TTBR1 for ARM64 kernel space
     // Maps Level (4 = PML4, 3 = PDPT, 2 = PD, 1 = PT) -> Index -> Entry
-    pub tables: BTreeMap<(u8, u64), PageTableEntry>,
+    pub tables: HashMap<(u8, u64), PageTableEntry>,
     // Register mapping for Page Fault Tracking
     pub cr2: u64,
 }
@@ -75,7 +75,7 @@ impl PageDirectory {
             arch,
             page_directory_base: base_register,
             ttbr1_base: ttbr1,
-            tables: BTreeMap::new(),
+            tables: HashMap::new(),
             cr2: 0,
         }
     }
@@ -374,13 +374,13 @@ pub struct Kpcr {
     pub minor_version: u16,
     pub fs_segment_base: u64,     // Segment base for x86
     pub gs_segment_base: u64,     // Segment base for x64
-    pub coprocessor_regs: BTreeMap<String, u64>, // ARM System Coprocessor registers (e.g. CP15, TTBR, SCTLR)
+    pub coprocessor_regs: HashMap<String, u64>, // ARM System Coprocessor registers (e.g. CP15, TTBR, SCTLR)
     pub kpcrb: Kpcrb,
 }
 
 impl Kpcr {
     pub fn new(major: u16, minor: u16, gs_base: u64, idle_thread: u32) -> Self {
-        let mut coprocessor_regs = BTreeMap::new();
+        let mut coprocessor_regs = HashMap::new();
         // Initialize basic ARM System Coprocessor control registers
         coprocessor_regs.insert("SCTLR_EL1".to_string(), 0x30D00800); // System Control Register default
         coprocessor_regs.insert("CPACR_EL1".to_string(), 0x300000);   // Coprocessor Access Control Register
@@ -542,15 +542,15 @@ pub struct Idtr {
 /// Service Descriptor Table for System Calls supporting calling convention parameters translation
 #[derive(Debug, Clone)]
 pub struct SystemServiceTable {
-    pub service_table: BTreeMap<u32, u64>, // Maps syscall number to handler address
-    pub call_count: BTreeMap<u32, u64>,    // Syscall profiling telemetry
+    pub service_table: HashMap<u32, u64>, // Maps syscall number to handler address
+    pub call_count: HashMap<u32, u64>,    // Syscall profiling telemetry
 }
 
 impl SystemServiceTable {
     pub fn new() -> Self {
         Self {
-            service_table: BTreeMap::new(),
-            call_count: BTreeMap::new(),
+            service_table: HashMap::new(),
+            call_count: HashMap::new(),
         }
     }
 
@@ -613,7 +613,7 @@ pub struct SovereignKernelInternals {
     pub irql_ctrl: IrqlController,
     pub sdt: SystemServiceTable,
     pub idtr: Idtr,
-    pub ums_threads: BTreeMap<u32, UmsContext>,
+    pub ums_threads: HashMap<u32, UmsContext>,
     pub windbg_hooked: bool,
 }
 
@@ -631,7 +631,7 @@ impl SovereignKernelInternals {
             irql_ctrl: IrqlController::new(),
             sdt,
             idtr: Idtr { limit: 256 * 16 - 1, base: 0xFFFFFFFF80100000 },
-            ums_threads: BTreeMap::new(),
+            ums_threads: HashMap::new(),
             windbg_hooked: false,
         }
     }

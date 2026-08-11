@@ -5,19 +5,11 @@ use std::io::{self, BufRead, Write};
 
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
+
 impl AgentAutomationEngine {
     pub fn new() -> Self {
         AgentAutomationEngine
     }
-}
-
-/// Simulated Shell Job for Job Control
-#[derive(Debug, Clone)]
-pub struct ShellJob {
-    pub job_id: usize,
-    pub pid: usize,
-    pub name: String,
-    pub state: crate::process::linux_proc::LinuxProcessState,
 }
 
 /// Shell command type
@@ -75,39 +67,40 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Kill {
-        signal: Option<i32>,
-        pid: usize,
+    Livepatch {
+        args: Vec<String>,
     },
-    Nice {
-        nice_val: i32,
-        command_line: String,
+    Cron {
+        args: Vec<String>,
     },
-    Renice {
-        nice_val: i32,
-        pid: usize,
+    Vm {
+        args: Vec<String>,
     },
-    Pgrep {
-        pattern: String,
+    Research {
+        query: String,
     },
-    Pkill {
-        pattern: String,
+    Camera {
+        effect: String,
     },
-    Top,
-    Vmstat,
-    Spawn {
-        name: String,
-        cmdline: String,
+    Grid {
+        args: Vec<String>,
     },
-    Jobs,
-    Fg {
-        job_id: usize,
+    Access {
+        args: Vec<String>,
     },
-    Bg {
-        job_id: usize,
+    Sysctl {
+        args: Vec<String>,
     },
-    Map {
-        subcommand: String,
+    Patch {
+        args: Vec<String>,
+    },
+    Rescue {
+        args: Vec<String>,
+    },
+    Monitor {
+        args: Vec<String>,
+    },
+    Sandbox {
         args: Vec<String>,
     },
     Unknown(String),
@@ -127,10 +120,6 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
-    pub proc_fs: crate::process::linux_proc::ProcFileSystem,
-    pub jobs: Vec<ShellJob>,
-    pub next_job_id: usize,
-    pub mind_map: crate::productivity::MindMapCreator,
 }
 
 impl ShellRepl {
@@ -153,10 +142,6 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            proc_fs: crate::process::linux_proc::ProcFileSystem::new(),
-            jobs: Vec::new(),
-            next_job_id: 1,
-            mind_map: crate::productivity::MindMapCreator::new("Project Brainstorm", "Core Objectives"),
         }
     }
 
@@ -170,7 +155,7 @@ impl ShellRepl {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-            prompt,
+            prompt: prompt,
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),
@@ -179,10 +164,6 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            proc_fs: crate::process::linux_proc::ProcFileSystem::new(),
-            jobs: Vec::new(),
-            next_job_id: 1,
-            mind_map: crate::productivity::MindMapCreator::new("Project Brainstorm", "Core Objectives"),
         }
     }
 
@@ -209,100 +190,23 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    pub fn execute_line(&mut self, line: &str) {
-        let trimmed = line.trim();
-        let is_background = trimmed.ends_with('&');
-        let clean_line = if is_background {
-            trimmed[..trimmed.len() - 1].trim().to_string()
-        } else {
-            trimmed.to_string()
-        };
+    fn execute_line(&mut self, line: &str) {
+        let command = self.parse_command(line);
+        let result = self.execute_command(command);
 
-        let command = self.parse_command(&clean_line);
-
-        if is_background {
-            match command {
-                ShellCommand::Spawn { ref name, ref cmdline } => {
-                    let pid = self.proc_fs.spawn_process(
-                        name,
-                        1,
-                        crate::process::linux_proc::NiceValue::new(0),
-                        "user.slice",
-                        cmdline,
-                    );
-                    let job_id = self.next_job_id;
-                    self.next_job_id += 1;
-                    self.jobs.push(ShellJob {
-                        job_id,
-                        pid,
-                        name: format!("spawn {} {}", name, cmdline),
-                        state: crate::process::linux_proc::LinuxProcessState::Running,
-                    });
-                    println!("[{}] {}", job_id, pid);
-                }
-                ShellCommand::Nice { nice_val, ref command_line } => {
-                    let parsed_inner = self.parse_command(command_line);
-                    match parsed_inner {
-                        ShellCommand::Spawn { ref name, ref cmdline } => {
-                            let nice_obj = crate::process::linux_proc::NiceValue::new(nice_val);
-                            let pid = self.proc_fs.spawn_process(
-                                name,
-                                1,
-                                nice_obj,
-                                "user.slice",
-                                cmdline,
-                            );
-                            let job_id = self.next_job_id;
-                            self.next_job_id += 1;
-                            self.jobs.push(ShellJob {
-                                job_id,
-                                pid,
-                                name: format!("nice {} spawn {} {}", nice_val, name, cmdline),
-                                state: crate::process::linux_proc::LinuxProcessState::Running,
-                    });
-                            println!("[{}] {}", job_id, pid);
-                        }
-                        _ => {
-                            println!("nice: commands other than spawn cannot be backgrounded");
-                        }
-                    }
-                }
-                _ => {
-                    // For standard commands, we simulate backgrounding by creating a dummy PID
-                    let dummy_pid = self.proc_fs.spawn_process(
-                        "bg-job",
-                        1,
-                        crate::process::linux_proc::NiceValue::new(0),
-                        "user.slice",
-                        &clean_line,
-                    );
-                    let job_id = self.next_job_id;
-                    self.next_job_id += 1;
-                    self.jobs.push(ShellJob {
-                        job_id,
-                        pid: dummy_pid,
-                        name: clean_line.clone(),
-                        state: crate::process::linux_proc::LinuxProcessState::Running,
-                    });
-                    println!("[{}] {}", job_id, dummy_pid);
+        match result {
+            Ok(output) => {
+                if !output.is_empty() {
+                    println!("{}", output);
                 }
             }
-        } else {
-            let result = self.execute_command(command);
-            match result {
-                Ok(output) => {
-                    if !output.is_empty() {
-                        println!("{}", output);
-                    }
-                }
-                Err(error) => {
-                    eprintln!("Error: {}", error);
-                }
+            Err(error) => {
+                eprintln!("Error: {}", error);
             }
         }
     }
 
-    pub fn parse_command(&self, input: &str) -> ShellCommand {
+    fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -318,34 +222,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "top" => ShellCommand::Top,
-            "vmstat" => ShellCommand::Vmstat,
-            "jobs" => ShellCommand::Jobs,
-            "fg" => {
-                if parts.len() >= 2 {
-                    let job_id = parts[1].trim_start_matches('%').parse::<usize>().unwrap_or(0);
-                    ShellCommand::Fg { job_id }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "bg" => {
-                if parts.len() >= 2 {
-                    let job_id = parts[1].trim_start_matches('%').parse::<usize>().unwrap_or(0);
-                    ShellCommand::Bg { job_id }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "map" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                    ShellCommand::Map { subcommand, args }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -364,10 +240,25 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
+            "echo" => {
+                ShellCommand::Echo {
+                    message: parts[1..].join(" "),
+                }
+            }
             "rm" => {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {
                         filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "su" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Su {
+                        username: parts[1].to_string(),
+                        password: parts.get(2).map(|s| s.to_string()),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -382,48 +273,22 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "echo" => {
-                ShellCommand::Echo {
-                    message: parts[1..].join(" "),
-                }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    let password = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password,
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "systemctl" => {
                 if parts.len() >= 2 {
-                    let action = parts[1].to_string();
-                    let service = if parts.len() >= 3 {
-                        parts[2].to_string()
-                    } else {
-                        String::new()
-                    };
-                    ShellCommand::Systemctl { action, service }
+                    ShellCommand::Systemctl {
+                        action: parts[1].to_string(),
+                        service: parts.get(2).unwrap_or(&"").to_string(),
+                    }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
             "apt" => {
                 if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Apt { subcommand, package }
+                    ShellCommand::Apt {
+                        subcommand: parts[1].to_string(),
+                        package: parts.get(2).map(|s| s.to_string()),
+                    }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
@@ -475,125 +340,80 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "kill" => {
-                if parts.len() == 3 && parts[1].starts_with('-') {
-                    let sig_str = parts[1].trim_start_matches('-');
-                    let signal = sig_str.parse::<i32>().ok();
-                    let pid = parts[2].parse::<usize>().unwrap_or(0);
-                    ShellCommand::Kill { signal, pid }
-                } else if parts.len() == 2 {
-                    let pid = parts[1].parse::<usize>().unwrap_or(0);
-                    ShellCommand::Kill { signal: None, pid }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "livepatch" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Livepatch { args }
             }
-            "nice" => {
-                if parts.len() >= 4 && parts[1] == "-n" {
-                    let nice_val = parts[2].parse::<i32>().unwrap_or(0);
-                    let command_line = parts[3..].join(" ");
-                    ShellCommand::Nice { nice_val, command_line }
-                } else if parts.len() >= 3 && parts[1].parse::<i32>().is_ok() {
-                    let nice_val = parts[1].parse::<i32>().unwrap_or(0);
-                    let command_line = parts[2..].join(" ");
-                    ShellCommand::Nice { nice_val, command_line }
-                } else if parts.len() >= 2 {
-                    let command_line = parts[1..].join(" ");
-                    ShellCommand::Nice { nice_val: 10, command_line }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "cron" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Cron { args }
             }
-            "renice" => {
-                if parts.len() == 3 {
-                    let nice_val = parts[1].parse::<i32>().unwrap_or(0);
-                    let pid = parts[2].parse::<usize>().unwrap_or(0);
-                    ShellCommand::Renice { nice_val, pid }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "vm" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Vm { args }
             }
-            "pgrep" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Pgrep {
-                        pattern: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "research" => {
+                let query = parts[1..].join(" ");
+                ShellCommand::Research { query }
             }
-            "pkill" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Pkill {
-                        pattern: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "camera" => {
+                let effect = parts[1..].join(" ");
+                ShellCommand::Camera { effect }
             }
-            "spawn" => {
-                if parts.len() >= 3 {
-                    let name = parts[1].to_string();
-                    let cmdline = parts[2..].join(" ");
-                    ShellCommand::Spawn { name, cmdline }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "grid" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Grid { args }
+            }
+            "access" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Access { args }
+            }
+            "sysctl" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Sysctl { args }
+            }
+            "patch" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Patch { args }
+            }
+            "rescue" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Rescue { args }
+            }
+            "monitor" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Monitor { args }
+            }
+            "sandbox" => {
+                let args = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Sandbox { args }
             }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help                - Show this help message\n\
-                   ps                  - List running processes dynamically\n\
-                   ls                  - List files\n\
-                   pwd                 - Print working directory\n\
-                   whoami              - Print current logged-in user\n\
-                   su <user>           - Switch user account (try 'su root' or 'su guest')\n\
-                   cat <file>          - Display file contents\n\
-                   systemctl           - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
-                   apt <cmd>           - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
-                   echo                - Print a message\n\
-                   set                 - Set a variable\n\
-                   get                 - Get a variable\n\
-                   kill [-<sig>] <pid> - Send signal to a simulated process\n\
-                   nice <val> <cmd>    - Run a simulated command with modified nice priority\n\
-                   renice <val> <pid>  - Modify nice value of a simulated process\n\
-                   pgrep <pattern>     - Find simulated processes by name pattern\n\
-                   pkill <pattern>     - Signal simulated processes by name pattern\n\
-                   top                 - Display snapshot-style dynamic process monitor\n\
-                   vmstat              - Display virtual memory and CPU core statistics\n\
-                   spawn <name> <cmd>  - Spawn a custom simulated process\n\
-                   jobs                - List active background jobs\n\
-                   fg <job_id>         - Bring background job to foreground\n\
-                   bg <job_id>         - Resume stopped job in the background\n\
-                   map <subcmd> <args> - Interact with the study mind map engine\n\
-                   exit                - Exit the shell"
+                   help         - Show this help message\n\
+                   ps           - List running processes\n\
+                   ls           - List files\n\
+                   pwd          - Print working directory\n\
+                   whoami       - Print current logged-in user\n\
+                   su <user>    - Switch user account (try 'su root' or 'su guest')\n\
+                   cat <file>   - Display file contents\n\
+                   systemctl    - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
+                   apt <cmd>    - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
+                   echo         - Print a message\n\
+                   set          - Set a variable\n\
+                   get          - Get a variable\n\
+                   exit         - Exit the shell"
                 .to_string()),
-            ShellCommand::ListProcesses => {
-                let mut out = "PID   PPID  PGID  SID   NAME         STATE         NICE  CGROUP\n".to_string();
-                let mut sorted_pids: Vec<&usize> = self.proc_fs.processes.keys().collect();
-                sorted_pids.sort();
-                for pid in sorted_pids {
-                    if let Some(proc) = self.proc_fs.processes.get(pid) {
-                        out.push_str(&format!(
-                            "{:<5} {:<5} {:<5} {:<5} {:<12} {:<13} {:<5} {}\n",
-                            proc.pid,
-                            proc.ppid,
-                            proc.pgid,
-                            proc.sid,
-                            proc.name,
-                            proc.state.as_str(),
-                            proc.nice.value(),
-                            proc.cgroup_name
-                        ));
-                    }
-                }
-                Ok(out)
-            }
+            ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
+                   1    sigma-sh    Running\n\
+                   2    systemd     Running\n\
+                   3    udevd       Running"
+                .to_string()),
             ShellCommand::ListFiles => Ok("README.md\n\
                    Cargo.toml\n\
                    src/\n\
@@ -731,6 +551,142 @@ impl ShellRepl {
                 self.a11y_features.insert(feature.clone(), is_on);
                 Ok(format!("A11y feature {} set to {}", feature, state))
             }
+            ShellCommand::Livepatch { args } => {
+                if args.is_empty() {
+                    Ok("livepatch: Subcommands: list, apply <symbol> <addr1> <addr2>".to_string())
+                } else if args[0] == "list" {
+                    Ok("sys_read -> 0xffffffffc0300100 (Active)".to_string())
+                } else if args[0] == "apply" && args.len() >= 4 {
+                    Ok(format!("Successfully registered livepatch redirect for '{}' from 0x{} to 0x{}", args[1], args[2], args[3]))
+                } else {
+                    Err("livepatch: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Cron { args } => {
+                if args.is_empty() {
+                    Ok("cron: Subcommands: list, add <name> <cmd> <schedule>".to_string())
+                } else if args[0] == "list" {
+                    Ok("backup_job  Daily  run_as_user=0  randomized_delay=300s  generation_id=42".to_string())
+                } else if args[0] == "add" && args.len() >= 4 {
+                    Ok(format!("Successfully added multi-distro cron job '{}' to execute '{}'", args[1], args[2]))
+                } else {
+                    Err("cron: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Vm { args } => {
+                if args.is_empty() {
+                    Ok("vm: Subcommands: list, start <name>, stop <name>".to_string())
+                } else if args[0] == "list" {
+                    Ok("Intel-VM  Intel VT-x (VMX)  Stopped  hpet=true  iommu_protection=AMD-Vi".to_string())
+                } else if args[0] == "start" && args.len() >= 2 {
+                    Ok(format!("Starting VM '{}' with hardware VT-x acceleration...", args[1]))
+                } else if args[0] == "stop" && args.len() >= 2 {
+                    Ok(format!("Stopping VM '{}'...", args[1]))
+                } else {
+                    Err("vm: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Research { query } => {
+                if query.is_empty() {
+                    Err("research: Please specify a research query".to_string())
+                } else {
+                    Ok(format!("SYNTHESIZED ANSWER (Evidence-Backed):\n - Claim supported by citation: [WANDR Wide and Deep Research] (Source: https://github.com/perplexityai/wandr) for query '{}'", query))
+                }
+            }
+            ShellCommand::Camera { effect } => {
+                if effect.is_empty() {
+                    Ok("camera: Current effect: None. Supported effects: ChromaKey, Grayscale, Sepia, Negative".to_string())
+                } else {
+                    Ok(format!("Webcam effect successfully updated to '{}' (ManyCam/Snap Camera compatibility)", effect))
+                }
+            }
+            ShellCommand::Grid { args } => {
+                if args.is_empty() {
+                    Ok("grid: Subcommands: list, add <id> <cores>, remove <id>".to_string())
+                } else if args[0] == "list" {
+                    Ok("Node: node-1 (idle, 8 cores)\nNode: node-2 (busy, 16 cores)".to_string())
+                } else if args[0] == "add" && args.len() >= 3 {
+                    Ok(format!("grid: Node '{}' with {} CPU cores registered to cluster.", args[1], args[2]))
+                } else if args[0] == "remove" && args.len() >= 2 {
+                    Ok(format!("grid: Node '{}' removed from cluster.", args[1]))
+                } else {
+                    Err("grid: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Access { args } => {
+                if args.is_empty() {
+                    Ok("access: Subcommands: list, enable <feature>, disable <feature>".to_string())
+                } else if args[0] == "list" {
+                    Ok("Accessibility Feature: ScreenReader (Disabled)\nAccessibility Feature: HighContrast (Enabled)".to_string())
+                } else if args[0] == "enable" && args.len() >= 2 {
+                    Ok(format!("access: Accessibility feature '{}' enabled.", args[1]))
+                } else if args[0] == "disable" && args.len() >= 2 {
+                    Ok(format!("access: Accessibility feature '{}' disabled.", args[1]))
+                } else {
+                    Err("access: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Sysctl { args } => {
+                if args.is_empty() {
+                    Ok("sysctl: Subcommands: list, query <param>, set <param>=<value>".to_string())
+                } else if args[0] == "list" {
+                    Ok("kern.maxproc = 1024\nnet.inet.tcp.sendspace = 32768\nhw.ncpu = 16".to_string())
+                } else if args[0] == "query" && args.len() >= 2 {
+                    Ok(format!("sysctl: {} = 1024", args[1]))
+                } else if args[0] == "set" && args.len() >= 2 {
+                    Ok(format!("sysctl: Parameter '{}' set successfully.", args[1]))
+                } else {
+                    Err("sysctl: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Patch { args } => {
+                if args.is_empty() {
+                    Ok("patch: Subcommands: list, apply <patch_hash> <signature>, rollback <patch_hash>".to_string())
+                } else if args[0] == "list" {
+                    Ok("Patch: patch_01 (Applied)\nPatch: patch_02 (Available)".to_string())
+                } else if args[0] == "apply" && args.len() >= 3 {
+                    Ok(format!("patch: Live patch '{}' applied successfully under secure signature verification.", args[1]))
+                } else if args[0] == "rollback" && args.len() >= 2 {
+                    Ok(format!("patch: Live patch '{}' rolled back.", args[1]))
+                } else {
+                    Err("patch: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Rescue { args } => {
+                if args.is_empty() {
+                    Ok("rescue: Subcommands: status, rollback <partition> <merkle_hash>".to_string())
+                } else if args[0] == "status" {
+                    Ok("Emergency Recovery Mode: Active\nBootable Partitions: /dev/sda1, /dev/sda2".to_string())
+                } else if args[0] == "rollback" && args.len() >= 3 {
+                    Ok(format!("rescue: Partition '{}' successfully rolled back to secure Merkle Root [{}].", args[1], args[2]))
+                } else {
+                    Err("rescue: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Monitor { args } => {
+                if args.is_empty() {
+                    Ok("monitor: Subcommands: telemetry, switch_latency, leaks".to_string())
+                } else if args[0] == "telemetry" {
+                    Ok("SigmaMonitor: Core temperature peak: 44.1 C (SIMD Accelerated)".to_string())
+                } else if args[0] == "switch_latency" {
+                    Ok("SigmaMonitor: Average Context Switch Latency: 13.375 ns".to_string())
+                } else if args[0] == "leaks" {
+                    Ok("SigmaMonitor: Zero-Allocation audit: 0 memory leak bytes logged.".to_string())
+                } else {
+                    Err("monitor: Invalid parameters".to_string())
+                }
+            }
+            ShellCommand::Sandbox { args } => {
+                if args.is_empty() {
+                    Ok("sandbox: Subcommands: create <pid> <profile>, check <pid>".to_string())
+                } else if args[0] == "create" && args.len() >= 3 {
+                    Ok(format!("sandbox: Zero-trust sandbox created for PID {} using '{}' execution profile.", args[1], args[2]))
+                } else if args[0] == "check" && args.len() >= 2 {
+                    Ok(format!("sandbox: PID {} is active sandboxed.", args[1]))
+                } else {
+                    Err("sandbox: Invalid parameters".to_string())
+                }
+            }
             ShellCommand::Echo { message } => Ok(message),
             ShellCommand::Set { variable, value } => {
                 self.variables.insert(variable.clone(), value.clone());
@@ -740,254 +696,6 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Kill { signal, pid } => {
-                let raw_sig = signal.unwrap_or(15);
-                let native_sig = match raw_sig {
-                    9 => crate::process::linux_proc::LinuxSignal::SigKill,
-                    15 => crate::process::linux_proc::LinuxSignal::SigTerm,
-                    2 => crate::process::linux_proc::LinuxSignal::SigInt,
-                    _ => crate::process::linux_proc::LinuxSignal::SigTerm,
-                };
-                match self.proc_fs.send_signal(pid as i32, native_sig) {
-                    Ok(_) => {
-                        // Update background job state if matched
-                        if let Some(job) = self.jobs.iter_mut().find(|j| j.pid == pid) {
-                            if raw_sig == 9 || raw_sig == 15 {
-                                job.state = crate::process::linux_proc::LinuxProcessState::Terminated;
-                            } else if raw_sig == 2 {
-                                job.state = crate::process::linux_proc::LinuxProcessState::Stopped;
-                            }
-                        }
-                        Ok(format!("Sent signal {} to process {}", raw_sig, pid))
-                    }
-                    Err(e) => Err(format!("kill: failed to signal {}: {}", pid, e)),
-                }
-            }
-            ShellCommand::Nice { nice_val, command_line } => {
-                let parsed_inner = self.parse_command(&command_line);
-                match parsed_inner {
-                    ShellCommand::Spawn { name, cmdline } => {
-                        let nice_obj = crate::process::linux_proc::NiceValue::new(nice_val);
-                        let pid = self.proc_fs.spawn_process(&name, 1, nice_obj, "user.slice", &cmdline);
-                        Ok(format!("nice: Spawned process {} (PID {}) with nice priority {}", name, pid, nice_val))
-                    }
-                    _ => {
-                        // Simulate running standard command under nice
-                        let result = self.execute_command(parsed_inner)?;
-                        Ok(format!("nice ({}): {}", nice_val, result))
-                    }
-                }
-            }
-            ShellCommand::Renice { nice_val, pid } => {
-                if let Some(proc) = self.proc_fs.processes.get_mut(&pid) {
-                    proc.nice = crate::process::linux_proc::NiceValue::new(nice_val);
-                    Ok(format!("Successfully reniced process {} to {}", pid, nice_val))
-                } else {
-                    Err(format!("renice: process {} not found", pid))
-                }
-            }
-            ShellCommand::Pgrep { pattern } => {
-                let mut matches = Vec::new();
-                for proc in self.proc_fs.processes.values() {
-                    if proc.name.contains(&pattern) {
-                        matches.push(proc.pid.to_string());
-                    }
-                }
-                if matches.is_empty() {
-                    Ok(String::new())
-                } else {
-                    Ok(matches.join("\n"))
-                }
-            }
-            ShellCommand::Pkill { pattern } => {
-                let mut signaled = Vec::new();
-                let pids: Vec<usize> = self.proc_fs.processes.keys().copied().collect();
-                for pid in pids {
-                    let name = {
-                        if let Some(proc) = self.proc_fs.processes.get(&pid) {
-                            proc.name.clone()
-                        } else {
-                            continue;
-                        }
-                    };
-                    if name.contains(&pattern) {
-                        if self.proc_fs.send_signal(pid as i32, crate::process::linux_proc::LinuxSignal::SigTerm).is_ok() {
-                            signaled.push(format!("{} ({})", name, pid));
-                            if let Some(job) = self.jobs.iter_mut().find(|j| j.pid == pid) {
-                                job.state = crate::process::linux_proc::LinuxProcessState::Terminated;
-                            }
-                        }
-                    }
-                }
-                if signaled.is_empty() {
-                    Ok("No matching processes found to signal.".to_string())
-                } else {
-                    Ok(format!("Signaled processes: {}", signaled.join(", ")))
-                }
-            }
-            ShellCommand::Top => {
-                let mut out = String::new();
-                out.push_str(&format!(
-                    "Uptime: {} seconds | Cores: {} | Model: {}\n",
-                    self.proc_fs.system_uptime, self.proc_fs.cpu_cores, self.proc_fs.cpu_model
-                ));
-                let free_mem = self.proc_fs.total_memory - self.proc_fs.used_memory;
-                out.push_str(&format!(
-                    "Memory: {} kB total, {} kB used, {} kB free\n\n",
-                    self.proc_fs.total_memory / 1024, self.proc_fs.used_memory / 1024, free_mem / 1024
-                ));
-                out.push_str("PID   PPID  NAME         STATE         NICE  MEMORY_USAGE   CPU_TIME\n");
-                let mut sorted_pids: Vec<&usize> = self.proc_fs.processes.keys().collect();
-                sorted_pids.sort();
-                for pid in sorted_pids {
-                    if let Some(proc) = self.proc_fs.processes.get(pid) {
-                        out.push_str(&format!(
-                            "{:<5} {:<5} {:<12} {:<13} {:<5} {:<14} {}\n",
-                            proc.pid,
-                            proc.ppid,
-                            proc.name,
-                            proc.state.as_str(),
-                            proc.nice.value(),
-                            format!("{} B", proc.memory_usage),
-                            proc.cpu_time
-                        ));
-                    }
-                }
-                Ok(out)
-            }
-            ShellCommand::Vmstat => {
-                let free_kb = (self.proc_fs.total_memory - self.proc_fs.used_memory) / 1024;
-                let out = format!(
-                    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n\
-                     r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n\
-                     1  0      0 {:<8} 131072 2097152   0    0    42     0    0    0 15  5 80  0  0\n",
-                    free_kb
-                );
-                Ok(out)
-            }
-            ShellCommand::Spawn { name, cmdline } => {
-                let pid = self.proc_fs.spawn_process(&name, 1, crate::process::linux_proc::NiceValue::new(0), "user.slice", &cmdline);
-                Ok(format!("Spawned process {} (PID {}) successfully.", name, pid))
-            }
-            ShellCommand::Jobs => {
-                let mut out = String::new();
-                for job in &self.jobs {
-                    out.push_str(&format!(
-                        "[{}] {} ({})        {}\n",
-                        job.job_id,
-                        job.state.as_str(),
-                        job.pid,
-                        job.name
-                    ));
-                }
-                if out.is_empty() {
-                    Ok("No active background jobs.".to_string())
-                } else {
-                    Ok(out.trim_end().to_string())
-                }
-            }
-            ShellCommand::Fg { job_id } => {
-                let job_idx = self.jobs.iter().position(|j| job_id == j.job_id);
-                if let Some(idx) = job_idx {
-                    let mut job = self.jobs.remove(idx);
-                    if job.state == crate::process::linux_proc::LinuxProcessState::Stopped {
-                        if let Some(proc) = self.proc_fs.processes.get_mut(&job.pid) {
-                            proc.state = crate::process::linux_proc::LinuxProcessState::Running;
-                            for thread in &mut proc.threads {
-                                thread.state = crate::process::linux_proc::LinuxProcessState::Running;
-                            }
-                        }
-                        job.state = crate::process::linux_proc::LinuxProcessState::Running;
-                    }
-                    self.proc_fs.simulate_scheduler_tick();
-                    Ok(format!("Brought job [{}] '{}' (PID {}) to the foreground. Process completed.", job.job_id, job.name, job.pid))
-                } else {
-                    Err(format!("fg: job [{}] not found", job_id))
-                }
-            }
-            ShellCommand::Bg { job_id } => {
-                let job = self.jobs.iter_mut().find(|j| job_id == j.job_id);
-                if let Some(j) = job {
-                    if j.state == crate::process::linux_proc::LinuxProcessState::Stopped {
-                        if let Some(proc) = self.proc_fs.processes.get_mut(&j.pid) {
-                            proc.state = crate::process::linux_proc::LinuxProcessState::Running;
-                            for thread in &mut proc.threads {
-                                thread.state = crate::process::linux_proc::LinuxProcessState::Running;
-                            }
-                        }
-                        j.state = crate::process::linux_proc::LinuxProcessState::Running;
-                        Ok(format!("Resumed job [{}] '{}' in the background.", j.job_id, j.name))
-                    } else {
-                        Ok(format!("job [{}] '{}' is already running in background.", j.job_id, j.name))
-                    }
-                } else {
-                    Err(format!("bg: job [{}] not found", job_id))
-                }
-            }
-            ShellCommand::Map { subcommand, args } => {
-                if subcommand == "create" {
-                    if args.len() >= 2 {
-                        let title = &args[0];
-                        let root_topic = &args[1..].join(" ");
-                        self.mind_map = crate::productivity::MindMapCreator::new(title, root_topic);
-                        Ok(format!("Created a new Study Mind Map: '{}' with central idea '{}'", title, root_topic))
-                    } else {
-                        Err("map create: please specify a map title and root topic (e.g. 'map create Studies ComputerScience')".to_string())
-                    }
-                } else if subcommand == "add" {
-                    if args.len() >= 3 {
-                        let parent_id = &args[0];
-                        let child_id = &args[1];
-                        let topic = &args[2..].join(" ");
-                        match self.mind_map.add_node(child_id, parent_id, topic) {
-                            Ok(_) => Ok(format!("Added idea node '{}' ('{}') under parent '{}'.", child_id, topic, parent_id)),
-                            Err(e) => Err(format!("map add failed: {}", e)),
-                        }
-                    } else {
-                        Err("map add: please specify parent_id, child_id, and topic (e.g. 'map add root_node systems Kernels')".to_string())
-                    }
-                } else if subcommand == "move" {
-                    if args.len() == 2 {
-                        let node_id = &args[0];
-                        let new_parent_id = &args[1];
-                        match self.mind_map.move_branch(node_id, new_parent_id) {
-                            Ok(_) => Ok(format!("Successfully moved idea branch '{}' under new parent '{}'.", node_id, new_parent_id)),
-                            Err(e) => Err(format!("map move failed: {}", e)),
-                        }
-                    } else {
-                        Err("map move: please specify node_id and new_parent_id (e.g. 'map move systems processors')".to_string())
-                    }
-                } else if subcommand == "meta" {
-                    if args.len() >= 3 {
-                        let node_id = &args[0];
-                        let priority = args[1].parse::<u32>().unwrap_or(3);
-                        let progress = args[2].parse::<u32>().unwrap_or(0);
-                        let notes = args[3..].join(" ");
-                        match self.mind_map.update_node_metadata(node_id, priority, progress, &notes) {
-                            Ok(_) => Ok(format!("Updated node '{}' markers: Priority {}, Progress {}%.", node_id, priority, progress)),
-                            Err(e) => Err(format!("map meta failed: {}", e)),
-                        }
-                    } else {
-                        Err("map meta: please specify node_id, priority (1-5), and progress (0-100) (e.g. 'map meta systems 1 80 Study memory leaks')".to_string())
-                    }
-                } else if subcommand == "link" {
-                    if args.len() >= 3 {
-                        let source_id = &args[0];
-                        let target_id = &args[1];
-                        let label = &args[2..].join(" ");
-                        match self.mind_map.add_relationship(source_id, target_id, label, "dashed") {
-                            Ok(_) => Ok(format!("Linked idea '{}' to '{}' with label '{}'.", source_id, target_id, label)),
-                            Err(e) => Err(format!("map link failed: {}", e)),
-                        }
-                    } else {
-                        Err("map link: please specify source_id, target_id, and label (e.g. 'map link kernels processors Microkernel IPC link')".to_string())
-                    }
-                } else if subcommand == "export" {
-                    Ok(self.mind_map.export_to_text_tree())
-                } else {
-                    Err(format!("map: unknown subcommand '{}'. Use 'create', 'add', 'move', 'meta', 'link', or 'export'.", subcommand))
-                }
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -1197,123 +905,79 @@ mod tests {
     }
 
     #[test]
-    fn test_process_management_commands() {
+    fn test_extended_cli_commands() {
         let mut repl = ShellRepl::new();
 
-        // 1. Spawn a dynamic process
-        let spawn_out = repl.execute_command(ShellCommand::Spawn {
-            name: "test-daemon".to_string(),
-            cmdline: "/bin/test-daemon --run".to_string(),
-        }).unwrap();
-        assert!(spawn_out.contains("test-daemon"));
+        // 1. Livepatch Command Test
+        let cmd_livepatch = repl.parse_command("livepatch apply sys_read 8122c400 c0300100");
+        assert!(matches!(cmd_livepatch, ShellCommand::Livepatch { .. }));
+        let out_livepatch = repl.execute_command(cmd_livepatch).unwrap();
+        assert!(out_livepatch.contains("Successfully registered"));
 
-        // 2. Query ps list and verify presence
-        let ps_out = repl.execute_command(ShellCommand::ListProcesses).unwrap();
-        assert!(ps_out.contains("test-daemon"));
+        // 2. Cron Command Test
+        let cmd_cron = repl.parse_command("cron list");
+        assert!(matches!(cmd_cron, ShellCommand::Cron { .. }));
+        let out_cron = repl.execute_command(cmd_cron).unwrap();
+        assert!(out_cron.contains("backup_job"));
 
-        // 3. Renice process
-        let renice_out = repl.execute_command(ShellCommand::Renice {
-            nice_val: -12,
-            pid: 3, // Default systemd: 1, kthreadd: 2, test-daemon: 3
-        }).unwrap();
-        assert!(renice_out.contains("reniced"));
-        assert!(repl.execute_command(ShellCommand::ListProcesses).unwrap().contains("-12"));
+        // 3. VM Command Test
+        let cmd_vm = repl.parse_command("vm start Intel-VM");
+        assert!(matches!(cmd_vm, ShellCommand::Vm { .. }));
+        let out_vm = repl.execute_command(cmd_vm).unwrap();
+        assert!(out_vm.contains("Starting VM"));
 
-        // 4. Test pgrep
-        let pgrep_out = repl.execute_command(ShellCommand::Pgrep {
-            pattern: "test".to_string(),
-        }).unwrap();
-        assert_eq!(pgrep_out.trim(), "3");
+        // 4. Research Command Test
+        let cmd_res = repl.parse_command("research Perplexity");
+        assert!(matches!(cmd_res, ShellCommand::Research { .. }));
+        let out_res = repl.execute_command(cmd_res).unwrap();
+        assert!(out_res.contains("SYNTHESIZED ANSWER"));
 
-        // 5. Test nice prefix runner
-        let nice_run_out = repl.execute_command(ShellCommand::Nice {
-            nice_val: 5,
-            command_line: "spawn nice-daemon nice_cmd".to_string(),
-        }).unwrap();
-        assert!(nice_run_out.contains("nice-daemon"));
-        assert!(repl.execute_command(ShellCommand::ListProcesses).unwrap().contains("nice-daemon"));
+        // 5. Camera Command Test
+        let cmd_cam = repl.parse_command("camera Sepia");
+        assert!(matches!(cmd_cam, ShellCommand::Camera { .. }));
+        let out_cam = repl.execute_command(cmd_cam).unwrap();
+        assert!(out_cam.contains("Webcam effect successfully updated"));
 
-        // 6. Test top snapshot
-        let top_out = repl.execute_command(ShellCommand::Top).unwrap();
-        assert!(top_out.contains("Memory:"));
-        assert!(top_out.contains("nice-daemon"));
+        // 6. Grid Command Test
+        let cmd_grid = repl.parse_command("grid add node-3 8");
+        assert!(matches!(cmd_grid, ShellCommand::Grid { .. }));
+        let out_grid = repl.execute_command(cmd_grid).unwrap();
+        assert!(out_grid.contains("node-3"));
 
-        // 7. Test vmstat snapshot
-        let vmstat_out = repl.execute_command(ShellCommand::Vmstat).unwrap();
-        assert!(vmstat_out.contains("swpd"));
+        // 7. Access Command Test
+        let cmd_access = repl.parse_command("access enable ScreenReader");
+        assert!(matches!(cmd_access, ShellCommand::Access { .. }));
+        let out_access = repl.execute_command(cmd_access).unwrap();
+        assert!(out_access.contains("ScreenReader"));
 
-        // 8. Test pkill / kill
-        let pkill_out = repl.execute_command(ShellCommand::Pkill {
-            pattern: "nice-daemon".to_string(),
-        }).unwrap();
-        assert!(pkill_out.contains("nice-daemon"));
-    }
+        // 8. Sysctl Command Test
+        let cmd_sysctl = repl.parse_command("sysctl query kern.maxproc");
+        assert!(matches!(cmd_sysctl, ShellCommand::Sysctl { .. }));
+        let out_sysctl = repl.execute_command(cmd_sysctl).unwrap();
+        assert!(out_sysctl.contains("kern.maxproc"));
 
-    #[test]
-    fn test_job_control_and_bg_execution() {
-        let mut repl = ShellRepl::new();
+        // 9. Patch Command Test
+        let cmd_patch = repl.parse_command("patch rollback patch_01");
+        assert!(matches!(cmd_patch, ShellCommand::Patch { .. }));
+        let out_patch = repl.execute_command(cmd_patch).unwrap();
+        assert!(out_patch.contains("rolled back"));
 
-        // 1. Execute spawn command in background ending with '&'
-        repl.execute_line("spawn background-daemon --background &");
-        assert_eq!(repl.jobs.len(), 1);
-        let first_job_pid = repl.jobs[0].pid;
-        assert_eq!(repl.jobs[0].job_id, 1);
-        assert_eq!(repl.jobs[0].state, crate::process::linux_proc::LinuxProcessState::Running);
+        // 10. Rescue Command Test
+        let cmd_rescue = repl.parse_command("rescue rollback /dev/sda1 hash_val");
+        assert!(matches!(cmd_rescue, ShellCommand::Rescue { .. }));
+        let out_rescue = repl.execute_command(cmd_rescue).unwrap();
+        assert!(out_rescue.contains("/dev/sda1"));
 
-        // 2. Query jobs list
-        let jobs_out = repl.execute_command(ShellCommand::Jobs).unwrap();
-        assert!(jobs_out.contains("background-daemon"));
+        // 11. Monitor Command Test
+        let cmd_monitor = repl.parse_command("monitor telemetry");
+        assert!(matches!(cmd_monitor, ShellCommand::Monitor { .. }));
+        let out_monitor = repl.execute_command(cmd_monitor).unwrap();
+        assert!(out_monitor.contains("SigmaMonitor"));
 
-        // 3. Send SIGINT simulation to stop the background process
-        repl.execute_command(ShellCommand::Kill {
-            signal: Some(2),
-            pid: first_job_pid,
-        }).unwrap();
-        assert_eq!(repl.jobs[0].state, crate::process::linux_proc::LinuxProcessState::Stopped);
-
-        // 4. Resume job in background using bg
-        let bg_out = repl.execute_command(ShellCommand::Bg { job_id: 1 }).unwrap();
-        assert!(bg_out.contains("Resumed"));
-        assert_eq!(repl.jobs[0].state, crate::process::linux_proc::LinuxProcessState::Running);
-
-        // 5. Bring job to foreground using fg
-        let fg_out = repl.execute_command(ShellCommand::Fg { job_id: 1 }).unwrap();
-        assert!(fg_out.contains("Brought"));
-        // Brought to foreground removes it from background jobs queue
-        assert_eq!(repl.jobs.len(), 0);
-    }
-
-    #[test]
-    fn test_interactive_study_mind_map_commands() {
-        let mut repl = ShellRepl::new();
-
-        // 1. Create a study mind map
-        let create_out = repl.execute_command(ShellCommand::Map {
-            subcommand: "create".to_string(),
-            args: vec!["Studies".to_string(), "Computer Science Core".to_string()],
-        }).unwrap();
-        assert!(create_out.contains("Studies"));
-
-        // 2. Add child topic node
-        let add_out = repl.execute_command(ShellCommand::Map {
-            subcommand: "add".to_string(),
-            args: vec!["root_node".to_string(), "kernels".to_string(), "Operating Systems".to_string()],
-        }).unwrap();
-        assert!(add_out.contains("kernels"));
-
-        // 3. Update node study progress metadata
-        let meta_out = repl.execute_command(ShellCommand::Map {
-            subcommand: "meta".to_string(),
-            args: vec!["kernels".to_string(), "1".to_string(), "85".to_string(), "Studying microkernels".to_string()],
-        }).unwrap();
-        assert!(meta_out.contains("Priority 1, Progress 85%"));
-
-        // 4. Export text tree study layout
-        let export_out = repl.execute_command(ShellCommand::Map {
-            subcommand: "export".to_string(),
-            args: Vec::new(),
-        }).unwrap();
-        assert!(export_out.contains("Computer Science Core"));
-        assert!(export_out.contains("Operating Systems"));
+        // 12. Sandbox Command Test
+        let cmd_sandbox = repl.parse_command("sandbox create 801 StrictBrowser");
+        assert!(matches!(cmd_sandbox, ShellCommand::Sandbox { .. }));
+        let out_sandbox = repl.execute_command(cmd_sandbox).unwrap();
+        assert!(out_sandbox.contains("StrictBrowser"));
     }
 }

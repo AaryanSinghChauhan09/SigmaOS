@@ -129,7 +129,12 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
+        match self.status.load(Ordering::SeqCst) {
+            1 => IntegrityStatus::Modified,
+            2 => IntegrityStatus::Corrupted,
+            3 => IntegrityStatus::Missing,
+            _ => IntegrityStatus::Valid,
+        }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {

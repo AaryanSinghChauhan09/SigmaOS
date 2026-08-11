@@ -1,7 +1,7 @@
 // SigmaOS Cross-Platform Compatibility Layer
 // Native support for Windows .exe, macOS .dmg, and Android .apk
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// OOP-based Superset Application Capability matching
 pub trait SupersetApplicationCapability {
@@ -111,13 +111,13 @@ impl SupersetApplicationCapability for SovereignVideoPlayerCapability {
 
 /// OOP Registry pattern to manage and query boxed SupersetApplicationCapability interfaces
 pub struct SovereignCapabilityRegistry {
-    capabilities: BTreeMap<String, Box<dyn SupersetApplicationCapability>>,
+    capabilities: HashMap<String, Box<dyn SupersetApplicationCapability>>,
 }
 
 impl SovereignCapabilityRegistry {
     pub fn new() -> Self {
         Self {
-            capabilities: BTreeMap::new(),
+            capabilities: HashMap::new(),
         }
     }
 
@@ -216,7 +216,7 @@ pub struct ApplicationBinary {
     pub path: String,
     pub compatibility_mode: CompatibilityMode,
     pub dependencies: Vec<String>,
-    pub environment: BTreeMap<String, String>,
+    pub environment: HashMap<String, String>,
 }
 
 impl ApplicationBinary {
@@ -228,7 +228,7 @@ impl ApplicationBinary {
             path: String::new(),
             compatibility_mode: CompatibilityMode::Native,
             dependencies: Vec::new(),
-            environment: BTreeMap::new(),
+            environment: HashMap::new(),
         }
     }
 
@@ -449,18 +449,18 @@ impl ContainerRuntime {
 
 /// Cross-platform compatibility manager
 pub struct CompatibilityManager {
-    pub translation_layers: BTreeMap<String, TranslationLayer>,
-    pub container_runtimes: BTreeMap<String, ContainerRuntime>,
-    pub registered_binaries: BTreeMap<String, ApplicationBinary>,
+    pub translation_layers: HashMap<String, TranslationLayer>,
+    pub container_runtimes: HashMap<String, ContainerRuntime>,
+    pub registered_binaries: HashMap<String, ApplicationBinary>,
     pub current_platform: TargetPlatform,
 }
 
 impl CompatibilityManager {
     pub fn new() -> Self {
         let mut manager = Self {
-            translation_layers: BTreeMap::new(),
-            container_runtimes: BTreeMap::new(),
-            registered_binaries: BTreeMap::new(),
+            translation_layers: HashMap::new(),
+            container_runtimes: HashMap::new(),
+            registered_binaries: HashMap::new(),
             current_platform: TargetPlatform::SigmaOS,
         };
 
@@ -740,13 +740,13 @@ pub struct SysctlParameter {
 
 /// BSD-inspired Sovereign Sysctl Kernel Parameter Tuning Engine
 pub struct SovereignSysctlManager {
-    pub parameters: BTreeMap<String, SysctlParameter>,
+    pub parameters: HashMap<String, SysctlParameter>,
 }
 
 impl SovereignSysctlManager {
     pub fn new() -> Self {
         let mut manager = Self {
-            parameters: BTreeMap::new(),
+            parameters: HashMap::new(),
         };
         manager.register_defaults();
         manager
@@ -900,13 +900,13 @@ impl Default for OpenSourceOsGapBridge {
 /// Dynamic bridge for open-source development tools (e.g. GDB trace registers or Git trees)
 #[derive(Debug, Clone)]
 pub struct OpenSourceToolsBridge {
-    pub simulated_gdb_registers: BTreeMap<String, u64>,
+    pub simulated_gdb_registers: HashMap<String, u64>,
 }
 
 impl OpenSourceToolsBridge {
     pub fn new() -> Self {
         Self {
-            simulated_gdb_registers: BTreeMap::new(),
+            simulated_gdb_registers: HashMap::new(),
         }
     }
 

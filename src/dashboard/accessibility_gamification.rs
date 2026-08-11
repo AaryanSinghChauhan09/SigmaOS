@@ -1,7 +1,7 @@
 // SigmaOS UI/UX Accessibility Overlay & Gamification Engine
 // Implements accessibility presets (high contrast, color filters) and gamified task/achievement tracking to boost user engagement and operational compliance.
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Accessibility color filters for users with visual impairments
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -106,7 +106,7 @@ pub struct Trophy {
 }
 
 pub struct GamifiedProductivityTracker {
-    pub trophies: BTreeMap<String, Trophy>,
+    pub trophies: HashMap<String, Trophy>,
     pub xp_points: u32,
     pub daily_streak: u32,
     pub consecutive_audits: u32,
@@ -115,7 +115,7 @@ pub struct GamifiedProductivityTracker {
 impl GamifiedProductivityTracker {
     pub fn new() -> Self {
         let mut tracker = Self {
-            trophies: BTreeMap::new(),
+            trophies: HashMap::new(),
             xp_points: 0,
             daily_streak: 0,
             consecutive_audits: 0,
