@@ -293,6 +293,7 @@ impl UniversalPackageAdapter {
             description: desc.to_string(),
             dependencies,
             checksum: format!("SHA256:{}", name),
+            mirrors: Vec::new(),
         })
     }
 }

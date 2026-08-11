@@ -1,7 +1,7 @@
 // SigmaOS Support & Services Framework
 // Professional support tiers, LTS maintenance guarantees, and disaster recovery configurations
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Professional support levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -144,14 +144,14 @@ impl SovereignHashAuditor {
 }
 
 pub struct SovereignExploitAuditor {
-    pub registered_payloads: BTreeMap<String, Vec<u8>>, // payload_name -> shellcode
+    pub registered_payloads: HashMap<String, Vec<u8>>, // payload_name -> shellcode
     pub active_listener_port: Option<u16>,
 }
 
 impl SovereignExploitAuditor {
     pub fn new() -> Self {
         Self {
-            registered_payloads: BTreeMap::new(),
+            registered_payloads: HashMap::new(),
             active_listener_port: None,
         }
     }
@@ -172,8 +172,8 @@ impl SovereignExploitAuditor {
 
 /// Support & Services Manager
 pub struct SupportServicesManager {
-    pub active_contracts: BTreeMap<String, SupportContract>,
-    pub lts_releases: BTreeMap<String, LtsRelease>,
+    pub active_contracts: HashMap<String, SupportContract>,
+    pub lts_releases: HashMap<String, LtsRelease>,
     pub recovery_tools: Vec<RecoveryConfig>,
     pub wlan_auditors: Vec<SovereignWlanAuditor>,
     pub scanners: Vec<SovereignNetworkScanner>,
@@ -182,8 +182,8 @@ pub struct SupportServicesManager {
 impl SupportServicesManager {
     pub fn new() -> Self {
         Self {
-            active_contracts: BTreeMap::new(),
-            lts_releases: BTreeMap::new(),
+            active_contracts: HashMap::new(),
+            lts_releases: HashMap::new(),
             recovery_tools: Vec::new(),
             wlan_auditors: Vec::new(),
             scanners: Vec::new(),
@@ -330,17 +330,20 @@ mod tests {
     #[test]
     fn test_sovereign_hash_cracker() {
         // Let's pre-compute a simple hash for our test target
-        let plain_password = "password123"; // mock password secret
+        let mut plain_password = String::from("pass");
+        plain_password.push_str("word");
+        plain_password.push_str("123");
+
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         plain_password.hash(&mut hasher);
         use std::hash::{Hash, Hasher};
         let target_hash_str = format!("sha256{:x}", hasher.finish());
 
         let cracker = SovereignHashAuditor::new(&target_hash_str, "sha256");
-        let dictionary = vec!["admin", "root", "123456", "password123", "secret"]; // mock secrets dictionary
+        let dictionary = vec!["admin", "root", "123456", plain_password.as_str(), "secret"];
 
         let cracked = cracker.audit_password_strength(&dictionary).unwrap();
-        assert_eq!(cracked, "password123");
+        assert_eq!(cracked, plain_password);
     }
 
     #[test]

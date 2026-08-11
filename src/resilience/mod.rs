@@ -2,7 +2,7 @@
 pub mod backup;
 pub mod self_healing;
 
-pub use backup::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
+pub use backup::{SigmaTimeshift, BackupError, BackupSnapshot};
 pub use self_healing::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,

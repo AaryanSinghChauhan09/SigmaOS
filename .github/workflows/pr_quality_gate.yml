@@ -36,7 +36,7 @@ jobs:
               "header-max-length": [2, "always", 100],
               "subject-empty": [2, "never"],
               "subject-case": [0, "never"],
-              "body-max-line-length": [0, "always", null]
+              "body-max-line-length": [0, "always", 10000]
             }
           }
           EOF
