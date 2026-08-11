@@ -19,3 +19,4 @@ pub enum PackageFormat {
     NixStore,     // Nix package manager (content-addressed store hashes)
     AppImage,     // AppImage (self-contained portable binaries)
     Homebrew,     // Homebrew (ruby formulas)
+}
