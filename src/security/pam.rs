@@ -269,11 +269,11 @@ mod tests {
         manager.create_group("wheel").unwrap();
 
         // Register user
-        let uid = manager.register_user("aaryan", "super-secret-pass", "wheel").unwrap();
+        let uid = manager.register_user("aaryan", "test-password-12345", "wheel").unwrap();
         assert_eq!(uid, 1000);
 
         // Authenticate user successfully
-        assert!(manager.authenticate("aaryan", "super-secret-pass").is_ok());
+        assert!(manager.authenticate("aaryan", "test-password-12345").is_ok());
 
         // Fail authentication with wrong password
         assert_eq!(manager.authenticate("aaryan", "wrong-pass"), Err(PamError::AuthenticationFailed));
@@ -296,7 +296,7 @@ mod tests {
         let mut manager = SovereignPamManager::new();
         manager.register_module(alloc::boxed::Box::new(AccountTallyModule { max_failed_attempts: 3 }));
 
-        manager.register_user("alice", "validpass123", "users").unwrap();
+        manager.register_user("alice", "secure-password-67890", "users").unwrap();
 
         // 3 consecutive failed attempts
         assert!(manager.authenticate("alice", "bad").is_err());

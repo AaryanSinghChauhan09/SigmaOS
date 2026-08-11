@@ -296,7 +296,7 @@ impl SigmaShell {
         None
     }
 
-    fn execute_external(&self, command: &Command) -> Result<String, ShellError> {
+    fn execute_external(&self, _command: &Command) -> Result<String, ShellError> {
         // Execute external command
         Ok(String::new())
     }

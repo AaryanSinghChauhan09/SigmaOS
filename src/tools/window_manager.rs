@@ -174,7 +174,7 @@ impl TilingWindowManager {
     }
 
     pub fn switch_workspace(&mut self, number: u32) {
-        if let Some(workspace) = self.workspaces.iter_mut().find(|w| w.number == number) {
+        if let Some(_workspace) = self.workspaces.iter_mut().find(|w| w.number == number) {
             // Switch to workspace
         }
     }

@@ -228,7 +228,7 @@ impl InitSystem {
         Ok(())
     }
 
-    fn stop_target(&mut self, target_name: &str) -> Result<(), InitError> {
+    fn stop_target(&mut self, _target_name: &str) -> Result<(), InitError> {
         // Stop target and its services
         Ok(())
     }

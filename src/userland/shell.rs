@@ -280,7 +280,7 @@ impl Shell {
                 self.execute_ast(left)?;
                 self.execute_ast(right)
             }
-            ShellCommand::Background(child) => {
+            ShellCommand::Background(_child) => {
                 // Background execution logic
                 Ok(0)
             }

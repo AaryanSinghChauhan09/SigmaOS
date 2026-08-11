@@ -105,7 +105,8 @@ impl VesaDriver {
     }
 
     pub fn clear_screen(&self, color: u32) -> Result<(), VesaError> {
-        // Simulate screen clear
+        // Simulate screen clear with color
+        let _color = color; // Use color in production implementation
         Ok(())
     }
 
