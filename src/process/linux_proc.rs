@@ -1,8 +1,15 @@
 // Linux-inspired Process & ProcFS Emulation for SigmaOS
 // Implements advanced process hierarchies, PID namespace isolation, nice priorities, cgroups, signal handling, and dynamic /proc pseudo-filesystem.
 
+<<<<<<< HEAD
 use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
+||||||| 803080c14
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicUsize, Ordering};
+=======
+use std::collections::HashMap;
+>>>>>>> origin/jules-12141202256370491032-4efbd54e
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxProcessState {
@@ -24,6 +31,41 @@ impl LinuxProcessState {
         }
     }
 }
+
+/// Linux Scheduling Policies
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SchedPolicy {
+    Other = 0,
+    Fifo = 1,
+    Rr = 2,
+    Batch = 3,
+    Idle = 5,
+}
+
+impl SchedPolicy {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            SchedPolicy::Other => "SCHED_OTHER",
+            SchedPolicy::Fifo => "SCHED_FIFO",
+            SchedPolicy::Rr => "SCHED_RR",
+            SchedPolicy::Batch => "SCHED_BATCH",
+            SchedPolicy::Idle => "SCHED_IDLE",
+        }
+    }
+}
+
+/// Nice-to-Weight conversion table used in CFS/EEVDF Linux kernels.
+/// Represents weights corresponding to Nice values from -20 to 19.
+const PRIO_TO_WEIGHT: [u32; 40] = [
+    /* -20 */ 88761,  71755,  56483,  46273,  36291,
+    /* -15 */ 29154,  23254,  18705,  14949,  11916,
+    /* -10 */  9548,   7620,   6100,   4904,   3906,
+    /*  -5 */  3121,   2501,   1991,   1586,   1277,
+    /*   0 */  1024,    820,    655,    526,    423,
+    /*   5 */   335,    272,    215,    172,    137,
+    /*  10 */   110,     87,     70,     56,     45,
+    /*  15 */    36,     29,     23,     18,     15,
+];
 
 /// Linux-inspired nice values ranging from -20 (highest priority) to 19 (lowest priority).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -52,6 +94,11 @@ impl NiceValue {
         } else {
             1 // Idle
         }
+    }
+
+    pub fn weight(&self) -> u32 {
+        let index = (self.0 + 20).clamp(0, 39) as usize;
+        PRIO_TO_WEIGHT[index]
     }
 }
 
@@ -115,6 +162,15 @@ impl PidNamespace {
     }
 }
 
+/// Simulated Linux Thread/Task Entry
+#[derive(Debug, Clone)]
+pub struct LinuxThreadEntry {
+    pub tid: usize,
+    pub name: String,
+    pub state: LinuxProcessState,
+    pub vruntime: u64,
+}
+
 /// Process Entry for our simulated system
 #[derive(Debug, Clone)]
 pub struct LinuxProcessEntry {
@@ -130,6 +186,13 @@ pub struct LinuxProcessEntry {
     pub cpu_time: u64,
     pub memory_usage: usize, // in bytes
     pub thread_count: usize,
+    // Advanced CFS/EEVDF Scheduling parameters
+    pub sched_policy: SchedPolicy,
+    pub vruntime: u64,
+    pub sched_weight: u32,
+    pub deadline: u64,
+    pub is_eligible: bool,
+    pub threads: Vec<LinuxThreadEntry>,
 }
 
 impl LinuxProcessEntry {
@@ -143,6 +206,13 @@ impl LinuxProcessEntry {
         cgroup_name: &str,
         cmdline: &str,
     ) -> Self {
+        let weight = nice.weight();
+        let initial_thread = LinuxThreadEntry {
+            tid: pid, // Initial Thread ID matches PID
+            name: name.to_string(),
+            state: LinuxProcessState::Running,
+            vruntime: 0,
+        };
         Self {
             pid,
             ppid,
@@ -156,6 +226,12 @@ impl LinuxProcessEntry {
             cpu_time: 1500,
             memory_usage: 4096000,
             thread_count: 1,
+            sched_policy: SchedPolicy::Other,
+            vruntime: 0,
+            sched_weight: weight,
+            deadline: 0,
+            is_eligible: true,
+            threads: vec![initial_thread],
         }
     }
 }
@@ -179,6 +255,13 @@ pub struct ProcFileSystem {
     pub used_memory: usize,
     pub cpu_model: String,
     pub cpu_cores: usize,
+    // Advanced system telemetry statistics
+    pub load_1m: f64,
+    pub load_5m: f64,
+    pub load_15m: f64,
+    pub jiffies_user: u64,
+    pub jiffies_system: u64,
+    pub jiffies_idle: u64,
 }
 
 impl ProcFileSystem {
@@ -193,6 +276,12 @@ impl ProcFileSystem {
             used_memory: 4194304 * 1024,  // 4GB
             cpu_model: "Sigma Core AI-Native 9".to_string(),
             cpu_cores: 16,
+            load_1m: 0.15,
+            load_5m: 0.08,
+            load_15m: 0.05,
+            jiffies_user: 42352,
+            jiffies_system: 235,
+            jiffies_idle: 4323112,
         };
 
         // Create default root cgroups
@@ -212,6 +301,51 @@ impl ProcFileSystem {
         pfs
     }
 
+    /// Simulate a scheduler tick. Increments running times, computes vruntime
+    /// progression, and adjusts virtual EEVDF deadlines and dynamic load averages.
+    pub fn simulate_scheduler_tick(&mut self) {
+        self.system_uptime += 1;
+        self.jiffies_user += 10;
+        self.jiffies_system += 2;
+        self.jiffies_idle += 88;
+
+        let running_pids: Vec<usize> = self.processes.iter()
+            .filter(|(_, p)| p.state == LinuxProcessState::Running)
+            .map(|(pid, _)| *pid)
+            .collect();
+
+        // Calculate load averages using standard exponential moving average simulation
+        let nr_active = running_pids.len() as f64;
+        self.load_1m = self.load_1m * 0.92 + nr_active * 0.10;
+        self.load_5m = self.load_5m * 0.97 + nr_active * 0.03;
+        self.load_15m = self.load_15m * 0.99 + nr_active * 0.01;
+
+        if running_pids.is_empty() {
+            return;
+        }
+
+        for pid in &running_pids {
+            if let Some(proc) = self.processes.get_mut(pid) {
+                proc.cpu_time += 1;
+                // vruntime += (delta_exec * nice_0_weight) / task_weight
+                let base_delta = 100u64;
+                let weight = proc.sched_weight.max(1) as f64;
+                let delta_vruntime = ((base_delta as f64 * 1024.0) / weight) as u64;
+                proc.vruntime += delta_vruntime;
+
+                // Propagate to thread tasks
+                for thread in &mut proc.threads {
+                    if thread.state == LinuxProcessState::Running {
+                        thread.vruntime += delta_vruntime;
+                    }
+                }
+
+                // Compute EEVDF virtual deadline: deadline = vruntime + lag_allocation_slice
+                proc.deadline = proc.vruntime + (1024000 / weight as u64);
+            }
+        }
+    }
+
     /// Create or spawn a new process in the simulated OS
     pub fn spawn_process(
         &mut self,
@@ -225,7 +359,7 @@ impl ProcFileSystem {
         let pgid = ppid; // Default to parent's pgid
         let sid = ppid;  // Default to parent's session id
 
-        let mut entry = LinuxProcessEntry::new(next_pid, ppid, pgid, sid, name, nice, cgroup, cmdline);
+        let entry = LinuxProcessEntry::new(next_pid, ppid, pgid, sid, name, nice, cgroup, cmdline);
 
         // Add to cgroup list of PIDs
         if let Some(cg) = self.cgroups.get_mut(cgroup) {
@@ -241,6 +375,21 @@ impl ProcFileSystem {
         next_pid
     }
 
+    /// Add a new simulated thread/task to an existing process
+    pub fn spawn_thread(&mut self, pid: usize, name: &str) -> Result<usize, String> {
+        let proc = self.processes.get_mut(&pid).ok_or("Process not found")?;
+        let next_tid = proc.threads.iter().map(|t| t.tid).max().unwrap_or(pid) + 1;
+
+        proc.threads.push(LinuxThreadEntry {
+            tid: next_tid,
+            name: name.to_string(),
+            state: LinuxProcessState::Running,
+            vruntime: proc.vruntime,
+        });
+        proc.thread_count += 1;
+        Ok(next_tid)
+    }
+
     /// Fork an existing process
     pub fn fork_process(&mut self, parent_pid: usize) -> Result<usize, String> {
         let parent = self.processes.get(&parent_pid).ok_or("Parent process not found")?.clone();
@@ -250,6 +399,17 @@ impl ProcFileSystem {
         child.pid = next_pid;
         child.ppid = parent_pid;
         child.state = LinuxProcessState::Running;
+        child.vruntime = parent.vruntime;
+
+        // Reset child's threads to single thread
+        let child_thread = LinuxThreadEntry {
+            tid: next_pid,
+            name: child.name.clone(),
+            state: LinuxProcessState::Running,
+            vruntime: parent.vruntime,
+        };
+        child.threads = vec![child_thread];
+        child.thread_count = 1;
 
         if let Some(cg) = self.cgroups.get_mut(&parent.cgroup_name) {
             cg.pids.push(next_pid);
@@ -265,7 +425,7 @@ impl ProcFileSystem {
 
     /// Re-parent orphans when a parent exits, and clean up / turn to zombie.
     /// If parent has already waited, we fully reap. Otherwise, turns to zombie.
-    pub fn exit_process(&mut self, pid: usize, exit_code: i32) -> Result<(), String> {
+    pub fn exit_process(&mut self, pid: usize, _exit_code: i32) -> Result<(), String> {
         if pid == 1 {
             return Err("Cannot exit system init process (PID 1)".to_string());
         }
@@ -280,6 +440,9 @@ impl ProcFileSystem {
         // 2. Set state to Zombie
         if let Some(proc) = self.processes.get_mut(&pid) {
             proc.state = LinuxProcessState::Zombie;
+            for thread in &mut proc.threads {
+                thread.state = LinuxProcessState::Zombie;
+            }
         } else {
             return Err("Process not found".to_string());
         }
@@ -345,6 +508,9 @@ impl ProcFileSystem {
                 if let Some(proc) = self.processes.get_mut(&pid) {
                     if pid != 1 {
                         proc.state = LinuxProcessState::Stopped;
+                        for thread in &mut proc.threads {
+                            thread.state = LinuxProcessState::Stopped;
+                        }
                     }
                 }
             }
@@ -363,8 +529,14 @@ impl ProcFileSystem {
             Ok(self.generate_uptime())
         } else if clean_path == "proc/cgroups" || clean_path == "cgroups" {
             Ok(self.generate_cgroups())
+        } else if clean_path == "proc/loadavg" || clean_path == "loadavg" {
+            Ok(self.generate_loadavg())
+        } else if clean_path == "proc/stat" || clean_path == "stat" {
+            Ok(self.generate_global_stat())
+        } else if clean_path == "proc/partitions" || clean_path == "partitions" {
+            Ok(self.generate_partitions())
         } else {
-            // Check for /proc/<pid>/status, /proc/<pid>/cmdline, /proc/<pid>/stat
+            // Check for /proc/<pid>/status, /proc/<pid>/cmdline, /proc/<pid>/stat, /proc/<pid>/task/<tid>/status
             let parts: Vec<&str> = clean_path.split('/').collect();
             if parts.len() >= 2 && parts[0] == "proc" {
                 if let Ok(pid) = parts[1].parse::<usize>() {
@@ -374,6 +546,12 @@ impl ProcFileSystem {
                             "cmdline" => return self.generate_cmdline(pid),
                             "stat" => return self.generate_stat(pid),
                             _ => {}
+                        }
+                    } else if parts.len() == 5 && parts[2] == "task" {
+                        if let Ok(tid) = parts[3].parse::<usize>() {
+                            if parts[4] == "status" {
+                                return self.generate_task_status(pid, tid);
+                            }
                         }
                     }
                 }
@@ -429,6 +607,39 @@ impl ProcFileSystem {
         out
     }
 
+    pub fn generate_loadavg(&self) -> String {
+        let nr_running = self.processes.values().filter(|p| p.state == LinuxProcessState::Running).count();
+        let total_threads: usize = self.processes.values().map(|p| p.thread_count).sum();
+        let last_pid = self.processes.keys().copied().max().unwrap_or(0);
+        format!(
+            "{:.2} {:.2} {:.2} {}/{} {}\n",
+            self.load_1m, self.load_5m, self.load_15m, nr_running, total_threads, last_pid
+        )
+    }
+
+    pub fn generate_global_stat(&self) -> String {
+        format!(
+            "cpu  {} 0 {} {} 0 0 0 0 0 0\n\
+             intr 1235232 0 0 0 0 0 0\n\
+             ctxt 4235252\n\
+             btime 1700000000\n\
+             processes {}\n\
+             procs_running {}\n",
+            self.jiffies_user, self.jiffies_system, self.jiffies_idle,
+            self.processes.len(),
+            self.processes.values().filter(|p| p.state == LinuxProcessState::Running).count()
+        )
+    }
+
+    pub fn generate_partitions(&self) -> String {
+        "major minor  #blocks  name\n\n\
+         8     0  512000000 sda\n\
+         8     1     512000 sda1\n\
+         8     2  511486976 sda2\n\
+         8    16  256000000 sdb\n"
+            .to_string()
+    }
+
     pub fn generate_status(&self, pid: usize) -> Result<String, String> {
         let proc = self.processes.get(&pid).ok_or_else(|| format!("PID {} not found", pid))?;
         Ok(format!(
@@ -444,7 +655,9 @@ impl ProcFileSystem {
              Groups:         0 \n\
              NiceValue:      {}\n\
              CGroup:         {}\n\
-             Threads:        {}\n",
+             Threads:        {}\n\
+             SchedPolicy:    {}\n\
+             Vruntime:       {}\n",
             proc.name,
             proc.state.as_str(),
             proc.pid,
@@ -452,7 +665,9 @@ impl ProcFileSystem {
             proc.ppid,
             proc.nice.value(),
             proc.cgroup_name,
-            proc.thread_count
+            proc.thread_count,
+            proc.sched_policy.as_str(),
+            proc.vruntime
         ))
     }
 
@@ -477,6 +692,25 @@ impl ProcFileSystem {
             proc.nice.value(),
             proc.thread_count,
             proc.memory_usage
+        ))
+    }
+
+    pub fn generate_task_status(&self, pid: usize, tid: usize) -> Result<String, String> {
+        let proc = self.processes.get(&pid).ok_or_else(|| format!("PID {} not found", pid))?;
+        let thread = proc.threads.iter().find(|t| t.tid == tid).ok_or_else(|| format!("TID {} not found under PID {}", tid, pid))?;
+        Ok(format!(
+            "Name:           {}\n\
+             State:          {}\n\
+             Tid:            {}\n\
+             Pid:            {}\n\
+             PPid:           {}\n\
+             Vruntime:       {}\n",
+            thread.name,
+            thread.state.as_str(),
+            thread.tid,
+            proc.pid,
+            proc.ppid,
+            thread.vruntime
         ))
     }
 }
@@ -552,18 +786,46 @@ mod tests {
         let cgroups = pfs.read_file("/proc/cgroups").unwrap();
         assert!(cgroups.contains("user.slice"));
 
+        // Read /proc/loadavg
+        let loadavg = pfs.read_file("/proc/loadavg").unwrap();
+        assert!(loadavg.contains("0.15"));
+
+        // Read /proc/stat
+        let stat = pfs.read_file("/proc/stat").unwrap();
+        assert!(stat.contains("cpu"));
+
+        // Read /proc/partitions
+        let partitions = pfs.read_file("/proc/partitions").unwrap();
+        assert!(partitions.contains("sda"));
+
         // Read /proc/<pid>/status
         let status = pfs.read_file(&format!("/proc/{}/status", pid)).unwrap();
         assert!(status.contains("Name:           dummy-daemon"));
         assert!(status.contains("NiceValue:      -10"));
+        assert!(status.contains("SchedPolicy:    SCHED_OTHER"));
 
         // Read /proc/<pid>/cmdline
         let cmdline = pfs.read_file(&format!("/proc/{}/cmdline", pid)).unwrap();
         assert!(cmdline.contains("/usr/bin/dummy-daemon --arg"));
 
         // Read /proc/<pid>/stat
-        let stat = pfs.read_file(&format!("/proc/{}/stat", pid)).unwrap();
-        assert!(stat.contains("dummy-daemon"));
+        let stat_node = pfs.read_file(&format!("/proc/{}/stat", pid)).unwrap();
+        assert!(stat_node.contains("dummy-daemon"));
+    }
+
+    #[test]
+    fn test_scheduler_tick_and_threading() {
+        let mut pfs = ProcFileSystem::new();
+        let pid = pfs.spawn_process("multithread", 1, NiceValue::new(-5), "user.slice", "multithread");
+        let tid = pfs.spawn_thread(pid, "worker-1").unwrap();
+
+        // Simulate scheduler tick
+        pfs.simulate_scheduler_tick();
+
+        // Read thread status
+        let thread_status = pfs.read_file(&format!("/proc/{}/task/{}/status", pid, tid)).unwrap();
+        assert!(thread_status.contains("Name:           worker-1"));
+        assert!(thread_status.contains("Vruntime:"));
     }
 
     #[test]

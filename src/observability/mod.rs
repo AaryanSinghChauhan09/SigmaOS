@@ -1,6 +1,7 @@
 // SigmaOS Observability Module
 pub mod stack;
 pub mod cognitive_narrative;
+pub mod profiler;
 
 pub use cognitive_narrative::{CognitiveOSNarrator, AdaptiveComplianceGater, SynestheticFeedbackEngine, GenerativeConfigParser, InterplanetaryDtnRoute, CollectiveSimulationNode};
 pub use stack::{
@@ -9,3 +10,4 @@ pub use stack::{
     SimpleObservabilityStack, SimpleSigmaDebug, SimpleSigmaMetrics, SimpleSigmaTrace, SimpleSpan,
     Span, SpanCapability, SpanInfo, StackCapability, TraceID,
 };
+pub use profiler::{SigmaProfiler, TracepointType, PerformanceMetric};
