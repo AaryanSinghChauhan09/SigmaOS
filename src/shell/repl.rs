@@ -11,15 +11,6 @@ impl AgentAutomationEngine {
     }
 }
 
-/// Simulated Shell Job for Job Control
-#[derive(Debug, Clone)]
-pub struct ShellJob {
-    pub job_id: usize,
-    pub pid: usize,
-    pub name: String,
-    pub state: crate::process::linux_proc::LinuxProcessState,
-}
-
 /// Shell command type
 #[derive(Debug, Clone)]
 pub enum ShellCommand {
@@ -75,41 +66,6 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Kill {
-        signal: Option<i32>,
-        pid: usize,
-    },
-    Nice {
-        nice_val: i32,
-        command_line: String,
-    },
-    Renice {
-        nice_val: i32,
-        pid: usize,
-    },
-    Pgrep {
-        pattern: String,
-    },
-    Pkill {
-        pattern: String,
-    },
-    Top,
-    Vmstat,
-    Spawn {
-        name: String,
-        cmdline: String,
-    },
-    Jobs,
-    Fg {
-        job_id: usize,
-    },
-    Bg {
-        job_id: usize,
-    },
-    Map {
-        subcommand: String,
-        args: Vec<String>,
-    },
     Unknown(String),
 }
 
@@ -127,10 +83,6 @@ pub struct ShellRepl {
     pub current_theme: String,
     pub current_profile: String,
     pub a11y_features: std::collections::HashMap<String, bool>,
-    pub proc_fs: crate::process::linux_proc::ProcFileSystem,
-    pub jobs: Vec<ShellJob>,
-    pub next_job_id: usize,
-    pub mind_map: crate::productivity::MindMapCreator,
 }
 
 impl ShellRepl {
@@ -153,10 +105,6 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            proc_fs: crate::process::linux_proc::ProcFileSystem::new(),
-            jobs: Vec::new(),
-            next_job_id: 1,
-            mind_map: crate::productivity::MindMapCreator::new("Project Brainstorm", "Core Objectives"),
         }
     }
 
@@ -179,10 +127,6 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-            proc_fs: crate::process::linux_proc::ProcFileSystem::new(),
-            jobs: Vec::new(),
-            next_job_id: 1,
-            mind_map: crate::productivity::MindMapCreator::new("Project Brainstorm", "Core Objectives"),
         }
     }
 
@@ -209,100 +153,23 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    pub fn execute_line(&mut self, line: &str) {
-        let trimmed = line.trim();
-        let is_background = trimmed.ends_with('&');
-        let clean_line = if is_background {
-            trimmed[..trimmed.len() - 1].trim().to_string()
-        } else {
-            trimmed.to_string()
-        };
+    fn execute_line(&mut self, line: &str) {
+        let command = self.parse_command(line);
+        let result = self.execute_command(command);
 
-        let command = self.parse_command(&clean_line);
-
-        if is_background {
-            match command {
-                ShellCommand::Spawn { ref name, ref cmdline } => {
-                    let pid = self.proc_fs.spawn_process(
-                        name,
-                        1,
-                        crate::process::linux_proc::NiceValue::new(0),
-                        "user.slice",
-                        cmdline,
-                    );
-                    let job_id = self.next_job_id;
-                    self.next_job_id += 1;
-                    self.jobs.push(ShellJob {
-                        job_id,
-                        pid,
-                        name: format!("spawn {} {}", name, cmdline),
-                        state: crate::process::linux_proc::LinuxProcessState::Running,
-                    });
-                    println!("[{}] {}", job_id, pid);
-                }
-                ShellCommand::Nice { nice_val, ref command_line } => {
-                    let parsed_inner = self.parse_command(command_line);
-                    match parsed_inner {
-                        ShellCommand::Spawn { ref name, ref cmdline } => {
-                            let nice_obj = crate::process::linux_proc::NiceValue::new(nice_val);
-                            let pid = self.proc_fs.spawn_process(
-                                name,
-                                1,
-                                nice_obj,
-                                "user.slice",
-                                cmdline,
-                            );
-                            let job_id = self.next_job_id;
-                            self.next_job_id += 1;
-                            self.jobs.push(ShellJob {
-                                job_id,
-                                pid,
-                                name: format!("nice {} spawn {} {}", nice_val, name, cmdline),
-                                state: crate::process::linux_proc::LinuxProcessState::Running,
-                    });
-                            println!("[{}] {}", job_id, pid);
-                        }
-                        _ => {
-                            println!("nice: commands other than spawn cannot be backgrounded");
-                        }
-                    }
-                }
-                _ => {
-                    // For standard commands, we simulate backgrounding by creating a dummy PID
-                    let dummy_pid = self.proc_fs.spawn_process(
-                        "bg-job",
-                        1,
-                        crate::process::linux_proc::NiceValue::new(0),
-                        "user.slice",
-                        &clean_line,
-                    );
-                    let job_id = self.next_job_id;
-                    self.next_job_id += 1;
-                    self.jobs.push(ShellJob {
-                        job_id,
-                        pid: dummy_pid,
-                        name: clean_line.clone(),
-                        state: crate::process::linux_proc::LinuxProcessState::Running,
-                    });
-                    println!("[{}] {}", job_id, dummy_pid);
+        match result {
+            Ok(output) => {
+                if !output.is_empty() {
+                    println!("{}", output);
                 }
             }
-        } else {
-            let result = self.execute_command(command);
-            match result {
-                Ok(output) => {
-                    if !output.is_empty() {
-                        println!("{}", output);
-                    }
-                }
-                Err(error) => {
-                    eprintln!("Error: {}", error);
-                }
+            Err(error) => {
+                eprintln!("Error: {}", error);
             }
         }
     }
 
-    pub fn parse_command(&self, input: &str) -> ShellCommand {
+    fn parse_command(&self, input: &str) -> ShellCommand {
         let parts: Vec<&str> = input.split_whitespace().collect();
 
         if parts.is_empty() {
@@ -318,34 +185,6 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
-            "top" => ShellCommand::Top,
-            "vmstat" => ShellCommand::Vmstat,
-            "jobs" => ShellCommand::Jobs,
-            "fg" => {
-                if parts.len() >= 2 {
-                    let job_id = parts[1].trim_start_matches('%').parse::<usize>().unwrap_or(0);
-                    ShellCommand::Fg { job_id }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "bg" => {
-                if parts.len() >= 2 {
-                    let job_id = parts[1].trim_start_matches('%').parse::<usize>().unwrap_or(0);
-                    ShellCommand::Bg { job_id }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "map" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let args = parts[2..].iter().map(|s| s.to_string()).collect();
-                    ShellCommand::Map { subcommand, args }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {
@@ -360,70 +199,6 @@ impl ShellRepl {
                     ShellCommand::Mkdir {
                         dirname: parts[1].to_string(),
                     }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "rm" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Rm {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "cat" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Cat {
-                        filename: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "echo" => {
-                ShellCommand::Echo {
-                    message: parts[1..].join(" "),
-                }
-            }
-            "su" => {
-                if parts.len() >= 2 {
-                    let password = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Su {
-                        username: parts[1].to_string(),
-                        password,
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "systemctl" => {
-                if parts.len() >= 2 {
-                    let action = parts[1].to_string();
-                    let service = if parts.len() >= 3 {
-                        parts[2].to_string()
-                    } else {
-                        String::new()
-                    };
-                    ShellCommand::Systemctl { action, service }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "apt" => {
-                if parts.len() >= 2 {
-                    let subcommand = parts[1].to_string();
-                    let package = if parts.len() >= 3 {
-                        Some(parts[2].to_string())
-                    } else {
-                        None
-                    };
-                    ShellCommand::Apt { subcommand, package }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
@@ -475,125 +250,32 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "kill" => {
-                if parts.len() == 3 && parts[1].starts_with('-') {
-                    let sig_str = parts[1].trim_start_matches('-');
-                    let signal = sig_str.parse::<i32>().ok();
-                    let pid = parts[2].parse::<usize>().unwrap_or(0);
-                    ShellCommand::Kill { signal, pid }
-                } else if parts.len() == 2 {
-                    let pid = parts[1].parse::<usize>().unwrap_or(0);
-                    ShellCommand::Kill { signal: None, pid }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "nice" => {
-                if parts.len() >= 4 && parts[1] == "-n" {
-                    let nice_val = parts[2].parse::<i32>().unwrap_or(0);
-                    let command_line = parts[3..].join(" ");
-                    ShellCommand::Nice { nice_val, command_line }
-                } else if parts.len() >= 3 && parts[1].parse::<i32>().is_ok() {
-                    let nice_val = parts[1].parse::<i32>().unwrap_or(0);
-                    let command_line = parts[2..].join(" ");
-                    ShellCommand::Nice { nice_val, command_line }
-                } else if parts.len() >= 2 {
-                    let command_line = parts[1..].join(" ");
-                    ShellCommand::Nice { nice_val: 10, command_line }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "renice" => {
-                if parts.len() == 3 {
-                    let nice_val = parts[1].parse::<i32>().unwrap_or(0);
-                    let pid = parts[2].parse::<usize>().unwrap_or(0);
-                    ShellCommand::Renice { nice_val, pid }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "pgrep" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Pgrep {
-                        pattern: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "pkill" => {
-                if parts.len() >= 2 {
-                    ShellCommand::Pkill {
-                        pattern: parts[1].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "spawn" => {
-                if parts.len() >= 3 {
-                    let name = parts[1].to_string();
-                    let cmdline = parts[2..].join(" ");
-                    ShellCommand::Spawn { name, cmdline }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
             _ => ShellCommand::Unknown(input.to_string()),
         }
     }
 
-    pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
+    fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help                - Show this help message\n\
-                   ps                  - List running processes dynamically\n\
-                   ls                  - List files\n\
-                   pwd                 - Print working directory\n\
-                   whoami              - Print current logged-in user\n\
-                   su <user>           - Switch user account (try 'su root' or 'su guest')\n\
-                   cat <file>          - Display file contents\n\
-                   systemctl           - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
-                   apt <cmd>           - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
-                   echo                - Print a message\n\
-                   set                 - Set a variable\n\
-                   get                 - Get a variable\n\
-                   kill [-<sig>] <pid> - Send signal to a simulated process\n\
-                   nice <val> <cmd>    - Run a simulated command with modified nice priority\n\
-                   renice <val> <pid>  - Modify nice value of a simulated process\n\
-                   pgrep <pattern>     - Find simulated processes by name pattern\n\
-                   pkill <pattern>     - Signal simulated processes by name pattern\n\
-                   top                 - Display snapshot-style dynamic process monitor\n\
-                   vmstat              - Display virtual memory and CPU core statistics\n\
-                   spawn <name> <cmd>  - Spawn a custom simulated process\n\
-                   jobs                - List active background jobs\n\
-                   fg <job_id>         - Bring background job to foreground\n\
-                   bg <job_id>         - Resume stopped job in the background\n\
-                   map <subcmd> <args> - Interact with the study mind map engine\n\
-                   exit                - Exit the shell"
+                   help         - Show this help message\n\
+                   ps           - List running processes\n\
+                   ls           - List files\n\
+                   pwd          - Print working directory\n\
+                   whoami       - Print current logged-in user\n\
+                   su <user>    - Switch user account (try 'su root' or 'su guest')\n\
+                   cat <file>   - Display file contents\n\
+                   systemctl    - Manage systemd services (try 'systemctl list' or 'systemctl status <service>')\n\
+                   apt <cmd>    - Advanced Package Tool (try 'apt update', 'apt search <pkg>', or 'apt install <pkg>')\n\
+                   echo         - Print a message\n\
+                   set          - Set a variable\n\
+                   get          - Get a variable\n\
+                   exit         - Exit the shell"
                 .to_string()),
-            ShellCommand::ListProcesses => {
-                let mut out = "PID   PPID  PGID  SID   NAME         STATE         NICE  CGROUP\n".to_string();
-                let mut sorted_pids: Vec<&usize> = self.proc_fs.processes.keys().collect();
-                sorted_pids.sort();
-                for pid in sorted_pids {
-                    if let Some(proc) = self.proc_fs.processes.get(pid) {
-                        out.push_str(&format!(
-                            "{:<5} {:<5} {:<5} {:<5} {:<12} {:<13} {:<5} {}\n",
-                            proc.pid,
-                            proc.ppid,
-                            proc.pgid,
-                            proc.sid,
-                            proc.name,
-                            proc.state.as_str(),
-                            proc.nice.value(),
-                            proc.cgroup_name
-                        ));
-                    }
-                }
-                Ok(out)
-            }
+            ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
+                   1    sigma-sh    Running\n\
+                   2    systemd     Running\n\
+                   3    udevd       Running"
+                .to_string()),
             ShellCommand::ListFiles => Ok("README.md\n\
                    Cargo.toml\n\
                    src/\n\
@@ -740,254 +422,6 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-            ShellCommand::Kill { signal, pid } => {
-                let raw_sig = signal.unwrap_or(15);
-                let native_sig = match raw_sig {
-                    9 => crate::process::linux_proc::LinuxSignal::SigKill,
-                    15 => crate::process::linux_proc::LinuxSignal::SigTerm,
-                    2 => crate::process::linux_proc::LinuxSignal::SigInt,
-                    _ => crate::process::linux_proc::LinuxSignal::SigTerm,
-                };
-                match self.proc_fs.send_signal(pid as i32, native_sig) {
-                    Ok(_) => {
-                        // Update background job state if matched
-                        if let Some(job) = self.jobs.iter_mut().find(|j| j.pid == pid) {
-                            if raw_sig == 9 || raw_sig == 15 {
-                                job.state = crate::process::linux_proc::LinuxProcessState::Terminated;
-                            } else if raw_sig == 2 {
-                                job.state = crate::process::linux_proc::LinuxProcessState::Stopped;
-                            }
-                        }
-                        Ok(format!("Sent signal {} to process {}", raw_sig, pid))
-                    }
-                    Err(e) => Err(format!("kill: failed to signal {}: {}", pid, e)),
-                }
-            }
-            ShellCommand::Nice { nice_val, command_line } => {
-                let parsed_inner = self.parse_command(&command_line);
-                match parsed_inner {
-                    ShellCommand::Spawn { name, cmdline } => {
-                        let nice_obj = crate::process::linux_proc::NiceValue::new(nice_val);
-                        let pid = self.proc_fs.spawn_process(&name, 1, nice_obj, "user.slice", &cmdline);
-                        Ok(format!("nice: Spawned process {} (PID {}) with nice priority {}", name, pid, nice_val))
-                    }
-                    _ => {
-                        // Simulate running standard command under nice
-                        let result = self.execute_command(parsed_inner)?;
-                        Ok(format!("nice ({}): {}", nice_val, result))
-                    }
-                }
-            }
-            ShellCommand::Renice { nice_val, pid } => {
-                if let Some(proc) = self.proc_fs.processes.get_mut(&pid) {
-                    proc.nice = crate::process::linux_proc::NiceValue::new(nice_val);
-                    Ok(format!("Successfully reniced process {} to {}", pid, nice_val))
-                } else {
-                    Err(format!("renice: process {} not found", pid))
-                }
-            }
-            ShellCommand::Pgrep { pattern } => {
-                let mut matches = Vec::new();
-                for proc in self.proc_fs.processes.values() {
-                    if proc.name.contains(&pattern) {
-                        matches.push(proc.pid.to_string());
-                    }
-                }
-                if matches.is_empty() {
-                    Ok(String::new())
-                } else {
-                    Ok(matches.join("\n"))
-                }
-            }
-            ShellCommand::Pkill { pattern } => {
-                let mut signaled = Vec::new();
-                let pids: Vec<usize> = self.proc_fs.processes.keys().copied().collect();
-                for pid in pids {
-                    let name = {
-                        if let Some(proc) = self.proc_fs.processes.get(&pid) {
-                            proc.name.clone()
-                        } else {
-                            continue;
-                        }
-                    };
-                    if name.contains(&pattern) {
-                        if self.proc_fs.send_signal(pid as i32, crate::process::linux_proc::LinuxSignal::SigTerm).is_ok() {
-                            signaled.push(format!("{} ({})", name, pid));
-                            if let Some(job) = self.jobs.iter_mut().find(|j| j.pid == pid) {
-                                job.state = crate::process::linux_proc::LinuxProcessState::Terminated;
-                            }
-                        }
-                    }
-                }
-                if signaled.is_empty() {
-                    Ok("No matching processes found to signal.".to_string())
-                } else {
-                    Ok(format!("Signaled processes: {}", signaled.join(", ")))
-                }
-            }
-            ShellCommand::Top => {
-                let mut out = String::new();
-                out.push_str(&format!(
-                    "Uptime: {} seconds | Cores: {} | Model: {}\n",
-                    self.proc_fs.system_uptime, self.proc_fs.cpu_cores, self.proc_fs.cpu_model
-                ));
-                let free_mem = self.proc_fs.total_memory - self.proc_fs.used_memory;
-                out.push_str(&format!(
-                    "Memory: {} kB total, {} kB used, {} kB free\n\n",
-                    self.proc_fs.total_memory / 1024, self.proc_fs.used_memory / 1024, free_mem / 1024
-                ));
-                out.push_str("PID   PPID  NAME         STATE         NICE  MEMORY_USAGE   CPU_TIME\n");
-                let mut sorted_pids: Vec<&usize> = self.proc_fs.processes.keys().collect();
-                sorted_pids.sort();
-                for pid in sorted_pids {
-                    if let Some(proc) = self.proc_fs.processes.get(pid) {
-                        out.push_str(&format!(
-                            "{:<5} {:<5} {:<12} {:<13} {:<5} {:<14} {}\n",
-                            proc.pid,
-                            proc.ppid,
-                            proc.name,
-                            proc.state.as_str(),
-                            proc.nice.value(),
-                            format!("{} B", proc.memory_usage),
-                            proc.cpu_time
-                        ));
-                    }
-                }
-                Ok(out)
-            }
-            ShellCommand::Vmstat => {
-                let free_kb = (self.proc_fs.total_memory - self.proc_fs.used_memory) / 1024;
-                let out = format!(
-                    "procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----\n\
-                     r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st\n\
-                     1  0      0 {:<8} 131072 2097152   0    0    42     0    0    0 15  5 80  0  0\n",
-                    free_kb
-                );
-                Ok(out)
-            }
-            ShellCommand::Spawn { name, cmdline } => {
-                let pid = self.proc_fs.spawn_process(&name, 1, crate::process::linux_proc::NiceValue::new(0), "user.slice", &cmdline);
-                Ok(format!("Spawned process {} (PID {}) successfully.", name, pid))
-            }
-            ShellCommand::Jobs => {
-                let mut out = String::new();
-                for job in &self.jobs {
-                    out.push_str(&format!(
-                        "[{}] {} ({})        {}\n",
-                        job.job_id,
-                        job.state.as_str(),
-                        job.pid,
-                        job.name
-                    ));
-                }
-                if out.is_empty() {
-                    Ok("No active background jobs.".to_string())
-                } else {
-                    Ok(out.trim_end().to_string())
-                }
-            }
-            ShellCommand::Fg { job_id } => {
-                let job_idx = self.jobs.iter().position(|j| job_id == j.job_id);
-                if let Some(idx) = job_idx {
-                    let mut job = self.jobs.remove(idx);
-                    if job.state == crate::process::linux_proc::LinuxProcessState::Stopped {
-                        if let Some(proc) = self.proc_fs.processes.get_mut(&job.pid) {
-                            proc.state = crate::process::linux_proc::LinuxProcessState::Running;
-                            for thread in &mut proc.threads {
-                                thread.state = crate::process::linux_proc::LinuxProcessState::Running;
-                            }
-                        }
-                        job.state = crate::process::linux_proc::LinuxProcessState::Running;
-                    }
-                    self.proc_fs.simulate_scheduler_tick();
-                    Ok(format!("Brought job [{}] '{}' (PID {}) to the foreground. Process completed.", job.job_id, job.name, job.pid))
-                } else {
-                    Err(format!("fg: job [{}] not found", job_id))
-                }
-            }
-            ShellCommand::Bg { job_id } => {
-                let job = self.jobs.iter_mut().find(|j| job_id == j.job_id);
-                if let Some(j) = job {
-                    if j.state == crate::process::linux_proc::LinuxProcessState::Stopped {
-                        if let Some(proc) = self.proc_fs.processes.get_mut(&j.pid) {
-                            proc.state = crate::process::linux_proc::LinuxProcessState::Running;
-                            for thread in &mut proc.threads {
-                                thread.state = crate::process::linux_proc::LinuxProcessState::Running;
-                            }
-                        }
-                        j.state = crate::process::linux_proc::LinuxProcessState::Running;
-                        Ok(format!("Resumed job [{}] '{}' in the background.", j.job_id, j.name))
-                    } else {
-                        Ok(format!("job [{}] '{}' is already running in background.", j.job_id, j.name))
-                    }
-                } else {
-                    Err(format!("bg: job [{}] not found", job_id))
-                }
-            }
-            ShellCommand::Map { subcommand, args } => {
-                if subcommand == "create" {
-                    if args.len() >= 2 {
-                        let title = &args[0];
-                        let root_topic = &args[1..].join(" ");
-                        self.mind_map = crate::productivity::MindMapCreator::new(title, root_topic);
-                        Ok(format!("Created a new Study Mind Map: '{}' with central idea '{}'", title, root_topic))
-                    } else {
-                        Err("map create: please specify a map title and root topic (e.g. 'map create Studies ComputerScience')".to_string())
-                    }
-                } else if subcommand == "add" {
-                    if args.len() >= 3 {
-                        let parent_id = &args[0];
-                        let child_id = &args[1];
-                        let topic = &args[2..].join(" ");
-                        match self.mind_map.add_node(child_id, parent_id, topic) {
-                            Ok(_) => Ok(format!("Added idea node '{}' ('{}') under parent '{}'.", child_id, topic, parent_id)),
-                            Err(e) => Err(format!("map add failed: {}", e)),
-                        }
-                    } else {
-                        Err("map add: please specify parent_id, child_id, and topic (e.g. 'map add root_node systems Kernels')".to_string())
-                    }
-                } else if subcommand == "move" {
-                    if args.len() == 2 {
-                        let node_id = &args[0];
-                        let new_parent_id = &args[1];
-                        match self.mind_map.move_branch(node_id, new_parent_id) {
-                            Ok(_) => Ok(format!("Successfully moved idea branch '{}' under new parent '{}'.", node_id, new_parent_id)),
-                            Err(e) => Err(format!("map move failed: {}", e)),
-                        }
-                    } else {
-                        Err("map move: please specify node_id and new_parent_id (e.g. 'map move systems processors')".to_string())
-                    }
-                } else if subcommand == "meta" {
-                    if args.len() >= 3 {
-                        let node_id = &args[0];
-                        let priority = args[1].parse::<u32>().unwrap_or(3);
-                        let progress = args[2].parse::<u32>().unwrap_or(0);
-                        let notes = args[3..].join(" ");
-                        match self.mind_map.update_node_metadata(node_id, priority, progress, &notes) {
-                            Ok(_) => Ok(format!("Updated node '{}' markers: Priority {}, Progress {}%.", node_id, priority, progress)),
-                            Err(e) => Err(format!("map meta failed: {}", e)),
-                        }
-                    } else {
-                        Err("map meta: please specify node_id, priority (1-5), and progress (0-100) (e.g. 'map meta systems 1 80 Study memory leaks')".to_string())
-                    }
-                } else if subcommand == "link" {
-                    if args.len() >= 3 {
-                        let source_id = &args[0];
-                        let target_id = &args[1];
-                        let label = &args[2..].join(" ");
-                        match self.mind_map.add_relationship(source_id, target_id, label, "dashed") {
-                            Ok(_) => Ok(format!("Linked idea '{}' to '{}' with label '{}'.", source_id, target_id, label)),
-                            Err(e) => Err(format!("map link failed: {}", e)),
-                        }
-                    } else {
-                        Err("map link: please specify source_id, target_id, and label (e.g. 'map link kernels processors Microkernel IPC link')".to_string())
-                    }
-                } else if subcommand == "export" {
-                    Ok(self.mind_map.export_to_text_tree())
-                } else {
-                    Err(format!("map: unknown subcommand '{}'. Use 'create', 'add', 'move', 'meta', 'link', or 'export'.", subcommand))
-                }
-            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -1194,126 +628,5 @@ mod tests {
         assert!(matches!(cmd, ShellCommand::Rm { .. }));
         let out = repl.execute_command(cmd).unwrap();
         assert_eq!(out, "Removed file: testfile.txt");
-    }
-
-    #[test]
-    fn test_process_management_commands() {
-        let mut repl = ShellRepl::new();
-
-        // 1. Spawn a dynamic process
-        let spawn_out = repl.execute_command(ShellCommand::Spawn {
-            name: "test-daemon".to_string(),
-            cmdline: "/bin/test-daemon --run".to_string(),
-        }).unwrap();
-        assert!(spawn_out.contains("test-daemon"));
-
-        // 2. Query ps list and verify presence
-        let ps_out = repl.execute_command(ShellCommand::ListProcesses).unwrap();
-        assert!(ps_out.contains("test-daemon"));
-
-        // 3. Renice process
-        let renice_out = repl.execute_command(ShellCommand::Renice {
-            nice_val: -12,
-            pid: 3, // Default systemd: 1, kthreadd: 2, test-daemon: 3
-        }).unwrap();
-        assert!(renice_out.contains("reniced"));
-        assert!(repl.execute_command(ShellCommand::ListProcesses).unwrap().contains("-12"));
-
-        // 4. Test pgrep
-        let pgrep_out = repl.execute_command(ShellCommand::Pgrep {
-            pattern: "test".to_string(),
-        }).unwrap();
-        assert_eq!(pgrep_out.trim(), "3");
-
-        // 5. Test nice prefix runner
-        let nice_run_out = repl.execute_command(ShellCommand::Nice {
-            nice_val: 5,
-            command_line: "spawn nice-daemon nice_cmd".to_string(),
-        }).unwrap();
-        assert!(nice_run_out.contains("nice-daemon"));
-        assert!(repl.execute_command(ShellCommand::ListProcesses).unwrap().contains("nice-daemon"));
-
-        // 6. Test top snapshot
-        let top_out = repl.execute_command(ShellCommand::Top).unwrap();
-        assert!(top_out.contains("Memory:"));
-        assert!(top_out.contains("nice-daemon"));
-
-        // 7. Test vmstat snapshot
-        let vmstat_out = repl.execute_command(ShellCommand::Vmstat).unwrap();
-        assert!(vmstat_out.contains("swpd"));
-
-        // 8. Test pkill / kill
-        let pkill_out = repl.execute_command(ShellCommand::Pkill {
-            pattern: "nice-daemon".to_string(),
-        }).unwrap();
-        assert!(pkill_out.contains("nice-daemon"));
-    }
-
-    #[test]
-    fn test_job_control_and_bg_execution() {
-        let mut repl = ShellRepl::new();
-
-        // 1. Execute spawn command in background ending with '&'
-        repl.execute_line("spawn background-daemon --background &");
-        assert_eq!(repl.jobs.len(), 1);
-        let first_job_pid = repl.jobs[0].pid;
-        assert_eq!(repl.jobs[0].job_id, 1);
-        assert_eq!(repl.jobs[0].state, crate::process::linux_proc::LinuxProcessState::Running);
-
-        // 2. Query jobs list
-        let jobs_out = repl.execute_command(ShellCommand::Jobs).unwrap();
-        assert!(jobs_out.contains("background-daemon"));
-
-        // 3. Send SIGINT simulation to stop the background process
-        repl.execute_command(ShellCommand::Kill {
-            signal: Some(2),
-            pid: first_job_pid,
-        }).unwrap();
-        assert_eq!(repl.jobs[0].state, crate::process::linux_proc::LinuxProcessState::Stopped);
-
-        // 4. Resume job in background using bg
-        let bg_out = repl.execute_command(ShellCommand::Bg { job_id: 1 }).unwrap();
-        assert!(bg_out.contains("Resumed"));
-        assert_eq!(repl.jobs[0].state, crate::process::linux_proc::LinuxProcessState::Running);
-
-        // 5. Bring job to foreground using fg
-        let fg_out = repl.execute_command(ShellCommand::Fg { job_id: 1 }).unwrap();
-        assert!(fg_out.contains("Brought"));
-        // Brought to foreground removes it from background jobs queue
-        assert_eq!(repl.jobs.len(), 0);
-    }
-
-    #[test]
-    fn test_interactive_study_mind_map_commands() {
-        let mut repl = ShellRepl::new();
-
-        // 1. Create a study mind map
-        let create_out = repl.execute_command(ShellCommand::Map {
-            subcommand: "create".to_string(),
-            args: vec!["Studies".to_string(), "Computer Science Core".to_string()],
-        }).unwrap();
-        assert!(create_out.contains("Studies"));
-
-        // 2. Add child topic node
-        let add_out = repl.execute_command(ShellCommand::Map {
-            subcommand: "add".to_string(),
-            args: vec!["root_node".to_string(), "kernels".to_string(), "Operating Systems".to_string()],
-        }).unwrap();
-        assert!(add_out.contains("kernels"));
-
-        // 3. Update node study progress metadata
-        let meta_out = repl.execute_command(ShellCommand::Map {
-            subcommand: "meta".to_string(),
-            args: vec!["kernels".to_string(), "1".to_string(), "85".to_string(), "Studying microkernels".to_string()],
-        }).unwrap();
-        assert!(meta_out.contains("Priority 1, Progress 85%"));
-
-        // 4. Export text tree study layout
-        let export_out = repl.execute_command(ShellCommand::Map {
-            subcommand: "export".to_string(),
-            args: Vec::new(),
-        }).unwrap();
-        assert!(export_out.contains("Computer Science Core"));
-        assert!(export_out.contains("Operating Systems"));
     }
 }

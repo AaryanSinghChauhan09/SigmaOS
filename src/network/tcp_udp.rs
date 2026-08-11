@@ -15,7 +15,7 @@ pub enum Protocol {
     UDP = 1,
 }
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
