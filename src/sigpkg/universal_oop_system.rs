@@ -151,7 +151,7 @@ pub trait IPackage: Send + Sync {
 }
 
 /// Package format enumeration
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum PackageFormat {
     // Debian-based
     Deb,
@@ -181,6 +181,10 @@ pub enum PackageFormat {
     Zypper,
     // Guix
     Guix,
+    // Homebrew formula
+    Homebrew,
+    // FreeBSD pkg
+    FreeBsdPkg,
     // SigmaOS Native
     Sigma,
 }
@@ -405,6 +409,245 @@ impl IPackageParser for DebAdapter {
                 .collect();
             output.push_str(&dep_names.join(", "));
             output.push('\n');
+        }
+
+        Ok(output.into_bytes())
+    }
+}
+
+/// Homebrew formula package adapter
+pub struct HomebrewAdapter {
+    base: BaseAdapter,
+}
+
+impl HomebrewAdapter {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            base: BaseAdapter::new(PackageFormat::Homebrew),
+        }
+    }
+
+    pub fn add_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
+        self.base.add_hook(hook);
+    }
+}
+
+impl IPackageParser for HomebrewAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::Homebrew
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("class ") && content.contains("< Formula")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with("class ") && trimmed.contains("< Formula") {
+                if let Some(class_name) = trimmed.split_whitespace().nth(1) {
+                    name = class_name.to_lowercase();
+                }
+            } else if trimmed.starts_with("version \"") {
+                if let Some(end) = trimmed[9..].find('"') {
+                    version_str = trimmed[9..9 + end].to_string();
+                }
+            } else if trimmed.starts_with("desc \"") {
+                if let Some(end) = trimmed[6..].find('"') {
+                    description = trimmed[6..6 + end].to_string();
+                }
+            } else if trimmed.starts_with("depends_on \"") {
+                if let Some(end) = trimmed[12..].find('"') {
+                    let dep_name = trimmed[12..12 + end].to_string();
+                    dependencies.push(Dependency {
+                        name: dep_name,
+                        version_constraint: VersionConstraint::Any,
+                    });
+                }
+            }
+        }
+
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        let mut package: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description,
+                license: String::new(),
+                maintainer: String::new(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies,
+            format: PackageFormat::Homebrew,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
+        });
+
+        self.base
+            .execute_hooks(package.as_mut())
+            .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
+
+        Ok(package)
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let mut output = String::new();
+        let meta = package.metadata();
+
+        // Convert lowercase name to CamelCase class name
+        let camel_name = meta.name.chars().enumerate().map(|(i, c)| {
+            if i == 0 { c.to_ascii_uppercase() } else { c }
+        }).collect::<String>();
+
+        output.push_str(&format!("class {} < Formula\n", camel_name));
+        output.push_str(&format!("  desc \"{}\"\n", meta.description));
+        output.push_str(&format!(
+            "  version \"{}.{}.{}\"\n",
+            meta.version.major, meta.version.minor, meta.version.patch
+        ));
+        for dep in package.dependencies() {
+            output.push_str(&format!("  depends_on \"{}\"\n", dep.name));
+        }
+        output.push_str("end\n");
+
+        Ok(output.into_bytes())
+    }
+}
+
+/// FreeBSD pkg package adapter
+pub struct FreeBsdPkgAdapter {
+    base: BaseAdapter,
+}
+
+impl FreeBsdPkgAdapter {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self {
+            base: BaseAdapter::new(PackageFormat::FreeBsdPkg),
+        }
+    }
+
+    pub fn add_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
+        self.base.add_hook(hook);
+    }
+}
+
+impl IPackageParser for FreeBsdPkgAdapter {
+    fn format(&self) -> PackageFormat {
+        PackageFormat::FreeBsdPkg
+    }
+
+    fn can_parse(&self, data: &[u8]) -> bool {
+        let content = String::from_utf8_lossy(data);
+        content.contains("name:") && content.contains("origin:")
+    }
+
+    fn parse(&self, data: &[u8]) -> Result<Box<dyn IPackage>, ParseError> {
+        let content = String::from_utf8_lossy(data);
+
+        let mut name = String::new();
+        let mut version_str = String::new();
+        let mut description = String::new();
+        let mut dependencies = Vec::new();
+
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with("name: ") {
+                name = trimmed[6..].trim_matches('"').to_string();
+            } else if trimmed.starts_with("version: ") {
+                version_str = trimmed[9..].trim_matches('"').to_string();
+            } else if trimmed.starts_with("comment: ") {
+                description = trimmed[9..].trim_matches('"').to_string();
+            } else if trimmed.starts_with("deps: ") {
+                // In FreeBSD manifest deps are blocks, but we can do simple line splits
+                let deps_part = trimmed[6..].trim();
+                for dep in deps_part.split_whitespace() {
+                    let dep_clean = dep.trim_matches(|c| c == '{' || c == '}' || c == ',' || c == '"' || c == ':');
+                    if !dep_clean.is_empty() && dep_clean != "version" {
+                        dependencies.push(Dependency {
+                            name: dep_clean.to_string(),
+                            version_constraint: VersionConstraint::Any,
+                        });
+                    }
+                }
+            }
+        }
+
+        let version = Version::parse(&version_str).unwrap_or_else(|_| Version::new(0, 0, 0));
+
+        let mut package: Box<dyn IPackage> = Box::new(StandardPackage {
+            metadata: PackageMetadata {
+                name,
+                version,
+                description,
+                license: String::new(),
+                maintainer: String::new(),
+                homepage: String::new(),
+                architecture: "x86_64".to_string(),
+                checksum: String::new(),
+                size: 0,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies,
+            format: PackageFormat::FreeBsdPkg,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
+        });
+
+        self.base
+            .execute_hooks(package.as_mut())
+            .map_err(|e| ParseError::IoError(format!("Hook error: {:?}", e)))?;
+
+        Ok(package)
+    }
+
+    fn serialize(&self, package: &dyn IPackage) -> Result<Vec<u8>, ParseError> {
+        let mut output = String::new();
+        let meta = package.metadata();
+
+        output.push_str(&format!("name: \"{}\"\n", meta.name));
+        output.push_str(&format!(
+            "version: \"{}.{}.{}\"\n",
+            meta.version.major, meta.version.minor, meta.version.patch
+        ));
+        output.push_str(&format!("comment: \"{}\"\n", meta.description));
+        output.push_str(&format!("origin: \"sys/{}\"\n", meta.name));
+        if !package.dependencies().is_empty() {
+            output.push_str("deps: {\n");
+            for dep in package.dependencies() {
+                output.push_str(&format!("  \"{}\": {{ \"version\": \"1.0.0\" }},\n", dep.name));
+            }
+            output.push_str("}\n");
         }
 
         Ok(output.into_bytes())
@@ -2288,6 +2531,8 @@ impl PackageParserFactory {
         factory.register_parser(Box::new(EopkgAdapter::new()));
         factory.register_parser(Box::new(ZypperAdapter::new()));
         factory.register_parser(Box::new(GuixAdapter::new()));
+        factory.register_parser(Box::new(HomebrewAdapter::new()));
+        factory.register_parser(Box::new(FreeBsdPkgAdapter::new()));
         factory.register_parser(Box::new(SigmaAdapter::new()));
 
         factory
@@ -2927,6 +3172,40 @@ Requires: glibc openssl";
         let package = adapter.parse(guix_data).unwrap();
         assert_eq!(package.name(), "test-guix");
         assert_eq!(package.format(), PackageFormat::Guix);
+        assert_eq!(package.dependencies().len(), 2);
+    }
+
+    #[test]
+    fn test_homebrew_adapter_parsing() {
+        let adapter = HomebrewAdapter::new();
+        let formula_data = b"class Wget < Formula
+  desc \"Internet file downloader\"
+  version \"1.21.4\"
+  depends_on \"openssl\"
+  depends_on \"pcre2\"
+end";
+
+        assert!(adapter.can_parse(formula_data));
+        let package = adapter.parse(formula_data).unwrap();
+        assert_eq!(package.name(), "wget");
+        assert_eq!(package.format(), PackageFormat::Homebrew);
+        assert_eq!(package.dependencies().len(), 2);
+        assert_eq!(package.dependencies()[0].name, "openssl");
+    }
+
+    #[test]
+    fn test_freebsd_pkg_adapter_parsing() {
+        let adapter = FreeBsdPkgAdapter::new();
+        let manifest_data = b"name: \"nginx\"
+version: \"1.24.0_1\"
+comment: \"Robust HTTP server\"
+origin: \"www/nginx\"
+deps: \"pcre2 openssl\"";
+
+        assert!(adapter.can_parse(manifest_data));
+        let package = adapter.parse(manifest_data).unwrap();
+        assert_eq!(package.name(), "nginx");
+        assert_eq!(package.format(), PackageFormat::FreeBsdPkg);
         assert_eq!(package.dependencies().len(), 2);
     }
 

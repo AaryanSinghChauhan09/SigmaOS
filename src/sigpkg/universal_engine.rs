@@ -5,7 +5,7 @@
 
 use crate::klib::BTreeMap;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum PackageFormat {
     Apt,
     Yum,
@@ -19,10 +19,29 @@ pub enum PackageFormat {
     Slackware,
     VoidXbps,
     FreeBsdPkg,
+    Homebrew,
     Sovereign,
-    Nix,
-    Apk,
-    Xbps,
+}
+
+impl PackageFormat {
+    pub fn to_oop_format(&self) -> crate::sigpkg::universal_oop_system::PackageFormat {
+        match self {
+            PackageFormat::Apt => crate::sigpkg::universal_oop_system::PackageFormat::Deb,
+            PackageFormat::Yum => crate::sigpkg::universal_oop_system::PackageFormat::Rpm,
+            PackageFormat::Pacman => crate::sigpkg::universal_oop_system::PackageFormat::Pacman,
+            PackageFormat::Portage => crate::sigpkg::universal_oop_system::PackageFormat::Ebuild,
+            PackageFormat::Apk => crate::sigpkg::universal_oop_system::PackageFormat::Apk,
+            PackageFormat::Nix => crate::sigpkg::universal_oop_system::PackageFormat::Nix,
+            PackageFormat::AppImage => crate::sigpkg::universal_oop_system::PackageFormat::AppImage,
+            PackageFormat::Flatpak => crate::sigpkg::universal_oop_system::PackageFormat::Flatpak,
+            PackageFormat::Snap => crate::sigpkg::universal_oop_system::PackageFormat::Snap,
+            PackageFormat::Slackware => crate::sigpkg::universal_oop_system::PackageFormat::Txz,
+            PackageFormat::VoidXbps => crate::sigpkg::universal_oop_system::PackageFormat::Xbps,
+            PackageFormat::FreeBsdPkg => crate::sigpkg::universal_oop_system::PackageFormat::FreeBsdPkg,
+            PackageFormat::Homebrew => crate::sigpkg::universal_oop_system::PackageFormat::Homebrew,
+            PackageFormat::Sovereign => crate::sigpkg::universal_oop_system::PackageFormat::Sigma,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -33,6 +52,52 @@ pub struct PackageContext {
     pub dependencies: Vec<String>,
     pub files: Vec<String>,
     pub hash: [u8; 32],
+}
+
+impl PackageContext {
+    /// Convert PackageContext into a standard OOP package representation
+    pub fn to_oop_package(&self) -> Box<dyn crate::sigpkg::universal_oop_system::IPackage> {
+        let oop_format = self.format.to_oop_format();
+        let parsed_ver = crate::sigpkg::Version::parse(&self.version)
+            .unwrap_or_else(|_| crate::sigpkg::Version::new(1, 0, 0));
+
+        let mut oop_deps = alloc::vec::Vec::new();
+        for dep in &self.dependencies {
+            oop_deps.push(crate::sigpkg::Dependency {
+                name: dep.clone(),
+                version_constraint: crate::sigpkg::VersionConstraint::Any,
+            });
+        }
+
+        let metadata = crate::sigpkg::universal_oop_system::PackageMetadata {
+            name: self.name.clone(),
+            version: parsed_ver,
+            description: format!("Interoperable package translated from Engine: {}", self.name),
+            license: "Sovereign".to_string(),
+            maintainer: "SigmaOS Engine".to_string(),
+            homepage: "https://sigmaos.org".to_string(),
+            architecture: "x86_64".to_string(),
+            checksum: hex_encode(&self.hash),
+            size: 0,
+            install_date: None,
+            pqc_signature: None,
+            gpg_key_id: None,
+            supported_architectures: alloc::vec!["x86_64".to_string()],
+        };
+
+        Box::new(crate::sigpkg::universal_oop_system::StandardPackage {
+            metadata,
+            dependencies: oop_deps,
+            format: oop_format,
+            use_flags: alloc::vec::Vec::new(),
+            files: self.files.clone(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: alloc::vec::Vec::new(),
+            conditional_dependencies: alloc::vec::Vec::new(),
+        })
+    }
 }
 
 /// Dynamic Polymorphic Interface for Package Formats (OOP Adapter pattern)
@@ -1074,6 +1139,11 @@ mod tests {
 
         let parsed_sov = sovereign.parse_package(b"sigpkg payload").unwrap();
         assert_eq!(parsed_sov.name, "sovereign-core-pkg");
+
+        // Test conversion/translation between Engine and OOP subsystems
+        let converted_oop = parsed_sov.to_oop_package();
+        assert_eq!(converted_oop.name(), "sovereign-core-pkg");
+        assert_eq!(converted_oop.format(), crate::sigpkg::universal_oop_system::PackageFormat::Sigma);
     }
 
     #[test]
