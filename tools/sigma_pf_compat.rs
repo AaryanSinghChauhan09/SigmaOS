@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 //! SigmaOS OpenBSD-style Packet Filter (PF) Compatibility Tool
 //! Safe, zero-dependency, `#![no_std]` compliant utility
 
