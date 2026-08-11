@@ -1,7 +1,7 @@
 // SigmaOS Education & Outreach Framework
 // Training ecosystem, university partnerships, and standardized documentation validation
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Training path / certification details
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ impl DocAsset {
 
 /// Manager of educational outreach and documentation quality assurance
 pub struct EducationOutreachManager {
-    pub learning_paths: HashMap<String, LearningPath>,
+    pub learning_paths: BTreeMap<String, LearningPath>,
     pub university_partners: Vec<UniversityPartnership>,
     pub documentation_pool: Vec<DocAsset>,
 }
@@ -58,7 +58,7 @@ pub struct EducationOutreachManager {
 impl EducationOutreachManager {
     pub fn new() -> Self {
         Self {
-            learning_paths: HashMap::new(),
+            learning_paths: BTreeMap::new(),
             university_partners: Vec::new(),
             documentation_pool: Vec::new(),
         }

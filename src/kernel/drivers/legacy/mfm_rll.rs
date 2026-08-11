@@ -23,7 +23,7 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux 0.01 hard disk driver — the very first block device Linux ever supported
 /// Supports ST-412 / ST-506 controllers, MFM and RLL encoding, CHS geometry
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 /// Maximum CHS (Cylinder-Head-Sector) values for ancient controllers
 pub const MFM_MAX_CYLINDERS: u16 = 1024;

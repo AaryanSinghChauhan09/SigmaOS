@@ -21,7 +21,7 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// States: CLOSED → LISTEN → SYN_SENT / SYN_RCVD → ESTABLISHED →
 ///         FIN_WAIT_1 → FIN_WAIT_2 → TIME_WAIT → CLOSED
 ///         ESTABLISHED → CLOSE_WAIT → LAST_ACK → CLOSED
-use crate::klib::{HashMap, VecDeque, Vec};
+use crate::klib::{BTreeMap, VecDeque, Vec};
 
 // ── TCP States (RFC 793 §3.2) ─────────────────────────────────────────────
 
@@ -367,14 +367,14 @@ impl TcpConnection {
 // =================================================================────────
 
 pub struct SovereignSockmapBypass {
-    pub socket_map: HashMap<(u16, u16), (u16, u16)>,
+    pub socket_map: BTreeMap<(u16, u16), (u16, u16)>,
 }
 
 impl SovereignSockmapBypass {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            socket_map: HashMap::new(),
+            socket_map: BTreeMap::new(),
         }
     }
 

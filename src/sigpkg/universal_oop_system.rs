@@ -23,10 +23,10 @@
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{HashMap, Arc};
+use crate::klib::{BTreeMap, Arc};
 
 #[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 #[cfg(feature = "standalone_test")]
 use std::sync::Arc;
 
@@ -88,12 +88,12 @@ pub struct ConditionalDependency {
 /// Matrix for mapping and translating architecture identifiers across distros
 #[derive(Debug, Clone, Default)]
 pub struct ArchitectureTranslationMatrix {
-    pub mapping: HashMap<String, String>,
+    pub mapping: BTreeMap<String, String>,
 }
 
 impl ArchitectureTranslationMatrix {
     pub fn new() -> Self {
-        let mut mapping = HashMap::new();
+        let mut mapping = BTreeMap::new();
         // Setup default cross-distro mappings
         mapping.insert("amd64".to_string(), "x86_64".to_string());
         mapping.insert("i386".to_string(), "x86".to_string());
@@ -2263,14 +2263,14 @@ impl IPackage for StandardPackage {
 
 /// Factory for creating package parsers
 pub struct PackageParserFactory {
-    parsers: HashMap<PackageFormat, Box<dyn IPackageParser>>,
+    parsers: BTreeMap<PackageFormat, Box<dyn IPackageParser>>,
 }
 
 impl PackageParserFactory {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut factory = Self {
-            parsers: HashMap::new(),
+            parsers: BTreeMap::new(),
         };
 
         // Register built-in parsers
@@ -2325,10 +2325,10 @@ impl Default for PackageParserFactory {
 /// Universal package manager - Facade for all package operations
 pub struct UniversalPackageManager {
     factory: PackageParserFactory,
-    installed_packages: HashMap<String, Box<dyn IPackage>>,
+    installed_packages: BTreeMap<String, Box<dyn IPackage>>,
     pub global_hooks: Vec<Arc<dyn UserDefinedHook>>,
     // Portage-style active USE flags
-    pub active_use_flags: HashMap<String, bool>,
+    pub active_use_flags: BTreeMap<String, bool>,
     // Pacman-style file path triggers/hooks
     pub path_triggers: Vec<Arc<dyn IPathTrigger>>,
 }
@@ -2338,9 +2338,9 @@ impl UniversalPackageManager {
     pub fn new() -> Self {
         Self {
             factory: PackageParserFactory::new(),
-            installed_packages: HashMap::new(),
+            installed_packages: BTreeMap::new(),
             global_hooks: Vec::new(),
-            active_use_flags: HashMap::new(),
+            active_use_flags: BTreeMap::new(),
             path_triggers: Vec::new(),
         }
     }
@@ -3114,7 +3114,7 @@ Description: Hook test";
     fn test_pacman_path_triggers() {
         let mut manager = UniversalPackageManager::new();
 
-        let trigger_executed = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let trigger_executed = Arc::new(core::sync::atomic::AtomicBool::new(false));
         let trigger_executed_clone = trigger_executed.clone();
 
         let trigger = PathTriggerHook {
@@ -3123,7 +3123,7 @@ Description: Hook test";
             script: Arc::new(move |matched_paths| {
                 assert_eq!(matched_paths.len(), 1);
                 assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
-                trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+                trigger_executed_clone.store(true, core::sync::atomic::Ordering::SeqCst);
                 Ok(())
             }),
         };
@@ -3161,6 +3161,6 @@ Description: Hook test";
         };
 
         manager.process_path_triggers(&pkg).unwrap();
-        assert!(trigger_executed.load(std::sync::atomic::Ordering::SeqCst));
+        assert!(trigger_executed.load(core::sync::atomic::Ordering::SeqCst));
     }
 }

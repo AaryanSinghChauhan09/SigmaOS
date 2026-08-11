@@ -20,7 +20,7 @@
 /// Automatically registers and creates device files when drivers boot.
 /// Improved with Linux-inspired udev rules, permissions, and symlink mappings.
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use crate::klib::Vec;
 use std::string::{String, ToString};
 
@@ -54,8 +54,8 @@ pub struct UdevRule {
 }
 
 pub struct DevTmpFs {
-    devices: HashMap<String, DeviceNode>,
-    symlinks: HashMap<String, String>, // symlink -> target node name
+    devices: BTreeMap<String, DeviceNode>,
+    symlinks: BTreeMap<String, String>, // symlink -> target node name
     udev_rules: Vec<UdevRule>,
 }
 
@@ -63,8 +63,8 @@ impl DevTmpFs {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DevTmpFs {
-            devices: HashMap::new(),
-            symlinks: HashMap::new(),
+            devices: BTreeMap::new(),
+            symlinks: BTreeMap::new(),
             udev_rules: Vec::new(),
         }
     }

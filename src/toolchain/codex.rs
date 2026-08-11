@@ -1,7 +1,7 @@
 // SigmaOS Ancient Build Replay Codex (BuildCodex)
 // Formulates compiler build codex logs for legacy reproducible tooling
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CodexCategory {
@@ -18,14 +18,14 @@ pub struct CodexEntry {
 
 pub struct BuildCodex {
     pub category: CodexCategory,
-    pub codex_map: HashMap<String, CodexEntry>,
+    pub codex_map: BTreeMap<String, CodexEntry>,
 }
 
 impl BuildCodex {
     pub fn new(cat: CodexCategory) -> Self {
         BuildCodex {
             category: cat,
-            codex_map: HashMap::new(),
+            codex_map: BTreeMap::new(),
         }
     }
 

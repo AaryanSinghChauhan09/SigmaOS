@@ -31,7 +31,7 @@
 // 10. High-impact HID keyboard/mouse and VESA Framebuffer graphics drivers
 // 11. Local AI task orchestration scheduler (S-AI)
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 // ==========================================
 // 1. Kernel Module Management
@@ -53,14 +53,14 @@ pub struct KernelModule {
 }
 
 pub struct KernelModuleManager {
-    pub active_modules: HashMap<String, KernelModule>,
+    pub active_modules: BTreeMap<String, KernelModule>,
 }
 
 impl KernelModuleManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            active_modules: HashMap::new(),
+            active_modules: BTreeMap::new(),
         }
     }
 
@@ -97,13 +97,13 @@ impl Default for KernelModuleManager {
 // ==========================================
 
 pub struct SyscallCompatibilityRegistry {
-    pub legacy_mappings: HashMap<u32, String>,
+    pub legacy_mappings: BTreeMap<u32, String>,
 }
 
 impl SyscallCompatibilityRegistry {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut mappings = HashMap::new();
+        let mut mappings = BTreeMap::new();
         // Seed historic syscalls across Linux kernel.org versions (2.x -> 6.x)
         mappings.insert(1, "sys_exit (2.x legacy)".to_string());
         mappings.insert(2, "sys_fork (2.x segment-based)".to_string());
@@ -149,16 +149,16 @@ pub struct HardwareDriver {
 }
 
 pub struct DriverRepositoryManager {
-    pub registry: HashMap<String, HardwareDriver>,
-    pub dependency_graph: HashMap<String, Vec<String>>,
+    pub registry: BTreeMap<String, HardwareDriver>,
+    pub dependency_graph: BTreeMap<String, Vec<String>>,
 }
 
 impl DriverRepositoryManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            registry: HashMap::new(),
-            dependency_graph: HashMap::new(),
+            registry: BTreeMap::new(),
+            dependency_graph: BTreeMap::new(),
         }
     }
 
@@ -385,7 +385,7 @@ pub enum MemoryProtection {
 }
 
 pub struct VirtualMemoryManager {
-    pub pages: HashMap<u64, MemoryProtection>,
+    pub pages: BTreeMap<u64, MemoryProtection>,
     pub demand_page_count: usize,
 }
 
@@ -393,7 +393,7 @@ impl VirtualMemoryManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            pages: HashMap::new(),
+            pages: BTreeMap::new(),
             demand_page_count: 0,
         }
     }
@@ -433,7 +433,7 @@ pub enum IpProtocol {
 }
 
 pub struct NetworkStackGateway {
-    pub routing_table: HashMap<String, String>, // maps dest IP pattern to gateway
+    pub routing_table: BTreeMap<String, String>, // maps dest IP pattern to gateway
     pub blocked_ports: HashSet<u16>,
 }
 
@@ -441,7 +441,7 @@ impl NetworkStackGateway {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            routing_table: HashMap::new(),
+            routing_table: BTreeMap::new(),
             blocked_ports: HashSet::new(),
         }
     }
@@ -701,7 +701,7 @@ impl SigmaOnboardingWelcome {
     pub fn new() -> Self {
         Self { mirrors_ranked: Vec::new() }
     }
-    pub fn rank_package_mirrors(&mut self, latencies: HashMap<String, u32>) {
+    pub fn rank_package_mirrors(&mut self, latencies: BTreeMap<String, u32>) {
         let mut sorted: Vec<(String, u32)> = latencies.into_iter().collect();
         sorted.sort_by_key(|&(_, latency)| latency);
         self.mirrors_ranked = sorted.into_iter().map(|(url, _)| url).collect();

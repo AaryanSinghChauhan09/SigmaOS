@@ -18,9 +18,9 @@
 
 /// SigmaOS POSIX signals implementation
 /// Based on early and modern Linux signals design
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u32)]
@@ -50,20 +50,20 @@ pub enum SignalHandler {
 }
 
 pub struct SignalManager {
-    pending_signals: HashMap<u64, Vec<Signal>>,
-    signal_actions: HashMap<u64, HashMap<Signal, SignalHandler>>,
-    signal_masks: HashMap<u64, Vec<Signal>>,
-    pub sigterm_escalation_tracker: HashMap<u64, bool>, // Track SIGTERM sent but pending SIGKILL escalation
+    pending_signals: BTreeMap<u64, Vec<Signal>>,
+    signal_actions: BTreeMap<u64, BTreeMap<Signal, SignalHandler>>,
+    signal_masks: BTreeMap<u64, Vec<Signal>>,
+    pub sigterm_escalation_tracker: BTreeMap<u64, bool>, // Track SIGTERM sent but pending SIGKILL escalation
 }
 
 impl SignalManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SignalManager {
-            pending_signals: HashMap::new(),
-            signal_actions: HashMap::new(),
-            signal_masks: HashMap::new(),
-            sigterm_escalation_tracker: HashMap::new(),
+            pending_signals: BTreeMap::new(),
+            signal_actions: BTreeMap::new(),
+            signal_masks: BTreeMap::new(),
+            sigterm_escalation_tracker: BTreeMap::new(),
         }
     }
 

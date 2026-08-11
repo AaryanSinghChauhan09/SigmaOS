@@ -20,7 +20,7 @@
 // Models advanced rolling-release, automatic hardware configuration,
 // kernel switching, and mirror-ranked transactional packaging.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// An Arch User Repository (AUR) package representation
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -250,14 +250,14 @@ pub enum ManjaroKernelRelease {
 #[derive(Debug, Clone)]
 pub struct MhwdDkmsRebuilder {
     pub registered_modules: Vec<String>,
-    pub compiled_modules_for_kernels: HashMap<String, Vec<String>>,
+    pub compiled_modules_for_kernels: BTreeMap<String, Vec<String>>,
 }
 
 impl MhwdDkmsRebuilder {
     pub fn new() -> Self {
         Self {
             registered_modules: Vec::new(),
-            compiled_modules_for_kernels: HashMap::new(),
+            compiled_modules_for_kernels: BTreeMap::new(),
         }
     }
 

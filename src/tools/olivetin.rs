@@ -6,7 +6,7 @@
 extern crate alloc;
 use alloc::string::String;
 use alloc::string::ToString;
-use crate::klib::{Vec, HashMap};
+use crate::klib::{Vec, BTreeMap};
 
 #[derive(Debug, Clone)]
 pub struct OliveTinAction {

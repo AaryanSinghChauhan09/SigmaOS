@@ -1,7 +1,7 @@
 // SigmaOS Kernel Personality Prism & Syscall Ledgerbook
 // Refracts workloads into different kernel behaviors and maintains historical syscall fallbacks
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PrismFacet {
@@ -11,13 +11,13 @@ pub enum PrismFacet {
 }
 
 pub struct KernelPrism {
-    pub active_facets: HashMap<PrismFacet, String>,
+    pub active_facets: BTreeMap<PrismFacet, String>,
 }
 
 impl KernelPrism {
     pub fn new() -> Self {
         let mut prism = KernelPrism {
-            active_facets: HashMap::new(),
+            active_facets: BTreeMap::new(),
         };
         // Refract memory ops into legacy 2.4 behaviour, network into modern 6.x
         prism.active_facets.insert(PrismFacet::LegacyMemoryOps, "Linux 2.4 Facet".to_string());
@@ -45,13 +45,13 @@ pub struct LedgerEntry {
 }
 
 pub struct SyscallLedgerbook {
-    pub entries: HashMap<u32, LedgerEntry>,
+    pub entries: BTreeMap<u32, LedgerEntry>,
 }
 
 impl SyscallLedgerbook {
     pub fn new() -> Self {
         let mut book = SyscallLedgerbook {
-            entries: HashMap::new(),
+            entries: BTreeMap::new(),
         };
         // Seed standard ledger entries
         book.register_fallback(12, "sys_sysfs".to_string(), "Translate sysfs to standard vfs probe".to_string());

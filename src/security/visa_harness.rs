@@ -21,7 +21,7 @@
 // Formally implements compilable, production-ready Rust structures for the absorbed VVAH SAST pipeline:
 // 1. VisaVulnerabilityAgenticHarness (Phase 1-4, Stage S1-S11 pipeline, SARIF reporting, and adversarial validation)
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PipelineStage {
@@ -58,7 +58,7 @@ pub struct VisaVulnerabilityAgenticHarness {
     pub target_repo_path: String,
     pub current_stage: PipelineStage,
     pub stop_after_stage: Option<PipelineStage>,
-    pub findings: HashMap<String, VvahFinding>,
+    pub findings: BTreeMap<String, VvahFinding>,
 }
 
 impl VisaVulnerabilityAgenticHarness {
@@ -67,7 +67,7 @@ impl VisaVulnerabilityAgenticHarness {
             target_repo_path: target_repo_path.to_string(),
             current_stage: PipelineStage::S1Explore,
             stop_after_stage,
-            findings: HashMap::new(),
+            findings: BTreeMap::new(),
         }
     }
 

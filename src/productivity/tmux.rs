@@ -2,7 +2,7 @@
 // Implements robust OOP principles with custom split, zoom, broadcast, and copy register functions
 // Built to outperform and exceed standard tmux capabilities of Linux distributions
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::ops::Range;
 
 /// Direction for splitting terminal panes
@@ -224,7 +224,7 @@ pub struct TmuxSession {
     pub name: String,
     pub windows: Vec<TmuxWindow>,
     pub active_window_idx: usize,
-    pub copy_registers: HashMap<String, String>, // Named clipboard buffers for multi-pane editing
+    pub copy_registers: BTreeMap<String, String>, // Named clipboard buffers for multi-pane editing
     pub is_attached: bool,
 }
 
@@ -235,7 +235,7 @@ impl TmuxSession {
             name: name.to_string(),
             windows: vec![initial_window],
             active_window_idx: 0,
-            copy_registers: HashMap::new(),
+            copy_registers: BTreeMap::new(),
             is_attached: true,
         }
     }
@@ -276,7 +276,7 @@ impl TmuxSession {
                     self.windows.push(win);
                 }
 
-                let mut parts = HashMap::new();
+                let mut parts = BTreeMap::new();
                 for part in trimmed.split(';') {
                     let kv: Vec<&str> = part.split('=').collect();
                     if kv.len() == 2 {
@@ -303,7 +303,7 @@ impl TmuxSession {
                 current_window = Some(win);
             } else if trimmed.starts_with("PANE_ID=") {
                 if let Some(ref mut win) = current_window {
-                    let mut parts = HashMap::new();
+                    let mut parts = BTreeMap::new();
                     for part in trimmed.split(';') {
                         let kv: Vec<&str> = part.split('=').collect();
                         if kv.len() == 2 {
@@ -366,14 +366,14 @@ impl TmuxSession {
 
 /// The high-level Terminal Multiplexer manager
 pub struct TmuxSessionManager {
-    pub sessions: HashMap<String, TmuxSession>,
+    pub sessions: BTreeMap<String, TmuxSession>,
     pub active_session_name: Option<String>,
 }
 
 impl TmuxSessionManager {
     pub fn new() -> Self {
         Self {
-            sessions: HashMap::new(),
+            sessions: BTreeMap::new(),
             active_session_name: None,
         }
     }

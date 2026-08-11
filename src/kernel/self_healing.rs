@@ -2,26 +2,26 @@
 // Deploys active system integrity checkers, memory quarantine, and AI-generated hot patches
 
 #[cfg(target_os = "none")]
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 #[cfg(not(target_os = "none"))]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 pub struct SovereignSelfHealingKernel {
-    pub integrity_hashes: HashMap<String, String>, // file paths -> baseline hashes
+    pub integrity_hashes: BTreeMap<String, String>, // file paths -> baseline hashes
     pub quarantined_memory_nodes: Vec<usize>,
     pub hot_patches_applied: usize,
-    pub config_backups: HashMap<String, String>, // config file paths -> pristine default config content
-    pub driver_history: HashMap<usize, String>,   // driver ID -> previously stable version string
+    pub config_backups: BTreeMap<String, String>, // config file paths -> pristine default config content
+    pub driver_history: BTreeMap<usize, String>,   // driver ID -> previously stable version string
 }
 
 impl SovereignSelfHealingKernel {
     pub fn new() -> Self {
         let mut kernel = SovereignSelfHealingKernel {
-            integrity_hashes: HashMap::new(),
+            integrity_hashes: BTreeMap::new(),
             quarantined_memory_nodes: Vec::new(),
             hot_patches_applied: 0,
-            config_backups: HashMap::new(),
-            driver_history: HashMap::new(),
+            config_backups: BTreeMap::new(),
+            driver_history: BTreeMap::new(),
         };
         // Baseline hashes
         kernel.integrity_hashes.insert("/boot/kernel".to_string(), "pristine_hash_111".to_string());

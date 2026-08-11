@@ -19,7 +19,7 @@
 // SigmaOS Password Manager
 // OOP-based password management with biometric unlock and encryption
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Password entry
 #[derive(Debug, Clone)]
@@ -183,7 +183,7 @@ pub struct PasswordManagerResult {
 pub struct PasswordManager {
     vault_path: String,
     master_key: Vec<u8>,
-    passwords: HashMap<String, PasswordEntry>,
+    passwords: BTreeMap<String, PasswordEntry>,
     biometric_auth: Option<Box<dyn BiometricAuth>>,
     biometric_enabled: bool,
     auto_lock_timeout_seconds: u64,
@@ -195,7 +195,7 @@ impl PasswordManager {
         Self {
             vault_path,
             master_key,
-            passwords: HashMap::new(),
+            passwords: BTreeMap::new(),
             biometric_auth: None,
             biometric_enabled: false,
             auto_lock_timeout_seconds: 300, // 5 minutes

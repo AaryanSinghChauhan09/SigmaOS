@@ -3,7 +3,7 @@
 // Includes Debian APT-style release signature keyring verification engine
 
 use crate::sigpkg::Package;
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// FreeBSD/Debian GPG-style Keychain Keyring containing trusted archive signing keys
 #[derive(Debug, Clone, Default)]
@@ -27,7 +27,7 @@ pub struct AptReleaseFile {
     pub origin: String,
     pub suite: String,
     pub codename: String,
-    pub files_sha256: HashMap<String, String>, // Filename to SHA256 mapping
+    pub files_sha256: BTreeMap<String, String>, // Filename to SHA256 mapping
 }
 
 /// Cryptographic verifier for package signatures
@@ -207,7 +207,7 @@ mod tests {
         let mut keyring = AptKeyring::new();
         keyring.register_key(trusted_key);
 
-        let mut files_sha256 = HashMap::new();
+        let mut files_sha256 = BTreeMap::new();
         files_sha256.insert("nano".to_string(), "nano_hash_value".to_string());
 
         let release = AptReleaseFile {

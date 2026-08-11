@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// HPC Cluster Job State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,7 +50,7 @@ impl HpcClusterJob {
 pub struct MpiCommunicator {
     pub size: u32,
     pub rank: u32,
-    pub message_buffer: HashMap<u32, Vec<u8>>, // maps rank to received byte packets
+    pub message_buffer: BTreeMap<u32, Vec<u8>>, // maps rank to received byte packets
 }
 
 impl MpiCommunicator {
@@ -58,7 +58,7 @@ impl MpiCommunicator {
         Self {
             size,
             rank,
-            message_buffer: HashMap::new(),
+            message_buffer: BTreeMap::new(),
         }
     }
 
@@ -353,13 +353,13 @@ pub struct RunitService {
 
 /// Void Linux-style Runit Service Manager
 pub struct RunitServiceManager {
-    pub active_services: HashMap<String, RunitService>,
+    pub active_services: BTreeMap<String, RunitService>,
 }
 
 impl RunitServiceManager {
     pub fn new() -> Self {
         Self {
-            active_services: HashMap::new(),
+            active_services: BTreeMap::new(),
         }
     }
 
@@ -395,13 +395,13 @@ impl Default for RunitServiceManager {
 
 /// NetBSD-style Rump Kernel Driver Shim Context
 pub struct RumpKernelShim {
-    pub active_drivers: HashMap<String, String>, // maps driver name to isolated process ID
+    pub active_drivers: BTreeMap<String, String>, // maps driver name to isolated process ID
 }
 
 impl RumpKernelShim {
     pub fn new() -> Self {
         Self {
-            active_drivers: HashMap::new(),
+            active_drivers: BTreeMap::new(),
         }
     }
 
@@ -435,14 +435,14 @@ pub struct AptPackageManifest {
 
 /// Debian-Style Local APT Cache Simulator
 pub struct AptCacheSimulator {
-    pub cached_manifests: HashMap<String, AptPackageManifest>,
+    pub cached_manifests: BTreeMap<String, AptPackageManifest>,
     pub max_cache_size: usize,
 }
 
 impl AptCacheSimulator {
     pub fn new(max_size: usize) -> Self {
         Self {
-            cached_manifests: HashMap::new(),
+            cached_manifests: BTreeMap::new(),
             max_cache_size: max_size,
         }
     }
@@ -522,12 +522,12 @@ impl Default for DebianPolicyEnforcer {
 /// Three-Tier Release Model: sigma.next (unstable), sigma.beta (testing), sigma.stable (stable)
 pub struct ThreeTierReleaseModel {
     pub active_channel: String,
-    pub channels: HashMap<String, String>, // Name to description
+    pub channels: BTreeMap<String, String>, // Name to description
 }
 
 impl ThreeTierReleaseModel {
     pub fn new() -> Self {
-        let mut channels = HashMap::new();
+        let mut channels = BTreeMap::new();
         channels.insert("sigma.next".to_string(), "Rolling, experimental, daily updates".to_string());
         channels.insert("sigma.beta".to_string(), "Pre-release, weekly, mostly stable".to_string());
         channels.insert("sigma.stable".to_string(), "Production LTS, quarterly security-only".to_string());
@@ -658,13 +658,13 @@ pub struct PreseedQuestion {
 
 /// Debian-style Automated Preseed installer configuration engine
 pub struct DebianPreseedEngine {
-    pub answers: HashMap<String, PreseedQuestion>,
+    pub answers: BTreeMap<String, PreseedQuestion>,
 }
 
 impl DebianPreseedEngine {
     pub fn new() -> Self {
         Self {
-            answers: HashMap::new(),
+            answers: BTreeMap::new(),
         }
     }
 

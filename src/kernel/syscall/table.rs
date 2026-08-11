@@ -5,9 +5,9 @@ use core::sync::atomic::{AtomicU64, Ordering};
 /// Improved with Windows-inspired System Service Descriptor Table (SSDT) structures,
 /// kernel-symbol export tables, and active Anti-Rootkit guard hooks detectors.
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 // ── Syscall numbers (Linux-compatible subset + SigmaOS extensions) ────────
 
@@ -256,7 +256,7 @@ impl SyscallHandler for BrkHandler {
 // ── Syscall dispatch table ────────────────────────────────────────────────
 
 pub struct SyscallTable {
-    handlers: HashMap<u64, Box<dyn SyscallHandler>>,
+    handlers: BTreeMap<u64, Box<dyn SyscallHandler>>,
     calls_dispatched: AtomicU64,
     calls_unsupported: AtomicU64,
 }
@@ -264,7 +264,7 @@ pub struct SyscallTable {
 impl SyscallTable {
     pub fn new() -> Self {
         let mut table = SyscallTable {
-            handlers: HashMap::new(),
+            handlers: BTreeMap::new(),
             calls_dispatched: AtomicU64::new(0),
             calls_unsupported: AtomicU64::new(0),
         };
@@ -338,7 +338,7 @@ pub struct SsdtEntry {
 
 /// Anti-Rootkit System Call tampering detector
 pub struct AntiRootkitGuard {
-    pub shadow_ssdt: HashMap<u32, u64>, // Pristine service_number -> address copy
+    pub shadow_ssdt: BTreeMap<u32, u64>, // Pristine service_number -> address copy
 }
 
 impl Default for AntiRootkitGuard {
@@ -350,7 +350,7 @@ impl Default for AntiRootkitGuard {
 impl AntiRootkitGuard {
     pub fn new() -> Self {
         AntiRootkitGuard {
-            shadow_ssdt: HashMap::new(),
+            shadow_ssdt: BTreeMap::new(),
         }
     }
 

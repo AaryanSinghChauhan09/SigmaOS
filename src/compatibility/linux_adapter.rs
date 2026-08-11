@@ -1,7 +1,7 @@
 // SigmaOS Legacy Linux Kernel & System Compatibility Adapter
 // Enables ancient software compiled for Linux 2.x, 3.x, 4.x, 5.x, and 6.x to run securely
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxKernelVersion {
@@ -14,12 +14,12 @@ pub enum LinuxKernelVersion {
 
 pub struct LegacyKernelAdapter {
     pub target_version: LinuxKernelVersion,
-    pub syscall_shims: HashMap<u32, String>,
+    pub syscall_shims: BTreeMap<u32, String>,
 }
 
 impl LegacyKernelAdapter {
     pub fn new(version: LinuxKernelVersion) -> Self {
-        let mut shims = HashMap::new();
+        let mut shims = BTreeMap::new();
         // Standard Linux syscall shims
         shims.insert(1, "sys_exit".to_string());
         shims.insert(3, "sys_read".to_string());

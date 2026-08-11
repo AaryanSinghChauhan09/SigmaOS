@@ -1,7 +1,7 @@
 // SigmaOS NUMA-Aware CFS Scheduler & Lock-Free Concurrency Primitives
 // Deploys abstract compare-and-swap Michael-Scott queues and Treiber stacks for multi-NUMA systems
 
-use std::sync::atomic::{AtomicPtr, Ordering};
+use core::sync::atomic::{AtomicPtr, Ordering};
 
 pub struct NumaNode {
     pub node_id: u32,

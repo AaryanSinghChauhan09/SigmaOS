@@ -99,7 +99,7 @@ impl Default for SoftirqEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::atomic::{AtomicUsize, Ordering};
+    use core::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
 
     static CALLED_COUNT: AtomicUsize = AtomicUsize::new(0);

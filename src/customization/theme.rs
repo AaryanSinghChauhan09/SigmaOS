@@ -20,7 +20,7 @@
 // OOP-based declarative theming with light/dark/auto modes
 // Enhanced with Material-You style dynamic color palettes and workspace density profiling
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Color palette
 #[derive(Debug, Clone)]
@@ -121,14 +121,14 @@ pub trait ThemeProvider {
 
 /// Built-in theme provider
 pub struct BuiltInThemeProvider {
-    themes: HashMap<String, Theme>,
+    themes: BTreeMap<String, Theme>,
     current_theme: String,
 }
 
 impl BuiltInThemeProvider {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut themes = HashMap::new();
+        let mut themes = BTreeMap::new();
 
         // Light theme
         themes.insert(
@@ -276,7 +276,7 @@ impl ThemeProvider for BuiltInThemeProvider {
 
 /// Custom theme provider
 pub struct CustomThemeProvider {
-    themes: HashMap<String, Theme>,
+    themes: BTreeMap<String, Theme>,
     current_theme: String,
     custom_themes_path: String,
 }
@@ -284,7 +284,7 @@ pub struct CustomThemeProvider {
 impl CustomThemeProvider {
     pub fn new(custom_themes_path: String) -> Self {
         Self {
-            themes: HashMap::new(),
+            themes: BTreeMap::new(),
             current_theme: "custom".to_string(),
             custom_themes_path,
         }
@@ -576,14 +576,14 @@ impl Default for ZenithBackdropFilter {
 
 /// SigmaSoundscape - Auditory Theme & Sound Event Mapper
 pub struct SigmaSoundscape {
-    pub mapped_sounds: HashMap<String, String>, // maps EventName -> AudioFileURI
+    pub mapped_sounds: BTreeMap<String, String>, // maps EventName -> AudioFileURI
     pub master_volume_percent: u8,
 }
 
 impl SigmaSoundscape {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut mapped = HashMap::new();
+        let mut mapped = BTreeMap::new();
         mapped.insert(
             "login".to_string(),
             "file:///system/audio/chime.wav".to_string(),

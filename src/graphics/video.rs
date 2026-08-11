@@ -184,7 +184,7 @@ impl TimelineClip for VideoClip {
 // 4. Concrete Streaming Overlay Manager (Streamlabs & XSplit)
 // ==========================================
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Type of overlay source (Webcam, Game Capture, Chat Box, Alerts, Labels)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -241,7 +241,7 @@ pub struct ActiveAlert {
 
 /// High-Performance Streaming Overlay Manager matching Streamlabs & XSplit capabilities
 pub struct StreamingOverlayManager {
-    pub scenes: HashMap<String, StreamScene>,
+    pub scenes: BTreeMap<String, StreamScene>,
     pub active_scene_name: String,
     pub transition_type: String, // "cut", "fade"
     pub transition_frames: u32,
@@ -251,7 +251,7 @@ pub struct StreamingOverlayManager {
 impl StreamingOverlayManager {
     pub fn new() -> Self {
         StreamingOverlayManager {
-            scenes: HashMap::new(),
+            scenes: BTreeMap::new(),
             active_scene_name: String::new(),
             transition_type: "cut".to_string(),
             transition_frames: 0,

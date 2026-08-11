@@ -2,7 +2,7 @@
 // Fully absorbs and implements all features, systems, and philosophies of FreeDOS:
 // AUTOEXEC.BAT batch files, CONFIG.SYS drivers, INT 21h MS-DOS syscalls, TSR multiplexing, FAT32/LBA filesystems, and shell utilities.
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeMap, VecDeque};
 use std::path::{Path, PathBuf};
 
 /// Represents CONFIG.SYS driver or parameter settings
@@ -36,9 +36,9 @@ pub struct FreeDosEmulator {
     pub config_sys: Vec<ConfigSysSetting>,
     pub autoexec_bat: Vec<String>,
     pub tsrs: Vec<TsrProgram>,
-    pub environment: HashMap<String, String>,
-    pub fat_entries: HashMap<PathBuf, Vec<FatDirectoryEntry>>,
-    pub files: HashMap<PathBuf, Vec<u8>>,
+    pub environment: BTreeMap<String, String>,
+    pub fat_entries: BTreeMap<PathBuf, Vec<FatDirectoryEntry>>,
+    pub files: BTreeMap<PathBuf, Vec<u8>>,
     pub output_stream: Vec<String>,
     pub input_buffer: VecDeque<String>,
 }
@@ -49,9 +49,9 @@ impl FreeDosEmulator {
             config_sys: Vec::new(),
             autoexec_bat: Vec::new(),
             tsrs: Vec::new(),
-            environment: HashMap::new(),
-            fat_entries: HashMap::new(),
-            files: HashMap::new(),
+            environment: BTreeMap::new(),
+            fat_entries: BTreeMap::new(),
+            files: BTreeMap::new(),
             output_stream: Vec::new(),
             input_buffer: VecDeque::new(),
         }
@@ -80,7 +80,7 @@ impl FreeDosEmulator {
     pub fn execute_autoexec_bat(&mut self, content: &str) {
         let lines: Vec<String> = content.lines().map(|s| s.trim().to_string()).collect();
         let mut pc = 0;
-        let mut labels: HashMap<String, usize> = HashMap::new();
+        let mut labels: BTreeMap<String, usize> = BTreeMap::new();
 
         // Scan labels first (e.g., :START, :ERROR)
         for (idx, line) in lines.iter().enumerate() {

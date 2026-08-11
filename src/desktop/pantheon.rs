@@ -14,10 +14,10 @@ use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 #[cfg(not(test))]
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Gala Window transition styles
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -104,7 +104,7 @@ impl GalaWindowManager {
 
 /// Wingpanel (Pantheon top panel) Status Bar
 pub struct Wingpanel {
-    pub indicators: HashMap<String, WingpanelIndicator>,
+    pub indicators: BTreeMap<String, WingpanelIndicator>,
     pub notification_badge_active: bool,
     pub clock_seconds_visible: bool,
 }
@@ -112,7 +112,7 @@ pub struct Wingpanel {
 impl Wingpanel {
     pub fn new() -> Self {
         let mut panel = Self {
-            indicators: HashMap::new(),
+            indicators: BTreeMap::new(),
             notification_badge_active: false,
             clock_seconds_visible: false,
         };
@@ -217,14 +217,14 @@ impl SlingshotLauncher {
 
 /// AppCenter Software Store (curated, pay-what-you-want parity)
 pub struct AppCenter {
-    pub products: HashMap<String, AppCenterProduct>,
+    pub products: BTreeMap<String, AppCenterProduct>,
     pub account_balance_usd: f64,
 }
 
 impl AppCenter {
     pub fn new() -> Self {
         Self {
-            products: HashMap::new(),
+            products: BTreeMap::new(),
             account_balance_usd: 100.0,
         }
     }

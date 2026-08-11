@@ -18,7 +18,7 @@
 
 /// SigmaOS vmalloc interface for virtual contiguous memory allocation
 /// Maps non-contiguous physical pages into contiguous virtual space
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 extern crate alloc;
 use alloc::vec::Vec;
 
@@ -29,7 +29,7 @@ pub struct VmallocRegion {
 }
 
 pub struct VmallocManager {
-    allocated_regions: HashMap<usize, VmallocRegion>,
+    allocated_regions: BTreeMap<usize, VmallocRegion>,
     next_virtual_addr: usize,
 }
 
@@ -37,7 +37,7 @@ impl VmallocManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         VmallocManager {
-            allocated_regions: HashMap::new(),
+            allocated_regions: BTreeMap::new(),
             next_virtual_addr: 0xD000_0000, // Typically high-memory space
         }
     }

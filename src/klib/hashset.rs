@@ -1,14 +1,14 @@
 //! Custom HashSet implementation for SigmaOS
 //! Reduces dependency on std::collections::HashSet
 
-use super::HashMap;
-use super::hashmap::HashMapIter;
+use super::BTreeMap;
+use super::hashmap::BTreeMapIter;
 
 pub struct HashSet<T>
 where
     T: Eq + core::hash::Hash + Clone,
 {
-    map: HashMap<T, ()>,
+    map: BTreeMap<T, ()>,
 }
 
 impl<T> Clone for HashSet<T>
@@ -41,13 +41,13 @@ where
 {
     pub fn new() -> Self {
         HashSet {
-            map: HashMap::new(),
+            map: BTreeMap::new(),
         }
     }
 
     pub fn with_capacity(capacity: usize) -> Self {
         HashSet {
-            map: HashMap::with_capacity(capacity),
+            map: BTreeMap::with_capacity(capacity),
         }
     }
 
@@ -90,7 +90,7 @@ where
 }
 
 pub struct HashSetIter<'a, T> {
-    map_iter: HashMapIter<'a, T, ()>,
+    map_iter: BTreeMapIter<'a, T, ()>,
 }
 
 impl<'a, T> Iterator for HashSetIter<'a, T>

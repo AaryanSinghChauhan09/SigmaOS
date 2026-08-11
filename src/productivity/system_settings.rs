@@ -2,7 +2,7 @@
 // Inspired by GNOME/KDE Control Centers, Windows Control Panel, and BSD rc.conf settings.
 // Manages accounts, network, bluetooth, backup, drivers, visual effects, firewall, font, input methods, and touch preferences.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserAccount {
@@ -29,7 +29,7 @@ pub struct InputDeviceSettings {
 
 /// Unified Control Center Settings Database
 pub struct UnifiedSettingsManager {
-    pub accounts: HashMap<String, UserAccount>,
+    pub accounts: BTreeMap<String, UserAccount>,
     pub display: DisplayPreference,
     pub input_settings: InputDeviceSettings,
     pub desktop_background: String,
@@ -43,7 +43,7 @@ pub struct UnifiedSettingsManager {
 impl UnifiedSettingsManager {
     pub fn new() -> Self {
         let mut usm = Self {
-            accounts: HashMap::new(),
+            accounts: BTreeMap::new(),
             display: DisplayPreference {
                 resolution: (1920, 1080),
                 refresh_rate_hz: 60,

@@ -20,10 +20,10 @@
 // OOP-based IDS with anomaly detection and rule-based analysis
 
 #[cfg(not(test))]
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 use std::net::IpAddr;
 use std::time::Instant;
@@ -38,7 +38,7 @@ pub struct SecurityEvent {
     pub timestamp: Instant,
     pub severity: Severity,
     pub description: String,
-    pub metadata: HashMap<String, String>,
+    pub metadata: BTreeMap<String, String>,
 }
 
 /// Event type
@@ -159,14 +159,14 @@ impl DetectionStrategy for SignatureDetection {
 
 /// Anomaly-based detection
 pub struct AnomalyDetection {
-    baseline: HashMap<String, f64>,
+    baseline: BTreeMap<String, f64>,
     threshold: f64,
 }
 
 impl AnomalyDetection {
     pub fn new(threshold: f64) -> Self {
         Self {
-            baseline: HashMap::new(),
+            baseline: BTreeMap::new(),
             threshold,
         }
     }
@@ -498,7 +498,7 @@ mod tests {
             timestamp: Instant::now(),
             severity: Severity::High,
             description: "Port scan detected".to_string(),
-            metadata: HashMap::new(),
+            metadata: BTreeMap::new(),
         };
         assert_eq!(event.event_type, EventType::PortScan);
     }
@@ -523,7 +523,7 @@ mod tests {
             timestamp: Instant::now(),
             severity: Severity::High,
             description: "Port scan detected".to_string(),
-            metadata: HashMap::new(),
+            metadata: BTreeMap::new(),
         };
 
         let result = detection.analyze(&event);
@@ -543,7 +543,7 @@ mod tests {
             timestamp: Instant::now(),
             severity: Severity::High,
             description: "Port scan detected".to_string(),
-            metadata: HashMap::new(),
+            metadata: BTreeMap::new(),
         };
 
         let _result = detection.analyze(&event);
@@ -567,7 +567,7 @@ mod tests {
             timestamp: Instant::now(),
             severity: Severity::High,
             description: "Port scan detected".to_string(),
-            metadata: HashMap::new(),
+            metadata: BTreeMap::new(),
         };
 
         let results = ids.process_event(event);

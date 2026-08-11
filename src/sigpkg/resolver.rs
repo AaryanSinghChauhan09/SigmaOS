@@ -2,7 +2,7 @@
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
 use crate::sigpkg::{Package, Version, VersionConstraint};
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 // =========================================================================
 // Davis-Putnam-Logemann-Loveland (DPLL) Boolean SAT Solver
@@ -37,7 +37,7 @@ impl DpllSolver {
 
     /// Evaluates a clause under the current assignment.
     /// Returns Some(true) if satisfied, Some(false) if unsatisfied (conflict), or None if unresolved.
-    pub fn evaluate_clause(&self, clause: &Clause, assignment: &HashMap<usize, bool>) -> Option<bool> {
+    pub fn evaluate_clause(&self, clause: &Clause, assignment: &BTreeMap<usize, bool>) -> Option<bool> {
         let mut has_unassigned = false;
         for lit in &clause.literals {
             if let Some(&val) = assignment.get(&lit.var_id) {
@@ -57,7 +57,7 @@ impl DpllSolver {
 
     /// Performs Unit Propagation:
     /// If an unresolved clause has only one unassigned literal, that literal must be assigned to true.
-    pub fn unit_propagate(&self, assignment: &mut HashMap<usize, bool>) -> Result<bool, ()> {
+    pub fn unit_propagate(&self, assignment: &mut BTreeMap<usize, bool>) -> Result<bool, ()> {
         let mut changed = false;
         loop {
             let mut unit_literal = None;
@@ -103,7 +103,7 @@ impl DpllSolver {
 
     /// Performs Pure Literal Elimination:
     /// If a variable appears with only one polarity in all unsatisfied clauses, assign it accordingly.
-    pub fn pure_literal_elimination(&self, assignment: &mut HashMap<usize, bool>) -> bool {
+    pub fn pure_literal_elimination(&self, assignment: &mut BTreeMap<usize, bool>) -> bool {
         let mut changed = false;
         for var_id in 0..self.num_variables {
             if assignment.contains_key(&var_id) {
@@ -140,12 +140,12 @@ impl DpllSolver {
     }
 
     /// Solves the CNF formula recursively using the backtracking DPLL search.
-    pub fn solve(&self) -> Option<HashMap<usize, bool>> {
-        let mut assignment = HashMap::new();
+    pub fn solve(&self) -> Option<BTreeMap<usize, bool>> {
+        let mut assignment = BTreeMap::new();
         self.solve_recursive(&mut assignment, 0)
     }
 
-    fn solve_recursive(&self, assignment: &mut HashMap<usize, bool>, next_var: usize) -> Option<HashMap<usize, bool>> {
+    fn solve_recursive(&self, assignment: &mut BTreeMap<usize, bool>, next_var: usize) -> Option<BTreeMap<usize, bool>> {
         // Step 1: Unit Propagation & Pure Literal Elimination
         let mut local_assignment = assignment.clone();
         if self.unit_propagate(&mut local_assignment).is_err() {
@@ -202,13 +202,13 @@ impl DpllSolver {
 // =========================================================================
 
 pub struct SatSolver {
-    pub packages: HashMap<String, Vec<Package>>,
+    pub packages: BTreeMap<String, Vec<Package>>,
 }
 
 impl SatSolver {
     pub fn new() -> Self {
         SatSolver {
-            packages: HashMap::new(),
+            packages: BTreeMap::new(),
         }
     }
 
@@ -265,8 +265,8 @@ impl SatSolver {
         }
 
         // 2. Map candidate packages to unique variables IDs
-        let mut pkg_to_var = HashMap::new();
-        let mut var_to_pkg = HashMap::new();
+        let mut pkg_to_var = BTreeMap::new();
+        let mut var_to_pkg = BTreeMap::new();
         for (idx, p) in all_packages.iter().enumerate() {
             let identifier = format!("{}#{}", p.name, p.version);
             pkg_to_var.insert(identifier.clone(), idx);

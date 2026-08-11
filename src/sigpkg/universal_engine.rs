@@ -3,7 +3,7 @@
 // Integrates User-Defined Functions (UDF) and instant O(1) transaction rollbacks
 // Supporting all major Linux/BSD distribution package formats (Apt, Yum, Pacman, Portage, Apk, Nix, AppImage, Flatpak, Snap, Slackware, VoidXbps, FreeBsdPkg, Sovereign)
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageFormat {
@@ -639,20 +639,20 @@ impl UserDefinedPackageHook {
 
 pub struct SovereignPackageManager {
     pub active_generation: u32,
-    pub store_generations: HashMap<u32, Vec<String>>, // Generation ID to list of package names (snapshots)
-    pub installed_packages: HashMap<String, PackageContext>,
-    pub hooks: HashMap<HookType, Vec<UserDefinedPackageHook>>,
+    pub store_generations: BTreeMap<u32, Vec<String>>, // Generation ID to list of package names (snapshots)
+    pub installed_packages: BTreeMap<String, PackageContext>,
+    pub hooks: BTreeMap<HookType, Vec<UserDefinedPackageHook>>,
 }
 
 impl SovereignPackageManager {
     pub fn new() -> Self {
-        let mut store_generations = HashMap::new();
+        let mut store_generations = BTreeMap::new();
         store_generations.insert(0, Vec::new());
         Self {
             active_generation: 0,
             store_generations,
-            installed_packages: HashMap::new(),
-            hooks: HashMap::new(),
+            installed_packages: BTreeMap::new(),
+            hooks: BTreeMap::new(),
         }
     }
 
@@ -787,7 +787,7 @@ impl PackageAdapterFactory {
             PackageFormat::Apt => std::boxed::Box::new(AptPackageAdapter),
             PackageFormat::Yum => std::boxed::Box::new(YumPackageAdapter),
             PackageFormat::Pacman => std::boxed::Box::new(PacmanPackageAdapter),
-            PackageFormat::Portage => std::boxed::Box::new(EbuildPackageAdapter::new(std::vec::Vec::new())),
+            PackageFormat::Portage => std::boxed::Box::new(EbuildPackageAdapter::new(alloc::vec::Vec::new())),
             PackageFormat::Sovereign => std::boxed::Box::new(SovereignPackageAdapter),
             PackageFormat::Nix => std::boxed::Box::new(NixPackageAdapter),
             PackageFormat::Apk => std::boxed::Box::new(ApkPackageAdapter),

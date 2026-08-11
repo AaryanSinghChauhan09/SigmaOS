@@ -1,7 +1,7 @@
 // SigmaOS Resilience and Self-Healing Modules
 // Event-driven recovery and rollback snapshots
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Recovery event type
@@ -33,8 +33,8 @@ pub enum RecoveryAction {
 pub struct SystemSnapshot {
     pub id: String,
     pub timestamp: u64,
-    pub system_state: HashMap<String, String>,
-    pub configuration: HashMap<String, String>,
+    pub system_state: BTreeMap<String, String>,
+    pub configuration: BTreeMap<String, String>,
     pub description: String,
 }
 
@@ -47,8 +47,8 @@ impl SystemSnapshot {
         Self {
             id: format!("snap-{}", timestamp_nanos),
             timestamp: (timestamp_nanos / 1_000_000_000) as u64,
-            system_state: HashMap::new(),
-            configuration: HashMap::new(),
+            system_state: BTreeMap::new(),
+            configuration: BTreeMap::new(),
             description,
         }
     }
@@ -98,7 +98,7 @@ impl RecoveryRule {
     pub fn matches(
         &self,
         event_type: RecoveryEventType,
-        context: &HashMap<String, String>,
+        context: &BTreeMap<String, String>,
     ) -> bool {
         if self.event_type != event_type {
             return false;

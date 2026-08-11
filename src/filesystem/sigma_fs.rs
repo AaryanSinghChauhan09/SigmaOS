@@ -1,14 +1,14 @@
 // SigmaOS Composable Filesystem (SigmaFS++)
 // Deploys plugin-based storage, deduplication, semantic indexers, and blockchain audit logs
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::path::PathBuf;
 
 /// Standardized next-generation hierarchy (SigmaFS)
 /// Compatible with Linux FHS, Windows NTFS, and BSD structures.
 /// Introduces native directory trees for AI models, agents, and cryptographic keys.
 pub struct SovereignFhsHierarchy {
-    pub directories: HashMap<String, Vec<String>>, // Directory path -> children
+    pub directories: BTreeMap<String, Vec<String>>, // Directory path -> children
     pub ai_agents_path: PathBuf,
     pub ai_models_path: PathBuf,
     pub pqc_keys_path: PathBuf,
@@ -16,7 +16,7 @@ pub struct SovereignFhsHierarchy {
 
 impl SovereignFhsHierarchy {
     pub fn new() -> Self {
-        let mut dirs = HashMap::new();
+        let mut dirs = BTreeMap::new();
         // Standard FHS directories
         dirs.insert("/bin".to_string(), Vec::new());
         dirs.insert("/etc".to_string(), Vec::new());
@@ -84,14 +84,14 @@ pub struct JournalTransaction {
 
 /// Sovereign Self-Healing Journaling & Recovery Engine (NTFS/Ext4 parity)
 pub struct SovereignFsJournal {
-    pub transactions: HashMap<u64, JournalTransaction>,
+    pub transactions: BTreeMap<u64, JournalTransaction>,
     pub next_tx_id: u64,
 }
 
 impl SovereignFsJournal {
     pub fn new() -> Self {
         Self {
-            transactions: HashMap::new(),
+            transactions: BTreeMap::new(),
             next_tx_id: 1,
         }
     }
@@ -154,13 +154,13 @@ impl SovereignFsJournal {
 /// Sovereign Distributed & Cloud-Native Storage (ZFS replication & ReFS cloud parity)
 /// Coordinates peer-to-peer blocks replication and consensus tracking.
 pub struct DistributedSovereignFS {
-    pub peer_replicas: HashMap<String, Vec<String>>, // block_hash -> list of peer_ids
+    pub peer_replicas: BTreeMap<String, Vec<String>>, // block_hash -> list of peer_ids
 }
 
 impl DistributedSovereignFS {
     pub fn new() -> Self {
         Self {
-            peer_replicas: HashMap::new(),
+            peer_replicas: BTreeMap::new(),
         }
     }
 
@@ -223,16 +223,16 @@ pub struct FileBlock {
 }
 
 pub struct SigmaFS {
-    pub file_blocks: HashMap<String, FileBlock>, // content-addressed block deduplication
-    pub semantic_index: HashMap<String, String>, // search terms -> file names
+    pub file_blocks: BTreeMap<String, FileBlock>, // content-addressed block deduplication
+    pub semantic_index: BTreeMap<String, String>, // search terms -> file names
     pub audit_trail_hashes: Vec<String>, // Tamper-evident SHA-256 blockchain hash ledger
 }
 
 impl SigmaFS {
     pub fn new() -> Self {
         SigmaFS {
-            file_blocks: HashMap::new(),
-            semantic_index: HashMap::new(),
+            file_blocks: BTreeMap::new(),
+            semantic_index: BTreeMap::new(),
             audit_trail_hashes: Vec::new(),
         }
     }
@@ -288,12 +288,12 @@ impl SigmaFS {
 // =========================================================================
 
 pub struct SigmaFhsRouter {
-    pub routing_rules: HashMap<String, String>, // Extension/pattern -> routed directory path
+    pub routing_rules: BTreeMap<String, String>, // Extension/pattern -> routed directory path
 }
 
 impl SigmaFhsRouter {
     pub fn new() -> Self {
-        let mut rules = HashMap::new();
+        let mut rules = BTreeMap::new();
         rules.insert(".conf".to_string(), "/etc".to_string());
         rules.insert(".yaml".to_string(), "/etc".to_string());
         rules.insert(".bin".to_string(), "/bin".to_string());
@@ -353,7 +353,7 @@ impl SigmaFhsHook {
 pub struct SigmaFhsNamespace {
     pub namespace_id: String,
     pub bind_mounts: Vec<String>,
-    pub local_files: HashMap<String, Vec<u8>>,
+    pub local_files: BTreeMap<String, Vec<u8>>,
 }
 
 impl SigmaFhsNamespace {
@@ -361,7 +361,7 @@ impl SigmaFhsNamespace {
         SigmaFhsNamespace {
             namespace_id: id.to_string(),
             bind_mounts: Vec::new(),
-            local_files: HashMap::new(),
+            local_files: BTreeMap::new(),
         }
     }
 

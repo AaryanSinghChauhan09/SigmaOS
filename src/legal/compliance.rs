@@ -1,7 +1,7 @@
 // SigmaOS Unified Statutory Compliance & Labour Integration Engine
 // Natively tracks global standards (GDPR, ISO-27001, SOC-2) and automates national statutory calculations (EPF, ESI, Payroll Auditing)
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Global security and privacy standards tracked by SigmaOS
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -34,13 +34,13 @@ pub struct RegulatoryControl {
 
 /// International Compliance Tracker
 pub struct InternationalComplianceTracker {
-    pub controls: HashMap<String, RegulatoryControl>,
+    pub controls: BTreeMap<String, RegulatoryControl>,
 }
 
 impl InternationalComplianceTracker {
     pub fn new() -> Self {
         Self {
-            controls: HashMap::new(),
+            controls: BTreeMap::new(),
         }
     }
 

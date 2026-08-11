@@ -2,7 +2,7 @@
 // Purpose-built, highly interactive hierarchical visualization tool inspired by XMind, MindMeister, and NiceMind.
 // Exposes rich styling, relationship boundaries, task progress tracking, and layouts.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Mind Map layouts (Radial, OrgChart, LogicChart)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -80,7 +80,7 @@ pub struct RelationshipConnection {
 /// High-Performance Mind Map Canvas managing node hierarchies and connections
 pub struct MindMapCreator {
     pub map_title: String,
-    pub nodes: HashMap<String, MindMapNode>,
+    pub nodes: BTreeMap<String, MindMapNode>,
     pub root_node_id: String,
     pub relationships: Vec<RelationshipConnection>,
     pub default_layout: MindMapLayout,
@@ -90,7 +90,7 @@ impl MindMapCreator {
     pub fn new(title: &str, root_topic: &str) -> Self {
         let root_id = "root_node".to_string();
         let root_node = MindMapNode::new(&root_id, root_topic, None);
-        let mut nodes = HashMap::new();
+        let mut nodes = BTreeMap::new();
         nodes.insert(root_id.clone(), root_node);
 
         Self {

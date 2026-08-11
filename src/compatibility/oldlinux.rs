@@ -21,7 +21,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Historical early Linux release metadata
 #[derive(Debug, Clone)]
@@ -35,14 +35,14 @@ pub struct OldLinuxRelease {
 /// Dynamic personality translator mapping early releases to modern interfaces
 pub struct OldLinuxCompatManager {
     pub active_version: &'static str,
-    pub releases: HashMap<&'static str, OldLinuxRelease>,
-    pub port_routing: HashMap<u16, String>,
+    pub releases: BTreeMap<&'static str, OldLinuxRelease>,
+    pub port_routing: BTreeMap<u16, String>,
 }
 
 impl OldLinuxCompatManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut releases = HashMap::new();
+        let mut releases = BTreeMap::new();
 
         releases.insert("0.01", OldLinuxRelease {
             version: "0.01",
@@ -99,7 +99,7 @@ impl OldLinuxCompatManager {
             min_ram_mb: 8,
         });
 
-        let mut port_routing = HashMap::new();
+        let mut port_routing = BTreeMap::new();
         // Setup default port maps for ancient peripherals
         port_routing.insert(0x3F0, "Floppy Disk Controller".to_string());
         port_routing.insert(0x220, "Sound Blaster 16".to_string());

@@ -1,7 +1,7 @@
 // SigmaOS Archive Manager
 // OOP-based archive creation and extraction with multiple formats
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// Archive format
@@ -298,14 +298,14 @@ impl ArchiveHandler for SevenZipArchiveHandler {
 
 /// OOP-based Archive Manager
 pub struct ArchiveManager {
-    handlers: HashMap<ArchiveFormat, Box<dyn ArchiveHandler>>,
+    handlers: BTreeMap<ArchiveFormat, Box<dyn ArchiveHandler>>,
     default_format: ArchiveFormat,
     default_compression: CompressionLevel,
 }
 
 impl ArchiveManager {
     pub fn new() -> Self {
-        let mut handlers: HashMap<ArchiveFormat, Box<dyn ArchiveHandler>> = HashMap::new();
+        let mut handlers: BTreeMap<ArchiveFormat, Box<dyn ArchiveHandler>> = BTreeMap::new();
         handlers.insert(ArchiveFormat::Zip, Box::new(ZipArchiveHandler));
         handlers.insert(ArchiveFormat::Tar, Box::new(TarArchiveHandler));
         handlers.insert(ArchiveFormat::TarGz, Box::new(TarArchiveHandler));

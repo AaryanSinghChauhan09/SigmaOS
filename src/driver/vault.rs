@@ -1,7 +1,7 @@
 // SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)
 // Stores legacy drivers in secure vault entries with lineage metadata and dependency chains
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 pub struct VaultEntry {
     pub id: usize,
@@ -11,13 +11,13 @@ pub struct VaultEntry {
 }
 
 pub struct DriverArchiveVault {
-    pub vault: HashMap<usize, VaultEntry>,
+    pub vault: BTreeMap<usize, VaultEntry>,
 }
 
 impl DriverArchiveVault {
     pub fn new() -> Self {
         let mut archive = DriverArchiveVault {
-            vault: HashMap::new(),
+            vault: BTreeMap::new(),
         };
         // Seed default driver vault entries
         archive.register_driver(

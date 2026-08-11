@@ -31,8 +31,8 @@
 // 10. Sovereign Recover Utility (sigma-recover): Sector node recovery from pristine backups
 // 11. Asynchronous Shard Ignition (ASI) with write-once system images (CoreOS Parity)
 
-use std::collections::{HashMap, VecDeque};
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::collections::{BTreeMap, VecDeque};
+use core::sync::atomic::{AtomicU64, Ordering};
 
 // ==========================================
 // 1. SovereignRegistry
@@ -40,14 +40,14 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 #[derive(Debug, Clone)]
 pub struct SovereignRegistry {
-    pub config_values: HashMap<String, String>,
+    pub config_values: BTreeMap<String, String>,
 }
 
 impl SovereignRegistry {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            config_values: HashMap::new(),
+            config_values: BTreeMap::new(),
         }
     }
 
@@ -120,14 +120,14 @@ impl Default for SovereignObjectBus {
 
 #[derive(Debug, Clone)]
 pub struct SovereignCloudFS {
-    pub encrypted_chunks: HashMap<String, Vec<u8>>,
+    pub encrypted_chunks: BTreeMap<String, Vec<u8>>,
     pub encryption_key: [u8; 32],
 }
 
 impl SovereignCloudFS {
     pub fn new(key: [u8; 32]) -> Self {
         Self {
-            encrypted_chunks: HashMap::new(),
+            encrypted_chunks: BTreeMap::new(),
             encryption_key: key,
         }
     }
@@ -266,14 +266,14 @@ pub struct NumaTask {
 }
 
 pub struct NumaCfsScheduler {
-    pub current_node_task_queue: HashMap<u32, Vec<NumaTask>>,
+    pub current_node_task_queue: BTreeMap<u32, Vec<NumaTask>>,
 }
 
 impl NumaCfsScheduler {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            current_node_task_queue: HashMap::new(),
+            current_node_task_queue: BTreeMap::new(),
         }
     }
 
@@ -405,14 +405,14 @@ impl Default for SovereignForensics {
 // ==========================================
 
 pub struct SovereignRecoverUtility {
-    pub backup_nodes: HashMap<u64, Vec<u8>>,
+    pub backup_nodes: BTreeMap<u64, Vec<u8>>,
 }
 
 impl SovereignRecoverUtility {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            backup_nodes: HashMap::new(),
+            backup_nodes: BTreeMap::new(),
         }
     }
 

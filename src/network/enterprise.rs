@@ -142,7 +142,7 @@ pub struct IPv6Route {
 #[cfg(not(test))]
 pub type RouteVec = crate::klib::Vec<IPv6Route>;
 #[cfg(test)]
-pub type RouteVec = std::vec::Vec<IPv6Route>;
+pub type RouteVec = alloc::vec::Vec<IPv6Route>;
 
 /// Longest Prefix Match (LPM) IPv6 routing table
 pub struct IPv6RoutingTable {

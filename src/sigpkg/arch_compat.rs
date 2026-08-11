@@ -2,7 +2,7 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
@@ -70,15 +70,15 @@ impl Default for AurRecipeCompiler {
 /// Rolling Release System Synchronizer
 #[derive(Debug, Clone)]
 pub struct RollingSyncManager {
-    pub installed_packages: HashMap<String, Version>,
-    pub remote_repository: HashMap<String, Version>,
+    pub installed_packages: BTreeMap<String, Version>,
+    pub remote_repository: BTreeMap<String, Version>,
 }
 
 impl RollingSyncManager {
     pub fn new() -> Self {
         Self {
-            installed_packages: HashMap::new(),
-            remote_repository: HashMap::new(),
+            installed_packages: BTreeMap::new(),
+            remote_repository: BTreeMap::new(),
         }
     }
 
@@ -182,13 +182,13 @@ pub struct GentooEbuildPackage {
 
 /// Gentoo Portage-style source-build package compiler & optimizer engine
 pub struct PortageEbuildCompiler {
-    pub global_use_flags: HashMap<String, bool>,
+    pub global_use_flags: BTreeMap<String, bool>,
 }
 
 impl PortageEbuildCompiler {
     pub fn new() -> Self {
         Self {
-            global_use_flags: HashMap::new(),
+            global_use_flags: BTreeMap::new(),
         }
     }
 

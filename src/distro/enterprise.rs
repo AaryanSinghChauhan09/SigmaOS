@@ -16,14 +16,14 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Configuration hook representing enterprise configuration scripts (e.g. Ansible playbook, Puppet manifest).
 #[derive(Debug, Clone)]
 pub struct ConfigHook {
     pub hook_id: String,
     pub target_subsystem: String,
-    pub variables: HashMap<String, String>,
+    pub variables: BTreeMap<String, String>,
 }
 
 impl ConfigHook {
@@ -31,7 +31,7 @@ impl ConfigHook {
         Self {
             hook_id: hook_id.to_string(),
             target_subsystem: subsystem.to_string(),
-            variables: HashMap::new(),
+            variables: BTreeMap::new(),
         }
     }
 
@@ -52,14 +52,14 @@ pub struct DirectoryUser {
 #[derive(Debug, Clone)]
 pub struct DirectoryService {
     pub domain_name: String,
-    pub users: HashMap<String, DirectoryUser>,
+    pub users: BTreeMap<String, DirectoryUser>,
 }
 
 impl DirectoryService {
     pub fn new(domain_name: &str) -> Self {
         Self {
             domain_name: domain_name.to_string(),
-            users: HashMap::new(),
+            users: BTreeMap::new(),
         }
     }
 
@@ -120,7 +120,7 @@ impl ComplianceAuditor {
     }
 
     /// Evaluates actual system states against rules.
-    pub fn perform_audit(&self, system_state: &HashMap<String, String>) -> Vec<AuditResult> {
+    pub fn perform_audit(&self, system_state: &BTreeMap<String, String>) -> Vec<AuditResult> {
         let mut results = Vec::new();
         for rule in &self.rules {
             let actual = system_state.get(&rule.rule_id).cloned().unwrap_or_default();
@@ -183,7 +183,7 @@ mod tests {
             "enforcing",
         );
 
-        let mut actual_state = HashMap::new();
+        let mut actual_state = BTreeMap::new();
         actual_state.insert("sys.password_min_length".to_string(), "14".to_string()); // passing but not exact
         actual_state.insert("sys.selinux_enforcing".to_string(), "enforcing".to_string()); // passing exact
 

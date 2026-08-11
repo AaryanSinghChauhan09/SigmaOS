@@ -2,7 +2,7 @@
 // Implements accessibility overlays, automation routines, forensic audit trails,
 // global legal compliance dashboards, cross-language developer tools, and IoT mesh orchestration.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 /// 1. Accessibility Overlay Manager
 pub struct AccessibilityOverlayManager {
@@ -73,14 +73,14 @@ pub struct SmartRoutine {
 
 /// 2. User-Centric Automation Routine Controller
 pub struct AutomationRoutineController {
-    pub routines: HashMap<String, SmartRoutine>,
+    pub routines: BTreeMap<String, SmartRoutine>,
     pub executed_actions_log: Vec<String>,
 }
 
 impl AutomationRoutineController {
     pub fn new() -> Self {
         Self {
-            routines: HashMap::new(),
+            routines: BTreeMap::new(),
             executed_actions_log: Vec::new(),
         }
     }
@@ -159,22 +159,22 @@ impl Default for ForensicReadinessAuditor {
 
 /// 4. Global Compliance Dashboard
 pub struct GlobalComplianceDashboard {
-    pub labor_law_verifications: HashMap<String, bool>,
-    pub social_security_verifications: HashMap<String, bool>,
-    pub technical_standard_verifications: HashMap<String, bool>,
+    pub labor_law_verifications: BTreeMap<String, bool>,
+    pub social_security_verifications: BTreeMap<String, bool>,
+    pub technical_standard_verifications: BTreeMap<String, bool>,
 }
 
 impl GlobalComplianceDashboard {
     pub fn new() -> Self {
-        let mut labor = HashMap::new();
+        let mut labor = BTreeMap::new();
         labor.insert("INDIAN_LABOUR_CODES".to_string(), true);
         labor.insert("COMPANIES_ACT_S135".to_string(), true);
 
-        let mut soc_sec = HashMap::new();
+        let mut soc_sec = BTreeMap::new();
         soc_sec.insert("ILO_CONVENTION_102".to_string(), true);
         soc_sec.insert("EPF_ESI_MANDATES".to_string(), true);
 
-        let mut tech = HashMap::new();
+        let mut tech = BTreeMap::new();
         tech.insert("GDPR_COMPLIANCE".to_string(), true);
         tech.insert("ISO_27001_COMPLIANCE".to_string(), true);
 
@@ -252,13 +252,13 @@ pub struct IotMeshDevice {
 }
 
 pub struct IotDeviceMeshOrchestrator {
-    pub registered_mesh_devices: HashMap<String, IotMeshDevice>,
+    pub registered_mesh_devices: BTreeMap<String, IotMeshDevice>,
 }
 
 impl IotDeviceMeshOrchestrator {
     pub fn new() -> Self {
         Self {
-            registered_mesh_devices: HashMap::new(),
+            registered_mesh_devices: BTreeMap::new(),
         }
     }
 

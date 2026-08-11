@@ -1,7 +1,7 @@
 // SigmaOS Linux-From-Scratch (LFS) and FreeBSD Inspired Bootstrap & Ports Engine
 // Designed for toolchain compiling, Stage 1/2 bootstrapping, and secure ports auditing
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootstrapStage {
@@ -20,7 +20,7 @@ pub struct PortPackage {
 pub struct LfsBootstrapEngine {
     pub current_stage: BootstrapStage,
     pub compiled_binaries: Vec<String>,
-    pub ports_tree: HashMap<String, PortPackage>,
+    pub ports_tree: BTreeMap<String, PortPackage>,
 }
 
 impl LfsBootstrapEngine {
@@ -28,7 +28,7 @@ impl LfsBootstrapEngine {
         let mut engine = LfsBootstrapEngine {
             current_stage: BootstrapStage::Stage1TempToolchain,
             compiled_binaries: Vec::new(),
-            ports_tree: HashMap::new(),
+            ports_tree: BTreeMap::new(),
         };
         // Seed some FreeBSD-style core port definitions
         engine.register_port(PortPackage {

@@ -19,7 +19,7 @@
 // SigmaOS Duplicate File Finder
 // OOP-based duplicate file detection with hash comparison
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// OOP trait for hash algorithms
@@ -155,13 +155,13 @@ impl DuplicateFinder {
         self.scan_stats = ScanStats::default();
         self.duplicate_groups.clear();
 
-        let mut files_by_size: HashMap<u64, Vec<FileMetadata>> = HashMap::new();
+        let mut files_by_size: BTreeMap<u64, Vec<FileMetadata>> = BTreeMap::new();
 
         // First pass: group by size
         self.collect_files_by_size(base_path, &mut files_by_size)?;
 
         // Second pass: hash files with same size
-        let mut files_by_hash: HashMap<String, Vec<FileMetadata>> = HashMap::new();
+        let mut files_by_hash: BTreeMap<String, Vec<FileMetadata>> = BTreeMap::new();
 
         for (size, files) in files_by_size {
             if files.len() > 1 {
@@ -203,7 +203,7 @@ impl DuplicateFinder {
     fn collect_files_by_size(
         &mut self,
         path: &Path,
-        files_by_size: &mut HashMap<u64, Vec<FileMetadata>>,
+        files_by_size: &mut BTreeMap<u64, Vec<FileMetadata>>,
     ) -> Result<(), DuplicateError> {
         let entries =
             std::fs::read_dir(path).map_err(|e| DuplicateError::IoError(e.to_string()))?;

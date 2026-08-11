@@ -18,7 +18,7 @@
 
 /// SigmaOS sysfs-like device tree implementation
 /// Exposes devices, drivers, and attributes in a structured tree
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
 
 pub struct SysfsAttribute {
@@ -28,18 +28,18 @@ pub struct SysfsAttribute {
 
 pub struct SysfsDeviceNode {
     pub name: String,
-    pub attributes: HashMap<String, String>,
+    pub attributes: BTreeMap<String, String>,
 }
 
 pub struct SysfsTree {
-    devices: HashMap<String, SysfsDeviceNode>,
+    devices: BTreeMap<String, SysfsDeviceNode>,
 }
 
 impl SysfsTree {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SysfsTree {
-            devices: HashMap::new(),
+            devices: BTreeMap::new(),
         }
     }
 
@@ -47,7 +47,7 @@ impl SysfsTree {
         let path = format!("/sys/class/{}/{}", class, name);
         let node = SysfsDeviceNode {
             name: name.to_string(),
-            attributes: HashMap::new(),
+            attributes: BTreeMap::new(),
         };
         self.devices.insert(path, node);
     }

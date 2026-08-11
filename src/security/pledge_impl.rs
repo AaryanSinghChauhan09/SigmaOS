@@ -9,7 +9,7 @@
 // This implementation is fully custom — no std, no libc, no external crates.
 
 // No predefined library dependency — we use only the kernel's own klib.
-use crate::klib::collections::SigmaHashMap;
+use crate::klib::collections::SigmaBTreeMap;
 use crate::runtime::process::ProcessId;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -139,15 +139,15 @@ pub enum PledgeError {
 ///
 /// Typically there is one global `PledgeEnforcer` per system, accessed through
 /// the kernel security subsystem.  It has no `alloc` / `std` dependency —
-/// `SigmaHashMap` is the project's own fixed-capacity hash map.
+/// `SigmaBTreeMap` is the project's own fixed-capacity hash map.
 pub struct PledgeEnforcer {
-    registry: SigmaHashMap<ProcessId, PledgeState>,
+    registry: SigmaBTreeMap<ProcessId, PledgeState>,
 }
 
 impl PledgeEnforcer {
     /// Create a new, empty enforcer.
     pub fn new() -> Self {
-        Self { registry: SigmaHashMap::new() }
+        Self { registry: SigmaBTreeMap::new() }
     }
 
     // ── pledge() ──────────────────────────────────────────────────────────────

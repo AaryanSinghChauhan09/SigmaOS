@@ -1,7 +1,7 @@
 //! Repository Management System (Debian APT + Arch Pacman Inspiration)
 //! Manages package repositories, mirrors, and metadata
 
-use crate::klib::{HashMap, Vec, String};
+use crate::klib::{BTreeMap, Vec, String};
 use crate::sigpkg::{Package, Version, VersionConstraint};
 
 /// Repository configuration (Debian sources.list inspiration)
@@ -39,16 +39,16 @@ impl Repository {
 /// Repository manager (APT sources.list.d inspiration)
 pub struct RepositoryManager {
     repositories: Vec<Repository>,
-    mirrors: HashMap<String, Vec<String>>,
-    current_mirror: HashMap<String, String>,
+    mirrors: BTreeMap<String, Vec<String>>,
+    current_mirror: BTreeMap<String, String>,
 }
 
 impl RepositoryManager {
     pub fn new() -> Self {
         Self {
             repositories: Vec::new(),
-            mirrors: HashMap::new(),
-            current_mirror: HashMap::new(),
+            mirrors: BTreeMap::new(),
+            current_mirror: BTreeMap::new(),
         }
     }
 

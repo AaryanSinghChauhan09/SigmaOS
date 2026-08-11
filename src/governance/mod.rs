@@ -7,8 +7,8 @@ pub use rfc::{
     GovernanceError, RFCRepository, RFCStatus, SimpleRFC, SimpleRFCRepository, SimpleVotingSystem,
     VotingSystem, RFC, RFCID,
 };
-use std::collections::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use alloc::collections::BTreeMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Foundation committee member profile
 #[derive(Debug, Clone)]
@@ -139,14 +139,14 @@ pub struct DemocraticProposal {
 
 /// Democratic Community Voting system
 pub struct DemocraticVoting {
-    pub proposals: HashMap<usize, DemocraticProposal>,
+    pub proposals: BTreeMap<usize, DemocraticProposal>,
     pub next_id: usize,
 }
 
 impl DemocraticVoting {
     pub fn new() -> Self {
         Self {
-            proposals: HashMap::new(),
+            proposals: BTreeMap::new(),
             next_id: 1,
         }
     }

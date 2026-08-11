@@ -1,7 +1,7 @@
 // SigmaOS High-Performance eBPF Tracing & Latency Profiler (SigmaProfiler)
 // Designed for tracking scheduler task latency, system tracepoints, and CPU profiling
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TracepointType {
@@ -18,14 +18,14 @@ pub struct PerformanceMetric {
 }
 
 pub struct SigmaProfiler {
-    pub tracepoints: HashMap<TracepointType, PerformanceMetric>,
+    pub tracepoints: BTreeMap<TracepointType, PerformanceMetric>,
     pub tracing_active: bool,
 }
 
 impl SigmaProfiler {
     pub fn new() -> Self {
         let mut profiler = SigmaProfiler {
-            tracepoints: HashMap::new(),
+            tracepoints: BTreeMap::new(),
             tracing_active: true,
         };
         // Initialize standard tracepoints

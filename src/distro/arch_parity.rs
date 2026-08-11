@@ -1,7 +1,7 @@
 // SigmaOS Arch Linux Parity Implementation
 // Implements PKGBUILD parsing, makepkg compiler parity, and AUR integration
 
-use crate::klib::{HashMap, SigmaString, ToString, Vec};
+use crate::klib::{BTreeMap, SigmaString, ToString, Vec};
 use core::cell::Cell;
 
 /// PKGBUILD representation following Arch Linux standards
@@ -141,13 +141,13 @@ impl SandboxedCompiler {
 
 /// ALPM database for package metadata sync
 pub struct AlpmDatabase {
-    pub packages: HashMap<SigmaString, PkgBuild>,
+    pub packages: BTreeMap<SigmaString, PkgBuild>,
 }
 
 impl AlpmDatabase {
     pub fn new() -> Self {
         AlpmDatabase {
-            packages: HashMap::new(),
+            packages: BTreeMap::new(),
         }
     }
 

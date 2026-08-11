@@ -19,7 +19,7 @@
 // SigmaOS System Restore Snapshots
 // OOP-based system snapshot and restore functionality
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -97,7 +97,7 @@ pub trait SnapshotStorage {
 /// File-based snapshot storage
 pub struct FileSnapshotStorage {
     base_path: PathBuf,
-    snapshots: HashMap<String, SnapshotMetadata>,
+    snapshots: BTreeMap<String, SnapshotMetadata>,
     config: SnapshotConfig,
 }
 
@@ -105,7 +105,7 @@ impl FileSnapshotStorage {
     pub fn new(base_path: PathBuf, config: SnapshotConfig) -> Self {
         Self {
             base_path,
-            snapshots: HashMap::new(),
+            snapshots: BTreeMap::new(),
             config,
         }
     }
@@ -220,7 +220,7 @@ impl FileSnapshotStorage {
 /// Merkle tree-based snapshot storage (SigmaFS optimized)
 pub struct MerkleSnapshotStorage {
     base_path: PathBuf,
-    snapshots: HashMap<String, SnapshotMetadata>,
+    snapshots: BTreeMap<String, SnapshotMetadata>,
     config: SnapshotConfig,
 }
 
@@ -228,7 +228,7 @@ impl MerkleSnapshotStorage {
     pub fn new(base_path: PathBuf, config: SnapshotConfig) -> Self {
         Self {
             base_path,
-            snapshots: HashMap::new(),
+            snapshots: BTreeMap::new(),
             config,
         }
     }

@@ -1,7 +1,7 @@
 // SigmaOS Support & Services Framework
 // Professional support tiers, LTS maintenance guarantees, and disaster recovery configurations
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Professional support levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -144,14 +144,14 @@ impl SovereignHashAuditor {
 }
 
 pub struct SovereignExploitAuditor {
-    pub registered_payloads: HashMap<String, Vec<u8>>, // payload_name -> shellcode
+    pub registered_payloads: BTreeMap<String, Vec<u8>>, // payload_name -> shellcode
     pub active_listener_port: Option<u16>,
 }
 
 impl SovereignExploitAuditor {
     pub fn new() -> Self {
         Self {
-            registered_payloads: HashMap::new(),
+            registered_payloads: BTreeMap::new(),
             active_listener_port: None,
         }
     }
@@ -172,8 +172,8 @@ impl SovereignExploitAuditor {
 
 /// Support & Services Manager
 pub struct SupportServicesManager {
-    pub active_contracts: HashMap<String, SupportContract>,
-    pub lts_releases: HashMap<String, LtsRelease>,
+    pub active_contracts: BTreeMap<String, SupportContract>,
+    pub lts_releases: BTreeMap<String, LtsRelease>,
     pub recovery_tools: Vec<RecoveryConfig>,
     pub wlan_auditors: Vec<SovereignWlanAuditor>,
     pub scanners: Vec<SovereignNetworkScanner>,
@@ -182,8 +182,8 @@ pub struct SupportServicesManager {
 impl SupportServicesManager {
     pub fn new() -> Self {
         Self {
-            active_contracts: HashMap::new(),
-            lts_releases: HashMap::new(),
+            active_contracts: BTreeMap::new(),
+            lts_releases: BTreeMap::new(),
             recovery_tools: Vec::new(),
             wlan_auditors: Vec::new(),
             scanners: Vec::new(),

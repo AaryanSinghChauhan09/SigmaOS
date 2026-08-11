@@ -3,7 +3,7 @@
 //! Zero-allocation package manager parsing simple, signed declarative community recipes.
 
 use crate::sigpkg::{Dependency, Version};
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,13 +34,13 @@ pub enum RecipeError {
 }
 
 pub struct RecipeManager {
-    pub recipes: HashMap<String, PackageRecipe>,
+    pub recipes: BTreeMap<String, PackageRecipe>,
 }
 
 impl RecipeManager {
     pub fn new() -> Self {
         let mut manager = Self {
-            recipes: HashMap::new(),
+            recipes: BTreeMap::new(),
         };
         // Add distro-inspired standard package recipes
         let neofetch = PackageRecipe::new("neofetch".to_string(), Version::new(7, 1, 0))
@@ -99,7 +99,7 @@ pub struct PackageRecipe {
     pub hash: String,
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
-    pub environment: HashMap<String, String>,
+    pub environment: BTreeMap<String, String>,
     pub pkgrel: u32,
     pub arch: String,
     pub license_spdx: String,
@@ -119,7 +119,7 @@ impl PackageRecipe {
             hash: String::new(),
             build_commands: Vec::new(),
             install_commands: Vec::new(),
-            environment: HashMap::new(),
+            environment: BTreeMap::new(),
             pkgrel: 1,
             arch: "x86_64".to_string(),
             license_spdx: "MIT".to_string(),

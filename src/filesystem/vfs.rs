@@ -3,7 +3,7 @@
 // Enhanced with standard Linux-conforming Hard Link reference counting
 
 use crate::security::CapabilityToken;
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

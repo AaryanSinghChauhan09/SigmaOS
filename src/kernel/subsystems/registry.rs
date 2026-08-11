@@ -20,9 +20,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Kernel Subsystem Registry
 /// Inspired by Linux initcall mechanism — provides ordered, dependency-aware subsystem boot
 /// OOP-based: every kernel module implements the KernelSubsystem trait
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 /// Initialization priority — mirrors Linux initcall levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -121,7 +121,7 @@ pub trait KernelSubsystem: Send + Sync {
 /// Implements dependency-ordered initialization similar to Linux initcall_t
 pub struct SubsystemRegistry {
     subsystems: Vec<Box<dyn KernelSubsystem>>,
-    states: HashMap<String, SubsystemState>,
+    states: BTreeMap<String, SubsystemState>,
     init_count: AtomicUsize,
 }
 
@@ -130,7 +130,7 @@ impl SubsystemRegistry {
     pub fn new() -> Self {
         SubsystemRegistry {
             subsystems: Vec::new(),
-            states: HashMap::new(),
+            states: BTreeMap::new(),
             init_count: AtomicUsize::new(0),
         }
     }

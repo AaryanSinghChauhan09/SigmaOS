@@ -2,7 +2,7 @@
 // Absorbs and implements cutting-edge concepts, tools, and designs from industry-standard apps:
 // IrfanView, PotPlayer, VLC, Flameshot, ShareX, OBS Studio, Everything, 7-Zip, OneCommander, Brave, EarTrumpet, Audacity, Notepad++.
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeMap, VecDeque};
 use std::path::{Path, PathBuf};
 
 // =========================================================================
@@ -87,7 +87,7 @@ pub struct Subtitle {
 
 pub struct PotPlayerVlcEngine {
     pub playback_speed: f32, // 0.25x to 4.0x
-    pub equalizer_presets: HashMap<String, Vec<f32>>, // Frequency gain settings
+    pub equalizer_presets: BTreeMap<String, Vec<f32>>, // Frequency gain settings
     pub subtitle_delay_ms: i32,
     pub subtitles: Vec<Subtitle>,
     pub playlist: Vec<PathBuf>,
@@ -95,7 +95,7 @@ pub struct PotPlayerVlcEngine {
 
 impl PotPlayerVlcEngine {
     pub fn new() -> Self {
-        let mut eq = HashMap::new();
+        let mut eq = BTreeMap::new();
         eq.insert("BassBoost".to_string(), vec![6.0, 4.0, 2.0, 0.0, 0.0, 0.0]);
         eq.insert("VocalClear".to_string(), vec![0.0, 0.0, 2.0, 4.0, 4.0, 2.0]);
 
@@ -134,13 +134,13 @@ pub struct IndexedFile {
 }
 
 pub struct EverythingSearchEngine {
-    pub index: HashMap<String, Vec<IndexedFile>>, // Index by name for instantaneous lookup
+    pub index: BTreeMap<String, Vec<IndexedFile>>, // Index by name for instantaneous lookup
 }
 
 impl EverythingSearchEngine {
     pub fn new() -> Self {
         Self {
-            index: HashMap::new(),
+            index: BTreeMap::new(),
         }
     }
 
@@ -332,7 +332,7 @@ impl AudacityEditor {
 
 pub struct NotepadPlusWorkspace {
     pub tabs: Vec<(String, String)>, // (File name, content)
-    pub macros: HashMap<String, Vec<String>>, // Recorded keyboard macro sequences
+    pub macros: BTreeMap<String, Vec<String>>, // Recorded keyboard macro sequences
     pub active_tab_index: usize,
 }
 
@@ -340,7 +340,7 @@ impl NotepadPlusWorkspace {
     pub fn new() -> Self {
         Self {
             tabs: vec![("untitled.txt".to_string(), "".to_string())],
-            macros: HashMap::new(),
+            macros: BTreeMap::new(),
             active_tab_index: 0,
         }
     }
@@ -370,7 +370,7 @@ pub struct OneCommanderPane {
 pub struct OneCommanderDualPane {
     pub left_pane: OneCommanderPane,
     pub right_pane: OneCommanderPane,
-    pub tags_colors: HashMap<PathBuf, String>, // Color-coded system file tagging
+    pub tags_colors: BTreeMap<PathBuf, String>, // Color-coded system file tagging
 }
 
 impl OneCommanderDualPane {
@@ -378,7 +378,7 @@ impl OneCommanderDualPane {
         Self {
             left_pane: OneCommanderPane { current_directory: PathBuf::from("/"), selected_files: Vec::new() },
             right_pane: OneCommanderPane { current_directory: PathBuf::from("/home"), selected_files: Vec::new() },
-            tags_colors: HashMap::new(),
+            tags_colors: BTreeMap::new(),
         }
     }
 

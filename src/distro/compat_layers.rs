@@ -17,10 +17,10 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 #[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Represents Windows Registry Value Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -42,7 +42,7 @@ pub struct RegistryValue {
 #[derive(Debug, Clone)]
 pub struct WindowsRegistry {
     pub hive_name: String,
-    pub database: HashMap<String, HashMap<String, RegistryValue>>, // Key path -> (Value Name -> RegistryValue)
+    pub database: BTreeMap<String, BTreeMap<String, RegistryValue>>, // Key path -> (Value Name -> RegistryValue)
     pub transaction_log: Vec<String>,
 }
 
@@ -50,7 +50,7 @@ impl WindowsRegistry {
     pub fn new(hive_name: &str) -> Self {
         Self {
             hive_name: hive_name.to_string(),
-            database: HashMap::new(),
+            database: BTreeMap::new(),
             transaction_log: Vec::new(),
         }
     }
@@ -68,7 +68,7 @@ impl WindowsRegistry {
         let values = self
             .database
             .entry(key_str.clone())
-            .or_insert_with(HashMap::new);
+            .or_insert_with(BTreeMap::new);
         values.insert(
             val_str.clone(),
             RegistryValue {
@@ -101,7 +101,7 @@ pub enum GdiObjectType {
 /// Simulates a Win32 Device Context (DC) and object binding (GDI compatibility layer)
 #[derive(Debug, Clone)]
 pub struct Win32Gdi {
-    pub active_objects: HashMap<GdiObjectType, u32>, // type -> handle ID
+    pub active_objects: BTreeMap<GdiObjectType, u32>, // type -> handle ID
     pub current_color: u32,
     pub commands_executed: Vec<String>,
 }
@@ -110,7 +110,7 @@ impl Win32Gdi {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            active_objects: HashMap::new(),
+            active_objects: BTreeMap::new(),
             current_color: 0x00000000,
             commands_executed: Vec::new(),
         }
@@ -146,7 +146,7 @@ impl Default for Win32Gdi {
 #[derive(Debug, Clone)]
 pub struct DllModule {
     pub name: String,
-    pub exported_symbols: HashMap<String, u64>, // Symbol Name -> virtual address offset
+    pub exported_symbols: BTreeMap<String, u64>, // Symbol Name -> virtual address offset
     pub is_loaded: bool,
     pub dll_main_called: bool,
 }
@@ -155,7 +155,7 @@ impl DllModule {
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
-            exported_symbols: HashMap::new(),
+            exported_symbols: BTreeMap::new(),
             is_loaded: false,
             dll_main_called: false,
         }
@@ -169,14 +169,14 @@ impl DllModule {
 /// Dynamic Link Library (DLL) loader (Windows ABI compatibility)
 #[derive(Debug, Clone)]
 pub struct DllLoader {
-    pub loaded_dlls: HashMap<String, DllModule>,
+    pub loaded_dlls: BTreeMap<String, DllModule>,
 }
 
 impl DllLoader {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            loaded_dlls: HashMap::new(),
+            loaded_dlls: BTreeMap::new(),
         }
     }
 

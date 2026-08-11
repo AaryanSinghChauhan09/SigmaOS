@@ -20,7 +20,7 @@
 /// CPUfreq governors, thermal throttling, suspend/resume lifecycle
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 // ── CPUfreq ───────────────────────────────────────────────────────────────
 

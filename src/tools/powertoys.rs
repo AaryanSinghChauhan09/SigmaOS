@@ -6,7 +6,7 @@
 //! - FileLocksmith (Tracks active process IDs holding file descriptor locks)
 //! - HostsEditor (IP lookup hosts custom DNS routing rule editor)
 
-use crate::klib::{Vec, HashMap};
+use crate::klib::{Vec, BTreeMap};
 
 pub struct ColorPicker;
 
@@ -192,12 +192,12 @@ impl FileLocksmith {
 }
 
 pub struct HostsEditor {
-    pub routes: HashMap<[u8; 32], [u8; 4]>, // maps Domain -> IPv4
+    pub routes: BTreeMap<[u8; 32], [u8; 4]>, // maps Domain -> IPv4
 }
 
 impl HostsEditor {
     pub fn new() -> Self {
-        Self { routes: HashMap::new() }
+        Self { routes: BTreeMap::new() }
     }
 
     pub fn add_route(&mut self, domain: &[u8], ip: [u8; 4]) {

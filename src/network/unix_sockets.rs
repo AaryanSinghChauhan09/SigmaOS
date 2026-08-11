@@ -1,7 +1,7 @@
 // UNIX Domain Sockets (AF_UNIX / PF_LOCAL IPC)
 // Native path-based and abstract inter-process socket communication inspired by Linux and BSD.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UnixSocketState {
@@ -76,13 +76,13 @@ impl UnixSocketConn {
 }
 
 pub struct UnixSocketRegistry {
-    pub sockets: HashMap<UnixSocketAddress, UnixSocketConn>,
+    pub sockets: BTreeMap<UnixSocketAddress, UnixSocketConn>,
 }
 
 impl UnixSocketRegistry {
     pub fn new() -> Self {
         Self {
-            sockets: HashMap::new(),
+            sockets: BTreeMap::new(),
         }
     }
 

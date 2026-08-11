@@ -2,7 +2,7 @@
 // Exposes robust, memory-safe Rust alternatives to BusyBox, systemd, syslog, cron, sudo/doas, and man pages.
 // Aligns perfectly with the core Sovereign replacement table.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 /// Log Level for sigma-log
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -54,13 +54,13 @@ pub struct CronJob {
 }
 
 pub struct SovereignCronScheduler {
-    pub jobs: HashMap<String, CronJob>,
+    pub jobs: BTreeMap<String, CronJob>,
 }
 
 impl SovereignCronScheduler {
     pub fn new() -> Self {
         Self {
-            jobs: HashMap::new(),
+            jobs: BTreeMap::new(),
         }
     }
 
@@ -99,13 +99,13 @@ impl Default for SovereignCronScheduler {
 /// 3. `sigma-priv` (Capability-Based Privilege Escalation Engine)
 /// Fully replaces legacy insecure Root escalation (sudo/doas) with highly granular capability checking.
 pub struct SovereignPrivilegeEngine {
-    pub authorized_tokens: HashMap<String, HashSet<String>>, // maps user to a list of allowed capabilities (e.g. "REBOOT", "NETWORK_BIND")
+    pub authorized_tokens: BTreeMap<String, HashSet<String>>, // maps user to a list of allowed capabilities (e.g. "REBOOT", "NETWORK_BIND")
 }
 
 impl SovereignPrivilegeEngine {
     pub fn new() -> Self {
         Self {
-            authorized_tokens: HashMap::new(),
+            authorized_tokens: BTreeMap::new(),
         }
     }
 
@@ -135,12 +135,12 @@ impl Default for SovereignPrivilegeEngine {
 /// 4. `sigma-doc` (Offline Documentation & Quick Guides Explorer)
 /// Replaces standard man pages and tldr/tealdeer with lightweight, offline guides.
 pub struct SovereignDocBrowser {
-    pub doc_pages: HashMap<String, String>,
+    pub doc_pages: BTreeMap<String, String>,
 }
 
 impl SovereignDocBrowser {
     pub fn new() -> Self {
-        let mut pages = HashMap::new();
+        let mut pages = BTreeMap::new();
         pages.insert(
             "sigma-sh".to_string(),
             "sigma-sh: Sovereign shell replacement for BusyBox/Fish.\nUsage: sigma-sh [options] [script]".to_string(),
@@ -169,13 +169,13 @@ impl Default for SovereignDocBrowser {
 /// 5. `sigma-core-utils` (Coreutils & BusyBox Replacement)
 /// Replaces GNU Coreutils with extremely clean, memory-safe Rust commands.
 pub struct SovereignCoreUtils {
-    pub virtual_filesystem: HashMap<String, String>, // path to simulated content
+    pub virtual_filesystem: BTreeMap<String, String>, // path to simulated content
 }
 
 impl SovereignCoreUtils {
     pub fn new() -> Self {
         Self {
-            virtual_filesystem: HashMap::new(),
+            virtual_filesystem: BTreeMap::new(),
         }
     }
 
@@ -207,7 +207,7 @@ impl Default for SovereignCoreUtils {
 pub struct SovereignShell {
     pub active_user: String,
     pub current_directory: String,
-    pub aliases: HashMap<String, String>,
+    pub aliases: BTreeMap<String, String>,
 }
 
 impl SovereignShell {
@@ -215,7 +215,7 @@ impl SovereignShell {
         Self {
             active_user: user.to_string(),
             current_directory: format!("/home/{}", user),
-            aliases: HashMap::new(),
+            aliases: BTreeMap::new(),
         }
     }
 

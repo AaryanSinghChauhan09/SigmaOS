@@ -3,7 +3,7 @@
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{Vec, String, HashMap};
+use crate::klib::{Vec, String, BTreeMap};
 use crate::klib::string::ToString;
 
 #[cfg(feature = "standalone_test")]
@@ -13,17 +13,17 @@ extern crate std;
 use alloc::{vec::Vec, string::{String, ToString}};
 
 #[cfg(feature = "standalone_test")]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Arch Linux inspired AUR-style user repos and minimal base
 pub struct ArchUserRepoManager {
-    packages: HashMap<String, String>,
+    packages: BTreeMap<String, String>,
 }
 
 impl ArchUserRepoManager {
     pub fn new() -> Self {
         Self {
-            packages: HashMap::new(),
+            packages: BTreeMap::new(),
         }
     }
     
@@ -184,13 +184,13 @@ pub struct BinderNode {
 
 /// Android Binder-parity secure inter-process communication with object translation
 pub struct AndroidBinderIpc {
-    pub registered_nodes: HashMap<u32, BinderNode>,
+    pub registered_nodes: BTreeMap<u32, BinderNode>,
 }
 
 impl AndroidBinderIpc {
     pub fn new() -> Self {
         Self {
-            registered_nodes: HashMap::new(),
+            registered_nodes: BTreeMap::new(),
         }
     }
 
@@ -510,13 +510,13 @@ pub struct RumpComponent {
 
 /// NetBSD rump kernels virtualizing driver and filesystem components
 pub struct NetBsdRumpKernel {
-    pub components: HashMap<String, RumpComponent>,
+    pub components: BTreeMap<String, RumpComponent>,
 }
 
 impl NetBsdRumpKernel {
     pub fn new() -> Self {
         Self {
-            components: HashMap::new(),
+            components: BTreeMap::new(),
         }
     }
 
@@ -548,15 +548,15 @@ pub struct KernelModule {
 
 /// Linux-style dynamically loadable kernel modules (LKM) with symbol/syscall monitoring
 pub struct DynamicLkmLoader {
-    pub loaded_modules: HashMap<String, KernelModule>,
-    pub sys_call_hooks: HashMap<u32, String>,
+    pub loaded_modules: BTreeMap<String, KernelModule>,
+    pub sys_call_hooks: BTreeMap<u32, String>,
 }
 
 impl DynamicLkmLoader {
     pub fn new() -> Self {
         Self {
-            loaded_modules: HashMap::new(),
-            sys_call_hooks: HashMap::new(),
+            loaded_modules: BTreeMap::new(),
+            sys_call_hooks: BTreeMap::new(),
         }
     }
 
@@ -594,13 +594,13 @@ pub struct KernelCapability {
 
 /// seL4-style capability inheritance with recursive capability pruning
 pub struct CapabilityDerivationTree {
-    pub capabilities: HashMap<u32, KernelCapability>,
+    pub capabilities: BTreeMap<u32, KernelCapability>,
 }
 
 impl CapabilityDerivationTree {
     pub fn new() -> Self {
         Self {
-            capabilities: HashMap::new(),
+            capabilities: BTreeMap::new(),
         }
     }
 
@@ -971,15 +971,15 @@ impl NixOsDeclarativeManager {
 
 /// Gentoo inspired USE flags / compile-time feature selection
 pub struct GentooUseFlags {
-    pub flags: HashMap<String, bool>,
-    pub dependencies: HashMap<String, String>, // (flag -> required companion flag)
+    pub flags: BTreeMap<String, bool>,
+    pub dependencies: BTreeMap<String, String>, // (flag -> required companion flag)
 }
 
 impl GentooUseFlags {
     pub fn new() -> Self {
         Self {
-            flags: HashMap::new(),
-            dependencies: HashMap::new(),
+            flags: BTreeMap::new(),
+            dependencies: BTreeMap::new(),
         }
     }
     

@@ -19,7 +19,7 @@
 // SigmaOS Customization Engine
 // Samsung Modes & Routines-style automation and theming
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Automation trigger type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -139,7 +139,7 @@ impl Routine {
         self.enabled = false;
     }
 
-    pub fn should_trigger(&self, context: &HashMap<String, String>) -> bool {
+    pub fn should_trigger(&self, context: &BTreeMap<String, String>) -> bool {
         if !self.enabled {
             return false;
         }
@@ -158,8 +158,8 @@ impl Routine {
 #[derive(Debug, Clone)]
 pub struct Theme {
     pub name: String,
-    pub colors: HashMap<String, String>,
-    pub fonts: HashMap<String, String>,
+    pub colors: BTreeMap<String, String>,
+    pub fonts: BTreeMap<String, String>,
     pub icon_set: String,
     pub window_decorations: bool,
     pub animations_enabled: bool,
@@ -169,8 +169,8 @@ impl Theme {
     pub fn new(name: String) -> Self {
         Self {
             name,
-            colors: HashMap::new(),
-            fonts: HashMap::new(),
+            colors: BTreeMap::new(),
+            fonts: BTreeMap::new(),
             icon_set: "default".to_string(),
             window_decorations: true,
             animations_enabled: true,
@@ -336,20 +336,20 @@ impl Default for SituationalPersonalizer {
 
 /// Customization engine
 pub struct CustomizationEngine {
-    pub routines: HashMap<String, Routine>,
-    pub themes: HashMap<String, Theme>,
+    pub routines: BTreeMap<String, Routine>,
+    pub themes: BTreeMap<String, Theme>,
     pub active_theme: Option<String>,
-    pub context: HashMap<String, String>,
+    pub context: BTreeMap<String, String>,
 }
 
 impl CustomizationEngine {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut engine = Self {
-            routines: HashMap::new(),
-            themes: HashMap::new(),
+            routines: BTreeMap::new(),
+            themes: BTreeMap::new(),
             active_theme: None,
-            context: HashMap::new(),
+            context: BTreeMap::new(),
         };
 
         engine.add_default_themes();

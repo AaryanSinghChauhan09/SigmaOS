@@ -19,7 +19,7 @@
 // SigmaOS Sharded Personality & Legacy Compatibility Subsystem (SigmaPersonality)
 // Implements sharded kernels, syscall capsules, driver emulators, firmware personas, build capsules, security grids, and peripheral pods.
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 // ==========================================
 // 1. Kernel Personality Sharding (KernelShard)
@@ -61,12 +61,12 @@ pub enum CapsuleVersion {
 #[derive(Debug, Clone)]
 pub struct SyscallCapsule {
     pub version: CapsuleVersion,
-    pub syscall_mappings: HashMap<u32, String>,
+    pub syscall_mappings: BTreeMap<u32, String>,
 }
 
 impl SyscallCapsule {
     pub fn new(version: CapsuleVersion) -> Self {
-        let mut mappings = HashMap::new();
+        let mut mappings = BTreeMap::new();
         match version {
             CapsuleVersion::Capsule2x => {
                 mappings.insert(1, "sys_exit_legacy".to_string());

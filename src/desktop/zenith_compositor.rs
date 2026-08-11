@@ -48,10 +48,10 @@
 use sigma_types::{CapabilityToken, Result};
 
 #[cfg(not(test))]
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 #[cfg(test)]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Window state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -291,9 +291,9 @@ pub struct HandoffVault {
 
 /// Zenith Compositor main structure
 pub struct ZenithCompositor {
-    windows: HashMap<u64, ZenithWindow>,
+    windows: BTreeMap<u64, ZenithWindow>,
     outputs: Vec<Output>,
-    surfaces: HashMap<u64, Surface>,
+    surfaces: BTreeMap<u64, Surface>,
     damage_regions: Vec<DamageRegion>,
     active_window: Option<u64>,
     next_window_id: u64,
@@ -309,9 +309,9 @@ impl ZenithCompositor {
     /// Create a new Zenith compositor
     pub fn new(capability: CapabilityToken) -> Self {
         ZenithCompositor {
-            windows: HashMap::new(),
+            windows: BTreeMap::new(),
             outputs: Vec::new(),
-            surfaces: HashMap::new(),
+            surfaces: BTreeMap::new(),
             damage_regions: Vec::new(),
             active_window: None,
             next_window_id: 1,

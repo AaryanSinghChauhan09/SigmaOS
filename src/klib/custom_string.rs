@@ -17,7 +17,7 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Custom String Type
-// A heap-backed UTF-8 string that does NOT depend on std::string::String or alloc::string::String.
+// A heap-backed UTF-8 string that does NOT depend on alloc::string::String or alloc::string::String.
 // Uses raw pointer management via the global SIGMA_ALLOCATOR.
 
 #[allow(dead_code)]

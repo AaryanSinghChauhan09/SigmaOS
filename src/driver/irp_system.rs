@@ -2,8 +2,8 @@
 // Implements highly-flexible Windows-style IRPs, APCs, DPCs, Buffering Methods,
 // Driver & Device Objects, File System Minifilters, and Kernel Callbacks.
 
-use std::collections::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use alloc::collections::BTreeMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub const IRP_MJ_CREATE: u8 = 0x00;
 pub const IRP_MJ_CLOSE: u8 = 0x02;
@@ -134,7 +134,7 @@ impl Irp {
 pub struct DriverObject {
     pub driver_name: String,
     pub driver_extension: usize,
-    pub dispatch_table: HashMap<u8, fn(device: &DeviceObject, irp: &mut Irp) -> IoStatus>,
+    pub dispatch_table: BTreeMap<u8, fn(device: &DeviceObject, irp: &mut Irp) -> IoStatus>,
 }
 
 pub struct DeviceObject {
@@ -308,13 +308,13 @@ impl IrpManager {
 
 /// Security-centric Rootkit audit and driver integrity verifier
 pub struct RootkitHookDetector {
-    pub verified_drivers: HashMap<String, *const DriverObject>,
+    pub verified_drivers: BTreeMap<String, *const DriverObject>,
 }
 
 impl RootkitHookDetector {
     pub fn new() -> Self {
         Self {
-            verified_drivers: HashMap::new(),
+            verified_drivers: BTreeMap::new(),
         }
     }
 
@@ -373,7 +373,7 @@ mod tests {
     fn test_irp_dispatch_buffered() {
         let mut manager = IrpManager::new();
 
-        let mut dispatch_table = HashMap::new();
+        let mut dispatch_table = BTreeMap::new();
         dispatch_table.insert(
             IRP_MJ_READ,
             (|device: &DeviceObject, irp: &mut Irp| {
@@ -437,7 +437,7 @@ mod tests {
         let driver = DriverObject {
             driver_name: "MockDevice".to_string(),
             driver_extension: 0,
-            dispatch_table: HashMap::new(),
+            dispatch_table: BTreeMap::new(),
         };
 
         let device = DeviceObject {
@@ -456,7 +456,7 @@ mod tests {
     fn test_wdk_call_driver_and_completion_routines() {
         let manager = IrpManager::new();
 
-        let mut dispatch_table = HashMap::new();
+        let mut dispatch_table = BTreeMap::new();
         dispatch_table.insert(
             IRP_MJ_WRITE,
             (|_dev: &DeviceObject, irp: &mut Irp| {
@@ -501,7 +501,7 @@ mod tests {
         let driver = DriverObject {
             driver_name: "TrustedFileDriver".to_string(),
             driver_extension: 0,
-            dispatch_table: HashMap::new(),
+            dispatch_table: BTreeMap::new(),
         };
 
         let device = DeviceObject {
@@ -520,7 +520,7 @@ mod tests {
         let malicious_driver = DriverObject {
             driver_name: "TrustedFileDriver".to_string(),
             driver_extension: 0,
-            dispatch_table: HashMap::new(),
+            dispatch_table: BTreeMap::new(),
         };
 
         let compromised_device = DeviceObject {

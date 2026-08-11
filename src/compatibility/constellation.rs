@@ -19,7 +19,7 @@
 // SigmaOS Constellation & Museum Architecture for Legacy Compatibility (SigmaConstellation)
 // Implements Kernel Constellations, Syscall Chronicles, Driver Museums, Firmware Pavilions, Build Archives, Security Pavilions, and Peripheral Museums.
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 // ==========================================
 // 1. Kernel Personality Constellation (KernelConstellation)
@@ -36,13 +36,13 @@ pub enum ConstellationNode {
 
 #[derive(Debug, Clone)]
 pub struct KernelConstellation {
-    pub active_nodes: HashMap<String, ConstellationNode>, // maps workload to constellation node
+    pub active_nodes: BTreeMap<String, ConstellationNode>, // maps workload to constellation node
 }
 
 impl KernelConstellation {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut active = HashMap::new();
+        let mut active = BTreeMap::new();
         // Default mapping
         active.insert("legacy_bin".to_string(), ConstellationNode::Star2_6);
         active.insert("modern_bin".to_string(), ConstellationNode::Star6_x);
@@ -80,12 +80,12 @@ pub enum ChronicleType {
 #[derive(Debug, Clone)]
 pub struct SyscallChronicle {
     pub chronicle_type: ChronicleType,
-    pub syscall_history: HashMap<u32, Vec<String>>, // maps syscall number to semantic changes per version
+    pub syscall_history: BTreeMap<u32, Vec<String>>, // maps syscall number to semantic changes per version
 }
 
 impl SyscallChronicle {
     pub fn new(chronicle_type: ChronicleType) -> Self {
-        let mut history = HashMap::new();
+        let mut history = BTreeMap::new();
         match chronicle_type {
             ChronicleType::FileChronicle => {
                 history.insert(
@@ -151,13 +151,13 @@ pub enum ExhibitType {
 
 #[derive(Debug, Clone)]
 pub struct DriverMuseum {
-    pub exhibits: HashMap<String, ExhibitType>,
+    pub exhibits: BTreeMap<String, ExhibitType>,
 }
 
 impl DriverMuseum {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut ex = HashMap::new();
+        let mut ex = BTreeMap::new();
         ex.insert("floppy".to_string(), ExhibitType::StorageExhibit);
         ex.insert("isa_sound".to_string(), ExhibitType::GraphicsExhibit);
         Self { exhibits: ex }

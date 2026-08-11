@@ -1,7 +1,7 @@
 // SigmaOS Legacy Driver API Mapper (DriverMapper)
 // Maps legacy driver APIs directly to modern equivalents to bypass heavy emulation overhead
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MapperCategory {
@@ -12,12 +12,12 @@ pub enum MapperCategory {
 
 pub struct DriverMapper {
     pub category: MapperCategory,
-    pub api_translations: HashMap<String, String>,
+    pub api_translations: BTreeMap<String, String>,
 }
 
 impl DriverMapper {
     pub fn new(cat: MapperCategory) -> Self {
-        let mut translations = HashMap::new();
+        let mut translations = BTreeMap::new();
         match cat {
             MapperCategory::Storage => {
                 translations.insert("ide_read_sector".to_string(), "nvme_read_block".to_string());

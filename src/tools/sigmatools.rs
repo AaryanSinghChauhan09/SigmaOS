@@ -5,7 +5,7 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::collections::BTreeMap as HashMap;
+use alloc::collections::BTreeMap as BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use alloc::format;
@@ -635,12 +635,12 @@ pub struct SovereignWordCounter {
 }
 
 impl SovereignWordCounter {
-    pub fn evaluate_text(&mut self, text: &str) -> HashMap<String, usize> {
+    pub fn evaluate_text(&mut self, text: &str) -> BTreeMap<String, usize> {
         self.total_chars = text.len();
         let words: Vec<&str> = text.split_whitespace().collect();
         self.total_words = words.len();
 
-        let mut duplicates = HashMap::new();
+        let mut duplicates = BTreeMap::new();
         for &word in &words {
             let word_string = word.to_string();
             let count = duplicates.entry(word_string).or_insert(0);

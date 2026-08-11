@@ -121,12 +121,12 @@ impl SovereignAccessManager {
 /// 4. Proton PE & Vulkan Gaming Translation Layer
 pub struct ProtonGameTranslator {
     pub vulkan_initialized: bool,
-    pub mapping_table: std::collections::HashMap<String, String>, // Translates Win32 call -> Native syscall
+    pub mapping_table: alloc::collections::BTreeMap<String, String>, // Translates Win32 call -> Native syscall
 }
 
 impl ProtonGameTranslator {
     pub fn new() -> Self {
-        let mut mapping_table = std::collections::HashMap::new();
+        let mut mapping_table = alloc::collections::BTreeMap::new();
         mapping_table.insert("CreateFileW".to_string(), "sigma_open".to_string());
         mapping_table.insert("VirtualAlloc".to_string(), "sigma_mmap".to_string());
         Self {

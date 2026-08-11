@@ -18,7 +18,7 @@
 
 /// SigmaOS NUMA (Non-Uniform Memory Access) Topology manager
 /// Tracks NUMA nodes and handles node-local memory allocation preferences
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 extern crate alloc;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -32,16 +32,16 @@ pub struct NumaNode {
 }
 
 pub struct NumaTopologyManager {
-    nodes: HashMap<u32, NumaNode>,
-    cpu_to_node: HashMap<u32, u32>,
+    nodes: BTreeMap<u32, NumaNode>,
+    cpu_to_node: BTreeMap<u32, u32>,
 }
 
 impl NumaTopologyManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         NumaTopologyManager {
-            nodes: HashMap::new(),
-            cpu_to_node: HashMap::new(),
+            nodes: BTreeMap::new(),
+            cpu_to_node: BTreeMap::new(),
         }
     }
 

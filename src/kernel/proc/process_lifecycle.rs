@@ -3,23 +3,23 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use core::time::Duration;
 /// SigmaOS Advanced Process Lifecycle Management
 /// Absorbs Linux fork/exec/exit/waitpid and Copy-on-Write semantics
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 pub struct ProcessLifecycleManager {
-    processes: HashMap<u64, Process>,
-    parent_map: HashMap<u64, u64>, // child -> parent
-    exit_codes: HashMap<u64, i32>,
+    processes: BTreeMap<u64, Process>,
+    parent_map: BTreeMap<u64, u64>, // child -> parent
+    exit_codes: BTreeMap<u64, i32>,
     next_pid: AtomicUsize,
 }
 
 impl ProcessLifecycleManager {
     pub fn new() -> Self {
         ProcessLifecycleManager {
-            processes: HashMap::new(),
-            parent_map: HashMap::new(),
-            exit_codes: HashMap::new(),
+            processes: BTreeMap::new(),
+            parent_map: BTreeMap::new(),
+            exit_codes: BTreeMap::new(),
             next_pid: AtomicUsize::new(100),
         }
     }

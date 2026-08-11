@@ -16,7 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Represents a compiled target architecture.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -40,7 +40,7 @@ pub struct DevTool {
 pub struct DeveloperToolkit {
     pub sdk_name: String,
     pub version: String,
-    pub tools: HashMap<String, DevTool>,
+    pub tools: BTreeMap<String, DevTool>,
 }
 
 impl DeveloperToolkit {
@@ -48,7 +48,7 @@ impl DeveloperToolkit {
         Self {
             sdk_name: sdk_name.to_string(),
             version: version.to_string(),
-            tools: HashMap::new(),
+            tools: BTreeMap::new(),
         }
     }
 
@@ -142,7 +142,7 @@ impl PackageBuildService {
 #[derive(Debug, Clone)]
 pub struct CrossBuildPipeline {
     pub pipeline_id: String,
-    pub target_sysroots: HashMap<TargetArch, String>,
+    pub target_sysroots: BTreeMap<TargetArch, String>,
     pub default_target: TargetArch,
 }
 
@@ -150,7 +150,7 @@ impl CrossBuildPipeline {
     pub fn new(pipeline_id: &str, default_target: TargetArch) -> Self {
         Self {
             pipeline_id: pipeline_id.to_string(),
-            target_sysroots: HashMap::new(),
+            target_sysroots: BTreeMap::new(),
             default_target,
         }
     }

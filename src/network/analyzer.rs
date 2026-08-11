@@ -19,7 +19,7 @@
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::time::{Duration, Instant};
 
@@ -201,13 +201,13 @@ impl NixDeclarativeFilter {
 #[derive(Debug, Clone)]
 pub struct KaliPacketFingerprinter {
     // Maps IP address to detected OS
-    fingerprints: HashMap<IpAddr, String>,
+    fingerprints: BTreeMap<IpAddr, String>,
 }
 
 impl KaliPacketFingerprinter {
     pub fn new() -> Self {
         Self {
-            fingerprints: HashMap::new(),
+            fingerprints: BTreeMap::new(),
         }
     }
 
@@ -250,14 +250,14 @@ impl KaliPacketFingerprinter {
 #[derive(Debug, Clone)]
 pub struct KaliSnoopAnalysis {
     fingerprinter: KaliPacketFingerprinter,
-    scan_history: HashMap<IpAddr, Vec<u16>>, // track ports visited by source IP
+    scan_history: BTreeMap<IpAddr, Vec<u16>>, // track ports visited by source IP
 }
 
 impl KaliSnoopAnalysis {
     pub fn new() -> Self {
         Self {
             fingerprinter: KaliPacketFingerprinter::new(),
-            scan_history: HashMap::new(),
+            scan_history: BTreeMap::new(),
         }
     }
 
@@ -382,14 +382,14 @@ impl GentooUseFlagsDissector {
 pub struct ClearLinuxFlowLoadBalancer {
     core_count: usize,
     // Tracks processed flow mapping (Flow hash -> designated virtual CPU Core ID)
-    flow_affinity: HashMap<u64, usize>,
+    flow_affinity: BTreeMap<u64, usize>,
 }
 
 impl ClearLinuxFlowLoadBalancer {
     pub fn new(core_count: usize) -> Self {
         Self {
             core_count: core_count.max(1),
-            flow_affinity: HashMap::new(),
+            flow_affinity: BTreeMap::new(),
         }
     }
 

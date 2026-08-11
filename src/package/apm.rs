@@ -1,7 +1,7 @@
 // Sovereign APM (Agent Package Manager)
 // Core native package manager for isolated, reproducible sovereign application deployments.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -55,18 +55,18 @@ impl SovereignApp {
 }
 
 pub struct SovereignApm {
-    pub registry: HashMap<String, SovereignApp>,
-    pub installed: HashMap<String, SovereignApp>,
-    pub active_containers: HashMap<String, IsolationLevel>,
+    pub registry: BTreeMap<String, SovereignApp>,
+    pub installed: BTreeMap<String, SovereignApp>,
+    pub active_containers: BTreeMap<String, IsolationLevel>,
     pub authority_key: [u8; 32], // Secure root verification key
 }
 
 impl SovereignApm {
     pub fn new(authority_key: [u8; 32]) -> Self {
         Self {
-            registry: HashMap::new(),
-            installed: HashMap::new(),
-            active_containers: HashMap::new(),
+            registry: BTreeMap::new(),
+            installed: BTreeMap::new(),
+            active_containers: BTreeMap::new(),
             authority_key,
         }
     }

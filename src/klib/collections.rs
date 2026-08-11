@@ -5,15 +5,15 @@
 
 use core::cell::Cell;
 
-/// Simple HashMap implementation for klib
+/// Simple BTreeMap implementation for klib
 /// This is a basic implementation to reduce std dependency
-pub struct HashMap<K, V> {
-    // Placeholder for actual HashMap implementation
+pub struct BTreeMap<K, V> {
+    // Placeholder for actual BTreeMap implementation
     // For now, this is a minimal stub
     _phantom: core::marker::PhantomData<(K, V)>,
 }
 
-impl<K, V> HashMap<K, V> {
+impl<K, V> BTreeMap<K, V> {
     pub fn new() -> Self {
         Self {
             _phantom: core::marker::PhantomData,
@@ -50,7 +50,7 @@ impl<K, V> HashMap<K, V> {
     }
 }
 
-impl<K, V> Default for HashMap<K, V> {
+impl<K, V> Default for BTreeMap<K, V> {
     fn default() -> Self {
         Self::new()
     }
@@ -256,7 +256,7 @@ mod tests {
 
     #[test]
     fn test_hashmap_basic() {
-        let mut map = HashMap::<u32, u32>::new();
+        let mut map = BTreeMap::<u32, u32>::new();
         assert!(map.is_empty());
         assert_eq!(map.len(), 0);
     }

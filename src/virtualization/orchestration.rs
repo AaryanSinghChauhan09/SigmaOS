@@ -2,7 +2,7 @@
 // KVM/QEMU, Docker, and Kubernetes orchestration preconfigured
 // Enhanced with Linux (KVM) and FreeBSD (bhyve) inspired VFIO passthrough and VirtIO memory ballooning.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Virtualization technology
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -60,7 +60,7 @@ pub struct VirtualMachine {
     pub memory_mb: u32,
     pub disk_gb: u32,
     pub state: VmState,
-    pub network_config: HashMap<String, String>,
+    pub network_config: BTreeMap<String, String>,
     pub storage_paths: Vec<String>,
     // Newly added KVM/bhyve components
     pub vfio_devices: Vec<VfioDevice>,
@@ -77,7 +77,7 @@ impl VirtualMachine {
             memory_mb: 2048,
             disk_gb: 20,
             state: VmState::Stopped,
-            network_config: HashMap::new(),
+            network_config: BTreeMap::new(),
             storage_paths: Vec::new(),
             vfio_devices: Vec::new(),
             balloon: MemoryBalloon { current_balloon_mb: 0, target_balloon_mb: 0 },
@@ -168,8 +168,8 @@ pub struct Container {
     pub image: String,
     pub runtime: VirtualizationTech,
     pub state: VmState,
-    pub environment: HashMap<String, String>,
-    pub ports: HashMap<String, u16>,
+    pub environment: BTreeMap<String, String>,
+    pub ports: BTreeMap<String, u16>,
     pub volumes: Vec<String>,
 }
 
@@ -181,8 +181,8 @@ impl Container {
             image,
             runtime,
             state: VmState::Stopped,
-            environment: HashMap::new(),
-            ports: HashMap::new(),
+            environment: BTreeMap::new(),
+            ports: BTreeMap::new(),
             volumes: Vec::new(),
         }
     }
@@ -362,9 +362,9 @@ impl VirtualizationStrategy for ModernVirtualizationStrategy {
 
 /// Virtualization orchestrator
 pub struct VirtualizationOrchestrator {
-    pub virtual_machines: HashMap<String, VirtualMachine>,
-    pub containers: HashMap<String, Container>,
-    pub kubernetes_pods: HashMap<String, KubernetesPod>,
+    pub virtual_machines: BTreeMap<String, VirtualMachine>,
+    pub containers: BTreeMap<String, Container>,
+    pub kubernetes_pods: BTreeMap<String, KubernetesPod>,
     pub enabled_technologies: Vec<VirtualizationTech>,
     pub resource_pool: ResourcePool,
     // Newly added KVM/bhyve control parameters
@@ -437,9 +437,9 @@ impl ResourcePool {
 impl VirtualizationOrchestrator {
     pub fn new() -> Self {
         let mut orchestrator = Self {
-            virtual_machines: HashMap::new(),
-            containers: HashMap::new(),
-            kubernetes_pods: HashMap::new(),
+            virtual_machines: BTreeMap::new(),
+            containers: BTreeMap::new(),
+            kubernetes_pods: BTreeMap::new(),
             enabled_technologies: vec![
                 VirtualizationTech::KVM,
                 VirtualizationTech::QEMU,

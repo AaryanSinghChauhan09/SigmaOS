@@ -19,7 +19,7 @@
 // SigmaOS System Cleanup Utility
 // Smart temporary file remover with OOP-based design
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// OOP trait for cleanup strategies

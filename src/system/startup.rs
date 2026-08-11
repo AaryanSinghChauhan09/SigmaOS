@@ -20,10 +20,10 @@
 // OOP-based startup process optimization with dependency analysis
 
 #[cfg(not(test))]
-use crate::klib::{HashMap, Duration, Instant};
+use crate::klib::{BTreeMap, Duration, Instant};
 
 #[cfg(test)]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 #[cfg(test)]
 use std::time::{Duration, Instant};
 

@@ -13,7 +13,7 @@
 //! - **Zero-Dependency**: No external libraries, pure Rust implementation
 
 use sigma_types::{CapabilityToken, Result};
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::sync::Arc;
 
 /// Document type enumeration
@@ -241,8 +241,8 @@ impl TextProcessor {
 /// Spreadsheet processor
 pub struct SpreadsheetProcessor {
     document: SigmaDocument,
-    cells: HashMap<(u32, u32), CellValue>,
-    formulas: HashMap<(u32, u32), String>,
+    cells: BTreeMap<(u32, u32), CellValue>,
+    formulas: BTreeMap<(u32, u32), String>,
 }
 
 impl SpreadsheetProcessor {
@@ -250,8 +250,8 @@ impl SpreadsheetProcessor {
     pub fn new(title: String, capability: CapabilityToken) -> Self {
         SpreadsheetProcessor {
             document: SigmaDocument::new(DocumentType::Spreadsheet, title, capability),
-            cells: HashMap::new(),
-            formulas: HashMap::new(),
+            cells: BTreeMap::new(),
+            formulas: BTreeMap::new(),
         }
     }
 
@@ -390,14 +390,14 @@ impl PresentationProcessor {
 
 /// Native typography renderer for Zenith compositor
 pub struct TypographyRenderer {
-    font_cache: HashMap<String, Vec<u8>>,
+    font_cache: BTreeMap<String, Vec<u8>>,
 }
 
 impl TypographyRenderer {
     /// Create new typography renderer
     pub fn new() -> Self {
         TypographyRenderer {
-            font_cache: HashMap::new(),
+            font_cache: BTreeMap::new(),
         }
     }
 
@@ -501,13 +501,13 @@ impl SigmaOffice {
 
 /// Microsoft-style Collaborative Co-authoring Session & Real-time Paragraph Locks
 pub struct LiveCoAuthoringManager {
-    pub locked_ranges: HashMap<String, String>, // resource_key -> active_username
+    pub locked_ranges: BTreeMap<String, String>, // resource_key -> active_username
 }
 
 impl LiveCoAuthoringManager {
     pub fn new() -> Self {
         Self {
-            locked_ranges: HashMap::new(),
+            locked_ranges: BTreeMap::new(),
         }
     }
 
@@ -538,13 +538,13 @@ impl Default for LiveCoAuthoringManager {
 
 /// Apache/LibreOffice-style Extensible Macro Interpreter
 pub struct MacroExecutor {
-    pub registered_macros: HashMap<String, String>, // macro_name -> raw_script
+    pub registered_macros: BTreeMap<String, String>, // macro_name -> raw_script
 }
 
 impl MacroExecutor {
     pub fn new() -> Self {
         Self {
-            registered_macros: HashMap::new(),
+            registered_macros: BTreeMap::new(),
         }
     }
 

@@ -1,8 +1,8 @@
 // SigmaOS Standard CLI Utilities & Diagnostic Tools (Linux/BSD/Windows Parity)
 // Implements top/htop, ifconfig/ip, and ping equivalents inside the microkernel ecosystem.
 
-use std::collections::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use alloc::collections::BTreeMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. TOP / HTOP (System Resource & Process Task Monitor)
@@ -62,13 +62,13 @@ pub struct NetworkInterface {
 }
 
 pub struct IfconfigCommand {
-    pub interfaces: HashMap<String, NetworkInterface>,
+    pub interfaces: BTreeMap<String, NetworkInterface>,
 }
 
 impl IfconfigCommand {
     pub fn new() -> Self {
         let mut ic = Self {
-            interfaces: HashMap::new(),
+            interfaces: BTreeMap::new(),
         };
         // Seed default loopback interface
         ic.set_interface("lo0", "127.0.0.1", "00:00:00:00:00:00", 16384, true);

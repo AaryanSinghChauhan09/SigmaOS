@@ -12,4 +12,4 @@ pub mod pledge;
 pub mod secrets;
 pub mod securelevels;
 pub mod unveil;
-pub mod vulnerability;
+pub mod vulnerability;pub mod bsd_pledge;

@@ -2,7 +2,7 @@
 // OOP-based container management with Docker and Podman support
 // Incorporating FreeBSD Jails (jail networking & IPC sandboxing) and Podman (rootless user namespaces) compatibility
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::path::PathBuf;
 
 /// FreeBSD Jail-inspired security & network sandboxing configuration
@@ -35,7 +35,7 @@ pub struct ContainerConfig {
     pub name: String,
     pub image: String,
     pub command: Option<String>,
-    pub env_vars: HashMap<String, String>,
+    pub env_vars: BTreeMap<String, String>,
     pub ports: Vec<PortMapping>,
     pub volumes: Vec<VolumeMapping>,
     pub network_mode: NetworkMode,
@@ -161,15 +161,15 @@ pub trait ContainerRuntime {
 
 /// Docker runtime
 pub struct DockerRuntime {
-    containers: HashMap<String, ContainerConfig>,
-    container_states: HashMap<String, ContainerState>,
+    containers: BTreeMap<String, ContainerConfig>,
+    container_states: BTreeMap<String, ContainerState>,
 }
 
 impl DockerRuntime {
     pub fn new() -> Self {
         Self {
-            containers: HashMap::new(),
-            container_states: HashMap::new(),
+            containers: BTreeMap::new(),
+            container_states: BTreeMap::new(),
         }
     }
 }
@@ -324,15 +324,15 @@ impl ContainerRuntime for DockerRuntime {
 
 /// Podman runtime
 pub struct PodmanRuntime {
-    containers: HashMap<String, ContainerConfig>,
-    container_states: HashMap<String, ContainerState>,
+    containers: BTreeMap<String, ContainerConfig>,
+    container_states: BTreeMap<String, ContainerState>,
 }
 
 impl PodmanRuntime {
     pub fn new() -> Self {
         Self {
-            containers: HashMap::new(),
-            container_states: HashMap::new(),
+            containers: BTreeMap::new(),
+            container_states: BTreeMap::new(),
         }
     }
 }
@@ -654,7 +654,7 @@ mod tests {
             name: "Test Container".to_string(),
             image: "nginx:latest".to_string(),
             command: None,
-            env_vars: HashMap::new(),
+            env_vars: BTreeMap::new(),
             ports: Vec::new(),
             volumes: Vec::new(),
             network_mode: NetworkMode::Bridge,
@@ -695,7 +695,7 @@ mod tests {
             name: "Test Container".to_string(),
             image: "nginx:latest".to_string(),
             command: None,
-            env_vars: HashMap::new(),
+            env_vars: BTreeMap::new(),
             ports: Vec::new(),
             volumes: Vec::new(),
             network_mode: NetworkMode::Bridge,
@@ -719,7 +719,7 @@ mod tests {
             name: "Test Container".to_string(),
             image: "nginx:latest".to_string(),
             command: None,
-            env_vars: HashMap::new(),
+            env_vars: BTreeMap::new(),
             ports: Vec::new(),
             volumes: Vec::new(),
             network_mode: NetworkMode::Bridge,
@@ -745,7 +745,7 @@ mod tests {
             name: "Audit Container".to_string(),
             image: "redis:alpine".to_string(),
             command: None,
-            env_vars: HashMap::new(),
+            env_vars: BTreeMap::new(),
             ports: Vec::new(),
             volumes: Vec::new(),
             network_mode: NetworkMode::Bridge,
@@ -794,7 +794,7 @@ mod tests {
             name: "FreeBSD-Jail-Container".to_string(),
             image: "alpine:latest".to_string(),
             command: None,
-            env_vars: HashMap::new(),
+            env_vars: BTreeMap::new(),
             ports: Vec::new(),
             volumes: Vec::new(),
             network_mode: NetworkMode::Bridge,

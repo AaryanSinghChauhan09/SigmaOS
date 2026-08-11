@@ -18,7 +18,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TestResult {
@@ -75,7 +75,7 @@ pub struct HardwareCertificate {
     pub certificate_id: String,
     pub vendor: String,
     pub model: String,
-    pub components_status: HashMap<ComponentType, CertificationStatus>,
+    pub components_status: BTreeMap<ComponentType, CertificationStatus>,
     pub overall_status: CertificationStatus,
 }
 
@@ -102,7 +102,7 @@ impl HardwareCertificationProgram {
         model: &str,
         components: &[(ComponentType, bool, u32)], // (type, is_functional, speed_or_score)
     ) -> HardwareCertificate {
-        let mut components_status = HashMap::new();
+        let mut components_status = BTreeMap::new();
         let mut overall_certified = true;
         let mut warning_present = false;
 

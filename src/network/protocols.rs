@@ -268,7 +268,7 @@ pub struct SshDaemon {
     pub config: SshdConfig,
     pub active_sessions: usize,
     pub max_sessions: usize,
-    pub failed_attempts: crate::klib::HashMap<String, u32>, // IP -> Count
+    pub failed_attempts: crate::klib::BTreeMap<String, u32>, // IP -> Count
     pub blocklisted_ips: Vec<String>,
 }
 
@@ -278,7 +278,7 @@ impl SshDaemon {
             config,
             active_sessions: 0,
             max_sessions,
-            failed_attempts: crate::klib::HashMap::new(),
+            failed_attempts: crate::klib::BTreeMap::new(),
             blocklisted_ips: Vec::new(),
         }
     }

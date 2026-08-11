@@ -8,7 +8,7 @@ use alloc::vec::Vec;
 #[cfg(not(test))]
 use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 #[cfg(test)]
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 // ==========================================
 // 1. BORE (Burst-Oriented Response Enhancer)

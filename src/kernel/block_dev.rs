@@ -31,13 +31,13 @@ use std::collections::{BTreeMap, VecDeque};
 use crate::klib::SigmaString as String;
 
 #[cfg(test)]
-use std::string::String;
+use alloc::string::String;
 
 #[cfg(not(test))]
 use crate::klib::Vec;
 
 #[cfg(test)]
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 pub const SECTOR_SIZE: usize = 512;
 pub const BLOCK_SIZE: usize = 4096; // 4K blocks
@@ -264,7 +264,7 @@ impl BlockDevice for RamDisk {
 // ── Block device manager ──────────────────────────────────────────────────
 
 pub struct BlockDeviceManager {
-    devices: std::collections::HashMap<String, Box<dyn BlockDevice>>,
+    devices: alloc::collections::BTreeMap<String, Box<dyn BlockDevice>>,
     scheduler: DeadlineScheduler,
     bio_counter: AtomicU64,
 }
@@ -273,7 +273,7 @@ impl BlockDeviceManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         BlockDeviceManager {
-            devices: std::collections::HashMap::new(),
+            devices: alloc::collections::BTreeMap::new(),
             scheduler: DeadlineScheduler::new(),
             bio_counter: AtomicU64::new(0),
         }

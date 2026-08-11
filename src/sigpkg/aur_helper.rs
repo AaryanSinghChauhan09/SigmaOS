@@ -13,7 +13,7 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
-use crate::klib::{HashMap, Vec, String, ToString};
+use crate::klib::{BTreeMap, Vec, String, ToString};
 
 /// AUR package metadata
 #[derive(Debug, Clone, PartialEq)]
@@ -32,13 +32,13 @@ impl Eq for AurPackage {}
 
 /// AUR metadata parser
 pub struct AurParser {
-    cache: HashMap<String, AurPackage>,
+    cache: BTreeMap<String, AurPackage>,
 }
 
 impl AurParser {
     pub fn new() -> Self {
         AurParser {
-            cache: HashMap::new(),
+            cache: BTreeMap::new(),
         }
     }
 
@@ -99,7 +99,7 @@ impl AurParser {
     /// Calculate build order based on dependencies
     pub fn calculate_build_order(&self, packages: &[String]) -> Result<Vec<String>, &'static str> {
         let mut order = Vec::new();
-        let mut visited = HashMap::new();
+        let mut visited = BTreeMap::new();
 
         for pkg_name in packages {
             if !visited.contains_key(pkg_name) {
@@ -110,7 +110,7 @@ impl AurParser {
         Ok(order)
     }
 
-    fn visit(&self, pkg_name: &str, order: &mut Vec<String>, visited: &mut HashMap<String, bool>) -> Result<(), &'static str> {
+    fn visit(&self, pkg_name: &str, order: &mut Vec<String>, visited: &mut BTreeMap<String, bool>) -> Result<(), &'static str> {
         if visited.get(pkg_name).copied().unwrap_or(false) {
             return Ok(());
         }

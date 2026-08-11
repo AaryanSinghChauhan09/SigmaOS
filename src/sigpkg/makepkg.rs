@@ -12,20 +12,20 @@
 #![allow(unused_mut)]
 #![allow(unused_imports)]
 
-use crate::klib::{HashMap, Vec, String, ToString};
+use crate::klib::{BTreeMap, Vec, String, ToString};
 use crate::sigpkg::{Package, Version};
 
 /// PKGBUILD parser for Arch Linux package recipes
 pub struct PkgbuildParser {
-    variables: HashMap<String, String>,
-    functions: HashMap<String, String>,
+    variables: BTreeMap<String, String>,
+    functions: BTreeMap<String, String>,
 }
 
 impl PkgbuildParser {
     pub fn new() -> Self {
         PkgbuildParser {
-            variables: HashMap::new(),
-            functions: HashMap::new(),
+            variables: BTreeMap::new(),
+            functions: BTreeMap::new(),
         }
     }
 
@@ -41,7 +41,7 @@ impl PkgbuildParser {
 
             // Parse variable assignments
             if line.contains('=') && !line.starts_with("function ") {
-                let parts: std::vec::Vec<&str> = line.splitn(2, '=').collect();
+                let parts: alloc::vec::Vec<&str> = line.splitn(2, '=').collect();
                 if parts.len() == 2 {
                     let key = parts[0].trim().to_string();
                     let value = parts[1].trim().trim_matches('"').trim_matches('\'').to_string();
@@ -164,7 +164,7 @@ impl MakepkgSandbox {
             pkgname,
             version,
             pkgdesc,
-            std::vec::Vec::new(),
+            alloc::vec::Vec::new(),
             crate::klib::String::new(),
         );
         pkg.source = String::from_str("arch");

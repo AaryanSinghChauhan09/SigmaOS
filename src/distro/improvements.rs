@@ -1326,7 +1326,7 @@ pub enum YastError {
 pub struct SelinuxManager {
     pub enforcing_mode: SelinuxMode,
     pub policy_type: alloc::string::String,
-    pub booleans: alloc::collections::HashMap<alloc::string::String, bool>,
+    pub booleans: alloc::collections::BTreeMap<alloc::string::String, bool>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -1341,7 +1341,7 @@ impl SelinuxManager {
         SelinuxManager {
             enforcing_mode: SelinuxMode::Enforcing,
             policy_type: alloc::string::String::from("targeted"),
-            booleans: alloc::collections::HashMap::new(),
+            booleans: alloc::collections::BTreeMap::new(),
         }
     }
 
@@ -1432,7 +1432,7 @@ pub enum SystemdError {
 pub struct PortagePackageManager {
     pub use_flags: alloc::collections::HashSet<alloc::string::String>,
     pub installed_packages:
-        alloc::collections::HashMap<alloc::string::String, alloc::string::String>,
+        alloc::collections::BTreeMap<alloc::string::String, alloc::string::String>,
     pub world_file: alloc::vec::Vec<alloc::string::String>,
 }
 
@@ -1440,7 +1440,7 @@ impl PortagePackageManager {
     pub fn new() -> Self {
         PortagePackageManager {
             use_flags: alloc::collections::HashSet::new(),
-            installed_packages: alloc::collections::HashMap::new(),
+            installed_packages: alloc::collections::BTreeMap::new(),
             world_file: alloc::vec::Vec::new(),
         }
     }

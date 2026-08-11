@@ -20,9 +20,9 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 /// SigmaOS Network Socket Layer
 /// Absorbs Linux BSD socket interface: socket()/bind()/listen()/accept()/connect()
 /// Supports AF_INET (IPv4), AF_INET6, AF_UNIX; SOCK_STREAM/DGRAM/RAW
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 // ── Address Families & Socket Types ──────────────────────────────────────
 
@@ -255,18 +255,18 @@ pub const SO_RCVBUF: i32 = 8;
 pub const SO_SNDBUF: i32 = 7;
 
 pub struct SocketLayer {
-    sockets: HashMap<u32, Socket>,
+    sockets: BTreeMap<u32, Socket>,
     next_fd: AtomicUsize,
-    bound_ports: HashMap<u16, u32>, // port -> fd
+    bound_ports: BTreeMap<u16, u32>, // port -> fd
 }
 
 impl SocketLayer {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         SocketLayer {
-            sockets: HashMap::new(),
+            sockets: BTreeMap::new(),
             next_fd: AtomicUsize::new(4),
-            bound_ports: HashMap::new(),
+            bound_ports: BTreeMap::new(),
         }
     }
 

@@ -18,9 +18,9 @@
 
 /// SigmaOS proc filesystem (/proc) implementation
 /// Provides dynamic system statistics and process information in-memory
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 pub struct ProcEntry {
     pub name: String,
@@ -29,14 +29,14 @@ pub struct ProcEntry {
 }
 
 pub struct ProcFileSystem {
-    entries: HashMap<String, ProcEntry>,
+    entries: BTreeMap<String, ProcEntry>,
 }
 
 impl ProcFileSystem {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut fs = ProcFileSystem {
-            entries: HashMap::new(),
+            entries: BTreeMap::new(),
         };
 
         // Standard /proc entries

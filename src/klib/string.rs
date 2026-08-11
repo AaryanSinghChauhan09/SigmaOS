@@ -179,7 +179,7 @@ mod tests {
     }
 }
 
-/// Simple String struct to replace std::string::String
+/// Simple String struct to replace alloc::string::String
 /// Note: This is a basic implementation - for production use, consider using alloc::string::String
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct String {

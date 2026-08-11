@@ -12,7 +12,7 @@ use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use crate::security::CapabilityToken;
 use crate::sigpkg::PackageRecipe;
 
@@ -119,12 +119,12 @@ impl EosWelcomeEngine {
 pub struct EosUpdateNotifier {
     pub check_interval_hours: u32,
     pub notify_on_aur: bool,
-    pub mock_updates: HashMap<String, String>, // package -> version
+    pub mock_updates: BTreeMap<String, String>, // package -> version
 }
 
 impl EosUpdateNotifier {
     pub fn new(interval: u32, notify_aur: bool) -> Self {
-        let mut mock_updates = HashMap::new();
+        let mut mock_updates = BTreeMap::new();
         mock_updates.insert("linux-sigma".to_string(), "6.12.5-1".to_string());
         mock_updates.insert("sigpkg".to_string(), "2.4.0".to_string());
         mock_updates.insert("yay-eos".to_string(), "12.3.0".to_string());
@@ -253,14 +253,14 @@ impl MakepkgSandbox {
 // =========================================================================
 pub struct AlpmSyncDb {
     pub sync_directories: Vec<String>,
-    pub registered_versions: HashMap<String, String>,
+    pub registered_versions: BTreeMap<String, String>,
 }
 
 impl AlpmSyncDb {
     pub fn new() -> Self {
         Self {
             sync_directories: Vec::new(),
-            registered_versions: HashMap::new(),
+            registered_versions: BTreeMap::new(),
         }
     }
 

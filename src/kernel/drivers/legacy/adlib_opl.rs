@@ -23,7 +23,7 @@ use crate::kernel::subsystems::registry::{
 /// Absorbs Linux ALSA snd-opl3 + snd-sb* driver families
 /// AdLib OPL2 (YM3812), OPL3 (YMF262), SB 1.0/2.0/Pro/16/AWE32
 use core::sync::atomic::{AtomicUsize, Ordering};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 /// OPL register space
 pub const OPL_BASE_ADDR: u16 = 0x388;

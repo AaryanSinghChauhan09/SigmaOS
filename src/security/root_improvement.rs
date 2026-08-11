@@ -584,14 +584,14 @@ pub struct PamRule {
 
 /// Central Pluggable Authentication Modules manager
 pub struct PamEngine {
-    pub chains: crate::klib::HashMap<PamGroup, Vec<PamRule>>,
+    pub chains: crate::klib::BTreeMap<PamGroup, Vec<PamRule>>,
     pub context: PamContext,
 }
 
 impl PamEngine {
     pub fn new() -> Self {
         Self {
-            chains: crate::klib::HashMap::new(),
+            chains: crate::klib::BTreeMap::new(),
             context: PamContext::new(),
         }
     }

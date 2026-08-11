@@ -1,7 +1,7 @@
 // SigmaOS Unified Dashboard System
 // Publisher-grade dashboards for system monitoring and productivity
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::time::{Duration, Instant};
 
 /// System metric type
@@ -90,7 +90,7 @@ impl DashboardWidget {
 
 /// Unified dashboard
 pub struct UnifiedDashboard {
-    pub widgets: HashMap<String, DashboardWidget>,
+    pub widgets: BTreeMap<String, DashboardWidget>,
     pub layout: String,
     pub theme: String,
     pub refresh_interval: Duration,
@@ -99,7 +99,7 @@ pub struct UnifiedDashboard {
 impl UnifiedDashboard {
     pub fn new() -> Self {
         Self {
-            widgets: HashMap::new(),
+            widgets: BTreeMap::new(),
             layout: "grid".to_string(),
             theme: "dark".to_string(),
             refresh_interval: Duration::from_secs(1),
@@ -134,10 +134,10 @@ impl UnifiedDashboard {
         }
     }
 
-    pub fn get_system_summary(&self) -> HashMap<String, f64> {
-        let mut summary = HashMap::new();
+    pub fn get_system_summary(&self) -> BTreeMap<String, f64> {
+        let mut summary = BTreeMap::new();
 
-        let iter: crate::klib::hashmap::HashMapIter<'_, String, DashboardWidget> = self.widgets.iter();
+        let iter: crate::klib::hashmap::BTreeMapIter<'_, String, DashboardWidget> = self.widgets.iter();
         for (id, widget) in iter {
             if let Some(value) = widget.get_latest_value() {
                 summary.insert(id.clone(), value);

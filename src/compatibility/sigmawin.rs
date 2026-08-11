@@ -21,9 +21,9 @@
 // Enhanced with standard NT Kernel object management and advanced PE Section parsing.
 
 #[cfg(not(test))]
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 #[cfg(test)]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// PE execution formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -70,14 +70,14 @@ pub struct NtObject {
 
 #[derive(Debug, Clone)]
 pub struct NtHandleTable {
-    pub handles: HashMap<u32, NtObject>,
+    pub handles: BTreeMap<u32, NtObject>,
     pub next_handle: u32,
 }
 
 impl NtHandleTable {
     pub fn new() -> Self {
         Self {
-            handles: HashMap::new(),
+            handles: BTreeMap::new(),
             next_handle: 4, // Windows system handles usually start at 4 or multiples of 4
         }
     }
@@ -246,14 +246,14 @@ impl Default for PeLoader {
 
 #[derive(Debug, Clone)]
 pub struct RegistryManager {
-    pub keys: HashMap<String, String>,
+    pub keys: BTreeMap<String, String>,
 }
 
 impl RegistryManager {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut reg = Self {
-            keys: HashMap::new(),
+            keys: BTreeMap::new(),
         };
         reg.set_key(
             "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion\\CurrentBuild".to_string(),
@@ -330,7 +330,7 @@ impl Default for User32MessageQueue {
 #[derive(Debug, Clone)]
 pub struct WinSockAdapter {
     pub wsa_active: bool,
-    pub active_connections: HashMap<u32, String>,
+    pub active_connections: BTreeMap<u32, String>,
 }
 
 impl WinSockAdapter {
@@ -338,7 +338,7 @@ impl WinSockAdapter {
     pub fn new() -> Self {
         Self {
             wsa_active: false,
-            active_connections: HashMap::new(),
+            active_connections: BTreeMap::new(),
         }
     }
 

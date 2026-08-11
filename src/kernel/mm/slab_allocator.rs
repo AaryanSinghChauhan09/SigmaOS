@@ -19,7 +19,7 @@
 /// SigmaOS SLAB/SLUB memory allocator
 /// Inspired by Bonwick's 1994 paper and the Linux kernel SLUB allocator.
 /// Exposes caches for fixed-size allocations to prevent fragmentation.
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 extern crate alloc;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -95,14 +95,14 @@ impl SlabCache {
 }
 
 pub struct SlabAllocator {
-    caches: HashMap<usize, SlabCache>,
+    caches: BTreeMap<usize, SlabCache>,
 }
 
 impl SlabAllocator {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut allocator = SlabAllocator {
-            caches: HashMap::new(),
+            caches: BTreeMap::new(),
         };
         // Pre-create caches for typical sizes
         allocator.create_cache(16);

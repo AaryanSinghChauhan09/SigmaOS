@@ -9,7 +9,7 @@ use crate::security::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(test)]
-use std::sync::atomic::{AtomicUsize, Ordering};
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

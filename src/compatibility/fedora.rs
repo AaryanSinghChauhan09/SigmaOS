@@ -1,13 +1,13 @@
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// DnfPackageResolver mimics Fedora's DNF/RPM package resolver.
 /// It performs dependency checks, tracks repo metadata, and validates GPG package signatures.
 pub struct DnfPackageResolver {
-    pub packages: HashMap<String, Vec<String>>, // pkg_name -> dependencies
-    pub installed: HashMap<String, String>,      // pkg_name -> version
+    pub packages: BTreeMap<String, Vec<String>>, // pkg_name -> dependencies
+    pub installed: BTreeMap<String, String>,      // pkg_name -> version
     pub repodata_synced: bool,
     pub signatures_verified: bool,
 }
@@ -15,8 +15,8 @@ pub struct DnfPackageResolver {
 impl DnfPackageResolver {
     pub fn new() -> Self {
         DnfPackageResolver {
-            packages: HashMap::new(),
-            installed: HashMap::new(),
+            packages: BTreeMap::new(),
+            installed: BTreeMap::new(),
             repodata_synced: false,
             signatures_verified: false,
         }
@@ -50,7 +50,7 @@ impl DnfPackageResolver {
         }
 
         let mut install_order = Vec::new();
-        let mut visited = HashMap::new();
+        let mut visited = BTreeMap::new();
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
 
@@ -65,7 +65,7 @@ impl DnfPackageResolver {
         &self,
         name: &str,
         order: &mut Vec<String>,
-        visited: &mut HashMap<String, bool>,
+        visited: &mut BTreeMap<String, bool>,
     ) -> Result<(), String> {
         if let Some(&in_progress) = visited.get(name) {
             if in_progress {
@@ -186,15 +186,15 @@ impl KojiBuildServer {
 /// BodhiUpdateTriage mimics Fedora's update triage system (Bodhi).
 /// It handles community feedback, accumulates karma, and gates the transition to stable.
 pub struct BodhiUpdateTriage {
-    pub updates: HashMap<String, i32>, // update_id -> karma
-    pub stable_gated: HashMap<String, bool>, // update_id -> is_gated
+    pub updates: BTreeMap<String, i32>, // update_id -> karma
+    pub stable_gated: BTreeMap<String, bool>, // update_id -> is_gated
 }
 
 impl BodhiUpdateTriage {
     pub fn new() -> Self {
         BodhiUpdateTriage {
-            updates: HashMap::new(),
-            stable_gated: HashMap::new(),
+            updates: BTreeMap::new(),
+            stable_gated: BTreeMap::new(),
         }
     }
 
@@ -235,13 +235,13 @@ pub struct SigmaChangeProposal {
 
 /// Tracks, gates, and updates technological transitions within SigmaOS, inspired by Fedora's Change Process.
 pub struct SigmaChangeProcessEngine {
-    pub proposals: HashMap<String, SigmaChangeProposal>,
+    pub proposals: BTreeMap<String, SigmaChangeProposal>,
 }
 
 impl SigmaChangeProcessEngine {
     pub fn new() -> Self {
         SigmaChangeProcessEngine {
-            proposals: HashMap::new(),
+            proposals: BTreeMap::new(),
         }
     }
 
@@ -258,7 +258,7 @@ impl SigmaChangeProcessEngine {
         }
     }
 
-    pub fn get_proposals(&self) -> &HashMap<String, SigmaChangeProposal> {
+    pub fn get_proposals(&self) -> &BTreeMap<String, SigmaChangeProposal> {
         &self.proposals
     }
 }

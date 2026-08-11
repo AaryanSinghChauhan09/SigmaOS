@@ -4,7 +4,7 @@
 // Anonsurf (Tor/I2P overlay, DNS shields), Forensics (inode carving, decoys), Kali Sniffer,
 // Password Auditor, Secure Wiper (7-pass shredder), and Sigma IDS (Intrusion Detection).
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeMap, VecDeque};
 use std::path::{Path, PathBuf};
 
 // 1. ANONSURF: TOR/I2P OVERLAY ANONYMITY TUNNEL
@@ -61,13 +61,13 @@ pub struct RecoveredFile {
 }
 
 pub struct ForensicsAuditTool {
-    pub decoy_honeypots: HashMap<PathBuf, String>, // Path -> Description
+    pub decoy_honeypots: BTreeMap<PathBuf, String>, // Path -> Description
     pub recovered_inodes: Vec<RecoveredFile>,
 }
 
 impl ForensicsAuditTool {
     pub fn new() -> Self {
-        let mut decoys = HashMap::new();
+        let mut decoys = BTreeMap::new();
         decoys.insert(PathBuf::from("/etc/shadow_backup"), "Fake credential hash store honeypot".to_string());
         decoys.insert(PathBuf::from("/home/admin/wallet.dat"), "Fake Bitcoin wallet decoy".to_string());
 

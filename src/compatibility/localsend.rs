@@ -22,7 +22,7 @@
 // to enable offline peer-to-peer secure file transfer within local networks.
 
 use crate::security::CapabilityToken;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 /// Device types supported by LocalSend protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -74,14 +74,14 @@ pub struct LocalSendFileMetadata {
 #[derive(Debug, Clone)]
 pub struct LocalSendSession {
     pub session_id: String,
-    pub files: HashMap<String, LocalSendFileMetadata>,
-    pub accepted_files_tokens: HashMap<String, String>, // file_id -> token
+    pub files: BTreeMap<String, LocalSendFileMetadata>,
+    pub accepted_files_tokens: BTreeMap<String, String>, // file_id -> token
 }
 
 /// Sovereign LocalSend Protocol Bridge Manager
 pub struct LocalSendBridgeManager {
-    pub active_sessions: HashMap<String, LocalSendSession>,
-    pub registered_peers: HashMap<String, LocalSendDevice>,
+    pub active_sessions: BTreeMap<String, LocalSendSession>,
+    pub registered_peers: BTreeMap<String, LocalSendDevice>,
     pub local_device: LocalSendDevice,
     pub pin_code: Option<String>,
 }
@@ -89,8 +89,8 @@ pub struct LocalSendBridgeManager {
 impl LocalSendBridgeManager {
     pub fn new(alias: &str, fingerprint: &str) -> Self {
         Self {
-            active_sessions: HashMap::new(),
-            registered_peers: HashMap::new(),
+            active_sessions: BTreeMap::new(),
+            registered_peers: BTreeMap::new(),
             local_device: LocalSendDevice {
                 alias: alias.to_string(),
                 version: "2.1".to_string(),
@@ -131,8 +131,8 @@ impl LocalSendBridgeManager {
         }
 
         let session_id = format!("sess_{}", sender_info.fingerprint);
-        let mut files_map = HashMap::new();
-        let mut tokens_map = HashMap::new();
+        let mut files_map = BTreeMap::new();
+        let mut tokens_map = BTreeMap::new();
 
         for file in files_to_upload {
             let token = format!("tok_{}", file.id);

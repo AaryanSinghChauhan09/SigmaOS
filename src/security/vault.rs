@@ -19,7 +19,7 @@
 // SigmaOS Encrypted File Vault
 // OOP-based encrypted file storage with post-quantum cryptography
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -255,7 +255,7 @@ pub struct EncryptedFileVault {
     metadata: VaultMetadata,
     encryption: Box<dyn VaultEncryption>,
     master_key: Vec<u8>,
-    files: HashMap<PathBuf, EncryptedFile>,
+    files: BTreeMap<PathBuf, EncryptedFile>,
     vault_path: PathBuf,
 }
 
@@ -282,7 +282,7 @@ impl EncryptedFileVault {
             metadata,
             encryption,
             master_key,
-            files: HashMap::new(),
+            files: BTreeMap::new(),
             vault_path,
         }
     }

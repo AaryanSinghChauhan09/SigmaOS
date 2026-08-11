@@ -2,7 +2,7 @@
 // Implements minimal footprint, frugal installs, RAM-copy booting, and .tcz loop-mount application extensions.
 // Ensures Tiny Core architecture is no longer a challenge to SigmaOS.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 
 /// Tiny Core Operation Modes
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,13 +53,13 @@ pub struct TczExtension {
 
 /// 2. TCZ Extension Manager (Loop-mount loop package overlays in /tmp/tcloop)
 pub struct TczExtensionManager {
-    pub mounted_extensions: HashMap<String, TczExtension>,
+    pub mounted_extensions: BTreeMap<String, TczExtension>,
 }
 
 impl TczExtensionManager {
     pub fn new() -> Self {
         Self {
-            mounted_extensions: HashMap::new(),
+            mounted_extensions: BTreeMap::new(),
         }
     }
 
@@ -97,13 +97,13 @@ impl Default for TczExtensionManager {
 
 /// 3. AppsAudit Dependency Resolver & Checker
 pub struct AppsAuditTool {
-    pub repo_dependencies: HashMap<String, Vec<String>>,
+    pub repo_dependencies: BTreeMap<String, Vec<String>>,
 }
 
 impl AppsAuditTool {
     pub fn new() -> Self {
         Self {
-            repo_dependencies: HashMap::new(),
+            repo_dependencies: BTreeMap::new(),
         }
     }
 

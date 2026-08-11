@@ -24,7 +24,7 @@ use crate::kernel::subsystems::registry::{
 /// Supports ISA, EISA, and LPC bridge legacy devices
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::string::{String, ToString};
-use std::vec::Vec;
+use alloc::vec::Vec;
 
 /// Classic ISA I/O port ranges (from PC architecture spec)
 pub const ISA_IO_BASE: u16 = 0x0000;

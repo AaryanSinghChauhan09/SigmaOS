@@ -3,9 +3,9 @@
 // zero-setup dev environments, IDE debugger support, Docker compatibility layers, and Kubernetes bootstrap configurations.
 
 #[cfg(test)]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 #[cfg(not(test))]
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Hardware architectures supported by SigmaOS
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -78,7 +78,7 @@ pub struct IdeDebugInfrastructure {
 pub struct ContainerCloudTools {
     pub docker_compat_active: bool,
     pub buildkit_integrated: bool,
-    pub registry_credentials: HashMap<String, String>, // registry_url -> auth_token
+    pub registry_credentials: BTreeMap<String, String>, // registry_url -> auth_token
     pub kubeadm_configured: bool,
     pub cni_type: String, // e.g., "Cilium", "Calico"
     pub helm_installed: bool,
@@ -86,9 +86,9 @@ pub struct ContainerCloudTools {
 
 /// Ecosystem Integration Manager
 pub struct EcosystemManager {
-    pub architecture_matrix: HashMap<String, ArchitecturePort>,
-    pub enterprise_partners: HashMap<String, EnterprisePartner>,
-    pub cert_pipeline: HashMap<String, EcosystemCertification>,
+    pub architecture_matrix: BTreeMap<String, ArchitecturePort>,
+    pub enterprise_partners: BTreeMap<String, EnterprisePartner>,
+    pub cert_pipeline: BTreeMap<String, EcosystemCertification>,
     pub dev_env: DevEnvironment,
     pub debug_infra: IdeDebugInfrastructure,
     pub cloud_tools: ContainerCloudTools,
@@ -97,9 +97,9 @@ pub struct EcosystemManager {
 impl EcosystemManager {
     pub fn new() -> Self {
         Self {
-            architecture_matrix: HashMap::new(),
-            enterprise_partners: HashMap::new(),
-            cert_pipeline: HashMap::new(),
+            architecture_matrix: BTreeMap::new(),
+            enterprise_partners: BTreeMap::new(),
+            cert_pipeline: BTreeMap::new(),
             dev_env: DevEnvironment {
                 rust_cargo_installed: true,
                 rustup_active: true,
@@ -118,7 +118,7 @@ impl EcosystemManager {
             cloud_tools: ContainerCloudTools {
                 docker_compat_active: true,
                 buildkit_integrated: true,
-                registry_credentials: HashMap::new(),
+                registry_credentials: BTreeMap::new(),
                 kubeadm_configured: true,
                 cni_type: String::from("Cilium"),
                 helm_installed: true,

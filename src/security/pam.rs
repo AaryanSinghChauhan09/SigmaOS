@@ -4,9 +4,9 @@
 extern crate alloc;
 
 #[cfg(not(target_os = "none"))]
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 #[cfg(target_os = "none")]
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 use crate::security::crypto_utils::{constant_time_eq, hash_password_placeholder, SecureRandom};
 use alloc::string::{String as AllocString, ToString};
@@ -101,8 +101,8 @@ impl PamModule for AccountTallyModule {
 
 /// Central registry managing user authentication, groups, and PAM configuration
 pub struct SovereignPamManager {
-    pub users: HashMap<AllocString, PamUser>,
-    pub groups: HashMap<AllocString, PamGroup>,
+    pub users: BTreeMap<AllocString, PamUser>,
+    pub groups: BTreeMap<AllocString, PamGroup>,
     pub modules: Vec<alloc::boxed::Box<dyn PamModule>>,
     pub next_uid: u32,
     pub next_gid: u32,
@@ -112,8 +112,8 @@ impl SovereignPamManager {
     /// Initialize a new PAM manager
     pub fn new() -> Self {
         Self {
-            users: HashMap::<AllocString, PamUser>::new(),
-            groups: HashMap::<AllocString, PamGroup>::new(),
+            users: BTreeMap::<AllocString, PamUser>::new(),
+            groups: BTreeMap::<AllocString, PamGroup>::new(),
             modules: Vec::new(),
             next_uid: 1000,
             next_gid: 1000,

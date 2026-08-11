@@ -1,7 +1,7 @@
 // SigmaOS Safe Win32 Compatibility Subsystem (SigmaWin)
 // Designed to parse, load, and manage legacy Win32 binaries securely on the sovereign transaction bus
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Win32 processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -91,13 +91,13 @@ impl PeLoader {
 // ==========================================
 
 pub struct RegistryManager {
-    pub keys: HashMap<String, String>,
+    pub keys: BTreeMap<String, String>,
 }
 
 impl RegistryManager {
     pub fn new() -> Self {
         let mut reg = RegistryManager {
-            keys: HashMap::new(),
+            keys: BTreeMap::new(),
         };
         // Seed default registry settings
         reg.set_key(

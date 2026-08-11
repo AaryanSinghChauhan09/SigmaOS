@@ -2,8 +2,8 @@
 // Absorbs and obsoletes Rancher OS, k3os, Bottlerocket, and containerd
 // by executing daemonless OCI containers directly on microkernel capabilities.
 
-use std::collections::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use alloc::collections::BTreeMap;
+use core::sync::atomic::{AtomicUsize, Ordering};
 use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,7 +46,7 @@ impl DaemonlessContainer {
 
 /// K3os-style bare-metal container orchestrator service
 pub struct K3osOrchestrator {
-    pub active_containers: HashMap<String, DaemonlessContainer>,
+    pub active_containers: BTreeMap<String, DaemonlessContainer>,
     pub allocated_memory_mb: usize,
     pub total_memory_mb: usize,
 }
@@ -54,7 +54,7 @@ pub struct K3osOrchestrator {
 impl K3osOrchestrator {
     pub fn new(total_mem: usize) -> Self {
         Self {
-            active_containers: HashMap::new(),
+            active_containers: BTreeMap::new(),
             allocated_memory_mb: 0,
             total_memory_mb: total_mem,
         }

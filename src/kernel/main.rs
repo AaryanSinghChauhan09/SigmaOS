@@ -6,19 +6,19 @@
 #[cfg(target_os = "none")]
 use core::panic::PanicInfo;
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Ubuntu/Linux-style Kernel Command Line Parser
 #[derive(Debug, Clone)]
 pub struct KernelCmdLineParser {
-    pub params: HashMap<String, String>,
+    pub params: BTreeMap<String, String>,
     pub flags: alloc::vec::Vec<String>,
 }
 
 impl KernelCmdLineParser {
     /// Parse a raw command-line string (e.g. "init=/bin/sh console=ttyS0 quiet boot=uefi")
     pub fn new(cmdline: &str) -> Self {
-        let mut params = HashMap::new();
+        let mut params = BTreeMap::new();
         let mut flags = alloc::vec::Vec::new();
 
         for arg in cmdline.split_whitespace() {

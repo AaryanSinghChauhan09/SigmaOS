@@ -1,7 +1,7 @@
 // SigmaOS Disk Usage Analyzer
 // OOP-based disk space analysis with visualization
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// Disk usage info
@@ -122,7 +122,7 @@ impl AnalysisStrategy for DeepAnalysisStrategy {
 /// OOP-based Disk Usage Analyzer
 pub struct DiskUsageAnalyzer {
     strategy: Box<dyn AnalysisStrategy>,
-    cache: HashMap<PathBuf, DirectorySizeInfo>,
+    cache: BTreeMap<PathBuf, DirectorySizeInfo>,
     cache_enabled: bool,
 }
 
@@ -130,7 +130,7 @@ impl DiskUsageAnalyzer {
     pub fn new(strategy: Box<dyn AnalysisStrategy>) -> Self {
         Self {
             strategy,
-            cache: HashMap::new(),
+            cache: BTreeMap::new(),
             cache_enabled: false,
         }
     }
@@ -208,8 +208,8 @@ impl DiskUsageAnalyzer {
     }
 
     /// Get size by file type
-    pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
-        let mut sizes = HashMap::new();
+    pub fn get_size_by_type(&self, path: &Path) -> BTreeMap<String, u64> {
+        let mut sizes = BTreeMap::new();
         sizes.insert("txt".to_string(), 1024 * 1024);
         sizes.insert("pdf".to_string(), 5 * 1024 * 1024);
         sizes.insert("bin".to_string(), 100 * 1024 * 1024);

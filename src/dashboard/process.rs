@@ -19,7 +19,7 @@
 // SigmaOS Process Manager
 // OOP-based process management with monitoring and control
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 use std::time::{Duration, Instant};
 
 /// Process info
@@ -89,13 +89,13 @@ pub trait ProcessMonitorStrategy {
 
 /// System process monitor
 pub struct SystemProcessMonitor {
-    processes: HashMap<u32, ProcessInfo>,
+    processes: BTreeMap<u32, ProcessInfo>,
 }
 
 impl SystemProcessMonitor {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
-        let mut processes = HashMap::new();
+        let mut processes = BTreeMap::new();
 
         // Simulated system processes
         processes.insert(
@@ -173,7 +173,7 @@ impl ProcessMonitorStrategy for SystemProcessMonitor {
 /// OOP-based Process Manager
 pub struct ProcessManager {
     monitor: Box<dyn ProcessMonitorStrategy>,
-    process_history: HashMap<u32, Vec<ProcessInfo>>,
+    process_history: BTreeMap<u32, Vec<ProcessInfo>>,
     auto_refresh_enabled: bool,
     refresh_interval: Duration,
     last_refresh: Option<Instant>,
@@ -183,7 +183,7 @@ impl ProcessManager {
     pub fn new(monitor: Box<dyn ProcessMonitorStrategy>) -> Self {
         Self {
             monitor,
-            process_history: HashMap::new(),
+            process_history: BTreeMap::new(),
             auto_refresh_enabled: false,
             refresh_interval: Duration::from_secs(5),
             last_refresh: None,

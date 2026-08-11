@@ -1,7 +1,7 @@
 // SigmaOS Universal Package Manager
 // Unified system absorbing apt, yum, pacman, snap, flatpak, gentoo ebuilds, freebsd pkgs, appimages, and nix store hashes.
 
-use std::collections::HashMap;
+use alloc::collections::BTreeMap;
 
 /// Package format type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

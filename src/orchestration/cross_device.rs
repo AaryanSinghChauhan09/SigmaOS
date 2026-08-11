@@ -19,7 +19,7 @@
 // SigmaOS Cross-Device Orchestration
 // IoT, smart home, and cloud integration baked into the OS
 
-use crate::klib::HashMap;
+use crate::klib::BTreeMap;
 
 /// Device type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -63,7 +63,7 @@ pub struct ConnectedDevice {
     pub connection_status: ConnectionStatus,
     pub capabilities: Vec<DeviceCapability>,
     pub last_seen: u64,
-    pub metadata: HashMap<String, String>,
+    pub metadata: BTreeMap<String, String>,
 }
 
 impl ConnectedDevice {
@@ -75,7 +75,7 @@ impl ConnectedDevice {
             connection_status: ConnectionStatus::Disconnected,
             capabilities: Vec::new(),
             last_seen: 0,
-            metadata: HashMap::new(),
+            metadata: BTreeMap::new(),
         }
     }
 
@@ -194,7 +194,7 @@ impl AutomationRule {
 pub struct SmartHomeDevice {
     pub base_device: ConnectedDevice,
     pub device_category: String, // "lighting", "climate", "security", etc.
-    pub state: HashMap<String, String>,
+    pub state: BTreeMap<String, String>,
 }
 
 impl SmartHomeDevice {
@@ -202,7 +202,7 @@ impl SmartHomeDevice {
         Self {
             base_device: ConnectedDevice::new(id, name, DeviceType::SmartHome),
             device_category,
-            state: HashMap::new(),
+            state: BTreeMap::new(),
         }
     }
 
@@ -217,8 +217,8 @@ impl SmartHomeDevice {
 
 /// Cross-device orchestration system
 pub struct CrossDeviceOrchestrator {
-    pub devices: HashMap<String, ConnectedDevice>,
-    pub smart_home_devices: HashMap<String, SmartHomeDevice>,
+    pub devices: BTreeMap<String, ConnectedDevice>,
+    pub smart_home_devices: BTreeMap<String, SmartHomeDevice>,
     pub automation_rules: Vec<AutomationRule>,
     pub cloud_sync_enabled: bool,
     pub auto_discovery_enabled: bool,
@@ -228,8 +228,8 @@ impl CrossDeviceOrchestrator {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            devices: HashMap::new(),
-            smart_home_devices: HashMap::new(),
+            devices: BTreeMap::new(),
+            smart_home_devices: BTreeMap::new(),
             automation_rules: Vec::new(),
             cloud_sync_enabled: true,
             auto_discovery_enabled: true,
@@ -279,7 +279,7 @@ impl CrossDeviceOrchestrator {
     pub fn control_smart_home_device(
         &mut self,
         id: &str,
-        state: HashMap<String, String>,
+        state: BTreeMap<String, String>,
     ) -> Result<(), OrchestrationError> {
         if let Some(device) = self.smart_home_devices.get_mut(id) {
             device.state = state;
@@ -526,12 +526,12 @@ impl CrossDeviceOrchestrator {
     }
 
     pub fn get_connected_devices(&self) -> Vec<&ConnectedDevice> {
-        let values_iter: crate::klib::hashmap::HashMapValues<'_, String, ConnectedDevice> = self.devices.values();
+        let values_iter: crate::klib::hashmap::BTreeMapValues<'_, String, ConnectedDevice> = self.devices.values();
         values_iter.filter(|d| d.is_connected()).collect()
     }
 
     pub fn get_devices_by_type(&self, device_type: DeviceType) -> Vec<&ConnectedDevice> {
-        let values_iter: crate::klib::hashmap::HashMapValues<'_, String, ConnectedDevice> = self.devices.values();
+        let values_iter: crate::klib::hashmap::BTreeMapValues<'_, String, ConnectedDevice> = self.devices.values();
         values_iter
             .filter(|d| d.device_type == device_type)
             .collect()
@@ -563,7 +563,7 @@ impl Default for CrossDeviceOrchestrator {
 /// LocalSendShard - Encrypted local P2P file and message transfer module (replaces LocalSend)
 pub struct LocalSendShard {
     pub local_ip: String,
-    pub active_transfers: HashMap<String, usize>, // maps file_id -> transfer percentage
+    pub active_transfers: BTreeMap<String, usize>, // maps file_id -> transfer percentage
     pub encryption_key: Vec<u8>,
 }
 
@@ -571,7 +571,7 @@ impl LocalSendShard {
     pub fn new(ip: &str, key: Vec<u8>) -> Self {
         Self {
             local_ip: ip.to_string(),
-            active_transfers: HashMap::new(),
+            active_transfers: BTreeMap::new(),
             encryption_key: key,
         }
     }

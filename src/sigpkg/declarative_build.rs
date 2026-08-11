@@ -1,8 +1,8 @@
 //! Pure Declarative Build System (Nix & Bazel Inspired) with Curated Ratings/Reviews Subsystem
 //! Implements deterministic build derivations, hermetic dependency graphs, and package reputation validation.
 
-use std::vec::Vec;
-use std::collections::HashMap;
+use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 use std::string::{String, ToString};
 
 // ==========================================
@@ -14,7 +14,7 @@ pub struct NixDerivation {
     pub name: String,
     pub builder: String,
     pub args: Vec<String>,
-    pub env: HashMap<String, String>,
+    pub env: BTreeMap<String, String>,
     pub input_sources_hashes: Vec<String>, // cryptographic hashes of source assets
 }
 
@@ -24,7 +24,7 @@ impl NixDerivation {
             name: name.to_string(),
             builder: builder.to_string(),
             args: Vec::new(),
-            env: HashMap::new(),
+            env: BTreeMap::new(),
             input_sources_hashes: Vec::new(),
         }
     }
@@ -70,13 +70,13 @@ pub struct BazelTarget {
 }
 
 pub struct BazelBuildEngine {
-    pub action_cache: HashMap<String, String>, // Action ID -> Output hash (for hermeticity)
+    pub action_cache: BTreeMap<String, String>, // Action ID -> Output hash (for hermeticity)
 }
 
 impl BazelBuildEngine {
     pub fn new() -> Self {
         Self {
-            action_cache: HashMap::new(),
+            action_cache: BTreeMap::new(),
         }
     }
 
@@ -121,13 +121,13 @@ pub struct PackageReview {
 }
 
 pub struct PackageRatingsRegistry {
-    pub store_reviews: HashMap<String, Vec<PackageReview>>, // StorePath -> Reviews list
+    pub store_reviews: BTreeMap<String, Vec<PackageReview>>, // StorePath -> Reviews list
 }
 
 impl PackageRatingsRegistry {
     pub fn new() -> Self {
         Self {
-            store_reviews: HashMap::new(),
+            store_reviews: BTreeMap::new(),
         }
     }
 
