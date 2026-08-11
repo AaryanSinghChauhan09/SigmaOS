@@ -36,7 +36,7 @@ Integrate these into `src/kernel/` and `src/security/capability.rs` to enforce v
 * `armbian/build`, `puppylinux-woof-CE/woof-CE`, `dietpi/dietpi`, `postmarketOS/pmaports`, `LFS/lfs` (SBC & mobile-focused)
 
 **Key Algorithmic & Design Ideas to Absorb:**
-- **Declarative & Immutable File System States:** From `nixpkgs`, `guix`, and `talos`, absorb functional system declarations. SigmaOS will boot into an immutable filesystem image where user configurations and security pledges define reproducible, read-only system environments.
+- **Declarative & Immutable File System States:** From `nixpkgs`, `guix`, and `talos`, absorb functional system declarations. SigmaOS will boot into an immutable filesystem image where user configurations and security pledges (`sigma_pledge` / `sigma_unveil`) define reproducible, read-only system environments.
 - **Musl-Based Minimalist Base Systems:** From `alpine` and `kisslinux`, adapt musl/libc concepts to keep SigmaOS's native userspace library footprint extremely lightweight, compiling entirely statically.
 - **SBC Optimization Scripts:** From `dietpi` and `armbian`, absorb extreme headless boot profiles that consume < 30MB of RAM under idle states.
 
@@ -115,7 +115,7 @@ Extend `src/customization/` and `zenith_desktop` with modern rendering loops, sc
 **Target Upstream Repositories:**
 * `btrfs/btrfs-progs`, `zfs/zfs` (Copy-on-Write, RAID, and storage pooling)
 * `ceph/ceph`, `gluster/glusterfs`, `lustre/lustre` (Distributed & parallel storage filesystems)
-* `xfs/xfsprogs`, `f2fs-tools/f2fs-tools`, `nilfs/nilfs-tools`, `reiserfs/reiserfsprogs` (Flash-friendly & high-throughput filesystems)
+* `xfs/xfsprogs`, `f2fs-tools/f2fs-tools`, `bcachefs/bcachefs-tools` (Flash-friendly & high-throughput filesystems)
 * `overlayfs/overlayfs-tools`, `squashfs-tools/squashfs-tools` (Stacked & compressed image filesystems)
 
 **Key Algorithmic & Design Ideas to Absorb:**
