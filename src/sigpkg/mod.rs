@@ -9,6 +9,7 @@ pub mod store;
 pub mod transaction;
 pub mod verifier;
 pub mod debian_defeater;
+pub mod universal_engine;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use spec::{
