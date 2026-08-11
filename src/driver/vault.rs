@@ -1,7 +1,7 @@
 // SigmaOS Legacy Driver Archive Vault (DriverArchiveVault)
 // Stores legacy drivers in secure vault entries with lineage metadata and dependency chains
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 pub struct VaultEntry {
     pub id: usize,
@@ -11,40 +11,27 @@ pub struct VaultEntry {
 }
 
 pub struct DriverArchiveVault {
-    pub vault: BTreeMap<usize, VaultEntry>,
+    pub vault: HashMap<usize, VaultEntry>,
 }
 
 impl DriverArchiveVault {
     pub fn new() -> Self {
         let mut archive = DriverArchiveVault {
-            vault: BTreeMap::new(),
+            vault: HashMap::new(),
         };
         // Seed default driver vault entries
-        archive.register_driver(
-            10,
-            "ne2000_isa_nic".to_string(),
-            "Linux 2.2 NIC".to_string(),
-            vec!["isa_bus_device".to_string()],
-        );
-        archive.register_driver(
-            11,
-            "ide_piix4_controller".to_string(),
-            "Linux 2.4 IDE".to_string(),
-            vec!["pci_express_bus".to_string()],
-        );
+        archive.register_driver(10, "ne2000_isa_nic".to_string(), "Linux 2.2 NIC".to_string(), vec!["isa_bus_device".to_string()]);
+        archive.register_driver(11, "ide_piix4_controller".to_string(), "Linux 2.4 IDE".to_string(), vec!["pci_express_bus".to_string()]);
         archive
     }
 
     pub fn register_driver(&mut self, id: usize, name: String, lineage: String, deps: Vec<String>) {
-        self.vault.insert(
+        self.vault.insert(id, VaultEntry {
             id,
-            VaultEntry {
-                id,
-                name,
-                lineage_version: lineage,
-                dependencies: deps,
-            },
-        );
+            name,
+            lineage_version: lineage,
+            dependencies: deps,
+        });
     }
 
     pub fn query_driver(&self, id: usize) -> Option<&VaultEntry> {

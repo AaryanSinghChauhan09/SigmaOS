@@ -7,6 +7,8 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod self_healing;
+pub mod udkf;
 
 pub use breakthroughs::{
     AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
@@ -25,3 +27,9 @@ pub use policy_mechanism::{
 };
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use self_healing::{
+    SovereignSelfHealingKernel,
+};
+pub use udkf::{
+    UdkfHook, UserDefinedKernelFunctions,
+};

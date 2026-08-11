@@ -1,7 +1,7 @@
 // SigmaOS High-Performance eBPF Tracing & Latency Profiler (SigmaProfiler)
 // Designed for tracking scheduler task latency, system tracepoints, and CPU profiling
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TracepointType {
@@ -18,41 +18,20 @@ pub struct PerformanceMetric {
 }
 
 pub struct SigmaProfiler {
-    pub tracepoints: BTreeMap<TracepointType, PerformanceMetric>,
+    pub tracepoints: HashMap<TracepointType, PerformanceMetric>,
     pub tracing_active: bool,
 }
 
 impl SigmaProfiler {
     pub fn new() -> Self {
         let mut profiler = SigmaProfiler {
-            tracepoints: BTreeMap::new(),
+            tracepoints: HashMap::new(),
             tracing_active: true,
         };
         // Initialize standard tracepoints
-        profiler.tracepoints.insert(
-            TracepointType::ContextSwitch,
-            PerformanceMetric {
-                total_hits: 0,
-                cumulative_latency_nanos: 0,
-                max_latency_nanos: 0,
-            },
-        );
-        profiler.tracepoints.insert(
-            TracepointType::SyscallEntry,
-            PerformanceMetric {
-                total_hits: 0,
-                cumulative_latency_nanos: 0,
-                max_latency_nanos: 0,
-            },
-        );
-        profiler.tracepoints.insert(
-            TracepointType::PageFault,
-            PerformanceMetric {
-                total_hits: 0,
-                cumulative_latency_nanos: 0,
-                max_latency_nanos: 0,
-            },
-        );
+        profiler.tracepoints.insert(TracepointType::ContextSwitch, PerformanceMetric { total_hits: 0, cumulative_latency_nanos: 0, max_latency_nanos: 0 });
+        profiler.tracepoints.insert(TracepointType::SyscallEntry, PerformanceMetric { total_hits: 0, cumulative_latency_nanos: 0, max_latency_nanos: 0 });
+        profiler.tracepoints.insert(TracepointType::PageFault, PerformanceMetric { total_hits: 0, cumulative_latency_nanos: 0, max_latency_nanos: 0 });
         profiler
     }
 
@@ -100,15 +79,10 @@ mod tests {
         profiler.record_event(TracepointType::ContextSwitch, 450);
         profiler.record_event(TracepointType::ContextSwitch, 550);
 
-        let avg = profiler
-            .get_average_latency(TracepointType::ContextSwitch)
-            .unwrap();
+        let avg = profiler.get_average_latency(TracepointType::ContextSwitch).unwrap();
         assert_eq!(avg, 500.0);
 
-        let metric = profiler
-            .tracepoints
-            .get(&TracepointType::ContextSwitch)
-            .unwrap();
+        let metric = profiler.tracepoints.get(&TracepointType::ContextSwitch).unwrap();
         assert_eq!(metric.max_latency_nanos, 550);
         assert_eq!(metric.total_hits, 2);
     }

@@ -15,11 +15,7 @@ impl VectorizedPqcEngine {
     }
 
     /// CRYSTALS-Kyber NTT (Number Theoretic Transform) polynomial multiplication optimizer
-    pub fn execute_kyber_ntt_multiplication(
-        &self,
-        poly_a: &[i16],
-        poly_b: &[i16],
-    ) -> Result<Vec<i16>, ()> {
+    pub fn execute_kyber_ntt_multiplication(&self, poly_a: &[i16], poly_b: &[i16]) -> Result<Vec<i16>, ()> {
         if poly_a.len() != 256 || poly_b.len() != 256 {
             return Err(());
         }
@@ -58,9 +54,7 @@ mod tests {
         let engine = VectorizedPqcEngine::new();
         let poly_a = vec![3i16; 256];
         let poly_b = vec![4i16; 256];
-        let res = engine
-            .execute_kyber_ntt_multiplication(&poly_a, &poly_b)
-            .unwrap();
+        let res = engine.execute_kyber_ntt_multiplication(&poly_a, &poly_b).unwrap();
         assert_eq!(res[0], 12);
         assert_eq!(res[255], 12);
     }

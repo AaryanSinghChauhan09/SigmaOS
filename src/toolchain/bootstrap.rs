@@ -1,7 +1,7 @@
 // SigmaOS Linux-From-Scratch (LFS) and FreeBSD Inspired Bootstrap & Ports Engine
 // Designed for toolchain compiling, Stage 1/2 bootstrapping, and secure ports auditing
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BootstrapStage {
@@ -20,7 +20,7 @@ pub struct PortPackage {
 pub struct LfsBootstrapEngine {
     pub current_stage: BootstrapStage,
     pub compiled_binaries: Vec<String>,
-    pub ports_tree: BTreeMap<String, PortPackage>,
+    pub ports_tree: HashMap<String, PortPackage>,
 }
 
 impl LfsBootstrapEngine {
@@ -28,7 +28,7 @@ impl LfsBootstrapEngine {
         let mut engine = LfsBootstrapEngine {
             current_stage: BootstrapStage::Stage1TempToolchain,
             compiled_binaries: Vec::new(),
-            ports_tree: BTreeMap::new(),
+            ports_tree: HashMap::new(),
         };
         // Seed some FreeBSD-style core port definitions
         engine.register_port(PortPackage {
@@ -54,8 +54,7 @@ impl LfsBootstrapEngine {
         match self.current_stage {
             BootstrapStage::Stage1TempToolchain => {
                 self.compiled_binaries.push("gcc-bootstrap".to_string());
-                self.compiled_binaries
-                    .push("binutils-bootstrap".to_string());
+                self.compiled_binaries.push("binutils-bootstrap".to_string());
                 self.current_stage = BootstrapStage::Stage2SysrootSetup;
                 Ok("Stage 1 complete: Temp toolchain built successfully".to_string())
             }
@@ -93,15 +92,10 @@ mod tests {
         let step1 = engine.execute_next_bootstrap_step().unwrap();
         assert_eq!(step1, "Stage 1 complete: Temp toolchain built successfully");
         assert_eq!(engine.current_stage, BootstrapStage::Stage2SysrootSetup);
-        assert!(engine
-            .compiled_binaries
-            .contains(&"gcc-bootstrap".to_string()));
+        assert!(engine.compiled_binaries.contains(&"gcc-bootstrap".to_string()));
 
         let step2 = engine.execute_next_bootstrap_step().unwrap();
-        assert_eq!(
-            step2,
-            "Stage 2 complete: Sysroot target headers established"
-        );
+        assert_eq!(step2, "Stage 2 complete: Sysroot target headers established");
         assert_eq!(engine.current_stage, BootstrapStage::Stage3FinalBuild);
     }
 

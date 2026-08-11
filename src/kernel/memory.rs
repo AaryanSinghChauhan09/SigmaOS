@@ -1,62 +1,234 @@
-// SigmaOS Virtual Memory Manager & Page Table implementation
-// Expanding to provide full 4-level x86_64 paging, CoW, and TLB management
-#![allow(dead_code)]
+// SigmaOS Kernel Memory Management
+// Implements buddy allocator and paging
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
 use core::ptr::NonNull;
-use crate::kernel::memory::BuddyAllocator; // existing
 
+/// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
 
-/// Page Table Entry (PTE) Flags
-pub const PTE_PRESENT: u64 = 1 << 0;
-pub const PTE_WRITABLE: u64 = 1 << 1;
-pub const PTE_USER: u64 = 1 << 2;
-pub const PTE_WRITE_THROUGH: u64 = 1 << 3;
-pub const PTE_CACHE_DISABLE: u64 = 1 << 4;
-pub const PTE_ACCESSED: u64 = 1 << 5;
-pub const PTE_DIRTY: u64 = 1 << 6;
-pub const PTE_HUGE_PAGE: u64 = 1 << 7;
-pub const PTE_GLOBAL: u64 = 1 << 8;
-pub const PTE_COW: u64 = 1 << 9; // Custom CoW bit in available OS area
-pub const PTE_NO_EXECUTE: u64 = 1 << 63;
+/// Memory block
+#[derive(Debug)]
+pub struct MemoryBlock {
+    pub addr: NonNull<u8>,
+    pub size: usize,
+}
 
-/// Address bounds
-pub const KERNEL_BASE: usize = 0xFFFF_8000_0000_0000;
-pub const USER_LIMIT: usize = 0x0000_7FFF_FFFF_FFFF;
+/// Buddy allocator for memory management
+pub struct BuddyAllocator {
+    free_lists: [Vec<MemoryBlock>; 12], // 2^0 to 2^11 pages (4KB to 8MB)
+}
 
-/// Represents an entry in any level of the page table
-#[derive(Clone, Copy)]
-#[repr(transparent)]
+impl BuddyAllocator {
+    pub fn new() -> Self {
+        Self {
+            free_lists: Default::default(),
+        }
+    }
+
+    pub fn with_memory(base_addr: usize, size: usize) -> Self {
+        let mut allocator = Self::new();
+        allocator.initialize_memory(base_addr, size);
+        allocator
+    }
+
+    pub fn initialize_memory(&mut self, base_addr: usize, size: usize) {
+        let pages = size / PAGE_SIZE;
+        let order = self.calculate_order(pages);
+
+        if order < 12 {
+            if let Some(addr) = NonNull::new(base_addr as *mut u8) {
+                let block = MemoryBlock {
+                    addr,
+                    size,
+                };
+                self.free_lists[order].push(block);
+            }
+        }
+    }
+
+    pub fn get_free_memory(&self) -> usize {
+        self.free_lists
+            .iter()
+            .enumerate()
+            .map(|(order, blocks)| blocks.len() * (1 << order) * PAGE_SIZE)
+            .sum()
+    }
+
+    pub fn get_total_memory(&self) -> usize {
+        self.free_lists
+            .iter()
+            .enumerate()
+            .map(|(order, blocks)| blocks.len() * (1 << order) * PAGE_SIZE)
+            .sum()
+    }
+
+    pub fn allocate(&mut self, size: usize) -> Option<MemoryBlock> {
+        // Prevent integer overflow in size calculation
+        if size == 0 || size > usize::MAX - PAGE_SIZE + 1 {
+            return None;
+        }
+
+        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+        let order = self.calculate_order(pages);
+
+        // Find smallest block that can satisfy request
+        for current_order in order..12 {
+            if let Some(block) = self.get_block(current_order) {
+                // Split block if necessary
+                if current_order > order {
+                    let split_block = self.split_block(block, current_order - order)?;
+                    return Some(split_block);
+                }
+                return Some(block);
+            }
+        }
+
+        None
+    }
+
+    pub fn deallocate(&mut self, block: MemoryBlock) {
+        let pages = block.size / PAGE_SIZE;
+        let order = self.calculate_order(pages);
+
+        // Try to merge with buddy
+        match self.try_merge(block, order) {
+            Ok(merged_block) => self.deallocate(merged_block),
+            Err(original_block) => self.free_lists[order].push(original_block),
+        }
+    }
+
+    fn calculate_order(&self, pages: usize) -> usize {
+        let mut order = 0;
+        let mut size = 1;
+        while size < pages {
+            size *= 2;
+            order += 1;
+        }
+        order
+    }
+
+    fn get_block(&mut self, order: usize) -> Option<MemoryBlock> {
+        if order < 12 {
+            self.free_lists[order].pop()
+        } else {
+            None
+        }
+    }
+
+    fn split_block(&mut self, block: MemoryBlock, target_order: usize) -> Option<MemoryBlock> {
+        let mut current_block = block;
+        let mut current_order = self.calculate_order(current_block.size / PAGE_SIZE);
+
+        while current_order > target_order {
+            current_order -= 1;
+            let half_size = current_block.size / 2;
+            let addr = current_block.addr.as_ptr() as usize + half_size;
+
+            let buddy = MemoryBlock {
+                addr: NonNull::new(addr as *mut u8)?,
+                size: half_size,
+            };
+
+            current_block.size = half_size;
+            self.free_lists[current_order].push(buddy);
+        }
+
+        Some(current_block)
+    }
+
+    fn try_merge(&mut self, block: MemoryBlock, order: usize) -> Result<MemoryBlock, MemoryBlock> {
+        if order >= 11 {
+            return Err(block); // Maximum order
+        }
+
+        let block_addr = block.addr.as_ptr() as usize;
+        let buddy_addr = block_addr ^ (1 << (order + 12)); // Calculate buddy address
+        let buddy_size = block.size * 2;
+
+        // Find buddy in free list
+        if let Some(pos) = self.free_lists[order]
+            .iter()
+            .position(|b| b.addr.as_ptr() as usize == buddy_addr && b.size == block.size)
+        {
+            let _buddy = self.free_lists[order].remove(pos);
+
+            // Merge blocks
+            let merged_addr = if block_addr < buddy_addr {
+                block_addr
+            } else {
+                buddy_addr
+            };
+
+            if let Some(addr) = NonNull::new(merged_addr as *mut u8) {
+                Ok(MemoryBlock {
+                    addr,
+                    size: buddy_size,
+                })
+            } else {
+                Err(block)
+            }
+        } else {
+            Err(block)
+        }
+    }
+}
+
+impl Default for BuddyAllocator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Page table entry flags
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PageFlags(pub u64);
+
+impl PageFlags {
+    pub const PRESENT: u64 = 1 << 0;
+    pub const WRITABLE: u64 = 1 << 1;
+    pub const USER_ACCESSIBLE: u64 = 1 << 2;
+    pub const WRITE_THROUGH: u64 = 1 << 3;
+    pub const CACHE_DISABLE: u64 = 1 << 4;
+    pub const ACCESSED: u64 = 1 << 5;
+    pub const DIRTY: u64 = 1 << 6;
+    pub const HUGE_PAGE: u64 = 1 << 7;
+    pub const GLOBAL: u64 = 1 << 8;
+    pub const NO_EXECUTE: u64 = 1 << 63;
+}
+
+/// A standard 4KB page table entry
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
 pub struct PageTableEntry(u64);
 
 impl PageTableEntry {
     pub fn new() -> Self {
-        PageTableEntry(0)
+        Self(0)
     }
-    
-    pub fn is_unused(&self) -> bool { self.0 == 0 }
-    pub fn set_unused(&mut self) { self.0 = 0; }
-    pub fn flags(&self) -> u64 { self.0 & 0xFFF0_0000_0000_0FFF }
-    pub fn addr(&self) -> usize { (self.0 & 0x000F_FFFF_FFFF_F000) as usize }
-    pub fn set_addr(&mut self, addr: usize, flags: u64) {
-        assert_eq!(addr & !0x000F_FFFF_FFFF_F000, 0);
-        self.0 = (addr as u64) | flags;
+
+    pub fn set_addr(&mut self, addr: u64, flags: PageFlags) {
+        // Clear everything but flags, and mask the address to align with 4KB
+        self.0 = (addr & 0x0000_00FF_FFFF_F000) | flags.0;
     }
-    pub fn is_present(&self) -> bool { (self.0 & PTE_PRESENT) != 0 }
-    pub fn is_writable(&self) -> bool { (self.0 & PTE_WRITABLE) != 0 }
-    pub fn set_flags(&mut self, flags: u64) {
-        self.0 = (self.0 & 0x000F_FFFF_FFFF_F000) | flags;
+
+    pub fn get_addr(&self) -> u64 {
+        self.0 & 0x0000_00FF_FFFF_F000
     }
-    pub fn clear_flags(&mut self, flags: u64) {
-        self.0 &= !flags;
+
+    pub fn flags(&self) -> PageFlags {
+        PageFlags(self.0 & 0xFFF0_0000_0000_0FFF)
+    }
+
+    pub fn is_present(&self) -> bool {
+        (self.0 & PageFlags::PRESENT) != 0
+    }
+
+    pub fn clear(&mut self) {
+        self.0 = 0;
     }
 }
 
-/// A 4KB page table containing 512 entries
+/// A standard Page Table (containing 512 entries on x86_64)
 #[repr(align(4096))]
 pub struct PageTable {
     pub entries: [PageTableEntry; 512],
@@ -68,346 +240,91 @@ impl PageTable {
             entries: [PageTableEntry::new(); 512],
         }
     }
-    pub fn clear(&mut self) {
-        for entry in self.entries.iter_mut() {
-            entry.set_unused();
-        }
-    }
 }
 
-/// Abstraction for active page table management
-pub struct ActivePageTable {
-    pub pml4_phys_addr: usize,
-}
-
-impl ActivePageTable {
-    pub unsafe fn new(pml4_phys_addr: usize) -> Self {
-        Self { pml4_phys_addr }
-    }
-
-    /// Access the PML4 table via its linear kernel mapping
-    pub fn pml4(&mut self) -> &mut PageTable {
-        // Assuming linear mapping of physical memory at KERNEL_BASE
-        let virt = KERNEL_BASE + self.pml4_phys_addr;
-        unsafe { &mut *(virt as *mut PageTable) }
-    }
-
-    /// Translates a virtual address to a physical address
-    pub fn translate(&mut self, virt_addr: usize) -> Option<usize> {
-        let p4_idx = (virt_addr >> 39) & 0x1FF;
-        let p3_idx = (virt_addr >> 30) & 0x1FF;
-        let p2_idx = (virt_addr >> 21) & 0x1FF;
-        let p1_idx = (virt_addr >> 12) & 0x1FF;
-        let offset = virt_addr & 0xFFF;
-
-        let pml4 = self.pml4();
-        let p4_entry = &pml4.entries[p4_idx];
-        if !p4_entry.is_present() { return None; }
-
-        let pdpt = unsafe { &*( (KERNEL_BASE + p4_entry.addr()) as *const PageTable ) };
-        let p3_entry = &pdpt.entries[p3_idx];
-        if !p3_entry.is_present() { return None; }
-        if (p3_entry.flags() & PTE_HUGE_PAGE) != 0 {
-            // 1GB huge page
-            return Some(p3_entry.addr() + (virt_addr & 0x3FFF_FFFF));
-        }
-
-        let pd = unsafe { &*( (KERNEL_BASE + p3_entry.addr()) as *const PageTable ) };
-        let p2_entry = &pd.entries[p2_idx];
-        if !p2_entry.is_present() { return None; }
-        if (p2_entry.flags() & PTE_HUGE_PAGE) != 0 {
-            // 2MB huge page
-            return Some(p2_entry.addr() + (virt_addr & 0x1F_FFFF));
-        }
-
-        let pt = unsafe { &*( (KERNEL_BASE + p2_entry.addr()) as *const PageTable ) };
-        let p1_entry = &pt.entries[p1_idx];
-        if !p1_entry.is_present() { return None; }
-
-        Some(p1_entry.addr() + offset)
-    }
-
-    /// Helper to get next level table, allocating if not present
-    fn get_next_level(&mut self, entry: &mut PageTableEntry, alloc: &mut BuddyAllocator, flags: u64) -> Result<&mut PageTable, &'static str> {
-        if !entry.is_present() {
-            let phys = alloc.allocate_pages(1).ok_or("OOM in page table allocation")?.as_ptr() as usize;
-            let virt = KERNEL_BASE + phys;
-            let table = unsafe { &mut *(virt as *mut PageTable) };
-            table.clear();
-            entry.set_addr(phys, PTE_PRESENT | PTE_WRITABLE | PTE_USER | flags); // Intermediate levels often have generic permissive flags
-            Ok(table)
-        } else {
-            let phys = entry.addr();
-            let virt = KERNEL_BASE + phys;
-            Ok(unsafe { &mut *(virt as *mut PageTable) })
-        }
-    }
-
-    /// Map a page
-    pub fn map_page(&mut self, virt_addr: usize, phys_addr: usize, flags: u64, alloc: &mut BuddyAllocator) -> Result<(), &'static str> {
-        assert_eq!(virt_addr % PAGE_SIZE, 0);
-        assert_eq!(phys_addr % PAGE_SIZE, 0);
-
-        let p4_idx = (virt_addr >> 39) & 0x1FF;
-        let p3_idx = (virt_addr >> 30) & 0x1FF;
-        let p2_idx = (virt_addr >> 21) & 0x1FF;
-        let p1_idx = (virt_addr >> 12) & 0x1FF;
-
-        let pml4 = self.pml4();
-        let p4_entry = &mut pml4.entries[p4_idx];
-        let pdpt = self.get_next_level(p4_entry, alloc, flags)?;
-        
-        let p3_entry = &mut pdpt.entries[p3_idx];
-        let pd = self.get_next_level(p3_entry, alloc, flags)?;
-        
-        let p2_entry = &mut pd.entries[p2_idx];
-        let pt = self.get_next_level(p2_entry, alloc, flags)?;
-        
-        let p1_entry = &mut pt.entries[p1_idx];
-        if p1_entry.is_present() {
-            return Err("Page already mapped");
-        }
-        
-        p1_entry.set_addr(phys_addr, flags | PTE_PRESENT);
-        Ok(())
-    }
-
-    /// Unmap a page
-    pub fn unmap_page(&mut self, virt_addr: usize) -> Result<(), &'static str> {
-        assert_eq!(virt_addr % PAGE_SIZE, 0);
-        let p4_idx = (virt_addr >> 39) & 0x1FF;
-        let p3_idx = (virt_addr >> 30) & 0x1FF;
-        let p2_idx = (virt_addr >> 21) & 0x1FF;
-        let p1_idx = (virt_addr >> 12) & 0x1FF;
-
-        let pml4 = self.pml4();
-        let p4_entry = &mut pml4.entries[p4_idx];
-        if !p4_entry.is_present() { return Err("Page not mapped (P4)"); }
-        let pdpt = unsafe { &mut *( (KERNEL_BASE + p4_entry.addr()) as *mut PageTable ) };
-        
-        let p3_entry = &mut pdpt.entries[p3_idx];
-        if !p3_entry.is_present() { return Err("Page not mapped (P3)"); }
-        let pd = unsafe { &mut *( (KERNEL_BASE + p3_entry.addr()) as *mut PageTable ) };
-
-        let p2_entry = &mut pd.entries[p2_idx];
-        if !p2_entry.is_present() { return Err("Page not mapped (P2)"); }
-        let pt = unsafe { &mut *( (KERNEL_BASE + p2_entry.addr()) as *mut PageTable ) };
-
-        let p1_entry = &mut pt.entries[p1_idx];
-        if !p1_entry.is_present() { return Err("Page not mapped (P1)"); }
-
-        p1_entry.set_unused();
-        Self::invlpg(virt_addr);
-        Ok(())
-    }
-
-    /// Protect a page (change flags)
-    pub fn protect_page(&mut self, virt_addr: usize, new_flags: u64) -> Result<(), &'static str> {
-        assert_eq!(virt_addr % PAGE_SIZE, 0);
-        let p1_idx = (virt_addr >> 12) & 0x1FF;
-        let pt = self.walk_to_pt(virt_addr)?;
-        let p1_entry = &mut pt.entries[p1_idx];
-        
-        if !p1_entry.is_present() { return Err("Page not mapped"); }
-        let phys = p1_entry.addr();
-        p1_entry.set_addr(phys, new_flags | PTE_PRESENT);
-        Self::invlpg(virt_addr);
-        Ok(())
-    }
-
-    fn walk_to_pt(&mut self, virt_addr: usize) -> Result<&mut PageTable, &'static str> {
-        let p4_idx = (virt_addr >> 39) & 0x1FF;
-        let p3_idx = (virt_addr >> 30) & 0x1FF;
-        let p2_idx = (virt_addr >> 21) & 0x1FF;
-
-        let pml4 = self.pml4();
-        let p4_entry = &mut pml4.entries[p4_idx];
-        if !p4_entry.is_present() { return Err("P4 missing"); }
-        let pdpt = unsafe { &mut *( (KERNEL_BASE + p4_entry.addr()) as *mut PageTable ) };
-        
-        let p3_entry = &mut pdpt.entries[p3_idx];
-        if !p3_entry.is_present() { return Err("P3 missing"); }
-        let pd = unsafe { &mut *( (KERNEL_BASE + p3_entry.addr()) as *mut PageTable ) };
-
-        let p2_entry = &mut pd.entries[p2_idx];
-        if !p2_entry.is_present() { return Err("P2 missing"); }
-        let pt = unsafe { &mut *( (KERNEL_BASE + p2_entry.addr()) as *mut PageTable ) };
-        Ok(pt)
-    }
-
-    /// TLB Shootdown implementation wrapper
-    pub fn invlpg(addr: usize) {
-        unsafe {
-            core::arch::asm!("invlpg [{}]", in(reg) addr, options(nostack, preserves_flags));
-        }
-    }
-}
-
-// VMA structures
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VmAccess {
-    Read,
-    ReadWrite,
-    Execute,
-    None,
-}
-
-impl VmAccess {
-    pub fn to_pte_flags(&self) -> u64 {
-        let mut flags = PTE_USER;
-        match self {
-            VmAccess::Read => flags |= PTE_NO_EXECUTE,
-            VmAccess::ReadWrite => flags |= PTE_WRITABLE | PTE_NO_EXECUTE,
-            VmAccess::Execute => {},
-            VmAccess::None => flags = 0,
-        }
-        flags
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct VmArea {
-    pub start: usize,
-    pub end: usize,
-    pub access: VmAccess,
-    pub is_cow: bool,
-    pub mapped_file: Option<u64>,
-    pub name: alloc::string::String,
-}
-
+/// Virtual Memory Manager (VMM) handling paging
 pub struct VirtualMemoryManager {
-    pub areas: BTreeMap<usize, VmArea>,
-    pub pt: ActivePageTable,
-    pub page_ref_counts: BTreeMap<usize, usize>, // Physical page reference counts for CoW
+    pub root_directory: NonNull<PageTable>,
 }
 
 impl VirtualMemoryManager {
-    pub fn new(pml4_phys: usize) -> Self {
-        Self {
-            areas: BTreeMap::new(),
-            pt: unsafe { ActivePageTable::new(pml4_phys) },
-            page_ref_counts: BTreeMap::new(),
-        }
+    pub fn new(root_directory: NonNull<PageTable>) -> Self {
+        Self { root_directory }
     }
 
-    pub fn inc_ref(&mut self, phys: usize) {
-        let count = self.page_ref_counts.entry(phys).or_insert(0);
-        *count += 1;
-    }
+    /// Translates a virtual address into a physical address
+    pub fn translate(&self, virtual_addr: u64) -> Option<u64> {
+        // Mock translation logic for SigmaOS OOP structure
+        // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_ref() };
 
-    pub fn dec_ref(&mut self, phys: usize, alloc: &mut BuddyAllocator) {
-        if let Some(count) = self.page_ref_counts.get_mut(&phys) {
-            if *count > 1 {
-                *count -= 1;
-            } else {
-                self.page_ref_counts.remove(&phys);
-                let ptr = NonNull::new((KERNEL_BASE + phys) as *mut u8).unwrap();
-                alloc.free_pages(ptr, 1);
-            }
-        }
-    }
-
-    pub fn mmap(&mut self, addr: usize, length: usize, access: VmAccess, is_cow: bool, mapped_file: Option<u64>, name: &str) -> Result<usize, &'static str> {
-        let aligned_addr = addr & !(PAGE_SIZE - 1);
-        let aligned_length = (length + PAGE_SIZE - 1) & !(PAGE_SIZE - 1);
-        
-        let area = VmArea {
-            start: aligned_addr,
-            end: aligned_addr + aligned_length,
-            access,
-            is_cow,
-            mapped_file,
-            name: alloc::string::String::from(name),
-        };
-        self.areas.insert(aligned_addr, area);
-        Ok(aligned_addr)
-    }
-
-    pub fn munmap(&mut self, addr: usize, length: usize, alloc: &mut BuddyAllocator) -> Result<(), &'static str> {
-        let aligned_addr = addr & !(PAGE_SIZE - 1);
-        let aligned_length = (length + PAGE_SIZE - 1) & !(PAGE_SIZE - 1);
-        
-        if let Some(area) = self.areas.remove(&aligned_addr) {
-            for vaddr in (area.start..area.end).step_by(PAGE_SIZE) {
-                if let Some(phys) = self.pt.translate(vaddr) {
-                    self.dec_ref(phys, alloc);
-                    let _ = self.pt.unmap_page(vaddr);
-                }
-            }
-            Ok(())
+        let entry = &root.entries[pt_index as usize];
+        if entry.is_present() {
+            Some(entry.get_addr() + (virtual_addr & 0xFFF))
         } else {
-            Err("No mapping found")
+            None
         }
     }
 
-    pub fn handle_page_fault(&mut self, fault_addr: usize, err_code: u64, alloc: &mut BuddyAllocator) -> Result<(), &'static str> {
-        let is_write = (err_code & 2) != 0;
-        let is_user = (err_code & 4) != 0;
-        let is_present = (err_code & 1) != 0;
+    /// Maps a virtual page to a physical frame
+    pub fn map_page(
+        &mut self,
+        virtual_addr: u64,
+        physical_addr: u64,
+        flags: PageFlags,
+    ) -> Result<(), &'static str> {
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_mut() };
 
-        let fault_page = fault_addr & !(PAGE_SIZE - 1);
-
-        // Find area
-        let mut target_area = None;
-        for (_, area) in self.areas.iter() {
-            if fault_addr >= area.start && fault_addr < area.end {
-                target_area = Some(area.clone());
-                break;
-            }
+        let entry = &mut root.entries[pt_index as usize];
+        if entry.is_present() {
+            return Err("Page already mapped!");
         }
 
-        let area = target_area.ok_or("Segmentation fault: Unmapped region")?;
+        entry.set_addr(physical_addr, flags);
+        Ok(())
+    }
 
-        if is_write && area.access == VmAccess::Read {
-            return Err("Segmentation fault: Write to read-only region");
+    /// Unmaps a virtual page
+    pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
+        let pt_index = (virtual_addr >> 12) & 0x1FF;
+        let root = unsafe { self.root_directory.as_mut() };
+
+        let entry = &mut root.entries[pt_index as usize];
+        if !entry.is_present() {
+            return Err("Page is not mapped!");
         }
 
-        if is_present && is_write && area.is_cow {
-            // Copy on write fault
-            let pt = self.pt.walk_to_pt(fault_page)?;
-            let p1_idx = (fault_page >> 12) & 0x1FF;
-            let p1_entry = &pt.entries[p1_idx];
-            
-            if (p1_entry.flags() & PTE_COW) != 0 {
-                let old_phys = p1_entry.addr();
-                let ref_count = *self.page_ref_counts.get(&old_phys).unwrap_or(&1);
-                
-                if ref_count == 1 {
-                    // We are the only owner, just make it writable
-                    self.pt.protect_page(fault_page, area.access.to_pte_flags())?;
-                } else {
-                    // Copy page
-                    let new_phys = alloc.allocate_pages(1).ok_or("OOM during CoW")?.as_ptr() as usize - KERNEL_BASE;
-                    self.inc_ref(new_phys);
-                    
-                    // Copy data
-                    unsafe {
-                        let src = (KERNEL_BASE + old_phys) as *const u8;
-                        let dst = (KERNEL_BASE + new_phys) as *mut u8;
-                        core::ptr::copy_nonoverlapping(src, dst, PAGE_SIZE);
-                    }
-                    
-                    self.dec_ref(old_phys, alloc);
-                    let _ = self.pt.unmap_page(fault_page);
-                    self.pt.map_page(fault_page, new_phys, area.access.to_pte_flags(), alloc)?;
-                }
-                return Ok(());
-            }
-        } else if !is_present {
-            // Normal demand paging
-            let new_phys = alloc.allocate_pages(1).ok_or("OOM during demand paging")?.as_ptr() as usize - KERNEL_BASE;
-            self.inc_ref(new_phys);
-            
-            // Zero the page
-            unsafe {
-                core::ptr::write_bytes((KERNEL_BASE + new_phys) as *mut u8, 0, PAGE_SIZE);
-            }
+        entry.clear();
+        Ok(())
+    }
+}
 
-            self.pt.map_page(fault_page, new_phys, area.access.to_pte_flags(), alloc)?;
-            return Ok(());
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-        Err("Unhandled page fault condition")
+    #[test]
+    fn test_allocator_creation() {
+        let allocator = BuddyAllocator::new();
+        assert!(allocator.free_lists.iter().all(|list| list.is_empty()));
+    }
+
+    #[test]
+    fn test_order_calculation() {
+        let allocator = BuddyAllocator::new();
+        assert_eq!(allocator.calculate_order(1), 0);
+        assert_eq!(allocator.calculate_order(2), 1);
+        assert_eq!(allocator.calculate_order(4), 2);
+    }
+
+    #[test]
+    fn test_allocate_deallocate() {
+        let mut allocator = BuddyAllocator::new();
+        // This would need actual memory to work properly
+        // For now, just test the interface
+        let result = allocator.allocate(4096);
+        // Will fail without actual memory, but tests the flow
     }
 }

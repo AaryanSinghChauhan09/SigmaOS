@@ -1,5 +1,4 @@
 // SigmaOS More Devices — Ancient & Newer OOP Drivers
-// SigmaOS More Devices — Ancient & Newer OOP Drivers
 // This file implements 12 distinct drivers spanning ancient/legacy era to state-of-the-art modern hardware.
 
 #![allow(clippy::all, warnings)]

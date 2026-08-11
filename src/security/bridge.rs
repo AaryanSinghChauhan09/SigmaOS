@@ -1,7 +1,7 @@
 // SigmaOS Security Evolution Bridge (SecurityBridge)
 // Maps legacy security models (basic Unix DAC, AppArmor profile contexts, legacy SELinux labels) to modern zero-trust capability gates
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum LegacySecurityType {
@@ -12,12 +12,12 @@ pub enum LegacySecurityType {
 
 pub struct SecurityBridge {
     pub security_type: LegacySecurityType,
-    pub legacy_rules: BTreeMap<String, String>,
+    pub legacy_rules: HashMap<String, String>,
 }
 
 impl SecurityBridge {
     pub fn new(sec_type: LegacySecurityType) -> Self {
-        let mut rules = BTreeMap::new();
+        let mut rules = HashMap::new();
         match sec_type {
             LegacySecurityType::UnixDac => {
                 rules.insert("owner_read".to_string(), "sigma_pledge_read".to_string());

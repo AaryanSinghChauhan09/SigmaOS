@@ -1,7 +1,7 @@
 // SigmaOS Safe Win32 Compatibility Subsystem (SigmaWin)
 // Designed to parse, load, and manage legacy Win32 binaries securely on the sovereign transaction bus
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Win32 processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -20,7 +20,7 @@ pub struct Win32Handle(pub u64);
 /// Supported PE formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PeFormat {
-    Pe32,     // 32-bit x86
+    Pe32,    // 32-bit x86
     Pe32Plus, // 64-bit x86_64
 }
 
@@ -70,8 +70,7 @@ impl PeLoader {
             return Err(Win32Error::InvalidPEHeader);
         }
 
-        let magic = (raw_bytes[optional_header_offset] as u16)
-            | ((raw_bytes[optional_header_offset + 1] as u16) << 8);
+        let magic = (raw_bytes[optional_header_offset] as u16) | ((raw_bytes[optional_header_offset + 1] as u16) << 8);
         match magic {
             0x10B => {
                 self.binary_format = PeFormat::Pe32; // x86 32-bit magic
@@ -91,19 +90,14 @@ impl PeLoader {
 // ==========================================
 
 pub struct RegistryManager {
-    pub keys: BTreeMap<String, String>,
+    pub keys: HashMap<String, String>,
 }
 
 impl RegistryManager {
     pub fn new() -> Self {
-        let mut reg = RegistryManager {
-            keys: BTreeMap::new(),
-        };
+        let mut reg = RegistryManager { keys: HashMap::new() };
         // Seed default registry settings
-        reg.set_key(
-            "HKLM\\Software\\SigmaWin\\Version".to_string(),
-            "1.0.0-LTS".to_string(),
-        );
+        reg.set_key("HKLM\\Software\\SigmaWin\\Version".to_string(), "1.0.0-LTS".to_string());
         reg
     }
 
@@ -133,9 +127,7 @@ pub struct User32MessageQueue {
 
 impl User32MessageQueue {
     pub fn new() -> Self {
-        User32MessageQueue {
-            messages: Vec::new(),
-        }
+        User32MessageQueue { messages: Vec::new() }
     }
 
     pub fn post_message(&mut self, msg: Win32Message) {
@@ -181,20 +173,9 @@ mod tests {
     #[test]
     fn test_registry_manager() {
         let mut manager = RegistryManager::new();
-        assert_eq!(
-            manager
-                .get_key("HKLM\\Software\\SigmaWin\\Version")
-                .unwrap(),
-            "1.0.0-LTS"
-        );
-        manager.set_key(
-            "HKCU\\Software\\Theme".to_string(),
-            "Glassmorphism".to_string(),
-        );
-        assert_eq!(
-            manager.get_key("HKCU\\Software\\Theme").unwrap(),
-            "Glassmorphism"
-        );
+        assert_eq!(manager.get_key("HKLM\\Software\\SigmaWin\\Version").unwrap(), "1.0.0-LTS");
+        manager.set_key("HKCU\\Software\\Theme".to_string(), "Glassmorphism".to_string());
+        assert_eq!(manager.get_key("HKCU\\Software\\Theme").unwrap(), "Glassmorphism");
     }
 
     #[test]

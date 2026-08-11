@@ -1,6 +1,8 @@
 // SigmaOS Sovereign AI-Native Photo Editing Suite (SigmaPaint)
 // Designed for high-performance raster image canvas and layer filtering
 
+use std::collections::HashMap;
+
 /// Image processing error states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PhotoError {
@@ -36,12 +38,7 @@ pub enum BlendMode {
 
 /// Base OOP interface representing any image processing filter
 pub trait ImageFilter {
-    fn apply_filter(
-        &self,
-        width: u32,
-        height: u32,
-        pixels: &mut [ColorRgba],
-    ) -> Result<(), PhotoError>;
+    fn apply_filter(&self, width: u32, height: u32, pixels: &mut [ColorRgba]) -> Result<(), PhotoError>;
 }
 
 /// Base OOP interface representing a composite layer inside a Canvas
@@ -117,12 +114,7 @@ impl GaussianBlurFilter {
 }
 
 impl ImageFilter for GaussianBlurFilter {
-    fn apply_filter(
-        &self,
-        width: u32,
-        height: u32,
-        pixels: &mut [ColorRgba],
-    ) -> Result<(), PhotoError> {
+    fn apply_filter(&self, width: u32, height: u32, pixels: &mut [ColorRgba]) -> Result<(), PhotoError> {
         if width == 0 || height == 0 || pixels.len() != (width * height) as usize {
             return Err(PhotoError::InvalidDimensions);
         }
@@ -145,8 +137,7 @@ impl ImageFilter for GaussianBlurFilter {
 
                 for dy in -1..=1 {
                     for dx in -1..=1 {
-                        let offset_idx =
-                            (((y as i32 + dy) * width as i32) + (x as i32 + dx)) as usize;
+                        let offset_idx = (((y as i32 + dy) * width as i32) + (x as i32 + dx)) as usize;
                         let p = temp_pixels[offset_idx];
                         sum_r += p.r as u32;
                         sum_g += p.g as u32;
@@ -175,16 +166,10 @@ impl ImageFilter for GaussianBlurFilter {
 pub struct GrayscaleConversionFilter;
 
 impl ImageFilter for GrayscaleConversionFilter {
-    fn apply_filter(
-        &self,
-        _width: u32,
-        _height: u32,
-        pixels: &mut [ColorRgba],
-    ) -> Result<(), PhotoError> {
+    fn apply_filter(&self, _width: u32, _height: u32, pixels: &mut [ColorRgba]) -> Result<(), PhotoError> {
         for pixel in pixels.iter_mut() {
             // Standard NTSC Grayscale coefficients
-            let gray =
-                (0.299 * pixel.r as f32 + 0.587 * pixel.g as f32 + 0.114 * pixel.b as f32) as u8;
+            let gray = (0.299 * pixel.r as f32 + 0.587 * pixel.g as f32 + 0.114 * pixel.b as f32) as u8;
             pixel.r = gray;
             pixel.g = gray;
             pixel.b = gray;

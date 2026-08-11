@@ -1,7 +1,7 @@
 // SigmaOS Legal & Licensing Framework
 // Clear licensing policies, patent/IP strategy, and compliance certification metrics
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Supported open-source and proprietary license types
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -62,18 +62,18 @@ pub struct ComplianceCert {
 
 /// Legal Compliance Registry Manager
 pub struct LegalComplianceRegistry {
-    pub licensed_components: BTreeMap<String, ComponentLicense>,
-    pub patent_pool: BTreeMap<String, PatentRecord>,
-    pub compliance_certs: BTreeMap<String, ComplianceCert>,
+    pub licensed_components: HashMap<String, ComponentLicense>,
+    pub patent_pool: HashMap<String, PatentRecord>,
+    pub compliance_certs: HashMap<String, ComplianceCert>,
     pub default_strict_copyleft_allow: bool,
 }
 
 impl LegalComplianceRegistry {
     pub fn new() -> Self {
         Self {
-            licensed_components: BTreeMap::new(),
-            patent_pool: BTreeMap::new(),
-            compliance_certs: BTreeMap::new(),
+            licensed_components: HashMap::new(),
+            patent_pool: HashMap::new(),
+            compliance_certs: HashMap::new(),
             default_strict_copyleft_allow: true,
         }
     }

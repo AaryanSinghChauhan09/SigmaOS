@@ -1,7 +1,7 @@
 // SigmaOS Legacy Driver API Mapper (DriverMapper)
 // Maps legacy driver APIs directly to modern equivalents to bypass heavy emulation overhead
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MapperCategory {
@@ -12,31 +12,22 @@ pub enum MapperCategory {
 
 pub struct DriverMapper {
     pub category: MapperCategory,
-    pub api_translations: BTreeMap<String, String>,
+    pub api_translations: HashMap<String, String>,
 }
 
 impl DriverMapper {
     pub fn new(cat: MapperCategory) -> Self {
-        let mut translations = BTreeMap::new();
+        let mut translations = HashMap::new();
         match cat {
             MapperCategory::Storage => {
                 translations.insert("ide_read_sector".to_string(), "nvme_read_block".to_string());
-                translations.insert(
-                    "ide_write_sector".to_string(),
-                    "nvme_write_block".to_string(),
-                );
+                translations.insert("ide_write_sector".to_string(), "nvme_write_block".to_string());
             }
             MapperCategory::Network => {
-                translations.insert(
-                    "slip_tx_packet".to_string(),
-                    "ethernet_tx_packet".to_string(),
-                );
+                translations.insert("slip_tx_packet".to_string(), "ethernet_tx_packet".to_string());
             }
             MapperCategory::Graphics => {
-                translations.insert(
-                    "vga_set_mode_13h".to_string(),
-                    "vesa_set_linear_modebar".to_string(),
-                );
+                translations.insert("vga_set_mode_13h".to_string(), "vesa_set_linear_modebar".to_string());
             }
         }
         DriverMapper {

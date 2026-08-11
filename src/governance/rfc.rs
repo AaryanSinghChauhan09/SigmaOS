@@ -1,7 +1,7 @@
 // SigmaOS RFC & Proposal Governance System
 // Standard compliance based on Ideas-999-Structured: Community & Governance
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub type RFCID = usize;
 

@@ -1,68 +1,35 @@
 // SigmaOS Compatibility Module
-pub mod absorb_tools;
-pub mod apache_ossie;
-pub mod chimera_linux;
 pub mod cross_platform;
-pub mod historic_linux;
-pub mod mint_linux;
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod sovereign_suite;
-pub mod tiny_core;
-pub mod wasm_sandbox;
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
+pub mod canonical;
+pub mod fedora;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-
-pub use historic_linux::{
-    Era0_11SyscallEmulator, Era1_0SyscallEmulator, Era2_4SyscallEmulator, HistoricError,
-    HistoricSyscallEmulator, HistoricalCpuState, LinuxEra, VintageDriverTranslator,
-    VintagePackageConverter, VintageVirtualizationSandbox,
+pub use linux_adapter::{
+    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };
-
-pub use mint_linux::{
-    MintAppMetadata, MintBackupTool, MintReportAlert, MintReportAlertSeverity, MintReportSystem,
-    MintSoftwareManager, MintUpdateLevel, MintUpdateManager, MintUpdatePackage,
+pub use persona::{
+    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
 };
-
-pub use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-    DinitServiceState,
+pub use abi_translator::{
+    CpuArchitecture, ABITranslator,
 };
-
-pub use relay_nexus::{
-    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
-    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
-    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
-    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
-    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
-    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
-    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
-    ZeroTrustNexus,
+pub use lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
 };
-
-pub use solid_kernel::{
-    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
-    SigmaFSPlusPlus, SolidKernelCore,
+pub use prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
 };
-
-pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
-
-pub use absorb_tools::{
-    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, Literal, PledgePermission,
-    PledgeUnveilSandbox, PqcSecureChannel,
+pub use canonical::{
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
 };
-
-pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
-
-pub use apache_ossie::{
-    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
-    OssieRelationship, SemanticRow,
-};
-
-pub use sovereign_suite::{
-    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
-    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };

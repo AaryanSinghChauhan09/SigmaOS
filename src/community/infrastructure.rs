@@ -1,7 +1,7 @@
 // SigmaOS Community Infrastructure
 // Mentorship onboarding, structured bug tracking, and funding sustainability model
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Contributor onboarding stages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,14 +38,14 @@ impl ContributorProfile {
 
 /// Mentorship program coordinator
 pub struct MentorshipProgram {
-    pub contributors: BTreeMap<String, ContributorProfile>,
+    pub contributors: HashMap<String, ContributorProfile>,
     pub active_mentors: Vec<String>,
 }
 
 impl MentorshipProgram {
     pub fn new() -> Self {
         Self {
-            contributors: BTreeMap::new(),
+            contributors: HashMap::new(),
             active_mentors: Vec::new(),
         }
     }
@@ -145,14 +145,14 @@ impl CommunityIssue {
 
 /// Bug Tracking & Triage System
 pub struct BugTracker {
-    pub issues: BTreeMap<u32, CommunityIssue>,
+    pub issues: HashMap<u32, CommunityIssue>,
     pub next_id: u32,
 }
 
 impl BugTracker {
     pub fn new() -> Self {
         Self {
-            issues: BTreeMap::new(),
+            issues: HashMap::new(),
             next_id: 1,
         }
     }
@@ -214,7 +214,7 @@ pub struct Sponsor {
 pub struct FundingSustainability {
     pub total_funds: f64,
     pub sponsors: Vec<Sponsor>,
-    pub resource_allocations: BTreeMap<String, f64>,
+    pub resource_allocations: HashMap<String, f64>,
 }
 
 impl FundingSustainability {
@@ -222,7 +222,7 @@ impl FundingSustainability {
         Self {
             total_funds: 0.0,
             sponsors: Vec::new(),
-            resource_allocations: BTreeMap::new(),
+            resource_allocations: HashMap::new(),
         }
     }
 

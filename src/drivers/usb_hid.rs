@@ -2,7 +2,7 @@
 // Hardware abstraction for USB HID devices + PeripheralDevice OOP integration
 
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use crate::security::capability::CapabilityToken;
+use crate::security::CapabilityToken;
 
 /// USB HID report type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
