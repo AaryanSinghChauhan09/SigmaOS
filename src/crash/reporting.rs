@@ -54,7 +54,10 @@ impl SimpleCrashReport {
 
 impl CrashReport for SimpleCrashReport {
     fn id(&self) -> CrashReportID { self.id }
-    fn crash_type(&self) -> CrashType { unsafe { core::mem::transmute(self.crash_type.load(Ordering::SeqCst)) } }
+    fn crash_type(&self) -> CrashType {
+        let val = self.crash_type.load(Ordering::SeqCst) as u32;
+        unsafe { core::mem::transmute(val) }
+    }
     fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
     fn process_name(&self) -> &[u8] {
         let len = self.process_name.iter().position(|&b| b == 0).unwrap_or(64);
@@ -148,10 +151,10 @@ impl Anonymizer for SimpleAnonymizer {
     fn strip_pii(&self, data: &[u8]) -> Vec<u8> {
         let mut anonymized = Vec::new();
         for &byte in data {
-            if byte.is_ascii_alphanumeric() || byte == b' ' || byte == b'\n' {
-                anonymized.push(byte);
-            } else if byte.is_ascii_digit() {
+            if byte.is_ascii_digit() {
                 anonymized.push(b'X');
+            } else if byte.is_ascii_alphanumeric() || byte == b' ' || byte == b'\n' {
+                anonymized.push(byte);
             }
         }
         anonymized
@@ -194,6 +197,7 @@ pub trait CrashPipeline {
 }
 
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct CrashStatistics {
     pub total_crashes: usize,
     pub by_type: [usize; 5],
@@ -242,7 +246,7 @@ impl CrashPipeline for SimpleCrashPipeline {
         report.push(b'\n');
 
         if let Some(crash) = self.collector.reports.iter().filter_map(|r| r.as_ref()).find(|r| r.id() == report_id) {
-            let type_str = match crash.crash_type() {
+            let type_str: &[u8] = match crash.crash_type() {
                 CrashType::SegmentationFault => b"Segmentation Fault",
                 CrashType::BusError => b"Bus Error",
                 CrashType::IllegalInstruction => b"Illegal Instruction",
@@ -266,11 +270,15 @@ impl CrashPipeline for SimpleCrashPipeline {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
@@ -279,7 +287,7 @@ impl<T> Vec<T> {
             }
         }
     }
-    fn contains(&self, item: &T) -> bool where T: PartialEq {
+    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
         for i in 0..self.len {
             unsafe {
                 if &*self.data.add(i) == item { return true; }
@@ -299,7 +307,24 @@ impl<T> Vec<T> {
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(_ptr: *mut u8) {
+    // Safe no-op or stub on hosted target during tests
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 
 impl<T> core::ops::Deref for Vec<T> {
