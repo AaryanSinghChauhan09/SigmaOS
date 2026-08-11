@@ -18,6 +18,7 @@ pub mod kernel;
 pub mod network;
 pub mod orchestration;
 pub mod distro;
+pub mod debugger;
 pub mod package;
 pub mod performance;
 pub mod productivity;
