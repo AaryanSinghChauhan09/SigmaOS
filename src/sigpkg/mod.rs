@@ -17,6 +17,7 @@ pub mod universal_engine;
 pub mod universal_oop_system;
 pub mod verifier;
 pub mod zero_alloc_resolver;
+pub mod declarative_build;
 
 pub use importer::{
     DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
