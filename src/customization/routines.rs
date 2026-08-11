@@ -19,7 +19,11 @@
 // SigmaOS Customization Engine
 // Samsung Modes & Routines-style automation and theming
 
-use crate::klib::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use std::collections::HashMap;
+
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::HashMap;
 
 /// Automation trigger type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,7 +61,10 @@ impl Condition {
     pub fn evaluate(&self, current_value: &str) -> bool {
         match self.operator.as_str() {
             "equals" => current_value == self.value,
+            "not_equals" => current_value != self.value,
             "contains" => current_value.contains(&self.value),
+            "starts_with" => current_value.starts_with(&self.value),
+            "ends_with" => current_value.ends_with(&self.value),
             "greater_than" => {
                 if let (Ok(curr), Ok(val)) =
                     (current_value.parse::<f64>(), self.value.parse::<f64>())
@@ -72,6 +79,33 @@ impl Condition {
                     (current_value.parse::<f64>(), self.value.parse::<f64>())
                 {
                     curr < val
+                } else {
+                    false
+                }
+            }
+            "greater_than_or_equal" => {
+                if let (Ok(curr), Ok(val)) =
+                    (current_value.parse::<f64>(), self.value.parse::<f64>())
+                {
+                    curr >= val
+                } else {
+                    false
+                }
+            }
+            "less_than_or_equal" => {
+                if let (Ok(curr), Ok(val)) =
+                    (current_value.parse::<f64>(), self.value.parse::<f64>())
+                {
+                    curr <= val
+                } else {
+                    false
+                }
+            }
+            "bitwise_and" => {
+                if let (Ok(curr), Ok(val)) =
+                    (current_value.parse::<u64>(), self.value.parse::<u64>())
+                {
+                    (curr & val) == val
                 } else {
                     false
                 }
@@ -139,7 +173,7 @@ impl Routine {
         self.enabled = false;
     }
 
-    pub fn should_trigger(&self, context: &BTreeMap<String, String>) -> bool {
+    pub fn should_trigger(&self, context: &HashMap<String, String>) -> bool {
         if !self.enabled {
             return false;
         }
@@ -158,8 +192,8 @@ impl Routine {
 #[derive(Debug, Clone)]
 pub struct Theme {
     pub name: String,
-    pub colors: BTreeMap<String, String>,
-    pub fonts: BTreeMap<String, String>,
+    pub colors: HashMap<String, String>,
+    pub fonts: HashMap<String, String>,
     pub icon_set: String,
     pub window_decorations: bool,
     pub animations_enabled: bool,
@@ -169,8 +203,8 @@ impl Theme {
     pub fn new(name: String) -> Self {
         Self {
             name,
-            colors: BTreeMap::new(),
-            fonts: BTreeMap::new(),
+            colors: HashMap::new(),
+            fonts: HashMap::new(),
             icon_set: "default".to_string(),
             window_decorations: true,
             animations_enabled: true,
@@ -336,20 +370,20 @@ impl Default for SituationalPersonalizer {
 
 /// Customization engine
 pub struct CustomizationEngine {
-    pub routines: BTreeMap<String, Routine>,
-    pub themes: BTreeMap<String, Theme>,
+    pub routines: HashMap<String, Routine>,
+    pub themes: HashMap<String, Theme>,
     pub active_theme: Option<String>,
-    pub context: BTreeMap<String, String>,
+    pub context: HashMap<String, String>,
 }
 
 impl CustomizationEngine {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut engine = Self {
-            routines: BTreeMap::new(),
-            themes: BTreeMap::new(),
+            routines: HashMap::new(),
+            themes: HashMap::new(),
             active_theme: None,
-            context: BTreeMap::new(),
+            context: HashMap::new(),
         };
 
         engine.add_default_themes();
@@ -567,5 +601,49 @@ mod tests {
             WindowGridLayout::ThreeColumn
         );
         assert_eq!(personalizer.layout_customizer.spacing_px, 12);
+    }
+
+    #[test]
+    fn test_not_equals_and_linux_string_operators() {
+        let cond_neq = Condition::new(TriggerType::SystemEvent, "critical_oom".to_string())
+            .with_operator("not_equals".to_string());
+        assert!(cond_neq.evaluate("minor_cache_trim"));
+        assert!(!cond_neq.evaluate("critical_oom"));
+
+        let cond_start = Condition::new(TriggerType::Application, "git_".to_string())
+            .with_operator("starts_with".to_string());
+        assert!(cond_start.evaluate("git_commit"));
+        assert!(!cond_start.evaluate("commit_git"));
+
+        let cond_end = Condition::new(TriggerType::Application, "_daemon".to_string())
+            .with_operator("ends_with".to_string());
+        assert!(cond_end.evaluate("syslog_daemon"));
+        assert!(!cond_end.evaluate("daemon_syslog"));
+    }
+
+    #[test]
+    fn test_advanced_windows_version_operators() {
+        let cond_gte = Condition::new(TriggerType::SystemEvent, "601.0".to_string()) // Windows 7 (NT 6.1) parity
+            .with_operator("greater_than_or_equal".to_string());
+        assert!(cond_gte.evaluate("601.0"));
+        assert!(cond_gte.evaluate("1000.0")); // Windows 10 (NT 10.0) parity
+        assert!(!cond_gte.evaluate("600.0")); // Windows Vista (NT 6.0) parity
+
+        let cond_lte = Condition::new(TriggerType::SystemEvent, "601.0".to_string())
+            .with_operator("less_than_or_equal".to_string());
+        assert!(cond_lte.evaluate("601.0"));
+        assert!(cond_lte.evaluate("600.0"));
+        assert!(!cond_lte.evaluate("1000.0"));
+    }
+
+    #[test]
+    fn test_bsd_bitwise_flag_operators() {
+        // BSD flag mask: checking if bit 0x2 is set
+        let cond_bit = Condition::new(TriggerType::SystemEvent, "2".to_string())
+            .with_operator("bitwise_and".to_string());
+
+        assert!(cond_bit.evaluate("3")); // (3 & 2) == 2 (True)
+        assert!(cond_bit.evaluate("6")); // (6 & 2) == 2 (True)
+        assert!(!cond_bit.evaluate("4")); // (4 & 2) == 0 (False)
     }
 }
