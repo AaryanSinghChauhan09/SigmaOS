@@ -28,6 +28,29 @@ impl<T> Default for Vec<T> {
 
 impl<T> Vec<T> {
     pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+
+    pub fn with_capacity(capacity: usize) -> Self {
+        let data = if capacity == 0 {
+            core::ptr::null_mut()
+        } else {
+            unsafe { alloc(capacity * mem::size_of::<T>()) as *mut T }
+        };
+        Vec {
+            data,
+            len: 0,
+            capacity,
+        }
+    }
+
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            self.len -= 1;
+            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
+        }
+    }
+
     pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
