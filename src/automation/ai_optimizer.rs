@@ -1,8 +1,6 @@
 // SigmaOS AI-Driven Optimization System
 // Copilot-style assistants for system tuning and automation
 
-use std::collections::HashMap;
-
 /// Optimization category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizationCategory {
@@ -212,111 +210,8 @@ impl AiOptimizer {
         recommendations.retain(|r| r.confidence >= self.optimization_threshold);
 
         // Sort by impact
-        recommendations.sort_by(|a, b| b.impact.partial_cmp(&a.impact).unwrap_or(core::cmp::Ordering::Equal));
-
-        recommendations
-    }
-
-    pub fn generate_recommendations(
-        &mut self,
-        current_state: &SystemState,
-    ) -> Vec<OptimizationRecommendation> {
-        let new_recommendations = self.analyze_current_state(current_state);
-        self.recommendations = new_recommendations.clone();
-        new_recommendations
-    }
-
-    pub fn apply_recommendation(
-        &mut self,
-        recommendation: &OptimizationRecommendation,
-    ) -> Result<(), OptimizationError> {
-        if !self.learning_enabled {
-            return Err(OptimizationError::LearningDisabled);
-        }
-
-        println!("Applying recommendation: {}", recommendation.action);
-
-        // Simulate applying the recommendation
-        Ok(())
-    }
-
-    pub fn enable_learning(&mut self) {
-        self.learning_enabled = true;
-    }
-
-    pub fn disable_learning(&mut self) {
-        self.learning_enabled = false;
-    }
-
-    pub fn get_recommendations(&self) -> &[OptimizationRecommendation] {
-        &self.recommendations
-    }
-
-    pub fn get_system_history(&self) -> &[SystemState] {
-        &self.system_history
-    }
-}
-
-impl Default for AiOptimizer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Optimization errors
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum OptimizationError {
-    LearningDisabled,
-    InvalidRecommendation,
-    SystemError,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_optimizer_creation() {
-        let optimizer = AiOptimizer::new();
-        assert!(optimizer.learning_enabled);
-        assert_eq!(optimizer.optimization_threshold, 0.7);
-    }
-
-    #[test]
-    fn test_state_recording() {
-        let mut optimizer = AiOptimizer::new();
-        let state = SystemState::new().with_cpu(50.0);
-        optimizer.record_state(state);
-        assert_eq!(optimizer.system_history.len(), 1);
-    }
-
-    #[test]
-    fn test_high_cpu_recommendation() {
-        let mut optimizer = AiOptimizer::new();
-        let state = SystemState::new().with_cpu(90.0);
-        let recommendations = optimizer.generate_recommendations(&state);
-        assert!(!recommendations.is_empty());
-        assert_eq!(
-            recommendations[0].category,
-            OptimizationCategory::Performance
-        );
-    }
-
-    #[test]
-    fn test_high_temperature_recommendation() {
-        let mut optimizer = AiOptimizer::new();
-        let state = SystemState::new().with_temperature(80.0);
-        let recommendations = optimizer.generate_recommendations(&state);
-        assert!(!recommendations.is_empty());
-        assert_eq!(recommendations[0].category, OptimizationCategory::Thermal);
-    }
-
-    #[test]
-    fn test_learning_toggle() {
-        let mut optimizer = AiOptimizer::new();
-        optimizer.disable_learning();
-        assert!(!optimizer.learning_enabled);
-        optimizer.enable_learning();
-        assert!(optimizer.learning_enabled);
-    }
-}
+        recommendations.sort_by(|a, b| {
+            b.impact
+                .partial_cmp(&a.impact)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });

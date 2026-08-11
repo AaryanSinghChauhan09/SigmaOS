@@ -1,6 +1,5 @@
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
-// Enhanced with SELinux Security, Systemd Presets, Saturated ALU, and Anaconda Kickstart Engines
 
 use std::collections::HashMap;
 
@@ -223,160 +222,90 @@ impl BodhiUpdateTriage {
     }
 }
 
-/// SELinux (Security-Enhanced Linux) Context Model
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SeLinuxContext {
-    pub user: String,
-    pub role: String,
-    pub domain_type: String,
-    pub sensitivity: String,
+/// Represents a single Sigma Change Proposal (SCP) tracking technology additions.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SigmaChangeProposal {
+    pub id: String,
+    pub owner: String,
+    pub status: String,
+    pub self_contained: bool,
+    pub summary: String,
+    pub benefit: String,
 }
 
-impl SeLinuxContext {
-    pub fn new(user: &str, role: &str, domain_type: &str, sensitivity: &str) -> Self {
-        Self {
-            user: user.to_string(),
-            role: role.to_string(),
-            domain_type: domain_type.to_string(),
-            sensitivity: sensitivity.to_string(),
-        }
-    }
-
-    /// Parses context string e.g. "unconfined_u:unconfined_r:unconfined_t:s0"
-    pub fn parse(context_str: &str) -> Result<Self, String> {
-        let parts: Vec<&str> = context_str.split(':').collect();
-        if parts.len() < 3 {
-            return Err("Invalid SELinux context format".to_string());
-        }
-        Ok(Self {
-            user: parts[0].to_string(),
-            role: parts[1].to_string(),
-            domain_type: parts[2].to_string(),
-            sensitivity: if parts.len() >= 4 { parts[3].to_string() } else { "s0".to_string() },
-        })
-    }
-
-    pub fn to_string_representation(&self) -> String {
-        format!("{}:{}:{}:{}", self.user, self.role, self.domain_type, self.sensitivity)
-    }
+/// Tracks, gates, and updates technological transitions within SigmaOS, inspired by Fedora's Change Process.
+pub struct SigmaChangeProcessEngine {
+    pub proposals: HashMap<String, SigmaChangeProposal>,
 }
 
-/// SELinux Security Rule Entry
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SeLinuxPolicyRule {
-    pub source_type: String,
-    pub target_type: String,
-    pub class_name: String,
-    pub permission: String,
-    pub is_allowed: bool,
-}
-
-/// SELinux Policy Engine
-pub struct SeLinuxEngine {
-    pub rules: Vec<SeLinuxPolicyRule>,
-    pub current_context: SeLinuxContext,
-    pub enforcing_mode: bool,
-}
-
-impl SeLinuxEngine {
-    pub fn new(default_context: SeLinuxContext) -> Self {
-        Self {
-            rules: Vec::new(),
-            current_context: default_context,
-            enforcing_mode: true,
-        }
-    }
-
-    pub fn add_rule(&mut self, source: &str, target: &str, class: &str, permission: &str, is_allowed: bool) {
-        self.rules.push(SeLinuxPolicyRule {
-            source_type: source.to_string(),
-            target_type: target.to_string(),
-            class_name: class.to_string(),
-            permission: permission.to_string(),
-            is_allowed,
-        });
-    }
-
-    /// Verifies access between source domain and target object domain
-    pub fn check_permission(&self, target_context: &SeLinuxContext, class: &str, permission: &str) -> bool {
-        if !self.enforcing_mode {
-            return true;
-        }
-
-        for rule in &self.rules {
-            if rule.source_type == self.current_context.domain_type
-                && rule.target_type == target_context.domain_type
-                && rule.class_name == class
-                && rule.permission == permission
-            {
-                return rule.is_allowed;
-            }
-        }
-        false
-    }
-
-    /// Validates process domain transitions (e.g., from unconfined_t to secure_t on file execution)
-    pub fn validate_transition(&self, target_context: &SeLinuxContext) -> bool {
-        self.check_permission(target_context, "process", "transition")
-    }
-}
-
-/// Systemd Preset service states
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SystemdPresetState {
-    Enable,
-    Disable,
-    Ignore,
-}
-
-/// Systemd service presets evaluator
-pub struct SystemdPresetConfigurator {
-    pub presets: HashMap<String, SystemdPresetState>,
-}
-
-impl SystemdPresetConfigurator {
+impl SigmaChangeProcessEngine {
     pub fn new() -> Self {
-        Self {
-            presets: HashMap::new(),
+        SigmaChangeProcessEngine {
+            proposals: HashMap::new(),
         }
     }
 
-    /// Evaluates preset configuration file lines (e.g., "enable sshd.service", "disable httpd.service")
-    pub fn parse_preset_line(&mut self, line: &str) {
-        let trimmed = line.trim();
-        if trimmed.is_empty() || trimmed.starts_with('#') {
-            return;
-        }
-
-        let parts: Vec<&str> = trimmed.split_whitespace().collect();
-        if parts.len() < 2 {
-            return;
-        }
-
-        let state = match parts[0] {
-            "enable" => SystemdPresetState::Enable,
-            "disable" => SystemdPresetState::Disable,
-            _ => SystemdPresetState::Ignore,
-        };
-
-        self.presets.insert(parts[1].to_string(), state);
+    pub fn submit_proposal(&mut self, proposal: SigmaChangeProposal) {
+        self.proposals.insert(proposal.id.clone(), proposal);
     }
 
-    pub fn get_preset_state(&self, service_name: &str) -> SystemdPresetState {
-        *self.presets.get(service_name).unwrap_or(&SystemdPresetState::Ignore)
+    pub fn update_proposal_status(&mut self, id: &str, status: &str) -> Result<String, String> {
+        if let Some(prop) = self.proposals.get_mut(id) {
+            prop.status = status.to_string();
+            Ok(prop.status.clone())
+        } else {
+            Err("Proposal not found".to_string())
+        }
+    }
+
+    pub fn get_proposals(&self) -> &HashMap<String, SigmaChangeProposal> {
+        &self.proposals
     }
 }
 
-/// Saturated High-Reliability Fedora ALU Flags
+/// Handles release channels, Rawhide rolling transitions, and updates mimicking Fedora Rawhide fast-track.
+pub struct SigmaNextChannel {
+    pub active_channel: String,
+    pub rollback_snapshots: Vec<String>,
+    pub package_version: String,
+}
+
+impl SigmaNextChannel {
+    pub fn new() -> Self {
+        SigmaNextChannel {
+            active_channel: "stable".to_string(),
+            rollback_snapshots: Vec::new(),
+            package_version: "1.0.0".to_string(),
+        }
+    }
+
+    pub fn set_channel(&mut self, channel: &str) {
+        self.active_channel = channel.to_string();
+    }
+
+    pub fn trigger_update(&mut self) -> Result<(usize, String), String> {
+        if self.active_channel == "sigma.next" {
+            // Save rollback snapshot
+            self.rollback_snapshots.push(self.package_version.clone());
+            self.package_version = "1.1.0-rawhide".to_string();
+            Ok((87, "sigma.next rolling Rawhide update complete".to_string()))
+        } else {
+            Ok((0, "No rolling updates available for stable channel".to_string()))
+        }
+    }
+}
+
+/// ALU Status Flags (mimicking x86 EFLAGS and ARM CPSR/PSTATE inside Fedora packaging and reliability suites)
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct FedoraAluFlags {
+    pub carry: bool,
     pub zero: bool,
     pub sign: bool,
-    pub carry: bool,
     pub overflow: bool,
 }
 
-/// High-reliability emulation of ALU with flags and dynamic saturation
+/// Fedora-inspired High-Reliability Arithmetic Logic Unit (ALU) Emulator.
+/// Restores mathematical stability constraints and saturated DSP boundaries to critical subsystems.
 pub struct FedoraAlu {
     pub flags: FedoraAluFlags,
 }
@@ -388,175 +317,60 @@ impl FedoraAlu {
         }
     }
 
-    /// Saturated 32-bit addition with CPU flag simulation
-    pub fn add_saturated(&mut self, a: i32, b: i32) -> i32 {
-        let (res, overflow) = a.overflowing_add(b);
-        let res_saturated = if overflow {
-            if a > 0 { i32::MAX } else { i32::MIN }
-        } else {
-            res
-        };
-
-        self.flags = FedoraAluFlags {
-            zero: res_saturated == 0,
-            sign: res_saturated < 0,
-            carry: overflow,
-            overflow,
-        };
-        res_saturated
+    /// Reset status flags
+    pub fn reset_flags(&mut self) {
+        self.flags = FedoraAluFlags::default();
     }
 
-    /// Saturated 32-bit subtraction with CPU flag simulation
-    pub fn sub_saturated(&mut self, a: i32, b: i32) -> i32 {
-        let (res, overflow) = a.overflowing_sub(b);
-        let res_saturated = if overflow {
-            if a > 0 { i32::MAX } else { i32::MIN }
-        } else {
-            res
-        };
-
-        self.flags = FedoraAluFlags {
-            zero: res_saturated == 0,
-            sign: res_saturated < 0,
-            carry: overflow,
-            overflow,
-        };
-        res_saturated
-    }
-}
-
-/// Anaconda automated Kickstart partition schema
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct KickstartPartition {
-    pub mountpoint: String,
-    pub size_mb: u64,
-    pub fstype: String,
-}
-
-/// Anaconda kickstart file configuration schema
-pub struct KickstartConfig {
-    pub lang: String,
-    pub timezone: String,
-    pub root_password_hash: String,
-    pub partitions: Vec<KickstartPartition>,
-    pub packages: Vec<String>,
-    pub post_script: String,
-}
-
-/// Anaconda Automated OS Installer Parser
-pub struct AnacondaInstaller {
-    pub config: Option<KickstartConfig>,
-}
-
-impl AnacondaInstaller {
-    pub fn new() -> Self {
-        Self { config: None }
+    /// Updates common Zero and Sign flags
+    fn update_zero_sign(&mut self, result: u64) {
+        self.flags.zero = result == 0;
+        self.flags.sign = (result as i64) < 0;
     }
 
-    /// Simulates parsing an Anaconda Kickstart file
-    pub fn parse_kickstart(&mut self, content: &str) -> Result<(), &'static str> {
-        let mut lang = "en_US.UTF-8".to_string();
-        let mut timezone = "UTC".to_string();
-        let mut rootpw = "".to_string();
-        let mut partitions = Vec::new();
-        let mut packages = Vec::new();
-        let mut post_script = String::new();
+    /// 64-bit Addition with Carry and Overflow detection (x86 ADD parity)
+    pub fn add(&mut self, op1: u64, op2: u64) -> u64 {
+        let (res, carry) = op1.overflowing_add(op2);
+        self.flags.carry = carry;
 
-        let mut in_packages_block = false;
-        let mut in_post_block = false;
+        let sign1 = (op1 as i64) < 0;
+        let sign2 = (op2 as i64) < 0;
+        let sign_res = (res as i64) < 0;
+        self.flags.overflow = (sign1 == sign2) && (sign1 != sign_res);
 
-        for line in content.lines() {
-            let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('#') {
-                continue;
-            }
-
-            if trimmed == "%packages" {
-                in_packages_block = true;
-                in_post_block = false;
-                continue;
-            } else if trimmed == "%post" {
-                in_packages_block = false;
-                in_post_block = true;
-                continue;
-            } else if trimmed == "%end" {
-                in_packages_block = false;
-                in_post_block = false;
-                continue;
-            }
-
-            if in_packages_block {
-                packages.push(trimmed.to_string());
-            } else if in_post_block {
-                post_script.push_str(trimmed);
-                post_script.push('\n');
-            } else {
-                let parts: Vec<&str> = trimmed.split_whitespace().collect();
-                if parts.is_empty() {
-                    continue;
-                }
-                match parts[0] {
-                    "lang" => {
-                        if parts.len() > 1 {
-                            lang = parts[1].to_string();
-                        }
-                    }
-                    "timezone" => {
-                        if parts.len() > 1 {
-                            timezone = parts[1].to_string();
-                        }
-                    }
-                    "rootpw" => {
-                        if parts.len() > 1 {
-                            rootpw = parts[1].to_string();
-                        }
-                    }
-                    "part" => {
-                        // format: part /boot --size=1024 --fstype=ext4
-                        if parts.len() >= 2 {
-                            let mount = parts[1].to_string();
-                            let mut size = 512;
-                            let mut fstype = "ext4".to_string();
-                            for &arg in &parts[2..] {
-                                if arg.starts_with("--size=") {
-                                    size = arg["--size=".len()..].parse::<u64>().unwrap_or(512);
-                                } else if arg.starts_with("--fstype=") {
-                                    fstype = arg["--fstype=".len()..].to_string();
-                                }
-                            }
-                            partitions.push(KickstartPartition {
-                                mountpoint: mount,
-                                size_mb: size,
-                                fstype,
-                            });
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
-
-        self.config = Some(KickstartConfig {
-            lang,
-            timezone,
-            root_password_hash: rootpw,
-            partitions,
-            packages,
-            post_script,
-        });
-
-        Ok(())
+        self.update_zero_sign(res);
+        res
     }
 
-    /// Simulates automated setup using Kickstart configurations
-    pub fn install_automated(&self) -> Result<usize, &'static str> {
-        if let Some(ref cfg) = self.config {
-            if cfg.partitions.is_empty() {
-                return Err("Anaconda: No partition schema defined in Kickstart config");
+    /// 64-bit Subtraction with Carry (Borrow) and Overflow (x86 SUB parity)
+    pub fn sub(&mut self, op1: u64, op2: u64) -> u64 {
+        let (res, carry) = op1.overflowing_sub(op2);
+        self.flags.carry = carry;
+
+        let sign1 = (op1 as i64) < 0;
+        let sign2 = (op2 as i64) < 0;
+        let sign_res = (res as i64) < 0;
+        self.flags.overflow = (sign1 != sign2) && (sign1 != sign_res);
+
+        self.update_zero_sign(res);
+        res
+    }
+
+    /// Saturated 64-bit Addition (ARM NEON / DSP parity)
+    /// Prevents standard overflow warping by clamping results to numeric bounds
+    pub fn saturated_add(&mut self, op1: i64, op2: i64) -> i64 {
+        match op1.checked_add(op2) {
+            Some(res) => {
+                self.flags.overflow = false;
+                self.update_zero_sign(res as u64);
+                res
             }
-            Ok(cfg.packages.len())
-        } else {
-            Err("Anaconda: Missing Kickstart configuration")
+            None => {
+                self.flags.overflow = true;
+                let res = if op1 > 0 { i64::MAX } else { i64::MIN };
+                self.update_zero_sign(res as u64);
+                res
+            }
         }
     }
 }
@@ -625,84 +439,116 @@ mod tests {
     }
 
     #[test]
-    fn test_selinux_transitions() {
-        let src = SeLinuxContext::parse("unconfined_u:unconfined_r:unconfined_t:s0").unwrap();
-        assert_eq!(src.user, "unconfined_u");
-        assert_eq!(src.to_string_representation(), "unconfined_u:unconfined_r:unconfined_t:s0");
+    fn test_sigma_change_process() {
+        let mut engine = SigmaChangeProcessEngine::new();
+        let proposal = SigmaChangeProposal {
+            id: "SCP-001".to_string(),
+            owner: "@kernel-team".to_string(),
+            status: "FinalBeta".to_string(),
+            self_contained: true,
+            summary: "Enable THP for all anonymous mappings >1MB".to_string(),
+            benefit: "8-15% speedup in compilation and database workloads".to_string(),
+        };
 
-        let mut engine = SeLinuxEngine::new(src);
-        let target = SeLinuxContext::new("system_u", "system_r", "secure_t", "s0");
+        engine.submit_proposal(proposal.clone());
+        assert_eq!(engine.get_proposals().len(), 1);
+        assert_eq!(engine.get_proposals().get("SCP-001").unwrap(), &proposal);
 
-        // Permission denied initially
-        assert!(!engine.validate_transition(&target));
+        let new_status = engine.update_proposal_status("SCP-001", "Completed").unwrap();
+        assert_eq!(new_status, "Completed");
+        assert_eq!(engine.get_proposals().get("SCP-001").unwrap().status, "Completed");
 
-        // Add allowing rule
-        engine.add_rule("unconfined_t", "secure_t", "process", "transition", true);
-        assert!(engine.validate_transition(&target));
+        assert!(engine.update_proposal_status("SCP-002", "Completed").is_err());
     }
 
     #[test]
-    fn test_systemd_preset_evaluator() {
-        let mut configurator = SystemdPresetConfigurator::new();
-        configurator.parse_preset_line("# This is a comment");
-        configurator.parse_preset_line("enable sshd.service");
-        configurator.parse_preset_line("disable firewalld.service");
+    fn test_sigma_next_channel() {
+        let mut channel = SigmaNextChannel::new();
+        assert_eq!(channel.active_channel, "stable");
+        assert_eq!(channel.package_version, "1.0.0");
 
-        assert_eq!(configurator.get_preset_state("sshd.service"), SystemdPresetState::Enable);
-        assert_eq!(configurator.get_preset_state("firewalld.service"), SystemdPresetState::Disable);
-        assert_eq!(configurator.get_preset_state("httpd.service"), SystemdPresetState::Ignore);
+        // stable channel should not trigger rolling rawhide updates
+        let (updated, msg) = channel.trigger_update().unwrap();
+        assert_eq!(updated, 0);
+        assert_eq!(msg, "No rolling updates available for stable channel");
+
+        // switch to rawhide fast-track (sigma.next)
+        channel.set_channel("sigma.next");
+        assert_eq!(channel.active_channel, "sigma.next");
+
+        let (updated_next, msg_next) = channel.trigger_update().unwrap();
+        assert_eq!(updated_next, 87);
+        assert_eq!(msg_next, "sigma.next rolling Rawhide update complete");
+        assert_eq!(channel.package_version, "1.1.0-rawhide");
+        assert_eq!(channel.rollback_snapshots, vec!["1.0.0".to_string()]);
     }
 
     #[test]
-    fn test_fedora_saturated_alu() {
+    fn test_fedora_alu_addition() {
         let mut alu = FedoraAlu::new();
-        let r1 = alu.add_saturated(i32::MAX - 10, 20);
-        assert_eq!(r1, i32::MAX);
-        assert!(alu.flags.overflow);
-        assert!(alu.flags.carry);
+        assert_eq!(alu.flags, FedoraAluFlags::default());
 
-        let r2 = alu.sub_saturated(i32::MIN + 5, 20);
-        assert_eq!(r2, i32::MIN);
-        assert!(alu.flags.overflow);
+        // Simple addition
+        let r1 = alu.add(10, 20);
+        assert_eq!(r1, 30);
+        assert!(!alu.flags.carry);
+        assert!(!alu.flags.zero);
+        assert!(!alu.flags.sign);
+        assert!(!alu.flags.overflow);
+
+        // Addition causing zero and sign
+        let r2 = alu.add(0xFFFF_FFFF_FFFF_FFFF, 1);
+        assert_eq!(r2, 0);
+        assert!(alu.flags.carry);
+        assert!(alu.flags.zero);
+        assert!(!alu.flags.sign);
+        assert!(!alu.flags.overflow);
+
+        // Sign test
+        let r3 = alu.add(0, 0x8000_0000_0000_0000);
+        assert_eq!(r3, 0x8000_0000_0000_0000);
+        assert!(!alu.flags.carry);
+        assert!(!alu.flags.zero);
         assert!(alu.flags.sign);
+        assert!(!alu.flags.overflow);
+
+        // Overflow test: positive + positive = negative
+        let r4 = alu.add(0x7FFF_FFFF_FFFF_FFFF, 1);
+        assert_eq!(r4, 0x8000_0000_0000_0000);
+        assert!(!alu.flags.carry);
+        assert!(!alu.flags.zero);
+        assert!(alu.flags.sign);
+        assert!(alu.flags.overflow);
     }
 
     #[test]
-    fn test_anaconda_kickstart_parser() {
-        let ks_content = r#"
-            lang en_US.UTF-8
-            timezone America/New_York
-            rootpw crypt_hash_here
+    fn test_fedora_alu_subtraction() {
+        let mut alu = FedoraAlu::new();
+        let r1 = alu.sub(10, 20);
+        assert_eq!(r1, 0xFFFF_FFFF_FFFF_FFF6);
+        assert!(alu.flags.carry); // Borrow occurred
+        assert!(!alu.flags.zero);
+        assert!(alu.flags.sign);
+        assert!(!alu.flags.overflow);
+    }
 
-            part /boot --size=1024 --fstype=ext4
-            part / --size=10240 --fstype=xfs
+    #[test]
+    fn test_fedora_alu_saturated_math() {
+        let mut alu = FedoraAlu::new();
 
-            %packages
-            @core
-            vim
-            systemd
-            %end
+        // Simple saturated add
+        let r1 = alu.saturated_add(10, 20);
+        assert_eq!(r1, 30);
+        assert!(!alu.flags.overflow);
 
-            %post
-            echo "automated setup finished"
-            %end
-        "#;
+        // Overflow saturated add
+        let r2 = alu.saturated_add(i64::MAX, 1);
+        assert_eq!(r2, i64::MAX);
+        assert!(alu.flags.overflow);
 
-        let mut installer = AnacondaInstaller::new();
-        installer.parse_kickstart(ks_content).unwrap();
-
-        let cfg = installer.config.as_ref().unwrap();
-        assert_eq!(cfg.lang, "en_US.UTF-8");
-        assert_eq!(cfg.timezone, "America/New_York");
-        assert_eq!(cfg.root_password_hash, "crypt_hash_here");
-        assert_eq!(cfg.partitions.len(), 2);
-        assert_eq!(cfg.partitions[0].mountpoint, "/boot");
-        assert_eq!(cfg.partitions[0].size_mb, 1024);
-        assert_eq!(cfg.partitions[1].fstype, "xfs");
-        assert_eq!(cfg.packages.len(), 3);
-        assert_eq!(cfg.packages[1], "vim");
-        assert!(cfg.post_script.contains("automated setup finished"));
-
-        assert_eq!(installer.install_automated().unwrap(), 3);
+        // Underflow saturated add
+        let r3 = alu.saturated_add(i64::MIN, -1);
+        assert_eq!(r3, i64::MIN);
+        assert!(alu.flags.overflow);
     }
 }

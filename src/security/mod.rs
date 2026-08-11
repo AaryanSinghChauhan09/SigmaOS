@@ -1,24 +1,15 @@
-// SigmaOS Security Subsystem
-pub mod capability;
-pub mod defensive_audit;
-pub mod parrot;
-pub mod pledge;
-pub mod vulnerability;
-pub mod hardening;
-pub mod deobfuscation;
-pub mod securelevels;
-pub mod pam;
-pub mod crypto_utils;
+// SigmaOS Security Module
+// Capability-based security, pledge, and access control
 
-pub use capability::{CapabilityGate, CapabilityToken, Permission};
-pub use defensive_audit::{
-    DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
-    SIGNATURE_LEN,
-};
-pub use parrot::{
-    AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
-    GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-};
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
-pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
+pub mod audit;
+pub mod capability;
+pub mod integrity;
+pub mod mac;
+pub mod obfuscator;
+pub mod phantom;
+pub mod pki;
+pub mod pledge;
+pub mod secrets;
+pub mod securelevels;
+pub mod unveil;
+pub mod vulnerability;

@@ -19,10 +19,7 @@
 // SigmaOS Network Traffic Analyzer
 // OOP-based network traffic monitoring and analysis
 
-#[cfg(not(test))]
 use crate::klib::HashMap;
-#[cfg(test)]
-use std::collections::HashMap;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::time::{Duration, Instant};
 
@@ -90,7 +87,10 @@ impl<const SIZE: usize> AlpineZeroAllocCaptureBuffer<SIZE> {
         } else {
             (&self.buffer[..self.count], &[][..])
         };
-        second.iter().chain(first.iter()).filter_map(|opt| opt.as_ref())
+        second
+            .iter()
+            .chain(first.iter())
+            .filter_map(|opt| opt.as_ref())
     }
 
     pub fn clear(&mut self) {
@@ -169,19 +169,29 @@ impl NixDeclarativeFilter {
     /// Pure evaluation function
     pub fn matches(&self, packet: &TrafficPacket) -> bool {
         if let Some(ip) = self.source_ip {
-            if packet.source_ip != ip { return false; }
+            if packet.source_ip != ip {
+                return false;
+            }
         }
         if let Some(ip) = self.destination_ip {
-            if packet.destination_ip != ip { return false; }
+            if packet.destination_ip != ip {
+                return false;
+            }
         }
         if let Some(p) = self.min_port {
-            if packet.source_port < p && packet.destination_port < p { return false; }
+            if packet.source_port < p && packet.destination_port < p {
+                return false;
+            }
         }
         if let Some(p) = self.max_port {
-            if packet.source_port > p && packet.destination_port > p { return false; }
+            if packet.source_port > p && packet.destination_port > p {
+                return false;
+            }
         }
         if let Some(proto) = self.protocol {
-            if packet.protocol != proto { return false; }
+            if packet.protocol != proto {
+                return false;
+            }
         }
         true
     }
@@ -196,11 +206,18 @@ pub struct KaliPacketFingerprinter {
 
 impl KaliPacketFingerprinter {
     pub fn new() -> Self {
-        Self { fingerprints: HashMap::new() }
+        Self {
+            fingerprints: HashMap::new(),
+        }
     }
 
     /// Passive OS fingerprinting heuristic inspired by p0f / wireshark signatures
-    pub fn fingerprint_packet(&mut self, packet: &TrafficPacket, ttl: u8, tcp_window: u16) -> String {
+    pub fn fingerprint_packet(
+        &mut self,
+        packet: &TrafficPacket,
+        ttl: u8,
+        tcp_window: u16,
+    ) -> String {
         // Simple but highly effective passive OS fingerprinting heuristics:
         // - Linux: TTL typically 64, TCP window typically 5840 or 29200
         // - Windows: TTL typically 128, TCP window typically 8192 or 65535
@@ -252,12 +269,21 @@ impl KaliSnoopAnalysis {
 impl AnalysisStrategy for KaliSnoopAnalysis {
     fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert> {
         // Infer TTL and window size from packet size and port properties for emulation
-        let inferred_ttl = if packet.destination_port == 22 || packet.destination_port == 443 { 64 } else { 128 };
+        let inferred_ttl = if packet.destination_port == 22 || packet.destination_port == 443 {
+            64
+        } else {
+            128
+        };
         let inferred_win = if inferred_ttl == 64 { 5840 } else { 8192 };
 
-        let detected_os = self.fingerprinter.fingerprint_packet(packet, inferred_ttl, inferred_win);
+        let detected_os = self
+            .fingerprinter
+            .fingerprint_packet(packet, inferred_ttl, inferred_win);
 
-        let ports = self.scan_history.entry(packet.source_ip).or_insert_with(Vec::new);
+        let ports = self
+            .scan_history
+            .entry(packet.source_ip)
+            .or_insert_with(Vec::new);
         if !ports.contains(&packet.destination_port) {
             ports.push(packet.destination_port);
         }
@@ -298,7 +324,9 @@ impl GentooUseFlagsDissector {
     pub const ALL: u16 = 0xFFFF;
 
     pub fn new(initial_flags: u16) -> Self {
-        Self { enabled_dissectors: initial_flags }
+        Self {
+            enabled_dissectors: initial_flags,
+        }
     }
 
     pub fn is_enabled(&self, flag: u16) -> bool {
@@ -318,21 +346,28 @@ impl GentooUseFlagsDissector {
         match packet.protocol {
             Protocol::Http => {
                 if self.is_enabled(Self::HTTP) {
-                    Some(format!("HTTP payload dissection enabled: Decoded URI on port {}", packet.destination_port))
+                    Some(format!(
+                        "HTTP payload dissection enabled: Decoded URI on port {}",
+                        packet.destination_port
+                    ))
                 } else {
                     None
                 }
             }
             Protocol::Https if packet.destination_port == 443 => {
                 if self.is_enabled(Self::TLS) {
-                    Some(format!("TLS handshake dissector enabled: SNI ClientHello parsed on port 443"))
+                    Some(format!(
+                        "TLS handshake dissector enabled: SNI ClientHello parsed on port 443"
+                    ))
                 } else {
                     None
                 }
             }
             Protocol::Ssh if packet.destination_port == 22 => {
                 if self.is_enabled(Self::SSH) {
-                    Some(format!("SSH transport dissector enabled: Key Exchange decoded on port 22"))
+                    Some(format!(
+                        "SSH transport dissector enabled: Key Exchange decoded on port 22"
+                    ))
                 } else {
                     None
                 }
@@ -399,700 +434,13 @@ impl ClearLinuxFlowLoadBalancer {
     pub fn steer_packet(&mut self, packet: &TrafficPacket) -> usize {
         let hash = self.calculate_flow_hash(packet);
         let core_count = self.core_count;
-        *self.flow_affinity.entry(hash).or_insert_with(|| (hash % core_count as u64) as usize)
+        *self
+            .flow_affinity
+            .entry(hash)
+            .or_insert_with(|| (hash % core_count as u64) as usize)
     }
 
     pub fn get_active_flows_count(&self) -> usize {
         self.flow_affinity.len()
-    }
-}
-
-/// Traffic statistics
-#[derive(Debug, Clone)]
-pub struct TrafficStatistics {
-    pub total_packets: u64,
-    pub total_bytes: u64,
-    pub upload_bytes: u64,
-    pub download_bytes: u64,
-    pub protocols: HashMap<Protocol, u64>,
-    pub top_talkers: Vec<IpAddr>,
-    pub start_time: Instant,
-}
-
-/// Connection info
-#[derive(Debug, Clone)]
-pub struct ConnectionInfo {
-    pub source_ip: IpAddr,
-    pub destination_ip: IpAddr,
-    pub source_port: u16,
-    pub destination_port: u16,
-    pub protocol: Protocol,
-    pub state: ConnectionState,
-    pub bytes_sent: u64,
-    pub bytes_received: u64,
-    pub duration: Duration,
-}
-
-/// Connection state
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ConnectionState {
-    Established,
-    Listening,
-    TimeWait,
-    Closed,
-}
-
-/// Alert type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AlertType {
-    HighBandwidthUsage,
-    SuspiciousActivity,
-    PortScan,
-    DdosAttack,
-    UnauthorizedAccess,
-}
-
-/// Traffic alert
-#[derive(Debug, Clone)]
-pub struct TrafficAlert {
-    pub alert_type: AlertType,
-    pub severity: AlertSeverity,
-    pub message: String,
-    pub timestamp: Instant,
-    pub related_ips: Vec<IpAddr>,
-}
-
-/// Alert severity
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AlertSeverity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
-
-/// OOP trait for analysis strategies
-pub trait AnalysisStrategy {
-    /// Analyze packet
-    fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert>;
-    /// Get strategy name
-    fn name(&self) -> &str;
-}
-
-/// Bandwidth analysis strategy
-pub struct BandwidthAnalysis {
-    threshold_mbps: f64,
-    current_bandwidth_mbps: f64,
-    window_packets: Vec<TrafficPacket>,
-    window_size: usize,
-}
-
-impl BandwidthAnalysis {
-    pub fn new(threshold_mbps: f64) -> Self {
-        Self {
-            threshold_mbps,
-            current_bandwidth_mbps: 0.0,
-            window_packets: Vec::new(),
-            window_size: 1000,
-        }
-    }
-}
-
-impl AnalysisStrategy for BandwidthAnalysis {
-    fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert> {
-        self.window_packets.push(packet.clone());
-
-        if self.window_packets.len() > self.window_size {
-            self.window_packets.remove(0);
-        }
-
-        // Calculate bandwidth over window
-        let total_bytes: u64 = self.window_packets.iter().map(|p| p.size_bytes).sum();
-        let window_duration = if self.window_packets.len() > 1 {
-            self.window_packets
-                .last()
-                .unwrap()
-                .timestamp
-                .duration_since(self.window_packets.first().unwrap().timestamp)
-        } else {
-            Duration::from_secs(1)
-        };
-
-        if window_duration.as_secs() > 0 {
-            self.current_bandwidth_mbps =
-                (total_bytes as f64 * 8.0) / (window_duration.as_secs() as f64 * 1_000_000.0);
-        }
-
-        if self.current_bandwidth_mbps > self.threshold_mbps {
-            Some(TrafficAlert {
-                alert_type: AlertType::HighBandwidthUsage,
-                severity: AlertSeverity::Medium,
-                message: format!(
-                    "High bandwidth usage detected: {:.2} Mbps",
-                    self.current_bandwidth_mbps
-                ),
-                timestamp: Instant::now(),
-                related_ips: vec![packet.source_ip],
-            })
-        } else {
-            None
-        }
-    }
-
-    fn name(&self) -> &str {
-        "BandwidthAnalysis"
-    }
-}
-
-/// Security analysis strategy
-pub struct SecurityAnalysis {
-    connection_attempts: HashMap<IpAddr, u32>,
-    suspicious_ports: Vec<u16>,
-    max_attempts: u32,
-}
-
-impl SecurityAnalysis {
-    pub fn new(max_attempts: u32) -> Self {
-        Self {
-            connection_attempts: HashMap::new(),
-            suspicious_ports: vec![22, 23, 80, 443, 3389], // SSH, Telnet, HTTP, HTTPS, RDP
-            max_attempts,
-        }
-    }
-}
-
-impl AnalysisStrategy for SecurityAnalysis {
-    fn analyze_packet(&mut self, packet: &TrafficPacket) -> Option<TrafficAlert> {
-        // Track connection attempts
-        *self
-            .connection_attempts
-            .entry(packet.source_ip)
-            .or_insert(0) += 1;
-
-        // Check for port scan
-        if self.suspicious_ports.contains(&packet.destination_port) {
-            let attempts = *self
-                .connection_attempts
-                .get(&packet.source_ip)
-                .unwrap_or(&0);
-
-            if attempts > self.max_attempts {
-                return Some(TrafficAlert {
-                    alert_type: AlertType::PortScan,
-                    severity: AlertSeverity::High,
-                    message: format!("Port scan detected from {}", packet.source_ip),
-                    timestamp: Instant::now(),
-                    related_ips: vec![packet.source_ip],
-                });
-            }
-        }
-
-        None
-    }
-
-    fn name(&self) -> &str {
-        "SecurityAnalysis"
-    }
-}
-
-/// OOP-based Network Traffic Analyzer
-pub struct NetworkTrafficAnalyzer {
-    strategies: Vec<Box<dyn AnalysisStrategy>>,
-    statistics: TrafficStatistics,
-    connections: HashMap<String, ConnectionInfo>,
-    alerts: Vec<TrafficAlert>,
-    capture_enabled: bool,
-    max_connections: usize,
-    pub promiscuous_mode: bool,
-    pub custom_alert_level: AlertSeverity,
-}
-
-impl NetworkTrafficAnalyzer {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            strategies: Vec::new(),
-            statistics: TrafficStatistics {
-                total_packets: 0,
-                total_bytes: 0,
-                upload_bytes: 0,
-                download_bytes: 0,
-                protocols: HashMap::new(),
-                top_talkers: Vec::new(),
-                start_time: Instant::now(),
-            },
-            connections: HashMap::new(),
-            alerts: Vec::new(),
-            capture_enabled: false,
-            max_connections: 10000,
-            promiscuous_mode: false,
-            custom_alert_level: AlertSeverity::Low,
-        }
-    }
-
-    pub fn set_promiscuous_mode(&mut self, enabled: bool) {
-        self.promiscuous_mode = enabled;
-    }
-
-    pub fn set_custom_alert_level(&mut self, level: AlertSeverity) {
-        self.custom_alert_level = level;
-    }
-
-    /// Add analysis strategy
-    pub fn add_strategy(mut self, strategy: Box<dyn AnalysisStrategy>) -> Self {
-        self.strategies.push(strategy);
-        self
-    }
-
-    /// Enable capture
-    pub fn with_capture(mut self, enabled: bool) -> Self {
-        self.capture_enabled = enabled;
-        self
-    }
-
-    /// Set max connections
-    pub fn with_max_connections(mut self, max: usize) -> Self {
-        self.max_connections = max;
-        self
-    }
-
-    /// Process packet
-    pub fn process_packet(&mut self, packet: TrafficPacket) {
-        if !self.capture_enabled {
-            return;
-        }
-
-        // Update statistics
-        self.statistics.total_packets += 1;
-        self.statistics.total_bytes += packet.size_bytes;
-
-        // Update protocol statistics
-        *self
-            .statistics
-            .protocols
-            .entry(packet.protocol)
-            .or_insert(0) += packet.size_bytes;
-
-        // Update upload/download
-        // Assume local IPs are in 192.168.x.x or 10.x.x.x ranges
-        let is_upload = match packet.source_ip {
-            IpAddr::V4(addr) => {
-                let octets = addr.octets();
-                (octets[0] == 192 && octets[1] == 168) || octets[0] == 10
-            }
-            IpAddr::V6(_) => false,
-        };
-
-        if is_upload {
-            self.statistics.upload_bytes += packet.size_bytes;
-        } else {
-            self.statistics.download_bytes += packet.size_bytes;
-        }
-
-        // Update top talkers
-        self.update_top_talkers(&packet.source_ip);
-
-        // Track connection
-        self.track_connection(&packet);
-
-        // Run analysis strategies
-        for strategy in &mut self.strategies {
-            if let Some(alert) = strategy.analyze_packet(&packet) {
-                self.alerts.push(alert);
-            }
-        }
-    }
-
-    /// Update top talkers
-    fn update_top_talkers(&mut self, ip: &IpAddr) {
-        // Simple implementation - in real would track bytes per IP
-        if !self.statistics.top_talkers.contains(ip) {
-            self.statistics.top_talkers.push(*ip);
-            if self.statistics.top_talkers.len() > 10 {
-                self.statistics.top_talkers.remove(0);
-            }
-        }
-    }
-
-    /// Track connection
-    fn track_connection(&mut self, packet: &TrafficPacket) {
-        let connection_key = format!(
-            "{}:{}-{}:{}",
-            packet.source_ip, packet.source_port, packet.destination_ip, packet.destination_port
-        );
-
-        if let Some(conn) = self.connections.get_mut(&connection_key) {
-            conn.bytes_sent += packet.size_bytes;
-            conn.duration = packet.timestamp.duration_since(self.statistics.start_time);
-        } else {
-            if self.connections.len() >= self.max_connections {
-                // Remove oldest connection
-                if let Some(key) = self.connections.keys().next().cloned() {
-                    self.connections.remove(&key);
-                }
-            }
-
-            self.connections.insert(
-                connection_key,
-                ConnectionInfo {
-                    source_ip: packet.source_ip,
-                    destination_ip: packet.destination_ip,
-                    source_port: packet.source_port,
-                    destination_port: packet.destination_port,
-                    protocol: packet.protocol,
-                    state: ConnectionState::Established,
-                    bytes_sent: packet.size_bytes,
-                    bytes_received: 0,
-                    duration: Duration::from_secs(0),
-                },
-            );
-        }
-    }
-
-    /// Get statistics
-    pub fn statistics(&self) -> &TrafficStatistics {
-        &self.statistics
-    }
-
-    /// Get connections
-    pub fn connections(&self) -> Vec<&ConnectionInfo> {
-        self.connections.values().collect()
-    }
-
-    /// Get alerts
-    pub fn alerts(&self) -> &[TrafficAlert] {
-        &self.alerts
-    }
-
-    /// Clear alerts
-    pub fn clear_alerts(&mut self) {
-        self.alerts.clear();
-    }
-
-    /// Get current bandwidth
-    pub fn current_bandwidth_mbps(&self) -> f64 {
-        let duration = self.statistics.start_time.elapsed().as_secs_f64();
-        if duration > 0.0 {
-            (self.statistics.total_bytes as f64 * 8.0) / (duration * 1_000_000.0)
-        } else {
-            0.0
-        }
-    }
-
-    /// Get connections by IP
-    pub fn connections_by_ip(&self, ip: IpAddr) -> Vec<&ConnectionInfo> {
-        self.connections
-            .values()
-            .filter(|c| c.source_ip == ip || c.destination_ip == ip)
-            .collect()
-    }
-
-    /// Get connections by protocol
-    pub fn connections_by_protocol(&self, protocol: Protocol) -> Vec<&ConnectionInfo> {
-        self.connections
-            .values()
-            .filter(|c| c.protocol == protocol)
-            .collect()
-    }
-}
-
-impl Default for NetworkTrafficAnalyzer {
-    fn default() -> Self {
-        Self::new()
-            .add_strategy(Box::new(BandwidthAnalysis::new(100.0)))
-            .add_strategy(Box::new(SecurityAnalysis::new(10)))
-            .with_capture(true)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_traffic_packet() {
-        let packet = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 12345,
-            destination_port: 80,
-            protocol: Protocol::Tcp,
-            size_bytes: 1024,
-            timestamp: Instant::now(),
-        };
-        assert_eq!(packet.protocol, Protocol::Tcp);
-    }
-
-    #[test]
-    fn test_bandwidth_analysis() {
-        let analysis = BandwidthAnalysis::new(100.0);
-        assert_eq!(analysis.name(), "BandwidthAnalysis");
-    }
-
-    #[test]
-    fn test_security_analysis() {
-        let analysis = SecurityAnalysis::new(10);
-        assert_eq!(analysis.name(), "SecurityAnalysis");
-    }
-
-    #[test]
-    fn test_network_traffic_analyzer() {
-        let analyzer = NetworkTrafficAnalyzer::default();
-        assert_eq!(analyzer.strategies.len(), 2);
-    }
-
-    #[test]
-    fn test_process_packet() {
-        let mut analyzer = NetworkTrafficAnalyzer::default();
-        let packet = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 12345,
-            destination_port: 80,
-            protocol: Protocol::Tcp,
-            size_bytes: 1024,
-            timestamp: Instant::now(),
-        };
-        analyzer.process_packet(packet);
-        assert_eq!(analyzer.statistics().total_packets, 1);
-    }
-
-    #[test]
-    fn test_alpine_zero_alloc_capture_buffer() {
-        let mut buffer = AlpineZeroAllocCaptureBuffer::<3>::new();
-        assert_eq!(buffer.len(), 0);
-
-        let packet1 = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 12345,
-            destination_port: 80,
-            protocol: Protocol::Tcp,
-            size_bytes: 100,
-            timestamp: Instant::now(),
-        };
-        let packet2 = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 2)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 12346,
-            destination_port: 443,
-            protocol: Protocol::Https,
-            size_bytes: 200,
-            timestamp: Instant::now(),
-        };
-        let packet3 = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 3)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 12347,
-            destination_port: 22,
-            protocol: Protocol::Ssh,
-            size_bytes: 300,
-            timestamp: Instant::now(),
-        };
-        let packet4 = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 4)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 12348,
-            destination_port: 23,
-            protocol: Protocol::Other,
-            size_bytes: 400,
-            timestamp: Instant::now(),
-        };
-
-        buffer.push(packet1);
-        buffer.push(packet2);
-        buffer.push(packet3);
-        assert_eq!(buffer.len(), 3);
-
-        // This push should overwrite packet1 (circular ring-buffer)
-        buffer.push(packet4);
-        assert_eq!(buffer.len(), 3);
-
-        let packets: Vec<TrafficPacket> = buffer.iter().cloned().collect();
-        assert_eq!(packets.len(), 3);
-        assert_eq!(packets[0].source_port, 12346); // packet2
-        assert_eq!(packets[1].source_port, 12347); // packet3
-        assert_eq!(packets[2].source_port, 12348); // packet4
-
-        buffer.clear();
-        assert_eq!(buffer.len(), 0);
-    }
-
-    #[test]
-    fn test_n_declarative_filter() {
-        let filter = NixDeclarativeFilter::new(
-            Some(IpAddr::V4(Ipv4Addr::new(192, 168, 1, 10))),
-            None,
-            Some(80),
-            Some(100),
-            Some(Protocol::Tcp),
-        );
-
-        // Verification of deterministic rule hashing
-        assert_ne!(filter.rule_hash, 0);
-
-        let matching_packet = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 10)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 90,
-            destination_port: 80,
-            protocol: Protocol::Tcp,
-            size_bytes: 50,
-            timestamp: Instant::now(),
-        };
-
-        let mismatch_packet = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 11)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 90,
-            destination_port: 80,
-            protocol: Protocol::Tcp,
-            size_bytes: 50,
-            timestamp: Instant::now(),
-        };
-
-        assert!(filter.matches(&matching_packet));
-        assert!(!filter.matches(&mismatch_packet));
-    }
-
-    #[test]
-    fn test_kali_fingerprinting_and_recon() {
-        let mut snoop = KaliSnoopAnalysis::new();
-        assert_eq!(snoop.name(), "KaliSnoopAnalysis");
-
-        let packet = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(10, 0, 0, 1)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 100)),
-            source_port: 43210,
-            destination_port: 22,
-            protocol: Protocol::Ssh,
-            size_bytes: 100,
-            timestamp: Instant::now(),
-        };
-
-        // Passive fingerprinting test
-        let mut fingerprinter = KaliPacketFingerprinter::new();
-        let os_linux = fingerprinter.fingerprint_packet(&packet, 64, 5840);
-        assert_eq!(os_linux, "Linux Core");
-
-        let os_windows = fingerprinter.fingerprint_packet(&packet, 128, 8192);
-        assert_eq!(os_windows, "Windows OS");
-
-        // Multi-port scanner reconnaissance snoop detection
-        for p in 1..=5 {
-            let scan_packet = TrafficPacket {
-                source_ip: IpAddr::V4(Ipv4Addr::new(10, 0, 0, 1)),
-                destination_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 100)),
-                source_port: 33200 + p,
-                destination_port: p,
-                protocol: Protocol::Tcp,
-                size_bytes: 40,
-                timestamp: Instant::now(),
-            };
-            let alert = snoop.analyze_packet(&scan_packet);
-            assert!(alert.is_none());
-        }
-
-        // 6th port scanned -> alert trigger
-        let trigger_packet = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(10, 0, 0, 1)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 100)),
-            source_port: 33206,
-            destination_port: 6,
-            protocol: Protocol::Tcp,
-            size_bytes: 40,
-            timestamp: Instant::now(),
-        };
-        let alert = snoop.analyze_packet(&trigger_packet).unwrap();
-        assert_eq!(alert.alert_type, AlertType::SuspiciousActivity);
-        assert!(alert.message.contains("Kali snoop alert"));
-    }
-
-    #[test]
-    fn test_gentoo_use_flags_dissector() {
-        let mut dissector = GentooUseFlagsDissector::new(GentooUseFlagsDissector::HTTP | GentooUseFlagsDissector::TLS);
-        assert!(dissector.is_enabled(GentooUseFlagsDissector::HTTP));
-        assert!(!dissector.is_enabled(GentooUseFlagsDissector::SSH));
-
-        let http_packet = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(10, 0, 0, 1)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(10, 0, 0, 2)),
-            source_port: 12345,
-            destination_port: 80,
-            protocol: Protocol::Http,
-            size_bytes: 1000,
-            timestamp: Instant::now(),
-        };
-
-        let ssh_packet = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(10, 0, 0, 1)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(10, 0, 0, 2)),
-            source_port: 12345,
-            destination_port: 22,
-            protocol: Protocol::Ssh,
-            size_bytes: 1000,
-            timestamp: Instant::now(),
-        };
-
-        // HTTP should dissect since HTTP flag is enabled
-        let decoded_http = dissector.dissect_packet(&http_packet);
-        assert!(decoded_http.is_some());
-        assert!(decoded_http.unwrap().contains("HTTP payload dissection enabled"));
-
-        // SSH should return None because SSH flag is disabled
-        assert!(dissector.dissect_packet(&ssh_packet).is_none());
-
-        // Now enable SSH flag and check
-        dissector.enable_dissector(GentooUseFlagsDissector::SSH);
-        assert!(dissector.is_enabled(GentooUseFlagsDissector::SSH));
-        let decoded_ssh = dissector.dissect_packet(&ssh_packet);
-        assert!(decoded_ssh.is_some());
-        assert!(decoded_ssh.unwrap().contains("SSH transport dissector enabled"));
-    }
-
-    #[test]
-    fn test_clear_linux_flow_load_balancer() {
-        let mut lb = ClearLinuxFlowLoadBalancer::new(4); // 4 virtual cores
-
-        let flow1_p1 = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 10)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            source_port: 50000,
-            destination_port: 443,
-            protocol: Protocol::Https,
-            size_bytes: 500,
-            timestamp: Instant::now(),
-        };
-
-        let flow1_p2_reverse = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 10)),
-            source_port: 443,
-            destination_port: 50000,
-            protocol: Protocol::Https,
-            size_bytes: 1500,
-            timestamp: Instant::now(),
-        };
-
-        let flow2_p1 = TrafficPacket {
-            source_ip: IpAddr::V4(Ipv4Addr::new(192, 168, 1, 11)),
-            destination_ip: IpAddr::V4(Ipv4Addr::new(1, 1, 1, 1)),
-            source_port: 60000,
-            destination_port: 53,
-            protocol: Protocol::Udp,
-            size_bytes: 64,
-            timestamp: Instant::now(),
-        };
-
-        // Core assignment steering tests
-        let core_flow1_p1 = lb.steer_packet(&flow1_p1);
-        let core_flow1_p2 = lb.steer_packet(&flow1_p2_reverse);
-        let core_flow2 = lb.steer_packet(&flow2_p1);
-
-        // Symmetric packets must map to the same virtual CPU core
-        assert_eq!(core_flow1_p1, core_flow1_p2);
-        assert!(core_flow1_p1 < 4);
-        assert!(core_flow2 < 4);
-        assert_eq!(lb.get_active_flows_count(), 2);
     }
 }

@@ -17,8 +17,14 @@ impl NumaScheduler {
     pub fn new() -> Self {
         NumaScheduler {
             nodes: vec![
-                NumaNode { node_id: 0, latency_weight: 10 },
-                NumaNode { node_id: 1, latency_weight: 20 },
+                NumaNode {
+                    node_id: 0,
+                    latency_weight: 10,
+                },
+                NumaNode {
+                    node_id: 1,
+                    latency_weight: 20,
+                },
             ],
             active_thread_affinity_node: 0,
         }
@@ -70,12 +76,29 @@ impl<T> MichaelScottQueue<T> {
             let tail = self.tail.load(Ordering::Acquire);
             let next = unsafe { (*tail).next.load(Ordering::Acquire) };
             if next.is_null() {
-                if unsafe { (*tail).next.compare_exchange(std::ptr::null_mut(), new_node, Ordering::Release, Ordering::Relaxed).is_ok() } {
-                    let _ = self.tail.compare_exchange(tail, new_node, Ordering::Release, Ordering::Relaxed);
+                if unsafe {
+                    (*tail)
+                        .next
+                        .compare_exchange(
+                            std::ptr::null_mut(),
+                            new_node,
+                            Ordering::Release,
+                            Ordering::Relaxed,
+                        )
+                        .is_ok()
+                } {
+                    let _ = self.tail.compare_exchange(
+                        tail,
+                        new_node,
+                        Ordering::Release,
+                        Ordering::Relaxed,
+                    );
                     break;
                 }
             } else {
-                let _ = self.tail.compare_exchange(tail, next, Ordering::Release, Ordering::Relaxed);
+                let _ =
+                    self.tail
+                        .compare_exchange(tail, next, Ordering::Release, Ordering::Relaxed);
             }
         }
     }
@@ -99,8 +122,14 @@ impl<T> TreiberStack<T> {
         }));
         loop {
             let top = self.top.load(Ordering::Acquire);
-            unsafe { (*new_node).next.store(top, Ordering::Release); }
-            if self.top.compare_exchange(top, new_node, Ordering::Release, Ordering::Relaxed).is_ok() {
+            unsafe {
+                (*new_node).next.store(top, Ordering::Release);
+            }
+            if self
+                .top
+                .compare_exchange(top, new_node, Ordering::Release, Ordering::Relaxed)
+                .is_ok()
+            {
                 break;
             }
         }
