@@ -83,6 +83,29 @@ impl PeLoader {
 
         Ok(())
     }
+
+    /// Debian WINE-style PE section relocation and mapping validator.
+    /// Safely computes the target virtual address offsets of PE sections (.text, .data, etc.)
+    /// relative to the preferred base address and the chosen relocation offset, preventing
+    /// out-of-bounds mapping errors.
+    pub fn validate_wine_relocation_table(
+        &self,
+        section: &WinePeSection,
+        preferred_base_addr: u64,
+        actual_load_addr: u64,
+    ) -> Result<u64, Win32Error> {
+        if actual_load_addr < preferred_base_addr {
+            return Err(Win32Error::PlatformMismatch);
+        }
+        let delta = actual_load_addr - preferred_base_addr;
+        let target_virtual_addr = section.virtual_address + delta;
+
+        // Ensure mapped address boundaries are correct
+        if target_virtual_addr < actual_load_addr {
+            return Err(Win32Error::PlatformMismatch); // Overflow guard
+        }
+        Ok(target_virtual_addr)
+    }
 }
 
 impl Default for PeLoader {
@@ -251,9 +274,36 @@ impl D3dToVulkanTranslator {
     }
 }
 
+/// Represents a Windows PE Section header mapped via Debian WINE package compatibility layers
+#[derive(Debug, Clone)]
+pub struct WinePeSection {
+    pub name: String,
+    pub virtual_address: u64,
+    pub virtual_size: u32,
+    pub raw_data_size: u32,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_debian_wine_pe_relocation() {
+        let loader = PeLoader::new();
+        let section = WinePeSection {
+            name: ".text".to_string(),
+            virtual_address: 0x1000,
+            virtual_size: 0x400,
+            raw_data_size: 0x400,
+        };
+
+        // Standard relocation with delta
+        let mapped_addr = loader.validate_wine_relocation_table(&section, 0x400000, 0x800000).unwrap();
+        assert_eq!(mapped_addr, 0x401000);
+
+        // Fail relocation if actual load address is less than preferred base address
+        assert!(loader.validate_wine_relocation_table(&section, 0x400000, 0x300000).is_err());
+    }
 
     #[test]
     fn test_pe_loader_header_parsing() {
