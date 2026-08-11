@@ -38,6 +38,7 @@ pub struct Version {
     pub patch: u64,
 }
 
+#[cfg(feature = "standalone_test")]
 impl std::fmt::Display for Version {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
@@ -250,7 +251,7 @@ impl BaseAdapter {
 
     pub fn execute_hooks(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.user_hooks {
-            UserDefinedHook::execute(hook.as_ref(), package)?;
+            hook.execute(package)?;
         }
         Ok(())
     }
@@ -2339,7 +2340,7 @@ impl UniversalPackageManager {
 
     pub fn execute_hook_chain(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.global_hooks {
-            UserDefinedHook::execute(hook.as_ref(), package)?;
+            hook.execute(package)?;
         }
         Ok(())
     }
@@ -2856,7 +2857,15 @@ Depends: kernel-base";
             }
         }
 
-        adapter.add_hook(Arc::new(CustomHook));
+        let hook_arc = Arc::new(CustomHook);
+        let ptr_custom = hook_arc.into_raw_inner();
+        let ptr_dyn = unsafe {
+            let ref_custom: &crate::klib::arc::ArcInner<CustomHook> = &*ptr_custom;
+            let ref_dyn: &crate::klib::arc::ArcInner<dyn UserDefinedHook> = ref_custom;
+            core::ptr::NonNull::new_unchecked(ref_dyn as *const crate::klib::arc::ArcInner<dyn UserDefinedHook> as *mut crate::klib::arc::ArcInner<dyn UserDefinedHook>)
+        };
+        let hook_dyn = unsafe { Arc::from_raw_inner(ptr_dyn) };
+        adapter.add_hook(hook_dyn);
 
         let deb_data = b"Package: original
 Version: 1.0.0
@@ -3016,15 +3025,32 @@ Description: Hook test";
         let trigger = PathTriggerHook {
             name: "update-desktop-database".to_string(),
             pattern: "*.desktop".to_string(),
-            script: Arc::new(move |matched_paths| {
-                assert_eq!(matched_paths.len(), 1);
-                assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
-                trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
-                Ok(())
-            }),
+            script: {
+                let s_arc = Arc::new(move |matched_paths: &[String]| -> Result<(), HookError> {
+                    assert_eq!(matched_paths.len(), 1);
+                    assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
+                    trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+                    Ok(())
+                });
+                let ptr_custom = s_arc.into_raw_inner();
+                let ptr_dyn = unsafe {
+                    let ref_custom = &*ptr_custom;
+                    let ref_dyn: &crate::klib::arc::ArcInner<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync> = ref_custom;
+                    core::ptr::NonNull::new_unchecked(ref_dyn as *const crate::klib::arc::ArcInner<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync> as *mut crate::klib::arc::ArcInner<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync>)
+                };
+                unsafe { Arc::from_raw_inner(ptr_dyn) }
+            },
         };
 
-        manager.add_path_trigger(Arc::new(trigger));
+        let trigger_arc = Arc::new(trigger);
+        let ptr_custom = trigger_arc.into_raw_inner();
+        let ptr_dyn = unsafe {
+            let ref_custom: &crate::klib::arc::ArcInner<PathTriggerHook> = &*ptr_custom;
+            let ref_dyn: &crate::klib::arc::ArcInner<dyn IPathTrigger> = ref_custom;
+            core::ptr::NonNull::new_unchecked(ref_dyn as *const crate::klib::arc::ArcInner<dyn IPathTrigger> as *mut crate::klib::arc::ArcInner<dyn IPathTrigger>)
+        };
+        let trigger_dyn = unsafe { Arc::from_raw_inner(ptr_dyn) };
+        manager.add_path_trigger(trigger_dyn);
 
         let pkg = StandardPackage {
             metadata: PackageMetadata {

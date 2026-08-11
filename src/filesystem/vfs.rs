@@ -63,6 +63,9 @@ pub struct Inode {
     pub capabilities: CapabilityToken,
     // Conforming Linux/BSD additions
     pub hard_links_count: u32,
+    pub symlink_target: Option<String>,
+    pub link_count: u32,
+    pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
     pub entries: HashMap<String, u64>, // Directory entries
 }
@@ -80,6 +83,9 @@ impl Inode {
             modified: 0,
             capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            symlink_target: None,
+            link_count: 1,
+            xattrs: HashMap::new(),
             data: Vec::new(),
             entries: HashMap::new(),
         }
@@ -306,8 +312,8 @@ impl VirtualFilesystem {
 
         let mut should_delete = false;
         if let Some(inode) = self.inodes.get_mut(&inode_id) {
-            if inode.hard_links_count > 1 {
-                inode.hard_links_count -= 1;
+            if inode.link_count > 1 {
+                inode.link_count -= 1;
             } else {
                 should_delete = true;
             }
@@ -510,6 +516,7 @@ pub enum FsError {
     IsDirectory,
     NoSpace,
     AlreadyExists,
+    AttributeNotFound,
 }
 
 #[cfg(test)]
@@ -565,6 +572,11 @@ mod tests {
         assert_eq!(vfs.write_file_gated(fd, b"gated", &bad_token), Err(FsError::PermissionDenied));
         assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
+
+        // Seek offset to 0 before reading
+        if let Some(fd_struct) = vfs.file_descriptors.get_mut(&fd) {
+            fd_struct.offset = 0;
+        }
 
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
         assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));

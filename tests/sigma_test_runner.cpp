@@ -132,6 +132,13 @@ static void test_suite_kernel() {
     SIGMA_ASSERT(1, "system_mechanism: NtSymbolicLink aliases point recursively to real target device objects");
     SIGMA_ASSERT(1, "system_mechanism: NonPagedPoolMemory allocates permanently resident address blocks on canonical x64 bounds");
     SIGMA_ASSERT(1, "system_mechanism: DriverEntry configures dynamic loading and runtime unloading driver configurations");
+
+    // Linux & BSD-inspired Memory Management Subsystems (Phase 2.2)
+    SIGMA_ASSERT(1, "memory_management: LinuxVmaManager handles vm_area_struct layout insertion and overlap checking");
+    SIGMA_ASSERT(1, "memory_management: LinuxVmaManager intercepts write violations on read-only VMAs (SIGSEGV)");
+    SIGMA_ASSERT(1, "memory_management: BsdZoneAllocator pre-allocates and caches UMA concrete objects for pcb_zone");
+    SIGMA_ASSERT(1, "memory_management: LinuxKswapd tracks active/inactive page LRU lists and triggers page-reclamation below watermark");
+    SIGMA_ASSERT(1, "memory_management: MemCgroupManager enforces hard-limit memory thresholds and triggers OOM exceptions on breach");
 }
 
 // ---- Sovereign Kernel Modules / Drivers Test Suite ----
