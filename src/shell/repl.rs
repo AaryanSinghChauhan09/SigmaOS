@@ -106,6 +106,10 @@ pub enum ShellCommand {
     Bg {
         job_id: usize,
     },
+    Map {
+        subcommand: String,
+        args: Vec<String>,
+    },
     Unknown(String),
 }
 
@@ -126,6 +130,7 @@ pub struct ShellRepl {
     pub proc_fs: crate::process::linux_proc::ProcFileSystem,
     pub jobs: Vec<ShellJob>,
     pub next_job_id: usize,
+    pub mind_map: crate::productivity::MindMapCreator,
 }
 
 impl ShellRepl {
@@ -151,6 +156,7 @@ impl ShellRepl {
             proc_fs: crate::process::linux_proc::ProcFileSystem::new(),
             jobs: Vec::new(),
             next_job_id: 1,
+            mind_map: crate::productivity::MindMapCreator::new("Project Brainstorm", "Core Objectives"),
         }
     }
 
@@ -176,6 +182,7 @@ impl ShellRepl {
             proc_fs: crate::process::linux_proc::ProcFileSystem::new(),
             jobs: Vec::new(),
             next_job_id: 1,
+            mind_map: crate::productivity::MindMapCreator::new("Project Brainstorm", "Core Objectives"),
         }
     }
 
@@ -252,7 +259,7 @@ impl ShellRepl {
                                 pid,
                                 name: format!("nice {} spawn {} {}", nice_val, name, cmdline),
                                 state: crate::process::linux_proc::LinuxProcessState::Running,
-                            });
+                    });
                             println!("[{}] {}", job_id, pid);
                         }
                         _ => {
@@ -326,6 +333,15 @@ impl ShellRepl {
                 if parts.len() >= 2 {
                     let job_id = parts[1].trim_start_matches('%').parse::<usize>().unwrap_or(0);
                     ShellCommand::Bg { job_id }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "map" => {
+                if parts.len() >= 2 {
+                    let subcommand = parts[1].to_string();
+                    let args = parts[2..].iter().map(|s| s.to_string()).collect();
+                    ShellCommand::Map { subcommand, args }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
@@ -554,6 +570,7 @@ impl ShellRepl {
                    jobs                - List active background jobs\n\
                    fg <job_id>         - Bring background job to foreground\n\
                    bg <job_id>         - Resume stopped job in the background\n\
+                   map <subcmd> <args> - Interact with the study mind map engine\n\
                    exit                - Exit the shell"
                 .to_string()),
             ShellCommand::ListProcesses => {
@@ -907,6 +924,70 @@ impl ShellRepl {
                     Err(format!("bg: job [{}] not found", job_id))
                 }
             }
+            ShellCommand::Map { subcommand, args } => {
+                if subcommand == "create" {
+                    if args.len() >= 2 {
+                        let title = &args[0];
+                        let root_topic = &args[1..].join(" ");
+                        self.mind_map = crate::productivity::MindMapCreator::new(title, root_topic);
+                        Ok(format!("Created a new Study Mind Map: '{}' with central idea '{}'", title, root_topic))
+                    } else {
+                        Err("map create: please specify a map title and root topic (e.g. 'map create Studies ComputerScience')".to_string())
+                    }
+                } else if subcommand == "add" {
+                    if args.len() >= 3 {
+                        let parent_id = &args[0];
+                        let child_id = &args[1];
+                        let topic = &args[2..].join(" ");
+                        match self.mind_map.add_node(child_id, parent_id, topic) {
+                            Ok(_) => Ok(format!("Added idea node '{}' ('{}') under parent '{}'.", child_id, topic, parent_id)),
+                            Err(e) => Err(format!("map add failed: {}", e)),
+                        }
+                    } else {
+                        Err("map add: please specify parent_id, child_id, and topic (e.g. 'map add root_node systems Kernels')".to_string())
+                    }
+                } else if subcommand == "move" {
+                    if args.len() == 2 {
+                        let node_id = &args[0];
+                        let new_parent_id = &args[1];
+                        match self.mind_map.move_branch(node_id, new_parent_id) {
+                            Ok(_) => Ok(format!("Successfully moved idea branch '{}' under new parent '{}'.", node_id, new_parent_id)),
+                            Err(e) => Err(format!("map move failed: {}", e)),
+                        }
+                    } else {
+                        Err("map move: please specify node_id and new_parent_id (e.g. 'map move systems processors')".to_string())
+                    }
+                } else if subcommand == "meta" {
+                    if args.len() >= 3 {
+                        let node_id = &args[0];
+                        let priority = args[1].parse::<u32>().unwrap_or(3);
+                        let progress = args[2].parse::<u32>().unwrap_or(0);
+                        let notes = args[3..].join(" ");
+                        match self.mind_map.update_node_metadata(node_id, priority, progress, &notes) {
+                            Ok(_) => Ok(format!("Updated node '{}' markers: Priority {}, Progress {}%.", node_id, priority, progress)),
+                            Err(e) => Err(format!("map meta failed: {}", e)),
+                        }
+                    } else {
+                        Err("map meta: please specify node_id, priority (1-5), and progress (0-100) (e.g. 'map meta systems 1 80 Study memory leaks')".to_string())
+                    }
+                } else if subcommand == "link" {
+                    if args.len() >= 3 {
+                        let source_id = &args[0];
+                        let target_id = &args[1];
+                        let label = &args[2..].join(" ");
+                        match self.mind_map.add_relationship(source_id, target_id, label, "dashed") {
+                            Ok(_) => Ok(format!("Linked idea '{}' to '{}' with label '{}'.", source_id, target_id, label)),
+                            Err(e) => Err(format!("map link failed: {}", e)),
+                        }
+                    } else {
+                        Err("map link: please specify source_id, target_id, and label (e.g. 'map link kernels processors Microkernel IPC link')".to_string())
+                    }
+                } else if subcommand == "export" {
+                    Ok(self.mind_map.export_to_text_tree())
+                } else {
+                    Err(format!("map: unknown subcommand '{}'. Use 'create', 'add', 'move', 'meta', 'link', or 'export'.", subcommand))
+                }
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -1200,5 +1281,39 @@ mod tests {
         assert!(fg_out.contains("Brought"));
         // Brought to foreground removes it from background jobs queue
         assert_eq!(repl.jobs.len(), 0);
+    }
+
+    #[test]
+    fn test_interactive_study_mind_map_commands() {
+        let mut repl = ShellRepl::new();
+
+        // 1. Create a study mind map
+        let create_out = repl.execute_command(ShellCommand::Map {
+            subcommand: "create".to_string(),
+            args: vec!["Studies".to_string(), "Computer Science Core".to_string()],
+        }).unwrap();
+        assert!(create_out.contains("Studies"));
+
+        // 2. Add child topic node
+        let add_out = repl.execute_command(ShellCommand::Map {
+            subcommand: "add".to_string(),
+            args: vec!["root_node".to_string(), "kernels".to_string(), "Operating Systems".to_string()],
+        }).unwrap();
+        assert!(add_out.contains("kernels"));
+
+        // 3. Update node study progress metadata
+        let meta_out = repl.execute_command(ShellCommand::Map {
+            subcommand: "meta".to_string(),
+            args: vec!["kernels".to_string(), "1".to_string(), "85".to_string(), "Studying microkernels".to_string()],
+        }).unwrap();
+        assert!(meta_out.contains("Priority 1, Progress 85%"));
+
+        // 4. Export text tree study layout
+        let export_out = repl.execute_command(ShellCommand::Map {
+            subcommand: "export".to_string(),
+            args: Vec::new(),
+        }).unwrap();
+        assert!(export_out.contains("Computer Science Core"));
+        assert!(export_out.contains("Operating Systems"));
     }
 }

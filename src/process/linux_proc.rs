@@ -1,7 +1,7 @@
 // Linux-inspired Process & ProcFS Emulation for SigmaOS
 // Implements advanced process hierarchies, PID namespace isolation, nice priorities, cgroups, signal handling, and dynamic /proc pseudo-filesystem.
 
-use std::collections::BTreeMap;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxProcessState {
@@ -120,9 +120,9 @@ pub struct PidNamespace {
     pub id: usize,
     pub parent_id: Option<usize>,
     /// Maps Virtual (local) PID to Global (real) PID
-    pub local_to_global: BTreeMap<usize, usize>,
+    pub local_to_global: HashMap<usize, usize>,
     /// Maps Global (real) PID to Virtual (local) PID
-    pub global_to_local: BTreeMap<usize, usize>,
+    pub global_to_local: HashMap<usize, usize>,
     next_local_pid: usize,
 }
 
@@ -131,8 +131,8 @@ impl PidNamespace {
         Self {
             id,
             parent_id,
-            local_to_global: BTreeMap::new(),
-            global_to_local: BTreeMap::new(),
+            local_to_global: HashMap::new(),
+            global_to_local: HashMap::new(),
             next_local_pid: 1,
         }
     }
@@ -238,9 +238,9 @@ pub enum LinuxSignal {
 
 /// The Core Proc pseudo-filesystem manager
 pub struct ProcFileSystem {
-    pub processes: BTreeMap<usize, LinuxProcessEntry>,
-    pub cgroups: BTreeMap<String, CGroup>,
-    pub namespaces: BTreeMap<usize, PidNamespace>,
+    pub processes: HashMap<usize, LinuxProcessEntry>,
+    pub cgroups: HashMap<String, CGroup>,
+    pub namespaces: HashMap<usize, PidNamespace>,
     pub active_namespace_id: usize,
     pub system_uptime: u64, // Simulated seconds
     pub total_memory: usize,
@@ -259,9 +259,9 @@ pub struct ProcFileSystem {
 impl ProcFileSystem {
     pub fn new() -> Self {
         let mut pfs = Self {
-            processes: BTreeMap::new(),
-            cgroups: BTreeMap::new(),
-            namespaces: BTreeMap::new(),
+            processes: HashMap::new(),
+            cgroups: HashMap::new(),
+            namespaces: HashMap::new(),
             active_namespace_id: 0,
             system_uptime: 43200, // 12 hours
             total_memory: 16777216 * 1024, // 16GB
