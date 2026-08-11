@@ -1,9 +1,8 @@
+use crate::klib::Vec;
 /// Open-Source Absorption and Synchronization Subsystem for SigmaOS
 /// Implements Pledge/Unveil sandboxing, Post-Quantum Cryptography secure channels,
 /// DPLL SAT-solving package dependency resolvers, and Content-Addressed Storage.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::Vec;
 
 // ==========================================
 // 1. Process Privilege Reduction (Pledge & Unveil)
@@ -103,7 +102,11 @@ impl PqcSecureChannel {
         }
     }
 
-    pub fn execute_hybrid_handshake(&mut self, client_kyber_public: &[u8; 1024], client_dilithium_sig: &[u8; 2048]) -> Result<u32, &'static str> {
+    pub fn execute_hybrid_handshake(
+        &mut self,
+        client_kyber_public: &[u8; 1024],
+        client_dilithium_sig: &[u8; 2048],
+    ) -> Result<u32, &'static str> {
         // Enforce Post-Quantum secure handshaking: checking signature digests
         if client_kyber_public[0] == 0 || client_dilithium_sig[0] == 0 {
             return Err("Invalid post-quantum cryptographic payload digest");
@@ -276,9 +279,7 @@ impl Default for ContentAddressedStorage {
 
 impl ContentAddressedStorage {
     pub fn new() -> Self {
-        ContentAddressedStorage {
-            store: Vec::new(),
-        }
+        ContentAddressedStorage { store: Vec::new() }
     }
 
     pub fn inject_object(&mut self, payload: &[u8]) -> [u8; 32] {
@@ -330,7 +331,9 @@ mod tests {
         let kyber = [0x55u8; 1024];
         let dilithium = [0xAAu8; 2048];
 
-        let secret = channel.execute_hybrid_handshake(&kyber, &dilithium).unwrap();
+        let secret = channel
+            .execute_hybrid_handshake(&kyber, &dilithium)
+            .unwrap();
         assert_ne!(secret, 0);
         assert!(channel.established);
 
@@ -344,8 +347,14 @@ mod tests {
 
         // Let's create clause: (X1 || !X2)
         let mut literals = Vec::new();
-        literals.push(Literal { var_id: 1, is_positive: true });
-        literals.push(Literal { var_id: 2, is_positive: false });
+        literals.push(Literal {
+            var_id: 1,
+            is_positive: true,
+        });
+        literals.push(Literal {
+            var_id: 2,
+            is_positive: false,
+        });
 
         let clause = Clause { literals };
         solver.add_clause(clause);
