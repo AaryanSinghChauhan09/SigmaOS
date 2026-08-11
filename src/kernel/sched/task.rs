@@ -24,7 +24,7 @@ use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 
 use crate::kernel::vfs::inode::{FileFlags, FsError, Inode};
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 pub const PID_MAX_LIMIT: u32 = 32768;
 pub const INIT_PID: u64 = 1;

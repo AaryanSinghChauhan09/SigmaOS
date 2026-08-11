@@ -3,98 +3,89 @@
 
 #![allow(dead_code)]
 
+extern crate alloc;
+use alloc::collections::BTreeMap as AllocBTreeMap;
+use alloc::collections::BTreeSet as AllocBTreeSet;
+use alloc::collections::VecDeque as AllocVecDeque;
 use core::cell::Cell;
 
 /// Simple BTreeMap implementation for klib
-/// This is a basic implementation to reduce std dependency
 pub struct BTreeMap<K, V> {
-    // Placeholder for actual BTreeMap implementation
-    // For now, this is a minimal stub
-    _phantom: core::marker::PhantomData<(K, V)>,
+    inner: AllocBTreeMap<K, V>,
 }
 
-impl<K, V> BTreeMap<K, V> {
+impl<K: Ord, V> BTreeMap<K, V> {
     pub fn new() -> Self {
         Self {
-            _phantom: core::marker::PhantomData,
+            inner: AllocBTreeMap::new(),
         }
     }
 
-    pub fn insert(&mut self, _key: K, _value: V) -> Option<V> {
-        // TODO: Implement actual insertion
-        None
+    pub fn insert(&mut self, key: K, value: V) -> Option<V> {
+        self.inner.insert(key, value)
     }
 
-    pub fn get(&self, _key: &K) -> Option<&V> {
-        // TODO: Implement actual lookup
-        None
+    pub fn get(&self, key: &K) -> Option<&V> {
+        self.inner.get(key)
     }
 
-    pub fn get_mut(&mut self, _key: &K) -> Option<&mut V> {
-        // TODO: Implement actual mutable lookup
-        None
+    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
+        self.inner.get_mut(key)
     }
 
-    pub fn remove(&mut self, _key: &K) -> Option<V> {
-        // TODO: Implement actual removal
-        None
+    pub fn remove(&mut self, key: &K) -> Option<V> {
+        self.inner.remove(key)
     }
 
     pub fn len(&self) -> usize {
-        // TODO: Implement actual length
-        0
+        self.inner.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len() == 0
+        self.inner.is_empty()
     }
 }
 
-impl<K, V> Default for BTreeMap<K, V> {
+impl<K: Ord, V> Default for BTreeMap<K, V> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-/// Simple HashSet implementation for klib
+/// Simple HashSet implementation for klib (Using BTreeSet internally)
 pub struct HashSet<T> {
-    // Placeholder for actual HashSet implementation
-    _phantom: core::marker::PhantomData<T>,
+    inner: AllocBTreeSet<T>,
 }
 
-impl<T> HashSet<T> {
+impl<T: Ord> HashSet<T> {
     pub fn new() -> Self {
         Self {
-            _phantom: core::marker::PhantomData,
+            inner: AllocBTreeSet::new(),
         }
     }
 
-    pub fn insert(&mut self, _value: T) -> bool {
-        // TODO: Implement actual insertion
-        false
+    pub fn insert(&mut self, value: T) -> bool {
+        self.inner.insert(value)
     }
 
-    pub fn contains(&self, _value: &T) -> bool {
-        // TODO: Implement actual containment check
-        false
+    pub fn contains(&self, value: &T) -> bool {
+        self.inner.contains(value)
     }
 
-    pub fn remove(&mut self, _value: &T) -> bool {
-        // TODO: Implement actual removal
-        false
+    pub fn remove(&mut self, value: &T) -> bool {
+        self.inner.remove(value)
     }
 
     pub fn len(&self) -> usize {
-        // TODO: Implement actual length
-        0
+        self.inner.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len() == 0
+        self.inner.is_empty()
     }
 }
 
-impl<T> Default for HashSet<T> {
+impl<T: Ord> Default for HashSet<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -102,52 +93,46 @@ impl<T> Default for HashSet<T> {
 
 /// Simple VecDeque implementation for klib
 pub struct VecDeque<T> {
-    // Placeholder for actual VecDeque implementation
-    _phantom: core::marker::PhantomData<T>,
+    inner: AllocVecDeque<T>,
 }
 
 impl<T> VecDeque<T> {
     pub fn new() -> Self {
         Self {
-            _phantom: core::marker::PhantomData,
+            inner: AllocVecDeque::new(),
         }
     }
 
-    pub fn push_front(&mut self, _value: T) {
-        // TODO: Implement actual push_front
+    pub fn push_front(&mut self, value: T) {
+        self.inner.push_front(value)
     }
 
-    pub fn push_back(&mut self, _value: T) {
-        // TODO: Implement actual push_back
+    pub fn push_back(&mut self, value: T) {
+        self.inner.push_back(value)
     }
 
     pub fn pop_front(&mut self) -> Option<T> {
-        // TODO: Implement actual pop_front
-        None
+        self.inner.pop_front()
     }
 
     pub fn pop_back(&mut self) -> Option<T> {
-        // TODO: Implement actual pop_back
-        None
+        self.inner.pop_back()
     }
 
     pub fn front(&self) -> Option<&T> {
-        // TODO: Implement actual front
-        None
+        self.inner.front()
     }
 
     pub fn back(&self) -> Option<&T> {
-        // TODO: Implement actual back
-        None
+        self.inner.back()
     }
 
     pub fn len(&self) -> usize {
-        // TODO: Implement actual length
-        0
+        self.inner.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len() == 0
+        self.inner.is_empty()
     }
 }
 

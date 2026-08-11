@@ -6,7 +6,7 @@ use alloc::vec::Vec;
 use core::any::Any;
 
 use crate::kernel::object::{KRef, KernelObject};
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DeviceType {

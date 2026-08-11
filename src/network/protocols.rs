@@ -2,7 +2,7 @@
 // SigmaOS DNS, mDNS, QUIC, TCP/IP, UDP, DHCP, HTTP, HTTPS, FTP, SSH, SMTP, TLS, WebSocket, BGP Network Implementations
 // Full-protocol stack support for bare-metal kernel and userspace layers
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // --- IP versions ---

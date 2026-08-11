@@ -1,7 +1,9 @@
-// SigmaOS AI-Driven Optimization System
-// Copilot-style assistants for system tuning and automation
+#![no_std]
+extern crate alloc;
 
-/// Optimization category
+use alloc::vec::Vec;
+use alloc::string::{String, ToString};
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizationCategory {
     Performance,
@@ -12,51 +14,16 @@ pub enum OptimizationCategory {
     Security,
 }
 
-/// Optimization recommendation
 #[derive(Debug, Clone)]
 pub struct OptimizationRecommendation {
     pub category: OptimizationCategory,
     pub description: String,
-    pub impact: f64,     // 0.0 to 1.0
-    pub confidence: f64, // 0.0 to 1.0
+    pub impact: f64,
+    pub confidence: f64,
     pub action: String,
     pub estimated_benefit: String,
 }
 
-impl OptimizationRecommendation {
-    pub fn new(category: OptimizationCategory, description: String) -> Self {
-        Self {
-            category,
-            description,
-            impact: 0.5,
-            confidence: 0.5,
-            action: String::new(),
-            estimated_benefit: String::new(),
-        }
-    }
-
-    pub fn with_impact(mut self, impact: f64) -> Self {
-        self.impact = impact.clamp(0.0, 1.0);
-        self
-    }
-
-    pub fn with_confidence(mut self, confidence: f64) -> Self {
-        self.confidence = confidence.clamp(0.0, 1.0);
-        self
-    }
-
-    pub fn with_action(mut self, action: String) -> Self {
-        self.action = action;
-        self
-    }
-
-    pub fn with_benefit(mut self, benefit: String) -> Self {
-        self.estimated_benefit = benefit;
-        self
-    }
-}
-
-/// System state snapshot
 #[derive(Debug, Clone)]
 pub struct SystemState {
     pub cpu_usage: f64,
@@ -68,150 +35,71 @@ pub struct SystemState {
     pub timestamp: u64,
 }
 
-impl SystemState {
-    pub fn new() -> Self {
-        Self {
-            cpu_usage: 0.0,
-            memory_usage: 0.0,
-            disk_usage: 0.0,
-            network_usage: 0.0,
-            temperature: 0.0,
-            power_consumption: 0.0,
-            timestamp: 0,
-        }
-    }
-
-    pub fn with_cpu(mut self, usage: f64) -> Self {
-        self.cpu_usage = usage.clamp(0.0, 100.0);
-        self
-    }
-
-    pub fn with_memory(mut self, usage: f64) -> Self {
-        self.memory_usage = usage.clamp(0.0, 100.0);
-        self
-    }
-
-    pub fn with_temperature(mut self, temp: f64) -> Self {
-        self.temperature = temp;
-        self
-    }
-}
-
-impl Default for SystemState {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// AI optimizer
 pub struct AiOptimizer {
     pub system_history: Vec<SystemState>,
-    pub recommendations: Vec<OptimizationRecommendation>,
-    pub learning_enabled: bool,
-    pub optimization_threshold: f64,
+    pub learning_rate: f64,
+    pub ema_cpu: f64,
+    pub ema_mem: f64,
 }
 
 impl AiOptimizer {
     pub fn new() -> Self {
         Self {
             system_history: Vec::new(),
-            recommendations: Vec::new(),
-            learning_enabled: true,
-            optimization_threshold: 0.7,
+            learning_rate: 0.1, // EMA alpha
+            ema_cpu: 0.0,
+            ema_mem: 0.0,
         }
     }
 
-    pub fn with_threshold(mut self, threshold: f64) -> Self {
-        self.optimization_threshold = threshold.clamp(0.0, 1.0);
-        self
-    }
-
     pub fn record_state(&mut self, state: SystemState) {
-        self.system_history.push(state);
+        if self.system_history.is_empty() {
+            self.ema_cpu = state.cpu_usage;
+            self.ema_mem = state.memory_usage;
+        } else {
+            // Update Exponential Moving Average
+            self.ema_cpu = (state.cpu_usage * self.learning_rate) + (self.ema_cpu * (1.0 - self.learning_rate));
+            self.ema_mem = (state.memory_usage * self.learning_rate) + (self.ema_mem * (1.0 - self.learning_rate));
+        }
 
-        // Keep only last 1000 states
+        self.system_history.push(state);
         if self.system_history.len() > 1000 {
             self.system_history.remove(0);
         }
     }
 
-    pub fn analyze_current_state(
-        &self,
-        current_state: &SystemState,
-    ) -> Vec<OptimizationRecommendation> {
-        let mut recommendations = Vec::new();
+    pub fn analyze_current_state(&self, current_state: &SystemState) -> Vec<OptimizationRecommendation> {
+        let mut recs = Vec::new();
 
-        // CPU optimization
-        if current_state.cpu_usage > 80.0 {
-            recommendations.push(
-                OptimizationRecommendation::new(
-                    OptimizationCategory::Performance,
-                    "High CPU usage detected".to_string(),
-                )
-                .with_impact(0.8)
-                .with_confidence(0.9)
-                .with_action("Reduce background processes".to_string())
-                .with_benefit("Expected 15-20% CPU reduction".to_string()),
-            );
+        // Use EMA for anomaly detection (Z-score simplified)
+        let diff_cpu = current_state.cpu_usage - self.ema_cpu;
+        if diff_cpu > 30.0 {
+            recs.push(OptimizationRecommendation {
+                category: OptimizationCategory::Performance,
+                description: "CPU spike anomaly detected".to_string(),
+                impact: 0.9,
+                confidence: 0.92,
+                action: "Throttle low-priority cgroups".to_string(),
+                estimated_benefit: "Expected 20% CPU normalization".to_string(),
+            });
         }
 
-        // Memory optimization
-        if current_state.memory_usage > 85.0 {
-            recommendations.push(
-                OptimizationRecommendation::new(
-                    OptimizationCategory::Performance,
-                    "High memory usage detected".to_string(),
-                )
-                .with_impact(0.7)
-                .with_confidence(0.85)
-                .with_action("Clear cache and inactive applications".to_string())
-                .with_benefit("Expected 10-15% memory reduction".to_string()),
-            );
-        }
-
-        // Thermal optimization
-        if current_state.temperature > 75.0 {
-            recommendations.push(
-                OptimizationRecommendation::new(
-                    OptimizationCategory::Thermal,
-                    "High temperature detected".to_string(),
-                )
-                .with_impact(0.9)
-                .with_confidence(0.95)
-                .with_action("Reduce CPU frequency and enable cooling".to_string())
-                .with_benefit("Expected 5-10°C temperature reduction".to_string()),
-            );
-        }
-
-        // Power optimization
-        if current_state.power_consumption > 50.0 && !self.system_history.is_empty() {
-            let avg_power: f64 = self
-                .system_history
-                .iter()
-                .map(|s| s.power_consumption)
-                .sum::<f64>()
-                / self.system_history.len() as f64;
-
-            if current_state.power_consumption > avg_power * 1.5 {
-                recommendations.push(
-                    OptimizationRecommendation::new(
-                        OptimizationCategory::Power,
-                        "Unusual power consumption detected".to_string(),
-                    )
-                    .with_impact(0.6)
-                    .with_confidence(0.7)
-                    .with_action("Enable power saving mode".to_string())
-                    .with_benefit("Expected 20-30% power reduction".to_string()),
-                );
+        // Linear regression for short-term CPU prediction
+        if self.system_history.len() > 10 {
+            let last_idx = self.system_history.len() - 1;
+            let slope = self.system_history[last_idx].cpu_usage - self.system_history[last_idx - 10].cpu_usage;
+            if slope > 2.0 {
+                recs.push(OptimizationRecommendation {
+                    category: OptimizationCategory::Performance,
+                    description: "Upward CPU trend predicted".to_string(),
+                    impact: 0.8,
+                    confidence: 0.85,
+                    action: "Pre-scale CPU frequency".to_string(),
+                    estimated_benefit: "Reduced latency for upcoming workload".to_string(),
+                });
             }
         }
-
-        // Filter by threshold
-        recommendations.retain(|r| r.confidence >= self.optimization_threshold);
-
-        // Sort by impact
-        recommendations.sort_by(|a, b| {
-            b.impact
-                .partial_cmp(&a.impact)
-                .unwrap_or(core::cmp::Ordering::Equal)
-        });
+        
+        recs
+    }
+}

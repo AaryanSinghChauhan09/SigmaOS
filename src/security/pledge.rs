@@ -226,7 +226,7 @@ impl Default for PledgeManager {
     }
 }
 
-/// Common pledge promises
+/// Enhanced pledge promises inspired by OpenBSD 7.9 security improvements
 pub mod promises {
     use super::{Permission, PledgePromise};
     use crate::klib::Vec;
@@ -248,6 +248,40 @@ pub mod promises {
         PledgePromise::new(p)
     }
 
+    /// DNS promise - DNS resolution only (OpenBSD 7.9 inspired)
+    pub fn dns() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Dns);
+        p.push(Permission::NetworkUdp);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
+    }
+
+    /// Unix domain sockets promise (OpenBSD 7.9 inspired)
+    pub fn unix() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Unix);
+        p.push(Permission::Ipc);
+        PledgePromise::new(p)
+    }
+
+    /// TTY promise - terminal access (OpenBSD 7.9 inspired)
+    pub fn tty() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Tty);
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
+    }
+
+    /// Process promise - process operations (OpenBSD 7.9 inspired)
+    pub fn proc() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Proc);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
+    }
+
     /// Exec promise - can execute processes
     pub fn exec() -> PledgePromise {
         let mut p = Vec::new();
@@ -257,10 +291,101 @@ pub mod promises {
         PledgePromise::new(p)
     }
 
+    /// ID promise - user/group ID operations (OpenBSD 7.9 inspired)
+    pub fn id() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Id);
+        PledgePromise::new(p)
+    }
+
+    /// Settime promise - time setting (OpenBSD 7.9 inspired)
+    pub fn settime() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Settime);
+        PledgePromise::new(p)
+    }
+
+    /// PF promise - packet filter access (OpenBSD 7.9 inspired)
+    pub fn pf() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Pf);
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
+    }
+
+    /// Route promise - routing table access (OpenBSD 7.9 inspired)
+    pub fn route() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Route);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
+    }
+
+    /// Wroute promise - write routing table (OpenBSD 7.9 inspired)
+    pub fn wroute() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Wroute);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
+    }
+
+    /// Audio promise - audio device access (OpenBSD 7.9 inspired)
+    pub fn audio() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Audio);
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
+    }
+
+    /// Video promise - video device access (OpenBSD 7.9 inspired)
+    pub fn video() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Video);
+        p.push(Permission::FileRead);
+        p.push(Permission::FileWrite);
+        PledgePromise::new(p)
+    }
+
+    /// BPF promise - Berkeley Packet Filter access (OpenBSD 7.9 inspired)
+    pub fn bpf() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::Bpf);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
+    }
+
     /// IPC promise - inter-process communication
     pub fn ipc() -> PledgePromise {
         let mut p = Vec::new();
         p.push(Permission::Ipc);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
+    }
+
+    /// SigmaOS AI capability promise - AI/ML operations
+    pub fn ai_capability() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::AICapability);
+        p.push(Permission::FileRead);
+        p.push(Permission::ProcessExec);
+        PledgePromise::new(p)
+    }
+
+    /// SigmaOS shard access promise - Shard system access
+    pub fn shard_access() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::ShardAccess);
+        p.push(Permission::Ipc);
+        p.push(Permission::FileRead);
+        PledgePromise::new(p)
+    }
+
+    /// SigmaOS quantum crypto promise - Post-quantum crypto operations
+    pub fn quantum_crypto() -> PledgePromise {
+        let mut p = Vec::new();
+        p.push(Permission::QuantumCrypto);
         p.push(Permission::FileRead);
         PledgePromise::new(p)
     }
@@ -274,6 +399,21 @@ pub mod promises {
         p.push(Permission::FileWrite);
         p.push(Permission::ProcessExec);
         p.push(Permission::Ipc);
+        p.push(Permission::Dns);
+        p.push(Permission::Unix);
+        p.push(Permission::Tty);
+        p.push(Permission::Proc);
+        p.push(Permission::Id);
+        p.push(Permission::Settime);
+        p.push(Permission::Pf);
+        p.push(Permission::Route);
+        p.push(Permission::Wroute);
+        p.push(Permission::Audio);
+        p.push(Permission::Video);
+        p.push(Permission::Bpf);
+        p.push(Permission::AICapability);
+        p.push(Permission::ShardAccess);
+        p.push(Permission::QuantumCrypto);
         PledgePromise::new(p)
     }
 }

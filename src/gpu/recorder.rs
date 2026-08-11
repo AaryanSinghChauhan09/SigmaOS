@@ -2,7 +2,7 @@
 // Real-time GPU-accelerated screen capture and sandbox security controls for benchmarking and visualization.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FrameFormat {

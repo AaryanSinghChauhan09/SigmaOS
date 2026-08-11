@@ -1,5 +1,9 @@
-// Core Init and Service Supervision Modules for SigmaOS
-pub mod sigma_init;
-pub mod system;
+// SigmaInit - Modern Init System Module
+// Inspired by OpenRC, runit, s6 (systemd alternatives)
 
-pub use sigma_init::{InitError, Service, ServiceState, SigmaInit, SimpleService};
+pub mod sigmainit;
+
+pub use sigmainit::{
+    SigmaInit, Service, ServiceState, RestartPolicy, SystemTarget,
+    Supervisor, DependencyGraph, ServiceError, DependencyError
+};

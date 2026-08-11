@@ -92,7 +92,7 @@ impl CapabilityToken {
     }
 }
 
-/// Permission types
+/// Permission types (Enhanced with OpenBSD 7.9 and SigmaOS-specific permissions)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
     NetworkTcp = 0,
@@ -101,6 +101,23 @@ pub enum Permission {
     FileWrite = 3,
     ProcessExec = 4,
     Ipc = 5,
+    // OpenBSD 7.9 inspired permissions
+    Dns = 6,
+    Unix = 7,
+    Tty = 8,
+    Proc = 9,
+    Id = 10,
+    Settime = 11,
+    Pf = 12,
+    Route = 13,
+    Wroute = 14,
+    Audio = 15,
+    Video = 16,
+    Bpf = 17,
+    // SigmaOS-specific permissions
+    AICapability = 18,
+    ShardAccess = 19,
+    QuantumCrypto = 20,
 }
 
 /// Capability gate for syscall validation

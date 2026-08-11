@@ -4,7 +4,7 @@
 
 use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {

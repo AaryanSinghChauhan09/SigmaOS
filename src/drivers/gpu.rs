@@ -1,7 +1,7 @@
 // SigmaOS GPU Driver
 // Hardware abstraction for graphics rendering with Vulkan/Mesa-parity pipeline models and self-healing recovery
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 extern crate alloc;
 use alloc::string::String;

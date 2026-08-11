@@ -4,7 +4,7 @@
 // completing the gap analysis against Windows, Android, iOS, and Linux distros.
 
 #[cfg(not(test))]
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

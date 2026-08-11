@@ -2,7 +2,7 @@
 // Core native package manager for isolated, reproducible sovereign application deployments.
 
 use alloc::collections::BTreeMap;
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum IsolationLevel {

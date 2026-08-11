@@ -2,6 +2,7 @@
 // Core library for SigmaOS operating system
 
 pub mod accessibility;
+pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod container;
@@ -11,6 +12,7 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod init;
 pub mod kernel;
 pub mod klib;
 pub mod ml;
@@ -23,6 +25,7 @@ pub mod performance;
 pub mod productivity;
 pub mod remote;
 pub mod resilience;
+pub mod scheduler;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -39,22 +42,12 @@ pub mod hardware {
 pub mod power {
     pub mod governor;
 }
-pub mod observability {
-    pub mod profiler;
-}
-pub mod ai {
-    pub mod agent;
-    pub mod orchestrator;
-}
 pub mod boot;
 pub mod toolchain {
     pub mod adapter;
     pub mod capsule;
     pub mod codex;
     pub mod bootstrap;
-}
-pub mod scheduler {
-    pub mod numa_scheduler;
 }
 pub mod crypto {
     pub mod vectorized_pqc;
@@ -70,22 +63,12 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BIOSGatewayMesh, BinaryFormat, BuildCodexGrid, CompatibilityError,
-    CompatibilityManager, CompatibilityMode, ConstellationNode, ContainerRuntime, CorebootGatewayMesh,
-    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
-    FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
-    LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
-    LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
-    LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
-    PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
-    StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, TargetPlatform,
-    TranslationLayer, UEFIGatewayMesh, ZeroTrustConstellation,
-    EosMirrorReflector, EosWelcomeEngine, EosUpdateNotifier, EosLogTool, YayAurHelper,
-    Mirror as EosMirror, WelcomeTab as EosWelcomeTab,
+    ApplicationBinary, BinaryFormat, CompatibilityError,
+    CompatibilityManager, CompatibilityMode, ContainerRuntime, TargetPlatform, TranslationLayer,
     SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
     DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };
-pub use container::{
+// pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
     ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
     SimpleContainer, SimpleContainerRuntime,
@@ -109,11 +92,11 @@ pub use kernel::{
     ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
     Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
     KernelPluginManager, LegacyScheduler, MemoryBlock, Message, MetaKernel, MicroDriver, NetPod,
-    PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState,
+    PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessState, ProcessManager, ProcessId,
     ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
-    UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
-    IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+    UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager, VirtualMemoryManager,
+    IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal, Tty,
 };
 pub use network::{
     compute_checksum as compute_net_checksum, IPv4Address, NetworkPacket, PacketRingBuffer,
@@ -153,6 +136,16 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
+    AurClient, AurPackage, PkgBuildRecipe, BuildSandboxConfig, BuiltPackage,
+    PkgBuildParser, AurError, BuildError, InstallError, ParseError,
+};
+pub use init::{
+    SigmaInit, Service, ServiceState, RestartPolicy, SystemTarget,
+    Supervisor, DependencyGraph, ServiceError, DependencyError,
+};
+pub use scheduler::{
+    SchedExtScheduler, SchedulingPolicy, BpfProgram, BpfMapDescriptor, BpfMapType,
+    UserSpaceScheduler, SchedulerConfig, ScheduleDecision, SchedulerStats, SchedError,
 };
 pub use remote::{
     FileTransfer, InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSession,
@@ -174,6 +167,7 @@ pub use security::{
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
     PORT_ALLOW_SSL, PORT_ALLOW_TCP,
+    HardenedSysctlManager, SysctlConfig, SysctlValue, SysctlError,
 };
 pub use shell::{
     CommandError as ShellCommandError, ShellCommand, ShellRepl, ShellSession, SimpleShellSession,
@@ -187,3 +181,6 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
+
+// Added networking mod
+pub mod networking;

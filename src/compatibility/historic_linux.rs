@@ -1,5 +1,5 @@
-#[cfg(not(test))]
-use crate::driver::device::DdeDeviceWrapper;
+// #[cfg(not(test))]
+// use crate::driver::device::DdeDeviceWrapper;
 
 #[cfg(test)]
 pub struct DdeDeviceWrapper {

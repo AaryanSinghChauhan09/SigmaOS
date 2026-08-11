@@ -3,7 +3,7 @@
 // Running natively in user-space with microsecond-level IPC latencies.
 
 #[cfg(not(test))]
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 #[cfg(not(test))]
 use core::sync::atomic::{AtomicUsize, Ordering};

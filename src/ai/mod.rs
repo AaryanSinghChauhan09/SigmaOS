@@ -15,7 +15,6 @@ pub use openclaw::{
     ClawBackgroundDaemon, ClawVoiceTranscriber, ClawChatIntegrator, AlertPlatform,
 };
 
-pub use agent::{AIAgent, SimpleAIAgent};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,
@@ -25,9 +24,14 @@ pub use llm::{
     LocalLlmEngine, QuantizationType, StreamingInference, StreamingLlmEngine,
 };
 pub use orchestrator::{AgentOrchestrator, AgentState, SimpleAgentOrchestrator};
+pub use orchestrator::{
+    AiTaskScheduler as EnhancedAiTaskScheduler, AiTask, AiTaskType, TaskPriority, ResourceRequirements,
+    AiTaskResult, ResourceUsage, LocalLlm as EnhancedLocalLlm, TaskQueue, ResourceManager,
+    AiError as EnhancedAiError, ResourceError, ScheduleError, OptimizationError,
+};
 pub use sai::{
     Agent as SaiAgent, AgentOrchestrator as SaiOrchestrator, AgentTask, AgentTask as SaiTask,
-    AiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
+    AiError as SaiAiError, ComputeBackend, LocalModel, ModelSize, SaiEngine, Tensor, TensorCore,
 };
 pub use sai::{Agent, AgentRole, AgentTask as Task, TaskStatus};
 pub use system::{

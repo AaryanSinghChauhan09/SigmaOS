@@ -3,7 +3,7 @@
 // Universal ABI Translator, SigmaFS++, Self-Healing Kernel, AI-Native Runtime,
 // Energy-Aware Scheduler, User-Defined Kernel Functions, and Privacy-First Sandboxes.
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// 1. Universal ABI Translator

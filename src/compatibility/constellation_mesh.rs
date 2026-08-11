@@ -2,7 +2,7 @@
 // Houses the core OOP designs for Kernel Constellations, Syscall Almanacs, Driver Archives,
 // Firmware Meshes, Build Codices, Security Constellations, and Peripheral Meshes.
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// 1. Kernel Personality Constellation Grid

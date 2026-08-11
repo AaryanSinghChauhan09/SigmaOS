@@ -45,11 +45,16 @@ pub use usb_hid::{HidError, HidKeyboardEvent, HidReportType, UsbHidDriver};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
 
 // Re-export the newly added virtual and physical standard device drivers
-pub use virtio::{VirtioBlkDriver, VirtioNetDriver, VirtioRngDriver, VirtQueue, VirtioDesc};
-pub use intel_e1000::{IntelE1000Driver, E1000RxDesc, E1000TxDesc};
-pub use legacy_audio_ac97::LegacyAudioAc97;
-pub use modern_audio_intel_hda::ModernAudioIntelHda;
-pub use modern_nvme::ModernNvmeDriver;
-pub use modern_usb_printer::ModernUsbPrinter;
-pub use modern_wifi::ModernWifiDriver;
-pub use touch_jingos::TouchJingOS;
+// pub use virtio::{VirtioBlkDriver, VirtioNetDriver, VirtioRngDriver, VirtQueue, VirtioDesc};
+// pub use intel_e1000::{IntelE1000Driver, E1000RxDesc, E1000TxDesc};
+// pub use legacy_audio_ac97::LegacyAudioAc97;
+// pub use modern_audio_intel_hda::ModernAudioIntelHda;
+// pub use modern_nvme::ModernNvmeDriver;
+// pub use modern_usb_printer::ModernUsbPrinter;
+// pub use modern_wifi::ModernWifiDriver;
+// pub use touch_jingos::TouchJingOS;
+pub mod pci;
+pub mod virtio_blk;
+pub mod virtio_net;
+pub mod ahci;
+pub mod framebuffer;

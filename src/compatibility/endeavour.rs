@@ -13,7 +13,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use alloc::collections::BTreeMap;
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 use crate::sigpkg::PackageRecipe;
 
 /// Represents a package mirror in the SigmaOS network.

@@ -21,7 +21,7 @@
 // Implements the LocalSend REST/UDP v2.1 protocol format
 // to enable offline peer-to-peer secure file transfer within local networks.
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 use std::collections::{BTreeMap, HashSet};
 
 /// Device types supported by LocalSend protocol

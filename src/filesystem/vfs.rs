@@ -2,7 +2,7 @@
 // Capability-based filesystem with security
 // Enhanced with standard Linux-conforming Hard Link reference counting
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 use alloc::collections::BTreeMap;
 
 /// File type
@@ -54,3 +54,4 @@ pub struct Inode {
     pub modified: u64,
     pub capabilities: CapabilityToken,
     pub link_count: u32, // standard inode link count tracking hard links
+}

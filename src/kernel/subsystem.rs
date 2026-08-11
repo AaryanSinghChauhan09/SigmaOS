@@ -29,7 +29,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 // ============================================================================
 // Core Driver Abstraction

@@ -7,7 +7,7 @@ use core::any::Any;
 
 use crate::kernel::device::{Device, DeviceBinding, DeviceType, DriverError, DriverMetadata};
 use crate::kernel::object::{KRef, KernelObject};
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 pub trait Driver: KernelObject + Send + Sync {
     fn driver_name(&self) -> &str;

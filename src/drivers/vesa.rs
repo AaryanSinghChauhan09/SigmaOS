@@ -2,7 +2,7 @@
 // Hardware abstraction for VESA BIOS extensions + PeripheralDevice OOP integration
 
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use crate::security::CapabilityToken;
+use crate::security::capability::CapabilityToken;
 
 /// VESA mode info
 #[derive(Debug, Clone)]
