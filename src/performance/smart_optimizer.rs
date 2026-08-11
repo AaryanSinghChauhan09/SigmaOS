@@ -5,7 +5,9 @@
 use crate::kernel::{Priority, Process, ProcessState};
 use core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 
+// ==========================================
 // 1. CPU Core Thread-Priority Optimizer
+// ==========================================
 
 pub struct CpuPriorityOptimizer {
     pub boost_active: AtomicBool,
@@ -44,7 +46,9 @@ impl CpuPriorityOptimizer {
     }
 }
 
+// ==========================================
 // 2. RAM Cleaner & Smart Defragmentation (ASC Parity)
+// ==========================================
 
 pub struct RamDefragmenter {
     pub cleanup_count: AtomicUsize,
@@ -75,7 +79,9 @@ impl RamDefragmenter {
     }
 }
 
+// ==========================================
 // 3. I/O Priority & Disk Access Optimizer
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IoTaskPriority {
@@ -107,7 +113,9 @@ impl IoPriorityOptimizer {
     }
 }
 
+// ==========================================
 // 4. Performance Profile Scheduler Rules (UDF Triggers)
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SmartPerformanceProfile {
@@ -165,7 +173,9 @@ impl PerformanceProfileRule for GlarySmartRule {
     }
 }
 
+// ==========================================
 // Unified Smart Resource Optimizer Manager
+// ==========================================
 
 pub struct SmartResourceOptimizer {
     pub cpu_opt: CpuPriorityOptimizer,

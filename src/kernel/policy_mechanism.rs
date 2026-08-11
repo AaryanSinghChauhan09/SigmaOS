@@ -7,7 +7,9 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
+// ==========================================
 // 1. Core Architectural Enums
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterruptClass {
@@ -35,7 +37,9 @@ pub enum IoWaitProfile {
     Idle,
 }
 
+// ==========================================
 // 2. Policy and Mechanism Separation Traits
+// ==========================================
 
 /// Defines "how" low-level operations are dispatched (Zero-policy Mechanism layer)
 pub trait KernelMechanism {
@@ -51,7 +55,9 @@ pub trait KernelPolicy {
     fn get_max_time_slice_ms(&self, wait_profile: IoWaitProfile) -> usize;
 }
 
+// ==========================================
 // 3. Concrete Implementations
+// ==========================================
 
 pub struct SovereignMechanism {
     pub active_task_id: usize,
@@ -81,10 +87,7 @@ impl KernelMechanism for SovereignMechanism {
     }
 
     fn force_io_wait(&mut self, wait_profile: IoWaitProfile) {
-        println!(
-            "[mechanism] Thread yielding context to enter wait profile: {:?}",
-            wait_profile
-        );
+        println!("[mechanism] Thread yielding context to enter wait profile: {:?}", wait_profile);
         self.io_wait_count.fetch_add(1, Ordering::SeqCst);
     }
 
@@ -140,7 +143,9 @@ impl KernelPolicy for AdaptivePolicy {
     }
 }
 
+// ==========================================
 // 4. Policy-Mechanism Coordinator Control Unit
+// ==========================================
 
 pub struct PolicyMechanismCoordinator {
     pub mechanism: SovereignMechanism,
@@ -176,10 +181,7 @@ impl PolicyMechanismCoordinator {
             }
             _ => {}
         }
-        println!(
-            "[control-unit] Dispatched interrupt event class: {:?}",
-            class
-        );
+        println!("[control-unit] Dispatched interrupt event class: {:?}", class);
     }
 
     /// Triggers dynamic thread prioritization and scheduling slices by coordinating policy and mechanism

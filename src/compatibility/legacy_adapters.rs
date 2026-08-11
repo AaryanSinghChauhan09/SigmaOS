@@ -4,7 +4,9 @@
 
 use core::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 
+// ==========================================
 // 1. Kernel Personality Virtualization
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KernelPersona {
@@ -57,7 +59,9 @@ impl KernelPersonaVM {
     }
 }
 
+// ==========================================
 // 2. Binary Compatibility Matrix
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LibcVersion {
@@ -69,7 +73,6 @@ pub enum LibcVersion {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SyscallAbi {
     Oabi_32,
-    Eabi_32,
     Eabi_64,
 }
 
@@ -98,7 +101,9 @@ impl BinaryCompatMatrix {
     }
 }
 
+// ==========================================
 // 3. Driver Evolution Bridge
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LegacyBus {
@@ -187,7 +192,9 @@ impl DriverBridge {
     }
 }
 
+// ==========================================
 // 4. Ancient Filesystem Revival
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DiscontinuedFS {
@@ -224,7 +231,9 @@ impl FSRevival {
     }
 }
 
+// ==========================================
 // 5. Cross-Kernel API Timeline
+// ==========================================
 
 pub struct APITimelineManager {
     pub target_kernel_version: KernelPersona,
@@ -249,7 +258,9 @@ impl APITimelineManager {
     }
 }
 
+// ==========================================
 // 6. Legacy Workload Optimizer
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkloadProfile {
@@ -304,7 +315,9 @@ impl WorkloadOptimizer {
     }
 }
 
+// ==========================================
 // 7. Community-Driven Legacy Plug-In System
+// ==========================================
 
 #[derive(Debug, Clone, Copy)]
 pub struct CompatibilityPlugin {
@@ -340,13 +353,17 @@ impl LegacyPluginManager {
     }
 }
 
+// ==========================================
 // Global Static Orchestrator Points
+// ==========================================
 
 pub static GLOBAL_PERSONA_VM: KernelPersonaVM = KernelPersonaVM::new();
 pub static GLOBAL_WORKLOAD_OPTIMIZER: WorkloadOptimizer = WorkloadOptimizer::new();
 pub static GLOBAL_PLUGIN_MANAGER: LegacyPluginManager = LegacyPluginManager::new();
 
+// ==========================================
 // Module Unit Tests
+// ==========================================
 
 #[cfg(test)]
 mod tests {

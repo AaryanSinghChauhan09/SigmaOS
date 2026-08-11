@@ -3,7 +3,6 @@
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -13,11 +12,9 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-pub mod graphics;
 pub mod kernel;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod performance;
 pub mod productivity;
@@ -37,22 +34,23 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
-    AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, ApplicationBinary,
-    BinaryCompatMatrix, BinaryFormat, BrailleMatrix, BsdJailSandbox, BundleType, CloudOrchestrator,
-    CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError, CompatibilityLayer,
-    CompatibilityManager, CompatibilityMode, ContainerRuntime, ContinuityCoordinator, DesktopMode,
-    DesktopProfile, DesktopTheme, DiscontinuedFS, DistroReleaseChannel, DriverBridge,
-    EcosystemSnapshot, FSRevival, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
-    KapudanAssistant, KernelPersona, KernelPersonaVM, LanguageTranslationCatalog, LegacyBus,
-    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
-    MicroService, MicroServiceState, NetworkBridge, ReleaseGovernanceCouncil,
-    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, StorageBridge, SuiteRegistry,
-    SyscallAbi, TargetPlatform, TranslationLayer, TribeInstaller, TtsSynthesizer, UnifiedAppStore,
-    WorkloadOptimizer, WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI,
-    GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN,
-    GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
-    GLOBAL_WORKLOAD_OPTIMIZER,
+    APITimelineManager, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
+    AntixDesktopProfiler, AntixInitManager, ApplicationBinary, BinaryCompatMatrix, BinaryFormat,
+    BundleType, CompatibilityError, CompatibilityManager, CompatibilityMode, ContainerRuntime,
+    DesktopProfile, DesktopTheme, DiscontinuedFS, DriverBridge, FSRevival, GraphicsBridge,
+    InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver,
+    LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, MicroService, MicroServiceState,
+    NetworkBridge, StorageBridge, SyscallAbi, TargetPlatform, TranslationLayer, TribeInstaller,
+    WorkloadOptimizer, WorkloadProfile, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP,
+    GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM,
+    GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
+    EcosystemSnapshot, SnapshotManager, CompatBinaryFormat, CompatBinary, CompatibilityLayer,
+    BsdJailSandbox, FlatpakApp, UnifiedAppStore, HandoffTask, ContinuityCoordinator,
+    DesktopMode, ZorinAppearanceSwitcher, AiResourceScheduler,
+    DistroReleaseChannel, ReproducibleBuildVerifier, ReleaseGovernanceCouncil,
+    LanguageTranslationCatalog, LocaleManager, TtsSynthesizer, BrailleMatrix,
+    AppSuiteType, AppSuiteBundle, SuiteRegistry,
+    CloudProvider, SigmaContainer, CloudOrchestrator,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -72,17 +70,16 @@ pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
     SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
 };
-pub use graphics::paint::ColorRgba;
 pub use kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
-    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
-    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
-    Tcb, ThreadState, WorkItem, PAGE_SIZE,
+    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
+    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
+    ArchitectureEngine, CpuRegisters, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase, Irql,
+    LookasideList, MemoryDescriptorList, Pcb, PoolType, ProcessorInitState, Tcb, ThreadState,
+    InterruptClass, InstructionCyclePhase, IoWaitProfile, KernelMechanism, KernelPolicy,
+    PolicyMechanismCoordinator, SovereignMechanism, AdaptivePolicy,
+    SinglyLinkedList, SequencedSinglyLinkedList, CircularDoublyLinkedList,
+    SystemThread, WorkItem, ApcMode, Apc, ApcQueue, CpuArchitectureClass,
+    EdfTask, LotteryTask, AuditBlock, LcgRandom, AdvancedAlgorithmsManager,
 };
 pub use network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
@@ -95,23 +92,26 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage, UniversalPackageManager,
+    ConflictResolution, DebPackageDriverTranslator, DependencyResolver, GenericLinuxTranslationUdf,
+    LinuxDriverPackageTranslator, LinuxTranslationService, PackageAdapter, PackageError,
+    PackageFormat, PackageSource, PackageTranslationUdf, PacmanPackageDriverTranslator,
+    RpmPackageDriverTranslator, SigmaSoftwareStore, SoftwareRegistryEntry, UnifiedPackage,
+    UniversalPackageManager, GLOBAL_SOFTWARE_STORE, GLOBAL_TRANSLATION_SERVICE,
+    GLOBAL_TRANSLATION_UDF,
+    UseFlagManager, SlottedPackage, PortageSlotResolver, EbuildSandbox,
+    OptLevel, GccOptimizationTuner, GenkernelOrchestrator,
 };
 pub use performance::{
-    AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CallGraph,
-    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoSchedClass, IoTaskPriority,
-    PerformanceProfileRule, PhysicalPageFrame, Profile, ProfileType, Profiler, ProfilerError,
-    RamDefragmenter, SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
-    SmartResourceOptimizer, UltraKernelSamepageMerger, X86v3v4OptimizationDetector,
-    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+    CallGraph, CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoTaskPriority,
+    PerformanceProfileRule, Profile, ProfileType, Profiler, ProfilerError, RamDefragmenter,
+    SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
+    SmartResourceOptimizer, GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
+    BoreScheduler, AnanicyRule, IoSchedClass, AnanicyCppDaemon, PhysicalPageFrame,
+    UltraKernelSamepageMerger, X86v3v4OptimizationDetector, CachyKernelManager,
 };
 pub use productivity::{
-    Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore, EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
-    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
-    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
-    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
+    Achievement, AchievementType, AudioChannel, GamifiedProductivity, Goal, PomodoroState,
+    PomodoroTimer, ProductivityScore, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE,
 };
 pub use resilience::{
     FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
@@ -121,8 +121,7 @@ pub use security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
     ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
     PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN, Securelevel, LinuxCapability,
-    SovereignSecurelevelManager, PamError, PamUser, PamGroup, SovereignPamManager,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{

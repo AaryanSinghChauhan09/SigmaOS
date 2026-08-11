@@ -9,7 +9,9 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+// ==========================================
 // 1. Singly, Sequenced, and Circular Doubly Linked Lists
+// ==========================================
 
 pub struct SinglyLinkedList<T> {
     pub value: T,
@@ -38,11 +40,7 @@ pub struct SequencedSinglyLinkedList<T> {
 
 impl<T> SequencedSinglyLinkedList<T> {
     pub fn new(value: T, seq: u64) -> Self {
-        Self {
-            value,
-            sequence_number: seq,
-            next: None,
-        }
+        Self { value, sequence_number: seq, next: None }
     }
 }
 
@@ -63,7 +61,9 @@ impl<T> CircularDoublyLinkedList<T> {
     }
 }
 
+// ==========================================
 // 2. Scheduler SystemThread, WorkItems, APCs
+// ==========================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CpuArchitectureClass {
@@ -147,7 +147,9 @@ impl ApcQueue {
     }
 }
 
+// ==========================================
 // 3. Next-Generation Advanced Algorithms (SovereignAlgorithms Blueprint)
+// ==========================================
 
 const MAX_SCHEDULER_TASKS: usize = 16;
 const MAX_LEDGER_BLOCKS: usize = 8;
@@ -156,7 +158,7 @@ const MAX_LEDGER_BLOCKS: usize = 8;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct EdfTask {
     pub tid: u32,
-    pub absolute_deadline: u64,   // Cycle deadline limit
+    pub absolute_deadline: u64, // Cycle deadline limit
     pub remaining_execution: u64, // Cycles required to complete
     pub is_active: bool,
 }
@@ -244,7 +246,9 @@ impl AdvancedAlgorithmsManager {
         hash
     }
 
+    // ==========================================
     // 1. EARLIEST DEADLINE FIRST REAL-TIME SCHEDULER
+    // ==========================================
     pub fn add_edf_task(&self, task: EdfTask) -> Result<(), &'static str> {
         let mut queue = self.edf_queue.borrow_mut();
         for slot in queue.iter_mut() {
@@ -267,9 +271,7 @@ impl AdvancedAlgorithmsManager {
                     match best_idx {
                         None => best_idx = Some(idx),
                         Some(best) => {
-                            if task.absolute_deadline
-                                < queue[best].as_ref().unwrap().absolute_deadline
-                            {
+                            if task.absolute_deadline < queue[best].as_ref().unwrap().absolute_deadline {
                                 best_idx = Some(idx);
                             }
                         }
@@ -281,7 +283,9 @@ impl AdvancedAlgorithmsManager {
         best_idx.map(|idx| queue[idx].unwrap())
     }
 
+    // ==========================================
     // 2. PROBABILISTIC LOTTERY SCHEDULER
+    // ==========================================
     pub fn add_lottery_task(&self, task: LotteryTask) -> Result<(), &'static str> {
         let mut queue = self.lottery_queue.borrow_mut();
         for slot in queue.iter_mut() {
@@ -331,16 +335,12 @@ impl AdvancedAlgorithmsManager {
         None
     }
 
+    // ==========================================
     // 3. CONSENSUS-BASED PROCESS AUDIT LEDGER
+    // ==========================================
 
     /// Append a process lifecycle audit log into our secure chained cryptographic block ledger
-    pub fn audit_process_event(
-        &self,
-        timestamp: u64,
-        event_type: u32,
-        pid: u32,
-        actor_hash: u32,
-    ) -> Result<(), &'static str> {
+    pub fn audit_process_event(&self, timestamp: u64, event_type: u32, pid: u32, actor_hash: u32) -> Result<(), &'static str> {
         let mut ledger = self.audit_ledger.borrow_mut();
 
         // Find previous block hash
@@ -390,10 +390,7 @@ impl AdvancedAlgorithmsManager {
                 // Verify block hash
                 let computed_hash = Self::calculate_block_hash(block);
                 if block.current_hash != computed_hash {
-                    println!(
-                        "Audit Ledger: Corruption detected on Block {} - Signature hash mismatch!",
-                        block.block_id
-                    );
+                    println!("Audit Ledger: Corruption detected on Block {} - Signature hash mismatch!", block.block_id);
                     return false; // Chain tampered!
                 }
 
@@ -401,13 +398,8 @@ impl AdvancedAlgorithmsManager {
                 if block.block_id > 1 {
                     let prev_index = (block.block_id as usize - 2) % MAX_LEDGER_BLOCKS;
                     if let Some(ref prev_block) = ledger[prev_index] {
-                        if prev_block.block_id == block.block_id - 1
-                            && block.prev_block_hash != prev_block.current_hash
-                        {
-                            println!(
-                                "Audit Ledger: Chain broken between Block {} and {}!",
-                                prev_block.block_id, block.block_id
-                            );
+                        if prev_block.block_id == block.block_id - 1 && block.prev_block_hash != prev_block.current_hash {
+                            println!("Audit Ledger: Chain broken between Block {} and {}!", prev_block.block_id, block.block_id);
                             return false; // Break detected!
                         }
                     }

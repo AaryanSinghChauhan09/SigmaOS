@@ -1,8 +1,8 @@
 // SigmaOS Defensive Audit & Anomaly Detection Shunts
 // Zero-dependency, #![no_std] compliant, OOP-centric
 
-use crate::klib::{SigmaString, Vec};
-use core::cell::{Cell, RefCell};
+use core::cell::RefCell;
+use core::sync::atomic::{AtomicU32, Ordering};
 
 pub const MAX_AUDIT_BLOCKS: usize = 16;
 pub const MAX_SIGNATURES: usize = 8;
@@ -32,7 +32,7 @@ pub struct MaliciousSignature {
 pub struct DefensiveAuditSystem {
     pub audit_ring: RefCell<[Option<ForensicBlock>; MAX_AUDIT_BLOCKS]>,
     pub signatures: [Option<MaliciousSignature>; MAX_SIGNATURES],
-    pub next_block_id: Cell<u32>,
+    pub next_block_id: AtomicU32,
     pub security_score_threshold: u32,
 }
 
@@ -49,7 +49,7 @@ impl DefensiveAuditSystem {
         let mut sys = Self {
             audit_ring: RefCell::new([EMPTY_BLOCK; MAX_AUDIT_BLOCKS]),
             signatures: [EMPTY_SIG; MAX_SIGNATURES],
-            next_block_id: Cell::new(1),
+            next_block_id: AtomicU32::new(1),
             security_score_threshold: threshold,
         };
 
@@ -107,14 +107,14 @@ impl DefensiveAuditSystem {
             payload_hash = payload_hash.wrapping_mul(16777619);
         }
 
-        let current_id = self.next_block_id.get();
+        let next_id = self.next_block_id.load(Ordering::SeqCst);
 
         // Find previous block hash
-        let prev_hash = if current_id > 1 {
+        let prev_hash = if next_id > 1 {
             let mut found_prev = 0;
             for slot in ring.iter() {
                 if let Some(ref block) = slot {
-                    if block.id == current_id - 1 {
+                    if block.id == next_id - 1 {
                         found_prev = block.current_hash;
                         break;
                     }
@@ -126,7 +126,7 @@ impl DefensiveAuditSystem {
         };
 
         let mut block = ForensicBlock {
-            id: current_id,
+            id: next_id,
             timestamp,
             actor_uid,
             syscall_num,
@@ -138,10 +138,10 @@ impl DefensiveAuditSystem {
         block.current_hash = Self::calculate_block_hash(&block);
 
         // Store block in circular ring ledger buffer
-        let idx = (current_id as usize - 1) % MAX_AUDIT_BLOCKS;
+        let idx = (next_id as usize - 1) % MAX_AUDIT_BLOCKS;
         ring[idx] = Some(block);
 
-        self.next_block_id.set(current_id + 1);
+        self.next_block_id.fetch_add(1, Ordering::SeqCst);
 
         Ok(())
     }

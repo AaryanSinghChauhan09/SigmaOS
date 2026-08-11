@@ -226,10 +226,7 @@ impl CachyKernelManager {
     /// Hot-swaps the kernel's active scheduler (e.g. BORE, EEVDF, CFS)
     pub fn hot_swap_scheduler(&mut self, scheduler: &str) -> Result<(), &'static str> {
         self.scheduler_name = String::from(scheduler);
-        println!(
-            "[cachy-sysctl] Hot-swapped active kernel scheduler target to: '{}'.",
-            scheduler
-        );
+        println!("[cachy-sysctl] Hot-swapped active kernel scheduler target to: '{}'.", scheduler);
         Ok(())
     }
 }
