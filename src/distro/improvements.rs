@@ -1430,7 +1430,7 @@ pub enum SystemdError {
 
 /// Portage-inspired package management with USE flags.
 pub struct PortagePackageManager {
-    pub use_flags: alloc::collections::HashSet<alloc::string::String>,
+    pub use_flags: crate::klib::HashSet<alloc::string::String>,
     pub installed_packages:
         alloc::collections::BTreeMap<alloc::string::String, alloc::string::String>,
     pub world_file: alloc::vec::Vec<alloc::string::String>,
@@ -1439,7 +1439,7 @@ pub struct PortagePackageManager {
 impl PortagePackageManager {
     pub fn new() -> Self {
         PortagePackageManager {
-            use_flags: alloc::collections::HashSet::new(),
+            use_flags: crate::klib::HashSet::new(),
             installed_packages: alloc::collections::BTreeMap::new(),
             world_file: alloc::vec::Vec::new(),
         }
@@ -1582,7 +1582,7 @@ impl PantheonFileManager {
     pub fn new() -> Self {
         PantheonFileManager {
             bookmarks: alloc::vec::Vec::new(),
-            recent_files: alloc::vec::Vec::Vec::new(),
+            recent_files: alloc::vec::Vec::new(),
             network_mounts: alloc::vec::Vec::new(),
         }
     }
@@ -1807,12 +1807,12 @@ pub struct ZorinWineManager {
     pub windows_apps: alloc::vec::Vec<alloc::string::String>,
 }
 
-impl ZorinWine {
+impl ZorinWineManager {
     pub fn new() -> Self {
         ZorinWineManager {
             wine_installed: false,
             wine_prefix: alloc::string::String::from("~/.wine"),
-            windows_apps: alloc::vec::vec::Vec::new(),
+            windows_apps: alloc::vec::Vec::new(),
         }
     }
 
@@ -1828,12 +1828,6 @@ impl ZorinWine {
         // Simulate installation
         Ok(())
     }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum ZorinError {
-    WineNotInstalled,
-    InstallationFailed,
 }
 
 /// Desktop layout switcher inspired by Zorin OS.
@@ -2005,7 +1999,7 @@ pub struct MxPackageInstaller {
 impl MxPackageInstaller {
     pub fn new() -> Self {
         MxPackageInstaller {
-            available_packages: alloc::vec::alloc::alloc::string::Vec::new(),
+            available_packages: alloc::vec::Vec::new(),
             installed_packages: alloc::vec::Vec::new(),
             auto_update_check: true,
         }
@@ -2094,6 +2088,12 @@ impl LinuxMintEnhancements {
 // COMPREHENSIVE LINUX DISTRO COMPATIBILITY ENGINE
 // ============================================================================
 
+pub struct SolusFeatures {
+    pub rolling_manager: SolusRollingManager,
+    pub budgie_desktop: BudgieDesktop,
+    pub budgie_settings: BudgieSettings,
+}
+
 /// Master compatibility engine that integrates all distro-specific features.
 pub struct LinuxDistroCompatibilityEngine {
     pub arch_linux: ArchLinuxFeatures,
@@ -2117,7 +2117,7 @@ pub struct ArchLinuxFeatures {
 }
 
 pub struct FedoraFeatures {
-    pub dnf_resolver: DnfPackageResolver,
+    pub dnf_resolver: crate::compatibility::fedora::DnfPackageResolver,
     pub btrfs_manager: BtrfsVolumeManager,
     pub systemd_integration: bool,
 }
@@ -2130,7 +2130,7 @@ pub struct UbuntuFeatures {
 
 pub struct GentooFeatures {
     pub portage_manager: PortagePackageManager,
-    pub use_flags: alloc::collections::HashSet<alloc::string::String>,
+    pub use_flags: crate::klib::HashSet<alloc::string::String>,
     pub custom_compile: bool,
 }
 
@@ -2183,7 +2183,7 @@ impl LinuxDistroCompatibilityEngine {
                 aur_support: true,
             },
             fedora: FedoraFeatures {
-                dnf_resolver: DnfPackageResolver::new(),
+                dnf_resolver: crate::compatibility::fedora::DnfPackageResolver::new(),
                 btrfs_manager: BtrfsVolumeManager {
                     device_path: alloc::string::String::from("/dev/sda1"),
                     subvolumes: alloc::vec::Vec::new(),
@@ -2198,7 +2198,7 @@ impl LinuxDistroCompatibilityEngine {
             },
             gentoo: GentooFeatures {
                 portage_manager: PortagePackageManager::new(),
-                use_flags: alloc::collections::HashSet::new(),
+                use_flags: crate::klib::HashSet::new(),
                 custom_compile: true,
             },
             mint: LinuxMintEnhancements::new(),
@@ -2548,15 +2548,15 @@ impl DeepinDdeControl {
 }
 
 /// MX Linux snapshot tool integration.
-pub struct MxSnapshot {
+pub struct MxSnapshotToolState {
     pub snapshots: Vec<String>,
     pub backup_location: String,
     pub compression: bool,
 }
 
-impl MxSnapshot {
+impl MxSnapshotToolState {
     pub fn new() -> Self {
-        MxSnapshot {
+        MxSnapshotToolState {
             snapshots: Vec::new(),
             backup_location: String::from("/mnt/backup"),
             compression: true,
@@ -2671,7 +2671,7 @@ pub struct LinuxDistroGapCloser {
     pub manjaro: ManjaroPamac,
     pub zorin: ZorinWineIntegration,
     pub deepin: DeepinDdeControl,
-    pub mx: MxSnapshot,
+    pub mx: MxSnapshotToolState,
     pub pop: PopShopIntegration,
     pub elementary: ElementaryPantheon,
     pub solus: SolusBudgie,
@@ -2687,7 +2687,7 @@ impl LinuxDistroGapCloser {
             manjaro: ManjaroPamac::new(),
             zorin: ZorinWineIntegration::new(),
             deepin: DeepinDdeControl::new(),
-            mx: MxSnapshot::new(),
+            mx: MxSnapshotToolState::new(),
             pop: PopShopIntegration::new(),
             elementary: ElementaryPantheon::new(),
             solus: SolusBudgie::new(),

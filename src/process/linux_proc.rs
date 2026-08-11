@@ -1,15 +1,7 @@
 // Linux-inspired Process & ProcFS Emulation for SigmaOS
 // Implements advanced process hierarchies, PID namespace isolation, nice priorities, cgroups, signal handling, and dynamic /proc pseudo-filesystem.
 
-<<<<<<< HEAD
-use alloc::collections::BTreeMap;
-use core::sync::atomic::{AtomicUsize, Ordering};
-||||||| 803080c14
-use std::collections::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
-=======
-use std::collections::HashMap;
->>>>>>> origin/jules-12141202256370491032-4efbd54e
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxProcessState {

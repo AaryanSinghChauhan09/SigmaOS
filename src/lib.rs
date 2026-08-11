@@ -12,14 +12,9 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
-<<<<<<< HEAD
+pub mod graphics;
 pub mod init;
-||||||| 803080c14
-pub mod graphics;
-=======
-pub mod graphics;
 pub mod ipc;
->>>>>>> origin/jules-13833786484755203691-7fe7d659
 pub mod kernel;
 pub mod klib;
 pub mod ml;
@@ -37,11 +32,7 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
-pub mod graphics {
-    pub mod compositor;
-    pub mod paint;
-    pub mod video;
-}
+
 pub mod hardware {
     pub mod compatibility;
     pub mod win32;
@@ -75,10 +66,9 @@ pub use compatibility::{
     SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
     DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };
-// pub use container::{
-    ContainerCapability, ContainerError, ContainerID, ContainerInfo,
-    ContainerRuntime as CoreContainerRuntime, ContainerState, RuntimeCapability, RuntimeStats,
-    SimpleContainer, SimpleContainerRuntime,
+pub use container::{
+    Container, ContainerError, ContainerImage, ContainerNetwork, ContainerRuntime, ContainerState,
+    Pod, PortMapping, RestartPolicy, RuntimeStats, Volume, VolumeMount,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -95,16 +85,11 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
-<<<<<<< HEAD
-||||||| 803080c14
-pub use graphics::paint::ColorRgba;
-=======
 pub use graphics::paint::ColorRgba;
 pub use ipc::{
     unix_socket::{UnixSocketType, UnixSocketAddress, UnixSocketState, UnixSocket, UnixSocketManager},
     signals::{SignalType, SignalDisposition, PendingSignal, ProcessSignalState, SignalDeliverySystem},
 };
->>>>>>> origin/jules-13833786484755203691-7fe7d659
 pub use kernel::{
     ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
     Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
@@ -143,6 +128,41 @@ pub use distro::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
     CanFrame, EcuController, EduChallenge, EduPlayground, HpcClusterJob, HpcJobState,
     MpiCommunicator,
+
+    // Newly registered modules representing missing components compared to linux & bsd distros
+    PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase,
+    OpenBsdSecurity, ZfsManager, PortsManager, PfFirewall, BsdJail,
+    AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller,
+    BundleType, DesktopTheme, ChakraInstallerStep,
+    DebianPackageManager, SnapPackageManager, DebianControl, UbuntuDesktopIntegration,
+    DnfPackageManager, RpmPackage, SelinuxPolicy, SystemdService,
+    UseFlag, FeatureSet, BuildSpec, CpuOptimizationDetector, SigmaBuildGraph, BuildError as GentooBuildError,
+    RollingReleaseChannel, RollingPackage, RollingReleaseManager, MinimalBaseInstaller, UserPackageRepository,
+    BtrfsVolumeManager, BtrfsSubvolume, BtrfsCompression, SnapshotPolicy, SystemSnapshotManager, SystemSnapshot,
+    DeclarativeSystemConfig, ServiceConfig, UserConfig, BootConfig, NixStyleStorePath, AtomicUpgradeEngine,
+    EphemeralSessionManager, EncryptedPersistentStorage, NetworkPrivacyMode, Amnesic, RamDisk,
+    PenTestToolRegistry, PenTestTool, PenTestCategory, LiveForensicsSession, CustodyEntry,
+    MinimalRuntime, LibcBackend, OpenRcStyleInit, Runlevel, InitService,
+    BoreSchedulerConfig, Task, BoreScheduler, OptimizedKernelProfile, GarudaBtrfsLayout, SnapperIntegration, SnapperConfig,
+    DistroReleaseError, SigmaDistroEngine, AptSource, DebControlFile, DebianAptPackageManager,
+    HostMapping, HostResolver, SwapPageFrame, SwapSpaceManager, ImprovementsSnapPackageManager,
+    ImprovementsSnapPackage, SnapConfinement, LtsReleaseManager, ZypperPackageManager, ZypperRepo, YastConfigManager, YastModule,
+    SelinuxManager, SelinuxMode, SystemdServiceManager, ImprovementsSystemdService, ServiceStatus, SystemdTarget,
+    PortagePackageManager, ImprovementsMintUpdateManager, MintUpdate, PopShop, PopApp, PantheonFileManager,
+    AppCenter, AppCenterApp, PamacManager, SolusRollingManager, BudgieDesktop, BudgieSettings, ZorinWineManager, DesktopLayoutSwitcher,
+    DesktopLayout, ImprovementsDdeControlCenter, DisplaySettings, SoundSettings, NetworkSettings,
+    MxSnapshotTool, ImprovementsMxSnapshot, MxPackageInstaller, LinuxMintEnhancements, MintTools, CinnamonSettings,
+    PanelSettings, LinuxDistroCompatibilityEngine, ArchLinuxFeatures, FedoraFeatures, UbuntuFeatures, GentooFeatures,
+    OpenSuseFeatures, RhelFeatures, ManjaroFeatures, SolusFeatures, ZorinFeatures, DeepinFeatures, MxFeatures,
+    UbuntuSnapManager, OpenSuseZypper, RhelSelinuxManager, GentooPortage, ManjaroPamac, ZorinWineIntegration, DeepinDdeControl,
+    PopShopIntegration, ElementaryPantheon, SolusBudgie, LinuxDistroGapCloser,
+    EbpfOpcode, EbpfInstruction, SovereignEbpfEngine, ArchDependencyResolver, PackageNode,
+    FreeBSDJail, OpenBSDUnveil, OpenBSDPledge, NixStyleStore, PinRule, AptPinStore, DriverContext,
+    RumpDriver, NetBsdRumpRouter, GentooUseFlagsManager, OpenRCService,
+    InstallationTarget, ParityInstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
+    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager, SigmaAppBundle,
+    BundleError, AppBundleRuntime, SovereignBundleRuntime, CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
+    PreseedVariable, SovereignPreseedParser,
 };
 pub use network::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
 pub use orchestration::{
@@ -153,7 +173,7 @@ pub use orchestration::{
 pub use package::{
     ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-    AurClient, AurPackage, PkgBuildRecipe, BuildSandboxConfig, BuiltPackage,
+    AurClient as CoreAurClient, AurPackage, PkgBuildRecipe, BuildSandboxConfig, BuiltPackage,
     PkgBuildParser, AurError, BuildError, InstallError, ParseError,
 };
 pub use init::{
@@ -195,7 +215,7 @@ pub use sigpkg::{
     DebAdapter, RpmAdapter, PacmanAdapter,
 };
 pub use virtualization::{
-    Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
+    Container as VirtualizationContainer, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
