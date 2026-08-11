@@ -3,19 +3,17 @@
 // Enhanced with Huge Pages (2MB/1GB), advanced page protection attributes,
 // VMA demand paging simulation, and Clock (Second-Chance) replacement tracking.
 //
-// Linux, FreeBSD, and OpenBSD Parity Features Incorporated:
+// Linux-Parity Features Incorporated:
 // 1. KSM (Kernel Samepage Merging): Deduplicates identical physical page frames to point to a shared read-only page.
 // 2. Copy-on-Write (CoW) Fault Handling: Generates a writable clone of a shared/KSM page upon write intents.
 // 3. zram/zswap (Compressed Memory Swap): Automatically compresses page contents when evicted, reducing swap I/O latency.
-// 4. FreeBSD-style Wired (Pinned) Pages: Pinned kernel pages (`is_wired`) that are absolutely immune to page reclamation or swaps.
-// 5. OpenBSD-style W^X (Write XOR Execute) Security Gate: Strict page-table check preventing any page from being simultaneously writable and executable.
-// 6. Linux-style kswapd Page Reclaimer Daemon: Automated page reclamation sweeps (`SovereignPageReclaimer`) based on low/high page watermarks.
 
 #![no_std]
 
 extern crate alloc;
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
 
 pub const PAGE_SIZE_BYTES: usize = 4096;
 pub const PAGE_TABLE_ENTRIES: usize = 512;
@@ -28,7 +26,6 @@ pub enum MemoryError {
     PermissionDenied,
     WriteToReadOnly,
     NonExecutablePage,
-    WxViolation, // OpenBSD-style Write XOR Execute security violation
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,7 +46,6 @@ pub struct PageTableEntry {
     pub dirty: bool,                 // D bit (written)
     pub accessed: bool,              // A bit (accessed)
     pub is_ksm_shared: bool,         // Linux KSM shared read-only page indicator
-    pub is_wired: bool,              // FreeBSD-style wired/pinned page indicator (cannot be swapped)
     pub physical_address: PhysicalAddress,
 }
 
@@ -60,13 +56,12 @@ impl PageTableEntry {
             writable: true,
             user_accessible: true,
             is_huge: false,
-            execute_disable: true, // safe default conforming to W^X
+            execute_disable: false,
             cache_disable: false,
             write_through: false,
             dirty: false,
             accessed: false,
             is_ksm_shared: false,
-            is_wired: false,
             physical_address: phys,
         }
     }
@@ -88,35 +83,17 @@ impl PageTableEntry {
             dirty: false,
             accessed: false,
             is_ksm_shared: false,
-            is_wired: false,
-            physical_address: phys,
-        }
-    }
-
-    pub fn with_wired(
-        phys: PhysicalAddress,
-        writable: bool,
-        is_huge: bool,
-        execute_disable: bool,
-        is_wired: bool,
-    ) -> Self {
-        Self {
-            present: true,
-            writable,
-            user_accessible: true,
-            is_huge,
-            execute_disable,
-            cache_disable: false,
-            write_through: false,
-            dirty: false,
-            accessed: false,
-            is_ksm_shared: false,
-            is_wired,
             physical_address: phys,
         }
     }
 }
 
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageTable {
     pub entries: Vec<Option<PageTableEntry>>,
@@ -152,6 +129,9 @@ impl Default for PageTable {
     }
 }
 
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectory {
     pub entries: Vec<Option<PageTable>>,
@@ -191,10 +171,6 @@ impl PageDirectory {
     pub fn get_table_mut(&mut self, idx: usize) -> Option<&mut PageTable> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
-
-    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
-        self.huge_entries.get(idx).and_then(|e| e.as_ref())
-    }
 }
 
 impl Default for PageDirectory {
@@ -203,6 +179,9 @@ impl Default for PageDirectory {
     }
 }
 
+#[derive(Clone)]
+#[derive(Clone)]
+#[derive(Clone)]
 #[derive(Clone)]
 pub struct PageDirectoryPointerTable {
     pub entries: Vec<Option<PageDirectory>>,
@@ -242,10 +221,6 @@ impl PageDirectoryPointerTable {
     pub fn get_directory_mut(&mut self, idx: usize) -> Option<&mut PageDirectory> {
         self.entries.get_mut(idx).and_then(|e| e.as_mut())
     }
-
-    pub fn get_huge_entry(&self, idx: usize) -> Option<&PageTableEntry> {
-        self.huge_entries.get(idx).and_then(|e| e.as_ref())
-    }
 }
 
 impl Default for PageDirectoryPointerTable {
@@ -269,20 +244,12 @@ impl VirtualMemoryArea {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ZramAlgorithm {
-    Lzo,
-    Lz4,
-    Zstd,
-}
-
 /// Simulated Zram page block for compressed paging swap (Linux zram compression concept)
 #[derive(Clone)]
 pub struct ZramPage {
     pub virt_addr: VirtualAddress,
     pub compressed_data: Vec<u8>,
     pub original_size: usize,
-    pub algorithm: ZramAlgorithm,
 }
 
 /// Simulated KSM Registry entry tracking content hashes for page merging (Linux KSM concept)
@@ -300,10 +267,6 @@ pub struct SimpleVMM {
     pub clock_hand: usize,
     pub zram_pool: Vec<ZramPage>,       // Swapped compressed pages
     pub ksm_registry: Vec<KsmRegistryEntry>, // Tracked KSM hashes and reference vectors
-    pub swappiness: u8,                 // Linux swappiness (0-100)
-    pub zram_algorithm: ZramAlgorithm,  // Selected zram compression algorithm
-    pub zswap_max_pool_pages: usize,    // Max compressed pages before writing to disk
-    pub swap_disk: Vec<(VirtualAddress, Vec<u8>)>, // Secondary Tier 2 disk swap
 }
 
 impl SimpleVMM {
@@ -315,10 +278,6 @@ impl SimpleVMM {
             clock_hand: 0,
             zram_pool: Vec::new(),
             ksm_registry: Vec::new(),
-            swappiness: 60,
-            zram_algorithm: ZramAlgorithm::Zstd,
-            zswap_max_pool_pages: 4,
-            swap_disk: Vec::new(),
         }
     }
 
@@ -327,45 +286,12 @@ impl SimpleVMM {
         self.vmas.push(vma);
     }
 
-    /// Maps a standard 4KB page (W^X safe default)
+    /// Maps a standard 4KB page
     pub fn map_page(
         &mut self,
         virt: VirtualAddress,
         phys: PhysicalAddress,
     ) -> Result<(), MemoryError> {
-        self.map_page_with_flags(virt, phys, true, true)
-    }
-
-    /// Maps a standard 4KB page with flags
-    pub fn map_page_with_flags(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        writable: bool,
-        execute_disable: bool,
-    ) -> Result<(), MemoryError> {
-        self.map_page_with_full_flags(virt, phys, writable, execute_disable, false)
-    }
-
-    /// Maps a standard 4KB page with full flags, supporting wired/pinned and W^X security checks
-    pub fn map_page_with_full_flags(
-        &mut self,
-        virt: VirtualAddress,
-        phys: PhysicalAddress,
-        writable: bool,
-        execute_disable: bool,
-        is_wired: bool,
-    ) -> Result<(), MemoryError> {
-        // Alignment verification check (4KB = 4096 bytes = 0xFFF mask)
-        if (virt.0 & 0xFFF) != 0 || (phys.0 & 0xFFF) != 0 {
-            return Err(MemoryError::InvalidAddress);
-        }
-
-        // OpenBSD-style W^X Security Gate: if writable is true, execute_disable MUST be true
-        if writable && !execute_disable {
-            return Err(MemoryError::WxViolation);
-        }
-
         let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
         let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
         let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
@@ -393,7 +319,7 @@ impl SimpleVMM {
         let pd = pdpt.get_table_mut(pd_idx).unwrap();
 
         // Set the page table entry
-        let pte = PageTableEntry::with_wired(phys, writable, false, execute_disable, is_wired);
+        let pte = PageTableEntry::with_attributes(phys, writable, false, execute_disable);
         pd.set_entry(pt_idx, pte)?;
 
         // Register in active list for Clock paging tracker
@@ -435,7 +361,7 @@ impl SimpleVMM {
         let pdpt = pml4.get_directory_mut(pdpt_idx).unwrap();
 
         // Set huge page entry on PD
-        let pte = PageTableEntry::with_attributes(phys, writable, true, true); // W^X safe
+        let pte = PageTableEntry::with_attributes(phys, writable, true, false);
         pdpt.set_huge_entry(pd_idx, pte)?;
 
         Ok(())
@@ -463,7 +389,7 @@ impl SimpleVMM {
 
         let pml4 = self.pml4_table[pml4_idx].as_mut().unwrap();
 
-        let pte = PageTableEntry::with_attributes(phys, writable, true, true); // W^X safe
+        let pte = PageTableEntry::with_attributes(phys, writable, true, false);
         pml4.set_huge_entry(pdpt_idx, pte)?;
 
         Ok(())
@@ -474,8 +400,10 @@ impl SimpleVMM {
         &mut self,
         virt: VirtualAddress,
     ) -> Result<PhysicalAddress, MemoryError> {
-        self.get_physical_address_with_access(virt, false, false)
-    }
+        let pml4_idx = ((virt.0 >> 39) & 0x1FF) as usize;
+        let pdpt_idx = ((virt.0 >> 30) & 0x1FF) as usize;
+        let pd_idx = ((virt.0 >> 21) & 0x1FF) as usize;
+        let pt_idx = ((virt.0 >> 12) & 0x1FF) as usize;
 
     /// Resolves virtual address while validating and recording access permissions (Read/Write/Execute)
     /// Incorporates Copy-on-Write (CoW) page-splitting for KSM merged pages upon write intents.
@@ -499,7 +427,7 @@ impl SimpleVMM {
 
         // 1GB Huge Page Check at PML4 level (points to PDPT huge entry)
         if let Some(huge_pte) = pml4.get_huge_entry(pdpt_idx) {
-            Self::validate_access(huge_pte, write_intent, execute_intent)?;
+            self.validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x3FFF_FFFF; // 1GB offset
             return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x3FFF_FFFF) + offset));
         }
@@ -513,7 +441,7 @@ impl SimpleVMM {
 
         // 2MB Huge Page Check at PDPT level (points to PD huge entry)
         if let Some(huge_pte) = pdpt.get_huge_entry(pd_idx) {
-            Self::validate_access(huge_pte, write_intent, execute_intent)?;
+            self.validate_access(huge_pte, write_intent, execute_intent)?;
             let offset = virt.0 & 0x1F_FFFF; // 2MB offset
             return Ok(PhysicalAddress((huge_pte.physical_address.0 & !0x1F_FFFF) + offset));
         }
@@ -550,7 +478,7 @@ impl SimpleVMM {
             return Ok(PhysicalAddress(unique_phys.0 + offset));
         }
 
-        Self::validate_access(pte, write_intent, execute_intent)?;
+        self.validate_access(pte, write_intent, execute_intent)?;
 
         // Compute 4KB physical offset
         let offset = virt.0 & 0xFFF;
@@ -564,23 +492,13 @@ impl SimpleVMM {
         write_intent: bool,
         execute_intent: bool,
     ) -> Result<PhysicalAddress, MemoryError> {
-        // Tier 1: Check if the page was swapped to zram pool (zswap cache layer)
+        // First check if the page was swapped to zram pool
         for i in 0..self.zram_pool.len() {
             if self.zram_pool[i].virt_addr.0 == virt.0 {
                 // Decompress page and map it back on demand (zram decompression swap-in)
                 let decompressed_phys = PhysicalAddress(virt.0); // mapped back
                 self.zram_pool.remove(i);
-                self.map_page_with_flags(virt, decompressed_phys, true, true).unwrap(); // W^X safe
-                return Ok(decompressed_phys);
-            }
-        }
-
-        // Tier 2: Check if the page was swapped out to secondary swap disk
-        for i in 0..self.swap_disk.len() {
-            if self.swap_disk[i].0.0 == virt.0 {
-                let decompressed_phys = PhysicalAddress(virt.0); // read back from disk
-                self.swap_disk.remove(i);
-                self.map_page_with_flags(virt, decompressed_phys, true, true).unwrap(); // W^X safe
+                self.map_page_with_flags(virt, decompressed_phys, true, false).unwrap();
                 return Ok(decompressed_phys);
             }
         }
@@ -602,6 +520,7 @@ impl SimpleVMM {
     }
 
     fn validate_access(
+        &self,
         pte: &PageTableEntry,
         write_intent: bool,
         execute_intent: bool,
@@ -614,10 +533,6 @@ impl SimpleVMM {
         }
         if execute_intent && pte.execute_disable {
             return Err(MemoryError::NonExecutablePage);
-        }
-        // OpenBSD W^X check on runtime access
-        if write_intent && !pte.execute_disable {
-            return Err(MemoryError::WxViolation);
         }
         Ok(())
     }
@@ -645,54 +560,22 @@ impl SimpleVMM {
                     if let Some(ref mut pd) = pdpt.get_table_mut(pd_idx) {
                         if let Some(ref mut pte) = pd.get_entry_mut(pt_idx) {
                             traversed = true;
-
-                            // FreeBSD-style Wired check: wired pages are absolutely immune to reclamation/swaps
-                            if pte.is_wired {
-                                self.clock_hand += 1;
-                                continue;
-                            }
-
                             if pte.accessed {
                                 // Give second chance
                                 pte.accessed = false;
                                 self.clock_hand += 1;
                             } else {
-                                // Linux swappiness check: if swappiness is 0, we bypass/avoid swapping out
-                                if self.swappiness == 0 {
-                                    return None;
-                                }
-
                                 // Evict this page and compress its simulated content to ZramPool
                                 let evicted = self.active_pages_for_clock.remove(idx);
                                 self.clock_hand = idx; // Next start point
 
-                                // Compress page contents depending on selected algorithm (simulated)
-                                let ratio = match self.zram_algorithm {
-                                    ZramAlgorithm::Lzo => 0.60,
-                                    ZramAlgorithm::Lz4 => 0.50,
-                                    ZramAlgorithm::Zstd => 0.35,
-                                };
-                                let compressed_len = (4096.0 * ratio) as usize;
-                                let mut compressed_data = vec![0; compressed_len];
-                                if compressed_len >= 3 {
-                                    compressed_data[0] = 0xAB;
-                                    compressed_data[1] = 0xCD;
-                                    compressed_data[2] = 0xEF;
-                                }
-
+                                // Compress page contents (simulated basic byte compress)
+                                let compressed_data = vec![0xAB, 0xCD, 0xEF];
                                 self.zram_pool.push(ZramPage {
                                     virt_addr: evicted,
                                     compressed_data,
                                     original_size: 4096,
-                                    algorithm: self.zram_algorithm,
                                 });
-
-                                // Write-Back Eviction Policy (zswap to secondary disk swap):
-                                // If Tier 1 (zram) pool size exceeds the threshold, unstage the oldest page to Tier 2 (swap_disk)
-                                if self.zram_pool.len() > self.zswap_max_pool_pages {
-                                    let oldest = self.zram_pool.remove(0);
-                                    self.swap_disk.push((oldest.virt_addr, oldest.compressed_data));
-                                }
 
                                 // Unmap the page frame
                                 pd.entries[pt_idx] = None;
@@ -831,42 +714,6 @@ impl Default for SimpleVMM {
     }
 }
 
-/// Linux-style kswapd Page Reclaimer Daemon
-pub struct SovereignPageReclaimer {
-    pub low_watermark: usize,
-    pub high_watermark: usize,
-}
-
-impl SovereignPageReclaimer {
-    pub fn new(low_watermark: usize, high_watermark: usize) -> Self {
-        Self {
-            low_watermark,
-            high_watermark,
-        }
-    }
-
-    /// Triggers page reclaiming sweeps when free memory blocks hit low_watermark limits
-    pub fn reclaim_pages(&self, vmm: &mut SimpleVMM, current_free_pages: usize) -> usize {
-        if current_free_pages >= self.low_watermark {
-            return 0; // Watermark is fine; no reclaiming needed
-        }
-
-        let mut reclaimed = 0;
-        let mut simulated_free_pages = current_free_pages;
-
-        // Evict pages utilizing our Clock paging reclaimer until we reach high_watermark limits
-        while simulated_free_pages < self.high_watermark && !vmm.active_pages_for_clock.is_empty() {
-            if let Some(_evicted) = vmm.perform_clock_replacement_step() {
-                reclaimed += 1;
-                simulated_free_pages += 1;
-            } else {
-                break; // No more evictable pages (e.g. all remaining are wired or swappiness=0)
-            }
-        }
-        reclaimed
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -905,7 +752,7 @@ mod tests {
         let virt = VirtualAddress(0x1000);
         let phys = PhysicalAddress(0x2000);
 
-        vmm.map_page_with_flags(virt, phys, true, true).unwrap(); // W^X safe (writable, executable disabled)
+        vmm.map_page(virt, phys).unwrap();
         let resolved = vmm.get_physical_address(virt).unwrap();
 
         assert_eq!(resolved.0, 0x2000);
@@ -917,7 +764,7 @@ mod tests {
         let virt = VirtualAddress(0x1000);
         let phys = PhysicalAddress(0x2000);
 
-        vmm.map_page_with_flags(virt, phys, true, true).unwrap();
+        vmm.map_page(virt, phys).unwrap();
         vmm.unmap_page(virt).unwrap();
 
         assert!(vmm.get_physical_address(virt).is_err());
@@ -975,8 +822,8 @@ mod tests {
         let page1 = VirtualAddress(0x1000);
         let page2 = VirtualAddress(0x2000);
 
-        vmm.map_page_with_flags(page1, PhysicalAddress(0x10000), true, true).unwrap();
-        vmm.map_page_with_flags(page2, PhysicalAddress(0x20000), true, true).unwrap();
+        vmm.map_page(page1, PhysicalAddress(0x10000)).unwrap();
+        vmm.map_page(page2, PhysicalAddress(0x20000)).unwrap();
 
         // Mark Page 1 accessed, Page 2 not accessed
         vmm.mark_accessed(page1, true).unwrap();
@@ -994,15 +841,14 @@ mod tests {
 
         assert!(pt.set_entry(512, entry).is_err());
     }
-
-    #[test]
+#[test]
     fn test_vmm_address_alignment_verification() {
         let mut vmm = SimpleVMM::new();
 
         // 4KB alignment checks
         assert!(vmm.map_page(VirtualAddress(0x1005), PhysicalAddress(0x2000)).is_err());
         assert!(vmm.map_page(VirtualAddress(0x1000), PhysicalAddress(0x2003)).is_err());
-        assert!(vmm.map_page_with_flags(VirtualAddress(0x1000), PhysicalAddress(0x2000), true, true).is_ok());
+        assert!(vmm.map_page(VirtualAddress(0x1000), PhysicalAddress(0x2000)).is_ok());
 
         // 2MB alignment checks
         assert!(vmm.map_huge_2mb(VirtualAddress(0x200100), PhysicalAddress(0x800000), true).is_err());
@@ -1011,7 +857,7 @@ mod tests {
 
         // 1GB alignment checks
         assert!(vmm.map_huge_1gb(VirtualAddress(0x40001000), PhysicalAddress(0xC0000000), true).is_err());
-        assert!(vmm.map_huge_1gb(VirtualAddress(0x40000000), PhysicalAddress(0xC0100000), true).is_err());
+        assert!(vmm.map_huge_1gb(VirtualAddress(0x40000000), PhysicalAddress(0xC001000), true).is_err());
         assert!(vmm.map_huge_1gb(VirtualAddress(0x40000000), PhysicalAddress(0xC0000000), true).is_ok());
     }
 
@@ -1025,8 +871,8 @@ mod tests {
         let virt_a = VirtualAddress(0x1000);
         let virt_b = VirtualAddress(0x2000);
 
-        vmm.map_page_with_flags(virt_a, PhysicalAddress(0x10000), true, true).unwrap();
-        vmm.map_page_with_flags(virt_b, PhysicalAddress(0x20000), true, true).unwrap();
+        vmm.map_page_with_flags(virt_a, PhysicalAddress(0x10000), true, false).unwrap();
+        vmm.map_page_with_flags(virt_b, PhysicalAddress(0x20000), true, false).unwrap();
 
         // Trigger KSM sweep representing content deduplication
         let merged_phys = vmm.trigger_ksm_deduplication_sweep(virt_a, virt_b, 0xDEADBEEF).unwrap();
@@ -1050,118 +896,19 @@ mod tests {
         let mut vmm = SimpleVMM::new();
         let virt = VirtualAddress(0x1000);
 
-        vmm.map_page_with_flags(virt, PhysicalAddress(0x10000), true, true).unwrap();
+        vmm.map_page(virt, PhysicalAddress(0x10000)).unwrap();
 
         // Evicting via Clock replacement triggers in-memory swap zram compression
         let evicted = vmm.perform_clock_replacement_step().unwrap();
         assert_eq!(evicted, virt);
 
-        // Verify page was unmapped from page tables into zram_pool
+        // Verify page was unmapped from page tables
+        assert!(vmm.get_physical_address(virt).is_err());
         assert_eq!(vmm.zram_pool.len(), 1);
 
         // Accessing the page triggers zram decompression restore fault handler
         let restored_phys = vmm.get_physical_address(virt).unwrap();
         assert_eq!(restored_phys.0, virt.0);
         assert_eq!(vmm.zram_pool.len(), 0); // removed from zram compressed pool
-    }
-
-    #[test]
-    fn test_advanced_multi_tier_swap_and_swappiness() {
-        let mut vmm = SimpleVMM::new();
-        vmm.swappiness = 0; // Disable swapping!
-
-        let virt1 = VirtualAddress(0x1000);
-        vmm.map_page_with_flags(virt1, PhysicalAddress(0x10000), true, true).unwrap();
-
-        // Evicting with swappiness = 0 should bypass swapping
-        let evicted = vmm.perform_clock_replacement_step();
-        assert!(evicted.is_none());
-
-        // Re-enable swappiness and change algorithm to Zstd (high compression)
-        vmm.swappiness = 60;
-        vmm.zram_algorithm = ZramAlgorithm::Zstd;
-        vmm.zswap_max_pool_pages = 2; // threshold of 2
-
-        let virt2 = VirtualAddress(0x2000);
-        let virt3 = VirtualAddress(0x3000);
-        let virt4 = VirtualAddress(0x4000);
-
-        vmm.map_page_with_flags(virt1, PhysicalAddress(0x10000), true, true).unwrap();
-        vmm.map_page_with_flags(virt2, PhysicalAddress(0x20000), true, true).unwrap();
-        vmm.map_page_with_flags(virt3, PhysicalAddress(0x30000), true, true).unwrap();
-        vmm.map_page_with_flags(virt4, PhysicalAddress(0x40000), true, true).unwrap();
-
-        // Evict 3 pages
-        vmm.perform_clock_replacement_step().unwrap();
-        vmm.perform_clock_replacement_step().unwrap();
-        vmm.perform_clock_replacement_step().unwrap();
-
-        // Since max zswap size is 2 pages, the 3rd eviction should push the oldest to Tier 2 swap disk
-        assert_eq!(vmm.zram_pool.len(), 2);
-        assert_eq!(vmm.swap_disk.len(), 1);
-
-        // Verify that the oldest page is located on swap disk
-        let oldest_virt = vmm.swap_disk[0].0;
-        // Restoring it from Tier 2 swap disk should succeed and remove it from swap disk
-        let restored_phys = vmm.get_physical_address(oldest_virt).unwrap();
-        assert_eq!(restored_phys.0, oldest_virt.0);
-        assert_eq!(vmm.swap_disk.len(), 0);
-    }
-
-    // ==========================================
-    // Advanced BSD/Competitor Paging Tests
-    // ==========================================
-
-    #[test]
-    fn test_freebsd_wired_pages_prevent_eviction() {
-        let mut vmm = SimpleVMM::new();
-        let page1 = VirtualAddress(0x1000);
-        let page2 = VirtualAddress(0x2000);
-
-        // page1 is wired (pinned), page2 is standard unpinned
-        vmm.map_page_with_full_flags(page1, PhysicalAddress(0x10000), true, true, true).unwrap();
-        vmm.map_page_with_full_flags(page2, PhysicalAddress(0x20000), true, true, false).unwrap();
-
-        // Attempt page reclamation step
-        let evicted = vmm.perform_clock_replacement_step().unwrap();
-        // Since page1 is wired, the reclaimer is forced to bypass it and evict page2 instead
-        assert_eq!(evicted, page2);
-
-        // Try reclaiming again - since only page1 (wired) is left, it returns None
-        assert!(vmm.perform_clock_replacement_step().is_none());
-    }
-
-    #[test]
-    fn test_openbsd_wx_violation() {
-        let mut vmm = SimpleVMM::new();
-        let virt = VirtualAddress(0x1000);
-        let phys = PhysicalAddress(0x2000);
-
-        // Mapping a page that is BOTH writable and executable (execute_disable = false) must trigger W^X violation
-        assert_eq!(
-            vmm.map_page_with_flags(virt, phys, true, false), // writable: true, execute_disable: false
-            Err(MemoryError::WxViolation)
-        );
-    }
-
-    #[test]
-    fn test_linux_page_reclaimer_kswapd() {
-        let mut vmm = SimpleVMM::new();
-        let reclaimer = SovereignPageReclaimer::new(5, 10);
-
-        // Add 8 pages
-        for i in 1..=8 {
-            let virt = VirtualAddress(i * 0x1000);
-            vmm.map_page_with_flags(virt, PhysicalAddress(i * 0x10000), true, true).unwrap();
-        }
-
-        assert_eq!(vmm.active_pages_for_clock.len(), 8);
-
-        // Current free pages is 4, which is below low_watermark (5)
-        // It must reclaim until free pages reaches high_watermark (10).
-        // Since we need to go from 4 to 10 free pages, it attempts to reclaim 6 pages.
-        let reclaimed = reclaimer.reclaim_pages(&mut vmm, 4);
-        assert_eq!(reclaimed, 6);
-        assert_eq!(vmm.active_pages_for_clock.len(), 2); // 8 - 6 = 2 remaining active pages
     }
 }

@@ -19,6 +19,15 @@ SigmaOS is a sovereign, zero-dependency, AI-native operating system built entire
 - **eBPF-based Scheduling**: Ubuntu 25.04 sched_ext-inspired hot-swappable policies
 - **Enhanced Filesystem**: devfs, procfs, sysfs implementations
 - **Security Hardening**: Hardened sysctl with secure defaults (HardenedBSD inspired)
+- **Bootable Container System**: RHEL Image Mode (bootc) inspired container-native OS deployment
+- **Feature Flags System**: Gentoo USE flags inspired fine-grained system configuration
+- **SELinux-style MAC**: Mandatory access control with security contexts and policies
+- **Dependency Reduction**: Zero external dependencies for core functionality (internal UUID, RNG)
+- **Linux/BSD Innovations**: Integrated cgroups v2, namespaces, jails, sysctl from modern OS innovations
+
+**New Development Plans:**
+- [Future Development Plan 2026-2027](FUTURE_DEVELOPMENT_PLAN_2026.md) - Comprehensive roadmap for OS advancement
+- [Driver Development Plan 2026-2027](DRIVER_DEVELOPMENT_PLAN_2026.md) - Complete driver ecosystem roadmap
 
 See [Comprehensive Modern Development Plan](COMPREHENSIVE_MODERN_DEVELOPMENT_PLAN.md) for complete details.
 

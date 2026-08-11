@@ -1,17 +1,4 @@
-// #[cfg(not(test))]
-// use crate::driver::device::DdeDeviceWrapper;
-
-#[cfg(test)]
-pub struct DdeDeviceWrapper {
-    pub simulated_pci_bar: [u8; 256],
-}
-#[cfg(test)]
-impl DdeDeviceWrapper {
-    pub fn new(_id: u32, _name: &[u8], _port: u16, _os: &[u8]) -> Self {
-        Self { simulated_pci_bar: [0; 256] }
-    }
-}
-
+use crate::driver::device::DdeDeviceWrapper;
 /// Historic Linux ABI & Kernel Compatibility Layer for SigmaOS
 /// Replicates historical system behaviors, driver translations, and sandbox layouts
 /// across early kernel eras: 0.01/0.11, 1.0, 2.0, 2.2, and 2.4/2.5.
@@ -261,81 +248,71 @@ pub enum HistoricError {
     MemoryAccessViolation,
     InvalidIoPortAccess,
     UnsupportedPackageFormat,
-    LfsBuildFailure,
 }
 
-/// Simulated LFS Stage 1 and 2 Toolchain builder
-pub struct LfsToolchainBuilder {
-    pub current_stage: u8,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl LfsToolchainBuilder {
-    pub fn new() -> Self {
-        Self { current_stage: 1 }
+    #[test]
+    fn test_era_emulation_getpid() {
+        let emu = Era0_11SyscallEmulator;
+        let mut state = HistoricalCpuState {
+            eax: 20, // sys_getpid
+            ..Default::default()
+        };
+        let pid = emu.emulate_syscall(&mut state).unwrap();
+        assert_eq!(pid, 100);
     }
 
-    pub fn execute_bootstrap_stage(&mut self, stage: u8) -> Result<&'static str, HistoricError> {
-        if stage > 3 {
-            return Err(HistoricError::LfsBuildFailure);
-        }
-        self.current_stage = stage;
-        match stage {
-            1 => Ok("LFS Stage 1: Cross-Binutils & Cross-GCC compiled successfully"),
-            2 => Ok("LFS Stage 2: Sovereign Glibc & POSIX C mapped successfully"),
-            3 => Ok("LFS Stage 3: Standalone Coreutils & Bash bootstrapped successfully"),
-            _ => Err(HistoricError::LfsBuildFailure),
-        }
-    }
-}
-
-impl Default for LfsToolchainBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// TinyCore-style RAM-only Ephemeral Execution Engine.
-/// Achieves minimal idle execution memory limits (below 30MB of RAM) through compressed read-only extensions (.tcz)
-/// mounted into a high-speed in-memory VFS overlay with copy-on-write persistence separation.
-pub struct TinyCoreEphemeralEngine {
-    pub mounted_extensions: alloc::collections::BTreeMap<String, usize>, // ext_name -> payload_size
-    pub volatile_overlay_ram_bytes: usize,
-    pub persistence_enabled: bool,
-}
-
-impl TinyCoreEphemeralEngine {
-    pub fn new() -> Self {
-        TinyCoreEphemeralEngine {
-            mounted_extensions: alloc::collections::BTreeMap::new(),
-            volatile_overlay_ram_bytes: 0,
-            persistence_enabled: false,
-        }
+    #[test]
+    fn test_era_emulation_read() {
+        let emu = Era0_11SyscallEmulator;
+        let mut state = HistoricalCpuState {
+            eax: 3,      // sys_read
+            ebx: 0,      // stdin
+            ecx: 0x1000, // buffer
+            edx: 12,     // count
+            ..Default::default()
+        };
+        let bytes_read = emu.emulate_syscall(&mut state).unwrap();
+        assert_eq!(bytes_read, 12);
     }
 
-    pub fn load_compressed_extension(&mut self, ext_name: &str, size_bytes: usize) -> Result<(), HistoricError> {
-        if ext_name.is_empty() || size_bytes == 0 {
-            return Err(HistoricError::MemoryAccessViolation);
-        }
-        self.mounted_extensions.insert(ext_name.to_string(), size_bytes);
-        Ok(())
+    #[test]
+    fn test_era_emulation_network() {
+        let emu = Era1_0SyscallEmulator::new();
+        let mut state = HistoricalCpuState {
+            eax: 102, // sys_socketcall
+            ebx: 1,   // socket()
+            ..Default::default()
+        };
+        let fd = emu.emulate_syscall(&mut state).unwrap();
+        assert_eq!(fd, 10);
+        assert_eq!(emu.socket_call_count.load(Ordering::SeqCst), 1);
     }
 
-    pub fn write_to_volatile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<usize, HistoricError> {
-        if self.persistence_enabled {
-            return Err(HistoricError::MemoryAccessViolation); // Non-persistent RAM-only mode expected
-        }
-        self.volatile_overlay_ram_bytes += data_len;
-        Ok(self.volatile_overlay_ram_bytes)
+    #[test]
+    fn test_vintage_sandbox() {
+        let sandbox = VintageVirtualizationSandbox::new(LinuxEra::Era0_11);
+        assert_eq!(sandbox.memory_limit, 16 * 1024 * 1024);
+        let regs = sandbox.setup_vintage_registers();
+        assert_eq!(regs.eflags, 0x200);
+        sandbox.register_ldt_segment();
+        assert_eq!(sandbox.simulated_ldt_entries.load(Ordering::SeqCst), 1);
     }
 
-    pub fn reset_ephemeral_state(&mut self) {
-        // Drop volatile in-memory overlay structures completely on reset
-        self.volatile_overlay_ram_bytes = 0;
+    #[test]
+    fn test_vintage_driver_io() {
+        let mut trans = VintageDriverTranslator::new(LinuxEra::Era1_0, "VintageIde");
+        assert!(trans.emulate_io_port(0x1F0, 0xA0).is_ok());
+        assert!(trans.emulate_io_port(0x999, 0xFF).is_err());
     }
-}
 
-impl Default for TinyCoreEphemeralEngine {
-    fn default() -> Self {
-        Self::new()
+    #[test]
+    fn test_package_converter() {
+        let conv = VintagePackageConverter;
+        let res = conv.convert_package("old_bash", "tar.Z").unwrap();
+        assert_eq!(res, "old_bash-sigpkg-compat");
     }
 }

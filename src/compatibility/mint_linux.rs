@@ -1,13 +1,10 @@
 /// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
 /// Replicates the signature user-friendly systems from Linux Mint:
-/// MintBackup, MintUpdate, MintInstall, and MintReport.
+/// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
+/// Cinnamon-like desktop theme manager, and MintDrivers manager.
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::format;
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MintUpdateLevel {
@@ -84,7 +81,7 @@ impl MintUpdateManager {
         self.pending_updates.push(update);
     }
 
-    pub fn auto_select_fastest_mirror(&mut self, mirrors: &[( &[u8], usize )]) {
+    pub fn auto_select_fastest_mirror(&mut self, mirrors: &[(&[u8], usize)]) {
         let mut best_speed = 9999;
         for &(_, speed) in mirrors {
             if speed < best_speed {
@@ -136,25 +133,73 @@ impl MintBackupTool {
     }
 }
 
-/// MintInstall: High-level application software ratings and metadata
+/// App review structure representing user feedback (GNOME Software / Google Play inspired)
+#[derive(Debug, Clone)]
+pub struct AppReview {
+    pub reviewer: [u8; 32],
+    pub stars: usize, // 1 to 5
+    pub comment: [u8; 64],
+}
+
+impl AppReview {
+    pub fn new(reviewer: &[u8], stars: usize, comment: &[u8]) -> Self {
+        let mut reviewer_arr = [0u8; 32];
+        let mut comment_arr = [0u8; 64];
+        reviewer_arr[..reviewer.len().min(31)].copy_from_slice(&reviewer[..reviewer.len().min(31)]);
+        comment_arr[..comment.len().min(63)].copy_from_slice(&comment[..comment.len().min(63)]);
+
+        AppReview {
+            reviewer: reviewer_arr,
+            stars: stars.clamp(1, 5),
+            comment: comment_arr,
+        }
+    }
+}
+
+/// MintInstall: High-level application software ratings, reviews, and categories metadata
 #[derive(Debug, Clone)]
 pub struct MintAppMetadata {
     pub name: [u8; 32],
-    pub rating_stars: usize, // 1 to 5
+    pub rating_stars: usize, // 1 to 5 (calculated as average of reviews)
     pub reviews_count: usize,
     pub is_flatpak: bool,
+    pub category: [u8; 16],   // e.g. "System", "Games", "Office"
+    pub license: [u8; 16],    // e.g. "GPL-3.0", "MIT"
+    pub size_bytes: u64,
+    pub reviews: Vec<AppReview>,
 }
 
 impl MintAppMetadata {
-    pub fn new(name: &[u8], rating_stars: usize, reviews_count: usize, is_flatpak: bool) -> Self {
+    pub fn new(name: &[u8], category: &[u8], license: &[u8], size_bytes: u64, is_flatpak: bool) -> Self {
         let mut name_arr = [0u8; 32];
+        let mut category_arr = [0u8; 16];
+        let mut license_arr = [0u8; 16];
         name_arr[..name.len().min(31)].copy_from_slice(&name[..name.len().min(31)]);
+        category_arr[..category.len().min(15)].copy_from_slice(&category[..category.len().min(15)]);
+        license_arr[..license.len().min(15)].copy_from_slice(&license[..license.len().min(15)]);
+
         MintAppMetadata {
             name: name_arr,
-            rating_stars: rating_stars.clamp(1, 5),
-            reviews_count,
+            rating_stars: 5, // Default perfect score prior to reviews
+            reviews_count: 0,
             is_flatpak,
+            category: category_arr,
+            license: license_arr,
+            size_bytes,
+            reviews: Vec::new(),
         }
+    }
+
+    /// Appends a new user rating/review dynamically and recalculates the average stars rating.
+    pub fn add_review(&mut self, review: AppReview) {
+        self.reviews.push(review);
+        self.reviews_count = self.reviews.len();
+
+        let mut sum = 0;
+        for rev in self.reviews.iter() {
+            sum += rev.stars;
+        }
+        self.rating_stars = sum / self.reviews_count;
     }
 }
 
@@ -177,6 +222,39 @@ impl MintSoftwareManager {
 
     pub fn add_app_to_catalog(&mut self, app: MintAppMetadata) {
         self.apps_catalog.push(app);
+    }
+
+    /// Filters catalog by category.
+    pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
+        let mut filtered = Vec::new();
+        let cat_len = category.len().min(15);
+        for app in self.apps_catalog.iter() {
+            let mut matches = true;
+            for i in 0..cat_len {
+                if app.category[i] != category[i] {
+                    matches = false;
+                    break;
+                }
+            }
+            if matches {
+                filtered.push(app.clone());
+            }
+        }
+        filtered
+    }
+
+    /// Returns apps ranked by user ratings (Featured Apps).
+    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
+        let mut sorted = self.apps_catalog.clone();
+        // Simple bubble sort over vector to rank featured apps without external traits
+        for i in 0..sorted.len() {
+            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
+                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
+                    sorted.swap(j, j + 1);
+                }
+            }
+        }
+        sorted
     }
 }
 
@@ -243,151 +321,156 @@ impl MintReportSystem {
     }
 }
 
-// =========================================================================
-// 1. MINT DESKTOP CUSTOMIZER (MINTDESK CINNAMON LAYOUT)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CinnamonLayoutMode {
-    Traditional, // Windows-like bottom panel with taskbar
-    Modern,      // macOS-like top bar and bottom dock
-    Compact,     // Netbook/tablet compact sidebar layout
+/// Timeshift-style System Restore checkpoint
+#[derive(Debug, Clone)]
+pub struct TimeshiftSnapshot {
+    pub id: usize,
+    pub timestamp_epoch: u64,
+    pub description: [u8; 64],
+    pub system_state_hash: u64, // Simulated Merkle root hash of systems
 }
 
-pub struct MintDeskCinnamonLayout {
-    pub layout_mode: CinnamonLayoutMode,
-    pub panel_widgets: Vec<String>,
-    pub desklet_items: Vec<String>,
-}
-
-impl MintDeskCinnamonLayout {
-    pub fn new() -> Self {
-        Self {
-            layout_mode: CinnamonLayoutMode::Traditional,
-            panel_widgets: vec!["menu".to_string(), "window-list".to_string(), "systray".to_string()],
-            desklet_items: Vec::new(),
+impl TimeshiftSnapshot {
+    pub fn new(id: usize, timestamp_epoch: u64, desc: &[u8], hash: u64) -> Self {
+        let mut desc_arr = [0u8; 64];
+        let len = desc.len().min(63);
+        desc_arr[..len].copy_from_slice(&desc[..len]);
+        TimeshiftSnapshot {
+            id,
+            timestamp_epoch,
+            description: desc_arr,
+            system_state_hash: hash,
         }
     }
-
-    pub fn set_layout_mode(&mut self, mode: CinnamonLayoutMode) {
-        self.layout_mode = mode;
-        match mode {
-            CinnamonLayoutMode::Traditional => {
-                self.panel_widgets = vec!["menu".to_string(), "window-list".to_string(), "systray".to_string()];
-            }
-            CinnamonLayoutMode::Modern => {
-                self.panel_widgets = vec!["global-menu".to_string(), "dock".to_string(), "indicator-applet".to_string()];
-            }
-            CinnamonLayoutMode::Compact => {
-                self.panel_widgets = vec!["vertical-launcher".to_string(), "systray-compact".to_string()];
-            }
-        }
-    }
-
-    pub fn add_panel_widget(&mut self, widget: &str) {
-        self.panel_widgets.push(widget.to_string());
-    }
-
-    pub fn add_desklet_item(&mut self, desklet: &str) {
-        self.desklet_items.push(desklet.to_string());
-    }
 }
 
-impl Default for MintDeskCinnamonLayout {
+/// Timeshift-inspired System Restore point manager
+pub struct MintTimeshiftEngine {
+    pub snapshots: Vec<TimeshiftSnapshot>,
+    pub next_snapshot_id: AtomicUsize,
+}
+
+impl Default for MintTimeshiftEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// =========================================================================
-// 2. MINT TIMESHIFT CHECKPOINT MANAGER
-// =========================================================================
-
-pub struct MintTimeshiftCheckpointManager {
-    pub last_snapshot_timestamp: u64,
-    pub snapshots_taken: Vec<String>,
-}
-
-impl MintTimeshiftCheckpointManager {
+impl MintTimeshiftEngine {
     pub fn new() -> Self {
-        Self {
-            last_snapshot_timestamp: 0,
-            snapshots_taken: Vec::new(),
+        MintTimeshiftEngine {
+            snapshots: Vec::new(),
+            next_snapshot_id: AtomicUsize::new(1),
         }
     }
 
-    /// Evaluates upgrade safety level. Insists on taking a Timeshift snapshot
-    /// if update is Level4Sensitive or Level5Critical and none was taken recently.
-    pub fn verify_and_schedule_pre_upgrade_snapshot(
-        &mut self,
-        package: &str,
-        level: MintUpdateLevel,
-        current_timestamp: u64,
-    ) -> Result<bool, &'static str> {
-        let is_sensitive = level == MintUpdateLevel::Level4Sensitive || level == MintUpdateLevel::Level5Critical;
+    pub fn create_checkpoint(&mut self, timestamp: u64, desc: &[u8], state_hash: u64) -> usize {
+        let id = self.next_snapshot_id.fetch_add(1, Ordering::SeqCst);
+        let checkpoint = TimeshiftSnapshot::new(id, timestamp, desc, state_hash);
+        self.snapshots.push(checkpoint);
+        id
+    }
 
-        if is_sensitive {
-            // Snapshot required if older than 24 hours (86400 seconds)
-            if self.last_snapshot_timestamp == 0 || (current_timestamp - self.last_snapshot_timestamp >= 86400) {
-                let name = format!("timeshift-pre-upgrade-{}-{}", package, current_timestamp);
-                self.snapshots_taken.push(name);
-                self.last_snapshot_timestamp = current_timestamp;
-                return Ok(true); // Snapshot successfully scheduled & triggered
+    pub fn restore_checkpoint(&self, snapshot_id: usize) -> Result<u64, &'static str> {
+        for snap in self.snapshots.iter() {
+            if snap.id == snapshot_id {
+                return Ok(snap.system_state_hash);
             }
         }
-        Ok(false) // No snapshot required for safe/standard updates or recent snap exists
+        Err("Timeshift: Target system restore point not found.")
     }
 }
 
-impl Default for MintTimeshiftCheckpointManager {
+/// Cinnamon-inspired desktop styling configuration
+#[derive(Debug, Clone, Copy)]
+pub struct MintCinnamonStyling {
+    pub panel_height: u32,
+    pub menu_layout_compact: bool,
+    pub opacity_percent: u32,
+    pub window_effects_enabled: bool,
+}
+
+impl MintCinnamonStyling {
+    pub fn default() -> Self {
+        MintCinnamonStyling {
+            panel_height: 40,
+            menu_layout_compact: false,
+            opacity_percent: 100,
+            window_effects_enabled: true,
+        }
+    }
+
+    pub fn configure_workspace(&mut self, height: u32, compact: bool, opacity: u32, effects: bool) {
+        self.panel_height = height;
+        self.menu_layout_compact = compact;
+        self.opacity_percent = opacity.min(100);
+        self.window_effects_enabled = effects;
+    }
+}
+
+/// Hardware Driver metadata managed by the MintDrivers-equivalent system
+#[derive(Debug, Clone)]
+pub struct MintDriverInfo {
+    pub name: [u8; 48],
+    pub hardware_class: [u8; 32],
+    pub proprietary: bool,
+    pub active: bool,
+}
+
+impl MintDriverInfo {
+    pub fn new(name: &[u8], class: &[u8], proprietary: bool) -> Self {
+        let mut name_arr = [0u8; 48];
+        let mut class_arr = [0u8; 32];
+        name_arr[..name.len().min(47)].copy_from_slice(&name[..name.len().min(47)]);
+        class_arr[..class.len().min(31)].copy_from_slice(&class[..class.len().min(31)]);
+        MintDriverInfo {
+            name: name_arr,
+            hardware_class: class_arr,
+            proprietary,
+            active: false,
+        }
+    }
+}
+
+/// MintDrivers-inspired Hardware Driver Manager
+pub struct MintDriverManager {
+    pub available_drivers: Vec<MintDriverInfo>,
+}
+
+impl Default for MintDriverManager {
     fn default() -> Self {
         Self::new()
     }
 }
 
-// =========================================================================
-// 3. MINT SYSTEM AUTO-FIXER (MINT SYSTEM FIXER)
-// =========================================================================
-
-pub struct MintSystemFixer {
-    pub applied_remedies: Vec<String>,
-}
-
-impl MintSystemFixer {
+impl MintDriverManager {
     pub fn new() -> Self {
-        Self {
-            applied_remedies: Vec::new(),
+        MintDriverManager {
+            available_drivers: Vec::new(),
         }
     }
 
-    /// Scans a crash report, identifies critical system failures (Xorg, graphics drivers,
-    /// dynamic kernel modules), and applies automated remedies.
-    pub fn diagnose_and_apply_remedy(&mut self, app_name: &str) -> Option<&'static str> {
-        if app_name.contains("nvidia") || app_name.contains("amdgpu") || app_name.contains("dkms") {
-            let action = "trigger-dkms-rebuild";
-            self.applied_remedies.push(format!("{}:{}", app_name, action));
-            Some("Hardware kernel driver crash detected. Initiated automatic DKMS rebuild.")
-        } else if app_name.contains("xorg") || app_name.contains("cinnamon") {
-            let action = "restart-display-manager";
-            self.applied_remedies.push(format!("{}:{}", app_name, action));
-            Some("X11 Server / display environment crashed. Re-started session safely.")
-        } else {
-            let action = "reinstall-package";
-            self.applied_remedies.push(format!("{}:{}", app_name, action));
-            Some("Application package corrupted. Scheduling automatic sigpkg reinstall.")
+    pub fn register_driver(&mut self, driver: MintDriverInfo) {
+        self.available_drivers.push(driver);
+    }
+
+    pub fn toggle_driver(&mut self, name: &[u8], active: bool) -> Result<(), &'static str> {
+        for driver in self.available_drivers.iter_mut() {
+            let mut matches = true;
+            for i in 0..name.len().min(47) {
+                if driver.name[i] != name[i] {
+                    matches = false;
+                    break;
+                }
+            }
+            if matches {
+                driver.active = active;
+                return Ok(());
+            }
         }
+        Err("MintDrivers: Specified driver not found.")
     }
 }
-
-impl Default for MintSystemFixer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// =========================================================================
-// UNIT TESTS MODULE
-// =========================================================================
 
 #[cfg(test)]
 mod tests {
@@ -396,17 +479,15 @@ mod tests {
     #[test]
     fn test_mint_update_manager() {
         let mut manager = MintUpdateManager::new();
-        let pkg = MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe);
+        let pkg =
+            MintUpdatePackage::new(b"zenith", b"1.0.0", b"1.1.0", MintUpdateLevel::Level1Safe);
         manager.add_update(pkg);
 
         assert_eq!(manager.pending_updates.len(), 1);
         assert_eq!(manager.pending_updates[0].safety_score, 99);
 
         // Fast mirror selection
-        manager.auto_select_fastest_mirror(&[
-            (b"us-mirror", 45),
-            (b"eu-mirror", 120),
-        ]);
+        manager.auto_select_fastest_mirror(&[(b"us-mirror", 45), (b"eu-mirror", 120)]);
         assert_eq!(manager.selected_mirror_speed_ms, 45);
 
         // Hot swap active kernel version
@@ -422,12 +503,33 @@ mod tests {
     }
 
     #[test]
-    fn test_mint_software_manager() {
+    fn test_mint_software_manager_with_reviews() {
         let mut software = MintSoftwareManager::new();
-        let app = MintAppMetadata::new(b"alacritty", 5, 230, true);
-        software.add_app_to_catalog(app);
-        assert_eq!(software.apps_catalog.len(), 1);
-        assert_eq!(software.apps_catalog[0].rating_stars, 5);
+
+        // 1. Create app metadata and add reviews
+        let mut app1 = MintAppMetadata::new(b"alacritty", b"System", b"Apache-2.0", 4500000, true);
+        app1.add_review(AppReview::new(b"gamer1", 5, b"Fast terminal!"));
+        app1.add_review(AppReview::new(b"dev1", 3, b"Nice, but lacks tabs."));
+
+        // Average should be (5 + 3) / 2 = 4 stars
+        assert_eq!(app1.rating_stars, 4);
+        assert_eq!(app1.reviews_count, 2);
+
+        let mut app2 = MintAppMetadata::new(b"flipper", b"Games", b"GPL-3.0", 12000000, false);
+        app2.add_review(AppReview::new(b"gamer2", 5, b"Pristine retro gameplay!"));
+
+        software.add_app_to_catalog(app1);
+        software.add_app_to_catalog(app2);
+
+        // 2. Test Category Search
+        let system_apps = software.search_by_category(b"System");
+        assert_eq!(system_apps.len(), 1);
+        assert!(system_apps[0].name.starts_with(b"alacritty"));
+
+        // 3. Test Featured (Ranked) Apps
+        let featured = software.get_featured_apps();
+        assert_eq!(featured.len(), 2);
+        assert!(featured[0].name.starts_with(b"flipper")); // 5 stars > 4 stars
     }
 
     #[test]
@@ -435,69 +537,47 @@ mod tests {
         let mut report = MintReportSystem::new();
         report.register_crash_alert(b"launcher");
         assert_eq!(report.active_alerts.len(), 1);
-        assert_eq!(report.active_alerts[0].severity, MintReportAlertSeverity::Critical);
+        assert_eq!(
+            report.active_alerts[0].severity,
+            MintReportAlertSeverity::Critical
+        );
     }
 
     #[test]
-    fn test_mint_desktop_cinnamon_layout() {
-        let mut desktop = MintDeskCinnamonLayout::new();
-        assert_eq!(desktop.layout_mode, CinnamonLayoutMode::Traditional);
-        assert_eq!(desktop.panel_widgets.len(), 3);
+    fn test_mint_timeshift_restore_points() {
+        let mut timeshift = MintTimeshiftEngine::new();
+        let snap_id = timeshift.create_checkpoint(1690000000, b"Fresh boot restore point", 0xDEADBEEF);
+        assert_eq!(snap_id, 1);
 
-        desktop.set_layout_mode(CinnamonLayoutMode::Modern);
-        assert_eq!(desktop.layout_mode, CinnamonLayoutMode::Modern);
-        assert_eq!(desktop.panel_widgets[0], "global-menu");
+        let hash = timeshift.restore_checkpoint(1).unwrap();
+        assert_eq!(hash, 0xDEADBEEF);
 
-        desktop.add_panel_widget("weather-applet");
-        assert_eq!(desktop.panel_widgets[3], "weather-applet");
-
-        desktop.add_desklet_item("cpu-monitor");
-        assert_eq!(desktop.desklet_items[0], "cpu-monitor");
+        assert!(timeshift.restore_checkpoint(99).is_err());
     }
 
     #[test]
-    fn test_mint_timeshift_checkpoint_manager() {
-        let mut timeshift = MintTimeshiftCheckpointManager::new();
+    fn test_mint_cinnamon_styling_options() {
+        let mut style = MintCinnamonStyling::default();
+        assert_eq!(style.panel_height, 40);
+        assert!(style.window_effects_enabled);
 
-        // Level 1 Safe update does not trigger snapshot
-        let res1 = timeshift.verify_and_schedule_pre_upgrade_snapshot("libc6", MintUpdateLevel::Level1Safe, 1700000000).unwrap();
-        assert!(!res1);
-        assert_eq!(timeshift.snapshots_taken.len(), 0);
-
-        // Level 5 Critical update triggers snapshot
-        let res2 = timeshift.verify_and_schedule_pre_upgrade_snapshot("linux-kernel", MintUpdateLevel::Level5Critical, 1700000000).unwrap();
-        assert!(res2);
-        assert_eq!(timeshift.snapshots_taken.len(), 1);
-        assert_eq!(timeshift.last_snapshot_timestamp, 1700000000);
-
-        // Successive Critical update within 24 hours does NOT trigger snapshot (recent one exists)
-        let res3 = timeshift.verify_and_schedule_pre_upgrade_snapshot("virtualbox-guest", MintUpdateLevel::Level5Critical, 1700010000).unwrap();
-        assert!(!res3);
-        assert_eq!(timeshift.snapshots_taken.len(), 1);
-
-        // Critical update after 24 hours triggers snapshot
-        let res4 = timeshift.verify_and_schedule_pre_upgrade_snapshot("systemd-sys", MintUpdateLevel::Level5Critical, 1700090000).unwrap();
-        assert!(res4);
-        assert_eq!(timeshift.snapshots_taken.len(), 2);
+        style.configure_workspace(36, true, 85, false);
+        assert_eq!(style.panel_height, 36);
+        assert!(style.menu_layout_compact);
+        assert_eq!(style.opacity_percent, 85);
+        assert!(!style.window_effects_enabled);
     }
 
     #[test]
-    fn test_mint_system_fixer() {
-        let mut fixer = MintSystemFixer::new();
+    fn test_mint_driver_manager_flows() {
+        let mut drivers = MintDriverManager::new();
+        let wifi_drv = MintDriverInfo::new(b"Broadcom BCM4360 WiFi", b"Wireless Controller", true);
+        drivers.register_driver(wifi_drv);
 
-        // Diagnose kernel driver crash
-        let rem1 = fixer.diagnose_and_apply_remedy("nvidia-dkms").unwrap();
-        assert!(rem1.contains("DKMS rebuild"));
-        assert_eq!(fixer.applied_remedies[0], "nvidia-dkms:trigger-dkms-rebuild");
+        assert_eq!(drivers.available_drivers.len(), 1);
+        assert!(!drivers.available_drivers[0].active);
 
-        // Diagnose xserver crash
-        let rem2 = fixer.diagnose_and_apply_remedy("xorg-server").unwrap();
-        assert!(rem2.contains("display environment"));
-        assert_eq!(fixer.applied_remedies[1], "xorg-server:restart-display-manager");
-
-        // Diagnose application corruption
-        let rem3 = fixer.diagnose_and_apply_remedy("libreoffice-calc").unwrap();
-        assert!(rem3.contains("reinstall"));
-        assert_eq!(fixer.applied_remedies[2], "libreoffice-calc:reinstall-package");
+        drivers.toggle_driver(b"Broadcom BCM4360 WiFi", true).unwrap();
+        assert!(drivers.available_drivers[0].active);
     }
 }

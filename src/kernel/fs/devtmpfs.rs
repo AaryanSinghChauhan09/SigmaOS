@@ -1,26 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 /// SigmaOS devtmpfs (/dev) pseudo-filesystem
 /// Automatically registers and creates device files when drivers boot.
 /// Improved with Linux-inspired udev rules, permissions, and symlink mappings.
 
-use crate::klib::BTreeMap;
+use crate::klib::HashMap;
 use crate::klib::Vec;
 use std::string::{String, ToString};
 
@@ -54,17 +36,16 @@ pub struct UdevRule {
 }
 
 pub struct DevTmpFs {
-    devices: BTreeMap<String, DeviceNode>,
-    symlinks: BTreeMap<String, String>, // symlink -> target node name
+    devices: HashMap<String, DeviceNode>,
+    symlinks: HashMap<String, String>, // symlink -> target node name
     udev_rules: Vec<UdevRule>,
 }
 
 impl DevTmpFs {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DevTmpFs {
-            devices: BTreeMap::new(),
-            symlinks: BTreeMap::new(),
+            devices: HashMap::new(),
+            symlinks: HashMap::new(),
             udev_rules: Vec::new(),
         }
     }

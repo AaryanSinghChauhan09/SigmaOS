@@ -1,4 +1,3 @@
-
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
 /// Implements 2^n page frames with free list per order, split/coalesce
@@ -19,8 +18,6 @@ pub trait BuddyAllocator {
     fn allocate(&mut self, order: usize) -> Result<BlockID, AllocError>;
     fn free(&mut self, block_id: BlockID, order: usize) -> Result<(), AllocError>;
     fn get_free_count(&self, order: usize) -> usize;
-    /// Linux-inspired lazy reclamation: free a page cache item or unused clean page if OOM
-    fn reclaim_pages(&mut self, target_order: usize) -> Result<(), AllocError>;
 }
 
 #[repr(C)]
@@ -29,7 +26,6 @@ pub struct Block {
     pub free: AtomicUsize,
     pub left: AtomicUsize,
     pub right: AtomicUsize,
-    pub is_cache: AtomicUsize, // 1 if occupied by reclaimable page cache/buffers, 0 otherwise
 }
 
 impl Block {
@@ -39,7 +35,6 @@ impl Block {
             free: AtomicUsize::new(1),
             left: AtomicUsize::new(0),
             right: AtomicUsize::new(0),
-            is_cache: AtomicUsize::new(0),
         }
     }
 }
@@ -69,7 +64,7 @@ impl SimpleBuddyAllocator {
         ];
         let mut blocks = Vec::new();
         let next_id = AtomicUsize::new(0);
-        
+
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
         let initial_block = Block::new(initial_order);
@@ -86,86 +81,50 @@ impl SimpleBuddyAllocator {
 }
 
 impl BuddyAllocator for SimpleBuddyAllocator {
-    fn reclaim_pages(&mut self, target_order: usize) -> Result<(), AllocError> {
-        // Search for blocks allocated as is_cache, free them to satisfy target_order allocation
-        let mut found_reclaimable = None;
-        for (id, block_opt) in self.blocks.iter().enumerate() {
-            if let Some(block) = block_opt {
-                if block.free.load(Ordering::SeqCst) == 0 && block.is_cache.load(Ordering::SeqCst) == 1 {
-                    let order = block.order.load(Ordering::SeqCst);
-                    if order >= target_order {
-                        found_reclaimable = Some((id, order));
-                        break;
-                    }
-                }
-            }
-        }
-
-        if let Some((id, order)) = found_reclaimable {
-            // Free the cache page back to the allocator
-            self.free(id, order)?;
-            Ok(())
-        } else {
-            Err(AllocError::OutOfMemory)
-        }
-    }
-
     fn allocate(&mut self, order: usize) -> Result<BlockID, AllocError> {
         if order > self.max_order.load(Ordering::SeqCst) {
             return Err(AllocError::OutOfMemory);
         }
 
-        let mut retry_count = 0;
-        loop {
-            for current_order in order..=self.max_order.load(Ordering::SeqCst) {
-                if !self.free_lists[current_order].is_empty() {
-                    let block_id = self.free_lists[current_order].remove(0);
-                    
-                    if current_order > order {
-                        let new_order = current_order - 1;
-                        let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
-                        let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
+        for current_order in order..=self.max_order.load(Ordering::SeqCst) {
+            if !self.free_lists[current_order].is_empty() {
+                let block_id = self.free_lists[current_order].remove(0);
 
-                        let left_block = Block::new(new_order);
-                        let right_block = Block::new(new_order);
+                if current_order > order {
+                    let new_order = current_order - 1;
+                    let left_id = self.next_id.fetch_add(1, Ordering::SeqCst);
+                    let right_id = self.next_id.fetch_add(1, Ordering::SeqCst);
 
-                        if let Some(ref mut parent) = self.blocks[block_id] {
-                            parent.left.store(left_id, Ordering::SeqCst);
-                            parent.right.store(right_id, Ordering::SeqCst);
-                            parent.free.store(0, Ordering::SeqCst);
-                        }
+                    let left_block = Block::new(new_order);
+                    let right_block = Block::new(new_order);
 
-                        while left_id >= self.blocks.len() {
-                            self.blocks.push(None);
-                        }
-                        while right_id >= self.blocks.len() {
-                            self.blocks.push(None);
-                        }
-
-                        self.blocks[left_id] = Some(left_block);
-                        self.blocks[right_id] = Some(right_block);
-
-                        self.free_lists[new_order].push(right_id);
-
-                        return Ok(left_id);
+                    if let Some(ref mut parent) = self.blocks[block_id] {
+                        parent.left.store(left_id, Ordering::SeqCst);
+                        parent.right.store(right_id, Ordering::SeqCst);
+                        parent.free.store(0, Ordering::SeqCst);
                     }
 
-                    if let Some(ref mut block) = self.blocks[block_id] {
-                        block.free.store(0, Ordering::SeqCst);
+                    while left_id >= self.blocks.len() {
+                        self.blocks.push(None);
+                    }
+                    while right_id >= self.blocks.len() {
+                        self.blocks.push(None);
                     }
 
-                    return Ok(block_id);
-                }
-            }
+                    self.blocks[left_id] = Some(left_block);
+                    self.blocks[right_id] = Some(right_block);
 
-            // If we are out of memory, try to reclaim cache pages (like Linux kswapd/lazy reclaim)
-            if retry_count == 0 {
-                if self.reclaim_pages(order).is_ok() {
-                    retry_count += 1;
-                    continue;
+                    self.free_lists[new_order].push(right_id);
+
+                    return Ok(left_id);
                 }
+
+                if let Some(ref mut block) = self.blocks[block_id] {
+                    block.free.store(0, Ordering::SeqCst);
+                }
+
+                return Ok(block_id);
             }
-            break;
         }
 
         Err(AllocError::OutOfMemory)
@@ -297,24 +256,6 @@ mod tests {
 
         assert!(allocator.free(block_1, 3).is_ok());
         assert!(allocator.free(block_2, 3).is_ok());
-    }
-
-    #[test]
-    fn test_lazy_reclaim() {
-        let mut allocator = SimpleBuddyAllocator::new(3, 8);
-
-        // Allocate all blocks
-        let b1 = allocator.allocate(2).unwrap();
-        let b2 = allocator.allocate(2).unwrap();
-
-        // Mark b1 as being used by page cache
-        if let Some(ref mut block) = allocator.blocks[b1] {
-            block.is_cache.store(1, Ordering::SeqCst);
-        }
-
-        // Next allocation of order 2 should fail due to OOM, but lazy reclaim should free b1 and succeed!
-        let b3 = allocator.allocate(2).unwrap();
-        assert_eq!(b3, b1);
     }
 
     #[test]

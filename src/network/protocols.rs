@@ -1,8 +1,7 @@
-#![allow(unused_variables)]
 // SigmaOS DNS, mDNS, QUIC, TCP/IP, UDP, DHCP, HTTP, HTTPS, FTP, SSH, SMTP, TLS, WebSocket, BGP Network Implementations
 // Full-protocol stack support for bare-metal kernel and userspace layers
 
-use crate::security::capability::CapabilityToken;
+use crate::security::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 // --- IP versions ---
@@ -268,7 +267,7 @@ pub struct SshDaemon {
     pub config: SshdConfig,
     pub active_sessions: usize,
     pub max_sessions: usize,
-    pub failed_attempts: crate::klib::BTreeMap<String, u32>, // IP -> Count
+    pub failed_attempts: crate::klib::HashMap<String, u32>, // IP -> Count
     pub blocklisted_ips: Vec<String>,
 }
 
@@ -278,7 +277,7 @@ impl SshDaemon {
             config,
             active_sessions: 0,
             max_sessions,
-            failed_attempts: crate::klib::BTreeMap::new(),
+            failed_attempts: crate::klib::HashMap::new(),
             blocklisted_ips: Vec::new(),
         }
     }

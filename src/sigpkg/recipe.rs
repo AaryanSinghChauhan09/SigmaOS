@@ -1,9 +1,9 @@
-//! SigPkg: Community Recipe Packaging (Arch Linux Absorption)
-//!
-//! Zero-allocation package manager parsing simple, signed declarative community recipes.
+// SigmaOS Package Recipes
+// Build recipes for package compilation and installation
+// Improved with Gentoo Portage-style USE flags and dynamic stage compilation profiles.
 
 use crate::sigpkg::{Dependency, Version};
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Build system type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -14,81 +14,28 @@ pub enum BuildSystem {
     Autotools,
     Meson,
     Ninja,
-    Custom,
 }
 
+/// Gentoo-inspired compilation optimization profiles (stages)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum RecipeError {
-    InvalidFormat,
-    MissingField,
-    SignatureMismatch,
-    DependencyConflict,
-    InvalidName,
-    InvalidSource,
-    InvalidHash,
-    NoBuildCommands,
-    InvalidRecipe,
-    NotFound,
-    InvalidSyntax,
-    SerializationError,
+pub enum StageProfile {
+    Stage1Minimal,      // Basic fallback bootstrap flags (-O1, -mno-sse)
+    Stage2Bootstrap,    // Balanced standard optimization (-O2)
+    Stage3Optimized,    // Maximum architecture-targeted performance (-O3 -march=native -flto)
 }
 
-pub struct RecipeManager {
-    pub recipes: BTreeMap<String, PackageRecipe>,
+/// Gentoo-style Portage USE flags representing conditional package compilation features
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UseFlag {
+    Ssl,
+    Threads,
+    X11,
+    Gpu,
+    Sound,
 }
 
-impl RecipeManager {
-    pub fn new() -> Self {
-        let mut manager = Self {
-            recipes: BTreeMap::new(),
-        };
-        // Add distro-inspired standard package recipes
-        let neofetch = PackageRecipe::new("neofetch".to_string(), Version::new(7, 1, 0))
-            .with_description("A fast, highly customizable system info script".to_string())
-            .with_build_system(BuildSystem::Make)
-            .with_source("https://github.com/dylanaraps/neofetch".to_string(), "hash_neofetch".to_string())
-            .with_build_command("make build".to_string());
-        let curl = PackageRecipe::new("curl".to_string(), Version::new(8, 7, 1))
-            .with_description("Command line tool for transferring data with URLs".to_string())
-            .with_build_system(BuildSystem::CMake)
-            .with_source("https://curl.se/download/curl-8.7.1.tar.gz".to_string(), "hash_curl".to_string())
-            .with_build_command("cmake .".to_string());
-        let ripgrep = PackageRecipe::new("ripgrep".to_string(), Version::new(14, 1, 0))
-            .with_description("ripgrep recursively searches directories for a regex pattern".to_string())
-            .with_build_system(BuildSystem::Cargo)
-            .with_source("https://github.com/BurntSushi/ripgrep".to_string(), "hash_ripgrep".to_string())
-            .with_build_command("cargo build --release".to_string());
-        let almalinux_release = PackageRecipe::new("almalinux-release".to_string(), Version::new(9, 4, 0))
-            .with_description("AlmaLinux release file".to_string())
-            .with_build_system(BuildSystem::Custom)
-            .with_source("https://github.com/AlmaLinux/almalinux-release".to_string(), "hash_almalinux".to_string())
-            .with_build_command("echo 'Building AlmaLinux release'".to_string());
-
-        let _ = manager.add_recipe(neofetch);
-        let _ = manager.add_recipe(curl);
-        let _ = manager.add_recipe(ripgrep);
-        let _ = manager.add_recipe(almalinux_release);
-        manager
-    }
-
-    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
-        recipe.validate()?;
-        self.recipes.insert(recipe.name.clone(), recipe);
-        Ok(())
-    }
-
-    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
-        self.recipes.values().collect()
-    }
-}
-
-impl Default for RecipeManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Declarative package recipes.
+/// Package recipe
+#[derive(Debug, Clone)]
 pub struct PackageRecipe {
     pub name: String,
     pub version: Version,
@@ -99,17 +46,17 @@ pub struct PackageRecipe {
     pub hash: String,
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
-    pub environment: BTreeMap<String, String>,
-    pub pkgrel: u32,
-    pub arch: String,
-    pub license_spdx: String,
-    pub prepare_commands: Vec<String>,
-    pub package_commands: Vec<String>,
+    pub environment: HashMap<String, String>,
+
+    // Gentoo-inspired features
+    pub active_use_flags: Vec<UseFlag>,
+    pub compilation_profile: StageProfile,
+    pub conditional_dependencies: Vec<(UseFlag, Dependency)>, // Dependency unlocked ONLY if USE flag is active
 }
 
 impl PackageRecipe {
     pub fn new(name: String, version: Version) -> Self {
-        PackageRecipe {
+        Self {
             name,
             version,
             description: String::new(),
@@ -119,12 +66,10 @@ impl PackageRecipe {
             hash: String::new(),
             build_commands: Vec::new(),
             install_commands: Vec::new(),
-            environment: BTreeMap::new(),
-            pkgrel: 1,
-            arch: "x86_64".to_string(),
-            license_spdx: "MIT".to_string(),
-            prepare_commands: Vec::new(),
-            package_commands: Vec::new(),
+            environment: HashMap::new(),
+            active_use_flags: Vec::new(),
+            compilation_profile: StageProfile::Stage2Bootstrap,
+            conditional_dependencies: Vec::new(),
         }
     }
 
@@ -159,38 +104,49 @@ impl PackageRecipe {
         self
     }
 
-    pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.build_commands.push(command);
-        self
-    }
-
-    pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
-        self
-    }
-
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
         self
     }
 
-    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
-        self.pkgrel = pkgrel;
+    // Builder helpers for USE flags and compilation profiles
+    pub fn with_use_flag(mut self, flag: UseFlag) -> Self {
+        self.active_use_flags.push(flag);
         self
     }
 
-    pub fn with_arch(mut self, arch: String) -> Self {
-        self.arch = arch;
+    pub fn with_compilation_profile(mut self, profile: StageProfile) -> Self {
+        self.compilation_profile = profile;
         self
     }
 
-    pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.prepare_commands.push(command);
+    pub fn with_conditional_dependency(mut self, flag: UseFlag, dependency: Dependency) -> Self {
+        self.conditional_dependencies.push((flag, dependency));
         self
     }
 
-    pub fn with_package_command(mut self, command: String) -> Self {
-        self.package_commands.push(command);
-        self
+    pub fn is_use_active(&self, flag: UseFlag) -> bool {
+        self.active_use_flags.contains(&flag)
+    }
+
+    /// Evaluates and returns all active dependencies including conditional USE-flag targets
+    pub fn get_active_dependencies(&self) -> Vec<Dependency> {
+        let mut deps = self.dependencies.clone();
+        for (flag, dep) in self.conditional_dependencies.iter() {
+            if self.is_use_active(*flag) {
+                deps.push(dep.clone());
+            }
+        }
+        deps
+    }
+
+    /// Returns CFLAGS/CXXFLAGS compilation flags matching the active Stage Profile
+    pub fn get_stage_optimization_flags(&self) -> &'static str {
+        match self.compilation_profile {
+            StageProfile::Stage1Minimal => "-O1 -mno-sse2",
+            StageProfile::Stage2Bootstrap => "-O2 -pipe",
+            StageProfile::Stage3Optimized => "-O3 -march=native -flto=fat -funroll-loops",
+        }
     }
 
     pub fn validate(&self) -> Result<(), RecipeError> {
@@ -221,8 +177,62 @@ impl PackageRecipe {
                 "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
             }
             BuildSystem::Ninja => "ninja\nninja install".to_string(),
-            BuildSystem::Custom => "custom_build_command".to_string(),
         }
+    }
+}
+
+/// Recipe errors
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RecipeError {
+    InvalidName,
+    InvalidSource,
+    InvalidHash,
+    NoBuildCommands,
+    DependencyConflict,
+    BuildFailed,
+}
+
+/// Recipe manager
+pub struct RecipeManager {
+    recipes: HashMap<String, PackageRecipe>,
+}
+
+impl RecipeManager {
+    pub fn new() -> Self {
+        Self {
+            recipes: HashMap::new(),
+        }
+    }
+
+    pub fn add_recipe(&mut self, recipe: PackageRecipe) -> Result<(), RecipeError> {
+        recipe.validate()?;
+        let key = format!("{}@{}", recipe.name, recipe.version);
+        self.recipes.insert(key, recipe);
+        Ok(())
+    }
+
+    pub fn get_recipe(&self, name: &str, version: &Version) -> Option<&PackageRecipe> {
+        let key = format!("{}@{}", name, version);
+        self.recipes.get(&key)
+    }
+
+    pub fn list_recipes(&self) -> Vec<&PackageRecipe> {
+        self.recipes.values().collect()
+    }
+
+    pub fn find_by_name(&self, name: &str) -> Vec<&PackageRecipe> {
+        self.recipes.values().filter(|r| r.name == name).collect()
+    }
+
+    pub fn remove_recipe(&mut self, name: &str, version: &Version) {
+        let key = format!("{}@{}", name, version);
+        self.recipes.remove(&key);
+    }
+}
+
+impl Default for RecipeManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -271,8 +281,7 @@ mod tests {
             .with_build_command("cargo build".to_string());
 
         assert!(manager.add_recipe(recipe).is_ok());
-        // Includes 4 default distro-inspired recipes plus our test recipe
-        assert_eq!(manager.list_recipes().len(), 5);
+        assert_eq!(manager.list_recipes().len(), 1);
     }
 
     #[test]
@@ -285,24 +294,38 @@ mod tests {
     }
 
     #[test]
-    fn test_pkgbuild_and_aur_compilation_fields() {
-        let recipe = PackageRecipe::new("neofetch-pqc".to_string(), Version::new(7, 1, 0))
-            .with_pkgrel(3)
-            .with_arch("aarch64".to_string())
-            .with_source(
-                "https://github.com/dylanaraps/neofetch".to_string(),
-                "hash_neofetch".to_string(),
-            )
-            .with_prepare_command("patch -p1 < pqc_patch.diff".to_string())
-            .with_build_command("make build".to_string())
-            .with_package_command("make DESTDIR=\"$pkgdir\" install".to_string());
+    fn test_portage_style_use_flags() {
+        let mut recipe = PackageRecipe::new("libcurl".to_string(), Version::new(8, 2, 1))
+            .with_source("https://example.com/curl".to_string(), "99aa88".to_string())
+            .with_build_command("make".to_string());
 
-        assert_eq!(recipe.pkgrel, 3);
-        assert_eq!(recipe.arch, "aarch64");
-        assert_eq!(recipe.prepare_commands[0], "patch -p1 < pqc_patch.diff");
-        assert_eq!(
-            recipe.package_commands[0],
-            "make DESTDIR=\"$pkgdir\" install"
-        );
+        // Setup conditional openssl dependency if "Ssl" USE flag is toggled active
+        let ssl_dependency = Dependency {
+            name: "openssl".to_string(),
+            version: Version::new(3, 0, 0),
+        };
+
+        recipe = recipe.with_conditional_dependency(UseFlag::Ssl, ssl_dependency);
+
+        // 1. By default, "Ssl" is inactive, so no conditional dependency is fetched
+        assert!(!recipe.is_use_active(UseFlag::Ssl));
+        assert_eq!(recipe.get_active_dependencies().len(), 0);
+
+        // 2. Toggle "Ssl" active
+        recipe = recipe.with_use_flag(UseFlag::Ssl);
+        assert!(recipe.is_use_active(UseFlag::Ssl));
+
+        let active_deps = recipe.get_active_dependencies();
+        assert_eq!(active_deps.len(), 1);
+        assert_eq!(active_deps[0].name, "openssl");
+    }
+
+    #[test]
+    fn test_portage_stage_optimization_flags() {
+        let mut recipe = PackageRecipe::new("kernel".to_string(), Version::new(6, 1, 0));
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O2 -pipe"); // default Stage2
+
+        recipe = recipe.with_compilation_profile(StageProfile::Stage3Optimized);
+        assert_eq!(recipe.get_stage_optimization_flags(), "-O3 -march=native -flto=fat -funroll-loops");
     }
 }

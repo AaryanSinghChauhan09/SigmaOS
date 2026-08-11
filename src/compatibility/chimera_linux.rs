@@ -1,4 +1,3 @@
-// SigmaOS Distro Compatibility Layer
 use crate::klib::Vec;
 /// Chimera Linux Compatibility and Subsystem Layer for SigmaOS
 /// Replicates Chimera's signature modern features:
