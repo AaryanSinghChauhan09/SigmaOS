@@ -1,126 +1,166 @@
 # Contributing to SigmaOS
 
-Thank you for your interest in contributing to **SigmaOS** — a next-generation operating system written in Rust, drawing inspiration from Linux, BSD, and Plan 9 philosophies.
+Thank you for your interest in contributing to SigmaOS! This document provides guidelines and instructions for contributing to the project.
 
----
+## Code of Conduct
 
-## Table of Contents
-
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Branch Strategy](#branch-strategy)
-- [Coding Standards](#coding-standards)
-- [Submitting Changes](#submitting-changes)
-- [Testing](#testing)
-- [Security](#security)
-- [Architecture Overview](#architecture-overview)
-
----
+- Be respectful and inclusive
+- Focus on what is best for the community
+- Show empathy towards other community members
 
 ## Getting Started
 
 ### Prerequisites
 
-| Tool | Minimum Version | Purpose |
-|------|----------------|---------|
-| Rust (nightly) | 1.80+ | Core build toolchain |
-| cargo | latest | Package management |
-| make | 4.x | Build orchestration |
-| git | 2.x | Version control |
-| QEMU | 8.x | OS emulation for testing |
+- Rust (latest stable version)
+- Cargo (comes with Rust)
+- Git
+- QEMU (for testing)
+- Make
 
-### Setup
+### Setting Up Development Environment
 
 ```bash
+# Clone the repository
 git clone https://github.com/AaryanSinghChauhan09/SigmaOS.git
 cd SigmaOS
-rustup toolchain install nightly && rustup default nightly
-rustup component add rust-src llvm-tools-preview
-make build
-make run
-```
 
----
+# Build the project
+cargo build
+
+# Run tests
+cargo test
+
+# Run the project
+cargo run
+```
 
 ## Development Workflow
 
-1. Branch from `main`: `git checkout -b feature/my-feature main`
-2. Make atomic, well-described commits
-3. Add tests for new functionality
-4. Open a Pull Request against `main`
+### Branching Strategy
 
----
+- `main` - The main development branch
+- All changes should be made through pull requests
+- Feature branches should be named `feature/description`
+- Bugfix branches should be named `fix/description`
 
-## Branch Strategy
+### Commit Guidelines
 
-SigmaOS uses a **single-trunk (`main`)** strategy:
-- All development merged into `main` via PRs
-- Feature branches deleted after merging
-- No long-lived divergent branches
+- Use clear, descriptive commit messages
+- Follow conventional commit format: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
----
+### Code Style
 
-## Coding Standards
-
-- **rustfmt**: `cargo fmt --all`
-- **clippy**: `cargo clippy --all-targets`
-- No `unwrap()` in library code — use `?` for error propagation
-- `#![no_std]` in kernel modules unless impossible
-- Prefer custom `klib/` implementations over external crates
-
-### Custom Types (use in kernel code)
-
-```rust
-use crate::klib::types::{SigmaU64, SigmaU32, SigmaBool, SigmaU8};
-```
-
-### Dependencies Policy
-
-Minimize external dependencies. Implement in-house using `klib/` where feasible:
-- `klib/vec.rs` — custom `Vec<T>`
-- `klib/string.rs` — custom `String`
-- `klib/alloc.rs` — custom allocator
-
-### Security Rules
-
-- **Never hard-code cryptographic values** (keys, IVs, passwords)
-- All crypto operations go through `src/security/`
-
----
+- Follow Rust standard formatting: `cargo fmt`
+- Use clippy for linting: `cargo clippy`
+- Write tests for new functionality
+- Document public APIs with rustdoc
 
 ## Testing
 
+### Running Tests
+
 ```bash
-cargo test                          # All unit tests
-cargo test --test <name>            # Specific test
-cargo test -- --nocapture           # With output
-make test-integration               # Integration tests
-make test-qemu                      # Hardware-level via QEMU
+# Run all tests
+cargo test
+
+# Run specific test
+cargo test test_name
+
+# Run tests with output
+cargo test -- --nocapture
 ```
 
----
+### Test Coverage
 
-## Security
+- Aim for high test coverage
+- Write unit tests for individual functions
+- Write integration tests for component interactions
+- Use property-based testing where appropriate
 
-Do not open public issues for security vulnerabilities. See [SECURITY.md](SECURITY.md).
+## Documentation
 
----
+### Code Documentation
 
-## Architecture Overview
+- Document all public functions and structs
+- Use `///` for item documentation
+- Use `//!` for module documentation
+- Include examples where helpful
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for details.
+### Wiki Documentation
 
-| Subsystem | Location | Description |
-|-----------|----------|-------------|
-| Kernel Core | `kernel/` | Boot, scheduling, memory |
-| System Calls | `src/syscall/` | POSIX-compatible syscall layer |
-| Memory | `kernel/mm/` | Buddy allocator, paging |
-| Drivers | `src/driver/` | Hardware abstraction |
-| Security | `src/security/` | Capabilities, MAC, crypto |
-| Networking | `src/network/` | TCP/IP stack |
-| File System | `src/fs/` | VFS layer |
-| Package Manager | `src/sigpkg/` | SigmaPkg package manager |
+- Update the wiki for major features
+- Add tutorials and guides
+- Keep architecture diagrams up to date
+- Document API changes
 
----
-*Happy hacking! — The SigmaOS Team*
+## Pull Request Process
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Update documentation
+6. Submit a pull request
+7. Address review feedback
+8. Get approval and merge
+
+## Project Structure
+
+```
+SigmaOS/
+├── src/              # Source code
+├── tests/            # Integration tests
+├── docs/             # Documentation
+├── scripts/          # Utility scripts
+├── .github/          # GitHub configuration
+├── Cargo.toml        # Rust dependencies
+└── README.md         # Project overview
+```
+
+## Module Guidelines
+
+### Security Module
+
+- Capability-based security model
+- No unsafe code without justification
+- Audit all security-sensitive operations
+
+### Kernel Module
+
+- No_std compatible where possible
+- Minimal dependencies
+- Clear error handling
+
+### Package Manager
+
+- Zero-dependency where possible
+- Cryptographic verification
+- Atomic transactions
+
+## Issue Reporting
+
+- Use GitHub Issues for bug reports
+- Provide reproduction steps
+- Include environment details
+- Tag relevant maintainers
+
+## Feature Requests
+
+- Use GitHub Issues for feature requests
+- Describe the use case
+- Propose a solution
+- Consider implementation complexity
+
+## License
+
+By contributing to SigmaOS, you agree that your contributions will be licensed under the same license as the project.
+
+## Questions?
+
+- Open an issue for questions
+- Contact maintainers via GitHub
+- Check existing documentation
+
+Thank you for contributing to SigmaOS!

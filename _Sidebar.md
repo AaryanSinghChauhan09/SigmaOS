@@ -22,11 +22,9 @@
 - [Package Management](Package-Management)
 - [Universal Package Manager](Universal-Package-Manager)
 - [AUR Helper](AUR-Helper)
-- [Custom Collections](Custom-Collections)
 
 ### 🔌 Hardware & Drivers
 - [Driver Development Guide](Driver-Development-Guide)
-- [Device Driver Framework](Device-Driver-Framework)
 - [Hardware Compatibility](Hardware-Compatibility)
 - [Universal Driver Support](UNIVERSAL_DRIVER_SUPPORT_PLAN)
 - [Driver Management Roadmap](Driver_Management_Roadmap)
@@ -44,7 +42,6 @@
 - [Defensive Audit Systems](DEFENSIVE_AUDIT_SYSTEMS_BLUEPRINT)
 - [Parrot Security Parity](PARROT_SECURITY_PARITY_BLUEPRINT)
 - [Qubes Isolation](QUBES_ISOLATION_ROADMAP)
-- [Virtualization & Container Isolation](Virtualization-and-Containers-Isolation)
 
 ### 🐧 Linux/BSD Inspirations
 - [Linux BSD Inspirations](LINUX_BSD_INSPIRATIONS)
