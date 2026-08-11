@@ -1,29 +1,11 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Intrusion Detection System
 // OOP-based IDS with anomaly detection and rule-based analysis
 
 #[cfg(not(test))]
-use crate::klib::BTreeMap;
+use crate::klib::HashMap;
 
 #[cfg(test)]
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 use std::net::IpAddr;
 use std::time::Instant;
@@ -38,7 +20,7 @@ pub struct SecurityEvent {
     pub timestamp: Instant,
     pub severity: Severity,
     pub description: String,
-    pub metadata: BTreeMap<String, String>,
+    pub metadata: HashMap<String, String>,
 }
 
 /// Event type
@@ -110,7 +92,6 @@ pub struct SignatureDetection {
 }
 
 impl SignatureDetection {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self { rules: Vec::new() }
     }
@@ -159,14 +140,14 @@ impl DetectionStrategy for SignatureDetection {
 
 /// Anomaly-based detection
 pub struct AnomalyDetection {
-    baseline: BTreeMap<String, f64>,
+    baseline: HashMap<String, f64>,
     threshold: f64,
 }
 
 impl AnomalyDetection {
     pub fn new(threshold: f64) -> Self {
         Self {
-            baseline: BTreeMap::new(),
+            baseline: HashMap::new(),
             threshold,
         }
     }
@@ -335,7 +316,6 @@ pub struct IntrusionDetectionSystem {
 }
 
 impl IntrusionDetectionSystem {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             strategies: Vec::new(),
@@ -498,7 +478,7 @@ mod tests {
             timestamp: Instant::now(),
             severity: Severity::High,
             description: "Port scan detected".to_string(),
-            metadata: BTreeMap::new(),
+            metadata: HashMap::new(),
         };
         assert_eq!(event.event_type, EventType::PortScan);
     }
@@ -523,7 +503,7 @@ mod tests {
             timestamp: Instant::now(),
             severity: Severity::High,
             description: "Port scan detected".to_string(),
-            metadata: BTreeMap::new(),
+            metadata: HashMap::new(),
         };
 
         let result = detection.analyze(&event);
@@ -543,7 +523,7 @@ mod tests {
             timestamp: Instant::now(),
             severity: Severity::High,
             description: "Port scan detected".to_string(),
-            metadata: BTreeMap::new(),
+            metadata: HashMap::new(),
         };
 
         let _result = detection.analyze(&event);
@@ -567,7 +547,7 @@ mod tests {
             timestamp: Instant::now(),
             severity: Severity::High,
             description: "Port scan detected".to_string(),
-            metadata: BTreeMap::new(),
+            metadata: HashMap::new(),
         };
 
         let results = ids.process_event(event);
