@@ -23,8 +23,19 @@
 /// Based on Ideas-999-Structured: Automation & Scripting Item 856
 /// Implements scripting engine and execution
 
+#[cfg(not(target_os = "none"))]
+use std::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(not(target_os = "none"))]
+use std::mem;
+#[cfg(not(target_os = "none"))]
+use std::ops::{Deref, DerefMut};
+
+#[cfg(target_os = "none")]
 use core::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(target_os = "none")]
 use core::mem;
+#[cfg(target_os = "none")]
+use core::ops::{Deref, DerefMut};
 
 pub type ScriptID = usize;
 
@@ -33,8 +44,14 @@ pub type ScriptID = usize;
 pub enum ScriptLanguage { Python = 0, JavaScript = 1, Lua = 2, Shell = 3 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum ScriptError { Success = 0, NotFound = 1, ExecutionFailed = 2 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ScriptError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    SyntaxError = 3,
+    LoopOverflow = 4,
+}
 
 pub trait Script {
     fn id(&self) -> ScriptID;
@@ -77,7 +94,14 @@ impl Script for SimpleScript {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(128);
         &self.name[..len]
     }
-    fn language(&self) -> ScriptLanguage { unsafe { core::mem::transmute(self.language.load(Ordering::SeqCst)) } }
+    fn language(&self) -> ScriptLanguage {
+        match self.language.load(Ordering::SeqCst) {
+            0 => ScriptLanguage::Python,
+            1 => ScriptLanguage::JavaScript,
+            2 => ScriptLanguage::Lua,
+            _ => ScriptLanguage::Shell,
+        }
+    }
     fn source(&self) -> &[u8] { &self.source }
 }
 
@@ -238,7 +262,6 @@ impl<'a, T> IntoIterator for &'a Vec<T> {
     type IntoIter = core::slice::Iter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
         self.deref().iter()
     }
 }
@@ -249,7 +272,145 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     type IntoIter = core::slice::IterMut<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+// ================= Linux & BSD-Inspired Shell Script Interpreter =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShellLoopType {
+    For,
+    While,
+    DoWhile,
+    ForeachExtension,
+}
+
+/// Shell interpreter supporting string/file/command tokenization and counting/foreach repetition loops
+pub struct ShellScriptInterpreter;
+
+impl ShellScriptInterpreter {
+    pub fn tokenize_string(input: &str, delimiter: char) -> std::vec::Vec<std::string::String> {
+        let mut tokens = std::vec::Vec::new();
+        for token in input.split(delimiter) {
+            if !token.is_empty() {
+                tokens.push(token.to_string());
+            }
+        }
+        tokens
+    }
+
+    pub fn tokenize_command_output(output: &str) -> std::vec::Vec<std::string::String> {
+        let mut fields = std::vec::Vec::new();
+        for line in output.lines() {
+            for field in line.split_whitespace() {
+                if !field.is_empty() {
+                    fields.push(field.to_string());
+                }
+            }
+        }
+        fields
+    }
+
+    pub fn tokenize_from_file(file_content: &str) -> std::vec::Vec<std::string::String> {
+        let mut tokens = std::vec::Vec::new();
+        for line in file_content.lines() {
+            let clean = line.split('#').next().unwrap_or("").trim();
+            if !clean.is_empty() {
+                tokens.push(clean.to_string());
+            }
+        }
+        tokens
+    }
+
+    pub fn execute_shell_loop(loop_type: ShellLoopType, variable: &str, limit_or_files: &[&str]) -> Result<std::vec::Vec<std::string::String>, ScriptError> {
+        let mut results = std::vec::Vec::new();
+        if limit_or_files.len() > 1000 {
+            return Err(ScriptError::LoopOverflow);
+        }
+
+        match loop_type {
+            ShellLoopType::For | ShellLoopType::While | ShellLoopType::DoWhile => {
+                for &val in limit_or_files {
+                    results.push(std::format!("{}={}", variable, val));
+                }
+            }
+            ShellLoopType::ForeachExtension => {
+                for &file in limit_or_files {
+                    if file.ends_with(".rs") || file.ends_with(".sh") {
+                        results.push(std::format!("processed_{}:{}", variable, file));
+                    }
+                }
+            }
+        }
+        Ok(results)
+    }
+
+    pub fn evaluate_conditional_block(block_code: &str, flag_condition: bool) -> Result<std::string::String, ScriptError> {
+        if !block_code.contains("if") || !block_code.contains("fi") {
+            return Err(ScriptError::SyntaxError);
+        }
+        if flag_condition {
+            Ok("Executing then block".to_string())
+        } else {
+            Ok("Executing else block".to_string())
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_shell_tokenizer_primitives() {
+        // String tokenization
+        let tokens = ShellScriptInterpreter::tokenize_string("param1:param2:param3", ':');
+        assert_eq!(tokens.len(), 3);
+        assert_eq!(tokens[0], "param1");
+
+        // Command output tokenization
+        let command_out = "Active   Size\neth0     1500\n";
+        let fields = ShellScriptInterpreter::tokenize_command_output(command_out);
+        assert_eq!(fields.len(), 4);
+        assert_eq!(fields[2], "eth0");
+
+        // File tokenization with comment stripping
+        let file_conf = "# Core Config\nnameserver 8.8.8.8 # Google DNS\n";
+        let file_tokens = ShellScriptInterpreter::tokenize_from_file(file_conf);
+        assert_eq!(file_tokens.len(), 1);
+        assert_eq!(file_tokens[0], "nameserver 8.8.8.8");
+    }
+
+    #[test]
+    fn test_shell_repetition_loops() {
+        // Count loop
+        let list = ["1", "2", "3"];
+        let count_res = ShellScriptInterpreter::execute_shell_loop(ShellLoopType::For, "idx", &list).unwrap();
+        assert_eq!(count_res.len(), 3);
+        assert_eq!(count_res[0], "idx=1");
+
+        // Extension provided foreach loop
+        let files = ["main.rs", "config.toml", "init.sh", "readme.md"];
+        let foreach_res = ShellScriptInterpreter::execute_shell_loop(ShellLoopType::ForeachExtension, "file", &files).unwrap();
+        assert_eq!(foreach_res.len(), 2);
+        assert_eq!(foreach_res[0], "processed_file:main.rs");
+        assert_eq!(foreach_res[1], "processed_file:init.sh");
+    }
+
+    #[test]
+    fn test_shell_conditional_syntax_errors() {
+        // Successful match
+        let res_then = ShellScriptInterpreter::evaluate_conditional_block("if [ x ]; then y; fi", true).unwrap();
+        assert_eq!(res_then, "Executing then block");
+
+        // Syntax error check
+        let res_err = ShellScriptInterpreter::evaluate_conditional_block("invalid conditional block", true);
+        assert_eq!(res_err, Err(ScriptError::SyntaxError));
+
+        // Loop overflow check
+        let giant_list = ["1"; 1005];
+        let res_overflow = ShellScriptInterpreter::execute_shell_loop(ShellLoopType::For, "idx", &giant_list);
+        assert_eq!(res_overflow, Err(ScriptError::LoopOverflow));
     }
 }
