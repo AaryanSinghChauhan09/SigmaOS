@@ -1,22 +1,36 @@
 // SigmaPkg - SigmaOS Package Manager
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
+pub mod arch_compat;
+pub mod aur;
+pub mod importer;
+pub mod linux_compat;
+pub mod pacman;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
 pub mod universal_adapter;
+pub mod universal_engine;
+pub mod universal_oop_system;
 pub mod verifier;
+pub mod zero_alloc_resolver;
+pub mod declarative_build;
 
+pub use importer::{
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
+};
+pub use linux_compat::{
+    DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
+    TranslatedMetadata, TranslatorError,
+};
+pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
-pub use universal_adapter::{
-    AptDebManifest, FlatpakManifest, PacmanPkgbuild, SnapcraftManifest, UniversalPackageAdapter,
-};
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
@@ -76,6 +90,24 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
+}
+
+impl Package {
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
+    }
 }
 
 /// Package dependency
