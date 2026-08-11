@@ -11,7 +11,7 @@ use core::mem;
 pub type TrainingID = usize;
 
 #[repr(usize)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum OptimizerType { SGD = 0, Adam = 1, RMSProp = 2 }
 
 #[repr(C)]

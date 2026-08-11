@@ -1,8 +1,5 @@
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
-extern crate alloc;
+#![no_std]
+#![no_main]
 
 /// OOP-based Secrets Management for SigmaOS
 /// Implements secrets management using OOP principles with traits and structs
@@ -347,10 +344,13 @@ impl Keyring for SimpleKeyring {
     }
 
     fn get_secret_mut(&mut self, id: SecretID) -> Option<&mut Box<dyn Secret>> {
-        for slot in self.secrets.iter_mut() {
-            if let Some(ref mut secret) = slot {
-                if secret.id() == id {
-                    return Some(secret);
+        for i in 0..self.secrets.len() {
+            unsafe {
+                let slot = &mut *self.secrets.data.add(i);
+                if let Some(ref mut secret) = *slot {
+                    if secret.id() == id {
+                        return Some(secret);
+                    }
                 }
             }
         }
@@ -398,3 +398,9 @@ mod tests {
         let secret = SimpleSecret::new(1, b"TestSecret", SecretType::APIKey, secret_cap);
         let id = keyring.add_secret(Box::new(secret)).unwrap();
         assert_eq!(id, 1);
+
+        let retrieved = keyring.get_secret(1).unwrap();
+        assert_eq!(retrieved.name(), b"TestSecret");
+    }
+}
+

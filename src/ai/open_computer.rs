@@ -2,7 +2,7 @@
 // Purpose-built, highly isolated, DOM/A11y-based agent microkernel environments.
 // Absorbs, merges, and enhances all features from Mintplex-Labs/anything-llm/open-computer.
 
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Open Computer update/connection state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,7 +27,7 @@ pub struct OpenComputerVirtualMachine {
     pub machine_id: String,
     pub state: MachineState,
     pub ram_mb: u32,
-    pub port_forwards: BTreeMap<u16, u16>, // maps host port to VM port
+    pub port_forwards: HashMap<u16, u16>, // maps host port to VM port
     pub disk_overlay: Qcow2Overlay,
 }
 
@@ -37,7 +37,7 @@ impl OpenComputerVirtualMachine {
             machine_id: id.to_string(),
             state: MachineState::Stopped,
             ram_mb: 512, // extremely light footprint
-            port_forwards: BTreeMap::new(),
+            port_forwards: HashMap::new(),
             disk_overlay: Qcow2Overlay {
                 base_image_path: base_path.to_string(),
                 overlay_path: overlay_path.to_string(),
@@ -71,13 +71,13 @@ pub struct A11yWidget {
 /// 2. Agent Accessibility Interface (A11y / DOM manipulation without pixels)
 /// Fully replaces slow and token-expensive screenshot coordinate guessing (saving 60%+ tokens).
 pub struct AgentA11yInterface {
-    pub widgets: BTreeMap<String, A11yWidget>,
+    pub widgets: HashMap<String, A11yWidget>,
 }
 
 impl AgentA11yInterface {
     pub fn new() -> Self {
         Self {
-            widgets: BTreeMap::new(),
+            widgets: HashMap::new(),
         }
     }
 
@@ -160,14 +160,14 @@ impl Default for HumanInTheLoopController {
 /// Exposes Short-term Context and Episodic/Long-term memories for inspectability and manual rices.
 pub struct AgentMemoryInspector {
     pub short_term_context: Vec<String>,
-    pub long_term_facts: BTreeMap<String, String>,
+    pub long_term_facts: HashMap<String, String>,
 }
 
 impl AgentMemoryInspector {
     pub fn new() -> Self {
         Self {
             short_term_context: Vec::new(),
-            long_term_facts: BTreeMap::new(),
+            long_term_facts: HashMap::new(),
         }
     }
 

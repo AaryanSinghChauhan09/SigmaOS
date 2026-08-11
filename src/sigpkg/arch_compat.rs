@@ -2,7 +2,7 @@
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
@@ -70,15 +70,15 @@ impl Default for AurRecipeCompiler {
 /// Rolling Release System Synchronizer
 #[derive(Debug, Clone)]
 pub struct RollingSyncManager {
-    pub installed_packages: BTreeMap<String, Version>,
-    pub remote_repository: BTreeMap<String, Version>,
+    pub installed_packages: HashMap<String, Version>,
+    pub remote_repository: HashMap<String, Version>,
 }
 
 impl RollingSyncManager {
     pub fn new() -> Self {
         Self {
-            installed_packages: BTreeMap::new(),
-            remote_repository: BTreeMap::new(),
+            installed_packages: HashMap::new(),
+            remote_repository: HashMap::new(),
         }
     }
 
@@ -92,7 +92,7 @@ impl RollingSyncManager {
 
     /// Checks for available package updates in the rolling release stream
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
-        let mut updates: Vec<(String, Version, Version)> = Vec::new();
+        let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
             if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
                 if remote_ver > installed_ver {
@@ -182,13 +182,13 @@ pub struct GentooEbuildPackage {
 
 /// Gentoo Portage-style source-build package compiler & optimizer engine
 pub struct PortageEbuildCompiler {
-    pub global_use_flags: BTreeMap<String, bool>,
+    pub global_use_flags: HashMap<String, bool>,
 }
 
 impl PortageEbuildCompiler {
     pub fn new() -> Self {
         Self {
-            global_use_flags: BTreeMap::new(),
+            global_use_flags: HashMap::new(),
         }
     }
 
