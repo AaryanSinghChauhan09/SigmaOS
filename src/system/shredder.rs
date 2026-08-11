@@ -22,6 +22,7 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::{self, Seek, SeekFrom, Write};
 use std::path::Path;
+use crate::klib::rng::SigmaRng;
 
 /// Shredding algorithm
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -119,12 +120,12 @@ impl ShreddingStrategy for RandomPassShredder {
             .map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         // Overwrite with random data
-        let mut _rng = rand::rng();
+        let mut rng = SigmaRng::new();
         let mut bytes_written = 0u64;
 
         while bytes_written < file_size {
             let write_size = std::cmp::min(8192, (file_size - bytes_written) as usize);
-            let random_buffer: Vec<u8> = (0..write_size).map(|_| rand::random()).collect();
+            let random_buffer: Vec<u8> = (0..write_size).map(|_| rng.next_u8()).collect();
             file.write_all(&random_buffer)
                 .map_err(|e| ShredderError::IoError(e.to_string()))?;
             bytes_written += write_size as u64;
@@ -178,11 +179,11 @@ impl ShreddingStrategy for Dod5220Shredder {
             .map_err(|e| ShredderError::IoError(e.to_string()))?;
 
         // Pass 3: Random
-        let mut _rng = rand::rng();
+        let mut rng = SigmaRng::new();
         let mut bytes_written = 0u64;
         while bytes_written < file_size {
             let write_size = std::cmp::min(8192, (file_size - bytes_written) as usize);
-            let random_buffer: Vec<u8> = (0..write_size).map(|_| rand::random()).collect();
+            let random_buffer: Vec<u8> = (0..write_size).map(|_| rng.next_u8()).collect();
             file.write_all(&random_buffer)
                 .map_err(|e| ShredderError::IoError(e.to_string()))?;
             bytes_written += write_size as u64;

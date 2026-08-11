@@ -5,6 +5,7 @@ use core::sync::atomic::{AtomicU64, Ordering};
 
 /// Simple RNG trait
 pub trait Rng {
+    fn next_u8(&self) -> u8;
     fn next_u32(&self) -> u32;
     fn next_u64(&self) -> u64;
     fn fill_bytes(&self, dest: &mut [u8]);
@@ -36,6 +37,10 @@ impl Default for SigmaRng {
 }
 
 impl Rng for SigmaRng {
+    fn next_u8(&self) -> u8 {
+        self.next_u32() as u8
+    }
+
     fn next_u32(&self) -> u32 {
         let state = self.state.fetch_add(0x9E3779B97F4A7C15, Ordering::SeqCst);
         // Simple xorshift-like operation
@@ -84,6 +89,10 @@ impl Default for OsRng {
 }
 
 impl Rng for OsRng {
+    fn next_u8(&self) -> u8 {
+        self.inner.next_u8()
+    }
+
     fn next_u32(&self) -> u32 {
         self.inner.next_u32()
     }
