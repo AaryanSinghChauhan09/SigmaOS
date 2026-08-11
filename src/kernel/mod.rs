@@ -8,8 +8,10 @@ pub mod virtual_cpu;
 pub mod process;
 pub mod syscall;
 pub mod tty;
+pub mod linux_bsd_innovations;
 
 pub use process::*;
 pub use syscall::*;
 pub use tty::*;
 pub use memory::*;
+pub use linux_bsd_innovations::*;

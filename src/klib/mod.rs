@@ -11,6 +11,7 @@ pub mod hashset;
 pub mod vec;
 pub mod error;
 pub mod uuid;
+pub mod random;
 pub mod hash;
 pub mod string;
 pub mod arc;
@@ -40,6 +41,7 @@ pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
 
 pub use vec::Vec;
 pub use uuid::Uuid;
+pub use random::{XorShiftRng, random_u64, random_u32, init_global_rng};
 
 #[cfg(not(target_os = "none"))]
 pub use alloc::collections::BTreeMap;
