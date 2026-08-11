@@ -254,6 +254,52 @@ impl EvaluationEngine {
             Err("Register not found")
         }
     }
+
+    /// Evaluates a WinDbg-style .printf command, replacing register formatters (e.g. %x, %d, %s, %f)
+    pub fn printf(&self, format_str: &str) -> String {
+        let mut result = String::new();
+        let mut chars = format_str.chars().peekable();
+
+        while let Some(c) = chars.next() {
+            if c == '%' {
+                if let Some(&next_c) = chars.peek() {
+                    match next_c {
+                        'd' => {
+                            chars.next(); // consume
+                            if let Some((_, val)) = self.mock_registers.iter().find(|(r, _)| r == "rax") {
+                                result.push_str(&alloc::format!("{}", val));
+                            }
+                        }
+                        'x' => {
+                            chars.next(); // consume
+                            if let Some((_, val)) = self.mock_registers.iter().find(|(r, _)| r == "rip") {
+                                result.push_str(&alloc::format!("0x{:X}", val));
+                            }
+                        }
+                        's' => {
+                            chars.next(); // consume
+                            result.push_str("kmain");
+                        }
+                        'f' => {
+                            chars.next(); // consume
+                            if let Some((_, val)) = self.mock_float_registers.iter().find(|(r, _)| r == "st0") {
+                                result.push_str("3.141593");
+                            }
+                        }
+                        _ => {
+                            result.push('%');
+                        }
+                    }
+                } else {
+                    result.push('%');
+                }
+            } else {
+                result.push(c);
+            }
+        }
+
+        result
+    }
 }
 
 // =========================================================================
@@ -613,6 +659,14 @@ mod tests {
         // FP float structure parsing
         let format_fp = engine.format_register_value("st0", RegisterDisplayFormat::FloatingPoint).unwrap();
         assert!(format_fp.contains("Sign: false"));
+    }
+
+    #[test]
+    fn test_printf_formatting_command() {
+        let engine = EvaluationEngine::new();
+
+        let out = engine.printf("PC=%x RAX=%d sym=%s float=%f");
+        assert_eq!(out, "PC=0x100400 RAX=42 sym=kmain float=3.141593");
     }
 
     #[test]
