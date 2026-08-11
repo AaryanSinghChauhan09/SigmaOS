@@ -12,7 +12,14 @@ pub mod device;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+<<<<<<< HEAD
 pub mod init;
+||||||| 803080c14
+pub mod graphics;
+=======
+pub mod graphics;
+pub mod ipc;
+>>>>>>> origin/jules-13833786484755203691-7fe7d659
 pub mod kernel;
 pub mod klib;
 pub mod ml;
@@ -88,6 +95,16 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+<<<<<<< HEAD
+||||||| 803080c14
+pub use graphics::paint::ColorRgba;
+=======
+pub use graphics::paint::ColorRgba;
+pub use ipc::{
+    unix_socket::{UnixSocketType, UnixSocketAddress, UnixSocketState, UnixSocket, UnixSocketManager},
+    signals::{SignalType, SignalDisposition, PendingSignal, ProcessSignalState, SignalDeliverySystem},
+};
+>>>>>>> origin/jules-13833786484755203691-7fe7d659
 pub use kernel::{
     ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
     Generation, GenerationManager, InterruptMechanism, IpcError, IpcManager, KernelGraph, KernelPersona, KernelPlugin,
