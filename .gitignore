@@ -12,3 +12,4 @@ build/
 **/build/
 test_enterprise
 wiki_repo/
+/sigma-test
