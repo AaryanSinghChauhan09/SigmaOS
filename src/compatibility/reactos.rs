@@ -1,13 +1,14 @@
+// SigmaOS Windows NT & ReactOS Competitor Parity Subsystem
+// Independent, zero-dependency implementations of NT kernel and Win32 GDI subsystems
+
 #![no_std]
-#![cfg_attr(not(test), no_main)]
 
-#[cfg(not(target_os = "none"))]
-extern crate std;
-
-use core::mem;
-/// ReactOS-inspired Windows NT Subsystem Compatibility Layer for SigmaOS
-/// Provides Portable Executable (PE) parsing, NT Registry Hive management,
-/// and NT Object Manager handle tables.
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::format;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[repr(usize)]
@@ -37,73 +38,59 @@ pub enum NtObjectType {
 }
 
 /// Entry representing an allocated NT handle
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NtHandleEntry {
     pub handle: NtHandle,
     pub object_type: NtObjectType,
-    pub name: [u8; 32],
+    pub name: String,
 }
 
 impl NtHandleEntry {
-    pub fn new(handle: NtHandle, object_type: NtObjectType, name: &[u8]) -> Self {
-        let mut name_array = [0u8; 32];
-        let len = name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
+    pub fn new(handle: NtHandle, object_type: NtObjectType, name: &str) -> Self {
         NtHandleEntry {
             handle,
             object_type,
-            name: name_array,
+            name: name.to_string(),
         }
     }
 }
 
 /// Windows NT Object Manager
 pub struct NtObjectManager {
-    pub handles: Vec<Option<NtHandleEntry>>,
+    pub handles: BTreeMap<NtHandle, NtHandleEntry>,
     pub next_handle: AtomicUsize,
 }
 
 impl NtObjectManager {
     pub fn new() -> Self {
         NtObjectManager {
-            handles: Vec::new(),
+            handles: BTreeMap::new(),
             next_handle: AtomicUsize::new(0x10), // Handle values typically start at 0x10
         }
     }
 
     /// Allocate and register a new NT handle (NtCreateFile/NtCreateProcess equivalent)
-    pub fn create_object(&mut self, object_type: NtObjectType, name: &[u8]) -> NtHandle {
+    pub fn create_object(&mut self, object_type: NtObjectType, name: &str) -> NtHandle {
         let handle = self.next_handle.fetch_add(4, Ordering::SeqCst); // Handles typically increment by 4
         let entry = NtHandleEntry::new(handle, object_type, name);
-        self.handles.push(Some(entry));
+        self.handles.insert(handle, entry);
         handle
     }
 
     /// Retrieve an object entry from a handle (NtQueryObject equivalent)
     pub fn lookup_object(&self, handle: NtHandle) -> Result<&NtHandleEntry, NtStatus> {
-        for i in 0..self.handles.len {
-            if let Some(ref entry) = self.handles[i] {
-                if entry.handle == handle {
-                    return Ok(entry);
-                }
-            }
-        }
-        Err(NtStatus::InvalidHandle)
+        self.handles.get(&handle).ok_or(NtStatus::InvalidHandle)
     }
 
     /// Close handle (NtClose equivalent)
     pub fn close_handle(&mut self, handle: NtHandle) -> Result<(), NtStatus> {
-        for i in 0..self.handles.len {
-            if let Some(ref entry) = self.handles[i] {
-                if entry.handle == handle {
-                    self.handles[i] = None;
-                    return Ok(());
-                }
-            }
-        }
-        Err(NtStatus::InvalidHandle)
+        self.handles.remove(&handle).map(|_| ()).ok_or(NtStatus::InvalidHandle)
+    }
+}
+
+impl Default for NtObjectManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -129,14 +116,14 @@ pub struct VirtualAllocation {
 }
 
 pub struct NtVirtualMemoryManager {
-    pub allocations: Vec<Option<VirtualAllocation>>,
+    pub allocations: BTreeMap<usize, VirtualAllocation>,
     pub next_free_address: usize,
 }
 
 impl NtVirtualMemoryManager {
     pub fn new() -> Self {
         NtVirtualMemoryManager {
-            allocations: Vec::new(),
+            allocations: BTreeMap::new(),
             next_free_address: 0x00400000, // Standard User space address start
         }
     }
@@ -151,35 +138,30 @@ impl NtVirtualMemoryManager {
             size,
             protection,
         };
-        self.allocations.push(Some(allocation));
+        self.allocations.insert(addr, allocation);
         Ok(addr)
     }
 
     /// NtFreeVirtualMemory equivalent
     pub fn free_virtual_memory(&mut self, base_address: usize) -> Result<(), NtStatus> {
-        for i in 0..self.allocations.len {
-            if let Some(ref alloc) = self.allocations[i] {
-                if alloc.base_address == base_address {
-                    self.allocations[i] = None;
-                    return Ok(());
-                }
-            }
-        }
-        Err(NtStatus::ObjectNameNotFound)
+        self.allocations.remove(&base_address).map(|_| ()).ok_or(NtStatus::ObjectNameNotFound)
     }
 
     /// NtProtectVirtualMemory equivalent
     pub fn protect_virtual_memory(&mut self, base_address: usize, new_protection: PageProtection) -> Result<PageProtection, NtStatus> {
-        for i in 0..self.allocations.len {
-            if let Some(ref mut alloc) = self.allocations[i] {
-                if alloc.base_address == base_address {
-                    let old_protection = alloc.protection;
-                    alloc.protection = new_protection;
-                    return Ok(old_protection);
-                }
-            }
+        if let Some(alloc) = self.allocations.get_mut(&base_address) {
+            let old_protection = alloc.protection;
+            alloc.protection = new_protection;
+            Ok(old_protection)
+        } else {
+            Err(NtStatus::ObjectNameNotFound)
         }
-        Err(NtStatus::ObjectNameNotFound)
+    }
+}
+
+impl Default for NtVirtualMemoryManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -209,17 +191,17 @@ pub struct NtSemaphoreObject {
 }
 
 pub struct NtSyncManager {
-    pub events: Vec<Option<NtEventObject>>,
-    pub mutants: Vec<Option<NtMutantObject>>,
-    pub semaphores: Vec<Option<NtSemaphoreObject>>,
+    pub events: BTreeMap<NtHandle, NtEventObject>,
+    pub mutants: BTreeMap<NtHandle, NtMutantObject>,
+    pub semaphores: BTreeMap<NtHandle, NtSemaphoreObject>,
 }
 
 impl NtSyncManager {
     pub fn new() -> Self {
         NtSyncManager {
-            events: Vec::new(),
-            mutants: Vec::new(),
-            semaphores: Vec::new(),
+            events: BTreeMap::new(),
+            mutants: BTreeMap::new(),
+            semaphores: BTreeMap::new(),
         }
     }
 
@@ -229,7 +211,7 @@ impl NtSyncManager {
             signaled: initial_state,
             manual_reset,
         };
-        self.events.push(Some(event));
+        self.events.insert(handle, event);
     }
 
     pub fn create_mutant(&mut self, handle: NtHandle, initial_owner: bool) {
@@ -238,7 +220,7 @@ impl NtSyncManager {
             count: if initial_owner { 1 } else { 0 },
             owner_thread_id: if initial_owner { Some(0x100) } else { None },
         };
-        self.mutants.push(Some(mutant));
+        self.mutants.insert(handle, mutant);
     }
 
     pub fn create_semaphore(&mut self, handle: NtHandle, initial_count: i32, limit: i32) {
@@ -247,7 +229,7 @@ impl NtSyncManager {
             count: initial_count,
             limit,
         };
-        self.semaphores.push(Some(sem));
+        self.semaphores.insert(handle, sem);
     }
 
     /// NtWaitForSingleObject equivalent
@@ -257,51 +239,45 @@ impl NtSyncManager {
         }
 
         // Search in events
-        for i in 0..self.events.len {
-            if let Some(ref mut ev) = self.events[i] {
-                if ev.handle == handle {
-                    if ev.signaled {
-                        if !ev.manual_reset {
-                            ev.signaled = false;
-                        }
-                        return NtStatus::Success;
-                    } else {
-                        return NtStatus::WaitTimeout;
-                    }
+        if let Some(ev) = self.events.get_mut(&handle) {
+            if ev.signaled {
+                if !ev.manual_reset {
+                    ev.signaled = false;
                 }
+                return NtStatus::Success;
+            } else {
+                return NtStatus::WaitTimeout;
             }
         }
 
         // Search in mutants
-        for i in 0..self.mutants.len {
-            if let Some(ref mut mut_obj) = self.mutants[i] {
-                if mut_obj.handle == handle {
-                    if mut_obj.count == 0 {
-                        mut_obj.count = 1;
-                        mut_obj.owner_thread_id = Some(0x100);
-                        return NtStatus::Success;
-                    } else {
-                        return NtStatus::WaitTimeout;
-                    }
-                }
+        if let Some(mut_obj) = self.mutants.get_mut(&handle) {
+            if mut_obj.count == 0 {
+                mut_obj.count = 1;
+                mut_obj.owner_thread_id = Some(0x100);
+                return NtStatus::Success;
+            } else {
+                return NtStatus::WaitTimeout;
             }
         }
 
         // Search in semaphores
-        for i in 0..self.semaphores.len {
-            if let Some(ref mut sem) = self.semaphores[i] {
-                if sem.handle == handle {
-                    if sem.count > 0 {
-                        sem.count -= 1;
-                        return NtStatus::Success;
-                    } else {
-                        return NtStatus::WaitTimeout;
-                    }
-                }
+        if let Some(sem) = self.semaphores.get_mut(&handle) {
+            if sem.count > 0 {
+                sem.count -= 1;
+                return NtStatus::Success;
+            } else {
+                return NtStatus::WaitTimeout;
             }
         }
 
         NtStatus::InvalidHandle
+    }
+}
+
+impl Default for NtSyncManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -393,7 +369,7 @@ pub struct Irp {
 }
 
 pub struct NtDriver {
-    pub driver_name: [u8; 32],
+    pub driver_name: String,
     pub dispatch_create: Option<fn(&mut Irp) -> NtStatus>,
     pub dispatch_close: Option<fn(&mut Irp) -> NtStatus>,
     pub dispatch_read: Option<fn(&mut Irp) -> NtStatus>,
@@ -402,15 +378,9 @@ pub struct NtDriver {
 }
 
 impl NtDriver {
-    pub fn new(name: &[u8]) -> Self {
-        let mut driver_name = [0u8; 32];
-        let len = name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), driver_name.as_mut_ptr(), len);
-        }
-
+    pub fn new(name: &str) -> Self {
         NtDriver {
-            driver_name,
+            driver_name: name.to_string(),
             dispatch_create: None,
             dispatch_close: None,
             dispatch_read: None,
@@ -486,7 +456,7 @@ impl Win32DllSubsystem {
     }
 
     /// kernel32.dll -> CreateFileA
-    pub fn win32_create_file_a(&mut self, filename: &[u8]) -> NtHandle {
+    pub fn win32_create_file_a(&mut self, filename: &str) -> NtHandle {
         self.object_manager.create_object(NtObjectType::File, filename)
     }
 
@@ -496,8 +466,14 @@ impl Win32DllSubsystem {
     }
 
     /// user32.dll -> CreateWindowExA
-    pub fn win32_create_window_ex_a(&mut self, window_name: &[u8]) -> NtHandle {
+    pub fn win32_create_window_ex_a(&mut self, window_name: &str) -> NtHandle {
         self.object_manager.create_object(NtObjectType::Event, window_name)
+    }
+}
+
+impl Default for Win32DllSubsystem {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -506,72 +482,53 @@ impl Win32DllSubsystem {
 // ==========================================
 
 pub struct RegistryValue {
-    pub name: [u8; 32],
-    pub data: [u8; 64],
-    pub data_len: usize,
+    pub name: String,
+    pub data: Vec<u8>,
 }
 
 impl RegistryValue {
-    pub fn new(name: &[u8], data: &[u8]) -> Self {
-        let mut name_array = [0u8; 32];
-        let mut data_array = [0u8; 64];
-        let name_len = name.len().min(31);
-        let data_len = data.len().min(63);
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(name.as_ptr(), name_array.as_mut_ptr(), name_len);
-            core::ptr::copy_nonoverlapping(data.as_ptr(), data_array.as_mut_ptr(), data_len);
-        }
-
+    pub fn new(name: &str, data: &[u8]) -> Self {
         RegistryValue {
-            name: name_array,
-            data: data_array,
-            data_len,
+            name: name.to_string(),
+            data: data.to_vec(),
         }
     }
 }
 
 /// Windows NT Registry Hive System (HKLM/HKCU configuration database)
 pub struct RegistryHive {
-    pub keys: Vec<Option<[u8; 32]>>,
-    pub values: Vec<Option<RegistryValue>>,
+    pub keys: Vec<String>,
+    pub values: BTreeMap<String, RegistryValue>,
 }
 
 impl RegistryHive {
     pub fn new() -> Self {
         RegistryHive {
             keys: Vec::new(),
-            values: Vec::new(),
+            values: BTreeMap::new(),
         }
     }
 
     /// Create registry key (NtCreateKey equivalent)
-    pub fn create_key(&mut self, key_name: &[u8]) {
-        let mut key_array = [0u8; 32];
-        let len = key_name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(key_name.as_ptr(), key_array.as_mut_ptr(), len);
-        }
-        self.keys.push(Some(key_array));
+    pub fn create_key(&mut self, key_name: &str) {
+        self.keys.push(key_name.to_string());
     }
 
     /// Set registry value (NtSetValueKey equivalent)
-    pub fn set_value(&mut self, name: &[u8], data: &[u8]) {
+    pub fn set_value(&mut self, name: &str, data: &[u8]) {
         let value = RegistryValue::new(name, data);
-        self.values.push(Some(value));
+        self.values.insert(name.to_string(), value);
     }
 
     /// Retrieve registry value (NtQueryValueKey equivalent)
-    pub fn query_value(&self, name: &[u8]) -> Result<&RegistryValue, NtStatus> {
-        for i in 0..self.values.len {
-            if let Some(ref val) = self.values[i] {
-                let val_name_len = val.name.iter().position(|&b| b == 0).unwrap_or(32);
-                if &val.name[..val_name_len] == name {
-                    return Ok(val);
-                }
-            }
-        }
-        Err(NtStatus::ObjectNameNotFound)
+    pub fn query_value(&self, name: &str) -> Result<&RegistryValue, NtStatus> {
+        self.values.get(&name.to_string()).ok_or(NtStatus::ObjectNameNotFound)
+    }
+}
+
+impl Default for RegistryHive {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -616,105 +573,203 @@ impl PortableExecutableLoader {
     }
 }
 
-// ==========================================
-// Custom Zero-Dependency Vector Collection
-// ==========================================
+// =========================================================================
+// 1. NT NATIVE SYSTEM CALLS DISPATCHER
+// =========================================================================
 
-pub struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
+pub struct NtNativeSystemCalls {
+    pub object_manager: NtObjectManager,
+    pub active_driver: Option<NtDriver>,
 }
 
-impl<T> Vec<T> {
+impl NtNativeSystemCalls {
     pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
+        Self {
+            object_manager: NtObjectManager::new(),
+            active_driver: None,
         }
     }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
+
+    pub fn register_driver_dispatch(&mut self, driver: NtDriver) {
+        self.active_driver = Some(driver);
     }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
+
+    /// NtOpenFile/NtCreateFile native syscall equivalent routing back to the active driver.
+    pub fn nt_open_file(&mut self, filename: &str) -> Result<NtHandle, NtStatus> {
+        if filename.is_empty() {
+            return Err(NtStatus::ObjectNameNotFound);
+        }
+        let handle = self.object_manager.create_object(NtObjectType::File, filename);
+        Ok(handle)
+    }
+
+    /// NtReadFile native syscall equivalent routing to our active IRP dispatcher.
+    pub fn nt_read_file(&self, handle: NtHandle, buffer: &mut [u8]) -> Result<usize, NtStatus> {
+        let _ = self.object_manager.lookup_object(handle)?;
+
+        let driver = self.active_driver.as_ref().ok_or(NtStatus::AccessDenied)?;
+
+        let mut irp = Irp {
+            io_status: IoStatusBlock {
+                status: NtStatus::AccessDenied,
+                information: 0,
+            },
+            current_stack_location: IrpStackLocation {
+                major_function: IrpMajorFunction::Read,
+                minor_function: 0,
+                flags: 0,
+                parameters_read_length: buffer.len(),
+                parameters_write_length: 0,
+                parameters_ioctl_code: 0,
+            },
+            user_buffer: buffer.as_mut_ptr(),
+            user_buffer_len: buffer.len(),
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+
+        let status = driver.dispatch_irp(&mut irp);
+        if status == NtStatus::Success {
+            Ok(irp.io_status.information)
+        } else {
+            Err(status)
+        }
+    }
+}
+
+impl Default for NtNativeSystemCalls {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 2. WIN32 GRAPHIC DEVICE INTERFACE (GDI) ENGINE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GdiObjectType {
+    Pen,
+    Brush,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct GdiObject {
+    pub object_type: GdiObjectType,
+    pub color_rgb: u32,
+}
+
+pub struct Win32GdiEngine {
+    pub gdi_resources: BTreeMap<NtHandle, GdiObject>,
+    pub graphics_buffer: Vec<u32>, // Simulated screen buffer representing active DC paint
+    pub width: usize,
+    pub height: usize,
+}
+
+impl Win32GdiEngine {
+    pub fn new(w: usize, h: usize) -> Self {
+        Self {
+            gdi_resources: BTreeMap::new(),
+            graphics_buffer: vec![0u32; w * h],
+            width: w,
+            height: h,
+        }
+    }
+
+    pub fn create_gdi_object(&mut self, handle: NtHandle, obj_type: GdiObjectType, color: u32) {
+        let obj = GdiObject {
+            object_type: obj_type,
+            color_rgb: color,
+        };
+        self.gdi_resources.insert(handle, obj);
+    }
+
+    /// Simulates painting/drawing a filled rectangle on the GDI device context.
+    pub fn gdi_rectangle(
+        &mut self,
+        x1: usize,
+        y1: usize,
+        x2: usize,
+        y2: usize,
+        brush_handle: NtHandle,
+    ) -> Result<(), &'static str> {
+        let brush = self
+            .gdi_resources
+            .get(&brush_handle)
+            .ok_or("GDI Error: Invalid GDI handle")?;
+
+        if brush.object_type != GdiObjectType::Brush {
+            return Err("GDI Error: GDI handle is not a valid Brush object");
+        }
+
+        // Paint rect pixels inside bounds
+        let end_x = x2.min(self.width);
+        let end_y = y2.min(self.height);
+
+        for y in y1..end_y {
+            for x in x1..end_x {
+                let idx = y * self.width + x;
+                self.graphics_buffer[idx] = brush.color_rgb;
             }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
+        }
+
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 3. STRUCTURED EXCEPTION HANDLING (SEH) DISPATCHER
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SehExceptionCode {
+    AccessViolation = 0xC0000005,
+    IntegerDivideByZero = 0xC0000094,
+    PageFault = 0xC0000006,
+}
+
+pub struct SehRegistrationFrame {
+    pub handler_rip: usize,
+    pub exception_code_mask: SehExceptionCode,
+}
+
+pub struct SehExceptionDispatcher {
+    pub nested_frames: Vec<SehRegistrationFrame>,
+}
+
+impl SehExceptionDispatcher {
+    pub fn new() -> Self {
+        Self {
+            nested_frames: Vec::new(),
+        }
+    }
+
+    pub fn register_seh_frame(&mut self, handler: usize, code: SehExceptionCode) {
+        self.nested_frames.push(SehRegistrationFrame {
+            handler_rip: handler,
+            exception_code_mask: code,
+        });
+    }
+
+    /// Simulates unwinding exception frames back to the registered SEH handler.
+    pub fn raise_and_unwind_exception(&self, code: SehExceptionCode) -> Result<usize, &'static str> {
+        // Unwind descending (last registered frame has highest priority)
+        for frame in self.nested_frames.iter().rev() {
+            if frame.exception_code_mask == code {
+                return Ok(frame.handler_rip); // Returns target exception handler address
             }
-            self.data = new_data;
-            self.capacity = new_capacity;
         }
+        Err("SEH Error: Unhandled exception! Thread terminated.")
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
+impl Default for SehExceptionDispatcher {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut T {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
-        }
-    }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    extern crate std;
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+// =========================================================================
+// UNIT TESTS MODULE
+// =========================================================================
 
 #[cfg(test)]
 mod tests {
@@ -723,42 +778,31 @@ mod tests {
     #[test]
     fn test_nt_object_manager_handles() {
         let mut manager = NtObjectManager::new();
-        let h1 = manager.create_object(NtObjectType::File, b"DeviceKeyboard");
-        let h2 = manager.create_object(NtObjectType::Process, b"explorer.exe");
+        let h1 = manager.create_object(NtObjectType::File, "DeviceKeyboard");
+        let h2 = manager.create_object(NtObjectType::Process, "explorer.exe");
 
         assert_eq!(h1, 0x10);
         assert_eq!(h2, 0x14);
 
         let entry = manager.lookup_object(h1).unwrap();
         assert_eq!(entry.object_type, NtObjectType::File);
-
-        let mut entry_name = [0u8; 14];
-        for i in 0..14 {
-            entry_name[i] = entry.name[i];
-        }
-        assert_eq!(&entry_name, b"DeviceKeyboard");
+        assert_eq!(entry.name, "DeviceKeyboard");
 
         assert!(manager.close_handle(h1).is_ok());
         assert_eq!(
-            manager.lookup_object(h1).unwrap_err() as usize,
-            NtStatus::InvalidHandle as usize
+            manager.lookup_object(h1).unwrap_err(),
+            NtStatus::InvalidHandle
         );
     }
 
     #[test]
     fn test_registry_hive_queries() {
         let mut hive = RegistryHive::new();
-        hive.create_key(b"SOFTWARE\\SigmaOS");
-        hive.set_value(b"Theme", b"SovereignDark");
+        hive.create_key("SOFTWARE\\SigmaOS");
+        hive.set_value("Theme", b"SovereignDark");
 
-        let val = hive.query_value(b"Theme").unwrap();
-        assert_eq!(val.data_len, 13);
-
-        let mut val_data = [0u8; 13];
-        for i in 0..13 {
-            val_data[i] = val.data[i];
-        }
-        assert_eq!(&val_data, b"SovereignDark");
+        let val = hive.query_value("Theme").unwrap();
+        assert_eq!(val.data, b"SovereignDark".to_vec());
     }
 
     #[test]
@@ -783,8 +827,8 @@ mod tests {
         let mut invalid_pe = pe_binary;
         invalid_pe[0] = b'X';
         assert_eq!(
-            PortableExecutableLoader::validate_pe_image(&invalid_pe).unwrap_err() as usize,
-            NtStatus::InvalidImageFormat as usize
+            PortableExecutableLoader::validate_pe_image(&invalid_pe).unwrap_err(),
+            NtStatus::InvalidImageFormat
         );
     }
 
@@ -817,7 +861,7 @@ mod tests {
 
     #[test]
     fn test_nt_irp_subsystem() {
-        let mut driver = NtDriver::new(b"SigmaDiskDriver");
+        let mut driver = NtDriver::new("SigmaDiskDriver");
         fn mock_read_irp(irp: &mut Irp) -> NtStatus {
             irp.io_status.status = NtStatus::Success;
             irp.io_status.information = 512;
@@ -851,12 +895,73 @@ mod tests {
     #[test]
     fn test_win32_dll_subsystem() {
         let mut win32 = Win32DllSubsystem::new();
-        let h_file = win32.win32_create_file_a(b"C:\\sigma_config.ini");
+        let h_file = win32.win32_create_file_a("C:\\sigma_config.ini");
         assert_eq!(h_file, 0x10);
 
         let addr = win32.win32_virtual_alloc(4096, PageProtection::ReadWrite).unwrap();
         assert_eq!(addr, 0x00400000);
 
         assert!(win32.win32_close_handle(h_file).is_ok());
+    }
+
+    #[test]
+    fn test_nt_native_system_calls() {
+        let mut ntsys = NtNativeSystemCalls::new();
+        let mut driver = NtDriver::new("VirtualMemoryDisk");
+
+        fn mock_read(irp: &mut Irp) -> NtStatus {
+            irp.io_status.status = NtStatus::Success;
+            irp.io_status.information = 24;
+            // Write mock values to user buffer
+            unsafe {
+                let ptr = irp.user_buffer;
+                if !ptr.is_null() {
+                    for i in 0..24 {
+                        *ptr.add(i) = (i + 10) as u8;
+                    }
+                }
+            }
+            NtStatus::Success
+        }
+        driver.dispatch_read = Some(mock_read);
+        ntsys.register_driver_dispatch(driver);
+
+        let handle = ntsys.nt_open_file("C:\\boot_config.ini").unwrap();
+        assert_eq!(handle, 0x10);
+
+        let mut read_buf = [0u8; 24];
+        let bytes_transferred = ntsys.nt_read_file(handle, &mut read_buf).unwrap();
+        assert_eq!(bytes_transferred, 24);
+        assert_eq!(read_buf[0], 10);
+        assert_eq!(read_buf[23], 33);
+    }
+
+    #[test]
+    fn test_win32_gdi_device_context_drawing() {
+        let mut gdi = Win32GdiEngine::new(640, 480);
+        let h_brush = 0x50;
+        gdi.create_gdi_object(h_brush, GdiObjectType::Brush, 0xFF00FF); // Magenta
+
+        assert!(gdi.gdi_rectangle(10, 20, 50, 40, h_brush).is_ok());
+        // Verify index paint
+        let idx = 25 * 640 + 30; // Row 25, Col 30 (inside rect bounds)
+        assert_eq!(gdi.graphics_buffer[idx], 0xFF00FF);
+
+        // Fail for invalid brush object
+        assert!(gdi.gdi_rectangle(10, 20, 50, 40, 0x999).is_err());
+    }
+
+    #[test]
+    fn test_seh_exception_unwinding() {
+        let mut seh = SehExceptionDispatcher::new();
+        seh.register_seh_frame(0x1000, SehExceptionCode::IntegerDivideByZero);
+        seh.register_seh_frame(0x2000, SehExceptionCode::AccessViolation);
+
+        // Raise Access Violation exception (highest priority / last nested frame wins)
+        let rip = seh.raise_and_unwind_exception(SehExceptionCode::AccessViolation).unwrap();
+        assert_eq!(rip, 0x2000);
+
+        // Raise non-registered exception
+        assert!(seh.raise_and_unwind_exception(SehExceptionCode::PageFault).is_err());
     }
 }
