@@ -5,6 +5,9 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::format;
+use alloc::collections::BTreeMap;
 use core::ptr::NonNull;
 
 pub const PAGE_SIZE: usize = 4096;
@@ -270,6 +273,177 @@ impl MemoryDescriptorList {
     }
 }
 
+// =========================================================================
+// Linux/BSD-Inspired Demand Paging and Copy-On-Write (COW) Subsystem
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DemandPageType {
+    /// Zero-filled anonymous memory (malloc allocations)
+    Anonymous,
+    /// Backed by a virtual file (e.g. shared libraries, executable segments)
+    FileBacked,
+    /// Memory page swapped out to disk
+    SwapBacked,
+}
+
+#[derive(Debug, Clone)]
+pub struct DemandPageZone {
+    pub start_address: u64,
+    pub size_bytes: usize,
+    pub zone_type: DemandPageType,
+    pub backing_file_id: Option<u64>,
+    pub backing_file_offset: usize,
+}
+
+impl DemandPageZone {
+    pub fn new(start: u64, size: usize, zone_type: DemandPageType) -> Self {
+        Self {
+            start_address: start,
+            size_bytes: size,
+            zone_type,
+            backing_file_id: None,
+            backing_file_offset: 0,
+        }
+    }
+
+    pub fn contains_address(&self, addr: u64) -> bool {
+        addr >= self.start_address && addr < self.start_address + self.size_bytes as u64
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageFaultReason {
+    /// Page is not mapped in the page table (demand paging)
+    PageNotPresent,
+    /// Access violation (Write to read-only Copy-On-Write page)
+    WriteOnCopyOnWrite,
+    /// Access control violation (unprivileged access)
+    ProtectionViolation,
+}
+
+pub struct DemandPagingSubsystem {
+    pub zones: Vec<DemandPageZone>,
+    pub cow_shared_frames: BTreeMap<u64, usize>, // physical_frame_addr -> ref_count
+}
+
+impl DemandPagingSubsystem {
+    pub fn new() -> Self {
+        Self {
+            zones: Vec::new(),
+            cow_shared_frames: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_zone(&mut self, zone: DemandPageZone) {
+        self.zones.push(zone);
+    }
+
+    /// Simulates handling a hardware page fault exception (x86_64 ISR Page Fault handler)
+    pub unsafe fn handle_page_fault(
+        &mut self,
+        faulting_address: u64,
+        reason: PageFaultReason,
+        vmm: &mut VirtualMemoryManagerV2,
+        allocator: &mut dyn FnMut() -> Option<NonNull<PageTable>>,
+        phys_page_allocator: &mut dyn FnMut() -> Option<u64>,
+    ) -> Result<String, &'static str> {
+        let aligned_addr = faulting_address & !0xFFF;
+
+        // Verify if the faulting address lies in a registered VM zone
+        let zone = self.zones.iter().find(|z| z.contains_address(faulting_address))
+            .ok_or("Segmentation Fault: Address out of bounds of any memory zone")?;
+
+        match reason {
+            PageFaultReason::PageNotPresent => {
+                // Allocate a fresh physical frame (demand paging lazy allocation)
+                let phys_frame = phys_page_allocator().ok_or("Out of physical memory frames")?;
+
+                match zone.zone_type {
+                    DemandPageType::Anonymous => {
+                        // Map zero-filled page
+                        let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
+                        vmm.map_page(aligned_addr, phys_frame, flags, allocator)?;
+                        Ok(format!("Lazy Paging: Zero-filled page allocated at physical 0x{:X}", phys_frame))
+                    }
+                    DemandPageType::FileBacked => {
+                        // Map file contents on-demand (mmap parity)
+                        let file_offset = zone.backing_file_offset + (aligned_addr - zone.start_address) as usize;
+                        let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
+                        vmm.map_page(aligned_addr, phys_frame, flags, allocator)?;
+                        Ok(format!("File Paging: Loaded file_id={} offset={} into physical 0x{:X}",
+                            zone.backing_file_id.unwrap_or(0), file_offset, phys_frame))
+                    }
+                    DemandPageType::SwapBacked => {
+                        // Load page back from virtual swap partitions
+                        let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
+                        vmm.map_page(aligned_addr, phys_frame, flags, allocator)?;
+                        Ok(format!("Swap Paging: Paged-in page from virtual swap device into physical 0x{:X}", phys_frame))
+                    }
+                }
+            }
+            PageFaultReason::WriteOnCopyOnWrite => {
+                // Retrieve the current physical frame mapped to the virtual address
+                let old_phys = vmm.translate(aligned_addr).ok_or("Page missing from page tables during COW fault")?;
+                let old_frame_aligned = old_phys & !0xFFF;
+
+                let refs = self.cow_shared_frames.get(&old_frame_aligned).copied().unwrap_or(1);
+                if refs > 1 {
+                    // Duplicate frame dynamically (copying original contents)
+                    let new_phys_frame = phys_page_allocator().ok_or("Out of physical memory for COW frame duplication")?;
+
+                    // Decrement old shared frame reference count
+                    self.cow_shared_frames.insert(old_frame_aligned, refs - 1);
+
+                    // Re-map virtual page to the new duplicated physical frame with WRITABLE flags
+                    // First unmap / set unused to avoid Page Already Mapped error
+                    let pml4 = vmm.pml4_table.as_mut();
+                    let pml4_index = ((aligned_addr >> 39) & 0x1FF) as usize;
+                    let pdpt_index = ((aligned_addr >> 30) & 0x1FF) as usize;
+                    let pd_index = ((aligned_addr >> 21) & 0x1FF) as usize;
+                    let pt_index = ((aligned_addr >> 12) & 0x1FF) as usize;
+
+                    let pdpt_addr = pml4.entries[pml4_index].physical_frame().unwrap();
+                    let pdpt = &mut *(pdpt_addr as *mut PageTable);
+                    let pd_addr = pdpt.entries[pdpt_index].physical_frame().unwrap();
+                    let pd = &mut *(pd_addr as *mut PageTable);
+                    let pt_addr = pd.entries[pd_index].physical_frame().unwrap();
+                    let pt = &mut *(pt_addr as *mut PageTable);
+
+                    pt.entries[pt_index].set_unused();
+
+                    let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
+                    vmm.map_page(aligned_addr, new_phys_frame, flags, allocator)?;
+
+                    Ok(format!("COW Fault: Duplicated shared physical frame 0x{:X} to 0x{:X}", old_frame_aligned, new_phys_frame))
+                } else {
+                    // Only one reference remains - elevate permission flags in-place
+                    let pml4 = vmm.pml4_table.as_mut();
+                    let pml4_index = ((aligned_addr >> 39) & 0x1FF) as usize;
+                    let pdpt_index = ((aligned_addr >> 30) & 0x1FF) as usize;
+                    let pd_index = ((aligned_addr >> 21) & 0x1FF) as usize;
+                    let pt_index = ((aligned_addr >> 12) & 0x1FF) as usize;
+
+                    let pdpt_addr = pml4.entries[pml4_index].physical_frame().unwrap();
+                    let pdpt = &mut *(pdpt_addr as *mut PageTable);
+                    let pd_addr = pdpt.entries[pdpt_index].physical_frame().unwrap();
+                    let pd = &mut *(pd_addr as *mut PageTable);
+                    let pt_addr = pd.entries[pd_index].physical_frame().unwrap();
+                    let pt = &mut *(pt_addr as *mut PageTable);
+
+                    let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
+                    pt.entries[pt_index].set_frame(old_frame_aligned, flags);
+
+                    Ok(format!("COW Fault: Elevated exclusive frame 0x{:X} to writable in-place", old_frame_aligned))
+                }
+            }
+            PageFaultReason::ProtectionViolation => {
+                Err("Access Denied: Protection Violation")
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -392,5 +566,145 @@ mod tests {
         assert!(!mdl.is_mapped);
         mdl.unlock();
         assert!(!mdl.is_locked);
+    }
+
+    #[test]
+    fn test_demand_paging_lazy_and_file_allocation() {
+        let mut pml4 = PageTable::new();
+        let mut pdpt = PageTable::new();
+        let mut pd = PageTable::new();
+        let mut pt = PageTable::new();
+
+        let pml4_ptr = &mut pml4 as *mut PageTable;
+        let pdpt_ptr = NonNull::new(&mut pdpt as *mut PageTable);
+        let pd_ptr = NonNull::new(&mut pd as *mut PageTable);
+        let pt_ptr = NonNull::new(&mut pt as *mut PageTable);
+
+        let mut allocator_calls = 0;
+        let mut allocator = || {
+            allocator_calls += 1;
+            match allocator_calls {
+                1 => Some(pdpt_ptr.unwrap()),
+                2 => Some(pd_ptr.unwrap()),
+                3 => Some(pt_ptr.unwrap()),
+                _ => None,
+            }
+        };
+
+        let mut vmm = unsafe { VirtualMemoryManagerV2::new(pml4_ptr as u64) };
+        let mut dp_subsystem = DemandPagingSubsystem::new();
+
+        // Register two demand paging zones
+        let anon_zone = DemandPageZone::new(0x0000_1000_0000_0000, 0x10000, DemandPageType::Anonymous);
+        let mut file_zone = DemandPageZone::new(0x0000_1000_0008_0000, 0x10000, DemandPageType::FileBacked);
+        file_zone.backing_file_id = Some(42);
+        file_zone.backing_file_offset = 8192;
+
+        dp_subsystem.register_zone(anon_zone);
+        dp_subsystem.register_zone(file_zone);
+
+        let mut phys_allocator_calls = 0;
+        let mut phys_allocator = || {
+            phys_allocator_calls += 1;
+            Some(0x5000_0000 + (phys_allocator_calls * 4096) as u64)
+        };
+
+        // 1. Handle PageNotPresent on Anonymous Zone
+        let res_anon = unsafe {
+            dp_subsystem.handle_page_fault(
+                0x0000_1000_0000_4050,
+                PageFaultReason::PageNotPresent,
+                &mut vmm,
+                &mut allocator,
+                &mut phys_allocator,
+            ).unwrap()
+        };
+        assert!(res_anon.contains("Lazy Paging"));
+        assert!(res_anon.contains("0x50001000"));
+
+        // Translate should now successfully yield mapped physical address
+        let resolved = unsafe { vmm.translate(0x0000_1000_0000_4050).unwrap() };
+        assert_eq!(resolved, 0x5000_1050);
+
+        // 2. Handle PageNotPresent on File-Backed Zone
+        let res_file = unsafe {
+            dp_subsystem.handle_page_fault(
+                0x0000_1000_0008_1010,
+                PageFaultReason::PageNotPresent,
+                &mut vmm,
+                &mut allocator,
+                &mut phys_allocator,
+            ).unwrap()
+        };
+        assert!(res_file.contains("File Paging"));
+        assert!(res_file.contains("file_id=42"));
+        assert!(res_file.contains("offset=12288")); // 8192 + 0x1000 = 12288
+    }
+
+    #[test]
+    fn test_demand_paging_copy_on_write() {
+        let mut pml4 = PageTable::new();
+        let mut pdpt = PageTable::new();
+        let mut pd = PageTable::new();
+        let mut pt = PageTable::new();
+
+        let pml4_ptr = &mut pml4 as *mut PageTable;
+        let pdpt_ptr = NonNull::new(&mut pdpt as *mut PageTable);
+        let pd_ptr = NonNull::new(&mut pd as *mut PageTable);
+        let pt_ptr = NonNull::new(&mut pt as *mut PageTable);
+
+        let mut allocator_calls = 0;
+        let mut allocator = || {
+            allocator_calls += 1;
+            match allocator_calls {
+                1 => Some(pdpt_ptr.unwrap()),
+                2 => Some(pd_ptr.unwrap()),
+                3 => Some(pt_ptr.unwrap()),
+                _ => None,
+            }
+        };
+
+        let mut vmm = unsafe { VirtualMemoryManagerV2::new(pml4_ptr as u64) };
+        let mut dp_subsystem = DemandPagingSubsystem::new();
+
+        let cow_zone = DemandPageZone::new(0x0000_3000_0000_0000, 0x1000, DemandPageType::Anonymous);
+        dp_subsystem.register_zone(cow_zone);
+
+        let shared_phys_frame = 0x6000_0000;
+        // Register shared physical frame with 2 active process references
+        dp_subsystem.cow_shared_frames.insert(shared_phys_frame, 2);
+
+        // Map initial read-only page to the shared physical frame
+        let r_flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::USER_ACCESSIBLE);
+        unsafe {
+            vmm.map_page(0x0000_3000_0000_0000, shared_phys_frame, r_flags, &mut allocator).unwrap();
+        }
+
+        let mut phys_allocator_calls = 0;
+        let mut phys_allocator = || {
+            phys_allocator_calls += 1;
+            Some(0x7000_0000 + (phys_allocator_calls * 4096) as u64)
+        };
+
+        // Trigger WriteOnCopyOnWrite Page Fault
+        let res_cow = unsafe {
+            dp_subsystem.handle_page_fault(
+                0x0000_3000_0000_0200,
+                PageFaultReason::WriteOnCopyOnWrite,
+                &mut vmm,
+                &mut allocator,
+                &mut phys_allocator,
+            ).unwrap()
+        };
+
+        assert!(res_cow.contains("COW Fault"));
+        assert!(res_cow.contains("Duplicated shared physical frame 0x60000000 to 0x70001000"));
+
+        // Verify the virtual page is now mapped to the duplicated writable page
+        let resolved = unsafe { vmm.translate(0x0000_3000_0000_0200).unwrap() };
+        assert_eq!(resolved, 0x7000_1200);
+
+        // Reference count of the old shared physical frame should be decremented to 1
+        assert_eq!(dp_subsystem.cow_shared_frames.get(&shared_phys_frame), Some(&1));
     }
 }
