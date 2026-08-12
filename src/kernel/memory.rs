@@ -3,7 +3,8 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+use std::ptr::NonNull;
 
 /// Memory page size (4KB)
 pub const PAGE_SIZE: usize = 4096;
@@ -14,8 +15,6 @@ pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
 }
-
-use core::ptr::NonNull;
 
 pub struct Zone {
     pub present_pages: u64,
