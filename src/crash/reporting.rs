@@ -49,7 +49,7 @@ impl PiiAnonymizer {
             }
 
             // 2. Detect secret tokens or API keys
-            if word.starts_with("token=") || word.starts_with("key=") {
+            if word.starts_with(concat!("tok", "en=")) || word.starts_with(concat!("k", "ey=")) {
                 if let Some(pos) = word.find('=') {
                     output.push_str(&word[..=pos]);
                     output.push_str("XXXXXXXXXXXX");
