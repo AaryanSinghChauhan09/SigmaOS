@@ -1,11 +1,11 @@
 #![no_std]
-#![no_main]
 
-/// OOP-based Virtual Memory Manager for SigmaOS
+/// OOP-based Virtual Memory Manager with Canonical Address Verification for SigmaOS
 /// Implements virtual memory management using OOP principles with traits and structs
 /// No dependency on external memory management libraries
+/// Inspired by x86_64, ARM64, Linux, BSD, and Windows canonical memory layouts
 
-use core::ptr::{self, NonNull};
+use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
@@ -17,6 +17,52 @@ pub type VirtualAddress = usize;
 
 /// Physical address
 pub type PhysicalAddress = usize;
+
+// =========================================================================
+// x86_64 & ARM64 Inspired Canonical Address Verification Subsystem
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CanonicalHalf {
+    Lower, // User space (bits 47-63 are 0)
+    Upper, // Kernel space (bits 47-63 are 1)
+}
+
+/// Verification: under a 48-bit address space, bits 47 to 63 must be copies of bit 47
+pub fn is_canonical_address(addr: VirtualAddress) -> bool {
+    let sign_bit = (addr >> 47) & 1;
+    let upper_bits = addr >> 47;
+    if sign_bit == 0 {
+        upper_bits == 0
+    } else {
+        // Shifting a 64-bit value right by 47 leaves 17 bits (64 - 47 = 17)
+        // If bit 47 was 1, those 17 bits must all be 1s (0x1FFFF)
+        upper_bits == 0x1FFFF
+    }
+}
+
+/// Retrieve the canonical half of a virtual address (Lower vs Upper space)
+pub fn get_canonical_half(addr: VirtualAddress) -> Option<CanonicalHalf> {
+    if !is_canonical_address(addr) {
+        return None;
+    }
+    let sign_bit = (addr >> 47) & 1;
+    if sign_bit == 0 {
+        Some(CanonicalHalf::Lower)
+    } else {
+        Some(CanonicalHalf::Upper)
+    }
+}
+
+/// Sign-extend bit 47 to convert any address into its canonical representation
+pub fn canonicalize_address(addr: VirtualAddress) -> VirtualAddress {
+    let sign_bit = (addr >> 47) & 1;
+    if sign_bit == 1 {
+        addr | 0xFFFF_8000_0000_0000
+    } else {
+        addr & 0x0000_7FFF_FFFF_FFFF
+    }
+}
 
 /// Page table entry flags
 #[repr(C)]
@@ -62,6 +108,7 @@ impl PageTableEntryFlags {
 
 /// Page table entry
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PageTableEntry {
     pub physical_address: PhysicalAddress,
     pub flags: PageTableEntryFlags,
@@ -272,7 +319,7 @@ impl MemoryRegion {
 
 /// Memory error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MemoryError {
     Success = 0,
     OutOfMemory = 1,
@@ -370,6 +417,11 @@ impl SimpleVirtualMemoryManager {
     }
 
     unsafe fn allocate_region(&mut self, start: VirtualAddress, size: usize, permissions: MemoryPermissions) -> Result<NonNull<MemoryRegion>, MemoryError> {
+        // Enforce canonical address validation
+        if !is_canonical_address(start) || !is_canonical_address(start + size) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         let region = MemoryRegion::new(start, start + size, permissions, MemoryRegionCapability::full());
         let region_ptr = alloc(mem::size_of::<MemoryRegion>()) as *mut MemoryRegion;
 
@@ -384,8 +436,9 @@ impl SimpleVirtualMemoryManager {
     }
 
     unsafe fn find_region(&self, addr: VirtualAddress) -> Option<&MemoryRegion> {
-        for region_option in &self.memory_regions {
-            if let Some(region_ptr) = *region_option {
+        for i in 0..self.memory_regions.len {
+            let slot = &*self.memory_regions.data.add(i);
+            if let Some(region_ptr) = *slot {
                 let region = &*region_ptr.as_ptr();
                 if region.contains(addr) {
                     return Some(region);
@@ -417,10 +470,15 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             return Err(MemoryError::PermissionDenied);
         }
 
+        if !is_canonical_address(addr) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         unsafe {
             let mut index = None;
-            for (i, region_option) in self.memory_regions.iter().enumerate() {
-                if let Some(region_ptr) = *region_option {
+            for i in 0..self.memory_regions.len {
+                let slot = &*self.memory_regions.data.add(i);
+                if let Some(region_ptr) = *slot {
                     let region = &*region_ptr.as_ptr();
                     if region.start == addr {
                         index = Some(i);
@@ -430,11 +488,12 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             }
 
             if let Some(i) = index {
-                if let Some(region_ptr) = self.memory_regions[i] {
+                let slot = &mut *self.memory_regions.data.add(i);
+                if let Some(region_ptr) = *slot {
                     core::ptr::drop_in_place(region_ptr.as_ptr());
                     free(region_ptr.as_ptr() as *mut u8);
                 }
-                self.memory_regions[i] = None;
+                *slot = None;
                 Ok(())
             } else {
                 Err(MemoryError::InvalidAddress)
@@ -445,6 +504,10 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
     fn map_physical(&mut self, virtual_addr: VirtualAddress, physical_addr: PhysicalAddress, size: usize, permissions: MemoryPermissions) -> Result<(), MemoryError> {
         if !self.capability.can_map_physical {
             return Err(MemoryError::PermissionDenied);
+        }
+
+        if !is_canonical_address(virtual_addr) || !is_canonical_address(virtual_addr + size) {
+            return Err(MemoryError::InvalidAddress);
         }
 
         unsafe {
@@ -465,7 +528,7 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             for offset in (0..aligned_size).step_by(PAGE_SIZE) {
                 let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
                 
-                while page_table_index >= self.page_tables.len() {
+                while page_table_index >= self.page_tables.len {
                     let page_table = PageTable::new(PageTableCapability::full());
                     let pt_ptr = alloc(mem::size_of::<PageTable>()) as *mut PageTable;
                     if pt_ptr.is_null() {
@@ -475,7 +538,8 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                     self.page_tables.push(Some(NonNull::new_unchecked(pt_ptr)));
                 }
 
-                if let Some(pt_ptr) = self.page_tables[page_table_index] {
+                let slot = &mut *self.page_tables.data.add(page_table_index);
+                if let Some(pt_ptr) = *slot {
                     let page_table = &mut *pt_ptr.as_ptr();
                     page_table.map_page(virtual_addr + offset, physical_addr + offset, flags)?;
                 }
@@ -490,6 +554,10 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             return Err(MemoryError::PermissionDenied);
         }
 
+        if !is_canonical_address(virtual_addr) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         unsafe {
             if let Some(region) = self.find_region(virtual_addr) {
                 let size = region.size();
@@ -497,8 +565,9 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                 for offset in (0..size).step_by(PAGE_SIZE) {
                     let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
                     
-                    if page_table_index < self.page_tables.len() {
-                        if let Some(pt_ptr) = self.page_tables[page_table_index] {
+                    if page_table_index < self.page_tables.len {
+                        let slot = &mut *self.page_tables.data.add(page_table_index);
+                        if let Some(pt_ptr) = *slot {
                             let page_table = &mut *pt_ptr.as_ptr();
                             page_table.unmap_page(virtual_addr + offset)?;
                         }
@@ -513,6 +582,10 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
     }
 
     fn protect(&mut self, virtual_addr: VirtualAddress, permissions: MemoryPermissions) -> Result<(), MemoryError> {
+        if !is_canonical_address(virtual_addr) {
+            return Err(MemoryError::InvalidAddress);
+        }
+
         unsafe {
             if let Some(region) = self.find_region(virtual_addr) {
                 region.change_permissions(permissions)?;
@@ -532,8 +605,9 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
                 for offset in (0..size).step_by(PAGE_SIZE) {
                     let page_table_index = (virtual_addr + offset) / (PAGE_SIZE * 512);
                     
-                    if page_table_index < self.page_tables.len() {
-                        if let Some(pt_ptr) = self.page_tables[page_table_index] {
+                    if page_table_index < self.page_tables.len {
+                        let slot = &mut *self.page_tables.data.add(page_table_index);
+                        if let Some(pt_ptr) = *slot {
                             let page_table = &mut *pt_ptr.as_ptr();
                             page_table.protect_page(virtual_addr + offset, flags)?;
                         }
@@ -548,6 +622,10 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
     }
 
     fn info(&self, virtual_addr: VirtualAddress) -> Option<MemoryInfo> {
+        if !is_canonical_address(virtual_addr) {
+            return None;
+        }
+
         unsafe {
             if let Some(region) = self.find_region(virtual_addr) {
                 let mut info = MemoryInfo::new(virtual_addr);
@@ -618,4 +696,30 @@ impl<T> Vec<T> {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_canonical_address_verifications() {
+        // Lower Canonical half (User space)
+        assert!(is_canonical_address(0x0000_0000_1000_0000));
+        assert_eq!(get_canonical_half(0x0000_0000_1000_0000), Some(CanonicalHalf::Lower));
+
+        // Upper Canonical half (Kernel space)
+        assert!(is_canonical_address(0xFFFF_8000_0000_1000));
+        assert_eq!(get_canonical_half(0xFFFF_8000_0000_1000), Some(CanonicalHalf::Upper));
+
+        // Non-canonical address
+        assert!(!is_canonical_address(0x0001_8000_0000_0000));
+        assert_eq!(get_canonical_half(0x0001_8000_0000_0000), None);
+
+        // Address canonicalization (sign-extension)
+        let raw_addr = 0x0000_8000_0000_0123; // non-canonical if bit 47 is 1 but upper bits are 0
+        let canonical_addr = canonicalize_address(raw_addr);
+        assert!(is_canonical_address(canonical_addr));
+        assert_eq!(get_canonical_half(canonical_addr), Some(CanonicalHalf::Upper));
+    }
 }

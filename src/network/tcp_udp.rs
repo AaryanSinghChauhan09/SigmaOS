@@ -15,7 +15,7 @@ pub type Port = u16;
 #[derive(Debug, Clone, Copy)]
 pub enum Protocol { TCP = 0, UDP = 1 }
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,
