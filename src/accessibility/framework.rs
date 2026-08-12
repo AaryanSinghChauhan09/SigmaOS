@@ -32,7 +32,7 @@ pub enum AccessibilityCategory {
 }
 
 /// Accessibility feature type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum AccessibilityFeature {
     ScreenReader,
     HighContrast,

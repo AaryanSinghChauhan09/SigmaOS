@@ -20,6 +20,24 @@
 // OOP-based network traffic monitoring and analysis
 
 use crate::klib::BTreeMap;
+
+/// Network security alert classification
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum AlertType {
+    SuspiciousActivity,
+    Reconnaissance,
+    MalwareDetected,
+    DdosAttack,
+}
+
+/// Network alert severity level
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum AlertSeverity {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::time::{Duration, Instant};
 
