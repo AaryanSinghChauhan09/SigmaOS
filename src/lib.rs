@@ -1,70 +1,31 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
-#![allow(clippy::all, unused)]
 
 pub mod accessibility;
 pub mod automation;
-pub mod community;
 pub mod compatibility;
 pub mod customization;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
 pub mod drivers;
-pub mod ecosystem;
-pub mod education;
 pub mod filesystem;
-pub mod governance;
+pub mod graphics;
+pub mod ipc;
 pub mod kernel;
-pub mod legal;
 pub mod network;
 pub mod orchestration;
+pub mod distro;
 pub mod package;
+pub mod performance;
 pub mod productivity;
 pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub mod support;
 pub mod virtualization;
-pub mod graphics {
-    pub mod paint;
-    pub mod video;
-    pub mod compositor;
-    pub mod render3d;
-}
-pub mod hardware {
-    pub mod win32;
-    pub mod compatibility;
-}
-pub mod power {
-    pub mod governor;
-}
-pub mod observability {
-    pub mod profiler;
-}
-pub mod ai {
-    pub mod agent;
-    pub mod orchestrator;
-    pub mod runtime;
-}
-pub mod boot {
-    pub mod firmware_bridge;
-    pub mod bridge_grid;
-}
-pub mod toolchain {
-    pub mod adapter;
-    pub mod capsule;
-    pub mod codex;
-    pub mod bootstrap;
-}
-pub mod scheduler {
-    pub mod numa_scheduler;
-    pub mod energy_aware;
-}
-pub mod crypto {
-    pub mod vectorized_pqc;
-}
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -75,14 +36,23 @@ pub use automation::{
     OptimizationRecommendation, PerformanceProfile, PredictiveModel, SystemAction,
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
-pub use community::{
-    BugSeverity, BugTracker, CommunityIssue, ContributorProfile, FundingSustainability,
-    IssueStatus, MentorshipProgram, OnboardingStage, Sponsor,
-};
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ContainerRuntime, TargetPlatform, TranslationLayer,
-    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
+    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
+    AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, ApplicationBinary,
+    BinaryCompatMatrix, BinaryFormat, BrailleMatrix, BsdJailSandbox, BundleType, CloudOrchestrator,
+    CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError, CompatibilityLayer,
+    CompatibilityManager, CompatibilityMode, ContainerRuntime, ContinuityCoordinator, DesktopMode,
+    DesktopProfile, DesktopTheme, DiscontinuedFS, DistroReleaseChannel, DriverBridge,
+    EcosystemSnapshot, FSRevival, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, LanguageTranslationCatalog, LegacyBus,
+    LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
+    MicroService, MicroServiceState, NetworkBridge, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, StorageBridge, SuiteRegistry,
+    SyscallAbi, TargetPlatform, TranslationLayer, TribeInstaller, TtsSynthesizer, UnifiedAppStore,
+    WorkloadOptimizer, WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI,
+    GLOBAL_ANTIX_CONTROL, GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN,
+    GLOBAL_MEMORY_TRIMMER, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE,
+    GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -91,38 +61,37 @@ pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
 pub use drivers::{
-    GpuCommand, GpuDriver, GpuError, HidError, HidKeyboardEvent, HidReportType, InputDriver,
-    InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
-    StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
-    VesaModeInfo,
-};
-pub use ecosystem::{
-    ArchTier, ArchitecturePort, EcosystemCertification, EcosystemManager, EcosystemPlatform,
-    EnterprisePartner,
-};
-pub use education::{
-    DocAsset, DocFormat, EducationOutreachManager, LearningPath, UniversityPartnership,
+    Bdle, Ch340Driver, DeviceGeneration, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver,
+    GpuError, GpuPipeline, GpuShader, HidError, HidKeyboardEvent, HidReportType, InputDriver,
+    InputEvent, InputType, IntelHdaDriver, NetworkCommand, NetworkDriver, NetworkError,
+    NetworkType, NvmeCmd, NvmeCqe, NvmeDriver, PeripheralDevice, PeripheralManager, PowerState,
+    RxDescriptor, ShaderStage, StorageCommand, StorageDriver, StorageError, StorageType,
+    TxDescriptor, UsbHidDriver, VesaDriver, VesaError, VesaModeInfo,
 };
 pub use filesystem::{
-    FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
-    LegacyFsType, LegacyFSAdapter,
-    FileBlock, SigmaFS,
+    FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
+    SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
 };
-pub use governance::{
-    DemocraticProposal, DemocraticVoting, FoundationMember, FoundationModel, ReleaseType,
-    RoadmapMilestone, TransparentRoadmap,
+pub use graphics::paint::ColorRgba;
+pub use ipc::{
+    unix_socket::{UnixSocketType, UnixSocketAddress, UnixSocketState, UnixSocket, UnixSocketManager},
+    signals::{SignalType, SignalDisposition, PendingSignal, ProcessSignalState, SignalDeliverySystem},
 };
 pub use kernel::{
-    BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,
-    ProcessState, RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, PAGE_SIZE,
-    SovereignSelfHealingKernel, UdkfHook, UserDefinedKernelFunctions,
-};
-pub use legal::{
-    ComplianceCert, ComponentLicense, LegalComplianceRegistry, LicenseType, PatentRecord,
+    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
+    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
+    InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
+    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
+    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
+    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
+    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
+    Tcb, ThreadState, WorkItem, PAGE_SIZE,
 };
 pub use network::{
-    TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
-    LegacyProtocol, LegacyProtocolAdapter,
+    FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
+    SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
+    UfwDefaultRule, GLOBAL_FIREWALL, GLOBAL_IP_COMMAND, GLOBAL_UFW_RULE,
 };
 pub use orchestration::{
     AutomationRule as CrossDeviceAutomationRule, AutomationTrigger, ConnectedDevice,
@@ -130,145 +99,40 @@ pub use orchestration::{
     DeviceType as CrossDeviceType, OrchestrationError, SmartHomeDevice,
 };
 pub use package::{
-    ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
+    ConflictResolution, DependencyResolver, PackageFormatAdapter, PackageError, PackageFormat,
     PackageSource, UnifiedPackage, UniversalPackageManager,
-    StoreError, StoreApp, SigmaSoftwareStore,
+};
+pub use performance::{
+    AnanicyCppDaemon, AnanicyRule, BoreScheduler, CachyKernelManager, CallGraph,
+    CpuPriorityOptimizer, GlarySmartRule, IoPriorityOptimizer, IoSchedClass, IoTaskPriority,
+    PerformanceProfileRule, PhysicalPageFrame, Profile, ProfileType, Profiler, ProfilerError,
+    RamDefragmenter, SimpleCallGraph, SimpleProfile, SimpleProfiler, SmartPerformanceProfile,
+    SmartResourceOptimizer, UltraKernelSamepageMerger, X86v3v4OptimizationDetector,
+    GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, PomodoroState, PomodoroTimer,
-    ProductivityScore,
-    MediaFormat, PlaybackState, AudioTrack, SigmaMediaEngine,
-    FileIndexEntry, EverythingSearchEngine, TextTab, NotepadPlusPlusBuffer,
-    BrowserContainerType, BrowserTabInstance, SovereignBrowserEngine,
-    CompressionMethod, ArchiveVolume, SevenZipEngine,
-    AnnotationShape, ScreenshotAnnotation, FlameshotAnnotator,
-    VideoSourceLayer, ObsStudioMixer,
-    AudacityWaveEditor,
-    VlcCodecPipeline,
-    VideoTrackClip, DaVinciTimeline,
-    ItemAgeColor, OneCommanderFileGrid,
-    AppVolumeChannel, EarTrumpetVolumeMatrix,
-    ExifMetadata, IrfanViewEngine,
+    ProductivityScore, EverythingSearchEngine, NotepadPlusPlusBuffer, SovereignBrowserEngine, SevenZipEngine,
+    CompressionMethod, FlameshotAnnotator, AnnotationShape, ObsStudioMixer,
+    AudacityWaveEditor, VlcCodecPipeline, DaVinciTimeline, OneCommanderFileGrid,
+    ItemAgeColor, EarTrumpetVolumeMatrix, IrfanViewEngine,
 };
 pub use resilience::{
-    RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
-    SystemSnapshot,
-    BackupError, BackupSnapshot, SigmaTimeshift,
+    FsSnapshot, RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError,
+    SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
 };
-pub use security::{CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise};
+pub use security::{
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
+    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
+    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+};
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
     BuildSystem, ContentAddressedStore, CryptoVerifier, PackageRecipe, RecipeError, RecipeManager,
     SatSolver, Transaction,
 };
-pub use support::{
-    LtsRelease, RecoveryConfig, SupportContract, SupportServicesManager, SupportTier,
-};
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
-};
-pub use graphics::paint::{
-    ColorRgba, BlendMode, PhotoError, ImageFilter, CanvasLayer, RasterLayer, GaussianBlurFilter, GrayscaleConversionFilter,
-};
-pub use graphics::video::{
-    VideoError, PixelRgba, VideoFrame, VideoEffect, TimelineClip, YuvToRgbEffect, SubtitleOverlayEffect, VideoClip,
-};
-pub use graphics::compositor::{
-    Position, Size, Rectangle, Color, Surface, SurfaceInfo, PixelFormat, SurfaceCapability, BitmapSurface, Window, WindowInfo, WindowCapability, SimpleWindow, Compositor, GraphicsError, CompositorStats, CompositorCapability, SimpleCompositor,
-};
-pub use graphics::render3d::{
-    Vec3, TriangleFace, MeshModel, MaterialShader, RenderCamera, BlenderRenderEngine,
-};
-pub use hardware::win32::{
-    Win32Error, Win32Handle, PeFormat, PeLoader, RegistryManager, Win32Message, User32MessageQueue,
-};
-pub use hardware::compatibility::{
-    HardwareCompatibilityManager, CompatibilityReport, CompatibilityResult, HardwareDevice, CompatibilityCheck,
-};
-pub use power::governor::{
-    GovernorMode, CPUState, SigmaGovernor,
-};
-pub use observability::profiler::{
-    TracepointType, PerformanceMetric, SigmaProfiler,
-};
-pub use boot::firmware_bridge::{
-    FirmwareType, FirmwareBridge,
-};
-pub use boot::bridge_grid::{
-    BIOSBridgeGrid, UEFIBridgeGrid, CorebootBridgeGrid, FirmwareBridgeGrid,
-};
-pub use toolchain::adapter::{
-    ToolchainProfile, ToolchainAdapter,
-};
-pub use toolchain::capsule::{
-    CapsuleProfile, BuildCapsule,
-};
-pub use toolchain::codex::{
-    CodexCategory, CodexEntry, BuildCodex,
-};
-pub use toolchain::bootstrap::{
-    BootstrapStage, PortPackage, LfsBootstrapEngine,
-};
-pub use compatibility::persona::{
-    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
-};
-pub use compatibility::abi_translator::{
-    CpuArchitecture, ABITranslator,
-};
-pub use compatibility::lattice::{
-    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
-};
-pub use compatibility::prism::{
-    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
-};
-pub use compatibility::canonical::{
-    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
-};
-pub use scheduler::numa_scheduler::{
-    NumaNode, NumaScheduler, Node as LFNode, MichaelScottQueue, TreiberStack,
-};
-pub use scheduler::energy_aware::{
-    TaskEnergyCost, EnergyAwareScheduler,
-};
-pub use crypto::vectorized_pqc::{
-    VectorizedPqcEngine,
-};
-pub use network::revival::{
-    RevivalProtocol, NetRevival,
-};
-pub use driver::simulation::{
-    SimType, PeripheralSim,
-};
-pub use driver::mapper::{
-    MapperCategory, DriverMapper,
-};
-pub use driver::pods::{
-    PodType, PeripheralPod,
-};
-pub use driver::vault::{
-    VaultEntry, DriverArchiveVault,
-};
-pub use driver::grid::{
-    GridSlotType, PeripheralArchiveGrid,
-};
-pub use security::bridge::{
-    LegacySecurityType, SecurityBridge,
-};
-pub use security::prism::{
-    SecurityFacet, SecurityPrism,
-};
-pub use security::sandbox::{
-    SandboxRule, PrivacyFirstSandbox,
-};
-pub use ai::agent::{
-    IntentType, Intent, AIError, AIAgent as CoreAIAgent, SimpleAIAgent as CoreSimpleAIAgent, AIAgentManager, SimpleAIAgentManager,
-};
-pub use ai::orchestrator::{
-    AgentID as OrchestratorAgentID, AgentState as OrchestratorAgentState, AgentError as OrchestratorAgentError,
-    AIAgent as OrchestratorAIAgent, SimpleAIAgent as OrchestratorSimpleAIAgent, AgentOrchestrator, SimpleAgentOrchestrator,
-    TaskQueue, SimpleTaskQueue, AgentCommunication, SimpleAgentCommunication,
-};
-pub use ai::runtime::{
-    ModelType, ModelProcess, IModelRuntime,
 };

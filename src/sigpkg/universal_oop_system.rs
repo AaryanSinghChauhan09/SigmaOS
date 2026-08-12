@@ -2246,98 +2246,6 @@ impl Default for PackageParserFactory {
 // Facade Pattern: Universal Package Manager
 // ============================================================================
 
-// ============================================================================
-// Delta Package Reconstruction Subsystem
-// ============================================================================
-
-pub struct PackageDeltaPatch {
-    pub source_checksum: String,
-    pub target_checksum: String,
-    pub delta_payload: Vec<u8>,
-}
-
-pub struct PackageDeltaEngine;
-
-impl PackageDeltaEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    /// Reconstitutes a full package by applying a binary patch to a cached source package
-    pub fn apply_delta_patch(
-        &self,
-        source_package: &dyn IPackage,
-        patch: &PackageDeltaPatch,
-    ) -> Result<Box<dyn IPackage>, &'static str> {
-        let meta = source_package.metadata();
-        if meta.checksum != patch.source_checksum {
-            return Err("Source checksum mismatch; cannot apply delta patch");
-        }
-
-        // Apply mock chunk-based delta reconstruction
-        let mut reconstructed_meta = meta.clone();
-        reconstructed_meta.checksum = patch.target_checksum.clone();
-        reconstructed_meta.size += patch.delta_payload.len() as u64;
-
-        Ok(Box::new(StandardPackage::new_simple(
-            reconstructed_meta,
-            source_package.dependencies().to_vec(),
-            source_package.format(),
-        )))
-    }
-}
-
-impl Default for PackageDeltaEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// Dual-Layer Cryptographic Signature Verifier (GPG & Post-Quantum)
-// ============================================================================
-
-pub struct GpgPqcVerifierAdapter {
-    pub trusted_gpg_keys: HashMap<String, bool>, // KeyID -> IsTrusted
-    pub quantum_root_anchors: Vec<String>,       // Quantum signature anchors
-}
-
-impl GpgPqcVerifierAdapter {
-    pub fn new() -> Self {
-        let mut trusted = HashMap::new();
-        trusted.insert("0x9E5A86A21B607B76".to_string(), true);
-        Self {
-            trusted_gpg_keys: trusted,
-            quantum_root_anchors: vec!["dilithium-5-anchor-01".to_string()],
-        }
-    }
-
-    /// Performs dual-layer authenticity check validating classical GPG & quantum-safe signatures
-    pub fn verify_authenticity(&self, package: &dyn IPackage) -> Result<bool, &'static str> {
-        let meta = package.metadata();
-
-        // Layer 1: Classical GPG Check
-        let key_id = meta.gpg_key_id.as_ref().ok_or("Missing GPG signature")?;
-        if !self.trusted_gpg_keys.contains_key(key_id) {
-            return Err("Invalid GPG signature key ID; package not trusted");
-        }
-
-        // Layer 2: Post-Quantum Check
-        let pqc_sig = meta.pqc_signature.as_ref().ok_or("Missing Post-Quantum signature")?;
-        if !pqc_sig.contains("dilithium") {
-            return Err("Invalid quantum-safe signature; signature tampered");
-        }
-
-        Ok(true)
-    }
-}
-
-impl Default for GpgPqcVerifierAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Universal package manager - Facade for all package operations
 pub struct UniversalPackageManager {
     factory: PackageParserFactory,
@@ -2959,96 +2867,196 @@ Description: Hook test";
     }
 
     #[test]
-    fn test_package_delta_patch_engine() {
-        let source_meta = PackageMetadata {
-            name: "bash".to_string(),
-            version: Version::new(5, 1, 0),
-            description: "GNU shell".to_string(),
-            license: "GPL-3.0".to_string(),
-            maintainer: "devs".to_string(),
-            homepage: "gnu.org".to_string(),
-            architecture: "x86_64".to_string(),
-            checksum: "source-sha-checksum-000".to_string(),
-            size: 2048,
-            install_date: None,
-            pqc_signature: None,
-            gpg_key_id: None,
-            supported_architectures: Vec::new(),
+    fn test_universal_translator() {
+        let original_package = StandardPackage {
+            metadata: PackageMetadata {
+                name: "test-lib".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Original description".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Deb,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         };
 
-        let source = StandardPackage::new_simple(
-            source_meta,
-            Vec::new(),
-            PackageFormat::Deb,
-        );
+        let translator = SigmaPackageTranslator::new();
+        let translated = translator.translate(&original_package, PackageFormat::Rpm).unwrap();
 
-        let patch = PackageDeltaPatch {
-            source_checksum: "source-sha-checksum-000".to_string(),
-            target_checksum: "target-sha-checksum-111".to_string(),
-            delta_payload: vec![1, 2, 3, 4],
-        };
-
-        let engine = PackageDeltaEngine::new();
-        let target = engine.apply_delta_patch(&source, &patch).unwrap();
-        assert_eq!(target.metadata().checksum, "target-sha-checksum-111");
-        assert_eq!(target.metadata().size, 2052);
-
-        // Fail case (checksum mismatch)
-        let mut bad_patch = patch;
-        bad_patch.source_checksum = "wrong-checksum".to_string();
-        assert!(engine.apply_delta_patch(&source, &bad_patch).is_err());
+        assert_eq!(translated.name(), "test-lib");
+        assert_eq!(translated.format(), PackageFormat::Rpm);
+        assert!(translated.metadata().description.contains("Translated from Deb to Rpm"));
     }
 
     #[test]
-    fn test_gpg_pqc_verification() {
-        let mut meta = PackageMetadata {
-            name: "curl".to_string(),
-            version: Version::new(7, 85, 0),
-            description: "URL transfer tool".to_string(),
-            license: "MIT".to_string(),
-            maintainer: "curl-dev".to_string(),
-            homepage: "curl.se".to_string(),
-            architecture: "x86_64".to_string(),
-            checksum: "abc".to_string(),
-            size: 1024,
-            install_date: None,
-            pqc_signature: Some("dilithium-5-sig-hex-data".to_string()),
-            gpg_key_id: Some("0x9E5A86A21B607B76".to_string()),
-            supported_architectures: Vec::new(),
+    fn test_architecture_translation() {
+        let matrix = ArchitectureTranslationMatrix::new();
+        assert_eq!(matrix.translate("amd64"), "x86_64");
+        assert_eq!(matrix.translate("arm64"), "aarch64");
+        assert_eq!(matrix.translate("mips"), "mips"); // Falls back cleanly
+    }
+
+    #[test]
+    fn test_portage_style_use_flags() {
+        let mut manager = UniversalPackageManager::new();
+        manager.set_use_flag("ssl", true);
+        manager.set_use_flag("gtk", false);
+
+        assert!(manager.is_use_flag_active("ssl"));
+        assert!(!manager.is_use_flag_active("gtk"));
+
+        let pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "test-app".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Test description".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Sigma,
+            use_flags: vec!["ssl".to_string(), "gtk".to_string()],
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: vec![
+                ConditionalDependency {
+                    dependency: Dependency {
+                        name: "openssl".to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    },
+                    required_use_flag: "ssl".to_string(),
+                },
+                ConditionalDependency {
+                    dependency: Dependency {
+                        name: "gtk3".to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    },
+                    required_use_flag: "gtk".to_string(),
+                },
+            ],
         };
 
-        let pkg = StandardPackage::new_simple(
-            meta.clone(),
-            Vec::new(),
-            PackageFormat::Rpm,
-        );
+        let evaluated_deps = manager.evaluate_conditional_dependencies(&pkg);
+        assert_eq!(evaluated_deps.len(), 1);
+        assert_eq!(evaluated_deps[0].name, "openssl");
+    }
 
-        let verifier = GpgPqcVerifierAdapter::new();
-        assert!(verifier.verify_authenticity(&pkg).unwrap());
+    #[test]
+    fn test_nix_derivation_path_computation() {
+        let pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "git".to_string(),
+                version: Version::new(2, 40, 0),
+                description: "VCS".to_string(),
+                license: "GPL".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Nix,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: vec!["glibc".to_string(), "curl".to_string()],
+            conditional_dependencies: Vec::new(),
+        };
 
-        // Fail Case 1: Untrusted GPG Key
-        meta.gpg_key_id = Some("0xBADKEY1234567890".to_string());
-        let bad_pkg1 = StandardPackage::new_simple(
-            meta.clone(),
-            Vec::new(),
-            PackageFormat::Rpm,
-        );
-        assert_eq!(
-            verifier.verify_authenticity(&bad_pkg1),
-            Err("Invalid GPG signature key ID; package not trusted")
-        );
+        let evaluator = NixDerivationEvaluator::new();
+        let store_path = evaluator.compute_store_path(&pkg);
+        assert!(store_path.starts_with("/nix/store/"));
+        assert!(store_path.ends_with("-git"));
 
-        // Fail Case 2: Missing/Tampered PQC signature
-        meta.gpg_key_id = Some("0x9E5A86A21B607B76".to_string());
-        meta.pqc_signature = Some("tampered-malicious-signature-data".to_string());
-        let bad_pkg2 = StandardPackage::new_simple(
-            meta,
-            Vec::new(),
-            PackageFormat::Rpm,
-        );
-        assert_eq!(
-            verifier.verify_authenticity(&bad_pkg2),
-            Err("Invalid quantum-safe signature; signature tampered")
-        );
+        // Ensure deterministic reproducibility
+        let store_path_2 = evaluator.compute_store_path(&pkg);
+        assert_eq!(store_path, store_path_2);
+    }
+
+    #[test]
+    fn test_pacman_path_triggers() {
+        let mut manager = UniversalPackageManager::new();
+
+        let trigger_executed = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let trigger_executed_clone = trigger_executed.clone();
+
+        let trigger = PathTriggerHook {
+            name: "update-desktop-database".to_string(),
+            pattern: "*.desktop".to_string(),
+            script: Arc::new(move |matched_paths: &[String]| {
+                assert_eq!(matched_paths.len(), 1);
+                assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
+                trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+                Ok(())
+            }),
+        };
+
+        manager.add_path_trigger(Arc::new(trigger));
+
+        let pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "my-editor".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "text editor".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Pacman,
+            use_flags: Vec::new(),
+            files: vec![
+                "usr/bin/my-editor".to_string(),
+                "usr/share/applications/app.desktop".to_string(),
+            ],
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
+        };
+
+        manager.process_path_triggers(&pkg).unwrap();
+        assert!(trigger_executed.load(std::sync::atomic::Ordering::SeqCst));
     }
 }
