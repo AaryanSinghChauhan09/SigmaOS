@@ -2279,11 +2279,11 @@ impl PackageDeltaEngine {
         reconstructed_meta.checksum = patch.target_checksum.clone();
         reconstructed_meta.size += patch.delta_payload.len() as u64;
 
-        Ok(Box::new(StandardPackage {
-            metadata: reconstructed_meta,
-            dependencies: source_package.dependencies().to_vec(),
-            format: source_package.format(),
-        }))
+        Ok(Box::new(StandardPackage::new_simple(
+            reconstructed_meta,
+            source_package.dependencies().to_vec(),
+            source_package.format(),
+        )))
     }
 }
 
@@ -2976,11 +2976,11 @@ Description: Hook test";
             supported_architectures: Vec::new(),
         };
 
-        let source = StandardPackage {
-            metadata: source_meta,
-            dependencies: Vec::new(),
-            format: PackageFormat::Deb,
-        };
+        let source = StandardPackage::new_simple(
+            source_meta,
+            Vec::new(),
+            PackageFormat::Deb,
+        );
 
         let patch = PackageDeltaPatch {
             source_checksum: "source-sha-checksum-000".to_string(),
@@ -3017,22 +3017,22 @@ Description: Hook test";
             supported_architectures: Vec::new(),
         };
 
-        let pkg = StandardPackage {
-            metadata: meta.clone(),
-            dependencies: Vec::new(),
-            format: PackageFormat::Rpm,
-        };
+        let pkg = StandardPackage::new_simple(
+            meta.clone(),
+            Vec::new(),
+            PackageFormat::Rpm,
+        );
 
         let verifier = GpgPqcVerifierAdapter::new();
         assert!(verifier.verify_authenticity(&pkg).unwrap());
 
         // Fail Case 1: Untrusted GPG Key
         meta.gpg_key_id = Some("0xBADKEY1234567890".to_string());
-        let bad_pkg1 = StandardPackage {
-            metadata: meta.clone(),
-            dependencies: Vec::new(),
-            format: PackageFormat::Rpm,
-        };
+        let bad_pkg1 = StandardPackage::new_simple(
+            meta.clone(),
+            Vec::new(),
+            PackageFormat::Rpm,
+        );
         assert_eq!(
             verifier.verify_authenticity(&bad_pkg1),
             Err("Invalid GPG signature key ID; package not trusted")
@@ -3041,11 +3041,11 @@ Description: Hook test";
         // Fail Case 2: Missing/Tampered PQC signature
         meta.gpg_key_id = Some("0x9E5A86A21B607B76".to_string());
         meta.pqc_signature = Some("tampered-malicious-signature-data".to_string());
-        let bad_pkg2 = StandardPackage {
-            metadata: meta,
-            dependencies: Vec::new(),
-            format: PackageFormat::Rpm,
-        };
+        let bad_pkg2 = StandardPackage::new_simple(
+            meta,
+            Vec::new(),
+            PackageFormat::Rpm,
+        );
         assert_eq!(
             verifier.verify_authenticity(&bad_pkg2),
             Err("Invalid quantum-safe signature; signature tampered")
