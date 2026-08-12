@@ -7,6 +7,8 @@ pub mod manager;
 pub mod support;
 pub mod tmpfs;
 pub mod vfs;
+pub mod legacy_fs;
+pub mod sigma_fs;
 
 pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{
@@ -28,3 +30,9 @@ pub use support::{
     LinuxPersonaRule, SimpleFilesystem, SimpleFilesystemManager, SmartSymlink, SymlinkResolverRule,
 };
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
+pub use legacy_fs::{
+    LegacyFsType, LegacyFSAdapter,
+};
+pub use sigma_fs::{
+    FileBlock, SigmaFS,
+};
