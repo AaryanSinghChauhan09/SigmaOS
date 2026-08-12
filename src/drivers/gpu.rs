@@ -7,6 +7,10 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
+
 /// GPU command type
 #[derive(Debug, Clone)]
 pub enum GpuCommand {
@@ -114,8 +118,6 @@ pub struct GpuDriver {
     pub registered_pipelines: Vec<GpuPipeline>,
     pub bound_pipeline_id: Option<usize>,
     pub reset_state: GpuResetState,
-    pub crtc: Option<DrmCrtc>,
-    pub connector: Option<DrmConnector>,
 }
 
 impl GpuDriver {
@@ -134,8 +136,6 @@ impl GpuDriver {
                 pipeline_reconstructed_count: 0,
                 is_hardware_ready: true,
             },
-            crtc: None,
-            connector: None,
         }
     }
 

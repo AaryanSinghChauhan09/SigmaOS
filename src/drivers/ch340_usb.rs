@@ -2,7 +2,7 @@
 // Conforms to SigmaOS UnifiedPeripheral interface
 
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use crate::security::capability::CapabilityToken;
+use crate::security::CapabilityToken;
 
 // CH340 USB Vendor & Product IDs
 pub const CH340_VENDOR_ID: u16 = 0x1A86;

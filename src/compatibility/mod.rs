@@ -1,14 +1,9 @@
 // SigmaOS Compatibility Module
-pub mod constellation_mesh;
+pub mod antix;
+pub mod chakra;
 pub mod cross_platform;
-pub mod historic_linux;
-pub mod mint_linux;
-pub mod chimera_linux;
-pub mod relay_nexus;
-pub mod solid_kernel;
-pub mod india_stack_localization;
 pub mod legacy_adapters;
-pub mod cross_platform_kernel;
+pub mod canonical;
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -75,4 +70,32 @@ pub use historic_linux::{
     Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
     VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
     ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+};
+
+pub use legacy_adapters::{
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
+};
+
+pub use chakra::{
+    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
+    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
+};
+
+pub use antix::{
+    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
+    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
+};
+
+pub use canonical::{
+    EcosystemSnapshot, SnapshotManager, CompatBinaryFormat, CompatBinary, CompatibilityLayer,
+    BsdJailSandbox, FlatpakApp, UnifiedAppStore, HandoffTask, ContinuityCoordinator,
+    DesktopMode, ZorinAppearanceSwitcher, AiResourceScheduler,
+    DistroReleaseChannel, ReproducibleBuildVerifier, ReleaseGovernanceCouncil,
+    LanguageTranslationCatalog, LocaleManager, TtsSynthesizer, BrailleMatrix,
+    AppSuiteType, AppSuiteBundle, SuiteRegistry,
+    CloudProvider, SigmaContainer, CloudOrchestrator,
 };

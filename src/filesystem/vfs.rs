@@ -1,5 +1,5 @@
 // SigmaOS Virtual Filesystem (VFS)
-// Capability-based filesystem with security
+// Capability-based, standard Linux/BSD conforming filesystem with security, hard links, and path traversal
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::security::{CapabilityToken, Permission};
@@ -43,6 +43,15 @@ impl CapabilityToken {
 }
 
 use std::collections::HashMap;
+
+// Standard POSIX / Linux / BSD open flags
+pub const O_RDONLY: u32 = 0x0000;
+pub const O_WRONLY: u32 = 0x0001;
+pub const O_RDWR: u32 = 0x0002;
+pub const O_CREAT: u32 = 0x0040;
+pub const O_EXCL: u32 = 0x0080;
+pub const O_TRUNC: u32 = 0x0200;
+pub const O_APPEND: u32 = 0x0400;
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -94,11 +103,8 @@ pub struct Inode {
     pub capabilities: CapabilityToken,
     // Conforming Linux/BSD additions
     pub hard_links_count: u32,
-    pub link_count: u32,
-    pub symlink_target: Option<String>,
-    pub xattrs: HashMap<String, Vec<u8>>,
-    pub data: Vec<u8>,                 // File storage data
-    pub entries: HashMap<String, u64>, // Directory entries
+    pub data: Vec<u8>,                      // File storage data
+    pub entries: HashMap<String, u64>,      // Directory entries
 }
 
 impl Inode {
@@ -114,9 +120,6 @@ impl Inode {
             modified: 0,
             capabilities: CapabilityToken::new(),
             hard_links_count: 1,
-            link_count: 1,
-            symlink_target: None,
-            xattrs: HashMap::new(),
             data: Vec::new(),
             entries: HashMap::new(),
         }
@@ -259,7 +262,6 @@ impl VirtualFilesystem {
         let root = Inode::new(0, FileType::Directory, 0);
         fs.inodes.insert(0, root);
         fs.root_inode = 0;
-        fs.directory_paths.insert("/".to_string(), 0);
 
         fs
     }
@@ -359,17 +361,27 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
+        // Check file offset and file size
+        if file_descriptor.offset >= inode.size {
+            return Ok(0);
+        }
+
+        let remaining = (inode.size - file_descriptor.offset) as usize;
+        let bytes_to_read = buffer.len().min(remaining);
+
         // Prevent integer overflow in offset calculation
-        let new_offset = file_descriptor
+        let _new_offset = file_descriptor
             .offset
-            .checked_add(buffer.len() as u64)
+            .checked_add(bytes_to_read as u64)
             .ok_or(FsError::InvalidFd)?;
 
-        // Simulate read (in production, actual file I/O)
-        let bytes_read = buffer.len().min(inode.size as usize);
-        file_descriptor.offset += bytes_read as u64;
+        // Read the actual bytes from storage data
+        let start = file_descriptor.offset as usize;
+        let end = start + bytes_to_read;
+        buffer[..bytes_to_read].copy_from_slice(&inode.data[start..end]);
 
-        Ok(bytes_read)
+        file_descriptor.offset += bytes_to_read as u64;
+        Ok(bytes_to_read)
     }
 
     pub fn write_file(&mut self, fd: u64, buffer: &[u8]) -> Result<usize, FsError> {
@@ -388,25 +400,37 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
-        // Prevent integer overflow in size calculation
+        // If open flag O_APPEND is set, offset is moved to the end of the file before each write
+        if (file_descriptor.flags & O_APPEND) != 0 {
+            file_descriptor.offset = inode.size;
+        }
+
+        // Prevent integer overflow in size and offset calculation
         let _new_size = inode
             .size
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
-        // Prevent integer overflow in offset calculation
-        let _new_offset = file_descriptor
+        let new_offset = file_descriptor
             .offset
             .checked_add(buffer.len() as u64)
             .ok_or(FsError::NoSpace)?;
 
-        // Simulate write (in production, actual file I/O)
-        let bytes_written = buffer.len();
-        inode.size += bytes_written as u64;
-        file_descriptor.offset += bytes_written as u64;
-        inode.modified = 0; // In production, actual timestamp
+        // Resize storage data buffer if offset + written bytes exceeds size (handling holes)
+        if new_offset > inode.size {
+            inode.data.resize(new_offset as usize, 0);
+            inode.size = new_offset;
+        }
 
-        Ok(bytes_written)
+        // Write the actual bytes into file storage data
+        let start = file_descriptor.offset as usize;
+        let end = start + buffer.len();
+        inode.data[start..end].copy_from_slice(buffer);
+
+        file_descriptor.offset = new_offset;
+        inode.modified = 1716000000; // Simulated timestamp
+
+        Ok(buffer.len())
     }
 
     pub fn read_file_gated(&mut self, fd: u64, buffer: &mut [u8], gate: &CapabilityToken) -> Result<usize, FsError> {
@@ -432,7 +456,6 @@ impl VirtualFilesystem {
         if let Some(inode) = self.inodes.get_mut(&inode_id) {
             if inode.hard_links_count > 1 {
                 inode.hard_links_count -= 1;
-                inode.link_count -= 1;
             } else {
                 should_delete = true;
             }
@@ -440,7 +463,9 @@ impl VirtualFilesystem {
             return Err(FsError::NotFound);
         }
 
-        self.inodes.remove(&inode_id);
+        if should_delete {
+            self.inodes.remove(&inode_id);
+        }
         Ok(())
     }
 
@@ -461,7 +486,9 @@ impl VirtualFilesystem {
         Ok(list)
     }
 
+    // =========================================================================
     // Advanced Linux & BSD Inspired Path Traversal, O_CREAT, and Link Handling
+    // =========================================================================
 
     /// Traverses and resolves a path name (e.g. "/var/log/syslog") to its Inode ID
     pub fn resolve_path(&self, path: &str) -> Result<u64, FsError> {
@@ -473,10 +500,7 @@ impl VirtualFilesystem {
         let components: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
 
         for component in components {
-            let inode = self
-                .inodes
-                .get(&current_inode_id)
-                .ok_or(FsError::NotFound)?;
+            let inode = self.inodes.get(&current_inode_id).ok_or(FsError::NotFound)?;
             if inode.file_type != FileType::Directory {
                 return Err(FsError::NotADirectory);
             }
@@ -526,10 +550,7 @@ impl VirtualFilesystem {
                 if (flags & O_CREAT) != 0 {
                     let new_id = self.create_file(FileType::Regular, owner)?;
                     // Link into parent directory
-                    let parent = self
-                        .inodes
-                        .get_mut(&parent_inode_id)
-                        .ok_or(FsError::NotFound)?;
+                    let parent = self.inodes.get_mut(&parent_inode_id).ok_or(FsError::NotFound)?;
                     parent.entries.insert(filename.to_string(), new_id);
                     new_id
                 } else {
@@ -579,15 +600,11 @@ impl VirtualFilesystem {
         }
 
         // Perform hard-linking
-        let parent_mut = self
-            .inodes
-            .get_mut(&parent_inode_id)
-            .ok_or(FsError::NotFound)?;
+        let parent_mut = self.inodes.get_mut(&parent_inode_id).ok_or(FsError::NotFound)?;
         parent_mut.entries.insert(filename.to_string(), target_id);
 
         let target_inode = self.inodes.get_mut(&target_id).ok_or(FsError::NotFound)?;
         target_inode.hard_links_count += 1;
-        target_inode.link_count += 1;
 
         Ok(())
     }
@@ -608,10 +625,7 @@ impl VirtualFilesystem {
             parent_inode_id = self.resolve_path(&parent_path)?;
         }
 
-        let parent = self
-            .inodes
-            .get_mut(&parent_inode_id)
-            .ok_or(FsError::NotFound)?;
+        let parent = self.inodes.get_mut(&parent_inode_id).ok_or(FsError::NotFound)?;
         let target_id = parent.entries.remove(filename).ok_or(FsError::NotFound)?;
 
         self.delete_file(target_id)
@@ -634,7 +648,6 @@ pub enum FsError {
     IsDirectory,
     NoSpace,
     AlreadyExists,
-    AttributeNotFound,
 }
 
 #[cfg(test)]
