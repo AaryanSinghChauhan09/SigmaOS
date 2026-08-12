@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Process Status Compatibility
 //! Process listing and monitoring (ps command)

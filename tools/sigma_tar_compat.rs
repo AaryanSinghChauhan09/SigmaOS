@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Tar Compatibility
 //! Archive creation and extraction (tar command)

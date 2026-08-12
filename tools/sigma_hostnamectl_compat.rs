@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Hostnamectl Compatibility
 //! System hostname management (hostnamectl command)

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Awk Compatibility
 //! Pattern scanning and processing language (awk command)

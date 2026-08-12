@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Snap Compatibility Layer
 //! Snap compatibility for Linux application distribution
