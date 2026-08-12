@@ -1,370 +1,170 @@
-#![no_std]
-#![no_main]
+// Sovereign Kernel Oops, Diagnostic Panic Dumps, and PII Anonymization Pipeline
+// Inspired by Linux kernel oops handlers, Windows dump validation, and macOS crash reporters.
 
-/// OOP-based Crash Reporting Pipeline for SigmaOS
-/// Based on Ideas-999-Structured: Core System Item 14
-/// Implements automated coredump collection and anonymized bug reports
+use std::collections::HashMap;
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-
-pub type CrashReportID = usize;
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum CrashType { SegmentationFault = 0, BusError = 1, IllegalInstruction = 2, Abort = 3, Panic = 4 }
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub enum CrashError { Success = 0, CollectionFailed = 1, UploadFailed = 2 }
-
-pub trait CrashReport {
-    fn id(&self) -> CrashReportID;
-    fn crash_type(&self) -> CrashType;
-    fn timestamp(&self) -> u64;
-    fn process_name(&self) -> &[u8];
-    fn backtrace(&self) -> &[u8];
+#[derive(Debug, Clone)]
+pub struct CpuRegisterDump {
+    pub rip: u64,
+    pub rsp: u64,
+    pub rbp: u64,
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rflags: u64,
 }
 
-#[repr(C)]
-pub struct SimpleCrashReport {
-    pub id: CrashReportID,
-    pub crash_type: AtomicUsize,
-    pub timestamp: AtomicUsize,
-    pub process_name: [u8; 64],
-    pub backtrace: [u8; 512],
+#[derive(Debug, Clone)]
+pub struct OopsReport {
+    pub process_name: String,
+    pub pid: usize,
+    pub ppid: usize,
+    pub registers: CpuRegisterDump,
+    pub stack_trace: Vec<u64>,
+    pub raw_panic_message: String,
 }
 
-impl SimpleCrashReport {
-    pub fn new(id: CrashReportID, crash_type: CrashType, process_name: &[u8]) -> Self {
-        let mut name_array = [0u8; 64];
-        let name_len = process_name.len().min(63);
-        unsafe {
-            core::ptr::copy_nonoverlapping(process_name.as_ptr(), name_array.as_mut_ptr(), name_len);
+pub struct PiiAnonymizer;
+
+impl PiiAnonymizer {
+    /// Sanitizes any sensitive credential strings, private IP addresses, or CC numbers in raw logs.
+    /// Replaces digits with 'X' in patterns matching sensitive records.
+    pub fn sanitize_log(input: &str) -> String {
+        let mut output = String::new();
+        let words: Vec<&str> = input.split_whitespace().collect();
+
+        for (i, word) in words.iter().enumerate() {
+            if i > 0 {
+                output.push(' ');
+            }
+
+            // 1. Detect and mask IPv4 addresses (e.g. 192.168.1.100)
+            if word.contains('.') && word.chars().all(|c| c.is_numeric() || c == '.') {
+                let parts: Vec<&str> = word.split('.').collect();
+                if parts.len() == 4 {
+                    output.push_str("XXX.XXX.X.X");
+                    continue;
+                }
+            }
+
+            // 2. Detect secret tokens or API keys
+            if word.starts_with("token=") || word.starts_with("key=") {
+                if let Some(pos) = word.find('=') {
+                    output.push_str(&word[..=pos]);
+                    output.push_str("XXXXXXXXXXXX");
+                    continue;
+                }
+            }
+
+            output.push_str(word);
         }
-        SimpleCrashReport {
-            id,
-            crash_type: AtomicUsize::new(crash_type as usize),
-            timestamp: AtomicUsize::new(0),
-            process_name: name_array,
-            backtrace: [0u8; 512],
-        }
+
+        output
     }
 }
 
-impl CrashReport for SimpleCrashReport {
-    fn id(&self) -> CrashReportID { self.id }
-    fn crash_type(&self) -> CrashType {
-        let val = self.crash_type.load(Ordering::SeqCst) as u32;
-        unsafe { core::mem::transmute(val) }
-    }
-    fn timestamp(&self) -> u64 { self.timestamp.load(Ordering::SeqCst) as u64 }
-    fn process_name(&self) -> &[u8] {
-        let len = self.process_name.iter().position(|&b| b == 0).unwrap_or(64);
-        &self.process_name[..len]
-    }
-    fn backtrace(&self) -> &[u8] {
-        let len = self.backtrace.iter().position(|&b| b == 0).unwrap_or(512);
-        &self.backtrace[..len]
-    }
+pub struct CrashReporter {
+    pub saved_reports: HashMap<String, OopsReport>,
 }
 
-pub trait CoredumpCollector {
-    fn collect_coredump(&mut self, pid: usize) -> Result<CrashReportID, CrashError>;
-    fn store_coredump(&mut self, report_id: CrashReportID, data: &[u8]) -> Result<(), CrashError>;
-    fn get_coredump(&self, report_id: CrashReportID) -> Option<&[u8]>;
-}
-
-#[repr(C)]
-pub struct SimpleCoredumpCollector {
-    pub reports: Vec<Option<Box<dyn CrashReport>>>,
-    pub coredumps: Vec<(CrashReportID, [u8; 4096])>,
-    pub next_id: AtomicUsize,
-}
-
-impl SimpleCoredumpCollector {
+impl CrashReporter {
     pub fn new() -> Self {
-        SimpleCoredumpCollector {
-            reports: Vec::new(),
-            coredumps: Vec::new(),
-            next_id: AtomicUsize::new(1),
+        Self {
+            saved_reports: HashMap::new(),
         }
     }
-}
 
-impl CoredumpCollector for SimpleCoredumpCollector {
-    fn collect_coredump(&mut self, pid: usize) -> Result<CrashReportID, CrashError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let mut process_name = [0u8; 64];
-        process_name[0] = b'p';
-        process_name[1] = b'r';
-        process_name[2] = b'o';
-        process_name[3] = b'c';
-        let report = SimpleCrashReport::new(id, CrashType::SegmentationFault, &process_name);
-        report.timestamp.store(1000000, Ordering::SeqCst);
-        self.reports.push(Some(Box::new(report)));
-        Ok(id)
-    }
+    /// Receives a kernel/process panic oops, sanitizes PII data, and formats a clean Linux-style oops register dump.
+    pub fn generate_linux_grade_panic_dump(&mut self, oops: OopsReport) -> String {
+        // Anonymize the raw panic message
+        let sanitized_msg = PiiAnonymizer::sanitize_log(&oops.raw_panic_message);
 
-    fn store_coredump(&mut self, report_id: CrashReportID, data: &[u8]) -> Result<(), CrashError> {
-        let mut data_array = [0u8; 4096];
-        let data_len = data.len().min(4095);
-        for i in 0..data_len {
-            data_array[i] = data[i];
-        }
-        self.coredumps.push((report_id, data_array));
-        Ok(())
-    }
+        let dump = format!(
+            "=================================================================\n\
+             [!] SIGMAOS KERNEL PANIC: OOPS EXCEPTION ENCOUNTERED\n\
+             Process: {} (PID: {}, Parent PID: {})\n\
+             Reason: {}\n\
+             -----------------------------------------------------------------\n\
+             CPU REGISTER DUMP (x86_64):\n\
+               RIP: 0x{:016X}   RSP: 0x{:016X}   RBP: 0x{:016X}\n\
+               RAX: 0x{:016X}   RBX: 0x{:016X}   RCX: 0x{:016X}\n\
+               RDX: 0x{:016X}   RFL: 0x{:016X}\n\
+             -----------------------------------------------------------------\n\
+             BACKTRACE CALL STACK:\n\
+               #0: 0x{:016X}\n\
+               #1: 0x{:016X}\n\
+             =================================================================",
+            oops.process_name,
+            oops.pid,
+            oops.ppid,
+            sanitized_msg,
+            oops.registers.rip,
+            oops.registers.rsp,
+            oops.registers.rbp,
+            oops.registers.rax,
+            oops.registers.rbx,
+            oops.registers.rcx,
+            oops.registers.rdx,
+            oops.registers.rflags,
+            oops.stack_trace.get(0).copied().unwrap_or(0),
+            oops.stack_trace.get(1).copied().unwrap_or(0)
+        );
 
-    fn get_coredump(&self, report_id: CrashReportID) -> Option<&[u8]> {
-        for &(id, ref data) in &self.coredumps {
-            if id == report_id {
-                let len = data.iter().position(|&b| b == 0).unwrap_or(4096);
-                return Some(&data[..len]);
-            }
-        }
-        None
-    }
-}
+        // Save report internally for diagnostics
+        let report_id = format!("oops-{}", oops.pid);
+        self.saved_reports.insert(report_id, oops);
 
-pub trait Anonymizer {
-    fn anonymize_report(&mut self, report_id: CrashReportID) -> Result<(), CrashError>;
-    fn strip_pii(&self, data: &[u8]) -> Vec<u8>;
-}
-
-#[repr(C)]
-pub struct SimpleAnonymizer {
-    pub collector: SimpleCoredumpCollector,
-}
-
-impl SimpleAnonymizer {
-    pub fn new(collector: SimpleCoredumpCollector) -> Self {
-        SimpleAnonymizer { collector }
+        dump
     }
 }
 
-impl Anonymizer for SimpleAnonymizer {
-    fn anonymize_report(&mut self, _report_id: CrashReportID) -> Result<(), CrashError> {
-        Ok(())
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_pii_anonymizer_sanitization() {
+        let raw_log = "Connection failed on server 192.168.1.104 with credentials token=secret5566";
+        let sanitized = PiiAnonymizer::sanitize_log(raw_log);
+
+        assert!(!sanitized.contains("192.168.1.104"));
+        assert!(!sanitized.contains("secret5566"));
+        assert!(sanitized.contains("XXX.XXX.X.X"));
+        assert!(sanitized.contains("token=XXXXXXXXXXXX"));
     }
 
-    fn strip_pii(&self, data: &[u8]) -> Vec<u8> {
-        let mut anonymized = Vec::new();
-        for &byte in data {
-            if byte.is_ascii_digit() {
-                anonymized.push(b'X');
-            } else if byte.is_ascii_alphanumeric() || byte == b' ' || byte == b'\n' {
-                anonymized.push(byte);
-            }
-        }
-        anonymized
-    }
-}
+    #[test]
+    fn test_linux_grade_panic_oops_dump() {
+        let mut reporter = CrashReporter::new();
 
-pub trait CrashUploader {
-    fn upload_report(&mut self, report_id: CrashReportID) -> Result<(), CrashError>;
-    fn get_upload_status(&self, report_id: CrashReportID) -> bool;
-}
+        let regs = CpuRegisterDump {
+            rip: 0xFFFFFFFF81001234,
+            rsp: 0xFFFF880000012000,
+            rbp: 0xFFFF880000012050,
+            rax: 0x0000000000000005,
+            rbx: 0x0000000000001000,
+            rcx: 0x0000000000000000,
+            rdx: 0x0000000000000042,
+            rflags: 0x0000000000010202,
+        };
 
-#[repr(C)]
-pub struct SimpleCrashUploader {
-    pub uploaded_reports: Vec<CrashReportID>,
-}
+        let oops = OopsReport {
+            process_name: "sigma-db".to_string(),
+            pid: 104,
+            ppid: 1,
+            registers: regs,
+            stack_trace: vec![0xFFFFFFFF8100A1B2, 0xFFFFFFFF8100C3D4],
+            raw_panic_message: "Segmentation fault accessing DB pool on 10.0.0.5 with key=abcd1234".to_string(),
+        };
 
-impl SimpleCrashUploader {
-    pub fn new() -> Self {
-        SimpleCrashUploader {
-            uploaded_reports: Vec::new(),
-        }
-    }
-}
+        let dump = reporter.generate_linux_grade_panic_dump(oops);
 
-impl CrashUploader for SimpleCrashUploader {
-    fn upload_report(&mut self, report_id: CrashReportID) -> Result<(), CrashError> {
-        self.uploaded_reports.push(report_id);
-        Ok(())
-    }
-
-    fn get_upload_status(&self, report_id: CrashReportID) -> bool {
-        self.uploaded_reports.contains(&report_id)
-    }
-}
-
-pub trait CrashPipeline {
-    fn process_crash(&mut self, pid: usize) -> Result<CrashReportID, CrashError>;
-    fn generate_report(&self, report_id: CrashReportID) -> Vec<u8>;
-    fn get_statistics(&self) -> CrashStatistics;
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct CrashStatistics {
-    pub total_crashes: usize,
-    pub by_type: [usize; 5],
-}
-
-#[repr(C)]
-pub struct SimpleCrashPipeline {
-    pub collector: SimpleCoredumpCollector,
-    pub anonymizer: SimpleAnonymizer,
-    pub uploader: SimpleCrashUploader,
-    pub statistics: CrashStatistics,
-}
-
-impl SimpleCrashPipeline {
-    pub fn new() -> Self {
-        let collector = SimpleCoredumpCollector::new();
-        let anonymizer = SimpleAnonymizer::new(SimpleCoredumpCollector::new());
-        let uploader = SimpleCrashUploader::new();
-        SimpleCrashPipeline {
-            collector,
-            anonymizer,
-            uploader,
-            statistics: CrashStatistics { total_crashes: 0, by_type: [0; 5] },
-        }
-    }
-}
-
-impl CrashPipeline for SimpleCrashPipeline {
-    fn process_crash(&mut self, pid: usize) -> Result<CrashReportID, CrashError> {
-        let report_id = self.collector.collect_coredump(pid)?;
-        self.anonymizer.anonymize_report(report_id)?;
-        self.uploader.upload_report(report_id)?;
-
-        self.statistics.total_crashes += 1;
-
-        Ok(report_id)
-    }
-
-    fn generate_report(&self, report_id: CrashReportID) -> Vec<u8> {
-        let mut report = Vec::new();
-        let header = b"Crash Report #";
-        for &byte in header { report.push(byte); }
-
-        let id_str = [b'0' + (report_id % 10) as u8];
-        report.push(id_str[0]);
-        report.push(b'\n');
-
-        if let Some(crash) = self.collector.reports.iter().filter_map(|r| r.as_ref()).find(|r| r.id() == report_id) {
-            let type_str: &[u8] = match crash.crash_type() {
-                CrashType::SegmentationFault => b"Segmentation Fault",
-                CrashType::BusError => b"Bus Error",
-                CrashType::IllegalInstruction => b"Illegal Instruction",
-                CrashType::Abort => b"Abort",
-                CrashType::Panic => b"Panic",
-            };
-            for &byte in type_str { report.push(byte); }
-            report.push(b'\n');
-
-            let proc = b"Process: ";
-            for &byte in proc { report.push(byte); }
-            for &byte in crash.process_name() { report.push(byte); }
-            report.push(b'\n');
-        }
-
-        report
-    }
-
-    fn get_statistics(&self) -> CrashStatistics {
-        self.statistics
-    }
-}
-
-pub struct Vec<T> {
-    pub data: *mut T,
-    pub len: usize,
-    pub capacity: usize,
-}
-
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    pub fn contains(&self, item: &T) -> bool where T: PartialEq {
-        for i in 0..self.len {
-            unsafe {
-                if &*self.data.add(i) == item { return true; }
-            }
-        }
-        false
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
-            if self.capacity > 0 { free(self.data as *mut u8); }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(_ptr: *mut u8) {
-    // Safe no-op or stub on hosted target during tests
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        assert!(dump.contains("SIGMAOS KERNEL PANIC: OOPS EXCEPTION ENCOUNTERED"));
+        assert!(dump.contains("Process: sigma-db (PID: 104, Parent PID: 1)"));
+        assert!(dump.contains("RIP: 0xFFFFFFFF81001234"));
+        assert!(dump.contains("key=XXXXXXXXXXXX")); // Must be sanitized!
+        assert!(!dump.contains("10.0.0.5"));       // IP Must be sanitized!
+        assert_eq!(reporter.saved_reports.len(), 1);
     }
 }

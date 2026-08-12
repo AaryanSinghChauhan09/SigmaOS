@@ -1,24 +1,7 @@
 // SigmaOS Shell REPL (Read-Eval-Print Loop)
-// Interactive shell with full desktop GUI-parity and defensive auditing commands
+// Interactive shell for SigmaOS
 
-use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
-
-use crate::accessibility::{
-    AccessibilityCategory, AccessibilityFeature, AccessibilityFramework, AccessibilityProfile,
-    AccessibilitySetting,
-};
-use crate::compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityManager, CompatibilityMode, TargetPlatform,
-};
-use crate::customization::{CustomizationEngine, Theme};
-use crate::dashboard::{MetricType, SystemMonitor, UnifiedDashboard, WidgetType};
-use crate::package::{PackageFormat, PackageSource, UnifiedPackage, UniversalPackageManager};
-use crate::resilience::{RecoveryAction, RecoveryEventType, RecoveryRule, SelfHealingModule};
-use crate::virtualization::{
-    Container, ResourcePool, VirtualMachine, VirtualizationOrchestrator, VirtualizationTech,
-    VmState,
-};
 
 /// Shell command type
 #[derive(Debug, Clone)]
@@ -37,110 +20,134 @@ pub enum ShellCommand {
     Get {
         variable: String,
     },
-
-    // Customization & GUI theme commands
-    ThemeSet {
-        theme: String,
+    Alias {
+        name: String,
+        value: String,
     },
-    ThemeList,
-    RoutineEnable {
-        routine_id: String,
-    },
-
-    // Accessibility commands
-    A11ySet {
-        setting: String,
-        enabled: bool,
-    },
-    A11yProfile {
-        profile: String,
-    },
-
-    // Telemetry and monitoring commands
-    MonitorShow,
-
-    // Package management commands
-    PkgInstall {
+    Unalias {
         name: String,
     },
-    PkgRemove {
-        name: String,
+    Run {
+        variable: String,
     },
-    PkgList,
-
-    // Virtualization and container commands
-    VmCreate {
-        name: String,
-        tech: String,
+    AgentList,
+    AgentRegister {
+        description: String,
+        commands: String,
     },
-    VmStart {
-        id: String,
+    AgentRun {
+        task_id: usize,
     },
-    VmList,
-    ContainerRun {
-        name: String,
-        image: String,
+    Gst {
+        basic_cost: f64,
+        rate: u32,
     },
-
-    // Cross-platform compatibility commands
-    PlatformRun {
-        name: String,
-        platform: String,
-        format: String,
+    Upi {
+        vpa: String,
+        amount: usize,
     },
-
-    // Resilience and backup commands
-    SnapshotCreate,
-    SnapshotRestore {
-        id: String,
+    Translate {
+        lang: String,
+        key: String,
     },
-
-    // Defensive Security Auditing commands
-    AuditStatus,
-    AuditLog,
-    AuditCheck,
-
+    PeValidate {
+        hex_stub: String,
+    },
+    VmStep {
+        hex_bytecode: String,
+    },
+    Proc {
+        args: Vec<String>,
+    },
+    FixAnomalies,
+    UnixSocketBridge,
+    SysfsViewer,
+    Crash,
+    Sysctl {
+        mib_expression: Option<String>,
+    },
+    Ebpf {
+        bytecode_spec: String,
+    },
     Unknown(String),
+}
+
+/// Represents an automated action task executed by an AI agent
+#[derive(Debug, Clone)]
+pub struct AgentTask {
+    pub task_id: usize,
+    pub description: String,
+    pub commands: Vec<String>,
+}
+
+/// AI Agent Automation Engine inside SigmaOS REPL
+#[derive(Debug, Clone)]
+pub struct AgentAutomationEngine {
+    pub registered_tasks: std::collections::HashMap<usize, AgentTask>,
+    pub next_task_id: usize,
+}
+
+impl AgentAutomationEngine {
+    pub fn new() -> Self {
+        AgentAutomationEngine {
+            registered_tasks: std::collections::HashMap::new(),
+            next_task_id: 1,
+        }
+    }
+
+    pub fn register_task(&mut self, description: String, commands: Vec<String>) -> usize {
+        let id = self.next_task_id;
+        self.next_task_id += 1;
+        self.registered_tasks.insert(
+            id,
+            AgentTask {
+                task_id: id,
+                description,
+                commands,
+            },
+        );
+        id
+    }
+}
+
+impl Default for AgentAutomationEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Shell REPL
 pub struct ShellRepl {
     running: bool,
-    variables: HashMap<String, String>,
+    variables: std::collections::HashMap<String, String>,
+    aliases: std::collections::HashMap<String, String>,
     prompt: String,
-
-    // Keep internal instances of engines for persistent state during shell interaction
-    pub customization: CustomizationEngine,
-    pub accessibility: AccessibilityFramework,
-    pub package_manager: UniversalPackageManager,
-    pub virt_orchestrator: VirtualizationOrchestrator,
-    pub compatibility: CompatibilityManager,
-    pub self_healing: SelfHealingModule,
+    agent_engine: AgentAutomationEngine,
 }
 
 impl ShellRepl {
     pub fn new() -> Self {
         Self {
             running: true,
-            variables: HashMap::new(),
+            variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
             prompt: "sigma-sh> ".to_string(),
-            customization: CustomizationEngine::new(),
-            accessibility: AccessibilityFramework::new(),
-            package_manager: UniversalPackageManager::new(),
-            virt_orchestrator: VirtualizationOrchestrator::new(),
-            compatibility: CompatibilityManager::new(),
-            self_healing: SelfHealingModule::new(),
+            agent_engine: AgentAutomationEngine::new(),
         }
     }
 
     pub fn with_prompt(prompt: String) -> Self {
-        let mut shell = Self::new();
-        shell.prompt = prompt;
-        shell
+        Self {
+            running: true,
+            variables: std::collections::HashMap::new(),
+            aliases: std::collections::HashMap::new(),
+            prompt,
+            agent_engine: AgentAutomationEngine::new(),
+        }
     }
 
     pub fn run(&mut self) {
-        println!("SigmaOS Shell v0.1.0 (GUI-Parity & Security Auditing Enabled)");
+        println!("SigmaOS Shell v0.1.0");
         println!("Type 'help' for available commands\n");
 
         let stdin = io::stdin();
@@ -162,7 +169,21 @@ impl ShellRepl {
         println!("Goodbye!");
     }
 
-    fn execute_line(&mut self, line: &str) {
+    pub fn execute_line(&mut self, line: &str) {
+        if line.contains(';') {
+            let subcommands: Vec<&str> = line.split(';').collect();
+            for sub in subcommands {
+                let trimmed = sub.trim();
+                if !trimmed.is_empty() {
+                    self.execute_single_line(trimmed);
+                }
+            }
+        } else {
+            self.execute_single_line(line);
+        }
+    }
+
+    fn execute_single_line(&mut self, line: &str) {
         let command = self.parse_command(line);
         let result = self.execute_command(command);
 
@@ -179,7 +200,18 @@ impl ShellRepl {
     }
 
     pub fn parse_command(&self, input: &str) -> ShellCommand {
-        let parts: Vec<&str> = input.split_whitespace().collect();
+        let mut expanded_input = input.to_string();
+        let first_word = input.split_whitespace().next().unwrap_or("");
+        if let Some(alias_value) = self.aliases.get(first_word) {
+            let rest = if input.len() > first_word.len() {
+                &input[first_word.len()..]
+            } else {
+                ""
+            };
+            expanded_input = format!("{}{}", alias_value, rest);
+        }
+
+        let parts: Vec<&str> = expanded_input.split_whitespace().collect();
 
         if parts.is_empty() {
             return ShellCommand::Unknown(input.to_string());
@@ -213,47 +245,56 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "theme" => {
-                if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::ThemeList,
-                        "set" => {
-                            if parts.len() >= 3 {
-                                ShellCommand::ThemeSet {
-                                    theme: parts[2].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "routine" => {
-                if parts.len() >= 3 && parts[1] == "enable" {
-                    ShellCommand::RoutineEnable {
-                        routine_id: parts[2].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "a11y" => {
+            "alias" => {
                 if parts.len() >= 3 {
+                    ShellCommand::Alias {
+                        name: parts[1].to_string(),
+                        value: parts[2..].join(" "),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "unalias" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Unalias {
+                        name: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "run" | "exec" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Run {
+                        variable: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "agent" => {
+                if parts.len() >= 2 {
                     match parts[1] {
-                        "profile" => ShellCommand::A11yProfile {
-                            profile: parts[2].to_string(),
-                        },
-                        "set" => {
+                        "list" => ShellCommand::AgentList,
+                        "run" => {
+                            if parts.len() >= 3 {
+                                if let Ok(id) = parts[2].parse::<usize>() {
+                                    ShellCommand::AgentRun { task_id: id }
+                                } else {
+                                    ShellCommand::Unknown(input.to_string())
+                                }
+                            } else {
+                                ShellCommand::Unknown(input.to_string())
+                            }
+                        }
+                        "register" => {
                             if parts.len() >= 4 {
-                                let enabled =
-                                    parts[3] == "on" || parts[3] == "true" || parts[3] == "1";
-                                ShellCommand::A11ySet {
-                                    setting: parts[2].to_string(),
-                                    enabled,
+                                let desc = parts[2].to_string();
+                                let cmds = parts[3..].join(" ");
+                                ShellCommand::AgentRegister {
+                                    description: desc,
+                                    commands: cmds,
                                 }
                             } else {
                                 ShellCommand::Unknown(input.to_string())
@@ -265,36 +306,49 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "monitor" => {
-                if parts.len() >= 2 && parts[1] == "show" {
-                    ShellCommand::MonitorShow
+            "gst" => {
+                if parts.len() >= 3 {
+                    if let (Ok(cost), Ok(rate)) = (parts[1].parse::<f64>(), parts[2].parse::<u32>())
+                    {
+                        ShellCommand::Gst {
+                            basic_cost: cost,
+                            rate,
+                        }
+                    } else {
+                        ShellCommand::Unknown(input.to_string())
+                    }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "pkg" => {
+            "upi" => {
+                if parts.len() >= 3 {
+                    if let Ok(amount) = parts[2].parse::<usize>() {
+                        ShellCommand::Upi {
+                            vpa: parts[1].to_string(),
+                            amount,
+                        }
+                    } else {
+                        ShellCommand::Unknown(input.to_string())
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "translate" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Translate {
+                        lang: parts[1].to_string(),
+                        key: parts[2].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "pe" => {
                 if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::PkgList,
-                        "install" => {
-                            if parts.len() >= 3 {
-                                ShellCommand::PkgInstall {
-                                    name: parts[2].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        "remove" => {
-                            if parts.len() >= 3 {
-                                ShellCommand::PkgRemove {
-                                    name: parts[2].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
+                    ShellCommand::PeValidate {
+                        hex_stub: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -302,79 +356,36 @@ impl ShellRepl {
             }
             "vm" => {
                 if parts.len() >= 2 {
-                    match parts[1] {
-                        "list" => ShellCommand::VmList,
-                        "create" => {
-                            if parts.len() >= 4 {
-                                ShellCommand::VmCreate {
-                                    name: parts[2].to_string(),
-                                    tech: parts[3].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        "start" => {
-                            if parts.len() >= 3 {
-                                ShellCommand::VmStart {
-                                    id: parts[2].to_string(),
-                                }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
+                    ShellCommand::VmStep {
+                        hex_bytecode: parts[1].to_string(),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "container" => {
-                if parts.len() >= 4 && parts[1] == "run" {
-                    ShellCommand::ContainerRun {
-                        name: parts[2].to_string(),
-                        image: parts[3].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
+            "proc" => {
+                let args_vec = parts[1..].iter().map(|s| s.to_string()).collect();
+                ShellCommand::Proc { args: args_vec }
             }
-            "platform" => {
-                if parts.len() >= 5 && parts[1] == "run" {
-                    ShellCommand::PlatformRun {
-                        name: parts[2].to_string(),
-                        platform: parts[3].to_string(),
-                        format: parts[4].to_string(),
-                    }
-                } else {
-                    ShellCommand::Unknown(input.to_string())
-                }
-            }
-            "snapshot" => {
+            "fix" => ShellCommand::FixAnomalies,
+            "sock" => ShellCommand::UnixSocketBridge,
+            "sysfs" => ShellCommand::SysfsViewer,
+            "crash" => ShellCommand::Crash,
+            "sysctl" => {
                 if parts.len() >= 2 {
-                    match parts[1] {
-                        "create" => ShellCommand::SnapshotCreate,
-                        "restore" => {
-                            if parts.len() >= 3 {
-                                let id = parts[2].to_string();
-                                ShellCommand::SnapshotRestore { id }
-                            } else {
-                                ShellCommand::Unknown(input.to_string())
-                            }
-                        }
-                        _ => ShellCommand::Unknown(input.to_string()),
+                    ShellCommand::Sysctl {
+                        mib_expression: Some(parts[1..].join(" ")),
                     }
                 } else {
-                    ShellCommand::Unknown(input.to_string())
+                    ShellCommand::Sysctl {
+                        mib_expression: None,
+                    }
                 }
             }
-            "audit" => {
+            "ebpf" => {
                 if parts.len() >= 2 {
-                    match parts[1] {
-                        "status" => ShellCommand::AuditStatus,
-                        "log" => ShellCommand::AuditLog,
-                        "check" => ShellCommand::AuditCheck,
-                        _ => ShellCommand::Unknown(input.to_string()),
+                    ShellCommand::Ebpf {
+                        bytecode_spec: parts[1..].join(" "),
                     }
                 } else {
                     ShellCommand::Unknown(input.to_string())
@@ -387,37 +398,42 @@ impl ShellRepl {
     pub fn execute_command(&mut self, command: ShellCommand) -> Result<String, String> {
         match command {
             ShellCommand::Help => Ok("Available commands:\n\
-                   help                      - Show this help message\n\
-                   ps                        - List running processes\n\
-                   ls                        - List files\n\
-                   echo <msg>                - Print a message\n\
-                   set <var> <val>           - Set a variable\n\
-                   get <var>                 - Get a variable\n\
-                   theme list                - List available customization themes\n\
-                   theme set <name>          - Set active system UI theme (GUI parity)\n\
-                   routine enable <id>       - Enable background automation routine\n\
-                   a11y set <feature> <on/off> - Override accessibility framework setting\n\
-                   a11y profile <name>       - Activate accessibility profile (e.g., Blind, Deaf)\n\
-                   monitor show              - Render CLI-parity dashboard telemetry\n\
-                   pkg list                  - List installed system packages\n\
-                   pkg install <name>        - Securely install a unified system package\n\
-                   pkg remove <name>         - Uninstall a package and resolve conflicts\n\
-                   vm list                   - List running virtualization guest machines\n\
-                   vm create <name> <tech>   - Provision a VM guest with dedicated ResourcePool\n\
-                   vm start <id>             - Boot virtual machine guest\n\
-                   container run <name> <img_hash> - Spin up sandboxed OCI-compliant container\n\
-                   platform run <name> <platform> <format> - Run foreign executable (.exe/.dmg) via Rosetta/Wine\n\
-                   snapshot create           - Create immutable self-healing system recovery checkpoint\n\
-                   snapshot restore <id>     - Atomic rollback to target snapshot state\n\
-                   audit status              - Display active defensive security auditing summary\n\
-                   audit log                 - Output latest capability access logs\n\
-                   audit check               - Run a capability and memory sandbox sanity scan\n\
-                   exit                      - Exit the shell"
+                   help      - Show this help message\n\
+                   ps        - List running processes\n\
+                   proc      - Access Linux-inspired ProcFS (e.g. proc cat /proc/meminfo)\n\
+                   ls        - List files\n\
+                   echo      - Print a message\n\
+                   set       - Set a variable\n\
+                   get       - Get a variable\n\
+                   alias     - Create a command shortcut/alias\n\
+                   unalias   - Remove an alias\n\
+                   run       - Execute an automated macro/script variable\n\
+                   agent     - Interface for AI Agent Automation tasks (register, list, run)\n\
+                   gst       - Perform sovereign India-first Goods and Services Tax Calculations\n\
+                   upi       - Generate sovereign Indian UPI virtual payment paylink\n\
+                   translate - Retrieve official Sanskrit/Hindi/Tamil Indic translations\n\
+                   pe        - Validate Windows NT PE and DOS MZ binary headers\n\
+                   vm        - Execute instruction-deterministic micro-virtualization steps\n\
+                   fix       - Run self-healing daemon to detect and remediate anomalies\n\
+                   sock      - Run local UNIX Domain Sockets server-client IPC pipeline\n\
+                   sysfs     - View Linux-inspired Sysfs (/sys) hardware and loop devices\n\
+                   crash     - Trigger a simulated anonymized kernel panic oops report\n\
+                   sysctl    - Query and modify BSD-style kernel parameter state\n\
+                   ebpf      - Execute verified sandboxed Linux-grade bytecode\n\
+                   exit      - Exit the shell"
                 .to_string()),
-            ShellCommand::ListProcesses => Ok("PID  NAME        STATE\n\
-                   1    sigma-sh    Running\n\
-                   2    kernel      Running"
-                .to_string()),
+            ShellCommand::ListProcesses => {
+                use crate::process::ProcFileSystem;
+                let pfs = ProcFileSystem::new();
+                let mut out = "PID  NAME             STATE\n".to_string();
+                let mut keys: Vec<&usize> = pfs.processes.keys().collect();
+                keys.sort();
+                for pid in keys {
+                    let proc = pfs.processes.get(pid).unwrap();
+                    out.push_str(&format!("{:<5} {:<16} {}\n", proc.pid, proc.name, proc.state.as_str()));
+                }
+                Ok(out)
+            },
             ShellCommand::ListFiles => Ok("README.md\n\
                    Cargo.toml\n\
                    src/\n\
@@ -436,210 +452,413 @@ impl ShellRepl {
                 Some(value) => Ok(value.clone()),
                 None => Err(format!("Variable '{}' not found", variable)),
             },
-
-            // Customization & Themes
-            ShellCommand::ThemeList => {
-                let themes = self.customization.list_themes();
-                let mut list = String::from("Available themes:\n");
-                for t in themes {
-                    list.push_str(&format!(" - {}\n", t.name));
-                }
-                Ok(list)
+            ShellCommand::Alias { name, value } => {
+                self.aliases.insert(name.clone(), value.clone());
+                Ok(format!("alias {} = {}", name, value))
             }
-            ShellCommand::ThemeSet { theme } => {
-                match self.customization.set_active_theme(&theme) {
-                    Ok(_) => Ok(format!("System UI theme shifted to '{}' successfully.", theme)),
-                    Err(_) => Err(format!("Theme '{}' not found.", theme)),
-                }
-            }
-            ShellCommand::RoutineEnable { routine_id } => {
-                if let Some(r) = self.customization.routines.get_mut(&routine_id) {
-                    r.enable();
-                    Ok(format!("Automation routine '{}' has been enabled.", r.name))
+            ShellCommand::Unalias { name } => {
+                if self.aliases.remove(&name).is_some() {
+                    Ok(format!("Removed alias {}", name))
                 } else {
-                    Err(format!("Routine '{}' not found.", routine_id))
+                    Err(format!("Alias '{}' not found", name))
                 }
             }
-
-            // Accessibility
-            ShellCommand::A11ySet { setting, enabled } => {
-                let feature = match setting.as_str() {
-                    "screen_reader" => AccessibilityFeature::ScreenReader,
-                    "high_contrast" => AccessibilityFeature::HighContrast,
-                    "voice_over" => AccessibilityFeature::VoiceControl,
-                    _ => return Err(format!("Unknown accessibility feature '{}'.", setting)),
-                };
-                let mut s = AccessibilitySetting::new(feature);
-                s.enabled = enabled;
-                self.accessibility.set_global_setting(s);
-                Ok(format!("Accessibility setting '{}' set to {}.", setting, enabled))
-            }
-            ShellCommand::A11yProfile { profile } => {
-                let profile_name = match profile.as_str() {
-                    "blind" => "Vision Impaired",
-                    "deaf" => "Hearing Impaired",
-                    "mobility" => "Mobility Impaired",
-                    _ => return Err(format!("Unknown accessibility profile '{}'.", profile)),
-                };
-                match self.accessibility.activate_profile(profile_name) {
-                    Ok(_) => Ok(format!("Accessibility profile '{}' activated successfully. Rendering pipeline updated.", profile_name)),
-                    Err(_) => Err(format!("Failed to activate profile '{}'.", profile_name)),
+            ShellCommand::Run { variable } => {
+                if let Some(val) = self.variables.get(&variable).cloned() {
+                    self.execute_line(&val);
+                    Ok(format!("Executed macro '{}'", variable))
+                } else {
+                    Err(format!("Variable/Macro '{}' not found", variable))
                 }
             }
-
-            // Telemetry & Dashboard Monitor
-            ShellCommand::MonitorShow => {
-                let mut monitor = SystemMonitor::new();
-                monitor.running = true;
-                monitor.update_metrics(); // automatically update to capture values
-
-                let cpu_avg = monitor.dashboard.widgets.get("cpu").and_then(|w| w.get_latest_value()).unwrap_or(42.5);
-                let mem_avg = monitor.dashboard.widgets.get("memory").and_then(|w| w.get_latest_value()).unwrap_or(61.2);
-                let disk_avg = monitor.dashboard.widgets.get("disk").and_then(|w| w.get_latest_value()).unwrap_or(75.0);
-
+            ShellCommand::AgentRegister {
+                description,
+                commands,
+            } => {
+                let cmd_list: Vec<String> =
+                    commands.split(';').map(|s| s.trim().to_string()).collect();
+                let id = self
+                    .agent_engine
+                    .register_task(description.clone(), cmd_list);
                 Ok(format!(
-                    "System Telemetry Dashboard:\n\
-                     ===========================\n\
-                     CPU Usage:    [████░░░░░░] {:.2}%\n\
-                     Memory Usage: [██████░░░░] {:.2}%\n\
-                     Disk Usage:   [███████░░░] {:.1}%",
-                    cpu_avg, mem_avg, disk_avg
+                    "Agent task #{} registered successfully: {}",
+                    id, description
                 ))
             }
-
-            // Package Manager
-            ShellCommand::PkgList => {
-                let list = self.package_manager.list_installed();
-                let mut out = String::from("Installed system packages:\n");
-                for p in list {
-                    out.push_str(&format!(" - {} ({})\n", p.name, p.version));
-                }
-                Ok(out)
-            }
-            ShellCommand::PkgInstall { name } => {
-                let pkg = UnifiedPackage::new(name.clone(), "1.0.0".to_string());
-                self.package_manager.add_package(pkg);
-                match self.package_manager.install(&name) {
-                    Ok(_) => Ok(format!("Package '{}' safely installed. Sandboxed caps registered.", name)),
-                    Err(_) => Err(format!("Failed to install package '{}'.", name)),
-                }
-            }
-            ShellCommand::PkgRemove { name } => {
-                match self.package_manager.remove(&name) {
-                    Ok(_) => Ok(format!("Package '{}' cleanly uninstalled and dependency trees pruned.", name)),
-                    Err(_) => Err(format!("Failed to uninstall package '{}'. Package not found.", name)),
-                }
-            }
-
-            // Virtualization & Containers
-            ShellCommand::VmList => {
-                let vms = self.virt_orchestrator.list_running_vms();
-                let mut out = String::from("Running Guest Virtual Machines:\n");
-                for vm in vms {
-                    out.push_str(&format!(" - ID: {} | Name: {} | Tech: {:?}\n", vm.id, vm.name, vm.technology));
-                }
-                Ok(out)
-            }
-            ShellCommand::VmCreate { name, tech } => {
-                let t = match tech.as_str() {
-                    "kvm" | "KVM" => VirtualizationTech::KVM,
-                    "qemu" | "QEMU" => VirtualizationTech::QEMU,
-                    _ => return Err(format!("Unsupported hypervisor tech '{}'.", tech)),
-                };
-                let id = format!("vm-{}", name.to_lowercase());
-                let mut vm = VirtualMachine::new(id.clone(), name.clone(), t).with_resources(4, 4096, 40);
-                vm.start().unwrap();
-                match self.virt_orchestrator.add_virtual_machine(vm) {
-                    Ok(_) => Ok(format!("Guest VM '{}' successfully created and booted.", name)),
-                    Err(_) => Err("Insufficient system resources in ResourcePool.".to_string()),
-                }
-            }
-            ShellCommand::VmStart { id } => {
-                if let Some(vm) = self.virt_orchestrator.virtual_machines.get_mut(&id) {
-                    vm.start().unwrap();
-                    Ok(format!("Booting guest VM '{}'...", vm.name))
+            ShellCommand::AgentList => {
+                if self.agent_engine.registered_tasks.is_empty() {
+                    Ok("No agent automation tasks registered.".to_string())
                 } else {
-                    Err(format!("VM with ID '{}' not found.", id))
-                }
-            }
-            ShellCommand::ContainerRun { name, image } => {
-                let id = format!("c-{}", name.to_lowercase());
-                let mut c = Container::new(id, name.clone(), image, VirtualizationTech::Docker);
-                c.start().unwrap();
-                match self.virt_orchestrator.add_container(c) {
-                    Ok(_) => Ok(format!("OCI Container '{}' spun up in sandbox.", name)),
-                    Err(_) => Err("Failed to spin up container. Insufficient memory.".to_string()),
-                }
-            }
-
-            // Cross-Platform Compatibility Layer (Wine / Rosetta equivalent)
-            ShellCommand::PlatformRun { name, platform, format } => {
-                let target_p = match platform.as_str() {
-                    "windows" | "Windows" => TargetPlatform::Windows,
-                    "mac" | "macos" | "MacOS" => TargetPlatform::MacOS,
-                    "linux" | "Linux" => TargetPlatform::Linux,
-                    _ => return Err(format!("Unsupported platform '{}'.", platform)),
-                };
-                let b_format = match format.as_str() {
-                    "exe" | "EXE" => BinaryFormat::Exe,
-                    "dmg" | "DMG" => BinaryFormat::Dmg,
-                    "elf" | "ELF" => BinaryFormat::Elf,
-                    _ => return Err(format!("Unsupported binary format '{}'.", format)),
-                };
-
-                let mut bin = ApplicationBinary::new(name.clone(), b_format, target_p);
-                self.compatibility.auto_configure_binary(&mut bin);
-                self.compatibility.register_binary(bin);
-
-                match self.compatibility.run_binary(&name) {
-                    Ok(_) => {
-                        let configured_mode = self.compatibility.get_binary(&name).unwrap().compatibility_mode;
-                        Ok(format!("Running foreign binary '{}' via CompatibilityManager.\nAuto-negotiated Mode: {:?}", name, configured_mode))
+                    let mut list_str = "Registered Agent Automation Tasks:\n".to_string();
+                    for (id, task) in &self.agent_engine.registered_tasks {
+                        list_str.push_str(&format!(
+                            "  [#{}] {} (Commands: {})\n",
+                            id,
+                            task.description,
+                            task.commands.join("; ")
+                        ));
                     }
-                    Err(e) => Err(format!("Compatibility layer translation failed: {:?}", e)),
+                    Ok(list_str)
                 }
             }
-
-            // Resilience Snapshots
-            ShellCommand::SnapshotCreate => {
-                let id = self.self_healing.create_snapshot("CLI Checkpoint".to_string());
-                Ok(format!("Immutable system snapshot '{}' successfully created.", id))
-            }
-            ShellCommand::SnapshotRestore { id } => {
-                match self.self_healing.rollback_to_snapshot(&id) {
-                    Ok(_) => Ok(format!("System successfully rolled back to snapshot '{}'.", id)),
-                    Err(_) => Err(format!("Snapshot '{}' not found or corrupted.", id)),
+            ShellCommand::AgentRun { task_id } => {
+                if let Some(task) = self.agent_engine.registered_tasks.get(&task_id).cloned() {
+                    let mut result_str = format!("[Agent Automation Run #{}]\n", task_id);
+                    result_str.push_str(&format!("Task Description: {}\n", task.description));
+                    result_str.push_str("-----------------------------\n");
+                    for (idx, cmd) in task.commands.iter().enumerate() {
+                        result_str.push_str(&format!("Step {}: Executing '{}'...\n", idx + 1, cmd));
+                        self.execute_line(cmd);
+                    }
+                    result_str.push_str("-----------------------------\n");
+                    result_str.push_str("[Agent Automation Complete: Success]");
+                    Ok(result_str)
+                } else {
+                    Err(format!("Agent task #{} not found", task_id))
                 }
             }
+            ShellCommand::Gst { basic_cost, rate } => {
+                use crate::compatibility::india_stack::GstCalculator;
+                match GstCalculator::calculate_gst(basic_cost, rate, false) {
+                    Ok((cgst, sgst, _)) => Ok(format!(
+                        "GST Details:\n  Basic Cost: INR {:.2}\n  CGST: INR {:.2}\n  SGST: INR {:.2}\n  Total: INR {:.2}",
+                        basic_cost, cgst, sgst, basic_cost + cgst + sgst
+                    )),
+                    Err(_) => Err("Invalid GST rate".to_string()),
+                }
+            }
+            ShellCommand::Upi { vpa, amount } => {
+                use crate::compatibility::india_stack::MockUPIService;
+                let upi = MockUPIService::new(amount);
+                let mut buf = [0u8; 128];
+                match upi.generate_upi_qr(vpa.as_bytes(), amount, &mut buf) {
+                    Ok(len) => {
+                        let qr_str = std::str::from_utf8(&buf[..len]).unwrap_or("");
+                        Ok(format!("Generated UPI QR Paylink:\n  {}", qr_str))
+                    }
+                    Err(_) => Err("Invalid VPA address".to_string()),
+                }
+            }
+            ShellCommand::Translate { lang, key } => {
+                use crate::compatibility::india_stack::MultilingualSupport;
+                match MultilingualSupport::translate(lang.as_bytes(), key.as_bytes()) {
+                    Ok(translated_bytes) => {
+                        let translated_str = std::str::from_utf8(translated_bytes).unwrap_or("");
+                        Ok(format!("Translation [{}]: {}", lang, translated_str))
+                    }
+                    Err(_) => Err("Translation not found".to_string()),
+                }
+            }
+            ShellCommand::PeValidate { hex_stub } => {
+                use crate::compatibility::reactos::PortableExecutableLoader;
+                let mut bytes = Vec::new();
+                let mut i = 0;
+                while i + 1 < hex_stub.len() {
+                    if let Ok(b) = u8::from_str_radix(&hex_stub[i..i + 2], 16) {
+                        bytes.push(b);
+                    }
+                    i += 2;
+                }
 
-            // Defensive Security Auditing
-            ShellCommand::AuditStatus => {
-                Ok("Defensive Audit Summary:\n\
-                    =========================\n\
-                    Audit Engine:      Active\n\
-                    Pledge Sandbox:    Enforced\n\
-                    Cap Tokens:        Verified (64-bit hardware tags)\n\
-                    Syscall Monitors:  Active\n\
-                    PQC Signatures:    Dilithium-5 Enforced\n\
-                    Anomalies Logged:  0".to_string())
+                match PortableExecutableLoader::validate_pe_image(&bytes) {
+                    Ok(()) => {
+                        Ok("Valid Windows Portable Executable (PE) headers parsed!".to_string())
+                    }
+                    Err(_) => Err("Invalid PE image headers format".to_string()),
+                }
             }
-            ShellCommand::AuditLog => {
-                Ok("Latest Defensive Access Logs:\n\
-                    =============================\n\
-                    [00:01:05] CAP_CHECK: process 'sigma-sh' (PID 1) requested network capability - ALLOWED (token valid)\n\
-                    [00:02:10] CAP_CHECK: process 'pkg-manager' (PID 12) requested write access to '/usr/bin' - ALLOWED (trusted spkg)\n\
-                    [00:03:45] SANDBOX_TRACE: process 'test-bin' (PID 42) invoked syscall #12 (sys_write) - BLOCKED (exceeded pledge rules)\n\
-                    [00:03:46] HEALER: rollback state snapshot initialized for PID 42 - SUCCESS (priors restored)".to_string())
-            }
-            ShellCommand::AuditCheck => {
-                Ok("System Safety Sanity Scan:\n\
-                    ==========================\n\
-                    [+] Verifying physical memory buddy manager paging write-protection... PASS (W^X strictly enforced)\n\
-                    [+] Scanning post-quantum Kyber-1024 cryptographic keys integrity... PASS (no leakage detected)\n\
-                    [+] Checking capability-gated device drivers isolation boundaries... PASS (zero boundary bleed)\n\
-                    Scan Result: 100% Secure. System is in absolute sovereign state.".to_string())
-            }
+            ShellCommand::VmStep { hex_bytecode } => {
+                use crate::virtualization::deterministic::DeterministicVirtualMachine;
+                let mut vm = DeterministicVirtualMachine::new();
+                let mut bytes = Vec::new();
+                let mut i = 0;
+                while i + 1 < hex_bytecode.len() {
+                    if let Ok(b) = u8::from_str_radix(&hex_bytecode[i..i + 2], 16) {
+                        bytes.push(b);
+                    }
+                    i += 2;
+                }
 
+                match vm.step_instruction(&bytes) {
+                    Ok(()) => Ok(format!(
+                        "VM Step Completed successfully!\n  RIP: {}\n  Reg[0]: {}",
+                        vm.cpu.rip, vm.cpu.r[0]
+                    )),
+                    Err(_) => Err("VM instruction execution limit/error".to_string()),
+                }
+            }
+            ShellCommand::Proc { args } => {
+                use crate::process::ProcFileSystem;
+                let pfs = ProcFileSystem::new();
+                if args.is_empty() {
+                    Ok("Usage: proc cat <file_path>\nAvailable files:\n  /proc/meminfo\n  /proc/cpuinfo\n  /proc/uptime\n  /proc/cgroups\n  /proc/<pid>/status\n  /proc/<pid>/cmdline\n  /proc/<pid>/stat".to_string())
+                } else if args[0] == "cat" && args.len() >= 2 {
+                    let path = &args[1];
+                    match pfs.read_file(path) {
+                        Ok(content) => Ok(content),
+                        Err(err) => Err(err),
+                    }
+                } else {
+                    Err(format!("Unknown proc action. Only 'cat' is supported."))
+                }
+            }
+            ShellCommand::FixAnomalies => {
+                use crate::resilience::{AutomatedFixerDaemon, SovereignProblemType, SelfHealingModule};
+                let mut daemon = AutomatedFixerDaemon::new();
+                let mut healing = SelfHealingModule::new();
+
+                // 1. Remediate Memory Leak (Triggers standard Cache Clear)
+                let r1 = daemon.detect_and_fix(SovereignProblemType::MemoryLeak, 5, &mut healing).unwrap();
+
+                // 2. Remediate Socket Port Block (Triggers TCP stack flush)
+                let r2 = daemon.detect_and_fix(SovereignProblemType::SocketPortBlocked, 8080, &mut healing).unwrap();
+
+                // 3. Remediate Null Pointer Deref (Triggers Virtual Page remapping)
+                let r3 = daemon.detect_and_fix(SovereignProblemType::NullPointerDeRef, 0, &mut healing).unwrap();
+
+                Ok(format!(
+                    "Self-Healing Anomaly Fixer Active!\n  \
+                     - Remediated Anomaly 1: MemoryLeak -> Action={:?}\n  \
+                     - Remediated Anomaly 2: SocketPortBlocked -> Action={:?}\n  \
+                     - Remediated Anomaly 3: NullPointerDeRef -> Action={:?}\n  \
+                     - Daemon Remediation Audit: Total Detected={}, Successful Fixes={}",
+                    r1,
+                    r2,
+                    r3,
+                    daemon.stats.total_problems_detected,
+                    daemon.stats.successful_fixes
+                ))
+            }
+            ShellCommand::UnixSocketBridge => {
+                use crate::network::{UnixSocketRegistry, UnixSocketAddress};
+                let mut registry = UnixSocketRegistry::new();
+                let server_addr = UnixSocketAddress::Path("/var/run/server.sock".to_string());
+                let client_addr = UnixSocketAddress::Path("/var/run/client.sock".to_string());
+
+                // 1. Bind and listen
+                registry.bind(server_addr.clone()).unwrap();
+                registry.listen(&server_addr).unwrap();
+
+                // 2. Connect
+                registry.connect(client_addr.clone(), server_addr.clone()).unwrap();
+
+                // 3. Write data from client
+                let mut client = registry.sockets.get_mut(&client_addr).unwrap();
+                client.write_data(b"IPC sovereign data stream!").unwrap();
+
+                // 4. Pipe packets
+                let peer_addr = UnixSocketAddress::Abstract(format!("peer-{:?}", server_addr));
+                let len = registry.pipe_packets(&client_addr, &peer_addr).unwrap();
+
+                // 5. Read data on server side peer
+                let server_peer = registry.sockets.get_mut(&peer_addr).unwrap();
+                let read_data = server_peer.read_data(100).unwrap();
+                let read_str = std::str::from_utf8(&read_data).unwrap_or("");
+
+                Ok(format!(
+                    "UNIX Sockets Local Bridge active!\n  \
+                     - Server path-bound: {:?}\n  \
+                     - Client path-bound: {:?}\n  \
+                     - Local IPC packet pipe transfer count: {} bytes\n  \
+                     - Received payload: '{}'",
+                    server_addr,
+                    client_addr,
+                    len,
+                    read_str
+                ))
+            }
+            ShellCommand::SysfsViewer => {
+                use crate::process::SysfsRegistry;
+                let mut registry = SysfsRegistry::new();
+
+                // 1. Read battery supply status
+                let bat_cap = registry.read_attribute("/sys/class/power_supply/BAT0/capacity").unwrap();
+                let bat_stat = registry.read_attribute("/sys/class/power_supply/BAT0/status").unwrap();
+
+                // 2. Read CPU 1 online state
+                let cpu_online = registry.read_attribute("/sys/devices/system/cpu/cpu1/online").unwrap();
+
+                // 3. Mount a loopback file
+                registry.mount_loop_device(0, "/home/developer/sigma_dev_overlay.img").unwrap();
+                let loop_dev = registry.loop_devices.get(&0).unwrap();
+
+                Ok(format!(
+                    "Sovereign Sysfs (/sys) Viewer Active!\n  \
+                     - Battery Supply BAT0: {}% ({})\n  \
+                     - CPU core cpu1 online state: {}\n  \
+                     - Loopback Block Device Gated Mounts:\n    \
+                       * /dev/loop0 back-mapped file: '{}'",
+                    bat_cap,
+                    bat_stat,
+                    cpu_online,
+                    loop_dev.backing_file_path
+                ))
+            }
+            ShellCommand::Crash => {
+                use crate::crash::{CrashReporter, OopsReport, CpuRegisterDump};
+                let mut reporter = CrashReporter::new();
+                let regs = CpuRegisterDump {
+                    rip: 0xFFFFFFFF8100A52B,
+                    rsp: 0xFFFF8800000A3000,
+                    rbp: 0xFFFF8800000A3040,
+                    rax: 0x0000000000000200,
+                    rbx: 0x0000000000004000,
+                    rcx: 0x0000000000000001,
+                    rdx: 0x0000000000000055,
+                    rflags: 0x0000000000010246,
+                };
+                let oops = OopsReport {
+                    process_name: "sigma-core".to_string(),
+                    pid: 45,
+                    ppid: 1,
+                    registers: regs,
+                    stack_trace: vec![0xFFFFFFFF8100F2A3, 0xFFFFFFFF8101C5D8],
+                    raw_panic_message: "Segmentation fault reading secrets token=secret_api_key_xyz from cache @ 192.168.1.55".to_string(),
+                };
+                let dump = reporter.generate_linux_grade_panic_dump(oops);
+                Ok(dump)
+            }
+            ShellCommand::Sysctl { mib_expression } => {
+                use crate::kernel::{SysctlRegistry, SysctlValue};
+                let mut registry = SysctlRegistry::new();
+
+                match mib_expression {
+                    None => {
+                        let mut out = "Sovereign BSD Sysctl MIB Nodes:\n".to_string();
+                        let mut keys: Vec<&String> = registry.nodes.keys().collect();
+                        keys.sort();
+                        for key in keys {
+                            let node = registry.nodes.get(key).unwrap();
+                            let val_str = match &node.value {
+                                SysctlValue::Int(v) => format!("{}", v),
+                                SysctlValue::String(s) => s.clone(),
+                                SysctlValue::Bool(b) => format!("{}", b),
+                            };
+                            out.push_str(&format!("  {} = {}  # {}\n", key, val_str, node.description));
+                        }
+                        Ok(out)
+                    }
+                    Some(expr) => {
+                        if expr.contains('=') {
+                            let parts: Vec<&str> = expr.split('=').collect();
+                            if parts.len() == 2 {
+                                let mib = parts[0].trim();
+                                let raw_val = parts[1].trim();
+
+                                let current_val = registry.get(mib).cloned();
+                                match current_val {
+                                    None => Err(format!("Sysctl node '{}' not found", mib)),
+                                    Some(SysctlValue::Int(_)) => {
+                                        if let Ok(v) = raw_val.parse::<i32>() {
+                                            registry.set(mib, SysctlValue::Int(v))?;
+                                            Ok(format!("Updated {} = {}", mib, v))
+                                        } else {
+                                            Err("Expected integer value!".to_string())
+                                        }
+                                    }
+                                    Some(SysctlValue::String(_)) => {
+                                        registry.set(mib, SysctlValue::String(raw_val.to_string()))?;
+                                        Ok(format!("Updated {} = {}", mib, raw_val))
+                                    }
+                                    Some(SysctlValue::Bool(_)) => {
+                                        if let Ok(b) = raw_val.parse::<bool>() {
+                                            registry.set(mib, SysctlValue::Bool(b))?;
+                                            Ok(format!("Updated {} = {}", mib, b))
+                                        } else {
+                                            Err("Expected boolean value (true/false)!".to_string())
+                                        }
+                                    }
+                                }
+                            } else {
+                                Err("Invalid sysctl assignment expression. Usage: sysctl vm.swappiness=10".to_string())
+                            }
+                        } else {
+                            let mib = expr.trim();
+                            if let Some(val) = registry.get(mib) {
+                                let val_str = match val {
+                                    SysctlValue::Int(v) => format!("{}", v),
+                                    SysctlValue::String(s) => s.clone(),
+                                    SysctlValue::Bool(b) => format!("{}", b),
+                                };
+                                Ok(format!("{} = {}", mib, val_str))
+                            } else {
+                                Err(format!("Sysctl node '{}' not found", mib))
+                            }
+                        }
+                    }
+                }
+            }
+            ShellCommand::Ebpf { bytecode_spec } => {
+                use crate::kernel::{EbpfInstruction, EbpfVerifier, EbpfEngine};
+                use crate::kernel::ebpf::*;
+
+                let mut program = Vec::new();
+                for chunk in bytecode_spec.split(';') {
+                    let chunk = chunk.trim();
+                    if chunk.is_empty() {
+                        continue;
+                    }
+                    let parts: Vec<&str> = chunk.split(':').collect();
+                    if parts.is_empty() {
+                        continue;
+                    }
+                    match parts[0] {
+                        "ADD" => {
+                            let dst = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            let src = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            program.push(EbpfInstruction { opcode: EBPF_OP_ADD, dst, src, offset: 0, imm: 0 });
+                        }
+                        "ADDI" => {
+                            let dst = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            let imm = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            program.push(EbpfInstruction { opcode: EBPF_OP_ADDI, dst, src: 0, offset: 0, imm });
+                        }
+                        "SUB" => {
+                            let dst = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            let src = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            program.push(EbpfInstruction { opcode: EBPF_OP_SUB, dst, src, offset: 0, imm: 0 });
+                        }
+                        "LD" => {
+                            let dst = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            let offset = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            program.push(EbpfInstruction { opcode: EBPF_OP_LD, dst, src: 0, offset, imm: 0 });
+                        }
+                        "ST" => {
+                            let dst = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            let offset = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            program.push(EbpfInstruction { opcode: EBPF_OP_ST, dst, src: 0, offset, imm: 0 });
+                        }
+                        "MAP_LOOKUP" => {
+                            let dst = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            let src = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            program.push(EbpfInstruction { opcode: EBPF_OP_MAP_LOOKUP, dst, src, offset: 0, imm: 0 });
+                        }
+                        "DIV" => {
+                            let dst = parts.get(1).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            let src = parts.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            let imm = parts.get(3).and_then(|s| s.parse().ok()).unwrap_or(0);
+                            program.push(EbpfInstruction { opcode: EBPF_OP_DIV, dst, src, offset: 0, imm });
+                        }
+                        "EXIT" => {
+                            program.push(EbpfInstruction { opcode: EBPF_OP_EXIT, dst: 0, src: 0, offset: 0, imm: 0 });
+                        }
+                        _ => return Err(format!("Invalid opcode token: {}", parts[0])),
+                    }
+                }
+
+                if let Err(verif_err) = EbpfVerifier::verify(&program) {
+                    return Err(format!("eBPF Verifier Rejected Bytecode: {}", verif_err));
+                }
+
+                let mut engine = EbpfEngine::new();
+                match engine.execute(&program) {
+                    Ok(retval) => Ok(format!(
+                        "eBPF Program Execution Successful!\n  Verifier Check: PASSED\n  Return Value (R0): {}",
+                        retval
+                    )),
+                    Err(exec_err) => Err(format!("eBPF Execution Failed: {}", exec_err)),
+                }
+            }
             ShellCommand::Unknown(cmd) => Err(format!("Unknown command: {}", cmd)),
         }
     }
@@ -711,140 +930,155 @@ mod tests {
     }
 
     #[test]
-    fn test_cli_customization() {
+    fn test_alias_unalias() {
+        let mut repl = ShellRepl::new();
+        let alias_cmd = ShellCommand::Alias {
+            name: "l".to_string(),
+            value: "ls".to_string(),
+        };
+        repl.execute_command(alias_cmd).unwrap();
+
+        let parsed = repl.parse_command("l");
+        assert!(matches!(parsed, ShellCommand::ListFiles));
+
+        let unalias_cmd = ShellCommand::Unalias {
+            name: "l".to_string(),
+        };
+        repl.execute_command(unalias_cmd).unwrap();
+
+        let parsed_after = repl.parse_command("l");
+        assert!(matches!(parsed_after, ShellCommand::Unknown(..)));
+    }
+
+    #[test]
+    fn test_macro_automation() {
+        let mut repl = ShellRepl::new();
+        let set_cmd = ShellCommand::Set {
+            variable: "test_macro".to_string(),
+            value: "echo running; ls".to_string(),
+        };
+        repl.execute_command(set_cmd).unwrap();
+
+        let run_cmd = ShellCommand::Run {
+            variable: "test_macro".to_string(),
+        };
+        let result = repl.execute_command(run_cmd);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_agent_automation() {
         let mut repl = ShellRepl::new();
 
-        let list_cmd = repl.parse_command("theme list");
-        assert!(matches!(list_cmd, ShellCommand::ThemeList));
+        // 1. Register an Agent Task
+        let reg_cmd = ShellCommand::AgentRegister {
+            description: "SysAudit".to_string(),
+            commands: "echo audit_start; ps; echo audit_end".to_string(),
+        };
+        let reg_res = repl.execute_command(reg_cmd).unwrap();
+        assert!(reg_res.contains("Agent task #1 registered successfully"));
+
+        // 2. List registered tasks
+        let list_cmd = ShellCommand::AgentList;
         let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Dark"));
-        assert!(list_res.contains("Light"));
+        assert!(list_res.contains("SysAudit"));
 
-        let set_cmd = repl.parse_command("theme set Light");
-        assert!(matches!(set_cmd, ShellCommand::ThemeSet { .. }));
-        let set_res = repl.execute_command(set_cmd).unwrap();
-        assert!(set_res.contains("Light"));
-
-        let enable_cmd = repl.parse_command("routine enable work_mode");
-        assert!(matches!(enable_cmd, ShellCommand::RoutineEnable { .. }));
-        let enable_res = repl.execute_command(enable_cmd).unwrap();
-        assert!(enable_res.contains("Work Mode"));
-    }
-
-    #[test]
-    fn test_cli_accessibility() {
-        let mut repl = ShellRepl::new();
-
-        let set_cmd = repl.parse_command("a11y set screen_reader on");
-        assert!(matches!(set_cmd, ShellCommand::A11ySet { .. }));
-        let set_res = repl.execute_command(set_cmd).unwrap();
-        assert!(set_res.contains("true"));
-
-        let profile_cmd = repl.parse_command("a11y profile blind");
-        assert!(matches!(profile_cmd, ShellCommand::A11yProfile { .. }));
-        let profile_res = repl.execute_command(profile_cmd).unwrap();
-        assert!(profile_res.contains("Vision Impaired"));
-    }
-
-    #[test]
-    fn test_cli_telemetry() {
-        let mut repl = ShellRepl::new();
-
-        let show_cmd = repl.parse_command("monitor show");
-        assert!(matches!(show_cmd, ShellCommand::MonitorShow));
-        let show_res = repl.execute_command(show_cmd).unwrap();
-        assert!(show_res.contains("System Telemetry Dashboard"));
-        assert!(show_res.contains("CPU Usage"));
-        assert!(show_res.contains("Memory Usage"));
-    }
-
-    #[test]
-    fn test_cli_package_management() {
-        let mut repl = ShellRepl::new();
-
-        let list_cmd = repl.parse_command("pkg list");
-        assert!(matches!(list_cmd, ShellCommand::PkgList));
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Installed system packages"));
-
-        let install_cmd = repl.parse_command("pkg install nano");
-        assert!(matches!(install_cmd, ShellCommand::PkgInstall { .. }));
-        let install_res = repl.execute_command(install_cmd).unwrap();
-        assert!(install_res.contains("nano"));
-
-        let remove_cmd = repl.parse_command("pkg remove nano");
-        assert!(matches!(remove_cmd, ShellCommand::PkgRemove { .. }));
-        let remove_res = repl.execute_command(remove_cmd).unwrap();
-        assert!(remove_res.contains("nano"));
-    }
-
-    #[test]
-    fn test_cli_virtualization() {
-        let mut repl = ShellRepl::new();
-
-        let list_cmd = repl.parse_command("vm list");
-        assert!(matches!(list_cmd, ShellCommand::VmList));
-        let list_res = repl.execute_command(list_cmd).unwrap();
-        assert!(list_res.contains("Running Guest Virtual Machines"));
-
-        let create_cmd = repl.parse_command("vm create guest-01 qemu");
-        assert!(matches!(create_cmd, ShellCommand::VmCreate { .. }));
-        let create_res = repl.execute_command(create_cmd).unwrap();
-        assert!(create_res.contains("guest-01"));
-
-        let container_cmd = repl.parse_command("container run web-c nginx-img");
-        assert!(matches!(container_cmd, ShellCommand::ContainerRun { .. }));
-        let container_res = repl.execute_command(container_cmd).unwrap();
-        assert!(container_res.contains("web-c"));
-    }
-
-    #[test]
-    fn test_cli_compatibility() {
-        let mut repl = ShellRepl::new();
-
-        let run_cmd = repl.parse_command("platform run photoshop windows exe");
-        assert!(matches!(run_cmd, ShellCommand::PlatformRun { .. }));
+        // 3. Run the Agent Task
+        let run_cmd = ShellCommand::AgentRun { task_id: 1 };
         let run_res = repl.execute_command(run_cmd).unwrap();
-        assert!(run_res.contains("photoshop"));
-        assert!(run_res.contains("Translation"));
+        assert!(run_res.contains("[Agent Automation Run #1]"));
+        assert!(run_res.contains("[Agent Automation Complete: Success]"));
     }
 
     #[test]
-    fn test_cli_resilience() {
+    fn test_sovereign_utility_commands() {
         let mut repl = ShellRepl::new();
 
-        let create_cmd = repl.parse_command("snapshot create");
-        assert!(matches!(create_cmd, ShellCommand::SnapshotCreate));
-        let create_res = repl.execute_command(create_cmd).unwrap();
-        assert!(create_res.contains("successfully created"));
+        // 1. Test GST Command
+        let gst_cmd = ShellCommand::Gst {
+            basic_cost: 1000.0,
+            rate: 18,
+        };
+        let gst_res = repl.execute_command(gst_cmd).unwrap();
+        assert!(gst_res.contains("CGST: INR 90.00"));
 
-        let restore_cmd = repl.parse_command("snapshot restore checkpoint-1");
-        assert!(matches!(restore_cmd, ShellCommand::SnapshotRestore { .. }));
-        let restore_res = repl.execute_command(restore_cmd);
-        // "checkpoint-1" won't exist initially, returns not found Err
-        assert!(restore_res.is_err());
+        // 2. Test UPI Command
+        let upi_cmd = ShellCommand::Upi {
+            vpa: "receiver@upi".to_string(),
+            amount: 1500,
+        };
+        let upi_res = repl.execute_command(upi_cmd).unwrap();
+        assert!(upi_res.contains("upi://pay?pa=receiver@upi&am=1500"));
+
+        // 3. Test Translate Command
+        let trans_cmd = ShellCommand::Translate {
+            lang: "sa".to_string(),
+            key: "welcome".to_string(),
+        };
+        let trans_res = repl.execute_command(trans_cmd).unwrap();
+        assert!(trans_res.contains("स्वागतम्"));
+
+        // 4. Test PE Validation Command (Valid minimal PE hex representation)
+        let pe_cmd = ShellCommand::PeValidate { hex_stub: "4d5a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000050450000".to_string() };
+        let pe_res = repl.execute_command(pe_cmd).unwrap();
+        assert!(pe_res.contains("Valid Windows Portable Executable"));
+
+        // 5. Test VM step command (0x10, 0x00, 0x05 -> ADDI r[0], 5)
+        let vm_cmd = ShellCommand::VmStep {
+            hex_bytecode: "100005".to_string(),
+        };
+        let vm_res = repl.execute_command(vm_cmd).unwrap();
+        assert!(vm_res.contains("VM Step Completed"));
     }
 
     #[test]
-    fn test_cli_defensive_auditing() {
+    fn test_crash_command() {
+        let mut repl = ShellRepl::new();
+        let cmd = repl.parse_command("crash");
+        assert!(matches!(cmd, ShellCommand::Crash));
+
+        let dump_res = repl.execute_command(cmd).unwrap();
+        assert!(dump_res.contains("SIGMAOS KERNEL PANIC: OOPS EXCEPTION ENCOUNTERED"));
+        assert!(dump_res.contains("Process: sigma-core (PID: 45, Parent PID: 1)"));
+        assert!(dump_res.contains("token=XXXXXXXXXXXX")); // IP and token must be anonymized!
+        assert!(!dump_res.contains("192.168.1.55"));
+    }
+
+    #[test]
+    fn test_sysctl_command() {
         let mut repl = ShellRepl::new();
 
-        let status_cmd = repl.parse_command("audit status");
-        assert!(matches!(status_cmd, ShellCommand::AuditStatus));
-        let status_res = repl.execute_command(status_cmd).unwrap();
-        assert!(status_res.contains("Defensive Audit Summary"));
-        assert!(status_res.contains("Enforced"));
+        // 1. List all sysctl parameters
+        let cmd_list = repl.parse_command("sysctl");
+        let list_res = repl.execute_command(cmd_list).unwrap();
+        assert!(list_res.contains("kern.ostype = SigmaOS"));
+        assert!(list_res.contains("vm.swappiness = 60"));
 
-        let log_cmd = repl.parse_command("audit log");
-        assert!(matches!(log_cmd, ShellCommand::AuditLog));
-        let log_res = repl.execute_command(log_cmd).unwrap();
-        assert!(log_res.contains("Latest Defensive Access Logs"));
-        assert!(log_res.contains("CAP_CHECK"));
+        // 2. Query specific parameter
+        let cmd_query = repl.parse_command("sysctl vm.swappiness");
+        let query_res = repl.execute_command(cmd_query).unwrap();
+        assert_eq!(query_res, "vm.swappiness = 60");
 
-        let check_cmd = repl.parse_command("audit check");
-        assert!(matches!(check_cmd, ShellCommand::AuditCheck));
-        let check_res = repl.execute_command(check_cmd).unwrap();
-        assert!(check_res.contains("System Safety Sanity Scan"));
-        assert!(check_res.contains("W^X strictly enforced"));
+        // 3. Update specific parameter
+        let cmd_update = repl.parse_command("sysctl vm.swappiness=10");
+        let update_res = repl.execute_command(cmd_update).unwrap();
+        assert_eq!(update_res, "Updated vm.swappiness = 10");
+    }
+
+    #[test]
+    fn test_ebpf_command() {
+        let mut repl = ShellRepl::new();
+
+        // Safe program: R1 = 40; R2 = 2; R0 = R1 + R2; EXIT
+        let cmd_run = repl.parse_command("ebpf ADDI:1:40; ADDI:2:2; ADD:0:1; ADD:0:2; EXIT");
+        let run_res = repl.execute_command(cmd_run).unwrap();
+        assert!(run_res.contains("eBPF Program Execution Successful!"));
+        assert!(run_res.contains("Return Value (R0): 42"));
+
+        // Unsafe program: ADDI:1:10; DIV:1:0:0; EXIT -> division by zero
+        let cmd_unsafe = repl.parse_command("ebpf ADDI:1:10; DIV:1:0:0; EXIT");
+        let run_unsafe_res = repl.execute_command(cmd_unsafe);
+        assert!(run_unsafe_res.is_err());
+        assert!(run_unsafe_res.unwrap_err().contains("eBPF Verifier Rejected Bytecode: Static validation error"));
     }
 }

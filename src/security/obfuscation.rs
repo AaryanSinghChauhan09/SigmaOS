@@ -1,7 +1,7 @@
 // Advanced Code Obfuscation, Anti-Analysis, and White-Box Cryptography Engine
 // Designed to thwart static analysis, linear sweep disassemblers, and runtime memory dumping.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// Custom Virtual Machine instruction set for Virtual Machine-based Obfuscation (VMO)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

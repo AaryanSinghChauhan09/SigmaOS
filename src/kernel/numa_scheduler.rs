@@ -1,7 +1,7 @@
 // NUMA-Aware Scheduler with Lock-free Synchronization Primitives
 // Optimizes multi-core scalability, limits cache line bouncing, and prevents socket bus saturation.
 
-use core::sync::atomic::{AtomicPtr, Ordering};
+use std::sync::atomic::{AtomicPtr, Ordering};
 use std::ptr;
 
 #[derive(Debug, Clone)]

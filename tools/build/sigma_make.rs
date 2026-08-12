@@ -1,4 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
 #![cfg_attr(target_os = "none", no_std)]
 #![allow(dead_code, non_snake_case)]
 

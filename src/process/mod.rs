@@ -1,18 +1,7 @@
-// SigmaOS Process Management Module
 pub mod spawn;
-pub mod kernel_data;
-pub mod linux_sysfs;
 pub mod linux_proc;
+pub mod linux_sysfs;
 
-pub use spawn::{
-    Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup,
-};
-pub use kernel_data::{
-    ThreadWaitMode, ThreadState, MemoryDescriptorList, KThread, EThread, VasDescriptor, KProcess, EProcess, KPrcb, Kpcr, KernelDebuggerShim,
-};
-pub use linux_sysfs::{
-    SysfsPermission, SysfsAttribute, SysfsManager,
-};
-pub use linux_proc::{
-    ProcFileSystem, LinuxProcessEntry, LinuxProcessState, NiceValue, CGroup, PidNamespace, LinuxThreadEntry, LinuxSignal, SchedPolicy,
-};
+pub use spawn::{Process, ProcessID, ProcessState, ProcessError, SimpleProcess, ProcessSpawner, SimpleProcessSpawner, ProcessWaiter, SimpleProcessWaiter, ProcessGroup, SimpleProcessGroup};
+pub use linux_proc::{NiceValue, CGroup, PidNamespace, LinuxProcessEntry, LinuxProcessState, LinuxSignal, ProcFileSystem};
+pub use linux_sysfs::{SysfsAttribute, LoopDevice, SysfsRegistry};

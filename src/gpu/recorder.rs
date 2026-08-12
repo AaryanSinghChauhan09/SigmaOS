@@ -1,8 +1,8 @@
 // GPU Screen Recorder Integration for SigmaOS
 // Real-time GPU-accelerated screen capture and sandbox security controls for benchmarking and visualization.
 
-use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::security::capability::CapabilityToken;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use crate::security::CapabilityToken;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FrameFormat {
