@@ -1,3 +1,7 @@
+use core::sync::atomic::{AtomicBool, AtomicUsize, AtomicU8, Ordering};
+use crate::process::{Process, ProcessState};
+use crate::Priority;
+
 // 1. CPU Core Thread-Priority Optimizer
 
 pub struct CpuPriorityOptimizer {

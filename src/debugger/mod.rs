@@ -1,45 +1,27 @@
+#![allow(unused_variables)]
 //! SigmaOS Debugger Module
 //!
 //! This module provides debugging tools for the SigmaOS kernel and userland applications,
 //! including breakpoints, watchpoints, stack tracing, and memory inspection.
-//! Replicates Debian-style debug symbols packages (.dbgsym) and Build ID lookup systems.
 
 #![no_std]
 
 extern crate alloc;
 use alloc::string::String;
-use alloc::string::ToString;
 use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
 
 pub mod breakpoint;
+pub mod advanced;
 
-pub use breakpoint::{Breakpoint, BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
+pub use breakpoint::{BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
+pub use advanced::{
+    DebugWindowType, DebugWindow, DebugWindowManager, ExpressionNode, EvaluationEngine,
+    DebugExecutionState, ThreadDebugState, ProcessDebugContainer, TraceExceptionType,
+    ExceptionResolution, DebugEvent, DebugEventMonitor,
+};
 
-/// Represents a Debian-style debug symbol package containing Build ID mappings
-#[derive(Debug, Clone)]
-pub struct DebianDbgsymPackage {
-    pub build_id: String,           // Unique ELF .note.gnu.build-id hash
-    pub package_name: String,       // Target binary name, e.g. "nano"
-    pub symbols_map: Vec<(u64, String, String, u32)>, // Address -> (Function, File, Line)
-}
-
-impl DebianDbgsymPackage {
-    pub fn new(build_id: &str, name: &str) -> Self {
-        Self {
-            build_id: build_id.to_string(),
-            package_name: name.to_string(),
-            symbols_map: Vec::new(),
-        }
-    }
-
-    pub fn register_symbol(&mut self, addr: u64, func: &str, file: &str, line: u32) {
-        self.symbols_map.push((addr, func.to_string(), file.to_string(), line));
-    }
-}
-
-#[derive(Debug, Clone)]
+/// Breakpoint representation for software debugger
+#[derive(Debug, Clone, Copy)]
 pub struct Breakpoint {
     pub address: u64,
     pub breakpoint_type: BreakpointType,
@@ -139,12 +121,10 @@ impl MemoryRegion {
 /// Main debugger interface
 pub struct Debugger {
     state: DebuggerState,
-    breakpoints: Vec<SimpleBreakpoint>,
+    breakpoints: Vec<Breakpoint>,
     current_frame: Option<StackFrame>,
     call_stack: Vec<StackFrame>,
     memory_regions: Vec<MemoryRegion>,
-    /// Registered Debian dbgsym packages, matching /usr/lib/debug/.build-id/ structures
-    pub dbgsym_packages: Vec<DebianDbgsymPackage>,
 }
 
 impl Debugger {
@@ -155,7 +135,6 @@ impl Debugger {
             current_frame: None,
             call_stack: Vec::new(),
             memory_regions: Vec::new(),
-            dbgsym_packages: Vec::new(),
         }
     }
 
@@ -182,7 +161,7 @@ impl Debugger {
         self.state = DebuggerState::Stepping;
     }
 
-    pub fn state(&self) -> DebuggerState {
+    pub fn get_state(&self) -> DebuggerState {
         self.state
     }
 
@@ -191,35 +170,35 @@ impl Debugger {
         &mut self,
         address: u64,
         breakpoint_type: BreakpointType,
-    ) -> Result<(), &'static str> {
+    ) -> Result<(), String> {
         // Check if breakpoint already exists
-        if self.breakpoints.iter().any(|bp| bp.address() == address as usize) {
-            return Err("Breakpoint already exists at this address");
+        if self.breakpoints.iter().any(|bp| bp.address == address) {
+            return Err("Breakpoint already exists at this address".to_string());
         }
 
-        let breakpoint = SimpleBreakpoint::new(self.breakpoints.len() + 1, address as usize, breakpoint_type);
+        let breakpoint = Breakpoint::new(address, breakpoint_type);
         self.breakpoints.push(breakpoint);
         Ok(())
     }
 
     /// Remove a breakpoint
-    pub fn remove_breakpoint(&mut self, address: u64) -> Result<(), &'static str> {
+    pub fn remove_breakpoint(&mut self, address: u64) -> Result<(), String> {
         let original_len = self.breakpoints.len();
-        self.breakpoints.retain(|bp| bp.address() != address as usize);
+        self.breakpoints.retain(|bp| bp.address != address);
 
         if self.breakpoints.len() == original_len {
-            return Err("Breakpoint not found at this address");
+            return Err("Breakpoint not found at this address".to_string());
         }
 
         Ok(())
     }
 
     /// Enable a breakpoint
-    pub fn enable_breakpoint(&mut self, address: u64) -> Result<(), &'static str> {
+    pub fn enable_breakpoint(&mut self, address: u64) -> Result<(), String> {
         let breakpoint = self
             .breakpoints
             .iter_mut()
-            .find(|bp| bp.address() == address as usize)
+            .find(|bp| bp.address == address)
             .ok_or("Breakpoint not found")?;
 
         breakpoint.enable();
@@ -227,11 +206,11 @@ impl Debugger {
     }
 
     /// Disable a breakpoint
-    pub fn disable_breakpoint(&mut self, address: u64) -> Result<(), &'static str> {
+    pub fn disable_breakpoint(&mut self, address: u64) -> Result<(), String> {
         let breakpoint = self
             .breakpoints
             .iter_mut()
-            .find(|bp| bp.address() == address as usize)
+            .find(|bp| bp.address == address)
             .ok_or("Breakpoint not found")?;
 
         breakpoint.disable();
@@ -239,14 +218,14 @@ impl Debugger {
     }
 
     /// Check if a breakpoint is hit
-    pub fn check_breakpoint(&self, address: u64) -> Option<&SimpleBreakpoint> {
+    pub fn check_breakpoint(&mut self, address: u64) -> Option<&Breakpoint> {
         self.breakpoints
             .iter()
-            .find(|bp| bp.address() == address as usize && bp.is_enabled())
+            .find(|bp| bp.address == address && bp.enabled)
     }
 
     /// Get all breakpoints
-    pub fn get_breakpoints(&self) -> &[SimpleBreakpoint] {
+    pub fn get_breakpoints(&self) -> &[Breakpoint] {
         &self.breakpoints
     }
 
@@ -308,7 +287,7 @@ impl Debugger {
     }
 
     /// Write memory to a specific address
-    pub fn write_memory(&self, address: u64, data: &[u8]) -> Result<(), String> {
+    pub fn write_memory(&self, address: u64, _data: &[u8]) -> Result<(), String> {
         let region = self
             .find_memory_region(address)
             .ok_or("Address not in any known memory region")?;
@@ -333,44 +312,12 @@ impl Debugger {
     }
 
     /// Set register value.
-    pub fn set_register(&self, register_name: &str, _value: u64) -> Result<(), String> {
+    pub fn set_register(&self, register_name: &str, value: u64) -> Result<(), String> {
         // In a real implementation, this would write to actual registers
         match register_name {
             "rip" | "pc" | "rsp" | "sp" | "rbp" | "fp" => Ok(()),
             _ => Err(format!("Unknown register: {}", register_name)),
         }
-    }
-
-    /// Registers a Debian-style debug symbol package into the debugger
-    pub fn register_dbgsym_package(&mut self, dbgsym: DebianDbgsymPackage) {
-        self.dbgsym_packages.push(dbgsym);
-    }
-
-    /// Validates if a dbgsym package conforms to standard Build ID formatting (minimum 16-character hex hash)
-    pub fn is_debian_dbgsym_compliant(&self, dbgsym: &DebianDbgsymPackage) -> bool {
-        if dbgsym.build_id.len() < 16 {
-            return false;
-        }
-        dbgsym.build_id.chars().all(|c| c.is_ascii_hexdigit())
-    }
-
-    /// Dynamically resolves an instruction address using registered Debian dbgsym packages.
-    /// Replicates the build-id symbol lookup of standard Debian debuggers.
-    pub fn resolve_address_to_symbol(&self, build_id: &str, address: u64) -> Option<StackFrame> {
-        for dbgsym in &self.dbgsym_packages {
-            if dbgsym.build_id == build_id {
-                for &(symbol_addr, ref func, ref file, line) in &dbgsym.symbols_map {
-                    if symbol_addr == address {
-                        let mut frame = StackFrame::new(address);
-                        frame.function_name = Some(func.clone());
-                        frame.file_name = Some(file.clone());
-                        frame.line_number = Some(line);
-                        return Some(frame);
-                    }
-                }
-            }
-        }
-        None
     }
 }
 
@@ -386,36 +333,40 @@ mod tests {
 
     #[test]
     fn test_breakpoint_creation() {
-        let bp = SimpleBreakpoint::new(1, 0x1000, BreakpointType::Software);
-        assert_eq!(bp.address(), 0x1000);
-        assert!(bp.is_enabled());
+        let bp = Breakpoint::new(0x1000, BreakpointType::Software);
+        assert_eq!(bp.address, 0x1000);
+        assert!(bp.enabled);
+        assert_eq!(bp.hit_count, 0);
     }
 
     #[test]
     fn test_breakpoint_enable_disable() {
-        let mut bp = SimpleBreakpoint::new(1, 0x1000, BreakpointType::Software);
+        let mut bp = Breakpoint::new(0x1000, BreakpointType::Software);
         bp.disable();
-        assert!(!bp.is_enabled());
+        assert!(!bp.enabled);
         bp.enable();
-        assert!(bp.is_enabled());
+        assert!(bp.enabled);
     }
 
     #[test]
     fn test_breakpoint_hit() {
-        let bp = SimpleBreakpoint::new(1, 0x1000, BreakpointType::Software);
-        assert!(bp.is_enabled());
+        let mut bp = Breakpoint::new(0x1000, BreakpointType::Software);
+        bp.hit();
+        assert_eq!(bp.hit_count, 1);
+        bp.hit();
+        assert_eq!(bp.hit_count, 2);
     }
 
     #[test]
     fn test_debugger_attach_detach() {
         let mut debugger = Debugger::new();
-        assert_eq!(debugger.state(), DebuggerState::Detached);
+        assert_eq!(debugger.get_state(), DebuggerState::Detached);
 
         debugger.attach();
-        assert_eq!(debugger.state(), DebuggerState::Attached);
+        assert_eq!(debugger.get_state(), DebuggerState::Attached);
 
         debugger.detach();
-        assert_eq!(debugger.state(), DebuggerState::Detached);
+        assert_eq!(debugger.get_state(), DebuggerState::Detached);
     }
 
     #[test]
@@ -478,32 +429,5 @@ mod tests {
         assert!(popped.is_some());
         assert_eq!(popped.unwrap().address, 0x2000);
         assert_eq!(debugger.get_call_stack().len(), 1);
-    }
-
-    #[test]
-    fn test_debian_dbgsym_symbol_resolver() {
-        let mut debugger = Debugger::new();
-        debugger.attach();
-
-        let build_id = "a1b2c3d4e5f67890abcdef1234567890".to_string();
-        let mut dbgsym = DebianDbgsymPackage::new(&build_id, "nano");
-        dbgsym.register_symbol(0x1040, "main", "nano.c", 42);
-
-        assert!(debugger.is_debian_dbgsym_compliant(&dbgsym));
-        debugger.register_dbgsym_package(dbgsym);
-
-        // Non-compliant package test (short build id)
-        let invalid_dbgsym = DebianDbgsymPackage::new("short_id", "nano");
-        assert!(!debugger.is_debian_dbgsym_compliant(&invalid_dbgsym));
-
-        // Resolve instruction address to debug symbol StackFrame
-        let frame = debugger.resolve_address_to_symbol(&build_id, 0x1040).unwrap();
-        assert_eq!(frame.function_name.unwrap(), "main");
-        assert_eq!(frame.file_name.unwrap(), "nano.c");
-        assert_eq!(frame.line_number.unwrap(), 42);
-
-        // Fail to resolve address with invalid build id or wrong address
-        assert!(debugger.resolve_address_to_symbol("wrong_id", 0x1040).is_none());
-        assert!(debugger.resolve_address_to_symbol(&build_id, 0x9999).is_none());
     }
 }
