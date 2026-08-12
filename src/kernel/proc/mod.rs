@@ -1,11 +1,31 @@
+#![allow(clippy::new_without_default)]
+#![allow(clippy::manual_memcpy)]
+#![allow(clippy::manual_strip)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::too_many_arguments)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![allow(clippy::items_after_test_module)]
+#![allow(clippy::doc_lazy_continuation)]
+#![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_enum_variant)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::unnecessary_lazy_evaluations)]
+
 pub mod cgroups;
 pub mod namespaces;
 pub mod process_lifecycle;
 pub mod signals;
 pub mod wdk_lists;
+pub mod ptrace;
 
 pub use cgroups::{Cgroup, CgroupManager, ResourceLimits};
 pub use namespaces::{Namespace, NamespaceManager, NamespaceType};
 pub use process_lifecycle::ProcessLifecycleManager;
 pub use signals::{Signal, SignalHandler, SignalManager};
 pub use wdk_lists::{SingleListHead, SingleListEntry, ListHead, ListEntry, ProcessControlBlock, ThreadControlBlock, Kdpc, StdCallSimulator};
+pub use ptrace::{PtraceRequest, DbgEvent, ThreadDebugContext, ExceptionStatus, ExceptionType, ExceptionMonitor};

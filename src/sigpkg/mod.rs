@@ -2,34 +2,43 @@
 // Zero-dependency, zero-allocation-ready, safe Rust package manager
 
 pub mod arch_compat;
+pub mod aur;
+pub mod importer;
+pub mod linux_compat;
+pub mod pacman;
 pub mod recipe;
 pub mod resolver;
 pub mod rpm_compat;
+pub mod spec;
 pub mod store;
 pub mod transaction;
+pub mod universal_adapter;
+pub mod universal_engine;
+pub mod universal_oop_system;
 pub mod verifier;
-pub mod rpm_compat;
+pub mod zero_alloc_resolver;
+pub mod declarative_build;
 
+pub use importer::{
+    DebPackageImporter, PackageImporter, PacmanPackageImporter, RpmPackageImporter,
+};
+pub use linux_compat::{
+    DebianPackageTranslator, LinuxPackageCompatManager, LinuxPackageType, RpmPackageTranslator,
+    TranslatedMetadata, TranslatorError,
+};
+pub use pacman::{MakePkgEngine, PacmanError, PacmanManager, PkgBuildScript};
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
-pub use rpm_compat::{RpmPackageTranslator, SpecMetadata, PackageSourceFormat};
 pub use resolver::SatSolver;
-pub use rpm_compat::{PackageSourceFormat, RpmPackageTranslator, SpecMetadata};
 pub use store::ContentAddressedStore;
 pub use transaction::Transaction;
 pub use verifier::CryptoVerifier;
 
 /// Package version using SemVer
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Version {
-    major: u64,
-    minor: u64,
-    patch: u64,
-}
-
-impl std::fmt::Display for Version {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-    }
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
 }
 
 impl Version {
@@ -42,33 +51,28 @@ impl Version {
     }
 
     pub fn parse(version_str: &str) -> Result<Self, ParseError> {
-        // Optimized to be entirely allocation-free by using inline parsing with iterators.
-        // This avoids heap-allocated collections like Vec inside utility version parsing.
-        let mut parts = version_str.split('.');
-
-        let major = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        let minor = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        let patch = parts
-            .next()
-            .ok_or(ParseError::InvalidFormat)?
-            .parse::<u64>()
-            .map_err(|_| ParseError::InvalidNumber)?;
-
-        if parts.next().is_some() {
+        let parts: Vec<&str> = version_str.split('.').collect();
+        if parts.len() != 3 {
             return Err(ParseError::InvalidFormat);
         }
 
+        let major = parts[0]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let minor = parts[1]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+        let patch = parts[2]
+            .parse::<u64>()
+            .map_err(|_| ParseError::InvalidNumber)?;
+
         Ok(Version::new(major, minor, patch))
+    }
+}
+
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
     }
 }
 
@@ -86,11 +90,6 @@ pub struct Package {
     pub description: String,
     pub dependencies: Vec<Dependency>,
     pub checksum: String,
-    pub mirrors: Vec<String>,
-    pub signing_keys: Vec<String>,
-    pub licenses: Vec<String>,
-    pub maintainers: Vec<String>,
-    pub changelogs: Vec<String>,
 }
 
 impl Package {
@@ -107,11 +106,6 @@ impl Package {
             description,
             dependencies,
             checksum,
-            mirrors: Vec::new(),
-            signing_keys: Vec::new(),
-            licenses: Vec::new(),
-            maintainers: Vec::new(),
-            changelogs: Vec::new(),
         }
     }
 }
@@ -124,7 +118,7 @@ pub struct Dependency {
 }
 
 /// Version constraint
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VersionConstraint {
     Exact(Version),
     GreaterThan(Version),
@@ -157,40 +151,5 @@ mod tests {
         let v1 = Version::new(1, 2, 3);
         let v2 = Version::new(1, 2, 4);
         assert!(v1 < v2);
-    }
-
-    #[test]
-    fn test_package_rich_metadata_and_pqc_trust() {
-        let mut pkg = Package::new(
-            "linux-rt-kernel".to_string(),
-            Version::new(6, 9, 3),
-            "Real-time preempt-rt microkernel variant for SigmaOS".to_string(),
-            Vec::new(),
-            "sha256:d83d102e3b74".to_string(),
-        );
-
-        // Populate rich metadata standard fields
-        pkg.licenses.push("GPL-2.0-only".to_string());
-        pkg.maintainers
-            .push("Sovereign Maintainers <maintainers@sigmaos.dev>".to_string());
-        pkg.mirrors
-            .push("https://mirrors.sigmaos.org/pkgs/".to_string());
-        pkg.signing_keys
-            .push("dilithium5:pubkey_root_ca".to_string());
-        pkg.changelogs
-            .push("v6.9.3: RT preemption schedulers stabilization".to_string());
-
-        assert_eq!(pkg.name, "linux-rt-kernel");
-        assert_eq!(pkg.licenses[0], "GPL-2.0-only");
-        assert_eq!(
-            pkg.maintainers[0],
-            "Sovereign Maintainers <maintainers@sigmaos.dev>"
-        );
-        assert_eq!(pkg.mirrors[0], "https://mirrors.sigmaos.org/pkgs/");
-        assert_eq!(pkg.signing_keys[0], "dilithium5:pubkey_root_ca");
-        assert_eq!(
-            pkg.changelogs[0],
-            "v6.9.3: RT preemption schedulers stabilization"
-        );
     }
 }
