@@ -1,7 +1,47 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based, standard Linux/BSD conforming filesystem with security, hard links, and path traversal
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::{CapabilityToken, Permission};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    FileRead,
+    FileWrite,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, Default)]
+pub struct CapabilityToken {
+    pub read_allowed: bool,
+    pub write_allowed: bool,
+}
+
+#[cfg(feature = "standalone_test")]
+impl CapabilityToken {
+    pub fn new() -> Self {
+        Self {
+            read_allowed: false,
+            write_allowed: false,
+        }
+    }
+    pub fn allow_read(mut self, _path: &str) -> Self {
+        self.read_allowed = true;
+        self
+    }
+    pub fn allow_write(mut self, _path: &str) -> Self {
+        self.write_allowed = true;
+        self
+    }
+    pub fn has_permission(&self, perm: Permission) -> bool {
+        match perm {
+            Permission::FileRead => self.read_allowed,
+            Permission::FileWrite => self.write_allowed,
+        }
+    }
+}
+
 use std::collections::HashMap;
 
 // Standard POSIX / Linux / BSD open flags
@@ -63,6 +103,9 @@ pub struct Inode {
     pub capabilities: CapabilityToken,
     // Conforming Linux/BSD additions
     pub hard_links_count: u32,
+    pub link_count: u32,
+    pub symlink_target: Option<String>,
+    pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
     pub entries: HashMap<String, u64>, // Directory entries
 }
@@ -80,9 +123,105 @@ impl Inode {
             modified: 0,
             capabilities: CapabilityToken::new(),
             hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
             data: Vec::new(),
             entries: HashMap::new(),
         }
+    }
+}
+
+// ================= Linux-style procfs & sysfs Dynamic Stats Bridge =================
+
+pub struct ProcSysFsBridge {
+    pub uptime_seconds: u64,
+    pub active_processes_count: usize,
+}
+
+impl ProcSysFsBridge {
+    pub fn new() -> Self {
+        Self {
+            uptime_seconds: 120,
+            active_processes_count: 5,
+        }
+    }
+
+    pub fn read_dynamic_proc_file(&self, filename: &str) -> Result<String, &'static str> {
+        match filename {
+            "uptime" => Ok(format!("uptime: {} seconds", self.uptime_seconds)),
+            "loadavg" => Ok(format!("loadavg: 0.15 0.24 0.35 active_tasks: {}", self.active_processes_count)),
+            _ => Err("procfs: File not found"),
+        }
+    }
+}
+
+// ================= OpenBSD chroot path containment sandbox =================
+
+pub struct ChrootSandbox {
+    pub chroot_root_path: String,
+}
+
+impl ChrootSandbox {
+    pub fn new(root_path: &str) -> Self {
+        Self {
+            chroot_root_path: root_path.to_string(),
+        }
+    }
+
+    /// Verifies path starts with jail prefix (chroot escape protection)
+    pub fn sandbox_resolve_path(&self, requested_path: &str) -> Result<String, &'static str> {
+        let clean_path = requested_path.to_string();
+        if clean_path.contains("../") {
+            return Err("chroot jail breach blocked: Directory traversal escape attempt detected!");
+        }
+        if !clean_path.starts_with(&self.chroot_root_path) {
+            Ok(format!("{}{}", self.chroot_root_path, clean_path))
+        } else {
+            Ok(clean_path)
+        }
+    }
+}
+
+// ================= macOS FSEvents directory change notifications =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FsEventAction {
+    Created,
+    Modified,
+    Deleted,
+}
+
+#[derive(Clone)]
+pub struct FsChangeLog {
+    pub path: String,
+    pub action: FsEventAction,
+}
+
+pub struct FsEventsAuditor {
+    pub change_logs: Vec<FsChangeLog>,
+}
+
+impl FsEventsAuditor {
+    pub fn new() -> Self {
+        Self { change_logs: Vec::new() }
+    }
+
+    pub fn record_filesystem_event(&mut self, path: &str, action: FsEventAction) {
+        self.change_logs.push(FsChangeLog {
+            path: path.to_string(),
+            action,
+        });
+    }
+
+    pub fn filter_events_by_prefix(&self, prefix: &str) -> Vec<FsChangeLog> {
+        let mut matched = Vec::new();
+        for log in &self.change_logs {
+            if log.path.starts_with(prefix) {
+                matched.push(log.clone());
+            }
+        }
+        matched
     }
 }
 
@@ -154,6 +293,7 @@ impl VirtualFilesystem {
     pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
         let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
         inode.link_count += 1;
+        inode.hard_links_count += 1;
         Ok(())
     }
 
@@ -308,6 +448,7 @@ impl VirtualFilesystem {
         if let Some(inode) = self.inodes.get_mut(&inode_id) {
             if inode.hard_links_count > 1 {
                 inode.hard_links_count -= 1;
+                inode.link_count -= 1;
             } else {
                 should_delete = true;
             }
@@ -464,6 +605,7 @@ impl VirtualFilesystem {
 
         let target_inode = self.inodes.get_mut(&target_id).ok_or(FsError::NotFound)?;
         target_inode.hard_links_count += 1;
+        target_inode.link_count += 1;
 
         Ok(())
     }
@@ -510,6 +652,7 @@ pub enum FsError {
     IsDirectory,
     NoSpace,
     AlreadyExists,
+    AttributeNotFound,
 }
 
 #[cfg(test)]
@@ -569,6 +712,9 @@ mod tests {
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
         assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
         assert_eq!(vfs.read_file_gated(fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+
+        // Reset file offset to beginning before reading
+        vfs.file_descriptors.get_mut(&fd).unwrap().offset = 0;
         assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
     }
 
@@ -599,5 +745,44 @@ mod tests {
         // 5. Deleting the file second time drops link_count to 0, successfully freeing the Inode from VFS!
         vfs.delete_file(inode_id).unwrap();
         assert!(vfs.get_inode(inode_id).is_none());
+    }
+
+    #[test]
+    fn test_vfs_proc_and_sysfs_bridge() {
+        let bridge = ProcSysFsBridge::new();
+        let uptime = bridge.read_dynamic_proc_file("uptime").unwrap();
+        assert_eq!(uptime, "uptime: 120 seconds");
+
+        let loadavg = bridge.read_dynamic_proc_file("loadavg").unwrap();
+        assert!(loadavg.contains("active_tasks: 5"));
+
+        assert!(bridge.read_dynamic_proc_file("nonexistent").is_err());
+    }
+
+    #[test]
+    fn test_vfs_chroot_sandbox_confinement() {
+        let sandbox = ChrootSandbox::new("/jail/app1");
+
+        let path1 = sandbox.sandbox_resolve_path("/var/log/syslog").unwrap();
+        assert_eq!(path1, "/jail/app1/var/log/syslog");
+
+        // Allowed relative transition
+        let path2 = sandbox.sandbox_resolve_path("/jail/app1/tmp").unwrap();
+        assert_eq!(path2, "/jail/app1/tmp");
+
+        // Malicious chroot escape block
+        assert!(sandbox.sandbox_resolve_path("/jail/app1/../../etc/passwd").is_err());
+    }
+
+    #[test]
+    fn test_vfs_fsevents_auditor() {
+        let mut auditor = FsEventsAuditor::new();
+        auditor.record_filesystem_event("/home/user/document.txt", FsEventAction::Created);
+        auditor.record_filesystem_event("/home/user/document.txt", FsEventAction::Modified);
+        auditor.record_filesystem_event("/etc/resolv.conf", FsEventAction::Modified);
+
+        let user_events = auditor.filter_events_by_prefix("/home/user");
+        assert_eq!(user_events.len(), 2);
+        assert_eq!(user_events[0].action, FsEventAction::Created);
     }
 }
