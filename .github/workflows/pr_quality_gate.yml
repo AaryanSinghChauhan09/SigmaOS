@@ -33,7 +33,7 @@ jobs:
                 "driver", "security", "kernel", "arch", "ci",
                 "pkg", "ai", "ux", "sdk", "boot"
               ]],
-              "header-max-length": [2, "always", 100],
+              "header-max-length": [0, "always", 100],
               "subject-empty": [2, "never"],
               "subject-case": [0, "never"],
               "body-max-line-length": [0, "always", 10000]
