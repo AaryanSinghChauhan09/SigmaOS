@@ -1,33 +1,17 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
+#![cfg_attr(not(test), no_main)]
 
 /// Custom Compression Algorithms for SigmaOS
 /// Implements compression without relying on external compression libraries
 /// Includes DEFLATE, LZ77, and Huffman coding
 
-use core::ptr;
-use core::mem;
+extern crate alloc;
+use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 /// LZ77 match
 #[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LZ77Match {
     pub offset: u16,
     pub length: u16,
@@ -120,7 +104,6 @@ impl LZ77Compressor {
 }
 
 /// Huffman node
-#[repr(C)]
 pub enum HuffmanNode {
     Leaf { value: u8, frequency: u32 },
     Internal { left: Box<HuffmanNode>, right: Box<HuffmanNode>, frequency: u32 },
@@ -141,7 +124,6 @@ pub struct HuffmanTree {
 }
 
 impl HuffmanTree {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         HuffmanTree {
             root: None,
@@ -174,7 +156,7 @@ impl HuffmanTree {
 
     pub fn encode(&self, data: &[u8]) -> Vec<bool> {
         let mut encoded = Vec::new();
-        let mut codes = [None; 256];
+        let mut codes: [Option<Vec<bool>>; 256] = [const { None }; 256];
 
         if let Some(ref root) = self.root {
             self.generate_codes(root, &mut [], &mut codes);
@@ -244,7 +226,6 @@ pub struct DeflateCompressor {
 }
 
 impl DeflateCompressor {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DeflateCompressor {
             lz77: LZ77Compressor::new(32768, 258),
@@ -297,7 +278,7 @@ impl DeflateCompressor {
         compressed
     }
 
-    pub fn decompress(&self, compressed: &[u8]) -> Vec<u8> {
+    pub fn decompress(&mut self, compressed: &[u8]) -> Vec<u8> {
         // Convert bytes to bits
         let mut encoded = Vec::new();
         for &byte in compressed {
@@ -362,150 +343,59 @@ impl RLECompressor {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
+/// BSD-inspired Fowler-Noll-Vo (FNV-1a) 64-bit non-cryptographic hashing algorithm.
+/// Extremely fast lookup algorithm for name matching and filesystem integrity verification.
+pub fn fnv1a_64(data: &[u8]) -> u64 {
+    let mut hash = 14695981039346656037u64; // FNV-1a 64-bit offset basis
+    for &byte in data {
+        hash ^= byte as u64;
+        hash = hash.wrapping_mul(1099511628211u64); // FNV-1a 64-bit prime
+    }
+    hash
 }
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                ptr::write(self.data.add(self.len), item);
-                self.len += 1;
+/// Linux-inspired 32-bit Cyclic Redundancy Check (CRC32) algorithm (IEEE 802.3 standard).
+/// Used across Linux for network frame FCS, ext4 metadata checksums, and package integrity validation.
+pub fn crc32_checksum(data: &[u8]) -> u32 {
+    let mut crc = 0xFFFFFFFFu32;
+    for &byte in data {
+        crc ^= byte as u32;
+        for _ in 0..8 {
+            if crc & 1 != 0 {
+                crc = (crc >> 1) ^ 0xEDB88320;
+            } else {
+                crc >>= 1;
             }
         }
     }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
-    fn iter(&self) -> Iter<T> {
-        Iter {
-            data: self.data,
-            len: self.len,
-            index: 0,
-        }
-    }
+    !crc
 }
 
-impl<T> Iter<T> {
-    fn next(&mut self) -> Option<&T> {
-        if self.index < self.len {
-            unsafe {
-                let item = &*self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fnv1a_hashing() {
+        let data = b"SigmaOS Hashing";
+        let hash = fnv1a_64(data);
+        assert!(hash != 0);
+        // Standard FNV-1a check for empty string
+        assert_eq!(fnv1a_64(b""), 14695981039346656037u64);
     }
-}
 
-struct Iter<T> {
-    data: *const T,
-    len: usize,
-    index: usize,
-}
-
-impl<T> Iterator for Iter<T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.len {
-            unsafe {
-                let item = &*self.data.add(self.index);
-                self.index += 1;
-                Some(item)
-            }
-        } else {
-            None
-        }
+    #[test]
+    fn test_crc32_checksum() {
+        let data = b"123456789";
+        // Standard CRC32 of "123456789" is 0xCBF43926
+        assert_eq!(crc32_checksum(data), 0xCBF43926);
     }
-}
 
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+    #[test]
+    fn test_rle_compression() {
+        let data = b"AAAAABBBCC";
+        let compressed = RLECompressor::compress(data);
+        let decompressed = RLECompressor::decompress(&compressed);
+        assert_eq!(decompressed, data);
     }
 }

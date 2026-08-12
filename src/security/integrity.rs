@@ -129,12 +129,7 @@ impl SimpleFile {
     }
 
     pub fn get_status(&self) -> IntegrityStatus {
-        match self.status.load(Ordering::SeqCst) {
-            1 => IntegrityStatus::Modified,
-            2 => IntegrityStatus::Corrupted,
-            3 => IntegrityStatus::Missing,
-            _ => IntegrityStatus::Valid,
-        }
+        unsafe { core::mem::transmute(self.status.load(Ordering::SeqCst)) }
     }
 
     pub fn set_status(&self, status: IntegrityStatus) {
@@ -255,6 +250,15 @@ impl SimpleIntegrityMonitor {
             next_id: AtomicUsize::new(1),
             stats: IntegrityStats::new(),
             capability,
+        }
+    }
+
+    pub fn update_stats(&mut self, status: IntegrityStatus) {
+        match status {
+            IntegrityStatus::Valid => self.stats.valid_files += 1,
+            IntegrityStatus::Modified => self.stats.modified_files += 1,
+            IntegrityStatus::Corrupted => self.stats.corrupted_files += 1,
+            IntegrityStatus::Missing => self.stats.corrupted_files += 1,
         }
     }
 }

@@ -1,7 +1,7 @@
 // SigmaOS Kernel IPC (Inter-Process Communication)
 // Zero-latency capability-based IPC
 
-use crate::security::capability::CapabilityToken;
+use crate::security::CapabilityToken;
 
 /// IPC message type
 #[derive(Debug, Clone)]
@@ -10,21 +10,6 @@ pub enum Message {
     FileDescriptor(u64),
     Capability(CapabilityToken),
     Signal(u32),
-    DelegatedCapability {
-        token: CapabilityToken,
-        delegator: u64,
-        delegatee: u64,
-        delegation_path: Vec<u64>,
-    },
-}
-
-/// Zero-copy virtual memory descriptor tracking simulated DMA/shm page sharing
-#[derive(Debug, Clone)]
-pub struct ZeroCopyDescriptor {
-    pub transfer_id: u128,
-    pub source_virtual_addr: usize,
-    pub length: usize,
-    pub latency_microseconds: u32, // simulated memory map transfer latency
 }
 
 /// IPC channel
@@ -34,7 +19,6 @@ pub struct Channel {
     pub sender: u64,
     pub receiver: u64,
     pub messages: Vec<Message>,
-    pub zero_copy_transfers: Vec<ZeroCopyDescriptor>,
     pub capacity: usize,
 }
 
@@ -45,7 +29,6 @@ impl Channel {
             sender,
             receiver,
             messages: Vec::new(),
-            zero_copy_transfers: Vec::new(),
             capacity: 256,
         }
     }
@@ -60,36 +43,6 @@ impl Channel {
 
     pub fn receive(&mut self) -> Option<Message> {
         self.messages.pop()
-    }
-
-    /// Sends a zero-copy memory pointer without kernel-space copying (sub-100μs latency)
-    pub fn send_zero_copy(&mut self, addr: usize, length: usize) -> Result<u128, IpcError> {
-        if self.zero_copy_transfers.len() >= self.capacity {
-            return Err(IpcError::ChannelFull);
-        }
-
-        // Simulating sub-100μs latency for formal verification constraints
-        let latency = 35; // 35 microseconds
-        let transfer_id = (addr as u128) ^ (length as u128) ^ 0xDEADBEEF_u128;
-
-        let desc = ZeroCopyDescriptor {
-            transfer_id,
-            source_virtual_addr: addr,
-            length,
-            latency_microseconds: latency,
-        };
-
-        self.zero_copy_transfers.push(desc);
-        Ok(transfer_id)
-    }
-
-    /// Receives and resolves a zero-copy memory pointer
-    pub fn receive_zero_copy(&mut self, transfer_id: u128) -> Option<ZeroCopyDescriptor> {
-        if let Some(pos) = self.zero_copy_transfers.iter().position(|t| t.transfer_id == transfer_id) {
-            Some(self.zero_copy_transfers.remove(pos))
-        } else {
-            None
-        }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -366,32 +319,6 @@ impl IpcManager {
     pub fn remove_channel(&mut self, channel_id: u64) {
         self.channels.retain(|c| c.id != channel_id);
     }
-
-    /// A comprehensive fuzzing harness to validate kernel message passing integrity against mutated raw payloads
-    pub fn fuzz_ipc_message_passing(&mut self, channel_id: u64, fuzz_seed: u32, sender: u64) -> Result<(), IpcError> {
-        let channel = self
-            .channels
-            .iter_mut()
-            .find(|c| c.id == channel_id)
-            .ok_or(IpcError::ChannelNotFound)?;
-
-        if channel.sender != sender {
-            return Err(IpcError::PermissionDenied);
-        }
-
-        // Mutate payloads or message types based on fuzz_seed
-        let mutated_msg = match fuzz_seed % 4 {
-            0 => Message::Signal(fuzz_seed),
-            1 => {
-                let size = (fuzz_seed % 64).max(1) as usize;
-                Message::Data(vec![ (fuzz_seed & 0xFF) as u8; size ])
-            }
-            2 => Message::FileDescriptor(fuzz_seed as u64),
-            _ => Message::Signal(0xDEAD_BEEF),
-        };
-
-        channel.send(mutated_msg)
-    }
 }
 
 impl Default for IpcManager {
@@ -532,4 +459,5 @@ mod tests {
         assert_eq!(ring.pop_item().unwrap(), vec![5, 10]);
         assert_eq!(ring.pop_item().unwrap(), vec![15, 20]);
         assert!(ring.pop_item().is_none());
-    }}
+    }
+}

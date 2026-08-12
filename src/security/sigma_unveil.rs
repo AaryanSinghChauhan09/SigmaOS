@@ -13,7 +13,7 @@
 //! ```
 
 use sigma_types::Result;
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 /// Access permissions for unveiled paths
@@ -211,14 +211,14 @@ impl Default for UnveilState {
 
 /// Unveil manager for all processes
 pub struct UnveilManager {
-    process_states: BTreeMap<u64, UnveilState>,
+    process_states: HashMap<u64, UnveilState>,
 }
 
 impl UnveilManager {
     /// Create a new unveil manager
     pub fn new() -> Self {
         UnveilManager {
-            process_states: BTreeMap::new(),
+            process_states: HashMap::new(),
         }
     }
 

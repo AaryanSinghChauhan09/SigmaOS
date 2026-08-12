@@ -1,25 +1,51 @@
+# bug report
+
+---
 name: Bug Report
+about: Report a kernel shard malfunction or build failure
+title: "[BUG] <shard_name>: <short description>"
+labels: bug, triage
+assignees: ''
+---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Affected Shard
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+<!-- Which kernel shard is affected? e.g. SovereignNetStack, SovereignGPU -->
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Description
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+<!-- A clear description of the bug -->
 
-**System Information**
- - OS: [e.g. SigmaOS 1.0.0]
- - Architecture: [e.g. x86_64]
- - Desktop Environment: [e.g. Zenith]
+## Reproduction Steps
 
-**Additional context**
-Add any other context about the problem here.
+1. Step one
+
+
+2. Step two
+
+
+3. Step three
+
+
+## Expected Behavior
+
+<!-- What should happen -->
+
+## Actual Behavior
+
+<!-- What actually happens -->
+
+## Build Environment
+
+- Architecture: `[ ] x86_64  [ ] ARM64  [ ] RISC-V
+
+
+ sigma-build output: paste here
+
+## Logs
+
+```text
+
+<!-- Paste sigma_log / serial output here -->
+
+```

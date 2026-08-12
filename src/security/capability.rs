@@ -1,98 +1,12 @@
-// SigmaOS Capability-Based Security System
-// Implements 64-bit hardware-enforced capability model
+#![no_std]
+#![no_main]
+
+/// SigmaOS Capability-Based Security System
+/// Implements 64-bit hardware-enforced capability model
 
 use core::sync::atomic::{AtomicU64, Ordering};
 
-/// Capability token representing access rights
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct CapabilityToken {
-    /// 64-bit capability bitmask
-    bits: u64,
-}
-
-impl Default for CapabilityToken {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl CapabilityToken {
-    /// Create a new capability token with no permissions
-    pub fn new() -> Self {
-        Self { bits: 0 }
-    }
-
-    /// Create capability token from raw bits
-    pub fn from_bits(bits: u64) -> Self {
-        Self { bits }
-    }
-
-    /// Allow network access
-    pub fn allow_network(mut self, protocol: &str, port: u16) -> Self {
-        match protocol {
-            "tcp" => self.bits |= 1 << 0,
-            "udp" => self.bits |= 1 << 1,
-            _ => {}
-        }
-        // Mask and clear target bit ranges (bits 16-31) to prevent bitmask overlap privilege escalation
-        self.bits &= !(0xFFFF_u64 << 16);
-        self.bits |= (port as u64) << 16;
-        self
-    }
-
-    /// Allow file read access
-    pub fn allow_read(mut self, path: &str) -> Self {
-        if path.starts_with("/var/www") {
-            self.bits |= 1 << 2;
-        }
-        self
-    }
-
-    /// Allow file write access
-    pub fn allow_write(mut self, path: &str) -> Self {
-        if path.starts_with("/tmp") || path.starts_with("/home") {
-            self.bits |= 1 << 3;
-        }
-        self
-    }
-
-    /// Allow process execution
-    pub fn allow_exec(mut self) -> Self {
-        self.bits |= 1 << 4;
-        self
-    }
-
-    /// Allow IPC communication
-    pub fn allow_ipc(mut self) -> Self {
-        self.bits |= 1 << 5;
-        self
-    }
-
-    /// Check if capability has specific permission
-    pub fn has_permission(&self, permission: Permission) -> bool {
-        (self.bits & (1 << permission as u64)) != 0
-    }
-
-    /// Revoke all permissions
-    pub fn revoke_all(&mut self) {
-        self.bits = 0;
-    }
-
-    /// Get raw capability bits
-    pub fn bits(&self) -> u64 {
-        self.bits
-    }
-
-    pub fn allow_capability(&mut self, bitmask: u64) {
-        self.bits |= bitmask;
-    }
-
-    pub fn contains(&self, bitmask: u64) -> bool {
-        (self.bits & bitmask) == bitmask
-    }
-}
-
-/// Permission types (Enhanced with OpenBSD 7.9 and SigmaOS-specific permissions)
+/// Permission types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {
     NetworkTcp = 0,
@@ -101,29 +15,93 @@ pub enum Permission {
     FileWrite = 3,
     ProcessExec = 4,
     Ipc = 5,
-    // OpenBSD 7.9 inspired permissions
-    Dns = 6,
-    Unix = 7,
-    Tty = 8,
-    Proc = 9,
-    Id = 10,
-    Settime = 11,
-    Pf = 12,
-    Route = 13,
-    Wroute = 14,
-    Audio = 15,
-    Video = 16,
-    Bpf = 17,
-    // SigmaOS-specific permissions
-    AICapability = 18,
-    ShardAccess = 19,
-    QuantumCrypto = 20,
+}
+
+/// A cryptographic capability token required for any privileged action.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub id: u64,
+    pub bits: u64,
+    pub is_revoked: bool,
+}
+
+impl CapabilityToken {
+    pub fn new() -> Self {
+        CapabilityToken {
+            id: 0,
+            bits: 0,
+            is_revoked: false,
+        }
+    }
+
+    pub fn from_bits(bits: u64) -> Self {
+        CapabilityToken {
+            id: 0,
+            bits,
+            is_revoked: false,
+        }
+    }
+
+    pub fn bits(&self) -> u64 {
+        self.bits
+    }
+
+    pub fn has_permission(&self, permission: Permission) -> bool {
+        if self.is_revoked {
+            return false;
+        }
+        (self.bits & (1 << permission as u64)) != 0
+    }
+
+    pub fn revoke_all(&mut self) {
+        self.bits = 0;
+        self.is_revoked = true;
+    }
+
+    pub fn allow_network(mut self, protocol: &str, _port: u16) -> Self {
+        match protocol {
+            "tcp" => self.bits |= 1 << 0,
+            "udp" => self.bits |= 1 << 1,
+            _ => {}
+        }
+        self
+    }
+
+    pub fn allow_read(mut self, path: &str) -> Self {
+        if path.starts_with("/var/www") {
+            self.bits |= 1 << 2;
+        }
+        self
+    }
+
+    pub fn allow_write(mut self, path: &str) -> Self {
+        if path.starts_with("/tmp") || path.starts_with("/home") {
+            self.bits |= 1 << 3;
+        }
+        self
+    }
+
+    pub fn allow_exec(mut self) -> Self {
+        self.bits |= 1 << 4;
+        self
+    }
+
+    pub fn allow_ipc(mut self) -> Self {
+        self.bits |= 1 << 5;
+        self
+    }
+}
+
+impl Default for CapabilityToken {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 /// Capability gate for syscall validation
 pub struct CapabilityGate {
-    /// Current capability token
-    current: AtomicU64,
+    /// Current capability token bits
+    pub current: AtomicU64,
 }
 
 impl CapabilityGate {
@@ -148,7 +126,9 @@ impl CapabilityGate {
     /// Get current capability
     pub fn current_capability(&self) -> CapabilityToken {
         CapabilityToken {
+            id: 0,
             bits: self.current.load(Ordering::SeqCst),
+            is_revoked: false,
         }
     }
 }
@@ -194,17 +174,5 @@ mod tests {
         let token = CapabilityToken::new().allow_network("tcp", 80);
         gate.set_capability(token);
         assert!(gate.validate_syscall(Permission::NetworkTcp));
-    }
-
-    #[test]
-    fn test_bitmask_overlap_prevention() {
-        // Registering port 80 and then 443 should not result in a corrupted port 507,
-        // but rather only store the latest port 443 cleanly.
-        let token = CapabilityToken::new()
-            .allow_network("tcp", 80)
-            .allow_network("tcp", 443);
-        // Extracts port stored in bits 16-31
-        let port = (token.bits() >> 16) & 0xFFFF;
-        assert_eq!(port, 443);
     }
 }

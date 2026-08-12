@@ -1,0 +1,4391 @@
+    Checking sigmaos v0.1.0 (/app)
+error[E0428]: the name `orchestrator` is defined multiple times
+ --> src/automation/mod.rs:5:1
+  |
+3 | pub mod orchestrator;
+  | --------------------- previous definition of the module `orchestrator` here
+4 | pub mod system_level;
+5 | pub mod orchestrator;
+  | ^^^^^^^^^^^^^^^^^^^^^ `orchestrator` redefined here
+  |
+  = note: `orchestrator` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `control_center` is defined multiple times
+ --> src/dashboard/mod.rs:4:1
+  |
+2 | pub mod control_center;
+  | ----------------------- previous definition of the module `control_center` here
+3 | pub mod monitor;
+4 | pub mod control_center;
+  | ^^^^^^^^^^^^^^^^^^^^^^^ `control_center` redefined here
+  |
+  = note: `control_center` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `even_more_devices` is defined multiple times
+  --> src/drivers/mod.rs:18:1
+   |
+ 2 | pub mod even_more_devices;
+   | -------------------------- previous definition of the module `even_more_devices` here
+...
+18 | pub mod even_more_devices;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^ `even_more_devices` redefined here
+   |
+   = note: `even_more_devices` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `breakthroughs` is defined multiple times
+  --> src/kernel/mod.rs:10:1
+   |
+ 2 | pub mod breakthroughs;
+   | ---------------------- previous definition of the module `breakthroughs` here
+...
+10 | pub mod breakthroughs;
+   | ^^^^^^^^^^^^^^^^^^^^^^ `breakthroughs` redefined here
+   |
+   = note: `breakthroughs` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `ipc` is defined multiple times
+  --> src/kernel/mod.rs:11:1
+   |
+ 5 | pub mod ipc;
+   | ------------ previous definition of the module `ipc` here
+...
+11 | pub mod ipc;
+   | ^^^^^^^^^^^^ `ipc` redefined here
+   |
+   = note: `ipc` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `ring_buffer_stack` is defined multiple times
+ --> src/network/mod.rs:5:1
+  |
+2 | pub mod ring_buffer_stack;
+  | -------------------------- previous definition of the module `ring_buffer_stack` here
+...
+5 | pub mod ring_buffer_stack;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^ `ring_buffer_stack` redefined here
+  |
+  = note: `ring_buffer_stack` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `advanced_app_absorber` is defined multiple times
+  --> src/productivity/mod.rs:11:1
+   |
+ 2 | pub mod advanced_app_absorber;
+   | ------------------------------ previous definition of the module `advanced_app_absorber` here
+...
+11 | pub mod advanced_app_absorber;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `advanced_app_absorber` redefined here
+   |
+   = note: `advanced_app_absorber` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `Vulnerability` is defined multiple times
+   --> src/security/vulnerability.rs:264:1
+    |
+ 39 | pub trait Vulnerability {
+    | ----------------------- previous definition of the trait `Vulnerability` here
+...
+264 | pub trait Vulnerability {
+    | ^^^^^^^^^^^^^^^^^^^^^^^ `Vulnerability` redefined here
+    |
+    = note: `Vulnerability` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `SimpleVulnerability` is defined multiple times
+   --> src/security/vulnerability.rs:273:1
+    |
+ 48 | pub struct SimpleVulnerability {
+    | ------------------------------ previous definition of the type `SimpleVulnerability` here
+...
+273 | pub struct SimpleVulnerability {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `SimpleVulnerability` redefined here
+    |
+    = note: `SimpleVulnerability` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `VulnerabilityScanner` is defined multiple times
+   --> src/security/vulnerability.rs:324:1
+    |
+ 99 | pub trait VulnerabilityScanner {
+    | ------------------------------ previous definition of the trait `VulnerabilityScanner` here
+...
+324 | pub trait VulnerabilityScanner {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `VulnerabilityScanner` redefined here
+    |
+    = note: `VulnerabilityScanner` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `SimpleVulnerabilityScanner` is defined multiple times
+   --> src/security/vulnerability.rs:332:1
+    |
+107 | pub struct SimpleVulnerabilityScanner {
+    | ------------------------------------- previous definition of the type `SimpleVulnerabilityScanner` here
+...
+332 | pub struct SimpleVulnerabilityScanner {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `SimpleVulnerabilityScanner` redefined here
+    |
+    = note: `SimpleVulnerabilityScanner` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `ScanReport` is defined multiple times
+   --> src/security/vulnerability.rs:424:1
+    |
+190 | pub trait ScanReport {
+    | -------------------- previous definition of the trait `ScanReport` here
+...
+424 | pub trait ScanReport {
+    | ^^^^^^^^^^^^^^^^^^^^ `ScanReport` redefined here
+    |
+    = note: `ScanReport` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `SimpleScanReport` is defined multiple times
+   --> src/security/vulnerability.rs:440:1
+    |
+206 | pub struct SimpleScanReport {
+    | --------------------------- previous definition of the type `SimpleScanReport` here
+...
+440 | pub struct SimpleScanReport {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `SimpleScanReport` redefined here
+    |
+    = note: `SimpleScanReport` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `clipboard` is defined multiple times
+  --> src/security/mod.rs:25:1
+   |
+ 9 | pub mod clipboard;
+   | ------------------ previous definition of the module `clipboard` here
+...
+25 | pub mod clipboard;
+   | ^^^^^^^^^^^^^^^^^^ `clipboard` redefined here
+   |
+   = note: `clipboard` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `intrusion` is defined multiple times
+  --> src/security/mod.rs:26:1
+   |
+12 | pub mod intrusion;
+   | ------------------ previous definition of the module `intrusion` here
+...
+26 | pub mod intrusion;
+   | ^^^^^^^^^^^^^^^^^^ `intrusion` redefined here
+   |
+   = note: `intrusion` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `password` is defined multiple times
+  --> src/security/mod.rs:27:1
+   |
+14 | pub mod password;
+   | ----------------- previous definition of the module `password` here
+...
+27 | pub mod password;
+   | ^^^^^^^^^^^^^^^^^ `password` redefined here
+   |
+   = note: `password` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `alloc` is defined multiple times
+   --> src/shell/command.rs:702:1
+    |
+ 98 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | --------------------------------------- previous definition of the value `alloc` here
+...
+702 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `alloc` redefined here
+    |
+    = note: `alloc` must be defined only once in the value namespace of this module
+
+error[E0428]: the name `free` is defined multiple times
+   --> src/shell/command.rs:709:1
+    |
+105 | unsafe fn free(ptr: *mut u8) {
+    | ---------------------------- previous definition of the value `free` here
+...
+709 | unsafe fn free(ptr: *mut u8) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `free` redefined here
+    |
+    = note: `free` must be defined only once in the value namespace of this module
+
+error[E0428]: the name `command` is defined multiple times
+ --> src/shell/mod.rs:4:1
+  |
+2 | pub mod command;
+  | ---------------- previous definition of the module `command` here
+3 | pub mod repl;
+4 | pub mod command;
+  | ^^^^^^^^^^^^^^^^ `command` redefined here
+  |
+  = note: `command` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `container` is defined multiple times
+ --> src/virtualization/mod.rs:6:1
+  |
+2 | pub mod container;
+  | ------------------ previous definition of the module `container` here
+...
+6 | pub mod container;
+  | ^^^^^^^^^^^^^^^^^^ `container` redefined here
+  |
+  = note: `container` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `namespaces` is defined multiple times
+ --> src/virtualization/mod.rs:7:1
+  |
+3 | pub mod namespaces;
+  | ------------------- previous definition of the module `namespaces` here
+...
+7 | pub mod namespaces;
+  | ^^^^^^^^^^^^^^^^^^^ `namespaces` redefined here
+  |
+  = note: `namespaces` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `observability` is defined multiple times
+  --> src/lib.rs:41:1
+   |
+18 | pub mod observability;
+   | ---------------------- previous definition of the module `observability` here
+...
+41 | pub mod observability {
+   | ^^^^^^^^^^^^^^^^^^^^^ `observability` redefined here
+   |
+   = note: `observability` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `TcpStack` is defined multiple times
+   --> src/lib.rs:143:56
+    |
+117 | ...Error, TcpSegment, TcpSocket, TcpStack, TcpState,
+    |                                  -------- previous import of the type `TcpStack` here
+...
+143 | ...Error, TcpSegment, TcpStack, TcpState};
+    |                       ^^^^^^^^--
+    |                       |
+    |                       `TcpStack` reimported here
+    |                       help: remove unnecessary import
+    |
+    = note: `TcpStack` must be defined only once in the type namespace of this module
+
+error: the `#[test]` attribute may only be used on a free function
+   --> src/klib/paging.rs:676:5
+    |
+676 |     #[test]
+    |     ^^^^^^^ the `#[test]` macro causes a function to be run as a test and has no effect on non-functions
+    |
+help: replace with conditional compilation to make the item only exist when tests are being run
+    |
+676 -     #[test]
+676 +     #[cfg(test)]
+    |
+
+error: the `#[test]` attribute may only be used on a free function
+   --> src/klib/paging.rs:695:5
+    |
+695 |     #[test]
+    |     ^^^^^^^ the `#[test]` macro causes a function to be run as a test and has no effect on non-functions
+    |
+help: replace with conditional compilation to make the item only exist when tests are being run
+    |
+695 -     #[test]
+695 +     #[cfg(test)]
+    |
+
+error: the `#[test]` attribute may only be used on a free function
+   --> src/klib/paging.rs:718:5
+    |
+718 |     #[test]
+    |     ^^^^^^^ the `#[test]` macro causes a function to be run as a test and has no effect on non-functions
+    |
+help: replace with conditional compilation to make the item only exist when tests are being run
+    |
+718 -     #[test]
+718 +     #[cfg(test)]
+    |
+
+error[E0428]: the name `CapabilityGate` is defined multiple times
+   --> src/security/capability.rs:217:1
+    |
+111 | pub struct CapabilityGate {
+    | ------------------------- previous definition of the type `CapabilityGate` here
+...
+217 | pub struct CapabilityGate {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^ `CapabilityGate` redefined here
+    |
+    = note: `CapabilityGate` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `Permission` is defined multiple times
+   --> src/security/capability.rs:207:1
+    |
+  9 | pub enum Permission {
+    | ------------------- previous definition of the type `Permission` here
+...
+207 | pub enum Permission {
+    | ^^^^^^^^^^^^^^^^^^^ `Permission` redefined here
+    |
+    = note: `Permission` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `Severity` is defined multiple times
+  --> src/security/vulnerability.rs:33:1
+   |
+15 | pub enum Severity {
+   | ----------------- previous definition of the type `Severity` here
+...
+33 | pub enum Severity { None = 0, Low = 1, Medium = 2, High = 3, Critical = 4 }
+   | ^^^^^^^^^^^^^^^^^ `Severity` redefined here
+   |
+   = note: `Severity` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `ScanError` is defined multiple times
+  --> src/security/vulnerability.rs:37:1
+   |
+25 | pub enum ScanError {
+   | ------------------ previous definition of the type `ScanError` here
+...
+37 | pub enum ScanError { Success = 0, PackageNotFound = 1, ScanFailed = 2 }
+   | ^^^^^^^^^^^^^^^^^^ `ScanError` redefined here
+   |
+   = note: `ScanError` must be defined only once in the type namespace of this module
+
+error[E0428]: the name `ScanSummary` is defined multiple times
+   --> src/security/vulnerability.rs:431:1
+    |
+197 | pub struct ScanSummary {
+    | ---------------------- previous definition of the type `ScanSummary` here
+...
+431 | pub struct ScanSummary {
+    | ^^^^^^^^^^^^^^^^^^^^^^ `ScanSummary` redefined here
+    |
+    = note: `ScanSummary` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `TcpConnection` is defined multiple times
+   --> src/lib.rs:143:19
+    |
+117 | ...e, TcpConnection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
+    |       ------------- previous import of the type `TcpConnection` here
+...
+143 | ...::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+    |       ^^^^^^^^^^^^^--
+    |       |
+    |       `TcpConnection` reimported here
+    |       help: remove unnecessary import
+    |
+    = note: `TcpConnection` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `TcpError` is defined multiple times
+   --> src/lib.rs:143:34
+    |
+117 | ...ection, TcpError, TcpSegment, TcpSocket, TcpStack, TcpState,
+    |            -------- previous import of the type `TcpError` here
+...
+143 | ...ection, TcpError, TcpSegment, TcpStack, TcpState};
+    |            ^^^^^^^^--
+    |            |
+    |            `TcpError` reimported here
+    |            help: remove unnecessary import
+    |
+    = note: `TcpError` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `TcpSegment` is defined multiple times
+   --> src/lib.rs:143:44
+    |
+117 | ...rror, TcpSegment, TcpSocket, TcpStack, TcpState,
+    |          ---------- previous import of the type `TcpSegment` here
+...
+143 | ...rror, TcpSegment, TcpStack, TcpState};
+    |          ^^^^^^^^^^--
+    |          |
+    |          `TcpSegment` reimported here
+    |          help: remove unnecessary import
+    |
+    = note: `TcpSegment` must be defined only once in the type namespace of this module
+
+error[E0252]: the name `TcpState` is defined multiple times
+   --> src/lib.rs:143:66
+    |
+117 | ...Segment, TcpSocket, TcpStack, TcpState,
+    |                                  -------- previous import of the type `TcpState` here
+...
+143 | ...Segment, TcpStack, TcpState};
+    |                       ^^^^^^^^ `TcpState` reimported here
+    |
+    = note: `TcpState` must be defined only once in the type namespace of this module
+
+error[E0432]: unresolved import `endeavour`
+  --> src/compatibility/mod.rs:34:9
+   |
+34 | pub use endeavour::{
+   |         ^^^^^^^^^ use of unresolved module or unlinked crate `endeavour`
+   |
+help: to make use of source file src/compatibility/endeavour.rs, use `mod endeavour` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod endeavour;
+   |
+
+error[E0432]: unresolved import `crate::boot::firmware`
+  --> src/kernel/mod.rs:15:22
+   |
+15 | pub use crate::boot::firmware::{
+   |                      ^^^^^^^^ could not find `firmware` in `boot`
+
+error[E0432]: unresolved import `bus`
+  --> src/kernel/mod.rs:18:9
+   |
+18 | pub use bus::{Bus, PciBus, UsableBus};
+   |         ^^^ use of unresolved module or unlinked crate `bus`
+   |
+help: to make use of source file src/kernel/bus.rs, use `mod bus` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod bus;
+   |
+
+error[E0432]: unresolved import `roundrobin`
+  --> src/kernel/mod.rs:35:9
+   |
+35 | pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerErr...
+   |         ^^^^^^^^^^ use of unresolved module or unlinked crate `roundrobin`
+   |
+help: to make use of source file src/kernel/roundrobin.rs, use `mod roundrobin` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod roundrobin;
+   |
+
+error[E0432]: unresolved import `scheduler`
+  --> src/kernel/mod.rs:36:9
+   |
+36 | pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+   |         ^^^^^^^^^ help: a similar path exists: `crate::scheduler`
+   |
+   = note: `use` statements changed in Rust 2018; read more at <https://doc.rust-lang.org/edition-guide/rust-2018/module-system/path-clarity.html>
+
+error[E0432]: unresolved import `terminal_emulator`
+ --> src/shell/mod.rs:8:9
+  |
+8 | pub use terminal_emulator::{TerminalSession, UserDefinedFunction, AutoSug...
+  |         ^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `terminal_emulator`
+  |
+help: to make use of source file src/shell/terminal_emulator.rs, use `mod terminal_emulator` in this file to declare the module
+ --> src/lib.rs:4:1
+  |
+4 + mod terminal_emulator;
+  |
+
+error[E0432]: unresolved imports `compatibility::FhsConventionStatus`, `compatibility::LegacyDriverAdapter`, `compatibility::LegacyFSAdapter`, `compatibility::LegacyKernelAdapter`, `compatibility::LegacyPackageAdapter`, `compatibility::LegacyProtocolAdapter`, `compatibility::LegacySecurityAdapter`, `compatibility::LegacyUIAdapter`, `compatibility::LsbProfile`, `compatibility::PosixComplianceLevel`, `compatibility::StandardsComplianceManager`
+  --> src/lib.rs:74:59
+   |
+74 |     DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FhsConventionStatus, FileAlmanacHub,
+   |                                                           ^^^^^^^^^^^^^^^^^^^ no `FhsConventionStatus` in `compatibility`
+75 |     FirmwareGatewayMesh, FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid,
+76 |     LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+   |                                                               ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^ no `LegacyFSAdapter` in `compatibility`
+   |                                                               |
+   |                                                               no `LegacyDriverAdapter` in `compatibility`
+77 |     LegacyKernelAdapter, LegacyPackageAdapter, LegacyProtocolAdapter, LegacySecurityAdapter,
+   |     ^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^ no `LegacySecurityAdapter` in `compatibility`
+   |     |                    |                     |
+   |     |                    |                     no `LegacyProtocolAdapter` in `compatibility`
+   |     |                    no `LegacyPackageAdapter` in `compatibility`
+   |     no `LegacyKernelAdapter` in `compatibility`
+78 |     LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
+   |     ^^^^^^^^^^^^^^^  ^^^^^^^^^^ no `LsbProfile` in `compatibility`
+   |     |
+   |     no `LegacyUIAdapter` in `compatibility`
+79 |     PosixComplianceLevel, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
+   |     ^^^^^^^^^^^^^^^^^^^^ no `PosixComplianceLevel` in `compatibility`
+80 |     StandardsComplianceManager, StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, TargetPlatform,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: a similar name exists in the module
+   |
+76 -     LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, LegacyFSAdapter,
+76 +     LegacyAsmCodexGrid, LegacyCCodexGrid, LegacyCppCodexGrid, LegacyDriverAdapter, legacy_adapters,
+   |
+help: a similar name exists in the module
+   |
+78 -     LegacyUIAdapter, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
+78 +     legacy_adapters, LsbProfile, NetworkAlmanacHub, NetworkArchiveGridV2, PeripheralArchiveMesh,
+   |
+
+error[E0432]: unresolved imports `kernel::AiNativeRuntime`, `kernel::EnergyAwareScheduler`, `kernel::PrivacyFirstSandbox`, `kernel::SelfHealingKernel`, `kernel::SigmaFsPlusPlus`, `kernel::UniversalAbiTranslator`, `kernel::UserDefinedKernelFunctions`, `kernel::GapError`, `kernel::Pml4PageTableEntry`, `kernel::VirtualMemoryPagingManager`, `kernel::IrqRoutingTable`, `kernel::AcpiInterruptManager`, `kernel::JournalState`, `kernel::JournalBlock`, `kernel::MetadataJournal`
+   --> src/lib.rs:106:17
+    |
+106 |     ABIManager, AiNativeRuntime, BuddyAllocator, Channel, EnergyAwareScheduler, FastPathIpc,
+    |                 ^^^^^^^^^^^^^^^                           ^^^^^^^^^^^^^^^^^^^^ no `EnergyAwareScheduler` in `kernel`
+    |                 |
+    |                 no `AiNativeRuntime` in `kernel`
+...
+109 |     PAGE_SIZE, PolicyError, PolicyManager, PrivacyFirstSandbox, Priority, Process, ProcessSt...
+    |                                            ^^^^^^^^^^^^^^^^^^^ no `PrivacyFirstSandbox` in `kernel`
+110 |     ProtectionDomain, PrivilegeLevel, ResourceBroker, RoundRobinConfig, RoundRobinScheduler,
+111 |     Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator,
+    |                                ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^ no `UniversalAbiTranslator` in `kernel`
+    |                                |                  |
+    |                                |                  no `SigmaFsPlusPlus` in `kernel`
+    |                                no `SelfHealingKernel` in `kernel`
+112 |     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^ no `VirtualMemoryPagingManager` in `kernel`
+    |     |                           |         |
+    |     |                           |         no `Pml4PageTableEntry` in `kernel`
+    |     |                           no `GapError` in `kernel`
+    |     no `UserDefinedKernelFunctions` in `kernel`
+113 |     IrqRoutingTable, AcpiInterruptManager, JournalState, JournalBlock, MetadataJournal,
+    |     ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^  ^^^^^^^^^^^^  ^^^^^^^^^^^^^^^
+    |
+    = help: consider importing this struct instead:
+            crate::kernel::breakthroughs::AiNativeRuntime
+    = help: consider importing this struct instead:
+            crate::kernel::breakthroughs::EnergyAwareScheduler
+    = help: consider importing this struct instead:
+            crate::kernel::breakthroughs::PrivacyFirstSandbox
+    = help: consider importing this struct instead:
+            crate::kernel::breakthroughs::SelfHealingKernel
+    = help: consider importing this struct instead:
+            crate::kernel::breakthroughs::SigmaFsPlusPlus
+    = help: consider importing this struct instead:
+            crate::kernel::breakthroughs::UniversalAbiTranslator
+    = help: consider importing this struct instead:
+            crate::kernel::breakthroughs::UserDefinedKernelFunctions
+    = help: consider importing this enum instead:
+            crate::kernel::gap_closing::GapError
+    = help: consider importing this struct instead:
+            crate::kernel::gap_closing::Pml4PageTableEntry
+    = help: consider importing this struct instead:
+            crate::kernel::gap_closing::VirtualMemoryPagingManager
+help: a similar name exists in the module
+    |
+112 -     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
+112 +     UserDefinedKernelFunctions, GapError, PageTableEntry, VirtualMemoryPagingManager,
+    |
+help: a similar name exists in the module
+    |
+112 -     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryPagingManager,
+112 +     UserDefinedKernelFunctions, GapError, Pml4PageTableEntry, VirtualMemoryManagerV2,
+    |
+
+error[E0432]: unresolved imports `security::DomainID`, `security::DomainOrchestrator`, `security::DomainType`, `security::IsolatedDomain`, `security::IsolationError`
+   --> src/lib.rs:170:38
+    |
+170 |     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
+    |                                      ^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^^^^^ no `IsolatedDomain` in `security`
+    |                                      |         |                   |
+    |                                      |         |                   no `DomainType` in `security`
+    |                                      |         no `DomainOrchestrator` in `security`
+    |                                      no `DomainID` in `security`
+171 |     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSe...
+    |     ^^^^^^^^^^^^^^ no `IsolationError` in `security`
+
+error[E0432]: unresolved import `crate::driver::device::DdeDeviceWrapper`
+ --> src/compatibility/historic_linux.rs:1:5
+  |
+1 | use crate::driver::device::DdeDeviceWrapper;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `DdeDeviceWrapper` in `driver::device`
+
+error[E0432]: unresolved imports `stack::SigmaDebug`, `stack::SigmaMetrics`, `stack::SigmaTrace`, `stack::SimpleSigmaDebug`, `stack::SimpleSigmaMetrics`, `stack::SimpleSigmaTrace`
+ --> src/observability/mod.rs:6:45
+  |
+6 | ... ObservabilityStats, SigmaDebug, SigmaMetrics, SigmaTrace, SimpleMetric,
+  |                         ^^^^^^^^^^  ^^^^^^^^^^^^  ^^^^^^^^^^ no `SigmaTrace` in `observability::stack`
+  |                         |           |
+  |                         |           no `SigmaMetrics` in `observability::stack`
+  |                         no `SigmaDebug` in `observability::stack`
+7 | ...Stack, SimpleSigmaDebug, SimpleSigmaMetrics, SimpleSigmaTrace, SimpleS...
+  |           ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^ no `SimpleSigmaTrace` in `observability::stack`
+  |           |                 |
+  |           |                 no `SimpleSigmaMetrics` in `observability::stack`
+  |           |                 help: a similar name exists in the module: `SimpleMetric`
+  |           no `SimpleSigmaDebug` in `observability::stack`
+
+error[E0432]: unresolved imports `crate::driver::framework::DriverError`, `crate::driver::framework::SimpleDriver`
+ --> src/package/linux_translation.rs:6:5
+  |
+6 |     DriverError, DriverID, DriverState, DriverType, SimpleDriver,
+  |     ^^^^^^^^^^^                                     ^^^^^^^^^^^^ no `SimpleDriver` in `driver::framework`
+  |     |
+  |     no `DriverError` in `driver::framework`
+  |
+  = help: consider importing this enum instead:
+          crate::kernel::subsystem::DriverError
+
+error[E0432]: unresolved imports `desktop::InputAuthGate`, `desktop::PqcVideoCipher`, `desktop::SigmaRendezvous`
+ --> src/remote/mod.rs:6:5
+  |
+6 |     InputAuthGate, PqcVideoCipher, RemoteDesktop, RemoteError, RemoteSess...
+  |     ^^^^^^^^^^^^^  ^^^^^^^^^^^^^^ no `PqcVideoCipher` in `remote::desktop`
+  |     |
+  |     no `InputAuthGate` in `remote::desktop`
+7 |     SessionState, SigmaRendezvous, SimpleRemoteDesktop, SimpleRemoteSessi...
+  |                   ^^^^^^^^^^^^^^^ no `SigmaRendezvous` in `remote::desktop`
+
+error[E0432]: unresolved import `selinux::Permission`
+  --> src/security/mod.rs:50:51
+   |
+50 | ...e, ObjectType, Permission as SelinuxPermission, SecurityContext,
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no `Permission` in `security::selinux`
+   |
+   = help: consider importing this enum through its public re-export instead:
+           crate::Permission
+
+error[E0432]: unresolved import `spec`
+  --> src/sigpkg/mod.rs:13:9
+   |
+13 | pub use spec::{
+   |         ^^^^ use of unresolved module or unlinked crate `spec`
+   |
+help: to make use of source file src/sigpkg/spec.rs, use `mod spec` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod spec;
+   |
+
+error[E0432]: unresolved import `zero_alloc_resolver`
+  --> src/sigpkg/mod.rs:27:9
+   |
+27 | pub use zero_alloc_resolver::{PackageDependencyResolver, MAX_RECIPE_DEPE...
+   |         ^^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `zero_alloc_resolver`
+   |
+help: to make use of source file src/sigpkg/zero_alloc_resolver.rs, use `mod zero_alloc_resolver` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod zero_alloc_resolver;
+   |
+
+error[E0432]: unresolved import `universal_adapter`
+  --> src/sigpkg/mod.rs:28:9
+   |
+28 | pub use universal_adapter::{
+   |         ^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `universal_adapter`
+   |
+help: to make use of source file src/sigpkg/universal_adapter.rs, use `mod universal_adapter` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod universal_adapter;
+   |
+
+error[E0432]: unresolved import `universal_oop_system`
+  --> src/sigpkg/mod.rs:32:9
+   |
+32 | pub use universal_oop_system::{
+   |         ^^^^^^^^^^^^^^^^^^^^ use of unresolved module or unlinked crate `universal_oop_system`
+   |
+help: to make use of source file src/sigpkg/universal_oop_system.rs, use `mod universal_oop_system` in this file to declare the module
+  --> src/lib.rs:4:1
+   |
+ 4 + mod universal_oop_system;
+   |
+
+error[E0432]: unresolved imports `uefi::GopFramebuffer`, `uefi::AcpiParser`, `uefi::UsbHostController`, `uefi::MultiKernelBootSelector`, `uefi::SovereignBootWatchdog`, `uefi::GopSplashCanvas`, `uefi::MicrokernelProfile`
+  --> src/boot/mod.rs:11:73
+   |
+11 |     SimpleUEFIBootloader, UEFIBootloader, SecureBoot, SimpleSecureBoot, GopFramebuffer,
+   |                                                                         ^^^^^^^^^^^^^^ no `GopFramebuffer` in `boot::uefi`
+12 |     AcpiParser, UsbHostController, MultiKernelBootSelector, SovereignBootWatchdog,
+   |     ^^^^^^^^^^  ^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^ no `SovereignBootWatchdog` in `boot::uefi`
+   |     |           |                  |
+   |     |           |                  no `MultiKernelBootSelector` in `boot::uefi`
+   |     |           no `UsbHostController` in `boot::uefi`
+   |     no `AcpiParser` in `boot::uefi`
+13 |     GopSplashCanvas, MicrokernelProfile, BootError,
+   |     ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^ no `MicrokernelProfile` in `boot::uefi`
+   |     |
+   |     no `GopSplashCanvas` in `boot::uefi`
+
+error[E0407]: method `set_state` is not a member of trait `Driver`
+  --> src/driver/framework.rs:80:5
+   |
+80 | /     fn set_state(&self, state: DriverState) {
+81 | |         self.state.store(state as usize, Ordering::SeqCst);
+82 | |     }
+   | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `init` is not a member of trait `Driver`
+  --> src/driver/framework.rs:83:5
+   |
+83 | /     fn init(&mut self) -> Result<(), DriverError> {
+84 | |         Ok(())
+85 | |     }
+   | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `probe` is not a member of trait `Driver`
+  --> src/driver/framework.rs:86:5
+   |
+86 | /     fn probe(&mut self) -> Result<bool, DriverError> {
+87 | |         Ok(true)
+88 | |     }
+   | |_____^ not a member of trait `Driver`
+
+error[E0407]: method `set_cow` is not a member of trait `PageTableEntry`
+  --> src/klib/paging.rs:97:5
+   |
+97 | /     fn set_cow(&mut self, cow: bool) {
+98 | |         self.cow.store(if cow { 1 } else { 0 }, Ordering::SeqCst);
+99 | |     }
+   | |_____^ not a member of trait `PageTableEntry`
+
+error[E0407]: method `mark_copy_on_write` is not a member of trait `VirtualMemoryManager`
+   --> src/klib/paging.rs:489:5
+    |
+489 | /     fn mark_copy_on_write(&mut self, virt: VirtualAddress) -> Result<...
+490 | |         let pml4_idx = self.get_pml4_index(virt);
+491 | |         let pdpt_idx = self.get_pdpt_index(virt);
+492 | |         let pd_idx = self.get_pd_index(virt);
+...   |
+533 | |         Err(PageFaultError::NotPresent)
+534 | |     }
+    | |_____^ not a member of trait `VirtualMemoryManager`
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:30:38
+   |
+30 |     fn load(&mut self) -> Result<(), DriverError>;
+   |                                      ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:31:40
+   |
+31 |     fn unload(&mut self) -> Result<(), DriverError>;
+   |                                        ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:35:80
+   |
+35 | ...-> Result<usize, DriverError>;
+   |                     ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:36:77
+   |
+36 | ...-> Result<usize, DriverError>;
+   |                     ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:40:60
+   |
+40 |     fn send_packet(&mut self, packet: &[u8]) -> Result<(), DriverError>;
+   |                                                            ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:41:67
+   |
+41 | ...-> Result<usize, DriverError>;
+   |                     ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:45:73
+   |
+45 | ...2) -> Result<(), DriverError>;
+   |                     ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:46:46
+   |
+46 |     fn flip_buffers(&mut self) -> Result<(), DriverError>;
+   |                                              ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:50:48
+   |
+50 |     fn poll_events(&mut self) -> Result<usize, DriverError>;
+   |                                                ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:83:38
+   |
+83 |     fn init(&mut self) -> Result<(), DriverError> {
+   |                                      ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:86:41
+   |
+86 |     fn probe(&mut self) -> Result<bool, DriverError> {
+   |                                         ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:89:38
+   |
+89 |     fn load(&mut self) -> Result<(), DriverError> {
+   |                                      ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+  --> src/driver/framework.rs:93:40
+   |
+93 |     fn unload(&mut self) -> Result<(), DriverError> {
+   |                                        ^^^^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::kernel::subsystem::DriverError;
+   |
+
+error[E0425]: cannot find type `DriverError` in this scope
+   --> src/driver/framework.rs:100:80
+    |
+100 | ...esult<DriverID, DriverError>;
+    |                    ^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  4 + use crate::kernel::subsystem::DriverError;
+    |
+
+error[E0425]: cannot find type `DriverError` in this scope
+   --> src/driver/framework.rs:101:59
+    |
+101 |     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
+    |                                                           ^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  4 + use crate::kernel::subsystem::DriverError;
+    |
+
+error[E0425]: cannot find type `DriverError` in this scope
+   --> src/driver/framework.rs:102:61
+    |
+102 |     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError>;
+    |                                                             ^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  4 + use crate::kernel::subsystem::DriverError;
+    |
+
+error[E0425]: cannot find type `DriverError` in this scope
+   --> src/driver/framework.rs:142:80
+    |
+142 | ...esult<DriverID, DriverError> {
+    |                    ^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  4 + use crate::kernel::subsystem::DriverError;
+    |
+
+error[E0425]: cannot find type `DriverError` in this scope
+   --> src/driver/framework.rs:147:59
+    |
+147 |     fn load_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
+    |                                                           ^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  4 + use crate::kernel::subsystem::DriverError;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `DriverError`
+   --> src/driver/framework.rs:155:13
+    |
+155 |         Err(DriverError::LoadFailed)
+    |             ^^^^^^^^^^^ use of undeclared type `DriverError`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::kernel::subsystem::DriverError;
+    |
+
+error[E0425]: cannot find type `DriverError` in this scope
+   --> src/driver/framework.rs:157:61
+    |
+157 |     fn unload_driver(&mut self, id: DriverID) -> Result<(), DriverError> {
+    |                                                             ^^^^^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  4 + use crate::kernel::subsystem::DriverError;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `DriverError`
+   --> src/driver/framework.rs:165:13
+    |
+165 |         Err(DriverError::UnloadFailed)
+    |             ^^^^^^^^^^^ use of undeclared type `DriverError`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::kernel::subsystem::DriverError;
+    |
+
+error[E0425]: cannot find function `alloc` in this scope
+   --> src/klib/paging.rs:667:24
+    |
+667 | ...   let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+    |                      ^^^^^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/compatibility/constellation_mesh.rs:449:1
+    |
+449 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::compatibility::constellation_mesh::alloc`: not accessible
+    |
+   ::: src/boot/uefi.rs:107:14
+    |
+107 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::boot::uefi::alloc`: not accessible
+    |
+   ::: src/ai/orchestrator.rs:259:1
+    |
+259 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::ai::orchestrator::alloc`: not accessible
+    |
+   ::: src/container/oci_runtime.rs:434:5
+    |
+434 |     fn alloc(size: usize) -> *mut u8;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::container::oci_runtime::alloc`: not accessible
+    |
+   ::: src/device/manager.rs:284:5
+    |
+284 |     fn alloc(size: usize) -> *mut u8;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::device::manager::alloc`: not accessible
+    |
+   ::: src/driver/device.rs:777:5
+    |
+777 |     fn alloc(size: usize) -> *mut u8;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::driver::device::alloc`: not accessible
+    |
+   ::: src/driver/framework.rs:225:5
+    |
+225 |     fn alloc(size: usize) -> *mut u8;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::driver::framework::alloc`: not accessible
+    |
+   ::: src/filesystem/cow_snapshot.rs:325:1
+    |
+325 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::filesystem::cow_snapshot::alloc`: not accessible
+    |
+   ::: src/filesystem/support.rs:304:14
+    |
+304 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::filesystem::support::alloc`: not accessible
+    |
+   ::: src/kernel/breakthroughs.rs:336:1
+    |
+336 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kernel::breakthroughs::alloc`: not accessible
+    |
+   ::: src/kernel/meta.rs:417:1
+    |
+417 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kernel::meta::alloc`: not accessible
+    |
+   ::: src/klib/buddy_allocator.rs:265:14
+    |
+265 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::klib::buddy_allocator::alloc`: not accessible
+    |
+   ::: src/klib/vec.rs:229:1
+    |
+229 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::klib::vec::alloc`: not accessible
+    |
+   ::: src/ml/training.rs:237:14
+    |
+237 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::ml::training::alloc`: not accessible
+    |
+   ::: src/network/tcp_udp.rs:407:14
+    |
+407 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::network::tcp_udp::alloc`: not accessible
+    |
+   ::: src/observability/stack.rs:584:5
+    |
+584 |     fn alloc(size: usize) -> *mut u8;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::observability::stack::alloc`: not accessible
+    |
+   ::: src/security/audit.rs:243:5
+    |
+243 |     fn alloc(size: usize) -> *mut u8;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::security::audit::alloc`: not accessible
+    |
+   ::: src/security/integrity.rs:462:5
+    |
+462 |     fn alloc(size: usize) -> *mut u8;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::security::integrity::alloc`: not accessible
+    |
+   ::: src/shell/command.rs:98:1
+    |
+ 98 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::shell::command::alloc`: not accessible
+    |
+   ::: src/virtualization/oci_pod.rs:268:1
+    |
+268 | unsafe fn alloc(size: usize) -> *mut u8 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::virtualization::oci_pod::alloc`: not accessible
+help: consider importing this function
+    |
+  4 + use std::alloc::alloc;
+    |
+
+error[E0425]: cannot find function `free` in this scope
+   --> src/klib/paging.rs:670:36
+    |
+670 |             if self.capacity > 0 { free(self.data as *mut u8); }
+    |                                    ^^^^ not found in this scope
+    |
+note: these functions exist but are inaccessible
+   --> src/compatibility/constellation_mesh.rs:456:1
+    |
+456 | unsafe fn free(ptr: *mut u8) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::compatibility::constellation_mesh::free`: not accessible
+    |
+   ::: src/boot/uefi.rs:107:48
+    |
+107 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^ `crate::boot::uefi::free`: not accessible
+    |
+   ::: src/ai/orchestrator.rs:266:1
+    |
+266 | unsafe fn free(ptr: *mut u8) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::ai::orchestrator::free`: not accessible
+    |
+   ::: src/container/oci_runtime.rs:435:5
+    |
+435 |     fn free(ptr: *mut u8);
+    |     ^^^^^^^^^^^^^^^^^^^^^^ `crate::container::oci_runtime::free`: not accessible
+    |
+   ::: src/device/manager.rs:285:5
+    |
+285 |     fn free(ptr: *mut u8);
+    |     ^^^^^^^^^^^^^^^^^^^^^^ `crate::device::manager::free`: not accessible
+    |
+   ::: src/driver/device.rs:778:5
+    |
+778 |     fn free(ptr: *mut u8);
+    |     ^^^^^^^^^^^^^^^^^^^^^^ `crate::driver::device::free`: not accessible
+    |
+   ::: src/driver/framework.rs:226:5
+    |
+226 |     fn free(ptr: *mut u8);
+    |     ^^^^^^^^^^^^^^^^^^^^^^ `crate::driver::framework::free`: not accessible
+    |
+   ::: src/filesystem/cow_snapshot.rs:332:1
+    |
+332 | unsafe fn free(ptr: *mut u8) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::filesystem::cow_snapshot::free`: not accessible
+    |
+   ::: src/filesystem/support.rs:304:48
+    |
+304 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^ `crate::filesystem::support::free`: not accessible
+    |
+   ::: src/kernel/breakthroughs.rs:343:1
+    |
+343 | unsafe fn free(ptr: *mut u8) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kernel::breakthroughs::free`: not accessible
+    |
+   ::: src/kernel/meta.rs:424:1
+    |
+424 | unsafe fn free(ptr: *mut u8) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::kernel::meta::free`: not accessible
+    |
+   ::: src/klib/buddy_allocator.rs:265:48
+    |
+265 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^ `crate::klib::buddy_allocator::free`: not accessible
+    |
+   ::: src/klib/vec.rs:236:1
+    |
+236 | unsafe fn free(ptr: *mut u8, size: usize) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::klib::vec::free`: not accessible
+    |
+   ::: src/ml/training.rs:237:48
+    |
+237 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^ `crate::ml::training::free`: not accessible
+    |
+   ::: src/network/tcp_udp.rs:407:48
+    |
+407 | extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^ `crate::network::tcp_udp::free`: not accessible
+    |
+   ::: src/observability/stack.rs:585:5
+    |
+585 |     fn free(ptr: *mut u8);
+    |     ^^^^^^^^^^^^^^^^^^^^^^ `crate::observability::stack::free`: not accessible
+    |
+   ::: src/security/audit.rs:244:5
+    |
+244 |     fn free(ptr: *mut u8);
+    |     ^^^^^^^^^^^^^^^^^^^^^^ `crate::security::audit::free`: not accessible
+    |
+   ::: src/security/integrity.rs:463:5
+    |
+463 |     fn free(ptr: *mut u8);
+    |     ^^^^^^^^^^^^^^^^^^^^^^ `crate::security::integrity::free`: not accessible
+    |
+   ::: src/shell/command.rs:105:1
+    |
+105 | unsafe fn free(ptr: *mut u8) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::shell::command::free`: not accessible
+    |
+   ::: src/virtualization/oci_pod.rs:275:1
+    |
+275 | unsafe fn free(ptr: *mut u8) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `crate::virtualization::oci_pod::free`: not accessible
+
+error[E0425]: cannot find type `NetfilterFirewall` in this scope
+   --> src/network/tcp_udp.rs:339:20
+    |
+339 |     pub netfilter: NetfilterFirewall,
+    |                    ^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find type `RoutingTable` in this scope
+   --> src/network/tcp_udp.rs:340:24
+    |
+340 |     pub routing_table: RoutingTable,
+    |                        ^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find type `NetworkInterface` in this scope
+   --> src/network/tcp_udp.rs:341:25
+    |
+341 |     pub interfaces: Vec<NetworkInterface>,
+    |                         ^^^^^^^^^^^^^^^^ not found in this scope
+    |
+help: you might be missing a type parameter
+    |
+333 | pub struct SimpleNetworkStack<NetworkInterface> {
+    |                              ++++++++++++++++++
+
+error[E0425]: cannot find type `AtomicU64` in this scope
+   --> src/security/capability.rs:219:14
+    |
+219 |     current: AtomicU64,
+    |              ^^^^^^^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+  5 + use std::sync::atomic::AtomicU64;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `AtomicU64`
+   --> src/security/capability.rs:226:22
+    |
+226 |             current: AtomicU64::new(0),
+    |                      ^^^^^^^^^ use of undeclared type `AtomicU64`
+    |
+help: consider importing this struct
+    |
+  5 + use std::sync::atomic::AtomicU64;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+   --> src/security/capability.rs:232:42
+    |
+232 |         self.current.store(token.bits(), Ordering::SeqCst);
+    |                                          ^^^^^^^^ use of undeclared type `Ordering`
+    |
+help: consider importing one of these enums
+    |
+  5 + use std::cmp::Ordering;
+    |
+  5 + use std::sync::atomic::Ordering;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+   --> src/security/capability.rs:237:41
+    |
+237 |         let current = self.current.load(Ordering::SeqCst);
+    |                                         ^^^^^^^^ use of undeclared type `Ordering`
+    |
+help: consider importing one of these enums
+    |
+  5 + use std::cmp::Ordering;
+    |
+  5 + use std::sync::atomic::Ordering;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Ordering`
+   --> src/security/capability.rs:244:37
+    |
+244 |             bits: self.current.load(Ordering::SeqCst),
+    |                                     ^^^^^^^^ use of undeclared type `Ordering`
+    |
+help: consider importing one of these enums
+    |
+  5 + use std::cmp::Ordering;
+    |
+  5 + use std::sync::atomic::Ordering;
+    |
+
+error[E0425]: cannot find type `AgentAutomationEngine` in this scope
+  --> src/shell/repl.rs:74:23
+   |
+74 |     pub agent_engine: AgentAutomationEngine,
+   |                       ^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `mem`
+   --> src/ai/orchestrator.rs:212:45
+    |
+212 | ...acity * mem::size_of::<T>()) as *mut T;
+    |            ^^^ use of unresolved module or unlinked crate `mem`
+    |
+    = help: if you wanted to use a crate named `mem`, use `cargo add mem` to add it to your `Cargo.toml`
+help: consider importing this module
+    |
+  4 + use std::mem;
+    |
+
+warning: unused import: `std::collections::HashMap`
+ --> src/automation/ai_optimizer.rs:4:5
+  |
+4 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/compatibility/constellation_mesh.rs:5:5
+  |
+5 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/compatibility/constellation_mesh.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: variant `Linux_6_x` should have an upper camel case name
+  --> src/compatibility/legacy_adapters.rs:10:5
+   |
+10 |     Linux_6_x,
+   |     ^^^^^^^^^ help: convert the identifier to upper camel case: `Linux6X`
+   |
+   = note: `#[warn(non_camel_case_types)]` (part of `#[warn(nonstandard_style)]`) on by default
+
+warning: variant `Linux_2_6` should have an upper camel case name
+  --> src/compatibility/legacy_adapters.rs:11:5
+   |
+11 |     Linux_2_6,
+   |     ^^^^^^^^^ help: convert the identifier to upper camel case: `Linux2_6`
+
+warning: variant `Glibc_2_5` should have an upper camel case name
+  --> src/compatibility/legacy_adapters.rs:35:5
+   |
+35 |     Glibc_2_5,
+   |     ^^^^^^^^^ help: convert the identifier to upper camel case: `Glibc2_5`
+
+warning: variant `Oabi_32` should have an upper camel case name
+  --> src/compatibility/legacy_adapters.rs:41:5
+   |
+41 |     Oabi_32,
+   |     ^^^^^^^ help: convert the identifier to upper camel case: `Oabi32`
+
+warning: variant `Eabi_32` should have an upper camel case name
+  --> src/compatibility/legacy_adapters.rs:42:5
+   |
+42 |     Eabi_32,
+   |     ^^^^^^^ help: convert the identifier to upper camel case: `Eabi32`
+
+warning: unused imports: `NonNull` and `self`
+ --> src/container/runtime.rs:5:17
+  |
+5 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused imports: `DeviceGeneration`, `PeripheralDevice`, and `PowerState`
+ --> src/drivers/boot_init.rs:4:34
+  |
+4 | ...eripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+  |                ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^  ^^^^^^^^^^
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/drivers/boot_init.rs:5:5
+  |
+5 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `AtomicU32`
+ --> src/kernel/memory.rs:6:26
+  |
+6 | use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
+  |                          ^^^^^^^^^
+
+warning: unused import: `crate::security::CapabilityToken`
+ --> src/kernel/meta.rs:4:5
+  |
+4 | use crate::security::CapabilityToken;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/kernel/meta.rs:5:26
+  |
+5 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused import: `alloc::boxed::Box`
+ --> src/kernel/linux_absorb.rs:9:5
+  |
+9 | use alloc::boxed::Box;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `core::mem`
+  --> src/ml/inference.rs:13:5
+   |
+13 | use core::mem;
+   |     ^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/observability/stack.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused imports: `AtomicUsize` and `Ordering`
+ --> src/distro/community.rs:4:26
+  |
+4 | use core::sync::atomic::{AtomicUsize, Ordering};
+  |                          ^^^^^^^^^^^  ^^^^^^^^
+
+warning: unused imports: `DriverID` and `DriverState`
+ --> src/package/linux_translation.rs:6:18
+  |
+6 |     DriverError, DriverID, DriverState, DriverType, SimpleDriver,
+  |                  ^^^^^^^^  ^^^^^^^^^^^
+
+warning: unused import: `std::path::PathBuf`
+ --> src/productivity/notes.rs:5:5
+  |
+5 | use std::path::PathBuf;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Duration`
+ --> src/productivity/screen_recorder.rs:5:17
+  |
+5 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> src/productivity/sigma_office.rs:17:5
+   |
+17 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+warning: unused imports: `Duration` and `Instant`
+ --> src/productivity/tasks.rs:5:17
+  |
+5 | use std::time::{Duration, Instant};
+  |                 ^^^^^^^^  ^^^^^^^
+
+warning: unused import: `alloc::vec::Vec`
+ --> src/security/cleaner.rs:4:5
+  |
+4 | use alloc::vec::Vec;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+ --> src/security/integrity.rs:9:17
+  |
+9 | use core::ptr::{self, NonNull};
+  |                 ^^^^  ^^^^^^^
+
+warning: unused import: `core::mem`
+ --> src/security/mac.rs:5:5
+  |
+5 | use core::mem;
+  |     ^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+  --> src/security/mac.rs:10:17
+   |
+10 | use core::ptr::{self, NonNull};
+   |                 ^^^^  ^^^^^^^
+
+warning: unused import: `core::mem`
+  --> src/security/pki.rs:10:5
+   |
+10 | use core::mem;
+   |     ^^^^^^^^^
+
+warning: unused imports: `NonNull` and `self`
+  --> src/security/secrets.rs:10:17
+   |
+10 | use core::ptr::{self, NonNull};
+   |                 ^^^^  ^^^^^^^
+
+warning: unused import: `core::mem`
+  --> src/security/secrets.rs:12:5
+   |
+12 | use core::mem;
+   |     ^^^^^^^^^
+
+warning: unused import: `CapabilityToken`
+  --> src/security/sigma_pledge.rs:16:19
+   |
+16 | use sigma_types::{CapabilityToken, Result};
+   |                   ^^^^^^^^^^^^^^^
+
+warning: unused imports: `TcpConnection`, `TcpError`, `TcpSegment`, `TcpStack`, and `TcpState`
+   --> src/lib.rs:143:19
+    |
+143 | ...ork::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
+    |          ^^^^^^^^^^^^^  ^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^  ^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/container/oci_runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default
+
+warning: crate-level attribute should be in the root module
+ --> src/container/runtime.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/device/manager.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/driver/framework.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/filesystem/support.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/klib/buddy_allocator.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/klib/paging.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/ml/inference.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/ml/training.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/network/tcp_udp.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/observability/stack.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/remote/desktop.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/remote/shell.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/audit.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/integrity.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/security/vulnerability.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/shell/command.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+warning: crate-level attribute should be in the root module
+ --> src/ai/orchestrator.rs:2:1
+  |
+2 | #![no_main]
+  | ^^^^^^^^^^^
+
+error[E0119]: conflicting implementations of trait `Debug` for type `capability::Permission`
+   --> src/security/capability.rs:206:10
+    |
+  8 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |          ----- first implementation here
+...
+206 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |          ^^^^^ conflicting implementation for `capability::Permission`
+
+error[E0119]: conflicting implementations of trait `Debug` for type `vulnerability::Severity`
+  --> src/security/vulnerability.rs:32:10
+   |
+14 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |          ----- first implementation here
+...
+32 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |          ^^^^^ conflicting implementation for `vulnerability::Severity`
+
+error[E0119]: conflicting implementations of trait `Debug` for type `vulnerability::ScanError`
+  --> src/security/vulnerability.rs:36:10
+   |
+24 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |          ----- first implementation here
+...
+36 | #[derive(Debug, Clone, Copy)]
+   |          ^^^^^ conflicting implementation for `vulnerability::ScanError`
+
+error[E0119]: conflicting implementations of trait `Debug` for type `vulnerability::ScanSummary`
+   --> src/security/vulnerability.rs:430:10
+    |
+196 | #[derive(Debug, Clone, Copy)]
+    |          ----- first implementation here
+...
+430 | #[derive(Debug, Clone, Copy)]
+    |          ^^^^^ conflicting implementation for `vulnerability::ScanSummary`
+
+error[E0119]: conflicting implementations of trait `Clone` for type `capability::Permission`
+   --> src/security/capability.rs:206:17
+    |
+  8 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                 ----- first implementation here
+...
+206 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                 ^^^^^ conflicting implementation for `capability::Permission`
+
+error[E0119]: conflicting implementations of trait `Clone` for type `vulnerability::Severity`
+  --> src/security/vulnerability.rs:32:17
+   |
+14 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                 ----- first implementation here
+...
+32 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                 ^^^^^ conflicting implementation for `vulnerability::Severity`
+
+error[E0119]: conflicting implementations of trait `Clone` for type `vulnerability::ScanError`
+  --> src/security/vulnerability.rs:36:17
+   |
+24 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                 ----- first implementation here
+...
+36 | #[derive(Debug, Clone, Copy)]
+   |                 ^^^^^ conflicting implementation for `vulnerability::ScanError`
+
+error[E0119]: conflicting implementations of trait `Clone` for type `vulnerability::ScanSummary`
+   --> src/security/vulnerability.rs:430:17
+    |
+196 | #[derive(Debug, Clone, Copy)]
+    |                 ----- first implementation here
+...
+430 | #[derive(Debug, Clone, Copy)]
+    |                 ^^^^^ conflicting implementation for `vulnerability::ScanSummary`
+
+error[E0119]: conflicting implementations of trait `std::marker::Copy` for type `capability::Permission`
+   --> src/security/capability.rs:206:24
+    |
+  8 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                        ---- first implementation here
+...
+206 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                        ^^^^ conflicting implementation for `capability::Permission`
+
+error[E0119]: conflicting implementations of trait `std::marker::Copy` for type `vulnerability::Severity`
+  --> src/security/vulnerability.rs:32:24
+   |
+14 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                        ---- first implementation here
+...
+32 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                        ^^^^ conflicting implementation for `vulnerability::Severity`
+
+error[E0119]: conflicting implementations of trait `std::marker::Copy` for type `vulnerability::ScanError`
+  --> src/security/vulnerability.rs:36:24
+   |
+24 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                        ---- first implementation here
+...
+36 | #[derive(Debug, Clone, Copy)]
+   |                        ^^^^ conflicting implementation for `vulnerability::ScanError`
+
+error[E0119]: conflicting implementations of trait `std::marker::Copy` for type `vulnerability::ScanSummary`
+   --> src/security/vulnerability.rs:430:24
+    |
+196 | #[derive(Debug, Clone, Copy)]
+    |                        ---- first implementation here
+...
+430 | #[derive(Debug, Clone, Copy)]
+    |                        ^^^^ conflicting implementation for `vulnerability::ScanSummary`
+
+error[E0119]: conflicting implementations of trait `StructuralPartialEq` for type `capability::Permission`
+   --> src/security/capability.rs:206:30
+    |
+  8 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                              --------- first implementation here
+...
+206 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                              ^^^^^^^^^ conflicting implementation for `capability::Permission`
+
+error[E0119]: conflicting implementations of trait `StructuralPartialEq` for type `vulnerability::Severity`
+  --> src/security/vulnerability.rs:32:30
+   |
+14 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                              --------- first implementation here
+...
+32 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                              ^^^^^^^^^ conflicting implementation for `vulnerability::Severity`
+
+error[E0119]: conflicting implementations of trait `PartialEq` for type `capability::Permission`
+   --> src/security/capability.rs:206:30
+    |
+  8 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                              --------- first implementation here
+...
+206 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                              ^^^^^^^^^ conflicting implementation for `capability::Permission`
+
+error[E0119]: conflicting implementations of trait `PartialEq` for type `vulnerability::Severity`
+  --> src/security/vulnerability.rs:32:30
+   |
+14 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                              --------- first implementation here
+...
+32 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                              ^^^^^^^^^ conflicting implementation for `vulnerability::Severity`
+
+error[E0119]: conflicting implementations of trait `std::cmp::Eq` for type `capability::Permission`
+   --> src/security/capability.rs:206:41
+    |
+  8 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                                         -- first implementation here
+...
+206 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    |                                         ^^ conflicting implementation for `capability::Permission`
+
+error[E0119]: conflicting implementations of trait `std::cmp::Eq` for type `vulnerability::Severity`
+  --> src/security/vulnerability.rs:32:41
+   |
+14 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                                         -- first implementation here
+...
+32 | #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+   |                                         ^^ conflicting implementation for `vulnerability::Severity`
+
+error[E0119]: conflicting implementations of trait `Default` for type `capability::CapabilityGate`
+   --> src/security/capability.rs:249:1
+    |
+127 | impl Default for CapabilityGate {
+    | ------------------------------- first implementation here
+...
+249 | impl Default for CapabilityGate {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `capability::CapabilityGate`
+
+error[E0053]: method `get_entry_ref` has an incompatible type for trait
+   --> src/klib/paging.rs:133:46
+    |
+133 |     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry {
+    |                                              ^^^^^^^^^^^^^^^^^^^ expected `SimplePageTableEntry`, found `dyn klib::paging::PageTableEntry`
+    |
+note: type in trait
+   --> src/klib/paging.rs:108:46
+    |
+108 |     fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry;
+    |                                              ^^^^^^^^^^^^^^^^^^^^^
+    = note: expected signature `fn(&SimplePageTable, _) -> &SimplePageTableEntry`
+               found signature `fn(&SimplePageTable, _) -> &dyn klib::paging::PageTableEntry`
+    = help: `SimplePageTableEntry` implements `PageTableEntry` so you could change the expected type to `Box<dyn PageTableEntry>`
+help: change the output type to match the trait
+    |
+133 -     fn get_entry_ref(&self, index: usize) -> &dyn PageTableEntry {
+133 +     fn get_entry_ref(&self, index: usize) -> &SimplePageTableEntry {
+    |
+
+error[E0053]: method `check_compliance` has an incompatible type for trait
+   --> src/security/audit.rs:170:59
+    |
+170 | ...n AuditEvent) -> Result<bool, AuditError> {
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `std::result::Result<bool, AuditError>`
+    |
+note: type in trait
+   --> src/security/audit.rs:152:59
+    |
+152 |     fn check_compliance(&self, event: &dyn AuditEvent) -> bool;
+    |                                                           ^^^^
+    = note: expected signature `fn(&SimpleAuditPolicy, &dyn AuditEvent) -> bool`
+               found signature `fn(&SimpleAuditPolicy, &dyn AuditEvent) -> std::result::Result<bool, AuditError>`
+help: change the output type to match the trait
+    |
+170 -     fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
+170 +     fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
+    |
+
+error[E0119]: conflicting implementations of trait `vulnerability::Vulnerability` for type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:307:1
+    |
+ 82 | impl Vulnerability for SimpleVulnerability {
+    | ------------------------------------------ first implementation here
+...
+307 | impl Vulnerability for SimpleVulnerability {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `vulnerability::SimpleVulnerability`
+
+error[E0119]: conflicting implementations of trait `vulnerability::VulnerabilityScanner` for type `vulnerability::SimpleVulnerabilityScanner`
+   --> src/security/vulnerability.rs:381:1
+    |
+150 | impl VulnerabilityScanner for SimpleVulnerabilityScanner {
+    | -------------------------------------------------------- first implementation here
+...
+381 | impl VulnerabilityScanner for SimpleVulnerabilityScanner {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `vulnerability::SimpleVulnerabilityScanner`
+
+error[E0119]: conflicting implementations of trait `vulnerability::ScanReport` for type `vulnerability::SimpleScanReport`
+   --> src/security/vulnerability.rs:450:1
+    |
+216 | impl ScanReport for SimpleScanReport {
+    | ------------------------------------ first implementation here
+...
+450 | impl ScanReport for SimpleScanReport {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ conflicting implementation for `vulnerability::SimpleScanReport`
+
+error[E0592]: duplicate definitions with name `new`
+   --> src/security/capability.rs:116:5
+    |
+116 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `new`
+...
+224 |     pub fn new() -> Self {
+    |     -------------------- other definition for `new`
+
+error[E0592]: duplicate definitions with name `set_capability`
+   --> src/security/capability.rs:122:5
+    |
+122 |     pub fn set_capability(&mut self, token: CapabilityToken) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `set_capability`
+...
+231 |     pub fn set_capability(&self, token: CapabilityToken) {
+    |     ---------------------------------------------------- other definition for `set_capability`
+
+error[E0592]: duplicate definitions with name `new`
+   --> src/security/vulnerability.rs:57:5
+    |
+ 57 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `new`
+...
+282 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     -------------------------------------------------------------------------------------------------------------- other definition for `new`
+
+error[E0592]: duplicate definitions with name `new`
+   --> src/security/vulnerability.rs:113:5
+    |
+113 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `new`
+...
+338 |     pub fn new() -> Self {
+    |     -------------------- other definition for `new`
+
+error[E0592]: duplicate definitions with name `seed_with_defaults`
+   --> src/security/vulnerability.rs:120:5
+    |
+120 |     pub fn seed_with_defaults(&mut self) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `seed_with_defaults`
+...
+345 |     pub fn seed_with_defaults(&mut self) {
+    |     ------------------------------------ other definition for `seed_with_defaults`
+
+error[E0592]: duplicate definitions with name `new`
+   --> src/security/vulnerability.rs:211:5
+    |
+211 |     pub fn new(scanner: SimpleVulnerabilityScanner) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `new`
+...
+445 |     pub fn new(scanner: SimpleVulnerabilityScanner) -> Self {
+    |     ------------------------------------------------------- other definition for `new`
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/container/oci_runtime.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/container/runtime.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/device/manager.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/driver/device.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/driver/framework.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/drivers/dde.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/filesystem/complete_filesystems.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/filesystem/support.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/gap_closing.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/generation_manager.rs:5:1
+  |
+5 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/linux_absorb.rs:5:1
+  |
+5 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/kernel/subsystem.rs:5:1
+  |
+5 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/klib/buddy_allocator.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/klib/paging.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/ml/inference.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/ml/training.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/network/tcp_udp.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/observability/stack.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/remote/desktop.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/remote/shell.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/audit.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/capability_enforcer.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/capability_token.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/cleaner.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/forensics.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/integrity.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/scanner.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/selinux.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/security/vulnerability.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/shell/command.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/virtualization/namespaces.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/ai/orchestrator.rs:1:1
+  |
+1 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/boot/pci.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+warning: the `#![no_std]` attribute can only be used at the crate root
+ --> src/boot/post.rs:4:1
+  |
+4 | #![no_std]
+  | ^^^^^^^^^^
+
+error[E0599]: no method named `len` found for struct `oci_runtime::Vec<T>` in the current scope
+   --> src/container/oci_runtime.rs:264:33
+    |
+264 |         for i in 0..self.images.len() {
+    |                                 ^^^-- help: remove the arguments
+    |                                 |
+    |                                 field, not a method
+...
+368 | struct Vec<T> {
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `oci_runtime::Vec<([u8; 128], [u8; 32])>`
+   --> src/container/oci_runtime.rs:265:40
+    |
+265 |             let img_name = &self.images[i].0;
+    |                                        ^^^
+
+error[E0277]: `&mut Vec<Option<Box<dyn Container>>>` is not an iterator
+   --> src/container/oci_runtime.rs:323:33
+    |
+323 |         for container_option in &mut self.oci_spec.containers {
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `&mut Vec<Option<Box<dyn Container>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `Vec<Option<Box<dyn Container>>>`
+   --> src/container/oci_runtime.rs:368:1
+    |
+368 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+    = note: required for `&mut Vec<Option<Box<dyn Container>>>` to implement `Iterator`
+    = note: required for `&mut Vec<Option<Box<dyn Container>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-2888569725712465581.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/container/oci_runtime.rs:325:20
+    |
+325 |                 if container.id() == id {
+    |                    ^^^^^^^^^ cannot infer type
+
+error[E0277]: `&mut Vec<Option<Box<dyn Container>>>` is not an iterator
+   --> src/container/oci_runtime.rs:334:33
+    |
+334 |         for container_option in &mut self.oci_spec.containers {
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `&mut Vec<Option<Box<dyn Container>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `Vec<Option<Box<dyn Container>>>`
+   --> src/container/oci_runtime.rs:368:1
+    |
+368 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+    = note: required for `&mut Vec<Option<Box<dyn Container>>>` to implement `Iterator`
+    = note: required for `&mut Vec<Option<Box<dyn Container>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-2888569725712465581.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/container/oci_runtime.rs:336:20
+    |
+336 |                 if container.id() == id {
+    |                    ^^^^^^^^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `oci_runtime::Vec<T>` in the current scope
+   --> src/container/oci_runtime.rs:346:46
+    |
+346 |         for i in 0..self.oci_spec.containers.len() {
+    |                                              ^^^-- help: remove the arguments
+    |                                              |
+    |                                              field, not a method
+...
+368 | struct Vec<T> {
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `oci_runtime::Vec<Option<Box<(dyn oci_runtime::Container + 'static)>>>`
+   --> src/container/oci_runtime.rs:347:66
+    |
+347 |             if let Some(ref container) = self.oci_spec.containers[i] {
+    |                                                                  ^^^
+
+error[E0282]: type annotations needed
+   --> src/container/oci_runtime.rs:348:20
+    |
+348 |                 if container.id() == id {
+    |                    ^^^^^^^^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `oci_runtime::Vec<Option<Box<(dyn oci_runtime::Container + 'static)>>>`
+   --> src/container/oci_runtime.rs:349:45
+    |
+349 |                     self.oci_spec.containers[i] = None;
+    |                                             ^^^
+
+error[E0277]: `&Vec<Option<Box<dyn Container>>>` is not an iterator
+   --> src/container/oci_runtime.rs:359:33
+    |
+359 |         for container_option in &self.oci_spec.containers {
+    |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Container>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Container>>>`
+    = note: required for `&Vec<Option<Box<dyn Container>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-6238218120002385266.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/container/oci_runtime.rs:361:26
+    |
+361 |                 ids.push(container.id());
+    |                          ^^^^^^^^^ cannot infer type
+
+error[E0599]: no method named `iter` found for struct `runtime::Vec<T>` in the current scope
+   --> src/container/runtime.rs:371:54
+    |
+371 |         for (i, container_option) in self.containers.iter().enumerate() {
+    |                                                      ^^^^ method not found in `Vec<Option<Box<dyn Container>>>`
+...
+509 | pub struct Vec<T> {
+    | ----------------- method `iter` not found for this struct
+    |
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-11398897731859947963.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/container/runtime.rs:373:20
+    |
+373 |                 if container.id() == id {
+    |                    ^^^^^^^^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `runtime::Vec<Option<Box<(dyn runtime::Container + 'static)>>>`
+   --> src/container/runtime.rs:381:28
+    |
+381 |             self.containers[i] = None;
+    |                            ^^^
+
+error[E0277]: `&Vec<Option<Box<dyn Container>>>` is not an iterator
+   --> src/container/runtime.rs:470:33
+    |
+470 |         for container_option in &self.containers {
+    |                                 ^^^^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Container>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Container>>>`
+    = note: required for `&Vec<Option<Box<dyn Container>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-14550005958826700401.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/container/runtime.rs:472:20
+    |
+472 |                 if container.id() == id {
+    |                    ^^^^^^^^^ cannot infer type
+
+error[E0277]: `&Vec<Option<Box<dyn Container>>>` is not an iterator
+   --> src/container/runtime.rs:482:33
+    |
+482 |         for container_option in &self.containers {
+    |                                 ^^^^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Container>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Container>>>`
+    = note: required for `&Vec<Option<Box<dyn Container>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-14550005958826700401.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/container/runtime.rs:484:26
+    |
+484 |                 ids.push(container.id());
+    |                          ^^^^^^^^^ cannot infer type
+
+error[E0277]: `&mut Vec<Option<Box<dyn Container>>>` is not an iterator
+   --> src/container/runtime.rs:497:33
+    |
+497 |         for container_option in &mut self.containers {
+    |                                 ^^^^^^^^^^^^^^^^^^^^ `&mut Vec<Option<Box<dyn Container>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `Vec<Option<Box<dyn Container>>>`
+   --> src/container/runtime.rs:509:1
+    |
+509 | pub struct Vec<T> {
+    | ^^^^^^^^^^^^^^^^^
+    = note: required for `&mut Vec<Option<Box<dyn Container>>>` to implement `Iterator`
+    = note: required for `&mut Vec<Option<Box<dyn Container>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-3595300965523493599.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/container/runtime.rs:499:20
+    |
+499 |                 if container.id() == id {
+    |                    ^^^^^^^^^ cannot infer type
+
+error[E0277]: `&mut Vec<Option<Box<dyn Device>>>` is not an iterator
+   --> src/device/manager.rs:113:30
+    |
+113 |         for device_option in &mut self.devices {
+    |                              ^^^^^^^^^^^^^^^^^ `&mut Vec<Option<Box<dyn Device>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `Vec<Option<Box<dyn Device>>>`
+   --> src/device/manager.rs:238:1
+    |
+238 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+    = note: required for `&mut Vec<Option<Box<dyn Device>>>` to implement `Iterator`
+    = note: required for `&mut Vec<Option<Box<dyn Device>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-1030539776565440586.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/device/manager.rs:115:20
+    |
+115 |                 if device.id() == id {
+    |                    ^^^^^^ cannot infer type
+
+error[E0277]: `&Vec<Option<Box<dyn Device>>>` is not an iterator
+   --> src/device/manager.rs:124:30
+    |
+124 |         for device_option in &self.devices {
+    |                              ^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Device>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Device>>>`
+    = note: required for `&Vec<Option<Box<dyn Device>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-6627984078282342079.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/device/manager.rs:126:20
+    |
+126 |                 if device.id() == id {
+    |                    ^^^^^^ cannot infer type
+
+error[E0277]: `&Vec<Option<Box<dyn Device>>>` is not an iterator
+   --> src/device/manager.rs:136:30
+    |
+136 |         for device_option in &self.devices {
+    |                              ^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Device>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Device>>>`
+    = note: required for `&Vec<Option<Box<dyn Device>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-6627984078282342079.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/device/manager.rs:138:20
+    |
+138 |                 if device.device_class() == device_class {
+    |                    ^^^^^^ cannot infer type
+
+error[E0277]: `&Vec<Option<Box<dyn Device>>>` is not an iterator
+   --> src/device/manager.rs:148:30
+    |
+148 |         for device_option in &self.devices {
+    |                              ^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Device>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Device>>>`
+    = note: required for `&Vec<Option<Box<dyn Device>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-6627984078282342079.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/device/manager.rs:150:26
+    |
+150 |                 ids.push(device.id());
+    |                          ^^^^^^ cannot infer type
+
+error[E0063]: missing field `driver_type` in initializer of `SimpleStorageDriver`
+  --> src/driver/framework.rs:63:9
+   |
+63 |         SimpleStorageDriver {
+   |         ^^^^^^^^^^^^^^^^^^^ missing `driver_type`
+
+error[E0599]: no method named `set_state` found for mutable reference `&mut SimpleStorageDriver` in the current scope
+  --> src/driver/framework.rs:90:14
+   |
+90 |         self.set_state(DriverState::Active);
+   |              ^^^^^^^^^
+   |
+   = help: items from traits can only be used if the trait is implemented and in scope
+note: `RemoteSession` defines an item `set_state`, perhaps you need to implement it
+  --> src/remote/desktop.rs:30:1
+   |
+30 | pub trait RemoteSession {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+help: there is a method `state` with a similar name, but with different arguments
+  --> src/driver/framework.rs:29:5
+   |
+29 |     fn state(&self) -> DriverState;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `set_state` found for mutable reference `&mut SimpleStorageDriver` in the current scope
+  --> src/driver/framework.rs:94:14
+   |
+94 |         self.set_state(DriverState::Unloaded);
+   |              ^^^^^^^^^
+   |
+   = help: items from traits can only be used if the trait is implemented and in scope
+note: `RemoteSession` defines an item `set_state`, perhaps you need to implement it
+  --> src/remote/desktop.rs:30:1
+   |
+30 | pub trait RemoteSession {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+help: there is a method `state` with a similar name, but with different arguments
+  --> src/driver/framework.rs:29:5
+   |
+29 |     fn state(&self) -> DriverState;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `dependencies` found for reference `&dyn Driver` in the current scope
+   --> src/driver/framework.rs:120:28
+    |
+120 |         for &dep in driver.dependencies() {
+    |                            ^^^^^^^^^^^^ method not found in `&dyn Driver`
+
+error[E0599]: no method named `iter` found for struct `driver::framework::Vec<T>` in the current scope
+   --> src/driver/framework.rs:122:42
+    |
+122 |             for option_d in self.drivers.iter() {
+    |                                          ^^^^ method not found in `Vec<Option<Box<dyn Driver>>>`
+...
+179 | struct Vec<T> {
+    | ------------- method `iter` not found for this struct
+    |
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-14365400479792334932.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/driver/framework.rs:125:30
+    |
+125 |                     let dt = d.driver_type() as usize;
+    |                              ^ cannot infer type
+
+error[E0277]: `&mut Vec<Option<Box<dyn Driver>>>` is not an iterator
+   --> src/driver/framework.rs:148:30
+    |
+148 |         for driver_option in &mut self.drivers {
+    |                              ^^^^^^^^^^^^^^^^^ `&mut Vec<Option<Box<dyn Driver>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `Vec<Option<Box<dyn Driver>>>`
+   --> src/driver/framework.rs:179:1
+    |
+179 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+    = note: required for `&mut Vec<Option<Box<dyn Driver>>>` to implement `Iterator`
+    = note: required for `&mut Vec<Option<Box<dyn Driver>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-7309316478461899029.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/driver/framework.rs:150:20
+    |
+150 |                 if driver.id() == id {
+    |                    ^^^^^^ cannot infer type
+
+error[E0277]: `&mut Vec<Option<Box<dyn Driver>>>` is not an iterator
+   --> src/driver/framework.rs:158:30
+    |
+158 |         for driver_option in &mut self.drivers {
+    |                              ^^^^^^^^^^^^^^^^^ `&mut Vec<Option<Box<dyn Driver>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `Vec<Option<Box<dyn Driver>>>`
+   --> src/driver/framework.rs:179:1
+    |
+179 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+    = note: required for `&mut Vec<Option<Box<dyn Driver>>>` to implement `Iterator`
+    = note: required for `&mut Vec<Option<Box<dyn Driver>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-7309316478461899029.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/driver/framework.rs:160:20
+    |
+160 |                 if driver.id() == id {
+    |                    ^^^^^^ cannot infer type
+
+error[E0277]: `&Vec<Option<Box<dyn Driver>>>` is not an iterator
+   --> src/driver/framework.rs:168:30
+    |
+168 |         for driver_option in &self.drivers {
+    |                              ^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Driver>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Driver>>>`
+    = note: required for `&Vec<Option<Box<dyn Driver>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-8785168935441003275.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/driver/framework.rs:170:20
+    |
+170 |                 if driver.id() == id {
+    |                    ^^^^^^ cannot infer type
+
+error[E0599]: no variant or associated item named `Fat32` found for enum `support::FilesystemType` in the current scope
+  --> src/filesystem/support.rs:58:34
+   |
+15 | pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
+   | ----------------------- variant or associated item `Fat32` not found for this enum
+...
+58 |             3 => FilesystemType::Fat32,
+   |                                  ^^^^^ variant or associated item not found in `support::FilesystemType`
+
+error[E0599]: no variant or associated item named `APFS` found for enum `support::FilesystemType` in the current scope
+  --> src/filesystem/support.rs:59:34
+   |
+15 | pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
+   | ----------------------- variant or associated item `APFS` not found for this enum
+...
+59 |             4 => FilesystemType::APFS,
+   |                                  ^^^^ variant or associated item not found in `support::FilesystemType`
+
+error[E0599]: no variant or associated item named `SovereignP2P` found for enum `support::FilesystemType` in the current scope
+  --> src/filesystem/support.rs:60:34
+   |
+15 | pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
+   | ----------------------- variant or associated item `SovereignP2P` not found for this enum
+...
+60 |             5 => FilesystemType::SovereignP2P,
+   |                                  ^^^^^^^^^^^^ variant or associated item not found in `support::FilesystemType`
+
+error[E0599]: no variant or associated item named `EncryptedFS` found for enum `support::FilesystemType` in the current scope
+  --> src/filesystem/support.rs:61:34
+   |
+15 | pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
+   | ----------------------- variant or associated item `EncryptedFS` not found for this enum
+...
+61 |             6 => FilesystemType::EncryptedFS,
+   |                                  ^^^^^^^^^^^ variant or associated item not found in `support::FilesystemType`
+
+error[E0599]: no variant or associated item named `CompressedFS` found for enum `support::FilesystemType` in the current scope
+  --> src/filesystem/support.rs:62:34
+   |
+15 | pub enum FilesystemType { Ext4 = 0, Btrfs = 1, ZFS = 2 }
+   | ----------------------- variant or associated item `CompressedFS` not found for this enum
+...
+62 |             7 => FilesystemType::CompressedFS,
+   |                                  ^^^^^^^^^^^^ variant or associated item not found in `support::FilesystemType`
+
+error[E0599]: no method named `len` found for struct `support::Vec<T>` in the current scope
+   --> src/filesystem/support.rs:134:37
+    |
+134 |         for i in 0..self.subvolumes.len() {
+    |                                     ^^^-- help: remove the arguments
+    |                                     |
+    |                                     field, not a method
+...
+259 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `support::Vec<[u8; 256]>`
+   --> src/filesystem/support.rs:135:42
+    |
+135 |             let subvol = &self.subvolumes[i];
+    |                                          ^^^
+
+error[E0599]: no method named `len` found for struct `support::Vec<T>` in the current scope
+   --> src/filesystem/support.rs:200:36
+    |
+200 |         for i in 0..self.snapshots.len() {
+    |                                    ^^^-- help: remove the arguments
+    |                                    |
+    |                                    field, not a method
+...
+259 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `support::Vec<[u8; 256]>`
+   --> src/filesystem/support.rs:201:39
+    |
+201 |             let snap = &self.snapshots[i];
+    |                                       ^^^
+
+error[E0277]: `&Vec<Option<Box<dyn Filesystem>>>` is not an iterator
+   --> src/filesystem/support.rs:240:26
+    |
+240 |         for fs_option in &self.filesystems {
+    |                          ^^^^^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Filesystem>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Filesystem>>>`
+    = note: required for `&Vec<Option<Box<dyn Filesystem>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-105508297891106778.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/filesystem/support.rs:242:20
+    |
+242 |                 if fs.id() == id { return Some(fs.as_ref()); }
+    |                    ^^ cannot infer type
+
+error[E0277]: `&Vec<Option<Box<dyn Filesystem>>>` is not an iterator
+   --> src/filesystem/support.rs:250:26
+    |
+250 |         for fs_option in &self.filesystems {
+    |                          ^^^^^^^^^^^^^^^^^ `&Vec<Option<Box<dyn Filesystem>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn Filesystem>>>`
+    = note: required for `&Vec<Option<Box<dyn Filesystem>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-105508297891106778.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/filesystem/support.rs:252:26
+    |
+252 |                 ids.push(fs.id());
+    |                          ^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
+  --> src/klib/buddy_allocator.rs:92:62
+   |
+92 |                     if let Some(ref mut parent) = self.blocks[block_id] {
+   |                                                              ^^^^^^^^^^
+
+error[E0599]: no method named `len` found for struct `buddy_allocator::Vec<T>` in the current scope
+   --> src/klib/buddy_allocator.rs:98:50
+    |
+ 98 |                     while left_id >= self.blocks.len() { self.blocks.pu...
+    |                                                  ^^^-- help: remove the arguments
+    |                                                  |
+    |                                                  field, not a method
+...
+214 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0599]: no method named `len` found for struct `buddy_allocator::Vec<T>` in the current scope
+   --> src/klib/buddy_allocator.rs:99:51
+    |
+ 99 |                     while right_id >= self.blocks.len() { self.blocks.p...
+    |                                                   ^^^-- help: remove the arguments
+    |                                                   |
+    |                                                   field, not a method
+...
+214 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
+   --> src/klib/buddy_allocator.rs:101:32
+    |
+101 |                     self.blocks[left_id] = Some(left_block);
+    |                                ^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
+   --> src/klib/buddy_allocator.rs:102:32
+    |
+102 |                     self.blocks[right_id] = Some(right_block);
+    |                                ^^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
+   --> src/klib/buddy_allocator.rs:109:57
+    |
+109 |                 if let Some(ref mut block) = self.blocks[block_id] {
+    |                                                         ^^^^^^^^^^
+
+error[E0599]: no method named `len` found for struct `buddy_allocator::Vec<T>` in the current scope
+   --> src/klib/buddy_allocator.rs:121:36
+    |
+121 |         if block_id >= self.blocks.len() {
+    |                                    ^^^-- help: remove the arguments
+    |                                    |
+    |                                    field, not a method
+...
+214 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
+   --> src/klib/buddy_allocator.rs:129:53
+    |
+129 |             if let Some(ref mut block) = self.blocks[current_id] {
+    |                                                     ^^^^^^^^^^^^
+
+error[E0599]: no method named `len` found for struct `buddy_allocator::Vec<T>` in the current scope
+   --> src/klib/buddy_allocator.rs:136:40
+    |
+136 |             if buddy_id >= self.blocks.len() {
+    |                                        ^^^-- help: remove the arguments
+    |                                        |
+    |                                        field, not a method
+...
+214 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
+   --> src/klib/buddy_allocator.rs:141:66
+    |
+141 | ...Some(ref buddy) = self.blocks[buddy_id] {
+    |                                 ^^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
+   --> src/klib/buddy_allocator.rs:154:53
+    |
+154 |             if let Some(ref mut buddy) = self.blocks[buddy_id] {
+    |                                                     ^^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `buddy_allocator::Vec<Option<Block>>`
+   --> src/klib/buddy_allocator.rs:157:53
+    |
+157 |             if let Some(ref mut block) = self.blocks[current_id] {
+    |                                                     ^^^^^^^^^^^^
+
+error[E0599]: no method named `len` found for struct `buddy_allocator::Vec<T>` in the current scope
+   --> src/klib/buddy_allocator.rs:170:32
+    |
+170 |         self.free_lists[order].len()
+    |                                ^^^-- help: remove the arguments
+    |                                |
+    |                                field, not a method
+...
+214 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0599]: no method named `len` found for struct `buddy_allocator::Vec<T>` in the current scope
+   --> src/klib/buddy_allocator.rs:182:21
+    |
+182 |         self.blocks.len()
+    |                     ^^^-- help: remove the arguments
+    |                     |
+    |                     field, not a method
+...
+214 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0277]: `&buddy_allocator::Vec<Option<Block>>` is not an iterator
+   --> src/klib/buddy_allocator.rs:187:29
+    |
+187 |         for block_option in &self.blocks {
+    |                             ^^^^^^^^^^^^ `&buddy_allocator::Vec<Option<Block>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&buddy_allocator::Vec<Option<Block>>`
+    = note: required for `&buddy_allocator::Vec<Option<Block>>` to implement `IntoIterator`
+
+error[E0599]: no method named `len` found for struct `buddy_allocator::Vec<T>` in the current scope
+   --> src/klib/buddy_allocator.rs:206:47
+    |
+206 |             free_blocks += self.free_lists[i].len();
+    |                                               ^^^-- help: remove the arguments
+    |                                               |
+    |                                               field, not a method
+...
+214 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<SimplePageTableEntry>`
+   --> src/klib/paging.rs:135:26
+    |
+135 |             &self.entries[index]
+    |                          ^^^^^^^
+
+error[E0015]: cannot call non-const associated function `SimplePageTableEntry::new` in statics
+   --> src/klib/paging.rs:137:54
+    |
+137 | ...plePageTableEntry = SimplePageTableEntry::new();
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: calls in statics are limited to constant functions, tuple structs and tuple variants
+    = note: consider wrapping this expression in `std::sync::LazyLock::new(|| ...)`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<SimplePageTableEntry>`
+   --> src/klib/paging.rs:143:30
+    |
+143 |             &mut self.entries[index]
+    |                              ^^^^^^^
+
+error[E0015]: cannot call non-const associated function `SimplePageTableEntry::new` in statics
+   --> src/klib/paging.rs:145:54
+    |
+145 | ...plePageTableEntry = SimplePageTableEntry::new();
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: calls in statics are limited to constant functions, tuple structs and tuple variants
+    = note: consider wrapping this expression in `std::sync::LazyLock::new(|| ...)`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<SimplePageTableEntry>`
+   --> src/klib/paging.rs:151:25
+    |
+151 |             self.entries[index] = entry;
+    |                         ^^^^^^^
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:238:44
+    |
+238 |                     while self.pdpt_tables.len() <= pml4_idx {
+    |                                            ^^^-- help: remove the arguments
+    |                                            |
+    |                                            field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:241:37
+    |
+241 |                     self.pdpt_tables[pml4_idx] = Some(pdpt_table);
+    |                                     ^^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:246:61
+    |
+246 | ...   if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
+    |                                                   ^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:247:40
+    |
+247 | ...   let pdpt_present = pdpt.get_entry(pdpt_idx).is_present();
+    |                          ^^^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:257:46
+    |
+257 |                         while self.pd_tables.len() <= pdpt_idx {
+    |                                              ^^^-- help: remove the arguments
+    |                                              |
+    |                                              field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:260:39
+    |
+260 |                         self.pd_tables[pdpt_idx] = Some(pd_table);
+    |                                       ^^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:266:57
+    |
+266 |                 if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+    |                                                         ^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:275:21
+    |
+275 |                     pd.set_entry(pd_idx, pd_entry);
+    |                     ^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:295:44
+    |
+295 |                     while self.pdpt_tables.len() <= pml4_idx {
+    |                                            ^^^-- help: remove the arguments
+    |                                            |
+    |                                            field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:298:37
+    |
+298 |                     self.pdpt_tables[pml4_idx] = Some(pdpt_table);
+    |                                     ^^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:303:61
+    |
+303 | ...   if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
+    |                                                   ^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:312:21
+    |
+312 |                     pdpt.set_entry(pdpt_idx, pdpt_entry);
+    |                     ^^^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:339:36
+    |
+339 |             while self.pdpt_tables.len() <= pml4_idx {
+    |                                    ^^^-- help: remove the arguments
+    |                                    |
+    |                                    field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:342:29
+    |
+342 |             self.pdpt_tables[pml4_idx] = Some(pdpt_table);
+    |                             ^^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:349:53
+    |
+349 |         if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
+    |                                                     ^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:350:30
+    |
+350 |             let pdpt_entry = pdpt.get_entry(pdpt_idx);
+    |                              ^^^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:361:38
+    |
+361 |                 while self.pd_tables.len() <= pdpt_idx {
+    |                                      ^^^-- help: remove the arguments
+    |                                      |
+    |                                      field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:364:31
+    |
+364 |                 self.pd_tables[pdpt_idx] = Some(pd_table);
+    |                               ^^^^^^^^^^
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:371:53
+    |
+371 |             if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+    |                                                     ^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:372:32
+    |
+372 |                 let pd_entry = pd.get_entry(pd_idx);
+    |                                ^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:383:42
+    |
+383 |                     while self.pt_tables.len() <= pd_idx {
+    |                                          ^^^-- help: remove the arguments
+    |                                          |
+    |                                          field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:386:35
+    |
+386 |                     self.pt_tables[pd_idx] = Some(pt_table);
+    |                                   ^^^^^^^^
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:393:57
+    |
+393 |                 if let Some(ref mut pt) = self.pt_tables[pt_idx_in_vec] {
+    |                                                         ^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:399:21
+    |
+399 |                     pt.set_entry(pt_idx, pt_entry);
+    |                     ^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:418:53
+    |
+418 |         if let Some(ref mut pdpt) = self.pdpt_tables[pml4_idx] {
+    |                                                     ^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:419:30
+    |
+419 |             let pdpt_entry = pdpt.get_entry(pdpt_idx);
+    |                              ^^^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:424:53
+    |
+424 |             if let Some(ref mut pd) = self.pd_tables[pdpt_idx] {
+    |                                                     ^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:425:32
+    |
+425 |                 let pd_entry = pd.get_entry(pd_idx);
+    |                                ^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:430:57
+    |
+430 |                 if let Some(ref mut pt) = self.pt_tables[pd_idx] {
+    |                                                         ^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:431:36
+    |
+431 |                     let pt_entry = pt.get_entry(pt_idx);
+    |                                    ^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:452:49
+    |
+452 |         if let Some(ref pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
+    |                                                 ^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:453:30
+    |
+453 |             let pdpt_entry = pdpt.get_entry_ref(pdpt_idx);
+    |                              ^^^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:464:49
+    |
+464 |             if let Some(ref pd) = self.pd_tables[pdpt_idx] {
+    |                                                 ^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:465:32
+    |
+465 |                 let pd_entry = pd.get_entry_ref(pd_idx);
+    |                                ^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:476:53
+    |
+476 |                 if let Some(ref pt) = self.pt_tables[pd_idx] {
+    |                                                     ^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:477:36
+    |
+477 |                     let pt_entry = pt.get_entry_ref(pt_idx);
+    |                                    ^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:501:53
+    |
+501 |         if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
+    |                                                     ^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:502:30
+    |
+502 |             let pdpt_entry = pdpt.get_entry(pdpt_idx);
+    |                              ^^^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:510:47
+    |
+510 |             if pd_idx_in_vec < self.pd_tables.len() {
+    |                                               ^^^-- help: remove the arguments
+    |                                               |
+    |                                               field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:511:57
+    |
+511 |                 if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+    |                                                         ^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:512:36
+    |
+512 |                     let pd_entry = pd.get_entry(pd_idx);
+    |                                    ^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:520:55
+    |
+520 |                     if pt_idx_in_vec < self.pt_tables.len() {
+    |                                                       ^^^-- help: remove the arguments
+    |                                                       |
+    |                                                       field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:522:44
+    |
+522 | ...                   let pt_entry = pt.get_entry(pt_idx);
+    |                                      ^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:547:57
+    |
+547 | ...   if let Some(ref mut pdpt) = self.pdpt_tables[pdpt_idx_in_vec] {
+    |                                                   ^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:548:34
+    |
+548 |                 let pdpt_entry = pdpt.get_entry(pdpt_idx);
+    |                                  ^^^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:553:55
+    |
+553 |                     if pd_idx_in_vec < self.pd_tables.len() {
+    |                                                       ^^^-- help: remove the arguments
+    |                                                       |
+    |                                                       field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimplePageTable>>`
+   --> src/klib/paging.rs:554:65
+    |
+554 | ...   if let Some(ref mut pd) = self.pd_tables[pd_idx_in_vec] {
+    |                                               ^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:555:44
+    |
+555 | ...                   let pd_entry = pd.get_entry(pd_idx);
+    |                                      ^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:560:67
+    |
+560 |                                 if pt_idx_in_vec < self.pt_tables.len() {
+    |                                                                   ^^^-- help: remove the arguments
+    |                                                                   |
+    |                                                                   field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:562:56
+    |
+562 | ...                   let pt_entry = pt.get_entry(pt_idx);
+    |                                      ^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:618:35
+    |
+618 |         while self.address_spaces.len() <= id {
+    |                                   ^^^-- help: remove the arguments
+    |                                   |
+    |                                   field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimpleVMM>>`
+   --> src/klib/paging.rs:621:28
+    |
+621 |         self.address_spaces[id] = Some(vmm);
+    |                            ^^^^
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:626:44
+    |
+626 |         if space_id >= self.address_spaces.len() {
+    |                                            ^^^-- help: remove the arguments
+    |                                            |
+    |                                            field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimpleVMM>>`
+   --> src/klib/paging.rs:629:28
+    |
+629 |         self.address_spaces[space_id] = None;
+    |                            ^^^^^^^^^^
+
+error[E0599]: no method named `len` found for struct `klib::paging::Vec<T>` in the current scope
+   --> src/klib/paging.rs:634:44
+    |
+634 |         if space_id >= self.address_spaces.len() {
+    |                                            ^^^-- help: remove the arguments
+    |                                            |
+    |                                            field, not a method
+...
+651 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `klib::paging::Vec<Option<SimpleVMM>>`
+   --> src/klib/paging.rs:637:55
+    |
+637 |         if let Some(ref mut vmm) = self.address_spaces[space_id] {
+    |                                                       ^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> src/klib/paging.rs:642:17
+    |
+642 |                 vmm.map_page(virt, phys, user, writable)?;
+    |                 ^^^ cannot infer type
+
+error[E0599]: no method named `mark_copy_on_write` found for struct `SimpleVMM` in the current scope
+   --> src/klib/paging.rs:686:21
+    |
+166 | pub struct SimpleVMM {
+    | -------------------- method `mark_copy_on_write` not found for this struct
+...
+686 |         assert!(vmm.mark_copy_on_write(0x1000).is_ok());
+    |                     ^^^^^^^^^^^^^^^^^^ method not found in `SimpleVMM`
+
+error[E0277]: `&mut Vec<Option<Box<...>>>` is not an iterator
+   --> src/ml/training.rs:124:31
+    |
+124 |         for session_option in &mut self.sessions {
+    |                               ^^^^^^^^^^^^^^^^^^ `&mut Vec<Option<Box<...>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `Vec<Option<Box<dyn TrainingSession>>>`
+   --> src/ml/training.rs:212:1
+    |
+212 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ^^^^^^^^^^^^^
+    = note: required for `&mut Vec<Option<Box<...>>>` to implement `Iterator`
+    = note: required for `&mut Vec<Option<Box<...>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-3348433054389530072.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/ml/training.rs:126:20
+    |
+126 |                 if session.id() == session_id {
+    |                    ^^^^^^^ cannot infer type
+
+error[E0277]: `&Vec<Option<Box<dyn TrainingSession>>>` is not an iterator
+   --> src/ml/training.rs:150:31
+    |
+150 |         for session_option in &self.sessions {
+    |                               ^^^^^^^^^^^^^^ `&Vec<Option<Box<dyn TrainingSession>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&Vec<Option<Box<dyn TrainingSession>>>`
+    = note: required for `&Vec<Option<Box<dyn TrainingSession>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-18105570906626102927.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/ml/training.rs:152:20
+    |
+152 |                 if session.id() == id { return Some(session.as_ref()); }
+    |                    ^^^^^^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `training::Vec<T>` in the current scope
+   --> src/ml/training.rs:189:31
+    |
+189 |         if start >= self.data.len() {
+    |                               ^^^-- help: remove the arguments
+    |                               |
+    |                               field, not a method
+...
+212 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0599]: no method named `len` found for struct `training::Vec<T>` in the current scope
+   --> src/ml/training.rs:193:54
+    |
+193 |         let end = (start + batch_size).min(self.data.len());
+    |                                                      ^^^-- help: remove the arguments
+    |                                                      |
+    |                                                      field, not a method
+...
+212 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `training::Vec<(f32, f32)>`
+   --> src/ml/training.rs:200:34
+    |
+200 |             inputs.push(self.data[i].0);
+    |                                  ^^^
+
+error[E0608]: cannot index into a value of type `training::Vec<(f32, f32)>`
+   --> src/ml/training.rs:201:35
+    |
+201 |             targets.push(self.data[i].1);
+    |                                   ^^^
+
+error[E0609]: no field `reuse_addr` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:103:22
+    |
+103 |                 self.reuse_addr.store(val, Ordering::SeqCst);
+    |                      ^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `protocol`, `local_port`, `remote_port`, `state`
+
+error[E0609]: no field `tcp_nodelay` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:106:22
+    |
+106 |                 self.tcp_nodelay.store(val, Ordering::SeqCst);
+    |                      ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `protocol`, `local_port`, `remote_port`, `state`
+
+error[E0609]: no field `rcvbuf` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:109:22
+    |
+109 |                 self.rcvbuf.store(val, Ordering::SeqCst);
+    |                      ^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `protocol`, `local_port`, `remote_port`, `state`
+
+error[E0609]: no field `sndbuf` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:112:22
+    |
+112 |                 self.sndbuf.store(val, Ordering::SeqCst);
+    |                      ^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `protocol`, `local_port`, `remote_port`, `state`
+
+error[E0609]: no field `reuse_addr` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:120:48
+    |
+120 | ...   SocketOption::ReuseAddr => Ok(self.reuse_addr.load(Ordering::SeqC...
+    |                                          ^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `protocol`, `local_port`, `remote_port`, `state`
+
+error[E0609]: no field `tcp_nodelay` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:121:49
+    |
+121 | ...   SocketOption::TcpNoDelay => Ok(self.tcp_nodelay.load(Ordering::Se...
+    |                                           ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `protocol`, `local_port`, `remote_port`, `state`
+
+error[E0609]: no field `rcvbuf` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:122:45
+    |
+122 | ...   SocketOption::RcvBuf => Ok(self.rcvbuf.load(Ordering::SeqCst)),
+    |                                       ^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `protocol`, `local_port`, `remote_port`, `state`
+
+error[E0609]: no field `sndbuf` on type `&SimpleSocket`
+   --> src/network/tcp_udp.rs:123:45
+    |
+123 | ...   SocketOption::SndBuf => Ok(self.sndbuf.load(Ordering::SeqCst)),
+    |                                       ^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `protocol`, `local_port`, `remote_port`, `state`
+
+error[E0277]: the trait bound `AtomicUsize: std::marker::Copy` is not satisfied
+   --> src/network/tcp_udp.rs:280:34
+    |
+280 |         let mut allowed_ports = [AtomicUsize::new(0); 65536];
+    |                                  ^^^^^^^^^^^^^^^^^^^ the trait `std::marker::Copy` is not implemented for `AtomicUsize`
+    |
+    = note: the `Copy` trait is required because this value will be copied for each element of the array
+help: create an inline `const` block
+    |
+280 |         let mut allowed_ports = [const { AtomicUsize::new(0) }; 65536];
+    |                                  +++++++                     +
+
+error[E0063]: missing fields `interfaces`, `netfilter` and `routing_table` in initializer of `SimpleNetworkStack`
+   --> src/network/tcp_udp.rs:346:9
+    |
+346 |         SimpleNetworkStack {
+    |         ^^^^^^^^^^^^^^^^^^ missing `interfaces`, `netfilter` and `routing_table`
+
+error[E0277]: `&mut Vec<Option<Box<dyn Socket>>>` is not an iterator
+   --> src/network/tcp_udp.rs:363:30
+    |
+363 |         for socket_option in &mut self.sockets {
+    |                              ^^^^^^^^^^^^^^^^^ `&mut Vec<Option<Box<dyn Socket>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `tcp_udp::Vec<Option<Box<(dyn Socket + 'static)>>>`
+   --> src/network/tcp_udp.rs:382:1
+    |
+382 | struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+    | ^^^^^^^^^^^^^
+    = note: required for `&mut Vec<Option<Box<dyn Socket>>>` to implement `Iterator`
+    = note: required for `&mut Vec<Option<Box<dyn Socket>>>` to implement `IntoIterator`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-15591290170059237283.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/network/tcp_udp.rs:365:20
+    |
+365 |                 if socket.id() == id {
+    |                    ^^^^^^ cannot infer type
+
+error[E0277]: `&tcp_udp::Vec<Option<Box<(dyn Socket + 'static)>>>` is not an iterator
+   --> src/network/tcp_udp.rs:373:30
+    |
+373 |         for socket_option in &self.sockets {
+    |                              ^^^^^^^^^^^^^ `&tcp_udp::Vec<Option<Box<(dyn Socket + 'static)>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&tcp_udp::Vec<Option<Box<(dyn Socket + 'static)>>>`
+    = note: required for `&tcp_udp::Vec<Option<Box<(dyn Socket + 'static)>>>` to implement `IntoIterator`
+
+error[E0282]: type annotations needed
+   --> src/network/tcp_udp.rs:375:20
+    |
+375 |                 if socket.id() == id { return Some(socket.as_ref()); }
+    |                    ^^^^^^ cannot infer type
+
+error[E0308]: mismatched types
+   --> src/observability/stack.rs:298:20
+    |
+298 |             .store(Self::get_current_time(), Ordering::SeqCst);
+    |              ----- ^^^^^^^^^^^^^^^^^^^^^^^^ expected `usize`, found `u64`
+    |              |
+    |              arguments to this method are incorrect
+    |
+note: method defined here
+   --> /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/core/src/sync/atomic.rs:2966:19
+   ::: /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/core/src/sync/atomic.rs:3992:1
+    |
+    = note: in this macro invocation
+    = note: this error originates in the macro `atomic_int` which comes from the expansion of the macro `atomic_int_ptr_sized` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: you can convert a `u64` to a `usize` and panic if the converted value doesn't fit
+    |
+298 |             .store(Self::get_current_time().try_into().unwrap(), Ordering::SeqCst);
+    |                                            ++++++++++++++++++++
+
+error[E0308]: mismatched types
+   --> src/observability/stack.rs:306:20
+    |
+306 |             .store(Self::get_current_time(), Ordering::SeqCst);
+    |              ----- ^^^^^^^^^^^^^^^^^^^^^^^^ expected `usize`, found `u64`
+    |              |
+    |              arguments to this method are incorrect
+    |
+note: method defined here
+   --> /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/core/src/sync/atomic.rs:2966:19
+   ::: /rustc/4a4ef493e3a1488c6e321570238084b38948f6db/library/core/src/sync/atomic.rs:3992:1
+    |
+    = note: in this macro invocation
+    = note: this error originates in the macro `atomic_int` which comes from the expansion of the macro `atomic_int_ptr_sized` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: you can convert a `u64` to a `usize` and panic if the converted value doesn't fit
+    |
+306 |             .store(Self::get_current_time().try_into().unwrap(), Ordering::SeqCst);
+    |                                            ++++++++++++++++++++
+
+error[E0599]: no method named `iter` found for struct `stack::Vec<T>` in the current scope
+   --> src/observability/stack.rs:449:48
+    |
+449 |         for (i, metric_option) in self.metrics.iter().enumerate() {
+    |                                                ^^^^ method not found in `stack::Vec<Option<Box<(dyn Metric + 'static)>>>`
+...
+527 | struct Vec<T> {
+    | ------------- method `iter` not found for this struct
+
+error[E0282]: type annotations needed
+   --> src/observability/stack.rs:451:20
+    |
+451 |                 if metric.id() == id {
+    |                    ^^^^^^ cannot infer type
+
+error[E0608]: cannot index into a value of type `stack::Vec<Option<Box<(dyn Metric + 'static)>>>`
+   --> src/observability/stack.rs:460:25
+    |
+460 |             self.metrics[i] = None;
+    |                         ^^^
+
+error[E0277]: `&stack::Vec<Option<Box<(dyn Metric + 'static)>>>` is not an iterator
+   --> src/observability/stack.rs:470:30
+    |
+470 |         for metric_option in &self.metrics {
+    |                              ^^^^^^^^^^^^^ `&stack::Vec<Option<Box<(dyn Metric + 'static)>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&stack::Vec<Option<Box<(dyn Metric + 'static)>>>`
+    = note: required for `&stack::Vec<Option<Box<(dyn Metric + 'static)>>>` to implement `IntoIterator`
+
+error[E0282]: type annotations needed
+   --> src/observability/stack.rs:472:20
+    |
+472 |                 if metric.id() == id {
+    |                    ^^^^^^ cannot infer type
+
+error[E0277]: `&mut stack::Vec<Option<Box<(dyn Span + 'static)>>>` is not an iterator
+   --> src/observability/stack.rs:498:28
+    |
+498 |         for span_option in &mut self.spans {
+    |                            ^^^^^^^^^^^^^^^ `&mut stack::Vec<Option<Box<(dyn Span + 'static)>>>` is not an iterator
+    |
+help: the trait `Iterator` is not implemented for `stack::Vec<Option<Box<(dyn Span + 'static)>>>`
+   --> src/observability/stack.rs:527:1
+    |
+527 | struct Vec<T> {
+    | ^^^^^^^^^^^^^
+    = note: required for `&mut stack::Vec<Option<Box<(dyn Span + 'static)>>>` to implement `Iterator`
+    = note: required for `&mut stack::Vec<Option<Box<(dyn Span + 'static)>>>` to implement `IntoIterator`
+
+error[E0282]: type annotations needed
+   --> src/observability/stack.rs:500:20
+    |
+500 |                 if span.id() == id {
+    |                    ^^^^ cannot infer type
+
+error[E0277]: `&stack::Vec<Option<Box<(dyn Span + 'static)>>>` is not an iterator
+   --> src/observability/stack.rs:511:28
+    |
+511 |         for span_option in &self.spans {
+    |                            ^^^^^^^^^^^ `&stack::Vec<Option<Box<(dyn Span + 'static)>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&stack::Vec<Option<Box<(dyn Span + 'static)>>>`
+    = note: required for `&stack::Vec<Option<Box<(dyn Span + 'static)>>>` to implement `IntoIterator`
+
+error[E0282]: type annotations needed
+   --> src/observability/stack.rs:513:20
+    |
+513 |                 if span.id() == id {
+    |                    ^^^^ cannot infer type
+
+error[E0609]: no field `transaction_history` on type `&mut UniversalPackageManager`
+   --> src/package/universal.rs:698:14
+    |
+698 |         self.transaction_history
+    |              ^^^^^^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `packages`, `adapters`, `resolver`, `installed_packages`, `metadata_cache`
+
+error[E0609]: no field `transaction_history` on type `&mut UniversalPackageManager`
+   --> src/package/universal.rs:704:14
+    |
+704 |             .transaction_history
+    |              ^^^^^^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `packages`, `adapters`, `resolver`, `installed_packages`, `metadata_cache`
+
+error[E0277]: `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>` is not an iterator
+   --> src/security/audit.rs:112:29
+    |
+112 |         for event_option in &self.events {
+    |                             ^^^^^^^^^^^^ `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>`
+    = note: required for `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>` to implement `IntoIterator`
+
+error[E0282]: type annotations needed
+   --> src/security/audit.rs:114:20
+    |
+114 |                 if event.id() == id {
+    |                    ^^^^^ cannot infer type
+
+error[E0277]: `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>` is not an iterator
+   --> src/security/audit.rs:124:29
+    |
+124 |         for event_option in &self.events {
+    |                             ^^^^^^^^^^^^ `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>` is not an iterator
+    |
+    = help: the trait `Iterator` is not implemented for `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>`
+    = note: required for `&audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>` to implement `IntoIterator`
+
+error[E0282]: type annotations needed
+   --> src/security/audit.rs:126:20
+    |
+126 | ...   if event.event_type() == event_type && event.user_id() == user_id {
+    |          ^^^^^ cannot infer type
+
+error[E0599]: no method named `len` found for struct `audit::Vec<T>` in the current scope
+   --> src/security/audit.rs:136:31
+    |
+136 |         while i < self.events.len() {
+    |                               ^^^-- help: remove the arguments
+    |                               |
+    |                               field, not a method
+...
+187 | struct Vec<T> {
+    | ------------- method `len` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `len`, perhaps you need to implement one of them:
+            candidate #1: `ExactSizeIterator`
+            candidate #2: `IndexedRandom`
+
+error[E0608]: cannot index into a value of type `audit::Vec<Option<Box<(dyn AuditEvent + 'static)>>>`
+   --> src/security/audit.rs:137:50
+    |
+137 |             if let Some(ref event) = *self.events[i] {
+    |                                                  ^^^
+
+error[E0282]: type annotations needed
+   --> src/security/audit.rs:138:20
+    |
+138 |                 if event.timestamp() < older_than {
+    |                    ^^^^^ cannot infer type
+
+error[E0369]: binary operation `==` cannot be applied to type `audit::EventType`
+   --> src/security/audit.rs:172:35
+    |
+172 |             Ok(event.event_type() == EventType::Authentication)
+    |                ------------------ ^^ ------------------------- audit::EventType
+    |                |
+    |                audit::EventType
+    |
+note: an implementation of `PartialEq` might be missing for `audit::EventType`
+   --> src/security/audit.rs:14:1
+    |
+ 14 | pub enum EventType {
+    | ^^^^^^^^^^^^^^^^^^ must implement `PartialEq`
+help: consider annotating `audit::EventType` with `#[derive(PartialEq)]`
+    |
+ 14 + #[derive(PartialEq)]
+ 15 | pub enum EventType {
+    |
+
+error[E0599]: no method named `unwrap_or` found for type `bool` in the current scope
+   --> src/security/audit.rs:179:41
+    |
+179 |         if self.check_compliance(event).unwrap_or(false) {
+    |                                         ^^^^^^^^^ method not found in `bool`
+
+error[E0609]: no field `token` on type `&capability::CapabilityGate`
+   --> src/security/capability.rs:112:9
+    |
+112 |     pub token: CapabilityToken,
+    |         ^^^^^ unknown field
+    |
+    = note: available field is: `current`
+
+error[E0560]: struct `capability::CapabilityGate` has no field named `token`
+   --> src/security/capability.rs:112:5
+    |
+112 |     pub token: CapabilityToken,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^ `capability::CapabilityGate` does not have this field
+    |
+    = note: all struct fields are already assigned
+
+error[E0560]: struct `capability::CapabilityGate` has no field named `token`
+   --> src/security/capability.rs:118:13
+    |
+118 |             token: CapabilityToken::new(),
+    |             ^^^^^ `capability::CapabilityGate` does not have this field
+    |
+    = note: available fields are: `current`
+
+error[E0609]: no field `token` on type `&mut capability::CapabilityGate`
+   --> src/security/capability.rs:123:14
+    |
+123 |         self.token = token;
+    |              ^^^^^ unknown field
+    |
+    = note: available field is: `current`
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/capability.rs:129:15
+    |
+129 |         Self::new()
+    |               ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `capability::CapabilityGate`
+   --> src/security/capability.rs:116:5
+    |
+116 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `capability::CapabilityGate`
+   --> src/security/capability.rs:224:5
+    |
+224 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+error[E0560]: struct `capability::SecurityEnforcer` has no field named `bits`
+   --> src/security/capability.rs:139:16
+    |
+139 |         Self { bits: 0 }
+    |                ^^^^ `capability::SecurityEnforcer` does not have this field
+    |
+    = note: available fields are: `active_tokens`
+
+error[E0560]: struct `capability::SecurityEnforcer` has no field named `bits`
+   --> src/security/capability.rs:143:16
+    |
+143 |         Self { bits }
+    |                ^^^^ `capability::SecurityEnforcer` does not have this field
+    |
+    = note: available fields are: `active_tokens`
+
+error[E0615]: attempted to take value of method `bits` on type `&mut capability::SecurityEnforcer`
+   --> src/security/capability.rs:147:14
+    |
+147 |         self.bits |= bit;
+    |              ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `capability::SecurityEnforcer`
+   --> src/security/capability.rs:153:27
+    |
+153 |             "tcp" => self.bits |= 1 << 0,
+    |                           ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `capability::SecurityEnforcer`
+   --> src/security/capability.rs:154:27
+    |
+154 |             "udp" => self.bits |= 1 << 1,
+    |                           ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `capability::SecurityEnforcer`
+   --> src/security/capability.rs:157:14
+    |
+157 |         self.bits |= (port as u64) << 16;
+    |              ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `capability::SecurityEnforcer`
+   --> src/security/capability.rs:164:18
+    |
+164 |             self.bits |= 1 << 2;
+    |                  ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `capability::SecurityEnforcer`
+   --> src/security/capability.rs:172:18
+    |
+172 |             self.bits |= 1 << 3;
+    |                  ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `capability::SecurityEnforcer`
+   --> src/security/capability.rs:179:14
+    |
+179 |         self.bits |= 1 << 4;
+    |              ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `capability::SecurityEnforcer`
+   --> src/security/capability.rs:185:14
+    |
+185 |         self.bits |= 1 << 5;
+    |              ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `&capability::SecurityEnforcer`
+   --> src/security/capability.rs:191:15
+    |
+191 |         (self.bits & (1 << permission as u64)) != 0
+    |               ^^^^ method, not a field
+    |
+help: use parentheses to call the method
+    |
+191 |         (self.bits() & (1 << permission as u64)) != 0
+    |                   ++
+
+error[E0615]: attempted to take value of method `bits` on type `&mut capability::SecurityEnforcer`
+   --> src/security/capability.rs:196:14
+    |
+196 |         self.bits = 0;
+    |              ^^^^ method, not a field
+    |
+    = help: methods are immutable and cannot be assigned to
+
+error[E0615]: attempted to take value of method `bits` on type `&capability::SecurityEnforcer`
+   --> src/security/capability.rs:201:14
+    |
+201 |         self.bits
+    |              ^^^^ method, not a field
+    |
+help: use parentheses to call the method
+    |
+201 |         self.bits()
+    |                  ++
+
+error[E0063]: missing fields `allowed_paths`, `allowed_ports`, `id` and 1 other field in initializer of `capability::CapabilityToken`
+   --> src/security/capability.rs:243:9
+    |
+243 |         CapabilityToken {
+    |         ^^^^^^^^^^^^^^^ missing `allowed_paths`, `allowed_ports`, `id` and 1 other field
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/capability.rs:251:15
+    |
+251 |         Self::new()
+    |               ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `capability::CapabilityGate`
+   --> src/security/capability.rs:116:5
+    |
+116 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `capability::CapabilityGate`
+   --> src/security/capability.rs:224:5
+    |
+224 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `update_stats` found for mutable reference `&mut SimpleIntegrityMonitor` in the current scope
+   --> src/security/integrity.rs:306:30
+    |
+306 |                         self.update_stats(status);
+    |                              ^^^^^^^^^^^^ method not found in `&mut SimpleIntegrityMonitor`
+
+error[E0599]: no method named `update_stats` found for mutable reference `&mut SimpleIntegrityMonitor` in the current scope
+   --> src/security/integrity.rs:329:26
+    |
+329 |                     self.update_stats(status);
+    |                          ^^^^^^^^^^^^ method not found in `&mut SimpleIntegrityMonitor`
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/pledge.rs:78:35
+    |
+ 78 |             gate: CapabilityGate::new(),
+    |                                   ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `capability::CapabilityGate`
+   --> src/security/capability.rs:116:5
+    |
+116 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `capability::CapabilityGate`
+   --> src/security/capability.rs:224:5
+    |
+224 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant or associated item named `PackageNotFound` found for enum `vulnerability::ScanError` in the current scope
+  --> src/security/vulnerability.rs:36:10
+   |
+25 | pub enum ScanError {
+   | ------------------ variant or associated item `PackageNotFound` not found for this enum
+...
+36 | #[derive(Debug, Clone, Copy)]
+   |          ^^^^^ variant or associated item not found in `vulnerability::ScanError`
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/vulnerability.rs:121:42
+    |
+121 |         let vuln1 = SimpleVulnerability::new(
+    |                                          ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:57:5
+    |
+ 57 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:282:5
+    |
+282 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/vulnerability.rs:130:42
+    |
+130 |         let vuln2 = SimpleVulnerability::new(
+    |                                          ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:57:5
+    |
+ 57 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:282:5
+    |
+282 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/vulnerability.rs:139:42
+    |
+139 |         let vuln3 = SimpleVulnerability::new(
+    |                                          ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:57:5
+    |
+ 57 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:282:5
+    |
+282 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `get` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/security/vulnerability.rs:154:64
+    |
+154 |             if let Some(Some(ref vuln)) = self.vulnerabilities.get(i) {
+    |                                                                ^^^ method not found in `Vec<Option<Box<dyn Vulnerability>>>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> {
+    | ----------------- method `get` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `get`, perhaps you need to implement one of them:
+            candidate #1: `shell::command::CommandRegistry`
+            candidate #2: `shell::command::CommandRegistry`
+            candidate #3: `SliceIndex`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-8041265003387360518.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/security/vulnerability.rs:155:20
+    |
+155 |                 if vuln.affected_package() == package {
+    |                    ^^^^ cannot infer type
+
+error[E0599]: no method named `get` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/security/vulnerability.rs:170:64
+    |
+170 |             if let Some(Some(ref vuln)) = self.vulnerabilities.get(i) {
+    |                                                                ^^^ method not found in `Vec<Option<Box<dyn Vulnerability>>>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> {
+    | ----------------- method `get` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `get`, perhaps you need to implement one of them:
+            candidate #1: `shell::command::CommandRegistry`
+            candidate #2: `shell::command::CommandRegistry`
+            candidate #3: `SliceIndex`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-8041265003387360518.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/security/vulnerability.rs:171:20
+    |
+171 |                 if vuln.id() == id { return Some(vuln.as_ref()); }
+    |                    ^^^^ cannot infer type
+
+error[E0599]: no method named `get` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/security/vulnerability.rs:180:64
+    |
+180 |             if let Some(Some(ref vuln)) = self.vulnerabilities.get(i) {
+    |                                                                ^^^ method not found in `Vec<Option<Box<dyn Vulnerability>>>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> {
+    | ----------------- method `get` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `get`, perhaps you need to implement one of them:
+            candidate #1: `shell::command::CommandRegistry`
+            candidate #2: `shell::command::CommandRegistry`
+            candidate #3: `SliceIndex`
+    = note: the full name for the type has been written to '/app/target/debug/deps/sigmaos-0b94560ff00d4902.long-type-8041265003387360518.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+error[E0282]: type annotations needed
+   --> src/security/vulnerability.rs:181:20
+    |
+181 |                 if vuln.severity() == severity {
+    |                    ^^^^ cannot infer type
+
+error[E0599]: no method named `get` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/security/vulnerability.rs:225:41
+    |
+225 |             if let Some(&id) = vuln_ids.get(i) {
+    |                                         ^^^ method not found in `klib::vec::Vec<usize>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> {
+    | ----------------- method `get` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `get`, perhaps you need to implement one of them:
+            candidate #1: `shell::command::CommandRegistry`
+            candidate #2: `shell::command::CommandRegistry`
+            candidate #3: `SliceIndex`
+
+error[E0599]: no method named `get` found for struct `klib::vec::Vec<T>` in the current scope
+   --> src/security/vulnerability.rs:246:41
+    |
+246 |             if let Some(&id) = vuln_ids.get(i) {
+    |                                         ^^^ method not found in `klib::vec::Vec<usize>`
+    |
+   ::: src/klib/vec.rs:3:1
+    |
+  3 | pub struct Vec<T> {
+    | ----------------- method `get` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following traits define an item `get`, perhaps you need to implement one of them:
+            candidate #1: `shell::command::CommandRegistry`
+            candidate #2: `shell::command::CommandRegistry`
+            candidate #3: `SliceIndex`
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/vulnerability.rs:346:42
+    |
+346 |         let vuln1 = SimpleVulnerability::new(
+    |                                          ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:57:5
+    |
+ 57 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:282:5
+    |
+282 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/vulnerability.rs:355:42
+    |
+355 |         let vuln2 = SimpleVulnerability::new(
+    |                                          ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:57:5
+    |
+ 57 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:282:5
+    |
+282 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/vulnerability.rs:364:42
+    |
+364 |         let vuln3 = SimpleVulnerability::new(
+    |                                          ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:57:5
+    |
+ 57 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `vulnerability::SimpleVulnerability`
+   --> src/security/vulnerability.rs:282:5
+    |
+282 |     pub fn new(id: VulnerabilityID, cve_id: &[u8], severity: Severity, package: &[u8], description: &[u8]) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0034]: multiple applicable items in scope
+   --> src/security/vulnerability.rs:377:15
+    |
+377 |         Self::new()
+    |               ^^^ multiple `new` found
+    |
+note: candidate #1 is defined in an impl for the type `vulnerability::SimpleVulnerabilityScanner`
+   --> src/security/vulnerability.rs:113:5
+    |
+113 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `vulnerability::SimpleVulnerabilityScanner`
+   --> src/security/vulnerability.rs:338:5
+    |
+338 |     pub fn new() -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^
+
+error[E0433]: failed to resolve: use of undeclared type `AgentAutomationEngine`
+  --> src/shell/repl.rs:97:27
+   |
+97 |             agent_engine: AgentAutomationEngine::new(),
+   |                           ^^^^^^^^^^^^^^^^^^^^^ use of undeclared type `AgentAutomationEngine`
+
+error[E0433]: failed to resolve: use of undeclared type `AgentAutomationEngine`
+   --> src/shell/repl.rs:120:27
+    |
+120 |             agent_engine: AgentAutomationEngine::new(),
+    |                           ^^^^^^^^^^^^^^^^^^^^^ use of undeclared type `AgentAutomationEngine`
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:136:11
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+135 | pub enum VersionConstraint {
+136 |     Exact(Version),
+    |           ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:137:17
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+137 |     GreaterThan(Version),
+    |                 ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:138:14
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+138 |     LessThan(Version),
+    |              ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:139:20
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+139 |     GreaterOrEqual(Version),
+    |                    ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+error[E0277]: the trait bound `sigpkg::Version: Hash` is not satisfied
+   --> src/sigpkg/mod.rs:140:17
+    |
+134 | #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    |                                             ---- in this derive macro expansion
+...
+140 |     LessOrEqual(Version),
+    |                 ^^^^^^^ the trait `Hash` is not implemented for `sigpkg::Version`
+    |
+help: consider annotating `sigpkg::Version` with `#[derive(Hash)]`
+    |
+ 41 + #[derive(Hash)]
+ 42 | pub struct Version {
+    |
+
+warning: unused variable: `action`
+   --> src/automation/orchestrator.rs:327:27
+    |
+327 |     fn execute(&mut self, action: &SystemAction) -> Result<(), Optimiza...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_action`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `action`
+   --> src/automation/orchestrator.rs:327:27
+    |
+327 |     fn execute(&mut self, action: &SystemAction) -> Result<(), Optimiza...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_action`
+
+warning: unused variable: `file_path`
+   --> src/compatibility/historic_linux.rs:310:49
+    |
+310 | ...ile_overlay(&mut self, file_path: &str, data_len: usize) -> Result<u...
+    |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_file_path`
+
+warning: variable does not need to be mutable
+   --> src/compatibility/india_stack_localization.rs:138:13
+    |
+138 |         let mut chars = integer_part.chars().rev().collect::<Vec<char>>();
+    |             ----^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `pid`
+   --> src/dashboard/process.rs:288:38
+    |
+288 | ...xecute_action(&mut self, pid: u32, action: ProcessAction) -> Result<...
+    |                             ^^^ help: if this is intentional, prefix it with an underscore: `_pid`
+
+warning: unused variable: `data`
+  --> src/drivers/usb_hid.rs:64:63
+   |
+64 | ...ort_type: HidReportType, data: &[u8]) -> Result<(), HidError> {
+   |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_data`
+
+warning: unused variable: `offset`
+   --> src/drivers/dde.rs:103:29
+    |
+103 |     fn read_byte(&mut self, offset: u32) -> Result<u8, DeviceError> {
+    |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_offset`
+
+warning: unused variable: `offset`
+   --> src/drivers/dde.rs:111:30
+    |
+111 | ...fn write_byte(&mut self, offset: u32, value: u8) -> Result<(), Devic...
+    |                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_offset`
+
+warning: unused variable: `value`
+   --> src/drivers/dde.rs:111:43
+    |
+111 | ...(&mut self, offset: u32, value: u8) -> Result<(), DeviceError> {
+    |                             ^^^^^ help: if this is intentional, prefix it with an underscore: `_value`
+
+warning: unused variable: `bytecode`
+   --> src/drivers/dde.rs:233:32
+    |
+233 | ...fn load_udf(&mut self, bytecode: &[u8]) -> Result<(), DeviceError> {
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bytecode`
+
+warning: unused variable: `bus_type`
+   --> src/drivers/dde.rs:267:28
+    |
+267 |     pub fn scan_bus(&self, bus_type: BusType) -> Vec<DeviceId> {
+    |                            ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bus_type`
+
+warning: unused variable: `path`
+   --> src/filesystem/disk_usage.rs:211:36
+    |
+211 |     pub fn get_size_by_type(&self, path: &Path) -> HashMap<String, u64> {
+    |                                    ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `new_offset`
+   --> src/filesystem/vfs.rs:170:13
+    |
+170 |         let new_offset = file_descriptor
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_new_offset`
+
+warning: unused variable: `signature`
+   --> src/kernel/subsystem.rs:520:40
+    |
+520 | ...y_signature(&mut self, signature: &[u8]) -> Result<(), DriverError> {
+    |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_signature`
+
+warning: variable does not need to be mutable
+  --> src/klib/buddy_allocator.rs:57:13
+   |
+57 |         let mut next_id = AtomicUsize::new(1);
+   |             ----^^^^^^^
+   |             |
+   |             help: remove this `mut`
+
+warning: unused variable: `total_frames`
+  --> src/klib/buddy_allocator.rs:50:34
+   |
+50 |     pub fn new(max_order: usize, total_frames: usize) -> Self {
+   |                                  ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_total_frames`
+
+warning: unused variable: `arguments`
+   --> src/orchestration/cross_device.rs:399:17
+    |
+399 |                 arguments,
+    |                 ^^^^^^^^^ help: try ignoring the field: `arguments: _`
+
+warning: unused variable: `font_size`
+   --> src/productivity/sigma_office.rs:405:43
+    |
+405 | ...ext(&self, text: &str, font_size: u32, position: (f32, f32)) -> Resu...
+    |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_font_size`
+
+warning: unused variable: `position`
+   --> src/productivity/sigma_office.rs:405:59
+    |
+405 | ... &str, font_size: u32, position: (f32, f32)) -> Result<Vec<u8>> {
+    |                           ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_position`
+
+warning: unused variable: `path`
+   --> src/productivity/sigma_office.rs:485:49
+    |
+485 | ...t(&self, doc_idx: usize, path: &str) -> Result<()> {
+    |                             ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `path`
+   --> src/productivity/sigma_office.rs:495:37
+    |
+495 |     pub fn load_document(&mut self, path: &str) -> Result<SigmaDocument> {
+    |                                     ^^^^ help: if this is intentional, prefix it with an underscore: `_path`
+
+warning: unused variable: `context`
+   --> src/resilience/self_healing.rs:101:9
+    |
+101 |         context: &HashMap<String, String>,
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_context`
+
+warning: unused variable: `config`
+   --> src/security/vpn.rs:109:27
+    |
+109 |     fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionRe...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `config`
+   --> src/security/vpn.rs:218:27
+    |
+218 |     fn connect(&mut self, config: &VpnConfig) -> Result<VpnConnectionRe...
+    |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_config`
+
+warning: unused variable: `meta`
+   --> src/sigpkg/rpm_compat.rs:116:9
+    |
+116 |         meta: &SpecMetadata,
+    |         ^^^^ help: if this is intentional, prefix it with an underscore: `_meta`
+
+Some errors have detailed explanations: E0015, E0034, E0053, E0063, E0119, E0252, E0277, E0282, E0308...
+For more information about an error, try `rustc --explain E0015`.
+warning: `sigmaos` (lib) generated 112 warnings (3 duplicates)
+error: could not compile `sigmaos` (lib) due to 346 previous errors; 112 warnings emitted

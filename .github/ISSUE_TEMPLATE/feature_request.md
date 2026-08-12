@@ -1,19 +1,33 @@
-name: Feature Request
+# feature request
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+---
+name: Feature Request / New Shard
+about: Propose a new Sovereign Shard or architectural improvement
+title: "[SHARD] <SovereignNewName>: <short description>"
+labels: enhancement, new-shard
+assignees: ''
+---
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+## Shard Name
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+<!-- e.g. SovereignQuantumCache -->
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+## Problem Statement
 
-**Priority**
-- [ ] Low
-- [ ] Medium
-- [ ] High
-- [ ] Critical
+<!-- What gap does this close? Reference MISSING_COMPONENTS.md if applicable -->
+
+## Proposed Solution
+
+<!-- Describe the sovereign singleton design and USP -->
+
+## Linux Equivalent
+
+<!-- What does this replace? e.g. `systemctl`, `/proc`, `iptables` -->
+
+## Algorithm / USP
+
+<!-- Name the algorithm (e.g. QREP, UMSM, ZBT) and explain its advantage -->
+
+## Dependencies
+
+<!-- Which existing shards does this require? -->
