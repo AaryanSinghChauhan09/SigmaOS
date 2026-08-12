@@ -60,10 +60,16 @@ pub trait SecureBoot {
 #[repr(C)]
 pub struct SimpleSecureBoot {
     pub bootloader: SimpleUEFIBootloader,
+    pub signature_key: u8,
 }
 
 impl SimpleSecureBoot {
-    pub fn new() -> Self { SimpleSecureBoot { bootloader: SimpleUEFIBootloader::new() } }
+    pub fn new() -> Self {
+        SimpleSecureBoot {
+            bootloader: SimpleUEFIBootloader::new(),
+            signature_key: 0x42,
+        }
+    }
 }
 
 impl SecureBoot for SimpleSecureBoot {
@@ -72,8 +78,9 @@ impl SecureBoot for SimpleSecureBoot {
     }
     fn sign(&self, data: &[u8]) -> Result<Vec<u8>, BootError> {
         let mut signature = Vec::new();
+        let key = self.signature_key;
         for byte in data {
-            signature.push(byte.wrapping_add(0x42));
+            signature.push(byte.wrapping_add(key));
         }
         Ok(signature)
     }

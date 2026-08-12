@@ -3,23 +3,14 @@ pub mod ipc;
 pub mod memory;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod object;
-pub mod proc;
+pub mod numa_scheduler;
+pub mod sysctl;
+pub mod ebpf;
 
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use architecture::{
-    ArchitectureEngine, CpuRegisters, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase, Irql,
-    LookasideList, MemoryDescriptorList, Pcb, PoolType, ProcessorInitState, Tcb, ThreadState,
-};
-pub use policy_mechanism::{
-    InterruptClass, InstructionCyclePhase, IoWaitProfile, KernelMechanism, KernelPolicy,
-    PolicyMechanismCoordinator, SovereignMechanism, AdaptivePolicy,
-};
-pub use structures::{
-    SinglyLinkedList, SequencedSinglyLinkedList, CircularDoublyLinkedList,
-    SystemThread, WorkItem, ApcMode, Apc, ApcQueue, CpuArchitectureClass,
-    EdfTask, LotteryTask, AuditBlock, LcgRandom, AdvancedAlgorithmsManager,
-};
+pub use numa_scheduler::{NumaTask, LockFreeTaskQueue, NumaNode, NumaScheduler};
+pub use sysctl::{SysctlValue, SysctlNode, SysctlRegistry};
+pub use ebpf::{EbpfInstruction, EbpfVerifier, EbpfEngine};
