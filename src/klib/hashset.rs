@@ -6,14 +6,14 @@ use super::hashmap::BTreeMapIter;
 
 pub struct HashSet<T>
 where
-    T: Eq + core::hash::Hash + Clone,
+    T: Eq + core::hash::Hash + Clone + Ord,
 {
     map: BTreeMap<T, ()>,
 }
 
 impl<T> Clone for HashSet<T>
 where
-    T: Eq + core::hash::Hash + Clone,
+    T: Eq + core::hash::Hash + Clone + Ord,
 {
     fn clone(&self) -> Self {
         HashSet {
@@ -24,7 +24,7 @@ where
 
 impl<T> core::fmt::Debug for HashSet<T>
 where
-    T: Eq + core::hash::Hash + Clone + core::fmt::Debug,
+    T: Eq + core::hash::Hash + Clone + core::fmt::Debug + Ord,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut set = f.debug_set();
@@ -37,7 +37,7 @@ where
 
 impl<T> HashSet<T>
 where
-    T: Eq + core::hash::Hash + Clone,
+    T: Eq + core::hash::Hash + Clone + Ord,
 {
     pub fn new() -> Self {
         HashSet {
@@ -82,7 +82,7 @@ where
 
 impl<T> Default for HashSet<T>
 where
-    T: Eq + core::hash::Hash + Clone,
+    T: Eq + core::hash::Hash + Clone + Ord,
 {
     fn default() -> Self {
         Self::new()
@@ -95,7 +95,7 @@ pub struct HashSetIter<'a, T> {
 
 impl<'a, T> Iterator for HashSetIter<'a, T>
 where
-    T: Eq + core::hash::Hash + Clone,
+    T: Eq + core::hash::Hash + Clone + Ord,
 {
     type Item = &'a T;
 
