@@ -136,3 +136,45 @@ PRs remaining:   0 open
 ```
 
 All branches are now fully consolidated into `main`. Repository is clean and synced with GitHub.
+
+---
+
+## Session Update (2026-08-12 — Session 2, 18:21 IST)
+
+### Context
+
+A previously merged PR (#101, merged 2026-07-17) had its source branch `fix/mem-leak-custom-vec-drop-7188808108065826003` still present on the remote with 1 additional unmerged commit on top. That commit was integrated this session.
+
+### Branch Merged
+
+| Branch | Unmerged Commits | Description | Status |
+|--------|-----------------|-------------|--------|
+| `fix/mem-leak-custom-vec-drop-7188808108065826003` | 1 (`e8a0f159a3`) | Fedora-inspired SELinux MAC + ioctl module path fix | ✅ Merged & Deleted |
+
+### Commit Integrated
+
+```
+e8a0f159a3  feat: Implement Fedora-inspired SELinux MAC and fix ioctl module path
+```
+
+### Key Changes Brought In
+
+- **Security:** `src/security/selinux.rs` — full SELinux MAC implementation
+- **Compatibility:** India Stack, Mint Linux, ReactOS, BSD jails, Jehanne OS layers
+- **Kernel:** eBPF subsystem (`src/kernel/ebpf.rs`), sysctl (`src/kernel/sysctl.rs`), NUMA scheduler
+- **Network:** Unix domain sockets, enterprise networking types
+- **Memory:** Custom `klib/vec.rs` (no_std Vec with Drop), `klib/uvm.rs` (user virtual memory)
+- **Build:** `SigmaOSSetupWizard.rs` setup wizard tool
+
+### Conflict Resolution
+
+All 25 conflicted source files resolved with `theirs` strategy (incoming branch takes precedence for all Rust source).
+
+### Final State After Session
+
+```
+Remote branches: origin/main only
+Local branches:  main only
+HEAD commit:     d56ccdd499
+PRs remaining:   0 open
+```

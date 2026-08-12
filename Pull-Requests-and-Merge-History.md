@@ -243,17 +243,49 @@ When merging branches, the following precedence rules apply:
 
 ---
 
+---
+
+### 2026-08-12 (Session 2 — 18:21 IST)
+
+#### Direct Branch Merges
+
+| Branch | PR | Description | Merge Strategy | Status |
+|--------|----|-------------|----------------|--------|
+| `fix/mem-leak-custom-vec-drop-7188808108065826003` | #101 (merged 2026-07-17, branch lingered) | Fix Memory Leak: Implement Drop for Custom no_std Vec + Fedora-inspired SELinux MAC | Direct git merge (no-ff) | ✅ MERGED 🗑️ |
+
+**Commits brought in:**
+- `e8a0f159a3` — `feat: Implement Fedora-inspired SELinux MAC and fix ioctl module path`
+
+**Key files added/modified:**
+- `src/security/selinux.rs` — Fedora-inspired SELinux mandatory access control
+- `src/compatibility/india_stack.rs`, `mint_linux.rs`, `reactos.rs`, `jails.rs`, `jehanne.rs` — new compatibility layers
+- `src/kernel/ebpf.rs`, `src/kernel/sysctl.rs` — eBPF and sysctl subsystems
+- `src/network/unix_sockets.rs`, `src/network/enterprise.rs` — networking improvements
+- `src/klib/vec.rs`, `src/klib/uvm.rs` — memory management
+- `tools/build/SigmaOSSetupWizard.rs` — build tooling
+
+**Conflicts resolved:** 25 source files (strategy: `theirs`)
+
+**After session state:**
+```
+Remote branches: origin/main only
+HEAD:            d56ccdd499
+Open PRs:        0
+```
+
+---
+
 ## Statistics
 
 | Metric | Count |
 |--------|-------|
-| Total PRs listed | 100 |
-| Merged into main (✅) | 65 |
+| Total PRs listed | 101 |
+| Merged into main (✅) | 66 |
 | Closed without merging (❌) | 35 |
-| Direct branch merges (🔀) | 1 |
-| Remote branches deleted | 2 (this session) |
+| Direct branch merges (🔀) | 2 |
+| Remote branches deleted | 3 (cumulative) |
 | Remaining remote branches | 1 (`origin/main`) |
 
 ---
 
-*Generated automatically on 2026-08-12 by Kiro CLI agent. For the full repository, see [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS).*
+*Last updated: 2026-08-12 18:21 IST by Kiro CLI agent. For the full repository, see [AaryanSinghChauhan09/SigmaOS](https://github.com/AaryanSinghChauhan09/SigmaOS).*
