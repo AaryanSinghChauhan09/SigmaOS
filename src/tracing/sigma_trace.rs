@@ -23,34 +23,6 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
-extern crate alloc;
-use alloc::vec::Vec;
-
 pub const TRACE_BUFFER_SIZE: usize = 16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

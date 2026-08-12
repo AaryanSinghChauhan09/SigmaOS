@@ -1,7 +1,5 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
-// SigmaOS Library
-// Core library for SigmaOS operating system
 
 pub mod accessibility;
 pub mod automation;
@@ -14,6 +12,12 @@ pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
 pub mod kernel;
+pub mod klib;
+pub mod logging;
+pub mod power;
+pub mod runtime;
+pub mod tracing;
+pub mod crash;
 pub mod network;
 pub mod orchestration;
 pub mod distro;
@@ -21,6 +25,7 @@ pub mod package;
 pub mod performance;
 pub mod productivity;
 pub mod resilience;
+pub mod resource;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -55,6 +60,10 @@ pub use compatibility::{
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use distro::{
+    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
+    PinRule, AptPinStore, OpenRCService,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,

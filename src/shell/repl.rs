@@ -185,6 +185,73 @@ impl ShellRepl {
             "whoami" => ShellCommand::WhoAmI,
             "uname" => ShellCommand::Uname,
             "clear" => ShellCommand::Clear,
+            "echo" => {
+                let message = parts[1..].join(" ");
+                ShellCommand::Echo { message }
+            }
+            "rm" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Rm {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "su" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Su {
+                        username: parts[1].to_string(),
+                        password: Some(parts[2].to_string()),
+                    }
+                } else if parts.len() == 2 {
+                    ShellCommand::Su {
+                        username: parts[1].to_string(),
+                        password: None,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "cat" => {
+                if parts.len() >= 2 {
+                    ShellCommand::Cat {
+                        filename: parts[1].to_string(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "systemctl" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Systemctl {
+                        action: parts[1].to_string(),
+                        service: parts[2].to_string(),
+                    }
+                } else if parts.len() == 2 {
+                    ShellCommand::Systemctl {
+                        action: parts[1].to_string(),
+                        service: String::new(),
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
+            "apt" => {
+                if parts.len() >= 3 {
+                    ShellCommand::Apt {
+                        subcommand: parts[1].to_string(),
+                        package: Some(parts[2].to_string()),
+                    }
+                } else if parts.len() == 2 {
+                    ShellCommand::Apt {
+                        subcommand: parts[1].to_string(),
+                        package: None,
+                    }
+                } else {
+                    ShellCommand::Unknown(input.to_string())
+                }
+            }
             "touch" => {
                 if parts.len() >= 2 {
                     ShellCommand::Touch {

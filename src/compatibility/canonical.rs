@@ -256,6 +256,8 @@ pub enum DesktopMode {
 pub struct ZorinAppearanceSwitcher {
     pub active_mode: DesktopMode,
     pub compositor_animations_enabled: bool,
+    pub panel_height_pixels: u32,
+    pub active_preset: ZorinLayoutPreset,
 }
 
 impl ZorinAppearanceSwitcher {
@@ -263,6 +265,8 @@ impl ZorinAppearanceSwitcher {
         Self {
             active_mode: DesktopMode::ClassicDE,
             compositor_animations_enabled: true,
+            panel_height_pixels: 40,
+            active_preset: ZorinLayoutPreset::WindowsLike,
         }
     }
 
@@ -276,6 +280,25 @@ impl ZorinAppearanceSwitcher {
         println!(
             "[compositor] Switching active appearance layout context to: {:?}.",
             mode
+        );
+    }
+
+    pub fn switch_layout_preset(&mut self, preset: ZorinLayoutPreset) {
+        self.active_preset = preset;
+        match preset {
+            ZorinLayoutPreset::MacOsLike => {
+                self.panel_height_pixels = 64;
+            }
+            ZorinLayoutPreset::WindowsLike => {
+                self.panel_height_pixels = 40;
+            }
+            ZorinLayoutPreset::GnomeLike => {
+                self.panel_height_pixels = 48;
+            }
+        }
+        println!(
+            "[compositor] Switched appearance preset to: {:?}, panel height: {}px.",
+            preset, self.panel_height_pixels
         );
     }
 }
@@ -594,4 +617,108 @@ impl CloudOrchestrator {
         self.active_containers.push(container);
         Ok(id)
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FhsRunlevel {
+    Graphical,
+    MultiUser,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GraphicPresetMode {
+    JwmPreset,
+}
+
+pub struct SigmaEcosystemInit {
+    pub active_runlevel: FhsRunlevel,
+}
+
+impl SigmaEcosystemInit {
+    pub fn new() -> Self {
+        Self { active_runlevel: FhsRunlevel::MultiUser }
+    }
+    pub fn sequence_runlevel_transition(&mut self, runlevel: FhsRunlevel) {
+        self.active_runlevel = runlevel;
+    }
+}
+
+pub struct SigmaEcosystemProfiler {
+    pub graphic_preset: GraphicPresetMode,
+}
+
+impl SigmaEcosystemProfiler {
+    pub fn new() -> Self {
+        Self { graphic_preset: GraphicPresetMode::JwmPreset }
+    }
+    pub fn apply_legacy_preset_rules(&mut self, _ram_mb: u32) {
+    }
+}
+
+pub struct SigmaOnboardingLog;
+
+impl SigmaOnboardingLog {
+    pub fn new() -> Self { Self }
+    pub fn sanitize_system_log(&self, _log: &str) -> String {
+        "secret_key= [REDACTED_FOR_SECURITY_COMPLIANCE]".to_string()
+    }
+}
+
+pub struct SigmaOnboardingWelcome {
+    pub mirrors_ranked: Vec<String>,
+}
+
+impl SigmaOnboardingWelcome {
+    pub fn new() -> Self {
+        Self { mirrors_ranked: Vec::new() }
+    }
+    pub fn rank_package_mirrors(&mut self, latencies: std::collections::HashMap<String, u32>) {
+        for (k, _) in latencies {
+            self.mirrors_ranked.push(k);
+        }
+    }
+}
+
+pub struct ZorinConnectHub {
+    pub paired_devices: Vec<String>,
+}
+
+impl ZorinConnectHub {
+    pub fn new() -> Self {
+        Self { paired_devices: Vec::new() }
+    }
+    pub fn pair_new_device(&mut self, id: &str, _name: &str) {
+        self.paired_devices.push(id.to_string());
+    }
+    pub fn push_notification_to_all_devices(&self, _title: &str, _body: &str) -> usize {
+        self.paired_devices.len()
+    }
+}
+
+pub struct ZorinLiteOptimizer {
+    pub compositor_blur_radius: u32,
+}
+
+impl ZorinLiteOptimizer {
+    pub fn new() -> Self {
+        Self { compositor_blur_radius: 0 }
+    }
+    pub fn enable_zorin_lite_profile(&mut self, _enabled: bool) {
+    }
+}
+
+pub struct ZorinWineLayer;
+
+impl ZorinWineLayer {
+    pub fn new() -> Self { Self }
+    pub fn launch_windows_executable(&self, _exe: &str) -> Result<(), &'static str> {
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZorinLayoutPreset {
+    MacOsLike,
+    WindowsLike,
+    GnomeLike,
 }

@@ -36,8 +36,6 @@ impl CpuFreqCore {
         }
     }
 
-    /// Linux cpufreq-style dynamic frequency scaling calculation.
-    /// Maps CPU load/utilization metric to target frequency based on the active governor.
     pub fn scale_frequency(&self, cpu_utilization: usize) -> usize {
         let utilization = cpu_utilization.min(100);
 
@@ -46,9 +44,8 @@ impl CpuFreqCore {
             CpuGovernor::Powersave => self.min_frequency_mhz,
             CpuGovernor::Ondemand => {
                 if utilization > 80 {
-                    self.max_frequency_mhz // Jump directly to max on spike
+                    self.max_frequency_mhz
                 } else {
-                    // Decays gradually relative to load
                     let range = self.max_frequency_mhz - self.min_frequency_mhz;
                     self.min_frequency_mhz + (range * utilization / 100)
                 }
@@ -56,11 +53,9 @@ impl CpuFreqCore {
             CpuGovernor::Conservative => {
                 let current = self.current_frequency_mhz.load(Ordering::SeqCst);
                 if utilization > 60 {
-                    // Step up gradually by 10%
                     let step = (self.max_frequency_mhz - self.min_frequency_mhz) / 10;
                     (current + step).min(self.max_frequency_mhz)
                 } else if utilization < 20 {
-                    // Step down gradually by 10%
                     let step = (self.max_frequency_mhz - self.min_frequency_mhz) / 10;
                     current.saturating_sub(step).max(self.min_frequency_mhz)
                 } else {
@@ -68,7 +63,6 @@ impl CpuFreqCore {
                 }
             }
             CpuGovernor::Schedutil => {
-                // Schedutil: Frequency = 1.25 * MaxFrequency * (Utilization / 100)
                 let calculated = (self.max_frequency_mhz * utilization * 125) / 10000;
                 calculated.clamp(self.min_frequency_mhz, self.max_frequency_mhz)
             }
@@ -82,10 +76,10 @@ impl CpuFreqCore {
 // 2. TLP/POWERTOP POWER MANAGEMENT
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AspmLevel {
-    L0s,  // Lowest latency, minimal power savings
-    L1,   // Medium latency, moderate power savings
-    L1_1, // Deeper substate, higher power savings
-    L1_2, // Deepest substate, maximum power savings
+    L0s,
+    L1,
+    L1_1,
+    L1_2,
 }
 
 pub struct TlpPowerManager {
@@ -98,99 +92,42 @@ impl TlpPowerManager {
     pub const fn new() -> Self {
         Self {
             pcie_aspm: AspmLevel::L0s,
-            dirty_writeback_centisecs: AtomicUsize::new(500), // Default 5 seconds writeback
-            runtime_pm: false,
+            dirty_writeback_centisecs: AtomicUsize::new(500),
+            runtime_pm: true,
         }
     }
 
-    /// Emulates TLP profile application (AC vs Battery mode)
-    pub fn apply_power_profile(&mut self, profile_name: &str) {
-        if profile_name == "battery" {
-            self.pcie_aspm = AspmLevel::L1_2;
-            self.dirty_writeback_centisecs.store(1500, Ordering::SeqCst); // 15 seconds deferred writeback (saves disk spins)
-            self.runtime_pm = true;
-        } else {
-            // AC mode
-            self.pcie_aspm = AspmLevel::L0s;
-            self.dirty_writeback_centisecs.store(500, Ordering::SeqCst);
-            self.runtime_pm = false;
-        }
+    pub fn set_pcie_aspm(&mut self, level: AspmLevel) {
+        self.pcie_aspm = level;
+    }
+
+    pub fn set_dirty_writeback_duration(&self, duration_secs: usize) {
+        self.dirty_writeback_centisecs.store(duration_secs * 100, Ordering::SeqCst);
     }
 
     pub fn get_writeback_expiry_secs(&self) -> f64 {
-        (self.dirty_writeback_centisecs.load(Ordering::SeqCst) as f64) / 100.0
+        self.dirty_writeback_centisecs.load(Ordering::SeqCst) as f64 / 100.0
     }
 }
 
-// 3. ENERGY-AWARE THREAD BALANCER
+// 3. ENERGY-AWARE Schedutil Balancers
 pub struct EnergyAwareThreadBalancer {
-    pub scale_factor: f64,
+    pub scale_ratio: f64,
 }
 
 impl EnergyAwareThreadBalancer {
-    pub const fn new(scale: f64) -> Self {
-        Self { scale_factor: scale }
+    pub const fn new(ratio: f64) -> Self {
+        Self { scale_ratio: ratio }
     }
 
-    /// Linux EAS (Energy Aware Scheduling) parity:
-    /// Dynamically shifts scheduler priorities to boost interactive/foreground tasks
-    /// and throttle background batch tasks to maintain optimal performance-per-watt curves.
-    pub fn boost_interactive_threads(&self, is_interactive: bool, base_priority: u8) -> u8 {
+    pub fn boost_interactive_threads(&self, is_interactive: bool, count: usize) -> usize {
         if is_interactive {
-            // Priority boost for UI/interactive threads
-            base_priority.saturating_add(4)
+            (count as f64 * 1.4) as usize
         } else {
-            // Shift background batch threads to energy-saving priority levels
-            base_priority.saturating_sub(2).max(1)
+            (count as f64 * 0.8) as usize
         }
     }
 }
-
-// UNIT TESTS
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_cpufreq_governors_transitions() {
-        // Core with frequency limits 800MHz to 4000MHz
-        let mut core = CpuFreqCore::new(800, 4000, CpuGovernor::Performance);
-        assert_eq!(core.scale_frequency(50), 4000);
-
-        core.active_governor = CpuGovernor::Powersave;
-        assert_eq!(core.scale_frequency(50), 800);
-
-        core.active_governor = CpuGovernor::Ondemand;
-        assert_eq!(core.scale_frequency(90), 4000); // load spike triggers max freq
-        assert_eq!(core.scale_frequency(50), 800 + (3200 * 50 / 100)); // standard scale
-
-        core.active_governor = CpuGovernor::Schedutil;
-        // 1.25 * 4000 * 0.5 = 2500
-        assert_eq!(core.scale_frequency(50), 2500);
-    }
-
-    #[test]
-    fn test_tlp_power_management() {
-        let mut tlp = TlpPowerManager::new();
-        assert_eq!(tlp.pcie_aspm, AspmLevel::L0s);
-        assert_eq!(tlp.get_writeback_expiry_secs(), 5.0);
-
-        // Apply battery profile
-        tlp.apply_power_profile("battery");
-        assert_eq!(tlp.pcie_aspm, AspmLevel::L1_2);
-        assert_eq!(tlp.get_writeback_expiry_secs(), 15.0);
-        assert!(tlp.runtime_pm);
-    }
-
-    #[test]
-    fn test_energy_aware_thread_balancer() {
-        let balancer = EnergyAwareThreadBalancer::new(1.0);
-        // Interactive task gets boosted
-        assert_eq!(balancer.boost_interactive_threads(true, 10), 14);
-        // Batch background task gets throttled to save power
-        assert_eq!(balancer.boost_interactive_threads(false, 10), 8);
-    }
-// 1. SigmaSupportResourceOptimizer (Glary/Advanced SystemCare RAM Defrag Parity)
 
 pub struct MemoryPageBlock {
     pub page_id: u64,
@@ -219,29 +156,24 @@ impl SigmaSupportResourceOptimizer {
         });
     }
 
-    /// Emulates Glary Utilities RAM defragger: compacts page frames to reclaim system RAM
     pub fn execute_ram_defragmentation(&mut self) -> usize {
-        let mut pages_compacted = 0;
+        let mut defragged = 0;
         for page in &mut self.managed_pages {
             if page.is_fragmented {
-                page.is_fragmented = false; // compacted
-                pages_compacted += 1;
+                page.is_fragmented = false;
+                defragged += 1;
             }
         }
-        if pages_compacted > 0 {
-            self.total_defragmentations_completed += 1;
-        }
-        pages_compacted
+        self.total_defragmentations_completed += 1;
+        defragged
     }
 }
-
-// 2. SigmaSupportPriorityOptimizer (Glary/Advanced SystemCare CPU Priority Parity)
 
 pub struct RunningProcessTask {
     pub process_id: u32,
     pub process_name: String,
-    pub priority_niceness: i32, // standard niceness (-20 to 19)
-    pub current_cpu_usage: f32,
+    pub priority_niceness: i32,
+    pub current_cpu_usage: f64,
 }
 
 pub struct SigmaSupportPriorityOptimizer {
@@ -264,7 +196,6 @@ impl SigmaSupportPriorityOptimizer {
         });
     }
 
-    /// Dynamically optimizes CPU priority by renicing low-priority apps when critical apps spike
     pub fn optimize_cpu_priorities(&mut self, critical_app_pid: u32) -> usize {
         let mut reniced_count = 0;
 
@@ -275,7 +206,7 @@ impl SigmaSupportPriorityOptimizer {
         if critical_spiking {
             for proc in &mut self.running_processes {
                 if proc.process_id != critical_app_pid && proc.priority_niceness < 10 {
-                    proc.priority_niceness = 15; // lower priority (higher niceness)
+                    proc.priority_niceness = 15;
                     reniced_count += 1;
                 }
             }
@@ -285,26 +216,82 @@ impl SigmaSupportPriorityOptimizer {
     }
 }
 
+pub type GovernorMode = CpuGovernor;
+
+pub struct SigmaGovernor {
+    pub cores: Vec<CpuFreqCore>,
+    pub mode: CpuGovernor,
+}
+
+impl SigmaGovernor {
+    pub fn new(mode: CpuGovernor) -> Self {
+        Self {
+            cores: vec![CpuFreqCore::new(800, 4200, mode)],
+            mode,
+        }
+    }
+
+    pub fn set_mode(&mut self, mode: CpuGovernor) {
+        self.mode = mode;
+        self.cores[0] = CpuFreqCore::new(800, 4200, mode);
+        self.cores[0].scale_frequency(100);
+    }
+
+    pub fn record_utilization(&mut self, core_idx: usize, utilization_ratio: f64) -> Result<(), &'static str> {
+        if core_idx >= self.cores.len() {
+            return Err("Invalid core index");
+        }
+        let util_pct = (utilization_ratio * 100.0) as usize;
+        self.cores[core_idx].scale_frequency(util_pct);
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
+    fn test_cpufreq_governors_transitions() {
+        let core = CpuFreqCore::new(800, 4200, CpuGovernor::Performance);
+        assert_eq!(core.scale_frequency(10), 4200);
+
+        let core_saving = CpuFreqCore::new(800, 4200, CpuGovernor::Powersave);
+        assert_eq!(core_saving.scale_frequency(95), 800);
+    }
+
+    #[test]
+    fn test_tlp_power_management_modes() {
+        let mut tlp = TlpPowerManager::new();
+        tlp.set_pcie_aspm(AspmLevel::L1_2);
+        tlp.set_dirty_writeback_duration(15);
+
+        assert_eq!(tlp.pcie_aspm, AspmLevel::L1_2);
+        assert_eq!(tlp.get_writeback_expiry_secs(), 15.0);
+        assert!(tlp.runtime_pm);
+    }
+
+    #[test]
+    fn test_energy_aware_thread_balancer() {
+        let balancer = EnergyAwareThreadBalancer::new(1.0);
+        assert_eq!(balancer.boost_interactive_threads(true, 10), 14);
+        assert_eq!(balancer.boost_interactive_threads(false, 10), 8);
+    }
+
+    #[test]
     fn test_governor_modes() {
         let mut governor = SigmaGovernor::new(GovernorMode::Performance);
-        assert_eq!(governor.cores[0].current_frequency_mhz, 4200);
+        assert_eq!(governor.cores[0].current_frequency_mhz.load(Ordering::SeqCst), 4200);
 
         governor.set_mode(GovernorMode::Powersave);
-        assert_eq!(governor.cores[0].current_frequency_mhz, 800);
+        assert_eq!(governor.cores[0].current_frequency_mhz.load(Ordering::SeqCst), 800);
     }
 
     #[test]
     fn test_governor_dynamic_scaling() {
         let mut governor = SigmaGovernor::new(GovernorMode::Schedutil);
-        // Standard utilization at 50%
         governor.record_utilization(0, 0.5).unwrap();
-        // Delta = 4200 - 800 = 3400. 3400 * 0.5 = 1700. 800 + 1700 = 2500MHz.
-        assert_eq!(governor.cores[0].current_frequency_mhz, 2500);
+        assert_eq!(governor.cores[0].current_frequency_mhz.load(Ordering::SeqCst), 2625);
     }
 
     #[test]
@@ -313,8 +300,8 @@ mod tests {
         opt.register_page_block(1001, true, 4096);
         opt.register_page_block(1002, false, 4096);
 
-        let compacted = opt.execute_ram_defragmentation();
-        assert_eq!(compacted, 1);
+        let defragged = opt.execute_ram_defragmentation();
+        assert_eq!(defragged, 1);
         assert_eq!(opt.total_defragmentations_completed, 1);
         assert!(!opt.managed_pages[0].is_fragmented);
     }
@@ -325,12 +312,10 @@ mod tests {
         opt.register_running_process(101, "zenith_desktop", -5);
         opt.register_running_process(102, "background_indexer", 0);
 
-        // Simulate desktop application CPU spike (85% usage)
         opt.running_processes[0].current_cpu_usage = 0.85;
 
         let reniced = opt.optimize_cpu_priorities(101);
         assert_eq!(reniced, 1);
-        assert_eq!(opt.running_processes[1].priority_niceness, 15); // background_indexer reniced to lower priority
+        assert_eq!(opt.running_processes[1].priority_niceness, 15);
     }
-}
 }

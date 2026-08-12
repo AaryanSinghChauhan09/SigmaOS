@@ -15,9 +15,7 @@ pub mod apache_ossie;
 pub mod sovereign_suite;
 pub mod gentoo;
 pub mod legacy_adapters;
-pub mod canonical;
 
-pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
@@ -48,6 +46,9 @@ pub use canonical::{
     HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
     ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
     UnifiedAppStore, ZorinAppearanceSwitcher,
+    ZorinLayoutPreset, ZorinConnectHub, ZorinLiteOptimizer, ZorinWineLayer,
+    FhsRunlevel, GraphicPresetMode, SigmaEcosystemInit, SigmaEcosystemProfiler,
+    SigmaOnboardingLog, SigmaOnboardingWelcome,
 };
 
 pub use solid_kernel::{

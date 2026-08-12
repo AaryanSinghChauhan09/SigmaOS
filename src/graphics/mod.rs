@@ -4,9 +4,6 @@ pub mod video_editor;
 pub mod paint;
 pub mod render3d;
 
-pub mod paint;
-
-pub mod paint;
 
 pub use compositor::{
     BitmapSurface, Color, Compositor, Position, Rectangle, SimpleCompositor, SimpleWindow, Size,

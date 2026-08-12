@@ -1,11 +1,7 @@
 extern crate alloc;
 
-// Core Library Collection Modules for SigmaOS
-// Sovereign implementations - no external crate dependencies
 pub mod buddy_allocator;
 pub mod paging;
-pub mod hashmap;
-pub mod hashset;
 pub mod uuid;
 pub mod hash;
 pub mod string;
@@ -15,8 +11,9 @@ pub mod linked_list;
 pub mod slab;
 pub mod custom_string;
 pub mod custom_allocator;
+pub mod vec;
+pub mod error;
 
-// Conditional compilation of other collection modules
 #[cfg(target_os = "none")]
 pub mod hashmap;
 #[cfg(target_os = "none")]
@@ -26,17 +23,29 @@ pub mod btreemap;
 #[cfg(target_os = "none")]
 pub mod vecdeque;
 
-// Re-exports
 pub use string::{String, ToString};
 pub use custom_string::SigmaString;
-pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
 pub use slab::{SlabCache, TypedSlabCache};
-pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
+pub use custom_string::{SigmaStringBuilder, CStringView};
+pub use error::*;
 
 #[cfg(target_os = "none")]
 pub use vec::Vec;
+
+#[cfg(target_os = "none")]
 pub use hashmap::HashMap;
+#[cfg(target_os = "none")]
 pub use hashset::HashSet;
+#[cfg(target_os = "none")]
+pub use arc::Arc;
+
+#[cfg(not(target_os = "none"))]
+pub use std::collections::{HashMap, HashSet, BTreeMap, VecDeque};
+#[cfg(not(target_os = "none"))]
+pub use std::vec::Vec;
+#[cfg(not(target_os = "none"))]
+pub use std::sync::Arc;
+
 pub use uuid::Uuid;
