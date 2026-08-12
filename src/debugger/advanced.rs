@@ -10,7 +10,11 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::vec::Vec;
+#[cfg(not(feature = "standalone_test"))]
 use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[cfg(feature = "standalone_test")]
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 // =========================================================================
 // 1. DEBUGGER WINDOWS MANAGEMENT
@@ -92,6 +96,173 @@ impl DebugWindowManager {
     pub fn set_focus(&mut self, window_type: DebugWindowType) {
         for win in &mut self.windows {
             win.is_focused = win.window_type == window_type;
+        }
+    }
+}
+
+// ================= Managed SOS & Narly Security Mitigations Audits =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MitigationFlags {
+    pub dep_nx_enabled: bool,
+    pub aslr_enabled: bool,
+    pub safe_seh_enabled: bool,
+}
+
+pub struct SosNarlyDebuggerExtension {
+    pub managed_app_domains: Vec<String>,
+}
+
+impl SosNarlyDebuggerExtension {
+    pub fn new() -> Self {
+        Self {
+            managed_app_domains: Vec::new(),
+        }
+    }
+
+    pub fn audit_module_security_mitigations(&self, module_name: &str, flags: MitigationFlags) -> bool {
+        let secure = flags.dep_nx_enabled && flags.aslr_enabled && flags.safe_seh_enabled;
+        if !secure {
+            println!(
+                "NARLY WARNING: Module '{}' is missing critical mitigations (DEP: {}, ASLR: {}, SafeSEH: {})!",
+                module_name, flags.dep_nx_enabled, flags.aslr_enabled, flags.safe_seh_enabled
+            );
+        }
+        secure
+    }
+
+    pub fn sos_dump_heap(&mut self, domain: &str) -> Vec<String> {
+        self.managed_app_domains.push(domain.to_string());
+        vec![
+            format!("SOS: Managed Heap dump for AppDomain '{}'", domain),
+            String::from("  Address       Size   Type"),
+            String::from("  0012f450         48   System.String"),
+            String::from("  0012f480         24   System.Int32"),
+        ]
+    }
+}
+
+// ================= !analyze & !exploitable Crash Diagnostic Analyzer =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExploitabilityRisk {
+    Critical,
+    Exploitable,
+    ProbablyExploitable,
+    LowRisk,
+}
+
+pub struct CrashDiagnosticAnalyzer;
+
+impl CrashDiagnosticAnalyzer {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Evaluates crash event mimicking WinDbg '!analyze -v' and '!exploitable'
+    pub fn analyze_crash(&self, exception: TraceExceptionType, fault_address: u64) -> (String, ExploitabilityRisk) {
+        match exception {
+            TraceExceptionType::AccessViolation => {
+                if fault_address < 0x1000 {
+                    (
+                        format!("!analyze: NULL Pointer Dereference at address {:#X}", fault_address),
+                        ExploitabilityRisk::LowRisk,
+                    )
+                } else if fault_address >= 0x7FFF0000_00000000 {
+                    (
+                        format!("!analyze: Kernel Space Access Violation at address {:#X}", fault_address),
+                        ExploitabilityRisk::Critical,
+                    )
+                } else {
+                    (
+                        format!("!analyze: User Space Memory Access Violation at address {:#X}", fault_address),
+                        ExploitabilityRisk::Exploitable,
+                    )
+                }
+            }
+            TraceExceptionType::DivisionByZero => {
+                (
+                    String::from("!analyze: Integer Divide-by-Zero fault"),
+                    ExploitabilityRisk::LowRisk,
+                )
+            }
+            _ => {
+                (
+                    String::from("!analyze: Exception trap triggered"),
+                    ExploitabilityRisk::ProbablyExploitable,
+                )
+            }
+        }
+    }
+}
+
+// ================= Dynamic Scripting Hook & PyKd Script Engine Parity =================
+
+pub struct DebuggerExtensionApi {
+    pub command_name: String,
+    pub script_payload: String,
+}
+
+pub struct PyKdEngine {
+    pub scripts: Vec<DebuggerExtensionApi>,
+}
+
+impl PyKdEngine {
+    pub fn new() -> Self {
+        Self { scripts: Vec::new() }
+    }
+
+    pub fn register_pykd_script(&mut self, cmd: &str, payload: &str) {
+        self.scripts.push(DebuggerExtensionApi {
+            command_name: cmd.to_string(),
+            script_payload: payload.to_string(),
+        });
+    }
+
+    pub fn execute_pykd_script(&self, cmd: &str, current_rip: u64) -> Result<String, &'static str> {
+        let script = self.scripts.iter()
+            .find(|s| s.command_name == cmd)
+            .ok_or("pykd: Target script command not registered")?;
+
+        if script.script_payload.contains("get_rip") {
+            Ok(format!("pykd output: RIP={:#X}", current_rip))
+        } else {
+            Ok(format!("pykd output: Executed script '{}' successfully", cmd))
+        }
+    }
+}
+
+// ================= VirtualKD & qb-sync Debugging Sync Pipes =================
+
+pub struct VirtualKdSyncChannel {
+    pub host_connected: bool,
+    pub virtual_port_ready: bool,
+    pub synchronization_flags: u32,
+}
+
+impl VirtualKdSyncChannel {
+    pub fn new() -> Self {
+        Self {
+            host_connected: false,
+            virtual_port_ready: true,
+            synchronization_flags: 0,
+        }
+    }
+
+    pub fn establish_handshake(&mut self, magic_token: u32) -> Result<(), &'static str> {
+        if magic_token != 0x564b4453 { // "VKDS" (VirtualKD Sync) Magic
+            return Err("VirtualKD: Invalid handshake token. Rejecting VM connection.");
+        }
+        self.host_connected = true;
+        Ok(())
+    }
+
+    pub fn exchange_synchronization_packet(&mut self, cmd_flag: u32) -> u32 {
+        if self.host_connected {
+            self.synchronization_flags = cmd_flag ^ 0xFFFFFFFF;
+            self.synchronization_flags
+        } else {
+            0
         }
     }
 }
@@ -483,5 +654,77 @@ mod tests {
         );
         assert_eq!(res2, ExceptionResolution::NotHandled);
         assert_eq!(monitor.unhandled_exceptions_count, 1);
+    }
+
+    #[test]
+    fn test_sos_narly_mitigation_audits() {
+        let extension = SosNarlyDebuggerExtension::new();
+
+        let secure_flags = MitigationFlags {
+            dep_nx_enabled: true,
+            aslr_enabled: true,
+            safe_seh_enabled: true,
+        };
+        let insecure_flags = MitigationFlags {
+            dep_nx_enabled: true,
+            aslr_enabled: false,
+            safe_seh_enabled: true,
+        };
+
+        assert!(extension.audit_module_security_mitigations("kernel32.dll", secure_flags));
+        assert!(!extension.audit_module_security_mitigations("untrusted.dll", insecure_flags));
+
+        let mut ext_mut = SosNarlyDebuggerExtension::new();
+        let heap_dump = ext_mut.sos_dump_heap("DefaultDomain");
+        assert!(heap_dump[0].contains("DefaultDomain"));
+    }
+
+    #[test]
+    fn test_analyze_and_exploitable_diagnostics() {
+        let analyzer = CrashDiagnosticAnalyzer::new();
+
+        // Null pointer read (LowRisk)
+        let (desc1, risk1) = analyzer.analyze_crash(TraceExceptionType::AccessViolation, 0x1c);
+        assert_eq!(risk1, ExploitabilityRisk::LowRisk);
+        assert!(desc1.contains("NULL Pointer"));
+
+        // User Space AV (Exploitable)
+        let (desc2, risk2) = analyzer.analyze_crash(TraceExceptionType::AccessViolation, 0x00401000);
+        assert_eq!(risk2, ExploitabilityRisk::Exploitable);
+
+        // Kernel Space AV (Critical)
+        let (desc3, risk3) = analyzer.analyze_crash(TraceExceptionType::AccessViolation, 0x8000000000000000);
+        assert_eq!(risk3, ExploitabilityRisk::Critical);
+    }
+
+    #[test]
+    fn test_pykd_script_extension_execution() {
+        let mut pykd = PyKdEngine::new();
+        pykd.register_pykd_script("dump_rip", "print(get_rip())");
+        pykd.register_pykd_script("hello", "print('hello world')");
+
+        let rip_out = pykd.execute_pykd_script("dump_rip", 0x100400).unwrap();
+        assert_eq!(rip_out, "pykd output: RIP=0x100400");
+
+        let hello_out = pykd.execute_pykd_script("hello", 0x100400).unwrap();
+        assert!(hello_out.contains("hello"));
+
+        assert!(pykd.execute_pykd_script("invalid_cmd", 0).is_err());
+    }
+
+    #[test]
+    fn test_virtualkd_sync_debugging_pipe() {
+        let mut vk = VirtualKdSyncChannel::new();
+        assert!(!vk.host_connected);
+
+        // Handshake rejection
+        assert!(vk.establish_handshake(0x0).is_err());
+
+        // Handshake accept
+        assert!(vk.establish_handshake(0x564b4453).is_ok());
+        assert!(vk.host_connected);
+
+        let reply = vk.exchange_synchronization_packet(0xAAAA5555);
+        assert_eq!(reply, 0x5555AAAA); // bitwise negated
     }
 }

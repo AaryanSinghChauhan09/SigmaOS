@@ -6,6 +6,7 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod structures;
+pub mod linux_bsd_innovations;
 
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,
@@ -28,4 +29,19 @@ pub use structures::{
     AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
     CpuArchitectureClass, EdfTask, LcgRandom, LotteryTask, SequencedSinglyLinkedList,
     SinglyLinkedList, SystemThread, WorkItem,
+};
+pub use linux_bsd_innovations::{
+    ArchUserRepoManager, AlpineHardenedEnv, OpenBsdPledge, FreeBsdJail,
+    NixOsDeclarativeManager, GentooUseFlags, VoidRunitInit,
+    DynamicLkmLoader, KernelModule,
+    CapabilityDerivationTree, KernelCapability,
+    HybridKernelManager, NtExecutiveService, MicrokernelCore,
+    ExokernelHardwareMultiplexer, ResourceBinding,
+    NetBsdRumpKernel, RumpComponent,
+    HammerHistoryFilesystem, HammerBlockTransaction,
+    CarpSecurityRouter,
+    KmdfDriver, KmdfPnpState, KmdfPowerState, KmdfIoRequest,
+    AndroidBinderIpc, BinderNode,
+    GcdDispatchQueue, GcdPriority, GcdTask,
+    EbpfRuntime, EbpfInstruction,
 };
