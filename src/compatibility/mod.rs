@@ -11,6 +11,9 @@ pub mod legacy_adapters;
 pub mod india_professional_tools;
 pub mod canonical;
 pub mod fedora;
+pub mod alpine_linux;
+pub mod void_linux;
+pub mod nixos;
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};
@@ -71,4 +74,18 @@ pub use solid_kernel::{
 pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+};
+
+pub use alpine_linux::{
+    ApkPackage, ApkError, ApkDatabase, MuslCompatibilityLayer, AcfServiceStatus,
+    AcfService, AlpineConfigFramework, HardeningFeature, AlpineHardening,
+};
+
+pub use void_linux::{
+    XbpsPackage, XbpsError, XbpsDatabase, RunitServiceState, RunitSignal,
+    RunitService, RinitInitSystem, VoidMuslToolchain,
+};
+
+pub use nixos::{
+    NixPackage, NixError, NixStore, ConfigOption, NixosConfig, NixChannel, NixChannels,
 };
