@@ -1,9 +1,614 @@
-/* Zenith CSS Compliance Stylesheet */
+/*
+ * Σ SIGMAOS: ZENITH GRAPHICS SYSTEM STYLESHEET
+ * Designed specifically for Phase G: Bare-Metal GUI Installation Wizard
+ * Conforms to Zenith Desktop design specs: Glassmorphism, Accessibility, and High Contrast
+ */
+
+:root {
+    --bg-primary: #0a0d16;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --glass-bg: rgba(15, 23, 42, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background animated gradient decor */
+.background-decor {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(16, 185, 129, 0.05) 50%, transparent 100%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(80px);
+}
+
+/* Glassmorphic Installer Box */
 .glass {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+.installer-container {
+    width: 850px;
+    max-width: 95%;
+    border-radius: 20px;
+    padding: 40px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 650px;
+}
+
+/* Header Styles */
+.installer-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 20px;
+}
+
+.logo {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.title-area h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.title-area .subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Stepper Stepped Indicator */
+.stepper {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.stepper::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 5%;
+    right: 5%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 0;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    flex: 1;
+    text-align: center;
+}
+
+.step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.step-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* Stepper state transitions */
+.step.active .step-num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+.step.active .step-label {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.step.completed .step-num {
+    background: var(--success);
+    border-color: var(--success);
+    color: #ffffff;
+}
+
+.step.completed .step-label {
+    color: var(--success);
+}
+
+/* Panels Body */
+.wizard-body {
+    flex-grow: 1;
+    margin-bottom: 30px;
+    position: relative;
+    min-height: 320px;
+}
+
+.panel {
+    display: none;
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.panel.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.panel-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+/* Feature Grid */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.25s ease;
+}
+
+.feature-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.feature-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.feature-card p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Checkbox Label Control */
+.license-agreement {
+    margin-top: 25px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    user-select: none;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark::after {
+    display: block;
+}
+
+.checkbox-container .checkmark::after {
+    left: 6px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Disk Cards selection */
+.disk-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.disk-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.disk-card:hover, .disk-card:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    outline: none;
+}
+
+.disk-card:focus-visible {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+.disk-card.active {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: var(--accent);
+}
+
+.disk-icon {
+    font-size: 1.8rem;
+}
+
+.disk-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.disk-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.disk-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.partition-warning {
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+/* Settings Forms Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-group select, .form-group input {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 0.85rem;
+    transition: all 0.25s ease;
+}
+
+.form-group select:focus, .form-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Installation Progress Styles */
+.progress-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.progress-bar-outer {
+    height: 10px;
+    background: #1e293b;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--success) 100%);
+    border-radius: 5px;
+    transition: width 0.4s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+#progress-percentage {
+    font-weight: 700;
+    color: var(--success);
+}
+
+/* Simulating Log Console */
+.terminal-log {
+    border-radius: 12px;
+    background: #010409;
+    border: 1px solid #21262d;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #161b22;
+    padding: 10px 15px;
+    border-bottom: 1px solid #21262d;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.dot.red { background-color: var(--danger); }
+.dot.yellow { background-color: var(--warning); }
+.dot.green { background-color: var(--success); }
+
+.terminal-title {
+    font-size: 0.75rem;
+    font-family: monospace;
+    color: var(--text-secondary);
+    margin-left: 8px;
+}
+
+.terminal-body {
+    padding: 15px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.75rem;
+    height: 140px;
+    overflow-y: auto;
+    color: #c9d1d9;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.log-line {
+    word-break: break-all;
+}
+
+.text-blue { color: #58a6ff; }
+.text-yellow { color: #d29922; }
+.text-green { color: #3fb950; }
+
+/* Success Box Panel */
+.success-screen {
+    text-align: center;
+    padding-top: 10px;
+}
+
+.success-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid var(--success);
+    border-radius: 50%;
+    color: var(--success);
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 20px auto;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.summary-box {
+    text-align: left;
+    max-width: 450px;
+    margin: 25px auto;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.summary-box h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 8px;
+}
+
+.summary-box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.8rem;
+}
+
+.reboot-note {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Footer & Buttons controls */
+.installer-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 20px;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid transparent;
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: var(--accent);
+    color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
 }
