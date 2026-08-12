@@ -7,10 +7,23 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 pub type AgentID = usize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AgentState { Idle = 0, Active = 1, Busy = 2, Error = 3, Learning = 4 }
+pub enum AgentState {
+    Idle = 0,
+    Active = 1,
+    Busy = 2,
+    Error = 3,
+    Learning = 4,
+}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AgentError { Success = 0, NotFound = 1, ExecutionFailed = 2, Timeout = 3, InvalidInput = 4 }
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub enum AgentError {
+    Success = 0,
+    NotFound = 1,
+    ExecutionFailed = 2,
+    Timeout = 3,
+    InvalidInput = 4,
+}
 
 pub trait AIAgent {
     fn id(&self) -> AgentID;
@@ -36,17 +49,27 @@ impl SimpleAIAgent {
 }
 
 impl AIAgent for SimpleAIAgent {
-    fn id(&self) -> AgentID { self.id }
-    fn name(&self) -> &str { &self.name }
-    fn state(&self) -> AgentState { self.state }
+    fn id(&self) -> AgentID {
+        self.id
+    }
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn state(&self) -> AgentState {
+        self.state
+    }
 
     fn execute(&mut self, task: &[u8]) -> Result<Vec<u8>, AgentError> {
         self.state = AgentState::Busy;
         let mut result = Vec::new();
-        for &byte in self.name.as_bytes() { result.push(byte); }
+        for &byte in self.name.as_bytes() {
+            result.push(byte);
+        }
         result.push(b':');
         result.push(b' ');
-        for &byte in task { result.push(byte); }
+        for &byte in task {
+            result.push(byte);
+        }
         self.state = AgentState::Idle;
         Ok(result)
     }
@@ -54,7 +77,11 @@ impl AIAgent for SimpleAIAgent {
 
 pub trait AgentOrchestrator {
     fn register_agent(&mut self, agent: Box<dyn AIAgent>) -> Result<AgentID, AgentError>;
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError>;
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError>;
     fn get_agent(&self, id: AgentID) -> Option<&dyn AIAgent>;
     fn list_agents(&self) -> Vec<AgentID>;
 }
@@ -62,6 +89,8 @@ pub trait AgentOrchestrator {
 pub struct SimpleAgentOrchestrator {
     pub agents: Vec<Box<dyn AIAgent>>,
     pub next_id: AtomicUsize,
+    pub model_temperature: f32,
+    pub response_timeout_secs: u32,
 }
 
 impl SimpleAgentOrchestrator {
@@ -69,7 +98,17 @@ impl SimpleAgentOrchestrator {
         SimpleAgentOrchestrator {
             agents: Vec::new(),
             next_id: AtomicUsize::new(1),
+            model_temperature: 0.7,
+            response_timeout_secs: 30,
         }
+    }
+
+    pub fn set_model_temperature(&mut self, temp: f32) {
+        self.model_temperature = temp;
+    }
+
+    pub fn set_response_timeout(&mut self, secs: u32) {
+        self.response_timeout_secs = secs;
     }
 }
 
@@ -80,7 +119,11 @@ impl AgentOrchestrator for SimpleAgentOrchestrator {
         Ok(id)
     }
 
-    fn dispatch_task(&mut self, task: &[u8], agent_id: Option<AgentID>) -> Result<Vec<u8>, AgentError> {
+    fn dispatch_task(
+        &mut self,
+        task: &[u8],
+        agent_id: Option<AgentID>,
+    ) -> Result<Vec<u8>, AgentError> {
         if let Some(target_id) = agent_id {
             if let Some(agent) = self.agents.iter_mut().find(|a| a.id() == target_id) {
                 agent.execute(task)
@@ -118,9 +161,7 @@ pub struct SimpleTaskQueue {
 
 impl SimpleTaskQueue {
     pub fn new() -> Self {
-        SimpleTaskQueue {
-            tasks: Vec::new(),
-        }
+        SimpleTaskQueue { tasks: Vec::new() }
     }
 }
 
@@ -151,16 +192,23 @@ impl TaskQueue for SimpleTaskQueue {
 
     fn peek(&self) -> Option<&[u8]> {
         if self.tasks.is_empty() {
-            return None
+            return None;
         }
         Some(&self.tasks[0].0)
     }
 
-    fn size(&self) -> usize { self.tasks.len() }
+    fn size(&self) -> usize {
+        self.tasks.len()
+    }
 }
 
 pub trait AgentCommunication {
-    fn send_message(&mut self, from: AgentID, to: AgentID, message: &[u8]) -> Result<(), AgentError>;
+    fn send_message(
+        &mut self,
+        from: AgentID,
+        to: AgentID,
+        message: &[u8],
+    ) -> Result<(), AgentError>;
     fn receive_message(&mut self, agent_id: AgentID) -> Option<[u8; 256]>;
     fn broadcast(&mut self, from: AgentID, message: &[u8]);
 }
@@ -178,7 +226,12 @@ impl SimpleAgentCommunication {
 }
 
 impl AgentCommunication for SimpleAgentCommunication {
-    fn send_message(&mut self, from: AgentID, to: AgentID, message: &[u8]) -> Result<(), AgentError> {
+    fn send_message(
+        &mut self,
+        from: AgentID,
+        to: AgentID,
+        message: &[u8],
+    ) -> Result<(), AgentError> {
         let mut msg_array = [0u8; 256];
         let msg_len = message.len().min(255);
         msg_array[..msg_len].copy_from_slice(&message[..msg_len]);
@@ -207,20 +260,25 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_orchestrator_and_queue() {
-        let mut orchestrator = SimpleAgentOrchestrator::new();
-        let agent = SimpleAIAgent::new(1, "TaskAgent");
-        orchestrator.register_agent(Box::new(agent)).unwrap();
+    fn test_orchestration_basics() {
+        let mut orch = SimpleAgentOrchestrator::new();
+        let agent = SimpleAIAgent::new(1, "AgentAlpha");
+        orch.register_agent(Box::new(agent)).unwrap();
 
-        let response = orchestrator.dispatch_task(b"RELOAD_CORES", Some(1)).unwrap();
-        assert_eq!(std::str::from_utf8(&response).unwrap(), "TaskAgent: RELOAD_CORES");
+        assert_eq!(orch.list_agents(), vec![1]);
 
+        let response = orch.dispatch_task(b"optimize system", Some(1)).unwrap();
+        assert_eq!(String::from_utf8(response).unwrap(), "AgentAlpha: optimize system");
+    }
+
+    #[test]
+    fn test_task_queue_priority() {
         let mut queue = SimpleTaskQueue::new();
-        queue.enqueue(b"TASK_PRIO_HIGH", 10);
-        queue.enqueue(b"TASK_PRIO_LOW", 1);
-        assert_eq!(queue.size(), 2);
+        queue.enqueue(b"low_prio_task", 1);
+        queue.enqueue(b"high_prio_task", 10);
 
-        let task = queue.dequeue().unwrap();
-        assert_eq!(std::str::from_utf8(&task[..14]).unwrap(), "TASK_PRIO_HIGH");
+        let dequeued = queue.dequeue().unwrap();
+        let name_len = dequeued.iter().position(|&b| b == 0).unwrap_or(256);
+        assert_eq!(String::from_utf8(dequeued[..name_len].to_vec()).unwrap(), "high_prio_task");
     }
 }

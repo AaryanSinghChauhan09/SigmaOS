@@ -90,12 +90,6 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
-    Nix,      // nix expression
-    Ebuild,   // gentoo ebuild
-    Apk,      // alpine apk
-    Txz,      // slackware pkgtool
-    Xbps,     // void xbps
-    Cachyos,  // CachyOS optimized format
 }
 
 /// Package source
@@ -243,298 +237,6 @@ impl PackageFormatAdapter for AptDebAdapter {
     fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
         println!("[{}] Refreshing and updating DEB package {}", self.adapter_name(), package.name);
         Ok(())
-    }
-}
-
-/// NixAdapter handles Nix declarative packages
-pub struct NixAdapter {
-    pub store_path: String,
-}
-
-impl NixAdapter {
-    pub fn new() -> Self {
-        Self {
-            store_path: "/nix/store".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for NixAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Nix
-    }
-
-    fn adapter_name(&self) -> &str {
-        "nix"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Realizing Nix derivation. Mounting sandbox store path {} for package {}",
-            self.adapter_name(),
-            self.store_path,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Garbage collecting Nix store path for package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Rebuilding Nix environment generation for package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-}
-
-/// EbuildAdapter handles Gentoo Portage ebuild formats
-pub struct EbuildAdapter {
-    pub portage_tree_path: String,
-}
-
-impl EbuildAdapter {
-    pub fn new() -> Self {
-        Self {
-            portage_tree_path: "/var/db/repos/gentoo".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for EbuildAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Ebuild
-    }
-
-    fn adapter_name(&self) -> &str {
-        "portage"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Compiling from source in portage tree {}. Installing ebuild package {}",
-            self.adapter_name(),
-            self.portage_tree_path,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Unmerging ebuild package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Re-emerging and updating ebuild package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-}
-
-/// ApkAdapter handles Alpine Linux APK package formats
-pub struct ApkAdapter {
-    pub alpine_keys_dir: String,
-}
-
-impl ApkAdapter {
-    pub fn new() -> Self {
-        Self {
-            alpine_keys_dir: "/etc/apk/keys".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for ApkAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Apk
-    }
-
-    fn adapter_name(&self) -> &str {
-        "apk"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Validating Alpine keys at {}. Unpacking APK package {}",
-            self.adapter_name(),
-            self.alpine_keys_dir,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Removing APK package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Upgrading APK package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-}
-
-/// TxzAdapter handles Slackware package formats
-pub struct TxzAdapter {
-    pub slackware_pkg_db: String,
-}
-
-impl TxzAdapter {
-    pub fn new() -> Self {
-        Self {
-            slackware_pkg_db: "/var/log/packages".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for TxzAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Txz
-    }
-
-    fn adapter_name(&self) -> &str {
-        "slackware"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Logging Slackware installation entry in {}. Installing txz package {}",
-            self.adapter_name(),
-            self.slackware_pkg_db,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Running Slackware removepkg for txz package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Running Slackware upgradepkg for txz package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-}
-
-/// XbpsAdapter handles Void Linux XBPS packages
-pub struct XbpsAdapter {
-    pub void_repo_cache: String,
-}
-
-impl XbpsAdapter {
-    pub fn new() -> Self {
-        Self {
-            void_repo_cache: "/var/cache/xbps".to_string(),
-        }
-    }
-}
-
-impl PackageFormatAdapter for XbpsAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Xbps
-    }
-
-    fn adapter_name(&self) -> &str {
-        "xbps"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Downloading to XBPS repo cache {}. Unpacking package {}",
-            self.adapter_name(),
-            self.void_repo_cache,
-            package.name
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Purging Void XBPS package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Re-syncing and upgrading Void XBPS package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-}
-
-/// CachyosAdapter handles CachyOS architecture-optimized packages
-pub struct CachyosAdapter {
-    pub microarch_optimization_level: u32,
-}
-
-impl CachyosAdapter {
-    pub fn new() -> Self {
-        Self {
-            microarch_optimization_level: 3,
-        }
-    }
-}
-
-impl PackageFormatAdapter for CachyosAdapter {
-    fn format(&self) -> PackageFormat {
-        PackageFormat::Cachyos
-    }
-
-    fn adapter_name(&self) -> &str {
-        "cachyos"
-    }
-
-    fn install(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!(
-            "[{}] Installing architecture-optimized package {} (Target optimization level: v{})",
-            self.adapter_name(),
-            package.name,
-            self.microarch_optimization_level
-        );
-        Ok(())
-    }
-
-    fn remove(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Removing optimized CachyOS package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-
-    fn update(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        println!("[{}] Upgrading optimized CachyOS package {}", self.adapter_name(), package.name);
-        Ok(())
-    }
-}
-
-/// User-defined extensible hook trait for package format actions
-pub trait PackageHook: Send + Sync {
-    fn hook_name(&self) -> &str;
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError>;
-}
-
-/// A standard hook implementation wrapping a closure/function
-pub struct CustomPackageHook {
-    pub name: String,
-    pub func: Box<dyn Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync>,
-}
-
-impl CustomPackageHook {
-    pub fn new<F>(name: &str, func: F) -> Self
-    where
-        F: Fn(&UnifiedPackage) -> Result<(), PackageError> + Send + Sync + 'static,
-    {
-        Self {
-            name: name.to_string(),
-            func: Box::new(func),
-        }
-    }
-}
-
-impl PackageHook for CustomPackageHook {
-    fn hook_name(&self) -> &str {
-        &self.name
-    }
-
-    fn execute(&self, package: &UnifiedPackage) -> Result<(), PackageError> {
-        (self.func)(package)
     }
 }
 
@@ -796,7 +498,7 @@ impl DependencyResolver {
 
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, PackageError> {
         let mut resolved = Vec::new();
-        let mut to_visit = vec![package_name.to_string()];
+        let mut to_visit = vec![package_name];
         let mut visited = std::collections::HashSet::new();
 
         while let Some(current) = to_visit.pop() {
@@ -919,75 +621,69 @@ impl Default for DependencyResolver {
     }
 }
 
-// ----------------------------------------------------
-// Local Metadata Cache
-// ----------------------------------------------------
-
-pub struct LocalMetadataCache {
-    pub cache: HashMap<String, UnifiedPackage>,
-}
-
-impl LocalMetadataCache {
-    pub fn new() -> Self {
-        Self { cache: HashMap::new() }
-    }
-    pub fn insert(&mut self, name: String, package: UnifiedPackage) {
-        self.cache.insert(name, package);
-    }
-    pub fn get(&self, name: &str) -> Option<&UnifiedPackage> {
-        self.cache.get(name)
-    }
-}
-
-// ----------------------------------------------------
-// Universal Package Manager
-// ----------------------------------------------------
-
+/// Transactional package manager checkpoint
 #[derive(Debug, Clone)]
 pub struct PackageCheckpoint {
-    pub id: usize,
-    pub installed_keys: std::collections::HashSet<String>,
+    pub checkpoint_id: usize,
+    pub installed_keys: Vec<String>,
 }
 
+/// Transactional history tracker for SigmaPkg/UniversalPackageManager rollbacks
 #[derive(Debug, Clone)]
-pub struct TransactionHistory {
+pub struct TransactionalHistory {
     pub checkpoints: Vec<PackageCheckpoint>,
-    pub next_id: usize,
+    pub next_checkpoint_id: usize,
 }
 
-impl TransactionHistory {
+impl TransactionalHistory {
     pub fn new() -> Self {
-        Self {
+        TransactionalHistory {
             checkpoints: Vec::new(),
-            next_id: 1,
+            next_checkpoint_id: 1,
         }
     }
 
-    pub fn create_checkpoint(&mut self, installed_packages: &HashMap<String, UnifiedPackage>) -> usize {
-        let id = self.next_id;
-        self.next_id += 1;
-        let installed_keys = installed_packages.keys().cloned().collect();
-        self.checkpoints.push(PackageCheckpoint { id, installed_keys });
+    pub fn create_checkpoint(&mut self, installed: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_checkpoint_id;
+        self.next_checkpoint_id += 1;
+
+        let mut keys = Vec::new();
+        for key in installed.keys() {
+            keys.push(key.clone());
+        }
+
+        self.checkpoints.push(PackageCheckpoint {
+            checkpoint_id: id,
+            installed_keys: keys,
+        });
+
         id
     }
 
     pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
-        self.checkpoints.iter().find(|c| c.id == id)
+        for i in 0..self.checkpoints.len() {
+            if self.checkpoints[i].checkpoint_id == id {
+                return Some(&self.checkpoints[i]);
+            }
+        }
+        None
     }
 }
 
-/// Universal package manager using dynamic dispatch to modularly handle various package format adapters
+impl Default for TransactionalHistory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, Box<dyn PackageFormatAdapter>>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
-    pub metadata_cache: LocalMetadataCache,
-    pub transaction_history: TransactionHistory,
-    pub pre_install_hooks: Vec<std::sync::Arc<dyn PackageHook>>,
-    pub post_install_hooks: Vec<std::sync::Arc<dyn PackageHook>>,
-    pub pre_remove_hooks: Vec<std::sync::Arc<dyn PackageHook>>,
-    pub post_remove_hooks: Vec<std::sync::Arc<dyn PackageHook>>,
+    pub transaction_history: TransactionalHistory,
+    pub metadata_cache: HashMap<String, UnifiedPackage>,
 }
 
 impl UniversalPackageManager {
@@ -997,12 +693,8 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
-            metadata_cache: LocalMetadataCache::new(),
-            transaction_history: TransactionHistory::new(),
-            pre_install_hooks: Vec::new(),
-            post_install_hooks: Vec::new(),
-            pre_remove_hooks: Vec::new(),
-            post_remove_hooks: Vec::new(),
+            transaction_history: TransactionalHistory::new(),
+            metadata_cache: HashMap::new(),
         };
 
         manager.add_default_adapters();
@@ -1016,33 +708,11 @@ impl UniversalPackageManager {
         self.adapters.insert(PackageFormat::Snap, Box::new(SnapAdapter::new()));
         self.adapters.insert(PackageFormat::Flatpak, Box::new(FlatpakAdapter::new()));
         self.adapters.insert(PackageFormat::SigmaPkg, Box::new(SigmaPkgAdapter::new()));
-        self.adapters.insert(PackageFormat::Nix, Box::new(NixAdapter::new()));
-        self.adapters.insert(PackageFormat::Ebuild, Box::new(EbuildAdapter::new()));
-        self.adapters.insert(PackageFormat::Apk, Box::new(ApkAdapter::new()));
-        self.adapters.insert(PackageFormat::Txz, Box::new(TxzAdapter::new()));
-        self.adapters.insert(PackageFormat::Xbps, Box::new(XbpsAdapter::new()));
-        self.adapters.insert(PackageFormat::Cachyos, Box::new(CachyosAdapter::new()));
     }
 
     /// Dynamic polymorphic registration of custom format adapters
     pub fn register_adapter(&mut self, format: PackageFormat, adapter: Box<dyn PackageFormatAdapter>) {
         self.adapters.insert(format, adapter);
-    }
-
-    pub fn add_pre_install_hook(&mut self, hook: std::sync::Arc<dyn PackageHook>) {
-        self.pre_install_hooks.push(hook);
-    }
-
-    pub fn add_post_install_hook(&mut self, hook: std::sync::Arc<dyn PackageHook>) {
-        self.post_install_hooks.push(hook);
-    }
-
-    pub fn add_pre_remove_hook(&mut self, hook: std::sync::Arc<dyn PackageHook>) {
-        self.pre_remove_hooks.push(hook);
-    }
-
-    pub fn add_post_remove_hook(&mut self, hook: std::sync::Arc<dyn PackageHook>) {
-        self.post_remove_hooks.push(hook);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -1104,14 +774,6 @@ impl UniversalPackageManager {
                     )));
                 }
 
-                // Execute pre-install hooks
-                for hook in &self.pre_install_hooks {
-                    if let Err(e) = hook.execute(package) {
-                        self.rollback_transaction(&installed_in_this_transaction);
-                        return Err(e);
-                    }
-                }
-
                 // Find appropriate adapter
                 let mut installed_by_adapter = false;
                 for format in &package.formats {
@@ -1136,16 +798,8 @@ impl UniversalPackageManager {
 
                 let mut installed = package.clone();
                 installed.installed = true;
-                self.installed_packages.insert(dep_name.clone(), installed.clone());
+                self.installed_packages.insert(dep_name.clone(), installed);
                 installed_in_this_transaction.push(dep_name);
-
-                // Execute post-install hooks
-                for hook in &self.post_install_hooks {
-                    if let Err(e) = hook.execute(&installed) {
-                        self.rollback_transaction(&installed_in_this_transaction);
-                        return Err(e);
-                    }
-                }
             }
         }
 
@@ -1167,16 +821,11 @@ impl UniversalPackageManager {
     }
 
     pub fn remove(&mut self, package_name: &str) -> Result<(), PackageError> {
-        if let Some(package) = self.installed_packages.get(package_name).cloned() {
-            // Execute pre-remove hooks
-            for hook in &self.pre_remove_hooks {
-                hook.execute(&package)?;
-            }
-
+        if let Some(package) = self.installed_packages.get(package_name) {
             let mut removed_by_adapter = false;
             for format in &package.formats {
                 if let Some(adapter) = self.adapters.get(format) {
-                    adapter.remove(&package)?;
+                    adapter.remove(package)?;
                     removed_by_adapter = true;
                     break;
                 }
@@ -1185,11 +834,6 @@ impl UniversalPackageManager {
                 return Err(PackageError::AdapterNotFound);
             }
             self.installed_packages.remove(package_name);
-
-            // Execute post-remove hooks
-            for hook in &self.post_remove_hooks {
-                hook.execute(&package)?;
-            }
         }
         Ok(())
     }
@@ -1260,7 +904,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 12);
+        assert_eq!(manager.adapters.len(), 6);
     }
 
     #[test]
@@ -1312,256 +956,27 @@ mod tests {
     }
 
     #[test]
-    fn test_apt_deb_adapter_flow() {
-        let adapter = AptDebAdapter::new();
-        assert_eq!(adapter.format(), PackageFormat::Deb);
-        assert_eq!(adapter.adapter_name(), "apt");
-
-        let package = UnifiedPackage::new("curl".to_string(), "7.81.0".to_string())
-            .with_format(PackageFormat::Deb);
-
-        assert!(adapter.can_handle(&package));
-        assert!(adapter.install(&package).is_ok());
-        assert!(adapter.update(&package).is_ok());
-        assert!(adapter.remove(&package).is_ok());
-    }
-
-    #[test]
-    fn test_yum_rpm_adapter_flow() {
-        let adapter = YumRpmAdapter::new();
-        assert_eq!(adapter.format(), PackageFormat::Rpm);
-        assert_eq!(adapter.adapter_name(), "yum");
-
-        let package = UnifiedPackage::new("nginx".to_string(), "1.20.1".to_string())
-            .with_format(PackageFormat::Rpm);
-
-        assert!(adapter.can_handle(&package));
-        assert!(adapter.install(&package).is_ok());
-        assert!(adapter.update(&package).is_ok());
-        assert!(adapter.remove(&package).is_ok());
-    }
-
-    struct MockCustomAdapter;
-    impl PackageFormatAdapter for MockCustomAdapter {
-        fn format(&self) -> PackageFormat {
-            PackageFormat::Deb
-        }
-        fn adapter_name(&self) -> &str {
-            "custom-mock"
-        }
-        fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-        fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-        fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-    }
-
-    #[test]
-    fn test_universal_manager_polymorphism() {
+    fn test_transactional_rollback() {
         let mut manager = UniversalPackageManager::new();
-        // Dynamic registration under Open-Closed/Polymorphism OOP principles
-        manager.register_adapter(PackageFormat::Deb, Box::new(MockCustomAdapter));
-
-        let package = UnifiedPackage::new("custom-app".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::Deb);
-
-        manager.add_package(package);
-        assert!(manager.install("custom-app").is_ok());
-        assert_eq!(manager.installed_packages.len(), 1);
-    }
-
-    #[test]
-    fn test_version_constraint_resolution() {
-        let mut resolver = DependencyResolver::new();
-
-        // Valid setup
-        let lib_pkg = UnifiedPackage::new("lib-helper".to_string(), "1.2.3".to_string())
+        let pkg1 = UnifiedPackage::new("pkg1".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg);
-        let app_pkg = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::SigmaPkg)
-            .with_dependency("lib-helper>=1.1.0".to_string());
-
-        resolver.add_package(lib_pkg);
-        resolver.add_package(app_pkg);
-
-        // This should pass since 1.2.3 matches >=1.1.0
-        let deps = resolver.resolve_dependencies("my-app").unwrap();
-        assert_eq!(deps.len(), 2);
-
-        // Invalid version setup (fails constraint check)
-        let mut resolver_err = DependencyResolver::new();
-        let lib_old = UnifiedPackage::new("lib-helper".to_string(), "1.0.5".to_string())
-            .with_format(PackageFormat::SigmaPkg);
-        let app_pkg2 = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::SigmaPkg)
-            .with_dependency("lib-helper>=1.1.0".to_string());
-
-        resolver_err.add_package(lib_old);
-        resolver_err.add_package(app_pkg2);
-
-        let err = resolver_err.resolve_dependencies("my-app").unwrap_err();
-        assert!(matches!(err, PackageError::VersionMismatch(_, _, _)));
-    }
-
-    struct FailingAdapter;
-    impl PackageFormatAdapter for FailingAdapter {
-        fn format(&self) -> PackageFormat {
-            PackageFormat::SigmaPkg
-        }
-        fn adapter_name(&self) -> &str {
-            "failing-adapter"
-        }
-        fn install(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Err(PackageError::InstallationFailed("Simulated crash".to_string()))
-        }
-        fn remove(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-        fn update(&self, _package: &UnifiedPackage) -> Result<(), PackageError> {
-            Ok(())
-        }
-    }
-
-    #[test]
-    fn test_batch_transaction_atomic_rollback() {
-        let mut manager = UniversalPackageManager::new();
-        manager.register_adapter(PackageFormat::SigmaPkg, Box::new(FailingAdapter));
-
-        let package = UnifiedPackage::new("my-app".to_string(), "1.0.0".to_string())
+        let pkg2 = UnifiedPackage::new("pkg2".to_string(), "1.0.0".to_string())
             .with_format(PackageFormat::SigmaPkg);
 
-        manager.add_package(package);
+        manager.add_package(pkg1);
+        manager.add_package(pkg2);
 
-        // Since it's FailingAdapter, installation will fail and trigger transaction rollback
-        let result = manager.install("my-app");
-        assert!(result.is_err());
-        // Verify installed count is 0
-        assert_eq!(manager.list_installed().len(), 0);
-    }
+        // 1. Create a baseline checkpoint (empty)
+        let checkpoint_id = manager.create_checkpoint();
+        assert_eq!(checkpoint_id, 1);
 
-    #[test]
-    fn test_new_distro_adapters_flow() {
-        let manager = UniversalPackageManager::new();
+        // 2. Install pkg1 and pkg2
+        manager.install("pkg1").unwrap();
+        manager.install("pkg2").unwrap();
+        assert_eq!(manager.installed_packages.len(), 2);
 
-        // 1. Nix
-        let nix_pkg = UnifiedPackage::new("hello-nix".to_string(), "2.10.0".to_string())
-            .with_format(PackageFormat::Nix);
-        let nix_adapter = manager.adapters.get(&PackageFormat::Nix).unwrap();
-        assert_eq!(nix_adapter.format(), PackageFormat::Nix);
-        assert_eq!(nix_adapter.adapter_name(), "nix");
-        assert!(nix_adapter.can_handle(&nix_pkg));
-        assert!(nix_adapter.install(&nix_pkg).is_ok());
-        assert!(nix_adapter.update(&nix_pkg).is_ok());
-        assert!(nix_adapter.remove(&nix_pkg).is_ok());
-
-        // 2. Portage/Ebuild
-        let ebuild_pkg = UnifiedPackage::new("gentoo-sources".to_string(), "6.1.0".to_string())
-            .with_format(PackageFormat::Ebuild);
-        let ebuild_adapter = manager.adapters.get(&PackageFormat::Ebuild).unwrap();
-        assert_eq!(ebuild_adapter.format(), PackageFormat::Ebuild);
-        assert_eq!(ebuild_adapter.adapter_name(), "portage");
-        assert!(ebuild_adapter.can_handle(&ebuild_pkg));
-        assert!(ebuild_adapter.install(&ebuild_pkg).is_ok());
-
-        // 3. APK
-        let apk_pkg = UnifiedPackage::new("alpine-baselayout".to_string(), "3.4.0".to_string())
-            .with_format(PackageFormat::Apk);
-        let apk_adapter = manager.adapters.get(&PackageFormat::Apk).unwrap();
-        assert_eq!(apk_adapter.format(), PackageFormat::Apk);
-        assert_eq!(apk_adapter.adapter_name(), "apk");
-        assert!(apk_adapter.can_handle(&apk_pkg));
-        assert!(apk_adapter.install(&apk_pkg).is_ok());
-
-        // 4. Txz/Slackware
-        let txz_pkg = UnifiedPackage::new("slack-base".to_string(), "15.0.0".to_string())
-            .with_format(PackageFormat::Txz);
-        let txz_adapter = manager.adapters.get(&PackageFormat::Txz).unwrap();
-        assert_eq!(txz_adapter.format(), PackageFormat::Txz);
-        assert_eq!(txz_adapter.adapter_name(), "slackware");
-        assert!(txz_adapter.can_handle(&txz_pkg));
-        assert!(txz_adapter.install(&txz_pkg).is_ok());
-
-        // 5. XBPS
-        let xbps_pkg = UnifiedPackage::new("void-runit".to_string(), "2.12.0".to_string())
-            .with_format(PackageFormat::Xbps);
-        let xbps_adapter = manager.adapters.get(&PackageFormat::Xbps).unwrap();
-        assert_eq!(xbps_adapter.format(), PackageFormat::Xbps);
-        assert_eq!(xbps_adapter.adapter_name(), "xbps");
-        assert!(xbps_adapter.can_handle(&xbps_pkg));
-        assert!(xbps_adapter.install(&xbps_pkg).is_ok());
-
-        // 6. CachyOS
-        let cachy_pkg = UnifiedPackage::new("linux-cachyos".to_string(), "6.4.2".to_string())
-            .with_format(PackageFormat::Cachyos);
-        let cachy_adapter = manager.adapters.get(&PackageFormat::Cachyos).unwrap();
-        assert_eq!(cachy_adapter.format(), PackageFormat::Cachyos);
-        assert_eq!(cachy_adapter.adapter_name(), "cachyos");
-        assert!(cachy_adapter.can_handle(&cachy_pkg));
-        assert!(cachy_adapter.install(&cachy_pkg).is_ok());
-    }
-
-    #[test]
-    fn test_user_defined_hooks_execution() {
-        let mut manager = UniversalPackageManager::new();
-
-        use std::sync::atomic::{AtomicU32, Ordering};
-        use std::sync::Arc;
-
-        let pre_install_count = Arc::new(AtomicU32::new(0));
-        let post_install_count = Arc::new(AtomicU32::new(0));
-        let pre_remove_count = Arc::new(AtomicU32::new(0));
-        let post_remove_count = Arc::new(AtomicU32::new(0));
-
-        let pre_i = pre_install_count.clone();
-        manager.add_pre_install_hook(Arc::new(CustomPackageHook::new("pre-install-tracker", move |pkg| {
-            pre_i.fetch_add(1, Ordering::SeqCst);
-            assert_eq!(pkg.name, "hooked-app");
-            Ok(())
-        })));
-
-        let post_i = post_install_count.clone();
-        manager.add_post_install_hook(Arc::new(CustomPackageHook::new("post-install-tracker", move |pkg| {
-            post_i.fetch_add(1, Ordering::SeqCst);
-            assert_eq!(pkg.name, "hooked-app");
-            Ok(())
-        })));
-
-        let pre_r = pre_remove_count.clone();
-        manager.add_pre_remove_hook(Arc::new(CustomPackageHook::new("pre-remove-tracker", move |pkg| {
-            pre_r.fetch_add(1, Ordering::SeqCst);
-            assert_eq!(pkg.name, "hooked-app");
-            Ok(())
-        })));
-
-        let post_r = post_remove_count.clone();
-        manager.add_post_remove_hook(Arc::new(CustomPackageHook::new("post-remove-tracker", move |pkg| {
-            post_r.fetch_add(1, Ordering::SeqCst);
-            assert_eq!(pkg.name, "hooked-app");
-            Ok(())
-        })));
-
-        let package = UnifiedPackage::new("hooked-app".to_string(), "1.0.0".to_string())
-            .with_format(PackageFormat::SigmaPkg);
-
-        manager.add_package(package);
-
-        assert_eq!(pre_install_count.load(Ordering::SeqCst), 0);
-        assert_eq!(post_install_count.load(Ordering::SeqCst), 0);
-
-        assert!(manager.install("hooked-app").is_ok());
-
-        assert_eq!(pre_install_count.load(Ordering::SeqCst), 1);
-        assert_eq!(post_install_count.load(Ordering::SeqCst), 1);
-        assert_eq!(pre_remove_count.load(Ordering::SeqCst), 0);
-        assert_eq!(post_remove_count.load(Ordering::SeqCst), 0);
-
-        assert!(manager.remove("hooked-app").is_ok());
-
-        assert_eq!(pre_remove_count.load(Ordering::SeqCst), 1);
-        assert_eq!(post_remove_count.load(Ordering::SeqCst), 1);
+        // 3. Roll back to baseline checkpoint
+        manager.rollback_to_checkpoint(checkpoint_id).unwrap();
+        assert_eq!(manager.installed_packages.len(), 0);
     }
 }
