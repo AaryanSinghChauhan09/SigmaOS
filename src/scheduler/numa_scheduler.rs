@@ -49,10 +49,10 @@ pub struct MichaelScottQueue<T> {
     pub tail: AtomicPtr<Node<T>>,
 }
 
-impl<T: Default> MichaelScottQueue<T> {
+impl<T> MichaelScottQueue<T> {
     pub fn new() -> Self {
         let dummy = Box::into_raw(Box::new(Node {
-            value: T::default(), // Safe default initialization
+            value: unsafe { std::mem::zeroed() }, // Dummy seed
             next: AtomicPtr::new(std::ptr::null_mut()),
         }));
         MichaelScottQueue {

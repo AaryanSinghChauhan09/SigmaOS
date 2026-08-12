@@ -1,48 +1,18 @@
 // SigmaOS Kernel Module
-pub mod architecture;
 pub mod ipc;
 pub mod memory;
-pub mod breakthroughs;
-pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod structures;
-pub mod linux_bsd_innovations;
+pub mod self_healing;
+pub mod udkf;
 
-pub use architecture::{
-    ArchitectureEngine, CpuRegisters, HardwareException,
-    InstructionCyclePhase as ArchInstructionCyclePhase, Irql, LookasideList, MemoryDescriptorList,
-    Pcb, PoolType, ProcessorInitState, Tcb, ThreadState,
-};
-pub use breakthroughs::{
-    AiNativeRuntime, EnergyAwareScheduler, PrivacyFirstSandbox, SelfHealingKernel, SigmaFsPlusPlus,
-    UniversalAbiTranslator, UserDefinedKernelFunctions,
-};
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use policy_mechanism::{
-    AdaptivePolicy, InstructionCyclePhase, InterruptClass, IoWaitProfile, KernelMechanism,
-    KernelPolicy, PolicyMechanismCoordinator, SovereignMechanism,
-};
 pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use structures::{
-    AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, AuditBlock, CircularDoublyLinkedList,
-    CpuArchitectureClass, EdfTask, LcgRandom, LotteryTask, SequencedSinglyLinkedList,
-    SinglyLinkedList, SystemThread, WorkItem,
+pub use self_healing::{
+    SovereignSelfHealingKernel,
 };
-pub use linux_bsd_innovations::{
-    ArchUserRepoManager, AlpineHardenedEnv, OpenBsdPledge, FreeBsdJail,
-    NixOsDeclarativeManager, GentooUseFlags, VoidRunitInit,
-    DynamicLkmLoader, KernelModule,
-    CapabilityDerivationTree, KernelCapability,
-    HybridKernelManager, NtExecutiveService, MicrokernelCore,
-    ExokernelHardwareMultiplexer, ResourceBinding,
-    NetBsdRumpKernel, RumpComponent,
-    HammerHistoryFilesystem, HammerBlockTransaction,
-    CarpSecurityRouter,
-    KmdfDriver, KmdfPnpState, KmdfPowerState, KmdfIoRequest,
-    AndroidBinderIpc, BinderNode,
-    GcdDispatchQueue, GcdPriority, GcdTask,
-    EbpfRuntime, EbpfInstruction,
+pub use udkf::{
+    UdkfHook, UserDefinedKernelFunctions,
 };
