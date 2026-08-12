@@ -11,7 +11,7 @@ use core::mem;
 pub type ProcessID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ProcessState { Created = 0, Running = 1, Sleeping = 2, Zombie = 3, Terminated = 4 }
 
 #[repr(C)]
@@ -48,7 +48,15 @@ impl SimpleProcess {
 impl Process for SimpleProcess {
     fn id(&self) -> ProcessID { self.id }
     fn parent_id(&self) -> ProcessID { self.parent_id }
-    fn state(&self) -> ProcessState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> ProcessState {
+        match self.state.load(Ordering::SeqCst) {
+            1 => ProcessState::Running,
+            2 => ProcessState::Sleeping,
+            3 => ProcessState::Zombie,
+            4 => ProcessState::Terminated,
+            _ => ProcessState::Created,
+        }
+    }
 
     fn set_state(&mut self, state: ProcessState) {
         self.state.store(state as usize, Ordering::SeqCst);
@@ -95,8 +103,8 @@ impl ProcessSpawner for SimpleProcessSpawner {
     }
 
     fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
-        for process_option in &mut self.processes {
-            if let Some(ref mut process) = *process_option {
+        for i in 0..self.processes.len() {
+            if let Some(ref mut process) = &mut self.processes.data_mut()[i] {
                 if process.id() == process_id {
                     process.set_state(ProcessState::Running);
                     return Ok(());
@@ -107,8 +115,8 @@ impl ProcessSpawner for SimpleProcessSpawner {
     }
 
     fn kill(&mut self, process_id: ProcessID, _signal: u8) -> Result<(), ProcessError> {
-        for process_option in &mut self.processes {
-            if let Some(ref mut process) = *process_option {
+        for i in 0..self.processes.len() {
+            if let Some(ref mut process) = &mut self.processes.data_mut()[i] {
                 if process.id() == process_id {
                     process.set_state(ProcessState::Terminated);
                     return Ok(());
@@ -137,8 +145,8 @@ impl SimpleProcessWaiter {
 
 impl ProcessWaiter for SimpleProcessWaiter {
     fn wait(&mut self, process_id: ProcessID) -> Result<i32, ProcessError> {
-        for process_option in &self.spawner.processes {
-            if let Some(ref process) = *process_option {
+        for i in 0..self.spawner.processes.len() {
+            if let Some(ref process) = self.spawner.processes.data()[i] {
                 if process.id() == process_id {
                     if process.state() == ProcessState::Terminated {
                         return Ok(process.exit_code());
@@ -150,8 +158,8 @@ impl ProcessWaiter for SimpleProcessWaiter {
     }
 
     fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
-        for process_option in &self.spawner.processes {
-            if let Some(ref process) = *process_option {
+        for i in 0..self.spawner.processes.len() {
+            if let Some(ref process) = self.spawner.processes.data()[i] {
                 if process.id() == process_id {
                     if process.state() == ProcessState::Terminated {
                         return Ok((process.id(), process.exit_code()));
@@ -194,7 +202,8 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 
     fn add_to_group(&mut self, group_id: usize, process_id: ProcessID) -> Result<(), ProcessError> {
-        for group in &mut self.groups {
+        for i in 0..self.groups.len() {
+            let group = &mut self.groups.data_mut()[i];
             if group.0 == group_id {
                 group.1.push(process_id);
                 return Ok(());
@@ -204,7 +213,8 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 
     fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
-        for group in &mut self.groups {
+        for i in 0..self.groups.len() {
+            let group = &self.groups.data()[i];
             if group.0 == group_id {
                 return Ok(());
             }
@@ -213,17 +223,32 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn len(&self) -> usize { self.len }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+    pub fn data(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+    pub fn data_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
     unsafe fn grow(&mut self) {
@@ -234,6 +259,19 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }

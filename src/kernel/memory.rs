@@ -7,10 +7,15 @@ use core::ptr::NonNull;
 pub const PAGE_SIZE: usize = 4096;
 
 /// Memory block
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct MemoryBlock {
     pub addr: NonNull<u8>,
     pub size: usize,
+}
+
+#[derive(Clone)]
+pub struct BuddyAllocatorCheckpoint {
+    free_lists: [Vec<MemoryBlock>; 12],
 }
 
 /// Buddy allocator for memory management
@@ -19,6 +24,15 @@ pub struct BuddyAllocator {
 }
 
 impl BuddyAllocator {
+    pub fn create_checkpoint(&self) -> BuddyAllocatorCheckpoint {
+        BuddyAllocatorCheckpoint {
+            free_lists: self.free_lists.clone(),
+        }
+    }
+
+    pub fn restore_checkpoint(&mut self, checkpoint: BuddyAllocatorCheckpoint) {
+        self.free_lists = checkpoint.free_lists;
+    }
     pub fn new() -> Self {
         Self {
             free_lists: Default::default(),
@@ -220,7 +234,7 @@ impl PageTableEntry {
     pub fn is_present(&self) -> bool {
         (self.0 & PageFlags::PRESENT) != 0
     }
-    
+
     pub fn clear(&mut self) {
         self.0 = 0;
     }
@@ -256,7 +270,7 @@ impl VirtualMemoryManager {
         // In a real x86_64 system, we would walk PML4 -> PDPT -> PD -> PT
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_ref() };
-        
+
         let entry = &root.entries[pt_index as usize];
         if entry.is_present() {
             Some(entry.get_addr() + (virtual_addr & 0xFFF))
@@ -266,15 +280,20 @@ impl VirtualMemoryManager {
     }
 
     /// Maps a virtual page to a physical frame
-    pub fn map_page(&mut self, virtual_addr: u64, physical_addr: u64, flags: PageFlags) -> Result<(), &'static str> {
+    pub fn map_page(
+        &mut self,
+        virtual_addr: u64,
+        physical_addr: u64,
+        flags: PageFlags,
+    ) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
-        
+
         let entry = &mut root.entries[pt_index as usize];
         if entry.is_present() {
             return Err("Page already mapped!");
         }
-        
+
         entry.set_addr(physical_addr, flags);
         Ok(())
     }
@@ -283,12 +302,12 @@ impl VirtualMemoryManager {
     pub fn unmap_page(&mut self, virtual_addr: u64) -> Result<(), &'static str> {
         let pt_index = (virtual_addr >> 12) & 0x1FF;
         let root = unsafe { self.root_directory.as_mut() };
-        
+
         let entry = &mut root.entries[pt_index as usize];
         if !entry.is_present() {
             return Err("Page is not mapped!");
         }
-        
+
         entry.clear();
         Ok(())
     }
@@ -319,5 +338,23 @@ mod tests {
         // For now, just test the interface
         let result = allocator.allocate(4096);
         // Will fail without actual memory, but tests the flow
+    }
+
+    #[test]
+    fn test_checkpoint_restore() {
+        let mut allocator = BuddyAllocator::new();
+        allocator.initialize_memory(0x1000, 4096);
+        assert_eq!(allocator.get_free_memory(), 4096);
+
+        // Save state
+        let checkpoint = allocator.create_checkpoint();
+
+        // Pretend an allocation fails/changes state
+        let block = allocator.allocate(4096).unwrap();
+        assert_eq!(allocator.get_free_memory(), 0);
+
+        // Restore baseline checkpoint
+        allocator.restore_checkpoint(checkpoint);
+        assert_eq!(allocator.get_free_memory(), 4096);
     }
 }

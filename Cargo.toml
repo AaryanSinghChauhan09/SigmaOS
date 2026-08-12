@@ -52,3 +52,15 @@ path = "src/drivers/main.rs"
 [[bin]]
 name = "sigma_userspace"
 path = "src/userspace/main.rs"
+
+[[bin]]
+name = "sovereign_edition_builder"
+path = "tools/build/SovereignEditionBuilder.rs"
+
+[[bin]]
+name = "sigma_make"
+path = "tools/build/sigma_make.rs"
+
+[[bin]]
+name = "sigmaos_setup_wizard"
+path = "tools/build/SigmaOSSetupWizard.rs"

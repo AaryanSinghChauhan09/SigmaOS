@@ -14,6 +14,11 @@ pub enum VirtualizationTech {
     LXC,
     LXD,
     VirtualBox,
+    Xen,
+    Firecracker,
+    Nomad,
+    DockerSwarm,
+    K3s,
 }
 
 /// VM state
@@ -296,9 +301,9 @@ impl VirtualizationOrchestrator {
 
     fn initialize_default_configs(&mut self) {
         // Preconfigure common virtualization settings
-        println!("Initializing KVM/QEMU configuration");
-        println!("Initializing Docker/Podman configuration");
-        println!("Initializing Kubernetes orchestration");
+        println!("Initializing KVM/QEMU/Xen/Firecracker configuration");
+        println!("Initializing Docker/Podman/LXC/LXD configuration");
+        println!("Initializing Kubernetes/Nomad/DockerSwarm/K3s orchestration");
     }
 
     pub fn add_virtual_machine(&mut self, vm: VirtualMachine) -> Result<(), VirtualizationError> {
