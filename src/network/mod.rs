@@ -1,7 +1,9 @@
 // SigmaOS Network Stack Module
 pub mod commands;
 pub mod tcp;
-pub mod unix_sockets;
+pub mod tcp_udp;
+pub mod sync;
+pub mod torrent;
 
 pub use commands::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
@@ -9,4 +11,5 @@ pub use commands::{
     GLOBAL_UFW_RULE,
 };
 pub use tcp::{TcpConnection, TcpError, TcpSegment, TcpStack, TcpState};
-pub use unix_sockets::{UnixSocketAddress, UnixSocketState, UnixSocketConn, UnixSocketRegistry};
+pub use sync::{CloudSyncManager, ConflictResolution, SyncConfig, SyncCredentials, SyncError, SyncItem, SyncItemType, SyncProvider, SyncResult, SyncStatus};
+pub use torrent::{PeerInfo, TorrentClient, TorrentError, TorrentState};

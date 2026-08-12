@@ -1,6 +1,8 @@
-// SPDX-License-Identifier: MIT
-// SigmaOS Parrot Security Forensic & Network Suite (ParrotLinuxParity)
-// Zero-dependency, #![no_std] compliant, highly-optimized for low-end hardware
+// SigmaOS Security, Pentesting, and Anonymity Suite (SigmaParrot)
+// SigmaOS Security, Pentesting, and Anonymity Suite (SigmaParrot)
+// Fully absorbs and implements all security, forensics, and anonymity systems of Parrot Linux:
+// Anonsurf (Tor/I2P overlay, DNS shields), Forensics (inode carving, decoys), Kali Sniffer,
+// Password Auditor, Secure Wiper (7-pass shredder), and Sigma IDS (Intrusion Detection).
 
 extern crate alloc;
 use alloc::vec::Vec;

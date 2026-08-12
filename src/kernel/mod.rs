@@ -3,9 +3,8 @@ pub mod ipc;
 pub mod memory;
 pub mod roundrobin;
 pub mod scheduler;
-pub mod architecture;
-pub mod policy_mechanism;
-pub mod structures;
+pub mod object;
+pub mod proc;
 
 pub use ipc::{Channel, IpcError, IpcManager, Message};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};

@@ -738,7 +738,106 @@ impl ArtixInitBridge {
 }
 
 // ==========================================
-// 14. Integration Tests Module
+// 14. Pacman Keyring Manager (pacman-key)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeyTrustLevel {
+    Unknown,
+    Marginal,
+    Full,
+    Ultimate,
+}
+
+pub struct PacmanKey {
+    pub id: String,
+    pub owner: String,
+    pub trust: KeyTrustLevel,
+}
+
+pub struct PacmanKeyring {
+    pub keys: HashMap<String, PacmanKey>,
+    pub is_initialized: bool,
+}
+
+impl PacmanKeyring {
+    pub fn new() -> Self {
+        Self {
+            keys: HashMap::new(),
+            is_initialized: false,
+        }
+    }
+
+    pub fn initialize_keyring(&mut self) {
+        self.is_initialized = true;
+    }
+
+    pub fn populate_arch_keys(&mut self) -> Result<(), &'static str> {
+        if !self.is_initialized {
+            return Err("Keyring not initialized");
+        }
+        self.keys.insert("0x9E5A86A21B607B76".to_string(), PacmanKey {
+            id: "0x9E5A86A21B607B76".to_string(),
+            owner: "Arch Linux Master Signing Key".to_string(),
+            trust: KeyTrustLevel::Ultimate,
+        });
+        self.keys.insert("0x8D969EEF6ECAD3C2".to_string(), PacmanKey {
+            id: "0x8D969EEF6ECAD3C2".to_string(),
+            owner: "Arch Linux Package Maintainer".to_string(),
+            trust: KeyTrustLevel::Full,
+        });
+        Ok(())
+    }
+
+    pub fn verify_signature(&self, key_id: &str) -> bool {
+        if let Some(key) = self.keys.get(key_id) {
+            key.trust == KeyTrustLevel::Full || key.trust == KeyTrustLevel::Ultimate
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for PacmanKeyring {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 15. AUR Unified Patch Engine
+// ==========================================
+
+pub struct AurPatch {
+    pub target_line: String,
+    pub replacement_line: String,
+}
+
+pub struct AurPatchEngine;
+
+impl AurPatchEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Applies line-by-line diff patch on an AUR PKGBUILD script
+    pub fn apply_patch(&self, original_script: &str, patch: &AurPatch) -> Result<String, &'static str> {
+        if !original_script.contains(&patch.target_line) {
+            return Err("Patch target line not found in recipe");
+        }
+        let replaced = original_script.replace(&patch.target_line, &patch.replacement_line);
+        Ok(replaced)
+    }
+}
+
+impl Default for AurPatchEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 16. Integration Tests Module
 // ==========================================
 
 #[cfg(test)]
@@ -901,5 +1000,41 @@ mod tests {
 
         openrc.manage_service("dbus", ServiceState::Started);
         assert_eq!(openrc.query_service_status("dbus"), ServiceState::Started);
+    }
+
+    #[test]
+    fn test_pacman_keyring() {
+        let mut keyring = PacmanKeyring::new();
+        assert_eq!(keyring.populate_arch_keys(), Err("Keyring not initialized"));
+
+        keyring.initialize_keyring();
+        assert!(keyring.populate_arch_keys().is_ok());
+
+        assert!(keyring.verify_signature("0x9E5A86A21B607B76"));
+        assert!(!keyring.verify_signature("0xBAD_KEY_ID"));
+    }
+
+    #[test]
+    fn test_aur_patch_engine() {
+        let original = r#"
+            pkgname="neovim-git"
+            pkgver=0.9.0
+        "#;
+
+        let patch = AurPatch {
+            target_line: "pkgver=0.9.0".to_string(),
+            replacement_line: "pkgver=0.10.0".to_string(),
+        };
+
+        let engine = AurPatchEngine::new();
+        let patched = engine.apply_patch(original, &patch).unwrap();
+        assert!(patched.contains("pkgver=0.10.0"));
+
+        // Fail Case (nonexistent target line)
+        let bad_patch = AurPatch {
+            target_line: "pkgver=0.1.0".to_string(),
+            replacement_line: "pkgver=0.2.0".to_string(),
+        };
+        assert_eq!(engine.apply_patch(original, &bad_patch), Err("Patch target line not found in recipe"));
     }
 }

@@ -8,7 +8,8 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
-pub mod debian_defeater;
+pub mod zero_alloc_resolver;
+pub mod declarative_build;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use spec::{
