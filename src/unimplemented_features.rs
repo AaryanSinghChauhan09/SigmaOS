@@ -1,11 +1,9 @@
-// Sovereign, AI-Native zero-dependency #![no_std] implementation of planned/unimplemented specs
+// Sovereign, AI-Native zero-dependency implementation of planned/unimplemented specs
 // Consolidated from UNIMPLEMENTED_IDEAS_IMPLEMENTATION.md, WIKI_ROADMAPS_IMPROVEMENTS_COMPLETE_CODES.md, and WIKI_AND_PLANS_CONSOLIDATED_IMPLEMENTATION.md
-
-#![no_std]
 
 extern crate alloc;
 use alloc::boxed::Box;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -1327,8 +1325,218 @@ impl FedoraDeltaRpmEngine {
     }
 }
 
+// =========================================================================
+// 20. FreeBSD-STYLE JAILS (OS-LEVEL VIRTUALIZATION)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BsdJail {
+    pub id: u32,
+    pub root_path: String,
+    pub hostname: String,
+    pub ip_address: String,
+    pub is_active: bool,
+    pub processes: Vec<u32>,
+}
+
+impl BsdJail {
+    pub fn new(id: u32, root_path: &str, hostname: &str, ip_address: &str) -> Self {
+        Self {
+            id,
+            root_path: root_path.to_string(),
+            hostname: hostname.to_string(),
+            ip_address: ip_address.to_string(),
+            is_active: false,
+            processes: Vec::new(),
+        }
+    }
+}
+
+pub struct BsdJailManager {
+    pub jails: Vec<BsdJail>,
+}
+
+impl BsdJailManager {
+    pub fn new() -> Self {
+        Self { jails: Vec::new() }
+    }
+
+    pub fn create_jail(&mut self, id: u32, root_path: &str, hostname: &str, ip_address: &str) -> Result<(), &'static str> {
+        if self.jails.iter().any(|j| j.id == id) {
+            return Err("Jail ID already exists");
+        }
+        let jail = BsdJail::new(id, root_path, hostname, ip_address);
+        self.jails.push(jail);
+        Ok(())
+    }
+
+    pub fn start_jail(&mut self, id: u32) -> Result<(), &'static str> {
+        if let Some(jail) = self.jails.iter_mut().find(|j| j.id == id) {
+            jail.is_active = true;
+            Ok(())
+        } else {
+            Err("Jail not found")
+        }
+    }
+
+    pub fn stop_jail(&mut self, id: u32) -> Result<(), &'static str> {
+        if let Some(jail) = self.jails.iter_mut().find(|j| j.id == id) {
+            jail.is_active = false;
+            jail.processes.clear();
+            Ok(())
+        } else {
+            Err("Jail not found")
+        }
+    }
+
+    pub fn assign_process_to_jail(&mut self, id: u32, pid: u32) -> Result<(), &'static str> {
+        if let Some(jail) = self.jails.iter_mut().find(|j| j.id == id) {
+            if !jail.is_active {
+                return Err("Cannot assign process to an inactive jail");
+            }
+            if !jail.processes.contains(&pid) {
+                jail.processes.push(pid);
+            }
+            Ok(())
+        } else {
+            Err("Jail not found")
+        }
+    }
+}
+
+impl Default for BsdJailManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 21. OpenBSD-STYLE PLEDGE & UNVEIL SANDBOX ENFORCER
+// =========================================================================
+
+pub struct OpenBsdSandboxEnforcer {
+    pub permitted_promises: Vec<String>,
+    pub unveiled_paths: Vec<(String, String)>, // (path, permissions)
+}
+
+impl OpenBsdSandboxEnforcer {
+    pub fn new() -> Self {
+        Self {
+            permitted_promises: Vec::new(),
+            unveiled_paths: Vec::new(),
+        }
+    }
+
+    /// Restricts system capability permissions (OpenBSD pledge parity)
+    pub fn pledge(&mut self, promises: &[&str]) {
+        self.permitted_promises = promises.iter().map(|s| s.to_string()).collect();
+    }
+
+    /// Whitelists specific subpaths for access (OpenBSD unveil parity)
+    pub fn unveil(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths.push((path.to_string(), permissions.to_string()));
+    }
+
+    /// Verifies if a specific capability/promise is allowed by pledge
+    pub fn validate_syscall(&self, promise: &str) -> bool {
+        if self.permitted_promises.is_empty() {
+            return true; // No restrictions pledge called yet -> Allow
+        }
+        self.permitted_promises.iter().any(|p| p == promise)
+    }
+
+    /// Verifies if file subpath is accessible under unveil constraints
+    pub fn validate_file_access(&self, path: &str, operation: &str) -> bool {
+        if self.unveiled_paths.is_empty() {
+            return true; // No directory unveil containment set -> Allow
+        }
+        for (unveiled_path, perms) in &self.unveiled_paths {
+            if path.starts_with(unveiled_path) {
+                // perms string might contain 'r' (read), 'w' (write), 'x' (execute), 'c' (create)
+                return perms.contains(operation);
+            }
+        }
+        false // Not unveiled -> Blocked by default (OpenBSD unveil containment)
+    }
+}
+
+impl Default for OpenBsdSandboxEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 22. BSD pf PACKET FILTER (FIREWALL & PACKET INSPECTION ENGINE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PfAction {
+    Pass,
+    Block,
+}
+
+#[derive(Debug, Clone)]
+pub struct PfRule {
+    pub action: PfAction,
+    pub proto: String,
+    pub src_ip: String,
+    pub dest_port: u16,
+}
+
+impl PfRule {
+    pub fn new(action: PfAction, proto: &str, src_ip: &str, dest_port: u16) -> Self {
+        Self {
+            action,
+            proto: proto.to_string(),
+            src_ip: src_ip.to_string(),
+            dest_port,
+        }
+    }
+}
+
+pub struct BsdPacketFilter {
+    pub rules: Vec<PfRule>,
+    pub default_action: PfAction,
+}
+
+impl BsdPacketFilter {
+    pub fn new(default_action: PfAction) -> Self {
+        Self {
+            rules: Vec::new(),
+            default_action,
+        }
+    }
+
+    pub fn add_rule(&mut self, rule: PfRule) {
+        self.rules.push(rule);
+    }
+
+    /// Evaluates pf rule-matching on a packet to decide if it should pass or block (last-match-wins)
+    pub fn filter_packet(&self, proto: &str, src_ip: &str, dest_port: u16) -> PfAction {
+        let mut final_action = self.default_action;
+        for rule in &self.rules {
+            let proto_match = rule.proto == "*" || rule.proto == proto;
+            let ip_match = rule.src_ip == "*" || rule.src_ip == src_ip;
+            let port_match = rule.dest_port == 0 || rule.dest_port == dest_port;
+
+            if proto_match && ip_match && port_match {
+                final_action = rule.action;
+            }
+        }
+        final_action
+    }
+}
+
+impl Default for BsdPacketFilter {
+    fn default() -> Self {
+        Self::new(PfAction::Pass)
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    extern crate std;
     use super::*;
 
     #[test]
@@ -1442,13 +1650,8 @@ mod tests {
         let mut fs = SigmaFsCasEngine::new(trusted_key);
 
         let data = b"CONFIDENTIAL_REPRODUCIBLE_SYSTEM_IMAGE";
-        let signature: [u8; DILITHIUM5_SIGNATURE_SIZE] = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-            .to_le_bytes()[..DILITHIUM5_SIGNATURE_SIZE]
-            .try_into()
-            .unwrap();
+        let mut signature = [0u8; DILITHIUM5_SIGNATURE_SIZE];
+        signature[..16].copy_from_slice(&nanos);
 
         let block_hash = fs.store_block(data, &signature).unwrap();
 
@@ -1463,21 +1666,21 @@ mod tests {
     #[test]
     fn test_ccleaner_equivalent_sweep_and_duplicate_finder() {
         let mut engine = SovereignCleanupEngine::new();
-        let hash_a: [u8; SHA256_HASH_SIZE] = std::time::SystemTime::now()
+        let nanos_a = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
-            .to_le_bytes()[..SHA256_HASH_SIZE]
-            .try_into()
-            .unwrap();
-        let hash_b: [u8; SHA256_HASH_SIZE] = std::time::SystemTime::now()
+            .to_le_bytes();
+        let nanos_b = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_nanos()
             .wrapping_add(1)
-            .to_le_bytes()[..SHA256_HASH_SIZE]
-            .try_into()
-            .unwrap();
+            .to_le_bytes();
+        let mut hash_a = [0u8; SHA256_HASH_SIZE];
+        hash_a[..16].copy_from_slice(&nanos_a);
+        let mut hash_b = [0u8; SHA256_HASH_SIZE];
+        hash_b[..16].copy_from_slice(&nanos_b);
 
         engine.register_file_metadata(FileMetadata {
             path: "/var/tmp/session.log",
@@ -1734,5 +1937,49 @@ mod tests {
 
         assert_eq!(len, 5);
         assert_eq!(reconstructed[..5], [0x11, 0x22, 0x99, 0x88, 0x55]);
+    }
+
+    #[test]
+    fn test_freebsd_jails() {
+        let mut manager = BsdJailManager::new();
+        assert!(manager.create_jail(1, "/compat/linux", "linux_jail", "192.168.1.10").is_ok());
+        assert!(manager.create_jail(1, "/compat/linux", "linux_jail2", "192.168.1.11").is_err()); // duplicate id error
+
+        assert!(manager.assign_process_to_jail(1, 1001).is_err()); // inactive error
+        manager.start_jail(1).unwrap();
+        assert!(manager.assign_process_to_jail(1, 1001).is_ok());
+
+        assert_eq!(manager.jails[0].processes[0], 1001);
+        manager.stop_jail(1).unwrap();
+        assert_eq!(manager.jails[0].processes.len(), 0);
+    }
+
+    #[test]
+    fn test_openbsd_pledge_unveil() {
+        let mut enforcer = OpenBsdSandboxEnforcer::new();
+
+        // Test Pledge limits
+        enforcer.pledge(&["stdio", "rpath"]);
+        assert!(enforcer.validate_syscall("stdio"));
+        assert!(enforcer.validate_syscall("rpath"));
+        assert!(!enforcer.validate_syscall("inet"));
+
+        // Test Unveil containment limits
+        enforcer.unveil("/var/www", "rx");
+        assert!(enforcer.validate_file_access("/var/www/index.html", "r"));
+        assert!(!enforcer.validate_file_access("/var/www/upload.php", "w"));
+        assert!(!enforcer.validate_file_access("/etc/passwd", "r"));
+    }
+
+    #[test]
+    fn test_bsd_packet_filter() {
+        let mut pf = BsdPacketFilter::new(PfAction::Pass);
+        pf.add_rule(PfRule::new(PfAction::Block, "tcp", "192.168.1.200", 22));
+        pf.add_rule(PfRule::new(PfAction::Pass, "udp", "*", 53));
+
+        // Evaluate rule matching policies (last-match-wins)
+        assert_eq!(pf.filter_packet("tcp", "192.168.1.200", 22), PfAction::Block);
+        assert_eq!(pf.filter_packet("tcp", "192.168.1.100", 22), PfAction::Pass); // default pass
+        assert_eq!(pf.filter_packet("udp", "192.168.1.200", 53), PfAction::Pass);
     }
 }

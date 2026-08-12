@@ -169,7 +169,7 @@ impl Default for SurfaceCapability {
 /// Bitmap surface (OOP: Concrete surface class)
 pub struct BitmapSurface {
     pub id: usize,
-    pub data: Vec<u32>,
+    pub data: std::vec::Vec<u32>,
     pub size: Size,
     pub stride: u32,
     pub capability: SurfaceCapability,
@@ -179,7 +179,7 @@ pub struct BitmapSurface {
 impl BitmapSurface {
     pub fn new(id: usize, width: u32, height: u32, capability: SurfaceCapability) -> Self {
         let size = (width * height) as usize;
-        let mut data = Vec::with_capacity(size);
+        let mut data = std::vec::Vec::with_capacity(size);
         data.resize(size, 0);
 
         BitmapSurface {
@@ -440,7 +440,7 @@ pub trait Compositor {
     /// Dynamic double buffering: Swap front and back display buffers
     fn swap_buffers(&mut self) -> Result<(), GraphicsError>;
     /// Captures a screenshot of the currently composed frame
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError>;
+    fn capture_screenshot(&self) -> Result<std::vec::Vec<u32>, GraphicsError>;
 }
 
 /// Graphics error types
@@ -487,6 +487,8 @@ pub struct SimpleCompositor {
     window_order: Vec<usize>,
     stats: CompositorStats,
     capability: CompositorCapability,
+    pub back_buffer: Option<BitmapSurface>,
+    pub double_buffering: AtomicBool,
 }
 
 /// Compositor capability
@@ -623,11 +625,11 @@ impl Compositor for SimpleCompositor {
         for &window_id in &self.window_order {
             if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
                 let window_rect = window.rect();
-                let output_stride = output.info().stride as usize / 4;
+                let output_stride = target_surface.info().stride as usize / 4;
                 if let Some(surface) = window.surface() {
                     let window_stride = surface.info().stride as usize / 4;
                     let window_data = surface.data();
-                    let output_data = output.data_mut();
+                    let output_data = target_surface.data_mut();
 
                     // Copy window surface to output
                     for y in 0..window_rect.size.height as usize {
@@ -661,7 +663,7 @@ impl Compositor for SimpleCompositor {
         Ok(())
     }
 
-    fn capture_screenshot(&self) -> Result<Vec<u32>, GraphicsError> {
+    fn capture_screenshot(&self) -> Result<std::vec::Vec<u32>, GraphicsError> {
         if let Some(ref back) = self.back_buffer {
             Ok(back.data.clone())
         } else {
@@ -676,8 +678,87 @@ impl Compositor for SimpleCompositor {
     }
 }
 
+use core::mem;
+
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
+
+pub struct Vec<T> {
+    data: *mut T,
+    len: usize,
+    capacity: usize,
+}
+
+impl<T> core::ops::Deref for Vec<T> {
+    type Target = [T];
+    fn deref(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> core::ops::DerefMut for Vec<T> {
+    fn deref_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::Deref;
+        self.deref().iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Vec<T> {
+    type Item = &'a mut T;
+    type IntoIter = core::slice::IterMut<'a, T>;
+    fn into_iter(self) -> Self::IntoIter {
+        use core::ops::DerefMut;
+        self.deref_mut().iter_mut()
+    }
+}
+
 impl<T> Vec<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Vec {
             data: core::ptr::null_mut(),
             len: 0,
