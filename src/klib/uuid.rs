@@ -14,6 +14,11 @@ pub struct Uuid {
 }
 
 impl Uuid {
+    /// Generate a new UUID v4 as alias for new
+    pub fn new() -> Self {
+        Self::new_v4()
+    }
+
     /// Generate a new UUID v4
     pub fn new_v4() -> Self {
         // Simple pseudo-random UUID v4
