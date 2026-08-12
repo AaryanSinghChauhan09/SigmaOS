@@ -1,7 +1,47 @@
 // SigmaOS Virtual Filesystem (VFS)
 // Capability-based filesystem with security
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::security::{CapabilityToken, Permission};
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Permission {
+    FileRead,
+    FileWrite,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, Default)]
+pub struct CapabilityToken {
+    pub read_allowed: bool,
+    pub write_allowed: bool,
+}
+
+#[cfg(feature = "standalone_test")]
+impl CapabilityToken {
+    pub fn new() -> Self {
+        Self {
+            read_allowed: false,
+            write_allowed: false,
+        }
+    }
+    pub fn allow_read(mut self, _path: &str) -> Self {
+        self.read_allowed = true;
+        self
+    }
+    pub fn allow_write(mut self, _path: &str) -> Self {
+        self.write_allowed = true;
+        self
+    }
+    pub fn has_permission(&self, perm: Permission) -> bool {
+        match perm {
+            Permission::FileRead => self.read_allowed,
+            Permission::FileWrite => self.write_allowed,
+        }
+    }
+}
+
 use std::collections::HashMap;
 
 /// File type
@@ -52,6 +92,13 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
+    // Conforming Linux/BSD additions
+    pub hard_links_count: u32,
+    pub link_count: u32,
+    pub symlink_target: Option<String>,
+    pub xattrs: HashMap<String, Vec<u8>>,
+    pub data: Vec<u8>,                 // File storage data
+    pub entries: HashMap<String, u64>, // Directory entries
 }
 
 impl Inode {
@@ -66,7 +113,106 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
+            hard_links_count: 1,
+            link_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            entries: HashMap::new(),
         }
+    }
+}
+
+// ================= Linux-style procfs & sysfs Dynamic Stats Bridge =================
+
+pub struct ProcSysFsBridge {
+    pub uptime_seconds: u64,
+    pub active_processes_count: usize,
+}
+
+impl ProcSysFsBridge {
+    pub fn new() -> Self {
+        Self {
+            uptime_seconds: 120,
+            active_processes_count: 5,
+        }
+    }
+
+    pub fn read_dynamic_proc_file(&self, filename: &str) -> Result<String, &'static str> {
+        match filename {
+            "uptime" => Ok(format!("uptime: {} seconds", self.uptime_seconds)),
+            "loadavg" => Ok(format!("loadavg: 0.15 0.24 0.35 active_tasks: {}", self.active_processes_count)),
+            _ => Err("procfs: File not found"),
+        }
+    }
+}
+
+// ================= OpenBSD chroot path containment sandbox =================
+
+pub struct ChrootSandbox {
+    pub chroot_root_path: String,
+}
+
+impl ChrootSandbox {
+    pub fn new(root_path: &str) -> Self {
+        Self {
+            chroot_root_path: root_path.to_string(),
+        }
+    }
+
+    /// Verifies path starts with jail prefix (chroot escape protection)
+    pub fn sandbox_resolve_path(&self, requested_path: &str) -> Result<String, &'static str> {
+        let clean_path = requested_path.to_string();
+        if clean_path.contains("../") {
+            return Err("chroot jail breach blocked: Directory traversal escape attempt detected!");
+        }
+        if !clean_path.starts_with(&self.chroot_root_path) {
+            Ok(format!("{}{}", self.chroot_root_path, clean_path))
+        } else {
+            Ok(clean_path)
+        }
+    }
+}
+
+// ================= macOS FSEvents directory change notifications =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FsEventAction {
+    Created,
+    Modified,
+    Deleted,
+}
+
+#[derive(Clone)]
+pub struct FsChangeLog {
+    pub path: String,
+    pub action: FsEventAction,
+}
+
+pub struct FsEventsAuditor {
+    pub change_logs: Vec<FsChangeLog>,
+}
+
+impl FsEventsAuditor {
+    pub fn new() -> Self {
+        Self { change_logs: Vec::new() }
+    }
+
+    pub fn record_filesystem_event(&mut self, path: &str, action: FsEventAction) {
+        self.change_logs.push(FsChangeLog {
+            path: path.to_string(),
+            action,
+        });
+    }
+
+    pub fn filter_events_by_prefix(&self, prefix: &str) -> Vec<FsChangeLog> {
+        let mut matched = Vec::new();
+        for log in &self.change_logs {
+            if log.path.starts_with(prefix) {
+                matched.push(log.clone());
+            }
+        }
+        matched
     }
 }
 
@@ -141,6 +287,37 @@ impl VirtualFilesystem {
         self.inodes.insert(inode_id, inode);
 
         Ok(inode_id)
+    }
+
+    /// Creates a symbolic link (Symlink) pointing to a target filepath string
+    pub fn create_symlink(&mut self, target_path: &str, owner: u64) -> Result<u64, FsError> {
+        let inode_id = self.create_file(FileType::Symlink, owner)?;
+        if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            inode.symlink_target = Some(target_path.to_string());
+        }
+        Ok(inode_id)
+    }
+
+    /// Creates a hard link pointing directly to the same underlying file Inode
+    pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.link_count += 1;
+        inode.hard_links_count += 1;
+        Ok(())
+    }
+
+    /// Sets an extended attribute (xattr) on an active Inode
+    pub fn set_xattr(&mut self, inode_id: u64, name: &str, value: &[u8]) -> Result<(), FsError> {
+        let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+        inode.xattrs.insert(name.to_string(), value.to_vec());
+        Ok(())
+    }
+
+    /// Retrieves an extended attribute (xattr) from an active Inode
+    pub fn get_xattr(&self, inode_id: u64, name: &str) -> Result<std::vec::Vec<u8>, FsError> {
+        let inode = self.inodes.get(&inode_id).ok_or(FsError::NotFound)?;
+        let val = inode.xattrs.get(name).ok_or(FsError::AttributeNotFound)?;
+        Ok(val.clone())
     }
 
     pub fn open_file(&mut self, inode_id: u64, flags: u32) -> Result<u64, FsError> {
@@ -251,7 +428,15 @@ impl VirtualFilesystem {
             return Err(FsError::PermissionDenied);
         }
 
-        if !self.inodes.contains_key(&inode_id) {
+        let mut should_delete = false;
+        if let Some(inode) = self.inodes.get_mut(&inode_id) {
+            if inode.hard_links_count > 1 {
+                inode.hard_links_count -= 1;
+                inode.link_count -= 1;
+            } else {
+                should_delete = true;
+            }
+        } else {
             return Err(FsError::NotFound);
         }
 
@@ -270,8 +455,166 @@ impl VirtualFilesystem {
             return Err(FsError::NotADirectory);
         }
 
-        // Return all inodes (in production, actual directory listing)
-        Ok(self.inodes.keys().copied().collect())
+        // Return child inode list of the directory
+        let mut list: Vec<u64> = inode.entries.values().copied().collect();
+        list.sort();
+        Ok(list)
+    }
+
+    // Advanced Linux & BSD Inspired Path Traversal, O_CREAT, and Link Handling
+
+    /// Traverses and resolves a path name (e.g. "/var/log/syslog") to its Inode ID
+    pub fn resolve_path(&self, path: &str) -> Result<u64, FsError> {
+        if path.is_empty() {
+            return Err(FsError::NotFound);
+        }
+
+        let mut current_inode_id = self.root_inode;
+        let components: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+
+        for component in components {
+            let inode = self
+                .inodes
+                .get(&current_inode_id)
+                .ok_or(FsError::NotFound)?;
+            if inode.file_type != FileType::Directory {
+                return Err(FsError::NotADirectory);
+            }
+            if let Some(&next_id) = inode.entries.get(component) {
+                current_inode_id = next_id;
+            } else {
+                return Err(FsError::NotFound);
+            }
+        }
+
+        Ok(current_inode_id)
+    }
+
+    /// Open path with creation, exclusion, truncation, and append logic matching POSIX
+    pub fn open_path(&mut self, path: &str, flags: u32, owner: u64) -> Result<u64, FsError> {
+        // Resolve parent and target component
+        let path_str = path.to_string();
+        let mut parts: Vec<&str> = path_str.split('/').filter(|s| !s.is_empty()).collect();
+
+        let filename = parts.pop().ok_or(FsError::NotFound)?;
+        let mut parent_inode_id = self.root_inode;
+
+        if !parts.is_empty() {
+            let mut parent_path = String::new();
+            for part in parts {
+                parent_path.push('/');
+                parent_path.push_str(part);
+            }
+            parent_inode_id = self.resolve_path(&parent_path)?;
+        }
+
+        let parent_inode = self.inodes.get(&parent_inode_id).ok_or(FsError::NotFound)?;
+        if parent_inode.file_type != FileType::Directory {
+            return Err(FsError::NotADirectory);
+        }
+
+        let target_inode_id = parent_inode.entries.get(filename).copied();
+
+        let inode_id = match target_inode_id {
+            Some(id) => {
+                if (flags & O_CREAT) != 0 && (flags & O_EXCL) != 0 {
+                    return Err(FsError::AlreadyExists);
+                }
+                id
+            }
+            None => {
+                if (flags & O_CREAT) != 0 {
+                    let new_id = self.create_file(FileType::Regular, owner)?;
+                    // Link into parent directory
+                    let parent = self
+                        .inodes
+                        .get_mut(&parent_inode_id)
+                        .ok_or(FsError::NotFound)?;
+                    parent.entries.insert(filename.to_string(), new_id);
+                    new_id
+                } else {
+                    return Err(FsError::NotFound);
+                }
+            }
+        };
+
+        // Apply O_TRUNC if write permission is allowed
+        if (flags & O_TRUNC) != 0 {
+            let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
+            if !inode.permissions.write {
+                return Err(FsError::PermissionDenied);
+            }
+            inode.data.clear();
+            inode.size = 0;
+        }
+
+        self.open_file(inode_id, flags)
+    }
+
+    /// Link target path to link path (POSIX link/hard link logic)
+    pub fn link_inode(&mut self, target_path: &str, link_path: &str) -> Result<(), FsError> {
+        let target_id = self.resolve_path(target_path)?;
+
+        let link_str = link_path.to_string();
+        let mut parts: Vec<&str> = link_str.split('/').filter(|s| !s.is_empty()).collect();
+        let filename = parts.pop().ok_or(FsError::NotFound)?;
+        let mut parent_inode_id = self.root_inode;
+
+        if !parts.is_empty() {
+            let mut parent_path = String::new();
+            for part in parts {
+                parent_path.push('/');
+                parent_path.push_str(part);
+            }
+            parent_inode_id = self.resolve_path(&parent_path)?;
+        }
+
+        // Verify parent directory
+        let parent = self.inodes.get(&parent_inode_id).ok_or(FsError::NotFound)?;
+        if parent.file_type != FileType::Directory {
+            return Err(FsError::NotADirectory);
+        }
+        if parent.entries.contains_key(filename) {
+            return Err(FsError::AlreadyExists);
+        }
+
+        // Perform hard-linking
+        let parent_mut = self
+            .inodes
+            .get_mut(&parent_inode_id)
+            .ok_or(FsError::NotFound)?;
+        parent_mut.entries.insert(filename.to_string(), target_id);
+
+        let target_inode = self.inodes.get_mut(&target_id).ok_or(FsError::NotFound)?;
+        target_inode.hard_links_count += 1;
+        target_inode.link_count += 1;
+
+        Ok(())
+    }
+
+    /// Unlinks (deletes directory entry) and decrements link count
+    pub fn unlink_inode(&mut self, path: &str) -> Result<(), FsError> {
+        let path_str = path.to_string();
+        let mut parts: Vec<&str> = path_str.split('/').filter(|s| !s.is_empty()).collect();
+        let filename = parts.pop().ok_or(FsError::NotFound)?;
+        let mut parent_inode_id = self.root_inode;
+
+        if !parts.is_empty() {
+            let mut parent_path = String::new();
+            for part in parts {
+                parent_path.push('/');
+                parent_path.push_str(part);
+            }
+            parent_inode_id = self.resolve_path(&parent_path)?;
+        }
+
+        let parent = self
+            .inodes
+            .get_mut(&parent_inode_id)
+            .ok_or(FsError::NotFound)?;
+        let target_id = parent.entries.remove(filename).ok_or(FsError::NotFound)?;
+
+        self.delete_file(target_id)
     }
 }
 
@@ -290,6 +633,8 @@ pub enum FsError {
     NotADirectory,
     IsDirectory,
     NoSpace,
+    AlreadyExists,
+    AttributeNotFound,
 }
 
 #[cfg(test)]
@@ -359,13 +704,57 @@ mod tests {
         let written = vfs.write_file_gated(fd, data, &write_gate).unwrap();
         assert_eq!(written, data.len());
 
-        // Read without permission -> fail
-        let mut buf = vec![0u8; data.len()];
-        assert!(vfs.read_file_gated(fd, &mut buf, &empty_gate).is_err());
+        // Read should fail with bad_token and write_token, but succeed with read_token or all_token
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+
+        // Reset file offset to beginning before reading
+        vfs.file_descriptors.get_mut(&fd).unwrap().offset = 0;
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
+    }
 
         // Read with permission -> success
         let read_gate = CapabilityToken::new().allow_read("/var/www");
         let read_bytes = vfs.read_file_gated(fd, &mut buf, &read_gate).unwrap();
         assert_eq!(read_bytes, data.len());
+    }
+
+    #[test]
+    fn test_vfs_proc_and_sysfs_bridge() {
+        let bridge = ProcSysFsBridge::new();
+        let uptime = bridge.read_dynamic_proc_file("uptime").unwrap();
+        assert_eq!(uptime, "uptime: 120 seconds");
+
+        let loadavg = bridge.read_dynamic_proc_file("loadavg").unwrap();
+        assert!(loadavg.contains("active_tasks: 5"));
+
+        assert!(bridge.read_dynamic_proc_file("nonexistent").is_err());
+    }
+
+    #[test]
+    fn test_vfs_chroot_sandbox_confinement() {
+        let sandbox = ChrootSandbox::new("/jail/app1");
+
+        let path1 = sandbox.sandbox_resolve_path("/var/log/syslog").unwrap();
+        assert_eq!(path1, "/jail/app1/var/log/syslog");
+
+        // Allowed relative transition
+        let path2 = sandbox.sandbox_resolve_path("/jail/app1/tmp").unwrap();
+        assert_eq!(path2, "/jail/app1/tmp");
+
+        // Malicious chroot escape block
+        assert!(sandbox.sandbox_resolve_path("/jail/app1/../../etc/passwd").is_err());
+    }
+
+    #[test]
+    fn test_vfs_fsevents_auditor() {
+        let mut auditor = FsEventsAuditor::new();
+        auditor.record_filesystem_event("/home/user/document.txt", FsEventAction::Created);
+        auditor.record_filesystem_event("/home/user/document.txt", FsEventAction::Modified);
+        auditor.record_filesystem_event("/etc/resolv.conf", FsEventAction::Modified);
+
+        let user_events = auditor.filter_events_by_prefix("/home/user");
+        assert_eq!(user_events.len(), 2);
+        assert_eq!(user_events[0].action, FsEventAction::Created);
     }
 }

@@ -99,6 +99,236 @@ impl OpenBsdPledge {
     }
 }
 
+// ================= Multikernel/Barrelfish Inter-Core Mailbox =================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MultikernelMessage {
+    pub sender_core: u32,
+    pub receiver_core: u32,
+    pub payload: String,
+    pub sequence_number: u64,
+}
+
+pub struct MultikernelMessagePassing {
+    pub core_id: u32,
+    pub mailbox: Vec<MultikernelMessage>,
+    pub max_capacity: usize,
+}
+
+impl MultikernelMessagePassing {
+    pub fn new(core_id: u32, max_capacity: usize) -> Self {
+        Self {
+            core_id,
+            mailbox: Vec::new(),
+            max_capacity,
+        }
+    }
+
+    pub fn send_message(&mut self, receiver: &mut MultikernelMessagePassing, payload: &str, seq: u64) -> Result<(), &'static str> {
+        if receiver.mailbox.len() >= receiver.max_capacity {
+            return Err("Multikernel: Target core mailbox capacity exceeded");
+        }
+        let msg = MultikernelMessage {
+            sender_core: self.core_id,
+            receiver_core: receiver.core_id,
+            payload: payload.to_string(),
+            sequence_number: seq,
+        };
+        receiver.mailbox.push(msg);
+        Ok(())
+    }
+
+    pub fn receive_message(&mut self) -> Option<MultikernelMessage> {
+        if self.mailbox.is_empty() {
+            None
+        } else {
+            Some(self.mailbox.remove(0))
+        }
+    }
+}
+
+// ================= Plan 9 Unified 9P Protocol Translator =================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NinePResource {
+    pub path: String,
+    pub content: String,
+    pub permission_mask: u32, // e.g. 0o777
+}
+
+pub struct NinePProtocolTranslator {
+    pub resources: HashMap<String, NinePResource>,
+}
+
+impl NinePProtocolTranslator {
+    pub fn new() -> Self {
+        Self {
+            resources: HashMap::new(),
+        }
+    }
+
+    pub fn mount_resource(&mut self, path: &str, content: &str, perm: u32) {
+        self.resources.insert(path.to_string(), NinePResource {
+            path: path.to_string(),
+            content: content.to_string(),
+            permission_mask: perm,
+        });
+    }
+
+    pub fn read_resource(&self, path: &str, caller_perm: u32) -> Result<String, &'static str> {
+        let res = self.resources.get(path).ok_or("9P: Resource path not found")?;
+        if (res.permission_mask & caller_perm) == 0 {
+            return Err("9P: Permission denied reading resource");
+        }
+        Ok(res.content.clone())
+    }
+
+    pub fn write_resource(&mut self, path: &str, new_content: &str, caller_perm: u32) -> Result<(), &'static str> {
+        let res = self.resources.get_mut(path).ok_or("9P: Resource path not found")?;
+        if (res.permission_mask & caller_perm) == 0 {
+            return Err("9P: Permission denied writing resource");
+        }
+        res.content = new_content.to_string();
+        Ok(())
+    }
+}
+
+// ================= Mach/Hurd Microkernel Translators Registry =================
+
+#[derive(Debug, Clone)]
+pub struct HurdTranslator {
+    pub passive_node: String,
+    pub server_port: u32,
+    pub is_active: bool,
+}
+
+pub struct MicrokernelTranslatorRegistry {
+    pub translators: HashMap<String, HurdTranslator>,
+}
+
+impl MicrokernelTranslatorRegistry {
+    pub fn new() -> Self {
+        Self {
+            translators: HashMap::new(),
+        }
+    }
+
+    pub fn bind_translator(&mut self, node: &str, port: u32) {
+        self.translators.insert(node.to_string(), HurdTranslator {
+            passive_node: node.to_string(),
+            server_port: port,
+            is_active: false,
+        });
+    }
+
+    pub fn activate_translator(&mut self, node: &str) -> Result<u32, &'static str> {
+        let trans = self.translators.get_mut(node).ok_or("Mach/Hurd: No translator bound to this node")?;
+        trans.is_active = true;
+        Ok(trans.server_port)
+    }
+
+    pub fn dispatch_io_request(&self, node: &str, op: &str) -> Result<String, &'static str> {
+        let trans = self.translators.get(node).ok_or("Mach/Hurd: Target translator not found")?;
+        if !trans.is_active {
+            return Err("Mach/Hurd: Translator is passive. Activate before dispatching I/O!");
+        }
+        Ok(alloc::format!("Dispatched operational request '{}' to Mach Server on Port {}", op, trans.server_port))
+    }
+}
+
+// ================= Pico/Nanokernel Interrupt Broker =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct NanokernelIrq {
+    pub irq_line: u32,
+    pub priority: u32,
+}
+
+pub struct NanokernelHardwareBroker {
+    pub registers: [u64; 8],
+    pub pending_irqs: Vec<NanokernelIrq>,
+}
+
+impl NanokernelHardwareBroker {
+    pub fn new() -> Self {
+        Self {
+            registers: [0; 8],
+            pending_irqs: Vec::new(),
+        }
+    }
+
+    pub fn write_virtual_register(&mut self, reg_idx: usize, val: u64) -> Result<(), &'static str> {
+        if reg_idx >= self.registers.len() {
+            return Err("Nanokernel: Register index out of bounds");
+        }
+        self.registers[reg_idx] = val;
+        Ok(())
+    }
+
+    pub fn trigger_physical_irq(&mut self, irq: u32, priority: u32) {
+        self.pending_irqs.push(NanokernelIrq { irq_line: irq, priority });
+        self.pending_irqs.sort_by(|a, b| b.priority.cmp(&a.priority));
+    }
+
+    pub fn dispatch_next_irq(&mut self) -> Option<NanokernelIrq> {
+        if self.pending_irqs.is_empty() {
+            None
+        } else {
+            Some(self.pending_irqs.remove(0))
+        }
+    }
+}
+
+// ================= Solaris/Illumos Zones Resource Container =================
+
+#[derive(Debug, Clone)]
+pub struct SovereignZone {
+    pub name: String,
+    pub cpu_shares: u32,
+    pub memory_limit_bytes: u64,
+    pub vnic_ips: Vec<String>,
+}
+
+pub struct SovereignZonesManager {
+    pub zones: HashMap<String, SovereignZone>,
+}
+
+impl SovereignZonesManager {
+    pub fn new() -> Self {
+        Self {
+            zones: HashMap::new(),
+        }
+    }
+
+    pub fn create_zone(&mut self, name: &str, cpu_shares: u32, mem_limit: u64) -> Result<(), &'static str> {
+        if self.zones.contains_key(name) {
+            return Err("Solaris Zones: Zone with this name already exists");
+        }
+        self.zones.insert(name.to_string(), SovereignZone {
+            name: name.to_string(),
+            cpu_shares,
+            memory_limit_bytes: mem_limit,
+            vnic_ips: Vec::new(),
+        });
+        Ok(())
+    }
+
+    pub fn configure_vnic(&mut self, zone_name: &str, ip_addr: &str) -> Result<(), &'static str> {
+        let zone = self.zones.get_mut(zone_name).ok_or("Solaris Zones: Target zone not found")?;
+        zone.vnic_ips.push(ip_addr.to_string());
+        Ok(())
+    }
+
+    pub fn calculate_cpu_percentage(&self, zone_name: &str) -> Result<f32, &'static str> {
+        let target_zone = self.zones.get(zone_name).ok_or("Solaris Zones: Target zone not found")?;
+        let total_shares: u32 = self.zones.values().map(|z| z.cpu_shares).sum();
+        if total_shares == 0 {
+            return Ok(0.0);
+        }
+        Ok((target_zone.cpu_shares as f32 / total_shares as f32) * 100.0)
+    }
+}
+
 // ================= Windows KMDF Driver Framework Parity =================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1055,6 +1285,101 @@ mod tests {
         let active = reactor.poll_active_handles();
         assert_eq!(active.len(), 1);
         assert_eq!(active[0], 10);
+    }
+
+    #[test]
+    fn test_multikernel_message_passing() {
+        let mut core0 = MultikernelMessagePassing::new(0, 5);
+        let mut core1 = MultikernelMessagePassing::new(1, 5);
+
+        assert!(core0.send_message(&mut core1, "Hello from Core 0", 101).is_ok());
+        assert_eq!(core1.mailbox.len(), 1);
+
+        let received = core1.receive_message().unwrap();
+        assert_eq!(received.sender_core, 0);
+        assert_eq!(received.receiver_core, 1);
+        assert_eq!(received.payload, "Hello from Core 0");
+        assert_eq!(received.sequence_number, 101);
+
+        assert!(core1.receive_message().is_none());
+    }
+
+    #[test]
+    fn test_nine_p_protocol_translator() {
+        let mut translator = NinePProtocolTranslator::new();
+        translator.mount_resource("/net/ether0", "State: Up", 0o644);
+
+        // Standard read permission matching
+        let content = translator.read_resource("/net/ether0", 0o400).unwrap();
+        assert_eq!(content, "State: Up");
+
+        // Write permission denied check
+        assert!(translator.write_resource("/net/ether0", "State: Down", 0o100).is_err());
+
+        // Successful write
+        assert!(translator.write_resource("/net/ether0", "State: Down", 0o200).is_ok());
+        let updated = translator.read_resource("/net/ether0", 0o400).unwrap();
+        assert_eq!(updated, "State: Down");
+    }
+
+    #[test]
+    fn test_microkernel_translator_registry() {
+        let mut registry = MicrokernelTranslatorRegistry::new();
+        registry.bind_translator("/servers/netfs", 4001);
+
+        // Node is passive; dispatch fails
+        assert!(registry.dispatch_io_request("/servers/netfs", "ReadBlocks").is_err());
+
+        // Activate translator node
+        let port = registry.activate_translator("/servers/netfs").unwrap();
+        assert_eq!(port, 4001);
+
+        // Dispatch succeeds
+        let dispatch_res = registry.dispatch_io_request("/servers/netfs", "ReadBlocks").unwrap();
+        assert!(dispatch_res.contains("Mach Server on Port 4001"));
+    }
+
+    #[test]
+    fn test_nanokernel_hardware_broker() {
+        let mut broker = NanokernelHardwareBroker::new();
+        assert!(broker.write_virtual_register(2, 0xABCDEF).is_ok());
+        assert_eq!(broker.registers[2], 0xABCDEF);
+        assert!(broker.write_virtual_register(10, 0x123).is_err());
+
+        // Queue high and low priority interrupts
+        broker.trigger_physical_irq(5, 10);
+        broker.trigger_physical_irq(8, 20);
+
+        // Highest priority should be dispatched first
+        let irq1 = broker.dispatch_next_irq().unwrap();
+        assert_eq!(irq1.irq_line, 8);
+        assert_eq!(irq1.priority, 20);
+
+        let irq2 = broker.dispatch_next_irq().unwrap();
+        assert_eq!(irq2.irq_line, 5);
+        assert_eq!(irq2.priority, 10);
+
+        assert!(broker.dispatch_next_irq().is_none());
+    }
+
+    #[test]
+    fn test_sovereign_zones_manager() {
+        let mut manager = SovereignZonesManager::new();
+        manager.create_zone("db_zone", 50, 1024 * 1024).unwrap();
+        manager.create_zone("web_zone", 150, 2048 * 1024).unwrap();
+
+        assert!(manager.create_zone("db_zone", 10, 123).is_err());
+
+        // CPU Shares percentages
+        let db_percentage = manager.calculate_cpu_percentage("db_zone").unwrap();
+        assert!((db_percentage - 25.0).abs() < 1e-5); // 50 / 200 = 25%
+
+        let web_percentage = manager.calculate_cpu_percentage("web_zone").unwrap();
+        assert!((web_percentage - 75.0).abs() < 1e-5); // 150 / 200 = 75%
+
+        // VNIC setup
+        manager.configure_vnic("db_zone", "10.0.0.5").unwrap();
+        assert_eq!(manager.zones.get("db_zone").unwrap().vnic_ips[0], "10.0.0.5");
     }
 }
 
