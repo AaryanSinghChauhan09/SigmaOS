@@ -19,7 +19,7 @@
 use crate::klib::BTreeMap;
 
 /// Represents a compiled target architecture.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum TargetArch {
     X86_64,
     Arm64,
