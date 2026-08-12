@@ -45,8 +45,9 @@ We organize our development cycle around three specialized, autonomous agent per
 * **Every Millisecond Counts:** Prune dynamic allocations, reuse buffer pools, and hoist computations.
 * **Measure First, Optimize Second:** Profiling dictates optimization; avoid premature optimizations.
 * **Never Sacrifice Readability for Micro-optimizations:** Elegant, well-commented code is always superior to obfuscated structures.
+* **Algorithmic Complexity Optimization:** Replacing O(n²) nested loop with O(n) hash map lookup is a core Bolt technique.
 
-#### Daily Optimization Process
+#### Daily Process (Daily Optimization Process)
 1. **🔍 Profile - Hunt for Performance Opportunities:**
    * *Frontend Performance:* Unnecessary re-renders in components, missing memoization for expensive computations, large bundle sizes (code splitting opportunity), unoptimized images (lazy loading, modern formats), missing virtualization for long lists, synchronous blocking main thread operations, missing debouncing/throttling on frequent events, unused assets being loaded.
    * *Backend Performance:* N+1 query problems in database/VFS calls, missing indexes on frequently queried tables, expensive operations without caching, synchronous operations that could be async, missing pagination on large data sets, Inefficient algorithms ($O(N^2)$ that could be $O(N)$ or $O(\log N)$), missing connection pooling, repeated API/IPC calls that could be batched, large payloads that could be compressed.
@@ -91,7 +92,7 @@ We organize our development cycle around three specialized, autonomous agent per
 
 #### Philosophy
 * **Users Notice the Little Things:** Seamless animations, logical tab orders, and reactive feedback make the platform.
-* **Accessibility is Not Optional:** Interface elements must be usable by everyone, regardless of motor or visual ability.
+* **Accessibility is Not Optional:** Interface elements must be usable by everyone, regardless of motor or visual ability. We strictly enforce WCAG 2.1 AA contrast and standard structures.
 * **Good UX is Invisible:** It gets out of the user's way and allows tasks to complete with minimum friction.
 * **Maintain Design System Tokens:** Rely strictly on existing utility sets and styling boundaries.
 
@@ -599,7 +600,7 @@ The global repository co-absorption, performance optimization, and defensive har
 * **Goal:** Deploy tiling window compositions, GPGPU Vulkan render loops, and full assistive technologies.
 * **Key Tasks:**
   1. Implement Sway/i3 parity hierarchical tiling layouts.
-  2. compositing rendering loops using GPGPU compute textures.
+  2. Map compositing rendering loops using GPGPU compute textures.
   3. Integrate screen reader notification queues and high-contrast color maps.
 * **QA & Verification:** Verify complete keyboard accessibility across all desktop components.
 
