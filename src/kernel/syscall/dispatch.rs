@@ -4,6 +4,8 @@
 
 #![no_std]
 
+pub mod ioctl_helper;
+
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[repr(C)]
@@ -60,6 +62,7 @@ pub const SYS_RMDIR: usize = 27;
 pub const SYS_UNLINK: usize = 28;
 pub const SYS_RENAME: usize = 29;
 pub const SYS_CHMOD: usize = 30;
+pub const SYS_IOCTL: usize = 31;
 
 impl SyscallDispatcher {
     pub fn new() -> Self {
@@ -107,6 +110,7 @@ impl SyscallDispatcher {
         dispatcher.register(SYS_UNLINK, sys_unlink as usize);
         dispatcher.register(SYS_RENAME, sys_rename as usize);
         dispatcher.register(SYS_CHMOD, sys_chmod as usize);
+        dispatcher.register(SYS_IOCTL, sys_ioctl as usize);
 
         dispatcher
     }
