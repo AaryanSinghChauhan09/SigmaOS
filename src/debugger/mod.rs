@@ -2,16 +2,42 @@
 //!
 //! This module provides debugging tools for the SigmaOS kernel and userland applications,
 //! including breakpoints, watchpoints, stack tracing, and memory inspection.
+//! Replicates Debian-style debug symbols packages (.dbgsym) and Build ID lookup systems.
 
 #![no_std]
 
 extern crate alloc;
 use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
+use alloc::vec;
+use alloc::format;
 
 pub mod breakpoint;
 
-pub use breakpoint::{BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
+pub use breakpoint::{Breakpoint, BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
+
+/// Represents a Debian-style debug symbol package containing Build ID mappings
+#[derive(Debug, Clone)]
+pub struct DebianDbgsymPackage {
+    pub build_id: String,           // Unique ELF .note.gnu.build-id hash
+    pub package_name: String,       // Target binary name, e.g. "nano"
+    pub symbols_map: Vec<(u64, String, String, u32)>, // Address -> (Function, File, Line)
+}
+
+impl DebianDbgsymPackage {
+    pub fn new(build_id: &str, name: &str) -> Self {
+        Self {
+            build_id: build_id.to_string(),
+            package_name: name.to_string(),
+            symbols_map: Vec::new(),
+        }
+    }
+
+    pub fn register_symbol(&mut self, addr: u64, func: &str, file: &str, line: u32) {
+        self.symbols_map.push((addr, func.to_string(), file.to_string(), line));
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Breakpoint {
@@ -117,6 +143,8 @@ pub struct Debugger {
     current_frame: Option<StackFrame>,
     call_stack: Vec<StackFrame>,
     memory_regions: Vec<MemoryRegion>,
+    /// Registered Debian dbgsym packages, matching /usr/lib/debug/.build-id/ structures
+    pub dbgsym_packages: Vec<DebianDbgsymPackage>,
 }
 
 impl Debugger {
@@ -127,6 +155,7 @@ impl Debugger {
             current_frame: None,
             call_stack: Vec::new(),
             memory_regions: Vec::new(),
+            dbgsym_packages: Vec::new(),
         }
     }
 
@@ -304,12 +333,44 @@ impl Debugger {
     }
 
     /// Set register value.
-    pub fn set_register(&self, register_name: &str, value: u64) -> Result<(), String> {
+    pub fn set_register(&self, register_name: &str, _value: u64) -> Result<(), String> {
         // In a real implementation, this would write to actual registers
         match register_name {
             "rip" | "pc" | "rsp" | "sp" | "rbp" | "fp" => Ok(()),
             _ => Err(format!("Unknown register: {}", register_name)),
         }
+    }
+
+    /// Registers a Debian-style debug symbol package into the debugger
+    pub fn register_dbgsym_package(&mut self, dbgsym: DebianDbgsymPackage) {
+        self.dbgsym_packages.push(dbgsym);
+    }
+
+    /// Validates if a dbgsym package conforms to standard Build ID formatting (minimum 16-character hex hash)
+    pub fn is_debian_dbgsym_compliant(&self, dbgsym: &DebianDbgsymPackage) -> bool {
+        if dbgsym.build_id.len() < 16 {
+            return false;
+        }
+        dbgsym.build_id.chars().all(|c| c.is_ascii_hexdigit())
+    }
+
+    /// Dynamically resolves an instruction address using registered Debian dbgsym packages.
+    /// Replicates the build-id symbol lookup of standard Debian debuggers.
+    pub fn resolve_address_to_symbol(&self, build_id: &str, address: u64) -> Option<StackFrame> {
+        for dbgsym in &self.dbgsym_packages {
+            if dbgsym.build_id == build_id {
+                for &(symbol_addr, ref func, ref file, line) in &dbgsym.symbols_map {
+                    if symbol_addr == address {
+                        let mut frame = StackFrame::new(address);
+                        frame.function_name = Some(func.clone());
+                        frame.file_name = Some(file.clone());
+                        frame.line_number = Some(line);
+                        return Some(frame);
+                    }
+                }
+            }
+        }
+        None
     }
 }
 
@@ -341,7 +402,7 @@ mod tests {
 
     #[test]
     fn test_breakpoint_hit() {
-        let mut bp = SimpleBreakpoint::new(1, 0x1000, BreakpointType::Software);
+        let bp = SimpleBreakpoint::new(1, 0x1000, BreakpointType::Software);
         assert!(bp.is_enabled());
     }
 
@@ -417,5 +478,32 @@ mod tests {
         assert!(popped.is_some());
         assert_eq!(popped.unwrap().address, 0x2000);
         assert_eq!(debugger.get_call_stack().len(), 1);
+    }
+
+    #[test]
+    fn test_debian_dbgsym_symbol_resolver() {
+        let mut debugger = Debugger::new();
+        debugger.attach();
+
+        let build_id = "a1b2c3d4e5f67890abcdef1234567890".to_string();
+        let mut dbgsym = DebianDbgsymPackage::new(&build_id, "nano");
+        dbgsym.register_symbol(0x1040, "main", "nano.c", 42);
+
+        assert!(debugger.is_debian_dbgsym_compliant(&dbgsym));
+        debugger.register_dbgsym_package(dbgsym);
+
+        // Non-compliant package test (short build id)
+        let invalid_dbgsym = DebianDbgsymPackage::new("short_id", "nano");
+        assert!(!debugger.is_debian_dbgsym_compliant(&invalid_dbgsym));
+
+        // Resolve instruction address to debug symbol StackFrame
+        let frame = debugger.resolve_address_to_symbol(&build_id, 0x1040).unwrap();
+        assert_eq!(frame.function_name.unwrap(), "main");
+        assert_eq!(frame.file_name.unwrap(), "nano.c");
+        assert_eq!(frame.line_number.unwrap(), 42);
+
+        // Fail to resolve address with invalid build id or wrong address
+        assert!(debugger.resolve_address_to_symbol("wrong_id", 0x1040).is_none());
+        assert!(debugger.resolve_address_to_symbol(&build_id, 0x9999).is_none());
     }
 }

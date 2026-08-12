@@ -10,7 +10,7 @@ use core::mem;
 
 pub type ProfileID = usize;
 
-#[repr(C)]
+#[repr(usize)]
 #[derive(Debug, Clone, Copy)]
 pub enum ProfileType { CPU = 0, Memory = 1, IO = 2, Network = 3 }
 

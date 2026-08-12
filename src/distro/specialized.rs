@@ -519,9 +519,226 @@ impl Default for DebianPolicyEnforcer {
     }
 }
 
+/// Three-Tier Release Model: sigma.next (unstable), sigma.beta (testing), sigma.stable (stable)
+pub struct ThreeTierReleaseModel {
+    pub active_channel: String,
+    pub channels: HashMap<String, String>, // Name to description
+}
+
+impl ThreeTierReleaseModel {
+    pub fn new() -> Self {
+        let mut channels = HashMap::new();
+        channels.insert("sigma.next".to_string(), "Rolling, experimental, daily updates".to_string());
+        channels.insert("sigma.beta".to_string(), "Pre-release, weekly, mostly stable".to_string());
+        channels.insert("sigma.stable".to_string(), "Production LTS, quarterly security-only".to_string());
+
+        Self {
+            active_channel: "sigma.stable".to_string(),
+            channels,
+        }
+    }
+
+    pub fn list_channels(&self) -> String {
+        let mut output = String::from("Σ [PKG] Available channels:\n");
+        let mut sorted_keys: Vec<&String> = self.channels.keys().collect();
+        sorted_keys.sort(); // Consistent ordering
+        for key in sorted_keys {
+            let desc = &self.channels[key];
+            let name_alias = match key.as_str() {
+                "sigma.next" => "Σ-next",
+                "sigma.beta" => "Σ-beta",
+                _ => "Σ-stable",
+            };
+            output.push_str(&format!("  {} ({}) — {}\n", key, name_alias, desc));
+        }
+        output
+    }
+
+    pub fn set_channel(&mut self, channel: &str) -> Result<String, &'static str> {
+        if self.channels.contains_key(channel) {
+            self.active_channel = channel.to_string();
+            Ok(format!("Σ [PKG] Channel set to {} (LTS). No experimental features.", channel))
+        } else {
+            Err("Unknown release channel")
+        }
+    }
+}
+
+impl Default for ThreeTierReleaseModel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Debian Social Contract and DFSG Guidelines checks
+pub struct DebianSocialContract {
+    pub open_source_only: bool,
+    pub public_bug_tracker: bool,
+    pub priorities_users_first: bool,
+}
+
+impl DebianSocialContract {
+    pub fn new() -> Self {
+        Self {
+            open_source_only: true,
+            public_bug_tracker: true,
+            priorities_users_first: true,
+        }
+    }
+
+    pub fn is_dfsg_compliant_license(&self, license: &str) -> bool {
+        // Commits to 100% open source licenses
+        match license {
+            "MIT" | "Apache-2.0" | "GPL-2.0" | "GPL-3.0" | "BSD-2-Clause" | "BSD-3-Clause" => true,
+            _ => false, // Non-free or proprietary are rejected
+        }
+    }
+
+    pub fn evaluate_social_contract_compliance(&self, is_open_source: bool, is_bug_public: bool, is_user_needs_prioritized: bool) -> bool {
+        if self.open_source_only && !is_open_source {
+            return false;
+        }
+        if self.public_bug_tracker && !is_bug_public {
+            return false;
+        }
+        if self.priorities_users_first && !is_user_needs_prioritized {
+            return false;
+        }
+        true
+    }
+}
+
+impl Default for DebianSocialContract {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Debian-Style Freeze-Based Stabilization lifecycle
+pub struct FreezeBasedStabilization {
+    pub is_freeze_active: bool,
+    pub allowed_update_types: Vec<String>, // "security", "critical-bugfix"
+}
+
+impl FreezeBasedStabilization {
+    pub fn new() -> Self {
+        Self {
+            is_freeze_active: false,
+            allowed_update_types: vec!["security".to_string(), "critical-bugfix".to_string()],
+        }
+    }
+
+    pub fn set_freeze_state(&mut self, active: bool) {
+        self.is_freeze_active = active;
+    }
+
+    pub fn is_update_allowed(&self, update_type: &str) -> bool {
+        if !self.is_freeze_active {
+            return true; // No freeze: everything is allowed
+        }
+        // During freeze, only security and critical bugfixes are permitted
+        self.allowed_update_types.iter().any(|t| t == update_type)
+    }
+}
+
+impl Default for FreezeBasedStabilization {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Debian-style preseed configuration question representing a installer response
+#[derive(Debug, Clone)]
+pub struct PreseedQuestion {
+    pub owner: String,       // e.g. "d-i" or "debian-installer"
+    pub template: String,    // e.g. "mirror/http/hostname"
+    pub question_type: String, // e.g. "string"
+    pub value: String,       // e.g. "ftp.us.debian.org"
+}
+
+/// Debian-style Automated Preseed installer configuration engine
+pub struct DebianPreseedEngine {
+    pub answers: HashMap<String, PreseedQuestion>,
+}
+
+impl DebianPreseedEngine {
+    pub fn new() -> Self {
+        Self {
+            answers: HashMap::new(),
+        }
+    }
+
+    /// Parses a standard debian preseed configuration file line:
+    /// e.g. "d-i mirror/http/hostname string ftp.us.debian.org"
+    pub fn parse_preseed_line(&mut self, line: &str) -> Result<(), &'static str> {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            return Ok(()); // Ignore empty lines or comments
+        }
+
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.len() < 4 {
+            return Err("Invalid preseed directive format, expected: owner template type value");
+        }
+
+        let owner = parts[0].to_string();
+        let template = parts[1].to_string();
+        let question_type = parts[2].to_string();
+        let value = parts[3..].join(" ");
+
+        let question = PreseedQuestion {
+            owner,
+            template: template.clone(),
+            question_type,
+            value,
+        };
+
+        self.answers.insert(template, question);
+        Ok(())
+    }
+
+    /// Retrieves pre-configured answers for automated installations
+    pub fn answer_question(&self, _owner: &str, template: &str) -> Option<String> {
+        self.answers.get(template).map(|q| q.value.clone())
+    }
+}
+
+impl Default for DebianPreseedEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_debian_preseed_engine() {
+        let mut engine = DebianPreseedEngine::new();
+
+        // Parse comment and empty lines
+        assert!(engine.parse_preseed_line("# This is a comment").is_ok());
+        assert!(engine.parse_preseed_line("   ").is_ok());
+
+        // Parse valid standard preseed directive
+        assert!(engine.parse_preseed_line("d-i mirror/http/hostname string ftp.us.debian.org").is_ok());
+        assert!(engine.parse_preseed_line("d-i passwd/root-login boolean false").is_ok());
+
+        // Invalid format
+        assert!(engine.parse_preseed_line("d-i invalid_line").is_err());
+
+        // Verify pre-configured answers
+        assert_eq!(
+            engine.answer_question("d-i", "mirror/http/hostname").unwrap(),
+            "ftp.us.debian.org"
+        );
+        assert_eq!(
+            engine.answer_question("d-i", "passwd/root-login").unwrap(),
+            "false"
+        );
+        assert!(engine.answer_question("d-i", "nonexistent/template").is_none());
+    }
 
     #[test]
     fn test_hpc_cluster_jobs() {
@@ -724,5 +941,59 @@ mod tests {
         assert!(enforcer.evaluate_package_compliance(true, "/usr/bin/libreoffice"));
         assert!(!enforcer.evaluate_package_compliance(false, "/usr/bin/libreoffice"));
         assert!(!enforcer.evaluate_package_compliance(true, "/var/log/libreoffice"));
+    }
+
+    #[test]
+    fn test_three_tier_release_model() {
+        let mut model = ThreeTierReleaseModel::new();
+        let channels_list = model.list_channels();
+        assert!(channels_list.contains("sigma.next"));
+        assert!(channels_list.contains("sigma.beta"));
+        assert!(channels_list.contains("sigma.stable"));
+
+        assert_eq!(model.active_channel, "sigma.stable");
+
+        let set_res = model.set_channel("sigma.next");
+        assert!(set_res.is_ok());
+        assert_eq!(model.active_channel, "sigma.next");
+
+        let set_err = model.set_channel("invalid_channel");
+        assert!(set_err.is_err());
+    }
+
+    #[test]
+    fn test_debian_social_contract() {
+        let sc = DebianSocialContract::new();
+
+        // DFSG Compliant Licenses
+        assert!(sc.is_dfsg_compliant_license("MIT"));
+        assert!(sc.is_dfsg_compliant_license("Apache-2.0"));
+        assert!(sc.is_dfsg_compliant_license("GPL-3.0"));
+        assert!(!sc.is_dfsg_compliant_license("Proprietary"));
+        assert!(!sc.is_dfsg_compliant_license("Non-Free-Ware"));
+
+        // Overall Social Contract compliance
+        assert!(sc.evaluate_social_contract_compliance(true, true, true));
+        assert!(!sc.evaluate_social_contract_compliance(false, true, true));
+        assert!(!sc.evaluate_social_contract_compliance(true, false, true));
+        assert!(!sc.evaluate_social_contract_compliance(true, true, false));
+    }
+
+    #[test]
+    fn test_freeze_based_stabilization() {
+        let mut stabilization = FreezeBasedStabilization::new();
+
+        // No active freeze
+        assert!(!stabilization.is_freeze_active);
+        assert!(stabilization.is_update_allowed("new-feature"));
+        assert!(stabilization.is_update_allowed("security"));
+        assert!(stabilization.is_update_allowed("critical-bugfix"));
+
+        // Activate freeze period
+        stabilization.set_freeze_state(true);
+        assert!(stabilization.is_freeze_active);
+        assert!(!stabilization.is_update_allowed("new-feature"));
+        assert!(stabilization.is_update_allowed("security"));
+        assert!(stabilization.is_update_allowed("critical-bugfix"));
     }
 }
