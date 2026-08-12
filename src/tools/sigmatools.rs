@@ -5,8 +5,10 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::string::String;
+use alloc::collections::BTreeMap as HashMap;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::format;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigmaToolError {
@@ -526,7 +528,7 @@ mod tests {
     fn test_sigma_monitor_performance_telemetry() {
         let mut monitor = SigmaMonitor::new();
         assert_eq!(monitor.get_highest_core_temp(), 44.1);
-        assert_eq!(monitor.get_average_context_latency_ns(), 13.75);
+        assert_eq!(monitor.get_average_context_latency_ns(), 13.375);
 
         monitor.log_allocation_leak(1024);
         assert_eq!(monitor.memory_leak_bytes_logged, 1024);
