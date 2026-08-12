@@ -39,3 +39,8 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 ## 2026-08-09 - Sanitizing Dynamic Dependency Trees
 **Learning:** Unverified third-party libraries downloaded during build stages can introduce hidden supply chain vulnerabilities. Outdated sub-dependencies like `brace-expansion` and `nanoid` must have priority upgrades pinned at the package level to eliminate Regular Expression Denial of Service (ReDoS) and loop hazards.
 **Action:** Always scan for nested lockfile overrides and apply semantic versions upgrades strictly.
+
+## 2026-08-10 - Enforcing Sub-Dependency Upgrades with Lockfile Overrides
+**Vulnerability:** High-severity vulnerabilities in dynamic sub-dependencies (specifically `brace-expansion` and `nanoid`) are not exposed as top-level dependencies, bypassing routine package-level upgrades.
+**Learning:** To securely patch indirect dependencies without breaking upstream dependency structures, utilize `"overrides"` (npm) and `"pnpm.overrides"` blocks directly inside `package.json` to pin safe versions (`^2.0.1` and `^3.3.17`).
+**Prevention:** Standardize a dynamic audit verification step (`npm audit`) within all development loops and CI security scans to enforce transitive dependency cleanliness.

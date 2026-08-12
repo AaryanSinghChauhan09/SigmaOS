@@ -19,3 +19,7 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-09 - Transitioning dynamic formatting out of hotpaths
 **Learning:** Performing dynamic formatting like `format!("...")` inside critical execution loops blocks register reuse and triggers standard allocator locks. Replacing them with pre-allocated trace buffers saves microsecond context processing times.
 **Action:** Always use static lifetime strings or write directly to static ring buffers in critical kernel tasks.
+
+## 2026-08-10 - O(1) Short-Circuit Optimization in Buddy Allocator
+**Learning:** When performing physical memory allocation search sequences under high concurrency, scanning empty priority free lists introduces O(N) traversal overhead. Short-circuiting the traversal immediately when the allocator saturation bitmask registers 0 for the requested block order guarantees O(1) failure latency and maximizes cache line locality in low-memory states.
+**Action:** Enforce fast-path bitmask lookups before diving into segment search iterators.
