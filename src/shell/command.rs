@@ -4,6 +4,9 @@
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::boxed::Box;
+use alloc::format;
+use alloc::string::ToString;
 
 use core::mem;
 /// OOP-based Shell Command System for SigmaOS
@@ -11,7 +14,66 @@ use core::mem;
 /// Implements command parsing, execution, and built-in commands
 use core::sync::atomic::{AtomicUsize, Ordering};
 
+extern "C" {
+    #[link_name = "alloc"]
+    fn sys_alloc(size: usize) -> *mut u8;
+    #[link_name = "free"]
+    fn sys_free(ptr: *mut u8);
+}
+
 pub type CommandID = usize;
+
+#[repr(C)]
+pub struct ShellVec<T> {
+    pub data: *mut T,
+    pub len: usize,
+    pub capacity: usize,
+}
+
+impl<T> ShellVec<T> {
+    pub fn new() -> Self {
+        ShellVec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = sys_alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                sys_free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -95,7 +157,7 @@ impl<T> Drop for ShellVec<T> {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
-                free(self.data as *mut u8);
+                sys_free(self.data as *mut u8);
             }
         }
     }
@@ -489,8 +551,8 @@ impl CommandRegistry for SimpleCommandRegistry {
         None
     }
 
-    fn list(&self) -> Vec<&[u8]> {
-        let mut names = Vec::new();
+    fn list(&self) -> ShellVec<&[u8]> {
+        let mut names = ShellVec::new();
         for command_option in &*self.commands {
             if let Some(ref command) = command_option {
                 names.push(command.name());
@@ -623,8 +685,8 @@ impl CommandHistory for SimpleCommandHistory {
         }
     }
 
-    fn list(&self) -> Vec<&[u8]> {
-        let mut commands = Vec::new();
+    fn list(&self) -> ShellVec<&[u8]> {
+        let mut commands = ShellVec::new();
         for cmd in &*self.history {
             let len = cmd.iter().position(|&b| b == 0).unwrap_or(256);
             commands.push(&cmd[..len]);
