@@ -17,6 +17,7 @@ pub mod india_professional_tools;
 pub mod debian;
 pub mod mobile_desktop_parity;
 pub mod opensuse_slackware;
+pub mod alpine_linux;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -110,4 +111,9 @@ pub use mobile_desktop_parity::{
 
 pub use opensuse_slackware::{
     YastModuleType, YastCentralControlCenter, SlackwarePackage, SlackwarePkgTools,
+};
+
+pub use alpine_linux::{
+    ApkPackage, ApkError, ApkDatabase, MuslCompatibilityLayer, AcfServiceStatus,
+    AcfService, AlpineConfigFramework, HardeningFeature, AlpineHardening,
 };
