@@ -20,7 +20,43 @@ This document serves as the master daily improvement plan, comprehensive system 
 
 ---
 
-## 🔍 1. Code Quality & Testing Audit
+## ⚖️ 1. Linux & BSD Competitor Parity & Gap Analysis
+
+To establish SigmaOS as a world-class operating system, we analyze current functional gaps and compile strategic design improvements inspired by leading Linux and BSD distributions.
+
+### A. Development Ecosystem
+*   **Arch Linux (Rolling Release & Arch Wiki):**
+    *   *Competitor State:* Highly documented onboarding and packaging procedures supported by the Arch Wiki and clean rolling-release cycles.
+    *   *SigmaOS Gap:* The repository contains 31 Rust files blocked by unresolved merge conflict markers (`|||||||`).
+    *   *Remediation:* Deploy automated pre-commit hooks to scrub conflicts, and compile standard onboarding wikis for kernel module compiling.
+*   **Debian (DFSG & Strict Policy Enforcement):**
+    *   *Competitor State:* Clear policy checks (Debian Free Software Guidelines) and deterministic package sorting.
+    *   *SigmaOS Gap:* Licensing checks and package sorting logic exist but must be expanded to handle multi-architecture pinning natively.
+    *   *Remediation:* Enforce automatic DFSG-compliant licence header checkers across the core tree.
+
+### B. Features & Subsystems
+*   **Red Hat Enterprise Linux (Dynamic MAC MLS/MCS):**
+    *   *Competitor State:* High-security Multi-Level Security / Multi-Category Security (MLS/MCS) dominance transitions in SELinux.
+    *   *SigmaOS Gap:* Currently lacks dynamic security label transitions on capabilities.
+    *   *Remediation:* Implement hierarchical security level checks (`DynamicMacEnforcer`) inside the S-SEC shard.
+*   **NixOS (Atomic Profiles & Functional Reproducibility):**
+    *   *Competitor State:* Declarative profiles and generational system-wide rollbacks.
+    *   *SigmaOS Gap:* Procedural package management without generation state checkpoints.
+    *   *Remediation:* Integrate atomic profile state checkpoints (`SovereignProfileManager`) inside S-FS and S-SEC.
+
+### C. Tools & Utilities
+*   **Gentoo (Portage USE Flags & Optimizations):**
+    *   *Competitor State:* Compile-time optimizations (USE flags) allowing highly targeted CPU instructions (AVX-512, etc.).
+    *   *SigmaOS Gap:* Universal package managers inside SigmaOS have static dependency maps.
+    *   *Remediation:* Integrate Portage-style dynamic USE flag resolution and conditional dependency trees into the package build system.
+*   **FreeBSD (Capsicum Jails & VNET):**
+    *   *Competitor State:* Lightweight sandbox jails supporting separated TCP/IP networks (VNET).
+    *   *SigmaOS Gap:* Capability-based tokens are local to process groups.
+    *   *Remediation:* Implement standard Jail constructs (`FreeBsdJail`) with isolated virtual net boundaries.
+
+---
+
+## 🔍 2. Code Quality & Testing Audit
 
 ### A. Syntax Errors, Runtime Bugs & Unused Imports
 *   **Git Merge Delimiters across Workspace Modules:**
@@ -42,21 +78,21 @@ This document serves as the master daily improvement plan, comprehensive system 
 
 ---
 
-## ⚡ 2. Performance & Optimization
+## ⚡ 3. Performance & Optimization
 
 ### A. Memory Profile & Hotpath Allocations
 *   **Hotpath Bottleneck:** Diagnostic telemetry and logging within execution loops perform dynamic heap formatting of strings.
-*   **Remediation:** Transition logging to utilize static-lifetime string slices (`&'static str`) or pre-allocated zero-allocation circular byte buffers for hotpath diagnostics.
+*   **Remediation:* Transition logging to utilize static-lifetime string slices (`&'static str`) or pre-allocated zero-allocation circular byte buffers for hotpath diagnostics.
 *   **Buddy Allocator Efficiency:** Leverage the O(1) saturation short-circuit to skip list traversal when free lists are empty, avoiding unnecessary search cycles.
 
 ### B. Core Module Bottlenecks
 *   **DMA Storage Polling:** Storage driver models utilize tight spin-locks for physical DMA operations, leading to high CPU usage.
-*   **Remediation:* Transition block storage interactions to hardware-level MSI-X APIC interrupt delivery.
+*   **Remediation:** Transition block storage interactions to hardware-level MSI-X APIC interrupt delivery.
 *   **CPU Frequency Scaling Benchmark:** Recommend benchmarking the `CpuPerformanceGovernor` under high loads to verify dynamic scaling transition latency (aim for sub-millisecond response).
 
 ---
 
-## 🛡️ 3. Security & Compliance
+## 🛡️ 4. Security & Compliance
 
 ### A. Dependency Scans & Patches
 *   **Vulnerability Detected:** High-severity ReDoS (Regular Expression Denial of Service) in dependency `brace-expansion` (GHSA-mh99-v99m-4gvg / GHSA-rgw5-rvv9-x895) causing OOM process crashes.
@@ -70,7 +106,7 @@ This document serves as the master daily improvement plan, comprehensive system 
 
 ---
 
-## 📂 4. Documentation & Workflow
+## 📂 5. Documentation & Workflow
 
 ### A. Completeness & Onboarding Guides
 *   **Onboarding Guides:** Expand `CONTRIBUTING.md` with compiler configurations for compiling safe `#![no_std]` Rust modules for ARM64 and RISC-V targets.
@@ -82,7 +118,7 @@ This document serves as the master daily improvement plan, comprehensive system 
 
 ---
 
-## 🏛️ 5. Repo Governance & Branch Health
+## 🏛️ 6. Repo Governance & Branch Health
 
 ### A. Issue & Pull Request Triage
 *   **Issues Categorization:** Define three clear categories: `bug` (compilation failures), `feature` (adding new distribution layers), and `enhancement` (OOP modular refactoring).
@@ -90,17 +126,11 @@ This document serves as the master daily improvement plan, comprehensive system 
 
 ---
 
-## 🤝 6. Community & Collaboration
+## 🤝 7. Community & Collaboration
 
 ### A. Discussions Summary & Guidelines
 *   **Zero-Dependency Strategy:** Transition all remaining standard components to custom collections (`klib`) to maintain complete compiler independence.
 *   **Community Mentorship:** Establish pairings of maintainers with incoming contributors (e.g. low-level memory experts pairing with juniors on low-level memory, security specialists pairing on sandbox overlays).
-
----
-
-## 🧩 7. Tools & Utilities
-*   **CLI Usability:** Standardize the `sigma-pkg` and `sigma-sh` commands to print rich, helpful, human-readable error messages on syntax failures instead of raw core dumps.
-*   **Build Tools Config:** Maintain an active `eslint.config.js` to ensure linter commands do not fail.
 
 ---
 

@@ -35,6 +35,18 @@ This guide outlines actionable steps and architectural patterns designed to sust
 
 ---
 
+## ⚖️ Linux & BSD Competitor Comparison
+
+| Aspect | SigmaOS Current State | Competitor Benchmark (Linux/BSD) | Strategic Actions Needed |
+| :--- | :--- | :--- | :--- |
+| **Development** | Standalone compilations blocked by 31 file conflicts. | Arch Linux's automated compile verification pipelines. | Run automated conflict scrubbers globally. |
+| **Features** | Capabilities model with basic isolation boundaries. | Red Hat / SELinux dynamic MAC MLS/MCS dominance. | Incorporate hierarchical `DynamicMacEnforcer`. |
+| **Tools** | Static package dependency resolution mappings. | Gentoo Portage USE flags build optimizer engine. | Implement Portage dynamic USE flag compilation flags. |
+| **Functions** | Dynamic heap logging in critical kernel schedulers. | NixOS atomic immutable system-wide configurations. | Transition scheduler telemetry to static ring buffers. |
+| **Packages** | Static multi-architecture package spec manifests. | Debian dpkg multi-architecture emulations and apt pins. | Build topological sorting package dependencies. |
+
+---
+
 ## 🛠️ Actionable Development Standards
 
 ### A. Code Quality & Formatting
