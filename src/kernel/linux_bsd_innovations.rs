@@ -422,6 +422,132 @@ impl CarpSecurityRouter {
     }
 }
 
+// ================= Linux-style VM Swap Page Engine =================
+
+pub struct SwapPage {
+    pub virtual_addr: u64,
+    pub disk_sector: u64,
+}
+
+/// Linux-style virtual memory swap stager and page fault resolver
+pub struct SovereignSwapEngine {
+    pub swap_pages: Vec<SwapPage>,
+    pub total_sectors_available: u64,
+}
+
+impl SovereignSwapEngine {
+    pub fn new(sectors: u64) -> Self {
+        Self {
+            swap_pages: Vec::new(),
+            total_sectors_available: sectors,
+        }
+    }
+
+    pub fn page_out_frame(&mut self, virtual_addr: u64, sector: u64) -> Result<(), &'static str> {
+        if sector >= self.total_sectors_available {
+            return Err("Swap Engine: No available swap sector space remaining on disk!");
+        }
+        self.swap_pages.push(SwapPage { virtual_addr, disk_sector: sector });
+        Ok(())
+    }
+
+    pub fn resolve_page_fault(&mut self, virtual_addr: u64) -> Result<u64, &'static str> {
+        let pos = self.swap_pages.iter().position(|p| p.virtual_addr == virtual_addr)
+            .ok_or("Swap Engine: Target page not located in swap space")?;
+
+        let p = self.swap_pages.remove(pos);
+        Ok(p.disk_sector)
+    }
+}
+
+// ================= Linux-style Container Namespace Isolation =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NamespaceType {
+    Pid,
+    Mount,
+    Net,
+}
+
+/// Linux-style namespace isolation (PID, Mount, Net) and secure jail sandbox
+pub struct SovereignNamespaceContainer {
+    pub container_id: u32,
+    pub active_namespaces: Vec<NamespaceType>,
+    pub sandbox_quarantined: bool,
+}
+
+impl SovereignNamespaceContainer {
+    pub fn new(id: u32) -> Self {
+        Self {
+            container_id: id,
+            active_namespaces: Vec::new(),
+            sandbox_quarantined: false,
+        }
+    }
+
+    pub fn unshare_namespace(&mut self, ns: NamespaceType) {
+        self.active_namespaces.push(ns);
+    }
+
+    pub fn enforce_jail_restrictions(&mut self) {
+        self.sandbox_quarantined = true;
+    }
+
+    pub fn check_permission_in_namespace(&self, ns: NamespaceType) -> bool {
+        if self.sandbox_quarantined {
+            false
+        } else {
+            self.active_namespaces.contains(&ns)
+        }
+    }
+}
+
+// ================= FreeBSD epoll/kqueue style event multiplexing =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReactorEvent {
+    ReadReady,
+    WriteReady,
+    ErrorTriggered,
+}
+
+pub struct ReactorRegistration {
+    pub handle_id: u32,
+    pub target_event: ReactorEvent,
+}
+
+/// FreeBSD kqueue/epoll-parity asynchronous event reactor notifier
+pub struct SovereignEventReactor {
+    pub registrations: Vec<ReactorRegistration>,
+    pub triggered_handles: Vec<u32>,
+}
+
+impl SovereignEventReactor {
+    pub fn new() -> Self {
+        Self {
+            registrations: Vec::new(),
+            triggered_handles: Vec::new(),
+        }
+    }
+
+    pub fn register_event_handle(&mut self, handle: u32, event: ReactorEvent) {
+        self.registrations.push(ReactorRegistration { handle_id: handle, target_event: event });
+    }
+
+    pub fn notify_handle_event(&mut self, handle: u32, event: ReactorEvent) {
+        let is_registered = self.registrations.iter().any(|r| r.handle_id == handle && r.target_event == event);
+        if is_registered && !self.triggered_handles.contains(&handle) {
+            self.triggered_handles.push(handle);
+        }
+    }
+
+    pub fn poll_active_handles(&mut self) -> Vec<u32> {
+        let active = self.triggered_handles.clone();
+        self.triggered_handles.clear();
+        active
+    }
+}
+
 // ================= Hybrid Kernel Inspirations =================
 
 pub struct NtExecutiveService {
@@ -889,6 +1015,46 @@ mod tests {
 
         let res = runtime.execute(&safe_program, 10).unwrap();
         assert_eq!(res, 70); // 10 + 100 - 40 = 70
+    }
+
+    #[test]
+    fn test_sovereign_swap_engine() {
+        let mut swap = SovereignSwapEngine::new(10);
+        assert!(swap.page_out_frame(0x00401000, 1).is_ok());
+        assert!(swap.page_out_frame(0x00402000, 2).is_ok());
+        assert!(swap.page_out_frame(0x00403000, 99).is_err()); // Out of bounds sector
+
+        let sector = swap.resolve_page_fault(0x00401000).unwrap();
+        assert_eq!(sector, 1);
+        assert!(swap.resolve_page_fault(0x00401000).is_err()); // Already resolved and swapped in
+    }
+
+    #[test]
+    fn test_sovereign_namespace_container() {
+        let mut container = SovereignNamespaceContainer::new(42);
+        container.unshare_namespace(NamespaceType::Pid);
+        container.unshare_namespace(NamespaceType::Net);
+
+        assert!(container.check_permission_in_namespace(NamespaceType::Pid));
+        assert!(!container.check_permission_in_namespace(NamespaceType::Mount));
+
+        container.enforce_jail_restrictions();
+        assert!(!container.check_permission_in_namespace(NamespaceType::Pid)); // All blocked under quarantined jail
+    }
+
+    #[test]
+    fn test_sovereign_event_reactor() {
+        let mut reactor = SovereignEventReactor::new();
+        reactor.register_event_handle(10, ReactorEvent::ReadReady);
+        reactor.register_event_handle(20, ReactorEvent::WriteReady);
+
+        reactor.notify_handle_event(10, ReactorEvent::ReadReady);
+        reactor.notify_handle_event(20, ReactorEvent::ReadReady); // Unregistered event type
+        reactor.notify_handle_event(30, ReactorEvent::ReadReady); // Unregistered handle
+
+        let active = reactor.poll_active_handles();
+        assert_eq!(active.len(), 1);
+        assert_eq!(active[0], 10);
     }
 }
 

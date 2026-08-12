@@ -225,9 +225,7 @@ impl TerminalSession {
         self.user_functions.get(name).map(|func| func.interpolate(args))
     }
 
-    // =========================================================================
     // AI-NATIVE ORCHESTRATION & DEPENDENCIES HEALING PRIMITIVES
-    // =========================================================================
 
     /// AI-Native Execution Planning: formulates sequential command lines to satisfy a high-level goal
     pub fn ai_run(&self, goal: &str) -> Vec<String> {
@@ -277,9 +275,7 @@ impl TerminalSession {
         Ok(report)
     }
 
-    // =========================================================================
     // CROSS-PLATFORM COMMAND TRANSLATION LAYER
-    // =========================================================================
 
     /// Translates standard Bash, PowerShell, or BSD shell commands into native SigmaOS commands
     pub fn translate_shell_script(&self, script: &str, source_shell: &str) -> String {
@@ -432,9 +428,7 @@ impl TerminalSession {
     }
 }
 
-// ==========================================
 // UNIT TESTS
-// ==========================================
 
 #[cfg(test)]
 mod tests {
