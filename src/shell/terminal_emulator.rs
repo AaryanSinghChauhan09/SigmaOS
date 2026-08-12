@@ -413,7 +413,6 @@ impl TerminalSession {
     }
 }
 
-// ==========================================
 // UNIT TESTS
 
 #[cfg(test)]

@@ -10,7 +10,7 @@ extern crate alloc;
 use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-#[cfg(not(feature = "standalone_test"))]
+use alloc::collections::BTreeMap;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 #[cfg(feature = "standalone_test")]
