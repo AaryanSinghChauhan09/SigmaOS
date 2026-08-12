@@ -1,26 +1,8 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Unified Subsystem Architecture
 // Abstract base trait hierarchy for Linux driver absorption and OOP-based modularity
 // This enables SigmaOS to absorb Linux subsystems while maintaining sovereign identity
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 
@@ -29,7 +11,27 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
-use crate::security::capability::CapabilityToken;
+#[cfg(not(test))]
+use crate::security::CapabilityToken;
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub bits: u64,
+}
+
+#[cfg(test)]
+impl CapabilityToken {
+    pub fn new() -> Self {
+        Self { bits: 0 }
+    }
+    pub fn allow_capability(&mut self, cap: u64) {
+        self.bits |= cap;
+    }
+    pub fn bits(&self) -> u64 {
+        self.bits
+    }
+}
 
 // ============================================================================
 // Core Driver Abstraction
@@ -40,21 +42,21 @@ use crate::security::capability::CapabilityToken;
 pub trait DeviceDriver: Any {
     /// Initialize the driver and its hardware
     fn init(&mut self) -> Result<(), DriverError>;
-
+    
     /// Handle I/O operations for the device
     fn handle_io(&mut self, operation: IoOperation) -> Result<IoResult, DriverError>;
-
+    
     /// Gracefully shutdown the driver
     fn shutdown(&mut self) -> Result<(), DriverError>;
-
+    
     /// Get driver metadata
     fn metadata(&self) -> &DriverMetadata;
-
+    
     /// Check if driver is capable of handling specific capability
     fn has_capability(&self, capability: u64) -> bool {
         self.metadata().capabilities.contains(&capability)
     }
-
+    
     /// Downcast to concrete type for driver-specific operations
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
@@ -138,27 +140,22 @@ pub enum DriverError {
 pub trait NetworkStack: Any {
     /// Initialize the network stack
     fn init(&mut self) -> Result<(), NetworkError>;
-
+    
     /// Handle incoming packet
     fn receive_packet(&mut self, packet: Vec<u8>) -> Result<(), NetworkError>;
-
+    
     /// Send packet through the stack
     fn send_packet(&mut self, packet: Vec<u8>) -> Result<(), NetworkError>;
-
+    
     /// Create a socket
-    fn create_socket(
-        &mut self,
-        domain: SocketDomain,
-        socket_type: SocketType,
-        protocol: SocketProtocol,
-    ) -> Result<SocketHandle, NetworkError>;
-
+    fn create_socket(&mut self, domain: SocketDomain, socket_type: SocketType, protocol: SocketProtocol) -> Result<SocketHandle, NetworkError>;
+    
     /// Close a socket
     fn close_socket(&mut self, handle: SocketHandle) -> Result<(), NetworkError>;
-
+    
     /// Get stack metadata
     fn metadata(&self) -> &NetworkStackMetadata;
-
+    
     /// Downcast for stack-specific operations
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
@@ -247,37 +244,37 @@ pub enum NetworkError {
 pub trait FileSystem: Any {
     /// Initialize the filesystem
     fn init(&mut self) -> Result<(), FsError>;
-
+    
     /// Mount the filesystem
     fn mount(&mut self, device: &str, mount_point: &str) -> Result<(), FsError>;
-
+    
     /// Unmount the filesystem
     fn unmount(&mut self) -> Result<(), FsError>;
-
+    
     /// Open a file
     fn open_file(&mut self, path: &str, flags: FileFlags) -> Result<FileHandle, FsError>;
-
+    
     /// Close a file
     fn close_file(&mut self, handle: FileHandle) -> Result<(), FsError>;
-
+    
     /// Read from a file
     fn read_file(&mut self, handle: FileHandle, buffer: &mut [u8]) -> Result<usize, FsError>;
-
+    
     /// Write to a file
     fn write_file(&mut self, handle: FileHandle, data: &[u8]) -> Result<usize, FsError>;
-
+    
     /// Create a directory
     fn create_directory(&mut self, path: &str) -> Result<(), FsError>;
-
+    
     /// Remove a file or directory
     fn remove(&mut self, path: &str) -> Result<(), FsError>;
-
+    
     /// Get file metadata
     fn get_metadata(&self, path: &str) -> Result<FileMetadata, FsError>;
-
+    
     /// Get filesystem metadata
     fn metadata(&self) -> &FilesystemMetadata;
-
+    
     /// Downcast for filesystem-specific operations
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
@@ -366,34 +363,28 @@ pub enum FsError {
 pub trait MemoryManager: Any {
     /// Initialize the memory manager
     fn init(&mut self) -> Result<(), MemoryError>;
-
+    
     /// Allocate physical memory
     fn allocate_physical(&mut self, size: usize) -> Result<u64, MemoryError>;
-
+    
     /// Free physical memory
     fn free_physical(&mut self, address: u64, size: usize) -> Result<(), MemoryError>;
-
+    
     /// Allocate virtual memory
     fn allocate_virtual(&mut self, size: usize) -> Result<u64, MemoryError>;
-
+    
     /// Free virtual memory
     fn free_virtual(&mut self, address: u64, size: usize) -> Result<(), MemoryError>;
-
+    
     /// Map virtual to physical memory
-    fn map_memory(
-        &mut self,
-        virtual_addr: u64,
-        physical_addr: u64,
-        size: usize,
-        flags: MapFlags,
-    ) -> Result<(), MemoryError>;
-
+    fn map_memory(&mut self, virtual_addr: u64, physical_addr: u64, size: usize, flags: MapFlags) -> Result<(), MemoryError>;
+    
     /// Unmap memory
     fn unmap_memory(&mut self, virtual_addr: u64, size: usize) -> Result<(), MemoryError>;
-
+    
     /// Get memory manager metadata
     fn metadata(&self) -> &MemoryManagerMetadata;
-
+    
     /// Downcast for memory manager-specific operations
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
@@ -450,22 +441,22 @@ pub enum MemoryError {
 pub trait Scheduler: Any {
     /// Initialize the scheduler
     fn init(&mut self) -> Result<(), SchedulerError>;
-
+    
     /// Add a process to the scheduler
     fn add_process(&mut self, process: ProcessInfo) -> Result<(), SchedulerError>;
-
+    
     /// Remove a process from the scheduler
     fn remove_process(&mut self, pid: u64) -> Result<(), SchedulerError>;
-
+    
     /// Get the next process to run
     fn schedule_next(&mut self) -> Option<ProcessInfo>;
-
+    
     /// Update process state
     fn update_process(&mut self, pid: u64, state: ProcessState) -> Result<(), SchedulerError>;
-
+    
     /// Get scheduler metadata
     fn metadata(&self) -> &SchedulerMetadata;
-
+    
     /// Downcast for scheduler-specific operations
     fn as_any(&self) -> &dyn Any;
     fn as_any_mut(&mut self) -> &mut dyn Any;
@@ -544,19 +535,19 @@ impl<T: DeviceDriver> SecureDriverWrapper<T> {
             sandbox_enabled: true,
         }
     }
-
+    
     /// Verify the driver's cryptographic signature
-    pub fn verify_signature(&mut self, signature: &[u8]) -> Result<(), DriverError> {
+    pub fn verify_signature(&mut self, _signature: &[u8]) -> Result<(), DriverError> {
         // In production, this would verify against a trusted key
         self.signature_verified = true;
         Ok(())
     }
-
+    
     /// Enable or disable sandbox mode
     pub fn set_sandbox(&mut self, enabled: bool) {
         self.sandbox_enabled = enabled;
     }
-
+    
     /// Check if the operation is permitted by capabilities
     fn check_capability(&self, required_capability: u64) -> Result<(), DriverError> {
         if (self.capabilities.bits() & required_capability) == 0 {
@@ -573,7 +564,7 @@ impl<T: DeviceDriver> DeviceDriver for SecureDriverWrapper<T> {
         }
         self.inner.init()
     }
-
+    
     fn handle_io(&mut self, operation: IoOperation) -> Result<IoResult, DriverError> {
         if self.sandbox_enabled {
             // Apply sandbox restrictions
@@ -585,19 +576,19 @@ impl<T: DeviceDriver> DeviceDriver for SecureDriverWrapper<T> {
         }
         self.inner.handle_io(operation)
     }
-
+    
     fn shutdown(&mut self) -> Result<(), DriverError> {
         self.inner.shutdown()
     }
-
+    
     fn metadata(&self) -> &DriverMetadata {
         self.inner.metadata()
     }
-
+    
     fn as_any(&self) -> &dyn Any {
         self
     }
-
+    
     fn as_any_mut(&mut self) -> &mut dyn Any {
         self
     }
@@ -618,7 +609,6 @@ pub struct DriverRegistry {
 
 impl DriverRegistry {
     /// Create a new driver registry
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             drivers: Vec::new(),
@@ -628,74 +618,60 @@ impl DriverRegistry {
             schedulers: Vec::new(),
         }
     }
-
+    
     /// Register a device driver
     pub fn register_driver(&mut self, driver: Box<dyn DeviceDriver>) -> Result<(), RegistryError> {
         self.drivers.push(driver);
         Ok(())
     }
-
+    
     /// Register a network stack
-    pub fn register_network_stack(
-        &mut self,
-        stack: Box<dyn NetworkStack>,
-    ) -> Result<(), RegistryError> {
+    pub fn register_network_stack(&mut self, stack: Box<dyn NetworkStack>) -> Result<(), RegistryError> {
         self.network_stacks.push(stack);
         Ok(())
     }
-
+    
     /// Register a filesystem
     pub fn register_filesystem(&mut self, fs: Box<dyn FileSystem>) -> Result<(), RegistryError> {
         self.filesystems.push(fs);
         Ok(())
     }
-
+    
     /// Register a memory manager
-    pub fn register_memory_manager(
-        &mut self,
-        mm: Box<dyn MemoryManager>,
-    ) -> Result<(), RegistryError> {
+    pub fn register_memory_manager(&mut self, mm: Box<dyn MemoryManager>) -> Result<(), RegistryError> {
         self.memory_managers.push(mm);
         Ok(())
     }
-
+    
     /// Register a scheduler
-    pub fn register_scheduler(
-        &mut self,
-        scheduler: Box<dyn Scheduler>,
-    ) -> Result<(), RegistryError> {
+    pub fn register_scheduler(&mut self, scheduler: Box<dyn Scheduler>) -> Result<(), RegistryError> {
         self.schedulers.push(scheduler);
         Ok(())
     }
-
+    
     /// Find a driver by name
     pub fn find_driver(&self, name: &str) -> Option<&Box<dyn DeviceDriver>> {
         self.drivers.iter().find(|d| d.metadata().name == name)
     }
-
+    
     /// Find a driver by capability
     pub fn find_driver_by_capability(&self, capability: u64) -> Option<&Box<dyn DeviceDriver>> {
         self.drivers.iter().find(|d| d.has_capability(capability))
     }
-
+    
     /// Get all drivers of a specific type
     pub fn get_drivers_by_type(&self, driver_type: DriverType) -> Vec<&Box<dyn DeviceDriver>> {
-        self.drivers
-            .iter()
-            .filter(|d| d.metadata().driver_type == driver_type)
-            .collect()
+        self.drivers.iter().filter(|d| d.metadata().driver_type == driver_type).collect()
     }
-
+    
     /// Initialize all registered drivers
     pub fn initialize_all(&mut self) -> Result<(), RegistryError> {
         for driver in &mut self.drivers {
-            driver
-                .init()
-                .map_err(|e| RegistryError::InitializationFailed(format!("{:?}", e)))?;
+            driver.init().map_err(|e| RegistryError::InitializationFailed(alloc::format!("{:?}", e)))?;
         }
         Ok(())
     }
-
+    
     /// Shutdown all registered drivers
     pub fn shutdown_all(&mut self) -> Result<(), RegistryError> {
         self.drivers.iter_mut().for_each(|d| {
@@ -727,6 +703,7 @@ pub enum RegistryError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     // Mock driver for testing
     struct MockDriver {
@@ -804,13 +781,13 @@ mod tests {
         let driver = MockDriver::new("secure_driver");
         let capabilities = CapabilityToken::new();
         let mut wrapper = SecureDriverWrapper::new(driver, capabilities);
-
+        
         // Should fail without signature verification
         assert!(wrapper.init().is_err());
-
+        
         // Verify signature
         assert!(wrapper.verify_signature(&[0u8; 32]).is_ok());
-
+        
         // Should succeed after verification
         assert!(wrapper.init().is_ok());
     }
@@ -820,7 +797,7 @@ mod tests {
         let driver = MockDriver::new("capability_driver");
         let mut capabilities = CapabilityToken::new();
         capabilities.allow_capability(0x1000);
-
+        
         let wrapper = SecureDriverWrapper::new(driver, capabilities);
         assert!(wrapper.has_capability(0x1000));
         assert!(!wrapper.has_capability(0x9999));
@@ -832,13 +809,13 @@ mod tests {
 // ============================================================================
 
 /// A robust round-robin task selector helper
+#[derive(Clone)]
 pub struct RoundRobinScheduler {
     pub ready_queue: Vec<ProcessInfo>,
     pub current_index: usize,
 }
 
 impl RoundRobinScheduler {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             ready_queue: Vec::new(),
@@ -874,10 +851,7 @@ pub struct BuddyAllocatorCheck {
 
 impl BuddyAllocatorCheck {
     pub fn new(block_size: usize, max_orders: u8) -> Self {
-        Self {
-            block_size,
-            max_orders,
-        }
+        Self { block_size, max_orders }
     }
 
     pub fn is_order_boundary_valid(&self, address: u64, order: u8) -> bool {
@@ -894,7 +868,10 @@ pub struct SigmaShParser;
 
 impl SigmaShParser {
     pub fn tokenize_line(input_line: &str) -> Vec<String> {
-        input_line.split_whitespace().map(String::from).collect()
+        input_line
+            .split_whitespace()
+            .map(String::from)
+            .collect()
     }
 }
 
@@ -905,7 +882,6 @@ pub struct UsbHidKeyboardSimulator {
 }
 
 impl UsbHidKeyboardSimulator {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             is_caps_lock: false,
@@ -983,6 +959,7 @@ impl PackageRecipeParser {
 #[cfg(test)]
 mod extra_tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_round_robin_scheduler() {

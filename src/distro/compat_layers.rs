@@ -273,6 +273,147 @@ impl Default for PosixTranslation {
     }
 }
 
+// ==========================================================
+// NetBSD/FreeBSD kqueue & kevent event notification framework
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum KFilter {
+    Read,
+    Write,
+    Signal,
+    Vnode,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct KEvent {
+    pub ident: uptr,     // File descriptor, process ID, or signal number
+    pub filter: KFilter, // Event filter
+    pub flags: u16,      // Event flags (e.g., EV_ADD, EV_DELETE, EV_ENABLE, EV_DISABLE)
+    pub fflags: u32,     // Filter-specific flags
+    pub data: iptr,      // Filter-specific data value
+    pub udata: uptr,     // Opaque user-defined data
+}
+
+pub type uptr = usize;
+pub type iptr = isize;
+
+/// BSD kqueue event notifications manager
+pub struct KQueue {
+    pub registry: HashMap<(uptr, KFilter), KEvent>,
+    pub active_events: Vec<KEvent>,
+}
+
+impl KQueue {
+    pub fn new() -> Self {
+        Self {
+            registry: HashMap::new(),
+            active_events: Vec::new(),
+        }
+    }
+
+    /// Registers a new event query to watch
+    pub fn kevent_register(&mut self, event: KEvent) {
+        let key = (event.ident, event.filter);
+        self.registry.insert(key, event);
+    }
+
+    /// Triggers a matched notification (used by kernel triggers like socket rx/tx or file modifications)
+    pub fn trigger_event(&mut self, ident: uptr, filter: KFilter, data: iptr) -> bool {
+        let key = (ident, filter);
+        if let Some(event) = self.registry.get(&key) {
+            let mut active_event = *event;
+            active_event.data = data;
+            self.active_events.push(active_event);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Polls/reaps next active event
+    pub fn kevent_poll(&mut self) -> Option<KEvent> {
+        if self.active_events.is_empty() {
+            None
+        } else {
+            Some(self.active_events.remove(0))
+        }
+    }
+}
+
+impl Default for KQueue {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================================
+// FreeBSD GEOM block storage layered topology framework
+// ==========================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeomType {
+    Disk,
+    PartitionTable, // e.g. GPT/MBR
+    Mirror,         // e.g. RAID1
+    Encryption,     // e.g. geli / crypt
+    Label,          // e.g. ufs label
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomProvider {
+    pub name: String,
+    pub geom_type: GeomType,
+    pub sector_size: u32,
+    pub total_sectors: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct GeomConsumer {
+    pub name: String,
+    pub attached_provider_name: String,
+}
+
+/// Dynamic stackable GEOM storage controller
+pub struct GeomTopology {
+    pub providers: HashMap<String, GeomProvider>,
+    pub consumers: Vec<GeomConsumer>,
+}
+
+impl GeomTopology {
+    pub fn new() -> Self {
+        Self {
+            providers: HashMap::new(),
+            consumers: Vec::new(),
+        }
+    }
+
+    /// Register a virtual or hardware storage provider node
+    pub fn register_provider(&mut self, provider: GeomProvider) {
+        self.providers.insert(provider.name.clone(), provider);
+    }
+
+    /// Attaches a consumer layer to a provider to stack virtualization
+    pub fn attach_consumer(&mut self, consumer: GeomConsumer) -> Result<(), &'static str> {
+        if !self.providers.contains_key(&consumer.attached_provider_name) {
+            return Err("GEOM: Target provider not found in active topology");
+        }
+        self.consumers.push(consumer);
+        Ok(())
+    }
+
+    /// Checks if a provider has any attached consumers (stacked layering)
+    pub fn is_provider_stacked(&self, provider_name: &str) -> bool {
+        self.consumers.iter().any(|c| c.attached_provider_name == provider_name)
+    }
+}
+
+impl Default for GeomTopology {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -351,5 +492,64 @@ mod tests {
 
         let exec_success = translation.translate_syscall(LinuxSyscall::Execve, &[0x401000]);
         assert!(exec_success.is_ok());
+    }
+
+    #[test]
+    fn test_bsd_kqueue_and_kevent() {
+        let mut kq = KQueue::new();
+        let ev = KEvent {
+            ident: 10, // file descriptor 10
+            filter: KFilter::Read,
+            flags: 1, // EV_ADD
+            fflags: 0,
+            data: 0,
+            udata: 0xDEADBEEF,
+        };
+
+        // Register event to watch
+        kq.kevent_register(ev);
+
+        // Trigger action representing file descriptor becoming readable with 12 bytes of data
+        assert!(kq.trigger_event(10, KFilter::Read, 12));
+        assert!(!kq.trigger_event(11, KFilter::Read, 12)); // unregistered
+
+        // Poll and verify reaped event
+        let reaped = kq.kevent_poll().unwrap();
+        assert_eq!(reaped.ident, 10);
+        assert_eq!(reaped.filter, KFilter::Read);
+        assert_eq!(reaped.data, 12);
+        assert_eq!(reaped.udata, 0xDEADBEEF);
+        assert!(kq.kevent_poll().is_none());
+    }
+
+    #[test]
+    fn test_freebsd_geom_storage() {
+        let mut geom = GeomTopology::new();
+
+        // Register base disk
+        geom.register_provider(GeomProvider {
+            name: "ada0".to_string(),
+            geom_type: GeomType::Disk,
+            sector_size: 512,
+            total_sectors: 1000000,
+        });
+
+        // Try attaching consumer to nonexistent base provider - fails
+        let bad_consumer = GeomConsumer {
+            name: "gpt_part1".to_string(),
+            attached_provider_name: "ada1".to_string(),
+        };
+        assert!(geom.attach_consumer(bad_consumer).is_err());
+
+        // Attach consumer to active provider - succeeds
+        let consumer = GeomConsumer {
+            name: "gpt_part1".to_string(),
+            attached_provider_name: "ada0".to_string(),
+        };
+        assert!(geom.attach_consumer(consumer).is_ok());
+
+        // Check topology stacked properties
+        assert!(geom.is_provider_stacked("ada0"));
+        assert!(!geom.is_provider_stacked("ada1"));
     }
 }
