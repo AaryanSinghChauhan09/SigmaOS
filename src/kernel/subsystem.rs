@@ -11,7 +11,27 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::any::Any;
 
+#[cfg(not(test))]
 use crate::security::CapabilityToken;
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CapabilityToken {
+    pub bits: u64,
+}
+
+#[cfg(test)]
+impl CapabilityToken {
+    pub fn new() -> Self {
+        Self { bits: 0 }
+    }
+    pub fn allow_capability(&mut self, cap: u64) {
+        self.bits |= cap;
+    }
+    pub fn bits(&self) -> u64 {
+        self.bits
+    }
+}
 
 // ============================================================================
 // Core Driver Abstraction
@@ -517,7 +537,7 @@ impl<T: DeviceDriver> SecureDriverWrapper<T> {
     }
     
     /// Verify the driver's cryptographic signature
-    pub fn verify_signature(&mut self, signature: &[u8]) -> Result<(), DriverError> {
+    pub fn verify_signature(&mut self, _signature: &[u8]) -> Result<(), DriverError> {
         // In production, this would verify against a trusted key
         self.signature_verified = true;
         Ok(())
@@ -647,7 +667,7 @@ impl DriverRegistry {
     /// Initialize all registered drivers
     pub fn initialize_all(&mut self) -> Result<(), RegistryError> {
         for driver in &mut self.drivers {
-            driver.init().map_err(|e| RegistryError::InitializationFailed(format!("{:?}", e)))?;
+            driver.init().map_err(|e| RegistryError::InitializationFailed(alloc::format!("{:?}", e)))?;
         }
         Ok(())
     }
@@ -683,6 +703,7 @@ pub enum RegistryError {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     // Mock driver for testing
     struct MockDriver {
@@ -788,6 +809,7 @@ mod tests {
 // ============================================================================
 
 /// A robust round-robin task selector helper
+#[derive(Clone)]
 pub struct RoundRobinScheduler {
     pub ready_queue: Vec<ProcessInfo>,
     pub current_index: usize,
@@ -937,6 +959,7 @@ impl PackageRecipeParser {
 #[cfg(test)]
 mod extra_tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_round_robin_scheduler() {

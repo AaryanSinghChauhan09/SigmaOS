@@ -8,7 +8,9 @@
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
+use alloc::string::ToString;
 use alloc::vec::Vec;
+use alloc::format;
 
 /// Documentation format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -194,6 +196,66 @@ impl Default for DocGenerator {
     }
 }
 
+// =========================================================================
+// BSD/LINUX-STYLE MAN PAGE SYSTEM INDEXER & MANUAL COMPILER
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct ManPage {
+    pub name: String,
+    pub section: u8, // e.g. 1 = Commands, 5 = File formats, 8 = Admin
+    pub synopsis: String,
+    pub description: String,
+    pub examples: String,
+}
+
+pub struct SovereignManPageIndexer {
+    pub pages: Vec<ManPage>,
+}
+
+impl SovereignManPageIndexer {
+    pub fn new() -> Self {
+        let mut indexer = Self { pages: Vec::new() };
+        indexer.register_default_manuals();
+        indexer
+    }
+
+    pub fn register_man_page(&mut self, page: ManPage) {
+        self.pages.push(page);
+    }
+
+    fn register_default_manuals(&mut self) {
+        self.register_man_page(ManPage {
+            name: "sigpkg".to_string(),
+            section: 1,
+            synopsis: "sigpkg [install|remove|status] <package_name>".to_string(),
+            description: "Sovereign content-addressed transactional package manager.".to_string(),
+            examples: "sigpkg install sigma-vim".to_string(),
+        });
+        self.register_man_page(ManPage {
+            name: "sysctl".to_string(),
+            section: 8,
+            synopsis: "sysctl [-w] <parameter_dot_path>[=<value>]".to_string(),
+            description: "Dynamic tuning and security capability configuration of microkernel variables.".to_string(),
+            examples: "sysctl -w kern.maxproc=2048".to_string(),
+        });
+    }
+
+    /// Queries manual pages and compiles them into formatted ANSI manual outputs (defeats Linux man!)
+    pub fn compile_man_page(&self, name: &str, section: Option<u8>) -> Option<String> {
+        let page = self.pages.iter().find(|p| {
+            p.name == name && (section.is_none() || section.unwrap() == p.section)
+        })?;
+
+        let mut output = String::new();
+        output.push_str(&format!("NAME\n\t{} - {}\n\n", page.name, page.description));
+        output.push_str(&format!("SYNOPSIS\n\t{}\n\n", page.synopsis));
+        output.push_str(&format!("DESCRIPTION\n\tThis manual page documents the '{}' tool for SigmaOS. {}\n\n", page.name, page.description));
+        output.push_str(&format!("EXAMPLES\n\t{}\n", page.examples));
+        Some(output)
+    }
+}
+
 /// API documentation builder
 pub struct ApiDocBuilder {
     generator: DocGenerator,
@@ -241,6 +303,7 @@ impl Default for ApiDocBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_doc_entry_creation() {
@@ -349,5 +412,33 @@ mod tests {
 
         assert_eq!(generator.get_entries().len(), 0);
         assert_eq!(generator.get_metadata().len(), 0);
+    }
+
+    #[test]
+    fn test_sovereign_man_pages() {
+        let mut indexer = SovereignManPageIndexer::new();
+
+        // Check default pages registered
+        assert_eq!(indexer.pages.len(), 2);
+
+        // Compile sigpkg page
+        let compiled = indexer.compile_man_page("sigpkg", None).unwrap();
+        assert!(compiled.contains("NAME"));
+        assert!(compiled.contains("sigpkg"));
+        assert!(compiled.contains("SYNOPSIS"));
+        assert!(compiled.contains("sigma-vim"));
+
+        // Add custom manual page (Pledge)
+        indexer.register_man_page(ManPage {
+            name: "pledge".to_string(),
+            section: 2,
+            synopsis: "pledge(promises)".to_string(),
+            description: "Dropping execution capabilities statically.".to_string(),
+            examples: "pledge(\"stdio rpath\")".to_string(),
+        });
+
+        assert_eq!(indexer.pages.len(), 3);
+        let pledge_page = indexer.compile_man_page("pledge", Some(2)).unwrap();
+        assert!(pledge_page.contains("stdio rpath"));
     }
 }
