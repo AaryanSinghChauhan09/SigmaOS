@@ -18,6 +18,7 @@ pub mod debian;
 pub mod mobile_desktop_parity;
 pub mod opensuse_slackware;
 pub mod alpine_linux;
+pub mod void_linux;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
@@ -116,4 +117,9 @@ pub use opensuse_slackware::{
 pub use alpine_linux::{
     ApkPackage, ApkError, ApkDatabase, MuslCompatibilityLayer, AcfServiceStatus,
     AcfService, AlpineConfigFramework, HardeningFeature, AlpineHardening,
+};
+
+pub use void_linux::{
+    XbpsPackage, XbpsError, XbpsDatabase, RunitServiceState, RunitSignal,
+    RunitService, RinitInitSystem, VoidMuslToolchain,
 };
