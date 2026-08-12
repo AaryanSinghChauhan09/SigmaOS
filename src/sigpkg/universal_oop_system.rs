@@ -3016,7 +3016,7 @@ Description: Hook test";
         let trigger = PathTriggerHook {
             name: "update-desktop-database".to_string(),
             pattern: "*.desktop".to_string(),
-            script: Arc::new(move |matched_paths| {
+            script: Arc::new(move |matched_paths: &[String]| {
                 assert_eq!(matched_paths.len(), 1);
                 assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
                 trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
