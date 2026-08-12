@@ -1,10 +1,9 @@
 #![no_std]
 
+extern crate alloc;
+
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::{Vec, String, ToString, HashMap};
-
-#[cfg(feature = "standalone_test")]
-extern crate alloc;
 
 #[cfg(feature = "standalone_test")]
 extern crate std;
@@ -97,6 +96,548 @@ impl OpenBsdPledge {
             }
         }
         false
+    }
+}
+
+// ================= Windows KMDF Driver Framework Parity =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KmdfPnpState {
+    PnpActive,
+    PnpStopped,
+    PnpRemoved,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KmdfPowerState {
+    PowerD0, // Full power
+    PowerD3, // Sleep
+}
+
+#[derive(Clone)]
+pub struct KmdfIoRequest {
+    pub id: u32,
+    pub operation: String,
+    pub is_completed: bool,
+}
+
+/// Windows Kernel-Mode Driver Framework (KMDF) Parity
+pub struct KmdfDriver {
+    pub name: String,
+    pub pnp_state: KmdfPnpState,
+    pub power_state: KmdfPowerState,
+    pub io_queue: Vec<KmdfIoRequest>,
+}
+
+impl KmdfDriver {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            pnp_state: KmdfPnpState::PnpStopped,
+            power_state: KmdfPowerState::PowerD3,
+            io_queue: Vec::new(),
+        }
+    }
+
+    pub fn handle_pnp_event(&mut self, state: KmdfPnpState) {
+        self.pnp_state = state;
+        if state == KmdfPnpState::PnpActive {
+            self.power_state = KmdfPowerState::PowerD0;
+        } else {
+            self.power_state = KmdfPowerState::PowerD3;
+        }
+    }
+
+    pub fn enqueue_io_request(&mut self, id: u32, operation: &str) -> Result<(), &'static str> {
+        if self.pnp_state != KmdfPnpState::PnpActive || self.power_state != KmdfPowerState::PowerD0 {
+            return Err("KMDF: Driver is not active or powered on. Request queued into error state.");
+        }
+        self.io_queue.push(KmdfIoRequest {
+            id,
+            operation: operation.to_string(),
+            is_completed: false,
+        });
+        Ok(())
+    }
+
+    pub fn process_queue(&mut self) -> usize {
+        let mut completed = 0;
+        for req in &mut self.io_queue {
+            if !req.is_completed {
+                req.is_completed = true;
+                completed += 1;
+            }
+        }
+        completed
+    }
+}
+
+// ================= Android Binder IPC Parity =================
+
+#[derive(Clone)]
+pub struct BinderNode {
+    pub handle_id: u32,
+    pub target_process_id: u32,
+    pub security_token: String,
+}
+
+/// Android Binder-parity secure inter-process communication with object translation
+pub struct AndroidBinderIpc {
+    pub registered_nodes: HashMap<u32, BinderNode>,
+}
+
+impl AndroidBinderIpc {
+    pub fn new() -> Self {
+        Self {
+            registered_nodes: HashMap::new(),
+        }
+    }
+
+    pub fn register_binder_node(&mut self, handle_id: u32, target_pid: u32, token: &str) {
+        self.registered_nodes.insert(handle_id, BinderNode {
+            handle_id,
+            target_process_id: target_pid,
+            security_token: token.to_string(),
+        });
+    }
+
+    /// Safely translates binder object handles across caller process boundaries
+    pub fn translate_binder_handle(&self, handle_id: u32, caller_token: &str) -> Result<u32, &'static str> {
+        let node = self.registered_nodes.get(&handle_id).ok_or("Binder: Node handle not found")?;
+        if node.security_token != caller_token {
+            return Err("Binder: Security token mismatch. Unauthorized handle translation blocked.");
+        }
+        Ok(node.target_process_id)
+    }
+}
+
+// ================= macOS Grand Central Dispatch Parity =================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum GcdPriority {
+    Low = 0,
+    Utility = 1,
+    UserInitiated = 2,
+    Interactive = 3,
+}
+
+#[derive(Clone)]
+pub struct GcdTask {
+    pub name: String,
+    pub priority: GcdPriority,
+}
+
+/// macOS GCD-parity priority-gated concurrent task dispatcher
+pub struct GcdDispatchQueue {
+    pub label: String,
+    pub serial: bool,
+    pub pending_tasks: Vec<GcdTask>,
+}
+
+impl GcdDispatchQueue {
+    pub fn new(label: &str, serial: bool) -> Self {
+        Self {
+            label: label.to_string(),
+            serial,
+            pending_tasks: Vec::new(),
+        }
+    }
+
+    pub fn dispatch_async(&mut self, name: &str, priority: GcdPriority) {
+        self.pending_tasks.push(GcdTask {
+            name: name.to_string(),
+            priority,
+        });
+        // Keep sorted so highest priority is executed first
+        self.pending_tasks.sort_by(|a, b| b.priority.cmp(&a.priority));
+    }
+
+    pub fn execute_next_batch(&mut self, count: usize) -> Vec<String> {
+        let mut executed = Vec::new();
+        let limit = count.min(self.pending_tasks.len());
+
+        if self.serial {
+            // Serial queue executes sequentially
+            for _ in 0..limit {
+                if !self.pending_tasks.is_empty() {
+                    let task = self.pending_tasks.remove(0);
+                    executed.push(alloc::format!("Serial executing: {}", task.name));
+                }
+            }
+        } else {
+            // Concurrent queue executes based on priority level
+            for _ in 0..limit {
+                if !self.pending_tasks.is_empty() {
+                    let task = self.pending_tasks.remove(0);
+                    executed.push(alloc::format!("Concurrent executing priority {:?}: {}", task.priority, task.name));
+                }
+            }
+        }
+        executed
+    }
+}
+
+// ================= Linux eBPF Safety Sandbox Interpreter =================
+
+#[derive(Debug, Clone, Copy)]
+pub struct EbpfInstruction {
+    pub opcode: u8, // 0 = Add, 1 = Sub, 2 = Div, 3 = Ret
+    pub dst: u8,
+    pub src: u8,
+    pub imm: i32,
+}
+
+/// Linux eBPF-parity sandboxed interpreter with static safety validation
+pub struct EbpfRuntime {
+    pub registers: [i64; 10],
+}
+
+impl EbpfRuntime {
+    pub fn new() -> Self {
+        Self {
+            registers: [0; 10],
+        }
+    }
+
+    pub fn verify_program(&self, program: &[EbpfInstruction]) -> Result<(), &'static str> {
+        if program.is_empty() {
+            return Err("eBPF Verifier: Program is empty");
+        }
+        if program.len() > 1000 {
+            return Err("eBPF Verifier: Program size exceeds safety limit (loop risk)");
+        }
+        for (i, inst) in program.iter().enumerate() {
+            if inst.dst >= 10 || inst.src >= 10 {
+                return Err("eBPF Verifier: Out-of-bounds register access");
+            }
+            if inst.opcode == 2 && inst.imm == 0 {
+                return Err("eBPF Verifier: Static division-by-zero risk detected");
+            }
+            if i == program.len() - 1 && inst.opcode != 3 {
+                return Err("eBPF Verifier: Program must end with a return (Ret) opcode");
+            }
+        }
+        Ok(())
+    }
+
+    pub fn execute(&mut self, program: &[EbpfInstruction], initial_val: i64) -> Result<i64, &'static str> {
+        self.verify_program(program)?;
+        self.registers[0] = initial_val;
+
+        for inst in program {
+            match inst.opcode {
+                0 => {
+                    self.registers[inst.dst as usize] = self.registers[inst.dst as usize].wrapping_add(inst.imm as i64);
+                }
+                1 => {
+                    self.registers[inst.dst as usize] = self.registers[inst.dst as usize].wrapping_sub(inst.imm as i64);
+                }
+                2 => {
+                    let div_val = inst.imm as i64;
+                    if div_val == 0 {
+                        return Err("eBPF Runtime: Division-by-zero panic");
+                    }
+                    self.registers[inst.dst as usize] /= div_val;
+                }
+                3 => {
+                    return Ok(self.registers[0]);
+                }
+                _ => return Err("eBPF Runtime: Unknown opcode executed"),
+            }
+        }
+        Ok(self.registers[0])
+    }
+}
+
+// ================= DragonFly BSD HAMMER Filesystem Inspirations =================
+
+#[derive(Clone)]
+pub struct HammerBlockTransaction {
+    pub transaction_id: u64,
+    pub block_id: usize,
+    pub data: String,
+}
+
+/// DragonFly BSD HAMMER-parity history-retaining multi-version block filesystem
+pub struct HammerHistoryFilesystem {
+    pub transactions: Vec<HammerBlockTransaction>,
+}
+
+impl HammerHistoryFilesystem {
+    pub fn new() -> Self {
+        Self {
+            transactions: Vec::new(),
+        }
+    }
+
+    pub fn commit_transaction(&mut self, tx_id: u64, block_id: usize, data: &str) {
+        self.transactions.push(HammerBlockTransaction {
+            transaction_id: tx_id,
+            block_id,
+            data: data.to_string(),
+        });
+    }
+
+    pub fn read_block_at_version(&self, block_id: usize, target_tx_id: u64) -> Option<String> {
+        let mut best_match: Option<&HammerBlockTransaction> = None;
+        for tx in &self.transactions {
+            if tx.block_id == block_id && tx.transaction_id <= target_tx_id {
+                best_match = Some(tx);
+            }
+        }
+        best_match.map(|tx| tx.data.clone())
+    }
+}
+
+// ================= OpenBSD CARP Routing Inspirations =================
+
+/// OpenBSD CARP (Common Address Redundancy Protocol) virtual router failover design
+pub struct CarpSecurityRouter {
+    pub virtual_ip: String,
+    pub master_host: String,
+    pub backup_host: String,
+    pub is_master_active: bool,
+}
+
+impl CarpSecurityRouter {
+    pub fn new(vip: &str, master: &str, backup: &str) -> Self {
+        Self {
+            virtual_ip: vip.to_string(),
+            master_host: master.to_string(),
+            backup_host: backup.to_string(),
+            is_master_active: true,
+        }
+    }
+
+    pub fn trigger_failover(&mut self) {
+        self.is_master_active = !self.is_master_active;
+    }
+
+    pub fn route_packet(&self) -> String {
+        if self.is_master_active {
+            self.master_host.clone()
+        } else {
+            self.backup_host.clone()
+        }
+    }
+}
+
+// ================= Hybrid Kernel Inspirations =================
+
+pub struct NtExecutiveService {
+    pub subsystem_name: String,
+    pub active_handles: usize,
+}
+
+pub struct MicrokernelCore {
+    pub active_threads: usize,
+    pub active_interrupts: usize,
+}
+
+/// Windows NT-style separating Executive Services from the Microkernel Core
+pub struct HybridKernelManager {
+    pub executive: NtExecutiveService,
+    pub microkernel: MicrokernelCore,
+}
+
+impl HybridKernelManager {
+    pub fn new() -> Self {
+        Self {
+            executive: NtExecutiveService {
+                subsystem_name: "Executive Subsystem".to_string(),
+                active_handles: 0,
+            },
+            microkernel: MicrokernelCore {
+                active_threads: 0,
+                active_interrupts: 0,
+            },
+        }
+    }
+
+    pub fn dispatch_abstract_handle(&mut self, handle_id: u32) -> Result<String, &'static str> {
+        self.executive.active_handles += 1;
+        self.microkernel.active_threads += 1;
+        self.microkernel.active_interrupts += 1;
+        Ok(alloc::format!("Dispatched Handle {} through NT-Executive to Microkernel", handle_id))
+    }
+}
+
+// ================= Exokernel Inspirations =================
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct ResourceBinding {
+    pub owner_id: u32,
+    pub start_block: usize,
+    pub end_block: usize,
+}
+
+/// MIT Aegis/Xok exokernel exposing physical hardware directly
+pub struct ExokernelHardwareMultiplexer {
+    pub disk_bindings: Vec<ResourceBinding>,
+}
+
+impl ExokernelHardwareMultiplexer {
+    pub fn new() -> Self {
+        Self {
+            disk_bindings: Vec::new(),
+        }
+    }
+
+    pub fn bind_disk_blocks(&mut self, owner_id: u32, start: usize, end: usize) -> Result<(), &'static str> {
+        for binding in &self.disk_bindings {
+            if (start >= binding.start_block && start <= binding.end_block) ||
+               (end >= binding.start_block && end <= binding.end_block) {
+                return Err("Physical resource conflict: blocks already securely bound to another domain");
+            }
+        }
+        self.disk_bindings.push(ResourceBinding {
+            owner_id,
+            start_block: start,
+            end_block: end,
+        });
+        Ok(())
+    }
+}
+
+// ================= Nanokernel / Anykernel Inspirations =================
+
+#[derive(Clone)]
+pub struct RumpComponent {
+    pub name: String,
+    pub run_in_userspace: bool,
+}
+
+/// NetBSD rump kernels virtualizing driver and filesystem components
+pub struct NetBsdRumpKernel {
+    pub components: HashMap<String, RumpComponent>,
+}
+
+impl NetBsdRumpKernel {
+    pub fn new() -> Self {
+        Self {
+            components: HashMap::new(),
+        }
+    }
+
+    pub fn register_component(&mut self, name: &str, run_in_userspace: bool) {
+        self.components.insert(name.to_string(), RumpComponent {
+            name: name.to_string(),
+            run_in_userspace,
+        });
+    }
+
+    pub fn bootstrap_component(&self, name: &str) -> Result<String, &'static str> {
+        let comp = self.components.get(name).ok_or("Component not found")?;
+        if comp.run_in_userspace {
+            Ok(alloc::format!("Bootstrap Anykernel component: {} running as Userspace Micro-thread", name))
+        } else {
+            Ok(alloc::format!("Bootstrap Anykernel component: {} running in Ring 0 Monolithic Space", name))
+        }
+    }
+}
+
+// ================= Monolithic Kernel Inspirations =================
+
+#[derive(Clone)]
+pub struct KernelModule {
+    pub name: String,
+    pub is_signed: bool,
+    pub is_loaded: bool,
+}
+
+/// Linux-style dynamically loadable kernel modules (LKM) with symbol/syscall monitoring
+pub struct DynamicLkmLoader {
+    pub loaded_modules: HashMap<String, KernelModule>,
+    pub sys_call_hooks: HashMap<u32, String>,
+}
+
+impl DynamicLkmLoader {
+    pub fn new() -> Self {
+        Self {
+            loaded_modules: HashMap::new(),
+            sys_call_hooks: HashMap::new(),
+        }
+    }
+
+    pub fn load_module(&mut self, name: &str, is_signed: bool) -> Result<(), &'static str> {
+        if !is_signed {
+            return Err("Module signature verification failed: rejected unsigned code");
+        }
+        self.loaded_modules.insert(name.to_string(), KernelModule {
+            name: name.to_string(),
+            is_signed,
+            is_loaded: true,
+        });
+        Ok(())
+    }
+
+    pub fn register_syscall_hook(&mut self, syscall_id: u32, hook_owner: &str) -> Result<(), &'static str> {
+        if let Some(owner) = self.sys_call_hooks.get(&syscall_id) {
+            if owner != hook_owner {
+                return Err("Syscall hijack blocked: unauthorized hook attempt detected");
+            }
+        }
+        self.sys_call_hooks.insert(syscall_id, hook_owner.to_string());
+        Ok(())
+    }
+}
+
+// ================= Microkernel Inspirations =================
+
+#[derive(Clone)]
+pub struct KernelCapability {
+    pub id: u32,
+    pub parent_id: Option<u32>,
+    pub rights: String,
+}
+
+/// seL4-style capability inheritance with recursive capability pruning
+pub struct CapabilityDerivationTree {
+    pub capabilities: HashMap<u32, KernelCapability>,
+}
+
+impl CapabilityDerivationTree {
+    pub fn new() -> Self {
+        Self {
+            capabilities: HashMap::new(),
+        }
+    }
+
+    pub fn derive_capability(&mut self, parent_id: u32, child_id: u32, child_rights: &str) -> Result<(), &'static str> {
+        let parent = self.capabilities.get(&parent_id).ok_or("Parent capability not found")?;
+        if child_rights.len() > parent.rights.len() {
+            return Err("Rights escalation forbidden in capability derivation");
+        }
+        self.capabilities.insert(child_id, KernelCapability {
+            id: child_id,
+            parent_id: Some(parent_id),
+            rights: child_rights.to_string(),
+        });
+        Ok(())
+    }
+
+    pub fn revoke_recursive(&mut self, target_id: u32) {
+        let mut to_remove = Vec::new();
+        to_remove.push(target_id);
+
+        let mut checking = true;
+        while checking {
+            checking = false;
+            let mut derived = Vec::new();
+            for cap in self.capabilities.values() {
+                if let Some(pid) = cap.parent_id {
+                    if to_remove.contains(&pid) && !to_remove.contains(&cap.id) {
+                        derived.push(cap.id);
+                        checking = true;
+                    }
+                }
+            }
+            to_remove.extend(derived);
+        }
+
+        for id in to_remove {
+            self.capabilities.remove(&id);
+        }
     }
 }
 
@@ -193,66 +734,161 @@ mod tests {
     }
 
     #[test]
-    fn test_linux_vma_manager() {
-        let mut vma_mgr = LinuxVmaManager::new();
-        vma_mgr.insert_vma(0x1000, 0x2000, PROT_READ | PROT_EXEC, "text").unwrap();
-        vma_mgr.insert_vma(0x2000, 0x3000, PROT_READ | PROT_WRITE, "data").unwrap();
+    fn test_lkm_loader_unsigned_rejection() {
+        let mut loader = DynamicLkmLoader::new();
+        assert!(loader.load_module("signed-core", true).is_ok());
+        assert!(loader.load_module("unsigned-malware", false).is_err());
 
-        assert!(vma_mgr.insert_vma(0x1500, 0x2500, PROT_READ, "overlap").is_err());
-        assert!(vma_mgr.find_vma(0x1500).is_some());
-        assert_eq!(vma_mgr.find_vma(0x1500).unwrap().name.as_str(), "text");
-
-        assert!(vma_mgr.handle_page_fault(0x1500, false).is_ok());
-        assert_eq!(vma_mgr.handle_page_fault(0x1500, true), Err("Permission Denied: Write violation in read-only VMA (SIGSEGV)"));
-        assert!(vma_mgr.handle_page_fault(0x2500, true).is_ok());
-        assert_eq!(vma_mgr.handle_page_fault(0x4000, false), Err("Segmentation Fault: Address not mapped in any VMA (SIGSEGV)"));
+        assert!(loader.register_syscall_hook(101, "signed-core").is_ok());
+        assert!(loader.register_syscall_hook(101, "rogue-hook").is_err());
     }
 
     #[test]
-    fn test_bsd_zone_allocator() {
-        let mut allocator = BsdZoneAllocator::new();
-        allocator.create_zone("pcb_zone", 128, 2).unwrap();
+    fn test_capability_recursive_revocation() {
+        let mut cdt = CapabilityDerivationTree::new();
+        cdt.capabilities.insert(1, KernelCapability {
+            id: 1,
+            parent_id: None,
+            rights: "rwx".to_string(),
+        });
 
-        let addr1 = allocator.zone_alloc("pcb_zone").unwrap();
-        let addr2 = allocator.zone_alloc("pcb_zone").unwrap();
-        assert_ne!(addr1, addr2);
+        assert!(cdt.derive_capability(1, 2, "rw").is_ok());
+        assert!(cdt.derive_capability(2, 3, "r").is_ok());
+        assert!(cdt.derive_capability(1, 4, "rw-escalation-attempt").is_err());
 
-        let addr3 = allocator.zone_alloc("pcb_zone").unwrap();
-        assert!(addr3 != addr1 && addr3 != addr2);
-
-        allocator.zone_free("pcb_zone", addr1).unwrap();
-        let addr_reclaimed = allocator.zone_alloc("pcb_zone").unwrap();
-        assert_eq!(addr_reclaimed, addr1);
+        cdt.revoke_recursive(2);
+        assert!(cdt.capabilities.get(&1).is_some());
+        assert!(cdt.capabilities.get(&2).is_none());
+        assert!(cdt.capabilities.get(&3).is_none());
     }
 
     #[test]
-    fn test_linux_kswapd() {
-        let mut kswapd = LinuxKswapd::new(100);
-        kswapd.add_page_frame(0x1000);
-        kswapd.add_page_frame(0x2000);
-        kswapd.add_page_frame(0x3000);
-
-        kswapd.access_page(0x1000, 100);
-        assert_eq!(kswapd.active_list.len(), 1);
-        assert_eq!(kswapd.active_list[0].phys_addr, 0x1000);
-
-        let reclaimed = kswapd.reclaim_pages(50).unwrap();
-        assert_eq!(reclaimed, 2);
-        assert!(kswapd.swap_space.contains_key(&0x2000));
-        assert!(kswapd.swap_space.contains_key(&0x3000));
+    fn test_hybrid_executive_dispatch() {
+        let mut manager = HybridKernelManager::new();
+        let res = manager.dispatch_abstract_handle(42).unwrap();
+        assert!(res.contains("Dispatched Handle 42"));
+        assert_eq!(manager.executive.active_handles, 1);
+        assert_eq!(manager.microkernel.active_threads, 1);
     }
 
     #[test]
-    fn test_linux_mem_cgroup() {
-        let mut manager = MemCgroupManager::new();
-        manager.create_cgroup(1, 10240).unwrap();
-        manager.attach_process(1, 42).unwrap();
+    fn test_exokernel_physical_overlapping_conflict() {
+        let mut multiplexer = ExokernelHardwareMultiplexer::new();
+        assert!(multiplexer.bind_disk_blocks(1, 0, 100).is_ok());
+        assert!(multiplexer.bind_disk_blocks(2, 200, 300).is_ok());
+        assert!(multiplexer.bind_disk_blocks(3, 50, 150).is_err());
+    }
 
-        assert!(manager.charge_memory(42, 5120).is_ok());
-        assert_eq!(manager.charge_memory(42, 6144), Err("Memory Limit Exceeded (MemCg OOM)"));
+    #[test]
+    fn test_rump_kernel_userspace_microthread_bootstrap() {
+        let mut rump = NetBsdRumpKernel::new();
+        rump.register_component("ext4fs", true);
+        rump.register_component("e1000", false);
 
-        manager.uncharge_memory(42, 5120);
-        assert!(manager.charge_memory(42, 6144).is_ok());
+        let res_ext4 = rump.bootstrap_component("ext4fs").unwrap();
+        assert!(res_ext4.contains("Userspace Micro-thread"));
+
+        let res_e1000 = rump.bootstrap_component("e1000").unwrap();
+        assert!(res_e1000.contains("Ring 0 Monolithic Space"));
+    }
+
+    #[test]
+    fn test_hammer_history_mvcc_time_travel() {
+        let mut fs = HammerHistoryFilesystem::new();
+        fs.commit_transaction(10, 1, "Initial file contents");
+        fs.commit_transaction(20, 1, "First updated contents");
+        fs.commit_transaction(30, 1, "Latest contents");
+
+        assert_eq!(fs.read_block_at_version(1, 15).unwrap().as_str(), "Initial file contents");
+        assert_eq!(fs.read_block_at_version(1, 25).unwrap().as_str(), "First updated contents");
+        assert_eq!(fs.read_block_at_version(1, 35).unwrap().as_str(), "Latest contents");
+    }
+
+    #[test]
+    fn test_carp_failover_routing() {
+        let mut router = CarpSecurityRouter::new("192.168.1.1", "10.0.0.1", "10.0.0.2");
+        assert_eq!(router.route_packet().as_str(), "10.0.0.1");
+
+        router.trigger_failover();
+        assert_eq!(router.route_packet().as_str(), "10.0.0.2");
+    }
+
+    #[test]
+    fn test_kmdf_pnp_and_power_transition() {
+        let mut driver = KmdfDriver::new("acpi_battery");
+        assert_eq!(driver.pnp_state, KmdfPnpState::PnpStopped);
+        assert_eq!(driver.power_state, KmdfPowerState::PowerD3);
+
+        // Disallowing enqueuing I/O requests when driver is not active
+        assert!(driver.enqueue_io_request(1, "ReadBatteryPercent").is_err());
+
+        // Bring driver to active state
+        driver.handle_pnp_event(KmdfPnpState::PnpActive);
+        assert_eq!(driver.pnp_state, KmdfPnpState::PnpActive);
+        assert_eq!(driver.power_state, KmdfPowerState::PowerD0);
+
+        // Enqueuing succeeds now
+        assert!(driver.enqueue_io_request(1, "ReadBatteryPercent").is_ok());
+        assert!(driver.enqueue_io_request(2, "SetChargeLimit").is_ok());
+
+        assert_eq!(driver.process_queue(), 2);
+    }
+
+    #[test]
+    fn test_binder_handle_translation() {
+        let mut binder = AndroidBinderIpc::new();
+        binder.register_binder_node(1001, 5001, "CallerToken_AppA");
+        binder.register_binder_node(1002, 5002, "CallerToken_AppB");
+
+        // Authorized translation succeeds
+        let translated_pid = binder.translate_binder_handle(1001, "CallerToken_AppA").unwrap();
+        assert_eq!(translated_pid, 5001);
+
+        // Unauthorized translation fails
+        assert!(binder.translate_binder_handle(1001, "RogueToken_AppX").is_err());
+        assert!(binder.translate_binder_handle(9999, "CallerToken_AppA").is_err());
+    }
+
+    #[test]
+    fn test_gcd_priority_scaling() {
+        let mut queue = GcdDispatchQueue::new("com.apple.networking", false);
+        queue.dispatch_async("DownloadAsset", GcdPriority::Low);
+        queue.dispatch_async("RenderFrame", GcdPriority::Interactive);
+        queue.dispatch_async("LoadCache", GcdPriority::Utility);
+
+        let executed = queue.execute_next_batch(2);
+        assert_eq!(executed.len(), 2);
+        // Interactive task executes first
+        assert!(executed[0].contains("Interactive"));
+        // Utility task executes second
+        assert!(executed[1].contains("Utility"));
+    }
+
+    #[test]
+    fn test_ebpf_bytecode_verifier() {
+        let mut runtime = EbpfRuntime::new();
+
+        let safe_program = [
+            EbpfInstruction { opcode: 0, dst: 0, src: 0, imm: 100 }, // add r0, 100
+            EbpfInstruction { opcode: 1, dst: 0, src: 0, imm: 40 },  // sub r0, 40
+            EbpfInstruction { opcode: 3, dst: 0, src: 0, imm: 0 },   // ret
+        ];
+
+        let unsafe_program_div_zero = [
+            EbpfInstruction { opcode: 2, dst: 0, src: 0, imm: 0 },   // div r0, 0 (division by zero)
+            EbpfInstruction { opcode: 3, dst: 0, src: 0, imm: 0 },
+        ];
+
+        let unsafe_program_no_ret = [
+            EbpfInstruction { opcode: 0, dst: 0, src: 0, imm: 100 }, // add r0, 100
+        ];
+
+        assert!(runtime.verify_program(&safe_program).is_ok());
+        assert!(runtime.verify_program(&unsafe_program_div_zero).is_err());
+        assert!(runtime.verify_program(&unsafe_program_no_ret).is_err());
+
+        let res = runtime.execute(&safe_program, 10).unwrap();
+        assert_eq!(res, 70); // 10 + 100 - 40 = 70
     }
 }
 
@@ -394,288 +1030,5 @@ impl VoidRunitInit {
             }
         }
         false
-    }
-}
-
-
-// =========================================================================
-// Linux & BSD-inspired Memory Management Subsystems
-// =========================================================================
-
-pub const PROT_READ: u32 = 1 << 0;
-pub const PROT_WRITE: u32 = 1 << 1;
-pub const PROT_EXEC: u32 = 1 << 2;
-
-#[derive(Debug, Clone)]
-pub struct VmArea {
-    pub start_addr: usize,
-    pub end_addr: usize,
-    pub flags: u32,
-    pub name: String,
-}
-
-pub struct LinuxVmaManager {
-    pub mmap_regions: Vec<VmArea>,
-}
-
-impl LinuxVmaManager {
-    pub fn new() -> Self {
-        Self {
-            mmap_regions: Vec::new(),
-        }
-    }
-
-    pub fn insert_vma(&mut self, start: usize, end: usize, flags: u32, name: &str) -> Result<(), &'static str> {
-        if start >= end {
-            return Err("Invalid address range");
-        }
-        for area in &self.mmap_regions {
-            if start < area.end_addr && end > area.start_addr {
-                return Err("Overlapping VMA region detected");
-            }
-        }
-        self.mmap_regions.push(VmArea {
-            start_addr: start,
-            end_addr: end,
-            flags,
-            name: name.to_string(),
-        });
-        Ok(())
-    }
-
-    pub fn find_vma(&self, addr: usize) -> Option<&VmArea> {
-        for area in &self.mmap_regions {
-            if addr >= area.start_addr && addr < area.end_addr {
-                return Some(area);
-            }
-        }
-        None
-    }
-
-    pub fn handle_page_fault(&self, addr: usize, is_write: bool) -> Result<&'static str, &'static str> {
-        if let Some(vma) = self.find_vma(addr) {
-            if is_write && (vma.flags & PROT_WRITE) == 0 {
-                return Err("Permission Denied: Write violation in read-only VMA (SIGSEGV)");
-            }
-            Ok("Demand Page Allocated successfully")
-        } else {
-            Err("Segmentation Fault: Address not mapped in any VMA (SIGSEGV)")
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct Zone {
-    pub name: String,
-    pub object_size: usize,
-    pub cached_objects: Vec<usize>,
-    pub total_allocations: usize,
-}
-
-pub struct BsdZoneAllocator {
-    pub zones: HashMap<String, Zone>,
-}
-
-impl BsdZoneAllocator {
-    pub fn new() -> Self {
-        Self {
-            zones: HashMap::new(),
-        }
-    }
-
-    pub fn create_zone(&mut self, name: &str, object_size: usize, pre_alloc_count: usize) -> Result<(), &'static str> {
-        if self.zones.contains_key(&name.to_string()) {
-            return Err("Zone already exists");
-        }
-        let mut cached_objects = Vec::new();
-        for i in 0..pre_alloc_count {
-            cached_objects.push(0x8000_0000 + name.len() * 0x1000 + i * object_size);
-        }
-        self.zones.insert(name.to_string(), Zone {
-            name: name.to_string(),
-            object_size,
-            cached_objects,
-            total_allocations: 0,
-        });
-        Ok(())
-    }
-
-    pub fn zone_alloc(&mut self, name: &str) -> Option<usize> {
-        if let Some(zone) = self.zones.get_mut(&name.to_string()) {
-            if let Some(addr) = zone.cached_objects.pop() {
-                zone.total_allocations += 1;
-                Some(addr)
-            } else {
-                let new_addr = 0x9000_0000 + name.len() * 0x1000 + zone.total_allocations * zone.object_size;
-                zone.total_allocations += 1;
-                Some(new_addr)
-            }
-        } else {
-            None
-        }
-    }
-
-    pub fn zone_free(&mut self, name: &str, addr: usize) -> Result<(), &'static str> {
-        if let Some(zone) = self.zones.get_mut(&name.to_string()) {
-            zone.cached_objects.push(addr);
-            Ok(())
-        } else {
-            Err("Zone not found")
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PageFrame {
-    pub phys_addr: usize,
-    pub is_active: bool,
-    pub last_accessed: u64,
-}
-
-pub struct LinuxKswapd {
-    pub active_list: Vec<PageFrame>,
-    pub inactive_list: Vec<PageFrame>,
-    pub swap_space: HashMap<usize, Vec<u8>>,
-    pub low_watermark: usize,
-}
-
-impl LinuxKswapd {
-    pub fn new(low_watermark: usize) -> Self {
-        Self {
-            active_list: Vec::new(),
-            inactive_list: Vec::new(),
-            swap_space: HashMap::new(),
-            low_watermark,
-        }
-    }
-
-    pub fn add_page_frame(&mut self, phys_addr: usize) {
-        self.inactive_list.push(PageFrame {
-            phys_addr,
-            is_active: false,
-            last_accessed: 0,
-        });
-    }
-
-    pub fn access_page(&mut self, phys_addr: usize, current_time: u64) {
-        let mut found_idx = None;
-        for (idx, page) in self.inactive_list.iter().enumerate() {
-            if page.phys_addr == phys_addr {
-                found_idx = Some(idx);
-                break;
-            }
-        }
-        if let Some(idx) = found_idx {
-            let mut page = self.inactive_list.remove(idx);
-            page.is_active = true;
-            page.last_accessed = current_time;
-            self.active_list.push(page);
-            return;
-        }
-
-        for page in &mut self.active_list {
-            if page.phys_addr == phys_addr {
-                page.last_accessed = current_time;
-                break;
-            }
-        }
-    }
-
-    pub fn reclaim_pages(&mut self, available_mem: usize) -> Result<usize, &'static str> {
-        if available_mem >= self.low_watermark {
-            return Ok(0);
-        }
-
-        let mut reclaimed_count = 0;
-        while !self.inactive_list.is_empty() && reclaimed_count < 3 {
-            let page = self.inactive_list.remove(0);
-            self.swap_space.insert(page.phys_addr, vec_clone(&[0u8; 4096]));
-            reclaimed_count += 1;
-        }
-
-        if self.inactive_list.is_empty() {
-            while !self.active_list.is_empty() && self.inactive_list.len() < 5 {
-                let mut page = self.active_list.remove(0);
-                page.is_active = false;
-                self.inactive_list.push(page);
-            }
-        }
-
-        Ok(reclaimed_count)
-    }
-}
-
-// Helper to clone/create vec for no_std compatibility
-fn vec_clone(slice: &[u8]) -> Vec<u8> {
-    let mut v = Vec::new();
-    for &val in slice {
-        v.push(val);
-    }
-    v
-}
-
-#[derive(Debug, Clone)]
-pub struct MemCgroup {
-    pub id: u32,
-    pub limit: usize,
-    pub usage: usize,
-    pub processes: Vec<u64>,
-}
-
-pub struct MemCgroupManager {
-    pub cgroups: HashMap<u32, MemCgroup>,
-    pub process_to_cgroup: HashMap<u64, u32>,
-}
-
-impl MemCgroupManager {
-    pub fn new() -> Self {
-        Self {
-            cgroups: HashMap::new(),
-            process_to_cgroup: HashMap::new(),
-        }
-    }
-
-    pub fn create_cgroup(&mut self, id: u32, limit: usize) -> Result<(), &'static str> {
-        if self.cgroups.contains_key(&id) {
-            return Err("cgroup already exists");
-        }
-        self.cgroups.insert(id, MemCgroup {
-            id,
-            limit,
-            usage: 0,
-            processes: Vec::new(),
-        });
-        Ok(())
-    }
-
-    pub fn attach_process(&mut self, id: u32, pid: u64) -> Result<(), &'static str> {
-        if !self.cgroups.contains_key(&id) {
-            return Err("cgroup does not exist");
-        }
-        self.process_to_cgroup.insert(pid, id);
-        if let Some(cgroup) = self.cgroups.get_mut(&id) {
-            cgroup.processes.push(pid);
-        }
-        Ok(())
-    }
-
-    pub fn charge_memory(&mut self, pid: u64, bytes: usize) -> Result<(), &'static str> {
-        if let Some(&cg_id) = self.process_to_cgroup.get(&pid) {
-            if let Some(cgroup) = self.cgroups.get_mut(&cg_id) {
-                if cgroup.usage + bytes > cgroup.limit {
-                    return Err("Memory Limit Exceeded (MemCg OOM)");
-                }
-                cgroup.usage += bytes;
-            }
-        }
-        Ok(())
-    }
-
-    pub fn uncharge_memory(&mut self, pid: u64, bytes: usize) {
-        if let Some(&cg_id) = self.process_to_cgroup.get(&pid) {
-            if let Some(cgroup) = self.cgroups.get_mut(&cg_id) {
-                cgroup.usage = cgroup.usage.saturating_sub(bytes);
-            }
-        }
     }
 }
