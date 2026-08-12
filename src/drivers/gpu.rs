@@ -7,10 +7,6 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-extern crate alloc;
-use alloc::string::String;
-use alloc::vec::Vec;
-
 /// GPU command type
 #[derive(Debug, Clone)]
 pub enum GpuCommand {
