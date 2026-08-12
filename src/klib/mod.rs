@@ -1,36 +1,28 @@
+// SigmaOS Kernel Library
+
 extern crate alloc;
 
-// Core Library Collection Modules for SigmaOS
-// Sovereign implementations - no external crate dependencies
-pub mod vec; // declared first in module tree to prevent circular dependencies
+pub mod vec;
 pub mod buddy_allocator;
 pub mod paging;
 pub mod hashmap;
 pub mod hashset;
-pub mod uuid;
-pub mod hash;
-pub mod string;
-pub mod arc;
-pub mod ring_buffer;
-pub mod linked_list;
-pub mod slab;
-pub mod custom_string;
-pub mod custom_allocator;
-
-// Conditional compilation of other collection modules
-#[cfg(target_os = "none")]
 pub mod btreemap;
-#[cfg(target_os = "none")]
 pub mod vecdeque;
+pub mod string;
+pub mod hash;
+pub mod time;
+pub mod math;
+pub mod uuid;
+pub mod conversion;
+pub mod error;
+pub mod store;
+pub mod async_runtime;
 
-// Re-exports
+// Re-export common types
 pub use vec::Vec;
-pub use string::{String, ToString};
-pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
-pub use arc::Arc;
-pub use ring_buffer::{RingBuffer, HeapRingBuffer};
-pub use linked_list::{LinkedList, SList};
-pub use slab::{SlabCache, TypedSlabCache};
-pub use hashmap::HashMap;
+pub use hashmap::{HashMap, Entry};
 pub use hashset::HashSet;
-pub use uuid::Uuid;
+pub use btreemap::BTreeMap;
+pub use vecdeque::VecDeque;
+pub use alloc::string::String;

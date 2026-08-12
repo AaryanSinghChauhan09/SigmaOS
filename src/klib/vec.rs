@@ -62,6 +62,44 @@ impl<T> Vec<T> {
             }
         }
     }
+    pub fn pop(&mut self) -> Option<T> {
+        if self.len == 0 {
+            None
+        } else {
+            self.len -= 1;
+            unsafe { Some(core::ptr::read(self.data.add(self.len))) }
+        }
+    }
+    pub fn insert(&mut self, index: usize, item: T) {
+        if index > self.len {
+            panic!("index out of bounds");
+        }
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            // Shift elements right
+            for i in (index..self.len).rev() {
+                core::ptr::copy_nonoverlapping(self.data.add(i), self.data.add(i + 1), 1);
+            }
+            core::ptr::write(self.data.add(index), item);
+            self.len += 1;
+        }
+    }
+    pub fn first(&self) -> Option<&T> {
+        if self.len == 0 {
+            None
+        } else {
+            unsafe { Some(&*self.data) }
+        }
+    }
+    pub fn last(&self) -> Option<&T> {
+        if self.len == 0 {
+            None
+        } else {
+            unsafe { Some(&*self.data.add(self.len - 1)) }
+        }
+    }
     pub fn len(&self) -> usize { self.len }
     pub fn is_empty(&self) -> bool { self.len == 0 }
 
@@ -219,6 +257,16 @@ impl<T> Drop for Vec<T> {
                 free(self.data as *mut u8, self.capacity * mem::size_of::<T>());
             }
         }
+    }
+}
+
+impl<T> core::iter::FromIterator<T> for Vec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        let mut vec = Vec::new();
+        for item in iter {
+            vec.push(item);
+        }
+        vec
     }
 }
 

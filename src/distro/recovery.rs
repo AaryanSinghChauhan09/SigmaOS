@@ -1,4 +1,4 @@
-use crate::klib::BTreeMap;
+use crate::klib::HashMap;
 
 /// Disaster rescue environment setup (inspired by SystemRescue and Rescuezilla).
 #[derive(Debug, Clone)]
@@ -49,19 +49,19 @@ impl RescueISOManager {
 pub struct KernelTrace {
     pub instruction_pointer: u64,
     pub stack_frame: Vec<u64>,
-    pub registers: BTreeMap<String, u64>,
+    pub registers: HashMap<String, u64>,
 }
 
 #[derive(Debug, Clone)]
 pub struct LiveDebugger {
-    pub active_patches: BTreeMap<String, Vec<u8>>,
+    pub active_patches: HashMap<String, Vec<u8>>,
     pub core_dumps: Vec<KernelTrace>,
 }
 
 impl LiveDebugger {
     pub fn new() -> Self {
         Self {
-            active_patches: BTreeMap::new(),
+            active_patches: HashMap::new(),
             core_dumps: Vec::new(),
         }
     }
@@ -99,7 +99,7 @@ impl Default for LiveDebugger {
 pub struct BackupSnapshot {
     pub snapshot_id: u32,
     pub timestamp_secs: u64,
-    pub file_hashes: BTreeMap<String, String>, // filepath -> sha256 checksum
+    pub file_hashes: HashMap<String, String>, // filepath -> sha256 checksum
     pub is_compressed: bool,
 }
 
@@ -121,7 +121,7 @@ impl BackupSystem {
         &mut self,
         snapshot_id: u32,
         timestamp: u64,
-        files: BTreeMap<String, String>,
+        files: HashMap<String, String>,
         compress: bool,
     ) -> BackupSnapshot {
         let snapshot = BackupSnapshot {
@@ -135,7 +135,7 @@ impl BackupSystem {
     }
 
     /// Performs incremental backup comparing changes with previous snapshot.
-    pub fn get_incremental_changes(&self, current_files: &BTreeMap<String, String>) -> Vec<String> {
+    pub fn get_incremental_changes(&self, current_files: &HashMap<String, String>) -> Vec<String> {
         let mut modified_or_new = Vec::new();
         if let Some(latest) = self.snapshots.last() {
             for (path, hash) in current_files {
@@ -163,7 +163,7 @@ impl BackupSystem {
     pub fn rollback_to_snapshot(
         &mut self,
         snapshot_id: u32,
-        target_files: &mut BTreeMap<String, String>,
+        target_files: &mut HashMap<String, String>,
     ) -> Result<usize, &'static str> {
         let mut found = false;
         let mut rolled_back = 0;
@@ -210,7 +210,7 @@ mod tests {
     #[test]
     fn test_live_debugger_and_hotpatch() {
         let mut dbg = LiveDebugger::new();
-        let mut regs = BTreeMap::new();
+        let mut regs = HashMap::new();
         regs.insert("rax".to_string(), 0xDEADBEEF);
 
         let trace = KernelTrace {
@@ -236,14 +236,14 @@ mod tests {
     fn test_incremental_backup_system() {
         let mut backup = BackupSystem::new("/mnt/backups");
 
-        let mut files_v1 = BTreeMap::new();
+        let mut files_v1 = HashMap::new();
         files_v1.insert("/etc/hosts".to_string(), "hash1".to_string());
         files_v1.insert("/home/jules/code.rs".to_string(), "hash2".to_string());
 
         backup.create_snapshot(1, 1718100000, files_v1.clone(), true);
 
         // V2 has code.rs modified, and new file profile.sh
-        let mut files_v2 = BTreeMap::new();
+        let mut files_v2 = HashMap::new();
         files_v2.insert("/etc/hosts".to_string(), "hash1".to_string());
         files_v2.insert(
             "/home/jules/code.rs".to_string(),
