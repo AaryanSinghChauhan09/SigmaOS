@@ -7,16 +7,17 @@ pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
-pub mod distro;
 pub mod dashboard;
 pub mod device;
+pub mod distro;
 pub mod driver;
 pub mod drivers;
 pub mod filesystem;
+pub mod installer;
 pub mod kernel;
+pub mod memory;
 pub mod network;
 pub mod orchestration;
-pub mod distro;
 pub mod package;
 pub mod performance;
 pub mod productivity;
@@ -74,6 +75,18 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
     SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
+};
+pub use installer::{
+    AccessibilitySettings, DiskInfo, FilesystemType, GuiInstallerWizard, HybridIsoBuilder,
+    InstallerError, InstallerScreen, InstallerSummary, InstallerTheme, IsoBootConfig,
+    IsoBuildSystem, IsoBuilder, IsoFileEntry, IsoFilesystem, IsoMetadata, IsoValidationError,
+    LiveSessionConfig, PartitionEntry, PartitioningCalculator, PartitioningOperation,
+    SystemConfiguration, UserAccount,
+};
+pub use memory::{
+    AdvancedMemoryManager, MemoryCgroup, MemoryCompaction, MemoryManagementResult,
+    MemoryPressure, MemoryPressureMonitor, PageReclaimWatermarks, ReclaimStats,
+    SovereignPageReclaimer, ThpConfig,
 };
 pub use kernel::{
     BuddyAllocator, Channel, IpcError, IpcManager, MemoryBlock, Message, Priority, Process,

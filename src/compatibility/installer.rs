@@ -33,8 +33,8 @@ impl LiveIsoConfig {
         if !self.enable_overlay_ramdisk {
             return Err("Overlay ramdisk is disabled in Live ISO boot configuration.");
         }
-        println!("[live-iso] Mounted SquashFS from '{}' read-only.", self.squashfs_path);
-        println!("[live-iso] Allocated {}MB writable RAM overlay for live session.", self.ramdisk_allocation_mb);
+        // In no_std environment, we can't use println!
+        // In production, this would log to kernel buffer
         Ok(self.ramdisk_allocation_mb)
     }
 }
@@ -75,15 +75,15 @@ impl GuiInstallerWizard {
 
         match self.selected_scheme {
             PartitionScheme::AutoBtrfs => {
-                println!("[installer] Automated partitioning on '{}' using Btrfs subvolumes.", self.target_drive);
+                // In production, would log to kernel buffer
                 Ok("btrfs")
             }
             PartitionScheme::AutoZfs => {
-                println!("[installer] Automated partitioning on '{}' using ZFS zpools.", self.target_drive);
+                // In production, would log to kernel buffer
                 Ok("zfs")
             }
             PartitionScheme::ManualExt4 => {
-                println!("[installer] Manual partitioning on '{}' using Ext4 filesystem.", self.target_drive);
+                // In production, would log to kernel buffer
                 Ok("ext4")
             }
         }
@@ -92,7 +92,7 @@ impl GuiInstallerWizard {
     /// Sets keyboard layouts and language localization steps
     pub fn configure_localization(&mut self, lang: &str) {
         self.locale_lang = String::from(lang);
-        println!("[installer] Layout localization set to: '{}'.", lang);
+        // In production, would log to kernel buffer
     }
 }
 
@@ -138,7 +138,7 @@ impl PreseedAutoDeployer {
 
     /// Starts automated unattended deployment setup loops
     pub fn execute_unattended_install(&self, wizard: &mut GuiInstallerWizard) -> Result<(), &'static str> {
-        println!("[autodeploy] Initiating unattended kickstart deployment sequence...");
+        // In production, would log to kernel buffer
 
         // 1. Resolve partitioning from preseed
         if let Some(scheme) = self.query_preseed_value("partman/scheme") {
@@ -162,7 +162,7 @@ impl PreseedAutoDeployer {
         }
 
         let filesystem = wizard.configure_partitioning()?;
-        println!("[autodeploy] Unattended installation completed successfully on filesystem '{}'.", filesystem);
+        // In production, would log success to kernel buffer
 
         Ok(())
     }

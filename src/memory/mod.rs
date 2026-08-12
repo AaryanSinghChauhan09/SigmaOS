@@ -20,8 +20,15 @@
 // Virtual memory management, paging, and physical memory allocation
 
 pub mod paging;
+pub mod vmm_completion;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
     PhysicalAddress, SimpleVMM, VirtualAddress, PAGE_SIZE_BYTES, PAGE_TABLE_ENTRIES,
+};
+
+pub use vmm_completion::{
+    AdvancedMemoryManager, MemoryCgroup, MemoryCompaction, MemoryManagementResult,
+    MemoryPressure, MemoryPressureMonitor, PageReclaimWatermarks, ReclaimStats,
+    SovereignPageReclaimer, ThpConfig,
 };
