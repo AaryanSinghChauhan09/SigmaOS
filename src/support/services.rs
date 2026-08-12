@@ -1,6 +1,23 @@
-// SigmaOS Support & Services Framework
-// Professional support tiers, LTS maintenance guarantees, and disaster recovery configurations
+// SigmaOS Support & Services Framework (Red Hat Insights, Ubuntu Pro, and SUSE Manager Parity)
+// Professional support tiers, LTS maintenance guarantees, Expanded Security Maintenance (ESM),
+// FIPS/CIS Compliance Scanners, Automated Remediation Playbooks, and System Drift Detectors.
 
+#![no_std]
+
+#[cfg(test)]
+extern crate std;
+
+extern crate alloc;
+
+use alloc::string::String;
+use alloc::vec::Vec;
+use alloc::string::ToString;
+use core::sync::atomic::{AtomicBool, Ordering};
+
+#[cfg(not(test))]
+use crate::klib::HashMap;
+
+#[cfg(test)]
 use std::collections::HashMap;
 
 /// Professional support levels
@@ -38,135 +55,95 @@ pub struct RecoveryConfig {
     pub automount_system_drives: bool,
 }
 
-// Kali Linux-inspired Incident Response Auditing, Penetration Testing & Recovery tools
+/// Ubuntu Pro-style Expanded Security Maintenance (ESM) Subscription
 #[derive(Debug, Clone)]
-pub struct SovereignWlanAuditor {
-    pub current_ssid: String,
-    pub bssid: [u8; 6],
-    pub monitor_mode_enabled: bool,
+pub struct EsmSubscription {
+    pub token: String,
+    pub active: bool,
+    pub enabled_repositories: Vec<String>, // e.g. "fips", "livepatch", "cis-audit"
 }
 
-impl SovereignWlanAuditor {
-    pub fn new(ssid: &str, bssid: [u8; 6]) -> Self {
+/// Compliance profile types (RHEL / Ubuntu Pro parity)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ComplianceStandard {
+    CisBenchmark,
+    Hipaa,
+    PciDss,
+    Fips140_3,
+}
+
+/// FIPS / CIS Compliance Auditor and Benchmark Scanner
+pub struct ComplianceScanner {
+    pub standard: ComplianceStandard,
+    pub enforce_fips_cryptography: bool,
+}
+
+impl ComplianceScanner {
+    pub fn new(standard: ComplianceStandard) -> Self {
         Self {
-            current_ssid: ssid.to_string(),
-            bssid,
-            monitor_mode_enabled: false,
+            standard,
+            enforce_fips_cryptography: standard == ComplianceStandard::Fips140_3,
         }
     }
 
-    /// Simulates monitor mode wireless packet sniffing / capturing
-    pub fn enable_monitor_mode(&mut self) {
-        self.monitor_mode_enabled = true;
-    }
-
-    /// Constructs raw 802.11 Beacon frame payloads
-    pub fn build_beacon_frame(&self) -> Vec<u8> {
-        let mut frame = Vec::new();
-        frame.extend_from_slice(b"802.11-BEACON-");
-        frame.extend_from_slice(self.current_ssid.as_bytes());
-        frame
-    }
-
-    /// Constructs 802.11 Deauthentication frames for wireless audit injection
-    pub fn build_deauth_frame(&self, target_mac: [u8; 6]) -> Vec<u8> {
-        let mut frame = Vec::new();
-        frame.extend_from_slice(b"DEAUTH-FROM-");
-        frame.extend_from_slice(&self.bssid);
-        frame.extend_from_slice(b"-TO-");
-        frame.extend_from_slice(&target_mac);
-        frame
+    /// Performs audit scanning on security profiles, returning compliance status and score
+    pub fn execute_audit(&self, active_pledges: &[String]) -> (bool, u32) {
+        let mut score = 100;
+        // Compliance Rules
+        if self.enforce_fips_cryptography && !active_pledges.contains(&"fips-crypto".to_string()) {
+            score -= 40; // Cryptographic module non-compliance penalty
+        }
+        if self.standard == ComplianceStandard::CisBenchmark && active_pledges.contains(&"unveiled-root".to_string()) {
+            score -= 30; // Unrestricted filesystem unveil violation
+        }
+        (score >= 80, score)
     }
 }
 
+/// Red Hat Insights-style Vulnerability Remediation Playbook
 #[derive(Debug, Clone)]
-pub struct SovereignNetworkScanner {
-    pub target_ip: String,
-    pub open_ports: Vec<u16>,
+pub struct RemediationPlaybook {
+    pub play_id: String,
+    pub description: String,
+    pub target_cve: String,
+    pub remediation_steps: Vec<String>,
 }
 
-impl SovereignNetworkScanner {
-    pub fn new(target_ip: &str) -> Self {
-        Self {
-            target_ip: target_ip.to_string(),
-            open_ports: Vec::new(),
-        }
-    }
-
-    /// Registers simulated open ports on the target
-    pub fn register_open_port(&mut self, port: u16) {
-        self.open_ports.push(port);
-    }
-
-    /// Emulates an nmap-parity TCP SYN port scan
-    pub fn perform_tcp_syn_scan(&self, port_range: core::ops::Range<u16>) -> Vec<u16> {
-        let mut scanned = Vec::new();
-        for port in port_range {
-            if self.open_ports.contains(&port) {
-                scanned.push(port);
-            }
-        }
-        scanned
-    }
+/// SUSE Manager-style Configuration Drift Detector
+pub struct DriftDetector {
+    pub baseline_hashes: HashMap<String, String>, // filepath -> md5/sha256 baseline
 }
 
-pub struct SovereignHashAuditor {
-    pub target_hash: String,
-    pub algorithm: String, // "md5", "sha256", "bcrypt"
-}
-
-impl SovereignHashAuditor {
-    pub fn new(target_hash: &str, algorithm: &str) -> Self {
-        Self {
-            target_hash: target_hash.to_string(),
-            algorithm: algorithm.to_string(),
-        }
-    }
-
-    /// Emulates cracking common password hashes using high-speed dictionary/brute-force sweeps (John the Ripper / Hashcat parity)
-    pub fn audit_password_strength(&self, dictionary: &[&str]) -> Option<String> {
-        for word in dictionary {
-            let hashed = self.compute_simple_hash(word);
-            if hashed == self.target_hash {
-                return Some(word.to_string());
-            }
-        }
-        None
-    }
-
-    fn compute_simple_hash(&self, word: &str) -> String {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-        let mut hasher = DefaultHasher::new();
-        word.hash(&mut hasher);
-        self.algorithm.clone() + &format!("{:x}", hasher.finish())
-    }
-}
-
-pub struct SovereignExploitAuditor {
-    pub registered_payloads: HashMap<String, Vec<u8>>, // payload_name -> shellcode
-    pub active_listener_port: Option<u16>,
-}
-
-impl SovereignExploitAuditor {
+impl DriftDetector {
     pub fn new() -> Self {
         Self {
-            registered_payloads: HashMap::new(),
-            active_listener_port: None,
+            baseline_hashes: HashMap::new(),
         }
     }
 
-    pub fn register_exploit_payload(&mut self, name: &str, shellcode: &[u8]) {
-        self.registered_payloads.insert(name.to_string(), shellcode.to_vec());
+    pub fn register_baseline(&mut self, filepath: &str, hash: &str) {
+        self.baseline_hashes.insert(filepath.to_string(), hash.to_string());
     }
 
-    pub fn start_reverse_tcp_listener(&mut self, port: u16) {
-        self.active_listener_port = Some(port);
+    /// Scans modified files, returning list of paths that drifted from configurations
+    pub fn detect_drift(&self, current_hashes: &HashMap<String, String>) -> Vec<String> {
+        let mut drifted = Vec::new();
+        for (path, base_hash) in &self.baseline_hashes {
+            if let Some(curr_hash) = current_hashes.get(path) {
+                if curr_hash != base_hash {
+                    drifted.push(path.clone());
+                }
+            } else {
+                drifted.push(path.clone()); // File missing from live system is considered drift
+            }
+        }
+        drifted
     }
+}
 
-    /// Simulates post-incident posture validation (executes a mock shellcode payloads safely)
-    pub fn execute_payload_audit(&self, name: &str) -> bool {
-        self.registered_payloads.contains_key(name)
+impl Default for DriftDetector {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -175,8 +152,11 @@ pub struct SupportServicesManager {
     pub active_contracts: HashMap<String, SupportContract>,
     pub lts_releases: HashMap<String, LtsRelease>,
     pub recovery_tools: Vec<RecoveryConfig>,
-    pub wlan_auditors: Vec<SovereignWlanAuditor>,
-    pub scanners: Vec<SovereignNetworkScanner>,
+
+    // Enterprise Competitor Services
+    pub esm_sub: Option<EsmSubscription>,
+    pub registered_playbooks: HashMap<String, RemediationPlaybook>,
+    pub drift_detector: DriftDetector,
 }
 
 impl SupportServicesManager {
@@ -185,8 +165,9 @@ impl SupportServicesManager {
             active_contracts: HashMap::new(),
             lts_releases: HashMap::new(),
             recovery_tools: Vec::new(),
-            wlan_auditors: Vec::new(),
-            scanners: Vec::new(),
+            esm_sub: None,
+            registered_playbooks: HashMap::new(),
+            drift_detector: DriftDetector::new(),
         }
     }
 
@@ -233,6 +214,20 @@ impl SupportServicesManager {
         self.active_contracts
             .get(client)
             .map(|c| c.sla_resolution_hours)
+    }
+
+    /// Register/activate Ubuntu Pro Expanded Security Maintenance
+    pub fn activate_esm_subscription(&mut self, token: &str, repos: Vec<String>) {
+        self.esm_sub = Some(EsmSubscription {
+            token: token.to_string(),
+            active: true,
+            enabled_repositories: repos,
+        });
+    }
+
+    /// Register proactive CVE playbooks (Red Hat Insights parity)
+    pub fn register_remediation_playbook(&mut self, play: RemediationPlaybook) {
+        self.registered_playbooks.insert(play.play_id.clone(), play);
     }
 }
 
@@ -285,7 +280,12 @@ mod tests {
         let mut manager = SupportServicesManager::new();
         let config = RecoveryConfig {
             rescue_iso_name: "SigmaOS-Rescue-v1.0.iso".to_string(),
-            diagnostic_tools_included: vec!["fsck.sigmafs".to_string(), "memtester".to_string()],
+            diagnostic_tools_included: {
+                let mut v = Vec::new();
+                v.push("fsck.sigmafs".to_string());
+                v.push("memtester".to_string());
+                v
+            },
             automount_system_drives: true,
         };
 
@@ -299,59 +299,61 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_wlan_injector() {
-        let bssid = [0x00, 0x11, 0x22, 0x33, 0x44, 0x55];
-        let mut auditor = SovereignWlanAuditor::new("TestWifiNetwork", bssid);
-        assert!(!auditor.monitor_mode_enabled);
+    fn test_esm_and_playbooks_proactive_scans() {
+        let mut manager = SupportServicesManager::new();
 
-        auditor.enable_monitor_mode();
-        assert!(auditor.monitor_mode_enabled);
+        // 1. Expanded Security Maintenance Subscription
+        let mut repos = Vec::new();
+        repos.push("fips-crypto".to_string());
+        repos.push("livepatch".to_string());
+        manager.activate_esm_subscription("UbuntuPro-token-9999", repos);
 
-        let beacon = auditor.build_beacon_frame();
-        assert!(beacon.starts_with(b"802.11-BEACON-TestWifiNetwork"));
+        assert!(manager.esm_sub.is_some());
+        let sub = manager.esm_sub.as_ref().unwrap();
+        assert!(sub.active);
+        assert_eq!(sub.enabled_repositories[0], "fips-crypto");
 
-        let deauth = auditor.build_deauth_frame([0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF]);
-        assert!(deauth.starts_with(b"DEAUTH-FROM-"));
-    }
+        // 2. FIPS Compliance Audit Scanning
+        let scanner = ComplianceScanner::new(ComplianceStandard::Fips140_3);
 
-    #[test]
-    fn test_sovereign_pentest_scanner() {
-        let mut scanner = SovereignNetworkScanner::new("192.168.1.50");
-        scanner.register_open_port(22);
-        scanner.register_open_port(80);
-        scanner.register_open_port(443);
+        // Audit fails without FIPS cryptography pledges enabled
+        let (passed_1, score_1) = scanner.execute_audit(&[]);
+        assert!(!passed_1);
+        assert_eq!(score_1, 60);
 
-        let active_ports = scanner.perform_tcp_syn_scan(1..100);
-        assert_eq!(active_ports.len(), 2);
-        assert!(active_ports.contains(&22));
-        assert!(active_ports.contains(&80));
-    }
+        // Audit succeeds once FIPS cryptography active pledges are present
+        let (passed_2, score_2) = scanner.execute_audit(&["fips-crypto".to_string()]);
+        assert!(passed_2);
+        assert_eq!(score_2, 100);
 
-    #[test]
-    fn test_sovereign_hash_cracker() {
-        // Let's pre-compute a simple hash for our test target
-        let plain_password = "password123";
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        plain_password.hash(&mut hasher);
-        use std::hash::{Hash, Hasher};
-        let target_hash_str = format!("sha256{:x}", hasher.finish());
+        // 3. Proactive Insights Playbooks
+        let mut play_steps = Vec::new();
+        play_steps.push("sysctl -w net.ipv4.ip_forward=0".to_string());
+        let playbook = RemediationPlaybook {
+            play_id: "insights-play-01".to_string(),
+            description: "Remediate IP forward vulnerability".to_string(),
+            target_cve: "CVE-2025-0012".to_string(),
+            remediation_steps: play_steps,
+        };
+        manager.register_remediation_playbook(playbook);
+        assert!(manager.registered_playbooks.contains_key("insights-play-01"));
 
-        let cracker = SovereignHashAuditor::new(&target_hash_str, "sha256");
-        let dictionary = vec!["admin", "root", "123456", "password123", "secret"];
+        // 4. Configuration Drift Detection
+        let mut live_hashes = HashMap::new();
+        live_hashes.insert("/etc/sysctl.conf".to_string(), "hash-001".to_string());
+        live_hashes.insert("/etc/hosts".to_string(), "hash-002".to_string());
 
-        let cracked = cracker.audit_password_strength(&dictionary).unwrap();
-        assert_eq!(cracked, "password123");
-    }
+        manager.drift_detector.register_baseline("/etc/sysctl.conf", "hash-001");
+        manager.drift_detector.register_baseline("/etc/hosts", "hash-002");
 
-    #[test]
-    fn test_sovereign_exploit_orchestrator() {
-        let mut orchestrator = SovereignExploitAuditor::new();
-        let payload = [0x90, 0x90, 0xCC, 0x90]; // mock shellcode bytes
-        orchestrator.register_exploit_payload("linux/x64/reverse_tcp", &payload);
-        orchestrator.start_reverse_tcp_listener(4444);
+        // No drift detected under matching baseline hashes
+        let drifted_files = manager.drift_detector.detect_drift(&live_hashes);
+        assert_eq!(drifted_files.len(), 0);
 
-        assert!(orchestrator.execute_payload_audit("linux/x64/reverse_tcp"));
-        assert!(!orchestrator.execute_payload_audit("windows/meterpreter/reverse_tcp"));
-        assert_eq!(orchestrator.active_listener_port, Some(4444));
+        // Modify a configuration file hash -> triggers drift detection
+        live_hashes.insert("/etc/sysctl.conf".to_string(), "modified-hash".to_string());
+        let drifted_files_after = manager.drift_detector.detect_drift(&live_hashes);
+        assert_eq!(drifted_files_after.len(), 1);
+        assert_eq!(drifted_files_after[0], "/etc/sysctl.conf");
     }
 }
