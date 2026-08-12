@@ -65,12 +65,7 @@ impl AuditEvent for SimpleAuditEvent {
         self.id
     }
     fn event_type(&self) -> EventType {
-        match self.event_type.load(Ordering::SeqCst) {
-            1 => EventType::Authorization,
-            2 => EventType::FileAccess,
-            3 => EventType::SystemChange,
-            _ => EventType::Authentication,
-        }
+        unsafe { core::mem::transmute(self.event_type.load(Ordering::SeqCst)) }
     }
     fn timestamp(&self) -> u64 {
         self.timestamp.load(Ordering::SeqCst) as u64
@@ -172,21 +167,16 @@ impl SimpleAuditPolicy {
 }
 
 impl AuditPolicy for SimpleAuditPolicy {
-    fn check_compliance(&self, event: &dyn AuditEvent) -> bool {
+    fn check_compliance(&self, event: &dyn AuditEvent) -> Result<bool, AuditError> {
         if self.require_authentication.load(Ordering::SeqCst) == 1 {
-            // Match authentication type or default
-            let et = event.event_type();
-            match et {
-                EventType::Authentication => true,
-                _ => false,
-            }
+            Ok(event.event_type() == EventType::Authentication)
         } else {
-            true
+            Ok(true)
         }
     }
 
     fn enforce_policy(&mut self, event: &dyn AuditEvent) -> Result<(), AuditError> {
-        if self.check_compliance(event) {
+        if self.check_compliance(event).unwrap_or(false) {
             Ok(())
         } else {
             Err(AuditError::InvalidEvent)

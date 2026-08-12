@@ -1,19 +1,13 @@
 // SigmaOS Desktop Module
 pub mod zenith_compositor;
-pub mod moksha;
-pub mod pantheon;
-
-pub use pantheon::{
-    GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
-    PlankDockItem, SlingshotLauncher, SlingshotApp, SlingshotCategory, AppCenter,
-    AppCenterProduct, PantheonGreeter,
-};
+pub mod notification;
 
 pub use zenith_compositor::{
     DamageRegion, InputEvent, InputEventData, InputEventType, Output, Surface, SurfaceType,
     WindowGeometry, WindowState, ZenithCompositor, ZenithWindow,
 };
-pub use moksha::{
-    EvasCanvasManager, EvasObject, MokshaProfile, MokshaWindowManager, MokshaWindowType,
-    ShelfOrientation, WallpaperTransition, TerminologyBackend, EphotoViewer, BodhiAppCenterInstaller,
+
+pub use notification::{
+    Notification, SimpleNotification, NotificationManager, SimpleNotificationManager,
+    NotificationUrgency, NotificationError,
 };
