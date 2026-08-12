@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Slackpkg Compatibility Layer
 //! Slackpkg compatibility for Slackware Linux

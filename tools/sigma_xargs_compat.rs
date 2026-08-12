@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Xargs Compatibility
 //! Build and execute command lines from stdin (xargs command)

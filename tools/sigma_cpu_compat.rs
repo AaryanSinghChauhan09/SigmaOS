@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 //! SigmaOS Micro-Architectural, Firmware & Instruction Set Abstraction Engine
 //! Simulates and abstracts low-level ISA concepts for both x86_64 (CISC) and ARM AArch64/AArch32 (RISC) architectures.
 //! Includes instruction modeling, flag arithmetic, cache operations, JIT safety, and sync primitives.

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 //! SigmaOS Secure Zero-on-Free Allocator Helper
 //! Implements strict memory scrubbing and zeroing guarantees on deallocation,
 //! inspired by OpenBSD's hardened security-first memory allocators (omalloc).

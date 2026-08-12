@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #![cfg_attr(target_os = "none", no_std)]
 #![allow(dead_code, non_snake_case)]
 

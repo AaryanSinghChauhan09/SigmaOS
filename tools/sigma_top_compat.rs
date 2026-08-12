@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS Top Process Monitor Compatibility
 //! Real-time process monitoring (top command)

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #![allow(unused_variables)]
 //! SigmaOS SSH Compatibility
 //! Secure shell client (ssh command)

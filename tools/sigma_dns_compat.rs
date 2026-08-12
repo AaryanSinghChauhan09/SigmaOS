@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 //! SigmaOS Process-Local DNS Cache
 //! Provides isolated network address caches per process compartment,
 //! inspired by FreeBSD jails and OpenBSD's pledge/unveil restrictions.

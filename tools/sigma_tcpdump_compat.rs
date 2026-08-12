@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 //! SigmaOS Tcpdump Compatibility
 //! Tcpdump packet capture and filtering engine
 //! Zero external dependencies

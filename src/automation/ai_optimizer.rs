@@ -1,8 +1,6 @@
 // SigmaOS AI-Driven Optimization System
 // Copilot-style assistants for system tuning and automation
 
-use std::collections::HashMap;
-
 /// Optimization category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizationCategory {
@@ -212,7 +210,11 @@ impl AiOptimizer {
         recommendations.retain(|r| r.confidence >= self.optimization_threshold);
 
         // Sort by impact
-        recommendations.sort_by(|a, b| b.impact.partial_cmp(&a.impact).unwrap_or(core::cmp::Ordering::Equal));
+        recommendations.sort_by(|a, b| {
+            b.impact
+                .partial_cmp(&a.impact)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
 
         recommendations
     }

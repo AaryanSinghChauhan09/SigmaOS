@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 //! SigmaOS Cron Compatibility Layer
 //! Cron job scheduling compatibility
 //! Zero external dependencies
