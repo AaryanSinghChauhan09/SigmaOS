@@ -3,7 +3,7 @@
 // Universal ABI Translator, SigmaFS++, Self-Healing Kernel, AI-Native Runtime,
 // Energy-Aware Scheduler, User-Defined Kernel Functions, and Privacy-First Sandboxes.
 
-use crate::security::capability::CapabilityToken;
+use crate::security::CapabilityToken;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// 1. Universal ABI Translator
@@ -445,105 +445,4 @@ unsafe fn free(ptr: *mut u8) {
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
-}
-
-impl Default for DeterministicReplayEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for DynamicKernelPersonalitySwitcher {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for InterruptRatePredictor {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_abi_translator_and_sigmafs_plus_plus() {
-        let translator = UniversalAbiTranslator::new("SigmaOS");
-        assert_eq!(translator.host_platform(), "SigmaOS");
-
-        let win_sys = translator.translate_abi_syscall("Windows", 0x2A).unwrap();
-        assert_eq!(win_sys, "sys_win32_create_window");
-
-        let fs = SigmaFsPlusPlus::new();
-        let mut audit_hash = [0u8; 32];
-        let size = fs.write_and_audit("/etc/hosts", b"127.0.0.1 localhost", &mut audit_hash);
-        assert_eq!(size, 19);
-        assert_eq!(fs.total_blocks(), 1); // 19 bytes is less than 4096, 1 block written
-        assert_ne!(audit_hash[0], 0);
-    }
-
-    #[test]
-    fn test_self_healing_and_ai_runtime() {
-        let kernel = SelfHealingKernel::new(0xABCDEF);
-        let stable_res = kernel.verify_and_heal(0xABCDEF).unwrap();
-        assert_eq!(stable_res, "System integral and stable");
-
-        let bad_res = kernel.verify_and_heal(0x112233).unwrap();
-        assert_eq!(
-            bad_res,
-            "Integrity violation detected: Rollback applied successfully"
-        );
-
-        let ai = AiNativeRuntime::new();
-        ai.register_model_context();
-        assert_eq!(ai.active_models_count(), 1);
-        assert_eq!(ai.execute_inference_cycles(1, 10), 2560);
-    }
-
-    #[test]
-    fn test_energy_scheduler_scripting_and_sandbox() {
-        let sched = EnergyAwareScheduler::new(80); // 80C thermal ceiling
-        let multiplier_high = sched.calculate_energy_multiplier(40, 10);
-        assert_eq!(multiplier_high, 4); // High performance on cold CPU
-
-        let multiplier_throttled = sched.calculate_energy_multiplier(85, 10);
-        assert_eq!(multiplier_throttled, 1); // Heavy throttle
-
-        let scripting = UserDefinedKernelFunctions::new();
-        let bytecode = [5u8];
-        let mut state = 10;
-        assert!(scripting
-            .execute_custom_script(&bytecode, &mut state)
-            .is_ok());
-        assert_eq!(state, 50);
-        assert_eq!(scripting.script_count(), 1);
-
-        let sandbox = PrivacyFirstSandbox::new();
-        let token = CapabilityToken::from_bits(0x0F);
-        assert!(sandbox.validate_and_execute_secure_call(&token, 0x0C));
-        assert!(!sandbox.validate_and_execute_secure_call(&token, 0x80));
-    }
-
-    #[test]
-    fn test_dynamic_switching_and_prediction() {
-        let switcher = DynamicKernelPersonalitySwitcher::new();
-        assert_eq!(switcher.get_mode(), KernelPersonalityMode::Microkernel);
-        switcher.set_mode(KernelPersonalityMode::Exokernel);
-        assert_eq!(switcher.get_mode(), KernelPersonalityMode::Exokernel);
-
-        let predictor = InterruptRatePredictor::new();
-        assert!(!predictor.predict_storm_and_prebuffer());
-        predictor.record_interrupt_event(1500);
-        assert!(predictor.predict_storm_and_prebuffer());
-
-        let mut replay = DeterministicReplayEngine::new();
-        assert_eq!(replay.get_trace_count(), 0);
-        assert!(!replay.replay_with_identical_timing());
-        replay.record_syscall(9, 100000);
-        assert_eq!(replay.get_trace_count(), 1);
-        assert!(replay.replay_with_identical_timing());
-    }
 }

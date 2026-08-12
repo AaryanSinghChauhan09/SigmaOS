@@ -1,10 +1,4 @@
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::string::{String, ToString};
-
-// =========================================================================
 // 1. LINUX FILE TYPE AND METADATA COMPATIBILITY LAYER
-// =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LinuxFileType {
@@ -44,9 +38,7 @@ impl LinuxFileMetadata {
     }
 }
 
-// =========================================================================
 // 2. NixOS-STYLE: ATOMIC INODE POINTER-SWAP GENERATION MANAGER
-// =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Generation {
@@ -61,6 +53,7 @@ pub struct NixosGenerationManager {
 }
 
 impl NixosGenerationManager {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             generations: Vec::new(),
@@ -81,7 +74,7 @@ impl NixosGenerationManager {
     }
 
     /// Perform a sub-millisecond, zero-copy atomic update/rollback by swapping root pointers
-    pub fn swap_active_generation(&mut self, generation_id: u32) -> Result<u64, &'static str> {
+    pub fn swap_active_generation(&mut self, _generation_id: u32) -> Result<u64, &'static str> {
         for (idx, gen) in self.generations.iter().enumerate() {
             if gen.id == generation_id {
                 self.active_generation_idx = Some(idx);
@@ -103,9 +96,7 @@ impl Default for NixosGenerationManager {
     }
 }
 
-// =========================================================================
 // 3. ARCH-STYLE: ZERO-ALLOCATION SAT SOLVER AND PACKAGE PARSER
-// =========================================================================
 
 pub const MAX_RECIPE_DEPENDENCIES: usize = 8;
 
@@ -128,6 +119,7 @@ pub struct ArchSatSolver {
 }
 
 impl ArchSatSolver {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             registry: [None; 16],
@@ -197,9 +189,7 @@ impl Default for ArchSatSolver {
     }
 }
 
-// =========================================================================
 // 4. ANDROID-STYLE: RUNTIME CAPABILITY TOKEN GUARD AND SECURITY DELEGATE
-// =========================================================================
 
 pub const PORT_ALLOW_TCP: u16 = 80;
 pub const PORT_ALLOW_SSL: u16 = 443;
@@ -217,6 +207,7 @@ pub struct AndroidSecurityEnforcer {
 }
 
 impl AndroidSecurityEnforcer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             tokens: [None; 32],
@@ -276,9 +267,7 @@ impl Default for AndroidSecurityEnforcer {
     }
 }
 
-// =========================================================================
 // 5. KALI-STYLE: ISOLATED DYNAMIC SYSTEM TRACING SANDBOX HOOK
-// =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TraceEvent {
@@ -300,6 +289,7 @@ pub struct KaliSysTracer {
 }
 
 impl KaliSysTracer {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             buffer: [None; 16],
@@ -336,9 +326,7 @@ impl Default for KaliSysTracer {
     }
 }
 
-// =========================================================================
 // 6. BUSYBOX-STYLE: MULTI-CALL COMMAND PARSER
-// =========================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SysCommandType {
@@ -362,9 +350,7 @@ impl BusyBoxMultiCallParser {
     }
 }
 
-// =========================================================================
 // UNIT TESTS
-// =========================================================================
 
 #[cfg(test)]
 mod tests {

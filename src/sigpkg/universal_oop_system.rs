@@ -20,13 +20,93 @@
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+#[cfg(not(feature = "standalone_test"))]
+use crate::klib::{HashMap, Arc};
+
+#[cfg(feature = "standalone_test")]
 use std::collections::HashMap;
+#[cfg(feature = "standalone_test")]
 use std::sync::Arc;
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+#[cfg(feature = "standalone_test")]
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+impl Version {
+    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+        Self { major, minor, patch }
+    }
+    pub fn parse(s: &str) -> Result<Self, &'static str> {
+        let mut parts = s.split('.');
+        let major = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        let minor = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        let patch = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        Ok(Self::new(major, minor, patch))
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Dependency {
+    pub name: String,
+    pub version_constraint: VersionConstraint,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum VersionConstraint {
+    Any,
+}
+
+#[cfg(feature = "standalone_test")]
+pub struct Package;
 
 // ============================================================================
 // Core Abstractions (OOP Interface Layer)
 // ============================================================================
+
+/// Conditional dependency based on active Portage-style USE flags
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ConditionalDependency {
+    pub dependency: Dependency,
+    pub required_use_flag: String,
+}
+
+/// Matrix for mapping and translating architecture identifiers across distros
+#[derive(Debug, Clone, Default)]
+pub struct ArchitectureTranslationMatrix {
+    pub mapping: HashMap<String, String>,
+}
+
+impl ArchitectureTranslationMatrix {
+    pub fn new() -> Self {
+        let mut mapping = HashMap::new();
+        // Setup default cross-distro mappings
+        mapping.insert("amd64".to_string(), "x86_64".to_string());
+        mapping.insert("i386".to_string(), "x86".to_string());
+        mapping.insert("arm64".to_string(), "aarch64".to_string());
+        mapping.insert("armhf".to_string(), "armv7hl".to_string());
+        Self { mapping }
+    }
+
+    pub fn translate(&self, arch: &str) -> String {
+        self.mapping.get(arch).cloned().unwrap_or_else(|| arch.to_string())
+    }
+}
 
 /// Core package trait - defines the contract for all package operations
 pub trait IPackage: Send + Sync {
@@ -36,6 +116,39 @@ pub trait IPackage: Send + Sync {
     fn format(&self) -> PackageFormat;
     fn metadata(&self) -> &PackageMetadata;
     fn metadata_mut(&mut self) -> &mut PackageMetadata;
+
+    // Portage-style USE flags
+    fn use_flags(&self) -> &[String] {
+        &[]
+    }
+
+    // List of files installed by this package (Pacman-style trigger input)
+    fn files(&self) -> &[String] {
+        &[]
+    }
+
+    // Extensible installation/deinstallation scripting hooks
+    fn install_script(&self) -> Option<&str> {
+        None
+    }
+
+    fn uninstall_script(&self) -> Option<&str> {
+        None
+    }
+
+    fn post_install_script(&self) -> Option<&str> {
+        None
+    }
+
+    // Nix-style deterministic derivation inputs
+    fn derivation_inputs(&self) -> &[String] {
+        &[]
+    }
+
+    // Conditional Portage-style dependencies based on active USE flags
+    fn conditional_dependencies(&self) -> &[ConditionalDependency] {
+        &[]
+    }
 }
 
 /// Package format enumeration
@@ -252,6 +365,13 @@ impl IPackageParser for DebAdapter {
             },
             dependencies,
             format: PackageFormat::Deb,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         // Execute user-defined hooks
@@ -387,6 +507,13 @@ impl IPackageParser for RpmAdapter {
             },
             dependencies,
             format: PackageFormat::Rpm,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -494,6 +621,13 @@ impl IPackageParser for PacmanAdapter {
             },
             dependencies,
             format: PackageFormat::Pacman,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -605,6 +739,13 @@ impl IPackageParser for EbuildAdapter {
             },
             dependencies,
             format: PackageFormat::Ebuild,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -712,6 +853,13 @@ impl IPackageParser for ApkAdapter {
             },
             dependencies,
             format: PackageFormat::Apk,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -829,6 +977,13 @@ impl IPackageParser for NixAdapter {
             },
             dependencies,
             format: PackageFormat::Nix,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -945,6 +1100,13 @@ impl IPackageParser for FlatpakAdapter {
             },
             dependencies,
             format: PackageFormat::Flatpak,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1060,6 +1222,13 @@ impl IPackageParser for SnapAdapter {
             },
             dependencies,
             format: PackageFormat::Snap,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1178,6 +1347,13 @@ impl IPackageParser for AppImageAdapter {
             },
             dependencies,
             format: PackageFormat::AppImage,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1286,6 +1462,13 @@ impl IPackageParser for XbpsAdapter {
             },
             dependencies,
             format: PackageFormat::Xbps,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1396,6 +1579,13 @@ impl IPackageParser for TxzAdapter {
             },
             dependencies,
             format: PackageFormat::Txz,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1508,6 +1698,13 @@ impl IPackageParser for EopkgAdapter {
             },
             dependencies,
             format: PackageFormat::Eopkg,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1616,6 +1813,13 @@ impl IPackageParser for ZypperAdapter {
             },
             dependencies,
             format: PackageFormat::Zypper,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1738,6 +1942,13 @@ impl IPackageParser for GuixAdapter {
             },
             dependencies,
             format: PackageFormat::Guix,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1847,6 +2058,13 @@ impl IPackageParser for SigmaAdapter {
             },
             dependencies,
             format: PackageFormat::Sigma,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         });
 
         self.base
@@ -1884,6 +2102,30 @@ pub struct StandardPackage {
     pub metadata: PackageMetadata,
     pub dependencies: Vec<Dependency>,
     pub format: PackageFormat,
+    pub use_flags: Vec<String>,
+    pub files: Vec<String>,
+    pub install_script: Option<String>,
+    pub uninstall_script: Option<String>,
+    pub post_install_script: Option<String>,
+    pub derivation_inputs: Vec<String>,
+    pub conditional_dependencies: Vec<ConditionalDependency>,
+}
+
+impl StandardPackage {
+    pub fn new_simple(metadata: PackageMetadata, dependencies: Vec<Dependency>, format: PackageFormat) -> Self {
+        Self {
+            metadata,
+            dependencies,
+            format,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
+        }
+    }
 }
 
 impl IPackage for StandardPackage {
@@ -1909,6 +2151,34 @@ impl IPackage for StandardPackage {
 
     fn metadata_mut(&mut self) -> &mut PackageMetadata {
         &mut self.metadata
+    }
+
+    fn use_flags(&self) -> &[String] {
+        &self.use_flags
+    }
+
+    fn files(&self) -> &[String] {
+        &self.files
+    }
+
+    fn install_script(&self) -> Option<&str> {
+        self.install_script.as_deref()
+    }
+
+    fn uninstall_script(&self) -> Option<&str> {
+        self.uninstall_script.as_deref()
+    }
+
+    fn post_install_script(&self) -> Option<&str> {
+        self.post_install_script.as_deref()
+    }
+
+    fn derivation_inputs(&self) -> &[String] {
+        &self.derivation_inputs
+    }
+
+    fn conditional_dependencies(&self) -> &[ConditionalDependency] {
+        &self.conditional_dependencies
     }
 }
 
@@ -1953,13 +2223,14 @@ impl PackageParserFactory {
     }
 
     pub fn get_parser(&self, format: PackageFormat) -> Option<&dyn IPackageParser> {
-        self.parsers.get(&format).map(|p| p.as_ref())
+        self.parsers.get::<PackageFormat>(&format).map(|p| p.as_ref())
     }
 
     pub fn auto_detect_parser(&self, data: &[u8]) -> Option<&dyn IPackageParser> {
         for parser in self.parsers.values() {
-            if parser.can_parse(data) {
-                return Some(parser.as_ref());
+            let p_ref: &dyn IPackageParser = parser.as_ref();
+            if p_ref.can_parse(data) {
+                return Some(p_ref);
             }
         }
         None
@@ -1976,103 +2247,15 @@ impl Default for PackageParserFactory {
 // Facade Pattern: Universal Package Manager
 // ============================================================================
 
-// ============================================================================
-// Delta Package Reconstruction Subsystem
-// ============================================================================
-
-pub struct PackageDeltaPatch {
-    pub source_checksum: String,
-    pub target_checksum: String,
-    pub delta_payload: Vec<u8>,
-}
-
-pub struct PackageDeltaEngine;
-
-impl PackageDeltaEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    /// Reconstitutes a full package by applying a binary patch to a cached source package
-    pub fn apply_delta_patch(
-        &self,
-        source_package: &dyn IPackage,
-        patch: &PackageDeltaPatch,
-    ) -> Result<Box<dyn IPackage>, &'static str> {
-        let meta = source_package.metadata();
-        if meta.checksum != patch.source_checksum {
-            return Err("Source checksum mismatch; cannot apply delta patch");
-        }
-
-        // Apply mock chunk-based delta reconstruction
-        let mut reconstructed_meta = meta.clone();
-        reconstructed_meta.checksum = patch.target_checksum.clone();
-        reconstructed_meta.size += patch.delta_payload.len() as u64;
-
-        Ok(Box::new(StandardPackage {
-            metadata: reconstructed_meta,
-            dependencies: source_package.dependencies().to_vec(),
-            format: source_package.format(),
-        }))
-    }
-}
-
-impl Default for PackageDeltaEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// Dual-Layer Cryptographic Signature Verifier (GPG & Post-Quantum)
-// ============================================================================
-
-pub struct GpgPqcVerifierAdapter {
-    pub trusted_gpg_keys: HashMap<String, bool>, // KeyID -> IsTrusted
-    pub quantum_root_anchors: Vec<String>,       // Quantum signature anchors
-}
-
-impl GpgPqcVerifierAdapter {
-    pub fn new() -> Self {
-        let mut trusted = HashMap::new();
-        trusted.insert("0x9E5A86A21B607B76".to_string(), true);
-        Self {
-            trusted_gpg_keys: trusted,
-            quantum_root_anchors: vec!["dilithium-5-anchor-01".to_string()],
-        }
-    }
-
-    /// Performs dual-layer authenticity check validating classical GPG & quantum-safe signatures
-    pub fn verify_authenticity(&self, package: &dyn IPackage) -> Result<bool, &'static str> {
-        let meta = package.metadata();
-
-        // Layer 1: Classical GPG Check
-        let key_id = meta.gpg_key_id.as_ref().ok_or("Missing GPG signature")?;
-        if !self.trusted_gpg_keys.contains_key(key_id) {
-            return Err("Invalid GPG signature key ID; package not trusted");
-        }
-
-        // Layer 2: Post-Quantum Check
-        let pqc_sig = meta.pqc_signature.as_ref().ok_or("Missing Post-Quantum signature")?;
-        if !pqc_sig.contains("dilithium") {
-            return Err("Invalid quantum-safe signature; signature tampered");
-        }
-
-        Ok(true)
-    }
-}
-
-impl Default for GpgPqcVerifierAdapter {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// Universal package manager - Facade for all package operations
 pub struct UniversalPackageManager {
     factory: PackageParserFactory,
     installed_packages: HashMap<String, Box<dyn IPackage>>,
     pub global_hooks: Vec<Arc<dyn UserDefinedHook>>,
+    // Portage-style active USE flags
+    pub active_use_flags: HashMap<String, bool>,
+    // Pacman-style file path triggers/hooks
+    pub path_triggers: Vec<Arc<dyn IPathTrigger>>,
 }
 
 impl UniversalPackageManager {
@@ -2082,7 +2265,73 @@ impl UniversalPackageManager {
             factory: PackageParserFactory::new(),
             installed_packages: HashMap::new(),
             global_hooks: Vec::new(),
+            active_use_flags: HashMap::new(),
+            path_triggers: Vec::new(),
         }
+    }
+
+    /// Add a Pacman-style path-based trigger hook
+    pub fn add_path_trigger(&mut self, trigger: Arc<dyn IPathTrigger>) {
+        self.path_triggers.push(trigger);
+    }
+
+    /// Scan all path triggers and execute those matching files inside the installed package
+    pub fn process_path_triggers(&self, package: &dyn IPackage) -> Result<(), HookError> {
+        let files = package.files();
+        if files.is_empty() {
+            return Ok(());
+        }
+
+        for trigger in &self.path_triggers {
+            let mut matched_files = Vec::new();
+            let pattern = trigger.pattern();
+
+            for file in files {
+                // Simplified pattern matching support:
+                // - Ends with pattern (e.g. "*.desktop" matching "usr/share/applications/app.desktop")
+                // - Starts with pattern (e.g. "usr/bin/*" matching "usr/bin/bash")
+                // - Direct equality
+                let is_match = if pattern.starts_with('*') {
+                    let suffix = &pattern[1..];
+                    file.ends_with(suffix)
+                } else if pattern.ends_with('*') {
+                    let prefix = &pattern[..pattern.len() - 1];
+                    file.starts_with(prefix)
+                } else {
+                    file == pattern
+                };
+
+                if is_match {
+                    matched_files.push(file.clone());
+                }
+            }
+
+            if !matched_files.is_empty() {
+                trigger.execute(&matched_files)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Set an active Portage-style USE flag
+    pub fn set_use_flag(&mut self, flag: &str, enabled: bool) {
+        self.active_use_flags.insert(flag.to_string(), enabled);
+    }
+
+    /// Check if a Portage-style USE flag is active
+    pub fn is_use_flag_active(&self, flag: &str) -> bool {
+        self.active_use_flags.get(flag).cloned().unwrap_or(false)
+    }
+
+    /// Dynamically evaluates dynamic conditional dependencies of a package based on current USE flags
+    pub fn evaluate_conditional_dependencies(&self, package: &dyn IPackage) -> Vec<Dependency> {
+        let mut deps = Vec::new();
+        for cond in package.conditional_dependencies() {
+            if self.is_use_flag_active(&cond.required_use_flag) {
+                deps.push(cond.dependency.clone());
+            }
+        }
+        deps
     }
 
     pub fn add_global_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
@@ -2126,7 +2375,7 @@ impl UniversalPackageManager {
 
         // Check dependencies
         for dep in package.dependencies() {
-            if !self.installed_packages.contains_key(&dep.name) {
+            if !self.installed_packages.contains_key::<str>(&dep.name) {
                 return Err(InstallError::MissingDependency(dep.name.clone()));
             }
         }
@@ -2145,7 +2394,7 @@ impl UniversalPackageManager {
 
     /// Get installed package
     pub fn get_package(&self, name: &str) -> Option<&dyn IPackage> {
-        self.installed_packages.get(name).map(|p| p.as_ref())
+        self.installed_packages.get::<str>(name).map(|p| p.as_ref())
     }
 
     /// List all installed packages
@@ -2175,6 +2424,148 @@ pub enum InstallError {
     PackageAlreadyInstalled(String),
     DependencyConflict(String),
     InstallFailed(String),
+}
+
+/// Trait for package translation across different major Linux distribution formats.
+/// Uses OOP design principles to translate unified package metadata.
+pub trait UniversalPackageTranslator {
+    fn translate(&self, package: &dyn IPackage, target_format: PackageFormat) -> Result<Box<dyn IPackage>, TranslateError>;
+}
+
+/// Dynamic error types during package conversion.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TranslateError {
+    UnsupportedTargetFormat(PackageFormat),
+    TranslationFailed(String),
+}
+
+// ============================================================================
+// Pacman-style Path Trigger Hook Subsystem
+// ============================================================================
+
+/// Trait defining the contract for path triggers (Pacman-style Hooks)
+pub trait IPathTrigger: Send + Sync {
+    fn name(&self) -> &str;
+    fn pattern(&self) -> &str; // e.g., "usr/bin/*" or "*.desktop"
+    fn execute(&self, matched_paths: &[String]) -> Result<(), HookError>;
+}
+
+/// Dynamic path-based trigger mechanism
+pub struct PathTriggerHook {
+    pub name: String,
+    pub pattern: String,
+    pub script: Arc<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync>,
+}
+
+impl IPathTrigger for PathTriggerHook {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn pattern(&self) -> &str {
+        &self.pattern
+    }
+
+    fn execute(&self, matched_paths: &[String]) -> Result<(), HookError> {
+        (self.script)(matched_paths)
+    }
+}
+
+// ============================================================================
+// Nix-style Content-Addressable Store Derivation Subsystem (Strategy Pattern)
+// ============================================================================
+
+/// Trait defining the contract for deterministic derivation path computations
+pub trait IDerivationEvaluator: Send + Sync {
+    fn compute_store_path(&self, package: &dyn IPackage) -> String;
+}
+
+/// Simple deterministic hash calculation strategy for Content-Addressable Store path derivation (like Nix)
+pub struct NixDerivationEvaluator;
+
+impl NixDerivationEvaluator {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    /// Basic djb2-like string hashing function for deterministic store hashes
+    fn simple_hash(&self, input: &str) -> String {
+        let mut hash: u64 = 5381;
+        for c in input.bytes() {
+            hash = ((hash << 5).wrapping_add(hash)).wrapping_add(c as u64);
+        }
+        format!("{:x}", hash)
+    }
+}
+
+impl Default for NixDerivationEvaluator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl IDerivationEvaluator for NixDerivationEvaluator {
+    fn compute_store_path(&self, package: &dyn IPackage) -> String {
+        // Hash the combination of package name, version, format, and derivation inputs
+        let mut input_summary = format!("{}-{}-{:?}", package.name(), package.version(), package.format());
+        for input in package.derivation_inputs() {
+            input_summary.push_str(&format!("-{}", input));
+        }
+
+        let hash_str = self.simple_hash(&input_summary);
+        format!("/nix/store/{}-{}", &hash_str[..16], package.name())
+    }
+}
+
+/// Concrete Strategy Pattern implementation of UniversalPackageTranslator
+pub struct SigmaPackageTranslator;
+
+impl SigmaPackageTranslator {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
+impl Default for SigmaPackageTranslator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl UniversalPackageTranslator for SigmaPackageTranslator {
+    fn translate(&self, package: &dyn IPackage, target_format: PackageFormat) -> Result<Box<dyn IPackage>, TranslateError> {
+        let meta = package.metadata();
+        let new_meta = PackageMetadata {
+            name: meta.name.clone(),
+            version: meta.version.clone(),
+            description: format!("Translated from {:?} to {:?}: {}", package.format(), target_format, meta.description),
+            license: meta.license.clone(),
+            maintainer: meta.maintainer.clone(),
+            homepage: meta.homepage.clone(),
+            architecture: meta.architecture.clone(),
+            checksum: meta.checksum.clone(),
+            size: meta.size,
+            install_date: meta.install_date,
+            pqc_signature: meta.pqc_signature.clone(),
+            gpg_key_id: meta.gpg_key_id.clone(),
+            supported_architectures: meta.supported_architectures.clone(),
+        };
+
+        let dependencies = package.dependencies().to_vec();
+
+        Ok(Box::new(StandardPackage {
+            metadata: new_meta,
+            dependencies,
+            format: target_format,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
+        }))
+    }
 }
 
 #[cfg(test)]
@@ -2466,7 +2857,15 @@ Depends: kernel-base";
             }
         }
 
-        adapter.add_hook(Arc::new(CustomHook));
+        let hook_arc = Arc::new(CustomHook);
+        let ptr_custom = hook_arc.into_raw_inner();
+        let ptr_dyn = unsafe {
+            let ref_custom: &crate::klib::arc::ArcInner<CustomHook> = &*ptr_custom;
+            let ref_dyn: &crate::klib::arc::ArcInner<dyn UserDefinedHook> = ref_custom;
+            core::ptr::NonNull::new_unchecked(ref_dyn as *const crate::klib::arc::ArcInner<dyn UserDefinedHook> as *mut crate::klib::arc::ArcInner<dyn UserDefinedHook>)
+        };
+        let hook_dyn = unsafe { Arc::from_raw_inner(ptr_dyn) };
+        adapter.add_hook(hook_dyn);
 
         let deb_data = b"Package: original
 Version: 1.0.0
@@ -2477,96 +2876,213 @@ Description: Hook test";
     }
 
     #[test]
-    fn test_package_delta_patch_engine() {
-        let source_meta = PackageMetadata {
-            name: "bash".to_string(),
-            version: Version::new(5, 1, 0),
-            description: "GNU shell".to_string(),
-            license: "GPL-3.0".to_string(),
-            maintainer: "devs".to_string(),
-            homepage: "gnu.org".to_string(),
-            architecture: "x86_64".to_string(),
-            checksum: "source-sha-checksum-000".to_string(),
-            size: 2048,
-            install_date: None,
-            pqc_signature: None,
-            gpg_key_id: None,
-            supported_architectures: Vec::new(),
-        };
-
-        let source = StandardPackage {
-            metadata: source_meta,
+    fn test_universal_translator() {
+        let original_package = StandardPackage {
+            metadata: PackageMetadata {
+                name: "test-lib".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Original description".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
             dependencies: Vec::new(),
             format: PackageFormat::Deb,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
         };
 
-        let patch = PackageDeltaPatch {
-            source_checksum: "source-sha-checksum-000".to_string(),
-            target_checksum: "target-sha-checksum-111".to_string(),
-            delta_payload: vec![1, 2, 3, 4],
-        };
+        let translator = SigmaPackageTranslator::new();
+        let translated = translator.translate(&original_package, PackageFormat::Rpm).unwrap();
 
-        let engine = PackageDeltaEngine::new();
-        let target = engine.apply_delta_patch(&source, &patch).unwrap();
-        assert_eq!(target.metadata().checksum, "target-sha-checksum-111");
-        assert_eq!(target.metadata().size, 2052);
-
-        // Fail case (checksum mismatch)
-        let mut bad_patch = patch;
-        bad_patch.source_checksum = "wrong-checksum".to_string();
-        assert!(engine.apply_delta_patch(&source, &bad_patch).is_err());
+        assert_eq!(translated.name(), "test-lib");
+        assert_eq!(translated.format(), PackageFormat::Rpm);
+        assert!(translated.metadata().description.contains("Translated from Deb to Rpm"));
     }
 
     #[test]
-    fn test_gpg_pqc_verification() {
-        let mut meta = PackageMetadata {
-            name: "curl".to_string(),
-            version: Version::new(7, 85, 0),
-            description: "URL transfer tool".to_string(),
-            license: "MIT".to_string(),
-            maintainer: "curl-dev".to_string(),
-            homepage: "curl.se".to_string(),
-            architecture: "x86_64".to_string(),
-            checksum: "abc".to_string(),
-            size: 1024,
-            install_date: None,
-            pqc_signature: Some("dilithium-5-sig-hex-data".to_string()),
-            gpg_key_id: Some("0x9E5A86A21B607B76".to_string()),
-            supported_architectures: Vec::new(),
-        };
+    fn test_architecture_translation() {
+        let matrix = ArchitectureTranslationMatrix::new();
+        assert_eq!(matrix.translate("amd64"), "x86_64");
+        assert_eq!(matrix.translate("arm64"), "aarch64");
+        assert_eq!(matrix.translate("mips"), "mips"); // Falls back cleanly
+    }
+
+    #[test]
+    fn test_portage_style_use_flags() {
+        let mut manager = UniversalPackageManager::new();
+        manager.set_use_flag("ssl", true);
+        manager.set_use_flag("gtk", false);
+
+        assert!(manager.is_use_flag_active("ssl"));
+        assert!(!manager.is_use_flag_active("gtk"));
 
         let pkg = StandardPackage {
-            metadata: meta.clone(),
+            metadata: PackageMetadata {
+                name: "test-app".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "Test description".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
             dependencies: Vec::new(),
-            format: PackageFormat::Rpm,
+            format: PackageFormat::Sigma,
+            use_flags: vec!["ssl".to_string(), "gtk".to_string()],
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: vec![
+                ConditionalDependency {
+                    dependency: Dependency {
+                        name: "openssl".to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    },
+                    required_use_flag: "ssl".to_string(),
+                },
+                ConditionalDependency {
+                    dependency: Dependency {
+                        name: "gtk3".to_string(),
+                        version_constraint: VersionConstraint::Any,
+                    },
+                    required_use_flag: "gtk".to_string(),
+                },
+            ],
         };
 
-        let verifier = GpgPqcVerifierAdapter::new();
-        assert!(verifier.verify_authenticity(&pkg).unwrap());
+        let evaluated_deps = manager.evaluate_conditional_dependencies(&pkg);
+        assert_eq!(evaluated_deps.len(), 1);
+        assert_eq!(evaluated_deps[0].name, "openssl");
+    }
 
-        // Fail Case 1: Untrusted GPG Key
-        meta.gpg_key_id = Some("0xBADKEY1234567890".to_string());
-        let bad_pkg1 = StandardPackage {
-            metadata: meta.clone(),
+    #[test]
+    fn test_nix_derivation_path_computation() {
+        let pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "git".to_string(),
+                version: Version::new(2, 40, 0),
+                description: "VCS".to_string(),
+                license: "GPL".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
             dependencies: Vec::new(),
-            format: PackageFormat::Rpm,
+            format: PackageFormat::Nix,
+            use_flags: Vec::new(),
+            files: Vec::new(),
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: vec!["glibc".to_string(), "curl".to_string()],
+            conditional_dependencies: Vec::new(),
         };
-        assert_eq!(
-            verifier.verify_authenticity(&bad_pkg1),
-            Err("Invalid GPG signature key ID; package not trusted")
-        );
 
-        // Fail Case 2: Missing/Tampered PQC signature
-        meta.gpg_key_id = Some("0x9E5A86A21B607B76".to_string());
-        meta.pqc_signature = Some("tampered-malicious-signature-data".to_string());
-        let bad_pkg2 = StandardPackage {
-            metadata: meta,
-            dependencies: Vec::new(),
-            format: PackageFormat::Rpm,
+        let evaluator = NixDerivationEvaluator::new();
+        let store_path = evaluator.compute_store_path(&pkg);
+        assert!(store_path.starts_with("/nix/store/"));
+        assert!(store_path.ends_with("-git"));
+
+        // Ensure deterministic reproducibility
+        let store_path_2 = evaluator.compute_store_path(&pkg);
+        assert_eq!(store_path, store_path_2);
+    }
+
+    #[test]
+    fn test_pacman_path_triggers() {
+        let mut manager = UniversalPackageManager::new();
+
+        let trigger_executed = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let trigger_executed_clone = trigger_executed.clone();
+
+        let trigger = PathTriggerHook {
+            name: "update-desktop-database".to_string(),
+            pattern: "*.desktop".to_string(),
+            script: {
+                let s_arc = Arc::new(move |matched_paths: &[String]| -> Result<(), HookError> {
+                    assert_eq!(matched_paths.len(), 1);
+                    assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
+                    trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+                    Ok(())
+                });
+                let ptr_custom = s_arc.into_raw_inner();
+                let ptr_dyn = unsafe {
+                    let ref_custom = &*ptr_custom;
+                    let ref_dyn: &crate::klib::arc::ArcInner<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync> = ref_custom;
+                    core::ptr::NonNull::new_unchecked(ref_dyn as *const crate::klib::arc::ArcInner<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync> as *mut crate::klib::arc::ArcInner<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync>)
+                };
+                unsafe { Arc::from_raw_inner(ptr_dyn) }
+            },
         };
-        assert_eq!(
-            verifier.verify_authenticity(&bad_pkg2),
-            Err("Invalid quantum-safe signature; signature tampered")
-        );
+
+        let trigger_arc = Arc::new(trigger);
+        let ptr_custom = trigger_arc.into_raw_inner();
+        let ptr_dyn = unsafe {
+            let ref_custom: &crate::klib::arc::ArcInner<PathTriggerHook> = &*ptr_custom;
+            let ref_dyn: &crate::klib::arc::ArcInner<dyn IPathTrigger> = ref_custom;
+            core::ptr::NonNull::new_unchecked(ref_dyn as *const crate::klib::arc::ArcInner<dyn IPathTrigger> as *mut crate::klib::arc::ArcInner<dyn IPathTrigger>)
+        };
+        let trigger_dyn = unsafe { Arc::from_raw_inner(ptr_dyn) };
+        manager.add_path_trigger(trigger_dyn);
+
+        let pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "my-editor".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "text editor".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
+            dependencies: Vec::new(),
+            format: PackageFormat::Pacman,
+            use_flags: Vec::new(),
+            files: vec![
+                "usr/bin/my-editor".to_string(),
+                "usr/share/applications/app.desktop".to_string(),
+            ],
+            install_script: None,
+            uninstall_script: None,
+            post_install_script: None,
+            derivation_inputs: Vec::new(),
+            conditional_dependencies: Vec::new(),
+        };
+
+        manager.process_path_triggers(&pkg).unwrap();
+        assert!(trigger_executed.load(std::sync::atomic::Ordering::SeqCst));
     }
 }

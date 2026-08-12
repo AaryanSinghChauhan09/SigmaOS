@@ -15,6 +15,7 @@ pub mod filesystem;
 pub mod graphics;
 pub mod ipc;
 pub mod kernel;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod distro;

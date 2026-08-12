@@ -79,7 +79,7 @@ pub struct Package {
 }
 
 /// Package dependency
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dependency {
     pub name: String,
     pub version_constraint: VersionConstraint,

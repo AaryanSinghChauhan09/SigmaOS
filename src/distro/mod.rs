@@ -1,5 +1,7 @@
 // SigmaOS Distro/Ecosystem Maturity Module
+pub mod arch_parity;
 pub mod certification;
+pub mod chakra_parity;
 pub mod community;
 pub mod compat_layers;
 pub mod developer;
@@ -10,13 +12,15 @@ pub mod nextgen;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
-pub mod parity;
+pub mod transformation_engine;
+pub mod preseed;
 
-pub use parity::{
-    InstallationTarget, InstallerStep, InstallerError, LiveInstaller, SovereignInstaller,
-    UpdateChannel, SystemStateStatus, UpdateError, ChannelManager, SovereignChannelManager,
-    SigmaAppBundle, BundleError, AppBundleRuntime, SovereignBundleRuntime,
-    CpuArchitecture, HalError, HardwareAbstractionLayer, SovereignHal,
+pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
+pub use preseed::{SovereignPreseedParser, PreseedVariable};
+pub use chakra_parity::{AkabeiBundle, AkabeiPackageEngine, KapudanAssistant, TribeInstaller, DesktopTheme, InstallerStep};
+pub use manjaro::{
+    GpuType, MhwdDriverConfig, ManjaroHardwareDetection,
+    ManjaroKernelRelease,
 };
 pub use certification::{
     AppManifest, CertificationStatus, ComponentType, HardwareCertificate,
@@ -39,14 +43,10 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
-pub use manjaro::{
-    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
-    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
-};
 pub use nextgen::{
-    AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
-    NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,
-    TimeTravelEngine,
+    AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
+    TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,
+    LivepatchPatch, LivepatchManager,
 };
 pub use recovery::{
     BackupSnapshot, BackupSystem, KernelTrace, LiveDebugger, RescueISO, RescueISOManager,
@@ -58,4 +58,9 @@ pub use specialized::{
 };
 pub use tiny_core::{
     TinyCoreRAMEngine, TinyCoreMode, TczExtensionManager, AppsAuditTool,
+};
+pub use transformation_engine::{
+    AccessibilityOverlayManager, AutomationRoutineController, RoutineTrigger, SmartRoutine,
+    ForensicReadinessAuditor, GlobalComplianceDashboard, DeveloperToolkitConverter,
+    IotDeviceMeshOrchestrator, IotMeshDevice,
 };

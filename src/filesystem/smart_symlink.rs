@@ -23,7 +23,10 @@ impl SymlinkResolverRule for LinuxPersonaRule {
         "linux-persona-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        persona.name.contains("Linux") || persona.name.contains("linux")
+        match persona {
+            KernelPersona::Linux_6_x | KernelPersona::Linux_2_6 => true,
+            _ => false,
+        }
     }
 }
 
@@ -33,7 +36,10 @@ impl SymlinkResolverRule for LegacyLinuxRule {
         "legacy-linux-rule"
     }
     fn evaluate(&self, persona: KernelPersona) -> bool {
-        persona.name == "Linux_2_6" || persona.api_version == "2.6"
+        match persona {
+            KernelPersona::Linux_2_6 => true,
+            _ => false,
+        }
     }
 }
 
@@ -135,7 +141,7 @@ impl SmartSymlink {
     /// Routes the symlink path to /lib32 or /lib64 automatically depending on the active ABI
     pub fn resolve_multi_lib_routing(&self, syscall_abi: SyscallAbi) -> &'static str {
         match syscall_abi {
-            SyscallAbi::Oabi_32 => {
+            SyscallAbi::Oabi_32 | SyscallAbi::Eabi_32 => {
                 // Route to legacy 32-bit library directory (multi-lib parity)
                 "/lib32/libc.so"
             }
