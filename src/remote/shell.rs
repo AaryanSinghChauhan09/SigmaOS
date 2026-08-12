@@ -1,16 +1,17 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
 /// OOP-based Remote Shell for SigmaOS
 /// Based on Ideas-999-Structured: Cloud & Remote Item 966
 /// Implements remote shell access
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 pub type ShellID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ShellError {
     Success = 0,
     NotFound = 1,
@@ -83,6 +84,12 @@ impl SimpleShellManager {
     }
 }
 
+impl Default for SimpleShellManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ShellManager for SimpleShellManager {
     fn connect(&mut self, host: &[u8], _port: u16) -> Result<ShellID, ShellError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
@@ -92,19 +99,26 @@ impl ShellManager for SimpleShellManager {
     }
 
     fn disconnect(&mut self, id: ShellID) -> Result<(), ShellError> {
-        for shell_option in &mut self.shells {
-            if let Some(ref shell) = *shell_option {
+        let mut index = None;
+        for i in 0..self.shells.len() {
+            if let Some(ref shell) = self.shells[i] {
                 if shell.id() == id {
-                    return Ok(());
+                    index = Some(i);
+                    break;
                 }
             }
         }
-        Err(ShellError::NotFound)
+        if let Some(i) = index {
+            self.shells[i] = None;
+            Ok(())
+        } else {
+            Err(ShellError::NotFound)
+        }
     }
 
     fn get_shell(&self, id: ShellID) -> Option<&dyn RemoteShell> {
-        for shell_option in &self.shells {
-            if let Some(ref shell) = *shell_option {
+        for i in 0..self.shells.len() {
+            if let Some(ref shell) = self.shells[i] {
                 if shell.id() == id {
                     return Some(shell.as_ref());
                 }
@@ -168,52 +182,22 @@ impl FileTransfer for SimpleFileTransfer {
     }
 }
 
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
+    #[test]
+    fn test_remote_shell_execution() {
+        let mut manager = SimpleShellManager::new();
+        let id = manager.connect(b"10.0.0.1", 22).unwrap();
 
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
+        let shell = manager.get_shell(id).unwrap();
+        assert_eq!(shell.host(), b"10.0.0.1");
+
+        let output = shell.execute(b"ls").unwrap();
+        assert_eq!(output, b"ls\n");
+
+        manager.disconnect(id).unwrap();
+        assert!(manager.get_shell(id).is_none());
+    }
 }

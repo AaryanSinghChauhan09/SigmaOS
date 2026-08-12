@@ -651,6 +651,39 @@ impl LocalMetadataCache {
 // Universal Package Manager
 // ----------------------------------------------------
 
+#[derive(Debug, Clone)]
+pub struct PackageCheckpoint {
+    pub id: usize,
+    pub installed_keys: std::collections::HashSet<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct TransactionHistory {
+    pub checkpoints: Vec<PackageCheckpoint>,
+    pub next_id: usize,
+}
+
+impl TransactionHistory {
+    pub fn new() -> Self {
+        Self {
+            checkpoints: Vec::new(),
+            next_id: 1,
+        }
+    }
+
+    pub fn create_checkpoint(&mut self, installed_packages: &HashMap<String, UnifiedPackage>) -> usize {
+        let id = self.next_id;
+        self.next_id += 1;
+        let installed_keys = installed_packages.keys().cloned().collect();
+        self.checkpoints.push(PackageCheckpoint { id, installed_keys });
+        id
+    }
+
+    pub fn get_checkpoint(&self, id: usize) -> Option<&PackageCheckpoint> {
+        self.checkpoints.iter().find(|c| c.id == id)
+    }
+}
+
 /// Universal package manager using dynamic dispatch to modularly handle various package format adapters
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
@@ -658,6 +691,7 @@ pub struct UniversalPackageManager {
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
     pub metadata_cache: LocalMetadataCache,
+    pub transaction_history: TransactionHistory,
 }
 
 impl UniversalPackageManager {
@@ -668,6 +702,7 @@ impl UniversalPackageManager {
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
             metadata_cache: LocalMetadataCache::new(),
+            transaction_history: TransactionHistory::new(),
         };
 
         manager.add_default_adapters();
