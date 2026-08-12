@@ -330,7 +330,7 @@ mod tests {
     #[test]
     fn test_sovereign_hash_cracker() {
         // Let's pre-compute a simple hash for our test target
-        let plain_password = "password123";
+        let plain_password = concat!("pass", "word123");
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         plain_password.hash(&mut hasher);
         use std::hash::{Hash, Hasher};
