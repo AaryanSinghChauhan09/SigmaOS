@@ -1,5 +1,5 @@
 // SigmaOS Universal Package Manager
-// Unified system absorbing apt, yum, pacman, snap, flatpak
+// Unified system absorbing apt, yum, pacman, snap, flatpak, apk
 
 use std::collections::HashMap;
 
@@ -12,6 +12,57 @@ pub enum PackageFormat {
     Snap,     // snap
     Flatpak,  // flatpak
     SigmaPkg, // native SigmaOS format
+    Apk,      // alpine apk
+}
+
+/// Version operator for dependency constraints
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VersionOp {
+    Any,
+    Eq,
+    Ge,
+    Le,
+}
+
+/// Structural package dependency constraint
+#[derive(Debug, Clone)]
+pub struct DependencyConstraint {
+    pub name: String,
+    pub op: VersionOp,
+    pub version: String,
+}
+
+impl DependencyConstraint {
+    pub fn parse(s: &str) -> Self {
+        if let Some(pos) = s.find(">=") {
+            let name = s[..pos].trim().to_string();
+            let version = s[pos+2..].trim().to_string();
+            DependencyConstraint { name, op: VersionOp::Ge, version }
+        } else if let Some(pos) = s.find("<=") {
+            let name = s[..pos].trim().to_string();
+            let version = s[pos+2..].trim().to_string();
+            DependencyConstraint { name, op: VersionOp::Le, version }
+        } else if let Some(pos) = s.find("==") {
+            let name = s[..pos].trim().to_string();
+            let version = s[pos+2..].trim().to_string();
+            DependencyConstraint { name, op: VersionOp::Eq, version }
+        } else {
+            DependencyConstraint {
+                name: s.to_string(),
+                op: VersionOp::Any,
+                version: String::new(),
+            }
+        }
+    }
+
+    pub fn is_satisfied_by(&self, pkg_ver: &str) -> bool {
+        match self.op {
+            VersionOp::Any => true,
+            VersionOp::Eq => pkg_ver == self.version,
+            VersionOp::Ge => pkg_ver >= &self.version,
+            VersionOp::Le => pkg_ver <= &self.version,
+        }
+    }
 }
 
 /// Package source
@@ -161,21 +212,32 @@ impl DependencyResolver {
         let mut visited = std::collections::HashSet::new();
 
         while let Some(current) = to_visit.pop() {
-            if visited.contains(&current) {
+            let constraint = DependencyConstraint::parse(&current);
+            let pkg_name = constraint.name.clone();
+
+            if visited.contains(&pkg_name) {
                 continue;
             }
 
-            visited.insert(current.clone());
+            visited.insert(pkg_name.clone());
 
-            if let Some(package) = self.packages.get(&current) {
+            if let Some(package) = self.packages.get(&pkg_name) {
+                if !constraint.is_satisfied_by(&package.version) {
+                    return Err(PackageError::InstallationFailed(format!(
+                        "Dependency version constraint violation: {} require version satisfies constraint, but found version {}",
+                        current, package.version
+                    )));
+                }
+
                 for dep in &package.dependencies {
-                    if !visited.contains(dep) {
+                    let dep_constraint = DependencyConstraint::parse(dep);
+                    if !visited.contains(&dep_constraint.name) {
                         to_visit.push(dep.clone());
                     }
                 }
-                resolved.push(current);
+                resolved.push(pkg_name);
             } else {
-                return Err(PackageError::DependencyNotFound(current));
+                return Err(PackageError::DependencyNotFound(pkg_name));
             }
         }
 
@@ -264,12 +326,21 @@ impl Default for DependencyResolver {
     }
 }
 
+/// Transaction state snapshot of the package manager
+#[derive(Debug, Clone)]
+pub struct PackageManagerSnapshot {
+    pub id: String,
+    pub description: String,
+    pub installed_versions: HashMap<String, String>, // package_name -> version
+}
+
 /// Universal package manager
 pub struct UniversalPackageManager {
     pub packages: HashMap<String, UnifiedPackage>,
     pub adapters: HashMap<PackageFormat, PackageAdapter>,
     pub resolver: DependencyResolver,
     pub installed_packages: HashMap<String, UnifiedPackage>,
+    pub snapshots: Vec<PackageManagerSnapshot>,
 }
 
 impl UniversalPackageManager {
@@ -279,6 +350,7 @@ impl UniversalPackageManager {
             adapters: HashMap::new(),
             resolver: DependencyResolver::new(),
             installed_packages: HashMap::new(),
+            snapshots: Vec::new(),
         };
 
         manager.add_default_adapters();
@@ -292,6 +364,7 @@ impl UniversalPackageManager {
         let snap_adapter = PackageAdapter::new(PackageFormat::Snap, "snap".to_string());
         let flatpak_adapter = PackageAdapter::new(PackageFormat::Flatpak, "flatpak".to_string());
         let sigpkg_adapter = PackageAdapter::new(PackageFormat::SigmaPkg, "sigpkg".to_string());
+        let apk_adapter = PackageAdapter::new(PackageFormat::Apk, "apk".to_string());
 
         self.adapters.insert(PackageFormat::Deb, apt_adapter);
         self.adapters.insert(PackageFormat::Rpm, yum_adapter);
@@ -301,6 +374,8 @@ impl UniversalPackageManager {
             .insert(PackageFormat::Flatpak, flatpak_adapter);
         self.adapters
             .insert(PackageFormat::SigmaPkg, sigpkg_adapter);
+        self.adapters
+            .insert(PackageFormat::Apk, apk_adapter);
     }
 
     pub fn add_package(&mut self, package: UnifiedPackage) {
@@ -380,6 +455,41 @@ impl UniversalPackageManager {
     pub fn get_package(&self, name: &str) -> Option<&UnifiedPackage> {
         self.packages.get(name)
     }
+
+    /// Creates a transaction snapshot of currently installed packages and versions
+    pub fn create_snapshot(&mut self, description: &str) -> String {
+        let id = format!("snap-{}", self.snapshots.len() + 1);
+        let mut installed_versions = HashMap::new();
+        for (name, pkg) in &self.installed_packages {
+            installed_versions.insert(name.clone(), pkg.version.clone());
+        }
+        self.snapshots.push(PackageManagerSnapshot {
+            id: id.clone(),
+            description: description.to_string(),
+            installed_versions,
+        });
+        id
+    }
+
+    /// Rolls back the entire installed package state to the specified snapshot state
+    pub fn rollback_to_snapshot(&mut self, snapshot_id: &str) -> Result<(), PackageError> {
+        let snapshot = self.snapshots.iter()
+            .find(|s| s.id == snapshot_id)
+            .cloned()
+            .ok_or_else(|| PackageError::InstallationFailed(format!("Snapshot not found: {}", snapshot_id)))?;
+
+        self.installed_packages.clear();
+
+        for (name, version) in snapshot.installed_versions {
+            if let Some(pkg) = self.packages.get(&name) {
+                let mut restored = pkg.clone();
+                restored.version = version;
+                restored.installed = true;
+                self.installed_packages.insert(name, restored);
+            }
+        }
+        Ok(())
+    }
 }
 
 impl Default for UniversalPackageManager {
@@ -405,7 +515,7 @@ mod tests {
     #[test]
     fn test_manager_creation() {
         let manager = UniversalPackageManager::new();
-        assert_eq!(manager.adapters.len(), 6);
+        assert_eq!(manager.adapters.len(), 7); // Deb, Rpm, Pacman, Snap, Flatpak, SigmaPkg, Apk
     }
 
     #[test]
@@ -454,5 +564,114 @@ mod tests {
         manager.add_package(package);
         assert!(manager.install("test").is_ok());
         assert_eq!(manager.installed_packages.len(), 1);
+    }
+
+    #[test]
+    fn test_version_constraints_parsing_and_checking() {
+        let c1 = DependencyConstraint::parse("openssl>=1.1.1");
+        assert_eq!(c1.name, "openssl");
+        assert_eq!(c1.op, VersionOp::Ge);
+        assert_eq!(c1.version, "1.1.1");
+        assert!(c1.is_satisfied_by("1.1.1"));
+        assert!(c1.is_satisfied_by("1.2.0"));
+        assert!(!c1.is_satisfied_by("1.1.0"));
+
+        let c2 = DependencyConstraint::parse("glibc<=2.34");
+        assert_eq!(c2.name, "glibc");
+        assert_eq!(c2.op, VersionOp::Le);
+        assert_eq!(c2.version, "2.34");
+        assert!(c2.is_satisfied_by("2.31"));
+        assert!(c2.is_satisfied_by("2.34"));
+        assert!(!c2.is_satisfied_by("2.35"));
+
+        let c3 = DependencyConstraint::parse("bash==5.1");
+        assert_eq!(c3.name, "bash");
+        assert_eq!(c3.op, VersionOp::Eq);
+        assert_eq!(c3.version, "5.1");
+        assert!(c3.is_satisfied_by("5.1"));
+        assert!(!c3.is_satisfied_by("5.2"));
+
+        let c4 = DependencyConstraint::parse("curl");
+        assert_eq!(c4.name, "curl");
+        assert_eq!(c4.op, VersionOp::Any);
+        assert!(c4.is_satisfied_by("1.0"));
+    }
+
+    #[test]
+    fn test_versioned_dependency_resolution_failures() {
+        let mut resolver = DependencyResolver::new();
+        let app = UnifiedPackage::new("app".to_string(), "1.0.0".to_string())
+            .with_dependency("openssl>=1.1.1".to_string());
+
+        // Register satisfying dependency
+        let openssl_good = UnifiedPackage::new("openssl".to_string(), "1.1.1g".to_string());
+        resolver.add_package(app.clone());
+        resolver.add_package(openssl_good);
+
+        let deps_good = resolver.resolve_dependencies("app").unwrap();
+        assert!(deps_good.contains(&"openssl".to_string()));
+        assert!(deps_good.contains(&"app".to_string()));
+
+        // Reset and register violating dependency
+        let mut resolver_bad = DependencyResolver::new();
+        let openssl_bad = UnifiedPackage::new("openssl".to_string(), "1.0.2u".to_string());
+        resolver_bad.add_package(app);
+        resolver_bad.add_package(openssl_bad);
+
+        let res = resolver_bad.resolve_dependencies("app");
+        assert!(res.is_err());
+        if let Err(PackageError::InstallationFailed(msg)) = res {
+            assert!(msg.contains("Dependency version constraint violation"));
+        } else {
+            panic!("Expected constraint violation error");
+        }
+    }
+
+    #[test]
+    fn test_package_manager_state_snapshots_and_rollback() {
+        let mut manager = UniversalPackageManager::new();
+        let pkg_a = UnifiedPackage::new("curl".to_string(), "7.81.0".to_string())
+            .with_format(PackageFormat::Apk);
+        let pkg_b = UnifiedPackage::new("wget".to_string(), "1.21.1".to_string())
+            .with_format(PackageFormat::SigmaPkg);
+
+        manager.add_package(pkg_a);
+        manager.add_package(pkg_b);
+
+        // Install curl only
+        manager.install("curl").unwrap();
+        assert!(manager.installed_packages.contains_key("curl"));
+        assert!(!manager.installed_packages.contains_key("wget"));
+
+        // Snapshot 1 (contains only curl)
+        let snap_id = manager.create_snapshot("Curl installed");
+        assert_eq!(snap_id, "snap-1");
+        assert_eq!(manager.snapshots.len(), 1);
+
+        // Install wget
+        manager.install("wget").unwrap();
+        assert!(manager.installed_packages.contains_key("wget"));
+
+        // Roll back to Snapshot 1
+        manager.rollback_to_snapshot("snap-1").unwrap();
+        assert!(manager.installed_packages.contains_key("curl"));
+        assert!(!manager.installed_packages.contains_key("wget"));
+    }
+
+    #[test]
+    fn test_multiple_formats_linux_distros() {
+        let mut manager = UniversalPackageManager::new();
+        let apk_pkg = UnifiedPackage::new("libssl".to_string(), "3.0.0".to_string())
+            .with_format(PackageFormat::Apk);
+        let rpm_pkg = UnifiedPackage::new("kernel-headers".to_string(), "6.1.0".to_string())
+            .with_format(PackageFormat::Rpm);
+
+        manager.add_package(apk_pkg);
+        manager.add_package(rpm_pkg);
+
+        manager.install("libssl").unwrap();
+        manager.install("kernel-headers").unwrap();
+
+        assert_eq!(manager.installed_packages.len(), 2);
     }
 }
