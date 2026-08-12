@@ -29,7 +29,8 @@ pub use jehanne::{
 };
 pub use mint_linux::{
     MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, MintUpdateManager,
-    SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor,
+    SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor, CinnamonThemeEngine,
+    TimeshiftSystemRestorer,
 };
 pub use reactos::{
     NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,

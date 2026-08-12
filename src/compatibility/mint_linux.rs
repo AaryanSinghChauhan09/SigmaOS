@@ -243,6 +243,114 @@ impl ZenithDisplayCompositor {
     }
 }
 
+// ==========================================
+// Cinnamon Desktop Theme Engine
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CinnamonDesklet {
+    pub id: u32,
+    pub x: usize,
+    pub y: usize,
+}
+
+pub struct CinnamonThemeEngine {
+    pub active_gtk_theme: [u8; 32],
+    pub desklets: Vec<Option<CinnamonDesklet>>,
+    pub is_panel_enabled: bool,
+}
+
+impl CinnamonThemeEngine {
+    pub fn new() -> Self {
+        let mut theme = [0u8; 32];
+        let default_name = b"Mint-Y-Dark";
+        unsafe {
+            core::ptr::copy_nonoverlapping(default_name.as_ptr(), theme.as_mut_ptr(), default_name.len());
+        }
+        Self {
+            active_gtk_theme: theme,
+            desklets: Vec::new(),
+            is_panel_enabled: true,
+        }
+    }
+
+    pub fn set_gtk_theme(&mut self, theme_name: &[u8]) {
+        let mut theme = [0u8; 32];
+        let len = theme_name.len().min(31);
+        unsafe {
+            core::ptr::copy_nonoverlapping(theme_name.as_ptr(), theme.as_mut_ptr(), len);
+        }
+        self.active_gtk_theme = theme;
+    }
+
+    pub fn add_desklet(&mut self, id: u32, x: usize, y: usize) {
+        self.desklets.push(Some(CinnamonDesklet { id, x, y }));
+    }
+}
+
+impl Default for CinnamonThemeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// Timeshift-style System Restorer
+// ==========================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct SystemRestorePoint {
+    pub id: u32,
+    pub is_rsync: bool,
+    pub timestamp_ms: u64,
+}
+
+pub struct TimeshiftSystemRestorer {
+    pub restore_points: Vec<Option<SystemRestorePoint>>,
+    pub active_restore_point_id: u32,
+}
+
+impl TimeshiftSystemRestorer {
+    pub fn new() -> Self {
+        Self {
+            restore_points: Vec::new(),
+            active_restore_point_id: 0,
+        }
+    }
+
+    pub fn create_restore_point(&mut self, id: u32, is_rsync: bool) {
+        self.restore_points.push(Some(SystemRestorePoint {
+            id,
+            is_rsync,
+            timestamp_ms: 0,
+        }));
+    }
+
+    pub fn rollback_system(&mut self, id: u32) -> Result<(), MintError> {
+        let mut found = false;
+        for i in 0..self.restore_points.len {
+            if let Some(ref rp) = self.restore_points[i] {
+                if rp.id == id {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if found {
+            self.active_restore_point_id = id;
+            Ok(())
+        } else {
+            Err(MintError::UpdateError)
+        }
+    }
+}
+
+impl Default for TimeshiftSystemRestorer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 struct Vec<T> {
     pub data: *mut T,
     pub len: usize,
@@ -433,5 +541,43 @@ mod tests {
                 height: 600
             }
         );
+    }
+
+    #[test]
+    fn test_cinnamon_theme_engine() {
+        let mut engine = CinnamonThemeEngine::new();
+        let mut default_theme = [0u8; 11];
+        for i in 0..11 {
+            default_theme[i] = engine.active_gtk_theme[i];
+        }
+        assert_eq!(&default_theme, b"Mint-Y-Dark");
+
+        engine.set_gtk_theme(b"Mint-Y-Light");
+        let mut new_theme = [0u8; 12];
+        for i in 0..12 {
+            new_theme[i] = engine.active_gtk_theme[i];
+        }
+        assert_eq!(&new_theme, b"Mint-Y-Light");
+
+        engine.add_desklet(101, 200, 200);
+        assert_eq!(engine.desklets.len, 1);
+        assert_eq!(engine.desklets[0].unwrap().id, 101);
+    }
+
+    #[test]
+    fn test_timeshift_system_restorer() {
+        let mut restorer = TimeshiftSystemRestorer::new();
+        assert_eq!(restorer.active_restore_point_id, 0);
+
+        restorer.create_restore_point(101, true); // rsync snapshot
+        restorer.create_restore_point(102, false); // btrfs snapshot
+        assert_eq!(restorer.restore_points.len, 2);
+
+        // Rollback succeeds for existing restore point
+        assert!(restorer.rollback_system(102).is_ok());
+        assert_eq!(restorer.active_restore_point_id, 102);
+
+        // Rollback fails for nonexistent point
+        assert_eq!(restorer.rollback_system(999), Err(MintError::UpdateError));
     }
 }
