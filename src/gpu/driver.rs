@@ -52,7 +52,14 @@ impl SimpleGPUDevice {
 
 impl GPUDevice for SimpleGPUDevice {
     fn id(&self) -> GPUDeviceID { self.id }
-    fn vendor(&self) -> GPUVendor { unsafe { core::mem::transmute(self.vendor.load(Ordering::SeqCst)) } }
+    fn vendor(&self) -> GPUVendor {
+        match self.vendor.load(Ordering::SeqCst) {
+            0 => GPUVendor::Intel,
+            1 => GPUVendor::AMD,
+            2 => GPUVendor::NVIDIA,
+            _ => GPUVendor::Other,
+        }
+    }
     fn model(&self) -> &[u8] {
         let len = self.model.iter().position(|&b| b == 0).unwrap_or(64);
         &self.model[..len]
@@ -94,7 +101,7 @@ impl GPUManager for SimpleGPUManager {
 
     fn get_primary_gpu(&self) -> Option<&dyn GPUDevice> {
         if !self.gpus.is_empty() {
-            if let Some(ref gpu) = *self.gpus[0] {
+            if let Some(ref gpu) = self.gpus.data()[0] {
                 return Some(gpu.as_ref());
             }
         }
@@ -103,8 +110,8 @@ impl GPUManager for SimpleGPUManager {
 
     fn list_gpus(&self) -> Vec<GPUDeviceID> {
         let mut ids = Vec::new();
-        for gpu_option in &self.gpus {
-            if let Some(ref gpu) = *gpu_option {
+        for i in 0..self.gpus.len() {
+            if let Some(ref gpu) = self.gpus.data()[i] {
                 ids.push(gpu.id());
             }
         }
@@ -144,7 +151,8 @@ impl Framebuffer for SimpleFramebuffer {
     }
 
     fn bind_framebuffer(&mut self, fb_id: usize) -> Result<(), GPUError> {
-        for &(id, _, _, _) in &self.framebuffers {
+        for i in 0..self.framebuffers.len() {
+            let &(id, _, _, _) = &self.framebuffers.data()[i];
             if id == fb_id {
                 self.current.store(fb_id, Ordering::SeqCst);
                 return Ok(());
@@ -199,7 +207,8 @@ impl RenderPipeline for SimpleRenderPipeline {
     }
 
     fn bind_pipeline(&mut self, pipeline_id: usize) -> Result<(), GPUError> {
-        for &(id, _, _) in &self.pipelines {
+        for i in 0..self.pipelines.len() {
+            let &(id, _, _) = &self.pipelines.data()[i];
             if id == pipeline_id {
                 self.current.store(pipeline_id, Ordering::SeqCst);
                 return Ok(());
@@ -213,11 +222,13 @@ impl RenderPipeline for SimpleRenderPipeline {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn len(&self) -> usize { self.len }
+    pub fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
@@ -226,7 +237,20 @@ impl<T> Vec<T> {
             }
         }
     }
-    fn is_empty(&self) -> bool { self.len == 0 }
+    pub fn data(&self) -> &[T] {
+        if self.data.is_null() {
+            &[]
+        } else {
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+    pub fn data_mut(&mut self) -> &mut [T] {
+        if self.data.is_null() {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
+        }
+    }
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
@@ -235,6 +259,19 @@ impl<T> Vec<T> {
             if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
+        }
+    }
+}
+
+impl<T> Drop for Vec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            unsafe {
+                for i in 0..self.len {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+                free(self.data as *mut u8);
+            }
         }
     }
 }
