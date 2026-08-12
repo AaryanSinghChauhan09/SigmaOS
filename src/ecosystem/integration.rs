@@ -1,11 +1,7 @@
 // SigmaOS Ecosystem Integration Framework
-// Mobile/embedded presence matrices, enterprise partnerships, hardware/software certification pipelines,
-// zero-setup dev environments, IDE debugger support, Docker compatibility layers, and Kubernetes bootstrap configurations.
+// Mobile/embedded presence matrices, enterprise partnerships, and hardware/software certification pipelines
 
-#[cfg(test)]
 use std::collections::HashMap;
-#[cfg(not(test))]
-use crate::klib::HashMap;
 
 /// Hardware architectures supported by SigmaOS
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -52,46 +48,11 @@ pub struct EcosystemCertification {
     pub compliance_stamp: Option<String>,
 }
 
-/// Zero-setup development environment status and version managers
-#[derive(Debug, Clone)]
-pub struct DevEnvironment {
-    pub rust_cargo_installed: bool,
-    pub rustup_active: bool,
-    pub go_gvm_installed: bool,
-    pub python_pyenv_installed: bool,
-    pub node_nvm_installed: bool,
-    pub clang_llvm_installed: bool,
-    pub lto_by_default: bool,
-}
-
-/// IDE & debugging infrastructure status
-#[derive(Debug, Clone)]
-pub struct IdeDebugInfrastructure {
-    pub integrated_vscode_ui: bool,
-    pub lldb_pretty_printers_active: bool,
-    pub gdb_pretty_printers_active: bool,
-    pub ebpf_kernel_tracer_active: bool,
-}
-
-/// Container & Cloud Tools configuration representation
-#[derive(Debug, Clone)]
-pub struct ContainerCloudTools {
-    pub docker_compat_active: bool,
-    pub buildkit_integrated: bool,
-    pub registry_credentials: HashMap<String, String>, // registry_url -> auth_token
-    pub kubeadm_configured: bool,
-    pub cni_type: String, // e.g., "Cilium", "Calico"
-    pub helm_installed: bool,
-}
-
 /// Ecosystem Integration Manager
 pub struct EcosystemManager {
     pub architecture_matrix: HashMap<String, ArchitecturePort>,
     pub enterprise_partners: HashMap<String, EnterprisePartner>,
     pub cert_pipeline: HashMap<String, EcosystemCertification>,
-    pub dev_env: DevEnvironment,
-    pub debug_infra: IdeDebugInfrastructure,
-    pub cloud_tools: ContainerCloudTools,
 }
 
 impl EcosystemManager {
@@ -100,29 +61,6 @@ impl EcosystemManager {
             architecture_matrix: HashMap::new(),
             enterprise_partners: HashMap::new(),
             cert_pipeline: HashMap::new(),
-            dev_env: DevEnvironment {
-                rust_cargo_installed: true,
-                rustup_active: true,
-                go_gvm_installed: true,
-                python_pyenv_installed: true,
-                node_nvm_installed: true,
-                clang_llvm_installed: true,
-                lto_by_default: true,
-            },
-            debug_infra: IdeDebugInfrastructure {
-                integrated_vscode_ui: true,
-                lldb_pretty_printers_active: true,
-                gdb_pretty_printers_active: true,
-                ebpf_kernel_tracer_active: true,
-            },
-            cloud_tools: ContainerCloudTools {
-                docker_compat_active: true,
-                buildkit_integrated: true,
-                registry_credentials: HashMap::new(),
-                kubeadm_configured: true,
-                cni_type: String::from("Cilium"),
-                helm_installed: true,
-            },
         }
     }
 
@@ -170,21 +108,6 @@ impl EcosystemManager {
             .get(product_id)
             .map(|c| c.hardware_compatible && c.certification_status == "Passed")
             .unwrap_or(false)
-    }
-
-    /// Docker Registry Authentication
-    pub fn authenticate_registry(&mut self, registry_url: &str, token: &str) {
-        self.cloud_tools.registry_credentials.insert(String::from(registry_url), String::from(token));
-    }
-
-    /// Bootstrap Kubernetes cluster using kubeadm with CNI configuration
-    pub fn bootstrap_k8s(&mut self, cni: &str) -> bool {
-        if self.cloud_tools.kubeadm_configured {
-            self.cloud_tools.cni_type = String::from(cni);
-            true
-        } else {
-            false
-        }
     }
 }
 
@@ -271,40 +194,5 @@ mod tests {
         manager.submit_certification(cert);
         assert!(manager.is_hardware_certified("HW-THINKPAD-T14"));
         assert!(!manager.is_hardware_certified("HW-DELL-NONEXISTENT"));
-    }
-
-    #[test]
-    fn test_phase5_dev_and_cloud_ecosystem() {
-        let mut manager = EcosystemManager::new();
-
-        // Verify pre-installed languages and bundled toolchains
-        assert!(manager.dev_env.rust_cargo_installed);
-        assert!(manager.dev_env.rustup_active);
-        assert!(manager.dev_env.go_gvm_installed);
-        assert!(manager.dev_env.python_pyenv_installed);
-        assert!(manager.dev_env.node_nvm_installed);
-        assert!(manager.dev_env.clang_llvm_installed);
-        assert!(manager.dev_env.lto_by_default);
-
-        // Verify IDE & Debugging integration
-        assert!(manager.debug_infra.integrated_vscode_ui);
-        assert!(manager.debug_infra.lldb_pretty_printers_active);
-        assert!(manager.debug_infra.ebpf_kernel_tracer_active);
-
-        // Verify Docker compat layer & Buildkit
-        assert!(manager.cloud_tools.docker_compat_active);
-        assert!(manager.cloud_tools.buildkit_integrated);
-
-        // Registry authentication
-        manager.authenticate_registry("https://index.docker.io/v1/", "Bearer-secret-token");
-        assert_eq!(
-            manager.cloud_tools.registry_credentials.get("https://index.docker.io/v1/").unwrap(),
-            "Bearer-secret-token"
-        );
-
-        // Kubernetes support & Helm pre-installation
-        assert!(manager.cloud_tools.helm_installed);
-        assert!(manager.bootstrap_k8s("Cilium"));
-        assert_eq!(manager.cloud_tools.cni_type, "Cilium");
     }
 }

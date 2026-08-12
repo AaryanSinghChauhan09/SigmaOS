@@ -2,9 +2,6 @@
 // Implements graphics composition using OOP principles with traits and structs
 // No dependency on external graphics frameworks
 
-extern crate alloc;
-use alloc::vec::Vec;
-use alloc::boxed::Box;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Position
@@ -466,8 +463,6 @@ pub struct SimpleCompositor {
     window_order: Vec<usize>,
     stats: CompositorStats,
     capability: CompositorCapability,
-    pub back_buffer: Option<BitmapSurface>,
-    pub double_buffering: AtomicBool,
 }
 
 /// Compositor capability
@@ -503,8 +498,6 @@ impl SimpleCompositor {
             window_order: Vec::new(),
             stats: CompositorStats::new(),
             capability,
-            back_buffer: None,
-            double_buffering: core::sync::atomic::AtomicBool::new(false),
         }
     }
 }
@@ -572,76 +565,30 @@ impl Compositor for SimpleCompositor {
     fn compose(&mut self, output: &mut dyn Surface) -> Result<(), GraphicsError> {
         self.stats.frame_count += 1;
 
-        // If double buffering is enabled, we render to our back buffer first, then copy to output.
-        // Otherwise, we render directly to output.
-        let use_double_buffering = self.double_buffering.load(Ordering::SeqCst) && self.back_buffer.is_some();
+        // Clear output
+        output.clear(Color::rgb(0, 0, 0));
 
-        if use_double_buffering {
-            let back = self.back_buffer.as_mut().unwrap();
-            back.clear(Color::rgb(0, 0, 0));
+        // Compose windows in order (back to front)
+        for &window_id in &self.window_order {
+            if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
+                let window_rect = window.rect();
+                let output_stride = output.info().stride as usize / 4;
+                if let Some(surface) = window.surface() {
+                    let window_stride = surface.info().stride as usize / 4;
+                    let window_data = surface.data();
+                    let output_data = output.data_mut();
 
-            // Compose windows in order (back to front)
-            for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                    let window_rect = window.rect();
-                    if let Some(surface) = window.surface() {
-                        let window_stride = surface.info().stride as usize / 4;
-                        let window_data = surface.data();
+                    // Copy window surface to output
+                    for y in 0..window_rect.size.height as usize {
+                        for x in 0..window_rect.size.width as usize {
+                            let output_x = (window_rect.position.x + x as i32) as usize;
+                            let output_y = (window_rect.position.y + y as i32) as usize;
+                            
+                            let output_index = output_y * output_stride + output_x;
+                            let window_index = y * window_stride + x;
 
-                        let back_stride = back.info().stride as usize / 4;
-                        let back_data = back.data_mut();
-
-                        // Copy window surface to back buffer
-                        for y in 0..window_rect.size.height as usize {
-                            for x in 0..window_rect.size.width as usize {
-                                let output_x = (window_rect.position.x + x as i32) as usize;
-                                let output_y = (window_rect.position.y + y as i32) as usize;
-
-                                let output_index = output_y * back_stride + output_x;
-                                let window_index = y * window_stride + x;
-
-                                if output_index < back_data.len() && window_index < window_data.len() {
-                                    back_data[output_index] = window_data[window_index];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Copy back buffer to output
-            let back = self.back_buffer.as_ref().unwrap();
-            let back_data = back.data();
-            let output_data = output.data_mut();
-            let len = back_data.len().min(output_data.len());
-            output_data[..len].copy_from_slice(&back_data[..len]);
-
-        } else {
-            output.clear(Color::rgb(0, 0, 0));
-
-            // Compose windows in order (back to front)
-            for &window_id in &self.window_order {
-                if let Some(window) = self.windows.iter_mut().find(|w| w.id() == window_id) {
-                    let window_rect = window.rect();
-                    if let Some(surface) = window.surface() {
-                        let window_stride = surface.info().stride as usize / 4;
-                        let window_data = surface.data();
-
-                        let output_stride = output.info().stride as usize / 4;
-                        let output_data = output.data_mut();
-
-                        // Copy window surface to output directly
-                        for y in 0..window_rect.size.height as usize {
-                            for x in 0..window_rect.size.width as usize {
-                                let output_x = (window_rect.position.x + x as i32) as usize;
-                                let output_y = (window_rect.position.y + y as i32) as usize;
-
-                                let output_index = output_y * output_stride + output_x;
-                                let window_index = y * window_stride + x;
-
-                                if output_index < output_data.len() && window_index < window_data.len() {
-                                    output_data[output_index] = window_data[window_index];
-                                }
+                            if output_index < output_data.len() && window_index < window_data.len() {
+                                output_data[output_index] = window_data[window_index];
                             }
                         }
                     }
@@ -656,5 +603,18 @@ impl Compositor for SimpleCompositor {
         let mut stats = self.stats.clone();
         stats.visible_windows = self.windows.iter().filter(|w| w.info().visible).count();
         stats
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_compositor_flow() {
+        let mut comp = SimpleCompositor::new(CompositorCapability::full());
+        let window = SimpleWindow::new(1, Rectangle::new(0, 0, 10, 10), WindowCapability::full());
+        comp.add_window(Box::new(window)).unwrap();
+        assert_eq!(comp.stats().total_windows, 1);
     }
 }

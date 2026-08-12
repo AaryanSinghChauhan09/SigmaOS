@@ -1,8 +1,12 @@
 // SigmaOS Filesystem Module
-pub mod smart_symlink;
 pub mod vfs;
-pub mod schemes;
+pub mod legacy_fs;
+pub mod sigma_fs;
 
-pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
-pub use schemes::{Scheme, NullScheme, RandScheme, LogScheme, ShmScheme, SchemeRegistry};
+pub use legacy_fs::{
+    LegacyFsType, LegacyFSAdapter,
+};
+pub use sigma_fs::{
+    FileBlock, SigmaFS,
+};

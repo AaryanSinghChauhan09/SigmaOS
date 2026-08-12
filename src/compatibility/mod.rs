@@ -1,29 +1,35 @@
 // SigmaOS Compatibility Module
 pub mod cross_platform;
-pub mod india_stack;
-pub mod jehanne;
-pub mod mint_linux;
-pub mod reactos;
-pub mod jails;
+pub mod linux_adapter;
+pub mod persona;
+pub mod abi_translator;
+pub mod lattice;
+pub mod prism;
+pub mod canonical;
+pub mod fedora;
 
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
-pub use jehanne::{
-    ComputeNode, DistributedComputeHandoff, JehanneError, JehanneNamespace, NamespaceBindEntry,
-    Plan9pMessage, Plan9pMsgType,
+pub use linux_adapter::{
+    LinuxKernelVersion, LegacyKernelAdapter, LegacyPackageAdapter, LegacySecurityAdapter, LegacyUIAdapter,
 };
-pub use mint_linux::{
-    MintBackupTool, MintSoftwareManager, MintUpdateItem, MintUpdateLevel, MintUpdateManager,
-    SoftwareMeta, WindowCoordinates, ZenithDisplayCompositor,
+pub use persona::{
+    PersonaVersion, KernelPersonaContainer, SyscallCategory, SyscallNode, SyscallGraph,
 };
-pub use reactos::{
-    NtHandle, NtHandleEntry, NtObjectManager, NtObjectType, NtStatus, PortableExecutableLoader,
-    RegistryHive,
+pub use abi_translator::{
+    CpuArchitecture, ABITranslator,
 };
-pub use jails::{
-    NamespaceType as SovereignNamespaceType, NamespaceIsolation as SovereignNamespaceIsolation,
-    SeccompFilter as SovereignSeccompFilter, FreeBsdJail, SovereignSandboxCoordinator,
+pub use lattice::{
+    LatticeFeature, KernelLattice, SyscallLifecycle, SyscallHistory, SyscallTracker,
+};
+pub use prism::{
+    PrismFacet, KernelPrism, LedgerEntry, SyscallLedgerbook,
+};
+pub use canonical::{
+    SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin,
+};
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
 };

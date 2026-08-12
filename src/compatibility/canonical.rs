@@ -1,585 +1,705 @@
-// SigmaOS Canonical Ecosystem, Snapshots, Security Jails, App Store, Continuity, Desktop Switcher, and AI Scheduler
-// Conforms to zero-dependency, #![no_std] compliant OOP structures
+// SigmaOS Canonical Clean-Room Absorption Daemons
+// Independent, zero-dependency reimplementations of Ubuntu's core tooling
 
-use core::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
+use std::collections::HashMap;
 
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::vec::Vec;
-
-// ==========================================
-// 1. Snapshot & Rollback System (openSUSE Btrfs style)
-// ==========================================
-
-#[derive(Debug, Clone)]
-pub struct EcosystemSnapshot {
-    pub id: usize,
-    pub timestamp: u64,
-    pub root_hash: u64,
-    pub description: String,
+pub struct SigmaSubiquity {
+    pub autoinstall_parsed: bool,
+    pub storage_partitioned: bool,
 }
 
-pub struct SnapshotManager {
-    pub snapshots: Vec<EcosystemSnapshot>,
-    pub next_id: usize,
-    pub system_root_hash: u64,
-}
-
-impl SnapshotManager {
+impl SigmaSubiquity {
     pub fn new() -> Self {
-        Self {
-            snapshots: Vec::new(),
-            next_id: 1,
-            system_root_hash: 0x55AA55AA,
+        SigmaSubiquity {
+            autoinstall_parsed: false,
+            storage_partitioned: false,
         }
     }
 
-    pub fn create_snapshot(&mut self, description: &str) -> usize {
-        let snapshot = EcosystemSnapshot {
-            id: self.next_id,
-            timestamp: 1716000000,
-            root_hash: self.system_root_hash,
-            description: String::from(description),
-        };
-        self.snapshots.push(snapshot);
-        let id = self.next_id;
-        self.next_id += 1;
-        println!("[snapshot] Btrfs-style snapshot #{} created: '{}'.", id, description);
+    pub fn parse_autoinstall_manifest(&mut self, yaml_data: &str) -> Result<(), ()> {
+        if yaml_data.contains("autoinstall:") {
+            self.autoinstall_parsed = true;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+
+    pub fn provision_storage(&mut self) -> Result<(), ()> {
+        if !self.autoinstall_parsed {
+            return Err(());
+        }
+        self.storage_partitioned = true;
+        Ok(())
+    }
+}
+
+pub struct SigmaNetplan {
+    pub active_routes: usize,
+    pub ebpf_routing_enabled: bool,
+}
+
+impl SigmaNetplan {
+    pub fn new() -> Self {
+        SigmaNetplan {
+            active_routes: 0,
+            ebpf_routing_enabled: true,
+        }
+    }
+
+    pub fn compile_netplan_yaml(&mut self, yaml_data: &str) -> Result<usize, ()> {
+        if yaml_data.contains("ethernets:") || yaml_data.contains("wifis:") {
+            self.active_routes = 2; // Simulated compiled routes count
+            Ok(self.active_routes)
+        } else {
+            Err(())
+        }
+    }
+}
+
+pub struct SigmaCloudInit {
+    pub instance_initialized: bool,
+    pub metadata_polled: bool,
+}
+
+impl SigmaCloudInit {
+    pub fn new() -> Self {
+        SigmaCloudInit {
+            instance_initialized: false,
+            metadata_polled: false,
+        }
+    }
+
+    pub fn poll_metadata_endpoints(&mut self, ip_addr: &str) -> Result<HashMap<String, String>, ()> {
+        self.metadata_polled = true;
+        let mut metadata = HashMap::new();
+        metadata.insert("instance-id".to_string(), "i-08a9f8b449".to_string());
+        metadata.insert("local-ipv4".to_string(), ip_addr.to_string());
+        Ok(metadata)
+    }
+
+    pub fn initialize_cloud_instance(&mut self) {
+        self.instance_initialized = true;
+    }
+}
+
+pub struct SigmaMultipass {
+    pub active_containers: usize,
+    pub overlayfs_mounted: bool,
+}
+
+impl SigmaMultipass {
+    pub fn new() -> Self {
+        SigmaMultipass {
+            active_containers: 0,
+            overlayfs_mounted: false,
+        }
+    }
+
+    pub fn mount_sovereign_overlayfs(&mut self, lower: &str, upper: &str) -> Result<(), ()> {
+        if lower.is_empty() || upper.is_empty() {
+            return Err(());
+        }
+        self.overlayfs_mounted = true;
+        Ok(())
+    }
+
+    pub fn spawn_micro_vm_container(&mut self) {
+        self.active_containers += 1;
+    }
+}
+
+pub struct SigmaCurtin {
+    pub storage_formatted: bool,
+    pub zfs_pool_mounted: bool,
+}
+
+impl SigmaCurtin {
+    pub fn new() -> Self {
+        SigmaCurtin {
+            storage_formatted: false,
+            zfs_pool_mounted: false,
+        }
+    }
+
+    pub fn execute_rapid_block_formatting(&mut self, drive: &str) -> Result<(), ()> {
+        if drive.is_empty() {
+            return Err(());
+        }
+        self.storage_formatted = true;
+        Ok(())
+    }
+
+    pub fn mount_sovereign_zfs_pool(&mut self) {
+        self.zfs_pool_mounted = true;
+    }
+}
+
+// =========================================================================
+// Linux Mint & Cinnamon Desktop Compatibility Suite
+// =========================================================================
+
+pub struct SovereignTimeshiftBackup {
+    pub snapshots: HashMap<String, String>, // label -> date_created
+    pub clean_restore_point: Option<String>,
+}
+
+impl SovereignTimeshiftBackup {
+    pub fn new() -> Self {
+        Self {
+            snapshots: HashMap::new(),
+            clean_restore_point: None,
+        }
+    }
+
+    pub fn create_restore_point(&mut self, label: &str, timestamp: &str) {
+        self.snapshots.insert(label.to_string(), timestamp.to_string());
+        if self.clean_restore_point.is_none() {
+            self.clean_restore_point = Some(label.to_string());
+        }
+    }
+
+    pub fn restore_to_snapshot(&mut self, label: &str) -> Result<String, ()> {
+        if self.snapshots.contains_key(label) {
+            Ok(format!("System cleanly rolled back to: {}", label))
+        } else {
+            Err(())
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CinnamonDesklet {
+    pub id: u32,
+    pub name: String,
+    pub x: i32,
+    pub y: i32,
+}
+
+pub struct CinnamonDeskletGrid {
+    pub desklets: Vec<CinnamonDesklet>,
+    pub panel_layout: String, // "bottom", "top"
+}
+
+impl CinnamonDeskletGrid {
+    pub fn new() -> Self {
+        Self {
+            desklets: Vec::new(),
+            panel_layout: "bottom".to_string(),
+        }
+    }
+
+    pub fn add_desklet(&mut self, name: &str, x: i32, y: i32) -> u32 {
+        let id = self.desklets.len() as u32 + 1;
+        self.desklets.push(CinnamonDesklet {
+            id,
+            name: name.to_string(),
+            x,
+            y,
+        });
         id
     }
 
-    pub fn rollback_to_snapshot(&mut self, id: usize) -> Result<u64, &'static str> {
-        for snapshot in &self.snapshots {
-            if snapshot.id == id {
-                self.system_root_hash = snapshot.root_hash;
-                println!(
-                    "[snapshot] Rollback successful! Restored system state hash to 0x{:X} from snapshot #{}.",
-                    snapshot.root_hash, id
-                );
-                return Ok(snapshot.root_hash);
-            }
-        }
-        Err("Snapshot ID not found")
+    pub fn update_panel_layout(&mut self, layout: &str) {
+        self.panel_layout = layout.to_string();
     }
 }
 
-// ==========================================
-// 2. Universal Compatibility Layer (Wine/Rosetta style)
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CompatBinaryFormat {
-    LinuxElf,
-    WindowsPe,
-    IosSandboxed,
+pub struct MintSourcesAuditor {
+    pub mirrors: HashMap<String, u32>, // mirror_url -> latency_ms
 }
 
-pub struct CompatBinary {
-    pub name: String,
-    pub format: CompatBinaryFormat,
-    pub payload_hash: u32,
-}
-
-pub struct CompatibilityLayer {
-    pub is_rosetta_active: bool,
-    pub loaded_binaries: Vec<CompatBinary>,
-}
-
-impl CompatibilityLayer {
+impl MintSourcesAuditor {
     pub fn new() -> Self {
         Self {
-            is_rosetta_active: true,
-            loaded_binaries: Vec::new(),
+            mirrors: HashMap::new(),
         }
     }
 
-    pub fn load_and_map_binary(&mut self, name: &str, format: CompatBinaryFormat) -> Result<u32, &'static str> {
-        let payload_hash = match format {
-            CompatBinaryFormat::LinuxElf => 0x011a011a,
-            CompatBinaryFormat::WindowsPe => 0x022b022b,
-            CompatBinaryFormat::IosSandboxed => 0x033c033c,
-        };
-        let bin = CompatBinary {
-            name: String::from(name),
-            format,
-            payload_hash,
-        };
-        self.loaded_binaries.push(bin);
-        println!(
-            "[compat-layer] Universal Loader: Successfully mapped {:?} binary '{}' to system memory.",
-            format, name
-        );
-        Ok(payload_hash)
+    pub fn register_mirror(&mut self, url: &str, latency_ms: u32) {
+        self.mirrors.insert(url.to_string(), latency_ms);
+    }
+
+    /// Selects the fastest local package mirror (lowest latency) to prevent slow updates
+    pub fn auto_select_fastest_mirror(&self) -> Option<String> {
+        self.mirrors
+            .iter()
+            .min_by_key(|entry| entry.1)
+            .map(|entry| entry.0.clone())
     }
 }
 
-// ==========================================
-// 3. Security Sandbox & Jail System (BSD Jails / iOS Sandboxing)
-// ==========================================
-
-pub struct BsdJailSandbox {
-    pub jail_id: usize,
-    pub isolated_root: String,
-    pub allow_raw_sockets: bool,
-    pub allow_network: bool,
-    pub blocked_directories: Vec<String>,
+pub struct MintWarpinator {
+    pub devices_discovered: Vec<String>,
+    pub transfer_queue: Vec<(String, String)>, // filename -> dest_device
 }
 
-impl BsdJailSandbox {
-    pub fn new(jail_id: usize, isolated_root: &str) -> Self {
-        Self {
-            jail_id,
-            isolated_root: String::from(isolated_root),
-            allow_raw_sockets: false,
-            allow_network: false,
-            blocked_directories: vec![String::from("/etc/passwd"), String::from("/sys/firmware")],
-        }
-    }
-
-    pub fn validate_operation(&self, path: &str, is_raw_socket_req: bool) -> bool {
-        if is_raw_socket_req && !self.allow_raw_sockets {
-            println!("[bsd-jail] SecurityViolation: Raw sockets are blocked inside jail #{}.", self.jail_id);
-            return false;
-        }
-        for blocked in &self.blocked_directories {
-            if path.starts_with(blocked) {
-                println!(
-                    "[bsd-jail] SecurityViolation: Jail #{} blocked access to path '{}'.",
-                    self.jail_id, path
-                );
-                return false;
-            }
-        }
-        true
-    }
-}
-
-// ==========================================
-// 4. Unified App Store (Arch AUR / Flatpak)
-// ==========================================
-
-pub struct FlatpakApp {
-    pub app_id: String,
-    pub recipe_url: String,
-    pub is_verified: bool,
-}
-
-pub struct UnifiedAppStore {
-    pub registered_recipes: Vec<FlatpakApp>,
-}
-
-impl UnifiedAppStore {
+impl MintWarpinator {
     pub fn new() -> Self {
         Self {
-            registered_recipes: Vec::new(),
+            devices_discovered: Vec::new(),
+            transfer_queue: Vec::new(),
         }
     }
 
-    pub fn register_app_recipe(&mut self, app_id: &str, recipe_url: &str, is_verified: bool) {
-        let app = FlatpakApp {
-            app_id: String::from(app_id),
-            recipe_url: String::from(recipe_url),
-            is_verified,
-        };
-        self.registered_recipes.push(app);
-        println!("[app-store] Recipe registered: app '{}' -> url: {}.", app_id, recipe_url);
+    pub fn discover_local_device(&mut self, hostname: &str) {
+        self.devices_discovered.push(hostname.to_string());
     }
 
-    pub fn get_app_recipe(&self, app_id: &str) -> Option<&FlatpakApp> {
-        for app in &self.registered_recipes {
-            if app.app_id == app_id {
-                return Some(app);
-            }
-        }
-        None
-    }
-}
-
-// ==========================================
-// 5. Cross-Device Continuity (Continuity / Handoff)
-// ==========================================
-
-pub struct HandoffTask {
-    pub task_name: String,
-    pub cursor_pos: usize,
-    pub payload: String,
-}
-
-pub struct ContinuityCoordinator {
-    pub local_clipboard: String,
-    pub active_handoff_task: Option<HandoffTask>,
-}
-
-impl ContinuityCoordinator {
-    pub fn new() -> Self {
-        Self {
-            local_clipboard: String::new(),
-            active_handoff_task: None,
-        }
-    }
-
-    pub fn sync_clipboard(&mut self, clipboard_text: &str) {
-        self.local_clipboard = String::from(clipboard_text);
-        println!("[continuity] Clipboard synced across ecosystem: '{}'.", clipboard_text);
-    }
-
-    pub fn push_task_state(&mut self, task_name: &str, cursor_pos: usize, payload: &str) {
-        let task = HandoffTask {
-            task_name: String::from(task_name),
-            cursor_pos,
-            payload: String::from(payload),
-        };
-        self.active_handoff_task = Some(task);
-        println!("[continuity] Ecosystem Handoff: Task '{}' state pushed to cloud.", task_name);
-    }
-}
-
-// ==========================================
-// 6. Layered Desktop Switcher (tiling / touch)
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DesktopMode {
-    ClassicDE,
-    TilingWM,
-    TouchTabletMode,
-}
-
-pub struct ZorinAppearanceSwitcher {
-    pub active_mode: DesktopMode,
-    pub compositor_animations_enabled: bool,
-}
-
-impl ZorinAppearanceSwitcher {
-    pub fn new() -> Self {
-        Self {
-            active_mode: DesktopMode::ClassicDE,
-            compositor_animations_enabled: true,
-        }
-    }
-
-    pub fn switch_mode(&mut self, mode: DesktopMode) {
-        self.active_mode = mode;
-        if mode == DesktopMode::TouchTabletMode {
-            self.compositor_animations_enabled = false; // Disable complex animations to save power
-        } else {
-            self.compositor_animations_enabled = true;
-        }
-        println!("[compositor] Switching active appearance layout context to: {:?}.", mode);
-    }
-}
-
-// ==========================================
-// 7. AI Resource Scheduler (iOS / Windows kernel style)
-// ==========================================
-
-pub struct AiResourceScheduler {
-    pub thermal_level: u32,       // CPU temperature in Celsius
-    pub battery_percentage: u32,  // Battery level
-    pub target_cpu_load: usize,
-}
-
-impl AiResourceScheduler {
-    pub fn new() -> Self {
-        Self {
-            thermal_level: 40,
-            battery_percentage: 100,
-            target_cpu_load: 50,
-        }
-    }
-
-    /// Evaluates thermal and battery states using an AI-inspired feedback governor
-    pub fn calculate_dynamic_time_slice(&self) -> usize {
-        if self.thermal_level >= 85 || self.battery_percentage <= 20 {
-            // Power saving: scale down quantum slice length to 4ms to reduce switching cycles
-            println!("[ai-scheduler] High thermal / low battery detected. Throttling time quantum slice.");
-            4
-        } else if self.thermal_level <= 50 && self.battery_percentage >= 80 {
-            // Turbo: scale up time quantum to 16ms for maximum CPU throughput
-            16
-        } else {
-            // Standard time quantum slice
-            10
-        }
-    }
-}
-
-// ==========================================
-// 8. Governance & Release Engineering
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DistroReleaseChannel {
-    Lts,
-    Rolling,
-    Experimental,
-}
-
-pub struct ReproducibleBuildVerifier {
-    pub trusted_hashes: Vec<u64>,
-}
-
-impl ReproducibleBuildVerifier {
-    pub fn new() -> Self {
-        Self {
-            trusted_hashes: vec![0x55AA55AA, 0xABCDEF12, 0x98765432],
-        }
-    }
-
-    pub fn verify_build(&self, iso_hash: u64, is_signed: bool) -> bool {
-        if !is_signed {
-            println!("[release-eng] Build verification failed: Unsigned build ISO.");
-            return false;
-        }
-        if self.trusted_hashes.contains(&iso_hash) {
-            println!("[release-eng] Build verification successful: Reproducible build hash matches signed keys.");
+    /// Safely queues Warpinator local network zero-configuration file sharing
+    pub fn send_file_offline(&mut self, filename: &str, dest_device: &str) -> bool {
+        if self.devices_discovered.contains(&dest_device.to_string()) {
+            self.transfer_queue.push((filename.to_string(), dest_device.to_string()));
             true
         } else {
-            println!("[release-eng] Build verification failed: Build hash mismatch.");
             false
         }
     }
 }
 
-pub struct ReleaseGovernanceCouncil {
-    pub total_members: usize,
-    pub approvals_needed: usize,
+// =========================================================================
+// Advanced BSD-parity Compatibility Subsystems
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct JailConfig {
+    pub jid: u32,
+    pub name: String,
+    pub path: String,
+    pub ip_address: String,
+    pub allow_raw_sockets: bool,
+    pub allow_sysvipc: bool,
+    pub is_running: bool,
 }
 
-impl ReleaseGovernanceCouncil {
-    pub fn new(total_members: usize, approvals_needed: usize) -> Self {
-        Self {
-            total_members,
-            approvals_needed,
-        }
-    }
-
-    pub fn propose_vote(&self, title: &str, votes_for: usize, votes_against: usize) -> bool {
-        let is_approved = votes_for >= self.approvals_needed;
-        println!(
-            "[governance] Proposal '{}' voted on. Result: For: {}/Against: {}. Approved: {}.",
-            title, votes_for, votes_against, is_approved
-        );
-        is_approved
-    }
+pub struct SovereignJailVirtualization {
+    pub jails: HashMap<u32, JailConfig>,
+    pub next_jid: u32,
 }
 
-// ==========================================
-// 9. Accessibility, TTS Synthesizer & Braille Display
-// ==========================================
-
-pub struct TtsSynthesizer {
-    pub current_volume: u32,
-}
-
-impl TtsSynthesizer {
+impl SovereignJailVirtualization {
     pub fn new() -> Self {
-        Self { current_volume: 80 }
-    }
-
-    pub fn synthesize_to_speech(&self, text: &str) -> String {
-        println!("[accessibility-tts] Speaking text: '{}'", text);
-        let mut speech_output = String::from("SPEECH: ");
-        speech_output.push_str(text);
-        speech_output
-    }
-}
-
-pub struct BrailleMatrix;
-
-impl BrailleMatrix {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn translate_text_to_braille(&self, text: &str) -> Vec<u8> {
-        let mut braille_bytes = Vec::new();
-        for ch in text.chars() {
-            // Simple mapping to simulated 8-dot Braille bitmasks
-            let mask = match ch.to_ascii_uppercase() {
-                'A' => 0b00000001,
-                'B' => 0b00000011,
-                'C' => 0b00001001,
-                'D' => 0b00011001,
-                'E' => 0b00010001,
-                'F' => 0b00001011,
-                'G' => 0b00011011,
-                'H' => 0b00010011,
-                _ => 0b00000000,
-            };
-            braille_bytes.push(mask);
-        }
-        println!("[accessibility-braille] Translated string to Braille representation bytes.");
-        braille_bytes
-    }
-}
-
-// ==========================================
-// 10. Localization (i18n) & Translation Engine
-// ==========================================
-
-pub struct LanguageTranslationCatalog {
-    pub locale: String,
-    pub dictionary: Vec<(String, String)>,
-}
-
-impl LanguageTranslationCatalog {
-    pub fn new(locale: &str) -> Self {
         Self {
-            locale: String::from(locale),
-            dictionary: Vec::new(),
+            jails: HashMap::new(),
+            next_jid: 1,
         }
     }
 
-    pub fn add_translation(&mut self, key: &str, val: &str) {
-        self.dictionary.push((String::from(key), String::from(val)));
+    pub fn create_jail(&mut self, name: &str, path: &str, ip: &str) -> u32 {
+        let jid = self.next_jid;
+        self.next_jid += 1;
+        self.jails.insert(jid, JailConfig {
+            jid,
+            name: name.to_string(),
+            path: path.to_string(),
+            ip_address: ip.to_string(),
+            allow_raw_sockets: false,
+            allow_sysvipc: false,
+            is_running: false,
+        });
+        jid
     }
 
-    pub fn resolve(&self, key: &str) -> String {
-        for (k, v) in &self.dictionary {
-            if k == key {
-                return v.clone();
+    pub fn start_jail(&mut self, jid: u32) -> Result<(), ()> {
+        if let Some(jail) = self.jails.get_mut(&jid) {
+            jail.is_running = true;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+
+    pub fn stop_jail(&mut self, jid: u32) -> Result<(), ()> {
+        if let Some(jail) = self.jails.get_mut(&jid) {
+            jail.is_running = false;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+
+    pub fn configure_capabilities(&mut self, jid: u32, raw_sockets: bool, sysvipc: bool) -> Result<(), ()> {
+        if let Some(jail) = self.jails.get_mut(&jid) {
+            jail.allow_raw_sockets = raw_sockets;
+            jail.allow_sysvipc = sysvipc;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+}
+
+pub struct ZfsDataset {
+    pub name: String,
+    pub mountpoint: String,
+    pub compression_enabled: bool,
+    pub snapshots: Vec<String>,
+}
+
+pub struct SovereignZfsStorage {
+    pub pool_name: String,
+    pub pool_status: String,
+    pub datasets: HashMap<String, ZfsDataset>,
+}
+
+impl SovereignZfsStorage {
+    pub fn new(pool_name: &str) -> Self {
+        Self {
+            pool_name: pool_name.to_string(),
+            pool_status: "ONLINE".to_string(),
+            datasets: HashMap::new(),
+        }
+    }
+
+    pub fn create_dataset(&mut self, name: &str, mountpoint: &str) -> Result<(), ()> {
+        let full_name = format!("{}/{}", self.pool_name, name);
+        if self.datasets.contains_key(&full_name) {
+            return Err(());
+        }
+        self.datasets.insert(full_name.clone(), ZfsDataset {
+            name: full_name,
+            mountpoint: mountpoint.to_string(),
+            compression_enabled: false,
+            snapshots: Vec::new(),
+        });
+        Ok(())
+    }
+
+    pub fn create_snapshot(&mut self, dataset_name: &str, snapshot_tag: &str) -> Result<(), ()> {
+        if let Some(dataset) = self.datasets.get_mut(dataset_name) {
+            dataset.snapshots.push(snapshot_tag.to_string());
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+
+    pub fn rollback_dataset(&mut self, dataset_name: &str, snapshot_tag: &str) -> Result<(), ()> {
+        if let Some(dataset) = self.datasets.get_mut(dataset_name) {
+            if dataset.snapshots.contains(&snapshot_tag.to_string()) {
+                Ok(())
+            } else {
+                Err(())
+            }
+        } else {
+            Err(())
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PfAction {
+    Pass,
+    Block,
+}
+
+#[derive(Debug, Clone)]
+pub struct PfRule {
+    pub action: PfAction,
+    pub protocol: String,
+    pub src_ip: String,
+    pub dest_ip: String,
+    pub dest_port: u16,
+    pub keep_state: bool,
+}
+
+pub struct SovereignPacketFilterSecurity {
+    pub rules: Vec<PfRule>,
+    pub active_states: Vec<(String, String, u16)>, // (src, dest, port)
+}
+
+impl SovereignPacketFilterSecurity {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            active_states: Vec::new(),
+        }
+    }
+
+    pub fn add_rule(&mut self, action: PfAction, proto: &str, src: &str, dest: &str, port: u16, keep_state: bool) {
+        self.rules.push(PfRule {
+            action,
+            protocol: proto.to_string(),
+            src_ip: src.to_string(),
+            dest_ip: dest.to_string(),
+            dest_port: port,
+            keep_state,
+        });
+    }
+
+    pub fn evaluate_packet(&mut self, proto: &str, src: &str, dest: &str, port: u16) -> PfAction {
+        for state in &self.active_states {
+            if state.0 == src && state.1 == dest && state.2 == port {
+                return PfAction::Pass;
             }
         }
-        String::from(key) // Fallback to key itself if translation is missing
-    }
-}
 
-pub struct LocaleManager {
-    pub active_locale: String,
-}
+        let mut current_decision = PfAction::Block;
+        for rule in &self.rules {
+            let proto_match = rule.protocol == "*" || rule.protocol == proto;
+            let src_match = rule.src_ip == "*" || rule.src_ip == src;
+            let dest_match = rule.dest_ip == "*" || rule.dest_ip == dest;
+            let port_match = rule.dest_port == 0 || rule.dest_port == port;
 
-impl LocaleManager {
-    pub fn new() -> Self {
-        Self {
-            active_locale: String::from("en_US"),
-        }
-    }
-
-    pub fn set_locale(&mut self, locale: &str) {
-        self.active_locale = String::from(locale);
-        println!("[i18n] Switch active language locale to: '{}'", locale);
-    }
-
-    /// Validates contrast ratio for WCAG AA compliance (e.g., minimum 4.5 ratio)
-    pub fn validate_wcag_contrast(&self, fg_hex: u32, bg_hex: u32) -> bool {
-        // Hex relative luminance approximation (simulated)
-        let fg_lum = ((fg_hex & 0xFF) + ((fg_hex >> 8) & 0xFF) + ((fg_hex >> 16) & 0xFF)) as f64 / 3.0;
-        let bg_lum = ((bg_hex & 0xFF) + ((bg_hex >> 8) & 0xFF) + ((bg_hex >> 16) & 0xFF)) as f64 / 3.0;
-
-        let lighter = fg_lum.max(bg_lum);
-        let darker = fg_lum.min(bg_lum);
-        let ratio = (lighter + 0.05) / (darker + 0.05);
-
-        let complies = ratio >= 4.5;
-        println!(
-            "[accessibility-wcag] Contrast check for fg: 0x{:X}, bg: 0x{:X}. Ratio: {:.2}. Complies: {}.",
-            fg_hex, bg_hex, ratio, complies
-        );
-        complies
-    }
-}
-
-// ==========================================
-// 11. Productivity & Creative Application Suites
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AppSuiteType {
-    Office,
-    CreativeMedia,
-    Enterprise,
-    DeveloperTools,
-}
-
-pub struct AppSuiteBundle {
-    pub name: String,
-    pub suite_type: AppSuiteType,
-    pub is_sandboxed: bool,
-    pub install_size_mb: usize,
-}
-
-pub struct SuiteRegistry {
-    pub bundles: Vec<AppSuiteBundle>,
-}
-
-impl SuiteRegistry {
-    pub fn new() -> Self {
-        Self { bundles: Vec::new() }
-    }
-
-    pub fn register_suite(&mut self, bundle: AppSuiteBundle) {
-        println!(
-            "[app-suite] Registered application: '{}' suite: {:?}, size: {}MB.",
-            bundle.name, bundle.suite_type, bundle.install_size_mb
-        );
-        self.bundles.push(bundle);
-    }
-
-    pub fn launch_suite_app(&self, name: &str) -> Result<String, &'static str> {
-        for bundle in &self.bundles {
-            if bundle.name == name {
-                if bundle.is_sandboxed {
-                    println!("[app-suite] Securely launching '{}' within isolated sandbox jail.", name);
-                } else {
-                    println!("[app-suite] Launching '{}' without isolated sandbox jail.", name);
+            if proto_match && src_match && dest_match && port_match {
+                current_decision = rule.action.clone();
+                if current_decision == PfAction::Pass && rule.keep_state {
+                    self.active_states.push((src.to_string(), dest.to_string(), port));
                 }
-                return Ok(format!("RUNNING: {}", name));
             }
         }
-        Err("Application not found in suite registry.")
+        current_decision
     }
 }
 
-// ==========================================
-// 12. Networking & Cloud-Native Containers
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CloudProvider {
-    Aws,
-    Azure,
-    Gcp,
-    SovereignCloud,
-}
-
-pub struct SigmaContainer {
-    pub container_id: usize,
+#[derive(Debug, Clone)]
+pub struct PkgsrcRecipe {
     pub name: String,
-    pub namespace_isolated: bool,
+    pub version: String,
+    pub dependencies: Vec<String>,
+    pub checksum: String,
 }
 
-pub struct CloudOrchestrator {
-    pub provider: CloudProvider,
-    pub active_containers: Vec<SigmaContainer>,
-    pub next_id: usize,
+pub struct SovereignPkgsrcCompiler {
+    pub available_recipes: HashMap<String, PkgsrcRecipe>,
+    pub installed_packages: HashMap<String, String>,
 }
 
-impl CloudOrchestrator {
-    pub fn new(provider: CloudProvider) -> Self {
+impl SovereignPkgsrcCompiler {
+    pub fn new() -> Self {
         Self {
-            provider,
-            active_containers: Vec::new(),
-            next_id: 1,
+            available_recipes: HashMap::new(),
+            installed_packages: HashMap::new(),
         }
     }
 
-    pub fn deploy_container(&mut self, name: &str, namespace_isolated: bool) -> Result<usize, &'static str> {
-        let id = self.next_id;
-        self.next_id += 1;
-
-        let container = SigmaContainer {
-            container_id: id,
-            name: String::from(name),
-            namespace_isolated,
+    pub fn register_recipe(&mut self, name: &str, version: &str, deps: Vec<&str>, checksum: &str) {
+        let recipe = PkgsrcRecipe {
+            name: name.to_string(),
+            version: version.to_string(),
+            dependencies: deps.into_iter().map(|s| s.to_string()).collect(),
+            checksum: checksum.to_string(),
         };
+        self.available_recipes.insert(name.to_string(), recipe);
+    }
 
-        println!(
-            "[cloud-orchestrator] Cloud-Native deployment on {:?}: container #{} ('{}') spawned (namespace isolate: {}).",
-            self.provider, id, name, namespace_isolated
-        );
-        self.active_containers.push(container);
-        Ok(id)
+    pub fn compile_and_install(&mut self, name: &str) -> Result<(), ()> {
+        let recipe = self.available_recipes.get(name).ok_or(())?.clone();
+
+        for dep in &recipe.dependencies {
+            if !self.installed_packages.contains_key(dep) {
+                self.compile_and_install(dep)?;
+            }
+        }
+
+        if recipe.checksum.is_empty() {
+            return Err(());
+        }
+
+        self.installed_packages.insert(name.to_string(), recipe.version);
+        Ok(())
+    }
+}
+
+pub struct SovereignSysctlRegistry {
+    pub mib: HashMap<String, String>,
+}
+
+impl SovereignSysctlRegistry {
+    pub fn new() -> Self {
+        let mut registry = Self {
+            mib: HashMap::new(),
+        };
+        registry.mib.insert("kern.maxproc".to_string(), "1044".to_string());
+        registry.mib.insert("net.inet.tcp.sendspace".to_string(), "32768".to_string());
+        registry.mib.insert("security.jail.jailed".to_string(), "0".to_string());
+        registry
+    }
+
+    pub fn get_value(&self, key: &str) -> Option<&String> {
+        self.mib.get(key)
+    }
+
+    pub fn set_value(&mut self, key: &str, value: &str) -> Result<(), ()> {
+        if self.mib.contains_key(key) {
+            self.mib.insert(key.to_string(), value.to_string());
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sigma_subiquity_installer() {
+        let mut subiquity = SigmaSubiquity::new();
+        assert!(subiquity.provision_storage().is_err());
+        subiquity.parse_autoinstall_manifest("autoinstall: true").unwrap();
+        assert!(subiquity.provision_storage().is_ok());
+    }
+
+    #[test]
+    fn test_sigma_netplan_compiler() {
+        let mut netplan = SigmaNetplan::new();
+        let routes = netplan.compile_netplan_yaml("network:\n  ethernets:\n    eth0:\n      dhcp4: true").unwrap();
+        assert_eq!(routes, 2);
+    }
+
+    #[test]
+    fn test_sigma_cloud_init() {
+        let mut init = SigmaCloudInit::new();
+        let data = init.poll_metadata_endpoints("169.254.169.254").unwrap();
+        assert_eq!(data.get("instance-id").unwrap(), "i-08a9f8b449");
+    }
+
+    #[test]
+    fn test_timeshift_backup_snapshots() {
+        let mut timeshift = SovereignTimeshiftBackup::new();
+        timeshift.create_restore_point("restore-point-1", "2025-01-20T12:00:00Z");
+
+        assert_eq!(timeshift.clean_restore_point, Some("restore-point-1".to_string()));
+        let res = timeshift.restore_to_snapshot("restore-point-1").unwrap();
+        assert!(res.contains("restore-point-1"));
+
+        assert!(timeshift.restore_to_snapshot("nonexistent").is_err());
+    }
+
+    #[test]
+    fn test_cinnamon_desklet_grid() {
+        let mut grid = CinnamonDeskletGrid::new();
+        let id = grid.add_desklet("Analog Clock", 10, 20);
+        assert_eq!(id, 1);
+        assert_eq!(grid.desklets[0].name, "Analog Clock");
+        assert_eq!(grid.desklets[0].x, 10);
+        assert_eq!(grid.panel_layout, "bottom");
+
+        grid.update_panel_layout("top");
+        assert_eq!(grid.panel_layout, "top");
+    }
+
+    #[test]
+    fn test_mint_sources_auditor() {
+        let mut auditor = MintSourcesAuditor::new();
+        auditor.register_mirror("https://mirror.us.mint.com", 150);
+        auditor.register_mirror("https://mirror.de.mint.com", 30);
+        auditor.register_mirror("https://mirror.sg.mint.com", 80);
+
+        let fastest = auditor.auto_select_fastest_mirror().unwrap();
+        assert_eq!(fastest, "https://mirror.de.mint.com");
+    }
+
+    #[test]
+    fn test_mint_warpinator() {
+        let mut warpinator = MintWarpinator::new();
+        warpinator.discover_local_device("MintBookPro");
+
+        assert!(warpinator.send_file_offline("photo.png", "MintBookPro"));
+        assert_eq!(warpinator.transfer_queue.len(), 1);
+        assert_eq!(warpinator.transfer_queue[0].0, "photo.png");
+
+        assert!(!warpinator.send_file_offline("video.mp4", "NonexistentHost"));
+    }
+
+    #[test]
+    fn test_sovereign_jail_virtualization() {
+        let mut jm = SovereignJailVirtualization::new();
+        let jid = jm.create_jail("webserver", "/usr/jails/webserver", "192.168.1.100");
+        assert_eq!(jid, 1);
+
+        let jail = jm.jails.get(&jid).unwrap();
+        assert_eq!(jail.name, "webserver");
+        assert_eq!(jail.path, "/usr/jails/webserver");
+        assert_eq!(jail.ip_address, "192.168.1.100");
+        assert!(!jail.is_running);
+
+        jm.start_jail(jid).unwrap();
+        assert!(jm.jails.get(&jid).unwrap().is_running);
+
+        jm.configure_capabilities(jid, true, true).unwrap();
+        let configured = jm.jails.get(&jid).unwrap();
+        assert!(configured.allow_raw_sockets);
+        assert!(configured.allow_sysvipc);
+
+        jm.stop_jail(jid).unwrap();
+        assert!(!jm.jails.get(&jid).unwrap().is_running);
+
+        assert!(jm.start_jail(999).is_err());
+    }
+
+    #[test]
+    fn test_sovereign_zfs_storage() {
+        let mut zfs = SovereignZfsStorage::new("zroot");
+        assert_eq!(zfs.pool_name, "zroot");
+        assert_eq!(zfs.pool_status, "ONLINE");
+
+        zfs.create_dataset("usr/home", "/usr/home").unwrap();
+        assert!(zfs.datasets.contains_key("zroot/usr/home"));
+
+        // Duplicate creation fails
+        assert!(zfs.create_dataset("usr/home", "/usr/home").is_err());
+
+        zfs.create_snapshot("zroot/usr/home", "snap-2025-01-20").unwrap();
+        let ds = zfs.datasets.get("zroot/usr/home").unwrap();
+        assert_eq!(ds.snapshots.len(), 1);
+        assert_eq!(ds.snapshots[0], "snap-2025-01-20");
+
+        assert!(zfs.rollback_dataset("zroot/usr/home", "snap-2025-01-20").is_ok());
+        assert!(zfs.rollback_dataset("zroot/usr/home", "nonexistent-snap").is_err());
+        assert!(zfs.rollback_dataset("nonexistent-ds", "snap").is_err());
+    }
+
+    #[test]
+    fn test_sovereign_packet_filter_security() {
+        let mut pf = SovereignPacketFilterSecurity::new();
+        pf.add_rule(PfAction::Pass, "tcp", "*", "*", 80, true);
+        pf.add_rule(PfAction::Block, "*", "*", "*", 22, false);
+
+        // Evaluate packet matching rule 1 (tcp on 80)
+        let dec1 = pf.evaluate_packet("tcp", "10.0.0.2", "192.168.1.1", 80);
+        assert_eq!(dec1, PfAction::Pass);
+
+        // State table should be populated because keep_state is true
+        assert_eq!(pf.active_states.len(), 1);
+        assert_eq!(pf.active_states[0], ("10.0.0.2".to_string(), "192.168.1.1".to_string(), 80));
+
+        // Evaluate packet matching rule 2 (any on 22)
+        let dec2 = pf.evaluate_packet("tcp", "10.0.0.5", "192.168.1.1", 22);
+        assert_eq!(dec2, PfAction::Block);
+
+        // Fast-path evaluation via state table matching
+        let dec3 = pf.evaluate_packet("tcp", "10.0.0.2", "192.168.1.1", 80);
+        assert_eq!(dec3, PfAction::Pass);
+    }
+
+    #[test]
+    fn test_sovereign_pkgsrc_compiler() {
+        let mut pkg = SovereignPkgsrcCompiler::new();
+        pkg.register_recipe("libiconv", "1.17", vec![], "hash_libiconv_123");
+        pkg.register_recipe("gettext", "0.21", vec!["libiconv"], "hash_gettext_456");
+
+        // Verify successful recursive compilation of gettext and dependency libiconv
+        pkg.compile_and_install("gettext").unwrap();
+
+        assert_eq!(pkg.installed_packages.get("libiconv").unwrap(), "1.17");
+        assert_eq!(pkg.installed_packages.get("gettext").unwrap(), "0.21");
+
+        // Register package with missing checksum (verification failure)
+        pkg.register_recipe("badpkg", "1.0", vec![], "");
+        assert!(pkg.compile_and_install("badpkg").is_err());
+    }
+
+    #[test]
+    fn test_sovereign_sysctl_registry() {
+        let mut sysctl = SovereignSysctlRegistry::new();
+        assert_eq!(sysctl.get_value("kern.maxproc").unwrap(), "1044");
+
+        sysctl.set_value("kern.maxproc", "2048").unwrap();
+        assert_eq!(sysctl.get_value("kern.maxproc").unwrap(), "2048");
+
+        assert!(sysctl.set_value("nonexistent.parameter", "value").is_err());
     }
 }

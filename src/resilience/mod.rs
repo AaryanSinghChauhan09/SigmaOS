@@ -1,14 +1,11 @@
 // SigmaOS Resilience Module
-pub mod backup;
 pub mod self_healing;
-pub mod automated_fixer;
+pub mod backup;
 
-pub use backup::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
 pub use self_healing::{
     RecoveryAction, RecoveryEventType, RecoveryRule, ResilienceError, SelfHealingModule,
     SystemSnapshot,
 };
-pub use automated_fixer::{
-    ProblemType as SovereignProblemType, RemediationAction as SovereignRemediationAction,
-    FixerStats as SovereignFixerStats, AutomatedFixerDaemon,
+pub use backup::{
+    BackupError, BackupSnapshot, SigmaTimeshift,
 };

@@ -8,6 +8,9 @@ pub mod peripheral;
 pub mod storage;
 pub mod usb_hid;
 pub mod vesa;
+pub mod more_devices;
+pub mod even_more_devices;
+pub mod kernel_releases;
 
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
 pub use input::{InputDriver, InputEvent, InputType};
