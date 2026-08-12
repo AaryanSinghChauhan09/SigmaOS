@@ -79,6 +79,63 @@ pub struct UserPackageRepository {
     pub packages: alloc::vec::Vec<RollingPackage>,
 }
 
+/// Dynamic implementation of the Arch-inspired RollingReleaseManager.
+pub struct SigmaRollingReleaseManager {
+    pub channel: RollingReleaseChannel,
+    pub is_minimal: bool,
+    pub mirrors_synced: bool,
+}
+
+impl SigmaRollingReleaseManager {
+    pub fn new(name: &'static str) -> Self {
+        Self {
+            channel: RollingReleaseChannel {
+                name,
+                packages: alloc::vec::Vec::new(),
+                last_sync: 0,
+            },
+            is_minimal: true,
+            mirrors_synced: false,
+        }
+    }
+}
+
+impl RollingReleaseManager for SigmaRollingReleaseManager {
+    fn sync_mirrors(&mut self) -> Result<(), ReleaseError> {
+        self.mirrors_synced = true;
+        Ok(())
+    }
+
+    fn upgrade_system(&mut self) -> Result<usize, ReleaseError> {
+        if !self.mirrors_synced {
+            return Err(ReleaseError::MirrorSyncFailed);
+        }
+        let mut upgraded = 0;
+        for pkg in &mut self.channel.packages {
+            if pkg.is_outdated {
+                pkg.version = pkg.upstream_version.clone();
+                pkg.is_outdated = false;
+                upgraded += 1;
+            }
+        }
+        Ok(upgraded)
+    }
+
+    fn get_outdated_packages(&self) -> alloc::vec::Vec<&RollingPackage> {
+        let mut outdated = alloc::vec::Vec::new();
+        for pkg in &self.channel.packages {
+            if pkg.is_outdated {
+                outdated.push(pkg);
+            }
+        }
+        outdated
+    }
+
+    fn is_minimal_base(&self) -> bool {
+        self.is_minimal
+    }
+}
+
 // ============================================================================
 // FEDORA — Btrfs by Default, System Snapshots
 // ============================================================================
@@ -704,3 +761,130 @@ impl SigmaDistroEngine {
 // Bring alloc into scope for format! and vec!
 extern crate alloc;
 use alloc::format as alloc_format;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rolling_release_manager() {
+        let mut manager = SigmaRollingReleaseManager::new("arch-sigma");
+        manager.channel.packages.push(RollingPackage {
+            name: "curl".to_string(),
+            version: "7.80.0".to_string(),
+            upstream_version: "7.85.0".to_string(),
+            is_outdated: true,
+        });
+
+        assert_eq!(manager.get_outdated_packages().len(), 1);
+
+        // Upgrade system fails without mirror sync
+        assert_eq!(manager.upgrade_system(), Err(ReleaseError::MirrorSyncFailed));
+
+        assert!(manager.sync_mirrors().is_ok());
+        assert_eq!(manager.upgrade_system().unwrap(), 1);
+        assert_eq!(manager.get_outdated_packages().len(), 0);
+    }
+
+    #[test]
+    fn test_minimal_base_installer() {
+        let mut installer = MinimalBaseInstaller::new();
+        assert_eq!(installer.installed_packages.len(), 0);
+
+        installer.install_base();
+        assert_eq!(installer.installed_packages.len(), 4);
+        assert_eq!(installer.installed_packages[0], "sigmaos-base");
+    }
+
+    #[test]
+    fn test_system_snapshot_manager() {
+        let mut manager = SystemSnapshotManager::new(3);
+        let id1 = manager.create_snapshot("initial snapshot", false);
+        let id2 = manager.create_snapshot("before glibc update", true);
+
+        assert_eq!(manager.snapshots.len(), 2);
+        assert!(manager.rollback_to(id2).is_ok());
+        assert_eq!(manager.rollback_to(999), Err(ReleaseError::SnapshotNotFound));
+    }
+
+    #[test]
+    fn test_atomic_upgrade_engine() {
+        let mut engine = AtomicUpgradeEngine {
+            current_generation: 1,
+            pending_generation: None,
+        };
+
+        let config = DeclarativeSystemConfig {
+            hostname: "sigma-nix".to_string(),
+            packages: alloc::vec!["tmux".into(), "git".into()],
+            services: alloc::vec![],
+            users: alloc::vec![],
+            boot: BootConfig {
+                loader: "systemd-boot".to_string(),
+                kernel_params: alloc::vec![],
+                max_generations: 5,
+            },
+            generation: 2,
+        };
+
+        engine.stage_upgrade(config);
+        assert_eq!(engine.commit_upgrade().unwrap(), 2);
+        assert_eq!(engine.current_generation, 2);
+
+        // Rollback generation
+        assert_eq!(engine.rollback().unwrap(), 1);
+    }
+
+    #[test]
+    fn test_ephemeral_session_manager() {
+        let mut session = EphemeralSessionManager::new(NetworkPrivacyMode::TorOnly);
+        assert!(session.ram_only);
+        assert!(session.wipe_on_shutdown());
+
+        session.enable_persistent("/dev/sdb1");
+        assert!(session.persistent_storage.is_some());
+    }
+
+    #[test]
+    fn test_pentest_tool_registry() {
+        let registry = PenTestToolRegistry::new();
+        let scanner_tools = registry.tools_in_category(&PenTestCategory::NetworkScanning);
+        assert_eq!(scanner_tools.len(), 2);
+    }
+
+    #[test]
+    fn test_bore_scheduler_queuing() {
+        let mut scheduler = BoreScheduler::new(BoreSchedulerConfig::default_desktop());
+        scheduler.enqueue(Task {
+            pid: 101,
+            name: "firefox".to_string(),
+            burst_score: 10,
+            vruntime: 100,
+            priority: 0,
+        });
+        scheduler.enqueue(Task {
+            pid: 102,
+            name: "cargo".to_string(),
+            burst_score: 0,
+            vruntime: 80,
+            priority: 0,
+        });
+
+        // "cargo" should be picked next because of lower vruntime and burst score (80 + 0 = 80 vs 110)
+        let next = scheduler.pick_next().unwrap();
+        assert_eq!(next.pid, 102);
+
+        scheduler.update_burst_score(102, 50_000_000);
+        let next_after_update = scheduler.pick_next().unwrap();
+        // vruntime + burst_score of cargo is now 80 + 50 = 130 vs 110 of firefox
+        assert_eq!(next_after_update.pid, 101);
+    }
+
+    #[test]
+    fn test_garuda_btrfs_layout() {
+        let layout = GarudaBtrfsLayout::new();
+        let mount_options = layout.mount_options();
+        assert!(mount_options.contains("compress=zstd:3"));
+        assert!(mount_options.contains("noatime"));
+    }
+}

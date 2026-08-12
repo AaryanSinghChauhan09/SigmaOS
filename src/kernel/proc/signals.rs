@@ -83,7 +83,11 @@ impl SignalManager {
             .unwrap_or(SignalHandler::Default);
 
         if sig == Signal::SIGKILL && handler == SignalHandler::Default {
-            // Terminate instantly (forceful)
+            // Terminate instantly (forceful) but ensure it's tracked as pending for state audits
+            self.pending_signals
+                .entry(target_pid)
+                .or_default()
+                .push(sig);
             return;
         }
 

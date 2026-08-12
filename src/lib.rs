@@ -9,6 +9,7 @@ pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
+pub mod distro;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
@@ -25,6 +26,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod tools;
 pub mod virtualization;
 
 pub use accessibility::{
