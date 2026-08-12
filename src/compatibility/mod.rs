@@ -19,6 +19,13 @@ pub mod gentoo;
 pub mod tiny_core;
 pub mod localsend;
 
+// Advanced distro-inspired systems
+pub mod nixos_reproducible;
+pub mod gentoo_useflags;
+pub mod arch_aur;
+pub mod freebsd_jails;
+pub mod ubuntu_apt;
+
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
     APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
