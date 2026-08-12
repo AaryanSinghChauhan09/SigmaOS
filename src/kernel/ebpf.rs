@@ -308,8 +308,21 @@ mod tests {
     fn test_bpf_map_hash() {
         let map = BpfMap::new(BpfMapType::Hash, 4, 8, 100);
         
-        let key = [1u8, 2, 3, 4];
-        let value = [5u8, 6, 7, 8, 9, 10, 11, 12];
+        // Generate test key using timestamp-based approach
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let mut key = [0u8; 4];
+        for (i, byte) in key.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
+        let mut value = [0u8; 8];
+        let value_timestamp = timestamp.wrapping_add(1);
+        for (i, byte) in value.iter_mut().enumerate() {
+            *byte = ((value_timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         
         map.update(&key, &value).unwrap();
         let retrieved = map.lookup(&key).unwrap();

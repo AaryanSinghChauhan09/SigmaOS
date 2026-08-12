@@ -15,15 +15,18 @@ This document provides a comprehensive, highly technical, and mathematically pre
    - [F. CPU Exception Vectors & Privilege Traps](#f-cpu-exception-vectors--privilege-traps)
    - [G. Advanced Debugger Engine](#g-advanced-debugger-engine)
 3. [What's Not Working: Active Compiler Errors & Deep Analysis](#3-whats-not-working-active-compiler-errors--deep-analysis)
-   - [A. Unresolved klib Module Exports & Missing Symbol Paths](#a-unresolved-klib-module-exports--missing-symbol-paths)
-   - [B. Syntax Remnants from Conflicts & Overlapping Blocks](#b-syntax-remnants-from-conflicts--overlapping-blocks)
-   - [C. Duplicate Symbol & Implementation Redeclarations](#c-duplicate-symbol--implementation-redeclarations)
-   - [D. Ownership, Borrow-Checker, & Lifetime Violations](#d-ownership-borrow-checker--lifetime-violations)
-   - [E. Missing Package Constructor & Struct Initializer Gaps](#e-missing-package-constructor--struct-initializer-gaps)
-   - [F. Type Mismatches & Closure Parameter Type Inference Gaps](#f-type-mismatches--closure-parameter-type-inference-gaps)
-   - [G. Underscore Parameter Gaps & Spelling Mismatches](#g-underscore-parameter-gaps--spelling-mismatches)
-   - [H. Unresolved Module Dependency in App Absorber](#h-unresolved-module-dependency-in-app-absorber)
-   - [I. Missing System Interface & Kernel Imports](#i-missing-system-interface--kernel-imports)
+   - [A. Syntax Remnants & Merge Conflict Markers in Enterprise Networking](#a-syntax-remnants--merge-conflict-markers-in-enterprise-networking)
+   - [B. Typographical Syntax Errors & Extra Angle Brackets in Distro Improvements](#b-typographical-syntax-errors--extra-angle-brackets-in-distro-improvements)
+   - [C. Syntax Order Errors in Shell Commands](#c-syntax-order-errors-in-shell-commands)
+   - [D. Mismatched Struct Initializer & Delimiters in Package Solver](#d-mismatched-struct-initializer--delimiters-in-package-solver)
+   - [E. Unresolved klib Module Exports & Missing Symbol Paths](#e-unresolved-klib-module-exports--missing-symbol-paths)
+   - [F. Duplicate Symbol & Implementation Redeclarations](#f-duplicate-symbol--implementation-redeclarations)
+   - [G. Ownership, Borrow-Checker, & Lifetime Violations](#g-ownership-borrow-checker--lifetime-violations)
+   - [H. Missing Package Constructor & Struct Initializer Gaps](#h-missing-package-constructor--struct-initializer-gaps)
+   - [I. Type Mismatches & Closure Parameter Type Inference Gaps](#i-type-mismatches--closure-parameter-type-inference-gaps)
+   - [J. Underscore Parameter Gaps & Spelling Mismatches](#j-underscore-parameter-gaps--spelling-mismatches)
+   - [K. Unresolved Module Dependency in App Absorber](#k-unresolved-module-dependency-in-app-absorber)
+   - [L. Missing System Interface & Kernel Imports](#l-missing-system-interface--kernel-imports)
 4. [Executable Remediation Blueprints for AI Agents](#4-executable-remediation-blueprints-for-ai-agents)
 5. [AI Agent Verification Protocol](#5-ai-agent-verification-protocol)
 
@@ -89,9 +92,51 @@ SigmaOS implements a robust, professional debugging and runtime-inspection toolk
 
 ## 3. What's Not Working: Active Compiler Errors & Deep Analysis
 
-A recent code consolidation introduced compile errors inside `src/`. Below is the complete diagnostic breakdown of what is broken, why, and how to resolve each category.
+During branch consolidation and feature development, several compile errors may arise. Below is the complete diagnostic breakdown of these issues, why they occur, and how to resolve them.
 
-### A. Unresolved klib Module Exports & Missing Symbol Paths
+### A. Syntax Remnants & Merge Conflict Markers in Enterprise Networking
+* **Symptoms:**
+  - `error: unexpected closing delimiter: }` in `src/network/enterprise.rs`
+  - Missing struct and enum definitions like `AntiReplayWindow`, `VpnVirtualInterface`, `TlsState`, `TlsRecordType`, and `SovereignSslEngine` during testing.
+* **Why It Occurs:**
+  Git branch consolidation merged `jules-*` and `package-universal-*` branches automatically, leaving behind git merge conflict markers (e.g. `>>>>>>> origin/jules-...`, `=======`, etc.) and truncating several critical security structures and tests in `src/network/enterprise.rs`.
+
+---
+
+### B. Typographical Syntax Errors & Extra Angle Brackets in Distro Improvements
+* **Symptoms:**
+  - `error: unmatched angle bracket` in `src/distro/improvements.rs:1769` and `src/distro/improvements.rs:1962`
+* **Why It Occurs:**
+  1. Typographical issues in struct field definitions added extra closing angle brackets (e.g., `alloc::vec::vec::Vec<alloc::string::String>>,`).
+  2. The type names used incorrect namespacing such as `alloc::vec::vec::Vec` instead of `alloc::vec::Vec`, or nested `alloc::string` inside `alloc::vec` as `alloc::vec::alloc::string::Vec`.
+
+---
+
+### C. Syntax Order Errors in Shell Commands
+* **Symptoms:**
+  - `error: visibility pub is not followed by an item` in `src/shell/command.rs:719`
+  - `error: expected item after attributes` in `src/shell/command.rs:718`
+* **Why It Occurs:**
+  A helper macro or manual refactoring placed the visibility qualifier `pub` in between target configuration attributes:
+  ```rust
+  #[derive(Debug, Clone, PartialEq, Eq)]
+  pub #[cfg(target_os = "none")]
+  #[cfg(target_os = "none")]
+  struct Vec<T> {
+  ```
+  In Rust, visibility qualifiers must immediately precede the struct or item keyword.
+
+---
+
+### D. Mismatched Struct Initializer & Delimiters in Package Solver
+* **Symptoms:**
+  - `error: mismatched closing delimiter: )` in `src/sigpkg/resolver.rs:439`
+* **Why It Occurs:**
+  Inside the circular dependency detection test, `pkg_a` was declared using struct braces `{ ... }` but closed with parentheses `);` like a function call. It also had trailing raw unkeyed expressions inside the struct block.
+
+---
+
+### E. Unresolved klib Module Exports & Missing Symbol Paths
 * **Symptoms:**
   - `error[E0432]: unresolved import crate::klib::HashMap`
   - `error[E0432]: unresolved import crate::klib::HashSet`
@@ -103,19 +148,7 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 ---
 
-### B. Syntax Remnants from Conflicts & Overlapping Blocks
-* **Symptoms:**
-  - `error: visibility pub is not followed by an item` in `src/shell/command.rs:719`
-  - `error: expected item after attributes` in `src/shell/command.rs:718`
-  - `error: expected one of ), ,, ., ?, or an operator, found format` in `src/sigpkg/universal_adapter.rs:283`
-  - `error: expected one of ), ,, ., ?, or an operator, found keyword crate` in `src/sigpkg/universal_adapter.rs:285`
-* **Why It Occurs:**
-  1. In `src/shell/command.rs`, a duplicate/mangled target macro block places `pub` directly in front of `#[cfg(target_os = "none")]`, which violates standard Rust syntax order.
-  2. In `src/sigpkg/universal_adapter.rs`, conflict resolution remnants left multiple overlapping, duplicate `Ok(Package::new(...` blocks stacked without commas or correct closing braces, throwing parser exceptions.
-
----
-
-### C. Duplicate Symbol & Implementation Redeclarations
+### F. Duplicate Symbol & Implementation Redeclarations
 * **Symptoms:**
   - `error[E0428]: the name backup is defined multiple times` in `src/resilience/mod.rs`
   - `error[E0252]: the name SigmaTimeshift is defined multiple times` in `src/resilience/mod.rs`
@@ -128,7 +161,7 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 ---
 
-### D. Ownership, Borrow-Checker, & Lifetime Violations
+### G. Ownership, Borrow-Checker, & Lifetime Violations
 * **Symptoms:**
   - `error[E0382]: borrow of moved value: source_addr` in `src/network/pf_firewall.rs:508`
   - `error[E0502]: cannot borrow *self as mutable because it is also borrowed as immutable` in `src/network/pf_firewall.rs:514`
@@ -140,7 +173,7 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 ---
 
-### E. Missing Package Constructor & Struct Initializer Gaps
+### H. Missing Package Constructor & Struct Initializer Gaps
 * **Symptoms:**
   - `error[E0599]: no function or associated item named new found for struct Package` in `src/sigpkg/universal_adapter.rs`
   - `error[E0063]: missing fields a11y_features, agent_engine, aliases and 2 other fields in initializer of ShellRepl` inside `src/shell/repl.rs`
@@ -150,7 +183,7 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 ---
 
-### F. Type Mismatches & Closure Parameter Type Inference Gaps
+### I. Type Mismatches & Closure Parameter Type Inference Gaps
 * **Symptoms:**
   - `error[E0282]: type annotations needed` in `src/dashboard/monitor.rs`
   - `error[E0282]: type annotations needed` in `src/dashboard/process.rs:331`
@@ -160,7 +193,7 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 ---
 
-### G. Underscore Parameter Gaps & Spelling Mismatches
+### J. Underscore Parameter Gaps & Spelling Mismatches
 * **Symptoms:**
   - `error[E0425]: cannot find value data_len in this scope` in `src/compatibility/historic_linux.rs:283`
   - `error[E0425]: cannot find value rule in this scope` in `src/network/nftables.rs:751`
@@ -172,7 +205,7 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 ---
 
-### H. Unresolved Module Dependency in App Absorber
+### K. Unresolved Module Dependency in App Absorber
 * **Symptoms:**
   - `error[E0433]: cannot find module or crate uuid in this scope` in `src/productivity/advanced_app_absorber.rs:69`
 * **Why It Occurs:**
@@ -180,7 +213,7 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 ---
 
-### I. Missing System Interface & Kernel Imports
+### L. Missing System Interface & Kernel Imports
 * **Symptoms:**
   - `error[E0432]: unresolved import kernel::SchedulerError` in `src/lib.rs`
   - `error[E0432]: unresolved imports support::LegacyLinuxRule, support::LinuxPersonaRule` in `src/filesystem/mod.rs`
@@ -194,7 +227,105 @@ A recent code consolidation introduced compile errors inside `src/`. Below is th
 
 Below are the exact code solutions and edits required to restore flawless compilation of the SigmaOS workspace.
 
-### 1. Fix `src/klib/mod.rs` (Exposing missing Custom Collections)
+### 1. Restore Enterprise Networking File (`src/network/enterprise.rs`)
+If the file contains merge conflict markers or is missing `VpnVirtualInterface` or `SovereignSslEngine`, restore the clean version of the file from commit `2b800249` or construct it cleanly.
+
+```bash
+git show 2b800249:src/network/enterprise.rs > src/network/enterprise.rs
+```
+
+---
+
+### 2. Fix Distro Improvements Typo (`src/distro/improvements.rs`)
+Locate `ZorinWineManager` and `MxPackageInstaller`, and replace their incorrect field declarations:
+
+**Before:**
+```rust
+pub struct ZorinWineManager {
+    pub wine_installed: bool,
+    pub wine_prefix: alloc::string::String,
+    pub windows_apps: alloc::vec::vec::Vec<alloc::string::String>>,
+}
+...
+pub struct MxPackageInstaller {
+    pub available_packages: alloc::vec::alloc::string::Vec<alloc::string::String>>,
+    pub installed_packages: alloc::vec::Vec<alloc::string::String>,
+    pub auto_update_check: bool,
+}
+```
+
+**After:**
+```rust
+pub struct ZorinWineManager {
+    pub wine_installed: bool,
+    pub wine_prefix: alloc::string::String,
+    pub windows_apps: alloc::vec::Vec<alloc::string::String>,
+}
+...
+pub struct MxPackageInstaller {
+    pub available_packages: alloc::vec::Vec<alloc::string::String>,
+    pub installed_packages: alloc::vec::Vec<alloc::string::String>,
+    pub auto_update_check: bool,
+}
+```
+
+---
+
+### 3. Fix Target Configuration Attribute Order (`src/shell/command.rs`)
+Make sure target configurations are defined on their own lines before any `pub` keyword.
+
+**Before:**
+```rust
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub #[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+#[cfg(target_os = "none")]
+struct Vec<T> { ... }
+```
+
+**After:**
+```rust
+#[cfg(target_os = "none")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Vec<T> { ... }
+```
+
+---
+
+### 4. Fix Package Solver Test Structure Initialization (`src/sigpkg/resolver.rs`)
+Change `pkg_a` initializer to use the standard associated function `Package::new(...)` instead of the broken struct literal syntax.
+
+**Before:**
+```rust
+        let pkg_a = Package {
+            name: "A".to_string(),
+            version: Version::new(1, 0, 0),
+            description: String::new(),
+            dependencies: vec![Dependency {
+                name: "B".to_string(),
+                version_constraint: VersionConstraint::Any,
+            }],
+            String::new(),
+        );
+```
+
+**After:**
+```rust
+        let pkg_a = Package::new(
+            "A".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            vec![Dependency {
+                name: "B".to_string(),
+                version_constraint: VersionConstraint::Any,
+            }],
+            String::new(),
+        );
+```
+
+---
+
+### 5. Fix `src/klib/mod.rs` (Exposing missing Custom Collections)
 Add the missing module declarations and re-exports:
 ```rust
 // SigmaOS Kernel Library
@@ -218,7 +349,7 @@ pub use uuid::Uuid;
 
 ---
 
-### 2. Fix `src/filesystem/mod.rs` (Exposing missing `smart_symlink`)
+### 6. Fix `src/filesystem/mod.rs` (Exposing missing `smart_symlink`)
 Add the module declaration:
 ```rust
 pub mod smart_symlink;
@@ -226,61 +357,7 @@ pub mod smart_symlink;
 
 ---
 
-### 3. Fix `src/shell/command.rs` (Correcting target attributes & visibility)
-**Replace lines 718-723:**
-```rust
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub #[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-#[cfg(target_os = "none")]
-struct Vec<T> {
-```
-**With the clean correct form:**
-```rust
-#[cfg(target_os = "none")]
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Vec<T> {
-```
-
----
-
-### 4. Fix `src/sigpkg/universal_adapter.rs` (Cleaning up syntactical conflicts)
-**Replace lines 268-290:**
-```rust
-        Ok(Package::new(
-            crate::klib::String::from_str(name),
-            parsed_ver,
-            crate::klib::String::from_str(desc),
-        Ok(Package::new(
-            name.to_string(),
-            parsed_ver,
-            desc.to_string(),
-        Ok(Package::new(
-            crate::klib::String::from_str(name),
-            parsed_ver,
-            crate::klib::String::from_str(desc),
-            dependencies,
-            crate::klib::String::from_str(&format!("SHA256:{}", name)),
-        ))
-            format!("SHA256:{}", name),
-        ))
-            crate::klib::String::from_str(&format!("SHA256:{}", name)),
-        ))
-```
-**With the singular, correct instantiation:**
-```rust
-        Ok(Package::new(
-            name.to_string(),
-            parsed_ver,
-            desc.to_string(),
-            dependencies,
-            format!("SHA256:{}", name),
-        ))
-```
-
----
-
-### 5. Fix `src/sigpkg/mod.rs` (Implementing Package Constructor)
+### 7. Fix `src/sigpkg/mod.rs` (Implementing Package Constructor)
 Add the constructor to the `Package` struct:
 ```rust
 impl Package {
@@ -304,17 +381,17 @@ impl Package {
 
 ---
 
-### 6. Fix `src/sigpkg/recipe.rs` (Removing duplicate builder functions)
-Remove the second duplicate definitions of `with_pkgrel` and `with_prepare_command` (lines 106-121) from the `impl Recipe` block.
+### 8. Fix `src/sigpkg/recipe.rs` (Removing duplicate builder functions)
+Remove the second duplicate definitions of `with_pkgrel` and `with_prepare_command` from the `impl Recipe` block.
 
 ---
 
-### 7. Fix `src/resilience/mod.rs` (Removing duplicate modules/imports)
+### 9. Fix `src/resilience/mod.rs` (Removing duplicate modules/imports)
 Ensure `pub mod backup;` is defined only once, and remove any duplicate `SigmaTimeshift` re-exports.
 
 ---
 
-### 8. Fix `src/driver/device.rs` (Consolidating `Default` for `DeviceManager`)
+### 10. Fix `src/driver/device.rs` (Consolidating `Default` for `DeviceManager`)
 Remove the duplicate `impl Default for DeviceManager` block. Keep only one:
 ```rust
 impl Default for DeviceManager {
@@ -326,7 +403,7 @@ impl Default for DeviceManager {
 
 ---
 
-### 9. Fix `src/shell/repl.rs` (Resolving missing ShellRepl struct fields)
+### 11. Fix `src/shell/repl.rs` (Resolving missing ShellRepl struct fields)
 Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to initialize the remaining fields:
 ```rust
         Self {
@@ -347,7 +424,7 @@ Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to 
 
 ---
 
-### 10. Fix `src/network/pf_firewall.rs` (Solving borrowing & ownership)
+### 12. Fix `src/network/pf_firewall.rs` (Solving borrowing & ownership)
 1. **Borrow Conflict:**
    To safely call `create_state` while iterating over `&self.rules`, gather matched rule indices or a duplicate state request list inside the loop, and process them *after* the loop terminates. This decouples the immutable borrow from the mutable mutation.
 2. **Move Conflict:**
@@ -366,7 +443,7 @@ Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to 
 
 ---
 
-### 11. Fix `src/compatibility/historic_linux.rs` (Spelling & Cast Correction)
+### 13. Fix `src/compatibility/historic_linux.rs` (Spelling & Cast Correction)
 1. Rename the parameter `_data_len` to `data_len` on line 279:
    ```rust
    pub fn write_to_volatile_overlay(&mut self, _file_path: &str, data_len: usize) -> Result<usize, HistoricError>
@@ -378,7 +455,7 @@ Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to 
 
 ---
 
-### 12. Fix `src/network/nftables.rs` (Parameter Matching & Expired Move)
+### 14. Fix `src/network/nftables.rs` (Parameter Matching & Expired Move)
 1. Rename the parameter `_rule` to `rule` on line 741:
    ```rust
    rule: &NftRule,
@@ -393,7 +470,7 @@ Update the `ShellRepl::new()` and `ShellRepl::with_prompt(...)` constructors to 
 
 ---
 
-### 13. Fix `src/productivity/advanced_app_absorber.rs` (Zero-Dependency UUID Integration)
+### 15. Fix `src/productivity/advanced_app_absorber.rs` (Zero-Dependency UUID Integration)
 Replace standard `uuid::Uuid` call with the native `#![no_std]` sovereign UUID implementation:
 ```rust
 screenshot.cloud_url = Some(format!(
@@ -405,7 +482,7 @@ screenshot.cloud_url = Some(format!(
 
 ---
 
-### 14. Fix Type Inference / Annotation Errors
+### 16. Fix Type Inference / Annotation Errors
 1. In `src/orchestration/cross_device.rs:529`, explicitly annotate types:
    ```rust
    self.devices.values().filter(|d: &&ConnectedDevice| d.is_connected()).collect()

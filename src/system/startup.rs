@@ -19,7 +19,31 @@
 // SigmaOS Startup Optimizer
 // OOP-based startup process optimization with dependency analysis
 
+#[cfg(not(test))]
 use crate::klib::{HashMap, Duration, Instant};
+
+#[cfg(test)]
+use std::collections::HashMap;
+#[cfg(test)]
+use std::time::{Duration, Instant};
+
+/// Startup item classification (inspired by Sysinternals Autoruns)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StartupType {
+    Logon,
+    Driver,
+    Task,
+    Services,
+    ExplorerExtension,
+}
+
+/// Soluto-inspired user choice classification for boot reduction
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SolutoCategory {
+    NoBrainer,     // System/Critical services that must run immediately
+    Delayable,     // Non-critical items that can run later in background
+    Removeable,    // Third-party bloat that can be disabled entirely
+}
 
 /// Startup service
 #[derive(Debug, Clone)]
@@ -31,6 +55,8 @@ pub struct StartupService {
     pub dependencies: Vec<String>,
     pub estimated_startup_time_ms: u64,
     pub priority: ServicePriority,
+    pub startup_type: StartupType,
+    pub publisher_verified: bool,
 }
 
 /// Service priority
@@ -307,6 +333,131 @@ impl StartupOptimizationStrategy for ProfileBasedOptimizer {
     }
 }
 
+/// Advanced Startup Optimizer taking inspiration from Autoruns and Soluto
+pub struct AdvancedStartupOptimizer {
+    pub delay_duration_sec: u64,
+}
+
+impl AdvancedStartupOptimizer {
+    pub fn new() -> Self {
+        Self {
+            delay_duration_sec: 5,
+        }
+    }
+
+    /// Categorizes a service based on Autoruns/Soluto criteria
+    pub fn classify_service(service: &StartupService) -> SolutoCategory {
+        if service.priority == ServicePriority::Critical || service.priority == ServicePriority::High {
+            SolutoCategory::NoBrainer
+        } else if !service.publisher_verified {
+            SolutoCategory::Removeable
+        } else {
+            SolutoCategory::Delayable
+        }
+    }
+}
+
+impl StartupOptimizationStrategy for AdvancedStartupOptimizer {
+    fn analyze(&self, services: &[StartupService]) -> StartupAnalysis {
+        let total_services = services.len();
+        let enabled_services = services.iter().filter(|s| s.enabled).count();
+        let total_estimated_time_ms: u64 = services
+            .iter()
+            .filter(|s| s.enabled)
+            .map(|s| s.estimated_startup_time_ms)
+            .sum();
+
+        let mut critical_path_time_ms = 0;
+        let mut parallelizable_services = Vec::new();
+        let mut delayable_services = Vec::new();
+
+        for s in services {
+            if !s.enabled {
+                continue;
+            }
+            match Self::classify_service(s) {
+                SolutoCategory::NoBrainer => {
+                    critical_path_time_ms += s.estimated_startup_time_ms;
+                }
+                SolutoCategory::Delayable => {
+                    delayable_services.push(s.name.clone());
+                }
+                SolutoCategory::Removeable => {
+                    // Removeables shouldn't run in critical path
+                }
+            }
+            if s.dependencies.is_empty() {
+                parallelizable_services.push(s.name.clone());
+            }
+        }
+
+        StartupAnalysis {
+            total_services,
+            enabled_services,
+            total_estimated_time_ms,
+            critical_path_time_ms,
+            parallelizable_services,
+            delayable_services,
+        }
+    }
+
+    fn optimize(&mut self, services: &mut [StartupService]) -> StartupOptimizationResult {
+        let mut services_delayed = Vec::new();
+        let mut services_parallelized = Vec::new();
+        let mut time_saved_ms = 0u64;
+
+        let initial_disabled = services.iter().filter(|s| !s.enabled).count();
+
+        for service in services.iter_mut() {
+            if !service.enabled {
+                continue;
+            }
+
+            match Self::classify_service(service) {
+                SolutoCategory::NoBrainer => {
+                    if service.dependencies.is_empty() {
+                        services_parallelized.push(service.name.clone());
+                    }
+                }
+                SolutoCategory::Delayable => {
+                    service.delay_seconds = self.delay_duration_sec;
+                    time_saved_ms += service.estimated_startup_time_ms;
+                    services_delayed.push(service.name.clone());
+                    if service.dependencies.is_empty() {
+                        services_parallelized.push(service.name.clone());
+                    }
+                }
+                SolutoCategory::Removeable => {
+                    service.enabled = false;
+                    time_saved_ms += service.estimated_startup_time_ms;
+                }
+            }
+        }
+
+        let current_disabled = services.iter().filter(|s| !s.enabled).count();
+        let newly_disabled = current_disabled - initial_disabled;
+        let delayed_count = services_delayed.len();
+        let services_optimized = delayed_count + newly_disabled;
+
+        StartupOptimizationResult {
+            services_optimized,
+            time_saved_ms,
+            services_delayed,
+            services_parallelized,
+            message: format!(
+                "Soluto/Autoruns Optimization applied. Saved {}ms in critical path. Services delayed: {}, disabled/paused: {}",
+                time_saved_ms,
+                delayed_count,
+                newly_disabled
+            ),
+        }
+    }
+
+    fn name(&self) -> &str {
+        "AdvancedStartupOptimizer"
+    }
+}
+
 /// OOP-based Startup Optimizer Manager
 pub struct StartupOptimizer {
     strategy: Box<dyn StartupOptimizationStrategy>,
@@ -361,6 +512,8 @@ impl StartupOptimizer {
                 dependencies: Vec::new(),
                 estimated_startup_time_ms: 500,
                 priority: ServicePriority::Critical,
+                startup_type: StartupType::Services,
+                publisher_verified: true,
             },
             StartupService {
                 name: "bluetooth".to_string(),
@@ -370,6 +523,8 @@ impl StartupOptimizer {
                 dependencies: vec!["network".to_string()],
                 estimated_startup_time_ms: 300,
                 priority: ServicePriority::Normal,
+                startup_type: StartupType::Driver,
+                publisher_verified: true,
             },
             StartupService {
                 name: "printing".to_string(),
@@ -379,6 +534,8 @@ impl StartupOptimizer {
                 dependencies: vec!["network".to_string()],
                 estimated_startup_time_ms: 800,
                 priority: ServicePriority::Low,
+                startup_type: StartupType::Services,
+                publisher_verified: true,
             },
             StartupService {
                 name: "update-checker".to_string(),
@@ -388,6 +545,8 @@ impl StartupOptimizer {
                 dependencies: Vec::new(),
                 estimated_startup_time_ms: 1200,
                 priority: ServicePriority::Low,
+                startup_type: StartupType::Task,
+                publisher_verified: false,
             },
         ];
 
@@ -417,6 +576,8 @@ mod tests {
             dependencies: Vec::new(),
             estimated_startup_time_ms: 100,
             priority: ServicePriority::Normal,
+            startup_type: StartupType::Services,
+            publisher_verified: true,
         };
         assert_eq!(service.name, "test");
     }
@@ -446,5 +607,27 @@ mod tests {
         optimizer.create_default_services();
         let result = optimizer.optimize();
         assert!(result.services_optimized > 0);
+    }
+
+    #[test]
+    fn test_advanced_startup_optimizer() {
+        let mut opt = StartupOptimizer::new(Box::new(AdvancedStartupOptimizer::new()));
+        opt.create_default_services();
+
+        let analysis = opt.analyze();
+        assert_eq!(analysis.total_services, 4);
+        assert_eq!(analysis.enabled_services, 4);
+        assert_eq!(analysis.critical_path_time_ms, 500);
+        assert!(analysis.delayable_services.contains(&"bluetooth".to_string()));
+        assert!(analysis.delayable_services.contains(&"printing".to_string()));
+
+        let result = opt.optimize();
+        assert_eq!(result.services_delayed.len(), 2);
+        assert!(result.services_delayed.contains(&"bluetooth".to_string()));
+        assert!(result.services_delayed.contains(&"printing".to_string()));
+
+        let services = opt.services();
+        let update_checker = services.iter().find(|s| s.name == "update-checker").unwrap();
+        assert!(!update_checker.enabled);
     }
 }

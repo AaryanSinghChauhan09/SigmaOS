@@ -23,10 +23,10 @@ cargo test
 
 ```
 feat(kernel): add NUMA-aware scheduler        ← type(scope): description
-fix(crypto): remove hardcoded key in LUKS
-docs(wiki): add architecture overview
-security(capability): fix bitmask overlap
-refactor(klib): optimize hashmap probe seq
+fix(crypto): remove hardcoded key in LUKS     
+docs(wiki): add architecture overview         
+security(capability): fix bitmask overlap     
+refactor(klib): optimize hashmap probe seq    
 ```
 
 ## Priority Areas

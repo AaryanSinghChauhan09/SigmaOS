@@ -23,25 +23,16 @@ use crate::klib::HashMap;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::time::{Duration, Instant};
 
-// Simple IP address types to replace std::net
-pub type SigmaIpv4Addr = std::net::Ipv4Addr;
-pub type SigmaIpv6Addr = std::net::Ipv6Addr;
-pub type SigmaIpAddr = std::net::IpAddr;
-
-// Simple time types to replace std::time
-pub type SigmaDuration = std::time::Duration;
-pub type SigmaInstant = std::time::Instant;
-
 /// Traffic packet
 #[derive(Debug, Clone)]
 pub struct TrafficPacket {
-    pub source_ip: SigmaIpAddr,
-    pub destination_ip: SigmaIpAddr,
+    pub source_ip: IpAddr,
+    pub destination_ip: IpAddr,
     pub source_port: u16,
     pub destination_port: u16,
     pub protocol: Protocol,
     pub size_bytes: u64,
-    pub timestamp: SigmaInstant,
+    pub timestamp: Instant,
 }
 
 /// Network protocol
@@ -91,18 +82,15 @@ impl<const SIZE: usize> AlpineZeroAllocCaptureBuffer<SIZE> {
     }
 
     pub fn iter(&self) -> impl Iterator<Item = &TrafficPacket> {
-        let mut result = Vec::new();
-        for i in 0..self.count {
-            let idx = if self.count == SIZE {
-                (self.head + i) % SIZE
-            } else {
-                i
-            };
-            if let Some(packet) = &self.buffer[idx] {
-                result.push(packet);
-            }
-        }
-        result.into_iter()
+        let (first, second) = if self.count == SIZE {
+            self.buffer.split_at(self.head)
+        } else {
+            (&self.buffer[..self.count], &[][..])
+        };
+        second
+            .iter()
+            .chain(first.iter())
+            .filter_map(|opt| opt.as_ref())
     }
 
     pub fn clear(&mut self) {

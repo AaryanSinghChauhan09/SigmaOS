@@ -1,42 +1,22 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
 /// OOP-based Performance Profiler for SigmaOS
-/// Based on 100-Improvement-Ideas.md #78: Code profiler + visualizer
-/// Implements comprehensive CPU, memory, I/O, and network profiling
-/// with call graph analysis and hotspot detection
+/// Based on Ideas-999-Structured: Kernel & Hardware Item 191
+/// Implements CPU and memory profiling
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use core::mem;
 
 pub type ProfileID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProfileType {
-    CPU = 0,
-    Memory = 1,
-    IO = 2,
-    Network = 3,
-}
-
-impl ProfileType {
-    fn from_usize(val: usize) -> Self {
-        match val {
-            0 => ProfileType::CPU,
-            1 => ProfileType::Memory,
-            2 => ProfileType::IO,
-            _ => ProfileType::Network,
-        }
-    }
-}
+#[repr(usize)]
+#[derive(Debug, Clone, Copy)]
+pub enum ProfileType { CPU = 0, Memory = 1, IO = 2, Network = 3 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-pub enum ProfilerError {
-    Success = 0,
-    NotFound = 1,
-    ProfileRunning = 2,
-}
+pub enum ProfilerError { Success = 0, NotFound = 1, ProfileRunning = 2 }
 
 pub trait Profile {
     fn id(&self) -> ProfileID;
@@ -44,7 +24,6 @@ pub trait Profile {
     fn start_time(&self) -> u64;
     fn end_time(&self) -> u64;
     fn duration(&self) -> u64;
-    fn end_profile(&self);
 }
 
 #[repr(C)]
@@ -67,29 +46,14 @@ impl SimpleProfile {
 }
 
 impl Profile for SimpleProfile {
-    fn id(&self) -> ProfileID {
-        self.id
-    }
-    fn profile_type(&self) -> ProfileType {
-        ProfileType::from_usize(self.profile_type.load(Ordering::SeqCst))
-    }
-    fn start_time(&self) -> u64 {
-        self.start_time.load(Ordering::SeqCst) as u64
-    }
-    fn end_time(&self) -> u64 {
-        self.end_time.load(Ordering::SeqCst) as u64
-    }
+    fn id(&self) -> ProfileID { self.id }
+    fn profile_type(&self) -> ProfileType { unsafe { core::mem::transmute(self.profile_type.load(Ordering::SeqCst)) } }
+    fn start_time(&self) -> u64 { self.start_time.load(Ordering::SeqCst) as u64 }
+    fn end_time(&self) -> u64 { self.end_time.load(Ordering::SeqCst) as u64 }
     fn duration(&self) -> u64 {
         let end = self.end_time();
         let start = self.start_time();
-        if end > start {
-            end - start
-        } else {
-            0
-        }
-    }
-    fn end_profile(&self) {
-        self.end_time.store(2000000, Ordering::SeqCst);
+        if end > start { end - start } else { 0 }
     }
 }
 
@@ -129,10 +93,10 @@ impl Profiler for SimpleProfiler {
     }
 
     fn stop_profile(&mut self, id: ProfileID) -> Result<(), ProfilerError> {
-        for i in 0..self.profiles.len() {
-            if let Some(ref profile) = self.profiles[i] {
+        for profile_option in &mut self.profiles {
+            if let Some(ref mut profile) = *profile_option {
                 if profile.id() == id {
-                    profile.end_profile();
+                    profile.end_time.store(2000000, Ordering::SeqCst);
                     return Ok(());
                 }
             }
@@ -141,23 +105,17 @@ impl Profiler for SimpleProfiler {
     }
 
     fn get_profile(&self, id: ProfileID) -> Option<&dyn Profile> {
-        for i in 0..self.profiles.len() {
-            if let Some(ref profile) = self.profiles[i] {
-                if profile.id() == id {
-                    return Some(profile.as_ref());
-                }
+        for profile_option in &self.profiles {
+            if let Some(ref profile) = *profile_option {
+                if profile.id() == id { return Some(profile.as_ref()); }
             }
         }
         None
     }
 
-    fn get_cpu_usage(&self) -> f32 {
-        (self.cpu_usage.load(Ordering::SeqCst) as f32) / 100.0
-    }
+    fn get_cpu_usage(&self) -> f32 { (self.cpu_usage.load(Ordering::SeqCst) as f32) / 100.0 }
 
-    fn get_memory_usage(&self) -> f32 {
-        (self.memory_usage.load(Ordering::SeqCst) as f32) / 100.0
-    }
+    fn get_memory_usage(&self) -> f32 { (self.memory_usage.load(Ordering::SeqCst) as f32) / 100.0 }
 }
 
 pub trait CallGraph {
@@ -196,19 +154,14 @@ impl CallGraph for SimpleCallGraph {
         let mut callee_array = [0u8; 128];
         let caller_len = caller.len().min(127);
         let callee_len = callee.len().min(127);
-        for i in 0..caller_len {
-            caller_array[i] = caller[i];
-        }
-        for i in 0..callee_len {
-            callee_array[i] = callee[i];
-        }
+        for i in 0..caller_len { caller_array[i] = caller[i]; }
+        for i in 0..callee_len { callee_array[i] = callee[i]; }
         self.edges.push((caller_array, callee_array));
     }
 
     fn get_hotspots(&self) -> Vec<&[u8]> {
         let mut hotspots = Vec::new();
-        for idx in 0..self.nodes.len() {
-            let node = &self.nodes[idx];
+        for node in &self.nodes {
             let len = node.iter().position(|&b| b == 0).unwrap_or(128);
             hotspots.push(&node[..len]);
         }
@@ -216,74 +169,29 @@ impl CallGraph for SimpleCallGraph {
     }
 }
 
-pub struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+struct Vec<T> { data: *mut T, len: usize, capacity: usize }
 
 impl<T> Vec<T> {
-    pub fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
-    }
-    pub fn push(&mut self, item: T) {
+    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    fn push(&mut self, item: T) {
         unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+            if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
         }
     }
-    pub fn len(&self) -> usize {
-        self.len
-    }
     unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
-        } else {
-            self.capacity * 2
-        };
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
         let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
         if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
+            for i in 0..self.len { core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1); }
+            if self.capacity > 0 { free(self.data as *mut u8); }
             self.data = new_data;
             self.capacity = new_capacity;
         }
     }
 }
 
-impl<T> core::ops::Index<usize> for Vec<T> {
-    type Output = T;
-    fn index(&self, index: usize) -> &Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &*self.data.add(index) }
-    }
-}
-
-impl<T> core::ops::IndexMut<usize> for Vec<T> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        if index >= self.len {
-            panic!("index out of bounds");
-        }
-        unsafe { &mut *self.data.add(index) }
-    }
-}
-
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
+extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }

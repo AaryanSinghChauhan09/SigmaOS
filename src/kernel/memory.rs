@@ -49,12 +49,7 @@ impl KernelPoolManager {
     }
 
     /// Allocate a block from the specific kernel pool with a pool tag (Inspired by Windows NT ExAllocatePoolWithTag)
-    pub fn allocate_pool(
-        &mut self,
-        pool_type: PoolType,
-        size: usize,
-        tag: &[u8; 4],
-    ) -> Result<PoolBlock, &'static str> {
+    pub fn allocate_pool(&mut self, pool_type: PoolType, size: usize, tag: &[u8; 4]) -> Result<PoolBlock, &'static str> {
         if size == 0 {
             return Err("Cannot allocate 0-byte pool block");
         }
@@ -530,18 +525,14 @@ mod tests {
         let mut pool_manager = KernelPoolManager::new();
 
         // Allocate Paged Pool Block with Tag 'File'
-        let paged_block = pool_manager
-            .allocate_pool(PoolType::Paged, 1024, b"File")
-            .unwrap();
+        let paged_block = pool_manager.allocate_pool(PoolType::Paged, 1024, b"File").unwrap();
         assert_eq!(paged_block.size, 1024);
         assert_eq!(paged_block.pool_type, PoolType::Paged);
         assert_eq!(&paged_block.tag, b"File");
         assert_eq!(pool_manager.total_paged_bytes, 1024);
 
         // Allocate NonPaged Pool Block with Tag 'Net '
-        let non_paged_block = pool_manager
-            .allocate_pool(PoolType::NonPaged, 2048, b"Net ")
-            .unwrap();
+        let non_paged_block = pool_manager.allocate_pool(PoolType::NonPaged, 2048, b"Net ").unwrap();
         assert_eq!(non_paged_block.size, 2048);
         assert_eq!(non_paged_block.pool_type, PoolType::NonPaged);
         assert_eq!(&non_paged_block.tag, b"Net ");

@@ -2,7 +2,7 @@
 //! Unified driver interface abstraction and platform-specific shims (x86_64, ARM64, RISC-V).
 //! Inspired by professional x86/x64 GDT, ARM64 Exception Levels, and Windows NT Kernel architectures (IRQL, KPCR, DPC, APC).
 
-// (no_std only applicable at crate root - removed)
+#![no_std]
 
 extern crate alloc;
 use alloc::boxed::Box;

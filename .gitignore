@@ -4,3 +4,10 @@
 *.log
 *.tmp
 SigmaOS.wiki/
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+test_enterprise

@@ -131,7 +131,7 @@ impl NvmeDriver {
         }
     }
 
-    unsafe fn read_reg32(&self, _offset: usize) -> u32 {
+    unsafe fn read_reg32(&self, offset: usize) -> u32 {
         #[cfg(target_os = "none")]
         {
             read_volatile((self.bar_base + offset) as *const u32)
@@ -146,14 +146,14 @@ impl NvmeDriver {
         }
     }
 
-    unsafe fn write_reg32(&self, _offset: usize, _value: u32) {
+    unsafe fn write_reg32(&self, offset: usize, value: u32) {
         #[cfg(target_os = "none")]
         {
             write_volatile((self.bar_base + offset) as *mut u32, value);
         }
     }
 
-    unsafe fn read_reg64(&self, _offset: usize) -> u64 {
+    unsafe fn read_reg64(&self, offset: usize) -> u64 {
         #[cfg(target_os = "none")]
         {
             read_volatile((self.bar_base + offset) as *const u64)
@@ -164,7 +164,7 @@ impl NvmeDriver {
         }
     }
 
-    unsafe fn write_reg64(&self, _offset: usize, _value: u64) {
+    unsafe fn write_reg64(&self, offset: usize, value: u64) {
         #[cfg(target_os = "none")]
         {
             write_volatile((self.bar_base + offset) as *mut u64, value);

@@ -158,8 +158,8 @@ impl ProcessSpawner for SimpleProcessSpawner {
     }
 
     fn exec(&mut self, process_id: ProcessID, _executable: &[u8], _args: &[[u8; 64]]) -> Result<(), ProcessError> {
-        for i in 0..self.processes.len() {
-            if let Some(ref mut process) = self.processes[i] {
+        for process_option in &mut self.processes {
+            if let Some(ref mut process) = *process_option {
                 if process.id() == process_id {
                     process.set_state(ProcessState::Running);
                     return Ok(());
@@ -200,8 +200,8 @@ impl SimpleProcessWaiter {
 
 impl ProcessWaiter for SimpleProcessWaiter {
     fn wait(&mut self, process_id: ProcessID) -> Result<i32, ProcessError> {
-        for i in 0..self.spawner.processes.len() {
-            if let Some(ref process) = self.spawner.processes[i] {
+        for process_option in &self.spawner.processes {
+            if let Some(ref process) = *process_option {
                 if process.id() == process_id {
                     if process.state() == ProcessState::Terminated {
                         return Ok(process.exit_code());
@@ -213,8 +213,8 @@ impl ProcessWaiter for SimpleProcessWaiter {
     }
 
     fn waitpid(&mut self, process_id: ProcessID, _options: u32) -> Result<(ProcessID, i32), ProcessError> {
-        for i in 0..self.spawner.processes.len() {
-            if let Some(ref process) = self.spawner.processes[i] {
+        for process_option in &self.spawner.processes {
+            if let Some(ref process) = *process_option {
                 if process.id() == process_id {
                     if process.state() == ProcessState::Terminated {
                         return Ok((process.id(), process.exit_code()));
@@ -263,8 +263,7 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 
     fn add_to_group(&mut self, group_id: usize, process_id: ProcessID) -> Result<(), ProcessError> {
-        for i in 0..self.groups.len() {
-            let group = &mut self.groups[i];
+        for group in &mut self.groups {
             if group.0 == group_id {
                 group.1.push(process_id);
                 return Ok(());
@@ -274,8 +273,7 @@ impl ProcessGroup for SimpleProcessGroup {
     }
 
     fn signal_group(&mut self, group_id: usize, _signal: u8) -> Result<(), ProcessError> {
-        for i in 0..self.groups.len() {
-            let group = &self.groups[i];
+        for group in &mut self.groups {
             if group.0 == group_id {
                 return Ok(());
             }

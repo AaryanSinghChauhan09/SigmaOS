@@ -354,36 +354,23 @@ mod tests {
         let mut io_mgr = IoManager::new();
 
         // 1. Emulate normal driver installation process
-        let driver_idx = io_mgr
-            .normal_driver_installation_process(
-                b"MySerialDriver",
-                b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver",
-            )
-            .unwrap();
+        let driver_idx = io_mgr.normal_driver_installation_process(b"MySerialDriver", b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver").unwrap();
         assert_eq!(io_mgr.active_drivers.len(), 1);
 
         let driver = &mut io_mgr.active_drivers[driver_idx];
         assert_eq!(&driver.driver_name[..14], b"MySerialDriver");
-        assert_eq!(
-            &driver.registry_path[..66],
-            b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver"
-        );
+        assert_eq!(&driver.registry_path[..66], b"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\MySerialDriver");
 
         // Set DRIVERUNLOAD unload routine callback
         driver.unload_routine = Some(|_drv| {});
 
         // 2. Create Device associated with the Driver Object
-        assert!(io_mgr
-            .io_create_device(driver_idx, b"COM1", DeviceType::Character)
-            .is_ok());
+        assert!(io_mgr.io_create_device(driver_idx, b"COM1", DeviceType::Character).is_ok());
 
         let driver_updated = &io_mgr.active_drivers[driver_idx];
         assert_eq!(driver_updated.device_objects.len(), 1);
         assert_eq!(&driver_updated.device_objects[0].name[..4], b"COM1");
-        assert_eq!(
-            driver_updated.device_objects[0].device_type,
-            DeviceType::Character
-        );
+        assert_eq!(driver_updated.device_objects[0].device_type, DeviceType::Character);
 
         // Configure HW Resource allocations inside Device Extension
         let ext = &mut io_mgr.active_drivers[driver_idx].device_objects[0].device_extension;
@@ -559,84 +546,11 @@ impl CharacterDevice for SimpleCharacterDevice {
     }
 }
 
-/// Linux-history inspired Early Boot Parameter Override Entry
-/// Maps a device identifier or legacy serial/io port to custom base IO, IRQs, or UDF bytecode overrides.
-/// This allows SigmaOS to work with older unsupported devices (ISA cards, custom PC clones, legacy serial, etc.)
-/// without needing a massive compiled-in driver binary, satisfying OOP size-reduction goals.
-pub struct EarlyBootParameterOverride {
-    pub device_name: [u8; 32],
-    pub port_io_override: u16,
-    pub irq_override: u8,
-    pub udf_bytecode: [u8; 16], // Light bytecode override for custom scaling/reg mapping
-    pub udf_len: usize,
-}
-
-impl EarlyBootParameterOverride {
-    pub fn new(device_name: &[u8], port: u16, irq: u8, bytecode: &[u8]) -> Self {
-        let mut name_array = [0u8; 32];
-        let len = device_name.len().min(31);
-        unsafe {
-            core::ptr::copy_nonoverlapping(device_name.as_ptr(), name_array.as_mut_ptr(), len);
-        }
-
-        let mut bc_array = [0u8; 16];
-        let bc_len = bytecode.len().min(16);
-        for i in 0..bc_len {
-            bc_array[i] = bytecode[i];
-        }
-
-        EarlyBootParameterOverride {
-            device_name: name_array,
-            port_io_override: port,
-            irq_override: irq,
-            udf_bytecode: bc_array,
-            udf_len: bc_len,
-        }
-    }
-}
-
-/// Linux-inspired early parameter override table for unmatched legacy devices
-pub struct LinuxEarlyOverrideTable {
-    pub overrides: Vec<Option<EarlyBootParameterOverride>>,
-}
-
-impl LinuxEarlyOverrideTable {
-    pub fn new() -> Self {
-        LinuxEarlyOverrideTable {
-            overrides: Vec::new(),
-        }
-    }
-
-    pub fn register_override(&mut self, entry: EarlyBootParameterOverride) {
-        self.overrides.push(Some(entry));
-    }
-
-    /// Checks if a legacy device has early boot-override configuration from early Linux history
-    pub fn lookup(&self, device_name: &[u8]) -> Option<&EarlyBootParameterOverride> {
-        for i in 0..self.overrides.len() {
-            if let Some(ref entry) = self.overrides[i] {
-                let entry_name_len = entry.device_name.iter().position(|&b| b == 0).unwrap_or(32);
-                if &entry.device_name[..entry_name_len] == device_name {
-                    return Some(entry);
-                }
-            }
-        }
-        None
-    }
-}
-
 /// Device manager (OOP: Manager class)
 pub struct DeviceManager {
     devices: Vec<Option<Box<dyn Device>>>,
     descriptors: Vec<Option<NonNull<DeviceDescriptor>>>,
     next_device_id: AtomicUsize,
-    pub linux_override_table: LinuxEarlyOverrideTable,
-}
-
-impl Default for DeviceManager {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 impl Default for DeviceManager {
@@ -651,7 +565,6 @@ impl DeviceManager {
             devices: Vec::new(),
             descriptors: Vec::new(),
             next_device_id: AtomicUsize::new(1),
-            linux_override_table: LinuxEarlyOverrideTable::new(),
         }
     }
 
@@ -681,35 +594,34 @@ impl DeviceManager {
     }
 
     pub fn unregister_device(&mut self, id: usize) -> Result<(), DeviceError> {
-        if id == 0 || id - 1 >= self.devices.len() {
+        if id >= self.devices.len() {
             return Err(DeviceError::InvalidParameter);
         }
 
-        let idx = id - 1;
-        self.devices[idx] = None;
+        self.devices[id] = None;
 
-        if let Some(descriptor_ptr) = self.descriptors[idx] {
+        if let Some(descriptor_ptr) = self.descriptors[id] {
             unsafe {
                 core::ptr::drop_in_place(descriptor_ptr.as_ptr());
                 free(descriptor_ptr.as_ptr() as *mut u8);
             }
         }
 
-        self.descriptors[idx] = None;
+        self.descriptors[id] = None;
         Ok(())
     }
 
     pub fn get_device(&mut self, id: usize) -> Option<&mut Box<dyn Device>> {
-        if id > 0 && id - 1 < self.devices.len() {
-            self.devices[id - 1].as_mut()
+        if id < self.devices.len() {
+            self.devices[id].as_mut()
         } else {
             None
         }
     }
 
     pub fn get_descriptor(&self, id: usize) -> Option<&DeviceDescriptor> {
-        if id > 0 && id - 1 < self.descriptors.len() {
-            self.descriptors[id - 1].map(|ptr| unsafe { &*ptr.as_ptr() })
+        if id < self.descriptors.len() {
+            self.descriptors[id].map(|ptr| unsafe { &*ptr.as_ptr() })
         } else {
             None
         }
@@ -836,19 +748,6 @@ impl<T> Vec<T> {
 
             self.data = new_data;
             self.capacity = new_capacity;
-        }
-    }
-}
-
-impl<T> Drop for Vec<T> {
-    fn drop(&mut self) {
-        if self.capacity > 0 {
-            unsafe {
-                for i in 0..self.len {
-                    core::ptr::drop_in_place(self.data.add(i));
-                }
-                free(self.data as *mut u8);
-            }
         }
     }
 }
@@ -1020,31 +919,20 @@ impl IoManager {
     }
 
     /// Emulate the normal driver installation process (creates a registered DriverObject)
-    pub fn normal_driver_installation_process(
-        &mut self,
-        driver_name: &[u8],
-        registry_path: &[u8],
-    ) -> Result<usize, DeviceError> {
+    pub fn normal_driver_installation_process(&mut self, driver_name: &[u8], registry_path: &[u8]) -> Result<usize, DeviceError> {
         let driver = DriverObject::new(driver_name, registry_path);
         self.active_drivers.push(driver);
         Ok(self.active_drivers.len() - 1)
     }
 
     /// IoCreateDevice: Create a Device Object associated with the specific Driver Object
-    pub fn io_create_device(
-        &mut self,
-        driver_idx: usize,
-        name: &[u8],
-        device_type: DeviceType,
-    ) -> Result<(), DeviceError> {
+    pub fn io_create_device(&mut self, driver_idx: usize, name: &[u8], device_type: DeviceType) -> Result<(), DeviceError> {
         if driver_idx >= self.active_drivers.len() {
             return Err(DeviceError::InvalidParameter);
         }
 
         let device_obj = DeviceObject::new(name, device_type);
-        self.active_drivers[driver_idx]
-            .device_objects
-            .push(device_obj);
+        self.active_drivers[driver_idx].device_objects.push(device_obj);
         Ok(())
     }
 

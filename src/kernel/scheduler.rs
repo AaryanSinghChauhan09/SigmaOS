@@ -33,7 +33,8 @@ pub struct Process {
     pub virtual_deadline: u64,
     pub time_slice: Duration,
     pub edf_deadline: Option<u64>, // Absolute real-time deadline for Earliest Deadline First (EDF) scheduler
-    pub burst_score: u64, // CachyOS-style Burst-Oriented Response Enhancer (BORE) metric
+    pub burst_score: u64,
+    pub last_active_time: u64,
 }
 
 impl Process {
@@ -48,6 +49,7 @@ impl Process {
             time_slice: Duration::from_millis(10),
             edf_deadline: None,
             burst_score: 0,
+            last_active_time: 0,
         }
     }
 
@@ -226,34 +228,37 @@ mod tests {
     }
 
     #[test]
-    fn test_bore_burst_penalty_and_decay() {
+    fn test_bore_scheduling_prioritization() {
         let mut scheduler = Scheduler::new();
-        let p1 = Process::new(10, "interactive".to_string(), Priority::Normal);
-        let p2 = Process::new(11, "cpu_bound".to_string(), Priority::Normal);
 
-        scheduler.add_process(p1);
-        scheduler.add_process(p2);
+        // 1. Create a CPU-bound process and an interactive process with identical priorities
+        let p_cpu = Process::new(1, "cpu_bound".to_string(), Priority::Normal);
+        let p_interactive = Process::new(2, "interactive".to_string(), Priority::Normal);
 
-        // Charge p2 with burst amount (simulating a CPU burst)
-        scheduler.charge_process_burst(11, 20);
+        // Add both to scheduler
+        scheduler.add_process(p_cpu);
+        scheduler.add_process(p_interactive);
 
-        // Retrieve processes and check their burst scores and deadlines
-        let proc1 = scheduler.processes.iter().find(|p| p.pid == 10).unwrap();
-        let proc2 = scheduler.processes.iter().find(|p| p.pid == 11).unwrap();
+        // 2. Simulate CPU-bound process running for long bursts, accumulating high burst score
+        scheduler.charge_process_burst(1, 50); // charge 50 burst penalty to cpu_bound
 
-        assert_eq!(proc1.burst_score, 0);
-        assert_eq!(proc2.burst_score, 20);
+        // Assert that the CPU-bound process now has a significantly higher virtual deadline (penalized)
+        let proc_cpu = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        let proc_interactive = scheduler.processes.iter().find(|p| p.pid == 2).unwrap();
+        assert!(proc_cpu.virtual_deadline > proc_interactive.virtual_deadline);
 
-        // p2 virtual deadline should be penalized (larger than p1's virtual deadline)
-        assert!(proc2.virtual_deadline > proc1.virtual_deadline);
-
-        // Decay the bursts
+        // 3. Advancing scheduler time ticks and scheduling should pick the interactive process first
         for _ in 0..10 {
-            scheduler.decay_process_bursts();
+            scheduler.tick();
         }
 
-        // Recover proc2 reference and check updated burst_score
-        let proc2_decayed = scheduler.processes.iter().find(|p| p.pid == 11).unwrap();
-        assert_eq!(proc2_decayed.burst_score, 10);
+        let chosen = scheduler.schedule().unwrap();
+        assert_eq!(chosen.pid, 2); // interactive should be scheduled first
+        assert_eq!(chosen.name, "interactive");
+
+        // 4. Test decay of burst scores
+        scheduler.decay_process_bursts();
+        let proc_cpu_decayed = scheduler.processes.iter().find(|p| p.pid == 1).unwrap();
+        assert_eq!(proc_cpu_decayed.burst_score, 49); // decayed by 1
     }
 }

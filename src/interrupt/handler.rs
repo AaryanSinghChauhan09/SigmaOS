@@ -1,6 +1,3 @@
-#![no_std]
-#![cfg_attr(not(test), no_main)]
-
 /// Advanced High-Fidelity Interrupt & Exception Handler for SigmaOS
 /// Models standard x86/x64 CPU register states, AMD64 canonical address checks, exception ISR routers, and PIC/APIC controllers.
 
@@ -8,17 +5,9 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::boxed::Box;
-use core::sync::atomic::{AtomicBool, Ordering};
-use crate::interrupt::controller::InterruptPriority;
+use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 pub type InterruptNumber = u32;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum InterruptError {
-    Success,
-    InvalidIRQ,
-    ControllerError,
-}
 
 /// Standard x86/x64 Exceptions and Hardware Interrupt vectors
 #[repr(u32)]
@@ -55,7 +44,6 @@ pub enum InterruptResult {
     Ignored = 1,
     ChainNext = 2,
     Error = 3,
-    Deferred = 4,
 }
 
 /// Models the complete x86_64 General Purpose and Segment CPU Register Set
@@ -88,48 +76,22 @@ pub struct RegisterSet {
     pub gs: u64,
 }
 
-pub trait InterruptHandler: Send + Sync {
+pub trait InterruptHandler {
     fn id(&self) -> InterruptNumber;
     fn handle(&mut self, regs: &mut RegisterSet) -> InterruptResult;
-    fn priority(&self) -> InterruptPriority {
-        InterruptPriority::Normal
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HandlerType {
-    Custom,
-    System,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct HandlerCapability {
-    pub mask: u32,
-}
-
-impl HandlerCapability {
-    pub fn full() -> Self {
-        HandlerCapability { mask: 0xFFFFFFFF }
-    }
 }
 
 /// Simulated concrete interrupt handler
 pub struct SimpleInterruptHandler {
     pub vector: InterruptNumber,
     pub trigger_count: u32,
-    pub handler_type: HandlerType,
-    pub priority: InterruptPriority,
-    pub capability: HandlerCapability,
 }
 
 impl SimpleInterruptHandler {
-    pub fn new(handler_type: HandlerType, priority: InterruptPriority, capability: HandlerCapability) -> Self {
+    pub fn new(vector: InterruptNumber) -> Self {
         SimpleInterruptHandler {
-            vector: 0,
+            vector,
             trigger_count: 0,
-            handler_type,
-            priority,
-            capability,
         }
     }
 }
@@ -142,10 +104,6 @@ impl InterruptHandler for SimpleInterruptHandler {
     fn handle(&mut self, _regs: &mut RegisterSet) -> InterruptResult {
         self.trigger_count += 1;
         InterruptResult::Handled
-    }
-
-    fn priority(&self) -> InterruptPriority {
-        self.priority
     }
 }
 
@@ -176,69 +134,11 @@ pub struct InterruptStats {
     pub gpf_faults: u64,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TraceEventType {
-    InterruptArrived,
-    InterruptDispatched,
-    InterruptCompleted,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct InterruptTrace {
-    pub event_type: TraceEventType,
-    pub interrupt_number: u32,
-    pub timestamp: u64,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ControllerCapability {
-    pub mask: u32,
-}
-
-impl ControllerCapability {
-    pub fn full() -> Self {
-        ControllerCapability { mask: 0xFFFFFFFF }
-    }
-}
-
-pub struct PIC {
-    pub capability: ControllerCapability,
-    pub handlers: Vec<(Box<dyn InterruptHandler>, u32)>,
-    pub enabled_interrupts: Vec<u32>,
-}
-
-impl PIC {
-    pub fn new(capability: ControllerCapability) -> Self {
-        PIC {
-            capability,
-            handlers: Vec::new(),
-            enabled_interrupts: Vec::new(),
-        }
-    }
-
-    pub fn register_handler(&mut self, handler: Box<dyn InterruptHandler>, irq: u32) -> Result<(), &'static str> {
-        self.handlers.push((handler, irq));
-        Ok(())
-    }
-
-    pub fn enable_interrupt(&mut self, irq: u32) -> Result<(), &'static str> {
-        if !self.enabled_interrupts.contains(&irq) {
-            self.enabled_interrupts.push(irq);
-        }
-        Ok(())
-    }
-}
-
 /// Core Interrupt & Exception Manager
 pub struct InterruptManager {
     pub handlers: Vec<Box<dyn InterruptHandler>>,
     pub descriptors: Vec<InterruptDescriptor>,
     pub stats: InterruptStats,
-    pub controllers: Vec<Box<PIC>>,
-    pub execution_stack: Vec<u32>,
-    pub pending_queue: Vec<u32>,
-    pub trace_log: Vec<InterruptTrace>,
-    pub interrupts_enabled: bool,
 }
 
 impl InterruptManager {
@@ -252,11 +152,6 @@ impl InterruptManager {
             handlers: Vec::new(),
             descriptors,
             stats: InterruptStats::default(),
-            controllers: Vec::new(),
-            execution_stack: Vec::new(),
-            pending_queue: Vec::new(),
-            trace_log: Vec::new(),
-            interrupts_enabled: true,
         }
     }
 
@@ -323,95 +218,6 @@ impl InterruptManager {
     pub fn get_stats(&self) -> InterruptStats {
         self.stats
     }
-
-    pub fn cli(&mut self) {
-        self.interrupts_enabled = false;
-    }
-
-    pub fn sti(&mut self) {
-        self.interrupts_enabled = true;
-        // Process pending interrupts
-        let mut temp_pending = Vec::new();
-        core::mem::swap(&mut self.pending_queue, &mut temp_pending);
-        for irq in temp_pending {
-            self.dispatch_interrupt(irq);
-        }
-    }
-
-    pub fn add_controller(&mut self, controller: Box<PIC>) {
-        self.controllers.push(controller);
-    }
-
-    pub fn dispatch_interrupt(&mut self, irq: u32) -> InterruptResult {
-        let arrived_ts = self.trace_log.len() as u64;
-        self.trace_log.push(InterruptTrace {
-            event_type: TraceEventType::InterruptArrived,
-            interrupt_number: irq,
-            timestamp: arrived_ts,
-        });
-
-        if !self.interrupts_enabled {
-            self.pending_queue.push(irq);
-            return InterruptResult::Deferred;
-        }
-
-        let irq_priority = self.get_irq_priority(irq);
-
-        if let Some(&active_irq) = self.execution_stack.last() {
-            let active_priority = self.get_irq_priority(active_irq);
-            if active_priority >= irq_priority {
-                self.pending_queue.push(irq);
-                return InterruptResult::Deferred;
-            }
-        }
-
-        let dispatched_ts = self.trace_log.len() as u64;
-        self.trace_log.push(InterruptTrace {
-            event_type: TraceEventType::InterruptDispatched,
-            interrupt_number: irq,
-            timestamp: dispatched_ts,
-        });
-
-        self.execution_stack.push(irq);
-
-        let mut handled = false;
-        for controller in &mut self.controllers {
-            for (handler, h_irq) in &mut controller.handlers {
-                if *h_irq == irq {
-                    let mut regs = RegisterSet::default();
-                    handler.handle(&mut regs);
-                    handled = true;
-                    break;
-                }
-            }
-        }
-
-        self.execution_stack.pop();
-
-        let completed_ts = self.trace_log.len() as u64;
-        self.trace_log.push(InterruptTrace {
-            event_type: TraceEventType::InterruptCompleted,
-            interrupt_number: irq,
-            timestamp: completed_ts,
-        });
-
-        if handled {
-            InterruptResult::Handled
-        } else {
-            InterruptResult::Ignored
-        }
-    }
-
-    fn get_irq_priority(&self, irq: u32) -> InterruptPriority {
-        for controller in &self.controllers {
-            for (handler, h_irq) in &controller.handlers {
-                if *h_irq == irq {
-                    return handler.priority();
-                }
-            }
-        }
-        InterruptPriority::Normal
-    }
 }
 
 #[cfg(test)]
@@ -466,12 +272,7 @@ mod tests {
         regs.rip = 0x0000_7FFF_FFFF_FFFF;
         regs.rsp = 0x0000_7FFF_FFFF_FFFF;
 
-        let mut handler = SimpleInterruptHandler::new(
-            HandlerType::Custom,
-            InterruptPriority::Normal,
-            HandlerCapability::full()
-        );
-        handler.vector = 13; // GPF handler vector
+        let handler = SimpleInterruptHandler::new(13); // GPF handler
         manager.register_handler(Box::new(handler));
 
         let res = manager.dispatch_exception(ExceptionVector::GeneralProtectionFault, &mut regs);

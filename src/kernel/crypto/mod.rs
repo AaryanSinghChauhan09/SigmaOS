@@ -350,7 +350,15 @@ mod tests {
 
     #[test]
     fn test_aes128_roundtrip() {
-        let key = [0u8; 16];
+        // Generate test key using timestamp-based approach
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let mut key = [0u8; 16];
+        for (i, byte) in key.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         let aes = Aes128::new(&key);
         let plaintext = [0x42u8; 16];
         let ciphertext = aes.encrypt_block(&plaintext);

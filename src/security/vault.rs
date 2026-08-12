@@ -402,13 +402,7 @@ impl EncryptedFileVault {
         let mut files_processed = 0;
         let mut bytes_processed = 0u64;
 
-        // Clone keys and values into a Vec to avoid borrowing self.files mutably while iterating
-        let mut files_vec = Vec::new();
-        for (k, v) in self.files.iter() {
-            files_vec.push((k.clone(), v.clone()));
-        }
-
-        for (original_path, encrypted_file) in files_vec {
+        for (original_path, encrypted_file) in &self.files.clone() {
             // Decrypt with old key
             let encrypted_data = std::fs::read(&encrypted_file.encrypted_path)
                 .map_err(|e| VaultError::IoError(e.to_string()))?;

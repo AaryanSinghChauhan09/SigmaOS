@@ -159,7 +159,6 @@ impl MakepkgSandbox {
             pkgver.to_string()
         };
         let version = Version::parse(&cleaned_ver).unwrap_or(Version::new(1, 0, 0));
->>>>>>> origin/bolt-hasher-and-repos-absorption-plan-5370057352677181426
 
         let mut pkg = Package::new(
             pkgname,
@@ -168,7 +167,8 @@ impl MakepkgSandbox {
             std::vec::Vec::new(),
             crate::klib::String::new(),
         );
->>>>>>> origin/bolt-hasher-and-repos-absorption-plan-5370057352677181426
+        pkg.source = String::from_str("arch");
+        Ok(pkg)
     }
 
     /// Validate the PKGBUILD structure
@@ -220,7 +220,7 @@ depends=("glibc")
 
     #[test]
     fn test_makepkg_sandbox() {
-        let sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
+        let mut sandbox = MakepkgSandbox::new(String::from_str("/tmp/build"));
         let content = r#"
 pkgname="test-package"
 pkgver="1.0.0"

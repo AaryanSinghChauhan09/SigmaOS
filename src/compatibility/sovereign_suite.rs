@@ -4,6 +4,7 @@
 /// Darktable & GIMP (layer composition, non-destructive exposure filters), Kdenlive (timeline slice),
 /// Jellyfin (metadata streaming), PowerToys (FancyZones tiling), Everything (instant path indexer),
 /// and the Sysinternals Suite (Procexp handle tracking, Procmon transaction sniffer).
+
 use crate::klib::Vec;
 
 // =========================================================================
@@ -90,10 +91,7 @@ impl ProcMonitor {
 
     /// Sniffs and logs raw files/registry/socket transactions in real-time (Procmon-grade)
     pub fn log_transaction(&mut self, event_type: &str, target: &str, value: &str) {
-        self.logs.push(format!(
-            "[PROCMON] [{}] Target: '{}' -> Value: '{}'",
-            event_type, target, value
-        ));
+        self.logs.push(format!("[PROCMON] [{}] Target: '{}' -> Value: '{}'", event_type, target, value));
     }
 }
 
@@ -177,35 +175,15 @@ impl FancyZonesManager {
     pub fn setup_vertical_split_layout(&mut self, screen_width: u32, screen_height: u32) {
         self.zones = Vec::new();
         let col_width = screen_width / 3;
-        self.zones.push(LayoutZone {
-            x: 0,
-            y: 0,
-            width: col_width,
-            height: screen_height,
-        });
-        self.zones.push(LayoutZone {
-            x: col_width,
-            y: 0,
-            width: col_width,
-            height: screen_height,
-        });
-        self.zones.push(LayoutZone {
-            x: col_width * 2,
-            y: 0,
-            width: col_width,
-            height: screen_height,
-        });
+        self.zones.push(LayoutZone { x: 0, y: 0, width: col_width, height: screen_height });
+        self.zones.push(LayoutZone { x: col_width, y: 0, width: col_width, height: screen_height });
+        self.zones.push(LayoutZone { x: col_width * 2, y: 0, width: col_width, height: screen_height });
     }
 
     /// Snaps a window into the nearest FancyZone boundary
     pub fn snap_window(&self, window_width: u32, window_height: u32) -> LayoutZone {
         if self.zones.is_empty() {
-            return LayoutZone {
-                x: 0,
-                y: 0,
-                width: window_width,
-                height: window_height,
-            };
+            return LayoutZone { x: 0, y: 0, width: window_width, height: window_height };
         }
         // Snap to middle zone
         let mid_idx = self.zones.len() / 2;
@@ -228,9 +206,7 @@ pub struct JoplinE2ee {
 
 impl JoplinE2ee {
     pub fn new() -> Self {
-        JoplinE2ee {
-            notebooks: Vec::new(),
-        }
+        JoplinE2ee { notebooks: Vec::new() }
     }
 
     /// Client-side secure E2EE note packaging using XOR encryption stream masking

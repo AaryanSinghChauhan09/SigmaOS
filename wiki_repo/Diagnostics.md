@@ -38,7 +38,7 @@ error[E0512]: cannot transmute between `u32` and `u64`
 ## Code Scanning Alerts
 
 ### `rust/access-invalid-pointer` (bootloader)
-**File:** `bootloader/sigma_boot_efi.rs`
+**File:** `bootloader/sigma_boot_efi.rs`  
 **Lines:** ~847–1226 (multiple UEFI raw pointer dereferences)
 
 **Root cause:** UEFI firmware returns `*mut` pointers to table structures. These are dereferenced without bounds checking.

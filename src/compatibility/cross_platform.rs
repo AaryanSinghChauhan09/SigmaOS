@@ -733,7 +733,7 @@ pub enum SysctlValue {
 
 #[derive(Debug, Clone)]
 pub struct SysctlParameter {
-    pub name: String, // Dot-separated path, e.g. "kern.maxproc"
+    pub name: String,         // Dot-separated path, e.g. "kern.maxproc"
     pub value: SysctlValue,
     pub writable: bool,
 }
@@ -754,19 +754,11 @@ impl SovereignSysctlManager {
 
     fn register_defaults(&mut self) {
         self.register_param("kern.maxproc".to_string(), SysctlValue::Integer(1024), true);
-        self.register_param(
-            "net.inet.tcp.sendspace".to_string(),
-            SysctlValue::Integer(32768),
-            true,
-        );
+        self.register_param("net.inet.tcp.sendspace".to_string(), SysctlValue::Integer(32768), true);
         self.register_param("hw.ncpu".to_string(), SysctlValue::Integer(16), false); // Read-only
         let mut os_release = [0u8; 64];
         os_release[..15].copy_from_slice(b"6.24.0-mainline");
-        self.register_param(
-            "kern.osrelease".to_string(),
-            SysctlValue::String(os_release),
-            false,
-        );
+        self.register_param("kern.osrelease".to_string(), SysctlValue::String(os_release), false);
     }
 
     pub fn register_param(&mut self, path: String, value: SysctlValue, writable: bool) {
@@ -789,9 +781,9 @@ impl SovereignSysctlManager {
             }
             // Ensure type matches
             match (&param.value, &new_value) {
-                (SysctlValue::Integer(_), SysctlValue::Integer(_))
-                | (SysctlValue::Boolean(_), SysctlValue::Boolean(_))
-                | (SysctlValue::String(_), SysctlValue::String(_)) => {
+                (SysctlValue::Integer(_), SysctlValue::Integer(_)) |
+                (SysctlValue::Boolean(_), SysctlValue::Boolean(_)) |
+                (SysctlValue::String(_), SysctlValue::String(_)) => {
                     param.value = new_value;
                     Ok(())
                 }
@@ -875,24 +867,6 @@ impl Default for SovereignSysctlManager {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum EbpfOpcode {
-    LdImm = 0x01,  // r[dst] = imm
-    AddReg = 0x02, // r[dst] = r[dst] + r[src]
-    SubReg = 0x03, // r[dst] = r[dst] - r[src]
-    JmpEq = 0x04,  // if r[dst] == imm, pc += offset
-    Ret = 0x05,    // return r0 (status)
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct EbpfInstruction {
-    pub opcode: EbpfOpcode,
-    pub dst: u8,
-    pub src: u8,
-    pub offset: i16,
-    pub imm: i64,
-}
-
 /// Dynamic bridge for open-source operating system subsystems (e.g. eBPF filter drivers or rump kernels)
 #[derive(Debug, Clone)]
 pub struct OpenSourceOsGapBridge {
@@ -914,89 +888,6 @@ impl OpenSourceOsGapBridge {
         }
         self.active_filters_count += 1;
         Ok("S-NET: eBPF security packet filter loaded dynamically")
-    }
-
-    /// Linux-inspired eBPF-style bytecode verifier.
-    /// Analyzes the control flow graph to ensure no backward jumps (preventing infinite loops),
-    /// and verifies that all register indices are strictly within bounds (registers 0..10).
-    pub fn verify_ebpf_bytecode(
-        &self,
-        instructions: &[EbpfInstruction],
-    ) -> Result<(), &'static str> {
-        if instructions.is_empty() {
-            return Err("Empty instructions");
-        }
-        for (pc, ins) in instructions.iter().enumerate() {
-            if ins.dst >= 10 || ins.src >= 10 {
-                return Err("Register index out of bounds (0..10 allowed)");
-            }
-            match ins.opcode {
-                EbpfOpcode::JmpEq => {
-                    if ins.offset <= 0 {
-                        return Err(
-                            "Infinite loop or backward jump detected in eBPF bytecode verifier",
-                        );
-                    }
-                    let target_pc = pc as i16 + 1 + ins.offset;
-                    if target_pc < 0 || target_pc as usize >= instructions.len() {
-                        return Err("Jump offset out of bounds");
-                    }
-                }
-                _ => {}
-            }
-        }
-        // Last instruction must be a Ret to prevent execution fallthrough
-        if let Some(last) = instructions.last() {
-            if last.opcode != EbpfOpcode::Ret {
-                return Err("Missing return instruction at end of eBPF stream");
-            }
-        }
-        Ok(())
-    }
-
-    /// Evaluates verified eBPF instructions on a simulated packet buffer.
-    pub fn execute_ebpf_bytecode(
-        &self,
-        instructions: &[EbpfInstruction],
-        packet: &[u8],
-    ) -> Result<i64, &'static str> {
-        self.verify_ebpf_bytecode(instructions)?;
-
-        let mut regs = [0i64; 10];
-        // Seed r1 with packet length and r2 with first byte of packet if present
-        regs[1] = packet.len() as i64;
-        if !packet.is_empty() {
-            regs[2] = packet[0] as i64;
-        }
-
-        let mut pc = 0;
-        while pc < instructions.len() {
-            let ins = instructions[pc];
-            match ins.opcode {
-                EbpfOpcode::LdImm => {
-                    regs[ins.dst as usize] = ins.imm;
-                }
-                EbpfOpcode::AddReg => {
-                    regs[ins.dst as usize] =
-                        regs[ins.dst as usize].wrapping_add(regs[ins.src as usize]);
-                }
-                EbpfOpcode::SubReg => {
-                    regs[ins.dst as usize] =
-                        regs[ins.dst as usize].wrapping_sub(regs[ins.src as usize]);
-                }
-                EbpfOpcode::JmpEq => {
-                    if regs[ins.dst as usize] == ins.imm {
-                        pc = (pc as i16 + 1 + ins.offset) as usize;
-                        continue;
-                    }
-                }
-                EbpfOpcode::Ret => {
-                    return Ok(regs[0]); // return r0
-                }
-            }
-            pc += 1;
-        }
-        Err("Execution fallthrough without Ret")
     }
 }
 
@@ -1195,90 +1086,20 @@ mod tests {
         let mut manager = SovereignSysctlManager::new();
 
         // 1. Query Default Parameters
-        assert_eq!(
-            manager.query_param("kern.maxproc").unwrap(),
-            &SysctlValue::Integer(1024)
-        );
-        assert_eq!(
-            manager.query_param("hw.ncpu").unwrap(),
-            &SysctlValue::Integer(16)
-        );
+        assert_eq!(manager.query_param("kern.maxproc").unwrap(), &SysctlValue::Integer(1024));
+        assert_eq!(manager.query_param("hw.ncpu").unwrap(), &SysctlValue::Integer(16));
 
         // 2. Command Parsing Read Query
-        let out_read = manager
-            .parse_and_execute_command("sysctl kern.maxproc")
-            .unwrap();
+        let out_read = manager.parse_and_execute_command("sysctl kern.maxproc").unwrap();
         assert_eq!(out_read, "kern.maxproc = 1024");
 
         // 3. Command Parsing Write Update
-        let out_write = manager
-            .parse_and_execute_command("sysctl -w kern.maxproc=2048")
-            .unwrap();
+        let out_write = manager.parse_and_execute_command("sysctl -w kern.maxproc=2048").unwrap();
         assert_eq!(out_write, "kern.maxproc = 2048");
-        assert_eq!(
-            manager.query_param("kern.maxproc").unwrap(),
-            &SysctlValue::Integer(2048)
-        );
+        assert_eq!(manager.query_param("kern.maxproc").unwrap(), &SysctlValue::Integer(2048));
 
         // 4. Try updating read-only parameter (hw.ncpu) -> should fail
-        assert!(manager
-            .update_param("hw.ncpu", SysctlValue::Integer(32))
-            .is_err());
-        assert!(manager
-            .parse_and_execute_command("sysctl -w hw.ncpu=32")
-            .is_err());
-    }
-
-    #[test]
-    fn test_ebpf_bytecode_verifier_and_interpreter() {
-        let bridge = OpenSourceOsGapBridge::new();
-
-        // 1. Simple passing eBPF program: r0 = r2 + 10, return r0
-        let program = vec![
-            EbpfInstruction {
-                opcode: EbpfOpcode::LdImm,
-                dst: 0,
-                src: 0,
-                offset: 0,
-                imm: 10,
-            },
-            EbpfInstruction {
-                opcode: EbpfOpcode::AddReg,
-                dst: 0,
-                src: 2, // seeded with packet[0]
-                offset: 0,
-                imm: 0,
-            },
-            EbpfInstruction {
-                opcode: EbpfOpcode::Ret,
-                dst: 0,
-                src: 0,
-                offset: 0,
-                imm: 0,
-            },
-        ];
-
-        let packet = [42u8];
-        let result = bridge.execute_ebpf_bytecode(&program, &packet).unwrap();
-        assert_eq!(result, 52); // 42 (packet[0]) + 10 = 52
-
-        // 2. Program with loop / backward jump (invalid)
-        let bad_program = vec![
-            EbpfInstruction {
-                opcode: EbpfOpcode::JmpEq,
-                dst: 0,
-                src: 0,
-                offset: -1, // backward jump
-                imm: 10,
-            },
-            EbpfInstruction {
-                opcode: EbpfOpcode::Ret,
-                dst: 0,
-                src: 0,
-                offset: 0,
-                imm: 0,
-            },
-        ];
-        assert!(bridge.verify_ebpf_bytecode(&bad_program).is_err());
+        assert!(manager.update_param("hw.ncpu", SysctlValue::Integer(32)).is_err());
+        assert!(manager.parse_and_execute_command("sysctl -w hw.ncpu=32").is_err());
     }
 }

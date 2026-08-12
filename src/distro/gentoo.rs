@@ -118,9 +118,18 @@ impl CpuOptimizationDetector {
     /// Generate optimal compilation flags for compiler backends
     pub fn optimal_flags(&self) -> HashMap<String, String> {
         let mut flags = HashMap::new();
-        flags.insert("CFLAGS".to_string(), "-march=native -O3 -pipe -fomit-frame-pointer".to_string());
-        flags.insert("CXXFLAGS".to_string(), "-march=native -O3 -pipe -fomit-frame-pointer".to_string());
-        flags.insert("RUSTFLAGS".to_string(), "-C target-cpu=native -C opt-level=3".to_string());
+        flags.insert(
+            "CFLAGS".to_string(),
+            "-march=native -O3 -pipe -fomit-frame-pointer".to_string(),
+        );
+        flags.insert(
+            "CXXFLAGS".to_string(),
+            "-march=native -O3 -pipe -fomit-frame-pointer".to_string(),
+        );
+        flags.insert(
+            "RUSTFLAGS".to_string(),
+            "-C target-cpu=native -C opt-level=3".to_string(),
+        );
         flags
     }
 }
@@ -225,9 +234,17 @@ pub enum BuildError {
 impl std::fmt::Display for BuildError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            BuildError::PackageNotFound(pkg) => write!(f, "Package not found in Portage database: {}", pkg),
-            BuildError::CircularDependency(pkg) => write!(f, "Circular dependency cycle detected involving package: {}", pkg),
-            BuildError::MissingDependency(pkg) => write!(f, "Unresolved / missing dependency: {}", pkg),
+            BuildError::PackageNotFound(pkg) => {
+                write!(f, "Package not found in Portage database: {}", pkg)
+            }
+            BuildError::CircularDependency(pkg) => write!(
+                f,
+                "Circular dependency cycle detected involving package: {}",
+                pkg
+            ),
+            BuildError::MissingDependency(pkg) => {
+                write!(f, "Unresolved / missing dependency: {}", pkg)
+            }
             BuildError::CompilationFailed(err) => write!(f, "Portage compilation failed: {}", err),
         }
     }
@@ -242,7 +259,10 @@ mod tests {
         let detector = CpuOptimizationDetector::detect();
         assert!(detector.features.contains(&"avx2".to_string()));
         let flags = detector.optimal_flags();
-        assert_eq!(flags.get("RUSTFLAGS").unwrap(), "-C target-cpu=native -C opt-level=3");
+        assert_eq!(
+            flags.get("RUSTFLAGS").unwrap(),
+            "-C target-cpu=native -C opt-level=3"
+        );
     }
 
     #[test]
@@ -254,14 +274,19 @@ mod tests {
         // Per-package overrides
         let mut overrides = HashMap::new();
         overrides.insert("gui".to_string(), true);
-        features.per_package_features.insert("custom-app".to_string(), overrides);
+        features
+            .per_package_features
+            .insert("custom-app".to_string(), overrides);
 
         assert!(features.is_enabled("other-app", "ssl"));
         assert!(!features.is_enabled("other-app", "gui"));
         assert!(features.is_enabled("custom-app", "gui"));
 
         let args = features.to_build_flags("custom-app", &["ssl".to_string(), "gui".to_string()]);
-        assert_eq!(args, vec!["--enable-ssl".to_string(), "--enable-gui".to_string()]);
+        assert_eq!(
+            args,
+            vec!["--enable-ssl".to_string(), "--enable-gui".to_string()]
+        );
     }
 
     #[test]
@@ -299,6 +324,9 @@ mod tests {
         graph.add_package(b);
 
         let res = graph.resolve("pkg-a");
-        assert_eq!(res, Err(BuildError::CircularDependency("pkg-a".to_string())));
+        assert_eq!(
+            res,
+            Err(BuildError::CircularDependency("pkg-a".to_string()))
+        );
     }
 }

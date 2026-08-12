@@ -10,10 +10,10 @@ This guide outlines actionable steps and architectural patterns designed to sust
 ### 1. Phase 1: Compile-Time Verification & Hotfixes (Priority: Immediate)
 *   **Resolve Firewall Borrow Mismatches:**
     Modify `src/network/pf_firewall.rs` and `src/network/nftables.rs` to clone transient connection parameters (`source_addr.clone()`, `dest_addr.clone()`) and calculate the state changes using scope blocks or temporary vectors to decouple borrow lifetimes from the parent `&self.rules` loop iteration.
-*   **Repair Interleaved Package Adapter Code:**
-    Locate lines 266-286 of `src/sigpkg/universal_adapter.rs` and remove the redundant, competing `Ok(Package::new(...))` definitions. Restore a clean single constructor call matching the structural expectations of `sigpkg::Package`.
 *   **Correct Custom Vec Scope Bounds:**
     Add `use core::mem;` or fully-qualify size queries with `core::mem::size_of::<T>()` inside the bare-metal allocator module within `src/scheduler/scheduler.rs`.
+*   **Verify Fixed Syntax Blockers:**
+    Validate that our compilation fixes for `src/network/enterprise.rs`, `src/distro/improvements.rs`, `src/shell/command.rs`, and `src/sigpkg/resolver.rs` have successfully resolved the primary build-blocking parser errors.
 
 ### 2. Phase 2: Structural Performance Tuning (Priority: High)
 *   **Transition to Zero-Allocation Loggers:**

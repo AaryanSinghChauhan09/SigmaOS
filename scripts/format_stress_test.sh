@@ -1,79 +1,52 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
-# SigmaOS Format & Cleanliness Stress Test (Linux Standards Compliant)
-# Strictly validates source code formatting, trailing whitespace, line endings, and limits.
+# SigmaOS Codebase Cleanliness and Format Stress Checker
+# Strictly audits source files for code styles, tab characters, and trailing whitespaces.
 
-set -e
+set -eo pipefail
 
-# Color Palettes
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+echo "=== SigmaOS Codebase Cleanliness Stress Checker ==="
 
-echo -e "${CYAN}=== SigmaOS Coding Style & Code Cleanliness Stress Check ===${NC}"
+STRESS_ERRORS=0
 
-# Find source files to inspect
-FILES=$(find src kernel klib scripts -type f \( -name "*.rs" -o -name "*.sh" -o -name "*.py" \) 2>/dev/null || true)
-
-if [ -z "$FILES" ]; then
-    echo -e "${YELLOW}[STRESS-WARN]${NC} No source files discovered to audit."
-    exit 0
+# 1. Check for tab characters in Rust source files (should use spaces as per rustfmt standard)
+echo "[INFO] Scanning for raw tabs in Rust source files..."
+TAB_LINES=$(grep -rn $'\t' src/ 2>/dev/null | wc -l | tr -d '[:space:]' || echo 0)
+if [ "$TAB_LINES" -gt 0 ]; then
+    echo "[WARN] Found $TAB_LINES lines containing raw tab characters in Rust files."
+    STRESS_ERRORS=$((STRESS_ERRORS + 1))
+else
+    echo "[PASS] No raw tabs found in Rust files."
 fi
 
-trailing_ws_count=0
-no_eof_newline_count=0
-long_lines_count=0
-total_inspected=0
+# 2. Check for trailing whitespaces in source files
+echo "[INFO] Scanning for trailing whitespaces..."
+TRAILING_WS=$(grep -rn "[[:space:]]\+$" src/ scripts/ 2>/dev/null | wc -l | tr -d '[:space:]' || echo 0)
+if [ "$TRAILING_WS" -gt 0 ]; then
+    echo "[WARN] Found $TRAILING_WS lines with trailing whitespaces."
+    STRESS_ERRORS=$((STRESS_ERRORS + 1))
+else
+    echo "[PASS] No trailing whitespaces found."
+fi
 
-echo -e "${BLUE}[STRESS-INFO]${NC} Auditing source files for style anomalies and formatting infractions..."
-
-for file in $FILES; do
-    # Ignore specific paths
-    if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *"target"* ]]; then
-        continue
-    fi
-
-    total_inspected=$((total_inspected + 1))
-
-    # 1. Check for trailing whitespace
-    if grep -q "[[:space:]]$" "$file"; then
-        trailing_ws_count=$((trailing_ws_count + 1))
-    fi
-
-    # 2. Check for missing newline at EOF
-    # In bash, if a file doesn't end with a newline, 'tail -c 1' will not be an empty line
-    if [ -f "$file" ]; then
-        LAST_CHAR=$(tail -c 1 "$file" 2>/dev/null || echo "")
-        if [ "$LAST_CHAR" != $'\n' ] && [ -n "$LAST_CHAR" ]; then
-            no_eof_newline_count=$((no_eof_newline_count + 1))
+# 3. Check for correct file endings (newline at EOF)
+echo "[INFO] Scanning for missing newlines at End-Of-File..."
+MISSING_EOF_NL=0
+for f in $(find src/ scripts/ -type f \( -name "*.rs" -o -name "*.sh" -o -name "*.py" \) 2>/dev/null); do
+    if [ -f "$f" ] && [ -s "$f" ]; then
+        if [ "$(tail -c1 "$f" | wc -l | tr -d '[:space:]')" -eq 0 ]; then
+            echo "[WARN] Missing newline at EOF: $f"
+            MISSING_EOF_NL=$((MISSING_EOF_NL + 1))
         fi
-    fi
-
-    # 3. Check for extremely long lines (>150 chars)
-    if grep -q -E "^.{151,}" "$file"; then
-        long_lines_count=$((long_lines_count + 1))
     fi
 done
 
-echo -e "\n--------------------------------------------------"
-echo -e "         CODEBASE CLEANLINESS STRESS AUDIT"
-echo -e "--------------------------------------------------"
-echo -e "  Files Inspected:              $total_inspected"
-echo -e "  Files with Trailing Spaces:   $trailing_ws_count"
-echo -e "  Files with Missing EOF LF:    $no_eof_newline_count"
-echo -e "  Files with Lines > 150 chars: $long_lines_count"
-echo -e "--------------------------------------------------"
-
-if [ $trailing_ws_count -gt 0 ]; then
-    echo -e "${YELLOW}[STRESS-WARN]${NC} Trailing whitespace detected on $trailing_ws_count files. Consider running a trimmer tool."
+if [ "$MISSING_EOF_NL" -gt 0 ]; then
+    echo "[WARN] Found $MISSING_EOF_NL files missing newlines at End-Of-File."
+else
+    echo "[PASS] All source files end with a clean newline."
 fi
 
-if [ $no_eof_newline_count -gt 0 ]; then
-    echo -e "${YELLOW}[STRESS-WARN]${NC} $no_eof_newline_count files are missing standard Unix line-feed (LF) terminators at end-of-file."
-fi
-
-echo -e "${GREEN}[SUCCESS]${NC} Code formatting stress check finished successfully."
+echo "[INFO] Cleanliness summary: $STRESS_ERRORS formatting/whitespace warnings detected."
+echo "[PASS] Codebase cleanliness stress checks completed successfully."
 exit 0

@@ -1,8 +1,9 @@
-use crate::klib::Vec;
 /// WebAssembly (WASM) Sandbox and Secure Runtime Execution Engine
 /// Provides isolated module runtimes, memory sandboxing, and pledge security checks
 /// to achieve Wasmer/Wasmtime/wasm3 parity inside SigmaOS.
+
 use core::sync::atomic::{AtomicUsize, Ordering};
+use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WasmState {
@@ -68,26 +69,19 @@ impl WasmSandboxEngine {
             return Err("Invalid WASM module magic header validation failed");
         }
 
-        let prospective_memory =
-            self.current_memory_used.load(Ordering::SeqCst) + module.bytecode_size_bytes;
+        let prospective_memory = self.current_memory_used.load(Ordering::SeqCst) + module.bytecode_size_bytes;
         if prospective_memory > self.memory_quota_bytes {
             return Err("WASM module load rejected: Sandbox memory quota exceeded");
         }
 
-        self.current_memory_used
-            .store(prospective_memory, Ordering::SeqCst);
+        self.current_memory_used.store(prospective_memory, Ordering::SeqCst);
         self.active_modules.push(module);
         Ok(())
     }
 
-    pub fn execute_export_function(
-        &self,
-        module_name: &[u8],
-        func_name: &[u8],
-    ) -> Result<WasmState, &'static str> {
+    pub fn execute_export_function(&self, module_name: &[u8], func_name: &[u8]) -> Result<WasmState, &'static str> {
         let mut name_arr = [0u8; 32];
-        name_arr[..module_name.len().min(31)]
-            .copy_from_slice(&module_name[..module_name.len().min(31)]);
+        name_arr[..module_name.len().min(31)].copy_from_slice(&module_name[..module_name.len().min(31)]);
 
         let mut found = false;
         for module in &self.active_modules {
@@ -111,8 +105,7 @@ impl WasmSandboxEngine {
 
     pub fn force_terminate_module(&mut self, module_name: &[u8]) -> Result<(), &'static str> {
         let mut name_arr = [0u8; 32];
-        name_arr[..module_name.len().min(31)]
-            .copy_from_slice(&module_name[..module_name.len().min(31)]);
+        name_arr[..module_name.len().min(31)].copy_from_slice(&module_name[..module_name.len().min(31)]);
 
         let mut found_idx = None;
         for (i, module) in self.active_modules.iter().enumerate() {
@@ -129,8 +122,7 @@ impl WasmSandboxEngine {
 
         let current_mem = self.current_memory_used.load(Ordering::SeqCst);
         if current_mem >= module_size {
-            self.current_memory_used
-                .store(current_mem - module_size, Ordering::SeqCst);
+            self.current_memory_used.store(current_mem - module_size, Ordering::SeqCst);
         }
 
         Ok(())
@@ -161,10 +153,7 @@ mod tests {
         engine.load_wasm_module(module_1).unwrap();
 
         assert_eq!(engine.active_modules.len(), 1);
-        assert_eq!(
-            engine.current_memory_used.load(Ordering::SeqCst),
-            2 * 1024 * 1024
-        );
+        assert_eq!(engine.current_memory_used.load(Ordering::SeqCst), 2 * 1024 * 1024);
 
         // Execute function inside app_1
         let state = engine.execute_export_function(b"app_1", b"start").unwrap();

@@ -1,21 +1,3 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
 // SigmaOS Gamified Productivity System
 // Built-in goal trackers, Pomodoro timers, and progress dashboards
 
@@ -113,7 +95,6 @@ pub struct PomodoroTimer {
 }
 
 impl PomodoroTimer {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             state: PomodoroState::Stopped,
@@ -299,7 +280,6 @@ pub struct ProductivityScore {
 }
 
 impl ProductivityScore {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             focus_score: 0.0,
@@ -352,7 +332,6 @@ pub struct GamifiedProductivity {
 }
 
 impl GamifiedProductivity {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         let mut system = Self {
             achievements: HashMap::new(),
@@ -419,8 +398,8 @@ impl GamifiedProductivity {
     }
 
     pub fn update_goal(&mut self, id: &str, value: u64) {
-        if let Some(goal) = self.goals.get_mut::<str>(id) {
-            let goal: &mut Goal = goal;
+        let goal_opt: Option<&mut Goal> = self.goals.get_mut(id);
+        if let Some(goal) = goal_opt {
             goal.update_progress(value);
             if goal.completed {
                 self.add_experience(100);
@@ -434,8 +413,8 @@ impl GamifiedProductivity {
     }
 
     pub fn update_achievement(&mut self, id: &str, value: u64) {
-        if let Some(achievement) = self.achievements.get_mut::<str>(id) {
-            let achievement: &mut Achievement = achievement;
+        let achievement_opt: Option<&mut Achievement> = self.achievements.get_mut(id);
+        if let Some(achievement) = achievement_opt {
             let was_unlocked = achievement.unlocked;
             achievement.update_progress(value);
 

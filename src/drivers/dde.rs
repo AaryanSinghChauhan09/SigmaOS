@@ -142,11 +142,28 @@ impl UnifiedPeripheral for GenericDriver {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IrqResult {
+    Handled,
+    WakeThread,
+    None,
+}
+
+#[derive(Debug, Clone)]
+pub struct DdeDmaBuffer {
+    pub physical_address: u64,
+    pub virtual_address: u64,
+    pub size: usize,
+}
+
 /// Linux DDE Shim Layer
 pub struct LinuxDdeShim {
     pub driver: GenericDriver,
     pub pci_registered: bool,
     pub irq_requested: bool,
+
+    // Simulated coherent DMA allocations
+    pub dma_allocations: Vec<DdeDmaBuffer>,
 }
 
 impl LinuxDdeShim {
@@ -155,6 +172,7 @@ impl LinuxDdeShim {
             driver: GenericDriver::new(device_id, DriverType::LinuxDde, base_address),
             pci_registered: false,
             irq_requested: false,
+            dma_allocations: Vec::new(),
         }
     }
 
@@ -174,6 +192,21 @@ impl LinuxDdeShim {
 
     pub fn kmalloc(&self, size: usize) -> Result<usize, DeviceError> {
         Ok(size)
+    }
+
+    /// Simulate Linux-style coherent DMA allocation (dma_alloc_coherent)
+    pub fn dma_alloc_coherent(&mut self, size: usize) -> Result<DdeDmaBuffer, DeviceError> {
+        if size == 0 {
+            return Err(DeviceError::InvalidOperation);
+        }
+        let offset = self.dma_allocations.len() as u64;
+        let dma_buf = DdeDmaBuffer {
+            physical_address: 0x20000000 + (offset * 0x100000), // simulated 2MB offset page limits
+            virtual_address: 0xFFFF800000000000 + (offset * 0x100000),
+            size,
+        };
+        self.dma_allocations.push(dma_buf.clone());
+        Ok(dma_buf)
     }
 }
 
@@ -449,11 +482,7 @@ impl UdfInterpreter {
                 let (res, overflow) = val1.overflowing_add(operand);
 
                 let sat_res = if overflow {
-                    if val1 >= 0 {
-                        i64::MAX
-                    } else {
-                        i64::MIN
-                    }
+                    if val1 >= 0 { i64::MAX } else { i64::MIN }
                 } else {
                     res
                 };
@@ -472,11 +501,7 @@ impl UdfInterpreter {
                 let (res, overflow) = val1.overflowing_sub(operand);
 
                 let sat_res = if overflow {
-                    if val1 >= 0 {
-                        i64::MAX
-                    } else {
-                        i64::MIN
-                    }
+                    if val1 >= 0 { i64::MAX } else { i64::MIN }
                 } else {
                     res
                 };
@@ -511,10 +536,30 @@ impl UdfInterpreter {
     }
 }
 
-/// Hardware Auto-Negotiation Broker
+#[derive(Debug, Clone)]
+pub struct DdeDeviceNode {
+    pub path: String,
+    pub device_id: DeviceId,
+    pub bus: BusType,
+    pub bound_driver: Option<String>,
+    pub properties: BTreeMap<String, String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct DdeTasklet {
+    pub id: u32,
+    pub pending: bool,
+    pub work_count: u32,
+}
+
+/// Hardware Auto-Negotiation Broker with advanced Devicetree and bottom half execution mechanisms
 pub struct HardwareBroker {
     pub drivers: BTreeMap<String, Box<dyn UnifiedPeripheral>>,
     pub device_database: BTreeMap<DeviceId, DriverType>,
+
+    // Simulated Devicetree & deferred bottom halves (tasklets)
+    pub devicetree: BTreeMap<String, DdeDeviceNode>,
+    pub tasklets: Vec<DdeTasklet>,
 }
 
 impl HardwareBroker {
@@ -523,6 +568,8 @@ impl HardwareBroker {
         Self {
             drivers: BTreeMap::new(),
             device_database: BTreeMap::new(),
+            devicetree: BTreeMap::new(),
+            tasklets: Vec::new(),
         }
     }
 
@@ -549,6 +596,69 @@ impl HardwareBroker {
     pub fn driver_count(&self) -> usize {
         self.drivers.len()
     }
+
+    // --- Advanced Devicetree & Bottom-Half interrupt APIs ---
+
+    /// Add a simulated physical device node to the Devicetree
+    pub fn add_device_node(&mut self, path: &str, device_id: DeviceId, bus: BusType) {
+        self.devicetree.insert(
+            path.to_string(),
+            DdeDeviceNode {
+                path: path.to_string(),
+                device_id,
+                bus,
+                bound_driver: None,
+                properties: BTreeMap::new(),
+            },
+        );
+    }
+
+    /// Auto-bind unregistered Devicetree nodes to loaded driver modules (mimics udev / sysfs)
+    pub fn bind_devices_to_drivers(&mut self) -> usize {
+        let mut bind_count = 0;
+        for node in self.devicetree.values_mut() {
+            if node.bound_driver.is_none() {
+                if let Some(drv_type) = self.device_database.get(&node.device_id).copied() {
+                    node.bound_driver = Some(format!("{:?}", drv_type));
+                    bind_count += 1;
+                }
+            }
+        }
+        bind_count
+    }
+
+    /// Register a bottom half tasklet interrupt execution handler
+    pub fn register_tasklet(&mut self, id: u32) {
+        self.tasklets.push(DdeTasklet {
+            id,
+            pending: false,
+            work_count: 0,
+        });
+    }
+
+    /// Schedule a tasklet for deferred interrupt execution (top half)
+    pub fn schedule_tasklet(&mut self, id: u32) -> Result<(), DeviceError> {
+        for t in &mut self.tasklets {
+            if t.id == id {
+                t.pending = true;
+                return Ok(());
+            }
+        }
+        Err(DeviceError::NotFound)
+    }
+
+    /// Execute all pending tasklets bottom half deferred payloads (bottom half)
+    pub fn run_pending_tasklets(&mut self) -> usize {
+        let mut run_count = 0;
+        for t in &mut self.tasklets {
+            if t.pending {
+                t.pending = false;
+                t.work_count += 1;
+                run_count += 1;
+            }
+        }
+        run_count
+    }
 }
 
 impl Default for HardwareBroker {
@@ -560,6 +670,7 @@ impl Default for HardwareBroker {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_device_id() {
@@ -650,25 +761,19 @@ mod tests {
 
         // 2. Test Sign Flag (SF) on MOV -5
         let val_neg_5 = -5i64 as u64;
-        interpreter
-            .execute_instruction(0x01, &[0, val_neg_5])
-            .unwrap();
+        interpreter.execute_instruction(0x01, &[0, val_neg_5]).unwrap();
         assert_eq!(interpreter.registers[0], val_neg_5);
         assert!(interpreter.sf);
 
         // 3. Test Carry Flag (CF) on addition overflow: u64::MAX + 1
-        interpreter
-            .execute_instruction(0x01, &[1, u64::MAX])
-            .unwrap();
+        interpreter.execute_instruction(0x01, &[1, u64::MAX]).unwrap();
         interpreter.execute_instruction(0x02, &[1, 1]).unwrap(); // R1 = R1 + 1
         assert_eq!(interpreter.registers[1], 0);
         assert!(interpreter.cf);
         assert!(interpreter.zf);
 
         // 4. Test signed overflow flag (OF): i64::MAX + 1 -> negative
-        interpreter
-            .execute_instruction(0x01, &[2, i64::MAX as u64])
-            .unwrap();
+        interpreter.execute_instruction(0x01, &[2, i64::MAX as u64]).unwrap();
         interpreter.execute_instruction(0x02, &[2, 1]).unwrap(); // R2 = R2 + 1
         assert_eq!(interpreter.registers[2], i64::MIN as u64);
         assert!(interpreter.of);
@@ -693,9 +798,7 @@ mod tests {
 
         // SAR (Arithmetic Shift Right) checks
         let signed_neg_16 = -16i64 as u64;
-        interpreter
-            .execute_instruction(0x01, &[2, signed_neg_16])
-            .unwrap();
+        interpreter.execute_instruction(0x01, &[2, signed_neg_16]).unwrap();
         interpreter.execute_instruction(0x0E, &[2, 2]).unwrap(); // R2 = R2 >>_sar 2
         assert_eq!(interpreter.registers[2] as i64, -4);
     }
@@ -706,17 +809,13 @@ mod tests {
         let mut interpreter = UdfInterpreter::new(device_id, 0x1000);
 
         // SADD i64::MAX + 10 -> clamp to i64::MAX
-        interpreter
-            .execute_instruction(0x01, &[0, i64::MAX as u64])
-            .unwrap();
+        interpreter.execute_instruction(0x01, &[0, i64::MAX as u64]).unwrap();
         interpreter.execute_instruction(0x0C, &[0, 10]).unwrap(); // R0 = SADD R0, 10
         assert_eq!(interpreter.registers[0] as i64, i64::MAX);
         assert!(interpreter.of);
 
         // SSUB i64::MIN - 10 -> clamp to i64::MIN
-        interpreter
-            .execute_instruction(0x01, &[1, i64::MIN as u64])
-            .unwrap();
+        interpreter.execute_instruction(0x01, &[1, i64::MIN as u64]).unwrap();
         interpreter.execute_instruction(0x0D, &[1, 10]).unwrap(); // R1 = SSUB R1, 10
         assert_eq!(interpreter.registers[1] as i64, i64::MIN);
         assert!(interpreter.of);
@@ -758,5 +857,50 @@ mod tests {
 
         let id = driver.get_device_id();
         assert_eq!(id.vendor_id, 0x1234);
+    }
+
+    #[test]
+    fn test_dde_devicetree_auto_binding() {
+        let mut broker = HardwareBroker::new();
+        let id_net = DeviceId::new(0x8086, 0x100E, 0x02, 0x00); // e1000 Intel net
+        broker.register_device(id_net, DriverType::LinuxDde);
+
+        // Add to Devicetree
+        broker.add_device_node("/sys/bus/pci/devices/0000:00:03.0", id_net, BusType::Pci);
+        assert_eq!(broker.devicetree.len(), 1);
+
+        let bound = broker.bind_devices_to_drivers();
+        assert_eq!(bound, 1);
+
+        let node = broker.devicetree.get("/sys/bus/pci/devices/0000:00:03.0").unwrap();
+        assert_eq!(node.bound_driver.as_deref(), Some("LinuxDde"));
+    }
+
+    #[test]
+    fn test_dde_tasklets_deferred_interrupts() {
+        let mut broker = HardwareBroker::new();
+        broker.register_tasklet(42);
+
+        // Schedule tasklet (top half)
+        broker.schedule_tasklet(42).unwrap();
+        assert!(broker.tasklets[0].pending);
+
+        // Run pending tasklets (bottom half execution)
+        let processed = broker.run_pending_tasklets();
+        assert_eq!(processed, 1);
+        assert_eq!(broker.tasklets[0].work_count, 1);
+        assert!(!broker.tasklets[0].pending);
+    }
+
+    #[test]
+    fn test_dde_coherent_dma_allocations() {
+        let id = DeviceId::new(0x1234, 0x5678, 0x01, 0x02);
+        let mut shim = LinuxDdeShim::new(id, 0x1000);
+
+        let dma_buf = shim.dma_alloc_coherent(4096).unwrap();
+        assert!(dma_buf.physical_address > 0);
+        assert!(dma_buf.virtual_address > 0);
+        assert_eq!(dma_buf.size, 4096);
+        assert_eq!(shim.dma_allocations.len(), 1);
     }
 }

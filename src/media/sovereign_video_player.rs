@@ -305,7 +305,16 @@ mod tests {
     #[test]
     fn test_secure_boot() {
         let mut keyring = SecureBootKeyring::new();
-        let key = [0x55u8; 32];
+        // Generate test key using timestamp-based approach
+        use std::time::{SystemTime, UNIX_EPOCH};
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let mut key = [0u8; 32];
+        for (i, byte) in key.iter_mut().enumerate() {
+            *byte = ((timestamp >> (i * 8)) & 0xFF) as u8;
+        }
         keyring.enroll_key(key).unwrap();
         assert!(keyring.verify_signature(&key));
     }

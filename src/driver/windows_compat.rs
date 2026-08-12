@@ -544,12 +544,12 @@ impl Device for WindowsDriverAdapter {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
         self.dispatch_irp(MajorFunction::Read, 0, &[], buffer)
             .map_err(|_| DeviceError::IoError)
     }
 
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         let mut dummy_out = [0u8; 1];
         self.dispatch_irp(MajorFunction::Write, 0, buffer, &mut dummy_out)
             .map_err(|_| DeviceError::IoError)
@@ -615,11 +615,11 @@ impl Device for WindowsNdisAdapter {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
 
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         self.send_packet(buffer)?;
         Ok(buffer.len())
     }
@@ -658,7 +658,7 @@ impl NetworkDevice for WindowsNdisAdapter {
         Err(DeviceError::NotSupported)
     }
 
-    fn receive_packet(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    fn receive_packet(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
 
@@ -691,11 +691,11 @@ impl Device for WindowsStorportAdapter {
         Ok(())
     }
 
-    fn read(&mut self, _buffer: &mut [u8]) -> Result<usize, DeviceError> {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
 
-    fn write(&mut self, _buffer: &[u8]) -> Result<usize, DeviceError> {
+    fn write(&mut self, buffer: &[u8]) -> Result<usize, DeviceError> {
         Ok(0)
     }
 
@@ -713,7 +713,7 @@ impl Device for WindowsStorportAdapter {
 }
 
 impl BlockDevice for WindowsStorportAdapter {
-    fn read_block(&mut self, block: u64, _buffer: &mut [u8]) -> Result<(), DeviceError> {
+    fn read_block(&mut self, block: u64, buffer: &mut [u8]) -> Result<(), DeviceError> {
         if let Some(ref init_data) = self.adapter.storport_init_data {
             if let Some(start_io) = init_data.hw_start_io {
                 let mut srb = SCSI_REQUEST_BLOCK {
@@ -742,7 +742,7 @@ impl BlockDevice for WindowsStorportAdapter {
         Err(DeviceError::IoError)
     }
 
-    fn write_block(&mut self, block: u64, _buffer: &[u8]) -> Result<(), DeviceError> {
+    fn write_block(&mut self, block: u64, buffer: &[u8]) -> Result<(), DeviceError> {
         if let Some(ref init_data) = self.adapter.storport_init_data {
             if let Some(start_io) = init_data.hw_start_io {
                 let mut srb = SCSI_REQUEST_BLOCK {
@@ -848,7 +848,7 @@ mod tests {
     use super::*;
 
     // Mock WDM major function handlers
-    fn mock_irp_read(_device: &mut DEVICE_OBJECT, irp: &mut IRP) -> NTSTATUS {
+    fn mock_irp_read(device: &mut DEVICE_OBJECT, irp: &mut IRP) -> NTSTATUS {
         irp.information = 8;
         unsafe {
             let buffer = core::slice::from_raw_parts_mut(irp.user_buffer as *mut u8, 8);
@@ -857,7 +857,7 @@ mod tests {
         STATUS_SUCCESS
     }
 
-    fn mock_irp_write(_device: &mut DEVICE_OBJECT, irp: &mut IRP) -> NTSTATUS {
+    fn mock_irp_write(device: &mut DEVICE_OBJECT, irp: &mut IRP) -> NTSTATUS {
         irp.information = irp
             .current_stack_location
             .parameters_device_io_control

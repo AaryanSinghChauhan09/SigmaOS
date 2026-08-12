@@ -5,10 +5,8 @@ pub mod compat_layers;
 pub mod developer;
 pub mod enterprise;
 pub mod i18n;
-pub mod linux_bsd_inspirations;
 pub mod manjaro;
 pub mod nextgen;
-pub mod parity;
 pub mod recovery;
 pub mod specialized;
 pub mod tiny_core;
@@ -40,10 +38,6 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
-pub use linux_bsd_inspirations::{
-    ArchDependencyResolver, FreeBSDJail, NixStyleStore, OpenBSDPledge,
-    AptPinStore, OpenRCService, PinRule, PackageNode,
-};
 pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, P2pNode, PqcSelfHealing, SovereignP2PSync,
     TimeTravelCheckpoint, TimeTravelEngine, NetplanConfig, NetplanManager,

@@ -39,6 +39,7 @@ pub trait LogFile {
     fn path(&self) -> &[u8];
     fn size(&self) -> usize;
     fn created(&self) -> u64;
+    fn clear(&self);
 }
 
 #[repr(C)]
@@ -83,6 +84,7 @@ impl LogFile for SimpleLogFile {
     }
     fn size(&self) -> usize { self.size.load(Ordering::SeqCst) }
     fn created(&self) -> u64 { self.created.load(Ordering::SeqCst) as u64 }
+    fn clear(&self) { self.size.store(0, Ordering::SeqCst); }
 }
 
 pub trait LogRotator {
@@ -118,7 +120,7 @@ impl SimpleLogRotator {
         // Shift generations in reverse order
         for i in (1..max_generations).rev() {
             let prev_name = format!("{}.{}.gz", base_filename, i);
-            if self.active_generations.iter().any(|name| name == &prev_name) {
+            if self.active_generations.as_slice().iter().any(|name| name == &prev_name) {
                 let next_name = format!("{}.{}.gz", base_filename, i + 1);
                 new_generations.push(next_name);
             }
@@ -144,7 +146,8 @@ impl LogRotator for SimpleLogRotator {
         let mut to_rotate = Vec::new();
         let threshold = self.threshold.load(Ordering::SeqCst);
 
-        for log_file_option in &self.log_files {
+        for i in 0..self.log_files.len {
+            let log_file_option = unsafe { &*self.log_files.data.add(i) };
             if let Some(ref log_file) = *log_file_option {
                 if log_file.size() >= threshold {
                     to_rotate.push(log_file.id());
@@ -156,10 +159,11 @@ impl LogRotator for SimpleLogRotator {
     }
 
     fn rotate(&mut self, id: LogFileID) -> Result<(), RotationError> {
-        for log_file_option in &mut self.log_files {
+        for i in 0..self.log_files.len {
+            let log_file_option = unsafe { &mut *self.log_files.data.add(i) };
             if let Some(ref mut log_file) = *log_file_option {
                 if log_file.id() == id {
-                    log_file.size.store(0, Ordering::SeqCst);
+                    log_file.clear();
                     // Standard Linux logrotate shift trigger
                     let path_str = core::str::from_utf8(log_file.path()).unwrap_or("log");
                     self.shift_backup_generations(path_str, 5);
@@ -234,17 +238,27 @@ impl LogCompressor for SimpleLogCompressor {
     }
 }
 
-struct Vec<T> { data: *mut T, len: usize, capacity: usize }
+pub struct Vec<T> { pub data: *mut T, pub len: usize, pub capacity: usize }
 
 impl<T> Vec<T> {
-    fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    fn push(&mut self, item: T) {
+    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
+    pub fn push(&mut self, item: T) {
         unsafe {
             if self.len >= self.capacity { self.grow(); }
             if self.capacity > self.len {
                 core::ptr::write(self.data.add(self.len), item);
                 self.len += 1;
             }
+        }
+    }
+    pub fn remove(&mut self, index: usize) -> T {
+        unsafe {
+            let item = core::ptr::read(self.data.add(index));
+            for i in index..self.len - 1 {
+                core::ptr::copy_nonoverlapping(self.data.add(i + 1), self.data.add(i), 1);
+            }
+            self.len -= 1;
+            item
         }
     }
     unsafe fn grow(&mut self) {
@@ -257,35 +271,43 @@ impl<T> Vec<T> {
             self.capacity = new_capacity;
         }
     }
-    fn iter(&self) -> SliceIter<'_, T> {
-        SliceIter {
-            ptr: self.data,
-            end: unsafe { self.data.add(self.len) },
-            _marker: core::marker::PhantomData,
-        }
-    }
-}
-
-struct SliceIter<'a, T> {
-    ptr: *const T,
-    end: *const T,
-    _marker: core::marker::PhantomData<&'a T>,
-}
-
-impl<'a, T> Iterator for SliceIter<'a, T> {
-    type Item = &'a T;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.ptr == self.end {
-            None
+    pub fn as_slice(&self) -> &[T] {
+        if self.len == 0 {
+            &[]
         } else {
-            let result = unsafe { &*self.ptr };
-            self.ptr = unsafe { self.ptr.add(1) };
-            Some(result)
+            unsafe { core::slice::from_raw_parts(self.data, self.len) }
+        }
+    }
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        if self.len == 0 {
+            &mut []
+        } else {
+            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
         }
     }
 }
 
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
+// Allocator shim: uses std allocator on hosted targets (test/dev) and extern C on bare-metal
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    if let Ok(layout) = Layout::from_size_align(size, 8) {
+        std_alloc(layout)
+    } else {
+        core::ptr::null_mut()
+    }
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 #[cfg(test)]
 mod tests {
@@ -305,10 +327,10 @@ mod tests {
         let original_data = b"AAAAABBBCC";
 
         let compressed = compressor.compress(original_data).unwrap();
-        assert_eq!(compressed, vec![5, b'A', 3, b'B', 2, b'C']);
+        assert_eq!(compressed.as_slice(), &[5, b'A', 3, b'B', 2, b'C']);
 
-        let decompressed = compressor.decompress(&compressed).unwrap();
-        assert_eq!(decompressed, original_data.to_vec());
+        let decompressed = compressor.decompress(compressed.as_slice()).unwrap();
+        assert_eq!(decompressed.as_slice(), original_data);
     }
 
     #[test]
@@ -317,13 +339,16 @@ mod tests {
         rotator.shift_backup_generations("syslog", 3);
 
         // Initial rotation creates .1.gz
-        assert_eq!(rotator.active_generations.len(), 1);
-        assert_eq!(rotator.active_generations[0], "syslog.1.gz");
+        assert_eq!(rotator.active_generations.len, 1);
+        let gen0 = unsafe { &*rotator.active_generations.data.add(0) };
+        assert_eq!(gen0, "syslog.1.gz");
 
         // Second rotation shifts .1.gz to .2.gz and creates fresh .1.gz
         rotator.shift_backup_generations("syslog", 3);
-        assert_eq!(rotator.active_generations.len(), 2);
-        assert_eq!(rotator.active_generations[0], "syslog.2.gz");
-        assert_eq!(rotator.active_generations[1], "syslog.1.gz");
+        assert_eq!(rotator.active_generations.len, 2);
+        let gen0_2 = unsafe { &*rotator.active_generations.data.add(0) };
+        let gen1_2 = unsafe { &*rotator.active_generations.data.add(1) };
+        assert_eq!(gen0_2, "syslog.2.gz");
+        assert_eq!(gen1_2, "syslog.1.gz");
     }
 }

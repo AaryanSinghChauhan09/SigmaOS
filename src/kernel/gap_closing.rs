@@ -23,6 +23,7 @@
 
 extern crate alloc;
 use alloc::vec::Vec;
+use alloc::boxed::Box;
 
 pub const PAGE_SIZE: usize = 4096;
 
@@ -339,7 +340,7 @@ impl KeServiceDescriptorTable {
     }
 
     /// Dispatch a system call using SSDT routing with bounds validation
-    pub fn dispatch_syscall(&self, id: u32, _args: &[u64]) -> Result<u64, GapError> {
+    pub fn dispatch_syscall(&self, id: u32, args: &[u64]) -> Result<u64, GapError> {
         if let Some(entry) = self.service_table.iter().find(|e| e.syscall_id == id) {
             if args.len() < entry.argument_count as usize {
                 return Err(GapError::InvalidPageAddress); // mismatched arguments count
@@ -476,6 +477,36 @@ impl X86RootkitAuditor {
 
         Ok(())
     }
+
+    /// Traverse and verify the integrity of the attached device driver stack (filtering rootkits)
+    pub fn audit_device_stack(&self, device: &DeviceObject, allowed_drivers: &[&str]) -> Result<(), &'static str> {
+        let mut current = Some(device);
+        while let Some(dev) = current {
+            if !allowed_drivers.contains(&dev.driver_name) {
+                return Err("Rootkit filter driver detected in device stack!");
+            }
+            current = dev.attached_device.as_ref().map(|b| b.as_ref());
+        }
+        Ok(())
+    }
+
+    /// Audit major function dispatch table addresses for illegal redirect hooks
+    pub fn audit_driver_dispatch_table(
+        &self,
+        driver: &DriverObject,
+        lower_bound: usize,
+        upper_bound: usize,
+    ) -> Result<(), &'static str> {
+        for handler_opt in &driver.major_function {
+            if let Some(handler) = handler_opt {
+                let addr = *handler as usize;
+                if addr < lower_bound || addr > upper_bound {
+                    return Err("Rootkit hook detected in DriverObject major function dispatch table!");
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 // ==========================================
@@ -491,11 +522,125 @@ pub enum IrpMajorFunction {
     DeviceControl = 4, // equivalent to IOCTL
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeviceType {
+    Physical = 1,
+    Functional = 2,
+    Filter = 3,
+}
+
+#[derive(Clone)]
+pub struct DeviceObject {
+    pub device_type: DeviceType,
+    pub driver_name: &'static str,
+    pub next_device: Option<Box<DeviceObject>>, // Next lower device in stack
+    pub attached_device: Option<Box<DeviceObject>>, // Attached filter/upper device
+}
+
+#[derive(Clone)]
+pub struct DriverObject {
+    pub driver_name: &'static str,
+    pub major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8],
+}
+
+#[derive(Clone)]
+pub struct IoStackLocation {
+    pub major_function: IrpMajorFunction,
+    pub minor_function: u8,
+    pub device_object: Option<DeviceObject>,
+    pub parameters_read_size: usize,
+    pub parameters_write_size: usize,
+}
+
+pub type IoCompletionRoutine = fn(&DeviceObject, &mut Irp) -> u32;
+
 pub struct Irp {
     pub major_function: IrpMajorFunction,
     pub ioctl_code: u32,
     pub system_buffer: Vec<u8>,
     pub status: u32, // Status codes (NTSTATUS/errno-like)
+
+    // WDK Layered I/O & Completion elements
+    pub stack_locations: Vec<IoStackLocation>,
+    pub current_stack_index: usize,
+    pub is_dynamic: bool,
+    pub completion_routine: Option<IoCompletionRoutine>,
+}
+
+impl Irp {
+    /// Create a standard static/dynamic IRP (WDK style)
+    pub fn new(major_function: IrpMajorFunction, ioctl_code: u32, system_buffer: Vec<u8>) -> Self {
+        Self::new_with_stack(major_function, ioctl_code, system_buffer, 1)
+    }
+
+    /// Create a new IRP with multiple stack locations
+    pub fn new_with_stack(
+        major_function: IrpMajorFunction,
+        ioctl_code: u32,
+        system_buffer: Vec<u8>,
+        stack_size: usize,
+    ) -> Self {
+        let mut stack_locations = Vec::new();
+        for _ in 0..stack_size {
+            stack_locations.push(IoStackLocation {
+                major_function,
+                minor_function: 0,
+                device_object: None,
+                parameters_read_size: 0,
+                parameters_write_size: 0,
+            });
+        }
+        Self {
+            major_function,
+            ioctl_code,
+            system_buffer,
+            status: 0,
+            stack_locations,
+            current_stack_index: stack_size.saturating_sub(1),
+            is_dynamic: true,
+            completion_routine: None,
+        }
+    }
+
+    /// Sets a completion routine on the next lower stack location (IoSetCompletionRoutine)
+    pub fn set_completion_routine(&mut self, routine: IoCompletionRoutine) -> Result<(), &'static str> {
+        let _ = self.current_stack_index; // Currently unused but kept for future bounds validation
+        self.completion_routine = Some(routine);
+        Ok(())
+    }
+
+    /// Complete the I/O Request, invoking completion routines bottom-to-top (IoCompleteRequest)
+    pub fn complete_request(&mut self, status: u32) {
+        self.status = status;
+        if let Some(routine) = self.completion_routine {
+            // Execute the completion routine in an arbitrary thread context
+            let dummy_device = DeviceObject {
+                device_type: DeviceType::Functional,
+                driver_name: "CompletedDriver",
+                next_device: None,
+                attached_device: None,
+            };
+            (routine)(&dummy_device, self);
+        }
+    }
+}
+
+/// Simulates attaching a Filter/Upper device object to a Device stack (IoAttachDeviceToDeviceStack)
+pub fn io_attach_device_to_device_stack(
+    source_device: &mut DeviceObject,
+    target_device: &mut DeviceObject,
+) {
+    target_device.attached_device = Some(Box::new(source_device.clone()));
+    source_device.next_device = Some(Box::new(target_device.clone()));
+}
+
+/// Simulates calling the driver, forwarding the IRP down the device stack (IoCallDriver)
+pub fn io_call_driver(_device: &DeviceObject, irp: &mut Irp) -> u32 {
+    if irp.current_stack_index > 0 {
+        irp.current_stack_index -= 1;
+    }
+    irp.status = 0; // STATUS_SUCCESS
+    0
 }
 
 pub struct IrpHandler {
@@ -578,7 +723,7 @@ impl CallingConventionEngine {
 
     /// Simulate function call arguments alignment layout on the stack and registers.
     /// Returns register assignments and stack frame alignment offsets.
-    pub fn align_arguments(&self, _args: &[u64]) -> (Vec<(&'static str, u64)>, Vec<(usize, u64)>) {
+    pub fn align_arguments(&self, args: &[u64]) -> (Vec<(&'static str, u64)>, Vec<(usize, u64)>) {
         let mut registers = Vec::new();
         let mut stack = Vec::new();
 
@@ -703,7 +848,7 @@ mod tests {
     #[test]
     fn test_ke_service_descriptor_table() {
         let mut ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler(_args: &[u64]) -> u64 {
+        fn mock_handler(args: &[u64]) -> u64 {
             args[0] + args[1]
         }
 
@@ -741,7 +886,8 @@ mod tests {
     #[test]
     fn test_x86_rootkit_auditor() {
         let mut ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler1(_args: &[u64]) -> u64 { 1 }
+        fn mock_handler1(args: &[u64]) -> u64 { 1 }
+        fn mock_handler2(args: &[u64]) -> u64 { 2 }
         ssdt.register_service(1, mock_handler1, 0);
 
         let kernel_text = b"\x90\x90\xCC\xC3"; // mock instructions
@@ -759,7 +905,6 @@ mod tests {
 
         // Test 2: SSDT Hooking (handler hijack)
         let mut infected_ssdt = KeServiceDescriptorTable::new();
-        fn mock_handler2(__args: &[u64]) -> u64 { 2 } // Different handler for hijack simulation
         infected_ssdt.register_service(1, mock_handler2, 0); // hijacked handler
         let err2 = auditor.audit_system(kernel_text, &infected_ssdt, 0x7FFF0000, 0x7FFF0000);
         assert!(err2.is_err());
@@ -780,12 +925,11 @@ mod tests {
         }
         let handler = IrpHandler::new(|_| 0, |_| 0, mock_ioctl_dispatch);
 
-        let irp = Irp {
-            major_function: IrpMajorFunction::DeviceControl,
-            ioctl_code: 0x222000,
-            system_buffer: vec![0x11, 0x22],
-            status: 0,
-        };
+        let irp = Irp::new(
+            IrpMajorFunction::DeviceControl,
+            0x222000,
+            vec![0x11, 0x22],
+        );
 
         let res = handler.process_irp(irp);
         assert_eq!(res, 0);
@@ -814,5 +958,134 @@ mod tests {
         assert_eq!(regs_f[0], ("RCX", 10));
         assert_eq!(stack_f.len(), 1);
         assert_eq!(stack_f[0], (0, 50));
+    }
+
+    #[test]
+    fn test_layered_irp_stack_and_completion_routine() {
+        let mut irp = Irp::new_with_stack(
+            IrpMajorFunction::Write,
+            0,
+            vec![1, 2, 3],
+            3,
+        );
+        assert_eq!(irp.current_stack_index, 2);
+        assert_eq!(irp.stack_locations.len(), 3);
+
+        // Define a completion routine
+        use std::sync::atomic::{AtomicBool, Ordering};
+        static COMPLETION_CALLED: AtomicBool = AtomicBool::new(false);
+        fn completion_handler(dev: &DeviceObject, irp: &mut Irp) -> u32 {
+            COMPLETION_CALLED.store(true, Ordering::SeqCst);
+            assert_eq!(irp.system_buffer.len(), 3);
+            0
+        }
+
+        irp.set_completion_routine(completion_handler).unwrap();
+        irp.complete_request(0);
+
+        assert!(COMPLETION_CALLED.load(Ordering::SeqCst));
+    }
+
+    #[test]
+    fn test_attached_device_stack_traversal() {
+        let mut pdo = DeviceObject {
+            device_type: DeviceType::Physical,
+            driver_name: "pci",
+            next_device: None,
+            attached_device: None,
+        };
+
+        let mut fdo = DeviceObject {
+            device_type: DeviceType::Functional,
+            driver_name: "keyboard_driver",
+            next_device: None,
+            attached_device: None,
+        };
+
+        let mut filter = DeviceObject {
+            device_type: DeviceType::Filter,
+            driver_name: "safe_keyboard_filter",
+            next_device: None,
+            attached_device: None,
+        };
+
+        io_attach_device_to_device_stack(&mut fdo, &mut pdo);
+        io_attach_device_to_device_stack(&mut filter, &mut fdo);
+
+        // Verify next device chains
+        assert_eq!(fdo.next_device.as_ref().unwrap().driver_name, "pci");
+        assert_eq!(filter.next_device.as_ref().unwrap().driver_name, "keyboard_driver");
+    }
+
+    #[test]
+    fn test_rootkit_device_stack_auditer() {
+        let mut pdo = DeviceObject {
+            device_type: DeviceType::Physical,
+            driver_name: "pci",
+            next_device: None,
+            attached_device: None,
+        };
+
+        let mut fdo = DeviceObject {
+            device_type: DeviceType::Functional,
+            driver_name: "keyboard_driver",
+            next_device: None,
+            attached_device: None,
+        };
+
+        let mut rootkit_filter = DeviceObject {
+            device_type: DeviceType::Filter,
+            driver_name: "malicious_keylogger_filter",
+            next_device: None,
+            attached_device: None,
+        };
+
+        io_attach_device_to_device_stack(&mut fdo, &mut pdo);
+        io_attach_device_to_device_stack(&mut rootkit_filter, &mut fdo);
+
+        let ssdt = KeServiceDescriptorTable::new();
+        let auditor = X86RootkitAuditor::new(&[], &ssdt);
+
+        let allowed_drivers = ["pci", "keyboard_driver"];
+        // Auditing should detect the malicious_keylogger_filter since it's not in allowed_drivers
+        let res = auditor.audit_device_stack(&fdo, &allowed_drivers);
+        assert!(res.is_err());
+        assert_eq!(res.unwrap_err(), "Rootkit filter driver detected in device stack!");
+
+        // Auditing with a clean pdo containing no filter device should pass
+        let clean_pdo = DeviceObject {
+            device_type: DeviceType::Physical,
+            driver_name: "pci",
+            next_device: None,
+            attached_device: None,
+        };
+        let res2 = auditor.audit_device_stack(&clean_pdo, &["pci"]);
+        assert!(res2.is_ok());
+    }
+
+    #[test]
+    fn test_rootkit_dispatch_table_hook_auditer() {
+        let mut major_function: [Option<fn(&DeviceObject, &mut Irp) -> u32>; 8] = [None; 8];
+
+        fn mock_dispatch(_dev: &DeviceObject, _irp: &mut Irp) -> u32 { 0 }
+        major_function[0] = Some(mock_dispatch);
+
+        let driver = DriverObject {
+            driver_name: "keyboard_driver",
+            major_function,
+        };
+
+        let ssdt = KeServiceDescriptorTable::new();
+        let auditor = X86RootkitAuditor::new(&[], &ssdt);
+
+        // Bounds audit passes because mock_dispatch is at its actual address
+        let addr = mock_dispatch as *const () as usize;
+        let res = auditor.audit_driver_dispatch_table(&driver, addr - 100, addr + 100);
+        assert!(res.is_ok());
+
+        // Bounds audit fails if bounds are restricted to exclude the dispatch address (detecting hook redirect)
+        let res2 = auditor.audit_driver_dispatch_table(&driver, addr + 10, addr + 100);
+        assert!(res2.is_err());
+        assert_eq!(res2.unwrap_err(), "Rootkit hook detected in DriverObject major function dispatch table!");
     }
 }

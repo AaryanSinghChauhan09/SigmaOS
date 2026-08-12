@@ -1,5 +1,5 @@
-use crate::klib::Vec;
 use crate::kernel::KernelPersona;
+use crate::klib::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SymlinkError {
@@ -13,13 +13,6 @@ pub trait SymlinkResolverRule {
 }
 
 pub struct LegacyLinuxRule;
-
-impl SymlinkResolverRule for LegacyLinuxRule {
-    fn is_legacy(&self) -> bool {
-        true
-    }
-}
-
 pub struct LinuxPersonaRule;
 
 impl SymlinkResolverRule for LinuxPersonaRule {
