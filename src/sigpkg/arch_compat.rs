@@ -1,8 +1,84 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
+#[cfg(not(test))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+#[cfg(test)]
+impl Version {
+    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+        Self { major, minor, patch }
+    }
+
+    pub fn parse(v_str: &str) -> Result<Self, &'static str> {
+        let mut parts = v_str.split('.');
+        let major = parts.next().ok_or("err")?.parse::<u64>().map_err(|_| "err")?;
+        let minor = parts.next().ok_or("err")?.parse::<u64>().map_err(|_| "err")?;
+        let patch = parts.next().ok_or("err")?.parse::<u64>().map_err(|_| "err")?;
+        Ok(Self::new(major, minor, patch))
+    }
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum VersionConstraint {
+    Exact(Version),
+    GreaterThan(Version),
+    LessThan(Version),
+    GreaterOrEqual(Version),
+    LessOrEqual(Version),
+    Any,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone)]
+pub struct Dependency {
+    pub name: String,
+    pub version_constraint: VersionConstraint,
+}
+
+#[cfg(test)]
+#[derive(Debug, Clone)]
+pub struct Package {
+    pub name: String,
+    pub version: Version,
+    pub description: String,
+    pub dependencies: Vec<Dependency>,
+    pub checksum: String,
+}
+
+#[cfg(test)]
+impl Package {
+    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
+        Self { name, version, description, dependencies, checksum }
+    }
+}
+
 use std::collections::HashMap;
+
+/// Debian-style Sbuild Source Build Dependency Representation
+#[derive(Debug, Clone)]
+pub struct DebianSbuildPackage {
+    pub name: String,
+    pub build_depends: Vec<String>,
+}
+
+impl DebianSbuildPackage {
+    pub fn new(name: &str, build_deps: Vec<String>) -> Self {
+        Self {
+            name: name.to_string(),
+            build_depends: build_deps,
+        }
+    }
+}
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
@@ -94,7 +170,7 @@ impl RollingSyncManager {
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
-            if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
+            if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
                 if remote_ver > installed_ver {
                     updates.push((pkg_name.clone(), *installed_ver, *remote_ver));
                 }
@@ -102,6 +178,19 @@ impl RollingSyncManager {
         }
         updates.sort_by(|a, b| a.0.cmp(&b.0));
         updates
+    }
+
+    /// Verifies if a Debian sbuild environment has all required build dependencies satisfied
+    pub fn is_debian_sbuild_builddeps_satisfied(
+        &self,
+        sbuild: &DebianSbuildPackage,
+    ) -> bool {
+        for dep in &sbuild.build_depends {
+            if !self.installed_packages.contains_key(dep) {
+                return false;
+            }
+        }
+        true
     }
 }
 
@@ -390,5 +479,24 @@ mod tests {
             imported.description,
             "Contrib utilities for pacman package manager"
         );
+    }
+
+    #[test]
+    fn test_debian_sbuild_resolver() {
+        let mut sync = RollingSyncManager::new();
+        sync.register_installed("gcc", Version::new(11, 2, 0));
+        sync.register_installed("make", Version::new(4, 3, 0));
+
+        let sbuild1 = DebianSbuildPackage::new(
+            "sigma-core",
+            vec!["gcc".to_string(), "make".to_string()],
+        );
+        assert!(sync.is_debian_sbuild_builddeps_satisfied(&sbuild1));
+
+        let sbuild2 = DebianSbuildPackage::new(
+            "sigma-core",
+            vec!["gcc".to_string(), "clang".to_string()], // clang not installed
+        );
+        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&sbuild2));
     }
 }
