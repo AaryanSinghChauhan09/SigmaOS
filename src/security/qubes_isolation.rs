@@ -214,3 +214,26 @@ impl TemplateVmManager {
         if self.app_vm_count > 0 {
             self.app_vm_count -= 1;
             self.active_overlays_allocated_bytes = self.active_overlays_allocated_bytes.saturating_sub(128 * 1024 * 1024);
+        }
+    }
+}
+
+#[cfg(not(test))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    crate::klib::custom_allocator::alloc(size)
+}
+
+#[cfg(not(test))]
+unsafe fn free(ptr: *mut u8) {
+    crate::klib::custom_allocator::free(ptr)
+}
+
+#[cfg(test)]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    std::alloc::alloc(std::alloc::Layout::from_size_align(size, 8).unwrap())
+}
+
+#[cfg(test)]
+unsafe fn free(ptr: *mut u8) {
+    std::alloc::dealloc(ptr, std::alloc::Layout::from_size_align(1, 8).unwrap()) // placeholder size
+}

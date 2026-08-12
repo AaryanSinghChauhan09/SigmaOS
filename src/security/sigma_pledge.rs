@@ -34,7 +34,7 @@ use sigma_types::{CapabilityToken, Result};
 use crate::klib::HashSet;
 
 /// Pledge namespaces representing different syscall categories
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum PledgeNamespace {
     /// TCP/UDP socket creation
     Inet,
