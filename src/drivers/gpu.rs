@@ -110,6 +110,8 @@ pub struct GpuDriver {
     pub height: u32,
     pub capabilities: CapabilityToken,
     pub frame_buffer: Vec<u32>,
+    pub crtc: Option<DrmCrtc>,
+    pub connector: Option<DrmConnector>,
     // Mesa/Vulkan-inspired state tracking
     pub registered_pipelines: Vec<GpuPipeline>,
     pub bound_pipeline_id: Option<usize>,
@@ -124,6 +126,8 @@ impl GpuDriver {
             height,
             capabilities: CapabilityToken::new(),
             frame_buffer: vec![0; size],
+            crtc: None,
+            connector: None,
             registered_pipelines: Vec::new(),
             bound_pipeline_id: None,
             reset_state: GpuResetState {

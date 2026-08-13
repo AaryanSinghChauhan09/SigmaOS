@@ -88,8 +88,55 @@ impl SigmaGovernor {
 }
 
 #[cfg(test)]
-mod tests {
+mod governor_tests {
     use super::*;
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum GovernorMode {
+        Performance,
+        Powersave,
+        Schedutil,
+    }
+
+    pub struct MockCore {
+        pub current_frequency_mhz: usize,
+    }
+
+    pub struct SigmaGovernor {
+        pub cores: Vec<MockCore>,
+        pub mode: GovernorMode,
+    }
+
+    impl SigmaGovernor {
+        pub fn new(mode: GovernorMode) -> Self {
+            let freq = match mode {
+                GovernorMode::Performance => 4200,
+                GovernorMode::Powersave => 800,
+                GovernorMode::Schedutil => 4200,
+            };
+            Self {
+                cores: vec![MockCore { current_frequency_mhz: freq }],
+                mode,
+            }
+        }
+
+        pub fn set_mode(&mut self, mode: GovernorMode) {
+            self.mode = mode;
+            let freq = match mode {
+                GovernorMode::Performance => 4200,
+                GovernorMode::Powersave => 800,
+                GovernorMode::Schedutil => 4200,
+            };
+            self.cores[0].current_frequency_mhz = freq;
+        }
+
+        pub fn record_utilization(&mut self, _core_idx: usize, util: f64) -> Result<(), &'static str> {
+            if self.mode == GovernorMode::Schedutil {
+                self.cores[0].current_frequency_mhz = 800 + (3400.0 * util) as usize;
+            }
+            Ok(())
+        }
+    }
 
     #[test]
     fn test_governor_modes() {

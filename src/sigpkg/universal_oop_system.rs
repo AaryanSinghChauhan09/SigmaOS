@@ -16,6 +16,8 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+extern crate alloc;
+
 // Universal OOP Package System for SigmaOS
 // Supports all Linux distro package formats with user-defined functions
 // Implements Strategy Pattern, Adapter Pattern, and Factory Pattern
@@ -2466,7 +2468,8 @@ Depends: kernel-base";
             }
         }
 
-        adapter.add_hook(Arc::new(CustomHook));
+        let custom_hook: Arc<dyn UserDefinedHook> = Arc::new(CustomHook);
+        adapter.add_hook(custom_hook);
 
         let deb_data = b"Package: original
 Version: 1.0.0

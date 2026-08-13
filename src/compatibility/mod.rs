@@ -76,3 +76,8 @@ pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
 };
+
+pub use sigmawin::{
+    PeLoader, PeSection, PeFormat, RegistryManager, User32MessageQueue, WinSockAdapter,
+    D3dToVulkanTranslator, NtHandleTable, NtObject, NtObjectType, Win32Message, Win32Error,
+};

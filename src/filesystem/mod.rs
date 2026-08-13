@@ -9,6 +9,7 @@ pub mod tmpfs;
 pub mod vfs;
 pub mod legacy_fs;
 pub mod sigma_fs;
+pub mod complete_filesystems;
 
 pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{

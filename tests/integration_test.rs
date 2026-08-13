@@ -38,7 +38,15 @@ use sigmaos::performance::{
     BoreScheduler, AnanicyRule, IoSchedClass, AnanicyCppDaemon, PhysicalPageFrame,
     UltraKernelSamepageMerger, X86v3v4OptimizationDetector, CachyKernelManager,
 };
-use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
+use sigmaos::productivity::*;
+
+use std::collections::HashMap;
+use sigmaos::crash::{CrashPipeline, Anonymizer};
+use sigmaos::filesystem::sigma_fs::{SigmaFsCrypt, SigmaFsVirtio};
+use sigmaos::filesystem::{SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid, VirtualFilesystem, FileType};
+use sigmaos::ColorRgba;
+use sigmaos::compatibility::DesktopMode;
+
 use sigmaos::resilience::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
 use sigmaos::security::{
     AnonSurfShunt, AppSandboxEngine, CapabilityToken, DefensiveAuditSystem, ForensicBlock,

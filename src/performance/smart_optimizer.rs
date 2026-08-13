@@ -294,10 +294,10 @@ mod tests {
     #[test]
     fn test_cpu_priority_optimizer() {
         let optimizer = CpuPriorityOptimizer::new();
-        let mut proc1 = Process::new(1, alloc::string::String::from("test1"), Priority::Normal);
+        let mut proc1 = Process::new(1, String::from("test1"), Priority::Normal);
         proc1.state = ProcessState::Running;
 
-        let mut proc2 = Process::new(2, alloc::string::String::from("test2"), Priority::Normal);
+        let mut proc2 = Process::new(2, String::from("test2"), Priority::Normal);
         proc2.state = ProcessState::Blocked;
 
         let mut processes = [proc1, proc2];
