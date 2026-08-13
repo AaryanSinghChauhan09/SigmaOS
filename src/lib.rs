@@ -27,10 +27,13 @@ pub use timeline_innovations::{
     GpuKernel, GpuComputeEngine, ProcessorArch, CoreGroup, CoreFrequencyState, EnergyOptimizer,
 };
 
+pub mod compatibility {
+    pub mod fedora;
+}
+
 // Temporarily disabled problematic modules
 // pub mod accessibility;
 // pub mod automation;
-// pub mod compatibility;
 // pub mod container;
 // pub mod customization;
 // pub mod dashboard;
