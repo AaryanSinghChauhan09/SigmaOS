@@ -244,8 +244,9 @@ impl PeripheralDeviceTrait for VesaDriver {
         PowerState::On // VESA is always on when initialized
     }
 
-    fn set_power_state(&mut self, _state: PowerState) {
+    fn set_power_state(&mut self, _state: PowerState) -> Result<(), &'static str> {
         // VESA doesn't support power state changes in this minimal implementation
+        Ok(())
     }
 }
 

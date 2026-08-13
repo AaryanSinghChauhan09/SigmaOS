@@ -43,7 +43,8 @@ impl PeripheralDeviceTrait for LegacySerialPort {
         self.power_state
     }
 
-    fn set_power_state(&mut self, state: PowerState) {
+    fn set_power_state(&mut self, state: PowerState) -> Result<(), &'static str> {
         self.power_state = state;
+        Ok(())
     }
 }
