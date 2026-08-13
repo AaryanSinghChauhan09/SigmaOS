@@ -1,7 +1,7 @@
 // SigmaOS Archive Manager
 // OOP-based archive creation and extraction with multiple formats
 
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 /// Archive format

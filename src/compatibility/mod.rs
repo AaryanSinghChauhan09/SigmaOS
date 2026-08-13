@@ -4,9 +4,9 @@ pub mod cross_platform;
 pub mod zorin;
 
 pub use zorin::{
-    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
-    ZorinChameleonColor, ZorinChameleonEngine,
-    ZorinConnectState, ZorinConnectManager,
+    ZorinLayoutSwitcher,
+    ZorinChameleonEngine,
+    ZorinConnectManager,
     ZorinWindowsAppSupport,
 };
 pub mod historic_linux;
@@ -43,10 +43,6 @@ pub use cross_platform::{
     CompatibilityError, CompatibilityError as CrossPlatformError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, HtmlRendererCapability, MediaDecoderCapability,
     SupersetApplicationCapability, TargetPlatform, TranslationLayer,
-};
-pub use endeavour::{
-    EosLogTool, EosMirrorReflector, EosUpdateNotifier, EosWelcomeEngine, Mirror, WelcomeTab,
-    YayAurHelper,
 };
 
 pub use mint_linux::{

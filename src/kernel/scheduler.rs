@@ -135,7 +135,7 @@ impl Process {
         let nice_adjustment = (self.nice_value as i32).abs() as u32;
         let weight = base_weight + nice_adjustment;
         
-        self.virtual_deadline = current_time + (1000 / weight);
+        self.virtual_deadline = current_time + ((1000 / weight) as u64);
     }
 
     pub fn get_dynamic_time_slice(&self, thermal_state: ThermalState) -> Duration {

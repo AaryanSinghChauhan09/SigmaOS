@@ -21,11 +21,15 @@
 // OOP-based memory leak detection with tracking and analysis
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{BTreeMap, HashSet};
+use crate::klib::BTreeMap;
 
 #[cfg(feature = "standalone_test")]
-use std::collections::{BTreeMap, HashSet};
+use std::collections::BTreeMap;
 
+#[cfg(not(feature = "standalone_test"))]
+use std::time::{Duration, Instant};
+
+#[cfg(feature = "standalone_test")]
 use std::time::{Duration, Instant};
 
 /// Memory allocation record

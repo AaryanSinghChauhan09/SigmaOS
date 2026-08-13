@@ -17,40 +17,22 @@
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
 // SigmaOS Kernel Module
-pub mod breakthroughs;
-pub mod ipc;
+// Core working components
 pub mod memory;
-pub mod meta;
-pub mod paging;
-pub mod policy_mechanism;
-pub mod roundrobin;
 pub mod scheduler;
-pub mod self_healing;
-pub mod udkf;
-pub mod object;
-pub mod proc;
 
-pub use breakthroughs::{
-    AiNativeRuntime, DeterministicReplayEngine, DynamicKernelPersonalitySwitcher,
-    EnergyAwareScheduler, InterruptRatePredictor, KernelPersonalityMode, PrivacyFirstSandbox,
-    SelfHealingKernel, SigmaFsPlusPlus, UniversalAbiTranslator, UserDefinedKernelFunctions,
-};
-pub use ipc::{Channel, IpcError, IpcManager, Message};
+// Temporarily disabled problematic modules
+// pub mod breakthroughs;
+// pub mod ipc;
+// pub mod meta;
+// pub mod paging;
+// pub mod policy_mechanism;
+// pub mod roundrobin;
+// pub mod self_healing;
+// pub mod udkf;
+// pub mod object;
+// pub mod proc;
+
+// Working exports
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
-pub use meta::{
-    ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
-    MetaKernel, MicroDriver, NetPod,
-};
-pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
-pub use policy_mechanism::{
-    FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
-    ResourceBroker,
-};
-pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
-pub use self_healing::{
-    SovereignSelfHealingKernel,
-};
-pub use udkf::{
-    UdkfHook, UserDefinedKernelFunctions,
-};

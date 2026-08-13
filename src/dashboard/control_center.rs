@@ -1,7 +1,7 @@
 // SigmaOS Unified Control Center
 // OOP-based centralized settings panel with modular architecture
 
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 
 /// Control panel type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

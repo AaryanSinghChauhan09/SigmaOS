@@ -1,8 +1,22 @@
-#![no_std]
-#![no_main]
-
 use core::mem;
-use core::sync::atomic::{AtomicUsize, Ordering};
+
+#[cfg(not(target_os = "none"))]
+unsafe fn alloc(size: usize) -> *mut u8 {
+    use std::alloc::{alloc as std_alloc, Layout};
+    let layout = Layout::from_size_align(size, 8).unwrap();
+    std_alloc(layout)
+}
+
+#[cfg(not(target_os = "none"))]
+unsafe fn free(ptr: *mut u8) {
+    let _ = ptr;
+}
+
+#[cfg(target_os = "none")]
+extern "C" {
+    fn alloc(size: usize) -> *mut u8;
+    fn free(ptr: *mut u8);
+}
 
 pub struct Vec<T> {
     pub data: *mut T,
@@ -17,6 +31,18 @@ impl<T> Vec<T> {
             len: 0,
             capacity: 0,
         }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn iter(&self) -> core::slice::Iter<T> {
+        unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
     }
 
     pub fn push(&mut self, item: T) {
@@ -60,7 +86,7 @@ impl<T> Vec<T> {
     {
         let mut write_idx = 0;
         for i in 0..self.len {
-            let item = &self[i];
+            let item = unsafe { &*self.data.add(i) };
             if f(item) {
                 if write_idx != i {
                     unsafe {
@@ -81,14 +107,6 @@ impl<T> Vec<T> {
         self.len = write_idx;
     }
 
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len == 0
-    }
-
     unsafe fn grow(&mut self) {
         let new_capacity = if self.capacity == 0 {
             4
@@ -106,6 +124,15 @@ impl<T> Vec<T> {
             self.data = new_data;
             self.capacity = new_capacity;
         }
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Vec<T> {
+    type Item = &'a T;
+    type IntoIter = core::slice::Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 
@@ -139,22 +166,4 @@ impl<T> Drop for Vec<T> {
             }
         }
     }
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn alloc(size: usize) -> *mut u8 {
-    use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
-}
-
-#[cfg(not(target_os = "none"))]
-unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
-}
-
-#[cfg(target_os = "none")]
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
 }

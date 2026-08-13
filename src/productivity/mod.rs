@@ -1,6 +1,5 @@
 // SigmaOS Productivity Module
 pub mod advanced_app_absorber;
-pub mod advanced_app_absorber;
 pub mod gamification;
 pub mod media;
 pub mod notes;

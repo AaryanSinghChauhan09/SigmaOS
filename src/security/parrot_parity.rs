@@ -1,7 +1,6 @@
 // SigmaOS Parrot Security Parity Implementation
 // Implements AnonSurf routing, AppSandbox policy engine, and forensic write-blocker
 
-use crate::klib::SigmaString;
 use core::cell::Cell;
 
 /// Routing modes for network traffic

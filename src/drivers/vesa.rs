@@ -1,8 +1,8 @@
 // SigmaOS VESA Framebuffer Driver
 // Hardware abstraction for VESA BIOS extensions + PeripheralDevice OOP integration
 
-use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
-use crate::security::CapabilityToken;
+use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice as PeripheralDeviceTrait, PowerState};
+use crate::security::capability::CapabilityToken;
 
 /// VESA mode info
 #[derive(Debug, Clone)]
@@ -24,6 +24,7 @@ pub struct VesaDriver {
     pub aspect_ratio: &'static str,
     pub double_buffered: bool,
     pub back_buffer: std::sync::Mutex<Vec<u32>>, // thread-safe Mutex
+    pub device_id: u32,
 }
 
 impl VesaDriver {
@@ -43,6 +44,7 @@ impl VesaDriver {
             aspect_ratio: "4:3",
             double_buffered: true,
             back_buffer: std::sync::Mutex::new(vec![0; 1024 * 768]),
+            device_id: 3,
         }
     }
 
@@ -70,6 +72,7 @@ impl VesaDriver {
             aspect_ratio,
             double_buffered: true,
             back_buffer: std::sync::Mutex::new(vec![0; (width * height) as usize]),
+            device_id: 3,
         }
     }
 
@@ -228,56 +231,21 @@ impl VesaDriver {
     }
 }
 
-impl PeripheralDevice for VesaDriver {
-    fn name(&self) -> &'static str {
-        "VESA Framebuffer"
+impl PeripheralDeviceTrait for VesaDriver {
+    fn device_id(&self) -> u32 {
+        self.device_id
     }
+
     fn generation(&self) -> DeviceGeneration {
         DeviceGeneration::Legacy
     }
 
-    fn initialize(&mut self) -> Result<(), &'static str> {
-        self.initialize().map_err(|_| "VESA: Initialization failed")
+    fn power_state(&self) -> PowerState {
+        PowerState::On // VESA is always on when initialized
     }
 
-    fn read(&mut self, buffer: &mut [u8]) -> Result<usize, &'static str> {
-        // Framebuffers are write-only; return mode info bytes instead
-        let info = [
-            (self.mode_info.width >> 8) as u8,
-            (self.mode_info.width & 0xFF) as u8,
-            (self.mode_info.height >> 8) as u8,
-            (self.mode_info.height & 0xFF) as u8,
-            self.mode_info.bpp as u8,
-            self.current_mode as u8,
-        ];
-        let len = buffer.len().min(info.len());
-        buffer[..len].copy_from_slice(&info[..len]);
-        Ok(len)
-    }
-
-    fn write(&mut self, data: &[u8]) -> Result<usize, &'static str> {
-        // Interpret data as (x_hi, x_lo, y_hi, y_lo, r, g, b, a) pixel write packets
-        let mut written = 0;
-        let mut idx = 0;
-        while idx + 7 < data.len() {
-            let x = u32::from_be_bytes([0, 0, data[idx], data[idx + 1]]);
-            let y = u32::from_be_bytes([0, 0, data[idx + 2], data[idx + 3]]);
-            let color =
-                u32::from_be_bytes([data[idx + 4], data[idx + 5], data[idx + 6], data[idx + 7]]);
-            self.write_pixel_raw(x, y, color).ok();
-            idx += 8;
-            written += 8;
-        }
-        Ok(written)
-    }
-
-    fn set_power_state(&mut self, _state: PowerState) -> Result<(), &'static str> {
-        Ok(())
-    }
-
-    fn shutdown(&mut self) -> Result<(), &'static str> {
-        self.fill_screen(0x00000000).ok();
-        Ok(())
+    fn set_power_state(&mut self, _state: PowerState) {
+        // VESA doesn't support power state changes in this minimal implementation
     }
 }
 
