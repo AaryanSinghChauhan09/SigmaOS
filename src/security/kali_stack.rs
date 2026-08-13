@@ -349,13 +349,25 @@ impl<T> Drop for Vec<T> {
 #[cfg(not(target_os = "none"))]
 unsafe fn alloc(size: usize) -> *mut u8 {
     use std::alloc::{alloc as std_alloc, Layout};
-    let layout = Layout::from_size_align(size, 8).unwrap();
-    std_alloc(layout)
+    let layout = Layout::from_size_align(size + 16, 8).unwrap();
+    let ptr = std_alloc(layout);
+    if ptr.is_null() {
+        return ptr;
+    }
+    *(ptr as *mut usize) = size;
+    ptr.add(16)
 }
 
 #[cfg(not(target_os = "none"))]
 unsafe fn free(ptr: *mut u8) {
-    let _ = ptr;
+    if ptr.is_null() {
+        return;
+    }
+    use std::alloc::{dealloc, Layout};
+    let original_ptr = ptr.sub(16);
+    let size = *(original_ptr as *const usize);
+    let layout = Layout::from_size_align(size + 16, 8).unwrap();
+    dealloc(original_ptr, layout);
 }
 
 #[cfg(target_os = "none")]

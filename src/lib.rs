@@ -67,6 +67,7 @@ pub use drivers::{
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+    SpecialDevice, NullDevice, ZeroDevice, RandomDevice,
 };
 pub use gpu::{
     GpuFrameFormat, GpuRecordedFrame, GpuRecorderStats, GpuScreenRecorder,
