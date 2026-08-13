@@ -28,6 +28,7 @@ pub mod modern_nvme;
 pub mod modern_usb_printer;
 pub mod modern_wifi;
 pub mod touch_jingos;
+pub mod unified_dma;
 
 pub use even_more_devices::*;
 pub use gpu::{GpuCommand, GpuDriver, GpuError};
@@ -53,3 +54,7 @@ pub use modern_nvme::ModernNvmeDriver;
 pub use modern_usb_printer::ModernUsbPrinter;
 pub use modern_wifi::ModernWifiDriver;
 pub use touch_jingos::TouchJingOS;
+pub use unified_dma::{
+    UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
+    DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
+};

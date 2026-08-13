@@ -106,6 +106,8 @@ pub use drivers::{
     InputEvent, InputType, NetworkCommand, NetworkDriver, NetworkError, NetworkType,
     StorageCommand, StorageDriver, StorageError, StorageType, UsbHidDriver, VesaDriver, VesaError,
     VesaModeInfo,
+    UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
+    DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
