@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/aaryansinghchauhan/SigmaOS
+cd "$(dirname "$0")"
 mkdir -p wiki
 
 cat << 'WIKI' > wiki/Home.md
@@ -69,5 +69,3 @@ cat << 'WIKI' > wiki/Code-Scanning-Fixes.md
 Recent updates removed unsafe transmutes, unused variables, and potential security risks from the codebase.
 WIKI
 
-chmod +x create_wiki.sh
-./create_wiki.sh

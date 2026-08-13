@@ -64,21 +64,6 @@ impl Package {
 
 use std::collections::HashMap;
 
-/// Debian-style Sbuild Source Build Dependency Representation
-#[derive(Debug, Clone)]
-pub struct DebianSbuildPackage {
-    pub name: String,
-    pub build_depends: Vec<String>,
-}
-
-impl DebianSbuildPackage {
-    pub fn new(name: &str, build_deps: Vec<String>) -> Self {
-        Self {
-            name: name.to_string(),
-            build_depends: build_deps,
-        }
-    }
-}
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
