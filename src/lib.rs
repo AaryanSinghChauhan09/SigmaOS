@@ -11,6 +11,13 @@ pub mod security {
     pub mod capability;
 }
 
+pub mod timeline_innovations;
+
+pub use timeline_innovations::{
+    SdkLanguage, SdkAppDescriptor, SigmaOsSdk, NodeState, HpcClusterNode, HpcClusterManager,
+    GpuKernel, GpuComputeEngine, ProcessorArch, CoreGroup, CoreFrequencyState, EnergyOptimizer,
+};
+
 // Temporarily disabled problematic modules
 // pub mod accessibility;
 // pub mod automation;
