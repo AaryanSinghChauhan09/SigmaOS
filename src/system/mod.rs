@@ -21,6 +21,7 @@
 
 pub mod cleanup;
 pub mod config;
+pub mod cron;
 pub mod defrag;
 pub mod duplicate;
 pub mod generation_manager;
@@ -40,6 +41,9 @@ pub use cleanup::{
 };
 pub use config::{
     ConfigEntry, ConfigError, ConfigType, ServiceManager, ServiceUnit, SystemConfigManager,
+};
+pub use cron::{
+    CronJob, CronSchedule, CronManager, CronError,
 };
 pub use defrag::{
     DefragError, DefragResult, DefragStrategy, DiskDefragmenter, FileBlockInfo,
