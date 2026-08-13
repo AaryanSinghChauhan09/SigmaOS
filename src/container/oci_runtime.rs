@@ -9,8 +9,8 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 
 pub type ContainerID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ContainerState {
     Created = 0,
     Running = 1,

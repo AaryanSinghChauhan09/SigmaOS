@@ -167,6 +167,7 @@ pub use resilience::{
     SystemSnapshot,
 };
 pub use security::{
+    KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
     PORT_ALLOW_SSL, PORT_ALLOW_TCP,

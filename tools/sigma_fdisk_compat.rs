@@ -11,6 +11,14 @@ type SigmaI32 = i32;
 type SigmaBool = bool;
 type SigmaU64 = u64;
 
+/// Partition layouts supported (Inspired by Linux parted & modern fdisk GPT)
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[repr(C)]
+pub enum PartitionTableScheme {
+    MBR,
+    GPT,
+}
+
 /// Partition types
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[repr(C)]
@@ -23,6 +31,7 @@ pub enum PartitionType {
 
 /// Partition entry
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct Partition {
     pub number: SigmaU32,
     pub bootable: SigmaBool,
@@ -30,15 +39,18 @@ pub struct Partition {
     pub size_sectors: SigmaU64,
     pub partition_type: PartitionType,
     pub partition_id: [u8; 4],
+    pub gpt_uuid: [u8; 16], // Added standard GPT unique GUID tracking
 }
 
 /// Disk device
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct DiskDevice {
     pub name: [u8; 32],
     pub size_bytes: SigmaU64,
     pub sector_size: SigmaU32,
     pub partition_count: SigmaU32,
+    pub scheme: PartitionTableScheme, // MBR vs GPT scheme selection
 }
 
 /// Fdisk state
@@ -50,6 +62,7 @@ static mut DISKS: [DiskDevice; MAX_DISKS] = [DiskDevice {
     size_bytes: 0,
     sector_size: 512,
     partition_count: 0,
+    scheme: PartitionTableScheme::MBR,
 }; MAX_DISKS];
 
 static mut PARTITIONS: [Partition; MAX_PARTITIONS] = [Partition {
@@ -57,8 +70,9 @@ static mut PARTITIONS: [Partition; MAX_PARTITIONS] = [Partition {
     bootable: false,
     start_sector: 0,
     size_sectors: 0,
-    partition_type:PartitionType::Empty,
+    partition_type: PartitionType::Empty,
     partition_id: [0; 4],
+    gpt_uuid: [0; 16],
 }; MAX_PARTITIONS];
 
 static mut DISK_COUNT: SigmaU32 = 0;
@@ -72,16 +86,18 @@ pub unsafe extern "C" fn fdisk_init() -> SigmaI32 {
     DISK_COUNT = 0;
     PARTITION_COUNT = 0;
     
-    // Add sample disk
+    // Add sample disk with modern GPT table scheme (Linux standard)
     let mut sda = DiskDevice {
         name: [0; 32],
         size_bytes: 500 * 1024 * 1024 * 1024, // 500GB
         sector_size: 512,
         partition_count: 0,
+        scheme: PartitionTableScheme::GPT,
     };
     
-    for i in 0..31 {
-        sda.name[i] = b"/dev/sda"[i.min(8)];
+    let default_name = b"/dev/sda";
+    for i in 0..default_name.len().min(31) {
+        sda.name[i] = default_name[i];
     }
     
     DISKS[0] = sda;
@@ -93,7 +109,7 @@ pub unsafe extern "C" fn fdisk_init() -> SigmaI32 {
 /// List disks
 #[no_mangle]
 pub unsafe extern "C" fn fdisk_list_disks(disks: *mut DiskDevice, max_count: SigmaU32) -> SigmaU32 {
-    if !FDISK_INITIALIZED || disks.isnull() {
+    if !FDISK_INITIALIZED || disks.is_null() {
         return 0;
     }
     
@@ -106,7 +122,7 @@ pub unsafe extern "C" fn fdisk_list_disks(disks: *mut DiskDevice, max_count: Sig
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// List partitions for disk
@@ -116,7 +132,7 @@ pub unsafe extern "C" fn fdisk_list_partitions(
     partitions: *mut Partition,
     max_count: SigmaU32,
 ) -> SigmaU32 {
-    if !FDISK_INITIALIZED || disk_name.isnull() || partitions.isnull() {
+    if !FDISK_INITIALIZED || disk_name.is_null() || partitions.is_null() {
         return 0;
     }
     
@@ -129,7 +145,7 @@ pub unsafe extern "C" fn fdisk_list_partitions(
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Create partition
@@ -140,17 +156,25 @@ pub unsafe extern "C" fn fdisk_create_partition(
     start_sector: SigmaU64,
     size_sectors: SigmaU64,
 ) -> SigmaI32 {
-    if !FDISK_INITIALIZED || PARTITION_COUNT >= MAX_PARTITIONS as SigmaU32 {
+    if !FDISK_INITIALIZED || PARTITION_COUNT >= MAX_PARTITIONS as SigmaU32 || disk_name.is_null() {
         return -1;
     }
     
-    let mut partition = Partition {
+    // Simulate unique GPT UUID generation
+    let mut uuid = [0u8; 16];
+    let seed = PARTITION_COUNT as u8;
+    for i in 0..16 {
+        uuid[i] = seed.wrapping_add(i as u8);
+    }
+
+    let partition = Partition {
         number: PARTITION_COUNT as SigmaU32 + 1,
         bootable: false,
         start_sector,
         size_sectors,
         partition_type,
         partition_id: [0x83, 0, 0, 0], // Linux partition
+        gpt_uuid: uuid,
     };
     
     PARTITIONS[PARTITION_COUNT as usize] = partition;
@@ -186,7 +210,7 @@ pub unsafe extern "C" fn fdisk_create_partition(
 /// Delete partition
 #[no_mangle]
 pub unsafe extern "C" fn fdisk_delete_partition(disk_name: *const u8, partition_number: SigmaU32) -> SigmaI32 {
-    if !FDISK_INITIALIZED || disk_name.isnull() {
+    if !FDISK_INITIALIZED || disk_name.is_null() {
         return -1;
     }
     
@@ -256,4 +280,24 @@ pub unsafe extern "C" fn fdisk_get_disk_count() -> SigmaU32 {
 #[no_mangle]
 pub unsafe extern "C" fn fdisk_get_partition_count() -> SigmaU32 {
     PARTITION_COUNT
+}
+
+// Simple test harness
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fdisk_gpt_schemes() {
+        unsafe {
+            fdisk_init();
+            assert_eq!(fdisk_get_disk_count(), 1);
+            assert_eq!(DISKS[0].scheme, PartitionTableScheme::GPT);
+
+            let disk_ptr = DISKS[0].name.as_ptr();
+            fdisk_create_partition(disk_ptr, PartitionType::Primary, 2048, 100000);
+            assert_eq!(fdisk_get_partition_count(), 1);
+            assert_eq!(PARTITIONS[0].gpt_uuid[0], 0); // first byte matching partition count seed (0)
+        }
+    }
 }
