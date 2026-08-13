@@ -120,8 +120,14 @@ impl ManjaroKernelSwitcher {
         let mut available = HashMap::new();
         available.insert(ManjaroKernelRelease::LinuxStable, "6.22-stable".to_string());
         available.insert(ManjaroKernelRelease::LinuxLts, "6.12-lts".to_string());
-        available.insert(ManjaroKernelRelease::LinuxRealtimeRt, "6.12-rt-rt15".to_string());
-        available.insert(ManjaroKernelRelease::LinuxExperimental, "6.23-rc3".to_string());
+        available.insert(
+            ManjaroKernelRelease::LinuxRealtimeRt,
+            "6.12-rt-rt15".to_string(),
+        );
+        available.insert(
+            ManjaroKernelRelease::LinuxExperimental,
+            "6.23-rc3".to_string(),
+        );
 
         Self {
             available_kernels: available,
@@ -178,16 +184,23 @@ impl PamacPackageManager {
         self.mirrors.sort_by(|a, b| {
             let score_a = (a.latency_ms as f64) / (a.reliability_score as f64);
             let score_b = (b.latency_ms as f64) / (b.reliability_score as f64);
-            score_a.partial_cmp(&score_b).unwrap_or(std::cmp::Ordering::Equal)
+            score_a
+                .partial_cmp(&score_b)
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
     }
 
     /// Simulates transaction-based safe rolling package upgrade
-    pub fn transaction_upgrade(&mut self, package_name: &str, version: &str) -> Result<(), &'static str> {
+    pub fn transaction_upgrade(
+        &mut self,
+        package_name: &str,
+        version: &str,
+    ) -> Result<(), &'static str> {
         if self.mirrors.is_empty() {
             return Err("Cannot perform upgrade. Mirror database list is empty.");
         }
-        self.installed_packages.insert(package_name.to_string(), version.to_string());
+        self.installed_packages
+            .insert(package_name.to_string(), version.to_string());
         Ok(())
     }
 }
@@ -245,7 +258,10 @@ mod tests {
 
         let configs = mhwd.auto_configure().unwrap();
         assert_eq!(configs, 2);
-        assert_eq!(mhwd.installed_drivers[0].name, "video-hybrid-intel-nvidia-prime");
+        assert_eq!(
+            mhwd.installed_drivers[0].name,
+            "video-hybrid-intel-nvidia-prime"
+        );
         assert_eq!(mhwd.installed_drivers[1].name, "video-linux-intel");
     }
 
@@ -254,9 +270,14 @@ mod tests {
         let mut switcher = ManjaroKernelSwitcher::new(ManjaroKernelRelease::LinuxLts);
         assert_eq!(switcher.active_kernel, ManjaroKernelRelease::LinuxLts);
 
-        let target_ver = switcher.switch_kernel(ManjaroKernelRelease::LinuxRealtimeRt).unwrap();
+        let target_ver = switcher
+            .switch_kernel(ManjaroKernelRelease::LinuxRealtimeRt)
+            .unwrap();
         assert_eq!(target_ver, "6.12-rt-rt15");
-        assert_eq!(switcher.active_kernel, ManjaroKernelRelease::LinuxRealtimeRt);
+        assert_eq!(
+            switcher.active_kernel,
+            ManjaroKernelRelease::LinuxRealtimeRt
+        );
         assert_eq!(switcher.hot_swaps_completed, 1);
     }
 

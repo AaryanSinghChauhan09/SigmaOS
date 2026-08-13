@@ -1,10 +1,9 @@
 /// Advanced High-Fidelity TCP/UDP Networking Stack & BSD Sockets for SigmaOS
 /// Inspired by Linux and FreeBSD socket layers, featuring stateful transitions and congestion control.
-
 extern crate alloc;
 
-use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, Ordering};
 
 pub type SocketID = usize;
@@ -164,7 +163,8 @@ impl TCPConnection for SimpleSocket {
 
         // Transition: Closed -> SynSent -> Established
         self.state.store(TCPState::SynSent as u32, Ordering::SeqCst);
-        self.state.store(TCPState::Established as u32, Ordering::SeqCst);
+        self.state
+            .store(TCPState::Established as u32, Ordering::SeqCst);
         Ok(())
     }
 
@@ -204,9 +204,12 @@ impl TCPConnection for SimpleSocket {
         let current = self.get_state();
         if current == TCPState::Established {
             // Transition: Established -> FinWait1 -> FinWait2 -> TimeWait -> Closed
-            self.state.store(TCPState::FinWait1 as u32, Ordering::SeqCst);
-            self.state.store(TCPState::FinWait2 as u32, Ordering::SeqCst);
-            self.state.store(TCPState::TimeWait as u32, Ordering::SeqCst);
+            self.state
+                .store(TCPState::FinWait1 as u32, Ordering::SeqCst);
+            self.state
+                .store(TCPState::FinWait2 as u32, Ordering::SeqCst);
+            self.state
+                .store(TCPState::TimeWait as u32, Ordering::SeqCst);
         }
         self.state.store(TCPState::Closed as u32, Ordering::SeqCst);
         Ok(())
@@ -423,7 +426,10 @@ impl NetworkStack for SimpleNetworkStack {
     }
 
     fn get_socket(&self, id: SocketID) -> Option<&dyn Socket> {
-        self.sockets.iter().find(|s| s.id() == id).map(|s| s.as_ref())
+        self.sockets
+            .iter()
+            .find(|s| s.id() == id)
+            .map(|s| s.as_ref())
     }
 }
 

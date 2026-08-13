@@ -15,14 +15,30 @@ pub struct Version {
 #[cfg(test)]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
 
     pub fn parse(v_str: &str) -> Result<Self, &'static str> {
         let mut parts = v_str.split('.');
-        let major = parts.next().ok_or("err")?.parse::<u64>().map_err(|_| "err")?;
-        let minor = parts.next().ok_or("err")?.parse::<u64>().map_err(|_| "err")?;
-        let patch = parts.next().ok_or("err")?.parse::<u64>().map_err(|_| "err")?;
+        let major = parts
+            .next()
+            .ok_or("err")?
+            .parse::<u64>()
+            .map_err(|_| "err")?;
+        let minor = parts
+            .next()
+            .ok_or("err")?
+            .parse::<u64>()
+            .map_err(|_| "err")?;
+        let patch = parts
+            .next()
+            .ok_or("err")?
+            .parse::<u64>()
+            .map_err(|_| "err")?;
         Ok(Self::new(major, minor, patch))
     }
 }
@@ -57,8 +73,20 @@ pub struct Package {
 
 #[cfg(test)]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Self { name, version, description, dependencies, checksum }
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
     }
 }
 
@@ -181,10 +209,7 @@ impl RollingSyncManager {
     }
 
     /// Verifies if a Debian sbuild environment has all required build dependencies satisfied
-    pub fn is_debian_sbuild_builddeps_satisfied(
-        &self,
-        sbuild: &DebianSbuildPackage,
-    ) -> bool {
+    pub fn is_debian_sbuild_builddeps_satisfied(&self, sbuild: &DebianSbuildPackage) -> bool {
         for dep in &sbuild.build_depends {
             if !self.installed_packages.contains_key(dep) {
                 return false;
@@ -319,10 +344,8 @@ mod tests {
         sync.register_installed("gcc", Version::new(11, 2, 0));
         sync.register_installed("make", Version::new(4, 3, 0));
 
-        let sbuild1 = DebianSbuildPackage::new(
-            "sigma-core",
-            vec!["gcc".to_string(), "make".to_string()],
-        );
+        let sbuild1 =
+            DebianSbuildPackage::new("sigma-core", vec!["gcc".to_string(), "make".to_string()]);
         assert!(sync.is_debian_sbuild_builddeps_satisfied(&sbuild1));
 
         let sbuild2 = DebianSbuildPackage::new(

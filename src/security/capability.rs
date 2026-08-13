@@ -2,8 +2,8 @@
 // Implements 64-bit hardware-enforced capability model
 
 extern crate alloc;
-use alloc::vec::Vec;
 use alloc::string::String;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Permission {

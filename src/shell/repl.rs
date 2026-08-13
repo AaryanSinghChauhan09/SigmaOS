@@ -240,11 +240,9 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "echo" => {
-                ShellCommand::Echo {
-                    message: parts[1..].join(" "),
-                }
-            }
+            "echo" => ShellCommand::Echo {
+                message: parts[1..].join(" "),
+            },
             "rm" => {
                 if parts.len() >= 2 {
                     ShellCommand::Rm {

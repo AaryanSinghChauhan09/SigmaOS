@@ -7,19 +7,25 @@
 extern crate alloc;
 
 use alloc::string::String;
-use alloc::vec::Vec;
 use alloc::string::ToString;
+use alloc::vec::Vec;
 
 #[cfg(not(test))]
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceGeneration { Legacy, Modern }
+pub enum DeviceGeneration {
+    Legacy,
+    Modern,
+}
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PowerState { Off, On }
+pub enum PowerState {
+    Off,
+    On,
+}
 
 #[cfg(test)]
 pub trait PeripheralDevice {
@@ -74,8 +80,8 @@ impl ModernWifiDriver {
             connected_ssid: None,
             current_security: WirelessSecurity::Open,
             channel: 1,
-            rssi_dbm: -127,      // Unconnected / extremely weak default
-            tx_power_dbm: 20,    // 20 dBm (100mW) standard TX power
+            rssi_dbm: -127,   // Unconnected / extremely weak default
+            tx_power_dbm: 20, // 20 dBm (100mW) standard TX power
             active_scanning: true,
             monitor_mode_enabled: false,
         }
@@ -345,11 +351,18 @@ mod tests {
         // 2. Association flow
         assert!(!wifi.is_connected());
         // Fail because of short password
-        assert!(wifi.associate("SigmaOS_Wifi_6", Some("short"), WirelessSecurity::Wpa3Sae).is_err());
+        assert!(wifi
+            .associate("SigmaOS_Wifi_6", Some("short"), WirelessSecurity::Wpa3Sae)
+            .is_err());
         assert!(!wifi.is_connected());
 
         // Succeed association
-        wifi.associate("SigmaOS_Wifi_6", Some("strong_wpa3_password"), WirelessSecurity::Wpa3Sae).unwrap();
+        wifi.associate(
+            "SigmaOS_Wifi_6",
+            Some("strong_wpa3_password"),
+            WirelessSecurity::Wpa3Sae,
+        )
+        .unwrap();
         assert!(wifi.is_connected());
         assert_eq!(wifi.get_connected_ssid(), Some("SigmaOS_Wifi_6"));
         assert_eq!(wifi.current_security, WirelessSecurity::Wpa3Sae);

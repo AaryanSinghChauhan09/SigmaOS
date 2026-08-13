@@ -1,6 +1,5 @@
 /// Advanced High-Fidelity UEFI Bootloader & Secure Boot Chain for SigmaOS
 /// Inspired by Linux systemd-boot and FreeBSD loader architectures, leveraging raw pointer descriptors.
-
 extern crate alloc;
 
 use alloc::vec::Vec;
@@ -57,8 +56,17 @@ pub struct UefiBootServices {
 
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
-    unsafe fn load_kernel_raw(&mut self, kernel_raw: *const u8, size: usize, destination: *mut u8) -> Result<BootStatus, BootError>;
-    unsafe fn parse_uefi_memory_map(&self, map_ptr: *const UefiMemoryDescriptor, descriptor_count: usize) -> u64;
+    unsafe fn load_kernel_raw(
+        &mut self,
+        kernel_raw: *const u8,
+        size: usize,
+        destination: *mut u8,
+    ) -> Result<BootStatus, BootError>;
+    unsafe fn parse_uefi_memory_map(
+        &self,
+        map_ptr: *const UefiMemoryDescriptor,
+        descriptor_count: usize,
+    ) -> u64;
     fn handoff(&mut self) -> Result<BootStatus, BootError>;
 }
 
@@ -99,7 +107,8 @@ impl UEFIBootloader for SimpleUEFIBootloader {
         // Copy raw memory non-overlapping
         core::ptr::copy_nonoverlapping(kernel_raw, destination, size);
 
-        self.phase.store(BootPhase::LoadKernel as u32, Ordering::SeqCst);
+        self.phase
+            .store(BootPhase::LoadKernel as u32, Ordering::SeqCst);
         self.kernel_loaded.store(1, Ordering::SeqCst);
         Ok(size)
     }
@@ -130,8 +139,10 @@ impl UEFIBootloader for SimpleUEFIBootloader {
         if self.kernel_loaded.load(Ordering::SeqCst) == 0 {
             return Err(BootError::HandoffFailed);
         }
-        self.phase.store(BootPhase::Handoff as u32, Ordering::SeqCst);
-        self.phase.store(BootPhase::Complete as u32, Ordering::SeqCst);
+        self.phase
+            .store(BootPhase::Handoff as u32, Ordering::SeqCst);
+        self.phase
+            .store(BootPhase::Complete as u32, Ordering::SeqCst);
         Ok(1)
     }
 }
@@ -203,11 +214,13 @@ mod tests {
         let mut kernel_dst = [0u8; 7];
 
         unsafe {
-            let result = bootloader.load_kernel_raw(
-                kernel_src.as_ptr(),
-                kernel_src.len(),
-                kernel_dst.as_mut_ptr(),
-            ).unwrap();
+            let result = bootloader
+                .load_kernel_raw(
+                    kernel_src.as_ptr(),
+                    kernel_src.len(),
+                    kernel_dst.as_mut_ptr(),
+                )
+                .unwrap();
             assert_eq!(result, 7);
         }
 
@@ -247,10 +260,14 @@ mod tests {
         let kernel_payload = [0xBB, 0xAA, 0x55, 0x33];
 
         let signature = secure_boot.sign(&kernel_payload).unwrap();
-        assert!(secure_boot.verify_signature(&kernel_payload, &signature).unwrap());
+        assert!(secure_boot
+            .verify_signature(&kernel_payload, &signature)
+            .unwrap());
 
         // Corrupted payload should fail verification
         let corrupted_payload = [0xBB, 0xAA, 0x55, 0x44];
-        assert!(!secure_boot.verify_signature(&corrupted_payload, &signature).unwrap());
+        assert!(!secure_boot
+            .verify_signature(&corrupted_payload, &signature)
+            .unwrap());
     }
 }

@@ -20,10 +20,10 @@ pub enum VirtioDeviceType {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct VirtioMmioHeader {
-    pub magic: u32,             // 0x74726976 ("virt" in little-endian)
-    pub version: u32,           // 1 for legacy, 2 for modern
-    pub device_id: u32,         // VirtioDeviceType
-    pub vendor_id: u32,         // 0x554d5143
+    pub magic: u32,     // 0x74726976 ("virt" in little-endian)
+    pub version: u32,   // 1 for legacy, 2 for modern
+    pub device_id: u32, // VirtioDeviceType
+    pub vendor_id: u32, // 0x554d5143
     pub device_features: u32,
     pub driver_features: u32,
     pub queue_sel: u32,
@@ -146,7 +146,9 @@ impl VirtioRngDriver {
         // FNV-1a non-cryptographic hash generator simulation for high entropy randomizer
         let mut hash = self.entropy_seed;
         for i in 0..dest.len() {
-            hash = hash.wrapping_mul(0x100000001B3).wrapping_add((i as u64) ^ 0xAA);
+            hash = hash
+                .wrapping_mul(0x100000001B3)
+                .wrapping_add((i as u64) ^ 0xAA);
             dest[i] = (hash & 0xFF) as u8;
         }
         Ok(dest.len())

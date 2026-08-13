@@ -72,7 +72,7 @@ pub struct IntelE1000Driver {
     pub multicast_hash_table: [u32; 128], // Multicast hash filter table
     pub tx_checksum_offload: bool,
     pub rx_checksum_offload: bool,
-    pub link_speed_mbps: u32,             // e.g. 10, 100, 1000
+    pub link_speed_mbps: u32, // e.g. 10, 100, 1000
     pub link_duplex: LinkDuplex,
 
     // FreeBSD-inspired device polling mode (prevents interrupt storms under load)
@@ -283,7 +283,7 @@ mod tests {
         assert!(nic.set_mtu(9000).is_ok()); // Jumbo frame support
         assert_eq!(nic.mtu, 9000);
         assert!(nic.set_mtu(9001).is_err()); // Exceeds jumbo limit
-        assert!(nic.set_mtu(60).is_err());   // Below min standard MTU
+        assert!(nic.set_mtu(60).is_err()); // Below min standard MTU
 
         // Configure back to standard for testing transmit bounds
         nic.set_mtu(1500).unwrap();

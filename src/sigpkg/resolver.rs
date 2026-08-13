@@ -15,7 +15,11 @@ pub struct Version {
 #[cfg(test)]
 impl Version {
     pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
 }
 
@@ -49,8 +53,20 @@ pub struct Package {
 
 #[cfg(test)]
 impl Package {
-    pub fn new(name: String, version: Version, description: String, dependencies: Vec<Dependency>, checksum: String) -> Self {
-        Self { name, version, description, dependencies, checksum }
+    pub fn new(
+        name: String,
+        version: Version,
+        description: String,
+        dependencies: Vec<Dependency>,
+        checksum: String,
+    ) -> Self {
+        Self {
+            name,
+            version,
+            description,
+            dependencies,
+            checksum,
+        }
     }
 }
 
@@ -76,7 +92,8 @@ impl DebianElementaryAppPackage {
     /// Validates reverse-domain naming and elementary design standards
     pub fn is_elementary_compliant(&self) -> bool {
         // App ID must be reverse domain starting with "io.elementary." or "org.sigmaos."
-        let valid_prefix = self.app_id.starts_with("io.elementary.") || self.app_id.starts_with("org.sigmaos.");
+        let valid_prefix =
+            self.app_id.starts_with("io.elementary.") || self.app_id.starts_with("org.sigmaos.");
         valid_prefix && self.has_csd_decorations
     }
 }

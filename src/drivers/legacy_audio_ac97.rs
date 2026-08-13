@@ -4,11 +4,17 @@ use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState}
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeviceGeneration { Legacy, Modern }
+pub enum DeviceGeneration {
+    Legacy,
+    Modern,
+}
 
 #[cfg(test)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PowerState { Off, On }
+pub enum PowerState {
+    Off,
+    On,
+}
 
 #[cfg(test)]
 pub trait PeripheralDevice {

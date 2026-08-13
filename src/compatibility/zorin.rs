@@ -5,11 +5,11 @@
 
 extern crate alloc;
 
-use alloc::string::String;
-use alloc::vec::Vec;
-use alloc::string::ToString;
-use alloc::format;
 use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ZorinLayoutType {
@@ -132,13 +132,20 @@ impl ZorinConnectManager {
     }
 
     /// Requests pairing with secure handshake parameters
-    pub fn pair_smartphone(&mut self, name: &str, pairing_pin: u32) -> Result<String, &'static str> {
+    pub fn pair_smartphone(
+        &mut self,
+        name: &str,
+        pairing_pin: u32,
+    ) -> Result<String, &'static str> {
         if pairing_pin != 7777 {
             return Err("ZorinConnect: Pair request rejected: invalid handshake pin");
         }
         self.device_name = Some(name.to_string());
         self.pairing_state = PairingState::Paired;
-        Ok(format!("ZorinConnect: Successfully paired and linked with {}", name))
+        Ok(format!(
+            "ZorinConnect: Successfully paired and linked with {}",
+            name
+        ))
     }
 
     /// Synchronizes clipboard data instantly across paired devices
@@ -176,12 +183,17 @@ impl ZorinWindowsAppSupport {
         let mut db = BTreeMap::new();
         db.insert("winword.exe".to_string(), "sigma-office-writer".to_string());
         db.insert("excel.exe".to_string(), "sigma-office-calc".to_string());
-        db.insert("powerpnt.exe".to_string(), "sigma-office-impress".to_string());
+        db.insert(
+            "powerpnt.exe".to_string(),
+            "sigma-office-impress".to_string(),
+        );
         db.insert("photoshop.exe".to_string(), "gimp".to_string());
         db.insert("chrome_installer.msi".to_string(), "chromium".to_string());
         db.insert("utorrent.exe".to_string(), "transmission".to_string());
 
-        Self { alternatives_db: db }
+        Self {
+            alternatives_db: db,
+        }
     }
 
     /// Intercepts a Windows application launch, returning a recommended native SigmaOS package alternative
@@ -252,7 +264,9 @@ mod tests {
     #[test]
     fn test_zorin_windows_app_support() {
         let support = ZorinWindowsAppSupport::new();
-        let recommendation = support.suggest_alternative_for_exe("photoshop.exe").unwrap();
+        let recommendation = support
+            .suggest_alternative_for_exe("photoshop.exe")
+            .unwrap();
         assert_eq!(recommendation, "gimp");
 
         assert_eq!(support.suggest_alternative_for_exe("unknown.exe"), None);
