@@ -101,7 +101,7 @@ impl ProcessSupervisor {
         if let Some(config) = self.processes.get(name) {
             if let Some(status) = self.process_status.get_mut(name) {
                 status.state = ProcessState::Running;
-                status.pid = Some(1000 + self.process_status.len() as u32);
+                status.pid = Some(1000 + self.process_status.len() as u32); // Simulated PID
                 status.uptime = 0;
                 status.restart_count = 0;
             }
