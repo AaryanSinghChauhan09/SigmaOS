@@ -102,9 +102,22 @@ pub enum CompatibilityError {
     InvalidParameter = 3,
 }
 
+/// Hotplug event type (inspired by Linux udev)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HotplugEvent {
+    Add = 0,
+    Remove = 1,
+}
+
+pub trait HotplugManager {
+    fn trigger_hotplug(&mut self, event: HotplugEvent, device: Box<dyn HardwareDevice>) -> Result<(), &'static str>;
+    fn list_hotplug_history(&self) -> &[(HotplugEvent, DeviceID)];
+}
+
 pub struct SimpleCompatibilityMatrix {
     pub devices: Vec<Box<dyn HardwareDevice>>,
     pub next_id: AtomicUsize,
+    pub hotplug_history: Vec<(HotplugEvent, DeviceID)>,
 }
 
 impl SimpleCompatibilityMatrix {
@@ -112,6 +125,7 @@ impl SimpleCompatibilityMatrix {
         SimpleCompatibilityMatrix {
             devices: Vec::new(),
             next_id: AtomicUsize::new(1),
+            hotplug_history: Vec::new(),
         }
     }
 
@@ -175,6 +189,47 @@ impl SimpleCompatibilityMatrix {
             SupportStatus::Supported,
         );
         self.devices.push(Box::new(chipset1));
+
+        // Broader driver coverage (inspired by Linux & BSD)
+        let audio1 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Audio,
+            0x10EC,
+            0x0887,
+            "Realtek ALC887",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(audio1));
+
+        let storage1 = SimpleDevice::new(
+            self.next_id.fetch_add(1, Ordering::SeqCst),
+            DeviceType::Storage,
+            0x8086,
+            0x2822,
+            "Intel SATA Controller",
+            SupportStatus::Supported,
+        );
+        self.devices.push(Box::new(storage1));
+    }
+}
+
+impl HotplugManager for SimpleCompatibilityMatrix {
+    fn trigger_hotplug(&mut self, event: HotplugEvent, device: Box<dyn HardwareDevice>) -> Result<(), &'static str> {
+        let dev_id = device.id();
+        self.hotplug_history.push((event, dev_id));
+        match event {
+            HotplugEvent::Add => {
+                let _ = self.add_device(device);
+            }
+            HotplugEvent::Remove => {
+                let _ = self.remove_device(dev_id);
+            }
+        }
+        Ok(())
+    }
+
+    fn list_hotplug_history(&self) -> &[(HotplugEvent, DeviceID)] {
+        &self.hotplug_history
     }
 }
 
@@ -272,10 +327,61 @@ impl CompatibilityCheck for SimpleDiagnostics {
     fn run_full_scan(&self) -> CompatibilityReport {
         let mut results = Vec::new();
         for device in &self.matrix.devices {
-            let result = self.check_device(device.id());
-            results.push((device.id(), result));
+            let result = self.check_device((**device).id());
+            results.push(((**device).id(), result));
         }
         CompatibilityReport { results }
+    }
+}
+
+/// ACPI power and interrupt load balancing strategy (inspired by Linux and BSD)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AcpiPowerState {
+    D0 = 0, // Fully functional
+    D1 = 1,
+    D2 = 2,
+    D3 = 3, // Power off
+}
+
+pub trait AcpiLoadBalancer {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str>;
+    fn set_device_power_state(&mut self, device_id: DeviceID, state: AcpiPowerState) -> Result<(), &'static str>;
+    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState>;
+}
+
+pub struct SimpleAcpiManager {
+    pub irq_routing: std::collections::HashMap<u8, usize>, // maps IRQ to CPU ID
+    pub device_states: std::collections::HashMap<DeviceID, AcpiPowerState>,
+}
+
+impl SimpleAcpiManager {
+    pub fn new() -> Self {
+        SimpleAcpiManager {
+            irq_routing: std::collections::HashMap::new(),
+            device_states: std::collections::HashMap::new(),
+        }
+    }
+}
+
+impl Default for SimpleAcpiManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl AcpiLoadBalancer for SimpleAcpiManager {
+    fn balance_irq_routing(&mut self, interrupt_line: u8, cpu_id: usize) -> Result<(), &'static str> {
+        self.irq_routing.insert(interrupt_line, cpu_id);
+        Ok(())
+    }
+
+    fn set_device_power_state(&mut self, device_id: DeviceID, state: AcpiPowerState) -> Result<(), &'static str> {
+        self.device_states.insert(device_id, state);
+        Ok(())
+    }
+
+    fn get_device_power_state(&self, device_id: DeviceID) -> Option<AcpiPowerState> {
+        self.device_states.get(&device_id).copied()
     }
 }
 
@@ -287,7 +393,8 @@ mod tests {
     fn test_compatibility_matrix() {
         let mut matrix = SimpleCompatibilityMatrix::new();
         matrix.seed_with_defaults();
-        assert_eq!(matrix.list_supported().len(), 5);
+        // Includes 6 standard devices + 2 new ones (Realtek ALC887, Intel SATA Controller)
+        assert_eq!(matrix.list_supported().len(), 7);
         assert_eq!(matrix.list_by_type(DeviceType::WiFi).len(), 2);
     }
 
@@ -297,6 +404,25 @@ mod tests {
         matrix.seed_with_defaults();
         let diag = SimpleDiagnostics::new(matrix);
         let report = diag.run_full_scan();
-        assert_eq!(report.results.len(), 6);
+        assert_eq!(report.results.len(), 8);
+    }
+
+    #[test]
+    fn test_acpi_load_balancing() {
+        let mut acpi = SimpleAcpiManager::new();
+        assert!(acpi.balance_irq_routing(11, 4).is_ok());
+        assert_eq!(acpi.irq_routing.get(&11), Some(&4));
+
+        assert!(acpi.set_device_power_state(42, AcpiPowerState::D3).is_ok());
+        assert_eq!(acpi.get_device_power_state(42), Some(AcpiPowerState::D3));
+    }
+
+    #[test]
+    fn test_hotplug_manager() {
+        let mut matrix = SimpleCompatibilityMatrix::new();
+        let cap = SimpleDevice::new(99, DeviceType::Storage, 0x1234, 0x5678, "HotplugDisk", SupportStatus::Supported);
+        assert!(matrix.trigger_hotplug(HotplugEvent::Add, Box::new(cap)).is_ok());
+        assert_eq!(matrix.list_hotplug_history().len(), 1);
+        assert_eq!(matrix.get_device(99).unwrap().name(), "HotplugDisk");
     }
 }

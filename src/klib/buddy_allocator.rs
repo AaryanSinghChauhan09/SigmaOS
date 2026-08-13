@@ -348,6 +348,72 @@ impl MemoryLeakTracker for LeakTracker {
     }
 }
 
+/// Allocation record tracked by LeakTracker (inspired by Valgrind and LeakSanitizer)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AllocRecord {
+    pub ptr: *mut u8,
+    pub size: usize,
+    pub tag: [u8; 32], // tag/location metadata
+}
+
+/// Valgrind and LeakSanitizer-inspired memory leak detector interface
+pub trait MemoryLeakTracker {
+    fn on_alloc(&mut self, ptr: *mut u8, size: usize, tag: &[u8]);
+    fn on_free(&mut self, ptr: *mut u8);
+    fn report_leaks(&self) -> (usize, usize); // Returns (leak_count, leaked_bytes)
+}
+
+/// LeakTracker implementation
+pub struct LeakTracker {
+    pub allocations: Vec<AllocRecord>,
+}
+
+impl LeakTracker {
+    pub fn new() -> Self {
+        LeakTracker {
+            allocations: Vec::new(),
+        }
+    }
+}
+
+impl MemoryLeakTracker for LeakTracker {
+    fn on_alloc(&mut self, ptr: *mut u8, size: usize, tag: &[u8]) {
+        let mut tag_arr = [0u8; 32];
+        let tag_len = tag.len().min(31);
+        tag_arr[..tag_len].copy_from_slice(&tag[..tag_len]);
+
+        self.allocations.push(AllocRecord {
+            ptr,
+            size,
+            tag: tag_arr,
+        });
+    }
+
+    fn on_free(&mut self, ptr: *mut u8) {
+        // Mark the record as freed by setting ptr to null
+        for i in 0..self.allocations.len() {
+            if self.allocations[i].ptr == ptr {
+                self.allocations[i].ptr = core::ptr::null_mut();
+                self.allocations[i].size = 0;
+                break;
+            }
+        }
+    }
+
+    fn report_leaks(&self) -> (usize, usize) {
+        let mut leak_count = 0;
+        let mut leaked_bytes = 0;
+        for i in 0..self.allocations.len() {
+            let record = &self.allocations[i];
+            if !record.ptr.is_null() {
+                leak_count += 1;
+                leaked_bytes += record.size;
+            }
+        }
+        (leak_count, leaked_bytes)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
