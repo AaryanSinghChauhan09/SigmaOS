@@ -1,8 +1,10 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
+extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
+pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
@@ -25,6 +27,12 @@ pub mod security;
 pub mod shell;
 pub mod sigpkg;
 pub mod virtualization;
+pub mod logging;
+pub mod tracing;
+pub mod crash;
+pub mod power;
+pub mod update;
+pub mod runtime;
 
 pub use accessibility::{
     AccessibilityCategory, AccessibilityError, AccessibilityFeature, AccessibilityFramework,
@@ -69,7 +77,9 @@ pub use drivers::{
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
-    SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
+    SmartSymlink, SymlinkResolverRule, VirtualFilesystem, PartitionTableType, DiskPartition,
+    PartitionTable, PhysicalVolume, LogicalVolume, VolumeGroup, LvmManager, ZpoolStatus,
+    ZfsDataset, ZfsPool, ZfsManager, MountPoint, MountManager, StorageAdminCli,
 };
 pub use graphics::paint::ColorRgba;
 pub use kernel::{

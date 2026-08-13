@@ -23,7 +23,9 @@
 #[cfg(not(feature = "standalone_test"))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 #[cfg(not(feature = "standalone_test"))]
-use crate::klib::{HashMap, Arc};
+use crate::klib::HashMap;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::sync::Arc;
 
 #[cfg(feature = "standalone_test")]
 use std::collections::HashMap;
@@ -38,6 +40,7 @@ pub struct Version {
     pub patch: u64,
 }
 
+#[cfg(feature = "standalone_test")]
 impl std::fmt::Display for Version {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
@@ -250,7 +253,7 @@ impl BaseAdapter {
 
     pub fn execute_hooks(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.user_hooks {
-            UserDefinedHook::execute(hook.as_ref(), package)?;
+            UserDefinedHook::execute(&**hook, package)?;
         }
         Ok(())
     }
@@ -2283,7 +2286,7 @@ impl UniversalPackageManager {
 
         for trigger in &self.path_triggers {
             let mut matched_files = Vec::new();
-            let pattern = trigger.pattern();
+            let pattern = IPathTrigger::pattern(&**trigger);
 
             for file in files {
                 // Simplified pattern matching support:
@@ -2306,7 +2309,7 @@ impl UniversalPackageManager {
             }
 
             if !matched_files.is_empty() {
-                trigger.execute(&matched_files)?;
+                IPathTrigger::execute(&**trigger, &matched_files)?;
             }
         }
         Ok(())
@@ -2339,7 +2342,7 @@ impl UniversalPackageManager {
 
     pub fn execute_hook_chain(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.global_hooks {
-            UserDefinedHook::execute(hook.as_ref(), package)?;
+            UserDefinedHook::execute(&**hook, package)?;
         }
         Ok(())
     }
@@ -2856,7 +2859,8 @@ Depends: kernel-base";
             }
         }
 
-        adapter.add_hook(Arc::new(CustomHook));
+        let custom_hook: Arc<dyn UserDefinedHook> = Arc::new(CustomHook);
+        adapter.add_hook(custom_hook);
 
         let deb_data = b"Package: original
 Version: 1.0.0
@@ -3013,18 +3017,21 @@ Description: Hook test";
         let trigger_executed = Arc::new(std::sync::atomic::AtomicBool::new(false));
         let trigger_executed_clone = trigger_executed.clone();
 
+        let script: Arc<dyn Fn(&[String]) -> Result<(), HookError> + Send + Sync> = Arc::new(move |matched_paths: &[String]| {
+            assert_eq!(matched_paths.len(), 1);
+            assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
+            trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+            Ok(())
+        });
+
         let trigger = PathTriggerHook {
             name: "update-desktop-database".to_string(),
             pattern: "*.desktop".to_string(),
-            script: Arc::new(move |matched_paths| {
-                assert_eq!(matched_paths.len(), 1);
-                assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
-                trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
-                Ok(())
-            }),
+            script,
         };
 
-        manager.add_path_trigger(Arc::new(trigger));
+        let trigger_arc: Arc<dyn IPathTrigger> = Arc::new(trigger);
+        manager.add_path_trigger(trigger_arc);
 
         let pkg = StandardPackage {
             metadata: PackageMetadata {

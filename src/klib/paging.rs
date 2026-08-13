@@ -3,7 +3,7 @@
 /// Implements 4-level page tables, PML4, userspace isolation, Copy-On-Write (COW), and page fault handling.
 
 use core::sync::atomic::{AtomicUsize, Ordering};
-use crate::klib::vec::Vec;
+use crate::klib::Vec;
 
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;

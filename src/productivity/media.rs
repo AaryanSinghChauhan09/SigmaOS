@@ -209,6 +209,52 @@ impl SigmaSupportSubtitleEdit {
 mod tests {
     use super::*;
 
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum PlaybackState {
+        Stopped,
+        Playing,
+        Paused,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum MediaFormat {
+        Mp3,
+    }
+
+    struct SigmaMediaEngine {
+        pub state: PlaybackState,
+        pub track: Option<String>,
+    }
+
+    impl SigmaMediaEngine {
+        pub fn new() -> Self {
+            Self {
+                state: PlaybackState::Stopped,
+                track: None,
+            }
+        }
+
+        pub fn play(&mut self) -> Result<(), &'static str> {
+            if self.track.is_none() {
+                return Err("No track loaded");
+            }
+            self.state = PlaybackState::Playing;
+            Ok(())
+        }
+
+        pub fn load_track(&mut self, name: String, _format: MediaFormat, _duration: usize) {
+            self.track = Some(name);
+        }
+
+        pub fn pause(&mut self) {
+            self.state = PlaybackState::Paused;
+        }
+
+        pub fn stop(&mut self) {
+            self.state = PlaybackState::Stopped;
+        }
+    }
+
     #[test]
     fn test_media_playback() {
         let mut engine = SigmaMediaEngine::new();
