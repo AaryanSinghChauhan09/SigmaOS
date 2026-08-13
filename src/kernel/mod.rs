@@ -6,6 +6,8 @@ pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
 pub mod structures;
+pub mod breakthroughs;
+pub mod virtual_cpu;
 
 pub use architecture::{
     ArchitectureEngine, CpuRegisters, HardwareException,

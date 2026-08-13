@@ -15,9 +15,8 @@ pub mod apache_ossie;
 pub mod sovereign_suite;
 pub mod gentoo;
 pub mod legacy_adapters;
-pub mod canonical;
+pub mod sigmawin;
 
-pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
@@ -81,4 +80,9 @@ pub use sovereign_suite::{
 pub use gentoo::{
     UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
     EbuildPackage, PortageEngine,
+};
+
+pub use sigmawin::{
+    PeLoader, PeSection, PeFormat, RegistryManager, User32MessageQueue, WinSockAdapter,
+    D3dToVulkanTranslator, NtHandleTable, NtObject, NtObjectType, Win32Message, Win32Error,
 };

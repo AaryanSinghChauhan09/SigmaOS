@@ -2,7 +2,13 @@
 pub mod smart_symlink;
 pub mod vfs;
 pub mod sigma_fs;
+pub mod complete_filesystems;
 
+pub use complete_filesystems::{
+    PartitionTableType, DiskPartition, PartitionTable, PhysicalVolume, LogicalVolume,
+    VolumeGroup, LvmManager, ZpoolStatus, ZfsDataset, ZfsPool, ZfsManager, MountPoint,
+    MountManager, StorageAdminCli,
+};
 pub use smart_symlink::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
 pub use vfs::{FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem};
 pub use sigma_fs::{

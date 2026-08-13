@@ -28,7 +28,6 @@ pub mod vecdeque;
 
 // Re-exports
 pub use string::{String, ToString};
-pub use custom_string::SigmaString;
 pub use arc::Arc;
 pub use ring_buffer::{RingBuffer, HeapRingBuffer};
 pub use linked_list::{LinkedList, SList};
@@ -36,7 +35,12 @@ pub use slab::{SlabCache, TypedSlabCache};
 pub use custom_string::{SigmaString, SigmaStringBuilder, CStringView};
 
 #[cfg(target_os = "none")]
+pub mod vec;
+
+#[cfg(target_os = "none")]
 pub use vec::Vec;
+#[cfg(not(target_os = "none"))]
+pub use alloc::vec::Vec;
 pub use hashmap::HashMap;
 pub use hashset::HashSet;
 pub use uuid::Uuid;

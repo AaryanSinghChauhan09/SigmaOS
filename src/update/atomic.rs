@@ -29,7 +29,7 @@ use core::mem;
 pub type TransactionID = usize;
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TransactionState { Pending = 0, InProgress = 1, Committed = 2, RolledBack = 3, Failed = 4 }
 
 #[repr(C)]
@@ -42,6 +42,7 @@ pub trait Transaction {
     fn begin(&mut self) -> Result<(), UpdateError>;
     fn commit(&mut self) -> Result<(), UpdateError>;
     fn rollback(&mut self) -> Result<(), UpdateError>;
+    fn register_op(&mut self, _op: [u8; 256]) {}
 }
 
 #[repr(C)]
@@ -65,7 +66,10 @@ impl SimpleTransaction {
 
 impl Transaction for SimpleTransaction {
     fn id(&self) -> TransactionID { self.id }
-    fn state(&self) -> TransactionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst)) } }
+    fn state(&self) -> TransactionState { unsafe { core::mem::transmute(self.state.load(Ordering::SeqCst) as u32) } }
+    fn register_op(&mut self, op: [u8; 256]) {
+        self.operations.push(op);
+    }
 
     fn begin(&mut self) -> Result<(), UpdateError> {
         self.state.store(TransactionState::InProgress as usize, Ordering::SeqCst);
@@ -130,9 +134,7 @@ impl AtomicUpdateManager for SimpleAtomicUpdateManager {
                     for i in 0..len {
                         op_array[i] = operation[i];
                     }
-                    if let SimpleTransaction { ref mut operations, .. } = **tx {
-                        operations.push(op_array);
-                    }
+                    tx.register_op(op_array);
                     return Ok(());
                 }
             }
