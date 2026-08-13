@@ -48,6 +48,7 @@ pub mod ai {
     pub mod orchestrator;
 }
 pub mod boot;
+pub mod system;
 pub mod toolchain {
     pub mod adapter;
     pub mod capsule;
