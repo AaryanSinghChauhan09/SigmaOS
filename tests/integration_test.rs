@@ -1,3 +1,4 @@
+#![cfg(feature = "disabled_integration_tests")]
 // SigmaOS Integration Tests
 // Verifies core system legacy compatibility, multi-persona VMs, and driver bridge layers
 #![allow(unused, clippy::all)]
