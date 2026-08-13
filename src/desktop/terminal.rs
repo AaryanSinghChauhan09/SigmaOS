@@ -4,24 +4,78 @@
 /// OOP-based Desktop Terminal for SigmaOS
 /// Implements terminal emulator, ANSI escape interpretation, and shell integration.
 /// Inspired by Alacritty, GNOME-Terminal, xterm, and tmux from Linux & BSD distributions.
+/// Enhanced with SerenityOS-style tab support for better productivity.
 
 extern crate alloc;
 use alloc::boxed::Box;
+use alloc::vec::Vec;
+use alloc::string::String;
 
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 
 pub type TerminalID = usize;
+pub type TabID = usize;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TerminalError { Success = 0, NotFound = 1, CommandFailed = 2 }
+pub enum TerminalError { Success = 0, NotFound = 1, CommandFailed = 2, TabNotFound = 3, TabLimitReached = 4 }
 
 pub trait Terminal {
     fn id(&self) -> TerminalID;
     fn title(&self) -> &[u8];
     fn working_directory(&self) -> &[u8];
     fn set_working_directory(&mut self, path: &[u8]);
+}
+
+/// SerenityOS-style Tab for terminal emulator
+#[repr(C)]
+pub struct TerminalTab {
+    pub id: TabID,
+    pub title: String,
+    pub terminal_id: TerminalID,
+    pub is_active: bool,
+    pub is_pinned: bool,
+    pub color_scheme: TabColorScheme,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TabColorScheme {
+    Default = 0,
+    Dark = 1,
+    Light = 2,
+    Solarized = 3,
+    Custom = 4,
+}
+
+impl TerminalTab {
+    pub fn new(id: TabID, title: &str, terminal_id: TerminalID) -> Self {
+        TerminalTab {
+            id,
+            title: String::from(title),
+            terminal_id,
+            is_active: false,
+            is_pinned: false,
+            color_scheme: TabColorScheme::Default,
+        }
+    }
+
+    pub fn set_title(&mut self, title: &str) {
+        self.title = String::from(title);
+    }
+
+    pub fn set_active(&mut self, active: bool) {
+        self.is_active = active;
+    }
+
+    pub fn set_pinned(&mut self, pinned: bool) {
+        self.is_pinned = pinned;
+    }
+
+    pub fn set_color_scheme(&mut self, scheme: TabColorScheme) {
+        self.color_scheme = scheme;
+    }
 }
 
 #[repr(C)]
@@ -75,10 +129,154 @@ pub trait TerminalManager {
     fn execute_command(&mut self, terminal_id: TerminalID, command: &[u8]) -> Result<Vec<u8>, TerminalError>;
 }
 
+/// SerenityOS-style Tab Manager for terminal emulator
+#[repr(C)]
+pub struct TabManager {
+    pub tabs: Vec<TerminalTab>,
+    pub active_tab_id: Option<TabID>,
+    pub next_tab_id: AtomicUsize,
+    pub max_tabs: usize,
+}
+
+impl TabManager {
+    pub fn new(max_tabs: usize) -> Self {
+        TabManager {
+            tabs: Vec::new(),
+            active_tab_id: None,
+            next_tab_id: AtomicUsize::new(1),
+            max_tabs,
+        }
+    }
+
+    /// Create a new tab
+    pub fn create_tab(&mut self, title: &str, terminal_id: TerminalID) -> Result<TabID, TerminalError> {
+        if self.tabs.len() >= self.max_tabs {
+            return Err(TerminalError::TabLimitReached);
+        }
+
+        let tab_id = self.next_tab_id.fetch_add(1, Ordering::SeqCst);
+        let mut tab = TerminalTab::new(tab_id, title, terminal_id);
+        
+        // If this is the first tab, make it active
+        if self.tabs.is_empty() {
+            tab.set_active(true);
+            self.active_tab_id = Some(tab_id);
+        }
+
+        self.tabs.push(tab);
+        Ok(tab_id)
+    }
+
+    /// Close a tab
+    pub fn close_tab(&mut self, tab_id: TabID) -> Result<(), TerminalError> {
+        let tab_index = self.tabs.iter().position(|t| t.id == tab_id)
+            .ok_or(TerminalError::TabNotFound)?;
+
+        let was_active = self.tabs[tab_index].is_active;
+        self.tabs.remove(tab_index);
+
+        // If we closed the active tab, activate another one
+        if was_active && !self.tabs.is_empty() {
+            let new_active_index = tab_index.min(self.tabs.len() - 1);
+            self.tabs[new_active_index].set_active(true);
+            self.active_tab_id = Some(self.tabs[new_active_index].id);
+        } else if self.tabs.is_empty() {
+            self.active_tab_id = None;
+        }
+
+        Ok(())
+    }
+
+    /// Switch to a specific tab
+    pub fn switch_to_tab(&mut self, tab_id: TabID) -> Result<(), TerminalError> {
+        let tab = self.tabs.iter_mut().find(|t| t.id == tab_id)
+            .ok_or(TerminalError::TabNotFound)?;
+
+        // Deactivate current active tab
+        if let Some(current_id) = self.active_tab_id {
+            if let Some(current_tab) = self.tabs.iter_mut().find(|t| t.id == current_id) {
+                current_tab.set_active(false);
+            }
+        }
+
+        // Activate new tab
+        tab.set_active(true);
+        self.active_tab_id = Some(tab_id);
+        Ok(())
+    }
+
+    /// Get the active tab
+    pub fn get_active_tab(&self) -> Option<&TerminalTab> {
+        self.active_tab_id.and_then(|id| self.tabs.iter().find(|t| t.id == id))
+    }
+
+    /// Get all tabs
+    pub fn get_tabs(&self) -> &[TerminalTab] {
+        &self.tabs
+    }
+
+    /// Move tab to new position
+    pub fn move_tab(&mut self, tab_id: TabID, new_index: usize) -> Result<(), TerminalError> {
+        let current_index = self.tabs.iter().position(|t| t.id == tab_id)
+            .ok_or(TerminalError::TabNotFound)?;
+
+        if new_index >= self.tabs.len() {
+            return Err(TerminalError::NotFound);
+        }
+
+        let tab = self.tabs.remove(current_index);
+        self.tabs.insert(new_index, tab);
+        Ok(())
+    }
+
+    /// Pin/unpin a tab
+    pub fn toggle_pin_tab(&mut self, tab_id: TabID) -> Result<(), TerminalError> {
+        let tab = self.tabs.iter_mut().find(|t| t.id == tab_id)
+            .ok_or(TerminalError::TabNotFound)?;
+        tab.set_pinned(!tab.is_pinned);
+        Ok(())
+    }
+
+    /// Set tab color scheme
+    pub fn set_tab_color_scheme(&mut self, tab_id: TabID, scheme: TabColorScheme) -> Result<(), TerminalError> {
+        let tab = self.tabs.iter_mut().find(|t| t.id == tab_id)
+            .ok_or(TerminalError::TabNotFound)?;
+        tab.set_color_scheme(scheme);
+        Ok(())
+    }
+
+    /// Get next tab (for cycling)
+    pub fn get_next_tab(&self) -> Option<&TerminalTab> {
+        if let Some(current_id) = self.active_tab_id {
+            let current_index = self.tabs.iter().position(|t| t.id == current_id)?;
+            let next_index = (current_index + 1) % self.tabs.len();
+            self.tabs.get(next_index)
+        } else {
+            self.tabs.first()
+        }
+    }
+
+    /// Get previous tab (for cycling)
+    pub fn get_previous_tab(&self) -> Option<&TerminalTab> {
+        if let Some(current_id) = self.active_tab_id {
+            let current_index = self.tabs.iter().position(|t| t.id == current_id)?;
+            let prev_index = if current_index == 0 {
+                self.tabs.len() - 1
+            } else {
+                current_index - 1
+            };
+            self.tabs.get(prev_index)
+        } else {
+            self.tabs.last()
+        }
+    }
+}
+
 #[repr(C)]
 pub struct SimpleTerminalManager {
     pub terminals: Vec<Option<Box<dyn Terminal>>>,
     pub next_id: AtomicUsize,
+    pub tab_manager: TabManager,
 }
 
 impl SimpleTerminalManager {
@@ -86,6 +284,7 @@ impl SimpleTerminalManager {
         SimpleTerminalManager {
             terminals: Vec::new(),
             next_id: AtomicUsize::new(1),
+            tab_manager: TabManager::new(32), // Max 32 tabs per terminal window
         }
     }
 }
@@ -95,10 +294,26 @@ impl TerminalManager for SimpleTerminalManager {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
         let terminal = SimpleTerminal::new(id, title);
         self.terminals.push(Some(Box::new(terminal)));
+        
+        // Automatically create a default tab for the new terminal
+        let title_str = core::str::from_utf8(title).unwrap_or("Terminal");
+        self.tab_manager.create_tab(title_str, id).ok();
+        
         Ok(id)
     }
     
     fn close_terminal(&mut self, id: TerminalID) -> Result<(), TerminalError> {
+        // Close all tabs associated with this terminal
+        let tabs_to_close: Vec<TabID> = self.tab_manager.get_tabs()
+            .iter()
+            .filter(|t| t.terminal_id == id)
+            .map(|t| t.id)
+            .collect();
+        
+        for tab_id in tabs_to_close {
+            self.tab_manager.close_tab(tab_id).ok();
+        }
+
         for terminal_option in &mut self.terminals {
             if let Some(ref terminal) = *terminal_option {
                 let term_ref: &dyn Terminal = terminal.as_ref();

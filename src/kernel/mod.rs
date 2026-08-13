@@ -23,6 +23,9 @@ pub mod scheduler;
 pub mod object;
 pub mod proc;
 
+// Genode-style Component Tree Architecture
+pub mod component;
+
 // Temporarily disabled problematic modules
 // pub mod breakthroughs;
 // pub mod ipc;
@@ -38,3 +41,4 @@ pub mod proc;
 // Working exports
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
+pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};

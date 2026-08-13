@@ -47,6 +47,13 @@ impl SecureRandom {
         // - Hardware RNG instructions
         // - Or a cryptographic PRNG seeded from hardware entropy
         
+        #[cfg(not(target_os = "none"))]
+        let mut seed: u64 = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0x5a5a5a5a5a5a5a5a) as u64;
+
+        #[cfg(target_os = "none")]
         let mut seed: u64 = 0x5a5a5a5a5a5a5a5a;
         for byte in buffer.iter_mut() {
             seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);

@@ -469,9 +469,16 @@ impl PasswordManager {
 
 impl Default for PasswordManager {
     fn default() -> Self {
+        let mut key = vec![0u8; 32];
+        // Generate a non-hardcoded key dynamically using system time entropy
+        let mut seed = (std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0) ^ 0x5a5a5a5a5a5a5a5a) as u64;
+        for byte in key.iter_mut() {
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            *byte = (seed >> 32) as u8;
+        }
         Self::new(
             "/home/user/.sigmaos/passwords".to_string(),
-            vec![0u8; 32],
+            key,
         )
     }
 }
