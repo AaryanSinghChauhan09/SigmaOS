@@ -69,6 +69,58 @@ pub enum InterruptError {
 pub trait InterruptHandler {
     fn id(&self) -> InterruptNumber;
     fn handle(&mut self, regs: &mut RegisterSet) -> InterruptResult;
+    fn info(&self) -> InterruptHandlerInfo;
+}
+
+/// CPU Register Set for interrupt context
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct RegisterSet {
+    pub rax: u64,
+    pub rbx: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64,
+    pub rdi: u64,
+    pub rbp: u64,
+    pub rsp: u64,
+    pub r8: u64,
+    pub r9: u64,
+    pub r10: u64,
+    pub r11: u64,
+    pub r12: u64,
+    pub r13: u64,
+    pub r14: u64,
+    pub r15: u64,
+    pub rip: u64,
+    pub rflags: u64,
+}
+
+impl RegisterSet {
+    pub fn new() -> Self {
+        RegisterSet {
+            rax: 0, rbx: 0, rcx: 0, rdx: 0,
+            rsi: 0, rdi: 0, rbp: 0, rsp: 0,
+            r8: 0, r9: 0, r10: 0, r11: 0,
+            r12: 0, r13: 0, r14: 0, r15: 0,
+            rip: 0, rflags: 0,
+        }
+    }
+}
+
+impl Default for RegisterSet {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Interrupt handler information
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct InterruptHandlerInfo {
+    pub handler_type: HandlerType,
+    pub priority: Priority,
+    pub capability: HandlerCapability,
 }
 
 impl InterruptHandlerInfo {
@@ -136,7 +188,6 @@ impl HandlerCapability {
 #[repr(C)]
 pub struct InterruptDescriptor {
     pub number: InterruptNumber,
-    pub vector: InterruptVector,
     pub enabled: AtomicBool,
     pub masked: AtomicBool,
     pub handler: Option<usize>, // Index into handlers array
@@ -145,10 +196,9 @@ pub struct InterruptDescriptor {
 }
 
 impl InterruptDescriptor {
-    pub fn new(number: InterruptNumber, vector: InterruptVector, capability: HandlerCapability) -> Self {
+    pub fn new(number: InterruptNumber, capability: HandlerCapability) -> Self {
         InterruptDescriptor {
             number,
-            vector,
             enabled: AtomicBool::new(false),
             masked: AtomicBool::new(false),
             handler: None,
@@ -221,39 +271,30 @@ impl InterruptDescriptor {
 /// Simple interrupt handler (OOP: Concrete handler class)
 pub struct SimpleInterruptHandler {
     pub vector: InterruptNumber,
-    pub trigger_count: u32,
+    pub trigger_count: AtomicUsize,
 }
 
 impl SimpleInterruptHandler {
     pub fn new(vector: InterruptNumber) -> Self {
         SimpleInterruptHandler {
             vector,
-            trigger_count: 0,
+            trigger_count: AtomicUsize::new(0),
         }
     }
 }
 
 impl InterruptHandler for SimpleInterruptHandler {
-    fn handle(&mut self, _interrupt: InterruptNumber) -> InterruptResult {
-        self.handle_count.fetch_add(1, Ordering::SeqCst);
+    fn id(&self) -> InterruptNumber {
+        self.vector
+    }
+
+    fn handle(&mut self, _regs: &mut RegisterSet) -> InterruptResult {
+        self.trigger_count.fetch_add(1, Ordering::SeqCst);
         InterruptResult::Handled
     }
-}
 
-/// Dynamic descriptor tracking interrupt routing
-pub struct InterruptDescriptor {
-    pub vector: InterruptNumber,
-    pub enabled: AtomicBool,
-    pub masked: AtomicBool,
-}
-
-impl InterruptDescriptor {
-    pub fn new(vector: InterruptNumber) -> Self {
-        InterruptDescriptor {
-            vector,
-            enabled: AtomicBool::new(true),
-            masked: AtomicBool::new(false),
-        }
+    fn info(&self) -> InterruptHandlerInfo {
+        InterruptHandlerInfo::new(HandlerType::Hardware)
     }
 }
 
@@ -340,7 +381,6 @@ impl PIC {
         // Initialize common interrupt descriptors
         for i in 0..256 {
             descriptors[i] = Some(InterruptDescriptor::new(
-                i as u8,
                 i as u8,
                 HandlerCapability::full()
             ));

@@ -7,6 +7,12 @@ extern crate alloc;
 pub mod kernel;
 pub mod klib;
 pub mod drivers;
+pub mod ipc;
+pub mod interrupt;
+pub mod lang;
+pub mod desktop;
+pub mod shell;
+pub mod integration;
 
 // Minimal security module for capability tokens
 pub mod security {

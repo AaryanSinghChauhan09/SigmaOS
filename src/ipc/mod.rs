@@ -21,11 +21,20 @@ pub mod mechanism;
 pub mod message;
 pub mod unix_socket;
 pub mod signals;
+pub mod helenos_async;
+pub mod pipes;
+pub mod transaction_bus;
 
 pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
     Pipe, MessageQueue, SharedMemory, IPCManager,
     SerenityIpcMessage, SerenitySharedBackingStore, SerenityIpcSandboxEnforcer,
+};
+
+pub use helenos_async::{
+    HelenIpcManager, HelenMessage, HelenIpcError, Answerbox, Phone,
+    IrqRegistration, TopHalfHandler, SimpleTopHalfHandler,
+    FibrilManager, Fibril, FibrilType, FibrilState, HelenAsyncSystem,
 };
 
 pub use unix_socket::{
