@@ -17,6 +17,7 @@ impl PageTableFlags {
     pub const NO_CACHE: u64 = 1 << 4;
     pub const HUGE_PAGE: u64 = 1 << 7; // Page Size (PS) flag for huge pages
     pub const COW: u64 = 1 << 9; // Copy-On-Write flag
+    pub const SWAPPED_OUT: u64 = 1 << 10; // Page is evacuated to swap disk space
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -261,8 +262,141 @@ impl VirtualMemoryManagerV2 {
     }
 }
 
+// ==========================================
+// Virtual Memory Demand Paging & Swapping
+// ==========================================
+
+use std::collections::HashMap;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PageFaultReason {
+    LazyLoad,
+    SwappedOut,
+    CopyOnWrite,
+    ProtectionViolation,
+}
+
+#[derive(Debug, Clone)]
+pub struct DemandPageZone {
+    pub start_address: u64,
+    pub size_pages: usize,
+    pub allocated: HashMap<u64, u64>, // VirtAddr -> PhysAddr
+    pub swap_disk_blocks: HashMap<u64, Vec<u8>>, // VirtAddr -> Evacuated swap bytes
+}
+
+pub struct DemandPagingSubsystem {
+    pub managed_zones: HashMap<u64, DemandPageZone>, // PID -> Page zone
+    pub physical_lru_queue: Vec<(u64, u64)>,        // (PID, VirtAddr) for LRU tracking
+    pub max_physical_frames: usize,
+    pub swap_out_count: usize,
+}
+
+impl DemandPagingSubsystem {
+    pub fn new(max_physical_frames: usize) -> Self {
+        Self {
+            managed_zones: HashMap::new(),
+            physical_lru_queue: Vec::new(),
+            max_physical_frames,
+            swap_out_count: 0,
+        }
+    }
+
+    /// Registers a lazy demand-loadable zone for a process
+    pub fn register_lazy_zone(&mut self, pid: u64, start_address: u64, size_pages: usize) {
+        self.managed_zones.insert(pid, DemandPageZone {
+            start_address,
+            size_pages,
+            allocated: HashMap::new(),
+            swap_disk_blocks: HashMap::new(),
+        });
+    }
+
+    /// Performs LRU eviction of physical frames when memory limit is reached (Tails & Linux Swap inspired)
+    pub fn evacuate_to_swap_lru(&mut self) -> Result<(u64, u64), &'static str> {
+        if self.physical_lru_queue.is_empty() {
+            return Err("No active frames in LRU queue to swap out");
+        }
+
+        // Evict the least-recently used page (oldest)
+        let (pid, virt_addr) = self.physical_lru_queue.remove(0);
+        let zone = self.managed_zones.get_mut(&pid).ok_or("Zone missing for pid")?;
+
+        if let Some(phys_addr) = zone.allocated.remove(&virt_addr) {
+            // Write to simulated swap disk block
+            let mut mock_swapped_bytes = vec![0u8; 4096];
+            mock_swapped_bytes[0] = 0xAA; // mock payload marker
+            zone.swap_disk_blocks.insert(virt_addr, mock_swapped_bytes);
+            self.swap_out_count += 1;
+            Ok((pid, virt_addr))
+        } else {
+            Err("Page metadata not found during swap-out")
+        }
+    }
+
+    /// Handles and resolves demand page faults natively
+    pub fn handle_demand_fault(
+        &mut self,
+        pid: u64,
+        fault_addr: u64,
+    ) -> Result<(PageFaultReason, u64), &'static str> {
+        let aligned_addr = fault_addr & !0xFFF;
+
+        // Check if zone exists and address boundaries
+        {
+            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
+            let page_offset = (aligned_addr - zone.start_address) / 4096;
+            if page_offset as usize >= zone.size_pages {
+                return Err("Fault address outside registered process memory boundaries");
+            }
+        }
+
+        // Case 1: Swapped Out Page
+        let is_swapped = {
+            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
+            zone.swap_disk_blocks.contains_key(&aligned_addr)
+        };
+
+        if is_swapped {
+            let zone = self.managed_zones.get_mut(&pid).ok_or("No mapped zone for PID")?;
+            zone.swap_disk_blocks.remove(&aligned_addr);
+            let reallocated_phys = aligned_addr + 0x5000_0000;
+            zone.allocated.insert(aligned_addr, reallocated_phys);
+            self.physical_lru_queue.push((pid, aligned_addr));
+            return Ok((PageFaultReason::SwappedOut, reallocated_phys));
+        }
+
+        // Case 2: Lazy Load Page (First access)
+        let is_allocated = {
+            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
+            zone.allocated.contains_key(&aligned_addr)
+        };
+
+        if !is_allocated {
+            // Check if we need to swap out a page first to respect physical limit
+            if self.physical_lru_queue.len() >= self.max_physical_frames {
+                let _ = self.evacuate_to_swap_lru()?;
+            }
+
+            let zone = self.managed_zones.get_mut(&pid).ok_or("No mapped zone for PID")?;
+            let new_phys = aligned_addr + 0x4000_0000; // Lazy dynamic mapping
+            zone.allocated.insert(aligned_addr, new_phys);
+            self.physical_lru_queue.push((pid, aligned_addr));
+            return Ok((PageFaultReason::LazyLoad, new_phys));
+        }
+
+        Err("Page fault cannot be handled by DemandPagingSubsystem")
+    }
+}
+
+impl Default for DemandPagingSubsystem {
+    fn default() -> Self {
+        Self::new(1024)
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::*;
     use super::*;
 
     #[test]
@@ -442,5 +576,41 @@ mod tests {
         let flags = pt.entries[0].flags();
         assert_eq!(flags.0 & PageTableFlags::COW, 0);
         assert_ne!(flags.0 & PageTableFlags::WRITABLE, 0);
+    }
+
+    #[test]
+    fn test_demand_paging_subsystem_lazy_and_swap() {
+        let mut sub = DemandPagingSubsystem::new(2); // physical memory limit is 2 pages
+        sub.register_lazy_zone(100, 0x1000_0000, 10); // PID 100, start 0x1000_0000, size 10 pages
+
+        // 1. First access (Lazy load)
+        let (reason1, frame1) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
+        assert_eq!(reason1, PageFaultReason::LazyLoad);
+        assert_eq!(frame1, 0x1000_0000 + 0x4000_0000);
+        assert_eq!(sub.physical_lru_queue.len(), 1);
+
+        // 2. Second access (Lazy load)
+        let (reason2, frame2) = sub.handle_demand_fault(100, 0x1000_1000).unwrap();
+        assert_eq!(reason2, PageFaultReason::LazyLoad);
+        assert_eq!(sub.physical_lru_queue.len(), 2);
+
+        // 3. Third access exceeds physical limit (2) -> triggers swap eviction of first page
+        let (reason3, frame3) = sub.handle_demand_fault(100, 0x1000_2000).unwrap();
+        assert_eq!(reason3, PageFaultReason::LazyLoad);
+        assert_eq!(sub.swap_out_count, 1);
+        assert_eq!(sub.physical_lru_queue.len(), 2); // Capped at physical limit
+
+        // Verify that address 0x1000_0000 has been swapped out
+        let zone = sub.managed_zones.get(&100).unwrap();
+        assert!(zone.swap_disk_blocks.contains_key(&0x1000_0000));
+        assert!(!zone.allocated.contains_key(&0x1000_0000));
+
+        // 4. Access swapped out address -> triggers load from swap disk and swap recovery
+        let (reason4, frame4) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
+        assert_eq!(reason4, PageFaultReason::SwappedOut);
+        assert_eq!(frame4, 0x1000_0000 + 0x5000_0000);
+
+        let zone = sub.managed_zones.get(&100).unwrap();
+        assert!(!zone.swap_disk_blocks.contains_key(&0x1000_0000)); // Pulled back from swap
     }
 }

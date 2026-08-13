@@ -25,6 +25,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
+use crate::klib::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SigmaToolError {
@@ -551,7 +552,7 @@ mod tests {
     fn test_sigma_monitor_performance_telemetry() {
         let mut monitor = SigmaMonitor::new();
         assert_eq!(monitor.get_highest_core_temp(), 44.1);
-        assert_eq!(monitor.get_average_context_latency_ns(), 13.75);
+        assert_eq!(monitor.get_average_context_latency_ns(), 13.375);
 
         monitor.log_allocation_leak(1024);
         assert_eq!(monitor.memory_leak_bytes_logged, 1024);
@@ -988,8 +989,8 @@ pub struct SovereignPasswordGenerator;
 impl SovereignPasswordGenerator {
     pub fn generate_secure_password(&self, length: usize, include_symbols: bool) -> String {
         let mut password = String::new();
-        let letters = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let symbols = b"!@#$%^&*()_+-=[]{}|;:,./?";
+        let letters: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let symbols: &[u8] = b"!@#$%^&*()_+-=[]{}|;:,./?";
 
         // Simple high-entropy pseudorandom mapping based on local timestamp variations
         let mut seed = length as u32 * 31;

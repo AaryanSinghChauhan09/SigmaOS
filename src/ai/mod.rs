@@ -11,6 +11,7 @@ pub mod sai;
 pub mod system;
 pub mod voice;
 pub mod wiki;
+pub mod qwenpaw;
 
 pub use lift_engine::{
     Citation, DocumentExtractor, ExtractionResult, ExtractionSchema, FieldType, LiftError,
@@ -50,3 +51,8 @@ pub use voice::{
     VoiceRecognizer, VoiceSynthesizer,
 };
 pub use wiki::{SovereignWikiEngine, WikiArticle};
+pub use qwenpaw::{
+    PawThreeLayerMemory, PawToolGuard, PawFileGuard, PawAgentMessage,
+    PawAgentCommunicationProtocol, SemanticSkillFunction, NativeSkillFunction,
+    SovereignSkillKernel,
+};
