@@ -280,7 +280,7 @@ impl MemoryPool for SimpleBuddyAllocator {
     }
 }
 
-pub use crate::klib::vec::Vec;
+pub use crate::klib::Vec;
 
 /// Allocation record tracked by LeakTracker (inspired by Valgrind and LeakSanitizer)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
