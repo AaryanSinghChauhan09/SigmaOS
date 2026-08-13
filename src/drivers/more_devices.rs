@@ -7,6 +7,7 @@
 extern crate alloc;
 
 use crate::drivers::peripheral::{DeviceGeneration, PeripheralDevice, PowerState};
+use core::result::Result::{self, Ok, Err};
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::string::String;

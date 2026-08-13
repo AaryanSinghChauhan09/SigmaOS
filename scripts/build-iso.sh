@@ -142,12 +142,7 @@ ISO_PATH="$BUILD_DIR/sigmaos-${SIGMAOS_VERSION}-${ARCH}.iso"
 
 if command -v grub-mkrescue >/dev/null 2>&1; then
     echo "[BUILD-ISO] Generating bootable SigmaOS ISO via grub-mkrescue..."
-    grub-mkrescue -o "$ISO_PATH" "$ISO_ROOT" -- \
-        -boot_image any replay \
-        -boot_image any appended_part_as=gpt \
-        -boot_image any emul_no_image \
-        -boot_image any partition_offset=0 \
-        -boot_image any partition_hd=0
+    grub-mkrescue -o "$ISO_PATH" "$ISO_ROOT"
     echo "[BUILD-ISO] Success! Bootable ISO created at $ISO_PATH"
 
 elif command -v xorriso >/dev/null 2>&1; then
