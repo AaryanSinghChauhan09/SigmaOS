@@ -9,6 +9,7 @@ pub mod solid_kernel;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
 pub mod cross_platform_kernel;
+pub mod zorin;
 
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
@@ -75,4 +76,9 @@ pub use historic_linux::{
     Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
     VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
     ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+};
+
+pub use zorin::{
+    ZorinLayoutType, ZorinLayoutSwitcher, ZorinChameleonEngine, PairingState,
+    ZorinConnectManager, ZorinWindowsAppSupport,
 };

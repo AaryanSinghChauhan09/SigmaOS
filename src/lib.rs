@@ -95,6 +95,8 @@ pub use compatibility::{
     Era1_0SyscallEmulator, Era2_4SyscallEmulator, VintageVirtualizationSandbox,
     VintageDriverTranslator, VintagePackageConverter, HistoricError, LfsToolchainBuilder,
     ProtectedModeSwitchSimulator, VgaTextModeDriverSimulator, PicKeyboardController,
+    ZorinLayoutType, ZorinLayoutSwitcher, ZorinChameleonEngine, PairingState,
+    ZorinConnectManager, ZorinWindowsAppSupport,
 };
 pub use container::{
     ContainerCapability, ContainerError, ContainerID, ContainerInfo,
