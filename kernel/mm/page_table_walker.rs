@@ -59,6 +59,22 @@ impl PageTableEntry {
         (self.raw & PT_USER) != 0
     }
 
+    pub fn is_global(&self) -> SigmaBool {
+        (self.raw & PT_GLOBAL) != 0
+    }
+
+    pub fn is_no_execute(&self) -> SigmaBool {
+        (self.raw & PT_NX) != 0
+    }
+
+    pub fn is_dirty(&self) -> SigmaBool {
+        (self.raw & PT_DIRTY) != 0
+    }
+
+    pub fn is_accessed(&self) -> SigmaBool {
+        (self.raw & PT_ACCESSED) != 0
+    }
+
     pub fn get_address(&self) -> SigmaU64 {
         self.raw & 0x000FFFFFFFFFF000
     }
@@ -73,6 +89,43 @@ impl PageTableEntry {
 
     pub fn clear_flags(&mut self, flags: SigmaU64) {
         self.raw &= !flags;
+    }
+
+    // Linux/BSD-inspired advanced features
+    pub fn set_global(&mut self) {
+        self.set_flags(PT_GLOBAL);
+    }
+
+    pub fn clear_global(&mut self) {
+        self.clear_flags(PT_GLOBAL);
+    }
+
+    pub fn set_no_execute(&mut self) {
+        self.set_flags(PT_NX);
+    }
+
+    pub fn clear_no_execute(&mut self) {
+        self.clear_flags(PT_NX);
+    }
+
+    pub fn set_page_size_extension(&mut self, is_2mb: SigmaBool) {
+        if is_2mb {
+            self.set_flags(PT_PS);
+        } else {
+            self.clear_flags(PT_PS);
+        }
+    }
+
+    // OpenBSD-style W^X support
+    pub fn is_write_xor_execute(&self) -> SigmaBool {
+        // W^X: if writable, cannot be executable
+        self.is_writable() && !self.is_no_execute()
+    }
+
+    // Linux-style copy-on-write preparation
+    pub fn prepare_cow(&mut self) {
+        self.clear_flags(PT_WRITE);
+        self.set_flags(PT_USER);
     }
 }
 
