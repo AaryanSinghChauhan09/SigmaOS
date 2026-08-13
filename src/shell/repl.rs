@@ -75,36 +75,9 @@ pub enum ShellCommand {
         feature: String,
         state: String,
     },
-    Pwd,
-    WhoAmI,
-    Su {
-        username: String,
-        password: Option<String>,
-    },
-    Cat {
-        filename: String,
-    },
-    Systemctl {
-        action: String,
-        service: String,
-    },
-    Apt {
-        subcommand: String,
-        package: Option<String>,
-    },
     Dnf {
         subcommand: String,
         package: Option<String>,
-    },
-    Theme {
-        name: String,
-    },
-    Profile {
-        name: String,
-    },
-    A11y {
-        feature: String,
-        state: String,
     },
     Unknown(String),
 }

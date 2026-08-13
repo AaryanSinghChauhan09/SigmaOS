@@ -20,6 +20,7 @@ pub mod security {
 }
 
 pub mod timeline_innovations;
+pub mod innovation;
 
 pub use timeline_innovations::{
     SdkLanguage, SdkAppDescriptor, SigmaOsSdk, NodeState, HpcClusterNode, HpcClusterManager,
