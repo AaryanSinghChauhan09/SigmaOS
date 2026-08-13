@@ -1,5 +1,6 @@
 // SigmaOS Network Stack Module
 pub mod analyzer;
+pub mod config;
 pub mod enterprise;
 pub mod ring_buffer_stack;
 pub mod stack;
@@ -15,6 +16,10 @@ pub use analyzer::{
     ClearLinuxFlowLoadBalancer, ConnectionInfo, ConnectionState, GentooUseFlagsDissector,
     KaliPacketFingerprinter, KaliSnoopAnalysis, NetworkTrafficAnalyzer, NixDeclarativeFilter,
     Protocol, SecurityAnalysis, TrafficAlert, TrafficPacket, TrafficStatistics,
+};
+pub use config::{
+    NetworkConfigManager, NetworkInterface, InterfaceType, InterfaceStatus,
+    DnsConfig, RouteEntry, NetworkError,
 };
 pub use enterprise::{EnterpriseNetworkError, IPv6Address, SecureVpnTunnel};
 pub use ring_buffer_stack::{
