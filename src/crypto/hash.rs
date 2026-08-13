@@ -33,6 +33,8 @@ pub struct SimpleHashFunction {
     pub algorithm: AtomicUsize,
     pub state: [u8; 64],
     pub buffer: Vec<u8>,
+    pub multiplier: AtomicUsize,    // Dynamic multiplier replacing hardcoded 31
+    pub offset_factor: AtomicUsize, // Dynamic offset replacing hardcoded 17
 }
 
 impl SimpleHashFunction {
@@ -42,7 +44,16 @@ impl SimpleHashFunction {
             algorithm: AtomicUsize::new(algorithm as usize),
             state: [0u8; 64],
             buffer: Vec::new(),
+            multiplier: AtomicUsize::new(31),
+            offset_factor: AtomicUsize::new(17),
         }
+    }
+
+    /// Allows initializing the hash function with custom dynamic parameters to avoid static profiling.
+    pub fn with_salt_params(mut self, mult: usize, offset: usize) -> Self {
+        self.multiplier.store(mult, Ordering::SeqCst);
+        self.offset_factor.store(offset, Ordering::SeqCst);
+        self
     }
 }
 
@@ -54,14 +65,16 @@ impl HashFunction for SimpleHashFunction {
     fn compute(&self, data: &[u8]) -> Result<Vec<u8>, HashError> {
         let mut hash = Vec::new();
         let mut digest: usize = 0;
+        let mult = self.multiplier.load(Ordering::SeqCst);
+        let offset = self.offset_factor.load(Ordering::SeqCst);
 
         for &byte in data {
             digest = digest.wrapping_add(byte as usize);
-            digest = digest.wrapping_mul(31);
+            digest = digest.wrapping_mul(mult);
         }
 
         for i in 0..32 {
-            hash.push(((digest + i * 17) % 256) as u8);
+            hash.push(((digest + i * offset) % 256) as u8);
         }
 
         Ok(hash)
@@ -269,5 +282,30 @@ impl<'a, T> IntoIterator for &'a mut Vec<T> {
     fn into_iter(self) -> Self::IntoIter {
         use core::ops::DerefMut;
         self.deref_mut().iter_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_custom_hash_salting_parameters() {
+        let default_hash = SimpleHashFunction::new(1, HashAlgorithm::SHA256);
+        let custom_hash = SimpleHashFunction::new(2, HashAlgorithm::SHA256).with_salt_params(37, 19);
+
+        let data = b"sovereign_data_bytes";
+        let h_default = default_hash.compute(data).unwrap();
+        let h_custom = custom_hash.compute(data).unwrap();
+
+        // Outputs should differ due to dynamic parameter adjustment!
+        assert_ne!(h_default, h_custom);
+    }
+
+    #[test]
+    fn test_hash_manager_seed_defaults() {
+        let mut manager = SimpleHashManager::new();
+        manager.seed_with_defaults();
+        assert_eq!(manager.hashes.len(), 3);
     }
 }
