@@ -102,8 +102,8 @@ For a detailed review of all security policies, see the canonical [Security Fram
 
 ```text
 Phase F (Competitor Crusher)   ████████████████████  100% ✅
-Phase G (Kernel Boot)          ████████████░░░░░░░░   60% ← ACTIVE
-Phase H (India Stack)          ░░░░░░░░░░░░░░░░░░░░    0% (blocked on G)
+Phase G (Kernel Boot)          ████████████████████  100% ✅
+Phase H (India Stack)          ████████░░░░░░░░░░░░   40% ← ACTIVE
 ```
 
 ### Current Status
@@ -158,7 +158,11 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 
 **Package Management:**
 - ✅ sigma-pkg CLI
-- 🔄 Universal package manager
+- ✅ Alpine-inspired lightweight package management
+- ✅ NixOS-inspired declarative configuration
+- ✅ Gentoo-inspired source compilation
+- ✅ Fedora/RPM compatibility layer
+- ✅ Universal package manager
 - 🔄 Rollback package snapshots
 
 **Networking:**
@@ -184,7 +188,10 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ High contrast mode
 
 **Boot & Deployment:**
-- ⬜ Bootable ISO (Phase G)
+- ✅ Bootable ISO (Phase G - Complete)
+- ✅ Native installer implementation
+- ✅ Initrd image support
+- ✅ GRUB and ISOLINUX configuration
 
 
 ---
@@ -241,6 +248,8 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 - **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
 - **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
 - **Innovative Features**: [Innovative OS Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Innovative-OS-Features)
+- **Linux/BSD Integration**: [Linux & BSD Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Linux-BSD-Innovations)
+- **Branch Consolidation**: [Branch Consolidation August 2026](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Branch-Consolidation-August-2026-Final)
 
 
 ---
