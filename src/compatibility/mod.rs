@@ -1,6 +1,14 @@
 // SigmaOS Compatibility Module
 pub mod constellation_mesh;
 pub mod cross_platform;
+pub mod zorin;
+
+pub use zorin::{
+    ZorinLayout, ZorinLayoutMetrics, ZorinLayoutSwitcher,
+    ZorinChameleonColor, ZorinChameleonEngine,
+    ZorinConnectState, ZorinConnectManager,
+    ZorinWindowsAppSupport,
+};
 pub mod historic_linux;
 pub mod mint_linux;
 pub mod chimera_linux;
