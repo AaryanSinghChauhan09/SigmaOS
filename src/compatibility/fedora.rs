@@ -572,29 +572,6 @@ pub enum SeLinuxMode {
     Disabled,
 }
 
-#[derive(Debug, Clone)]
-pub struct SeLinuxContext {
-    pub user: String,
-    pub role: String,
-    pub domain_type: String,
-    pub sensitivity: String,
-}
-
-impl SeLinuxContext {
-    pub fn parse(context_str: &str) -> Result<Self, &'static str> {
-        let parts: Vec<&str> = context_str.split(':').collect();
-        if parts.len() < 4 {
-            return Err("Invalid SELinux context string format");
-        }
-        Ok(Self {
-            user: parts[0].to_string(),
-            role: parts[1].to_string(),
-            domain_type: parts[2].to_string(),
-            sensitivity: parts[3].to_string(),
-        })
-    }
-}
-
 pub struct SeLinuxEnforcer {
     pub mode: SeLinuxMode,
     pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
@@ -677,9 +654,221 @@ impl CoprRepositoryManager {
     }
 }
 
+// ==========================================
+// OSTree-style OS Deployer (SovereignOstreeDeployer)
+// ==========================================
+
+pub struct SovereignOstreeDeployer {
+    pub active_version: String,
+    pub staged_version: Option<String>,
+    pub rollback_version: Option<String>,
+    pub layered_packages: Vec<String>,
+}
+
+impl SovereignOstreeDeployer {
+    pub fn new(base_version: &str) -> Self {
+        Self {
+            active_version: base_version.to_string(),
+            staged_version: None,
+            rollback_version: None,
+            layered_packages: Vec::new(),
+        }
+    }
+
+    pub fn stage_upgrade(&mut self, new_version: &str) {
+        self.staged_version = Some(new_version.to_string());
+    }
+
+    pub fn install_layered_package(&mut self, pkg: &str) {
+        self.layered_packages.push(pkg.to_string());
+    }
+
+    pub fn commit_deploy(&mut self) -> Result<(), &'static str> {
+        if let Some(staged) = self.staged_version.take() {
+            self.rollback_version = Some(self.active_version.clone());
+            self.active_version = staged;
+            Ok(())
+        } else {
+            Err("No deployment currently staged")
+        }
+    }
+
+    pub fn rollback(&mut self) -> Result<(), &'static str> {
+        if let Some(rollback) = self.rollback_version.take() {
+            self.staged_version = Some(self.active_version.clone());
+            self.active_version = rollback;
+            Ok(())
+        } else {
+            Err("No rollback deployment available")
+        }
+    }
+}
+
+// ==========================================
+// SELinux-style Mandatory Access Control (SovereignSeLinuxEngine)
+// ==========================================
+
+pub struct SovereignSeLinuxEngine {
+    pub current_context: SeLinuxContext,
+    pub enforcing: bool,
+    pub policy_rules: HashMap<String, Vec<String>>, // source_type -> target_types allowed
+}
+
+impl SovereignSeLinuxEngine {
+    pub fn new(default_context: SeLinuxContext) -> Self {
+        Self {
+            current_context: default_context,
+            enforcing: true,
+            policy_rules: HashMap::new(),
+        }
+    }
+
+    pub fn add_transition_rule(&mut self, source_type: &str, target_type: &str) {
+        self.policy_rules
+            .entry(source_type.to_string())
+            .or_insert_with(Vec::new)
+            .push(target_type.to_string());
+    }
+
+    pub fn evaluate_transition(&self, target_context: &SeLinuxContext) -> bool {
+        if !self.enforcing {
+            return true;
+        }
+        if let Some(allowed_targets) = self.policy_rules.get(&self.current_context.domain_type) {
+            allowed_targets.contains(&target_context.domain_type)
+        } else {
+            false
+        }
+    }
+}
+
+// ==========================================
+// Firewalld Zone-based Network Router (SovereignFirewalldManager)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct FirewalldZone {
+    pub name: String,
+    pub allowed_ports: Vec<u16>,
+    pub allowed_services: Vec<String>,
+}
+
+pub struct SovereignFirewalldManager {
+    pub zones: HashMap<String, FirewalldZone>,
+    pub interface_zones: HashMap<String, String>, // interface -> zone_name
+    pub default_zone: String,
+}
+
+impl SovereignFirewalldManager {
+    pub fn new() -> Self {
+        let mut zones = HashMap::new();
+        zones.insert(
+            "public".to_string(),
+            FirewalldZone {
+                name: "public".to_string(),
+                allowed_ports: vec![22, 80, 443],
+                allowed_services: vec!["ssh".to_string(), "http".to_string(), "https".to_string()],
+            },
+        );
+        zones.insert(
+            "trusted".to_string(),
+            FirewalldZone {
+                name: "trusted".to_string(),
+                allowed_ports: Vec::new(),
+                allowed_services: Vec::new(),
+            },
+        );
+
+        Self {
+            zones,
+            interface_zones: HashMap::new(),
+            default_zone: "public".to_string(),
+        }
+    }
+
+    pub fn assign_interface_to_zone(&mut self, interface: &str, zone: &str) -> Result<(), &'static str> {
+        if !self.zones.contains_key(zone) {
+            return Err("Zone does not exist");
+        }
+        self.interface_zones.insert(interface.to_string(), zone.to_string());
+        Ok(())
+    }
+
+    pub fn check_packet_allowed(&self, interface: &str, port: u16, service: &str) -> bool {
+        let zone_name = self.interface_zones.get(interface).unwrap_or(&self.default_zone);
+        if zone_name == "trusted" {
+            return true;
+        }
+        if let Some(zone) = self.zones.get(zone_name) {
+            zone.allowed_ports.contains(&port) || zone.allowed_services.contains(&service.to_string())
+        } else {
+            false
+        }
+    }
+
+    pub fn add_port_to_zone(&mut self, zone: &str, port: u16) -> Result<(), &'static str> {
+        if let Some(z) = self.zones.get_mut(zone) {
+            if !z.allowed_ports.contains(&port) {
+                z.allowed_ports.push(port);
+            }
+            Ok(())
+        } else {
+            Err("Zone does not exist")
+        }
+    }
+}
+
+// ==========================================
+// Cockpit Console Server Telemetry (SovereignCockpitConsole)
+// ==========================================
+
+pub struct SovereignCockpitConsole {
+    pub cpu_usage: f64,
+    pub memory_used_bytes: u64,
+    pub active_sessions: usize,
+    pub logged_events: Vec<String>,
+}
+
+impl SovereignCockpitConsole {
+    pub fn new() -> Self {
+        Self {
+            cpu_usage: 0.0,
+            memory_used_bytes: 0,
+            active_sessions: 0,
+            logged_events: Vec::new(),
+        }
+    }
+
+    pub fn update_metrics(&mut self, cpu: f64, mem: u64, sessions: usize) {
+        self.cpu_usage = cpu;
+        self.memory_used_bytes = mem;
+        self.active_sessions = sessions;
+    }
+
+    pub fn log_event(&mut self, event: &str) {
+        self.logged_events.push(event.to_string());
+    }
+
+    pub fn stream_telemetry_json(&self) -> String {
+        let mut events_json = String::new();
+        events_json.push('[');
+        for (i, ev) in self.logged_events.iter().enumerate() {
+            if i > 0 {
+                events_json.push_str(", ");
+            }
+            events_json.push_str(&format!("\"{}\"", ev));
+        }
+        events_json.push(']');
+
+        format!(
+            "{{\n  \"cpu_percent\": {:.1},\n  \"memory_used_bytes\": {},\n  \"active_sessions\": {},\n  \"events\": {}\n}}",
+            self.cpu_usage, self.memory_used_bytes, self.active_sessions, events_json
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::*;
 
     #[test]
@@ -855,5 +1044,87 @@ mod tests {
 
         // Fail Case (nonexistent task ID)
         assert_eq!(copr.execute_build_compile(999), Err("COPR build task ID not found"));
+    }
+
+    #[test]
+    fn test_sovereign_ostree_deployer() {
+        let mut deployer = SovereignOstreeDeployer::new("40.20240101.0");
+        assert_eq!(deployer.active_version, "40.20240101.0");
+
+        deployer.install_layered_package("git");
+        deployer.install_layered_package("tmux");
+        assert_eq!(deployer.layered_packages.len(), 2);
+
+        // Attempt commit with nothing staged
+        assert!(deployer.commit_deploy().is_err());
+
+        // Stage and commit upgrade
+        deployer.stage_upgrade("41.20240501.0");
+        assert!(deployer.commit_deploy().is_ok());
+        assert_eq!(deployer.active_version, "41.20240501.0");
+        assert_eq!(deployer.rollback_version.as_deref(), Some("40.20240101.0"));
+
+        // Rollback
+        assert!(deployer.rollback().is_ok());
+        assert_eq!(deployer.active_version, "40.20240101.0");
+        assert_eq!(deployer.staged_version.as_deref(), Some("41.20240501.0"));
+
+        // No more rollback available
+        assert!(deployer.rollback().is_err());
+    }
+
+    #[test]
+    fn test_sovereign_selinux_engine() {
+        let default_ctx = SeLinuxContext::parse("unconfined_u:unconfined_r:unconfined_t:s0").unwrap();
+        let mut engine = SovereignSeLinuxEngine::new(default_ctx);
+
+        let target_ctx = SeLinuxContext::parse("system_u:system_r:httpd_t:s0").unwrap();
+
+        // Denied by default
+        assert!(!engine.evaluate_transition(&target_ctx));
+
+        // Add allow rule
+        engine.add_transition_rule("unconfined_t", "httpd_t");
+        assert!(engine.evaluate_transition(&target_ctx));
+
+        // Verify permissive mode bypasses checks
+        engine.enforcing = false;
+        let unregistered_ctx = SeLinuxContext::parse("system_u:system_r:unknown_t:s0").unwrap();
+        assert!(engine.evaluate_transition(&unregistered_ctx));
+    }
+
+    #[test]
+    fn test_sovereign_firewalld_manager() {
+        let mut fm = SovereignFirewalldManager::new();
+
+        // Default interface eth0 defaults to public
+        assert!(fm.check_packet_allowed("eth0", 22, "ssh"));
+        assert!(!fm.check_packet_allowed("eth0", 8080, "http-alt"));
+
+        // Assign eth0 to trusted
+        assert!(fm.assign_interface_to_zone("eth0", "trusted").is_ok());
+        assert!(fm.check_packet_allowed("eth0", 8080, "http-alt"));
+
+        // Invalid zone error
+        assert!(fm.assign_interface_to_zone("eth0", "invalid_zone").is_err());
+
+        // Add new port dynamically
+        assert!(fm.add_port_to_zone("public", 8080).is_ok());
+        assert!(fm.check_packet_allowed("eth1", 8080, "http-alt"));
+    }
+
+    #[test]
+    fn test_sovereign_cockpit_console() {
+        let mut console = SovereignCockpitConsole::new();
+        console.update_metrics(45.2, 8192000000, 3);
+        console.log_event("User admin logged in");
+        console.log_event("Service sshd restarted");
+
+        let json = console.stream_telemetry_json();
+        assert!(json.contains("\"cpu_percent\": 45.2"));
+        assert!(json.contains("\"memory_used_bytes\": 8192000000"));
+        assert!(json.contains("\"active_sessions\": 3"));
+        assert!(json.contains("\"User admin logged in\""));
+        assert!(json.contains("\"Service sshd restarted\""));
     }
 }
