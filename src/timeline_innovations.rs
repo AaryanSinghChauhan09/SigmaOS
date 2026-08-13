@@ -2,6 +2,9 @@ extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
 use alloc::collections::BTreeMap;
+use core::result::Result::{self, Ok, Err};
+use core::option::Option::{self, Some, None};
+use core::default::Default;
 
 // =========================================================================
 // 1. CROSS-PLATFORM SDK (RUST, NIM, ZIG COMPATIBILITY ENVELOPES)

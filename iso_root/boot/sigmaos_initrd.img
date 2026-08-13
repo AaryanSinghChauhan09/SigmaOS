@@ -1,0 +1,4 @@
+#!/bin/sh
+# Minimal SigmaOS initrd
+echo "SigmaOS Initrd Loading..."
+# Add initialization logic here
