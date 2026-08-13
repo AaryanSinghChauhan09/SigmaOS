@@ -77,6 +77,14 @@ To render legacy distributions and data processing tools irrelevant, SigmaOS emb
 * **4. Data Security Guard (SovereignGuard):** A deep packet and register inspector executing continuously within userspace sandboxes. Implements real-time Data Loss Prevention (DLP), monitoring data flows against cryptographically-hashed signature tables (GDPR, HIPAA, and PCI-DSS definitions). Prevents unverified socket writes or peripheral exposures and reports findings directly to the immutable system compliance ledger.
 * **5. Data Manager System (SovereignCatalog):** A unified metadata management layer. Tracks data residency, filesystem snapshots, schemas, and cryptographic hash audits across local SigmaFS partition targets and remote SigmaCloud cluster endpoints. Bypasses standard textual database catalogs with high-density, memory-mapped Merkle tables.
 
+### 1.8 GPU-Accelerated Sovereign Screen Recorder Subsystem (ZenithRecorder)
+SigmaOS specifies an ultra-low-overhead visual monitoring framework built directly into the display hardware pipelines.
+* **Constant-Time Capture:** Performs direct-to-GPU frame captures via MMIO with constant-time O(1) complexity.
+* **Lock-Free HW Pipelines:** Implements zero-copy hardware H.264/AV1 encoding pipelines utilizing lock-free circular ring buffers.
+* **Freestanding Systems Core:** Written as a pure zero-dependency, statically linked `#![no_std]` systems implementation.
+* **Security Isolation:** Enforces absolute isolation, ensuring screen capture memory can never leak across guest VMs.
+* **Zero-Allocation Stream:** Employs pre-allocated ring-buffered page frames, avoiding any heap allocation runtime overhead.
+
 ---
 
 ## 2. THE DISTRO-CRUSHING BENCHMARK SPECIFICATION
@@ -1607,7 +1615,7 @@ impl HardwareRegister {
                 value
             }
             RegisterAccessMode::MemoryMapped(address) => {
-                let ptr = address as *const volatile u32;
+                let ptr = address as *const u32;
                 core::ptr::read_volatile(ptr)
             }
         }
@@ -1630,7 +1638,7 @@ impl HardwareRegister {
                 }
             }
             RegisterAccessMode::MemoryMapped(address) => {
-                let ptr = address as *mut volatile u32;
+                let ptr = address as *mut u32;
                 core::ptr::write_volatile(ptr, value);
             }
         }

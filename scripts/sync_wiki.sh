@@ -150,6 +150,19 @@ main() {
     # Perform full batch sync
     WikiSyncEngine_run_sync "$engine"
 
+    # Also synchronize to 'wiki' directory
+    local engine_wiki
+    WikiSyncEngine_new engine_wiki "$wiki_dir" "wiki"
+    WikiSyncEngine_initialize_env "$engine_wiki"
+    for filepath in "$wiki_dir"/*.md; do
+        if [ -f "$filepath" ]; then
+            local page
+            WikiPage_new page "$filepath"
+            WikiSyncEngine_add_page "$engine_wiki" "$page"
+        fi
+    done
+    WikiSyncEngine_run_sync "$engine_wiki"
+
     echo "=== Wiki Synchronization Complete! ==="
 }
 
