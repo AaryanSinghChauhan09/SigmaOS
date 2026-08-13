@@ -45,6 +45,13 @@ where
             }
         }
     }
+
+    pub fn or_default(self) -> &'a mut V
+    where
+        V: Default,
+    {
+        self.or_insert_with(Default::default)
+    }
 }
 
 impl<K, V> BTreeMap<K, V>

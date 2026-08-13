@@ -149,7 +149,7 @@ impl PageTable for SimplePageTable {
             &self.entries[index]
         } else {
             static mut DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
-            unsafe { &mut *(&raw mut DUMMY) }
+            unsafe { &mut DUMMY }
         }
     }
     fn get_entry(&mut self, index: usize) -> &mut dyn PageTableEntry {
@@ -157,7 +157,7 @@ impl PageTable for SimplePageTable {
             &mut self.entries[index]
         } else {
             static mut DUMMY: SimplePageTableEntry = SimplePageTableEntry::new();
-            unsafe { &mut *(&raw mut DUMMY) }
+            unsafe { &mut DUMMY }
         }
     }
     fn set_entry(&mut self, index: usize, entry: SimplePageTableEntry) {
@@ -194,6 +194,12 @@ impl TlbTracker {
     pub fn flush_shootdowns(&self) -> usize {
         self.pending_shootdowns.store(0, Ordering::SeqCst);
         self.current_epoch.load(Ordering::SeqCst)
+    }
+}
+
+impl Default for TlbTracker {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -258,6 +264,12 @@ impl SimpleVMM {
 
     fn get_pt_index(&self, virt: VirtualAddress) -> usize {
         (virt >> 12) & 0x1FF
+    }
+}
+
+impl Default for SimpleVMM {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -617,6 +629,12 @@ impl SimpleProcessMemory {
     }
 }
 
+impl Default for SimpleProcessMemory {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ProcessMemory for SimpleProcessMemory {
     fn create_address_space(&mut self) -> Result<usize, PageFaultError> {
         let id = self.next_id.fetch_add(1, Ordering::SeqCst);
@@ -648,7 +666,7 @@ impl ProcessMemory for SimpleProcessMemory {
             return Err(PageFaultError::InvalidAddress);
         }
         if let Some(ref mut vmm) = self.address_spaces[space_id] {
-            let page_count = (size + 4095) / 4096;
+            let page_count = size.div_ceil(4096);
             for i in 0..page_count {
                 let virt = base + i * 4096;
                 let phys = 0x1000000 + i * 4096;

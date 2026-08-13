@@ -33,6 +33,19 @@ impl<T> Vec<T> {
         }
     }
 
+    pub fn with_capacity(capacity: usize) -> Self {
+        if capacity == 0 {
+            Self::new()
+        } else {
+            let data = unsafe { alloc(capacity * mem::size_of::<T>()) as *mut T };
+            Vec {
+                data: if data.is_null() { core::ptr::null_mut() } else { data },
+                len: 0,
+                capacity: if data.is_null() { 0 } else { capacity },
+            }
+        }
+    }
+
     pub fn len(&self) -> usize {
         self.len
     }
@@ -41,8 +54,12 @@ impl<T> Vec<T> {
         self.len == 0
     }
 
-    pub fn iter(&self) -> core::slice::Iter<T> {
+    pub fn iter(&self) -> core::slice::Iter<'_, T> {
         unsafe { core::slice::from_raw_parts(self.data, self.len).iter() }
+    }
+
+    pub fn iter_mut(&mut self) -> core::slice::IterMut<'_, T> {
+        unsafe { core::slice::from_raw_parts_mut(self.data, self.len).iter_mut() }
     }
 
     pub fn push(&mut self, item: T) {
@@ -127,6 +144,12 @@ impl<T> Vec<T> {
     }
 }
 
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Vec::new()
+    }
+}
+
 impl<'a, T> IntoIterator for &'a Vec<T> {
     type Item = &'a T;
     type IntoIter = core::slice::Iter<'a, T>;
@@ -167,3 +190,17 @@ impl<T> Drop for Vec<T> {
         }
     }
 }
+
+impl<T: Clone> Clone for Vec<T> {
+    fn clone(&self) -> Self {
+        let mut new_vec = Vec::with_capacity(self.capacity);
+        for i in 0..self.len {
+            unsafe {
+                let item = (&*self.data.add(i)).clone();
+                new_vec.push(item);
+            }
+        }
+        new_vec
+    }
+}
+

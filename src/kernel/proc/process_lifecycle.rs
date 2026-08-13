@@ -22,7 +22,7 @@ use crate::klib::HashMap;
 use std::collections::HashMap;
 
 #[cfg(test)]
-mod mock_scheduler {
+pub mod mock_scheduler {
     use core::time::Duration;
     use alloc::string::String;
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -113,6 +113,7 @@ pub struct ProcessLifecycleManager {
     extended_contexts: HashMap<u64, ProcessExtendedContext>,
     parent_map: HashMap<u64, u64>, // child -> parent
     exit_codes: HashMap<u64, i32>,
+    pub group_ids: HashMap<u64, u32>,
     next_pid: AtomicUsize,
 }
 
@@ -123,6 +124,7 @@ impl ProcessLifecycleManager {
             extended_contexts: HashMap::new(),
             parent_map: HashMap::new(),
             exit_codes: HashMap::new(),
+            group_ids: HashMap::new(),
             next_pid: AtomicUsize::new(100),
         }
     }
@@ -163,6 +165,8 @@ impl ProcessLifecycleManager {
         self.processes.insert(child_pid, child);
         self.extended_contexts.insert(child_pid, child_ctx);
         self.parent_map.insert(child_pid, parent_pid);
+        let parent_pgid = *self.group_ids.get(&parent_pid).unwrap_or(&0);
+        self.group_ids.insert(child_pid, parent_pgid);
 
         Ok(child_pid)
     }

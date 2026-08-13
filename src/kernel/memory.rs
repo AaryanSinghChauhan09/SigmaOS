@@ -82,7 +82,7 @@ impl BuddyAllocator {
             return None;
         }
 
-        let pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+        let pages = size.div_ceil(PAGE_SIZE);
         let order = self.calculate_order(pages);
 
         // Find smallest block that can satisfy request

@@ -161,7 +161,7 @@ impl Default for SignalManager {
 mod tests {
     use super::*;
     use crate::kernel::proc::process_lifecycle::{ProcessLifecycleManager};
-    use crate::kernel::scheduler::{Priority, Process};
+    use crate::kernel::proc::process_lifecycle::mock_scheduler::{Priority, Process};
 
     extern "C" fn mock_handler(_sig: u32) {}
 

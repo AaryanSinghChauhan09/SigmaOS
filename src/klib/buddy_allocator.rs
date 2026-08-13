@@ -91,12 +91,13 @@ impl BuddyAllocator for SimpleBuddyAllocator {
         let mut found_reclaimable = None;
         for (id, block_opt) in self.blocks.iter().enumerate() {
             if let Some(block) = block_opt {
-                if block.free.load(Ordering::SeqCst) == 0 && block.is_cache.load(Ordering::SeqCst) == 1 {
-                    let order = block.order.load(Ordering::SeqCst);
-                    if order >= target_order {
-                        found_reclaimable = Some((id, order));
-                        break;
-                    }
+                let order = block.order.load(Ordering::SeqCst);
+                if block.free.load(Ordering::SeqCst) == 0
+                    && block.is_cache.load(Ordering::SeqCst) == 1
+                    && order >= target_order
+                {
+                    found_reclaimable = Some((id, order));
+                    break;
                 }
             }
         }
@@ -307,6 +308,12 @@ impl LeakTracker {
         LeakTracker {
             allocations: Vec::new(),
         }
+    }
+}
+
+impl Default for LeakTracker {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

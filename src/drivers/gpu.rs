@@ -7,6 +7,13 @@ extern crate alloc;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+#[derive(Debug, Clone)]
+pub struct DrmCrtc;
+
+#[derive(Debug, Clone)]
+pub struct DrmConnector;
+
+
 /// GPU command type
 #[derive(Debug, Clone)]
 pub enum GpuCommand {
@@ -92,6 +99,12 @@ impl GpuCommandBuffer {
 
     pub fn end_recording(&mut self) {
         self.is_recorded = true;
+    }
+}
+
+impl Default for GpuCommandBuffer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

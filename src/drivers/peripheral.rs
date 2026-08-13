@@ -71,6 +71,26 @@ impl PeripheralManager {
         self.devices.push(device);
     }
 
+    pub fn register_device(&mut self, device: alloc::boxed::Box<dyn PeripheralDevice>) -> Result<(), &'static str> {
+        let info = PeripheralDeviceInfo {
+            generation: device.generation(),
+            power_state: device.power_state(),
+            device_id: device.device_id(),
+        };
+        self.devices.push(info);
+        Ok(())
+    }
+
+    pub fn device_count(&self) -> usize {
+        self.devices.len()
+    }
+
+    pub fn broadcast_power_state(&mut self, state: PowerState) {
+        for device in &mut self.devices {
+            device.set_power_state(state);
+        }
+    }
+
     pub fn get_device(&self, device_id: u32) -> Option<&PeripheralDeviceInfo> {
         self.devices.iter().find(|d| d.device_id == device_id)
     }

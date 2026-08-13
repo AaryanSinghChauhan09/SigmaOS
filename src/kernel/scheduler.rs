@@ -132,10 +132,10 @@ impl Process {
         };
         
         // Nice value adjustment: higher nice = lower priority
-        let nice_adjustment = (self.nice_value as i32).abs() as u32;
+        let nice_adjustment = self.nice_value.unsigned_abs() as u32;
         let weight = base_weight + nice_adjustment;
         
-        self.virtual_deadline = current_time + ((1000 / weight) as u64);
+        self.virtual_deadline = current_time + (1000 / weight) as u64;
     }
 
     pub fn get_dynamic_time_slice(&self, thermal_state: ThermalState) -> Duration {
@@ -178,10 +178,8 @@ pub struct Scheduler {
 
 impl Scheduler {
     pub fn new(total_cores: u8) -> Self {
-        let mut core_load = Vec::new();
-        for _ in 0..total_cores {
-            core_load.push(0.0);
-        }
+        let mut core_load = Vec::with_capacity(total_cores as usize);
+        core_load.resize(total_cores as usize, 0.0_f32);
 
         Self {
             processes: Vec::new(),
