@@ -81,3 +81,12 @@ pub use sigmawin::{
     PeLoader, PeSection, PeFormat, RegistryManager, User32MessageQueue, WinSockAdapter,
     D3dToVulkanTranslator, NtHandleTable, NtObject, NtObjectType, Win32Message, Win32Error,
 };
+pub use lubuntu::{
+    CpuGovernor, SystemPressure, LubuntuHealthReport, LubuntuSystemManager,
+    LxqtSessionManager, LxqtSessionState, PcmanfmQtAdapter, FileNode,
+    DiscoverPackageAdapter, AptPackage, FeatherpadEditor, QTerminalEmulator, TerminalTab,
+    CalamaresInstallerShim, CalamaresStage
+};
+pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
+pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
+pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};

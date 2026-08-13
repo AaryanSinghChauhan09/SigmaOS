@@ -20,6 +20,8 @@
 // Core working components
 pub mod memory;
 pub mod scheduler;
+pub mod object;
+pub mod proc;
 
 // Temporarily disabled problematic modules
 // pub mod breakthroughs;

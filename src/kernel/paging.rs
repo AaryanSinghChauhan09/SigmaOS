@@ -447,6 +447,7 @@ impl DemandPagingSubsystem {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::*;
 
     #[test]
     fn test_4level_page_table_walking() {
@@ -706,5 +707,41 @@ mod tests {
 
         // Reference count of the old shared physical frame should be decremented to 1
         assert_eq!(dp_subsystem.cow_shared_frames.get(&shared_phys_frame), Some(&1));
+    }
+
+    #[test]
+    fn test_demand_paging_subsystem_lazy_and_swap() {
+        let mut sub = DemandPagingSubsystem::new(2); // physical memory limit is 2 pages
+        sub.register_lazy_zone(100, 0x1000_0000, 10); // PID 100, start 0x1000_0000, size 10 pages
+
+        // 1. First access (Lazy load)
+        let (reason1, frame1) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
+        assert_eq!(reason1, PageFaultReason::LazyLoad);
+        assert_eq!(frame1, 0x1000_0000 + 0x4000_0000);
+        assert_eq!(sub.physical_lru_queue.len(), 1);
+
+        // 2. Second access (Lazy load)
+        let (reason2, frame2) = sub.handle_demand_fault(100, 0x1000_1000).unwrap();
+        assert_eq!(reason2, PageFaultReason::LazyLoad);
+        assert_eq!(sub.physical_lru_queue.len(), 2);
+
+        // 3. Third access exceeds physical limit (2) -> triggers swap eviction of first page
+        let (reason3, frame3) = sub.handle_demand_fault(100, 0x1000_2000).unwrap();
+        assert_eq!(reason3, PageFaultReason::LazyLoad);
+        assert_eq!(sub.swap_out_count, 1);
+        assert_eq!(sub.physical_lru_queue.len(), 2); // Capped at physical limit
+
+        // Verify that address 0x1000_0000 has been swapped out
+        let zone = sub.managed_zones.get(&100).unwrap();
+        assert!(zone.swap_disk_blocks.contains_key(&0x1000_0000));
+        assert!(!zone.allocated.contains_key(&0x1000_0000));
+
+        // 4. Access swapped out address -> triggers load from swap disk and swap recovery
+        let (reason4, frame4) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
+        assert_eq!(reason4, PageFaultReason::SwappedOut);
+        assert_eq!(frame4, 0x1000_0000 + 0x5000_0000);
+
+        let zone = sub.managed_zones.get(&100).unwrap();
+        assert!(!zone.swap_disk_blocks.contains_key(&0x1000_0000)); // Pulled back from swap
     }
 }

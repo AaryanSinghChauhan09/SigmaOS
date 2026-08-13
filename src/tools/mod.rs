@@ -3,6 +3,8 @@
 
 pub mod sigmatools;
 pub mod sigma_core_utils;
+pub mod powertoys;
+pub mod sys_tools;
 
 pub use sigmatools::{
     AccessibilityFeature, AnsiColor, AnsiTextCompositor, CliCommandTool, ClusterNode, NodeState,
@@ -16,3 +18,5 @@ pub use sigma_core_utils::{
     SovereignPrivilegeEngine, SovereignDocBrowser, SovereignCoreUtils,
     SovereignShell, SovereignInitSystem, InitSupervisorType,
 };
+pub use powertoys::{SovereignPowerToys, ColorPicker, FancyZones, PowerRename, FileLocksmith, HostsEditor, ScreenZone, LocksmithRecord};
+pub use sys_tools::{PacketProtocol, RawPacket, SovereignTcpDump, DiskNode, SovereignNcdu, SovereignSysctl};

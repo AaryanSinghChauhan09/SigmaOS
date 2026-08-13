@@ -8,6 +8,7 @@ pub mod network;
 pub mod peripheral;
 pub mod storage;
 pub mod vesa;
+pub mod more_devices;
 
 // Temporarily disabled problematic modules
 // pub mod even_more_devices;
@@ -38,3 +39,8 @@ pub use network::{NetworkCommand, NetworkDriver, NetworkError, NetworkType};
 pub use peripheral::{DeviceGeneration, PeripheralDevice as PeripheralDeviceTrait, PeripheralDeviceInfo, PeripheralManager, PowerState};
 pub use storage::{StorageCommand, StorageDriver, StorageError, StorageType};
 pub use vesa::{VesaDriver, VesaError, VesaModeInfo};
+pub use more_devices::{
+    FloppyDiskDriver, SoundBlaster16Driver, GameportJoystickDriver, IdeControllerDriver,
+    ParallelPrinterDriver, CgaGraphicsDriver, PcieGen5NvmeDriver, Thunderbolt4Controller,
+    Wifi7Adapter, IntelXeGpuDriver, CxlMemoryDriver, AppleSiliconUnifiedMemoryBus,
+};
