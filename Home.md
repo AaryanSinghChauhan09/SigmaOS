@@ -143,6 +143,9 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - ✅ Intrusion detection system
 - 🔄 Secure VPN client
 - ✅ Capability-based security framework
+- ✅ Pledge/unveil-inspired access control
+- ✅ WebAssembly sandbox
+- ✅ Trusted execution environment
 
 **System Tools:**
 - ✅ File manager
@@ -164,11 +167,21 @@ Phase H (India Stack)          ░░░░░░░░░░░░░░░░�
 - 🔄 Network traffic analyzer
 
 **AI & Automation:**
+- ✅ AI-native OS integration with LLM capabilities
+- ✅ Intelligent scheduling with ML-based optimization
+- ✅ Predictive system optimization
 - 🔄 AI orchestrator for system optimization
 
 **Customization:**
 - 🔄 Unified control center
 - ✅ Declarative theming engine
+
+**Mobile & Accessibility:**
+- ✅ Mobile power management
+- ✅ Touch optimization and gestures
+- ✅ Screen reader with TTS
+- ✅ Voice control system
+- ✅ High contrast mode
 
 **Boot & Deployment:**
 - ⬜ Bootable ISO (Phase G)
@@ -227,6 +240,7 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 - **Kernel Performance**: [Kernel Performance Optimization Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/KERNEL_PERFORMANCE_PLAN)
 - **Zig Driver Integration**: [Zig Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/ZIG_INTEGRATION_PLAN)
 - **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
+- **Innovative Features**: [Innovative OS Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Innovative-OS-Features)
 
 
 ---
