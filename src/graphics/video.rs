@@ -41,7 +41,11 @@ impl VideoFrame {
         for _ in 0..size {
             pixels.push(PixelRgba::new(0, 0, 0, 255));
         }
-        VideoFrame { width, height, pixels }
+        VideoFrame {
+            width,
+            height,
+            pixels,
+        }
     }
 }
 
@@ -475,7 +479,11 @@ mod tests {
     #[test]
     fn test_subtitle_overlay() {
         let mut frame = VideoFrame::new(100, 100);
-        let overlay = SubtitleOverlayEffect::new("Hello World".to_string(), 10, PixelRgba::new(255, 0, 0, 128));
+        let overlay = SubtitleOverlayEffect::new(
+            "Hello World".to_string(),
+            10,
+            PixelRgba::new(255, 0, 0, 128),
+        );
         overlay.process_frame(&mut frame).unwrap();
         // Check that pixels in lower fifth of frame have been blended
         let idx = 85 * 100 + 50;

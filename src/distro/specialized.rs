@@ -447,11 +447,15 @@ impl AptCacheSimulator {
         }
     }
 
-    pub fn cache_package_metadata(&mut self, manifest: AptPackageManifest) -> Result<&'static str, &'static str> {
+    pub fn cache_package_metadata(
+        &mut self,
+        manifest: AptPackageManifest,
+    ) -> Result<&'static str, &'static str> {
         if self.cached_manifests.len() >= self.max_cache_size {
             return Err("APT Cache is full, trigger cache pruning");
         }
-        self.cached_manifests.insert(manifest.name.clone(), manifest);
+        self.cached_manifests
+            .insert(manifest.name.clone(), manifest);
         Ok("Package metadata stored in offline APT cache")
     }
 
@@ -507,7 +511,9 @@ impl DebianPolicyEnforcer {
         }
         if self.enforce_fhs {
             // FHS conventions require standard starting blocks
-            return path.starts_with("/usr/") || path.starts_with("/bin/") || path.starts_with("/etc/");
+            return path.starts_with("/usr/")
+                || path.starts_with("/bin/")
+                || path.starts_with("/etc/");
         }
         true
     }
@@ -878,15 +884,28 @@ mod tests {
     fn test_runit_service_manager() {
         let mut manager = RunitServiceManager::new();
         manager.register_and_start_service("vfs_shard");
-        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
+        assert_eq!(
+            manager.active_services.get("vfs_shard").unwrap().status,
+            ServiceStatus::Up
+        );
 
         // Manually panic the service
         manager.active_services.get_mut("vfs_shard").unwrap().status = ServiceStatus::Panicked;
 
         let recovered = manager.supervise_and_recover_services();
         assert_eq!(recovered, 1);
-        assert_eq!(manager.active_services.get("vfs_shard").unwrap().status, ServiceStatus::Up);
-        assert_eq!(manager.active_services.get("vfs_shard").unwrap().restart_count, 1);
+        assert_eq!(
+            manager.active_services.get("vfs_shard").unwrap().status,
+            ServiceStatus::Up
+        );
+        assert_eq!(
+            manager
+                .active_services
+                .get("vfs_shard")
+                .unwrap()
+                .restart_count,
+            1
+        );
     }
 
     #[test]
@@ -908,7 +927,10 @@ mod tests {
             sha256: "sha256_mock_manifest_bytes".to_string(),
         };
         assert!(cache.cache_package_metadata(m1).is_ok());
-        assert_eq!(cache.query_cached_package("libreoffice").unwrap().version, "1.0.0");
+        assert_eq!(
+            cache.query_cached_package("libreoffice").unwrap().version,
+            "1.0.0"
+        );
 
         let m2 = AptPackageManifest {
             name: "vim".to_string(),
