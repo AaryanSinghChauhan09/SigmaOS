@@ -28,6 +28,7 @@ pub mod generation_manager;
 pub mod memory;
 pub mod optimizer;
 pub mod power;
+pub mod process_supervisor;
 pub mod sandbox;
 pub mod shredder;
 pub mod snapshot;
@@ -66,6 +67,9 @@ pub use optimizer::{
 pub use power::{
     BatterySaverManager, BatteryStatus, CpuPowerStrategy, DisplayPowerStrategy,
     NetworkPowerStrategy, PowerError, PowerMode, PowerResult, PowerStrategy,
+};
+pub use process_supervisor::{
+    ProcessConfig, ProcessState, ProcessStatus, ProcessSupervisor, SupervisorError,
 };
 pub use sandbox::{
     CapabilitySandboxEnforcer, NamespaceSandboxEnforcer, NetworkPolicy, ProcessSandboxManager,
