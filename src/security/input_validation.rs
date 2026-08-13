@@ -257,6 +257,62 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
     Ok(())
 }
 
+/// Validate a textual IPv6 address (hexadecimal blocks separated by colons, ≤ 39 bytes).
+pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
+    if addr.is_empty() {
+        return Err(ValidationError::EmptyInput);
+    }
+    if addr.len() > MAX_IPV6_LEN {
+        return Err(ValidationError::TooLong);
+    }
+
+    let mut colons = 0;
+    let mut double_colon = false;
+    let mut block_len = 0;
+    let mut i = 0;
+
+    while i < addr.len() {
+        let b = addr[i];
+        if b == b':' {
+            if i + 1 < addr.len() && addr[i + 1] == b':' {
+                if double_colon {
+                    return Err(ValidationError::InvalidChars);
+                }
+                double_colon = true;
+                colons += 1;
+                i += 2;
+                block_len = 0;
+                if i < addr.len() && addr[i] == b':' {
+                    return Err(ValidationError::InvalidChars);
+                }
+                continue;
+            }
+            if i == 0 || i + 1 == addr.len() {
+                return Err(ValidationError::InvalidChars);
+            }
+            colons += 1;
+            block_len = 0;
+        } else if b.is_ascii_hexdigit() {
+            block_len += 1;
+            if block_len > 4 {
+                return Err(ValidationError::OutOfRange);
+            }
+        } else {
+            return Err(ValidationError::InvalidChars);
+        }
+        i += 1;
+    }
+
+    if colons > 7 {
+        return Err(ValidationError::OutOfRange);
+    }
+    if !double_colon && colons != 7 {
+        return Err(ValidationError::OutOfRange);
+    }
+
+    Ok(())
+}
+
 // ── Port number ────────────────────────────────────────────────────────────
 
 /// Validate a TCP/UDP port number (1..=65535).
@@ -322,6 +378,36 @@ mod tests {
         assert!(validate_ipv4(b"255.255.255.255").is_ok());
         assert!(validate_ipv4(b"256.0.0.1").is_err());
         assert!(validate_ipv4(b"192.168.1").is_err());
+    }
+
+    #[test]
+    fn test_ipv6_validation() {
+        // Valid full uncontracted address
+        assert!(validate_ipv6(b"2001:db8:85a3:0:0:8a2e:370:7334").is_ok());
+        // Valid contracted addresses
+        assert!(validate_ipv6(b"2001:db8::1").is_ok());
+        assert!(validate_ipv6(b"::1").is_ok());
+        assert!(validate_ipv6(b"::").is_ok());
+        assert!(validate_ipv6(b"2001:db8:85a3::8a2e").is_ok());
+
+        // Empty input
+        assert_eq!(validate_ipv6(b""), Err(ValidationError::EmptyInput));
+        // Too long
+        assert_eq!(validate_ipv6(b"2001:0db8:85a3:0000:0000:8a2e:0370:7334:9999"), Err(ValidationError::TooLong));
+        // Block length > 4
+        assert!(validate_ipv6(b"20011:db8::1").is_err());
+        // Multiple double colons
+        assert!(validate_ipv6(b"2001::db8::1").is_err());
+        // Invalid characters
+        assert!(validate_ipv6(b"2001:db8:85a3:0:0:8a2e:370:733g").is_err());
+        // Single colon at start/end
+        assert!(validate_ipv6(b":2001::db8").is_err());
+        assert!(validate_ipv6(b"2001::db8:").is_err());
+        // Consecutive colons
+        assert!(validate_ipv6(b"2001:::db8").is_err());
+        // Incorrect block counts
+        assert!(validate_ipv6(b"2001:db8:85a3").is_err());
+        assert!(validate_ipv6(b"2001:db8:85a3:0:0:8a2e:370:7334:1234").is_err());
     }
 
     #[test]
