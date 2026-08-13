@@ -21,6 +21,7 @@ pub mod package;
 pub mod performance;
 pub mod productivity;
 pub mod resilience;
+pub mod resource;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
@@ -55,6 +56,10 @@ pub use compatibility::{
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
+};
+pub use distro::{
+    ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
+    PinRule, AptPinStore, OpenRCService,
 };
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
