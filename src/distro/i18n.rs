@@ -40,7 +40,7 @@ impl LanguagePack {
     }
 
     pub fn translate(&self, key: &str) -> Option<&str> {
-        self.translations.get(key).map(|s| s.as_str())
+        self.translations.get(key).map(|s: &String| s.as_str())
     }
 
     /// Formats the translation by replacing placeholders like `{0}`, `{1}` with arguments.
@@ -98,6 +98,7 @@ impl InputMethodEngine {
     /// Automatically converts input if a single perfect candidate exists, or returns the original.
     pub fn convert_auto(&self, input: &str) -> String {
         if let Some(candidates) = self.dictionary.get(input) {
+            let candidates: &Vec<ImeCandidate> = candidates;
             if !candidates.is_empty() {
                 return candidates[0].text.clone();
             }
@@ -221,7 +222,9 @@ impl LocaleManager {
 
     pub fn translate(&self, key: &str) -> String {
         if let Some(pack) = self.language_packs.get(&self.current_locale) {
+            let pack: &LanguagePack = pack;
             if let Some(translation) = pack.translate(key) {
+                let translation: &str = translation;
                 return translation.to_string();
             }
         }

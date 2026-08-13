@@ -163,7 +163,7 @@ impl UnifiedDashboard {
         let iter = self.widgets.iter();
         for (id, widget) in iter {
             if let Some(value) = widget.get_latest_value() {
-                summary.insert(id.clone(), value);
+                let id: &String = id; let value: f64 = value; summary.insert(id.clone(), value);
             }
         }
 
