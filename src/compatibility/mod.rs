@@ -21,7 +21,11 @@ pub mod canonical;
 pub mod fedora;
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
-pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SovereignOstreeDeployer, SovereignSeLinuxContext, SovereignSeLinuxEngine,
+    SovereignFirewalldManager, SovereignCockpitConsole,
+};
 pub use legacy_adapters::{
     KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
     APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,

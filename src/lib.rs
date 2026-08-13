@@ -25,6 +25,10 @@ pub use timeline_innovations::{
 // pub mod automation;
 // pub mod compatibility;
 // pub mod container;
+
+#[cfg(test)]
+#[path = "compatibility/fedora.rs"]
+pub mod fedora_compat_test;
 // pub mod customization;
 // pub mod dashboard;
 // pub mod desktop;
