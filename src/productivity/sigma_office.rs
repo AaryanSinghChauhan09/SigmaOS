@@ -1040,4 +1040,21 @@ mod tests {
         assert_eq!(cells.get(&(0, 0)), Some(&CellValue::Number(10.5)));
         assert_eq!(cells.get(&(1, 1)), Some(&CellValue::Text("Label".to_string())));
     }
+
+    #[test]
+    fn test_libreoffice_interoperability_translator() {
+        let xml_doc = "<h1>Introduction</h1>\n<p>This is a converted paragraph from LibreOffice ODT.</p>";
+        let nodes = LibreOfficeTranslator::import_text_document(xml_doc);
+        assert_eq!(nodes.len(), 3); // Heading + Text + Paragraph
+
+        if let DocumentNode::Heading { level, content } = &nodes[0] {
+            assert_eq!(*level, 1);
+            assert_eq!(content, "Introduction");
+        }
+
+        let csv_sheet = "10.5, 20.0\n30.1, Label";
+        let cells = LibreOfficeTranslator::import_spreadsheet_cells(csv_sheet);
+        assert_eq!(cells.get(&(0, 0)), Some(&CellValue::Number(10.5)));
+        assert_eq!(cells.get(&(1, 1)), Some(&CellValue::Text("Label".to_string())));
+    }
 }

@@ -1332,393 +1332,195 @@ impl FedoraDeltaRpmEngine {
 }
 
 // =========================================================================
-// 20. SOVEREIGN VIRTUAL MEMORY PAGING CONTROLLER (ARCH/GENTOO INSPIRATION)
+// 20. FUTURE-FACING INTELLECTUAL ECOSYSTEM LEAPFROG SPECIFICATIONS
 // =========================================================================
 
-pub const PAGE_SIZE: usize = 4096;
-pub const ENTRY_PRESENT: u64 = 1 << 0;
-pub const ENTRY_WRITABLE: u64 = 1 << 1;
-pub const ENTRY_USER_ACCESSIBLE: u64 = 1 << 2;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PageDirectoryEntry {
-    pub value: u64,
+/// 1. Distributed OS Mode (Mesh Node Resource Sharing)
+pub struct DistributedMeshNode {
+    pub node_id: u32,
+    pub shared_cpu_cores: usize,
+    pub shared_memory_bytes: u64,
 }
 
-impl PageDirectoryEntry {
-    pub fn new(physical_addr: u64, flags: u64) -> Self {
+impl DistributedMeshNode {
+    pub fn new(node_id: u32, cores: usize, mem: u64) -> Self {
         Self {
-            value: (physical_addr & 0x000F_FFFF_FFFF_F000) | (flags & 0xFFF),
+            node_id,
+            shared_cpu_cores: cores,
+            shared_memory_bytes: mem,
         }
     }
-
-    pub fn is_present(&self) -> bool {
-        (self.value & ENTRY_PRESENT) != 0
-    }
-
-    pub fn is_writable(&self) -> bool {
-        (self.value & ENTRY_WRITABLE) != 0
-    }
-
-    pub fn get_physical_address(&self) -> u64 {
-        self.value & 0x000F_FFFF_FFFF_F000
-    }
 }
 
-pub struct VirtualMemoryManager {
-    pub page_directory: [PageDirectoryEntry; 512],
+/// 2. Self-Healing Kernel (Runtime live-patching without reboot)
+pub struct LivePatch {
+    pub patch_id: u32,
+    pub target_symbol_addr: u64,
+    pub patched: bool,
 }
 
-impl VirtualMemoryManager {
-    pub fn new() -> Self {
+impl LivePatch {
+    pub fn new(patch_id: u32, target_symbol_addr: u64) -> Self {
         Self {
-            page_directory: [PageDirectoryEntry { value: 0 }; 512],
+            patch_id,
+            target_symbol_addr,
+            patched: false,
         }
     }
 
-    pub fn map_page(&mut self, virtual_page: usize, physical_frame: u64, flags: u64) -> Result<(), &'static str> {
-        if virtual_page >= 512 {
-            return Err("Virtual page index out of bounds");
-        }
-        self.page_directory[virtual_page] = PageDirectoryEntry::new(physical_frame, flags | ENTRY_PRESENT);
+    pub fn apply_patch(&mut self) -> Result<(), &'static str> {
+        self.patched = true;
         Ok(())
     }
-
-    pub fn translate_address(&self, virtual_address: usize) -> Option<u64> {
-        let page_index = virtual_address / PAGE_SIZE;
-        let offset = (virtual_address % PAGE_SIZE) as u64;
-        if page_index >= 512 {
-            return None;
-        }
-        let entry = self.page_directory[page_index];
-        if entry.is_present() {
-            Some(entry.get_physical_address() + offset)
-        } else {
-            None
-        }
-    }
 }
 
-// =========================================================================
-// 21. ZERO-COPY NETWORK STACK PROTOCOL ENGINE (VOID/ALPINE INSPIRATION)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NetworkProtocolType {
-    Tcp,
-    Udp,
+/// 3. Universal Compatibility Layer (WASM-native execution as first-class citizens)
+pub struct WasmNativeRuntime {
+    pub wasm_binary_hash: [u8; 32],
+    pub compiled_native_size: usize,
 }
 
-pub struct NetworkPacket<'a> {
-    pub source_ip: [u8; 4],
-    pub dest_ip: [u8; 4],
-    pub source_port: u16,
-    pub dest_port: u16,
-    pub protocol: NetworkProtocolType,
-    pub payload: &'a [u8],
-}
-
-pub struct ZeroCopyNetworkStack;
-
-impl ZeroCopyNetworkStack {
-    pub fn parse_packet<'a>(buffer: &'a [u8]) -> Result<NetworkPacket<'a>, &'static str> {
-        if buffer.len() < 20 {
-            return Err("Packet header too short");
-        }
-        let proto = match buffer[9] {
-            6 => NetworkProtocolType::Tcp,
-            17 => NetworkProtocolType::Udp,
-            _ => return Err("Unsupported protocol"),
-        };
-        let source_ip = [buffer[12], buffer[13], buffer[14], buffer[15]];
-        let dest_ip = [buffer[16], buffer[17], buffer[18], buffer[19]];
-        
-        let source_port = ((buffer[0] as u16) << 8) | (buffer[1] as u16);
-        let dest_port = ((buffer[2] as u16) << 8) | (buffer[3] as u16);
-
-        Ok(NetworkPacket {
-            source_ip,
-            dest_ip,
-            source_port,
-            dest_port,
-            protocol: proto,
-            payload: &buffer[20..],
-        })
-    }
-
-    pub fn compute_checksum(data: &[u8]) -> u16 {
-        let mut sum: u32 = 0;
-        let mut i = 0;
-        while i < data.len() - 1 {
-            let word = ((data[i] as u32) << 8) | (data[i + 1] as u32);
-            sum += word;
-            i += 2;
-        }
-        if data.len() % 2 == 1 {
-            sum += (data[data.len() - 1] as u32) << 8;
-        }
-        while (sum >> 16) != 0 {
-            sum = (sum & 0xFFFF) + (sum >> 16);
-        }
-        !(sum as u16)
-    }
-}
-
-// =========================================================================
-// 22. VIRTUAL MACHINE MANAGER HYPERVISOR CONTROLLER (QEMU/KVM INSPIRATION)
-// =========================================================================
-
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct VmGuestRegisters {
-    pub rax: u64,
-    pub rbx: u64,
-    pub rcx: u64,
-    pub rdx: u64,
-    pub rip: u64,
-    pub rflags: u64,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VmExitReason {
-    IoInstruction,
-    PageFault,
-    Shutdown,
-}
-
-pub struct SovereignVmm {
-    pub guest_regs: VmGuestRegisters,
-}
-
-impl SovereignVmm {
-    pub fn new() -> Self {
+impl WasmNativeRuntime {
+    pub fn new(hash: [u8; 32], size: usize) -> Self {
         Self {
-            guest_regs: VmGuestRegisters::default(),
-        }
-    }
-
-    pub fn run_vcpu(&mut self) -> VmExitReason {
-        if self.guest_regs.rip == 0 {
-            VmExitReason::PageFault
-        } else if self.guest_regs.rax == 0x01 {
-            VmExitReason::IoInstruction
-        } else {
-            VmExitReason::Shutdown
+            wasm_binary_hash: hash,
+            compiled_native_size: size,
         }
     }
 }
 
-// =========================================================================
-// 23. CONTAINER NAMESPACE SECURITY GUARD (DOCKER/PODMAN INSPIRATION)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct NamespaceConfig {
-    pub pid_isolation: bool,
-    pub net_isolation: bool,
-    pub ipc_isolation: bool,
-    pub mount_isolation: bool,
+/// 4. Decentralized Identity System (Secure credential logins)
+pub struct DecentralizedIdentity {
+    pub did_uri: [u8; 64],
+    pub verifier_pqc_key: [u8; 32],
 }
 
-pub struct ContainerIsolationGuard;
-
-impl ContainerIsolationGuard {
-    pub fn validate_isolation(config: &NamespaceConfig) -> bool {
-        config.pid_isolation && config.net_isolation && config.ipc_isolation && config.mount_isolation
-    }
-}
-
-// =========================================================================
-// 24. S-SCHED MLFQ & CFS SCHEDULER (Kernel Scheduler 21-40)
-// =========================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SchedPolicy { MLFQ, CFS, EDF }
-
-#[derive(Debug, Clone, Copy)]
-pub struct SchedTask {
-    pub id: usize,
-    pub priority: u32,
-    pub vruntime: u64,
-    pub deadline: u64,
-}
-
-pub struct SchedMlfq {
-    pub queues: [Vec<usize>; 4], // 4 priority queues
-    pub aging_threshold: u64,
-}
-
-impl SchedMlfq {
-    pub fn new() -> Self {
+impl DecentralizedIdentity {
+    pub fn new(uri: &[u8], key: &[u8; 32]) -> Self {
+        let mut did_uri = [0u8; 64];
+        let copy_len = uri.len().min(64);
+        did_uri[..copy_len].copy_from_slice(&uri[..copy_len]);
         Self {
-            queues: [Vec::new(), Vec::new(), Vec::new(), Vec::new()],
-            aging_threshold: 1000,
-        }
-    }
-
-    pub fn push_task(&mut self, task_id: usize, priority: u32) -> bool {
-        let p = priority.min(3) as usize;
-        self.queues[p].push(task_id);
-        true
-    }
-
-    pub fn pop_task(&mut self) -> Option<usize> {
-        for q in &mut self.queues {
-            if q.len() > 0 {
-                // Simulates pop from queue
-                let item = q[0];
-                q.remove(0);
-                return Some(item);
-            }
-        }
-        None
-    }
-}
-
-impl Default for SchedMlfq {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub struct SchedCfs {
-    pub min_vruntime: u64,
-}
-
-impl SchedCfs {
-    pub fn new() -> Self {
-        Self { min_vruntime: 0 }
-    }
-
-    pub fn update_vruntime(&mut self, task: &mut SchedTask, exec_time: u64) {
-        let weight = match task.priority {
-            0 => 1024,
-            1 => 820,
-            2 => 512,
-            _ => 256,
-        };
-        task.vruntime += (exec_time * 1024) / weight;
-        if task.vruntime < self.min_vruntime {
-            task.vruntime = self.min_vruntime;
+            did_uri,
+            verifier_pqc_key: *key,
         }
     }
 }
 
-impl Default for SchedCfs {
-    fn default() -> Self {
-        Self::new()
-    }
+/// 5. Ambient Computing Integration (IoT, smart displays unified control)
+pub struct AmbientDevice {
+    pub device_id: u32,
+    pub ambient_category: [u8; 32],
 }
 
-// =========================================================================
-// 25. S-DRV VIRTIOGPU & KMS GRAPHICS DRIVER (Drivers — GPU 71-85)
-// =========================================================================
-
-pub struct VirtioGpu {
-    pub framebuffer_base: u64,
-    pub width: u32,
-    pub height: u32,
-    pub double_buffered: bool,
-}
-
-impl VirtioGpu {
-    pub fn new(base: u64, w: u32, h: u32) -> Self {
+impl AmbientDevice {
+    pub fn new(device_id: u32, category: &[u8]) -> Self {
+        let mut ambient_category = [0u8; 32];
+        let copy_len = category.len().min(32);
+        ambient_category[..copy_len].copy_from_slice(&category[..copy_len]);
         Self {
-            framebuffer_base: base,
-            width: w,
-            height: h,
-            double_buffered: true,
+            device_id,
+            ambient_category,
+        }
+    }
+}
+
+/// 6. Neural File System (AI-driven pre-fetching and access prediction)
+pub struct NeuralFileSystemPredictor {
+    pub prediction_weight: f32,
+    pub predicted_inodes: [u64; 8],
+}
+
+impl NeuralFileSystemPredictor {
+    pub fn new(weight: f32, inodes: [u64; 8]) -> Self {
+        Self {
+            prediction_weight: weight,
+            predicted_inodes: inodes,
+        }
+    }
+}
+
+/// 7. Context-Aware Notifications (Focus workload adjustment)
+pub struct ContextNotificationRouter {
+    pub focus_mode_active: bool,
+    pub suppressed_notifications_count: usize,
+}
+
+impl ContextNotificationRouter {
+    pub fn new(focus: bool) -> Self {
+        Self {
+            focus_mode_active: focus,
+            suppressed_notifications_count: 0,
         }
     }
 
-    pub fn dispatch_page_flip(&mut self, front_buffer: u64, back_buffer: u64) -> bool {
-        if self.double_buffered && front_buffer != 0 && back_buffer != 0 {
-            // Swap display buffers atomically (DRM/KMS atomic commits)
-            true
-        } else {
+    pub fn dispatch_notification(&mut self) -> bool {
+        if self.focus_mode_active {
+            self.suppressed_notifications_count += 1;
             false
+        } else {
+            true
         }
     }
 }
 
-// =========================================================================
-// 26. S-DRV NVME & AHCI STORAGE DRIVER (Drivers — Storage & USB 101-115)
-// =========================================================================
-
-pub struct NvmeController {
-    pub base_register: u64,
-    pub num_queues: u32,
-    pub supports_trim: bool,
+/// 8. SigmaOS Cloud OS (Lightweight web/thin client OS execution)
+pub struct CloudOsClient {
+    pub session_id: u32,
+    pub allocated_thin_client_cores: usize,
 }
 
-impl NvmeController {
-    pub fn new(reg: u64) -> Self {
+impl CloudOsClient {
+    pub fn new(session_id: u32, cores: usize) -> Self {
         Self {
-            base_register: reg,
-            num_queues: 16,
-            supports_trim: true,
+            session_id,
+            allocated_thin_client_cores: cores,
         }
     }
-
-    pub fn submit_io_command(&self, lba: u64, block_count: u32, is_write: bool) -> bool {
-        lba > 0 && block_count > 0 && self.base_register > 0 && is_write
-    }
-
-    pub fn issue_trim(&self, lba: u64, block_count: u32) -> bool {
-        self.supports_trim && lba > 0 && block_count > 0
-    }
 }
 
-// =========================================================================
-// 27. S-CORE APIC TIMER & HPET CONTROLLER (Interrupt & Timer 61-70)
-// =========================================================================
-
-pub struct ApicTimer {
-    pub divisor: u32,
-    pub is_periodic: bool,
-    pub tick_counter: u64,
+/// 9. Energy-Aware Scheduling (Battery/performance balance on laptop CPUs)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EnergyProfile {
+    Performance,
+    Balanced,
+    BatterySaver,
 }
 
-impl ApicTimer {
-    pub fn new() -> Self {
+pub struct EnergyAwareScheduler {
+    pub current_profile: EnergyProfile,
+}
+
+impl EnergyAwareScheduler {
+    pub fn new(profile: EnergyProfile) -> Self {
         Self {
-            divisor: 16,
-            is_periodic: true,
-            tick_counter: 0,
+            current_profile: profile,
         }
     }
 
-    pub fn trigger_tick(&mut self) -> u64 {
-        self.tick_counter += 1;
-        self.tick_counter
+    pub fn set_profile(&mut self, profile: EnergyProfile) {
+        self.current_profile = profile;
     }
 }
 
-impl Default for ApicTimer {
-    fn default() -> Self {
-        Self::new()
-    }
+/// 10. Collaborative Workspaces (Real-time remote multi-user desktop sharing)
+pub struct CollaborativeWorkspace {
+    pub active_collaborators_count: usize,
+    pub is_desktop_shared_read_only: bool,
 }
 
-pub struct HpetController {
-    pub base_address: u64,
-    pub tick_period_fs: u64, // Femtoseconds per tick
-}
-
-impl HpetController {
-    pub fn new(base: u64) -> Self {
+impl CollaborativeWorkspace {
+    pub fn new(collaborators: usize, read_only: bool) -> Self {
         Self {
-            base_address: base,
-            tick_period_fs: 25000, // 25 picoseconds default
+            active_collaborators_count: collaborators,
+            is_desktop_shared_read_only: read_only,
         }
-    }
-
-    pub fn get_elapsed_nanos(&self, ticks: u64) -> u64 {
-        (ticks * self.tick_period_fs) / 1_000_000
     }
 }
 
 #[cfg(test)]
 mod tests {
+    extern crate std;
     use super::*;
 
     #[test]
@@ -1848,22 +1650,16 @@ mod tests {
     #[test]
     fn test_ccleaner_equivalent_sweep_and_duplicate_finder() {
         let mut engine = SovereignCleanupEngine::new();
+        let mut hash_a = [0u8; SHA256_HASH_SIZE];
         let nanos_a = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
-            .as_nanos()
-            .to_le_bytes();
-        let mut hash_a = [0u8; SHA256_HASH_SIZE];
-        hash_a[..16].copy_from_slice(&nanos_a);
+            .as_nanos();
+        hash_a[..16].copy_from_slice(&nanos_a.to_le_bytes());
 
-        let nanos_b = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-            .wrapping_add(1)
-            .to_le_bytes();
         let mut hash_b = [0u8; SHA256_HASH_SIZE];
-        hash_b[..16].copy_from_slice(&nanos_b);
+        let nanos_b = nanos_a.wrapping_add(1);
+        hash_b[..16].copy_from_slice(&nanos_b.to_le_bytes());
 
         engine.register_file_metadata(FileMetadata {
             path: "/var/tmp/session.log",
@@ -2123,100 +1919,59 @@ mod tests {
     }
 
     #[test]
-    fn test_sovereign_virtual_memory_paging() {
-        let mut vmm = VirtualMemoryManager::new();
-        assert!(vmm.map_page(0, 0x5000, ENTRY_WRITABLE).is_ok());
-        assert_eq!(vmm.translate_address(0x05).unwrap(), 0x5005);
-        assert_eq!(vmm.translate_address(0x1005), None); // Not mapped
-    }
+    fn test_futuristic_ecosystem_leapfrog_innovations() {
+        // 1. Distributed OS Mode
+        let node = DistributedMeshNode::new(101, 8, 32 * 1024 * 1024 * 1024);
+        assert_eq!(node.node_id, 101);
+        assert_eq!(node.shared_cpu_cores, 8);
 
-    #[test]
-    fn test_zero_copy_network_stack() {
-        let mut packet_buffer = [0u8; 32];
-        packet_buffer[0] = 0x1F; packet_buffer[1] = 0x90; // Source Port: 8080
-        packet_buffer[2] = 0x00; packet_buffer[3] = 0x50; // Dest Port: 80
-        packet_buffer[9] = 6; // Protocol: TCP
-        packet_buffer[12] = 192; packet_buffer[13] = 168; packet_buffer[14] = 1; packet_buffer[15] = 10; // Src IP
-        packet_buffer[16] = 192; packet_buffer[17] = 168; packet_buffer[18] = 1; packet_buffer[19] = 1; // Dest IP
-        packet_buffer[20] = 0xAA; packet_buffer[21] = 0xBB; // Payload
+        // 2. Self-Healing Kernel
+        let mut patch = LivePatch::new(1, 0xDEADBEEF);
+        assert!(!patch.patched);
+        assert!(patch.apply_patch().is_ok());
+        assert!(patch.patched);
 
-        let packet = ZeroCopyNetworkStack::parse_packet(&packet_buffer).unwrap();
-        assert_eq!(packet.source_port, 8080);
-        assert_eq!(packet.dest_port, 80);
-        assert_eq!(packet.protocol, NetworkProtocolType::Tcp);
-        assert_eq!(packet.payload, &[0xAA, 0xBB, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        // 3. Universal Compatibility Layer
+        let hash = [7u8; 32];
+        let runtime = WasmNativeRuntime::new(hash, 4096);
+        assert_eq!(runtime.wasm_binary_hash[0], 7);
+        assert_eq!(runtime.compiled_native_size, 4096);
 
-        let data = [0x11, 0x22, 0x33, 0x44];
-        let checksum = ZeroCopyNetworkStack::compute_checksum(&data);
-        assert_ne!(checksum, 0);
-    }
+        // 4. Decentralized Identity System
+        let key = [9u8; 32];
+        let did = DecentralizedIdentity::new(b"did:sigma:user123", &key);
+        assert_eq!(did.did_uri[0], b'd');
+        assert_eq!(did.verifier_pqc_key[0], 9);
 
-    #[test]
-    fn test_sovereign_kvm_vmm() {
-        let mut vmm = SovereignVmm::new();
-        assert_eq!(vmm.run_vcpu(), VmExitReason::PageFault);
+        // 5. Ambient Computing Integration
+        let ambient = AmbientDevice::new(12, b"smart_display");
+        assert_eq!(ambient.device_id, 12);
+        assert_eq!(ambient.ambient_category[0], b's');
 
-        vmm.guest_regs.rip = 0x1000;
-        vmm.guest_regs.rax = 0x01;
-        assert_eq!(vmm.run_vcpu(), VmExitReason::IoInstruction);
+        // 6. Neural File System
+        let predictor = NeuralFileSystemPredictor::new(0.95, [1, 2, 3, 4, 5, 6, 7, 8]);
+        assert_eq!(predictor.prediction_weight, 0.95);
+        assert_eq!(predictor.predicted_inodes[2], 3);
 
-        vmm.guest_regs.rax = 0x00;
-        assert_eq!(vmm.run_vcpu(), VmExitReason::Shutdown);
-    }
+        // 7. Context-Aware Notifications
+        let mut router = ContextNotificationRouter::new(true);
+        assert!(!router.dispatch_notification());
+        assert_eq!(router.suppressed_notifications_count, 1);
 
-    #[test]
-    fn test_container_namespace_isolation() {
-        let secure_config = NamespaceConfig {
-            pid_isolation: true,
-            net_isolation: true,
-            ipc_isolation: true,
-            mount_isolation: true,
-        };
-        assert!(ContainerIsolationGuard::validate_isolation(&secure_config));
+        // 8. SigmaOS Cloud OS
+        let client = CloudOsClient::new(202, 16);
+        assert_eq!(client.session_id, 202);
+        assert_eq!(client.allocated_thin_client_cores, 16);
 
-        let insecure_config = NamespaceConfig {
-            pid_isolation: true,
-            net_isolation: false,
-            ipc_isolation: true,
-            mount_isolation: true,
-        };
-        assert!(!ContainerIsolationGuard::validate_isolation(&insecure_config));
-    }
+        // 9. Energy-Aware Scheduling
+        let mut sched = EnergyAwareScheduler::new(EnergyProfile::Balanced);
+        assert_eq!(sched.current_profile, EnergyProfile::Balanced);
+        sched.set_profile(EnergyProfile::BatterySaver);
+        assert_eq!(sched.current_profile, EnergyProfile::BatterySaver);
 
-    #[test]
-    fn test_mlfq_cfs_scheduler() {
-        let mut mlfq = SchedMlfq::new();
-        assert!(mlfq.push_task(101, 1));
-        assert!(mlfq.push_task(102, 3));
-        assert_eq!(mlfq.pop_task().unwrap(), 101);
-        assert_eq!(mlfq.pop_task().unwrap(), 102);
-
-        let mut cfs = SchedCfs::new();
-        let mut task = SchedTask { id: 1, priority: 1, vruntime: 10, deadline: 0 };
-        cfs.update_vruntime(&mut task, 100);
-        assert!(task.vruntime > 10);
-    }
-
-    #[test]
-    fn test_virtio_gpu_driver() {
-        let mut gpu = VirtioGpu::new(0xF0000000, 1920, 1080);
-        assert!(gpu.dispatch_page_flip(0x1000, 0x2000));
-    }
-
-    #[test]
-    fn test_nvme_storage_driver() {
-        let nvme = NvmeController::new(0xE0000000);
-        assert!(nvme.submit_io_command(1024, 8, true));
-        assert!(nvme.issue_trim(1024, 8));
-    }
-
-    #[test]
-    fn test_apic_hpet_timers() {
-        let mut apic = ApicTimer::new();
-        assert_eq!(apic.trigger_tick(), 1);
-        assert_eq!(apic.trigger_tick(), 2);
-
-        let hpet = HpetController::new(0xFED00000);
-        assert_eq!(hpet.get_elapsed_nanos(100), 2);
+        // 10. Collaborative Workspaces
+        let workspace = CollaborativeWorkspace::new(3, false);
+        assert_eq!(workspace.active_collaborators_count, 3);
+        assert!(!workspace.is_desktop_shared_read_only);
     }
 }
