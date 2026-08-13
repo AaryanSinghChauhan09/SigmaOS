@@ -22,6 +22,8 @@ pub struct VesaDriver {
     pub refresh_rate_hz: u32,
     pub color_depth: u32,
     pub aspect_ratio: &'static str,
+    pub double_buffered: bool,
+    pub back_buffer: std::sync::Mutex<Vec<u32>>, // thread-safe Mutex
 }
 
 impl VesaDriver {
@@ -39,6 +41,8 @@ impl VesaDriver {
             refresh_rate_hz: 60,
             color_depth: 32,
             aspect_ratio: "4:3",
+            double_buffered: true,
+            back_buffer: std::sync::Mutex::new(vec![0; 1024 * 768]),
         }
     }
 
@@ -64,6 +68,8 @@ impl VesaDriver {
             refresh_rate_hz: 60,
             color_depth: bpp,
             aspect_ratio,
+            double_buffered: true,
+            back_buffer: std::sync::Mutex::new(vec![0; (width * height) as usize]),
         }
     }
 
@@ -119,9 +125,18 @@ impl VesaDriver {
         &self.mode_info
     }
 
-    pub fn write_pixel(&self, x: u32, y: u32, _color: u32) -> Result<(), VesaError> {
+    pub fn write_pixel(&self, x: u32, y: u32, color: u32) -> Result<(), VesaError> {
         if x >= self.mode_info.width || y >= self.mode_info.height {
             return Err(VesaError::OutOfBounds);
+        }
+
+        if self.double_buffered {
+            let index = (y * self.mode_info.width + x) as usize;
+            if let Ok(mut buffer) = self.back_buffer.lock() {
+                if index < buffer.len() {
+                    buffer[index] = color;
+                }
+            }
         }
 
         // Calculate pixel offset
@@ -132,8 +147,30 @@ impl VesaDriver {
         Ok(())
     }
 
-    pub fn clear_screen(&self, _color: u32) -> Result<(), VesaError> {
-        // Simulate screen clear
+    pub fn clear_screen(&self, color: u32) -> Result<(), VesaError> {
+        if self.double_buffered {
+            if let Ok(mut buffer) = self.back_buffer.lock() {
+                for pixel in buffer.iter_mut() {
+                    *pixel = color;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    /// Swap the back buffer to the front buffer (screen presentation)
+    pub fn present(&self) -> Result<(), VesaError> {
+        if self.double_buffered {
+            if let Ok(buffer) = self.back_buffer.lock() {
+                // Write each back-buffer pixel to the raw hardware framebuffer
+                for y in 0..self.mode_info.height {
+                    for x in 0..self.mode_info.width {
+                        let index = (y * self.mode_info.width + x) as usize;
+                        self.write_pixel_raw(x, y, buffer[index])?;
+                    }
+                }
+            }
+        }
         Ok(())
     }
 
@@ -319,5 +356,13 @@ mod tests {
     fn test_out_of_bounds() {
         let vesa = VesaDriver::new();
         assert!(vesa.write_pixel(9999, 9999, 0xFFFFFF).is_err());
+    }
+
+    #[test]
+    fn test_double_buffered_presentation() {
+        let vesa = VesaDriver::new();
+        vesa.clear_screen(0x11223344).unwrap();
+        assert_eq!(vesa.back_buffer.lock().unwrap()[0], 0x11223344);
+        assert!(vesa.present().is_ok());
     }
 }

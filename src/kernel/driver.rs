@@ -104,14 +104,14 @@ impl DriverRegistry {
         }
     }
 
-    pub fn find_driver(&self, name: &str) -> Option<&dyn Driver> {
+    pub fn find_driver<'a>(&'a self, name: &str) -> Option<&'a (dyn Driver + 'static)> {
         self.drivers
             .iter()
             .find(|d| d.driver.driver_name() == name)
             .map(|d| d.driver.as_ref())
     }
 
-    pub fn find_driver_mut(&mut self, name: &str) -> Option<&mut dyn Driver> {
+    pub fn find_driver_mut<'a>(&'a mut self, name: &str) -> Option<&'a mut (dyn Driver + 'static)> {
         self.drivers
             .iter_mut()
             .find(|d| d.driver.driver_name() == name)
