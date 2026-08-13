@@ -33,6 +33,7 @@ pub mod shredder;
 pub mod snapshot;
 pub mod startup;
 pub mod state;
+pub mod syslog;
 pub mod user;
 
 pub use cleanup::{
@@ -87,6 +88,9 @@ pub use startup::{
 pub use state::{
     DeclarativeStateGraph, StateError, StateNode, StateValue, SystemConfiguration,
     get_system_config, get_system_config_mut, init_system_config,
+};
+pub use syslog::{
+    LogLevel, LogFacility, LogEntry, SyslogManager, LogRule, LogAction, SyslogError,
 };
 pub use user::{
     Group, User, UserError, UserManager,
