@@ -24,6 +24,7 @@ pub mod qubes_isolation;
 pub mod scanner;
 pub mod secrets;
 pub mod selinux;
+pub mod selinux_integration;
 pub mod sigma_pledge;
 pub mod sigma_unveil;
 pub mod vault;
@@ -65,6 +66,10 @@ pub use sandbox::{
 pub use qubes_isolation::{
     DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
 };
+pub use selinux_integration::{
+    SelinuxSyscallIntegration, SelinuxError, SelinuxStats, SyscallSecurityClass,
+    initialize_selinux_integration, get_selinux_integration, check_syscall_selinux,
+};
 pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
@@ -79,34 +84,28 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-// Integrity: export the monitor trait and concrete types that actually exist
 pub use integrity::{
     File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError as SecIntegrityError,
     IntegrityStats, IntegrityStatus as SecIntegrityStatus, MonitorCapability, SimpleFile,
     SimpleIntegrityMonitor as SecSimpleIntegrityMonitor,
 };
-// MAC: export what the module actually defines
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACStats, MLSPolicy,
     PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
     SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
     SimpleMACEngine,
 };
-// PKI: export actual types
 pub use pki::{
     PKIManager as SecPKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
 };
-// Secrets: export actual types
 pub use secrets::{
     Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SimpleKeyring,
     SimpleSecret,
 };
-// Vulnerability: export actual types
 pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
 };
-// Parrot Parity and Defensive Audit
 pub use defensive_audit::{
     DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
     SIGNATURE_LEN,
@@ -119,10 +118,8 @@ pub use parrot_linux::{
     AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
     SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionSeverity, IntrusionAlert,
 };
-// NemoClaw Security Primitives
 pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
 
-// Placeholder stubs for standard types to satisfy lib.rs exports
 pub struct CronDaemon;
 pub struct CronJob;
 pub struct DmesgLog;

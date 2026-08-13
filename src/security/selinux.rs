@@ -1,3 +1,7 @@
+#![cfg_attr(not(test), no_std)]
+
+extern crate alloc;
+
 // Fedora-inspired SELinux (Security-Enhanced Linux) Mandatory Access Control Subsystem.
 // Implements labeling security contexts (user:role:type:sensitivity), enforcement modes,
 // an Access Vector Cache (AVC) for performance, policy rules, and detailed audit logging.
