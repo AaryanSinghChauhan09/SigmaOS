@@ -8,6 +8,9 @@ extern crate alloc;
 use crate::klib::{Vec, String};
 
 pub mod bootc;
+pub mod system_init;
+
+pub use system_init::{BootStage, BootStatus, SystemInit, BootError, Runlevel, RunlevelManager};
 
 /// Boot entry
 #[derive(Debug, Clone)]
@@ -28,7 +31,7 @@ impl BootEntry {
             kernel: kernel.to_string(),
             initrd: initrd.to_string(),
             parameters: Vec::new(),
-            device: "".to_string(),
+            device: String::new(),
         }
     }
 
@@ -89,7 +92,7 @@ impl BootManager {
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),
-            default_entry: "".to_string(),
+            default_entry: String::new(),
             timeout: 5,
             theme: BootTheme::new("default"),
             secure_boot: false,
@@ -104,12 +107,12 @@ impl BootManager {
         self.entries.iter_mut().find(|e| e.id == id || e.name == id)
     }
 
-    pub fn set_default(&mut self, entry_id: &str) -> Result<(), BootError> {
+    pub fn set_default(&mut self, entry_id: &str) -> Result<(), BootManagerError> {
         if self.entries.iter().any(|e| e.id == entry_id || e.name == entry_id) {
             self.default_entry = entry_id.to_string();
             Ok(())
         } else {
-            Err(BootError::EntryNotFound)
+            Err(BootManagerError::EntryNotFound)
         }
     }
 
@@ -129,12 +132,11 @@ impl BootManager {
         self.secure_boot = false;
     }
 
-    pub fn boot_entry(&self, entry_id: &str) -> Result<(), BootError> {
-        if let Some(entry) = self.entries.iter().find(|e| e.id == entry_id || e.name == entry_id) {
-            // Boot the entry (in production, would use actual boot mechanism)
+    pub fn boot_entry(&self, entry_id: &str) -> Result<(), BootManagerError> {
+        if self.entries.iter().any(|e| e.id == entry_id || e.name == entry_id) {
             Ok(())
         } else {
-            Err(BootError::EntryNotFound)
+            Err(BootManagerError::EntryNotFound)
         }
     }
 
@@ -159,7 +161,7 @@ pub struct BootStats {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum BootError {
+pub enum BootManagerError {
     EntryNotFound,
     BootFailed,
     ConfigurationError,
