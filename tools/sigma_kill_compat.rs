@@ -71,7 +71,7 @@ pub unsafe extern "C" fn kill_send(pid: SigmaU32, signal: Signal) -> SigmaI32 {
 /// Send signal by name
 #[no_mangle]
 pub unsafe extern "C" fn kill_send_by_name(pid: SigmaU32, signal_name: *const u8) -> SigmaI32 {
-    if !KILL_INITIALIZED || signal_name.isnull() {
+    if !KILL_INITIALIZED || signal_name.is_null() {
         return -1;
     }
     
@@ -88,7 +88,7 @@ pub unsafe extern "C" fn kill_send_by_name(pid: SigmaU32, signal_name: *const u8
 /// Get signal name
 #[no_mangle]
 pub unsafe extern "C" fn kill_get_signal_name(signal: Signal, name: *mut u8, max_len: SigmaU32) -> SigmaI32 {
-    if !KILL_INITIALIZED || name.isnull() {
+    if !KILL_INITIALIZED || name.is_null() {
         return -1;
     }
     

@@ -65,7 +65,7 @@ pub unsafe extern "C" fn nice_set(nice_value: SigmaI32) -> SigmaI32 {
 /// Get nice value for process
 #[no_mangle]
 pub unsafe extern "C" fn nice_get(pid: SigmaU32, nice_value: *mut SigmaI32) -> SigmaI32 {
-    if !NICE_INITIALIZED || nice_value.isnull() {
+    if !NICE_INITIALIZED || nice_value.is_null() {
         return -1;
     }
     
@@ -127,7 +127,7 @@ pub unsafe extern "C" fn nice_renice(pid: SigmaU32, nice_value: SigmaI32) -> Sig
 /// List process priorities
 #[no_mangle]
 pub unsafe extern "C" fn nice_list(priorities: *mut ProcessPriority, max_count: SigmaU32) -> SigmaU32 {
-    if !NICE_INITIALIZED || priorities.isnull() {
+    if !NICE_INITIALIZED || priorities.is_null() {
         return 0;
     }
     
