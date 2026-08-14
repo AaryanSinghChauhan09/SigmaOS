@@ -3,8 +3,25 @@
 // Dynamically mixes chiptune buffers and sound streams out-of-the-box (Linux Mint MintMedia parity).
 
 use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
+use alloc::string::String;
+use alloc::string::ToString;
+use alloc::vec::Vec;
 
 pub const MAX_AUDIO_CHANNELS: usize = 4;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PlaybackState {
+    Stopped,
+    Playing,
+    Paused,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MediaFormat {
+    Mp3,
+    Wav,
+    Ogg,
+}
 
 pub struct AudioChannel {
     pub active: AtomicBool,
@@ -14,6 +31,10 @@ pub struct AudioChannel {
 pub struct SigmaMediaEngine {
     pub channels: [AudioChannel; MAX_AUDIO_CHANNELS],
     pub master_mute: AtomicBool,
+    pub state: PlaybackState,
+    pub active_track: Option<String>,
+    pub format: Option<MediaFormat>,
+    pub duration_seconds: usize,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -40,6 +61,10 @@ impl SigmaMediaEngine {
                 },
             ],
             master_mute: AtomicBool::new(false),
+            state: PlaybackState::Stopped,
+            active_track: None,
+            format: None,
+            duration_seconds: 0,
         }
     }
 
@@ -98,6 +123,30 @@ impl SigmaMediaEngine {
             channel_id, target_vol
         );
         Ok(())
+    }
+
+    pub fn load_track(&mut self, track: String, format: MediaFormat, duration: usize) {
+        self.active_track = Some(track);
+        self.format = Some(format);
+        self.duration_seconds = duration;
+    }
+
+    pub fn play(&mut self) -> Result<(), &'static str> {
+        if self.active_track.is_none() {
+            return Err("No track loaded");
+        }
+        self.state = PlaybackState::Playing;
+        Ok(())
+    }
+
+    pub fn pause(&mut self) {
+        if self.state == PlaybackState::Playing {
+            self.state = PlaybackState::Paused;
+        }
+    }
+
+    pub fn stop(&mut self) {
+        self.state = PlaybackState::Stopped;
     }
 }
 

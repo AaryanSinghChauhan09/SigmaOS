@@ -19,9 +19,19 @@
 pub mod ipc;
 pub mod mechanism;
 pub mod message;
+pub mod unix_socket;
+pub mod signals;
 
 pub use ipc::{
     IPCEndpoint, IPCError, IPCType, IPCInfo, IPCCapability,
     Pipe, MessageQueue, SharedMemory, IPCManager,
     SerenityIpcMessage, SerenitySharedBackingStore, SerenityIpcSandboxEnforcer,
+};
+
+pub use unix_socket::{
+    UnixSocketType, UnixSocketAddress, UnixSocketState, UnixSocket, UnixSocketManager,
+};
+
+pub use signals::{
+    SignalType, SignalDisposition, PendingSignal, ProcessSignalState, SignalDeliverySystem,
 };

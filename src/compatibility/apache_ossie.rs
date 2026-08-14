@@ -174,7 +174,7 @@ impl OssieInterpreter {
         }
 
         // 2. Perform aggregate operations based on Ossie Metric Specifications
-        let mut results = Vec::new();
+        let mut results: Vec<(String, f64)> = Vec::new();
         for (group_key, values) in &grouped_values {
             let aggregated_value = match metric.aggregation {
                 MetricAggregation::Sum => {

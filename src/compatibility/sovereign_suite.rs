@@ -25,7 +25,7 @@ impl EverySearch {
 
     /// Performs instant sub-microsecond search query matches
     pub fn search(&self, query: &str) -> Vec<String> {
-        let mut results = Vec::new();
+        let mut results: Vec<String> = Vec::new();
         for (name, path) in &self.index {
             if name.to_lowercase().contains(&query.to_lowercase()) {
                 results.push(path.clone());

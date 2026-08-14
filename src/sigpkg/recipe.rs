@@ -30,10 +30,8 @@ pub struct PackageRecipe {
     pub prepare_commands: Vec<String>,
     pub pkgrel: u32,
     pub environment: HashMap<String, String>,
-    pub pkgrel: u32,
     pub arch: String,
     pub license_spdx: String,
-    pub prepare_commands: Vec<String>,
     pub package_commands: Vec<String>,
 }
 
@@ -52,10 +50,8 @@ impl PackageRecipe {
             prepare_commands: Vec::new(),
             pkgrel: 1,
             environment: HashMap::new(),
-            pkgrel: 1,
             arch: "x86_64".to_string(),
             license_spdx: "GPL".to_string(),
-            prepare_commands: Vec::new(),
             package_commands: Vec::new(),
         }
     }

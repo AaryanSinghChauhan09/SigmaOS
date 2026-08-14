@@ -250,7 +250,8 @@ impl BaseAdapter {
 
     pub fn execute_hooks(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.user_hooks {
-            UserDefinedHook::execute(hook.as_ref(), package)?;
+            let h: &dyn UserDefinedHook = &**hook;
+            h.execute(package)?;
         }
         Ok(())
     }
@@ -2222,12 +2223,12 @@ impl PackageParserFactory {
     }
 
     pub fn get_parser(&self, format: PackageFormat) -> Option<&dyn IPackageParser> {
-        self.parsers.get::<PackageFormat>(&format).map(|p| p.as_ref())
+        self.parsers.get(&format).map(|p: &Box<dyn IPackageParser>| p.as_ref())
     }
 
     pub fn auto_detect_parser(&self, data: &[u8]) -> Option<&dyn IPackageParser> {
         for parser in self.parsers.values() {
-            let p_ref: &dyn IPackageParser = parser.as_ref();
+            let p_ref: &dyn IPackageParser = &**parser;
             if p_ref.can_parse(data) {
                 return Some(p_ref);
             }
@@ -2283,7 +2284,8 @@ impl UniversalPackageManager {
 
         for trigger in &self.path_triggers {
             let mut matched_files = Vec::new();
-            let pattern = trigger.pattern();
+            let trigger_ref: &dyn IPathTrigger = &**trigger;
+            let pattern = trigger_ref.pattern();
 
             for file in files {
                 // Simplified pattern matching support:
@@ -2339,7 +2341,8 @@ impl UniversalPackageManager {
 
     pub fn execute_hook_chain(&self, package: &mut dyn IPackage) -> Result<(), HookError> {
         for hook in &self.global_hooks {
-            UserDefinedHook::execute(hook.as_ref(), package)?;
+            let h: &dyn UserDefinedHook = &**hook;
+            h.execute(package)?;
         }
         Ok(())
     }
@@ -2393,14 +2396,14 @@ impl UniversalPackageManager {
 
     /// Get installed package
     pub fn get_package(&self, name: &str) -> Option<&dyn IPackage> {
-        self.installed_packages.get::<str>(name).map(|p| p.as_ref())
+        self.installed_packages.get(name).map(|p: &Box<dyn IPackage>| p.as_ref())
     }
 
     /// List all installed packages
     pub fn list_packages(&self) -> Vec<&dyn IPackage> {
         self.installed_packages
             .values()
-            .map(|p| p.as_ref())
+            .map(|p: &Box<dyn IPackage>| p.as_ref())
             .collect()
     }
 
@@ -3016,7 +3019,7 @@ Description: Hook test";
         let trigger = PathTriggerHook {
             name: "update-desktop-database".to_string(),
             pattern: "*.desktop".to_string(),
-            script: Arc::new(move |matched_paths| {
+            script: Arc::new(move |matched_paths: &[String]| {
                 assert_eq!(matched_paths.len(), 1);
                 assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
                 trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
