@@ -9,6 +9,7 @@ pub mod ai;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
+pub mod distro;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
@@ -25,6 +26,7 @@ pub mod resilience;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
+pub mod tools;
 pub mod virtualization;
 
 pub use accessibility::{
@@ -48,6 +50,9 @@ pub use compatibility::{
     MultilingualSupport, NamespaceBindEntry, NtHandle, NtObjectManager, NtObjectType, NtStatus,
     Plan9pMessage, Plan9pMsgType, PortableExecutableLoader, ReformPowerStats, RegistryHive,
     SoftwareMeta, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
+    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
+    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
+    Literal, SpacSatResolver,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

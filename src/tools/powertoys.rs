@@ -53,7 +53,7 @@ impl FancyZones {
 
     /// Configures standard coordinates grid splits
     pub fn create_split_layout(&mut self, screen_width: u32, screen_height: u32) {
-        self.zones.clear();
+        self.zones = Vec::new();
         let half_w = screen_width / 2;
 
         // Zone 0: Left side

@@ -1,3 +1,4 @@
+// SigmaOS Distro Compatibility Layer
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};

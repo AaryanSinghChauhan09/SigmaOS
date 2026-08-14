@@ -257,8 +257,166 @@ impl Default for IrctcPnrTracker {
     }
 }
 
+// ============================================================================
+// S-PAC CAS Graph & DPLL SAT Solver Package Installer
+// ============================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct Literal {
+    pub variable: i32, // Positive or negative integer representing package ID
+    pub is_positive: bool,
+}
+
+pub type Clause = Vec<Literal>;
+
+pub struct SpacSatResolver {
+    pub clauses: Vec<Clause>,
+    pub package_id_to_name: HashMap<i32, String>,
+}
+
+impl SpacSatResolver {
+    pub fn new() -> Self {
+        Self {
+            clauses: Vec::new(),
+            package_id_to_name: HashMap::new(),
+        }
+    }
+
+    pub fn register_package(&mut self, id: i32, name: &str) {
+        self.package_id_to_name.insert(id, name.to_string());
+    }
+
+    pub fn add_clause(&mut self, clause: Clause) {
+        self.clauses.push(clause);
+    }
+
+    /// Evaluates satisfiability using DPLL (Davis-Putnam-Logemann-Loveland) backtracking
+    pub fn solve_dpll(&self) -> Option<HashMap<i32, bool>> {
+        let mut assignments = HashMap::new();
+        if self.dpll_recursive(&self.clauses, &mut assignments) {
+            Some(assignments)
+        } else {
+            None
+        }
+    }
+
+    fn dpll_recursive(&self, clauses: &[Clause], assignments: &mut HashMap<i32, bool>) -> bool {
+        // 1. Base case: if all clauses are satisfied, return true
+        let mut all_satisfied = true;
+        for clause in clauses {
+            let mut clause_satisfied = false;
+            for lit in clause {
+                if let Some(&val) = assignments.get(&lit.variable.abs()) {
+                    let actual_val = if lit.variable > 0 { val } else { !val };
+                    if actual_val {
+                        clause_satisfied = true;
+                        break;
+                    }
+                }
+            }
+            if !clause_satisfied {
+                all_satisfied = false;
+                break;
+            }
+        }
+        if all_satisfied && !clauses.is_empty() {
+            return true;
+        }
+
+        // 2. Base case: if any clause is completely unsatisfied (empty under current assignment), return false
+        for clause in clauses {
+            let mut active_literals = 0;
+            let mut clause_satisfied = false;
+            for lit in clause {
+                if let Some(&val) = assignments.get(&lit.variable.abs()) {
+                    let actual_val = if lit.variable > 0 { val } else { !val };
+                    if actual_val {
+                        clause_satisfied = true;
+                        break;
+                    }
+                } else {
+                    active_literals += 1;
+                }
+            }
+            if !clause_satisfied && active_literals == 0 {
+                return false; // Conflict!
+            }
+        }
+
+        // 3. Unit Clause Propagation
+        for clause in clauses {
+            let mut unassigned_lit = None;
+            let mut clause_satisfied = false;
+            let mut active_literals = 0;
+            for lit in clause {
+                if let Some(&val) = assignments.get(&lit.variable.abs()) {
+                    let actual_val = if lit.variable > 0 { val } else { !val };
+                    if actual_val {
+                        clause_satisfied = true;
+                        break;
+                    }
+                } else {
+                    active_literals += 1;
+                    unassigned_lit = Some(lit);
+                }
+            }
+            if !clause_satisfied && active_literals == 1 {
+                if let Some(lit) = unassigned_lit {
+                    let var = lit.variable.abs();
+                    let val = lit.variable > 0;
+                    assignments.insert(var, val);
+                    let result = self.dpll_recursive(clauses, assignments);
+                    if result {
+                        return true;
+                    }
+                    assignments.remove(&var);
+                    return false;
+                }
+            }
+        }
+
+        // 4. Find first unassigned variable
+        let mut next_var = None;
+        for clause in clauses {
+            for lit in clause {
+                let var = lit.variable.abs();
+                if !assignments.contains_key(&var) {
+                    next_var = Some(var);
+                    break;
+                }
+            }
+            if next_var.is_some() {
+                break;
+            }
+        }
+
+        let var = match next_var {
+            Some(v) => v,
+            None => return true, // No more unassigned variables -> Satisfied!
+        };
+
+        // 5. Recursive Backtracking (Try True first, then False)
+        for &val in &[true, false] {
+            assignments.insert(var, val);
+            if self.dpll_recursive(clauses, assignments) {
+                return true;
+            }
+            assignments.remove(&var);
+        }
+
+        false
+    }
+}
+
+impl Default for SpacSatResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::*;
     use super::*;
 
     #[test]
@@ -328,5 +486,32 @@ mod tests {
 
         tracker.update_pnr_status("2748927491", "CONFIRMED");
         assert_eq!(tracker.get_pnr_status("2748927491"), Some("CONFIRMED"));
+    }
+
+    #[test]
+    fn test_spac_sat_resolver_dpll() {
+        let mut resolver = SpacSatResolver::new();
+        resolver.register_package(1, "kernel");
+        resolver.register_package(2, "drivers");
+
+        // Add clause: (kernel OR drivers) i.e. (1 OR 2)
+        let c1 = vec![
+            Literal { variable: 1, is_positive: true },
+            Literal { variable: 2, is_positive: true },
+        ];
+        // Add clause: (NOT kernel OR NOT drivers) i.e. (-1 OR -2)
+        let c2 = vec![
+            Literal { variable: -1, is_positive: false },
+            Literal { variable: -2, is_positive: false },
+        ];
+
+        resolver.add_clause(c1);
+        resolver.add_clause(c2);
+
+        let solution = resolver.solve_dpll().unwrap();
+        // At least one of them must be true, and not both (XOR relation)
+        let val1 = *solution.get(&1).unwrap();
+        let val2 = *solution.get(&2).unwrap();
+        assert!(val1 != val2);
     }
 }

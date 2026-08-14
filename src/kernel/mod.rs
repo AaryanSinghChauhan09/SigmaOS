@@ -25,6 +25,8 @@ pub mod paging;
 pub mod policy_mechanism;
 pub mod roundrobin;
 pub mod scheduler;
+pub mod object;
+pub mod proc;
 
 pub use breakthroughs::{
     AiNativeRuntime, DeterministicReplayEngine, DynamicKernelPersonalitySwitcher,
