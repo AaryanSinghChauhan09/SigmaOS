@@ -1027,6 +1027,122 @@ impl Default for SovereignLandlockLsm {
     }
 }
 
+// ==========================================
+// 11. LINUX KFIFO-INSPIRED SPSC LOCK-FREE RING BUFFER (SovereignRingBuffer)
+// ==========================================
+
+/// Single-producer single-consumer lock-free ring buffer directly modeled on Linux kfifo
+pub struct SovereignRingBuffer<T, const N: usize> {
+    pub buffer: [Option<T>; N],
+    pub write_idx: usize,
+    pub read_idx: usize,
+}
+
+impl<T, const N: usize> SovereignRingBuffer<T, N> {
+    pub const fn new() -> Self {
+        Self {
+            buffer: [const { None }; N],
+            write_idx: 0,
+            read_idx: 0,
+        }
+    }
+
+    /// Push an item into the ring buffer (lock-free SPSC)
+    pub fn push(&mut self, item: T) -> Result<(), &'static str> {
+        let next_write = (self.write_idx + 1) % N;
+        if next_write == self.read_idx {
+            return Err("Ring buffer is full");
+        }
+        self.buffer[self.write_idx] = Some(item);
+        self.write_idx = next_write;
+        Ok(())
+    }
+
+    /// Pop an item from the ring buffer (lock-free SPSC)
+    pub fn pop(&mut self) -> Option<T> {
+        if self.read_idx == self.write_idx {
+            None
+        } else {
+            let item = self.buffer[self.read_idx].take();
+            self.read_idx = (self.read_idx + 1) % N;
+            item
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.read_idx == self.write_idx
+    }
+
+    pub fn len(&self) -> usize {
+        if self.write_idx >= self.read_idx {
+            self.write_idx - self.read_idx
+        } else {
+            N - (self.read_idx - self.write_idx)
+        }
+    }
+}
+
+// ==========================================
+// 12. DRM/KMS ATOMIC MODESETTING SPECIFICATION (DrmModeInfo)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DrmModeInfo {
+    pub clock: u32,
+    pub hdisplay: u16,
+    pub hsync_start: u16,
+    pub hsync_end: u16,
+    pub htotal: u16,
+    pub vdisplay: u16,
+    pub vsync_start: u16,
+    pub vsync_end: u16,
+    pub vtotal: u16,
+    pub vrefresh: u32,
+    pub flags: u32,
+    pub name: [u8; 32],
+}
+
+impl DrmModeInfo {
+    pub fn new(width: u16, height: u16, refresh: u32) -> Self {
+        let mut name = [0u8; 32];
+        let name_str = format!("{}x{}@{}", width, height, refresh);
+        let bytes = name_str.as_bytes();
+        let len = bytes.len().min(31);
+        for i in 0..len {
+            name[i] = bytes[i];
+        }
+
+        Self {
+            clock: (width as u32 * height as u32 * refresh) / 1000,
+            hdisplay: width,
+            hsync_start: width + 8,
+            hsync_end: width + 16,
+            htotal: width + 32,
+            vdisplay: height,
+            vsync_start: height + 2,
+            vsync_end: height + 4,
+            vtotal: height + 8,
+            vrefresh: refresh,
+            flags: 0,
+            name,
+        }
+    }
+
+    /// Verifies if the modesetting timing complies with standard refresh margins
+    pub fn verify_timing_boundaries(&self) -> bool {
+        if self.htotal <= self.hdisplay || self.vtotal <= self.vdisplay {
+            return false;
+        }
+        if self.hsync_start < self.hdisplay || self.hsync_end < self.hsync_start || self.hsync_end > self.htotal {
+            return false;
+        }
+        if self.vsync_start < self.vdisplay || self.vsync_end < self.vsync_start || self.vsync_end > self.vtotal {
+            return false;
+        }
+        true
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1482,5 +1598,48 @@ mod tests {
 
         // /etc/shadow has no rules so it is denied by default under enforcement
         assert!(!lsm.check_access("/etc/shadow", LandlockAccess::ReadOnly));
+    }
+
+    #[test]
+    fn test_sovereign_ring_buffer_fifo() {
+        let mut ring: SovereignRingBuffer<i32, 5> = SovereignRingBuffer::new();
+        assert!(ring.is_empty());
+        assert_eq!(ring.len(), 0);
+
+        assert!(ring.push(10).is_ok());
+        assert!(ring.push(20).is_ok());
+        assert!(ring.push(30).is_ok());
+        assert!(ring.push(40).is_ok());
+        assert_eq!(ring.len(), 4);
+
+        // Fifth push should fail because SPSC queue of capacity 5 allows at most 4 items (1 slot is always left empty to distinguish empty vs full)
+        assert!(ring.push(50).is_err());
+
+        assert_eq!(ring.pop(), Some(10));
+        assert_eq!(ring.pop(), Some(20));
+        assert_eq!(ring.len(), 2);
+
+        assert!(ring.push(50).is_ok());
+        assert_eq!(ring.len(), 3);
+
+        assert_eq!(ring.pop(), Some(30));
+        assert_eq!(ring.pop(), Some(40));
+        assert_eq!(ring.pop(), Some(50));
+        assert!(ring.pop().is_none());
+        assert!(ring.is_empty());
+    }
+
+    #[test]
+    fn test_drm_kms_modesetting_validation() {
+        let mode = DrmModeInfo::new(1920, 1080, 60);
+        assert!(mode.verify_timing_boundaries());
+        assert_eq!(mode.hdisplay, 1920);
+        assert_eq!(mode.vdisplay, 1080);
+        assert_eq!(mode.vrefresh, 60);
+
+        // Custom invalid timing should be caught
+        let mut bad_mode = mode;
+        bad_mode.htotal = 1900; // invalid total < display
+        assert!(!bad_mode.verify_timing_boundaries());
     }
 }
