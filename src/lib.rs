@@ -135,10 +135,6 @@ pub use virtualization::{
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
 
-pub mod compatibility {
-    pub mod fedora;
-}
-
 // Temporarily disabled problematic modules
 // pub mod accessibility;
 // pub mod automation;
