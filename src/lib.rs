@@ -207,6 +207,8 @@ pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
     VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
     PenetrationAssistant, secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
+    FileIntegrityGuard, MalwareSignature, RootkitDetector, ScanVerdict, SovereignMalwareEngine,
+    ThreatSeverity, ThreatType, YaraSignatureMatcher,
 };
 pub use security::hardening;
 pub use shell::{ShellCommand, ShellRepl};
