@@ -449,6 +449,215 @@ impl Default for PortageSlotResolver {
 }
 
 // =========================================================================
+// 8. DEBIAN APT PACKAGE PINNING & MULTI-ARCH RESOLVER
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptPackageMetadata {
+    pub name: String,
+    pub version: String,
+    pub architecture: String,
+    pub depends: Vec<String>,
+    pub pin_priority: i32,
+}
+
+pub struct MultiArchResolver {
+    pub native_architecture: String,
+    pub foreign_architectures: Vec<String>,
+}
+
+impl MultiArchResolver {
+    pub fn new(native_arch: &str) -> Self {
+        Self {
+            native_architecture: native_arch.to_string(),
+            foreign_architectures: Vec::new(),
+        }
+    }
+
+    pub fn add_foreign_architecture(&mut self, arch: &str) {
+        if arch != self.native_architecture && !self.foreign_architectures.iter().any(|a| a == arch) {
+            self.foreign_architectures.push(arch.to_string());
+        }
+    }
+
+    pub fn is_architecture_supported(&self, arch: &str) -> bool {
+        arch == self.native_architecture || self.foreign_architectures.iter().any(|a| a == arch)
+    }
+}
+
+impl Default for MultiArchResolver {
+    fn default() -> Self {
+        Self::new("x86_64")
+    }
+}
+
+pub struct AptPackageResolver {
+    pub sources_list: Vec<String>,
+    pub available_packages: Vec<AptPackageMetadata>,
+    pub installed_packages: Vec<AptPackageMetadata>,
+    pub multiarch: MultiArchResolver,
+    pub pinned_priorities: BTreeMap<String, i32>,
+}
+
+impl AptPackageResolver {
+    pub fn new(native_arch: &str) -> Self {
+        Self {
+            sources_list: Vec::new(),
+            available_packages: Vec::new(),
+            installed_packages: Vec::new(),
+            multiarch: MultiArchResolver::new(native_arch),
+            pinned_priorities: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_source_repository(&mut self, repo_url: &str) {
+        self.sources_list.push(repo_url.to_string());
+    }
+
+    pub fn set_pin_priority(&mut self, package_pattern: &str, priority: i32) {
+        self.pinned_priorities.insert(package_pattern.to_string(), priority);
+    }
+
+    pub fn register_available_package(&mut self, mut pkg: AptPackageMetadata) {
+        if let Some(&prio) = self.pinned_priorities.get(&pkg.name) {
+            pkg.pin_priority = prio;
+        }
+        let version_pin = alloc::format!("{}={}", pkg.name, pkg.version);
+        if let Some(&prio) = self.pinned_priorities.get(&version_pin) {
+            pkg.pin_priority = prio;
+        }
+        self.available_packages.push(pkg);
+    }
+
+    pub fn apt_get_install(&mut self, name: &str, arch: &str) -> Result<(), &'static str> {
+        if !self.multiarch.is_architecture_supported(arch) {
+            return Err("APT install failed: Architecture not supported (Multi-Arch not configured for target)");
+        }
+
+        let mut candidates: Vec<AptPackageMetadata> = self.available_packages.iter()
+            .filter(|p| p.name == name && p.architecture == arch)
+            .cloned()
+            .collect();
+
+        if candidates.is_empty() {
+            return Err("APT install failed: Package not found in configured repositories");
+        }
+
+        candidates.sort_by(|a, b| {
+            let res = b.pin_priority.cmp(&a.pin_priority);
+            if res == core::cmp::Ordering::Equal {
+                b.version.cmp(&a.version)
+            } else {
+                res
+            }
+        });
+
+        let chosen_candidate = &candidates[0];
+
+        if let Some(installed) = self.installed_packages.iter().find(|p| p.name == name && p.architecture == arch) {
+            if chosen_candidate.version < installed.version && chosen_candidate.pin_priority <= 1000 {
+                return Err("APT install failed: Pinned priority prevents downgrade of installed package");
+            }
+        }
+
+        for dep in &chosen_candidate.depends {
+            if !self.installed_packages.iter().any(|p| p.name == *dep) {
+                self.apt_get_install(dep, arch)?;
+            }
+        }
+
+        self.installed_packages.retain(|p| !(p.name == name && p.architecture == arch));
+        self.installed_packages.push(chosen_candidate.clone());
+
+        Ok(())
+    }
+}
+
+impl Default for AptPackageResolver {
+    fn default() -> Self {
+        Self::new("x86_64")
+    }
+}
+
+// =========================================================================
+// 9. DEBIAN POLICY ENFORCER & DFSG COMPLIANCE ENGINE
+// =========================================================================
+
+pub struct DebianSocialContract {
+    pub open_source_only: bool,
+}
+
+impl DebianSocialContract {
+    pub fn new() -> Self {
+        Self {
+            open_source_only: true,
+        }
+    }
+
+    pub fn is_dfsg_compliant(&self, license: &str) -> bool {
+        match license {
+            "GPL-2.0" | "GPL-3.0" | "MIT" | "BSD-3-Clause" | "Apache-2.0" => true,
+            _ => false,
+        }
+    }
+}
+
+impl Default for DebianSocialContract {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct DebianPolicyEnforcer {
+    pub social_contract: DebianSocialContract,
+    pub enforce_fhs: bool,
+}
+
+impl DebianPolicyEnforcer {
+    pub fn new() -> Self {
+        Self {
+            social_contract: DebianSocialContract::new(),
+            enforce_fhs: true,
+        }
+    }
+
+    pub fn verify_fhs_path_compliance(&self, path: &str) -> bool {
+        path.starts_with("/usr/")
+            || path.starts_with("/etc/")
+            || path.starts_with("/bin/")
+            || path.starts_with("/var/")
+            || path.starts_with("/lib/")
+    }
+
+    pub fn evaluate_package_compliance(
+        &self,
+        _pkg_name: &str,
+        license: &str,
+        install_paths: &[&str],
+    ) -> Result<(), &'static str> {
+        if self.social_contract.open_source_only && !self.social_contract.is_dfsg_compliant(license) {
+            return Err("Debian Policy Violation: License is not DFSG-compliant (Non-Free archive restricted)");
+        }
+
+        if self.enforce_fhs {
+            for path in install_paths {
+                if !self.verify_fhs_path_compliance(path) {
+                    return Err("Debian Policy Violation: Installation directory violates Filesystem Hierarchy Standard (FHS)");
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for DebianPolicyEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -658,5 +867,93 @@ mod tests {
         let flags = resolver.resolve_optimal_compiler_flags();
         assert!(flags.contains("-march=native"));
         assert!(flags.contains("-flto"));
+    }
+
+    #[test]
+    fn test_debian_apt_package_resolver() {
+        let mut resolver = AptPackageResolver::new("amd64");
+
+        // 1. Add repository source
+        resolver.add_source_repository("deb http://deb.debian.org/debian bookworm main");
+        assert_eq!(resolver.sources_list[0], "deb http://deb.debian.org/debian bookworm main");
+
+        // 2. Setup Multi-Arch foreign architecture support
+        assert!(!resolver.multiarch.is_architecture_supported("i386"));
+        resolver.multiarch.add_foreign_architecture("i386");
+        assert!(resolver.multiarch.is_architecture_supported("i386"));
+
+        // Register available packages with various pinning priorities
+        resolver.set_pin_priority("libssl=1.1.1", 990); // higher pinning priority
+
+        resolver.register_available_package(AptPackageMetadata {
+            name: "libssl".to_string(),
+            version: "1.1.1".to_string(),
+            architecture: "i386".to_string(),
+            depends: Vec::new(),
+            pin_priority: 500, // will be overridden to 990 by pin priority registry
+        });
+
+        resolver.register_available_package(AptPackageMetadata {
+            name: "libssl".to_string(),
+            version: "3.0.2".to_string(),
+            architecture: "i386".to_string(),
+            depends: Vec::new(),
+            pin_priority: 100, // lower priority
+        });
+
+        resolver.register_available_package(AptPackageMetadata {
+            name: "curl".to_string(),
+            version: "7.88.1".to_string(),
+            architecture: "i386".to_string(),
+            depends: {
+                let mut v = Vec::new();
+                v.push("libssl".to_string());
+                v
+            },
+            pin_priority: 500,
+        });
+
+        // Try to install package for unsupported architecture (armhf) -> should fail
+        assert!(resolver.apt_get_install("curl", "armhf").is_err());
+
+        // Install curl:i386 -> should successfully install and pull in libssl:i386 (specifically v1.1.1 because of higher pin priority 990 vs 100)
+        assert!(resolver.apt_get_install("curl", "i386").is_ok());
+
+        assert_eq!(resolver.installed_packages.len(), 2);
+        let ssl_installed = resolver.installed_packages.iter().find(|p| p.name == "libssl").unwrap();
+        assert_eq!(ssl_installed.version, "1.1.1");
+        assert_eq!(ssl_installed.pin_priority, 990);
+
+        // Try to downgrade libssl:i386 to an available v1.1.0 with pin_priority <= 1000 -> should fail
+        resolver.set_pin_priority("libssl=1.1.0", 995); // higher priority than v1.1.1 (990) but <= 1000
+        resolver.register_available_package(AptPackageMetadata {
+            name: "libssl".to_string(),
+            version: "1.1.0".to_string(),
+            architecture: "i386".to_string(),
+            depends: Vec::new(),
+            pin_priority: 500, // overridden to 995
+        });
+        assert!(resolver.apt_get_install("libssl", "i386").is_err());
+
+        // Downgrade becomes allowed if priority is set > 1000
+        resolver.set_pin_priority("libssl=1.1.0", 1005);
+        resolver.available_packages.iter_mut().find(|p| p.name == "libssl" && p.version == "1.1.0").unwrap().pin_priority = 1005;
+        assert!(resolver.apt_get_install("libssl", "i386").is_ok());
+        let ssl_downgraded = resolver.installed_packages.iter().find(|p| p.name == "libssl").unwrap();
+        assert_eq!(ssl_downgraded.version, "1.1.0");
+    }
+
+    #[test]
+    fn test_debian_policy_enforcement_and_dfsg() {
+        let enforcer = DebianPolicyEnforcer::new();
+
+        // 1. DFSG Compliant (GPL-3.0) and FHS Compliant paths (/usr/bin) -> Compliant
+        assert!(enforcer.evaluate_package_compliance("grep", "GPL-3.0", &["/usr/bin/grep", "/etc/grep.conf"]).is_ok());
+
+        // 2. Proprietary license (non-free) -> Non-compliant
+        assert!(enforcer.evaluate_package_compliance("nvidia-driver", "Proprietary", &["/usr/lib/nvidia/"]).is_err());
+
+        // 3. FHS Non-compliant path (/opt/mycustomapp) -> Non-compliant
+        assert!(enforcer.evaluate_package_compliance("custom-app", "MIT", &["/opt/custom/app"]).is_err());
     }
 }
