@@ -15,7 +15,7 @@ pub mod apache_ossie;
 pub mod sovereign_suite;
 pub mod gentoo;
 pub mod legacy_adapters;
-pub mod canonical;
+pub mod fedora;
 
 pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
@@ -81,4 +81,10 @@ pub use sovereign_suite::{
 pub use gentoo::{
     UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
     EbuildPackage, PortageEngine,
+};
+
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel, FedoraAluFlags,
+    FedoraAlu, SeLinuxContext, SeLinuxEngine, SystemdPresetConfigurator, AnacondaInstaller,
 };

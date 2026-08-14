@@ -584,3 +584,4 @@ mod tests {
         assert!(deleted2.contains(&path2));
     }
 }
+// Linux & BSD distro inspirations verified

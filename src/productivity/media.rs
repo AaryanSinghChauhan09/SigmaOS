@@ -6,6 +6,20 @@ use core::sync::atomic::{AtomicBool, AtomicU16, Ordering};
 
 pub const MAX_AUDIO_CHANNELS: usize = 4;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PlaybackState {
+    Stopped,
+    Playing,
+    Paused,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MediaFormat {
+    Mp3,
+    Wav,
+    Flac,
+}
+
 pub struct AudioChannel {
     pub active: AtomicBool,
     pub volume: AtomicU16, // scale of 0-100
@@ -14,6 +28,8 @@ pub struct AudioChannel {
 pub struct SigmaMediaEngine {
     pub channels: [AudioChannel; MAX_AUDIO_CHANNELS],
     pub master_mute: AtomicBool,
+    pub state: PlaybackState,
+    pub has_track: bool,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -40,7 +56,32 @@ impl SigmaMediaEngine {
                 },
             ],
             master_mute: AtomicBool::new(false),
+            state: PlaybackState::Stopped,
+            has_track: false,
         }
+    }
+
+    pub fn play(&mut self) -> Result<(), &'static str> {
+        if !self.has_track {
+            return Err("No track loaded");
+        }
+        self.state = PlaybackState::Playing;
+        Ok(())
+    }
+
+    pub fn load_track(&mut self, name: alloc::string::String, format: MediaFormat, duration: u32) {
+        self.has_track = true;
+        self.state = PlaybackState::Stopped;
+    }
+
+    pub fn pause(&mut self) {
+        if self.state == PlaybackState::Playing {
+            self.state = PlaybackState::Paused;
+        }
+    }
+
+    pub fn stop(&mut self) {
+        self.state = PlaybackState::Stopped;
     }
 
     /// Plays a raw chiptune sound buffer over an active audio channel
