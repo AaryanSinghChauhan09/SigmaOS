@@ -215,21 +215,21 @@ impl ArchDependencyResolver {
     /// Resolve dependencies using Kahn's algorithm with cycle detection.
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, &'static str> {
         // 1. Traverse and find the sub-graph of all reachable packages
-        let mut subgraph = Vec::new();
-        let mut stack = Vec::new();
+        let mut subgraph = Vec::with_capacity(16);
+        let mut stack = Vec::with_capacity(16);
         stack.push(package_name.to_string());
 
         while let Some(curr) = stack.pop() {
-            if subgraph.contains(&curr) {
+            if subgraph.iter().any(|x| x == &curr) {
                 continue;
             }
             // Find package or a package providing it
             let pkg = self.packages.iter()
-                .find(|p| p.name == curr || p.provides.contains(&curr));
+                .find(|p| p.name == curr || p.provides.iter().any(|prov| prov == &curr));
             if let Some(p) = pkg {
                 subgraph.push(p.name.clone());
                 for dep in &p.dependencies {
-                    if !subgraph.contains(dep) {
+                    if !subgraph.iter().any(|x| x == dep) {
                         stack.push(dep.clone());
                     }
                 }
@@ -241,28 +241,28 @@ impl ArchDependencyResolver {
         // 2. Compute in-degree for all nodes in the subgraph.
         // In-degree is the number of dependencies a package has that are also in our subgraph.
         // Also map out-edges (dependents). If u is depended on by v, we have an edge u -> v.
-        let mut in_degrees = Vec::new();
-        let mut adj_list = Vec::new(); // (u, Vec<v>) where v depends on u
+        let mut in_degrees = Vec::with_capacity(subgraph.len());
+        let mut adj_list = Vec::with_capacity(subgraph.len()); // (u, Vec<v>) where v depends on u
 
         for u in &subgraph {
             // Find u's package node
             let u_node = self.packages.iter().find(|p| &p.name == u).unwrap();
             let mut u_in_degree = 0;
             for dep in &u_node.dependencies {
-                if subgraph.contains(dep) {
+                if subgraph.iter().any(|x| x == dep) {
                     u_in_degree += 1;
                 }
             }
             in_degrees.push((u.clone(), u_in_degree));
 
             // Populate adjacency list: find all nodes in subgraph that depend on u
-            let mut dependents = Vec::new();
+            let mut dependents = Vec::with_capacity(subgraph.len());
             for v in &subgraph {
                 if v == u {
                     continue;
                 }
                 let v_node = self.packages.iter().find(|p| &p.name == v).unwrap();
-                if v_node.dependencies.contains(u) {
+                if v_node.dependencies.iter().any(|dep| dep == u) {
                     dependents.push(v.clone());
                 }
             }
@@ -270,7 +270,7 @@ impl ArchDependencyResolver {
         }
 
         // 3. Initialize queue with in-degree 0 (leaves of the dependency tree, i.e. no deps)
-        let mut queue = Vec::new();
+        let mut queue = Vec::with_capacity(subgraph.len());
         for (node, deg) in &in_degrees {
             if *deg == 0 {
                 queue.push(node.clone());
@@ -280,7 +280,7 @@ impl ArchDependencyResolver {
         // 4. Sort queue to ensure deterministic sorting order
         queue.sort();
 
-        let mut resolved = Vec::new();
+        let mut resolved = Vec::with_capacity(subgraph.len());
 
         while !queue.is_empty() {
             // We want Kahn's to build from dependencies up to the targets.
