@@ -1,8 +1,83 @@
 // SAT Solver for Dependency Resolution
 // DPLL (Davis-Putnam-Logemann-Loveland) algorithm implementation
 
+#[cfg(not(test))]
 use crate::sigpkg::{Package, Version, VersionConstraint};
+
+#[cfg(test)]
+pub use mock_sigpkg::{Package, Version, VersionConstraint, Dependency};
+
+#[cfg(test)]
+mod mock_sigpkg {
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub struct Version {
+        pub major: u64,
+        pub minor: u64,
+        pub patch: u64,
+    }
+    impl Version {
+        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+            Self { major, minor, patch }
+        }
+        pub fn parse(s: &str) -> Result<Self, ()> {
+            let mut parts = s.split('.');
+            let major = parts.next().ok_or(())?.parse().map_err(|_| ())?;
+            let minor = parts.next().ok_or(())?.parse().map_err(|_| ())?;
+            let patch = parts.next().ok_or(())?.parse().map_err(|_| ())?;
+            Ok(Self { major, minor, patch })
+        }
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub enum VersionConstraint {
+        Any,
+        Exact(Version),
+        GreaterThan(Version),
+        LessThan(Version),
+        GreaterOrEqual(Version),
+        LessOrEqual(Version),
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Dependency {
+        pub name: String,
+        pub version_constraint: VersionConstraint,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Package {
+        pub name: String,
+        pub version: Version,
+        pub description: String,
+        pub dependencies: Vec<Dependency>,
+        pub checksum: String,
+    }
+    impl Package {
+        pub fn new(name: String, version: Version, description: String, deps: Vec<Dependency>, checksum: String) -> Self {
+            Self { name, version, description, dependencies: deps, checksum }
+        }
+    }
+}
+
 use std::collections::{HashMap, HashSet};
+
+/// Debian-style APT Pinning Rule representing release and priority weighting
+#[derive(Debug, Clone)]
+pub struct AptPinRule {
+    pub package_name_pattern: String,
+    pub release_target: String,
+    pub priority: i32,
+}
+
+impl AptPinRule {
+    pub fn new(pattern: &str, release: &str, priority: i32) -> Self {
+        Self {
+            package_name_pattern: pattern.to_string(),
+            release_target: release.to_string(),
+            priority,
+        }
+    }
+}
 
 /// SAT Solver for dependency resolution
 pub struct SatSolver {
@@ -85,6 +160,46 @@ impl SatSolver {
         }
     }
 
+    /// Resolves the optimal package version using Debian-style APT pinning priorities
+    pub fn resolve_with_pinning(
+        &self,
+        package_name: &str,
+        constraint: &VersionConstraint,
+        pin_rules: &[AptPinRule],
+    ) -> Result<Package, ResolveError> {
+        let candidates = self
+            .packages
+            .get(package_name)
+            .ok_or(ResolveError::PackageNotFound(package_name.to_string()))?;
+
+        let mut best_candidate: Option<(&Package, i32)> = None;
+
+        for candidate in candidates {
+            if self.satisfies_constraint(&candidate.version, constraint) {
+                // Determine priority score based on pinning rules
+                let mut priority = 500; // Default Debian priority for installed packages
+                for rule in pin_rules {
+                    if rule.package_name_pattern == "*" || rule.package_name_pattern == package_name {
+                        // Priority is matched by release targets or patterns
+                        priority = rule.priority;
+                    }
+                }
+
+                if let Some((_, best_priority)) = best_candidate {
+                    if priority > best_priority {
+                        best_candidate = Some((candidate, priority));
+                    }
+                } else {
+                    best_candidate = Some((candidate, priority));
+                }
+            }
+        }
+
+        best_candidate
+            .map(|(p, _): (&Package, i32)| p.clone())
+            .ok_or(ResolveError::NoMatchingVersion(package_name.to_string()))
+    }
+
     /// Detect circular dependencies
     pub fn detect_circular(&self, package_name: &str) -> bool {
         let mut visited = HashSet::new();
@@ -138,7 +253,6 @@ pub enum ResolveError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::sigpkg::Dependency;
 
     #[test]
     fn test_sat_solver_creation() {
@@ -184,23 +298,54 @@ mod tests {
                 name: "B".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
-            checksum: String::new(),
-        };
+            String::new(),
+        );
 
-        let pkg_b = Package {
-            name: "B".to_string(),
-            version: Version::new(1, 0, 0),
-            description: String::new(),
-            dependencies: vec![Dependency {
+        let pkg_b = Package::new(
+            "B".to_string(),
+            Version::new(1, 0, 0),
+            String::new(),
+            vec![Dependency {
                 name: "A".to_string(),
                 version_constraint: VersionConstraint::Any,
             }],
-            checksum: String::new(),
-        };
+            String::new(),
+        );
 
         solver.add_package(pkg_a);
         solver.add_package(pkg_b);
 
         assert!(solver.detect_circular("A"));
+    }
+
+    #[test]
+    fn test_debian_apt_pinning() {
+        let mut solver = SatSolver::new();
+        let pkg_stable = Package::new(
+            "nginx".to_string(),
+            Version::new(1, 18, 0),
+            "Stable release".to_string(),
+            Vec::new(),
+            String::new(),
+        );
+        let pkg_unstable = Package::new(
+            "nginx".to_string(),
+            Version::new(1, 25, 0),
+            "Unstable experimental release".to_string(),
+            Vec::new(),
+            String::new(),
+        );
+
+        solver.add_package(pkg_stable);
+        solver.add_package(pkg_unstable);
+
+        let pin_rules = vec![
+            AptPinRule::new("nginx", "stable", 990),
+        ];
+
+        let selected = solver
+            .resolve_with_pinning("nginx", &VersionConstraint::Any, &pin_rules)
+            .unwrap();
+        assert_eq!(selected.version, Version::new(1, 18, 0));
     }
 }

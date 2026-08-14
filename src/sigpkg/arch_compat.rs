@@ -1,8 +1,78 @@
 // SigmaOS Arch Linux Compatibility & Parity Subsystem (sigpkg-arch)
 // Natively compiles PKGBUILD recipes, emulates Pacman database states, and manages rolling release upgrades.
 
+#[cfg(not(test))]
 use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(test)]
+pub use mock_sigpkg::{Dependency, Package, Version, VersionConstraint};
+
+#[cfg(test)]
+mod mock_sigpkg {
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    pub struct Version {
+        pub major: u64,
+        pub minor: u64,
+        pub patch: u64,
+    }
+    impl Version {
+        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+            Self { major, minor, patch }
+        }
+        pub fn parse(s: &str) -> Result<Self, ()> {
+            let mut parts = s.split('.');
+            let major = parts.next().ok_or(())?.parse().map_err(|_| ())?;
+            let minor = parts.next().ok_or(())?.parse().map_err(|_| ())?;
+            let patch = parts.next().ok_or(())?.parse().map_err(|_| ())?;
+            Ok(Self { major, minor, patch })
+        }
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub enum VersionConstraint {
+        Any,
+        Exact(Version),
+        GreaterThan(Version),
+        LessThan(Version),
+        GreaterOrEqual(Version),
+        LessOrEqual(Version),
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Dependency {
+        pub name: String,
+        pub version_constraint: VersionConstraint,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct Package {
+        pub name: String,
+        pub version: Version,
+        pub description: String,
+        pub dependencies: Vec<Dependency>,
+        pub checksum: String,
+    }
+    impl Package {
+        pub fn new(name: String, version: Version, description: String, deps: Vec<Dependency>, checksum: String) -> Self {
+            Self { name, version, description, dependencies: deps, checksum }
+        }
+    }
+}
+
 use std::collections::HashMap;
+
+/// Debian sbuild-style build package description with build dependency limits
+#[derive(Debug, Clone)]
+pub struct DebianSbuildPackage {
+    pub name: String,
+    pub build_depends: Vec<Dependency>,
+}
+
+impl DebianSbuildPackage {
+    pub fn new(name: String, build_depends: Vec<Dependency>) -> Self {
+        Self { name, build_depends }
+    }
+}
 
 /// Emulates Arch User Repository (AUR) PKGBUILD recipes parsing and compiling
 #[derive(Debug, Clone)]
@@ -90,11 +160,44 @@ impl RollingSyncManager {
         self.remote_repository.insert(name.to_string(), version);
     }
 
+    /// Verifies if Debian sbuild-style build-dependency requirements are satisfied by the current environment
+    pub fn is_debian_sbuild_builddeps_satisfied(
+        &self,
+        package: &DebianSbuildPackage,
+    ) -> bool {
+        for dep in &package.build_depends {
+            if let Some(installed_ver) = self.installed_packages.get(&dep.name) {
+                // Check version constraint
+                match &dep.version_constraint {
+                    VersionConstraint::Exact(v) => {
+                        if installed_ver != v { return false; }
+                    }
+                    VersionConstraint::GreaterThan(v) => {
+                        if installed_ver <= v { return false; }
+                    }
+                    VersionConstraint::LessThan(v) => {
+                        if installed_ver >= v { return false; }
+                    }
+                    VersionConstraint::GreaterOrEqual(v) => {
+                        if installed_ver < v { return false; }
+                    }
+                    VersionConstraint::LessOrEqual(v) => {
+                        if installed_ver > v { return false; }
+                    }
+                    VersionConstraint::Any => {}
+                }
+            } else {
+                return false; // Dependency not installed
+            }
+        }
+        true
+    }
+
     /// Checks for available package updates in the rolling release stream
     pub fn list_pending_rolling_updates(&self) -> Vec<(String, Version, Version)> {
         let mut updates = Vec::new();
         for (pkg_name, installed_ver) in &self.installed_packages {
-            if let Some(remote_ver) = self.remote_repository.get(pkg_name.as_str()) {
+            if let Some(remote_ver) = self.remote_repository.get(pkg_name) {
                 if remote_ver > installed_ver {
                     updates.push((pkg_name.clone(), *installed_ver, *remote_ver));
                 }
@@ -222,5 +325,40 @@ mod tests {
             imported.description,
             "Contrib utilities for pacman package manager"
         );
+    }
+
+    #[test]
+    fn test_debian_sbuild_builddeps() {
+        let mut sync = RollingSyncManager::new();
+        sync.register_installed("gcc", Version::new(12, 2, 0));
+        sync.register_installed("make", Version::new(4, 3, 0));
+
+        let sbuild_pkg = DebianSbuildPackage::new(
+            "linux-kernel-core".to_string(),
+            vec![
+                Dependency {
+                    name: "gcc".to_string(),
+                    version_constraint: VersionConstraint::GreaterOrEqual(Version::new(10, 0, 0)),
+                },
+                Dependency {
+                    name: "make".to_string(),
+                    version_constraint: VersionConstraint::Any,
+                },
+            ],
+        );
+
+        assert!(sync.is_debian_sbuild_builddeps_satisfied(&sbuild_pkg));
+
+        let sbuild_pkg_unsatisfied = DebianSbuildPackage::new(
+            "linux-kernel-core".to_string(),
+            vec![
+                Dependency {
+                    name: "gcc".to_string(),
+                    version_constraint: VersionConstraint::GreaterOrEqual(Version::new(13, 0, 0)),
+                },
+            ],
+        );
+
+        assert!(!sync.is_debian_sbuild_builddeps_satisfied(&sbuild_pkg_unsatisfied));
     }
 }
