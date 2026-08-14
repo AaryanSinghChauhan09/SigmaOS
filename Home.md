@@ -119,6 +119,8 @@ Phase H (India Stack)          ████████░░░░░░░░�
 - ✅ Kernel Evolution Architecture (OOP-based trait hierarchy)
 - ✅ Linux Driver Absorption Engine
 - ✅ 5 Abstract Base Traits (DeviceDriver, NetworkStack, FileSystem, MemoryManager, Scheduler)
+- ✅ Enhanced kernel structures (280+ lines of improvements)
+- ✅ Custom sovereign io_uring simulator
 
 **Networking & Storage:**
 - 🔄 TCP/UDP stack - Partial
@@ -146,6 +148,9 @@ Phase H (India Stack)          ████████░░░░░░░░�
 - ✅ Pledge/unveil-inspired access control
 - ✅ WebAssembly sandbox
 - ✅ Trusted execution environment
+- ✅ Enhanced SELinux MAC engine with mode support
+- ✅ Landlock LSM simulator
+- ✅ BSD jail resource controls
 
 **System Tools:**
 - ✅ File manager
@@ -162,6 +167,8 @@ Phase H (India Stack)          ████████░░░░░░░░�
 - ✅ NixOS-inspired declarative configuration
 - ✅ Gentoo-inspired source compilation
 - ✅ Fedora/RPM compatibility layer
+- ✅ Debian APT package resolver and policy enforcer
+- ✅ COPR repository build manager
 - ✅ Universal package manager
 - 🔄 Rollback package snapshots
 
@@ -249,7 +256,8 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 - **Nim Driver Integration**: [Nim Language Driver Integration Specification](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/NIM_INTEGRATION_PLAN)
 - **Innovative Features**: [Innovative OS Features](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Innovative-OS-Features)
 - **Linux/BSD Integration**: [Linux & BSD Innovations](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Linux-BSD-Innovations)
-- **Branch Consolidation**: [Branch Consolidation August 2026](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Branch-Consolidation-August-2026-Final)
+- **Branch Consolidation Phase 1**: [Branch Consolidation August 2026](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Branch-Consolidation-August-2026-Final)
+- **Branch Consolidation Phase 2**: [Branch Consolidation August 2026 Phase 2](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Branch-Consolidation-August-2026-Phase2)
 
 
 ---
