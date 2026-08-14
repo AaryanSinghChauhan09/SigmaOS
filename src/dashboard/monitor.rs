@@ -137,7 +137,7 @@ impl UnifiedDashboard {
     pub fn get_system_summary(&self) -> HashMap<String, f64> {
         let mut summary = HashMap::new();
 
-        let iter: crate::klib::hashmap::HashMapIter<'_, String, DashboardWidget> = self.widgets.iter();
+        let iter = self.widgets.iter();
         for (id, widget) in iter {
             if let Some(value) = widget.get_latest_value() {
                 summary.insert(id.clone(), value);

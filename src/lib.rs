@@ -1,5 +1,6 @@
 #![allow(warnings)]
 #![allow(clippy::all)]
+extern crate alloc;
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
@@ -14,6 +15,8 @@ pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
 pub mod kernel;
+pub mod memory;
+pub mod klib;
 pub mod network;
 pub mod orchestration;
 pub mod distro;
@@ -130,4 +133,7 @@ pub use sigpkg::{
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+};
+pub use memory::{
+    BsdZoneAllocator, LinuxKswapd, MemCgroupManager, SimpleVMM, Zone, MemCgroup, PageState,
 };

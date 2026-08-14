@@ -20,8 +20,15 @@
 // Virtual memory management, paging, and physical memory allocation
 
 pub mod paging;
+pub mod zone;
+pub mod kswapd;
+pub mod cgroups;
 
 pub use paging::{
     MemoryError, PageDirectory, PageDirectoryPointerTable, PageTable, PageTableEntry,
     PhysicalAddress, SimpleVMM, VirtualAddress, PAGE_SIZE_BYTES, PAGE_TABLE_ENTRIES,
 };
+
+pub use zone::{BsdZoneAllocator, Zone, ZoneStats, Slab};
+pub use kswapd::{LinuxKswapd, PageState};
+pub use cgroups::{MemCgroupManager, MemCgroup};

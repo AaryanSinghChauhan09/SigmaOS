@@ -302,7 +302,7 @@ impl AllocStats {
 // ============================================================================
 
 /// The global instance of the SigmaOS bump allocator.
-#[global_allocator]
+#[cfg_attr(target_os = "none", global_allocator)]
 pub static SIGMA_ALLOCATOR: SigmaBumpAllocator = SigmaBumpAllocator::new();
 
 // ============================================================================
