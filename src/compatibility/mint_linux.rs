@@ -232,6 +232,40 @@ impl MintSoftwareManager {
         self.apps_catalog.push(app);
     }
 
+    /// Filters catalog by category.
+    pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
+        let mut filtered = Vec::new();
+        let cat_len = category.len().min(15);
+        for app in self.apps_catalog.iter() {
+            let mut matches = true;
+            for i in 0..cat_len {
+                if app.category[i] != category[i] {
+                    matches = false;
+                    break;
+                }
+            }
+            if matches {
+                filtered.push(app.clone());
+            }
+        }
+        filtered
+    }
+
+    /// Returns apps ranked by user ratings (Featured Apps).
+    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
+        let mut sorted = self.apps_catalog.clone();
+        // Simple bubble sort over vector to rank featured apps without external traits
+        for i in 0..sorted.len() {
+            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
+                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
+                    sorted.swap(j, j + 1);
+                }
+            }
+        }
+        sorted
+    }
+}
+
 // Cinnamon Desktop Theme Engine
 // ==========================================
 
@@ -410,39 +444,9 @@ impl<T> Drop for Vec<T> {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
-            }
-=======
-    /// Filters catalog by category.
-    pub fn search_by_category(&self, category: &[u8]) -> Vec<MintAppMetadata> {
-        let mut filtered = Vec::new();
-        let cat_len = category.len().min(15);
-        for app in self.apps_catalog.iter() {
-            let mut matches = true;
-            for i in 0..cat_len {
-                if app.category[i] != category[i] {
-                    matches = false;
-                    break;
-                }
-            }
-            if matches {
-                filtered.push(app.clone());
+                free(self.data as *mut u8);
             }
         }
-        filtered
-    }
-
-    /// Returns apps ranked by user ratings (Featured Apps).
-    pub fn get_featured_apps(&self) -> Vec<MintAppMetadata> {
-        let mut sorted = self.apps_catalog.clone();
-        // Simple bubble sort over vector to rank featured apps without external traits
-        for i in 0..sorted.len() {
-            for j in 0..sorted.len().saturating_sub(i).saturating_sub(1) {
-                if sorted[j].rating_stars < sorted[j + 1].rating_stars {
-                    sorted.swap(j, j + 1);
-                }
-            }
-        }
-        sorted
     }
 }
 

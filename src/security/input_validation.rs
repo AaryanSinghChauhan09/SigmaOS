@@ -81,6 +81,9 @@ pub fn validate_filename(name: &[u8]) -> Result<(), ValidationError> {
     if name.len() > MAX_FILENAME_LEN {
         return Err(ValidationError::TooLong);
     }
+    if name == b"." || name == b".." {
+        return Err(ValidationError::PathTraversal);
+    }
     for &b in name {
         if b == 0 || b == b'/' || b == b'\\' {
             return Err(ValidationError::InvalidChars);
@@ -342,6 +345,20 @@ mod tests {
     fn test_valid_path() {
         assert!(validate_path(b"/usr/share/sigma/config").is_ok());
         assert!(validate_path(b"/home/user/.config").is_ok());
+    }
+
+    #[test]
+    fn test_validate_filename() {
+        assert_eq!(validate_filename(b"document.pdf"), Ok(()));
+        assert_eq!(validate_filename(b".env"), Ok(()));
+        assert_eq!(validate_filename(b""), Err(ValidationError::EmptyInput));
+        assert_eq!(validate_filename(b"."), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_filename(b".."), Err(ValidationError::PathTraversal));
+        assert_eq!(validate_filename(b"dir/file"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"dir\\file"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(&[b'a', 0, b'b']), Err(ValidationError::InvalidChars));
+        let long_name = [b'a'; MAX_FILENAME_LEN + 1];
+        assert_eq!(validate_filename(&long_name), Err(ValidationError::TooLong));
     }
 
     #[test]
