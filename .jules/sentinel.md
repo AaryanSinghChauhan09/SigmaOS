@@ -44,3 +44,8 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 **Vulnerability:** High-severity vulnerabilities in dynamic sub-dependencies (specifically `brace-expansion` and `nanoid`) are not exposed as top-level dependencies, bypassing routine package-level upgrades.
 **Learning:** To securely patch indirect dependencies without breaking upstream dependency structures, utilize `"overrides"` (npm) and `"pnpm.overrides"` blocks directly inside `package.json` to pin safe versions (`^2.0.1` and `^3.3.17`).
 **Prevention:** Standardize a dynamic audit verification step (`npm audit`) within all development loops and CI security scans to enforce transitive dependency cleanliness.
+
+## 2026-08-14 - Division-by-Zero Panic Vector in Cipher Byte Modulo Indexing
+**Vulnerability:** Cipher routines performing key byte wrapping via `i % key.len()` panic when provided an empty key slice (`&[]`), triggering a kernel/process Denial-of-Service (DoS).
+**Learning:** In `#![no_std]` Rust code where panics translate to kernel halts or aborts, slice length must be validated prior to modulo arithmetic.
+**Prevention:** Always enforce non-emptiness validation (`key.is_empty()`) before performing modulo indexing over input slices.
