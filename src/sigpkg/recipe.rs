@@ -159,6 +159,11 @@ impl PackageRecipe {
         self
     }
 
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
+        self
+    }
+
     pub fn with_env(mut self, key: String, value: String) -> Self {
         self.environment.insert(key, value);
         self

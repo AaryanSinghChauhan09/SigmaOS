@@ -120,8 +120,8 @@ impl CgroupManager {
         }
 
         // Migrate PIDs to parent or root
-        let parent = self.cgroups.get(name).expect("cgroup exists").parent_name.clone().unwrap_or(String::from("/"));
-        let pids_to_migrate = self.cgroups.get(name).expect("cgroup exists").pids.clone();
+        let parent = self.cgroups.get(name).unwrap().parent_name.clone().unwrap_or(String::from("/"));
+        let pids_to_migrate = self.cgroups.get(name).unwrap().pids.clone();
 
         for pid in pids_to_migrate {
             let _ = self.attach_pid(&parent, pid);

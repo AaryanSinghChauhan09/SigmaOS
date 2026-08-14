@@ -46,6 +46,7 @@ pub struct SnapPackage {
     pub confinement: String, // classic, strict
 }
 
+
 /// Hardware GPU types detected on the system bus
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GpuType {

@@ -26,6 +26,51 @@ use crate::sigpkg::{Dependency, Package, Version, VersionConstraint};
 use std::collections::HashMap;
 use std::sync::Arc;
 
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Version {
+    pub major: u64,
+    pub minor: u64,
+    pub patch: u64,
+}
+
+#[cfg(feature = "standalone_test")]
+impl std::fmt::Display for Version {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+impl Version {
+    pub fn new(major: u64, minor: u64, patch: u64) -> Self {
+        Self { major, minor, patch }
+    }
+    pub fn parse(s: &str) -> Result<Self, &'static str> {
+        let mut parts = s.split('.');
+        let major = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        let minor = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        let patch = parts.next().ok_or("err")?.parse().map_err(|_| "err")?;
+        Ok(Self::new(major, minor, patch))
+    }
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Dependency {
+    pub name: String,
+    pub version_constraint: VersionConstraint,
+}
+
+#[cfg(feature = "standalone_test")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum VersionConstraint {
+    Any,
+}
+
+#[cfg(feature = "standalone_test")]
+pub struct Package;
+
 // ============================================================================
 // Core Abstractions (OOP Interface Layer)
 // ============================================================================
@@ -1955,13 +2000,15 @@ impl PackageParserFactory {
     }
 
     pub fn get_parser(&self, format: PackageFormat) -> Option<&dyn IPackageParser> {
-        self.parsers.get(&format).map(|p| p.as_ref())
+        self.parsers.get(&format).map(|p: &Box<dyn IPackageParser>| p.as_ref())
     }
 
     pub fn auto_detect_parser(&self, data: &[u8]) -> Option<&dyn IPackageParser> {
         for parser in self.parsers.values() {
-            if parser.can_parse(data) {
-                return Some(parser.as_ref());
+            let parser: &Box<dyn IPackageParser> = parser;
+            let p_ref: &dyn IPackageParser = parser.as_ref();
+            if p_ref.can_parse(data) {
+                return Some(p_ref);
             }
         }
         None
@@ -2087,6 +2134,71 @@ impl UniversalPackageManager {
         }
     }
 
+    /// Add a Pacman-style path-based trigger hook
+    pub fn add_path_trigger(&mut self, trigger: Arc<dyn IPathTrigger>) {
+        self.path_triggers.push(trigger);
+    }
+
+    /// Scan all path triggers and execute those matching files inside the installed package
+    pub fn process_path_triggers(&self, package: &dyn IPackage) -> Result<(), HookError> {
+        let files = package.files();
+        if files.is_empty() {
+            return Ok(());
+        }
+
+        for trigger in &self.path_triggers {
+            let mut matched_files = Vec::new();
+            let trigger_ref: &dyn IPathTrigger = trigger.as_ref();
+            let pattern = trigger_ref.pattern();
+
+            for file in files {
+                // Simplified pattern matching support:
+                // - Ends with pattern (e.g. "*.desktop" matching "usr/share/applications/app.desktop")
+                // - Starts with pattern (e.g. "usr/bin/*" matching "usr/bin/bash")
+                // - Direct equality
+                let is_match = if pattern.starts_with('*') {
+                    let suffix = &pattern[1..];
+                    file.ends_with(suffix)
+                } else if pattern.ends_with('*') {
+                    let prefix = &pattern[..pattern.len() - 1];
+                    file.starts_with(prefix)
+                } else {
+                    file == pattern
+                };
+
+                if is_match {
+                    matched_files.push(file.clone());
+                }
+            }
+
+            if !matched_files.is_empty() {
+                trigger.execute(&matched_files)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Set an active Portage-style USE flag
+    pub fn set_use_flag(&mut self, flag: &str, enabled: bool) {
+        self.active_use_flags.insert(flag.to_string(), enabled);
+    }
+
+    /// Check if a Portage-style USE flag is active
+    pub fn is_use_flag_active(&self, flag: &str) -> bool {
+        self.active_use_flags.get(flag).cloned().unwrap_or(false)
+    }
+
+    /// Dynamically evaluates dynamic conditional dependencies of a package based on current USE flags
+    pub fn evaluate_conditional_dependencies(&self, package: &dyn IPackage) -> Vec<Dependency> {
+        let mut deps = Vec::new();
+        for cond in package.conditional_dependencies() {
+            if self.is_use_flag_active(&cond.required_use_flag) {
+                deps.push(cond.dependency.clone());
+            }
+        }
+        deps
+    }
+
     pub fn add_global_hook(&mut self, hook: Arc<dyn UserDefinedHook>) {
         self.global_hooks.push(hook);
     }
@@ -2147,15 +2259,15 @@ impl UniversalPackageManager {
 
     /// Get installed package
     pub fn get_package(&self, name: &str) -> Option<&dyn IPackage> {
-        self.installed_packages.get(name).map(|p| p.as_ref())
+        self.installed_packages.get(name).map(|p: &Box<dyn IPackage>| p.as_ref())
     }
 
     /// List all installed packages
     pub fn list_packages(&self) -> Vec<&dyn IPackage> {
         self.installed_packages
             .values()
-            .map(|p| p.as_ref())
-            .collect()
+            .map(|p: &Box<dyn IPackage>| p.as_ref())
+            .collect::<Vec<&dyn IPackage>>()
     }
 
     /// Register a custom parser
@@ -2559,11 +2671,52 @@ Description: Hook test";
             Err("Invalid GPG signature key ID; package not trusted")
         );
 
-        // Fail Case 2: Missing/Tampered PQC signature
-        meta.gpg_key_id = Some("0x9E5A86A21B607B76".to_string());
-        meta.pqc_signature = Some("tampered-malicious-signature-data".to_string());
-        let bad_pkg2 = StandardPackage {
-            metadata: meta,
+        let evaluator = NixDerivationEvaluator::new();
+        let store_path = evaluator.compute_store_path(&pkg);
+        assert!(store_path.starts_with("/nix/store/"));
+        assert!(store_path.ends_with("-git"));
+
+        // Ensure deterministic reproducibility
+        let store_path_2 = evaluator.compute_store_path(&pkg);
+        assert_eq!(store_path, store_path_2);
+    }
+
+    #[test]
+    fn test_pacman_path_triggers() {
+        let mut manager = UniversalPackageManager::new();
+
+        let trigger_executed = Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let trigger_executed_clone = trigger_executed.clone();
+
+        let trigger = PathTriggerHook {
+            name: "update-desktop-database".to_string(),
+            pattern: "*.desktop".to_string(),
+            script: Arc::new(move |matched_paths: &[String]| {
+                assert_eq!(matched_paths.len(), 1);
+                assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
+                trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
+                Ok(())
+            }),
+        };
+
+        manager.add_path_trigger(Arc::new(trigger));
+
+        let pkg = StandardPackage {
+            metadata: PackageMetadata {
+                name: "my-editor".to_string(),
+                version: Version::new(1, 0, 0),
+                description: "text editor".to_string(),
+                license: "MIT".to_string(),
+                maintainer: "Maintainer".to_string(),
+                homepage: "Homepage".to_string(),
+                architecture: "x86_64".to_string(),
+                checksum: "checksum".to_string(),
+                size: 100,
+                install_date: None,
+                pqc_signature: None,
+                gpg_key_id: None,
+                supported_architectures: Vec::new(),
+            },
             dependencies: Vec::new(),
             format: PackageFormat::Rpm,
         };

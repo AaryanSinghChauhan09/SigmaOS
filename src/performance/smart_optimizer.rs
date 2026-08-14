@@ -1,56 +1,6 @@
-// SigmaOS Glary Utilities & Advanced SystemCare Parity Resource Optimizer
-// Zero-dependency, #![no_std] compliant, zero-allocation
-// Dynamically tunes CPU cores, compacts memory page fragmentation, and adjusts disk I/O priorities under live workloads.
-
-#![no_std]
-
-extern crate alloc;
-
-#[cfg(not(test))]
 use crate::kernel::{Priority, Process, ProcessState};
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Priority {
-    Idle = 0,
-    Low = 1,
-    Normal = 2,
-    High = 3,
-    Realtime = 4,
-}
-
-#[cfg(test)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ProcessState {
-    Running,
-    Ready,
-    Blocked,
-    Terminated,
-}
-
-#[cfg(test)]
-pub struct Process {
-    pub pid: u64,
-    pub name: alloc::string::String,
-    pub priority: Priority,
-    pub state: ProcessState,
-}
-
-#[cfg(test)]
-impl Process {
-    pub fn new(pid: u64, name: alloc::string::String, priority: Priority) -> Self {
-        Self {
-            pid,
-            name,
-            priority,
-            state: ProcessState::Ready,
-        }
-    }
-}
-
 use core::sync::atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering};
 
-// ==========================================
 // 1. CPU Core Thread-Priority Optimizer
 // ==========================================
 
@@ -289,6 +239,7 @@ pub static GLOBAL_GLARY_RULE: GlarySmartRule = GlarySmartRule;
 
 #[cfg(test)]
 mod tests {
+    extern crate alloc;
     use super::*;
 
     #[test]

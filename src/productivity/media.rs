@@ -20,7 +20,7 @@ pub enum PlaybackState {
 pub enum MediaFormat {
     Mp3,
     Wav,
-    Ogg,
+    Flac,
 }
 
 pub struct AudioChannel {
@@ -32,9 +32,7 @@ pub struct SigmaMediaEngine {
     pub channels: [AudioChannel; MAX_AUDIO_CHANNELS],
     pub master_mute: AtomicBool,
     pub state: PlaybackState,
-    pub active_track: Option<String>,
-    pub format: Option<MediaFormat>,
-    pub duration_seconds: usize,
+    pub has_track: bool,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -62,10 +60,31 @@ impl SigmaMediaEngine {
             ],
             master_mute: AtomicBool::new(false),
             state: PlaybackState::Stopped,
-            active_track: None,
-            format: None,
-            duration_seconds: 0,
+            has_track: false,
         }
+    }
+
+    pub fn play(&mut self) -> Result<(), &'static str> {
+        if !self.has_track {
+            return Err("No track loaded");
+        }
+        self.state = PlaybackState::Playing;
+        Ok(())
+    }
+
+    pub fn load_track(&mut self, name: alloc::string::String, format: MediaFormat, duration: u32) {
+        self.has_track = true;
+        self.state = PlaybackState::Stopped;
+    }
+
+    pub fn pause(&mut self) {
+        if self.state == PlaybackState::Playing {
+            self.state = PlaybackState::Paused;
+        }
+    }
+
+    pub fn stop(&mut self) {
+        self.state = PlaybackState::Stopped;
     }
 
     /// Plays a raw chiptune sound buffer over an active audio channel

@@ -52,7 +52,13 @@ pub struct Inode {
     pub created: u64,
     pub modified: u64,
     pub capabilities: CapabilityToken,
-    pub link_count: u32, // standard inode link count tracking hard links
+    // Conforming Linux/BSD additions
+    pub link_count: u32,
+    pub hard_links_count: u32,
+    pub symlink_target: Option<String>,
+    pub xattrs: HashMap<String, Vec<u8>>,
+    pub data: Vec<u8>,                 // File storage data
+    pub entries: HashMap<String, u64>, // Directory entries
 }
 
 impl Inode {
@@ -67,7 +73,12 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            link_count: 1, // default link count of 1
+            link_count: 1,
+            hard_links_count: 1,
+            symlink_target: None,
+            xattrs: HashMap::new(),
+            data: Vec::new(),
+            entries: HashMap::new(),
         }
     }
 }
@@ -278,6 +289,8 @@ pub enum FsError {
     NotADirectory,
     IsDirectory,
     NoSpace,
+    AlreadyExists,
+    AttributeNotFound,
 }
 
 #[cfg(test)]
