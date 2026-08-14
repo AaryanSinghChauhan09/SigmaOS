@@ -348,7 +348,7 @@ impl TimeshiftSystemRestorer {
         }));
     }
 
-    pub fn rollback_system(&mut self, id: u32) -> Result<(), MintError> {
+    pub fn rollback_system(&mut self, id: u32) -> Result<(), &'static str> {
         let mut found = false;
         for i in 0..self.restore_points.len {
             if let Some(ref rp) = self.restore_points[i] {
@@ -362,7 +362,7 @@ impl TimeshiftSystemRestorer {
             self.active_restore_point_id = id;
             Ok(())
         } else {
-            Err(MintError::UpdateError)
+            Err("Mint: Specified restore point not found.")
         }
     }
 }
