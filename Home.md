@@ -266,6 +266,7 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 - **Branch Consolidation Phase 2**: [Branch Consolidation August 2026 Phase 2](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Branch-Consolidation-August-2026-Phase2)
 - **Branch Consolidation Phase 3**: [Branch Consolidation August 2026 Phase 3](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Branch-Consolidation-August-2026-Phase3)
 - **Branch Consolidation Final Summary**: [Branch Consolidation Final Summary](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Branch-Consolidation-Final-Summary)
+- **Branch Cleanup Complete**: [Branch Cleanup Complete](https://github.com/AaryanSinghChauhan09/SigmaOS/wiki/Branch-Cleanup-Complete)
 
 
 ---
