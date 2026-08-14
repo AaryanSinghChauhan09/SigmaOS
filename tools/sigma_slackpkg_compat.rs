@@ -178,7 +178,7 @@ pub unsafe extern "C" fn slackpkg_remove(package_name: *const u8) -> SigmaI32 {
 /// Search for packages
 #[no_mangle]
 pub unsafe extern "C" fn slackpkg_search(query: *const u8, results: *mut SigmaU32, max_results: SigmaU32) -> SigmaU32 {
-    if !SLACKPKG_INITIALIZED || query.is_null() || results.isnull() || max_results == 0 {
+    if !SLACKPKG_INITIALIZED || query.is_null() || results.is_null() || max_results == 0 {
         return 0;
     }
     
@@ -227,7 +227,7 @@ pub unsafe extern "C" fn slackpkg_upgrade_all() -> SigmaI32 {
 /// Get package info
 #[no_mangle]
 pub unsafe extern "C" fn slackpkg_info(package_name: *const u8, package: *mut SlackpkgPackage) -> SigmaI32 {
-    if !SLACKPKG_INITIALIZED || package_name.isnull() || package.isnull() {
+    if !SLACKPKG_INITIALIZED || package_name.is_null() || package.is_null() {
         return -1;
     }
     
@@ -260,7 +260,7 @@ pub unsafe extern "C" fn slackpkg_info(package_name: *const u8, package: *mut Sl
 /// List installed packages
 #[no_mangle]
 pub unsafe extern "C" fn slackpkg_list(packages: *mut SlackpkgPackage, max_count: SigmaU32) -> SigmaU32 {
-    if !SLACKPKG_INITIALIZED || packages.isnull() {
+    if !SLACKPKG_INITIALIZED || packages.is_null() {
         return 0;
     }
     
