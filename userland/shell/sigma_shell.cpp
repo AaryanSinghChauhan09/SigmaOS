@@ -20,6 +20,12 @@
  */
 
 #include "../../include/sigma_kernel_types.h"
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
 
 namespace sigma {
 namespace shell {
@@ -259,6 +265,174 @@ static sigma_u32 tokenize(const char* input, Token* tokens, sigma_u32 max_tokens
     return count;
 }
 
+// ─── Simulated VFS (Linux Inspired File System Storage) ──────────────────────
+#define MAX_FILES 64
+#define MAX_FILE_NAME 64
+#define MAX_FILE_CONTENT 4096
+
+struct VfsFile {
+    char name[MAX_FILE_NAME];
+    char content[MAX_FILE_CONTENT];
+    sigma_u32 len;
+};
+
+static VfsFile g_vfs[MAX_FILES];
+static sigma_u32 g_vfs_count = 0;
+
+// Safe bounded string copy
+static void safe_strcpy(char* dest, const char* src, size_t dest_size) {
+    if (!dest || dest_size == 0) return;
+    std::strncpy(dest, src, dest_size - 1);
+    dest[dest_size - 1] = '\0';
+}
+
+// Initialize VFS with default standard pre-seeded files (Arch/Alpine style)
+void vfs_init() {
+    if (g_vfs_count > 0) return; // Already initialized
+
+    std::strcpy(g_vfs[0].name, "README.md");
+    std::strcpy(g_vfs[0].content, "# SigmaOS Sovereign Zenith Shell\nInteractive shell environment with streams redirection.\n");
+    g_vfs[0].len = std::strlen(g_vfs[0].content);
+
+    std::strcpy(g_vfs[1].name, "Makefile");
+    std::strcpy(g_vfs[1].content, "all:\n\tg++ -std=c++20 sigma_shell.cpp -o sigma_shell\n");
+    g_vfs[1].len = std::strlen(g_vfs[1].content);
+
+    std::strcpy(g_vfs[2].name, "config.json");
+    std::strcpy(g_vfs[2].content, "{\n  \"theme\": \"sigma-256color\",\n  \"resilient\": true\n}\n");
+    g_vfs[2].len = std::strlen(g_vfs[2].content);
+
+    g_vfs_count = 3;
+}
+
+// VFS Write helper
+sigma_status vfs_write(const char* name, const char* content, sigma_bool append) {
+    if (std::strcmp(name, "/dev/null") == 0) {
+        return SIGMA_SUCCESS; // Discard sink
+    }
+
+    // Check if file already exists
+    for (sigma_u32 i = 0; i < g_vfs_count; ++i) {
+        if (std::strcmp(g_vfs[i].name, name) == 0) {
+            if (append) {
+                sigma_u32 new_len = g_vfs[i].len + std::strlen(content);
+                if (new_len >= MAX_FILE_CONTENT) {
+                    return SIGMA_ERROR;
+                }
+                std::strcat(g_vfs[i].content, content);
+                g_vfs[i].len = new_len;
+            } else {
+                if (std::strlen(content) >= MAX_FILE_CONTENT) {
+                    return SIGMA_ERROR;
+                }
+                safe_strcpy(g_vfs[i].content, content, MAX_FILE_CONTENT);
+                g_vfs[i].len = std::strlen(content);
+            }
+            return SIGMA_SUCCESS;
+        }
+    }
+
+    // Create new file
+    if (g_vfs_count >= MAX_FILES) {
+        return SIGMA_ERROR;
+    }
+    if (std::strlen(name) >= MAX_FILE_NAME || std::strlen(content) >= MAX_FILE_CONTENT) {
+        return SIGMA_ERROR;
+    }
+
+    safe_strcpy(g_vfs[g_vfs_count].name, name, MAX_FILE_NAME);
+    safe_strcpy(g_vfs[g_vfs_count].content, content, MAX_FILE_CONTENT);
+    g_vfs[g_vfs_count].len = std::strlen(content);
+    g_vfs_count++;
+    return SIGMA_SUCCESS;
+}
+
+// VFS Read helper
+const char* vfs_read(const char* name) {
+    if (std::strcmp(name, "/dev/null") == 0) {
+        return ""; // Empty sink
+    }
+    for (sigma_u32 i = 0; i < g_vfs_count; ++i) {
+        if (std::strcmp(g_vfs[i].name, name) == 0) {
+            return g_vfs[i].content;
+        }
+    }
+    return nullptr;
+}
+
+// ─── Stream Redirection State variables ──────────────────────────────────────
+static char g_stdout_buf[MAX_FILE_CONTENT];
+static sigma_u32 g_stdout_len = 0;
+static sigma_bool g_stdout_redirected = SIGMA_FALSE;
+static char g_stdout_redirect_file[MAX_FILE_NAME] = {0};
+static sigma_bool g_stdout_append = SIGMA_FALSE;
+
+static char g_stderr_buf[MAX_FILE_CONTENT];
+static sigma_u32 g_stderr_len = 0;
+static sigma_bool g_stderr_redirected = SIGMA_FALSE;
+static char g_stderr_redirect_file[MAX_FILE_NAME] = {0};
+static sigma_bool g_stderr_to_stdout = SIGMA_FALSE;
+
+static char g_stdin_buf[MAX_FILE_CONTENT];
+static sigma_u32 g_stdin_len = 0;
+static sigma_bool g_stdin_redirected = SIGMA_FALSE;
+
+// Reset active stream redirection variables
+void reset_streams() {
+    g_stdout_buf[0] = '\0';
+    g_stdout_len = 0;
+    g_stdout_redirected = SIGMA_FALSE;
+    g_stdout_redirect_file[0] = '\0';
+    g_stdout_append = SIGMA_FALSE;
+
+    g_stderr_buf[0] = '\0';
+    g_stderr_len = 0;
+    g_stderr_redirected = SIGMA_FALSE;
+    g_stderr_redirect_file[0] = '\0';
+    g_stderr_to_stdout = SIGMA_FALSE;
+
+    g_stdin_buf[0] = '\0';
+    g_stdin_len = 0;
+    g_stdin_redirected = SIGMA_FALSE;
+}
+
+// Flush and persist the streams to our simulated VFS files
+void flush_streams() {
+    if (g_stdout_redirected && g_stdout_redirect_file[0]) {
+        vfs_write(g_stdout_redirect_file, g_stdout_buf, g_stdout_append);
+    }
+    if (g_stderr_redirected && g_stderr_redirect_file[0]) {
+        vfs_write(g_stderr_redirect_file, g_stderr_buf, SIGMA_FALSE);
+    }
+}
+
+// Stream routing writes
+void shell_write_stdout(const char* text) {
+    if (g_stdout_redirected) {
+        sigma_u32 i = 0;
+        while (text[i] && g_stdout_len < MAX_FILE_CONTENT - 1) {
+            g_stdout_buf[g_stdout_len++] = text[i++];
+        }
+        g_stdout_buf[g_stdout_len] = '\0';
+    } else {
+        std::printf("%s", text);
+    }
+}
+
+void shell_write_stderr(const char* text) {
+    if (g_stderr_to_stdout) {
+        shell_write_stdout(text);
+    } else if (g_stderr_redirected) {
+        sigma_u32 i = 0;
+        while (text[i] && g_stderr_len < MAX_FILE_CONTENT - 1) {
+            g_stderr_buf[g_stderr_len++] = text[i++];
+        }
+        g_stderr_buf[g_stderr_len] = '\0';
+    } else {
+        std::fprintf(stderr, "%s", text);
+    }
+}
+
 // ─── Glob Expansion ──────────────────────────────────────────────────────────
 static sigma_bool match_glob(const char* pattern, const char* text) {
     while (*pattern) {
@@ -266,7 +440,7 @@ static sigma_bool match_glob(const char* pattern, const char* text) {
             while (*pattern == '*') pattern++;
             if (!*pattern) return SIGMA_TRUE;
             while (*text) {
-                if (match_glob(pattern, text)) return SIGMA_TRUE;
+                if (match_glob(pattern, text) == SIGMA_TRUE) return SIGMA_TRUE;
                 text++;
             }
             return SIGMA_FALSE;
@@ -278,10 +452,11 @@ static sigma_bool match_glob(const char* pattern, const char* text) {
             return SIGMA_FALSE;
         }
     }
-    return *text == '\0';
+    return (*text == '\0') ? SIGMA_TRUE : SIGMA_FALSE;
 }
 
 static sigma_u32 expand_glob(const char* pattern, const char** matches, sigma_u32 max_matches) {
+    vfs_init();
     sigma_u32 count = 0;
     sigma_bool has_glob = SIGMA_FALSE;
     for (sigma_u32 i = 0; pattern[i]; ++i) {
@@ -293,13 +468,10 @@ static sigma_u32 expand_glob(const char* pattern, const char** matches, sigma_u3
         return count;
     }
 
-    /* Simulate VFS directory read for globbing */
-    const char* vfs_stub_files[] = { "README.md", "sigma_shell.cpp", "Makefile", "kernel.bin", "config.json" };
-    sigma_u32 num_stub_files = sizeof(vfs_stub_files) / sizeof(vfs_stub_files[0]);
-    
-    for (sigma_u32 i = 0; i < num_stub_files && count < max_matches; ++i) {
-        if (match_glob(pattern, vfs_stub_files[i])) {
-            matches[count++] = vfs_stub_files[i];
+    /* Dynamically read files from our in-memory VFS */
+    for (sigma_u32 i = 0; i < g_vfs_count && count < max_matches; ++i) {
+        if (match_glob(pattern, g_vfs[i].name) == SIGMA_TRUE) {
+            matches[count++] = g_vfs[i].name;
         }
     }
     
@@ -318,8 +490,14 @@ static sigma_bool str_eq(const char* a, const char* b) {
 typedef sigma_status (*BuiltinFn)(sigma_u32 argc, const char** argv);
 
 static sigma_status builtin_echo(sigma_u32 argc, const char** argv) {
-    // Print all arguments separated by spaces
-    (void)argc; (void)argv;
+    // Print all arguments separated by spaces to our stdout stream redirection
+    for (sigma_u32 i = 1; i < argc; ++i) {
+        shell_write_stdout(argv[i]);
+        if (i < argc - 1) {
+            shell_write_stdout(" ");
+        }
+    }
+    shell_write_stdout("\n");
     return SIGMA_SUCCESS;
 }
 
@@ -364,19 +542,69 @@ static sigma_status builtin_alias_cmd(sigma_u32 argc, const char** argv) {
 
 static sigma_status builtin_history(sigma_u32 argc, const char** argv) {
     (void)argc; (void)argv;
-    // Print history entries
+    for (sigma_u32 i = 0; i < g_history_count; ++i) {
+        char buf[64];
+        std::sprintf(buf, "%4d  ", i + 1);
+        shell_write_stdout(buf);
+        shell_write_stdout(g_history[i % MAX_HISTORY]);
+        shell_write_stdout("\n");
+    }
     return SIGMA_SUCCESS;
 }
 
 static sigma_status builtin_pwd(sigma_u32 argc, const char** argv) {
     (void)argc; (void)argv;
-    // Print PWD env var
+    const char* pwd = get_env("PWD");
+    if (pwd) {
+        shell_write_stdout(pwd);
+        shell_write_stdout("\n");
+    } else {
+        shell_write_stdout("/\n");
+    }
     return SIGMA_SUCCESS;
 }
 
 static sigma_status builtin_exit(sigma_u32 argc, const char** argv) {
     (void)argc; (void)argv;
     return SIGMA_ERROR; // Signal shell exit
+}
+
+// Simulated builtin: cat (Alpine/Arch style)
+static sigma_status builtin_cat(sigma_u32 argc, const char** argv) {
+    vfs_init();
+    if (argc < 2) {
+        // Read from stdin if redirected
+        if (g_stdin_redirected) {
+            shell_write_stdout(g_stdin_buf);
+            return SIGMA_SUCCESS;
+        }
+        shell_write_stderr("cat: missing file operand\n");
+        return SIGMA_ERROR;
+    }
+
+    for (sigma_u32 idx = 1; idx < argc; ++idx) {
+        const char* content = vfs_read(argv[idx]);
+        if (content) {
+            shell_write_stdout(content);
+        } else {
+            char err[128];
+            std::sprintf(err, "cat: %s: No such file or directory\n", argv[idx]);
+            shell_write_stderr(err);
+        }
+    }
+    return SIGMA_SUCCESS;
+}
+
+// Simulated builtin: ls (Alpine/Arch style)
+static sigma_status builtin_ls(sigma_u32 argc, const char** argv) {
+    vfs_init();
+    (void)argc; (void)argv;
+    for (sigma_u32 i = 0; i < g_vfs_count; ++i) {
+        shell_write_stdout(g_vfs[i].name);
+        shell_write_stdout("  ");
+    }
+    shell_write_stdout("\n");
+    return SIGMA_SUCCESS;
 }
 
 struct BuiltinEntry {
@@ -392,6 +620,8 @@ static const BuiltinEntry g_builtins[] = {
     {"history", builtin_history},
     {"pwd",     builtin_pwd},
     {"exit",    builtin_exit},
+    {"cat",     builtin_cat},
+    {"ls",      builtin_ls},
 };
 
 static const sigma_u32 NUM_BUILTINS = sizeof(g_builtins) / sizeof(g_builtins[0]);
@@ -407,44 +637,110 @@ sigma_status execute_command(sigma_u32 argc, const char** argv) {
         }
     }
 
-    // Not a builtin → fork + exec via kernel syscall interface
-    // sigma_syscall(SYS_EXEC, argv[0], argv);
+    // If it's a simulated execution (e.g. running mock programs)
+    if (str_eq(argv[0], "sigma-kernel") || str_eq(argv[0], "sigma-pqc")) {
+        shell_write_stdout("SigmaOS Sovereign Core Subsystem Initializing...\n");
+        return SIGMA_SUCCESS;
+    }
+
+    // Not a builtin, signal mock process error via stderr
+    char err[128];
+    std::sprintf(err, "sigma-shell: command not found: %s\n", argv[0]);
+    shell_write_stderr(err);
     return SIGMA_SUCCESS;
 }
 
 // ─── Pipeline Executor ───────────────────────────────────────────────────────
 sigma_status execute_pipeline(Token* tokens, sigma_u32 num_tokens) {
-    // Split tokens at pipes and execute each segment
+    vfs_init();
+    reset_streams();
+
+    // 1. First Pass: Parse Redirections (<, >, >>, 2>, 2>&1)
+    // Extract filename targets and mark redirections
+    std::vector<Token> clean_tokens;
+    for (sigma_u32 i = 0; i < num_tokens; ++i) {
+        if (tokens[i].type == TOK_REDIR_OUT) {
+            if (i + 1 < num_tokens && tokens[i+1].type == TOK_WORD) {
+                g_stdout_redirected = SIGMA_TRUE;
+                safe_strcpy(g_stdout_redirect_file, tokens[i+1].text, MAX_FILE_NAME);
+                g_stdout_append = SIGMA_FALSE;
+                i++; // Skip filename token
+            }
+        } else if (tokens[i].type == TOK_REDIR_APP) {
+            if (i + 1 < num_tokens && tokens[i+1].type == TOK_WORD) {
+                g_stdout_redirected = SIGMA_TRUE;
+                safe_strcpy(g_stdout_redirect_file, tokens[i+1].text, MAX_FILE_NAME);
+                g_stdout_append = SIGMA_TRUE;
+                i++; // Skip filename token
+            }
+        } else if (tokens[i].type == TOK_REDIR_IN) {
+            if (i + 1 < num_tokens && tokens[i+1].type == TOK_WORD) {
+                g_stdin_redirected = SIGMA_TRUE;
+                const char* file_content = vfs_read(tokens[i+1].text);
+                if (file_content) {
+                    safe_strcpy(g_stdin_buf, file_content, MAX_FILE_CONTENT);
+                    g_stdin_len = std::strlen(file_content);
+                } else {
+                    g_stdin_buf[0] = '\0';
+                    g_stdin_len = 0;
+                }
+                i++; // Skip filename token
+            }
+        } else if (tokens[i].type == TOK_REDIR_ERR) {
+            if (i + 1 < num_tokens && tokens[i+1].type == TOK_WORD) {
+                // If it is 2>&1
+                if (std::strcmp(tokens[i+1].text, "&1") == 0) {
+                    g_stderr_to_stdout = SIGMA_TRUE;
+                } else {
+                    g_stderr_redirected = SIGMA_TRUE;
+                    safe_strcpy(g_stderr_redirect_file, tokens[i+1].text, MAX_FILE_NAME);
+                }
+                i++; // Skip filename/redirect token
+            }
+        } else if (tokens[i].type == TOK_WORD && std::strcmp(tokens[i].text, "2>&1") == 0) {
+            g_stderr_to_stdout = SIGMA_TRUE;
+        } else {
+            clean_tokens.push_back(tokens[i]);
+        }
+    }
+
+    // 2. Second Pass: Build Command Arguments & Execute Clean Segment
     const char* argv[32];
     sigma_u32 argc = 0;
+    sigma_status final_status = SIGMA_SUCCESS;
 
-    for (sigma_u32 i = 0; i <= num_tokens; ++i) {
-        if (i == num_tokens || tokens[i].type == TOK_PIPE ||
-            tokens[i].type == TOK_SEMICOL || tokens[i].type == TOK_AND ||
-            tokens[i].type == TOK_OR) {
+    for (size_t i = 0; i <= clean_tokens.size(); ++i) {
+        if (i == clean_tokens.size() || clean_tokens[i].type == TOK_PIPE ||
+            clean_tokens[i].type == TOK_SEMICOL || clean_tokens[i].type == TOK_AND ||
+            clean_tokens[i].type == TOK_OR) {
 
             if (argc > 0) {
-                execute_command(argc, argv);
+                final_status = execute_command(argc, argv);
             }
             argc = 0;
 
-        } else if (tokens[i].type == TOK_WORD) {
+        } else if (clean_tokens[i].type == TOK_WORD) {
             const char* matches[16];
-            sigma_u32 n = expand_glob(tokens[i].text, matches, 16);
+            sigma_u32 n = expand_glob(clean_tokens[i].text, matches, 16);
             for (sigma_u32 m = 0; m < n && argc < 31; ++m) {
                 argv[argc++] = matches[m];
             }
-        } else if (tokens[i].type == TOK_VAR) {
-            const char* val = get_env(tokens[i].text);
+        } else if (clean_tokens[i].type == TOK_VAR) {
+            const char* val = get_env(clean_tokens[i].text);
             if (val && argc < 31) argv[argc++] = val;
         }
     }
 
-    return SIGMA_SUCCESS;
+    // 3. Third Pass: Flush active streams back to VFS files
+    flush_streams();
+    reset_streams();
+
+    return final_status;
 }
 
 // ─── Shell Init ──────────────────────────────────────────────────────────────
 sigma_status shell_init() {
+    vfs_init();
     set_env("HOME", "/root");
     set_env("PWD", "/root");
     set_env("PATH", "/bin:/usr/bin:/usr/local/bin");
@@ -471,23 +767,8 @@ sigma_status shell_run() {
     Token tokens[64];
 
     while (running) {
-        // 1. Print prompt (PS1)
-        // 2. Read line from stdin
-        // 3. Tokenize
-        // 4. History push
-        // 5. Variable expansion
-        // 6. Alias expansion
-        // 7. Execute pipeline
-
-        // Placeholder: in a real implementation, this reads from a TTY fd
-        // For now, represent the core loop structure
-
-        // Simulate reading a line
+        // Simulated reading a line
         line[0] = '\0';
-
-        // Fish-style auto-suggestion UI hook (in real implementation, triggers on keystroke)
-        // const char* suggestion = history_suggest(line_buffer);
-        // if (suggestion) render_ghost_text(suggestion + strlen(line_buffer));
 
         if (line[0] == '\0') continue;
 
