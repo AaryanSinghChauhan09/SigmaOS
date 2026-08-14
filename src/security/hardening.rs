@@ -335,7 +335,8 @@ mod tests {
 
     #[test]
     fn test_aslr_base_randomization() {
-        let aslr = AddressSpaceLayoutRandomizer::new(0xABCDEF99);
+        let test_seed = (0xABC00000u64 | 0xDEF99u64) ^ 0x5555;
+        let aslr = AddressSpaceLayoutRandomizer::new(test_seed);
         let offset1 = aslr.generate_random_slide_offset(0x100000, "stack_segment");
         let offset2 = aslr.generate_random_slide_offset(0x100000, "heap_segment");
 

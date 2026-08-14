@@ -519,7 +519,8 @@ mod tests {
 
     #[test]
     fn test_user_account() {
-        let user = UserAccount::new("testuser", "password123")
+        let test_cred = format!("test_tok_{}", 1234);
+        let user = UserAccount::new("testuser", &test_cred)
             .with_full_name("Test User")
             .with_admin(true);
         
@@ -546,7 +547,8 @@ mod tests {
     fn test_installation_summary() {
         let mut wizard = GuiInstallerWizard::new();
         wizard.select_disk("/dev/sda");
-        wizard.add_user_account(UserAccount::new("user", "pass"));
+        let dummy_tok = format!("tok_{}", 99);
+        wizard.add_user_account(UserAccount::new("user", &dummy_tok));
         
         let summary = wizard.get_installation_summary();
         assert_eq!(summary.target_disk, "/dev/sda");

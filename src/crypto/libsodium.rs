@@ -535,7 +535,8 @@ mod tests {
         let bob_box = BoxCipher::new(alice_pk, bob_sk);
         
         let message = b"Secret message";
-        let nonce = [1u8; constants::CRYPTO_BOX_NONCEBYTES];
+        let mut nonce = [0u8; constants::CRYPTO_BOX_NONCEBYTES];
+        random_bytes(&mut nonce);
         
         let ciphertext = alice_box.encrypt(message, &nonce, &bob_pk);
         let decrypted = bob_box.decrypt(&ciphertext, &nonce, &alice_pk).unwrap();
@@ -546,11 +547,13 @@ mod tests {
     #[test]
     fn test_secret_box() {
         sodium_init();
-        let key = [42u8; constants::CRYPTO_SECRETBOX_KEYBYTES];
+        let mut key = [0u8; constants::CRYPTO_SECRETBOX_KEYBYTES];
+        random_bytes(&mut key);
         let box_ = SecretBox::new(&key);
         
         let message = b"Secret message";
-        let nonce = [1u8; constants::CRYPTO_SECRETBOX_NONCEBYTES];
+        let mut nonce = [0u8; constants::CRYPTO_SECRETBOX_NONCEBYTES];
+        random_bytes(&mut nonce);
         
         let ciphertext = box_.encrypt(message, &nonce);
         let decrypted = box_.decrypt(&ciphertext, &nonce).unwrap();
