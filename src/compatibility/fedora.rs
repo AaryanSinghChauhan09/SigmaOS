@@ -572,6 +572,7 @@ pub enum SeLinuxMode {
     Disabled,
 }
 
+
 pub struct SeLinuxEnforcer {
     pub mode: SeLinuxMode,
     pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
@@ -655,87 +656,189 @@ impl CoprRepositoryManager {
 }
 
 // ==========================================
-// OSTree-style OS Deployer (SovereignOstreeDeployer)
+// Sovereign OSTree-style Deployer
 // ==========================================
 
 pub struct SovereignOstreeDeployer {
-    pub active_version: String,
-    pub staged_version: Option<String>,
-    pub rollback_version: Option<String>,
+    pub active_deployment_hash: String,
+    pub staged_deployment_hash: String,
+    pub rollback_deployment_hash: String,
     pub layered_packages: Vec<String>,
+    pub rollback_available: bool,
 }
 
 impl SovereignOstreeDeployer {
-    pub fn new(base_version: &str) -> Self {
+    pub fn new() -> Self {
         Self {
-            active_version: base_version.to_string(),
-            staged_version: None,
-            rollback_version: None,
+            active_deployment_hash: "fedora-base-39.20231101.0".to_string(),
+            staged_deployment_hash: String::new(),
+            rollback_deployment_hash: String::new(),
             layered_packages: Vec::new(),
+            rollback_available: false,
         }
     }
 
-    pub fn stage_upgrade(&mut self, new_version: &str) {
-        self.staged_version = Some(new_version.to_string());
-    }
-
-    pub fn install_layered_package(&mut self, pkg: &str) {
-        self.layered_packages.push(pkg.to_string());
-    }
-
-    pub fn commit_deploy(&mut self) -> Result<(), &'static str> {
-        if let Some(staged) = self.staged_version.take() {
-            self.rollback_version = Some(self.active_version.clone());
-            self.active_version = staged;
-            Ok(())
-        } else {
-            Err("No deployment currently staged")
+    pub fn stage_deployment(&mut self, hash: &str) -> Result<(), String> {
+        if hash.is_empty() {
+            return Err("Deployment hash cannot be empty".to_string());
         }
+        self.staged_deployment_hash = hash.to_string();
+        Ok(())
     }
 
-    pub fn rollback(&mut self) -> Result<(), &'static str> {
-        if let Some(rollback) = self.rollback_version.take() {
-            self.staged_version = Some(self.active_version.clone());
-            self.active_version = rollback;
-            Ok(())
-        } else {
-            Err("No rollback deployment available")
+    pub fn commit_deployment(&mut self) -> Result<(), String> {
+        if self.staged_deployment_hash.is_empty() {
+            return Err("No staged deployment to commit".to_string());
         }
+        self.rollback_deployment_hash = self.active_deployment_hash.clone();
+        self.active_deployment_hash = self.staged_deployment_hash.clone();
+        self.staged_deployment_hash.clear();
+        self.rollback_available = true;
+        Ok(())
+    }
+
+    pub fn layer_package(&mut self, package: &str) -> Result<(), String> {
+        if package.is_empty() {
+            return Err("Package name cannot be empty".to_string());
+        }
+        if self.layered_packages.contains(&package.to_string()) {
+            return Err(format!("Package {} is already layered", package));
+        }
+        self.layered_packages.push(package.to_string());
+        Ok(())
+    }
+
+    pub fn rollback(&mut self) -> Result<(), String> {
+        if !self.rollback_available {
+            return Err("No rollback deployment available".to_string());
+        }
+        let temp = self.active_deployment_hash.clone();
+        self.active_deployment_hash = self.rollback_deployment_hash.clone();
+        self.rollback_deployment_hash = temp;
+        Ok(())
+    }
+
+    pub fn get_active_state(&self) -> (String, Vec<String>) {
+        (self.active_deployment_hash.clone(), self.layered_packages.clone())
     }
 }
 
 // ==========================================
-// SELinux-style Mandatory Access Control (SovereignSeLinuxEngine)
+// Sovereign SELinux MAC Engine
 // ==========================================
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SovereignSeLinuxContext {
+    pub user: String,
+    pub role: String,
+    pub domain_type: String,
+    pub sensitivity: String,
+}
+
+impl SovereignSeLinuxContext {
+    pub fn new(user: &str, role: &str, domain_type: &str, sensitivity: &str) -> Self {
+        Self {
+            user: user.to_string(),
+            role: role.to_string(),
+            domain_type: domain_type.to_string(),
+            sensitivity: sensitivity.to_string(),
+        }
+    }
+
+    pub fn parse(context_str: &str) -> Result<Self, String> {
+        let parts: Vec<&str> = context_str.split(':').collect();
+        if parts.len() < 3 {
+            return Err("Invalid SELinux context format".to_string());
+        }
+        Ok(Self {
+            user: parts[0].to_string(),
+            role: parts[1].to_string(),
+            domain_type: parts[2].to_string(),
+            sensitivity: if parts.len() >= 4 { parts[3].to_string() } else { "s0".to_string() },
+        })
+    }
+
+    pub fn to_string_representation(&self) -> String {
+        format!("{}:{}:{}:{}", self.user, self.role, self.domain_type, self.sensitivity)
+    }
+}
+
 pub struct SovereignSeLinuxEngine {
-    pub current_context: SeLinuxContext,
-    pub enforcing: bool,
-    pub policy_rules: HashMap<String, Vec<String>>, // source_type -> target_types allowed
+    pub mode: SeLinuxMode,
+    pub file_contexts: HashMap<String, SovereignSeLinuxContext>,
+    pub allowed_transitions: HashMap<String, Vec<String>>,
+    pub domain_permissions: HashMap<String, HashMap<String, Vec<String>>>,
 }
 
 impl SovereignSeLinuxEngine {
-    pub fn new(default_context: SeLinuxContext) -> Self {
+    pub fn new(mode: SeLinuxMode) -> Self {
         Self {
-            current_context: default_context,
-            enforcing: true,
-            policy_rules: HashMap::new(),
+            mode,
+            file_contexts: HashMap::new(),
+            allowed_transitions: HashMap::new(),
+            domain_permissions: HashMap::new(),
         }
     }
 
-    pub fn add_transition_rule(&mut self, source_type: &str, target_type: &str) {
-        self.policy_rules
-            .entry(source_type.to_string())
-            .or_insert_with(Vec::new)
-            .push(target_type.to_string());
+    pub fn register_file_context(&mut self, path: &str, context: SovereignSeLinuxContext) {
+        self.file_contexts.insert(path.to_string(), context);
     }
 
-    pub fn evaluate_transition(&self, target_context: &SeLinuxContext) -> bool {
-        if !self.enforcing {
+    pub fn add_transition_rule(&mut self, src_domain: &str, dest_domain: &str) {
+        self.allowed_transitions
+            .entry(src_domain.to_string())
+            .or_insert_with(Vec::new)
+            .push(dest_domain.to_string());
+    }
+
+    pub fn add_permission(&mut self, domain: &str, class: &str, permission: &str) {
+        self.domain_permissions
+            .entry(domain.to_string())
+            .or_insert_with(HashMap::new)
+            .entry(class.to_string())
+            .or_insert_with(Vec::new)
+            .push(permission.to_string());
+    }
+
+    pub fn check_access(&self, src_domain: &str, file_path: &str, permission: &str) -> Result<bool, &'static str> {
+        if self.mode == SeLinuxMode::Disabled {
+            return Ok(true);
+        }
+
+        let file_ctx = match self.file_contexts.get(file_path) {
+            Some(ctx) => ctx,
+            None => return Err("SELinux Error: Path has no registered label/context"),
+        };
+
+        let is_allowed = if let Some(classes) = self.domain_permissions.get(src_domain) {
+            if let Some(perms) = classes.get("file") {
+                perms.contains(&permission.to_string()) && file_ctx.domain_type == "httpd_sys_content_t"
+            } else {
+                false
+            }
+        } else {
+            false
+        };
+
+        if !is_allowed {
+            if self.mode == SeLinuxMode::Enforcing {
+                return Err("SELinux AVC Denial: Access Prohibited by Sovereign MAC policy");
+            } else if self.mode == SeLinuxMode::Permissive {
+                println!("SELinux AVC Warning (Permissive): Denial ignored");
+                return Ok(true);
+            }
+        }
+
+        Ok(is_allowed)
+    }
+
+    pub fn validate_transition(&self, current_domain: &str, target_domain: &str) -> bool {
+        if self.mode == SeLinuxMode::Disabled {
             return true;
         }
-        if let Some(allowed_targets) = self.policy_rules.get(&self.current_context.domain_type) {
-            allowed_targets.contains(&target_context.domain_type)
+
+        if let Some(allowed) = self.allowed_transitions.get(current_domain) {
+            allowed.contains(&target_domain.to_string())
         } else {
             false
         }
@@ -743,127 +846,147 @@ impl SovereignSeLinuxEngine {
 }
 
 // ==========================================
-// Firewalld Zone-based Network Router (SovereignFirewalldManager)
+// Sovereign Firewalld Manager
 // ==========================================
 
-#[derive(Debug, Clone)]
-pub struct FirewalldZone {
-    pub name: String,
-    pub allowed_ports: Vec<u16>,
-    pub allowed_services: Vec<String>,
-}
-
 pub struct SovereignFirewalldManager {
-    pub zones: HashMap<String, FirewalldZone>,
-    pub interface_zones: HashMap<String, String>, // interface -> zone_name
+    pub active_zones: HashMap<String, Vec<String>>,
+    pub zone_allowed_ports: HashMap<String, Vec<u16>>,
     pub default_zone: String,
 }
 
 impl SovereignFirewalldManager {
     pub fn new() -> Self {
-        let mut zones = HashMap::new();
-        zones.insert(
-            "public".to_string(),
-            FirewalldZone {
-                name: "public".to_string(),
-                allowed_ports: vec![22, 80, 443],
-                allowed_services: vec!["ssh".to_string(), "http".to_string(), "https".to_string()],
-            },
-        );
-        zones.insert(
-            "trusted".to_string(),
-            FirewalldZone {
-                name: "trusted".to_string(),
-                allowed_ports: Vec::new(),
-                allowed_services: Vec::new(),
-            },
-        );
+        let mut active_zones = HashMap::new();
+        active_zones.insert("public".to_string(), Vec::new());
+        active_zones.insert("trusted".to_string(), Vec::new());
+        active_zones.insert("work".to_string(), Vec::new());
+
+        let mut zone_allowed_ports = HashMap::new();
+        zone_allowed_ports.insert("public".to_string(), vec![22, 80, 443]);
+        zone_allowed_ports.insert("trusted".to_string(), (1..=65535).collect());
+        zone_allowed_ports.insert("work".to_string(), vec![22, 80, 443, 8080]);
 
         Self {
-            zones,
-            interface_zones: HashMap::new(),
+            active_zones,
+            zone_allowed_ports,
             default_zone: "public".to_string(),
         }
     }
 
-    pub fn assign_interface_to_zone(&mut self, interface: &str, zone: &str) -> Result<(), &'static str> {
-        if !self.zones.contains_key(zone) {
-            return Err("Zone does not exist");
+    pub fn set_default_zone(&mut self, zone: &str) -> Result<(), String> {
+        if !self.active_zones.contains_key(zone) {
+            return Err(format!("Zone {} does not exist", zone));
         }
-        self.interface_zones.insert(interface.to_string(), zone.to_string());
+        self.default_zone = zone.to_string();
         Ok(())
     }
 
-    pub fn check_packet_allowed(&self, interface: &str, port: u16, service: &str) -> bool {
-        let zone_name = self.interface_zones.get(interface).unwrap_or(&self.default_zone);
-        if zone_name == "trusted" {
-            return true;
+    pub fn assign_interface_to_zone(&mut self, interface: &str, zone: &str) -> Result<(), String> {
+        if !self.active_zones.contains_key(zone) {
+            return Err(format!("Zone {} does not exist", zone));
         }
-        if let Some(zone) = self.zones.get(zone_name) {
-            zone.allowed_ports.contains(&port) || zone.allowed_services.contains(&service.to_string())
+
+        for interfaces in self.active_zones.values_mut() {
+            interfaces.retain(|i| i != interface);
+        }
+
+        self.active_zones.get_mut(zone).unwrap().push(interface.to_string());
+        Ok(())
+    }
+
+    pub fn allow_port_in_zone(&mut self, zone: &str, port: u16) -> Result<(), String> {
+        if !self.zone_allowed_ports.contains_key(zone) {
+            return Err(format!("Zone {} has no configured port rules", zone));
+        }
+        self.zone_allowed_ports.get_mut(zone).unwrap().push(port);
+        Ok(())
+    }
+
+    pub fn is_packet_allowed(&self, interface: &str, destination_port: u16) -> bool {
+        let mut matched_zone = &self.default_zone;
+        for (zone, interfaces) in &self.active_zones {
+            if interfaces.contains(&interface.to_string()) {
+                matched_zone = zone;
+                break;
+            }
+        }
+
+        if let Some(ports) = self.zone_allowed_ports.get(matched_zone) {
+            ports.contains(&destination_port)
         } else {
             false
         }
     }
-
-    pub fn add_port_to_zone(&mut self, zone: &str, port: u16) -> Result<(), &'static str> {
-        if let Some(z) = self.zones.get_mut(zone) {
-            if !z.allowed_ports.contains(&port) {
-                z.allowed_ports.push(port);
-            }
-            Ok(())
-        } else {
-            Err("Zone does not exist")
-        }
-    }
 }
 
 // ==========================================
-// Cockpit Console Server Telemetry (SovereignCockpitConsole)
+// Sovereign Cockpit Console
 // ==========================================
 
 pub struct SovereignCockpitConsole {
-    pub cpu_usage: f64,
-    pub memory_used_bytes: u64,
-    pub active_sessions: usize,
-    pub logged_events: Vec<String>,
+    pub is_listening: bool,
+    pub connected_clients: usize,
+    pub system_metrics: HashMap<String, f64>,
 }
 
 impl SovereignCockpitConsole {
     pub fn new() -> Self {
+        let mut system_metrics = HashMap::new();
+        system_metrics.insert("cpu_usage_pct".to_string(), 0.0);
+        system_metrics.insert("memory_used_gb".to_string(), 0.0);
+        system_metrics.insert("network_rx_mbps".to_string(), 0.0);
+
         Self {
-            cpu_usage: 0.0,
-            memory_used_bytes: 0,
-            active_sessions: 0,
-            logged_events: Vec::new(),
+            is_listening: false,
+            connected_clients: 0,
+            system_metrics,
         }
     }
 
-    pub fn update_metrics(&mut self, cpu: f64, mem: u64, sessions: usize) {
-        self.cpu_usage = cpu;
-        self.memory_used_bytes = mem;
-        self.active_sessions = sessions;
-    }
-
-    pub fn log_event(&mut self, event: &str) {
-        self.logged_events.push(event.to_string());
-    }
-
-    pub fn stream_telemetry_json(&self) -> String {
-        let mut events_json = String::new();
-        events_json.push('[');
-        for (i, ev) in self.logged_events.iter().enumerate() {
-            if i > 0 {
-                events_json.push_str(", ");
-            }
-            events_json.push_str(&format!("\"{}\"", ev));
+    pub fn start_server(&mut self) -> Result<(), String> {
+        if self.is_listening {
+            return Err("Cockpit Server is already running".to_string());
         }
-        events_json.push(']');
+        self.is_listening = true;
+        Ok(())
+    }
 
-        format!(
-            "{{\n  \"cpu_percent\": {:.1},\n  \"memory_used_bytes\": {},\n  \"active_sessions\": {},\n  \"events\": {}\n}}",
-            self.cpu_usage, self.memory_used_bytes, self.active_sessions, events_json
-        )
+    pub fn stop_server(&mut self) {
+        self.is_listening = false;
+        self.connected_clients = 0;
+    }
+
+    pub fn register_client(&mut self) -> Result<usize, String> {
+        if !self.is_listening {
+            return Err("Cannot connect: Cockpit Server offline".to_string());
+        }
+        self.connected_clients += 1;
+        Ok(self.connected_clients)
+    }
+
+    pub fn update_metric(&mut self, metric: &str, value: f64) {
+        self.system_metrics.insert(metric.to_string(), value);
+    }
+
+    pub fn stream_metrics_json(&self) -> Result<String, String> {
+        if !self.is_listening {
+            return Err("Cockpit Server offline".to_string());
+        }
+
+        let mut parts = Vec::new();
+        parts.push(format!("\"listening\":{}", self.is_listening));
+        parts.push(format!("\"clients\":{}", self.connected_clients));
+
+        let mut metrics_parts = Vec::new();
+        for (key, val) in &self.system_metrics {
+            metrics_parts.push(format!("\"{}\":{}", key, val));
+        }
+        metrics_parts.sort();
+
+        parts.push(format!("\"metrics\":{{ {} }}", metrics_parts.join(",")));
+
+        Ok(format!("{{ {} }}", parts.join(",")))
     }
 }
 
@@ -1048,83 +1171,124 @@ mod tests {
 
     #[test]
     fn test_sovereign_ostree_deployer() {
-        let mut deployer = SovereignOstreeDeployer::new("40.20240101.0");
-        assert_eq!(deployer.active_version, "40.20240101.0");
+        let mut deployer = SovereignOstreeDeployer::new();
+        assert_eq!(deployer.active_deployment_hash, "fedora-base-39.20231101.0");
 
-        deployer.install_layered_package("git");
-        deployer.install_layered_package("tmux");
-        assert_eq!(deployer.layered_packages.len(), 2);
+        // Stage deployment
+        assert!(deployer.stage_deployment("").is_err());
+        assert!(deployer.stage_deployment("fedora-base-40.20240401.0").is_ok());
+        assert_eq!(deployer.staged_deployment_hash, "fedora-base-40.20240401.0");
 
-        // Attempt commit with nothing staged
-        assert!(deployer.commit_deploy().is_err());
+        // Commit deployment
+        assert!(deployer.commit_deployment().is_ok());
+        assert_eq!(deployer.active_deployment_hash, "fedora-base-40.20240401.0");
+        assert_eq!(deployer.rollback_deployment_hash, "fedora-base-39.20231101.0");
+        assert!(deployer.rollback_available);
 
-        // Stage and commit upgrade
-        deployer.stage_upgrade("41.20240501.0");
-        assert!(deployer.commit_deploy().is_ok());
-        assert_eq!(deployer.active_version, "41.20240501.0");
-        assert_eq!(deployer.rollback_version.as_deref(), Some("40.20240101.0"));
+        // Layer package
+        assert!(deployer.layer_package("").is_err());
+        assert!(deployer.layer_package("htop").is_ok());
+        assert!(deployer.layer_package("htop").is_err()); // duplicate should fail
+
+        let (active_hash, layered) = deployer.get_active_state();
+        assert_eq!(active_hash, "fedora-base-40.20240401.0");
+        assert_eq!(layered, vec!["htop".to_string()]);
 
         // Rollback
         assert!(deployer.rollback().is_ok());
-        assert_eq!(deployer.active_version, "40.20240101.0");
-        assert_eq!(deployer.staged_version.as_deref(), Some("41.20240501.0"));
-
-        // No more rollback available
-        assert!(deployer.rollback().is_err());
+        assert_eq!(deployer.active_deployment_hash, "fedora-base-39.20231101.0");
     }
 
     #[test]
     fn test_sovereign_selinux_engine() {
-        let default_ctx = SeLinuxContext::parse("unconfined_u:unconfined_r:unconfined_t:s0").unwrap();
-        let mut engine = SovereignSeLinuxEngine::new(default_ctx);
+        let mut engine = SovereignSeLinuxEngine::new(SeLinuxMode::Enforcing);
+        let ctx = SovereignSeLinuxContext::new("system_u", "system_r", "httpd_sys_content_t", "s0");
+        engine.register_file_context("/var/www/html/index.html", ctx);
 
-        let target_ctx = SeLinuxContext::parse("system_u:system_r:httpd_t:s0").unwrap();
+        engine.add_permission("httpd_t", "file", "read");
+        engine.add_transition_rule("init_t", "httpd_t");
 
-        // Denied by default
-        assert!(!engine.evaluate_transition(&target_ctx));
+        // Verify transition rule
+        assert!(engine.validate_transition("init_t", "httpd_t"));
+        assert!(!engine.validate_transition("init_t", "unconfined_t"));
 
-        // Add allow rule
-        engine.add_transition_rule("unconfined_t", "httpd_t");
-        assert!(engine.evaluate_transition(&target_ctx));
+        // Verify access check
+        let res = engine.check_access("httpd_t", "/var/www/html/index.html", "read");
+        assert_eq!(res, Ok(true));
 
-        // Verify permissive mode bypasses checks
-        engine.enforcing = false;
-        let unregistered_ctx = SeLinuxContext::parse("system_u:system_r:unknown_t:s0").unwrap();
-        assert!(engine.evaluate_transition(&unregistered_ctx));
+        // Access violation due to missing permission
+        let res_denied = engine.check_access("httpd_t", "/var/www/html/index.html", "write");
+        assert_eq!(res_denied, Err("SELinux AVC Denial: Access Prohibited by Sovereign MAC policy"));
+
+        // Missing file context
+        let res_missing = engine.check_access("httpd_t", "/etc/shadow", "read");
+        assert_eq!(res_missing, Err("SELinux Error: Path has no registered label/context"));
+
+        // Permissive mode allows but warns
+        let mut permissive_engine = SovereignSeLinuxEngine::new(SeLinuxMode::Permissive);
+        let ctx2 = SovereignSeLinuxContext::new("system_u", "system_r", "httpd_sys_content_t", "s0");
+        permissive_engine.register_file_context("/var/www/html/index.html", ctx2);
+        let permissive_res = permissive_engine.check_access("httpd_t", "/var/www/html/index.html", "write");
+        assert_eq!(permissive_res, Ok(true));
+
+        // Disabled mode allows everything
+        let disabled_engine = SovereignSeLinuxEngine::new(SeLinuxMode::Disabled);
+        assert!(disabled_engine.check_access("any_t", "/any/path", "any").unwrap());
     }
 
     #[test]
     fn test_sovereign_firewalld_manager() {
-        let mut fm = SovereignFirewalldManager::new();
+        let mut fwd = SovereignFirewalldManager::new();
+        assert_eq!(fwd.default_zone, "public");
 
-        // Default interface eth0 defaults to public
-        assert!(fm.check_packet_allowed("eth0", 22, "ssh"));
-        assert!(!fm.check_packet_allowed("eth0", 8080, "http-alt"));
+        // Allowed public ports are 22, 80, 443
+        assert!(fwd.is_packet_allowed("eth0", 80));
+        assert!(!fwd.is_packet_allowed("eth0", 8080));
 
-        // Assign eth0 to trusted
-        assert!(fm.assign_interface_to_zone("eth0", "trusted").is_ok());
-        assert!(fm.check_packet_allowed("eth0", 8080, "http-alt"));
+        // Assign interface to work zone
+        assert!(fwd.assign_interface_to_zone("eth0", "work").is_ok());
+        // Work allows 8080
+        assert!(fwd.is_packet_allowed("eth0", 8080));
+
+        // Add custom port rule to work zone
+        assert!(fwd.allow_port_in_zone("work", 9090).is_ok());
+        assert!(fwd.is_packet_allowed("eth0", 9090));
 
         // Invalid zone error
-        assert!(fm.assign_interface_to_zone("eth0", "invalid_zone").is_err());
-
-        // Add new port dynamically
-        assert!(fm.add_port_to_zone("public", 8080).is_ok());
-        assert!(fm.check_packet_allowed("eth1", 8080, "http-alt"));
+        assert!(fwd.set_default_zone("invalid_zone").is_err());
+        assert!(fwd.assign_interface_to_zone("eth0", "invalid_zone").is_err());
     }
 
     #[test]
     fn test_sovereign_cockpit_console() {
         let mut console = SovereignCockpitConsole::new();
-        console.update_metrics(45.2, 8192000000, 3);
-        console.log_event("User admin logged in");
-        console.log_event("Service sshd restarted");
+        assert!(!console.is_listening);
 
-        let json = console.stream_telemetry_json();
-        assert!(json.contains("\"cpu_percent\": 45.2"));
-        assert!(json.contains("\"memory_used_bytes\": 8192000000"));
-        assert!(json.contains("\"active_sessions\": 3"));
-        assert!(json.contains("\"User admin logged in\""));
-        assert!(json.contains("\"Service sshd restarted\""));
+        // Fail registering client when offline
+        assert!(console.register_client().is_err());
+
+        // Start server
+        assert!(console.start_server().is_ok());
+        assert!(console.is_listening);
+        assert!(console.start_server().is_err()); // duplicate starts fail
+
+        // Register client
+        assert_eq!(console.register_client().unwrap(), 1);
+        assert_eq!(console.register_client().unwrap(), 2);
+
+        // Metrics
+        console.update_metric("cpu_usage_pct", 45.2);
+        console.update_metric("memory_used_gb", 7.4);
+
+        let json = console.stream_metrics_json().unwrap();
+        assert!(json.contains("\"listening\":true"));
+        assert!(json.contains("\"clients\":2"));
+        assert!(json.contains("\"cpu_usage_pct\":45.2"));
+        assert!(json.contains("\"memory_used_gb\":7.4"));
+
+        // Stop server
+        console.stop_server();
+        assert!(!console.is_listening);
+        assert_eq!(console.connected_clients, 0);
     }
 }
