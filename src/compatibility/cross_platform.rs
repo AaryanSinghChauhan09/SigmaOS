@@ -724,6 +724,157 @@ impl Default for KqueueEventNotifier {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SysctlValue {
+    Integer(i64),
+    Boolean(bool),
+    String([u8; 64]),
+}
+
+#[derive(Debug, Clone)]
+pub struct SysctlParameter {
+    pub name: String, // Dot-separated path, e.g. "kern.maxproc"
+    pub value: SysctlValue,
+    pub writable: bool,
+}
+
+/// BSD-inspired Sovereign Sysctl Kernel Parameter Tuning Engine
+pub struct SovereignSysctlManager {
+    pub parameters: HashMap<String, SysctlParameter>,
+}
+
+impl SovereignSysctlManager {
+    pub fn new() -> Self {
+        let mut manager = Self {
+            parameters: HashMap::new(),
+        };
+        manager.register_defaults();
+        manager
+    }
+
+    fn register_defaults(&mut self) {
+        self.register_param("kern.maxproc".to_string(), SysctlValue::Integer(1024), true);
+        self.register_param(
+            "net.inet.tcp.sendspace".to_string(),
+            SysctlValue::Integer(32768),
+            true,
+        );
+        self.register_param("hw.ncpu".to_string(), SysctlValue::Integer(16), false); // Read-only
+        let mut os_release = [0u8; 64];
+        os_release[..15].copy_from_slice(b"6.24.0-mainline");
+        self.register_param(
+            "kern.osrelease".to_string(),
+            SysctlValue::String(os_release),
+            false,
+        );
+    }
+
+    pub fn register_param(&mut self, path: String, value: SysctlValue, writable: bool) {
+        let param = SysctlParameter {
+            name: path.clone(),
+            value,
+            writable,
+        };
+        self.parameters.insert(path, param);
+    }
+
+    pub fn query_param(&self, path: &str) -> Option<&SysctlValue> {
+        self.parameters.get(path).map(|p| &p.value)
+    }
+
+    pub fn update_param(&mut self, path: &str, new_value: SysctlValue) -> Result<(), &'static str> {
+        if let Some(param) = self.parameters.get_mut(path) {
+            if !param.writable {
+                return Err("Parameter is read-only");
+            }
+            // Ensure type matches
+            match (&param.value, &new_value) {
+                (SysctlValue::Integer(_), SysctlValue::Integer(_))
+                | (SysctlValue::Boolean(_), SysctlValue::Boolean(_))
+                | (SysctlValue::String(_), SysctlValue::String(_)) => {
+                    param.value = new_value;
+                    Ok(())
+                }
+                _ => Err("Mismatched type update"),
+            }
+        } else {
+            Err("Parameter not found")
+        }
+    }
+
+    /// Shell/Terminal interface parser for sysctl commands, e.g. "sysctl -w net.inet.tcp.sendspace=65536"
+    pub fn parse_and_execute_command(&mut self, command: &str) -> Result<String, &'static str> {
+        let parts: Vec<&str> = command.split_whitespace().collect();
+        if parts.is_empty() {
+            return Err("Empty command");
+        }
+
+        if parts[0] != "sysctl" {
+            return Err("Command is not sysctl");
+        }
+
+        if parts.len() == 2 {
+            // Read query, e.g. "sysctl kern.maxproc"
+            let path = parts[1];
+            if let Some(val) = self.query_param(path) {
+                match val {
+                    SysctlValue::Integer(i) => Ok(format!("{} = {}", path, i)),
+                    SysctlValue::Boolean(b) => Ok(format!("{} = {}", path, b)),
+                    SysctlValue::String(s) => {
+                        let len = s.iter().position(|&b| b == 0).unwrap_or(64);
+                        if let Ok(st) = core::str::from_utf8(&s[..len]) {
+                            Ok(format!("{} = {}", path, st))
+                        } else {
+                            Err("Invalid string value")
+                        }
+                    }
+                }
+            } else {
+                Err("Parameter not found")
+            }
+        } else if parts.len() == 3 && parts[1] == "-w" {
+            // Write update, e.g. "sysctl -w net.inet.tcp.sendspace=65536"
+            let kv: Vec<&str> = parts[2].split('=').collect();
+            if kv.len() == 2 {
+                let path = kv[0];
+                let val_str = kv[1];
+
+                // Inspect type to parse correctly
+                let current_val = self.query_param(path).ok_or("Parameter not found")?;
+                let next_val = match current_val {
+                    SysctlValue::Integer(_) => {
+                        let i: i64 = val_str.parse().map_err(|_| "Invalid integer format")?;
+                        SysctlValue::Integer(i)
+                    }
+                    SysctlValue::Boolean(_) => {
+                        let b: bool = val_str.parse().map_err(|_| "Invalid boolean format")?;
+                        SysctlValue::Boolean(b)
+                    }
+                    SysctlValue::String(_) => {
+                        let mut arr = [0u8; 64];
+                        let len = val_str.len().min(63);
+                        arr[..len].copy_from_slice(&val_str.as_bytes()[..len]);
+                        SysctlValue::String(arr)
+                    }
+                };
+
+                self.update_param(path, next_val)?;
+                Ok(format!("{} = {}", path, val_str))
+            } else {
+                Err("Invalid write parameter format (expected path=value)")
+            }
+        } else {
+            Err("Usage: sysctl <path> or sysctl -w <path>=<value>")
+        }
+    }
+}
+
+impl Default for SovereignSysctlManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// Dynamic bridge for open-source operating system subsystems (e.g. eBPF filter drivers or rump kernels)
 #[derive(Debug, Clone)]
 pub struct OpenSourceOsGapBridge {
@@ -936,5 +1087,44 @@ mod tests {
 
         ai.load_open_model("llama-3");
         assert!(ai.verify_model_loaded("llama-3"));
+    }
+
+    #[test]
+    fn test_bsd_sysctl_engine() {
+        let mut manager = SovereignSysctlManager::new();
+
+        // 1. Query Default Parameters
+        assert_eq!(
+            manager.query_param("kern.maxproc").unwrap(),
+            &SysctlValue::Integer(1024)
+        );
+        assert_eq!(
+            manager.query_param("hw.ncpu").unwrap(),
+            &SysctlValue::Integer(16)
+        );
+
+        // 2. Command Parsing Read Query
+        let out_read = manager
+            .parse_and_execute_command("sysctl kern.maxproc")
+            .unwrap();
+        assert_eq!(out_read, "kern.maxproc = 1024");
+
+        // 3. Command Parsing Write Update
+        let out_write = manager
+            .parse_and_execute_command("sysctl -w kern.maxproc=2048")
+            .unwrap();
+        assert_eq!(out_write, "kern.maxproc = 2048");
+        assert_eq!(
+            manager.query_param("kern.maxproc").unwrap(),
+            &SysctlValue::Integer(2048)
+        );
+
+        // 4. Try updating read-only parameter (hw.ncpu) -> should fail
+        assert!(manager
+            .update_param("hw.ncpu", SysctlValue::Integer(32))
+            .is_err());
+        assert!(manager
+            .parse_and_execute_command("sysctl -w hw.ncpu=32")
+            .is_err());
     }
 }

@@ -38,9 +38,16 @@ impl UniversalAbiTranslator {
         }
     }
 
-    pub fn load_and_translate_binary(&mut self, bin_name: String, guest_os: GuestOsType) -> Result<String, &'static str> {
+    pub fn load_and_translate_binary(
+        &mut self,
+        bin_name: String,
+        guest_os: GuestOsType,
+    ) -> Result<String, &'static str> {
         self.active_translations.insert(bin_name.clone(), guest_os);
-        Ok(format!("ABI: Successfully mapped and executing {} natively as a translated {:?} workload", bin_name, guest_os))
+        Ok(format!(
+            "ABI: Successfully mapped and executing {} natively as a translated {:?} workload",
+            bin_name, guest_os
+        ))
     }
 }
 
@@ -80,7 +87,10 @@ impl SigmaFsPlus {
     }
 
     pub fn commit_transaction(&mut self, file_name: &str, operation: &str) {
-        if self.active_plugins.contains(&FsPluginType::BlockchainAuditTrail) {
+        if self
+            .active_plugins
+            .contains(&FsPluginType::BlockchainAuditTrail)
+        {
             let hash = format!("BLOCK_HASH_{:x}", file_name.len() * operation.len() * 42);
             self.audit_blocks.push(hash);
         }
@@ -164,15 +174,21 @@ impl AiNativeRuntime {
     }
 
     pub fn spawn_model_process(&mut self, pid: u64, model: ModelType, ram_mb: usize) {
-        self.active_models.insert(pid, ModelProcess {
+        self.active_models.insert(
             pid,
-            model_type: model,
-            memory_footprint_mb: ram_mb,
-        });
+            ModelProcess {
+                pid,
+                model_type: model,
+                memory_footprint_mb: ram_mb,
+            },
+        );
     }
 
     pub fn count_loaded_models_by_type(&self, model: ModelType) -> usize {
-        self.active_models.values().filter(|m| m.model_type == model).count()
+        self.active_models
+            .values()
+            .filter(|m| m.model_type == model)
+            .count()
     }
 }
 
@@ -312,7 +328,10 @@ impl CrossDeviceContinuity {
         self.paired_devices.push(mac_address);
     }
 
-    pub fn synchronize_task_state(&mut self, task: ContinuationTask) -> Result<&'static str, &'static str> {
+    pub fn synchronize_task_state(
+        &mut self,
+        task: ContinuationTask,
+    ) -> Result<&'static str, &'static str> {
         if self.paired_devices.is_empty() {
             return Err("No continuation devices available; state caching locally");
         }
@@ -334,7 +353,9 @@ mod tests {
     #[test]
     fn test_abi_translator() {
         let mut translator = UniversalAbiTranslator::new();
-        let res = translator.load_and_translate_binary("explorer.exe".to_string(), GuestOsType::Windows).unwrap();
+        let res = translator
+            .load_and_translate_binary("explorer.exe".to_string(), GuestOsType::Windows)
+            .unwrap();
         assert!(res.contains("executing explorer.exe"));
     }
 

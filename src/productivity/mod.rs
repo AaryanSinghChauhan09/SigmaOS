@@ -1,5 +1,6 @@
 // SigmaOS Productivity Module
 pub mod advanced_app_absorber;
+pub mod advanced_app_absorber;
 pub mod gamification;
 pub mod media;
 pub mod notes;
@@ -8,7 +9,6 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
-pub mod advanced_app_absorber;
 pub mod tmux;
 
 pub use advanced_app_absorber::{
@@ -47,5 +47,5 @@ pub use terminal::{
     SigmaShell, TerminalConfig, TerminalError, TerminalSession, ZshShell,
 };
 pub use tmux::{
-    SplitDirection, LayoutPreset, TmuxPane, TmuxWindow, TmuxSession, TmuxSessionManager,
+    LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
