@@ -50,8 +50,9 @@ impl DnfPackageResolver {
             return Err(format!("Package {} not found in repositories", name));
         }
 
-        let mut install_order = Vec::new();
-        let mut visited = HashMap::new();
+        // Pre-allocate to minimize heap reallocations
+        let mut install_order = Vec::with_capacity(self.packages.len().min(32));
+        let mut visited = HashMap::with_capacity(self.packages.len().min(32));
 
         self.resolve_deps_recursive(name, &mut install_order, &mut visited)?;
 
@@ -84,7 +85,9 @@ impl DnfPackageResolver {
         }
 
         visited.insert(name.to_string(), false);
-        if !order.contains(&name.to_string()) {
+        // Avoid linear scans with .contains and string creation. Check against visited/order or do O(1) checks.
+        // Since order is small, contains is fine, but we can avoid string clone if it contains already.
+        if !order.iter().any(|x| x == name) {
             order.push(name.to_string());
         }
 
