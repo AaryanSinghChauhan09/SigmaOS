@@ -855,6 +855,178 @@ impl OpenRCService {
     }
 }
 
+// ==========================================
+// 9. LINUX IO_URING SIMULATOR (SovereignIoUring)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoUringOpcode {
+    Read,
+    Write,
+    Nop,
+}
+
+#[derive(Debug, Clone)]
+pub struct SubmissionQueueEntry {
+    pub opcode: IoUringOpcode,
+    pub fd: i32,
+    pub offset: u64,
+    pub user_data: u64,
+    pub data: Vec<u8>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CompletionQueueEntry {
+    pub user_data: u64,
+    pub result: i32, // negative represents errors (like -EINVAL), positive/zero is success or bytes read/written
+}
+
+/// Linux io_uring inspired asynchronous I/O engine
+pub struct SovereignIoUring {
+    pub sq: Vec<SubmissionQueueEntry>,
+    pub cq: Vec<CompletionQueueEntry>,
+    pub max_entries: usize,
+}
+
+impl SovereignIoUring {
+    pub fn new(entries: usize) -> Self {
+        Self {
+            sq: Vec::with_capacity(entries),
+            cq: Vec::with_capacity(entries),
+            max_entries: entries,
+        }
+    }
+
+    /// Submit an entry to the submission queue (SQ)
+    pub fn submit_entry(&mut self, sqe: SubmissionQueueEntry) -> Result<(), &'static str> {
+        if self.sq.len() >= self.max_entries {
+            return Err("Submission Queue is full");
+        }
+        self.sq.push(sqe);
+        Ok(())
+    }
+
+    /// Processes all SQ entries asynchronously/simulated and populates the Completion Queue (CQ)
+    pub fn submit_and_wait(&mut self) -> usize {
+        let mut processed = 0;
+        let entries: Vec<SubmissionQueueEntry> = self.sq.drain(..).collect();
+
+        for sqe in entries {
+            let res = match sqe.opcode {
+                IoUringOpcode::Nop => 0,
+                IoUringOpcode::Read => sqe.data.len() as i32,
+                IoUringOpcode::Write => sqe.data.len() as i32,
+            };
+
+            self.cq.push(CompletionQueueEntry {
+                user_data: sqe.user_data,
+                result: res,
+            });
+            processed += 1;
+        }
+
+        processed
+    }
+
+    /// Harvest a single Completion Queue Entry (CQE)
+    pub fn reap_cqe(&mut self) -> Option<CompletionQueueEntry> {
+        if self.cq.is_empty() {
+            None
+        } else {
+            Some(self.cq.remove(0))
+        }
+    }
+}
+
+// ==========================================
+// 10. LINUX LANDLOCK LSM SIMULATOR (SovereignLandlockLsm)
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LandlockAccess {
+    ReadOnly,
+    ReadWrite,
+    Execute,
+}
+
+#[derive(Debug, Clone)]
+pub struct LandlockRule {
+    pub path: String,
+    pub access: LandlockAccess,
+}
+
+/// Linux Landlock LSM inspired path-specific sandbox
+pub struct SovereignLandlockLsm {
+    pub rules: Vec<LandlockRule>,
+    pub is_enforced: bool,
+}
+
+impl SovereignLandlockLsm {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            is_enforced: false,
+        }
+    }
+
+    /// Add a path rule to the ruleset
+    pub fn add_rule(&mut self, path: &str, access: LandlockAccess) -> Result<(), &'static str> {
+        if self.is_enforced {
+            return Err("Ruleset is already enforced and immutable");
+        }
+        self.rules.push(LandlockRule {
+            path: path.to_string(),
+            access,
+        });
+        Ok(())
+    }
+
+    /// Enable ruleset enforcement
+    pub fn restrict_self(&mut self) {
+        self.is_enforced = true;
+    }
+
+    /// Check if a path can be accessed with a specific access type
+    pub fn check_access(&self, path: &str, access_type: LandlockAccess) -> bool {
+        if !self.is_enforced {
+            return true; // Not restricted yet
+        }
+
+        let mut best_match: Option<&LandlockRule> = None;
+
+        for rule in &self.rules {
+            if path == rule.path || (path.starts_with(&rule.path) && (rule.path == "/" || path.as_bytes().get(rule.path.len()) == Some(&b'/'))) {
+                match best_match {
+                    Some(best) if rule.path.len() > best.path.len() => {
+                        best_match = Some(rule);
+                    }
+                    None => {
+                        best_match = Some(rule);
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if let Some(rule) = best_match {
+            match (&rule.access, &access_type) {
+                (LandlockAccess::ReadWrite, _) => true, // ReadWrite allows anything
+                (LandlockAccess::ReadOnly, LandlockAccess::ReadOnly) => true,
+                (LandlockAccess::Execute, LandlockAccess::Execute) => true,
+                _ => false,
+            }
+        } else {
+            false // Denied by default if restricted and no matching rule
+        }
+    }
+}
+
+impl Default for SovereignLandlockLsm {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1233,5 +1405,82 @@ mod tests {
         let deleted2 = store.garbage_collect();
         assert!(deleted2.contains(&path1));
         assert!(deleted2.contains(&path2));
+    }
+
+    #[test]
+    fn test_sovereign_io_uring_queues() {
+        let mut io_uring = SovereignIoUring::new(4);
+
+        let sqe1 = SubmissionQueueEntry {
+            opcode: IoUringOpcode::Nop,
+            fd: 0,
+            offset: 0,
+            user_data: 42,
+            data: Vec::new(),
+        };
+
+        let sqe2 = SubmissionQueueEntry {
+            opcode: IoUringOpcode::Read,
+            fd: 3,
+            offset: 1024,
+            user_data: 43,
+            data: vec![0; 128],
+        };
+
+        assert!(io_uring.submit_entry(sqe1).is_ok());
+        assert!(io_uring.submit_entry(sqe2).is_ok());
+
+        // SQ should have 2 entries
+        assert_eq!(io_uring.sq.len(), 2);
+
+        // Submit and wait for processing
+        let processed = io_uring.submit_and_wait();
+        assert_eq!(processed, 2);
+        assert_eq!(io_uring.sq.len(), 0);
+        assert_eq!(io_uring.cq.len(), 2);
+
+        // Reap CQEs
+        let cqe1 = io_uring.reap_cqe().unwrap();
+        assert_eq!(cqe1.user_data, 42);
+        assert_eq!(cqe1.result, 0);
+
+        let cqe2 = io_uring.reap_cqe().unwrap();
+        assert_eq!(cqe2.user_data, 43);
+        assert_eq!(cqe2.result, 128); // bytes read/written length
+
+        assert!(io_uring.reap_cqe().is_none());
+    }
+
+    #[test]
+    fn test_sovereign_landlock_sandboxing() {
+        let mut lsm = SovereignLandlockLsm::new();
+
+        // Rules can only be added before self restriction
+        assert!(lsm.add_rule("/usr/bin", LandlockAccess::Execute).is_ok());
+        assert!(lsm.add_rule("/home/user", LandlockAccess::ReadOnly).is_ok());
+        assert!(lsm.add_rule("/home/user/downloads", LandlockAccess::ReadWrite).is_ok());
+
+        // Prior to restriction, all access is allowed
+        assert!(lsm.check_access("/etc/shadow", LandlockAccess::ReadWrite));
+
+        // Enforce sandboxing
+        lsm.restrict_self();
+
+        // Adding rule post restriction is rejected
+        assert!(lsm.add_rule("/tmp", LandlockAccess::ReadWrite).is_err());
+
+        // Check path matching and hierarchical permissions
+        assert!(lsm.check_access("/usr/bin/cargo", LandlockAccess::Execute));
+        assert!(!lsm.check_access("/usr/bin/cargo", LandlockAccess::ReadWrite)); // no write allowed
+
+        assert!(lsm.check_access("/home/user/document.txt", LandlockAccess::ReadOnly));
+        assert!(!lsm.check_access("/home/user/document.txt", LandlockAccess::ReadWrite));
+
+        // downloads subpath is ReadWrite (best match because it is longer than /home/user)
+        assert!(lsm.check_access("/home/user/downloads/movie.mp4", LandlockAccess::ReadWrite));
+        assert!(lsm.check_access("/home/user/downloads/movie.mp4", LandlockAccess::ReadOnly));
+
+        // /etc/shadow has no rules so it is denied by default under enforcement
+        assert!(!lsm.check_access("/etc/shadow", LandlockAccess::ReadOnly));
     }
 }
