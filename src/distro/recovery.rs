@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use crate::klib::HashMap;
 
 /// Disaster rescue environment setup (inspired by SystemRescue and Rescuezilla).
 #[derive(Debug, Clone)]

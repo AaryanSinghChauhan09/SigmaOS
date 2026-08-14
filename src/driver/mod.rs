@@ -7,7 +7,6 @@ pub mod pods;
 pub mod simulation;
 pub mod vault;
 pub mod rootkit;
-pub mod distro_drivers;
 
 pub use grid::{GridSlotType, PeripheralArchiveGrid};
 pub use mapper::{DriverMapper, MapperCategory};
