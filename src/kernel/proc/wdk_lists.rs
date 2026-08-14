@@ -26,6 +26,11 @@ impl SingleListHead {
         Self { next: None }
     }
 
+    /// Pushes an entry to the front of the single linked list.
+    ///
+    /// # Safety
+    /// Caller must ensure `entry` is a valid, properly aligned pointer to `SingleListEntry`,
+    /// or null. If non-null, `entry` must remain valid for the lifetime of its presence in the list.
     pub unsafe fn push(&mut self, entry: *mut SingleListEntry) {
         if entry.is_null() {
             return;
@@ -34,6 +39,11 @@ impl SingleListHead {
         self.next = Some(entry);
     }
 
+    /// Pops an entry from the front of the single linked list.
+    ///
+    /// # Safety
+    /// Caller must ensure the list pointers are valid and that accessing the dereferenced
+    /// pointer does not cause data races.
     pub unsafe fn pop(&mut self) -> Option<*mut SingleListEntry> {
         let first = self.next?;
         self.next = (*first).next;
@@ -71,12 +81,19 @@ impl ListHead {
     }
 
     /// Initializes the circular doubly linked list in-place (InitializeListHead parity)
+    ///
+    /// # Safety
+    /// `self` must be at a stable memory location that will not move while the list is in use.
     pub unsafe fn initialize(&mut self) {
         let list_head = &mut self.head as *mut ListEntry;
         self.head.flink = list_head;
         self.head.blink = list_head;
     }
 
+    /// Inserts an entry at the tail of the list.
+    ///
+    /// # Safety
+    /// `entry` must point to a valid, initialized `ListEntry` that is not currently part of another list.
     pub unsafe fn insert_tail(&mut self, entry: *mut ListEntry) {
         if entry.is_null() {
             return;
@@ -91,6 +108,10 @@ impl ListHead {
         (*list_head).blink = entry;
     }
 
+    /// Inserts an entry at the head of the list.
+    ///
+    /// # Safety
+    /// `entry` must point to a valid, initialized `ListEntry` that is not currently part of another list.
     pub unsafe fn insert_head(&mut self, entry: *mut ListEntry) {
         if entry.is_null() {
             return;
@@ -105,6 +126,10 @@ impl ListHead {
         (*list_head).flink = entry;
     }
 
+    /// Removes an entry from the list.
+    ///
+    /// # Safety
+    /// `entry` must be a valid pointer to a `ListEntry` currently in this list.
     pub unsafe fn remove_entry(&mut self, entry: *mut ListEntry) -> bool {
         if entry.is_null() || entry == (&mut self.head as *mut ListEntry) {
             return false;
@@ -120,6 +145,10 @@ impl ListHead {
         true
     }
 
+    /// Pops the head entry from the list.
+    ///
+    /// # Safety
+    /// Caller must ensure that no concurrent modifications are occurring on the list.
     pub unsafe fn pop_head(&mut self) -> Option<*mut ListEntry> {
         let list_head = &mut self.head as *mut ListEntry;
         let first = (*list_head).flink;
@@ -131,6 +160,10 @@ impl ListHead {
         }
     }
 
+    /// Checks if the list is empty.
+    ///
+    /// # Safety
+    /// Pointer to `self.head` must be valid.
     pub unsafe fn is_empty(&self) -> bool {
         self.head.flink == (&self.head as *const ListEntry as *mut ListEntry)
     }
