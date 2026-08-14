@@ -1155,7 +1155,6 @@ impl DrmModeInfo {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
