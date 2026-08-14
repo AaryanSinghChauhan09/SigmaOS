@@ -45,7 +45,7 @@ This journal logs CRITICAL security lessons, vulnerability fixes, and proactive 
 **Learning:** To securely patch indirect dependencies without breaking upstream dependency structures, utilize `"overrides"` (npm) and `"pnpm.overrides"` blocks directly inside `package.json` to pin safe versions (`^2.0.1` and `^3.3.17`).
 **Prevention:** Standardize a dynamic audit verification step (`npm audit`) within all development loops and CI security scans to enforce transitive dependency cleanliness.
 
-## 2026-08-14 - Division-by-Zero Panic Vector in Cipher Byte Modulo Indexing
-**Vulnerability:** Cipher routines performing key byte wrapping via `i % key.len()` panic when provided an empty key slice (`&[]`), triggering a kernel/process Denial-of-Service (DoS).
-**Learning:** In `#![no_std]` Rust code where panics translate to kernel halts or aborts, slice length must be validated prior to modulo arithmetic.
-**Prevention:** Always enforce non-emptiness validation (`key.is_empty()`) before performing modulo indexing over input slices.
+## 2026-08-11 - Path Traversal and Prefix Bypass in Unveil Filesystem Sandboxing
+**Vulnerability:** OpenBSD-inspired path narrowing sandboxes (`unveil.rs` and `pledge.rs`) were vulnerable to Directory Traversal (e.g. `/var/www/../../etc/passwd` bypassing constraints because it starts with `/var/www`) and Prefix Substring Bypasses (e.g. `/var/www-secret` matching `/var/www` as a prefix).
+**Learning:** Checking prefixes with raw `starts_with` string comparison is highly insecure without enforcing boundary path-separator checks and validating that path segments do not contain `..` relative traversal components.
+**Prevention:** Reject paths containing dot-dot (`..`) segments, and validate prefix substring matches by confirming they align on directory boundaries (exact matches, or followed by `/` or `\`, or configuring the policy path with a trailing slash).

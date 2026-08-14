@@ -40,5 +40,15 @@ pub mod component;
 
 // Working exports
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
+pub use meta::{
+    ABIManager, KernelGraph, KernelPersona, KernelPlugin, KernelPluginManager, LegacyScheduler,
+    MetaKernel, MicroDriver, NetPod,
+};
+pub use paging::{PageTable, PageTableEntry, PageTableFlags, VirtualMemoryManagerV2};
+pub use policy_mechanism::{
+    FastPathIpc, InterruptMechanism, PolicyError, PolicyManager, PrivilegeLevel, ProtectionDomain,
+    ResourceBroker,
+};
+pub use roundrobin::{RoundRobinConfig, RoundRobinScheduler, SchedulerError as RoundRobinSchedulerError};
 pub use scheduler::{Priority, Process, ProcessState, Scheduler};
 pub use component::{Component, ComponentTree, ComponentId, ComponentState, CapabilityHandle, CapabilityRights, ComponentError, ResourceType, ResourceAllocation};

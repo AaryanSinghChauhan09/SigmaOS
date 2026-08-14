@@ -1,4 +1,3 @@
-
 /// OOP-based Buddy Allocator for SigmaOS
 /// Based on Ultimate Dominance Strategy: Stage 0 Week 3-4
 /// Implements 2^n page frames with free list per order, split/coalesce
@@ -69,7 +68,7 @@ impl SimpleBuddyAllocator {
         ];
         let mut blocks = Vec::new();
         let next_id = AtomicUsize::new(0);
-        
+
         let initial_order = max_order;
         let initial_block_id = next_id.fetch_add(1, Ordering::SeqCst);
         let initial_block = Block::new(initial_order);

@@ -503,6 +503,8 @@ pub mod utils {
 }
 
 #[cfg(test)]
+#[allow(clippy::unreadable_literal)]
+#[allow(clippy::identity_op)]
 mod tests {
     use super::*;
     
@@ -515,7 +517,8 @@ mod tests {
     #[test]
     fn test_auth() {
         sodium_init();
-        let key = [42u8; constants::CRYPTO_AUTH_KEYBYTES];
+        #[allow(clippy::unreadable_literal)]
+        let key = [42u8; constants::CRYPTO_AUTH_KEYBYTES]; // Test-only constant
         let auth = Auth::new(&key);
         
         let message = b"Hello, World!";
