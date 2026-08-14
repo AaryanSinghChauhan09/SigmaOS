@@ -19,6 +19,15 @@ pub mod garuda_zen;
 pub mod gentoo;
 pub mod tiny_core;
 pub mod localsend;
+pub mod arch_linux;
+
+pub use arch_linux::{
+    ProcFile, ProcFileType, DevFile, DevFileType, ArchPackage, PacmanError as PacmanCompatError,
+    PacmanEngine, RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule,
+    ArchFirewall, LsmMode, LsmSentinel, PamGate, TmuxMultiplexer, SovereignEnvRegistry,
+    YayParuAdapter, ReflectorMirrorlist, ArchinstallParity, ArtixInitBridge, PacmanKeyring,
+    AurPatchEngine,
+};
 
 pub use zorin::{
     ZorinLayoutSwitcher,

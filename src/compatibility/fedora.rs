@@ -921,78 +921,6 @@ impl SovereignFirewalldManager {
 }
 
 // ==========================================
-// SELinux State and Policy Enforcer
-// ==========================================
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SeLinuxMode {
-    Enforcing,
-    Permissive,
-    Disabled,
-}
-
-#[derive(Debug, Clone)]
-pub struct SeLinuxContext {
-    pub user: String,
-    pub role: String,
-    pub domain_type: String,
-    pub sensitivity: String,
-}
-
-impl SeLinuxContext {
-    pub fn parse(context_str: &str) -> Result<Self, &'static str> {
-        let parts: Vec<&str> = context_str.split(':').collect();
-        if parts.len() < 4 {
-            return Err("Invalid SELinux context string format");
-        }
-        Ok(Self {
-            user: parts[0].to_string(),
-            role: parts[1].to_string(),
-            domain_type: parts[2].to_string(),
-            sensitivity: parts[3].to_string(),
-        })
-    }
-}
-
-pub struct SeLinuxEnforcer {
-    pub mode: SeLinuxMode,
-    pub allowed_transitions: HashMap<String, Vec<String>>, // src_type -> dest_types
-}
-
-impl SeLinuxEnforcer {
-    pub fn new(mode: SeLinuxMode) -> Self {
-        let mut transitions = HashMap::new();
-        transitions.insert("httpd_t".to_string(), vec!["httpd_sys_content_t".to_string()]);
-        Self {
-            mode,
-            allowed_transitions: transitions,
-        }
-    }
-
-    /// Validates transition or access check between subject context type and target file context type
-    pub fn check_access(&self, subject_type: &str, target_type: &str) -> Result<bool, &'static str> {
-        if self.mode == SeLinuxMode::Disabled {
-            return Ok(true);
-        }
-
-        let is_allowed = if let Some(allowed) = self.allowed_transitions.get(subject_type) {
-            allowed.contains(&target_type.to_string())
-        } else {
-            false
-        };
-
-        if !is_allowed {
-            if self.mode == SeLinuxMode::Enforcing {
-                return Err("SELinux AVC Denial: Access Prohibited");
-            } else if self.mode == SeLinuxMode::Permissive {
-                println!("SELinux AVC Warning (Permissive): Access Prohibited but allowed");
-            }
-        }
-        Ok(true)
-    }
-}
-
-// ==========================================
 // COPR User Repositories Build Manager
 // ==========================================
 
@@ -1337,39 +1265,5 @@ mod tests {
         console.stop_server();
         assert!(!console.is_listening);
         assert_eq!(console.connected_clients, 0);
-    }
-
-    #[test]
-    fn test_selinux_context_and_enforcer() {
-        let context = SeLinuxContext::parse("system_u:system_r:httpd_t:s0").unwrap();
-        assert_eq!(context.user, "system_u");
-        assert_eq!(context.domain_type, "httpd_t");
-
-        let enforcer = SeLinuxEnforcer::new(SeLinuxMode::Enforcing);
-        assert!(enforcer.check_access("httpd_t", "httpd_sys_content_t").unwrap());
-
-        // Enforcing AVC Denial
-        assert_eq!(
-            enforcer.check_access("httpd_t", "unlabeled_t"),
-            Err("SELinux AVC Denial: Access Prohibited")
-        );
-
-        // Permissive warning only
-        let permissive = SeLinuxEnforcer::new(SeLinuxMode::Permissive);
-        assert!(permissive.check_access("httpd_t", "unlabeled_t").unwrap());
-    }
-
-    #[test]
-    fn test_copr_repository_manager() {
-        let mut copr = CoprRepositoryManager::new("developer_delta", "neo-vim");
-        copr.submit_copr_build(101, "https://github.com/neovim/neovim.git");
-        assert_eq!(copr.builds.len(), 1);
-
-        let rpm_name = copr.execute_build_compile(101).unwrap();
-        assert_eq!(rpm_name, "copr-build-neo-vim-101.rpm");
-        assert_eq!(copr.builds[0].status, "Success");
-
-        // Fail Case (nonexistent task ID)
-        assert_eq!(copr.execute_build_compile(999), Err("COPR build task ID not found"));
     }
 }

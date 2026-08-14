@@ -345,7 +345,7 @@ impl PortageResolver {
 
                 let matching: Vec<_> = versions.iter()
                     .filter(|v| v.version.satisfies(version_constraint))
-                    .filter(|v| slot.as_ref().map_or(true, |s| v.slot.matches(s))))
+                    .filter(|v| slot.as_ref().map_or(true, |s| v.slot.matches(s)))
                     .collect();
 
                 if matching.is_empty() {
