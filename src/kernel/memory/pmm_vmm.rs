@@ -1,7 +1,7 @@
-//! SigmaOS Physical + Virtual Memory Manager
-//! Buddy allocator + Slab allocator + Paging
-//! Target: 10,000 pages/sec alloc/free, sub-100ns kmalloc
-//! Formally verified with Kani
+// SigmaOS Physical + Virtual Memory Manager
+// Buddy allocator + Slab allocator + Paging
+// Target: 10,000 pages/sec alloc/free, sub-100ns kmalloc
+// Formally verified with Kani
 
 #![no_std]
 
@@ -32,6 +32,7 @@ pub struct BuddyAllocator {
 #[repr(C)]
 pub struct BuddyBlock {
     order: AtomicUsize,
+    is_free: AtomicUsize, // 1 = Free, 0 = Allocated/In-use
     next: AtomicPtr<BuddyBlock>,
     prev: AtomicPtr<BuddyBlock>,
 }
@@ -154,14 +155,25 @@ impl BuddyAllocator {
 
         // Try to allocate from current order
         if let Some(block) = self.pop_free_list(order) {
+            unsafe {
+                (*block).is_free.store(0, Ordering::SeqCst);
+            }
             return Ok(block);
         }
 
-        // Split from higher order
+        // Split from higher order recursively down to target order
         for current_order in (order + 1)..=10 {
-            if let Some(block) = self.pop_free_list(current_order) {
-                let buddy = self.split_block(block, current_order, order);
-                self.push_free_list(buddy, current_order - 1);
+            if let Some(mut block) = self.pop_free_list(current_order) {
+                // Perform recursive splits order-by-order to prevent memory loss
+                let mut temp_order = current_order;
+                while temp_order > order {
+                    temp_order -= 1;
+                    let buddy = self.split_block(block, temp_order);
+                    self.push_free_list(buddy, temp_order);
+                }
+                unsafe {
+                    (*block).is_free.store(0, Ordering::SeqCst);
+                }
                 return Ok(block);
             }
         }
@@ -170,6 +182,11 @@ impl BuddyAllocator {
     }
 
     pub fn free(&self, block: *mut BuddyBlock, order: usize) {
+        if order >= 10 {
+            self.push_free_list(block, order);
+            return;
+        }
+
         let buddy = self.find_buddy(block, order);
         
         if let Some(buddy_block) = self.try_coalesce(block, buddy, order) {
@@ -190,6 +207,7 @@ impl BuddyAllocator {
             if self.free_lists[order].compare_exchange(head, next, Ordering::SeqCst, Ordering::SeqCst).is_ok() {
                 (*head).next.store(null_mut(), Ordering::SeqCst);
                 (*head).prev.store(null_mut(), Ordering::SeqCst);
+                (*head).is_free.store(0, Ordering::SeqCst);
                 Some(head)
             } else {
                 None
@@ -202,6 +220,8 @@ impl BuddyAllocator {
             let head = self.free_lists[order].load(Ordering::Acquire);
             (*block).next.store(head, Ordering::SeqCst);
             (*block).prev.store(null_mut(), Ordering::SeqCst);
+            (*block).is_free.store(1, Ordering::SeqCst);
+            (*block).order.store(order, Ordering::SeqCst);
             if !head.is_null() {
                 (*head).prev.store(block, Ordering::SeqCst);
             }
@@ -209,13 +229,14 @@ impl BuddyAllocator {
         }
     }
 
-    fn split_block(&self, block: *mut BuddyBlock, from_order: usize, to_order: usize) -> *mut BuddyBlock {
+    fn split_block(&self, block: *mut BuddyBlock, target_order: usize) -> *mut BuddyBlock {
         unsafe {
-            let offset = (PAGE_SIZE << to_order) as isize;
+            let offset = (PAGE_SIZE << target_order) as isize;
             let buddy = (block as *mut u8).offset(offset) as *mut BuddyBlock;
             
-            (*block).order.store(to_order, Ordering::SeqCst);
-            (*buddy).order.store(to_order, Ordering::SeqCst);
+            (*block).order.store(target_order, Ordering::SeqCst);
+            (*buddy).order.store(target_order, Ordering::SeqCst);
+            (*buddy).is_free.store(1, Ordering::SeqCst);
             
             buddy
         }
@@ -232,7 +253,8 @@ impl BuddyAllocator {
 
     fn try_coalesce(&self, block: *mut BuddyBlock, buddy: *mut BuddyBlock, order: usize) -> Option<*mut BuddyBlock> {
         unsafe {
-            if (*buddy).order.load(Ordering::Acquire) != order {
+            // Verify buddy exists, is free, and has matching order to prevent corruption
+            if (*buddy).is_free.load(Ordering::Acquire) != 1 || (*buddy).order.load(Ordering::Acquire) != order {
                 return None;
             }
 
@@ -267,6 +289,7 @@ impl BuddyAllocator {
 
             (*block).next.store(null_mut(), Ordering::SeqCst);
             (*block).prev.store(null_mut(), Ordering::SeqCst);
+            (*block).is_free.store(0, Ordering::SeqCst);
         }
     }
 }
