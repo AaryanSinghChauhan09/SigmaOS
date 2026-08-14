@@ -66,6 +66,8 @@ impl SigmaSoftwareStore {
     pub fn check_for_updates(&mut self) -> usize {
         self.pending_updates.clear();
         for (name, app) in &self.catalog {
+            let name: &String = name;
+            let app: &StoreApp = app;
             if app.is_installed && app.version != "1.5.0" {
                 // Assume latest stable is 1.5.0
                 let name_str: String = name.clone();

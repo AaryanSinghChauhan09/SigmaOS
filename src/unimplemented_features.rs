@@ -1708,6 +1708,652 @@ impl HpetController {
     }
 }
 
+// =========================================================================
+// 24. SLACKWARE CRUSHER ENGINE (AUTOMATED DEPENDENCY HARVESTER)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PackageArchiveType {
+    Tgz,
+    Txz,
+}
+
+pub struct SlackwareLegacyPackage {
+    pub name: &'static str,
+    pub archive_type: PackageArchiveType,
+    pub embedded_libraries: [&'static str; 4],
+    pub lib_count: usize,
+}
+
+pub struct SlackwareCrusherManager {
+    pub library_provider_registry: [Option<(&'static str, &'static str)>; 16], // (lib_name, package_provider_name)
+}
+
+impl SlackwareCrusherManager {
+    pub fn new() -> Self {
+        Self {
+            library_provider_registry: [None; 16],
+        }
+    }
+
+    pub fn register_library_provider(&mut self, lib: &'static str, provider: &'static str) -> Result<(), &'static str> {
+        for slot in self.library_provider_registry.iter_mut() {
+            if slot.is_none() {
+                *slot = Some((lib, provider));
+                return Ok(());
+            }
+        }
+        Err("Library provider registry database full")
+    }
+
+    /// Automatically harvests library requirements from unversioned, dependency-less legacy Slackware packages
+    /// and resolves them to their correct provider packages to form a hermetic dependency transaction.
+    pub fn harvest_and_resolve_dependencies(
+        &self,
+        pkg: &SlackwareLegacyPackage,
+        resolved_dependencies: &mut [&'static str; 8],
+        resolved_count: &mut usize,
+    ) -> Result<(), &'static str> {
+        for i in 0..pkg.lib_count {
+            let required_lib = pkg.embedded_libraries[i];
+            let mut provider_found = None;
+            for slot in self.library_provider_registry.iter() {
+                if let Some((lib, provider)) = slot {
+                    if *lib == required_lib {
+                        provider_found = Some(*provider);
+                        break;
+                    }
+                }
+            }
+
+            if let Some(provider) = provider_found {
+                // Deduplicate and push resolved dependency
+                let mut already_exists = false;
+                for j in 0..*resolved_count {
+                    if resolved_dependencies[j] == provider {
+                        already_exists = true;
+                        break;
+                    }
+                }
+                if !already_exists {
+                    if *resolved_count >= 8 {
+                        return Err("Dependency harvester overflow: too many unique dependencies resolved");
+                    }
+                    resolved_dependencies[*resolved_count] = provider;
+                    *resolved_count += 1;
+                }
+            } else {
+                return Err("Failed to resolve dependency: missing provider for required shared library");
+            }
+        }
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 25. IOKIT DRIVER MATCHING GRAPH (MACOS/IOS STYLE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct IokitService {
+    pub name: &'static str,
+    pub class_name: &'static str,
+    pub provider_class: &'static str,
+    pub is_matched: bool,
+}
+
+pub struct IokitRegistry {
+    pub registered_services: [Option<IokitService>; 8],
+}
+
+impl IokitRegistry {
+    pub fn new() -> Self {
+        Self {
+            registered_services: [None; 8],
+        }
+    }
+
+    pub fn register_service(&mut self, name: &'static str, class: &'static str, provider: &'static str) -> Result<(), &'static str> {
+        for slot in self.registered_services.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(IokitService {
+                    name,
+                    class_name: class,
+                    provider_class: provider,
+                    is_matched: false,
+                });
+                return Ok(());
+            }
+        }
+        Err("IOKit registry capacity limit exceeded")
+    }
+
+    pub fn match_and_start_drivers(&mut self, provider_class: &'static str) -> usize {
+        let mut match_count = 0;
+        for slot in self.registered_services.iter_mut() {
+            if let Some(ref mut service) = slot {
+                if service.provider_class == provider_class && !service.is_matched {
+                    service.is_matched = true;
+                    match_count += 1;
+                }
+            }
+        }
+        match_count
+    }
+}
+
+// =========================================================================
+// 26. ANDROID-STYLE LOW MEMORY KILLER (LMK)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ProcessActivityState {
+    Foreground = 0,
+    Perceptible = 1,
+    Background = 2,
+    Cached = 3,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct AndroidProcess {
+    pub pid: u32,
+    pub state: ProcessActivityState,
+    pub memory_rss_mb: u32,
+    pub is_reaped: bool,
+}
+
+pub struct AndroidLmk {
+    pub processes: [Option<AndroidProcess>; 8],
+}
+
+impl AndroidLmk {
+    pub fn new() -> Self {
+        Self {
+            processes: [None; 8],
+        }
+    }
+
+    pub fn register_process(&mut self, pid: u32, state: ProcessActivityState, mem_rss: u32) -> Result<(), &'static str> {
+        for slot in self.processes.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(AndroidProcess {
+                    pid,
+                    state,
+                    memory_rss_mb: mem_rss,
+                    is_reaped: false,
+                });
+                return Ok(());
+            }
+        }
+        Err("Process monitor capacity limit reached")
+    }
+
+    pub fn trigger_memory_pressure_reap(&mut self, target_rss_reclaim_mb: u32) -> u32 {
+        let mut reclaimed = 0;
+        // Sweep states from Cached down to Foreground
+        for target_state in &[ProcessActivityState::Cached, ProcessActivityState::Background, ProcessActivityState::Perceptible] {
+            for slot in self.processes.iter_mut() {
+                if let Some(ref mut proc) = slot {
+                    if proc.state == *target_state && !proc.is_reaped {
+                        proc.is_reaped = true;
+                        reclaimed += proc.memory_rss_mb;
+                        if reclaimed >= target_rss_reclaim_mb {
+                            return reclaimed;
+                        }
+                    }
+                }
+            }
+        }
+        reclaimed
+    }
+}
+
+// =========================================================================
+// 27. WINDOWS NT OBJECT MANAGER NAMESPACE
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct NtObject {
+    pub path: &'static str,
+    pub object_type: &'static str, // "Device", "Directory", "Link"
+}
+
+pub struct NtObjectManager {
+    pub namespace: [Option<NtObject>; 16],
+}
+
+impl NtObjectManager {
+    pub fn new() -> Self {
+        Self {
+            namespace: [None; 16],
+        }
+    }
+
+    pub fn insert_object(&mut self, path: &'static str, obj_type: &'static str) -> Result<(), &'static str> {
+        for slot in self.namespace.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(NtObject {
+                    path,
+                    object_type: obj_type,
+                });
+                return Ok(());
+            }
+        }
+        Err("NT Object namespace directory is full")
+    }
+
+    pub fn lookup_object(&self, path: &'static str) -> Option<&'static str> {
+        for slot in self.namespace.iter() {
+            if let Some(ref obj) = slot {
+                if obj.path == path {
+                    return Some(obj.object_type);
+                }
+            }
+        }
+        None
+    }
+}
+
+// =========================================================================
+// 28. COMPLETELY FAIR SCHEDULER (LINUX STYLE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct CfsTask {
+    pub id: u32,
+    pub vruntime_ns: u64,
+    pub weight: u32,
+}
+
+pub struct LinuxCfsRunqueue {
+    pub tasks: [Option<CfsTask>; 8],
+}
+
+impl LinuxCfsRunqueue {
+    pub fn new() -> Self {
+        Self {
+            tasks: [None; 8],
+        }
+    }
+
+    pub fn enqueue_task(&mut self, id: u32, weight: u32) -> Result<(), &'static str> {
+        // Find minimum vruntime to initialize the new task fairly
+        let mut min_vruntime = 0;
+        for slot in self.tasks.iter() {
+            if let Some(ref t) = slot {
+                if min_vruntime == 0 || t.vruntime_ns < min_vruntime {
+                    min_vruntime = t.vruntime_ns;
+                }
+            }
+        }
+
+        for slot in self.tasks.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(CfsTask {
+                    id,
+                    vruntime_ns: min_vruntime,
+                    weight,
+                });
+                return Ok(());
+            }
+        }
+        Err("CFS runqueue overflow")
+    }
+
+    pub fn pick_next_task(&mut self) -> Option<u32> {
+        let mut best_idx = None;
+        let mut min_vruntime = u64::MAX;
+
+        for (idx, slot) in self.tasks.iter().enumerate() {
+            if let Some(ref t) = slot {
+                if t.vruntime_ns < min_vruntime {
+                    min_vruntime = t.vruntime_ns;
+                    best_idx = Some(idx);
+                }
+            }
+        }
+
+        if let Some(idx) = best_idx {
+            // Simulate task run slice execution by incrementing vruntime inversely to weight
+            let t = self.tasks[idx].as_mut().unwrap();
+            let vruntime_increment = 1000_000 / t.weight as u64;
+            t.vruntime_ns += vruntime_increment;
+            Some(t.id)
+        } else {
+            None
+        }
+    }
+}
+
+// =========================================================================
+// 29. KQUEUE EVENT MULTIPLEXER (BSD STYLE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KeventFilter {
+    Read,
+    Write,
+    Signal,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Kevent {
+    pub ident: Uptr,
+    pub filter: KeventFilter,
+    pub flags: u16,
+    pub data: Iptr,
+}
+
+type Uptr = usize;
+type Iptr = isize;
+
+pub const EV_ADD: u16 = 0x0001;
+pub const EV_DELETE: u16 = 0x0002;
+pub const EV_ENABLE: u16 = 0x0004;
+
+pub struct BsdKqueue {
+    pub registered_events: [Option<Kevent>; 8],
+    pub triggered_event_idents: [usize; 8],
+    pub triggered_count: usize,
+}
+
+impl BsdKqueue {
+    pub fn new() -> Self {
+        Self {
+            registered_events: [None; 8],
+            triggered_event_idents: [0; 8],
+            triggered_count: 0,
+        }
+    }
+
+    pub fn register_kevent(&mut self, ident: Uptr, filter: KeventFilter, flags: u16) -> Result<(), &'static str> {
+        if flags & EV_DELETE != 0 {
+            for slot in self.registered_events.iter_mut() {
+                if let Some(ref ev) = slot {
+                    if ev.ident == ident && ev.filter == filter {
+                        *slot = None;
+                        return Ok(());
+                    }
+                }
+            }
+            return Err("Target event not registered");
+        }
+
+        for slot in self.registered_events.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(Kevent {
+                    ident,
+                    filter,
+                    flags,
+                    data: 0,
+                });
+                return Ok(());
+            }
+        }
+        Err("Kqueue event table overflow")
+    }
+
+    pub fn trigger_event(&mut self, ident: Uptr) {
+        for slot in self.registered_events.iter() {
+            if let Some(ref ev) = slot {
+                if ev.ident == ident {
+                    if self.triggered_count < 8 {
+                        self.triggered_event_idents[self.triggered_count] = ident;
+                        self.triggered_count += 1;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    pub fn poll_events(&mut self, output_events: &mut [usize]) -> usize {
+        let count = self.triggered_count.min(output_events.len());
+        output_events[..count].copy_from_slice(&self.triggered_event_idents[..count]);
+        self.triggered_count = 0;
+        count
+    }
+}
+
+// =========================================================================
+// 30. TRANSACTIONAL REGISTRY ENGINE (WINDOWS KTM PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct RegistryKv {
+    pub key: &'static str,
+    pub val: u32,
+}
+
+pub struct NtKtmRegistry {
+    pub storage: [Option<RegistryKv>; 8],
+    pub active_transaction_key: Option<&'static str>,
+    pub active_transaction_val: Option<u32>,
+}
+
+impl NtKtmRegistry {
+    pub fn new() -> Self {
+        Self {
+            storage: [None; 8],
+            active_transaction_key: None,
+            active_transaction_val: None,
+        }
+    }
+
+    pub fn begin_transaction(&mut self) -> Result<(), &'static str> {
+        if self.active_transaction_key.is_some() {
+            return Err("KTM Transaction already in progress");
+        }
+        Ok(())
+    }
+
+    pub fn write_key(&mut self, key: &'static str, val: u32) {
+        self.active_transaction_key = Some(key);
+        self.active_transaction_val = Some(val);
+    }
+
+    pub fn commit_transaction(&mut self) -> Result<(), &'static str> {
+        let key = self.active_transaction_key.ok_or("No active KTM transaction to commit")?;
+        let val = self.active_transaction_val.unwrap();
+
+        for slot in self.storage.iter_mut() {
+            if let Some(ref mut kv) = slot {
+                if kv.key == key {
+                    kv.val = val;
+                    self.active_transaction_key = None;
+                    self.active_transaction_val = None;
+                    return Ok(());
+                }
+            }
+        }
+
+        for slot in self.storage.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(RegistryKv { key, val });
+                self.active_transaction_key = None;
+                self.active_transaction_val = None;
+                return Ok(());
+            }
+        }
+        Err("Registry database storage capacity limit reached")
+    }
+
+    pub fn rollback_transaction(&mut self) {
+        self.active_transaction_key = None;
+        self.active_transaction_val = None;
+    }
+}
+
+// =========================================================================
+// 31. BOOTSTRAP DAEMON ON-DEMAND LAUNCHER (IOS LAUNCHD PARITY)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct LaunchdDaemon {
+    pub label: &'static str,
+    pub socket_port: u16,
+    pub is_spawned: bool,
+}
+
+pub struct IosLaunchd {
+    pub daemons: [Option<LaunchdDaemon>; 4],
+}
+
+impl IosLaunchd {
+    pub fn new() -> Self {
+        Self {
+            daemons: [None; 4],
+        }
+    }
+
+    pub fn register_daemon(&mut self, label: &'static str, port: u16) -> Result<(), &'static str> {
+        for slot in self.daemons.iter_mut() {
+            if slot.is_none() {
+                *slot = Some(LaunchdDaemon {
+                    label,
+                    socket_port: port,
+                    is_spawned: false,
+                });
+                return Ok(());
+            }
+        }
+        Err("Launchd registry table full")
+    }
+
+    pub fn notify_socket_activity(&mut self, port: u16) -> Option<&'static str> {
+        for slot in self.daemons.iter_mut() {
+            if let Some(ref mut daemon) = slot {
+                if daemon.socket_port == port && !daemon.is_spawned {
+                    daemon.is_spawned = true;
+                    return Some(daemon.label);
+                }
+            }
+        }
+        None
+    }
+}
+
+// =========================================================================
+// 32. CONTROL GROUPS V2 RESOURCE CONTROLLER (LINUX STYLE)
+// =========================================================================
+
+pub struct CgroupLimits {
+    pub cpu_weight: u32,
+    pub memory_max_bytes: u64,
+}
+
+pub struct LinuxCgroups {
+    pub path: &'static str,
+    pub limits: CgroupLimits,
+    pub registered_pids: [u32; 8],
+    pub pid_count: usize,
+    pub cpu_usage_ticks: u64,
+    pub memory_current_bytes: u64,
+}
+
+impl LinuxCgroups {
+    pub fn new(path: &'static str, cpu_weight: u32, memory_max: u64) -> Self {
+        Self {
+            path,
+            limits: CgroupLimits {
+                cpu_weight,
+                memory_max_bytes: memory_max,
+            },
+            registered_pids: [0; 8],
+            pid_count: 0,
+            cpu_usage_ticks: 0,
+            memory_current_bytes: 0,
+        }
+    }
+
+    pub fn attach_process(&mut self, pid: u32) -> Result<(), &'static str> {
+        if self.pid_count >= 8 {
+            return Err("Cgroup PID controller limit reached");
+        }
+        self.registered_pids[self.pid_count] = pid;
+        self.pid_count += 1;
+        Ok(())
+    }
+
+    pub fn consume_resources(&mut self, ticks: u64, bytes: u64) -> Result<(), &'static str> {
+        if self.memory_current_bytes + bytes > self.limits.memory_max_bytes {
+            return Err("Cgroup limits triggered: Out of memory (Max limit exceeded)");
+        }
+        self.cpu_usage_ticks += ticks;
+        self.memory_current_bytes += bytes;
+        Ok(())
+    }
+}
+
+// =========================================================================
+// 33. EBPF SANDBOX JIT INTERPRETER/VM (LINUX STYLE)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy)]
+pub struct EbpfInstruction {
+    pub opcode: u8, // 0x01 = Add, 0x02 = Sub, 0x03 = Jeq, 0x04 = Ret
+    pub dst: u8,
+    pub src: u8,
+    pub imm: u32,
+}
+
+pub struct LinuxEbpfVm {
+    pub registers: [u64; 4],
+}
+
+impl LinuxEbpfVm {
+    pub fn new() -> Self {
+        Self {
+            registers: [0; 4],
+        }
+    }
+
+    pub fn execute_bytecode(&mut self, program: &[EbpfInstruction], context_packet: &[u8]) -> Result<u64, &'static str> {
+        // Register r0 is return value, register r1 is context pointer length
+        self.registers[0] = 0;
+        self.registers[1] = context_packet.len() as u64;
+
+        let mut pc = 0;
+        while pc < program.len() {
+            let inst = program[pc];
+            match inst.opcode {
+                0x01 => {
+                    // Add immediate
+                    let dst = inst.dst as usize;
+                    if dst < 4 {
+                        self.registers[dst] = self.registers[dst].wrapping_add(inst.imm as u64);
+                    }
+                    pc += 1;
+                }
+                0x02 => {
+                    // Sub immediate
+                    let dst = inst.dst as usize;
+                    if dst < 4 {
+                        self.registers[dst] = self.registers[dst].wrapping_sub(inst.imm as u64);
+                    }
+                    pc += 1;
+                }
+                0x03 => {
+                    // Jump if equal: if reg[dst] == imm, jump relative
+                    let dst = inst.dst as usize;
+                    if dst < 4 && self.registers[dst] == inst.imm as u64 {
+                        let relative_jump = inst.src as usize;
+                        pc += relative_jump;
+                    } else {
+                        pc += 1;
+                    }
+                }
+                0x04 => {
+                    // Return r0
+                    return Ok(self.registers[0]);
+                }
+                _ => return Err("Illegal eBPF instruction opcode"),
+            }
+        }
+        Ok(self.registers[0])
+    }
+}
+
 #[cfg(test)]
 mod tests {
     extern crate std;
@@ -3857,5 +4503,167 @@ mod advanced_security_roadmap_tests {
 
         let hpet = HpetController::new(0xFED00000);
         assert_eq!(hpet.get_elapsed_nanos(100), 2);
+    }
+
+    #[test]
+    fn test_slackware_crusher_automatic_dependency_resolution() {
+        let mut crusher = SlackwareCrusherManager::new();
+        assert!(crusher.register_library_provider("libc.so.6", "glibc").is_ok());
+        assert!(crusher.register_library_provider("libssl.so.3", "openssl").is_ok());
+
+        let legacy_pkg = SlackwareLegacyPackage {
+            name: "curl-8.2.1-x86_64-1.txz",
+            archive_type: PackageArchiveType::Txz,
+            embedded_libraries: ["libc.so.6", "libssl.so.3", "", ""],
+            lib_count: 2,
+        };
+
+        let mut resolved_deps = [""; 8];
+        let mut resolved_count = 0;
+
+        assert!(crusher.harvest_and_resolve_dependencies(&legacy_pkg, &mut resolved_deps, &mut resolved_count).is_ok());
+        assert_eq!(resolved_count, 2);
+        assert_eq!(resolved_deps[0], "glibc");
+        assert_eq!(resolved_deps[1], "openssl");
+
+        // Test with missing provider
+        let corrupt_pkg = SlackwareLegacyPackage {
+            name: "broken-app-1.0.tgz",
+            archive_type: PackageArchiveType::Tgz,
+            embedded_libraries: ["libmissing.so.1", "", "", ""],
+            lib_count: 1,
+        };
+
+        let mut fail_deps = [""; 8];
+        let mut fail_count = 0;
+        assert!(crusher.harvest_and_resolve_dependencies(&corrupt_pkg, &mut fail_deps, &mut fail_count).is_err());
+    }
+
+    #[test]
+    fn test_iokit_driver_matching_graph() {
+        let mut registry = IokitRegistry::new();
+        assert!(registry.register_service("AppleUSBMouse", "USBClass", "AppleUSBHostController").is_ok());
+        assert!(registry.register_service("AppleUSBKeyboard", "USBClass", "AppleUSBHostController").is_ok());
+
+        let matched = registry.match_and_start_drivers("AppleUSBHostController");
+        assert_eq!(matched, 2);
+
+        let rematched = registry.match_and_start_drivers("AppleUSBHostController");
+        assert_eq!(rematched, 0); // Already matched
+    }
+
+    #[test]
+    fn test_android_low_memory_killer() {
+        let mut lmk = AndroidLmk::new();
+        assert!(lmk.register_process(101, ProcessActivityState::Foreground, 100).is_ok());
+        assert!(lmk.register_process(102, ProcessActivityState::Cached, 250).is_ok());
+        assert!(lmk.register_process(103, ProcessActivityState::Background, 150).is_ok());
+
+        let reclaimed = lmk.trigger_memory_pressure_reap(300);
+        assert_eq!(reclaimed, 400); // Reaped Cached (250) + Background (150)
+        assert!(lmk.processes[1].as_ref().unwrap().is_reaped); // PID 102 reaped
+        assert!(!lmk.processes[0].as_ref().unwrap().is_reaped); // PID 101 untouched
+    }
+
+    #[test]
+    fn test_nt_object_manager_namespace() {
+        let mut obj_mgr = NtObjectManager::new();
+        assert!(obj_mgr.insert_object("\\Device\\COM1", "Device").is_ok());
+        assert!(obj_mgr.insert_object("\\DosDevices\\C:", "Link").is_ok());
+
+        assert_eq!(obj_mgr.lookup_object("\\Device\\COM1"), Some("Device"));
+        assert_eq!(obj_mgr.lookup_object("\\DosDevices\\C:"), Some("Link"));
+        assert_eq!(obj_mgr.lookup_object("\\Registry"), None);
+    }
+
+    #[test]
+    fn test_linux_cfs_scheduler_runqueue() {
+        let mut rq = LinuxCfsRunqueue::new();
+        assert!(rq.enqueue_task(1, 1024).is_ok());
+        assert!(rq.enqueue_task(2, 2048).is_ok());
+
+        let next = rq.pick_next_task().unwrap();
+        assert_eq!(next, 1); // Selects task 1 (weight 1024)
+
+        // Task 1 vruntime increased, so task 2 should run next
+        let next_again = rq.pick_next_task().unwrap();
+        assert_eq!(next_again, 2);
+    }
+
+    #[test]
+    fn test_bsd_kqueue_event_multiplexer() {
+        let mut kq = BsdKqueue::new();
+        assert!(kq.register_kevent(12, KeventFilter::Read, EV_ADD).is_ok());
+        assert!(kq.register_kevent(34, KeventFilter::Write, EV_ADD).is_ok());
+
+        kq.trigger_event(12);
+        kq.trigger_event(99); // Unregistered, ignored
+
+        let mut events = [0; 4];
+        let count = kq.poll_events(&mut events);
+        assert_eq!(count, 1);
+        assert_eq!(events[0], 12);
+
+        // Delete kevent
+        assert!(kq.register_kevent(12, KeventFilter::Read, EV_DELETE).is_ok());
+        kq.trigger_event(12);
+        let mut empty_events = [0; 4];
+        assert_eq!(kq.poll_events(&mut empty_events), 0);
+    }
+
+    #[test]
+    fn test_windows_ktm_transactional_registry() {
+        let mut reg = NtKtmRegistry::new();
+        assert!(reg.begin_transaction().is_ok());
+        reg.write_key("HKLM\\System\\CurrentControlSet", 42);
+
+        // Value shouldn't exist in registry prior to commit
+        assert!(reg.storage[0].is_none());
+
+        assert!(reg.commit_transaction().is_ok());
+        assert_eq!(reg.storage[0].as_ref().unwrap().key, "HKLM\\System\\CurrentControlSet");
+        assert_eq!(reg.storage[0].as_ref().unwrap().val, 42);
+
+        // Rollback test
+        assert!(reg.begin_transaction().is_ok());
+        reg.write_key("HKCU\\Software\\Sigma", 99);
+        reg.rollback_transaction();
+        assert!(reg.commit_transaction().is_err()); // No active transaction
+    }
+
+    #[test]
+    fn test_ios_launchd_on_demand_spawning() {
+        let mut launchd = IosLaunchd::new();
+        assert!(launchd.register_daemon("com.apple.syslogd", 514).is_ok());
+
+        assert_eq!(launchd.notify_socket_activity(80), None); // No match
+        assert_eq!(launchd.notify_socket_activity(514), Some("com.apple.syslogd"));
+        assert_eq!(launchd.notify_socket_activity(514), None); // Already spawned
+    }
+
+    #[test]
+    fn test_linux_cgroups_v2_controller() {
+        let mut cg = LinuxCgroups::new("/sys/fs/cgroup/user.slice", 100, 1024 * 1024);
+        assert!(cg.attach_process(1234).is_ok());
+
+        assert!(cg.consume_resources(50, 512 * 1024).is_ok());
+        assert_eq!(cg.memory_current_bytes, 512 * 1024);
+
+        assert!(cg.consume_resources(10, 600 * 1024).is_err()); // Exceeds limit
+    }
+
+    #[test]
+    fn test_linux_ebpf_vm_interpreter() {
+        let mut vm = LinuxEbpfVm::new();
+        let program = [
+            EbpfInstruction { opcode: 0x01, dst: 0, src: 0, imm: 10 }, // add r0, 10
+            EbpfInstruction { opcode: 0x02, dst: 0, src: 0, imm: 3 },  // sub r0, 3
+            EbpfInstruction { opcode: 0x03, dst: 0, src: 2, imm: 7 },  // jeq r0, 7, relative_jump=2
+            EbpfInstruction { opcode: 0x01, dst: 0, src: 0, imm: 99 }, // add r0, 99 (skipped if r0 == 7)
+            EbpfInstruction { opcode: 0x04, dst: 0, src: 0, imm: 0 },  // ret
+        ];
+
+        let ret = vm.execute_bytecode(&program, b"packet_data").unwrap();
+        assert_eq!(ret, 7);
     }
 }
