@@ -53,6 +53,8 @@ pub use compatibility::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
     Literal, SpacSatResolver,
+    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
+    AlpineSyslogManager, BusyBoxMulticall,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,

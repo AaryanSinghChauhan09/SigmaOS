@@ -2,6 +2,7 @@
 pub mod cross_platform;
 pub mod india_stack;
 pub mod india_professional_tools;
+pub mod alpine_linux;
 pub mod interim;
 pub mod jehanne;
 pub mod mint_linux;
@@ -27,6 +28,10 @@ pub use india_professional_tools::{
     JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
     PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
     Literal, SpacSatResolver,
+};
+pub use alpine_linux::{
+    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
+    AlpineSyslogManager, BusyBoxMulticall,
 };
 pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
 pub use jehanne::{
