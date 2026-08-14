@@ -30,6 +30,50 @@ pub struct ShellVec<T> {
     pub capacity: usize,
 }
 
+impl<T> ShellVec<T> {
+    pub fn new() -> Self {
+        ShellVec {
+            data: core::ptr::null_mut(),
+            len: 0,
+            capacity: 0,
+        }
+    }
+
+    pub fn push(&mut self, item: T) {
+        unsafe {
+            if self.len >= self.capacity {
+                self.grow();
+            }
+            if self.capacity > self.len {
+                core::ptr::write(self.data.add(self.len), item);
+                self.len += 1;
+            }
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    unsafe fn grow(&mut self) {
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
+        let new_data = sys_alloc(new_capacity * mem::size_of::<T>()) as *mut T;
+        if !new_data.is_null() {
+            for i in 0..self.len {
+                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+            }
+            if self.capacity > 0 {
+                sys_free(self.data as *mut u8);
+            }
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -177,7 +221,7 @@ impl<T> Drop for ShellVec<T> {
                 for i in 0..self.len {
                     core::ptr::drop_in_place(self.data.add(i));
                 }
-                free(self.data as *mut u8);
+                sys_free(self.data as *mut u8);
             }
         }
     }
