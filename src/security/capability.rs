@@ -1,6 +1,8 @@
 // Minimal capability token implementation for SigmaOS
 // This provides the basic CapabilityToken structure needed by drivers
 
+use core::default::Default;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CapabilityToken {
     pub permissions: u64,

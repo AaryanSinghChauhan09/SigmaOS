@@ -11,6 +11,12 @@ pub mod drivers;
 // Minimal security module for capability tokens
 pub mod security {
     pub mod capability;
+    pub mod selinux;
+}
+
+pub mod desktop {
+    pub mod pantheon;
+    pub mod notification;
 }
 
 pub mod timeline_innovations;

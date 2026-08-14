@@ -1,6 +1,10 @@
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::{String, ToString};
+use alloc::collections::BTreeMap;
+use core::result::Result::{self, Ok, Err};
+use core::option::Option::{self, Some, None};
+use core::default::Default;
 
 // =========================================================================
 // 1. CROSS-PLATFORM SDK (RUST, NIM, ZIG COMPATIBILITY ENVELOPES)
@@ -242,6 +246,418 @@ impl EnergyOptimizer {
 }
 
 // =========================================================================
+// 5. ALPINE LINUX APK PARITY (LIGHTWEIGHT SECURE PACKAGE DATABASE)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ApkPackage {
+    pub name: String,
+    pub version: String,
+    pub dependencies: Vec<String>,
+    pub pqc_signature: String, // Dilithium-5 signature simulation
+    pub file_size_kb: u32,
+}
+
+pub struct ApkPackageRegistry {
+    pub installed: Vec<ApkPackage>,
+    pub available: Vec<ApkPackage>,
+}
+
+impl ApkPackageRegistry {
+    pub fn new() -> Self {
+        Self {
+            installed: Vec::new(),
+            available: Vec::new(),
+        }
+    }
+
+    pub fn register_available(&mut self, pkg: ApkPackage) {
+        self.available.push(pkg);
+    }
+
+    /// Verifies post-quantum signature (must contain "dilithium-5") and resolves dependencies
+    pub fn install_with_pqc_verification(&mut self, pkg_name: &str) -> Result<(), &'static str> {
+        let pkg = self.available.iter().find(|p| p.name == pkg_name)
+            .ok_or("Package not found in available repositories")?.clone();
+
+        // PQC Signature validation
+        if !pkg.pqc_signature.contains("dilithium-5") {
+            return Err("Security Violation: Package lacks a secure Dilithium-5 post-quantum signature");
+        }
+
+        // Install dependencies recursively
+        for dep in &pkg.dependencies {
+            if !self.installed.iter().any(|p| p.name == *dep) {
+                self.install_with_pqc_verification(dep)?;
+            }
+        }
+
+        // Check if already installed
+        if !self.installed.iter().any(|p| p.name == pkg.name) {
+            self.installed.push(pkg);
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for ApkPackageRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 6. NIXOS DECLARATIVE CONFIGURATION ENGINE (STATE EVALUATION & ROLLBACK)
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NixConfigValue {
+    Boolean(bool),
+    Integer(i32),
+    Text(String),
+}
+
+#[derive(Debug, Clone)]
+pub struct NixosGeneration {
+    pub generation_id: u32,
+    pub timestamp: u64,
+    pub settings: BTreeMap<String, NixConfigValue>,
+}
+
+pub struct FunctionalConfigEngine {
+    pub current_settings: BTreeMap<String, NixConfigValue>,
+    pub history: Vec<NixosGeneration>,
+    pub next_generation_id: u32,
+}
+
+impl FunctionalConfigEngine {
+    pub fn new() -> Self {
+        Self {
+            current_settings: BTreeMap::new(),
+            history: Vec::new(),
+            next_generation_id: 1,
+        }
+    }
+
+    pub fn set_option(&mut self, key: &str, value: NixConfigValue) {
+        self.current_settings.insert(key.to_string(), value);
+    }
+
+    pub fn get_option(&self, key: &str) -> Option<&NixConfigValue> {
+        self.current_settings.get(key)
+    }
+
+    /// Captures the current configuration state as a new NixOS generation checkpoint
+    pub fn commit_generation(&mut self, timestamp: u64) -> u32 {
+        let id = self.next_generation_id;
+        self.next_generation_id += 1;
+
+        self.history.push(NixosGeneration {
+            generation_id: id,
+            timestamp,
+            settings: self.current_settings.clone(),
+        });
+
+        id
+    }
+
+    /// Rollback the configuration state to a previous generation ID (<1s atomic swap)
+    pub fn rollback_to_generation(&mut self, gen_id: u32) -> Result<(), &'static str> {
+        let generation = self.history.iter().find(|g| g.generation_id == gen_id)
+            .ok_or("NixOS Generation ID not found in system checkpoint log")?;
+
+        self.current_settings = generation.settings.clone();
+        Ok(())
+    }
+}
+
+impl Default for FunctionalConfigEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 7. GENTOO PORTAGE COMPILER (SLOTS & USE-FLAGS PROFILE TUNING)
+// =========================================================================
+
+#[derive(Debug, Clone)]
+pub struct EbuildPackage {
+    pub name: String,
+    pub version: String,
+    pub slot: String, // Coexisting versions (e.g. "3.10" or "3.11" for python)
+    pub use_flags: Vec<String>,
+}
+
+pub struct PortageSlotResolver {
+    pub active_packages: Vec<EbuildPackage>,
+    pub active_use_flags: Vec<String>,
+}
+
+impl PortageSlotResolver {
+    pub fn new() -> Self {
+        Self {
+            active_packages: Vec::new(),
+            active_use_flags: Vec::new(),
+        }
+    }
+
+    pub fn set_use_flag(&mut self, flag: &str, enable: bool) {
+        if enable {
+            if !self.active_use_flags.iter().any(|f| f == flag) {
+                self.active_use_flags.push(flag.to_string());
+            }
+        } else {
+            self.active_use_flags.retain(|f| f != flag);
+        }
+    }
+
+    /// Adds package. Multiple packages can coexist if they are in different SLOTS
+    pub fn merge_package(&mut self, pkg: EbuildPackage) -> Result<(), &'static str> {
+        // Check slot collision: same name, same slot, but different version
+        for active in &self.active_packages {
+            if active.name == pkg.name && active.slot == pkg.slot && active.version != pkg.version {
+                return Err("Portage Slot Collision: Another package version is already merged in this Slot");
+            }
+        }
+
+        self.active_packages.push(pkg);
+        Ok(())
+    }
+
+    /// Optimizes compiler targeting flags depending on enabled USE flags
+    pub fn resolve_optimal_compiler_flags(&self) -> String {
+        let mut flags = String::from("-O2");
+        if self.active_use_flags.iter().any(|f| f == "march-native") {
+            flags.push_str(" -march=native");
+        }
+        if self.active_use_flags.iter().any(|f| f == "lto") {
+            flags.push_str(" -flto");
+        }
+        if self.active_use_flags.iter().any(|f| f == "graphite") {
+            flags.push_str(" -fgraphite-identity");
+        }
+        flags
+    }
+}
+
+impl Default for PortageSlotResolver {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
+// 8. DEBIAN APT PACKAGE PINNING & MULTI-ARCH RESOLVER
+// =========================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AptPackageMetadata {
+    pub name: String,
+    pub version: String,
+    pub architecture: String,
+    pub depends: Vec<String>,
+    pub pin_priority: i32,
+}
+
+pub struct MultiArchResolver {
+    pub native_architecture: String,
+    pub foreign_architectures: Vec<String>,
+}
+
+impl MultiArchResolver {
+    pub fn new(native_arch: &str) -> Self {
+        Self {
+            native_architecture: native_arch.to_string(),
+            foreign_architectures: Vec::new(),
+        }
+    }
+
+    pub fn add_foreign_architecture(&mut self, arch: &str) {
+        if arch != self.native_architecture && !self.foreign_architectures.iter().any(|a| a == arch) {
+            self.foreign_architectures.push(arch.to_string());
+        }
+    }
+
+    pub fn is_architecture_supported(&self, arch: &str) -> bool {
+        arch == self.native_architecture || self.foreign_architectures.iter().any(|a| a == arch)
+    }
+}
+
+impl Default for MultiArchResolver {
+    fn default() -> Self {
+        Self::new("x86_64")
+    }
+}
+
+pub struct AptPackageResolver {
+    pub sources_list: Vec<String>,
+    pub available_packages: Vec<AptPackageMetadata>,
+    pub installed_packages: Vec<AptPackageMetadata>,
+    pub multiarch: MultiArchResolver,
+    pub pinned_priorities: BTreeMap<String, i32>,
+}
+
+impl AptPackageResolver {
+    pub fn new(native_arch: &str) -> Self {
+        Self {
+            sources_list: Vec::new(),
+            available_packages: Vec::new(),
+            installed_packages: Vec::new(),
+            multiarch: MultiArchResolver::new(native_arch),
+            pinned_priorities: BTreeMap::new(),
+        }
+    }
+
+    pub fn add_source_repository(&mut self, repo_url: &str) {
+        self.sources_list.push(repo_url.to_string());
+    }
+
+    pub fn set_pin_priority(&mut self, package_pattern: &str, priority: i32) {
+        self.pinned_priorities.insert(package_pattern.to_string(), priority);
+    }
+
+    pub fn register_available_package(&mut self, mut pkg: AptPackageMetadata) {
+        if let Some(&prio) = self.pinned_priorities.get(&pkg.name) {
+            pkg.pin_priority = prio;
+        }
+        let version_pin = alloc::format!("{}={}", pkg.name, pkg.version);
+        if let Some(&prio) = self.pinned_priorities.get(&version_pin) {
+            pkg.pin_priority = prio;
+        }
+        self.available_packages.push(pkg);
+    }
+
+    pub fn apt_get_install(&mut self, name: &str, arch: &str) -> Result<(), &'static str> {
+        if !self.multiarch.is_architecture_supported(arch) {
+            return Err("APT install failed: Architecture not supported (Multi-Arch not configured for target)");
+        }
+
+        let mut candidates: Vec<AptPackageMetadata> = self.available_packages.iter()
+            .filter(|p| p.name == name && p.architecture == arch)
+            .cloned()
+            .collect();
+
+        if candidates.is_empty() {
+            return Err("APT install failed: Package not found in configured repositories");
+        }
+
+        candidates.sort_by(|a, b| {
+            let res = b.pin_priority.cmp(&a.pin_priority);
+            if res == core::cmp::Ordering::Equal {
+                b.version.cmp(&a.version)
+            } else {
+                res
+            }
+        });
+
+        let chosen_candidate = &candidates[0];
+
+        if let Some(installed) = self.installed_packages.iter().find(|p| p.name == name && p.architecture == arch) {
+            if chosen_candidate.version < installed.version && chosen_candidate.pin_priority <= 1000 {
+                return Err("APT install failed: Pinned priority prevents downgrade of installed package");
+            }
+        }
+
+        for dep in &chosen_candidate.depends {
+            if !self.installed_packages.iter().any(|p| p.name == *dep) {
+                self.apt_get_install(dep, arch)?;
+            }
+        }
+
+        self.installed_packages.retain(|p| !(p.name == name && p.architecture == arch));
+        self.installed_packages.push(chosen_candidate.clone());
+
+        Ok(())
+    }
+}
+
+impl Default for AptPackageResolver {
+    fn default() -> Self {
+        Self::new("x86_64")
+    }
+}
+
+// =========================================================================
+// 9. DEBIAN POLICY ENFORCER & DFSG COMPLIANCE ENGINE
+// =========================================================================
+
+pub struct DebianSocialContract {
+    pub open_source_only: bool,
+}
+
+impl DebianSocialContract {
+    pub fn new() -> Self {
+        Self {
+            open_source_only: true,
+        }
+    }
+
+    pub fn is_dfsg_compliant(&self, license: &str) -> bool {
+        match license {
+            "GPL-2.0" | "GPL-3.0" | "MIT" | "BSD-3-Clause" | "Apache-2.0" => true,
+            _ => false,
+        }
+    }
+}
+
+impl Default for DebianSocialContract {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub struct DebianPolicyEnforcer {
+    pub social_contract: DebianSocialContract,
+    pub enforce_fhs: bool,
+}
+
+impl DebianPolicyEnforcer {
+    pub fn new() -> Self {
+        Self {
+            social_contract: DebianSocialContract::new(),
+            enforce_fhs: true,
+        }
+    }
+
+    pub fn verify_fhs_path_compliance(&self, path: &str) -> bool {
+        path.starts_with("/usr/")
+            || path.starts_with("/etc/")
+            || path.starts_with("/bin/")
+            || path.starts_with("/var/")
+            || path.starts_with("/lib/")
+    }
+
+    pub fn evaluate_package_compliance(
+        &self,
+        _pkg_name: &str,
+        license: &str,
+        install_paths: &[&str],
+    ) -> Result<(), &'static str> {
+        if self.social_contract.open_source_only && !self.social_contract.is_dfsg_compliant(license) {
+            return Err("Debian Policy Violation: License is not DFSG-compliant (Non-Free archive restricted)");
+        }
+
+        if self.enforce_fhs {
+            for path in install_paths {
+                if !self.verify_fhs_path_compliance(path) {
+                    return Err("Debian Policy Violation: Installation directory violates Filesystem Hierarchy Standard (FHS)");
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
+
+impl Default for DebianPolicyEnforcer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// =========================================================================
 // UNIT TESTS
 // =========================================================================
 
@@ -316,5 +732,228 @@ mod tests {
         opt.set_eco_energy_saver(false);
         assert_eq!(opt.cores[0].active_frequency_mhz, 1000);
         assert!(!opt.cores[2].deep_sleep_active);
+    }
+
+    #[test]
+    fn test_apk_package_registry() {
+        let mut reg = ApkPackageRegistry::new();
+
+        // Register openssl and curl dependency
+        reg.register_available(ApkPackage {
+            name: "openssl".to_string(),
+            version: "3.2.0".to_string(),
+            dependencies: Vec::new(),
+            pqc_signature: "dilithium-5-sig-0x1234".to_string(),
+            file_size_kb: 450,
+        });
+
+        reg.register_available(ApkPackage {
+            name: "curl".to_string(),
+            version: "8.4.0".to_string(),
+            dependencies: {
+                let mut d = Vec::new();
+                d.push("openssl".to_string());
+                d
+            },
+            pqc_signature: "dilithium-5-sig-0x5678".to_string(),
+            file_size_kb: 210,
+        });
+
+        reg.register_available(ApkPackage {
+            name: "badpkg".to_string(),
+            version: "1.0.0".to_string(),
+            dependencies: Vec::new(),
+            pqc_signature: "weak-md5-sig-0x0000".to_string(),
+            file_size_kb: 10,
+        });
+
+        // 1. Check PQC signature validation failure
+        assert!(reg.install_with_pqc_verification("badpkg").is_err());
+
+        // 2. Install curl (should recursively verify and install openssl first)
+        assert!(reg.install_with_pqc_verification("curl").is_ok());
+
+        assert_eq!(reg.installed.len(), 2);
+        assert_eq!(reg.installed[0].name, "openssl");
+        assert_eq!(reg.installed[1].name, "curl");
+    }
+
+    #[test]
+    fn test_functional_config_engine() {
+        let mut engine = FunctionalConfigEngine::new();
+
+        // 1. Initial declarative configurations
+        engine.set_option("boot.loader.systemd-boot.enable", NixConfigValue::Boolean(true));
+        engine.set_option("services.openssh.ports", NixConfigValue::Integer(22));
+        engine.set_option("networking.hostName", NixConfigValue::Text("sigmaos-workspace".to_string()));
+
+        assert_eq!(
+            engine.get_option("networking.hostName"),
+            Some(&NixConfigValue::Text("sigmaos-workspace".to_string()))
+        );
+
+        // 2. Commit Generation 1
+        let gen1 = engine.commit_generation(1716000000);
+        assert_eq!(gen1, 1);
+
+        // 3. Mutate declarative state to a new state and commit Generation 2
+        engine.set_option("networking.hostName", NixConfigValue::Text("sigmaos-production".to_string()));
+        engine.set_option("services.openssh.ports", NixConfigValue::Integer(2222));
+        let gen2 = engine.commit_generation(1716005000);
+        assert_eq!(gen2, 2);
+
+        assert_eq!(
+            engine.get_option("networking.hostName"),
+            Some(&NixConfigValue::Text("sigmaos-production".to_string()))
+        );
+
+        // 4. Perform dynamic <1s atomic rollback to Generation 1
+        assert!(engine.rollback_to_generation(gen1).is_ok());
+
+        assert_eq!(
+            engine.get_option("networking.hostName"),
+            Some(&NixConfigValue::Text("sigmaos-workspace".to_string()))
+        );
+        assert_eq!(
+            engine.get_option("services.openssh.ports"),
+            Some(&NixConfigValue::Integer(22))
+        );
+    }
+
+    #[test]
+    fn test_portage_slot_resolver() {
+        let mut resolver = PortageSlotResolver::new();
+
+        // 1. Merge Python 3.10 into slot "3.10"
+        assert!(resolver.merge_package(EbuildPackage {
+            name: "python".to_string(),
+            version: "3.10.12".to_string(),
+            slot: "3.10".to_string(),
+            use_flags: {
+                let mut v = Vec::new();
+                v.push("gdbm".to_string());
+                v
+            },
+        }).is_ok());
+
+        // 2. Merge Python 3.11 into slot "3.11" (different slot, can coexist!)
+        assert!(resolver.merge_package(EbuildPackage {
+            name: "python".to_string(),
+            version: "3.11.4".to_string(),
+            slot: "3.11".to_string(),
+            use_flags: {
+                let mut v = Vec::new();
+                v.push("gdbm".to_string());
+                v
+            },
+        }).is_ok());
+
+        assert_eq!(resolver.active_packages.len(), 2);
+
+        // 3. Try to merge Python 3.10.13 into slot "3.10" (slot collision!)
+        let collision_pkg = EbuildPackage {
+            name: "python".to_string(),
+            version: "3.10.13".to_string(),
+            slot: "3.10".to_string(),
+            use_flags: Vec::new(),
+        };
+        assert!(resolver.merge_package(collision_pkg).is_err());
+
+        // 4. Test optimization flags under USE flag profiles
+        assert_eq!(resolver.resolve_optimal_compiler_flags(), "-O2");
+
+        resolver.set_use_flag("march-native", true);
+        resolver.set_use_flag("lto", true);
+        let flags = resolver.resolve_optimal_compiler_flags();
+        assert!(flags.contains("-march=native"));
+        assert!(flags.contains("-flto"));
+    }
+
+    #[test]
+    fn test_debian_apt_package_resolver() {
+        let mut resolver = AptPackageResolver::new("amd64");
+
+        // 1. Add repository source
+        resolver.add_source_repository("deb http://deb.debian.org/debian bookworm main");
+        assert_eq!(resolver.sources_list[0], "deb http://deb.debian.org/debian bookworm main");
+
+        // 2. Setup Multi-Arch foreign architecture support
+        assert!(!resolver.multiarch.is_architecture_supported("i386"));
+        resolver.multiarch.add_foreign_architecture("i386");
+        assert!(resolver.multiarch.is_architecture_supported("i386"));
+
+        // Register available packages with various pinning priorities
+        resolver.set_pin_priority("libssl=1.1.1", 990); // higher pinning priority
+
+        resolver.register_available_package(AptPackageMetadata {
+            name: "libssl".to_string(),
+            version: "1.1.1".to_string(),
+            architecture: "i386".to_string(),
+            depends: Vec::new(),
+            pin_priority: 500, // will be overridden to 990 by pin priority registry
+        });
+
+        resolver.register_available_package(AptPackageMetadata {
+            name: "libssl".to_string(),
+            version: "3.0.2".to_string(),
+            architecture: "i386".to_string(),
+            depends: Vec::new(),
+            pin_priority: 100, // lower priority
+        });
+
+        resolver.register_available_package(AptPackageMetadata {
+            name: "curl".to_string(),
+            version: "7.88.1".to_string(),
+            architecture: "i386".to_string(),
+            depends: {
+                let mut v = Vec::new();
+                v.push("libssl".to_string());
+                v
+            },
+            pin_priority: 500,
+        });
+
+        // Try to install package for unsupported architecture (armhf) -> should fail
+        assert!(resolver.apt_get_install("curl", "armhf").is_err());
+
+        // Install curl:i386 -> should successfully install and pull in libssl:i386 (specifically v1.1.1 because of higher pin priority 990 vs 100)
+        assert!(resolver.apt_get_install("curl", "i386").is_ok());
+
+        assert_eq!(resolver.installed_packages.len(), 2);
+        let ssl_installed = resolver.installed_packages.iter().find(|p| p.name == "libssl").unwrap();
+        assert_eq!(ssl_installed.version, "1.1.1");
+        assert_eq!(ssl_installed.pin_priority, 990);
+
+        // Try to downgrade libssl:i386 to an available v1.1.0 with pin_priority <= 1000 -> should fail
+        resolver.set_pin_priority("libssl=1.1.0", 995); // higher priority than v1.1.1 (990) but <= 1000
+        resolver.register_available_package(AptPackageMetadata {
+            name: "libssl".to_string(),
+            version: "1.1.0".to_string(),
+            architecture: "i386".to_string(),
+            depends: Vec::new(),
+            pin_priority: 500, // overridden to 995
+        });
+        assert!(resolver.apt_get_install("libssl", "i386").is_err());
+
+        // Downgrade becomes allowed if priority is set > 1000
+        resolver.set_pin_priority("libssl=1.1.0", 1005);
+        resolver.available_packages.iter_mut().find(|p| p.name == "libssl" && p.version == "1.1.0").unwrap().pin_priority = 1005;
+        assert!(resolver.apt_get_install("libssl", "i386").is_ok());
+        let ssl_downgraded = resolver.installed_packages.iter().find(|p| p.name == "libssl").unwrap();
+        assert_eq!(ssl_downgraded.version, "1.1.0");
+    }
+
+    #[test]
+    fn test_debian_policy_enforcement_and_dfsg() {
+        let enforcer = DebianPolicyEnforcer::new();
+
+        // 1. DFSG Compliant (GPL-3.0) and FHS Compliant paths (/usr/bin) -> Compliant
+        assert!(enforcer.evaluate_package_compliance("grep", "GPL-3.0", &["/usr/bin/grep", "/etc/grep.conf"]).is_ok());
+
+        // 2. Proprietary license (non-free) -> Non-compliant
+        assert!(enforcer.evaluate_package_compliance("nvidia-driver", "Proprietary", &["/usr/lib/nvidia/"]).is_err());
+
+        // 3. FHS Non-compliant path (/opt/mycustomapp) -> Non-compliant
+        assert!(enforcer.evaluate_package_compliance("custom-app", "MIT", &["/opt/custom/app"]).is_err());
     }
 }
