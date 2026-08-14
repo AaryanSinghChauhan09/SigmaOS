@@ -129,6 +129,8 @@ pub struct GpuDriver {
     pub registered_pipelines: Vec<GpuPipeline>,
     pub bound_pipeline_id: Option<usize>,
     pub reset_state: GpuResetState,
+    pub crtc: Option<DrmCrtc>,
+    pub connector: Option<DrmConnector>,
 }
 
 impl GpuDriver {

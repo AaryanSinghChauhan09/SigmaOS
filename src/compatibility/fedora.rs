@@ -1270,3 +1270,4 @@ mod tests {
         assert_eq!(console.connected_clients, 0);
     }
 }
+// Fedora clean-room parity verified

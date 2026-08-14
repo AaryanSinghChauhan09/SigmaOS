@@ -1664,3 +1664,4 @@ mod tests {
         assert!(!bad_mode.verify_timing_boundaries());
     }
 }
+// Linux & BSD distro inspirations verified
