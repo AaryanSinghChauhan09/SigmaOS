@@ -50,15 +50,15 @@ impl PkgBuild {
         for line in content.lines() {
             let line = line.trim();
             if line.starts_with("pkgname=") {
-                pkg.pkgname = SigmaString::from_str(&line[9..].trim_matches('"'));
+                pkg.pkgname = SigmaString::from_str(line[8..].trim_matches('"'));
             } else if line.starts_with("pkgver=") {
-                pkg.pkgver = SigmaString::from_str(&line[8..].trim_matches('"'));
+                pkg.pkgver = SigmaString::from_str(line[7..].trim_matches('"'));
             } else if line.starts_with("pkgrel=") {
-                if let Ok(rel) = line[8..].trim_matches('"').parse::<u32>() {
+                if let Ok(rel) = line[7..].trim_matches('"').parse::<u32>() {
                     pkg.pkgrel = rel;
                 }
             } else if line.starts_with("pkgdesc=") {
-                pkg.pkgdesc = SigmaString::from_str(&line[9..].trim_matches('"'));
+                pkg.pkgdesc = SigmaString::from_str(line[8..].trim_matches('"'));
             }
             // Add more parsing as needed
         }
@@ -172,6 +172,37 @@ impl AlpmDatabase {
 impl Default for PkgBuild {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_pkgbuild_parsing() {
+        let content = "pkgname=\"neovim-git\"\npkgver=\"0.10.0\"\npkgrel=3\npkgdesc=\"Sovereign text editor\"\n";
+        let pkg = PkgBuild::parse(content).unwrap();
+        assert_eq!(pkg.pkgname.as_str(), "neovim-git");
+        assert_eq!(pkg.pkgver.as_str(), "0.10.0");
+        assert_eq!(pkg.pkgrel, 3);
+        assert_eq!(pkg.pkgdesc.as_str(), "Sovereign text editor");
+    }
+
+    #[test]
+    fn test_alpm_database_and_sandbox_compiler() {
+        let mut db = AlpmDatabase::new();
+        let compiler = SandboxedCompiler::new();
+        let client = AurClient::new();
+
+        assert!(client.download_and_compile_aur_package("neovim-git", &compiler, &mut db).is_ok());
+
+        let pkg = db.get_package("neovim-git").unwrap();
+        assert_eq!(pkg.pkgname.as_str(), "neovim-git");
+        assert_eq!(pkg.pkgver.as_str(), "1.0.0");
+        assert_eq!(pkg.pkgdesc.as_str(), "Downloaded and compiled safely from S-AUR.");
+
+        assert!(db.sync().is_ok());
     }
 }
 
