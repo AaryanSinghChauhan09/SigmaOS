@@ -855,6 +855,294 @@ impl OpenRCService {
     }
 }
 
+// ==========================================
+// 9. LINUX IO_URING SIMULATOR (SovereignIoUring)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IoUringOpcode {
+    Read,
+    Write,
+    Nop,
+}
+
+#[derive(Debug, Clone)]
+pub struct SubmissionQueueEntry {
+    pub opcode: IoUringOpcode,
+    pub fd: i32,
+    pub offset: u64,
+    pub user_data: u64,
+    pub data: Vec<u8>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CompletionQueueEntry {
+    pub user_data: u64,
+    pub result: i32, // negative represents errors (like -EINVAL), positive/zero is success or bytes read/written
+}
+
+/// Linux io_uring inspired asynchronous I/O engine
+pub struct SovereignIoUring {
+    pub sq: Vec<SubmissionQueueEntry>,
+    pub cq: Vec<CompletionQueueEntry>,
+    pub max_entries: usize,
+}
+
+impl SovereignIoUring {
+    pub fn new(entries: usize) -> Self {
+        Self {
+            sq: Vec::with_capacity(entries),
+            cq: Vec::with_capacity(entries),
+            max_entries: entries,
+        }
+    }
+
+    /// Submit an entry to the submission queue (SQ)
+    pub fn submit_entry(&mut self, sqe: SubmissionQueueEntry) -> Result<(), &'static str> {
+        if self.sq.len() >= self.max_entries {
+            return Err("Submission Queue is full");
+        }
+        self.sq.push(sqe);
+        Ok(())
+    }
+
+    /// Processes all SQ entries asynchronously/simulated and populates the Completion Queue (CQ)
+    pub fn submit_and_wait(&mut self) -> usize {
+        let mut processed = 0;
+        let entries: Vec<SubmissionQueueEntry> = self.sq.drain(..).collect();
+
+        for sqe in entries {
+            let res = match sqe.opcode {
+                IoUringOpcode::Nop => 0,
+                IoUringOpcode::Read => sqe.data.len() as i32,
+                IoUringOpcode::Write => sqe.data.len() as i32,
+            };
+
+            self.cq.push(CompletionQueueEntry {
+                user_data: sqe.user_data,
+                result: res,
+            });
+            processed += 1;
+        }
+
+        processed
+    }
+
+    /// Harvest a single Completion Queue Entry (CQE)
+    pub fn reap_cqe(&mut self) -> Option<CompletionQueueEntry> {
+        if self.cq.is_empty() {
+            None
+        } else {
+            Some(self.cq.remove(0))
+        }
+    }
+}
+
+// ==========================================
+// 10. LINUX LANDLOCK LSM SIMULATOR (SovereignLandlockLsm)
+// ==========================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LandlockAccess {
+    ReadOnly,
+    ReadWrite,
+    Execute,
+}
+
+#[derive(Debug, Clone)]
+pub struct LandlockRule {
+    pub path: String,
+    pub access: LandlockAccess,
+}
+
+/// Linux Landlock LSM inspired path-specific sandbox
+pub struct SovereignLandlockLsm {
+    pub rules: Vec<LandlockRule>,
+    pub is_enforced: bool,
+}
+
+impl SovereignLandlockLsm {
+    pub fn new() -> Self {
+        Self {
+            rules: Vec::new(),
+            is_enforced: false,
+        }
+    }
+
+    /// Add a path rule to the ruleset
+    pub fn add_rule(&mut self, path: &str, access: LandlockAccess) -> Result<(), &'static str> {
+        if self.is_enforced {
+            return Err("Ruleset is already enforced and immutable");
+        }
+        self.rules.push(LandlockRule {
+            path: path.to_string(),
+            access,
+        });
+        Ok(())
+    }
+
+    /// Enable ruleset enforcement
+    pub fn restrict_self(&mut self) {
+        self.is_enforced = true;
+    }
+
+    /// Check if a path can be accessed with a specific access type
+    pub fn check_access(&self, path: &str, access_type: LandlockAccess) -> bool {
+        if !self.is_enforced {
+            return true; // Not restricted yet
+        }
+
+        let mut best_match: Option<&LandlockRule> = None;
+
+        for rule in &self.rules {
+            if path == rule.path || (path.starts_with(&rule.path) && (rule.path == "/" || path.as_bytes().get(rule.path.len()) == Some(&b'/'))) {
+                match best_match {
+                    Some(best) if rule.path.len() > best.path.len() => {
+                        best_match = Some(rule);
+                    }
+                    None => {
+                        best_match = Some(rule);
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if let Some(rule) = best_match {
+            match (&rule.access, &access_type) {
+                (LandlockAccess::ReadWrite, _) => true, // ReadWrite allows anything
+                (LandlockAccess::ReadOnly, LandlockAccess::ReadOnly) => true,
+                (LandlockAccess::Execute, LandlockAccess::Execute) => true,
+                _ => false,
+            }
+        } else {
+            false // Denied by default if restricted and no matching rule
+        }
+    }
+}
+
+impl Default for SovereignLandlockLsm {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 11. LINUX KFIFO-INSPIRED SPSC LOCK-FREE RING BUFFER (SovereignRingBuffer)
+// ==========================================
+
+/// Single-producer single-consumer lock-free ring buffer directly modeled on Linux kfifo
+pub struct SovereignRingBuffer<T, const N: usize> {
+    pub buffer: [Option<T>; N],
+    pub write_idx: usize,
+    pub read_idx: usize,
+}
+
+impl<T, const N: usize> SovereignRingBuffer<T, N> {
+    pub const fn new() -> Self {
+        Self {
+            buffer: [const { None }; N],
+            write_idx: 0,
+            read_idx: 0,
+        }
+    }
+
+    /// Push an item into the ring buffer (lock-free SPSC)
+    pub fn push(&mut self, item: T) -> Result<(), &'static str> {
+        let next_write = (self.write_idx + 1) % N;
+        if next_write == self.read_idx {
+            return Err("Ring buffer is full");
+        }
+        self.buffer[self.write_idx] = Some(item);
+        self.write_idx = next_write;
+        Ok(())
+    }
+
+    /// Pop an item from the ring buffer (lock-free SPSC)
+    pub fn pop(&mut self) -> Option<T> {
+        if self.read_idx == self.write_idx {
+            None
+        } else {
+            let item = self.buffer[self.read_idx].take();
+            self.read_idx = (self.read_idx + 1) % N;
+            item
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.read_idx == self.write_idx
+    }
+
+    pub fn len(&self) -> usize {
+        if self.write_idx >= self.read_idx {
+            self.write_idx - self.read_idx
+        } else {
+            N - (self.read_idx - self.write_idx)
+        }
+    }
+}
+
+// ==========================================
+// 12. DRM/KMS ATOMIC MODESETTING SPECIFICATION (DrmModeInfo)
+// ==========================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DrmModeInfo {
+    pub clock: u32,
+    pub hdisplay: u16,
+    pub hsync_start: u16,
+    pub hsync_end: u16,
+    pub htotal: u16,
+    pub vdisplay: u16,
+    pub vsync_start: u16,
+    pub vsync_end: u16,
+    pub vtotal: u16,
+    pub vrefresh: u32,
+    pub flags: u32,
+    pub name: [u8; 32],
+}
+
+impl DrmModeInfo {
+    pub fn new(width: u16, height: u16, refresh: u32) -> Self {
+        let mut name = [0u8; 32];
+        let name_str = format!("{}x{}@{}", width, height, refresh);
+        let bytes = name_str.as_bytes();
+        let len = bytes.len().min(31);
+        for i in 0..len {
+            name[i] = bytes[i];
+        }
+
+        Self {
+            clock: (width as u32 * height as u32 * refresh) / 1000,
+            hdisplay: width,
+            hsync_start: width + 8,
+            hsync_end: width + 16,
+            htotal: width + 32,
+            vdisplay: height,
+            vsync_start: height + 2,
+            vsync_end: height + 4,
+            vtotal: height + 8,
+            vrefresh: refresh,
+            flags: 0,
+            name,
+        }
+    }
+
+    /// Verifies if the modesetting timing complies with standard refresh margins
+    pub fn verify_timing_boundaries(&self) -> bool {
+        if self.htotal <= self.hdisplay || self.vtotal <= self.vdisplay {
+            return false;
+        }
+        if self.hsync_start < self.hdisplay || self.hsync_end < self.hsync_start || self.hsync_end > self.htotal {
+            return false;
+        }
+        if self.vsync_start < self.vdisplay || self.vsync_end < self.vsync_start || self.vsync_end > self.vtotal {
+            return false;
+        }
+        true
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1233,5 +1521,125 @@ mod tests {
         let deleted2 = store.garbage_collect();
         assert!(deleted2.contains(&path1));
         assert!(deleted2.contains(&path2));
+    }
+
+    #[test]
+    fn test_sovereign_io_uring_queues() {
+        let mut io_uring = SovereignIoUring::new(4);
+
+        let sqe1 = SubmissionQueueEntry {
+            opcode: IoUringOpcode::Nop,
+            fd: 0,
+            offset: 0,
+            user_data: 42,
+            data: Vec::new(),
+        };
+
+        let sqe2 = SubmissionQueueEntry {
+            opcode: IoUringOpcode::Read,
+            fd: 3,
+            offset: 1024,
+            user_data: 43,
+            data: vec![0; 128],
+        };
+
+        assert!(io_uring.submit_entry(sqe1).is_ok());
+        assert!(io_uring.submit_entry(sqe2).is_ok());
+
+        // SQ should have 2 entries
+        assert_eq!(io_uring.sq.len(), 2);
+
+        // Submit and wait for processing
+        let processed = io_uring.submit_and_wait();
+        assert_eq!(processed, 2);
+        assert_eq!(io_uring.sq.len(), 0);
+        assert_eq!(io_uring.cq.len(), 2);
+
+        // Reap CQEs
+        let cqe1 = io_uring.reap_cqe().unwrap();
+        assert_eq!(cqe1.user_data, 42);
+        assert_eq!(cqe1.result, 0);
+
+        let cqe2 = io_uring.reap_cqe().unwrap();
+        assert_eq!(cqe2.user_data, 43);
+        assert_eq!(cqe2.result, 128); // bytes read/written length
+
+        assert!(io_uring.reap_cqe().is_none());
+    }
+
+    #[test]
+    fn test_sovereign_landlock_sandboxing() {
+        let mut lsm = SovereignLandlockLsm::new();
+
+        // Rules can only be added before self restriction
+        assert!(lsm.add_rule("/usr/bin", LandlockAccess::Execute).is_ok());
+        assert!(lsm.add_rule("/home/user", LandlockAccess::ReadOnly).is_ok());
+        assert!(lsm.add_rule("/home/user/downloads", LandlockAccess::ReadWrite).is_ok());
+
+        // Prior to restriction, all access is allowed
+        assert!(lsm.check_access("/etc/shadow", LandlockAccess::ReadWrite));
+
+        // Enforce sandboxing
+        lsm.restrict_self();
+
+        // Adding rule post restriction is rejected
+        assert!(lsm.add_rule("/tmp", LandlockAccess::ReadWrite).is_err());
+
+        // Check path matching and hierarchical permissions
+        assert!(lsm.check_access("/usr/bin/cargo", LandlockAccess::Execute));
+        assert!(!lsm.check_access("/usr/bin/cargo", LandlockAccess::ReadWrite)); // no write allowed
+
+        assert!(lsm.check_access("/home/user/document.txt", LandlockAccess::ReadOnly));
+        assert!(!lsm.check_access("/home/user/document.txt", LandlockAccess::ReadWrite));
+
+        // downloads subpath is ReadWrite (best match because it is longer than /home/user)
+        assert!(lsm.check_access("/home/user/downloads/movie.mp4", LandlockAccess::ReadWrite));
+        assert!(lsm.check_access("/home/user/downloads/movie.mp4", LandlockAccess::ReadOnly));
+
+        // /etc/shadow has no rules so it is denied by default under enforcement
+        assert!(!lsm.check_access("/etc/shadow", LandlockAccess::ReadOnly));
+    }
+
+    #[test]
+    fn test_sovereign_ring_buffer_fifo() {
+        let mut ring: SovereignRingBuffer<i32, 5> = SovereignRingBuffer::new();
+        assert!(ring.is_empty());
+        assert_eq!(ring.len(), 0);
+
+        assert!(ring.push(10).is_ok());
+        assert!(ring.push(20).is_ok());
+        assert!(ring.push(30).is_ok());
+        assert!(ring.push(40).is_ok());
+        assert_eq!(ring.len(), 4);
+
+        // Fifth push should fail because SPSC queue of capacity 5 allows at most 4 items (1 slot is always left empty to distinguish empty vs full)
+        assert!(ring.push(50).is_err());
+
+        assert_eq!(ring.pop(), Some(10));
+        assert_eq!(ring.pop(), Some(20));
+        assert_eq!(ring.len(), 2);
+
+        assert!(ring.push(50).is_ok());
+        assert_eq!(ring.len(), 3);
+
+        assert_eq!(ring.pop(), Some(30));
+        assert_eq!(ring.pop(), Some(40));
+        assert_eq!(ring.pop(), Some(50));
+        assert!(ring.pop().is_none());
+        assert!(ring.is_empty());
+    }
+
+    #[test]
+    fn test_drm_kms_modesetting_validation() {
+        let mode = DrmModeInfo::new(1920, 1080, 60);
+        assert!(mode.verify_timing_boundaries());
+        assert_eq!(mode.hdisplay, 1920);
+        assert_eq!(mode.vdisplay, 1080);
+        assert_eq!(mode.vrefresh, 60);
+
+        // Custom invalid timing should be caught
+        let mut bad_mode = mode;
+        bad_mode.htotal = 1900; // invalid total < display
+        assert!(!bad_mode.verify_timing_boundaries());
     }
 }
