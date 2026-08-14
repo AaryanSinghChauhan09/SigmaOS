@@ -479,7 +479,7 @@ impl HelenIpcManager {
         registration.increment_counter();
 
         // Execute top-half handler if present
-        let (method, arg1, arg2, arg3, arg4) = if let Some(ref handler) = registration.top_half_handler {
+        let (method, arg1, arg2, arg3, arg4) = if let Some(ref _handler) = registration.top_half_handler {
             // This is a simplified call - in real implementation would need proper mutability
             (irq as u64, registration.get_counter() as u64, 0, 0, 0)
         } else {

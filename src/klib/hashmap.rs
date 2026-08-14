@@ -248,6 +248,7 @@ where
         ValuesMut { iter: self.iter_mut(), _marker: core::marker::PhantomData }
     }
 
+    #[allow(unused_mut)]
     fn grow(&mut self) {
         let mut old_buckets = core::mem::replace(&mut self.buckets, Vec::new());
         self.capacity *= 2;

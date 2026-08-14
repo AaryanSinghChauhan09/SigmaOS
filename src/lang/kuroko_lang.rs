@@ -540,7 +540,7 @@ impl KurokoCompiler {
         }
     }
 
-    fn consume(&mut self, token_type: TokenType, message: &str) -> Result<&Token, KurokoError> {
+    fn consume(&mut self, token_type: TokenType, _message: &str) -> Result<&Token, KurokoError> {
         if self.check(token_type) {
             Ok(self.advance())
         } else {
@@ -1206,7 +1206,7 @@ fn builtin_input(vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValu
     Ok(KurokoValue::String("user_input".to_string()))
 }
 
-fn builtin_len(vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValue, KurokoError> {
+fn builtin_len(_vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValue, KurokoError> {
     if args.len() != 1 {
         return Err(KurokoError::ValueError);
     }
@@ -1219,7 +1219,7 @@ fn builtin_len(vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValue,
     }
 }
 
-fn builtin_type(vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValue, KurokoError> {
+fn builtin_type(_vm: &mut KurokoVM, args: Vec<KurokoValue>) -> Result<KurokoValue, KurokoError> {
     if args.len() != 1 {
         return Err(KurokoError::ValueError);
     }

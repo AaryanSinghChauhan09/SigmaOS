@@ -162,19 +162,19 @@ pub enum IntegrationError {
 }
 
 impl From<HelenIpcError> for IntegrationError {
-    fn from(error: HelenIpcError) -> Self {
+    fn from(_error: HelenIpcError) -> Self {
         IntegrationError::IpcError
     }
 }
 
 impl From<KurokoError> for IntegrationError {
-    fn from(error: KurokoError) -> Self {
+    fn from(_error: KurokoError) -> Self {
         IntegrationError::LanguageError
     }
 }
 
 impl From<TerminalError> for IntegrationError {
-    fn from(error: TerminalError) -> Self {
+    fn from(_error: TerminalError) -> Self {
         IntegrationError::TerminalError
     }
 }
