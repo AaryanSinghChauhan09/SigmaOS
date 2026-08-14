@@ -10,8 +10,8 @@ use core::mem;
 
 pub type BreakpointID = usize;
 
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[repr(usize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BreakpointType { Software = 0, Hardware = 1, Watchpoint = 2 }
 
 #[repr(C)]
