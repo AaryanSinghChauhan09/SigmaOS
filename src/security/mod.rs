@@ -123,6 +123,7 @@ pub use parrot_linux::{
     AnonsurfEngine, AnonymityMode, ForensicsAuditTool, RecoveredFile, KaliSniffer,
     SniffedPacket, PentestAssistant, SecureWipeTool, SigmaIDS, IntrusionSeverity, IntrusionAlert,
 };
+// NemoClaw Security Primitives
 pub use nemoclaw::{DefaultDenyNetworkPolicy, NemoClawError, OpenShellAgentSandbox, PrivacyRouter};
 
 pub struct CronDaemon;

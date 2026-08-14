@@ -9,6 +9,8 @@ pub mod rpm_compat;
 pub mod store;
 pub mod transaction;
 pub mod verifier;
+pub mod zero_alloc_resolver;
+pub mod declarative_build;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
 pub use debian_defeater::{SovereignMirrorSelector, SovereignTransactionManager, SovereignSandboxEnforcer, SovereignDeltaGenerator, TransactionStatus};

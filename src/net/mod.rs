@@ -15,7 +15,6 @@ pub mod signal_client;
 pub mod zenith;
 pub mod quic;
 pub mod pqc_vpn;
-pub mod smoltcp_integration;
 
 pub use stack::{
     BbrCongestionControl, CongestionControl, NFAction, NetDevice, Netfilter, NetfilterRule,
@@ -26,7 +25,3 @@ pub use tcpip_stack::{TCPIPStack, IPAddress, MACAddress, EthernetFrame, IPPacket
 pub use ipv6::{Ipv6Stack, Ipv6Address, Ipv6Header, Ipv6Interface, Ipv6Route, Ipv6AddressType};
 pub use quic::{SovereignQuicConnection, QuicConnectionState, QuicStream};
 pub use pqc_vpn::{PqcVpnTunnel, TunnelState};
-pub use smoltcp_integration::{
-    SmoltcpStack, SmoltcpInterface, SmoltcpSocket, SmoltcpSocketType, SmoltcpSocketState,
-    SmoltcpError, SmoltcpEvent, IpAddress, IpEndpoint, InterfaceConfig, DhcpClient, DnsClient,
-};

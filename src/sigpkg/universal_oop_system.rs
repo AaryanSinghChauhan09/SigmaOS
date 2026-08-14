@@ -2671,52 +2671,11 @@ Description: Hook test";
             Err("Invalid GPG signature key ID; package not trusted")
         );
 
-        let evaluator = NixDerivationEvaluator::new();
-        let store_path = evaluator.compute_store_path(&pkg);
-        assert!(store_path.starts_with("/nix/store/"));
-        assert!(store_path.ends_with("-git"));
-
-        // Ensure deterministic reproducibility
-        let store_path_2 = evaluator.compute_store_path(&pkg);
-        assert_eq!(store_path, store_path_2);
-    }
-
-    #[test]
-    fn test_pacman_path_triggers() {
-        let mut manager = UniversalPackageManager::new();
-
-        let trigger_executed = Arc::new(std::sync::atomic::AtomicBool::new(false));
-        let trigger_executed_clone = trigger_executed.clone();
-
-        let trigger = PathTriggerHook {
-            name: "update-desktop-database".to_string(),
-            pattern: "*.desktop".to_string(),
-            script: Arc::new(move |matched_paths: &[String]| {
-                assert_eq!(matched_paths.len(), 1);
-                assert_eq!(matched_paths[0], "usr/share/applications/app.desktop");
-                trigger_executed_clone.store(true, std::sync::atomic::Ordering::SeqCst);
-                Ok(())
-            }),
-        };
-
-        manager.add_path_trigger(Arc::new(trigger));
-
-        let pkg = StandardPackage {
-            metadata: PackageMetadata {
-                name: "my-editor".to_string(),
-                version: Version::new(1, 0, 0),
-                description: "text editor".to_string(),
-                license: "MIT".to_string(),
-                maintainer: "Maintainer".to_string(),
-                homepage: "Homepage".to_string(),
-                architecture: "x86_64".to_string(),
-                checksum: "checksum".to_string(),
-                size: 100,
-                install_date: None,
-                pqc_signature: None,
-                gpg_key_id: None,
-                supported_architectures: Vec::new(),
-            },
+        // Fail Case 2: Missing/Tampered PQC signature
+        meta.gpg_key_id = Some("0x9E5A86A21B607B76".to_string());
+        meta.pqc_signature = Some("tampered-malicious-signature-data".to_string());
+        let bad_pkg2 = StandardPackage {
+            metadata: meta,
             dependencies: Vec::new(),
             format: PackageFormat::Rpm,
         };

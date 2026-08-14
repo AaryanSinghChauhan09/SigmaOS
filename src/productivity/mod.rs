@@ -9,7 +9,7 @@ pub mod sigma_office;
 pub mod tasks;
 pub mod terminal;
 pub mod tmux;
-pub mod mind_map;
+pub mod editor;
 
 pub use advanced_app_absorber::{
     AudacityEditor, BraveBrowserEngine, EarTrumpetAudioRouter, EverythingSearchEngine,
@@ -49,6 +49,7 @@ pub use terminal::{
 pub use tmux::{
     LayoutPreset, SplitDirection, TmuxPane, TmuxSession, TmuxSessionManager, TmuxWindow,
 };
-pub use mind_map::{
-    MindMapCreator, MindMapNode, MindMapLayout, NodeShape, NodeStyle, RelationshipConnection,
+pub use editor::{
+    CodeEditor, Document as EditorDocument, EditorConfig, EditorError, Language as EditorLanguage,
+    LspClient, SyntaxHighlighter,
 };

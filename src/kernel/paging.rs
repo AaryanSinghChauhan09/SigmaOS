@@ -22,6 +22,9 @@ impl PageTableFlags {
     pub const USER_ACCESSIBLE: u64 = 1 << 2;
     pub const WRITE_THROUGH: u64 = 1 << 3;
     pub const NO_CACHE: u64 = 1 << 4;
+    pub const HUGE_PAGE: u64 = 1 << 7; // Page Size (PS) flag for huge pages
+    pub const COW: u64 = 1 << 9; // Copy-On-Write flag
+    pub const SWAPPED_OUT: u64 = 1 << 10; // Page is evacuated to swap disk space
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -177,270 +180,135 @@ impl VirtualMemoryManagerV2 {
     }
 }
 
-// =========================================================================
-// Memory Descriptor List (MDL) Architecture
-// =========================================================================
+// ==========================================
+// Virtual Memory Demand Paging & Swapping
+// ==========================================
 
-/// Represents a Memory Descriptor List (MDL) describing the physical layout of a virtual memory buffer.
-/// Inspired by the Windows and Linux/BSD kernel designs for handling DMA buffers,
-/// mapping user buffers to kernel space, locking physical pages, and virtual memory protection.
-#[derive(Debug, Clone)]
-pub struct MemoryDescriptorList {
-    pub virtual_address: u64,
-    pub byte_count: usize,
-    pub byte_offset: usize,
-    pub physical_pages: Vec<u64>,
-    pub is_probed: bool,
-    pub is_locked: bool,
-    pub is_mapped: bool,
-    pub mapped_kernel_address: Option<u64>,
-}
-
-impl MemoryDescriptorList {
-    /// Initialize a new Memory Descriptor List (MDL)
-    pub fn new(virtual_address: u64, byte_count: usize) -> Self {
-        let byte_offset = (virtual_address & 0xFFF) as usize;
-        let start_page = virtual_address & !0xFFF;
-        let end_page = (virtual_address + byte_count as u64 + 0xFFF) & !0xFFF;
-        let page_count = ((end_page - start_page) / 4096) as usize;
-
-        Self {
-            virtual_address,
-            byte_count,
-            byte_offset,
-            physical_pages: alloc::vec![0; page_count],
-            is_probed: false,
-            is_locked: false,
-            is_mapped: false,
-            mapped_kernel_address: None,
-        }
-    }
-
-    /// Probes and locks the physical pages associated with the virtual address range
-    pub fn probe_and_lock(&mut self, vmm: &VirtualMemoryManagerV2) -> Result<(), &'static str> {
-        if self.is_locked {
-            return Err("MDL is already locked");
-        }
-
-        let start_page = self.virtual_address & !0xFFF;
-        for i in 0..self.physical_pages.len() {
-            let virt = start_page + (i * 4096) as u64;
-            let phys = unsafe { vmm.translate(virt) }.ok_or("Virtual address page fault during probe")?;
-            self.physical_pages[i] = phys & !0xFFF;
-        }
-
-        self.is_probed = true;
-        self.is_locked = true;
-        Ok(())
-    }
-
-    /// Maps the physically locked pages of the MDL to a contiguous virtual buffer in kernel space
-    pub unsafe fn map_to_kernel_space(
-        &mut self,
-        mut kernel_start_virt: u64,
-        vmm: &mut VirtualMemoryManagerV2,
-        allocator: &mut dyn FnMut() -> Option<NonNull<PageTable>>,
-    ) -> Result<u64, &'static str> {
-        if !self.is_locked {
-            return Err("MDL must be locked before mapping");
-        }
-        if self.is_mapped {
-            return Err("MDL is already mapped");
-        }
-
-        let map_flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE);
-        for &phys in &self.physical_pages {
-            vmm.map_page(kernel_start_virt, phys, map_flags, allocator)?;
-            kernel_start_virt += 4096;
-        }
-
-        let mapped_address = kernel_start_virt - (self.physical_pages.len() * 4096) as u64 + self.byte_offset as u64;
-        self.mapped_kernel_address = Some(mapped_address);
-        self.is_mapped = true;
-        Ok(mapped_address)
-    }
-
-    /// Unmaps the mapped virtual buffer in kernel space
-    pub fn unmap(&mut self) {
-        self.mapped_kernel_address = None;
-        self.is_mapped = false;
-    }
-
-    /// Unlocks the physical pages
-    pub fn unlock(&mut self) {
-        self.is_locked = false;
-        self.is_probed = false;
-    }
-}
-
-// =========================================================================
-// Linux/BSD-Inspired Demand Paging and Copy-On-Write (COW) Subsystem
-// =========================================================================
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DemandPageType {
-    /// Zero-filled anonymous memory (malloc allocations)
-    Anonymous,
-    /// Backed by a virtual file (e.g. shared libraries, executable segments)
-    FileBacked,
-    /// Memory page swapped out to disk
-    SwapBacked,
+pub enum PageFaultReason {
+    LazyLoad,
+    SwappedOut,
+    CopyOnWrite,
+    ProtectionViolation,
 }
 
 #[derive(Debug, Clone)]
 pub struct DemandPageZone {
     pub start_address: u64,
-    pub size_bytes: usize,
-    pub zone_type: DemandPageType,
-    pub backing_file_id: Option<u64>,
-    pub backing_file_offset: usize,
-}
-
-impl DemandPageZone {
-    pub fn new(start: u64, size: usize, zone_type: DemandPageType) -> Self {
-        Self {
-            start_address: start,
-            size_bytes: size,
-            zone_type,
-            backing_file_id: None,
-            backing_file_offset: 0,
-        }
-    }
-
-    pub fn contains_address(&self, addr: u64) -> bool {
-        addr >= self.start_address && addr < self.start_address + self.size_bytes as u64
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PageFaultReason {
-    /// Page is not mapped in the page table (demand paging)
-    PageNotPresent,
-    /// Access violation (Write to read-only Copy-On-Write page)
-    WriteOnCopyOnWrite,
-    /// Access control violation (unprivileged access)
-    ProtectionViolation,
+    pub size_pages: usize,
+    pub allocated: HashMap<u64, u64>, // VirtAddr -> PhysAddr
+    pub swap_disk_blocks: HashMap<u64, Vec<u8>>, // VirtAddr -> Evacuated swap bytes
 }
 
 pub struct DemandPagingSubsystem {
-    pub zones: Vec<DemandPageZone>,
-    pub cow_shared_frames: BTreeMap<u64, usize>, // physical_frame_addr -> ref_count
+    pub managed_zones: HashMap<u64, DemandPageZone>, // PID -> Page zone
+    pub physical_lru_queue: Vec<(u64, u64)>,        // (PID, VirtAddr) for LRU tracking
+    pub max_physical_frames: usize,
+    pub swap_out_count: usize,
 }
 
 impl DemandPagingSubsystem {
-    pub fn new() -> Self {
+    pub fn new(max_physical_frames: usize) -> Self {
         Self {
-            zones: Vec::new(),
-            cow_shared_frames: BTreeMap::new(),
+            managed_zones: HashMap::new(),
+            physical_lru_queue: Vec::new(),
+            max_physical_frames,
+            swap_out_count: 0,
         }
     }
 
-    pub fn register_zone(&mut self, zone: DemandPageZone) {
-        self.zones.push(zone);
+    /// Registers a lazy demand-loadable zone for a process
+    pub fn register_lazy_zone(&mut self, pid: u64, start_address: u64, size_pages: usize) {
+        self.managed_zones.insert(pid, DemandPageZone {
+            start_address,
+            size_pages,
+            allocated: HashMap::new(),
+            swap_disk_blocks: HashMap::new(),
+        });
     }
 
-    /// Simulates handling a hardware page fault exception (x86_64 ISR Page Fault handler)
-    pub unsafe fn handle_page_fault(
+    /// Performs LRU eviction of physical frames when memory limit is reached (Tails & Linux Swap inspired)
+    pub fn evacuate_to_swap_lru(&mut self) -> Result<(u64, u64), &'static str> {
+        if self.physical_lru_queue.is_empty() {
+            return Err("No active frames in LRU queue to swap out");
+        }
+
+        // Evict the least-recently used page (oldest)
+        let (pid, virt_addr) = self.physical_lru_queue.remove(0);
+        let zone = self.managed_zones.get_mut(&pid).ok_or("Zone missing for pid")?;
+
+        if let Some(phys_addr) = zone.allocated.remove(&virt_addr) {
+            // Write to simulated swap disk block
+            let mut mock_swapped_bytes = vec![0u8; 4096];
+            mock_swapped_bytes[0] = 0xAA; // mock payload marker
+            zone.swap_disk_blocks.insert(virt_addr, mock_swapped_bytes);
+            self.swap_out_count += 1;
+            Ok((pid, virt_addr))
+        } else {
+            Err("Page metadata not found during swap-out")
+        }
+    }
+
+    /// Handles and resolves demand page faults natively
+    pub fn handle_demand_fault(
         &mut self,
-        faulting_address: u64,
-        reason: PageFaultReason,
-        vmm: &mut VirtualMemoryManagerV2,
-        allocator: &mut dyn FnMut() -> Option<NonNull<PageTable>>,
-        phys_page_allocator: &mut dyn FnMut() -> Option<u64>,
-    ) -> Result<String, &'static str> {
-        let aligned_addr = faulting_address & !0xFFF;
+        pid: u64,
+        fault_addr: u64,
+    ) -> Result<(PageFaultReason, u64), &'static str> {
+        let aligned_addr = fault_addr & !0xFFF;
 
-        // Verify if the faulting address lies in a registered VM zone
-        let zone = self.zones.iter().find(|z| z.contains_address(faulting_address))
-            .ok_or("Segmentation Fault: Address out of bounds of any memory zone")?;
-
-        match reason {
-            PageFaultReason::PageNotPresent => {
-                // Allocate a fresh physical frame (demand paging lazy allocation)
-                let phys_frame = phys_page_allocator().ok_or("Out of physical memory frames")?;
-
-                match zone.zone_type {
-                    DemandPageType::Anonymous => {
-                        // Map zero-filled page
-                        let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
-                        vmm.map_page(aligned_addr, phys_frame, flags, allocator)?;
-                        Ok(format!("Lazy Paging: Zero-filled page allocated at physical 0x{:X}", phys_frame))
-                    }
-                    DemandPageType::FileBacked => {
-                        // Map file contents on-demand (mmap parity)
-                        let file_offset = zone.backing_file_offset + (aligned_addr - zone.start_address) as usize;
-                        let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
-                        vmm.map_page(aligned_addr, phys_frame, flags, allocator)?;
-                        Ok(format!("File Paging: Loaded file_id={} offset={} into physical 0x{:X}",
-                            zone.backing_file_id.unwrap_or(0), file_offset, phys_frame))
-                    }
-                    DemandPageType::SwapBacked => {
-                        // Load page back from virtual swap partitions
-                        let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
-                        vmm.map_page(aligned_addr, phys_frame, flags, allocator)?;
-                        Ok(format!("Swap Paging: Paged-in page from virtual swap device into physical 0x{:X}", phys_frame))
-                    }
-                }
-            }
-            PageFaultReason::WriteOnCopyOnWrite => {
-                // Retrieve the current physical frame mapped to the virtual address
-                let old_phys = vmm.translate(aligned_addr).ok_or("Page missing from page tables during COW fault")?;
-                let old_frame_aligned = old_phys & !0xFFF;
-
-                let refs = self.cow_shared_frames.get(&old_frame_aligned).copied().unwrap_or(1);
-                if refs > 1 {
-                    // Duplicate frame dynamically (copying original contents)
-                    let new_phys_frame = phys_page_allocator().ok_or("Out of physical memory for COW frame duplication")?;
-
-                    // Decrement old shared frame reference count
-                    self.cow_shared_frames.insert(old_frame_aligned, refs - 1);
-
-                    // Re-map virtual page to the new duplicated physical frame with WRITABLE flags
-                    // First unmap / set unused to avoid Page Already Mapped error
-                    let pml4 = vmm.pml4_table.as_mut();
-                    let pml4_index = ((aligned_addr >> 39) & 0x1FF) as usize;
-                    let pdpt_index = ((aligned_addr >> 30) & 0x1FF) as usize;
-                    let pd_index = ((aligned_addr >> 21) & 0x1FF) as usize;
-                    let pt_index = ((aligned_addr >> 12) & 0x1FF) as usize;
-
-                    let pdpt_addr = pml4.entries[pml4_index].physical_frame().unwrap();
-                    let pdpt = &mut *(pdpt_addr as *mut PageTable);
-                    let pd_addr = pdpt.entries[pdpt_index].physical_frame().unwrap();
-                    let pd = &mut *(pd_addr as *mut PageTable);
-                    let pt_addr = pd.entries[pd_index].physical_frame().unwrap();
-                    let pt = &mut *(pt_addr as *mut PageTable);
-
-                    pt.entries[pt_index].set_unused();
-
-                    let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
-                    vmm.map_page(aligned_addr, new_phys_frame, flags, allocator)?;
-
-                    Ok(format!("COW Fault: Duplicated shared physical frame 0x{:X} to 0x{:X}", old_frame_aligned, new_phys_frame))
-                } else {
-                    // Only one reference remains - elevate permission flags in-place
-                    let pml4 = vmm.pml4_table.as_mut();
-                    let pml4_index = ((aligned_addr >> 39) & 0x1FF) as usize;
-                    let pdpt_index = ((aligned_addr >> 30) & 0x1FF) as usize;
-                    let pd_index = ((aligned_addr >> 21) & 0x1FF) as usize;
-                    let pt_index = ((aligned_addr >> 12) & 0x1FF) as usize;
-
-                    let pdpt_addr = pml4.entries[pml4_index].physical_frame().unwrap();
-                    let pdpt = &mut *(pdpt_addr as *mut PageTable);
-                    let pd_addr = pdpt.entries[pdpt_index].physical_frame().unwrap();
-                    let pd = &mut *(pd_addr as *mut PageTable);
-                    let pt_addr = pd.entries[pd_index].physical_frame().unwrap();
-                    let pt = &mut *(pt_addr as *mut PageTable);
-
-                    let flags = PageTableFlags(PageTableFlags::PRESENT | PageTableFlags::WRITABLE | PageTableFlags::USER_ACCESSIBLE);
-                    pt.entries[pt_index].set_frame(old_frame_aligned, flags);
-
-                    Ok(format!("COW Fault: Elevated exclusive frame 0x{:X} to writable in-place", old_frame_aligned))
-                }
-            }
-            PageFaultReason::ProtectionViolation => {
-                Err("Access Denied: Protection Violation")
+        // Check if zone exists and address boundaries
+        {
+            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
+            let page_offset = (aligned_addr - zone.start_address) / 4096;
+            if page_offset as usize >= zone.size_pages {
+                return Err("Fault address outside registered process memory boundaries");
             }
         }
+
+        // Case 1: Swapped Out Page
+        let is_swapped = {
+            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
+            zone.swap_disk_blocks.contains_key(&aligned_addr)
+        };
+
+        if is_swapped {
+            let zone = self.managed_zones.get_mut(&pid).ok_or("No mapped zone for PID")?;
+            zone.swap_disk_blocks.remove(&aligned_addr);
+            let reallocated_phys = aligned_addr + 0x5000_0000;
+            zone.allocated.insert(aligned_addr, reallocated_phys);
+            self.physical_lru_queue.push((pid, aligned_addr));
+            return Ok((PageFaultReason::SwappedOut, reallocated_phys));
+        }
+
+        // Case 2: Lazy Load Page (First access)
+        let is_allocated = {
+            let zone = self.managed_zones.get(&pid).ok_or("No mapped zone for PID")?;
+            zone.allocated.contains_key(&aligned_addr)
+        };
+
+        if !is_allocated {
+            // Check if we need to swap out a page first to respect physical limit
+            if self.physical_lru_queue.len() >= self.max_physical_frames {
+                let _ = self.evacuate_to_swap_lru()?;
+            }
+
+            let zone = self.managed_zones.get_mut(&pid).ok_or("No mapped zone for PID")?;
+            let new_phys = aligned_addr + 0x4000_0000; // Lazy dynamic mapping
+            zone.allocated.insert(aligned_addr, new_phys);
+            self.physical_lru_queue.push((pid, aligned_addr));
+            return Ok((PageFaultReason::LazyLoad, new_phys));
+        }
+
+        Err("Page fault cannot be handled by DemandPagingSubsystem")
+    }
+}
+
+impl Default for DemandPagingSubsystem {
+    fn default() -> Self {
+        Self::new(1024)
     }
 }
 
@@ -707,6 +575,42 @@ mod tests {
 
         // Reference count of the old shared physical frame should be decremented to 1
         assert_eq!(dp_subsystem.cow_shared_frames.get(&shared_phys_frame), Some(&1));
+    }
+
+    #[test]
+    fn test_demand_paging_subsystem_lazy_and_swap() {
+        let mut sub = DemandPagingSubsystem::new(2); // physical memory limit is 2 pages
+        sub.register_lazy_zone(100, 0x1000_0000, 10); // PID 100, start 0x1000_0000, size 10 pages
+
+        // 1. First access (Lazy load)
+        let (reason1, frame1) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
+        assert_eq!(reason1, PageFaultReason::LazyLoad);
+        assert_eq!(frame1, 0x1000_0000 + 0x4000_0000);
+        assert_eq!(sub.physical_lru_queue.len(), 1);
+
+        // 2. Second access (Lazy load)
+        let (reason2, frame2) = sub.handle_demand_fault(100, 0x1000_1000).unwrap();
+        assert_eq!(reason2, PageFaultReason::LazyLoad);
+        assert_eq!(sub.physical_lru_queue.len(), 2);
+
+        // 3. Third access exceeds physical limit (2) -> triggers swap eviction of first page
+        let (reason3, frame3) = sub.handle_demand_fault(100, 0x1000_2000).unwrap();
+        assert_eq!(reason3, PageFaultReason::LazyLoad);
+        assert_eq!(sub.swap_out_count, 1);
+        assert_eq!(sub.physical_lru_queue.len(), 2); // Capped at physical limit
+
+        // Verify that address 0x1000_0000 has been swapped out
+        let zone = sub.managed_zones.get(&100).unwrap();
+        assert!(zone.swap_disk_blocks.contains_key(&0x1000_0000));
+        assert!(!zone.allocated.contains_key(&0x1000_0000));
+
+        // 4. Access swapped out address -> triggers load from swap disk and swap recovery
+        let (reason4, frame4) = sub.handle_demand_fault(100, 0x1000_0000).unwrap();
+        assert_eq!(reason4, PageFaultReason::SwappedOut);
+        assert_eq!(frame4, 0x1000_0000 + 0x5000_0000);
+
+        let zone = sub.managed_zones.get(&100).unwrap();
+        assert!(!zone.swap_disk_blocks.contains_key(&0x1000_0000)); // Pulled back from swap
     }
 
     #[test]
