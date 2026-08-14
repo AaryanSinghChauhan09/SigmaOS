@@ -1579,4 +1579,4 @@ The core abstraction maps physical/virtual registers transparently, regardless o
 The device model is built completely from custom, self-contained primitives. It uses standard Rust traits with static polymorphic generics to eliminate dynamic runtime allocation and standard library overhead.
 
 ```rust
-// =======================================================================
+// ================================================================
