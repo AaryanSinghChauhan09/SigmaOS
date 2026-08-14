@@ -167,6 +167,47 @@ Detailed conceptual documentation is managed exclusively in the GitHub Wiki:
 
 ---
 
+## 🛠️ Operational Workstreams & Governance
+
+To transition SigmaOS into a production-grade competitor to mature systems, the core developers coordinate across six parallel execution tracks overseen by designated maintainer roles.
+
+### 📋 Actionable Engineering Workstreams
+
+1. **Packaging & Registry**:
+   - Establish `.spkg` metadata schemas including `capabilities-required` process privileges.
+   - Enforce cryptographic package integrity checking using signed repository index catalogs.
+
+2. **CI & Buildfarm**:
+   - Orchestrate continuous integration workflows on GitHub Actions across multi-architecture target matrices (x86_64, aarch64).
+   - Maintain reproducible build scripts and remote hermetic compilation caches.
+
+3. **Security & Supply Chain**:
+   - Automatically compile Software Bill of Materials (SBOM) manifests.
+   - Employ cargo-audit vulnerability scanning, signed Git commits, and code signature verification gateways.
+
+4. **Driver & Compatibility**:
+   - Deploy driver regression test harnesses executing standalone simulations of hardware blocks.
+   - Validate syscall translation filters (Proton/Wine-equivalent) against common POSIX test suites.
+
+5. **UX & Desktop**:
+   - Standardize portable application sandboxing packages for Zenith Desktop.
+   - Optimize widget tools, system localization templates, and automated accessibility screen reader checks.
+
+6. **Documentation & Onboarding**:
+   - Expand the canonical getting-started guides and maintain an Arch-style "How-to" wiki catalog.
+
+---
+
+### 👑 Sovereign OS Governance Roles
+
+* 🚀 **Release Lead**: Coordinates stable milestones, rollback release gates, and long-term support (LTS) policies.
+* ⚙️ **CI Engineer**: Manages GitHub Actions runner farms, reproducible artifact hashing, and regression benchmarks.
+* 🔌 **Driver Custodian**: Approves native hardware driver integrations, hardware abstraction layers, and I/O pipelines.
+* 🛡️ **Security Lead**: Performs threat modeling, capability auditing, CVE tracking, and coordinate security disclosure gates.
+* 📦 **Packaging Lead**: Oversees the `sigpkg` repository indexing, metadata lints, and package signing.
+
+---
+
 ## 📄 License
 
 Dual-licensed under MIT and GPL-2.0. See the `LICENSE` file for details.

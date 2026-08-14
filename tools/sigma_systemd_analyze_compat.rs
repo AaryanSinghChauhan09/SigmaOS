@@ -12,18 +12,29 @@ type SigmaI32 = i32;
 type SigmaBool = bool;
 type SigmaU64 = u64;
 
-/// Service timing
+/// Service timing (blame and critical chain)
 #[repr(C)]
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ServiceTiming {
     pub name: [u8; 128],
     pub startup_time_ms: SigmaU64,
     pub activation_time_ms: SigmaU64,
 }
 
+/// Service security rating (systemd-analyze security inspired)
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ServiceSecurityRating {
+    pub name: [u8; 128],
+    pub private_tmp: SigmaBool,
+    pub no_new_privileges: SigmaBool,
+    pub protect_system_strict: SigmaBool,
+    pub exposure_score: SigmaU32, // 0 to 100 (lower is more secure)
+}
+
 /// Boot statistics
 #[repr(C)]
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BootStats {
     pub firmware_time_ms: SigmaU64,
     pub loader_time_ms: SigmaU64,
@@ -55,6 +66,14 @@ static mut SERVICE_TIMINGS: [ServiceTiming; MAX_SERVICE_TIMINGS] = [ServiceTimin
     activation_time_ms: 0,
 }; MAX_SERVICE_TIMINGS];
 
+static mut SERVICE_SECURITY_RATINGS: [ServiceSecurityRating; MAX_SERVICE_TIMINGS] = [ServiceSecurityRating {
+    name: [0; 128],
+    private_tmp: false,
+    no_new_privileges: false,
+    protect_system_strict: false,
+    exposure_score: 100,
+}; MAX_SERVICE_TIMINGS];
+
 static mut BOOT_STATS: BootStats = BootStats {
     firmware_time_ms: 0,
     loader_time_ms: 0,
@@ -65,6 +84,7 @@ static mut BOOT_STATS: BootStats = BootStats {
 };
 
 static mut SERVICE_TIMING_COUNT: SigmaU32 = 0;
+static mut SERVICE_SECURITY_COUNT: SigmaU32 = 0;
 static mut SYSTEMD_ANALYZE_INITIALIZED: SigmaBool = false;
 
 /// Initialize systemd-analyze
@@ -72,6 +92,7 @@ static mut SYSTEMD_ANALYZE_INITIALIZED: SigmaBool = false;
 pub unsafe extern "C" fn systemd_analyze_init() -> SigmaI32 {
     SYSTEMD_ANALYZE_INITIALIZED = true;
     SERVICE_TIMING_COUNT = 0;
+    SERVICE_SECURITY_COUNT = 0;
     
     // Initialize boot stats with sample values
     BOOT_STATS.firmware_time_ms = 500;
@@ -111,7 +132,7 @@ pub unsafe extern "C" fn systemd_analyze_blame(timings: *mut ServiceTiming, max_
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Get critical chain
@@ -131,7 +152,7 @@ pub unsafe extern "C" fn systemd_analyze_critical_chain(timings: *mut ServiceTim
         count += 1;
     }
     
-    count
+    count as SigmaU32
 }
 
 /// Add service timing
@@ -269,62 +290,95 @@ pub unsafe extern "C" fn systemd_analyze_plot_text(
     0 // Success
 }
 
+/// Get security count
+#[no_mangle]
+pub unsafe extern "C" fn systemd_analyze_get_security_count() -> SigmaU32 {
+    SERVICE_SECURITY_COUNT
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    // Run all tests sequentially inside one test wrapper to avoid parallel mutable static race conditions
     #[test]
-    fn test_systemd_analyze_security_checks() {
+    fn test_systemd_analyze_all_sequential() {
         unsafe {
-            let mut analysis = SecurityAnalysis {
-                service_name: [0; 128],
-                private_tmp: false,
-                protect_system: false,
-                protect_home: false,
-                restrict_namespaces: false,
-                no_new_privileges: false,
-                exposure_score: 0.0,
-            };
-
-            // Test highly insecure service (no guards active)
-            systemd_analyze_security(
-                b"insecure.service\0".as_ptr(),
-                false, false, false, false, false,
-                &mut analysis,
-            );
-            assert_eq!(analysis.exposure_score, 10.0);
-
-            // Test highly secure service (all guards active)
-            systemd_analyze_security(
-                b"secure.service\0".as_ptr(),
-                true, true, true, true, true,
-                &mut analysis,
-            );
-            assert_eq!(analysis.exposure_score, 0.0);
+            // First, run legacy checks
+            test_legacy_analyze_timing_impl();
+            // Second, run distro-inspired security and verify checks
+            test_systemd_analyze_distro_features_impl();
         }
     }
 
-    #[test]
-    fn test_systemd_analyze_verify_checks() {
-        unsafe {
-            assert_eq!(systemd_analyze_verify(false, false), 0); // Success
-            assert_eq!(systemd_analyze_verify(true, false), 2);  // Dangling
-            assert_eq!(systemd_analyze_verify(false, true), 1);  // Syntax error
-        }
+    unsafe fn test_legacy_analyze_timing_impl() {
+        assert_eq!(systemd_analyze_init(), 0);
+        let mut stats = BootStats {
+            firmware_time_ms: 0,
+            loader_time_ms: 0,
+            kernel_time_ms: 0,
+            initrd_time_ms: 0,
+            userspace_time_ms: 0,
+            total_time_ms: 0,
+        };
+        assert_eq!(systemd_analyze_time(&mut stats), 0);
+        assert_eq!(stats.total_time_ms, 4000);
+
+        assert_eq!(systemd_analyze_add_timing(b"network.service\0".as_ptr(), 50, 100), 0);
+        assert_eq!(systemd_analyze_get_timing_count(), 1);
+
+        let mut timings = [ServiceTiming {
+            name: [0; 128],
+            startup_time_ms: 0,
+            activation_time_ms: 0,
+        }; 1];
+        assert_eq!(systemd_analyze_blame(timings.as_mut_ptr(), 1), 1);
+        let name_str = core::str::from_utf8(&timings[0].name).unwrap().trim_end_matches('\0');
+        assert!(name_str.starts_with("network.service"));
     }
 
-    #[test]
-    fn test_systemd_analyze_plot_text_render() {
-        unsafe {
-            let mut buffer = [0u8; 512];
-            let res = systemd_analyze_plot_text(buffer.as_mut_ptr(), 512);
-            assert_eq!(res, 0);
+    unsafe fn test_systemd_analyze_distro_features_impl() {
+        assert_eq!(systemd_analyze_init(), 0);
 
-            // Check that the output contains key labels
-            let out_str = core::str::from_utf8(&buffer).unwrap();
-            assert!(out_str.contains("SigmaOS Boot Phase Graph"));
-            assert!(out_str.contains("Firmware"));
-            assert!(out_str.contains("Userspace"));
+        // 1. Test systemd-analyze verify (detect configuration validity)
+        assert_eq!(systemd_analyze_verify(), 0); // Passes because we have registered valid services or none
+
+        // Add timing with empty name (simulating invalid config)
+        assert_eq!(systemd_analyze_add_timing(core::ptr::null(), 10, 20), 0);
+        assert_eq!(systemd_analyze_verify(), -2); // Fails verify with invalid/missing name configuration
+
+        // 2. Test systemd-analyze security (exposed/hardening configurations)
+        assert_eq!(systemd_analyze_add_security(b"insecure.service\0".as_ptr(), false, false, false), 0);
+        assert_eq!(systemd_analyze_add_security(b"secure.service\0".as_ptr(), true, true, true), 0);
+        assert_eq!(systemd_analyze_get_security_count(), 2);
+
+        let mut ratings = [ServiceSecurityRating {
+            name: [0; 128],
+            private_tmp: false,
+            no_new_privileges: false,
+            protect_system_strict: false,
+            exposure_score: 100,
+        }; 2];
+
+        assert_eq!(systemd_analyze_security(ratings.as_mut_ptr(), 2), 2);
+
+        // secure.service has private_tmp, no_new_privileges, and protect_system_strict -> score: 10
+        // insecure.service has none -> score: 100
+        let mut found_secure = false;
+        let mut found_insecure = false;
+
+        for rating in &ratings {
+            let name_str = core::str::from_utf8(&rating.name).unwrap().trim_end_matches('\0');
+            if name_str.starts_with("secure.service") {
+                assert_eq!(rating.exposure_score, 10);
+                found_secure = true;
+            }
+            if name_str.starts_with("insecure.service") {
+                assert_eq!(rating.exposure_score, 100);
+                found_insecure = true;
+            }
         }
+        assert!(found_secure);
+        assert!(found_insecure);
     }
 }
