@@ -135,7 +135,7 @@ impl SimpleSecret {
     }
 
     pub fn set_data(&mut self, data: &[u8]) {
-        let len = data.len().min(511);
+        let len = data.len().min(512);
         unsafe {
             core::ptr::copy_nonoverlapping(data.as_ptr(), self.data.as_mut_ptr(), len);
         }
@@ -166,6 +166,10 @@ impl Secret for SimpleSecret {
             return Err(SecretError::PermissionDenied);
         }
 
+        if key.is_empty() {
+            return Err(SecretError::InvalidKey);
+        }
+
         if self.is_encrypted.load(Ordering::SeqCst) {
             return Err(SecretError::EncryptionFailed);
         }
@@ -182,6 +186,10 @@ impl Secret for SimpleSecret {
     fn decrypt(&mut self, key: &[u8]) -> Result<(), SecretError> {
         if !self.capability.can_read {
             return Err(SecretError::PermissionDenied);
+        }
+
+        if key.is_empty() {
+            return Err(SecretError::InvalidKey);
         }
 
         if !self.is_encrypted.load(Ordering::SeqCst) {
@@ -399,6 +407,28 @@ mod tests {
 
         let retrieved = keyring.get_secret(1).unwrap();
         assert_eq!(retrieved.name(), b"TestSecret");
+    }
+
+    #[test]
+    fn test_empty_key_encryption_rejection() {
+        let secret_cap = SecretCapability::full();
+        let mut secret = SimpleSecret::new(1, b"SecretKey", SecretType::Password, secret_cap);
+        secret.set_data(b"SensitiveData123");
+
+        // Attempting to encrypt with an empty key must fail gracefully without panic
+        let err = secret.encrypt(b"");
+        assert!(matches!(err, Err(SecretError::InvalidKey)));
+
+        // Verify encryption succeeds with a valid key
+        assert!(secret.encrypt(b"secretkey123").is_ok());
+
+        // Attempting to decrypt with an empty key must fail gracefully without panic
+        let err_dec = secret.decrypt(b"");
+        assert!(matches!(err_dec, Err(SecretError::InvalidKey)));
+
+        // Decryption succeeds with valid key
+        assert!(secret.decrypt(b"secretkey123").is_ok());
+        assert_eq!(secret.get_data(), b"SensitiveData123");
     }
 }
 
