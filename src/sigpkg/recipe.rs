@@ -1,58 +1,7 @@
-// SigmaOS Package Recipes (Gentoo Ebuild, Arch PKGBUILD, and FreeBSD Ports parity)
-// Build recipes for package compilation, USE flags, conditional dependencies, checksum arrays, and licenses.
+// SigmaOS Package Recipes
+// Build recipes for package compilation and installation
 
-#![no_std]
-
-#[cfg(test)]
-extern crate std;
-
-extern crate alloc;
-
-use alloc::string::String;
-use alloc::string::ToString;
-use alloc::format;
-use alloc::vec::Vec;
-
-#[cfg(test)]
-mod test_types {
-    use alloc::string::String;
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-    pub struct Version {
-        pub major: u64,
-        pub minor: u64,
-        pub patch: u64,
-    }
-    impl Version {
-        pub fn new(major: u64, minor: u64, patch: u64) -> Self {
-            Self { major, minor, patch }
-        }
-    }
-    impl core::fmt::Display for Version {
-        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-            write!(f, "{}.{}.{}", self.major, self.minor, self.patch)
-        }
-    }
-    #[derive(Debug, Clone)]
-    pub struct Dependency {
-        pub name: String,
-        pub version_constraint: VersionConstraint,
-    }
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum VersionConstraint {
-        Any,
-    }
-}
-
-#[cfg(test)]
-use test_types::{Version, Dependency, VersionConstraint};
-
-#[cfg(not(test))]
-use crate::sigpkg::{Dependency, Version};
-
-#[cfg(not(test))]
-use crate::klib::HashMap;
-
-#[cfg(test)]
+use crate::sigpkg::{Dependency, Version, VersionConstraint};
 use std::collections::HashMap;
 
 /// Build system type
@@ -66,7 +15,7 @@ pub enum BuildSystem {
     Ninja,
 }
 
-/// Package recipe with Gentoo, Arch, and Ports capabilities
+/// Package recipe
 #[derive(Debug, Clone)]
 pub struct PackageRecipe {
     pub name: String,
@@ -78,18 +27,12 @@ pub struct PackageRecipe {
     pub hash: String,
     pub build_commands: Vec<String>,
     pub install_commands: Vec<String>,
+    pub prepare_commands: Vec<String>,
+    pub pkgrel: u32,
     pub environment: HashMap<String, String>,
-
-    // Gentoo-style USE flags and conditional dependencies
-    pub use_flags: HashMap<String, bool>,
-    pub conditional_dependencies: Vec<(String, Dependency)>, // use_flag -> conditional dependency
-
-    // Arch Linux-style checksum arrays & supported architectures
-    pub sha256sums: Vec<String>,
-    pub supported_archs: Vec<String>,
-
-    // FreeBSD ports-style licenses and config options
-    pub license: String,
+    pub arch: String,
+    pub license_spdx: String,
+    pub package_commands: Vec<String>,
 }
 
 impl PackageRecipe {
@@ -104,12 +47,12 @@ impl PackageRecipe {
             hash: String::new(),
             build_commands: Vec::new(),
             install_commands: Vec::new(),
+            prepare_commands: Vec::new(),
+            pkgrel: 1,
             environment: HashMap::new(),
-            use_flags: HashMap::new(),
-            conditional_dependencies: Vec::new(),
-            sha256sums: Vec::new(),
-            supported_archs: Vec::new(),
-            license: "MIT".to_string(),
+            arch: "x86_64".to_string(),
+            license_spdx: "GPL".to_string(),
+            package_commands: Vec::new(),
         }
     }
 
@@ -125,7 +68,6 @@ impl PackageRecipe {
 
     pub fn with_source(mut self, url: String, hash: String) -> Self {
         self.source_url = url;
-        self.sha256sums.push(hash.clone());
         self.hash = hash;
         self
     }
@@ -146,11 +88,12 @@ impl PackageRecipe {
     }
 
     pub fn with_prepare_command(mut self, command: String) -> Self {
-        self.build_commands.insert(0, command);
+        self.prepare_commands.push(command);
         self
     }
 
-    pub fn with_pkgrel(self, _pkgrel: u32) -> Self {
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
         self
     }
 
@@ -159,27 +102,23 @@ impl PackageRecipe {
         self
     }
 
-    /// Gentoo ebuild builder helper: registers a USE flag with its default state
-    pub fn with_use_flag(mut self, flag_name: &str, enabled: bool) -> Self {
-        self.use_flags.insert(flag_name.to_string(), enabled);
+    pub fn with_pkgrel(mut self, pkgrel: u32) -> Self {
+        self.pkgrel = pkgrel;
         self
     }
 
-    /// Gentoo ebuild builder helper: registers a dependency activated only if a specific USE flag is enabled
-    pub fn with_conditional_dependency(mut self, use_flag: &str, dep: Dependency) -> Self {
-        self.conditional_dependencies.push((use_flag.to_string(), dep));
+    pub fn with_arch(mut self, arch: String) -> Self {
+        self.arch = arch;
         self
     }
 
-    /// Arch-style builder helper: registers multiple supported architectures
-    pub fn with_arch(mut self, arch: &str) -> Self {
-        self.supported_archs.push(arch.to_string());
+    pub fn with_prepare_command(mut self, command: String) -> Self {
+        self.prepare_commands.push(command);
         self
     }
 
-    /// Ports-style builder helper: configures package license type
-    pub fn with_license(mut self, lic: &str) -> Self {
-        self.license = lic.to_string();
+    pub fn with_package_command(mut self, command: String) -> Self {
+        self.package_commands.push(command);
         self
     }
 
@@ -201,28 +140,25 @@ impl PackageRecipe {
 
     pub fn get_build_script(&self) -> String {
         match self.build_system {
-            BuildSystem::Cargo => "cargo build --release\ncargo install --path .".to_string(),
-            BuildSystem::Make => "make -j$(nproc)\nmake install".to_string(),
+            BuildSystem::Cargo => {
+                format!("cargo build --release\ncargo install --path .")
+            }
+            BuildSystem::Make => {
+                format!("make -j$(nproc)\nmake install")
+            }
             BuildSystem::CMake => {
-                "mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install".to_string()
+                format!("mkdir -p build\ncd build\ncmake ..\nmake -j$(nproc)\nmake install")
             }
-            BuildSystem::Autotools => "./configure\nmake -j$(nproc)\nmake install".to_string(),
+            BuildSystem::Autotools => {
+                format!("./configure\nmake -j$(nproc)\nmake install")
+            }
             BuildSystem::Meson => {
-                "meson setup build\nmeson compile -C build\nmeson install -C build".to_string()
+                format!("meson setup build\nmeson compile -C build\nmeson install -C build")
             }
-            BuildSystem::Ninja => "ninja\nninja install".to_string(),
-        }
-    }
-
-    /// Returns all active dependencies, consolidating static and active conditional USE flag dependencies
-    pub fn resolve_active_dependencies(&self) -> Vec<Dependency> {
-        let mut active: Vec<Dependency> = self.dependencies.clone();
-        for (flag, dep) in &self.conditional_dependencies {
-            if let Some(&true) = self.use_flags.get(flag) {
-                active.push(dep.clone());
+            BuildSystem::Ninja => {
+                format!("ninja\nninja install")
             }
         }
-        active
     }
 }
 
@@ -339,37 +275,24 @@ mod tests {
     }
 
     #[test]
-    fn test_distro_inspired_ebuild_ports_features() {
-        let ssl_dep = Dependency {
-            name: "openssl".to_string(),
-            version_constraint: VersionConstraint::Any,
-        };
-        let mut recipe = PackageRecipe::new("nginx-sovereign".to_string(), Version::new(1, 25, 0))
-            .with_source("https://nginx.org/nginx-1.25.0.tar.gz".to_string(), "sha-abc-123".to_string())
-            .with_build_command("make".to_string())
-            .with_license("BSD-2-Clause")
-            .with_arch("x86_64")
-            .with_arch("aarch64")
-            // 1. Gentoo ebuild USE flags
-            .with_use_flag("ssl", true)
-            .with_use_flag("http2", false)
-            // 2. Conditional ebuild dependencies
-            .with_conditional_dependency("ssl", ssl_dep);
+    fn test_pkgbuild_and_aur_compilation_fields() {
+        let recipe = PackageRecipe::new("neofetch-pqc".to_string(), Version::new(7, 1, 0))
+            .with_pkgrel(3)
+            .with_arch("aarch64".to_string())
+            .with_source(
+                "https://github.com/dylanaraps/neofetch".to_string(),
+                "hash_neofetch".to_string(),
+            )
+            .with_prepare_command("patch -p1 < pqc_patch.diff".to_string())
+            .with_build_command("make build".to_string())
+            .with_package_command("make DESTDIR=\"$pkgdir\" install".to_string());
 
-        // Under enabled 'ssl' flag, should pull in openssl dependency
-        let active_deps = recipe.resolve_active_dependencies();
-        assert_eq!(active_deps.len(), 1);
-        assert_eq!(active_deps[0].name, "openssl");
-
-        // Toggle 'ssl' flag off -> conditional dependency is no longer active
-        recipe.use_flags.insert("ssl".to_string(), false);
-        let active_deps_off = recipe.resolve_active_dependencies();
-        assert_eq!(active_deps_off.len(), 0);
-
-        // Verify Arch & Ports metadata
-        assert_eq!(recipe.license, "BSD-2-Clause");
-        assert_eq!(recipe.supported_archs.len(), 2);
-        assert_eq!(recipe.supported_archs[1], "aarch64");
-        assert_eq!(recipe.sha256sums[0], "sha-abc-123");
+        assert_eq!(recipe.pkgrel, 3);
+        assert_eq!(recipe.arch, "aarch64");
+        assert_eq!(recipe.prepare_commands[0], "patch -p1 < pqc_patch.diff");
+        assert_eq!(
+            recipe.package_commands[0],
+            "make DESTDIR=\"$pkgdir\" install"
+        );
     }
 }

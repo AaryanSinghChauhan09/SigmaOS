@@ -20,7 +20,7 @@ pub enum PlaybackState {
 pub enum MediaFormat {
     Mp3,
     Wav,
-    Flac,
+    Ogg,
 }
 
 pub struct AudioChannel {
@@ -32,7 +32,9 @@ pub struct SigmaMediaEngine {
     pub channels: [AudioChannel; MAX_AUDIO_CHANNELS],
     pub master_mute: AtomicBool,
     pub state: PlaybackState,
-    pub has_track: bool,
+    pub active_track: Option<String>,
+    pub format: Option<MediaFormat>,
+    pub duration_seconds: usize,
 }
 
 unsafe impl Sync for SigmaMediaEngine {}
@@ -60,31 +62,10 @@ impl SigmaMediaEngine {
             ],
             master_mute: AtomicBool::new(false),
             state: PlaybackState::Stopped,
-            has_track: false,
+            active_track: None,
+            format: None,
+            duration_seconds: 0,
         }
-    }
-
-    pub fn play(&mut self) -> Result<(), &'static str> {
-        if !self.has_track {
-            return Err("No track loaded");
-        }
-        self.state = PlaybackState::Playing;
-        Ok(())
-    }
-
-    pub fn load_track(&mut self, name: alloc::string::String, format: MediaFormat, duration: u32) {
-        self.has_track = true;
-        self.state = PlaybackState::Stopped;
-    }
-
-    pub fn pause(&mut self) {
-        if self.state == PlaybackState::Playing {
-            self.state = PlaybackState::Paused;
-        }
-    }
-
-    pub fn stop(&mut self) {
-        self.state = PlaybackState::Stopped;
     }
 
     /// Plays a raw chiptune sound buffer over an active audio channel
@@ -277,67 +258,24 @@ impl SigmaSupportSubtitleEdit {
 mod tests {
     use super::*;
 
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum PlaybackState {
-        Stopped,
-        Playing,
-        Paused,
-    }
-
-    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    pub enum MediaFormat {
-        Mp3,
-    }
-
-    struct SigmaMediaEngine {
-        pub state: PlaybackState,
-        pub track: Option<String>,
-    }
-
-    impl SigmaMediaEngine {
-        pub fn new() -> Self {
-            Self {
-                state: PlaybackState::Stopped,
-                track: None,
-            }
-        }
-
-        pub fn play(&mut self) -> Result<(), &'static str> {
-            if self.track.is_none() {
-                return Err("No track loaded");
-            }
-            self.state = PlaybackState::Playing;
-            Ok(())
-        }
-
-        pub fn load_track(&mut self, name: String, _format: MediaFormat, _duration: usize) {
-            self.track = Some(name);
-        }
-
-        pub fn pause(&mut self) {
-            self.state = PlaybackState::Paused;
-        }
-
-        pub fn stop(&mut self) {
-            self.state = PlaybackState::Stopped;
-        }
-    }
-
     #[test]
     fn test_media_playback() {
         let mut engine = SigmaMediaEngine::new();
-        assert!(!engine.master_mute.load(core::sync::atomic::Ordering::SeqCst));
-        assert_eq!(engine.channels.len(), 4);
+        assert_eq!(engine.state, PlaybackState::Stopped);
+        assert!(engine.play().is_err());
+
+        engine.load_track("Symphony-9.mp3".to_string(), MediaFormat::Mp3, 340);
+        assert_eq!(engine.state, PlaybackState::Stopped);
+
+        assert!(engine.play().is_ok());
+        assert_eq!(engine.state, PlaybackState::Playing);
+
+        engine.pause();
+        assert_eq!(engine.state, PlaybackState::Paused);
+
+        engine.stop();
+        assert_eq!(engine.state, PlaybackState::Stopped);
     }
-
-    #[test]
-
-
-    #[test]
-
-
-    #[test]
-
 
     #[test]
     fn test_aegisub_styling_tags() {

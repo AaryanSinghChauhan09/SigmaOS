@@ -1,153 +1,83 @@
 // SigmaOS Compatibility Module
-pub mod absorb_tools;
-pub mod android_chromeos;
-pub mod apache_ossie;
-pub mod chimera_linux;
-pub mod cross_platform;
-pub mod india_stack;
-pub mod india_professional_tools;
-pub mod alpine_linux;
-pub mod interim;
-pub mod jehanne;
-pub mod macos_darwin;
-pub mod mint_linux;
-pub mod reactos;
-pub mod lubuntu;
 pub mod antix;
-pub mod bodhi_moksha;
-pub mod cachy_os;
+pub mod canonical;
 pub mod chakra;
-pub mod endeavour;
-pub mod garuda_zen;
-pub mod gentoo;
-pub mod tiny_core;
-pub mod localsend;
-pub mod arch_linux;
-
-pub use macos_darwin::{
-    ApfsFileClone, ApfsSnapshot, ApfsSnapshotManager, AudioStreamDescription, CoreAudioHalRouter,
-    CoreAudioNode, FatArch, LaunchdJobConfig, LaunchdServiceManager, LaunchdState, MachO64Header,
-    MachOLoader, MachOSegment64, SpotlightMetadata, SpotlightMetadataIndex, FAT_MAGIC,
-    LC_LOAD_DYLIB, LC_MAIN, LC_SEGMENT_64, MH_MAGIC_64,
-};
-
-pub use android_chromeos::{
-    AndroidActivity, AndroidAppManifest, ApkManifestParser, ArtBytecodeSandbox,
-    CrostiniContainerBridge, CrostiniState, DexClassDef, IntentRouter, IntentTarget, PartitionSlot,
-    VerifiedBootSlotSwitcher,
-};
-
-pub use arch_linux::{
-    ProcFile, ProcFileType, DevFile, DevFileType, ArchPackage, PacmanError as PacmanCompatError,
-    PacmanEngine, RunlevelTarget, SystemdBootMetrics, ArchInitSystem, RuleAction, FirewallRule,
-    ArchFirewall, LsmMode, LsmSentinel, PamGate, TmuxMultiplexer, SovereignEnvRegistry,
-    YayParuAdapter, ReflectorMirrorlist, ArchinstallParity, ArtixInitBridge, PacmanKeyring,
-    AurPatchEngine,
-};
-
-pub use zorin::{
-    ZorinLayoutSwitcher,
-    ZorinChameleonEngine,
-    ZorinConnectManager,
-    ZorinWindowsAppSupport,
-};
+pub mod cross_platform;
 pub mod historic_linux;
+pub mod mint_linux;
+pub mod chimera_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
-pub mod sovereign_suite;
 pub mod wasm_sandbox;
-pub mod open_source_tier1;
+pub mod absorb_tools;
+pub mod tiny_core;
+pub mod apache_ossie;
+pub mod sovereign_suite;
+pub mod gentoo;
+pub mod legacy_adapters;
 
-pub use open_source_tier1::{
-    WasmerIntegration, SmolTcpIntegration, LibsodiumIntegration, SqliteIntegration,
-};
-
-pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
-pub use fedora::{
-    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
-    SovereignOstreeDeployer, SovereignSeLinuxContext, SovereignSeLinuxEngine,
-    SovereignFirewalldManager, SovereignCockpitConsole,
-};
-pub use legacy_adapters::{
-    KernelPersona, KernelPersonaVM, LibcVersion, SyscallAbi, BinaryCompatMatrix,
-    APITimelineManager, LegacyBus, StorageBridge, GraphicsBridge, WorkloadProfile,
-    WorkloadOptimizer, DiscontinuedFS, DriverBridge, FSRevival,
-    LegacyPluginManager, NetworkBridge, GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER,
-    GLOBAL_WORKLOAD_OPTIMIZER,
-};
-
-pub use constellation_mesh::{
-    BIOSGatewayMesh, BuildCodexGrid, CRTMesh, ConstellationNode, CorebootGatewayMesh,
-    DACConstellation, DotMatrixMesh, DriverArchiveGridV2, FileAlmanacHub, FirmwareGatewayMesh,
-    FloppyMesh, GraphicsArchiveGridV2, KernelConstellationGrid, LegacyAsmCodexGrid,
-    LegacyCCodexGrid, LegacyCppCodexGrid, NetworkAlmanacHub, NetworkArchiveGridV2,
-    PeripheralArchiveMesh, ProcessAlmanacHub, SELinuxConstellation, SecurityConstellation,
-    StorageArchiveGridV2, SyscallAlmanacHub, TapeMesh, UEFIGatewayMesh, ZeroTrustConstellation,
-};
+pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-pub use india_stack::{GstCalculator, IndiaStackError, MockUPIService, MultilingualSupport};
-pub use india_professional_tools::{
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
-    SpacSatResolver,
-};
-pub use alpine_linux::{
-    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
-    AlpineSyslogManager, BusyBoxMulticall,
-};
-pub use interim::{InterimLispVM, LispVal, MntReformLpcDriver, ReformPowerStats};
-pub use jehanne::{
-    ComputeNode, DistributedComputeHandoff, JehanneError, JehanneNamespace, NamespaceBindEntry,
-    Plan9pMessage, Plan9pMsgType,
+
+pub use legacy_adapters::{
+    APITimelineManager, BinaryCompatMatrix, DiscontinuedFS, DriverBridge, FSRevival,
+    GraphicsBridge, KernelPersona, KernelPersonaVM, LegacyBus, LegacyDriver, LegacyPluginManager,
+    LibcVersion, NetworkBridge, StorageBridge, SyscallAbi, WorkloadOptimizer, WorkloadProfile,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 
-pub use mint_linux::{
-    MintBackupTool, MintSoftwareManager, MintUpdateLevel, MintUpdateManager,
-    MintCinnamonStyling, MintDriverInfo, MintDriverManager, MintReportAlert,
-    MintReportSystem, MintTimeshiftEngine, TimeshiftSnapshot,
+pub use chakra::{
+    AkabeiBundle, AkabeiPackageEngine, BundleType, DesktopTheme, InstallerStep, KapudanAssistant,
+    TribeInstaller, GLOBAL_AKABEI, GLOBAL_KAPUDAN, GLOBAL_TRIBE,
 };
 
-pub use chimera_linux::{
-    ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
-    DinitServiceState,
+pub use antix::{
+    AntixControlCenter, AntixDesktopProfiler, AntixInitManager, DesktopProfile,
+    LegacyMemoryTrimmer, MicroService, MicroServiceState, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_MEMORY_TRIMMER,
 };
 
-pub use relay_nexus::{
-    BIOSNexus, BuildChronicle, BuildChronicleManager, CRTArchiveV2, CorebootNexus, DACNexus,
-    DotMatrixArchiveV2, DriverVaultV2, DriverVaultV2Manager, FileEntry, FirmwareNexus,
-    FirmwareNexusManager, FirmwareType, FloppyArchiveV2, GraphicsVaultV2, KernelRelay,
-    LegacyAsmChronicle, LegacyCChronicle, LegacyCppChronicle, LegacyDriver, NetworkEntry,
-    NetworkVaultV2, PeripheralArchiveV2, PeripheralArchiveV2Manager, PersonaType, ProcessEntry,
-    SELinuxNexus, SecurityModelType, SecurityNexus, SecurityNexusManager, StorageVaultV2,
-    SyscallEncyclopedia, SyscallEncyclopediaEntry, SyscallEntry, TapeArchiveV2, UEFINexus,
-    ZeroTrustNexus,
+pub use canonical::{
+    AiResourceScheduler, AppSuiteBundle, AppSuiteType, BrailleMatrix, BsdJailSandbox,
+    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityLayer,
+    ContinuityCoordinator, DesktopMode, DistroReleaseChannel, EcosystemSnapshot, FlatpakApp,
+    HandoffTask, LanguageTranslationCatalog, LocaleManager, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SigmaContainer, SnapshotManager, SuiteRegistry, TtsSynthesizer,
+    UnifiedAppStore, ZorinAppearanceSwitcher,
 };
 
 pub use solid_kernel::{
-    AuditBlock, ComplianceScheduler, IScheduler, PrioritySchedulerPort, RoundRobinSchedulerPort,
-    SigmaFSPlusPlus, SolidKernelCore,
+    IScheduler, RoundRobinSchedulerPort, PrioritySchedulerPort, SolidKernelCore,
+    ComplianceScheduler, AuditBlock, SigmaFSPlusPlus,
 };
 
-pub use wasm_sandbox::{WasmModule, WasmSandboxEngine, WasmState};
+pub use wasm_sandbox::{
+    WasmState, WasmModule, WasmSandboxEngine,
+};
 
 pub use absorb_tools::{
-    CasObject, Clause, ContentAddressedStorage, DpllSatSolver, PledgePermission,
-    PledgeUnveilSandbox, PqcSecureChannel,
+    PledgePermission, PledgeUnveilSandbox, PqcSecureChannel, Literal, Clause,
+    DpllSatSolver, CasObject, ContentAddressedStorage,
 };
 
-pub use tiny_core::{FiletoolOverlay, FrugalLoader, TceLoader, TczExtension, TinyCoreBootConfig};
+pub use tiny_core::{
+    TinyCoreBootConfig, TczExtension, TceLoader, FiletoolOverlay, FrugalLoader,
+};
 
 pub use apache_ossie::{
-    MetricAggregation, OssieCatalog, OssieDimension, OssieInterpreter, OssieMetric, OssieOntology,
-    OssieRelationship, SemanticRow,
+    MetricAggregation, OssieMetric, OssieDimension, OssieRelationship, OssieCatalog,
+    SemanticRow, OssieInterpreter, OssieOntology,
 };
 
 pub use sovereign_suite::{
-    CreativeMatrix, EverySearch, FancyZonesManager, ImageLayer, JoplinE2ee, LayoutZone,
-    ProcMonitor, ProcessExplorerState, SpreadsheetCore, SysDiag,
+    EverySearch, SysDiag, ProcessExplorerState, ProcMonitor, CreativeMatrix, ImageLayer,
+    FancyZonesManager, LayoutZone, JoplinE2ee, SpreadsheetCore,
 };
-pub use gentoo::{EbuildPackage, OpenRcManager, OpenRcRunlevel, OpenRcService, PortageEngine, ServiceStatus, UseFlagManager};
-pub use localsend::{LocalSendBridgeManager, LocalSendDevice, LocalSendDeviceType, LocalSendFileMetadata, LocalSendSession};
+
+pub use gentoo::{
+    UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
+    EbuildPackage, PortageEngine,
+};

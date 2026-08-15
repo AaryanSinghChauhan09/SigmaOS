@@ -181,7 +181,7 @@ impl Routine {
         self.conditions.iter().all(|condition| {
             let current_value = context
                 .get(&condition.value)
-                .map(|s| s.as_str())
+                .map(|s: &String| s.as_str())
                 .unwrap_or("");
             condition.evaluate(current_value)
         })
@@ -469,6 +469,7 @@ impl CustomizationEngine {
         let mut triggered_actions = Vec::new();
 
         for routine in self.routines.values() {
+            let routine: &Routine = routine;
             if routine.should_trigger(&self.context) {
                 triggered_actions.extend(routine.actions.clone());
             }

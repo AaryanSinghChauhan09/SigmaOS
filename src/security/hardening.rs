@@ -2,25 +2,8 @@
 /// Implements Defense-In-Depth (Sentinel standard): Secure volatile memory zeroization,
 /// rate-limiting intrusion monitoring, and a tamper-proof cryptographically hash-chained audit trail.
 
-#[cfg(feature = "standalone_test")]
-use std::vec::Vec;
-
-#[cfg(feature = "standalone_test")]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Permission {
-    NetworkTcp,
-    FileRead,
-    FileWrite,
-}
-
-#[cfg(feature = "standalone_test")]
-use std::sync::atomic::{AtomicUsize, Ordering};
-
-#[cfg(not(feature = "standalone_test"))]
 use crate::klib::Vec;
-#[cfg(not(feature = "standalone_test"))]
 use crate::security::Permission;
-#[cfg(not(feature = "standalone_test"))]
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Secure Memory Zeroization utility
@@ -122,7 +105,7 @@ impl HardenedAuditTrail {
 
         // Compute simple dynamic rolling hash chain: XOR elements with prime multi
         let entry_payload = pid ^ (perm as u64) ^ (if allowed { 1 } else { 0 });
-        let next_hash = (prev ^ entry_payload).wrapping_mul(1099511628211_u64); // FNV-1a 64-bit prime
+        let next_hash = (prev ^ entry_payload).wrapping_mul(1099511628211); // FNV-1a 64-bit prime
 
         let entry = AuditLogEntry {
             process_id: pid,
@@ -143,16 +126,15 @@ impl HardenedAuditTrail {
             return true;
         }
 
-        let mut expected_prev = 0x1337_C0DE_FA11_FACEu64;
+        let mut expected_prev: u64 = 0x1337_C0DE_FA11_FACE;
         for i in 0..self.logs.len() {
             let log = &self.logs[i];
             if log.previous_hash != expected_prev {
                 return false; // Chain broken! Tampering detected!
             }
 
-            let payload =
-                log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1 } else { 0 });
-            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211);
+            let payload: u64 = log.process_id ^ (log.permission as u64) ^ (if log.status_allowed { 1u64 } else { 0u64 });
+            let calculated_hash = (expected_prev ^ payload).wrapping_mul(1099511628211_u64);
 
             if log.entry_hash != calculated_hash {
                 return false; // Entry hash mismatch! Tampering detected!
@@ -162,116 +144,6 @@ impl HardenedAuditTrail {
         }
 
         true
-    }
-}
-
-// ================= Linux ASLR base offset randomization =================
-
-pub struct AddressSpaceLayoutRandomizer {
-    pub seed: u64,
-}
-
-impl AddressSpaceLayoutRandomizer {
-    pub fn new(entropy_seed: u64) -> Self {
-        Self { seed: entropy_seed }
-    }
-
-    pub fn generate_random_slide_offset(&self, base_addr: u64, salt: &str) -> u64 {
-        let mut hash = self.seed;
-        for byte in salt.bytes() {
-            hash = (hash ^ (byte as u64)).wrapping_mul(1099511628211u64);
-        }
-        (base_addr ^ hash) & 0x000000000FFFF000
-    }
-}
-
-// ================= OpenBSD Write XOR Execute memory segment guard =================
-
-pub struct MemorySegment {
-    pub start_address: u64,
-    pub size: usize,
-    pub is_writable: bool,
-    pub is_executable: bool,
-}
-
-pub struct MemoryWxorXGuard {
-    pub segments: Vec<MemorySegment>,
-}
-
-impl MemoryWxorXGuard {
-    pub fn new() -> Self {
-        Self { segments: Vec::new() }
-    }
-
-    pub fn register_segment(&mut self, start: u64, len: usize, write: bool, exec: bool) -> Result<(), &'static str> {
-        if write && exec {
-            return Err("W^X Protection Violation: Segment cannot be concurrently writable and executable!");
-        }
-        self.segments.push(MemorySegment {
-            start_address: start,
-            size: len,
-            is_writable: write,
-            is_executable: exec,
-        });
-        Ok(())
-    }
-
-    pub fn update_segment_protections(&mut self, start: u64, write: bool, exec: bool) -> Result<(), &'static str> {
-        if write && exec {
-            return Err("W^X Protection Violation: Transition to concurrently writable and executable blocked!");
-        }
-        let seg = self.segments.iter_mut().find(|s| s.start_address == start)
-            .ok_or("W^X: Segment not found")?;
-
-        seg.is_writable = write;
-        seg.is_executable = exec;
-        Ok(())
-    }
-}
-
-// ================= Android Keystore-style key envelope wrapping =================
-
-pub struct WrappedKey {
-    pub label: String,
-    pub wrapped_payload: Vec<u8>,
-}
-
-pub struct SovereignSecureKeystore {
-    pub master_key_hash: [u8; 16],
-    pub keys: Vec<WrappedKey>,
-}
-
-impl SovereignSecureKeystore {
-    pub fn new(pin_phrase: &str) -> Self {
-        let mut key = [0u8; 16];
-        for (i, byte) in pin_phrase.as_bytes().iter().enumerate() {
-            key[i % 16] ^= byte.wrapping_mul(17);
-        }
-        Self {
-            master_key_hash: key,
-            keys: Vec::new(),
-        }
-    }
-
-    pub fn wrap_and_store_key(&mut self, label: &str, raw_key: &[u8]) {
-        let mut wrapped = Vec::new();
-        for (i, &byte) in raw_key.iter().enumerate() {
-            let wrap_byte = byte ^ self.master_key_hash[i % 16];
-            wrapped.push(wrap_byte);
-        }
-        self.keys.push(WrappedKey {
-            label: label.to_string(),
-            wrapped_payload: wrapped,
-        });
-    }
-
-    pub fn unwrap_and_retrieve_key(&self, label: &str) -> Result<Vec<u8>, &'static str> {
-        let key = self.keys.iter().find(|k| k.label == label).ok_or("Keystore: Key label not found")?;
-        let mut unwrapped = Vec::new();
-        for (i, &byte) in key.wrapped_payload.iter().enumerate() {
-            unwrapped.push(byte ^ self.master_key_hash[i % 16]);
-        }
-        Ok(unwrapped)
     }
 }
 
@@ -332,45 +204,5 @@ mod tests {
 
         // Integrity verification must detect this modification instantly!
         assert!(!audit.verify_integrity());
-    }
-
-    #[test]
-    fn test_aslr_base_randomization() {
-        let test_seed = (0xABC00000u64 | 0xDEF99u64) ^ 0x5555;
-        let aslr = AddressSpaceLayoutRandomizer::new(test_seed);
-        let offset1 = aslr.generate_random_slide_offset(0x100000, "stack_segment");
-        let offset2 = aslr.generate_random_slide_offset(0x100000, "heap_segment");
-
-        assert_ne!(offset1, offset2); // Slide offsets must be randomized based on salt
-        assert_eq!(offset1 & 0xFFF, 0); // Must be page-aligned (4KB)
-    }
-
-    #[test]
-    fn test_memory_wxor_x_protection() {
-        let mut guard = MemoryWxorXGuard::new();
-
-        // Allowed combinations
-        assert!(guard.register_segment(0x1000, 4096, true, false).is_ok());  // RW- (Writable, non-executable)
-        assert!(guard.register_segment(0x2000, 4096, false, true).is_ok());  // R-X (Executable, non-writable)
-
-        // Blocked combination (Writable and Executable concurrently)
-        assert!(guard.register_segment(0x3000, 4096, true, true).is_err());
-
-        // Blocked transition
-        assert!(guard.update_segment_protections(0x1000, true, true).is_err());
-    }
-
-    #[test]
-    fn test_keystore_envelope_wrapping() {
-        let mut keystore = SovereignSecureKeystore::new("UserPin1234!");
-        let secret_key = b"SovereignSecKey_ABC123";
-
-        keystore.wrap_and_store_key("database_encryption_key", secret_key);
-
-        // Recover key
-        let retrieved = keystore.unwrap_and_retrieve_key("database_encryption_key").unwrap();
-        assert_eq!(retrieved, secret_key);
-
-        assert!(keystore.unwrap_and_retrieve_key("invalid_label").is_err());
     }
 }
