@@ -1155,6 +1155,221 @@ impl DrmModeInfo {
     }
 }
 
+// ==========================================
+// 13. LINUX BPF CO-RE & BTF ENGINE (SovereignBpfCoReEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct BtfFieldReloc {
+    pub type_name: String,
+    pub field_name: String,
+    pub target_offset: i16,
+}
+
+pub struct SovereignBpfCoReEngine {
+    pub relocations: Vec<BtfFieldReloc>,
+}
+
+impl SovereignBpfCoReEngine {
+    pub fn new() -> Self {
+        Self { relocations: Vec::new() }
+    }
+
+    pub fn register_relocation(&mut self, type_name: &str, field_name: &str, target_offset: i16) {
+        self.relocations.push(BtfFieldReloc {
+            type_name: type_name.to_string(),
+            field_name: field_name.to_string(),
+            target_offset,
+        });
+    }
+
+    pub fn relocate_instruction(&self, type_name: &str, field_name: &str, inst: &mut EbpfInstruction) -> Result<(), &'static str> {
+        if let Some(reloc) = self.relocations.iter().find(|r| r.type_name == type_name && r.field_name == field_name) {
+            inst.offset = reloc.target_offset;
+            Ok(())
+        } else {
+            Err("BTF field relocation mapping not found")
+        }
+    }
+}
+
+impl Default for SovereignBpfCoReEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 14. FREEBSD CAPSICUM CAPABILITY RIGHTS (BsdCapsicumRights)
+// ==========================================
+
+pub struct BsdCapsicumRights {
+    pub cap_read: bool,
+    pub cap_write: bool,
+    pub cap_seek: bool,
+    pub cap_fstat: bool,
+    pub cap_mmap: bool,
+    pub cap_ioctl: bool,
+    pub in_capability_mode: bool,
+}
+
+impl BsdCapsicumRights {
+    pub fn new_full_rights() -> Self {
+        Self {
+            cap_read: true,
+            cap_write: true,
+            cap_seek: true,
+            cap_fstat: true,
+            cap_mmap: true,
+            cap_ioctl: true,
+            in_capability_mode: false,
+        }
+    }
+
+    pub fn enter_capability_mode(&mut self) {
+        self.in_capability_mode = true;
+    }
+
+    pub fn limit_rights(&mut self, read: bool, write: bool, seek: bool, fstat: bool, mmap: bool, ioctl: bool) {
+        self.cap_read &= read;
+        self.cap_write &= write;
+        self.cap_seek &= seek;
+        self.cap_fstat &= fstat;
+        self.cap_mmap &= mmap;
+        self.cap_ioctl &= ioctl;
+    }
+
+    pub fn check_right(&self, operation: &str) -> bool {
+        match operation {
+            "read" => self.cap_read,
+            "write" => self.cap_write,
+            "seek" => self.cap_seek,
+            "fstat" => self.cap_fstat,
+            "mmap" => self.cap_mmap,
+            "ioctl" => self.cap_ioctl,
+            _ => !self.in_capability_mode,
+        }
+    }
+}
+
+impl Default for BsdCapsicumRights {
+    fn default() -> Self {
+        Self::new_full_rights()
+    }
+}
+
+// ==========================================
+// 15. DRAGONFLY BSD HAMMER2 MVCC B-TREE ENGINE (Hammer2MultiVersionEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct Hammer2Inode {
+    pub inode_id: u64,
+    pub generation: u64,
+    pub path: String,
+    pub data: Vec<u8>,
+}
+
+pub struct Hammer2MultiVersionEngine {
+    pub inodes: Vec<Hammer2Inode>,
+    pub current_generation: u64,
+}
+
+impl Hammer2MultiVersionEngine {
+    pub fn new() -> Self {
+        Self {
+            inodes: Vec::new(),
+            current_generation: 1,
+        }
+    }
+
+    pub fn write_inode(&mut self, inode_id: u64, path: &str, data: &[u8]) {
+        self.inodes.push(Hammer2Inode {
+            inode_id,
+            generation: self.current_generation,
+            path: path.to_string(),
+            data: data.to_vec(),
+        });
+    }
+
+    pub fn create_snapshot(&mut self) -> u64 {
+        let snap_gen = self.current_generation;
+        self.current_generation += 1;
+        snap_gen
+    }
+
+    pub fn read_at_generation(&self, inode_id: u64, target_gen: u64) -> Option<&Hammer2Inode> {
+        self.inodes.iter()
+            .filter(|i| i.inode_id == inode_id && i.generation <= target_gen)
+            .max_by_key(|i| i.generation)
+    }
+}
+
+impl Default for Hammer2MultiVersionEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ==========================================
+// 16. FEDORA SILVERBLUE OSTREE ATOMIC ENGINE (SovereignOstreeEngine)
+// ==========================================
+
+#[derive(Debug, Clone)]
+pub struct OstreeCommit {
+    pub checksum: String,
+    pub version: String,
+    pub kernel_ref: String,
+    pub rootfs_hash: u64,
+}
+
+pub struct SovereignOstreeEngine {
+    pub staged_commits: Vec<OstreeCommit>,
+    pub active_deployment_idx: Option<usize>,
+}
+
+impl SovereignOstreeEngine {
+    pub fn new() -> Self {
+        Self {
+            staged_commits: Vec::new(),
+            active_deployment_idx: None,
+        }
+    }
+
+    pub fn stage_commit(&mut self, checksum: &str, version: &str, kernel_ref: &str, rootfs_hash: u64) -> usize {
+        let commit = OstreeCommit {
+            checksum: checksum.to_string(),
+            version: version.to_string(),
+            kernel_ref: kernel_ref.to_string(),
+            rootfs_hash,
+        };
+        self.staged_commits.push(commit);
+        let idx = self.staged_commits.len() - 1;
+        if self.active_deployment_idx.is_none() {
+            self.active_deployment_idx = Some(idx);
+        }
+        idx
+    }
+
+    pub fn switch_active_deployment(&mut self, idx: usize) -> Result<(), &'static str> {
+        if idx >= self.staged_commits.len() {
+            return Err("Target Ostree commit deployment index out of bounds");
+        }
+        self.active_deployment_idx = Some(idx);
+        Ok(())
+    }
+
+    pub fn get_active_deployment(&self) -> Option<&OstreeCommit> {
+        self.active_deployment_idx.and_then(|idx| self.staged_commits.get(idx))
+    }
+}
+
+impl Default for SovereignOstreeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1662,6 +1877,72 @@ mod tests {
         let mut bad_mode = mode;
         bad_mode.htotal = 1900; // invalid total < display
         assert!(!bad_mode.verify_timing_boundaries());
+    }
+
+    #[test]
+    fn test_bpf_core_relocation() {
+        let mut core_engine = SovereignBpfCoReEngine::new();
+        core_engine.register_relocation("task_struct", "pid", 16);
+
+        let mut inst = EbpfInstruction {
+            opcode: EbpfOpcode::Load,
+            dst: 1,
+            src: 0,
+            offset: 0,
+            imm: 0,
+            use_imm: false,
+        };
+
+        assert!(core_engine.relocate_instruction("task_struct", "pid", &mut inst).is_ok());
+        assert_eq!(inst.offset, 16);
+        assert!(core_engine.relocate_instruction("task_struct", "nonexistent", &mut inst).is_err());
+    }
+
+    #[test]
+    fn test_bsd_capsicum_rights_and_mode() {
+        let mut capsicum = BsdCapsicumRights::new_full_rights();
+        assert!(capsicum.check_right("read"));
+        assert!(capsicum.check_right("write"));
+        assert!(capsicum.check_right("exec_other")); // Allowed before capability mode
+
+        capsicum.limit_rights(true, false, true, true, false, false);
+        capsicum.enter_capability_mode();
+
+        assert!(capsicum.check_right("read"));
+        assert!(!capsicum.check_right("write"));
+        assert!(!capsicum.check_right("exec_other")); // Blocked in capability mode
+    }
+
+    #[test]
+    fn test_hammer2_mvcc_snapshots() {
+        let mut hammer2 = Hammer2MultiVersionEngine::new();
+
+        hammer2.write_inode(100, "/etc/config", b"v1_data");
+        let gen1 = hammer2.create_snapshot();
+
+        hammer2.write_inode(100, "/etc/config", b"v2_data");
+        let gen2 = hammer2.create_snapshot();
+
+        let v1_node = hammer2.read_at_generation(100, gen1).unwrap();
+        assert_eq!(v1_node.data, b"v1_data");
+
+        let v2_node = hammer2.read_at_generation(100, gen2).unwrap();
+        assert_eq!(v2_node.data, b"v2_data");
+    }
+
+    #[test]
+    fn test_ostree_atomic_deployment_switch() {
+        let mut ostree = SovereignOstreeEngine::new();
+        let _idx0 = ostree.stage_commit("hash0", "1.0.0", "vmlinuz-1.0", 0x1111);
+        let idx1 = ostree.stage_commit("hash1", "1.1.0", "vmlinuz-1.1", 0x2222);
+
+        assert_eq!(ostree.get_active_deployment().unwrap().version, "1.0.0");
+
+        assert!(ostree.switch_active_deployment(idx1).is_ok());
+        assert_eq!(ostree.get_active_deployment().unwrap().version, "1.1.0");
+        assert_eq!(ostree.get_active_deployment().unwrap().rootfs_hash, 0x2222);
+
+        assert!(ostree.switch_active_deployment(99).is_err());
     }
 }
 // Linux & BSD distro inspirations verified
