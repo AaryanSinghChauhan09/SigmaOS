@@ -27,7 +27,3 @@ Using a pre-allocated vector and a single-pass iterator chain (`.iter().cycle()`
 ## 2026-08-11 - Optimizing UKSM Page Deduplication Lookup Complexity
 **Learning:** Checking for duplicate physical pages using a linear scan (`contains`) on a standard `Vec` inside high-frequency deduplication passes degrades to $O(N^2)$ complexity. Utilizing a `BTreeSet` reduces search and insertion overhead to $O(\log N)$ while maintaining complete `#![no_std]` compatibility.
 **Action:** Always prefer `BTreeSet` or sorted collections over linear lookup vectors for high-density indexing/deduplication arrays in memory-constrained environments.
-
-## 2026-08-14 - Zero-Allocation Pass for Kernel Slab Cache Selection
-**Learning:** Allocating temporary heap vectors inside a kernel memory allocator's `allocate()` method introduces recursive allocation hazards and $O(N^2)$ sorting overhead on every allocation request. A single-pass $O(N)$ scalar search eliminates dynamic memory allocation during slab lookup and dramatically reduces kernel allocation latency.
-**Action:** Never allocate dynamic memory inside core memory management search loops; use stack scalars or direct iterator passes.

@@ -63,7 +63,7 @@ impl PledgeManager {
         exec_promises: Option<&str>,
     ) -> Result<(), PledgeError> {
         let new_permissions = Self::parse_promises(promises)?;
-        
+
         if let Some(ref current) = self.pledge {
             // Can only restrict, never expand
             for perm in &new_permissions {
@@ -72,7 +72,7 @@ impl PledgeManager {
                 }
             }
         }
-        
+
         self.pledge = Some(PledgePromise::new(new_permissions));
         Ok(())
     }
@@ -116,7 +116,7 @@ Process calls unveil("", "")      ← Lock the unveil list
 // src/security/unveil.rs - Path normalization
 fn normalize_path(raw_path: &str) -> Result<String, SecurityError> {
     let mut components: Vec<&str> = Vec::new();
-    
+
     for component in raw_path.split('/') {
         match component {
             "" | "." => continue,
@@ -127,7 +127,7 @@ fn normalize_path(raw_path: &str) -> Result<String, SecurityError> {
             c => components.push(c),
         }
     }
-    
+
     let mut result = String::from("/");
     result.push_str(&components.join("/"));
     Ok(result)
@@ -139,17 +139,17 @@ pub fn is_path_allowed(&self, path: &str, required: UnveilPermission) -> bool {
         Ok(p) => p,
         Err(_) => return false, // Reject malformed paths
     };
-    
+
     for restriction in &self.restrictions {
         // Must be exact match or subdirectory - NOT a prefix bypass
         let unveiled_normalized = normalize_path(&restriction.path).unwrap_or_default();
-        
-        if normalized == unveiled_normalized 
+
+        if normalized == unveiled_normalized
             || normalized.starts_with(&format!("{}/", unveiled_normalized)) {
             return restriction.permissions.contains(&required);
         }
     }
-    
+
     false
 }
 ```

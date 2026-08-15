@@ -15,7 +15,7 @@ Every open file descriptor can have a subset of rights attached:
 bitflags::bitflags! {
     pub struct CapRights: u64 {
         const READ       = 1 << 0;  // CAP_READ
-        const WRITE      = 1 << 1;  // CAP_WRITE  
+        const WRITE      = 1 << 1;  // CAP_WRITE
         const SEEK       = 1 << 2;  // CAP_SEEK
         const LOOKUP     = 1 << 3;  // CAP_LOOKUP (directory traversal)
         const FSTAT      = 1 << 4;  // CAP_FSTAT
@@ -86,7 +86,7 @@ impl CapabilityToken {
             is_revoked: AtomicBool::new(false),
         })
     }
-    
+
     /// Check if an operation is permitted
     pub fn check(&self, required: CapRights) -> Result<(), CapError> {
         if self.is_revoked.load(Ordering::SeqCst) {
@@ -115,7 +115,7 @@ impl ProcessCapTable {
     pub fn cap_enter(&mut self) {
         self.cap_mode = true;
     }
-    
+
     /// Open with capability (openat semantics)
     pub fn openat_cap(&self, dir_cap: u64, path: &str) -> Result<i32, CapError> {
         let cap = self.caps.get(&dir_cap).ok_or(CapError::InvalidToken)?;

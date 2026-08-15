@@ -32,7 +32,7 @@ SigmaOS implements a defense-in-depth security model:
 
 ### Layer 1: Process Isolation
 - **pledge(2)**: Promise-based syscall restriction (OpenBSD-inspired)
-- **unveil(2)**: Filesystem visibility restriction (OpenBSD-inspired)  
+- **unveil(2)**: Filesystem visibility restriction (OpenBSD-inspired)
 - **Capsicum**: Capability-based access control (FreeBSD-inspired)
 - **Namespaces**: PID, mount, network namespaces (Linux-inspired)
 - **cgroups**: Resource limitation and accounting

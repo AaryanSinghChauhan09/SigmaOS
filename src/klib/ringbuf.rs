@@ -31,13 +31,13 @@ impl<T, const N: usize> RingBuf<T, N> {
             tail: AtomicUsize::new(0),
         }
     }
-    
+
     /// Returns the capacity of the ring buffer.
     #[inline]
     pub const fn capacity(&self) -> usize {
         N
     }
-    
+
     /// Returns the number of elements currently in the buffer.
     #[inline]
     pub fn len(&self) -> usize {
@@ -45,76 +45,76 @@ impl<T, const N: usize> RingBuf<T, N> {
         let head = self.head.load(Ordering::Acquire);
         tail.wrapping_sub(head)
     }
-    
+
     /// Returns true if the buffer is empty.
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
-    
+
     /// Returns true if the buffer is full.
     #[inline]
     pub fn is_full(&self) -> bool {
         self.len() == N
     }
-    
+
     /// Push an item to the tail (producer side).
     /// Returns `Err(item)` if the buffer is full.
     pub fn push(&self, item: T) -> Result<(), T> {
         let tail = self.tail.load(Ordering::Relaxed);
         let head = self.head.load(Ordering::Acquire);
-        
+
         if tail.wrapping_sub(head) >= N {
             return Err(item); // Buffer full
         }
-        
+
         let slot = tail & (N - 1); // Fast modulo for power-of-2 N
-        
+
         // SAFETY: We have exclusive access to this slot (producer owns tail)
         unsafe {
             let data = &mut *self.data.get();
             data[slot] = Some(item);
         }
-        
+
         // Release: ensure the write to data is visible before tail update
         self.tail.store(tail.wrapping_add(1), Ordering::Release);
         Ok(())
     }
-    
+
     /// Pop an item from the head (consumer side).
     /// Returns `None` if the buffer is empty.
     pub fn pop(&self) -> Option<T> {
         let head = self.head.load(Ordering::Relaxed);
         let tail = self.tail.load(Ordering::Acquire);
-        
+
         if head == tail {
             return None; // Buffer empty
         }
-        
+
         let slot = head & (N - 1); // Fast modulo for power-of-2 N
-        
+
         // SAFETY: We have exclusive access to this slot (consumer owns head)
         let item = unsafe {
             let data = &mut *self.data.get();
             data[slot].take()
         };
-        
+
         // Release: ensure the read from data is done before head update
         self.head.store(head.wrapping_add(1), Ordering::Release);
         item
     }
-    
+
     /// Peek at the front item without consuming it.
     pub fn peek(&self) -> Option<&T> {
         let head = self.head.load(Ordering::Acquire);
         let tail = self.tail.load(Ordering::Acquire);
-        
+
         if head == tail {
             return None;
         }
-        
+
         let slot = head & (N - 1);
-        
+
         // SAFETY: Slot is valid and not being modified by producer (different slot)
         unsafe {
             let data = &*self.data.get();
@@ -137,7 +137,7 @@ impl<T, const N: usize> MpscRingBuf<T, N> {
             lock: AtomicUsize::new(0),
         }
     }
-    
+
     fn acquire_lock(&self) {
         while self.lock.compare_exchange_weak(
             0, 1, Ordering::Acquire, Ordering::Relaxed
@@ -146,18 +146,18 @@ impl<T, const N: usize> MpscRingBuf<T, N> {
             core::hint::spin_loop();
         }
     }
-    
+
     fn release_lock(&self) {
         self.lock.store(0, Ordering::Release);
     }
-    
+
     pub fn push(&self, item: T) -> Result<(), T> {
         self.acquire_lock();
         let result = self.inner.push(item);
         self.release_lock();
         result
     }
-    
+
     pub fn pop(&self) -> Option<T> {
         self.acquire_lock();
         let result = self.inner.pop();
@@ -169,47 +169,47 @@ impl<T, const N: usize> MpscRingBuf<T, N> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_basic_push_pop() {
         let buf: RingBuf<u32, 4> = RingBuf::new();
-        
+
         assert!(buf.is_empty());
         assert!(!buf.is_full());
-        
+
         buf.push(1).unwrap();
         buf.push(2).unwrap();
         buf.push(3).unwrap();
         buf.push(4).unwrap();
-        
+
         assert!(buf.is_full());
         assert!(buf.push(5).is_err()); // Should fail when full
-        
+
         assert_eq!(buf.pop(), Some(1)); // FIFO ordering
         assert_eq!(buf.pop(), Some(2));
         assert_eq!(buf.pop(), Some(3));
         assert_eq!(buf.pop(), Some(4));
         assert_eq!(buf.pop(), None); // Empty
     }
-    
+
     #[test]
     fn test_wrap_around() {
         let buf: RingBuf<u32, 4> = RingBuf::new();
-        
+
         // Fill and drain, then fill again (tests wrap-around)
         for i in 0..4u32 { buf.push(i).unwrap(); }
         for _ in 0..4 { buf.pop(); }
         for i in 4..8u32 { buf.push(i).unwrap(); }
-        
+
         assert_eq!(buf.pop(), Some(4));
         assert_eq!(buf.pop(), Some(5));
     }
-    
+
     #[test]
     fn test_peek() {
         let buf: RingBuf<u32, 8> = RingBuf::new();
         buf.push(42).unwrap();
-        
+
         assert_eq!(buf.peek(), Some(&42));
         assert_eq!(buf.peek(), Some(&42)); // Still there
         assert_eq!(buf.pop(), Some(42));

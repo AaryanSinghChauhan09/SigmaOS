@@ -33,7 +33,7 @@ impl CfsSigmaScheduler {
     pub fn pick_next_task(&mut self) -> Option<u64> {
         self.run_queue.keys().next().copied()
     }
-    
+
     /// Update vruntime after running for delta nanoseconds
     pub fn update_vruntime(&mut self, task_id: u64, delta_ns: u64, weight: u64) {
         let vruntime_delta = delta_ns * 1024 / weight;  // Weighted time
@@ -66,7 +66,7 @@ impl BoreTask {
         // With alpha = 1/8 (bit shift for efficiency)
         self.burst_score = (self.burst_score * 7 + burst_ns) / 8;
     }
-    
+
     /// Calculate BORE-adjusted vruntime penalty
     pub fn vruntime_penalty(&self, base_penalty: u64) -> u64 {
         // Scale penalty by burst_score
@@ -109,16 +109,16 @@ impl SigmaHybridScheduler {
         if let Some(&rt_task) = self.rt_queue.first() {
             return Some(rt_task);
         }
-        
+
         // 2. CFS for normal tasks
         if let Some(cfs_task) = self.cfs_queue.pick_next_task() {
             return Some(cfs_task);
         }
-        
+
         // 3. Idle task if nothing else
         self.idle_queue.first().copied()
     }
-    
+
     /// Dynamic priority boost for interactive tasks (Linux-inspired)
     pub fn boost_interactive(&mut self, task_id: u64) {
         // Reduce vruntime to give interactive tasks a scheduling advantage
