@@ -2,6 +2,14 @@
 pub mod zenith_compositor;
 pub mod moksha;
 pub mod pantheon;
+pub mod granite_contractor;
+
+pub use granite_contractor::{
+    GraniteUiToolkit, ToastNotification, AccentColor,
+    SwitchboardSettingsHub, SwitchboardPlug, SwitchboardCategory,
+    ContractorService, ContractorAction,
+    ScreenTimeParentalGovernor, TimeQuota,
+};
 
 pub use pantheon::{
     GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
