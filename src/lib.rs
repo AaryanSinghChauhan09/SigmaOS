@@ -35,6 +35,7 @@ pub mod shell;
 pub mod sigpkg;
 pub mod tools;
 pub mod virtualization;
+pub mod cluster;
 
 pub mod graphics {
     pub mod compositor;

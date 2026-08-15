@@ -12,6 +12,7 @@ pub mod deobfuscation;
 pub mod securelevels;
 pub mod pam;
 pub mod crypto_utils;
+pub mod qubes_isolation;
 
 pub use pqc_enclave::{
     KyberKem, DilithiumSignature, RotatableToken, PqcTokenRotationBus, PqcZeroTrustGater,
@@ -43,9 +44,6 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-pub mod clipboard;
-pub mod intrusion;
-pub mod password;
 pub mod parrot_kali;
 
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
@@ -60,78 +58,58 @@ pub use capability_token::{
 pub use clipboard::{
     ClipboardEntry, ClipboardError, ClipboardSecurity, ClipboardType, NoEncryption,
     SecureClipboardManager, SecurityLevel as ClipboardSecurityLevel, XorEncryption,
-};
 pub use intrusion::{
     AnomalyDetection, DetectionResult, DetectionRule, DetectionStrategy, EventType, IdsError,
     IntrusionDetectionSystem, RuleAction, SecurityEvent, Severity, SignatureDetection,
-};
 pub use password::{
     BiometricAuth, BiometricResult, BiometricType, FaceIdAuth, FingerprintAuth, PasswordCategory,
     PasswordEntry, PasswordError, PasswordManager, PasswordManagerResult,
-};
 pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use bridge::{
     LegacySecurityType, SecurityBridge,
-};
 pub use prism::{
     SecurityFacet, SecurityPrism,
-};
 pub use sandbox::{
     SandboxRule, PrivacyFirstSandbox,
-};
 pub use qubes_isolation::{
     DomainID, DomainOrchestrator, DomainType, IsolatedDomain, IsolationError,
-};
 pub use selinux_integration::{
     SelinuxSyscallIntegration, SelinuxError, SelinuxStats, SyscallSecurityClass,
     initialize_selinux_integration, get_selinux_integration, check_syscall_selinux,
-};
 pub use selinux::{
     AppArmorManager, AppArmorProfile, ObjectType, SecurityContext, SecurityLabel, SecurityPolicy,
     SecurityRule, SelinuxPermission,
-};
 pub use vault::{
     Aes256GcmEncryption, ChaCha20Poly1305Encryption, EncryptedFile, EncryptedFileVault,
     EncryptionAlgorithm, Kyber1024Encryption, VaultEncryption, VaultError, VaultMetadata,
     VaultResult,
-};
 pub use vpn::{
     AuthMethod, ConnectionState, KillSwitchConfig, OpenVpnHandler, SecureVpnClient, VpnConfig,
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
-};
 pub use integrity::{
     File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError as SecIntegrityError,
     IntegrityStats, IntegrityStatus as SecIntegrityStatus, MonitorCapability, SimpleFile,
     SimpleIntegrityMonitor as SecSimpleIntegrityMonitor,
-};
 pub use mac::{
     ContextCapability, ContextID, EngineCapability as MacEngineCapability, MACStats, MLSPolicy,
     PolicyCapability as MacPolicyCapability, PolicyInfo as MacPolicyInfo,
     SecurityContext as MacSecurityContext, SecurityDomain, SecurityLevel as MacSecurityLevel,
     SimpleMACEngine,
-};
 pub use pki::{
     PKIManager as SecPKIManager, SimpleCRL, SimpleCertificate, SimplePKIManager, CRL as CrlTrait,
-};
 pub use secrets::{
     Keyring, KeyringCapability, KeyringStats, Secret, SecretCapability, SecretInfo, SimpleKeyring,
     SimpleSecret,
-};
 pub use vulnerability::{
     CIPipelineIntegration, ScanReport, ScanSummary, SimpleCIPipelineIntegration, SimpleScanReport,
     SimpleVulnerability, SimpleVulnerabilityScanner, Vulnerability, VulnerabilityScanner,
-};
 pub use defensive_audit::{
     DefensiveAuditSystem, ForensicBlock, MaliciousSignature, MAX_AUDIT_BLOCKS, MAX_SIGNATURES,
     SIGNATURE_LEN,
-};
 pub use parrot_parity::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, RoutingMode, SandboxPolicy,
     GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-};
-pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
-
 pub use kali_stack::{
     PluggableAuthenticationModule, FirewallRule, IptablesFirewall, CronJob, CronDaemon,
     SudoPrivilegeEscalation, TmuxPane, TmuxMultiplexer, SwapSpaceManager, DmesgLog, KaliError,
@@ -140,8 +118,8 @@ pub use parrot_kali::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
     HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
     GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
-};
 pub use unveil::{UnveilManager, UnveilPermission, UnveilRestriction};
 pub use selinux::{AppArmorManager, AppArmorProfile, SecurityPolicy, SecurityLabel, SecurityRule, SelinuxPermission};
 pub use securelevels::{Securelevel, LinuxCapability, SovereignSecurelevelManager};
 pub use pam::{PamError, PamUser, PamGroup, SovereignPamManager};
+pub use qubes_isolation::{DomainID, DomainType, IsolationError, IsolatedDomain, DomainOrchestrator};
