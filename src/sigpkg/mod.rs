@@ -35,7 +35,7 @@ pub use universal_oop_system::{
     IPackage, IPackageParser, PackageFormat, PackageMetadata,
     PackageParserFactory, UniversalPackageManager,
     DebAdapter as OopDebAdapter, RpmAdapter as OopRpmAdapter, PacmanAdapter as OopPacmanAdapter,
-    UserDefinedHook, ParseError, InstallError, HookError,
+    UserDefinedHook, InstallError, HookError,
 };
 
 /// Package version using SemVer
