@@ -24,11 +24,9 @@ pub mod ml;
 pub mod network;
 pub mod orchestration;
 pub mod package;
-<<<<<<< HEAD
-pub mod process;
-=======
 pub mod performance;
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+pub mod process;
 pub mod productivity;
 pub mod resilience;
 pub mod resource;
@@ -120,7 +118,6 @@ pub use distro::{
 pub use dashboard::{
     DashboardWidget, MetricData, MetricType, SystemMonitor, UnifiedDashboard, WidgetType,
 };
-<<<<<<< HEAD
 pub use distro::{
     AdminAction, AiSysAdmin, AppManifest, AuditResult, AuditRule, BackupSnapshot, BackupSystem,
     BountyStatus, BugBountyProgram, BugBountyReport, BuildJob, BuildStatus, CanFrame,
@@ -144,7 +141,7 @@ pub use drivers::{
     StorageDriver, StorageError, StorageType, TouchJingosDriver, UsbHidDriver, VesaDriver,
     VesaError, VesaModeInfo, VirtioBlkDriver, VirtioDeviceType, VirtioMmioHeader, VirtioNetDriver,
     VirtioRngDriver,
-=======
+
 pub use desktop::{
     Notification, SimpleNotification, NotificationManager, SimpleNotificationManager,
     NotificationUrgency, NotificationError,
@@ -156,7 +153,6 @@ pub use drivers::{
     VesaModeInfo,
     UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
     DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
->>>>>>> origin/jules-880081283500171861-1eb07604
 };
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, LegacyLinuxRule, LinuxPersonaRule,
@@ -221,21 +217,19 @@ pub use resilience::{
 };
 pub use security::hardening;
 pub use security::{
-<<<<<<< HEAD
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
-    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
-    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
-    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
-    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
-=======
     CapabilityGate, CapabilityToken, DomainID, DomainOrchestrator, DomainType, IsolatedDomain,
     IsolationError, Permission, PledgeManager, PledgePromise, SecurityEnforcer as AndroidStyleSecurityEnforcer,
     PORT_ALLOW_SSL, PORT_ALLOW_TCP,
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
     HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
     GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
+    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
+    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
+    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
+    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use tools::{

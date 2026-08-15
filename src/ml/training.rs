@@ -10,17 +10,24 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type TrainingID = usize;
 
 #[repr(usize)]
-<<<<<<< HEAD
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OptimizerType {
     SGD = 0,
     Adam = 1,
     RMSProp = 2,
 }
-=======
-#[derive(Debug, Clone, Copy)]
-pub enum OptimizerType { SGD = 0, Adam = 1, RMSProp = 2 }
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+impl OptimizerType {
+    /// Safe conversion from usize without unsafe transmute
+    pub fn from_usize(val: usize) -> Self {
+        match val {
+            0 => Self::SGD,
+            1 => Self::Adam,
+            2 => Self::RMSProp,
+            _ => Self::SGD, // safe default
+        }
+    }
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -94,7 +101,7 @@ impl SimpleOptimizer {
 }
 
 impl Optimizer for SimpleOptimizer {
-    fn optimizer_type(&self) -> OptimizerType { unsafe { core::mem::transmute(self.optimizer_type.load(Ordering::SeqCst) as u32) } }
+    fn optimizer_type(&self) -> OptimizerType { OptimizerType::from_usize(self.optimizer_type.load(Ordering::SeqCst)) }
     fn learning_rate(&self) -> f32 { (self.learning_rate.load(Ordering::SeqCst) as f32) / 10000.0 }
 
     fn set_learning_rate(&mut self, rate: f32) {

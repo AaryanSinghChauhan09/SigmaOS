@@ -20,7 +20,6 @@ pub use antix::{
 pub mod historic_linux;
 pub mod india_stack_localization;
 pub mod legacy_adapters;
-<<<<<<< HEAD
 pub mod mint_linux;
 pub mod relay_nexus;
 pub mod solid_kernel;
@@ -39,11 +38,10 @@ pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
 };
-=======
+
 pub mod india_professional_tools;
 pub mod canonical;
 pub mod fedora;
->>>>>>> origin/jules-880081283500171861-1eb07604
 
 pub use canonical::{SigmaSubiquity, SigmaNetplan, SigmaCloudInit, SigmaMultipass, SigmaCurtin};
 pub use fedora::{DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage};

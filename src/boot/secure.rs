@@ -5,12 +5,6 @@
 
 #![no_std]
 
-<<<<<<< HEAD
-extern crate alloc;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use core::sync::atomic::{AtomicUsize, Ordering};
-=======
 /// OOP-based Secure Boot Validation for SigmaOS
 /// Implements secure boot using OOP principles with traits and structs
 /// No dependency on external security frameworks
@@ -19,7 +13,11 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
 use core::ptr::NonNull;
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+extern crate alloc;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
+use core::sync::atomic::{AtomicUsize, Ordering};
 
 /// Component ID
 pub type ComponentID = usize;
@@ -479,7 +477,6 @@ pub struct DbKey {
     pub is_revoked: bool, // true -> dbx (forbidden), false -> db (authorized)
 }
 
-<<<<<<< HEAD
 // ==========================================
 // PE/COFF Image Header Parser & Hardware Interface Verification
 // ==========================================
@@ -615,21 +612,16 @@ impl UefiFirmwareSecurityState {
     }
 }
 
-=======
->>>>>>> origin/jules-880081283500171861-1eb07604
 pub struct UefiDatabase {
     pub keys: [Option<DbKey>; 16],
 }
 
-<<<<<<< HEAD
 impl Default for UefiDatabase {
     fn default() -> Self {
         Self::new()
     }
 }
 
-=======
->>>>>>> origin/jules-880081283500171861-1eb07604
 impl UefiDatabase {
     pub fn new() -> Self {
         Self { keys: [None; 16] }
@@ -677,15 +669,12 @@ pub struct TpmMeasuredBoot {
     pub pcrs: [u32; 16], // Platform Configuration Registers
 }
 
-<<<<<<< HEAD
 impl Default for TpmMeasuredBoot {
     fn default() -> Self {
         Self::new()
     }
 }
 
-=======
->>>>>>> origin/jules-880081283500171861-1eb07604
 impl TpmMeasuredBoot {
     pub fn new() -> Self {
         Self { pcrs: [0; 16] }
@@ -697,11 +686,9 @@ impl TpmMeasuredBoot {
         if pcr_idx < 16 {
             let mut current = self.pcrs[pcr_idx];
             // FNV-1a 32-bit hash step
-<<<<<<< HEAD
-            current ^= val;
-=======
             current = current ^ val;
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+            current ^= val;
             current = current.wrapping_mul(16777619);
             self.pcrs[pcr_idx] = current;
         }
@@ -797,10 +784,7 @@ impl Component for SimpleComponent {
 
         // Validate via a default safe database
         let mut uefi_db = UefiDatabase::new();
-<<<<<<< HEAD
-=======
         // Enroll current component hash so it can be verified successfully
->>>>>>> origin/jules-880081283500171861-1eb07604
         let db_key = DbKey {
             hash: self.hash,
             key_id: self.key_id,
@@ -952,14 +936,6 @@ impl SecureBootValidator for SimpleSecureBootValidator {
         let mut index = None;
         let mut component_type = ComponentType::Kernel;
 
-<<<<<<< HEAD
-        for (i, slot) in self.components.iter().enumerate() {
-            if let Some(ref component) = slot {
-                if component.id() == id {
-                    index = Some(i);
-                    component_type = component.component_type();
-                    break;
-=======
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &*self.components.data.add(i);
@@ -969,7 +945,13 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                         component_type = component.component_type();
                         break;
                     }
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+        for (i, slot) in self.components.iter().enumerate() {
+            if let Some(ref component) = slot {
+                if component.id() == id {
+                    index = Some(i);
+                    component_type = component.component_type();
+                    break;
                 }
             }
         }
@@ -991,14 +973,6 @@ impl SecureBootValidator for SimpleSecureBootValidator {
             return Err(SecureBootError::PermissionDenied);
         }
 
-<<<<<<< HEAD
-        for slot in self.components.iter_mut() {
-            if let Some(ref mut component) = slot {
-                if component.id() == id {
-                    let result = component.validate();
-                    if let Ok(status) = result {
-                        self.update_stats(status);
-=======
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &mut *self.components.data.add(i);
@@ -1009,7 +983,13 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                             self.update_stats(status);
                         }
                         return result;
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+        for slot in self.components.iter_mut() {
+            if let Some(ref mut component) = slot {
+                if component.id() == id {
+                    let result = component.validate();
+                    if let Ok(status) = result {
+                        self.update_stats(status);
                     }
                 }
             }
@@ -1025,16 +1005,6 @@ impl SecureBootValidator for SimpleSecureBootValidator {
         let mut invalid_components = Vec::new();
         let mut status_updates = Vec::new();
 
-<<<<<<< HEAD
-        for slot in self.components.iter_mut() {
-            if let Some(ref mut component) = slot {
-                let result = component.validate();
-                if let Ok(status) = result {
-                    if status != ValidationStatus::Valid {
-                        invalid_components.push(component.id());
-                    }
-                    status_updates.push(status);
-=======
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &mut *self.components.data.add(i);
@@ -1046,7 +1016,15 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                         }
                         self.update_stats(status);
                     }
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+        for slot in self.components.iter_mut() {
+            if let Some(ref mut component) = slot {
+                let result = component.validate();
+                if let Ok(status) = result {
+                    if status != ValidationStatus::Valid {
+                        invalid_components.push(component.id());
+                    }
+                    status_updates.push(status);
                 }
             }
         }
@@ -1059,12 +1037,6 @@ impl SecureBootValidator for SimpleSecureBootValidator {
     }
 
     fn get_component(&self, id: ComponentID) -> Option<&dyn Component> {
-<<<<<<< HEAD
-        for slot in self.components.iter() {
-            if let Some(ref component) = slot {
-                if component.id() == id {
-                    return Some(component.as_ref());
-=======
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &*self.components.data.add(i);
@@ -1072,7 +1044,11 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                     if component.id() == id {
                         return Some(component.as_ref());
                     }
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+        for slot in self.components.iter() {
+            if let Some(ref component) = slot {
+                if component.id() == id {
+                    return Some(component.as_ref());
                 }
             }
         }
@@ -1082,12 +1058,6 @@ impl SecureBootValidator for SimpleSecureBootValidator {
     fn list_components(&self, component_type: ComponentType) -> Vec<ComponentID> {
         let mut ids = Vec::new();
 
-<<<<<<< HEAD
-        for slot in self.components.iter() {
-            if let Some(ref component) = slot {
-                if component.component_type() == component_type {
-                    ids.push(component.id());
-=======
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &*self.components.data.add(i);
@@ -1095,7 +1065,11 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                     if component.component_type() == component_type {
                         ids.push(component.id());
                     }
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+        for slot in self.components.iter() {
+            if let Some(ref component) = slot {
+                if component.component_type() == component_type {
+                    ids.push(component.id());
                 }
             }
         }
@@ -1283,8 +1257,6 @@ mod tests {
         assert!(!fw_state.setup_mode);
     }
 }
-<<<<<<< HEAD
-=======
 
 /// Simple Vec implementation for no_std
 pub struct Vec<T> {
@@ -1396,4 +1368,3 @@ mod tests {
         assert_ne!(val2, 0);
     }
 }
->>>>>>> origin/jules-880081283500171861-1eb07604

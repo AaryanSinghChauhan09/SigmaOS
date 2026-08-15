@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-#![no_std]
-
-/// OOP-based Virtual Memory Manager with Canonical Address Verification for SigmaOS
-/// Implements virtual memory management using OOP principles with traits and structs
-/// No dependency on external memory management libraries
-/// Inspired by x86_64, ARM64, Linux, BSD, and Windows canonical memory layouts
-
-=======
 // OOP-based Virtual Memory Manager with Canonical Address Verification for SigmaOS
 // Implements virtual memory management using OOP principles with traits and structs
 // No dependency on external memory management libraries
@@ -14,7 +5,14 @@
 // Enhanced with OpenBSD/FreeBSD W^X (Write XOR Execute) security, FreeBSD wired/pinned page protection,
 // and Linux kswapd-inspired active/inactive LRU page reclaimer scanning.
 
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+#![no_std]
+
+/// OOP-based Virtual Memory Manager with Canonical Address Verification for SigmaOS
+/// Implements virtual memory management using OOP principles with traits and structs
+/// No dependency on external memory management libraries
+/// Inspired by x86_64, ARM64, Linux, BSD, and Windows canonical memory layouts
+
 use core::ptr::NonNull;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::mem;
@@ -45,11 +43,8 @@ pub fn is_canonical_address(addr: VirtualAddress) -> bool {
     if sign_bit == 0 {
         upper_bits == 0
     } else {
-<<<<<<< HEAD
         // Shifting a 64-bit value right by 47 leaves 17 bits (64 - 47 = 17)
         // If bit 47 was 1, those 17 bits must all be 1s (0x1FFFF)
-=======
->>>>>>> origin/jules-880081283500171861-1eb07604
         upper_bits == 0x1FFFF
     }
 }
@@ -471,22 +466,16 @@ impl SimpleVirtualMemoryManager {
     }
 
     unsafe fn allocate_region(&mut self, start: VirtualAddress, size: usize, permissions: MemoryPermissions) -> Result<NonNull<MemoryRegion>, MemoryError> {
-<<<<<<< HEAD
         // Enforce canonical address validation
-=======
->>>>>>> origin/jules-880081283500171861-1eb07604
         if !is_canonical_address(start) || !is_canonical_address(start + size) {
             return Err(MemoryError::InvalidAddress);
         }
 
-<<<<<<< HEAD
-=======
         // Enforce W^X (Write XOR Execute) security rule
         if !permissions.is_wx_compliant() {
             return Err(MemoryError::WxViolation);
         }
 
->>>>>>> origin/jules-880081283500171861-1eb07604
         let region = MemoryRegion::new(start, start + size, permissions, MemoryRegionCapability::full());
         let region_ptr = alloc(mem::size_of::<MemoryRegion>()) as *mut MemoryRegion;
 
@@ -579,14 +568,11 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             return Err(MemoryError::InvalidAddress);
         }
 
-<<<<<<< HEAD
-=======
         // Enforce W^X security rule
         if !permissions.is_wx_compliant() {
             return Err(MemoryError::WxViolation);
         }
 
->>>>>>> origin/jules-880081283500171861-1eb07604
         unsafe {
             let aligned_size = (size + PAGE_SIZE - 1) & !(PAGE_SIZE - 1);
             self.allocate_region(virtual_addr, aligned_size, permissions)?;
@@ -667,13 +653,10 @@ impl VirtualMemoryManager for SimpleVirtualMemoryManager {
             return Err(MemoryError::InvalidAddress);
         }
 
-<<<<<<< HEAD
-=======
         if !permissions.is_wx_compliant() {
             return Err(MemoryError::WxViolation);
         }
 
->>>>>>> origin/jules-880081283500171861-1eb07604
         unsafe {
             if let Some(region) = self.find_region(virtual_addr) {
                 region.change_permissions(permissions)?;
@@ -843,8 +826,6 @@ extern "C" {
 }
 
 #[cfg(test)]
-<<<<<<< HEAD
-=======
 #[no_mangle]
 pub unsafe extern "C" fn alloc(size: usize) -> *mut u8 {
     std::alloc::alloc(std::alloc::Layout::from_size_align_unchecked(size, 8))
@@ -859,13 +840,11 @@ pub unsafe extern "C" fn free(ptr: *mut u8) {
 }
 
 #[cfg(test)]
->>>>>>> origin/jules-880081283500171861-1eb07604
 mod tests {
     use super::*;
 
     #[test]
     fn test_canonical_address_verifications() {
-<<<<<<< HEAD
         // Lower Canonical half (User space)
         assert!(is_canonical_address(0x0000_0000_1000_0000));
         assert_eq!(get_canonical_half(0x0000_0000_1000_0000), Some(CanonicalHalf::Lower));
@@ -880,7 +859,7 @@ mod tests {
 
         // Address canonicalization (sign-extension)
         let raw_addr = 0x0000_8000_0000_0123; // non-canonical if bit 47 is 1 but upper bits are 0
-=======
+
         assert!(is_canonical_address(0x0000_0000_1000_0000));
         assert_eq!(get_canonical_half(0x0000_0000_1000_0000), Some(CanonicalHalf::Lower));
 
@@ -891,13 +870,10 @@ mod tests {
         assert_eq!(get_canonical_half(0x0001_8000_0000_0000), None);
 
         let raw_addr = 0x0000_8000_0000_0123;
->>>>>>> origin/jules-880081283500171861-1eb07604
         let canonical_addr = canonicalize_address(raw_addr);
         assert!(is_canonical_address(canonical_addr));
         assert_eq!(get_canonical_half(canonical_addr), Some(CanonicalHalf::Upper));
     }
-<<<<<<< HEAD
-=======
 
     #[test]
     fn test_wx_protection_enforcement() {
@@ -959,5 +935,4 @@ mod tests {
             assert_eq!(reclaimed_pass2, 1);
         }
     }
->>>>>>> origin/jules-880081283500171861-1eb07604
 }

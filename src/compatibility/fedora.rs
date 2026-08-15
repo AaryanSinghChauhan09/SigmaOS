@@ -1,12 +1,10 @@
 // SigmaOS Fedora Clean-Room Parity Subsystem
 // Independent, zero-dependency implementations of Red Hat/Fedora's core tooling
-<<<<<<< HEAD
 // Enhanced with Fedora's standard SELinux Context & Policy Transition security engines,
 // Fedora's systemd-preset automated service activation controller,
 // and Fedora's Anaconda automated installation Kickstart parser.
-=======
+
 // Enhanced with SELinux (Security-Enhanced Linux) Transition engines and Anaconda Kickstart auto-provisioners
->>>>>>> origin/jules-880081283500171861-1eb07604
 
 use std::collections::HashMap;
 
@@ -229,7 +227,6 @@ impl BodhiUpdateTriage {
     }
 }
 
-<<<<<<< HEAD
 /// Represents a single Sigma Change Proposal (SCP) tracking technology additions.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SigmaChangeProposal {
@@ -862,21 +859,19 @@ impl SovereignOstreeDeployer {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SovereignSeLinuxContext {
-=======
+
 // ==========================================
 // 5. SELinux Transition & Access Policy Engine
 // ==========================================
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SeLinuxContext {
->>>>>>> origin/jules-880081283500171861-1eb07604
     pub user: String,
     pub role: String,
     pub domain_type: String,
     pub sensitivity: String,
 }
 
-<<<<<<< HEAD
 impl SovereignSeLinuxContext {
     pub fn new(user: &str, role: &str, domain_type: &str, sensitivity: &str) -> Self {
         Self {
@@ -901,7 +896,7 @@ impl SovereignSeLinuxContext {
     }
 
     pub fn to_string_representation(&self) -> String {
-=======
+
 impl SeLinuxContext {
     pub fn parse(context_str: &str) -> Option<Self> {
         let parts: Vec<&str> = context_str.split(':').collect();
@@ -918,12 +913,10 @@ impl SeLinuxContext {
     }
 
     pub fn to_string(&self) -> String {
->>>>>>> origin/jules-880081283500171861-1eb07604
         format!("{}:{}:{}:{}", self.user, self.role, self.domain_type, self.sensitivity)
     }
 }
 
-<<<<<<< HEAD
 pub struct SovereignSeLinuxEngine {
     pub mode: SeLinuxMode,
     pub file_contexts: HashMap<String, SovereignSeLinuxContext>,
@@ -1002,7 +995,7 @@ impl SovereignSeLinuxEngine {
             allowed.contains(&target_domain.to_string())
         } else {
             false
-=======
+
 pub struct SeLinuxPolicyEngine {
     /// maps allow: (subject_type, target_type, class_permission) -> is_allowed
     pub allow_rules: HashMap<(String, String, String), bool>,
@@ -1049,13 +1042,11 @@ impl SeLinuxPolicyEngine {
             })
         } else {
             None // No transition matched, domain remains unchanged
->>>>>>> origin/jules-880081283500171861-1eb07604
         }
     }
 }
 
 // ==========================================
-<<<<<<< HEAD
 // Sovereign Firewalld Manager
 // ==========================================
 
@@ -1214,7 +1205,7 @@ impl CoprRepositoryManager {
         }
         Err("COPR build task ID not found")
 impl Default for AnacondaInstaller {
-=======
+
 // 6. Anaconda Kickstart Automated Provisioner
 // ==========================================
 
@@ -1324,13 +1315,11 @@ impl AnacondaKickstartEngine {
 }
 
 impl Default for AnacondaKickstartEngine {
->>>>>>> origin/jules-880081283500171861-1eb07604
     fn default() -> Self {
         Self::new()
     }
 }
 
-<<<<<<< HEAD
 pub struct SovereignCockpitConsole {
     pub is_listening: bool,
     pub connected_clients: usize,
@@ -1383,8 +1372,6 @@ impl SovereignCockpitConsole {
     }
 }
 
-=======
->>>>>>> origin/jules-880081283500171861-1eb07604
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1450,7 +1437,6 @@ mod tests {
     }
 
     #[test]
-<<<<<<< HEAD
     fn test_sigma_change_process() {
         let mut engine = SigmaChangeProcessEngine::new();
         let proposal = SigmaChangeProposal {
@@ -1628,7 +1614,7 @@ mod tests {
         let res = installer.execute_automated_installation().unwrap();
         assert!(res.contains(" Automated OS provisioning completed"));
         assert!(installer.installation_successful);
-=======
+
     fn test_selinux_policy_transitions() {
         let mut engine = SeLinuxPolicyEngine::new(true);
 
@@ -1678,7 +1664,6 @@ mod tests {
         assert_eq!(engine.provision_storage_size(), 11264); // 1024 + 10240
         assert_eq!(engine.selected_packages, vec!["@core", "gcc", "git"]);
         assert!(engine.post_install_script.contains("Setup complete"));
->>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }
 // Fedora clean-room parity verified

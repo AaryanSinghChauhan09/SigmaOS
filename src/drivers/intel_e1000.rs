@@ -1,21 +1,3 @@
-<<<<<<< HEAD
-// SigmaOS Intel 8254x Gigabit Ethernet (e1000) Network Driver Subsystem
-// Parity-level implementation of the legendary Intel hardware NIC controller in a #![no_std] environment
-// Enhanced with advanced Linux-style net interface configuration and FreeBSD-style device polling
-
-#![no_std]
-
-extern crate alloc;
-
-use alloc::collections::VecDeque;
-use alloc::vec::Vec;
-
-/// Intel e1000 Transmit Descriptor Structure
-#[repr(C, packed)]
-#[derive(Debug, Clone, Copy, Default)]
-pub struct E1000TxDescriptor {
-    pub buffer_addr: u64,
-=======
 // Intel 8254x Gigabit Ethernet Network Controller Driver (e1000)
 // Extremely ubiquitous virtual and hardware gigabit networking driver used by Linux and BSD guest environments
 
@@ -37,7 +19,23 @@ pub struct E1000RxDesc {
 #[repr(C)]
 pub struct E1000TxDesc {
     pub addr: u64,
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+// SigmaOS Intel 8254x Gigabit Ethernet (e1000) Network Driver Subsystem
+// Parity-level implementation of the legendary Intel hardware NIC controller in a #![no_std] environment
+// Enhanced with advanced Linux-style net interface configuration and FreeBSD-style device polling
+
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::VecDeque;
+use alloc::vec::Vec;
+
+/// Intel e1000 Transmit Descriptor Structure
+#[repr(C, packed)]
+#[derive(Debug, Clone, Copy, Default)]
+pub struct E1000TxDescriptor {
+    pub buffer_addr: u64,
     pub length: u16,
     pub cso: u8,
     pub cmd: u8,
@@ -46,7 +44,6 @@ pub struct E1000TxDesc {
     pub special: u16,
 }
 
-<<<<<<< HEAD
 /// Intel e1000 Receive Descriptor Structure
 #[repr(C, packed)]
 #[derive(Debug, Clone, Copy, Default)]
@@ -258,7 +255,7 @@ impl IntelE1000Driver {
         };
 
         self.rx_packet_queue.push_back(payload.to_vec());
-=======
+
 /// Intel E1000 Driver matching Intel 8254x controller specification
 pub struct IntelE1000Driver {
     pub is_initialized: bool,
@@ -357,7 +354,6 @@ impl PeripheralDevice for IntelE1000Driver {
         self.is_initialized = false;
         self.power_state = PowerState::Off;
         Ok(())
->>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }
 
@@ -366,7 +362,6 @@ mod tests {
     use super::*;
 
     #[test]
-<<<<<<< HEAD
     fn test_e1000_nic_lifecycle_and_packet_flows() {
         let mut nic = IntelE1000Driver::new(0xF0000000, [0x00, 0x0C, 0x29, 0x12, 0x34, 0x56]);
         assert_eq!(nic.pci_bar_base, 0xF0000000);
@@ -458,7 +453,7 @@ mod tests {
         // 2. Link Settings
         assert_eq!(nic.link_speed_mbps, 1000);
         assert_eq!(nic.link_duplex, LinkDuplex::Full);
-=======
+
     fn test_intel_e1000_driver() {
         let mut e1000 = IntelE1000Driver::new([0x00, 0x1a, 0xa0, 0x11, 0x22, 0x33]);
         assert_eq!(e1000.name(), "Intel 8254x Gigabit Ethernet Controller Driver (e1000)");
@@ -480,6 +475,5 @@ mod tests {
 
         e1000.shutdown().unwrap();
         assert!(e1000.write(&tx_data).is_err());
->>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }

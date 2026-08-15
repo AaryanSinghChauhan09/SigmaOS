@@ -16,12 +16,10 @@ pub enum Protocol {
     Udp = 1,
 }
 
-<<<<<<< HEAD
 /// Standard RFC-793 TCP States
 #[repr(u32)]
-=======
+
 #[repr(usize)]
->>>>>>> origin/jules-880081283500171861-1eb07604
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TCPState {
     Closed = 0,

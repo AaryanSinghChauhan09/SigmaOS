@@ -11,11 +11,6 @@ pub mod transaction;
 pub mod verifier;
 
 pub use arch_compat::{AurRecipeCompiler, PacmanDbAdapter, RollingSyncManager};
-<<<<<<< HEAD
-pub use debian_defeater::{
-    FileState, FileTransactionEntry, MirrorNode, SandboxRule, SovereignDeltaGenerator,
-    SovereignMirrorSelector, SovereignSandboxEnforcer, SovereignTransactionManager,
-=======
 pub use debian_defeater::{SovereignMirrorSelector, SovereignTransactionManager, SovereignSandboxEnforcer, SovereignDeltaGenerator, TransactionStatus};
 pub use spec::{
     AptPackageAdapter, ManagerCapability, PackageAdapterFactory, PackageCapability,
@@ -25,7 +20,10 @@ pub use spec::{
     TxzPackageAdapter, XbpsPackageAdapter,
     CachyCpuDetector, CachyosPackageAdapter, CpuArchLevel,
     UniversalPackage, UniversalPackageType, UserDefinedPackageHook,
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+pub use debian_defeater::{
+    FileState, FileTransactionEntry, MirrorNode, SandboxRule, SovereignDeltaGenerator,
+    SovereignMirrorSelector, SovereignSandboxEnforcer, SovereignTransactionManager,
 };
 pub use recipe::{BuildSystem, PackageRecipe, RecipeError, RecipeManager};
 pub use resolver::SatSolver;

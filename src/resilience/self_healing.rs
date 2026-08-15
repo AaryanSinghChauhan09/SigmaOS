@@ -614,57 +614,6 @@ mod tests {
     }
 
     #[test]
-<<<<<<< HEAD
-    fn test_system_stability_monitor_heartbeat() {
-        let mut monitor = SystemStabilityMonitor::new();
-        assert_eq!(monitor.system_stability_score, 100.0);
-        assert!(!monitor.in_safe_mode);
-
-        // Ping kernel shard with fast response
-        monitor.ping_shard("kernel", 10, true);
-        // Ping scheduler with very slow response (150ms)
-        monitor.ping_shard("scheduler", 150, true);
-
-        // Stability score should adjust, but still responsive enough to avoid safe mode
-        assert!(monitor.system_stability_score < 100.0);
-        assert!(!monitor.in_safe_mode);
-
-        // Mark scheduler, vfs, and ipc as unresponsive to crash the stability score
-        monitor.ping_shard("scheduler", 0, false);
-        monitor.ping_shard("vfs", 0, false);
-        monitor.ping_shard("ipc", 0, false);
-
-        assert!(monitor.system_stability_score < 50.0);
-        assert!(monitor.in_safe_mode);
-    }
-
-    #[test]
-    fn test_double_fault_guard_trigger() {
-        let mut monitor = SystemStabilityMonitor::default();
-        assert!(!monitor.in_safe_mode);
-
-        // Register first attempt
-        let status1 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
-        assert_eq!(status1, "ATTEMPTING_RECOVERY");
-        assert!(!monitor.in_safe_mode);
-
-        // Register second attempt
-        let status2 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
-        assert_eq!(status2, "ATTEMPTING_RECOVERY");
-        assert!(!monitor.in_safe_mode);
-
-        // Register third attempt (breaching threshold of 3)
-        let status3 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
-        assert_eq!(status3, "DOUBLE_FAULT_DETECTED: DEGRADED_TO_SAFE_MODE");
-        assert!(monitor.in_safe_mode);
-
-        // Clear fault and confirm reset works
-        monitor.clear_fault("filesystem_corrupt");
-        monitor.in_safe_mode = false;
-        let status_after_clear = monitor.trigger_recovery_for_fault("filesystem_corrupt");
-        assert_eq!(status_after_clear, "ATTEMPTING_RECOVERY");
-        assert!(!monitor.in_safe_mode);
-=======
     fn test_shard_heartbeats_and_degraded_safety_mode() {
         let mut monitor = SystemStabilityMonitor::new();
         assert_eq!(monitor.system_health_score, 100);
@@ -725,6 +674,55 @@ mod tests {
 
         // Successive restarts are blocked to protect microkernel stability
         assert!(guard.record_attempt(1004).is_err());
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+    fn test_system_stability_monitor_heartbeat() {
+        let mut monitor = SystemStabilityMonitor::new();
+        assert_eq!(monitor.system_stability_score, 100.0);
+        assert!(!monitor.in_safe_mode);
+
+        // Ping kernel shard with fast response
+        monitor.ping_shard("kernel", 10, true);
+        // Ping scheduler with very slow response (150ms)
+        monitor.ping_shard("scheduler", 150, true);
+
+        // Stability score should adjust, but still responsive enough to avoid safe mode
+        assert!(monitor.system_stability_score < 100.0);
+        assert!(!monitor.in_safe_mode);
+
+        // Mark scheduler, vfs, and ipc as unresponsive to crash the stability score
+        monitor.ping_shard("scheduler", 0, false);
+        monitor.ping_shard("vfs", 0, false);
+        monitor.ping_shard("ipc", 0, false);
+
+        assert!(monitor.system_stability_score < 50.0);
+        assert!(monitor.in_safe_mode);
+    }
+
+    #[test]
+    fn test_double_fault_guard_trigger() {
+        let mut monitor = SystemStabilityMonitor::default();
+        assert!(!monitor.in_safe_mode);
+
+        // Register first attempt
+        let status1 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
+        assert_eq!(status1, "ATTEMPTING_RECOVERY");
+        assert!(!monitor.in_safe_mode);
+
+        // Register second attempt
+        let status2 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
+        assert_eq!(status2, "ATTEMPTING_RECOVERY");
+        assert!(!monitor.in_safe_mode);
+
+        // Register third attempt (breaching threshold of 3)
+        let status3 = monitor.trigger_recovery_for_fault("filesystem_corrupt");
+        assert_eq!(status3, "DOUBLE_FAULT_DETECTED: DEGRADED_TO_SAFE_MODE");
+        assert!(monitor.in_safe_mode);
+
+        // Clear fault and confirm reset works
+        monitor.clear_fault("filesystem_corrupt");
+        monitor.in_safe_mode = false;
+        let status_after_clear = monitor.trigger_recovery_for_fault("filesystem_corrupt");
+        assert_eq!(status_after_clear, "ATTEMPTING_RECOVERY");
+        assert!(!monitor.in_safe_mode);
     }
 }

@@ -34,7 +34,6 @@ pub struct InvocationLayout {
     pub stack_size: usize,        // Bytes required on stack
     pub shadow_space_size: usize, // Windows x64 shadow/home space size
     pub stack_alignment: usize,   // Stack alignment boundary
-<<<<<<< HEAD
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -56,8 +55,6 @@ pub struct InvocationStackLayout {
     pub stack_cleaning_authority: &'static str,
     pub shadow_space_bytes: usize,
     pub stack_alignment_bytes: usize,
-=======
->>>>>>> origin/jules-880081283500171861-1eb07604
 }
 
 pub struct ABITranslator {
@@ -73,115 +70,6 @@ impl ABITranslator {
         }
     }
 
-<<<<<<< HEAD
-    /// Computes register and stack layouts for a function invocation based on chosen ABI / calling convention
-    pub fn compute_invocation_layout(
-        &self,
-        params: &[u64],
-        convention: CallingConvention,
-    ) -> InvocationStackLayout {
-        let mut register_params = Vec::new();
-        let mut stack_params = Vec::new();
-        let mut stack_cleaning_authority = "CALLER";
-        let mut shadow_space_bytes = 0;
-        let mut stack_alignment_bytes = 4; // x86 standard
-
-        match convention {
-            CallingConvention::Cdecl => {
-                stack_params.extend_from_slice(params);
-                stack_cleaning_authority = "CALLER";
-                stack_alignment_bytes = 4;
-            }
-            CallingConvention::Stdcall => {
-                stack_params.extend_from_slice(params);
-                stack_cleaning_authority = "CALLEE";
-                stack_alignment_bytes = 4;
-            }
-            CallingConvention::Fastcall32 => {
-                if params.len() >= 1 {
-                    register_params.push(("ECX".to_string(), params[0]));
-                }
-                if params.len() >= 2 {
-                    register_params.push(("EDX".to_string(), params[1]));
-                }
-                if params.len() > 2 {
-                    stack_params.extend_from_slice(&params[2..]);
-                }
-                stack_cleaning_authority = "CALLEE";
-                stack_alignment_bytes = 4;
-            }
-            CallingConvention::Thiscall => {
-                if params.len() >= 1 {
-                    register_params.push(("ECX".to_string(), params[0]));
-                }
-                if params.len() > 1 {
-                    stack_params.extend_from_slice(&params[1..]);
-                }
-                stack_cleaning_authority = "CALLEE";
-                stack_alignment_bytes = 4;
-            }
-            CallingConvention::MicrosoftX64 => {
-                let gprs = ["RCX", "RDX", "R8", "R9"];
-                for i in 0..params.len() {
-                    if i < 4 {
-                        register_params.push((gprs[i].to_string(), params[i]));
-                    } else {
-                        stack_params.push(params[i]);
-                    }
-                }
-                shadow_space_bytes = 32;
-                stack_cleaning_authority = "CALLER";
-                stack_alignment_bytes = 16;
-            }
-            CallingConvention::SystemVAmd64 => {
-                let gprs = ["RDI", "RSI", "RDX", "RCX", "R8", "R9"];
-                for i in 0..params.len() {
-                    if i < 6 {
-                        register_params.push((gprs[i].to_string(), params[i]));
-                    } else {
-                        stack_params.push(params[i]);
-                    }
-                }
-                stack_cleaning_authority = "CALLER";
-                stack_alignment_bytes = 16;
-            }
-            CallingConvention::AArch32AAPCS => {
-                let gprs = ["R0", "R1", "R2", "R3"];
-                for i in 0..params.len() {
-                    if i < 4 {
-                        register_params.push((gprs[i].to_string(), params[i]));
-                    } else {
-                        stack_params.push(params[i]);
-                    }
-                }
-                stack_cleaning_authority = "CALLER";
-                stack_alignment_bytes = 8;
-            }
-            CallingConvention::AArch64AAPCS => {
-                let gprs = ["X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7"];
-                for i in 0..params.len() {
-                    if i < 8 {
-                        register_params.push((gprs[i].to_string(), params[i]));
-                    } else {
-                        stack_params.push(params[i]);
-                    }
-                }
-                stack_cleaning_authority = "CALLER";
-                stack_alignment_bytes = 16;
-            }
-        }
-
-        InvocationStackLayout {
-            register_params,
-            stack_params,
-            stack_cleaning_authority,
-            shadow_space_bytes,
-            stack_alignment_bytes,
-        }
-    }
-
-    pub fn translate_register_map(&self, old_registers: &[u64]) -> Result<Vec<u64>, ()> {
-=======
     /// Compute exact register map and stack layout for any calling convention
     pub fn compute_invocation_layout(
         &self,
@@ -307,7 +195,114 @@ impl ABITranslator {
 
     /// Legacy fallback register map translation
     pub fn translate_register_map(&self, old_registers: &[u64_type]) -> Result<Vec<u64_type>, ()> {
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+    /// Computes register and stack layouts for a function invocation based on chosen ABI / calling convention
+    pub fn compute_invocation_layout(
+        &self,
+        params: &[u64],
+        convention: CallingConvention,
+    ) -> InvocationStackLayout {
+        let mut register_params = Vec::new();
+        let mut stack_params = Vec::new();
+        let mut stack_cleaning_authority = "CALLER";
+        let mut shadow_space_bytes = 0;
+        let mut stack_alignment_bytes = 4; // x86 standard
+
+        match convention {
+            CallingConvention::Cdecl => {
+                stack_params.extend_from_slice(params);
+                stack_cleaning_authority = "CALLER";
+                stack_alignment_bytes = 4;
+            }
+            CallingConvention::Stdcall => {
+                stack_params.extend_from_slice(params);
+                stack_cleaning_authority = "CALLEE";
+                stack_alignment_bytes = 4;
+            }
+            CallingConvention::Fastcall32 => {
+                if params.len() >= 1 {
+                    register_params.push(("ECX".to_string(), params[0]));
+                }
+                if params.len() >= 2 {
+                    register_params.push(("EDX".to_string(), params[1]));
+                }
+                if params.len() > 2 {
+                    stack_params.extend_from_slice(&params[2..]);
+                }
+                stack_cleaning_authority = "CALLEE";
+                stack_alignment_bytes = 4;
+            }
+            CallingConvention::Thiscall => {
+                if params.len() >= 1 {
+                    register_params.push(("ECX".to_string(), params[0]));
+                }
+                if params.len() > 1 {
+                    stack_params.extend_from_slice(&params[1..]);
+                }
+                stack_cleaning_authority = "CALLEE";
+                stack_alignment_bytes = 4;
+            }
+            CallingConvention::MicrosoftX64 => {
+                let gprs = ["RCX", "RDX", "R8", "R9"];
+                for i in 0..params.len() {
+                    if i < 4 {
+                        register_params.push((gprs[i].to_string(), params[i]));
+                    } else {
+                        stack_params.push(params[i]);
+                    }
+                }
+                shadow_space_bytes = 32;
+                stack_cleaning_authority = "CALLER";
+                stack_alignment_bytes = 16;
+            }
+            CallingConvention::SystemVAmd64 => {
+                let gprs = ["RDI", "RSI", "RDX", "RCX", "R8", "R9"];
+                for i in 0..params.len() {
+                    if i < 6 {
+                        register_params.push((gprs[i].to_string(), params[i]));
+                    } else {
+                        stack_params.push(params[i]);
+                    }
+                }
+                stack_cleaning_authority = "CALLER";
+                stack_alignment_bytes = 16;
+            }
+            CallingConvention::AArch32AAPCS => {
+                let gprs = ["R0", "R1", "R2", "R3"];
+                for i in 0..params.len() {
+                    if i < 4 {
+                        register_params.push((gprs[i].to_string(), params[i]));
+                    } else {
+                        stack_params.push(params[i]);
+                    }
+                }
+                stack_cleaning_authority = "CALLER";
+                stack_alignment_bytes = 8;
+            }
+            CallingConvention::AArch64AAPCS => {
+                let gprs = ["X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7"];
+                for i in 0..params.len() {
+                    if i < 8 {
+                        register_params.push((gprs[i].to_string(), params[i]));
+                    } else {
+                        stack_params.push(params[i]);
+                    }
+                }
+                stack_cleaning_authority = "CALLER";
+                stack_alignment_bytes = 16;
+            }
+        }
+
+        InvocationStackLayout {
+            register_params,
+            stack_params,
+            stack_cleaning_authority,
+            shadow_space_bytes,
+            stack_alignment_bytes,
+        }
+    }
+
+    pub fn translate_register_map(&self, old_registers: &[u64]) -> Result<Vec<u64>, ()> {
         let mut modern_registers = Vec::new();
         match self.target_arch {
             CpuArchitecture::X86 | CpuArchitecture::X64 => {
@@ -443,7 +438,6 @@ mod tests {
     }
 
     #[test]
-<<<<<<< HEAD
     fn test_compute_invocation_layout_x86() {
         let translator = ABITranslator::new(CpuArchitecture::X86);
         let params = vec![100, 200, 300, 400];
@@ -529,7 +523,7 @@ mod tests {
         ]);
         assert!(aapcs64.stack_params.is_empty());
         assert_eq!(aapcs64.stack_alignment_bytes, 16);
-=======
+
     fn test_calling_convention_computations() {
         let translator = ABITranslator::new(CpuArchitecture::X64);
         let args = [100, 200, 300, 400, 500, 600, 700];
@@ -566,6 +560,5 @@ mod tests {
         assert_eq!(arm64_layout.registers[7], 8);
         assert_eq!(arm64_layout.stack_size, 2 * 8);
         assert_eq!(arm64_layout.stack_alignment, 16);
->>>>>>> origin/jules-880081283500171861-1eb07604
     }
 }

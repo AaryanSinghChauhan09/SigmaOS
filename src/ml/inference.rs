@@ -1,7 +1,6 @@
 #![no_std]
 #![no_main]
 
-use core::mem;
 /// OOP-based ML Inference Engine for SigmaOS
 /// Based on Ideas-999-Structured: AI & Machine Learning Item 926
 /// Implements neural network inference and model loading
@@ -15,7 +14,6 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type ModelID = usize;
 
 #[repr(usize)]
-<<<<<<< HEAD
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModelType {
     NeuralNetwork = 0,
@@ -23,10 +21,19 @@ pub enum ModelType {
     SVM = 2,
     Transformer = 3,
 }
-=======
-#[derive(Debug, Clone, Copy)]
-pub enum ModelType { NeuralNetwork = 0, DecisionTree = 1, SVM = 2, Transformer = 3 }
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+impl ModelType {
+    /// Safe conversion from usize without unsafe transmute
+    pub fn from_usize(val: usize) -> Self {
+        match val {
+            0 => Self::NeuralNetwork,
+            1 => Self::DecisionTree,
+            2 => Self::SVM,
+            3 => Self::Transformer,
+            _ => Self::NeuralNetwork, // safe default
+        }
+    }
+}
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -72,7 +79,7 @@ impl SimpleMLModel {
 
 impl MLModel for SimpleMLModel {
     fn id(&self) -> ModelID { self.id }
-    fn model_type(&self) -> ModelType { unsafe { core::mem::transmute(self.model_type.load(Ordering::SeqCst) as u32) } }
+    fn model_type(&self) -> ModelType { ModelType::from_usize(self.model_type.load(Ordering::SeqCst)) }
     fn input_size(&self) -> usize { self.input_size.load(Ordering::SeqCst) }
     fn output_size(&self) -> usize { self.output_size.load(Ordering::SeqCst) }
 

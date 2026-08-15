@@ -3,18 +3,16 @@
 
 use std::io::{self, BufRead, Write};
 
-<<<<<<< HEAD
-pub struct AgentAutomationEngine;
-impl AgentAutomationEngine {
-    pub fn new() -> Self { AgentAutomationEngine }
-=======
 #[derive(Debug, Clone)]
 pub struct AgentAutomationEngine;
 impl AgentAutomationEngine {
     pub fn new() -> Self {
         AgentAutomationEngine
     }
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+pub struct AgentAutomationEngine;
+impl AgentAutomationEngine {
+    pub fn new() -> Self { AgentAutomationEngine }
 }
 
 /// Shell command type
@@ -116,10 +114,7 @@ impl ShellRepl {
             current_theme: "default".to_string(),
             current_profile: "default".to_string(),
             a11y_features: std::collections::HashMap::new(),
-<<<<<<< HEAD
             command_history: Vec::new(),
-=======
->>>>>>> origin/jules-880081283500171861-1eb07604
         }
     }
 
@@ -133,11 +128,9 @@ impl ShellRepl {
             running: true,
             variables: std::collections::HashMap::new(),
             aliases: std::collections::HashMap::new(),
-<<<<<<< HEAD
-            prompt: prompt,
-=======
             prompt,
->>>>>>> origin/jules-880081283500171861-1eb07604
+
+            prompt: prompt,
             agent_engine: AgentAutomationEngine::new(),
             current_user: "ubuntu".to_string(),
             current_dir: "/home/ubuntu".to_string(),

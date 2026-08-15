@@ -32,13 +32,10 @@ pub mod sigma_unveil;
 pub mod vault;
 pub mod vpn;
 pub mod vulnerability;
-<<<<<<< HEAD
-=======
 pub mod clipboard;
 pub mod intrusion;
 pub mod password;
 pub mod parrot_kali;
->>>>>>> origin/jules-880081283500171861-1eb07604
 
 pub use self::sigma_pledge::{PledgeNamespace, PledgePromise as SigmaPledgePromise, SyscallFilter};
 pub use self::sigma_unveil::{UnveilEntry, UnveilManager, UnveilPermissions, UnveilState};
@@ -92,7 +89,6 @@ pub use vpn::{
     VpnConnectionResult, VpnError, VpnProtocol, VpnProtocolHandler, VpnStatistics,
     WireGuardHandler,
 };
-<<<<<<< HEAD
 pub use integrity::{
     File as IntegrityFile, FileCapability, FileID, FileInfo, IntegrityError as SecIntegrityError,
     IntegrityStats, IntegrityStatus as SecIntegrityStatus, MonitorCapability, SimpleFile,
@@ -128,11 +124,10 @@ pub use pledge::{promises, PledgeError, PledgeManager, PledgePromise};
 pub use kali_stack::{
     PluggableAuthenticationModule, FirewallRule, IptablesFirewall, CronJob, CronDaemon,
     SudoPrivilegeEscalation, TmuxPane, TmuxMultiplexer, SwapSpaceManager, DmesgLog, KaliError,
-=======
+
 pub use vulnerability::{VulnerabilityDatabase, VulnerabilityScanner};
 pub use parrot_kali::{
     AnonSurfShunt, AppSandboxEngine, ForensicStorageFilter, MacChanger, KaliPacketSniffer,
     HashAuditor, RoutingMode, PacketAnomaly, GLOBAL_ANONSURF, GLOBAL_SANDBOX, GLOBAL_FORENSIC,
     GLOBAL_MACCHANGER, GLOBAL_SNIFFER, GLOBAL_AUDITOR,
->>>>>>> origin/jules-880081283500171861-1eb07604
 };

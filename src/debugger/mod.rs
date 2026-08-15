@@ -16,8 +16,6 @@ use alloc::format;
 pub mod breakpoint;
 
 pub use breakpoint::{Breakpoint, BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
-<<<<<<< HEAD
-=======
 
 /// Represents a Debian-style debug symbol package containing Build ID mappings
 #[derive(Debug, Clone)]
@@ -40,7 +38,6 @@ impl DebianDbgsymPackage {
         self.symbols_map.push((addr, func.to_string(), file.to_string(), line));
     }
 }
->>>>>>> origin/jules-880081283500171861-1eb07604
 
 /// Breakpoint representation for software debugger
 #[derive(Debug, Clone, Copy)]
