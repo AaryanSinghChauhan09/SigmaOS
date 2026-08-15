@@ -14,6 +14,7 @@ pub use sigma_fs::{
     SigmaFS, SigmaFhsRouter, SigmaFhsHook, SigmaFhsNamespace, SigmaFhsAuditor,
     JournalState, RaidLevel, SigmaFsJournal, SigmaFsCow, SigmaFsVolume, SigmaFsRaid,
     SigmaFsCrypt, SigmaFsVirtio,
+};
 
 pub use tmpfs::{TmpfsFileSystem, TmpfsConfig, TmpfsInode, TmpfsFileType};
 pub use archive::{

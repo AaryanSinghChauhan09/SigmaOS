@@ -88,6 +88,7 @@ pub use touch_jingos::TouchJingOS;
 pub use unified_dma::{
     UnifiedDmaBroker, SelfHealingDriverManager, DmaDescriptor, DeviceCommandType,
     DeviceTransactionLog, GLOBAL_DMA_BROKER, GLOBAL_HEALING_MANAGER,
+};
 
 pub use virtio::{
     VirtioBlkDriver, VirtioDeviceType, VirtioMmioHeader, VirtioNetDriver, VirtioRngDriver,

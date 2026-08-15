@@ -32,6 +32,20 @@ pub type SensorID = usize;
 #[derive(Debug, Clone, Copy)]
 pub enum SensorType { Temperature = 0, Voltage = 1, Current = 2, Power = 3, Fan = 4 }
 
+impl SensorType {
+    /// Safe conversion from usize without unsafe transmute
+    pub fn from_usize(val: usize) -> Self {
+        match val {
+            0 => Self::Temperature,
+            1 => Self::Voltage,
+            2 => Self::Current,
+            3 => Self::Power,
+            4 => Self::Fan,
+            _ => Self::Temperature, // safe default
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum HealthStatus { Healthy = 0, Warning = 1, Critical = 2, Unknown = 3 }
@@ -75,7 +89,7 @@ impl SimpleSensor {
 
 impl Sensor for SimpleSensor {
     fn id(&self) -> SensorID { self.id }
-    fn sensor_type(&self) -> SensorType { unsafe { core::mem::transmute(self.sensor_type.load(Ordering::SeqCst)) } }
+    fn sensor_type(&self) -> SensorType { SensorType::from_usize(self.sensor_type.load(Ordering::SeqCst)) }
     fn name(&self) -> &[u8] {
         let len = self.name.iter().position(|&b| b == 0).unwrap_or(64);
         &self.name[..len]
