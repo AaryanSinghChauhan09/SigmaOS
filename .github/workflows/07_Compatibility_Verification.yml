@@ -18,7 +18,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: "Set up Rust Toolchain"
-        uses: dtolnay/rust-toolchain@stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
 
       - name: "1. Run Standalone POSIX & Libc compatibility tests"
         run: |

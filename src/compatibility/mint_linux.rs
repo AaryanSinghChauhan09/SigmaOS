@@ -1,7 +1,7 @@
-/// Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
-/// Replicates the signature user-friendly systems from Linux Mint:
-/// MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
-/// Cinnamon-like desktop theme manager, and MintDrivers manager.
+//! Linux Mint (MintTools) Compatibility and UI Subsystem Layer for SigmaOS
+//! Replicates the signature user-friendly systems from Linux Mint:
+//! MintBackup, MintUpdate, MintInstall, MintReport, Timeshift-style System Restore,
+//! Cinnamon-like desktop theme manager, and MintDrivers manager.
 
 #![no_std]
 
