@@ -3,23 +3,21 @@
 
 #![no_std]
 
-extern crate alloc;
-use alloc::boxed::Box;
 use core::sync::atomic::{AtomicUsize, Ordering};
 use core::ops::{Deref, DerefMut};
 use core::ptr::NonNull;
-use core::convert::AsRef;
 
 /// ArcInner - Internal structure for Arc
-struct ArcInner<T: ?Sized> {
-    count: AtomicUsize,
-    data: T,
+#[repr(C)]
+pub struct ArcInner<T: ?Sized> {
+    pub count: AtomicUsize,
+    pub data: T,
 }
 
 /// Arc - Atomic Reference Counting smart pointer
 /// Provides thread-safe shared ownership with reference counting
 pub struct Arc<T: ?Sized> {
-    ptr: NonNull<ArcInner<T>>,
+    pub ptr: NonNull<ArcInner<T>>,
 }
 
 unsafe impl<T: ?Sized + Send + Sync> Send for Arc<T> {}
@@ -40,6 +38,18 @@ impl<T> Arc<T> {
 }
 
 impl<T: ?Sized> Arc<T> {
+    /// Create Arc from raw ArcInner pointer
+    pub unsafe fn from_raw_inner(ptr: NonNull<ArcInner<T>>) -> Self {
+        Arc { ptr }
+    }
+
+    /// Extract raw ArcInner pointer and forget Self
+    pub fn into_raw_inner(self) -> *mut ArcInner<T> {
+        let ptr = self.ptr.as_ptr();
+        core::mem::forget(self);
+        ptr
+    }
+
     /// Get the number of strong references to this Arc
     pub fn strong_count(&self) -> usize {
         self.inner().count.load(Ordering::SeqCst)
@@ -105,7 +115,7 @@ impl<T: ?Sized> Deref for Arc<T> {
 
 impl<T: ?Sized> AsRef<T> for Arc<T> {
     fn as_ref(&self) -> &T {
-        self.deref()
+        unsafe { &self.ptr.as_ref().data }
     }
 }
 

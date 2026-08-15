@@ -4,6 +4,7 @@ pub mod breakthroughs;
 pub mod ipc;
 pub mod linux_absorb;
 pub mod memory;
+pub mod breakthroughs;
 pub mod policy_mechanism;
 pub mod sched;
 pub mod subsystem;

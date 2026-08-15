@@ -189,7 +189,6 @@ mod tests {
     use super::*;
 
     #[test]
-    #[allow(unused_variables)]
     fn test_zone_creation_and_alloc() {
         let mut allocator = BsdZoneAllocator::new(0x10000000);
         let thread_zone_idx = allocator.uma_zcreate("ThreadControlBlock", 256, 100);
