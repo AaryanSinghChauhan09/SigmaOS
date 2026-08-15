@@ -13,10 +13,16 @@ pub mod tiny_core;
 pub mod transformation_engine;
 pub mod preseed;
 pub mod linux_bsd_inspirations;
+pub mod linux_bsd_parity;
 
 pub use linux_bsd_inspirations::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
     PinRule, AptPinStore, OpenRCService,
+};
+pub use linux_bsd_parity::{
+    ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine, HookAction, HookWhen,
+    NixOSFlakeEngine, PacmanHook, PortagePackage, RunitService, ServiceState, SystemClosure,
+    VoidRunitSupervisor,
 };
 pub use arch_parity::{PkgBuild, AurClient, SandboxedCompiler, AlpmDatabase};
 pub use preseed::{SovereignPreseedParser, PreseedVariable};
@@ -47,10 +53,6 @@ pub use enterprise::{
     AuditResult, AuditRule, ComplianceAuditor, ConfigHook, DirectoryService, DirectoryUser,
 };
 pub use i18n::{ImeCandidate, InputMethodEngine, LanguagePack, LocaleManager, RegionalSettings};
-pub use manjaro::{
-    GpuType, ManjaroHardwareDetection, ManjaroKernelRelease, ManjaroKernelSwitcher,
-    ManjaroSettingsManager, MhwdDriverConfig, PacmanMirror, PamacPackageManager,
-};
 pub use nextgen::{
     AdminAction, AiSysAdmin, IntegrityState, LivepatchManager, LivepatchPatch, NetplanConfig,
     NetplanManager, P2pNode, PqcSelfHealing, SovereignP2PSync, TimeTravelCheckpoint,

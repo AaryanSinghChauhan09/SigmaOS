@@ -110,11 +110,11 @@ pub use customization::{
 };
 pub use distro::{
     ArchDependencyResolver, PackageNode, FreeBSDJail, OpenBSDPledge, NixStyleStore,
-    PinRule, AptPinStore, OpenRCService,
+    PinRule, AptPinStore, OpenRCService, ArchPacmanHooksManager, FlakeInput, GentooPortageUseFlagsEngine,
+    NixOSFlakeEngine, PacmanHook, PortagePackage, RunitService, ServiceState, SystemClosure, VoidRunitSupervisor,
     AdminAction, AiSysAdmin, AppManifest, AuditResult, AuditRule, BackupSnapshot, BackupSystem,
     BountyStatus, BugBountyProgram, BugBountyReport, BuildJob, BuildStatus, CanFrame,
-    CertificationStatus, CommunityConference, ComplianceAuditor, ComponentType, ConferenceTalk,
-    ConfigHook, CrossBuildPipeline, DevTool, DeveloperToolkit, DirectoryService, DirectoryUser,
+    CertificationStatus, CommunityConference, ConferenceTalk, ConfigHook, CrossBuildPipeline, DevTool, DeveloperToolkit, DirectoryService, DirectoryUser,
     DllLoader, DllModule, EcuController, EduChallenge, EduPlayground, ForumChannel, ForumPost,
     GdiObjectType, HardwareCertificate, HardwareCertificationProgram, HardwareProfile,
     HardwareRegressionSuite, HelpSystem, HowToGuide, HpcClusterJob, HpcJobState, ImeCandidate,
