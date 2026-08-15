@@ -2,6 +2,7 @@
 pub mod architecture;
 pub mod breakthroughs;
 pub mod ipc;
+pub mod linux_bsd_innovations;
 pub mod memory;
 pub mod policy_mechanism;
 pub mod roundrobin;
@@ -18,6 +19,10 @@ pub use breakthroughs::{
     UniversalAbiTranslator, UserDefinedKernelFunctions,
 };
 pub use ipc::{Channel, IpcError, IpcManager, Message};
+pub use linux_bsd_innovations::{
+    BsdPfStateTable, FreeBsdVfsNullfs, FutexOp, FutexWaiter, LinuxFutexEngine,
+    PfFiveTuple, PfStateEntry, SovereignCgroupGovernor, CgroupResourceLimits,
+};
 pub use memory::{BuddyAllocator, MemoryBlock, PAGE_SIZE};
 pub use policy_mechanism::{
     AdaptivePolicy, InstructionCyclePhase, InterruptClass, IoWaitProfile, KernelMechanism,

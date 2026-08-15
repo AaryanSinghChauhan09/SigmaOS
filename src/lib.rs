@@ -96,14 +96,16 @@ pub use filesystem::{
 pub use graphics::paint::ColorRgba;
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
-    AuditBlock, BuddyAllocator, Channel, CircularDoublyLinkedList, CpuArchitectureClass,
-    CpuRegisters, EdfTask, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
+    AuditBlock, BsdPfStateTable, BuddyAllocator, CgroupResourceLimits, Channel,
+    CircularDoublyLinkedList, CpuArchitectureClass, CpuRegisters, FreeBsdVfsNullfs, FutexOp,
+    FutexWaiter, HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase,
     InstructionCyclePhase, InterruptClass, IoWaitProfile, IpcError, IpcManager, Irql,
-    KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask, MemoryBlock,
-    MemoryDescriptorList, Message, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
-    ProcessState, ProcessorInitState, RoundRobinConfig, RoundRobinScheduler, Scheduler,
-    SchedulerError, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism, SystemThread,
-    Tcb, ThreadState, WorkItem, PAGE_SIZE,
+    KernelMechanism, KernelPolicy, LcgRandom, LinuxFutexEngine, LookasideList, LotteryTask,
+    MemoryBlock, MemoryDescriptorList, Message, Pcb, PfFiveTuple, PfStateEntry,
+    PolicyMechanismCoordinator, PoolType, Priority, Process, ProcessState, ProcessorInitState,
+    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SequencedSinglyLinkedList,
+    SinglyLinkedList, SovereignCgroupGovernor, SovereignMechanism, SystemThread, Tcb, ThreadState,
+    WorkItem, PAGE_SIZE,
 };
 pub use network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
