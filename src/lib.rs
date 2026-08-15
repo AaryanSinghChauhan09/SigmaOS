@@ -27,6 +27,8 @@ pub mod config;
 pub mod container;
 pub mod customization;
 pub mod dashboard;
+pub mod desktop;
+pub mod distro;
 pub mod edge;
 pub mod filesystem;
 pub mod functions;
@@ -207,6 +209,31 @@ pub use security::{
     CapabilityGate, CapabilityToken, Permission, PledgeManager, PledgePromise,
     VulnerabilityClass, VulnerabilityReport, SecurityScanner, ExploitPayload,
     PenetrationAssistant, secure_zeroize, IntrusionSeverity, IntrusionMonitor, AuditLogEntry, HardenedAuditTrail,
+    FileIntegrityGuard, MalwareSignature, RootkitDetector, ScanVerdict, SovereignMalwareEngine,
+    ThreatSeverity, ThreatType, YaraSignatureMatcher,
+};
+pub use distro::{
+    RhelSubscriptionEntitlementManager, SubscriptionPool, EntitlementCertificate,
+    DebianDpkgDbSimulator, DpkgPackageStatus, DpkgPackageRecord,
+    AlpineApkOverlayEngine, ApkOverlayFile,
+    SystemdCgroupGovernor, CgroupV2Limits, CgroupV2Accounting,
+    BsdStatefulPacketFilter, PfRuleAction, PfStateEntry,
+    DragonFlyHammerFs, Hammer2Snapshot,
+    VoidRunitManager, RunitServiceState, RunitService,
+    SovereignAnonScrubber,
+    TlpPowerGovernor, PowerSource, CpuGovernorPolicy, TlpConfig,
+    NmtuiNetworkManager, ConnectionType, NetworkConnectionProfile,
+    FreeBsdBhyveHypervisor, BhyveVmState, BhyveVirtualMachine,
+    TailscaleWireguardMesh, WireguardPeer,
+};
+pub use desktop::{
+    GraniteUiToolkit, ToastNotification, AccentColor,
+    SwitchboardSettingsHub, SwitchboardPlug, SwitchboardCategory,
+    ContractorService, ContractorAction,
+    ScreenTimeParentalGovernor, TimeQuota,
+    GalaWindowManager, GalaTransitionStyle, Wingpanel, WingpanelIndicator, PlankDock,
+    PlankDockItem, SlingshotLauncher, SlingshotApp, SlingshotCategory, AppCenter,
+    AppCenterProduct, PantheonGreeter,
 };
 pub use security::hardening;
 pub use shell::{ShellCommand, ShellRepl};
