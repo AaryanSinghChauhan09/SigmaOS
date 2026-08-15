@@ -2410,7 +2410,7 @@ impl UniversalPackageManager {
         self.installed_packages
             .values()
             .map(|p: &Box<dyn IPackage>| p.as_ref())
-            .collect::<Vec<&dyn IPackage>>()
+            .collect()
     }
 
     /// Register a custom parser

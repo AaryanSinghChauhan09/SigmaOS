@@ -13,6 +13,7 @@ pub mod driver;
 pub mod drivers;
 pub mod filesystem;
 pub mod graphics;
+pub mod ipc;
 pub mod kernel;
 pub mod klib;
 pub mod network;
@@ -82,6 +83,10 @@ pub use filesystem::{
     SmartSymlink, SymlinkResolverRule, VirtualFilesystem,
 };
 pub use graphics::paint::ColorRgba;
+pub use ipc::{
+    unix_socket::{UnixSocketType, UnixSocketAddress, UnixSocketState, UnixSocket, UnixSocketManager},
+    signals::{SignalType, SignalDisposition, PendingSignal, ProcessSignalState, SignalDeliverySystem},
+};
 pub use kernel::{
     AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
     AuditBlock, BsdPfStateTable, BuddyAllocator, CgroupResourceLimits, Channel,

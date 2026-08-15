@@ -17,29 +17,8 @@ pub mod breakpoint;
 
 pub use breakpoint::{Breakpoint, BreakpointID, BreakpointType, DebuggerError, SimpleBreakpoint};
 
-/// Represents a Debian-style debug symbol package containing Build ID mappings
-#[derive(Debug, Clone)]
-pub struct DebianDbgsymPackage {
-    pub build_id: String,           // Unique ELF .note.gnu.build-id hash
-    pub package_name: String,       // Target binary name, e.g. "nano"
-    pub symbols_map: Vec<(u64, String, String, u32)>, // Address -> (Function, File, Line)
-}
-
-impl DebianDbgsymPackage {
-    pub fn new(build_id: &str, name: &str) -> Self {
-        Self {
-            build_id: build_id.to_string(),
-            package_name: name.to_string(),
-            symbols_map: Vec::new(),
-        }
-    }
-
-    pub fn register_symbol(&mut self, addr: u64, func: &str, file: &str, line: u32) {
-        self.symbols_map.push((addr, func.to_string(), file.to_string(), line));
-    }
-}
-
-#[derive(Debug, Clone)]
+/// Breakpoint representation for software debugger
+#[derive(Debug, Clone, Copy)]
 pub struct Breakpoint {
     pub address: u64,
     pub breakpoint_type: BreakpointType,

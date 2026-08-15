@@ -44,6 +44,8 @@ pub mod solid_kernel;
 pub mod sovereign_suite;
 pub mod gentoo;
 pub mod legacy_adapters;
+
+pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,

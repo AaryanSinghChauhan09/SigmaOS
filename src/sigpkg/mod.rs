@@ -90,7 +90,7 @@ pub enum ParseError {
 }
 
 /// Package metadata
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
     pub version: Version,

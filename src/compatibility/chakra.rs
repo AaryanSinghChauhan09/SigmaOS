@@ -1,8 +1,3 @@
-// SigmaOS Chakra Linux Parity Engine Shard
-// Zero-dependency, #![no_std] compliant, zero-allocation
-
-use core::sync::atomic::{AtomicBool, AtomicU8, Ordering};
-
 // 1. Akabei Bundle Resolver & Bundler
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
