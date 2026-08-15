@@ -1,45 +1,40 @@
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
+//! OOP-based Zenith Desktop Core for SigmaOS
+//! Implements desktop environment using OOP principles with traits and structs
+//! No dependency on external desktop frameworks
+//! Based on Roadmap Item 41: Zenith Desktop core
 
-// (no_std only applicable at crate root - removed)
-// #![no_main]  // crate-root only
+#![no_std]
 
-/// OOP-based Zenith Desktop Core for SigmaOS
-/// Implements desktop environment using OOP principles with traits and structs
-/// No dependency on external desktop frameworks
-/// Based on Roadmap Item 41: Zenith Desktop core
+extern crate alloc;
 
-use core::ptr::{self, NonNull};
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
 
 /// Window ID
 pub type WindowID = usize;
 
 /// Window state
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WindowState {
     Minimized = 0,
     Normal = 1,
     Maximized = 2,
     Fullscreen = 3,
     Hidden = 4,
+}
+
+impl WindowState {
+    pub fn from_usize(val: usize) -> Self {
+        match val {
+            0 => WindowState::Minimized,
+            1 => WindowState::Normal,
+            2 => WindowState::Maximized,
+            3 => WindowState::Fullscreen,
+            _ => WindowState::Hidden,
+        }
+    }
 }
 
 /// Window trait (OOP interface)
@@ -66,7 +61,7 @@ pub trait Window {
 
 /// Desktop error types
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DesktopError {
     Success = 0,
     AlreadyVisible = 1,
@@ -77,6 +72,7 @@ pub enum DesktopError {
 
 /// Window info
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct WindowInfo {
     pub id: WindowID,
     pub title: [u8; 128],
@@ -112,8 +108,13 @@ pub struct WindowCapability {
     pub can_close: bool,
 }
 
+impl Default for WindowCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl WindowCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         WindowCapability {
             can_move: false,
@@ -148,10 +149,7 @@ impl SimpleWindow {
     pub fn new(id: WindowID, title: &[u8], capability: WindowCapability) -> Self {
         let mut title_array = [0u8; 128];
         let title_len = title.len().min(127);
-
-        unsafe {
-            core::ptr::copy_nonoverlapping(title.as_ptr(), title_array.as_mut_ptr(), title_len);
-        }
+        title_array[..title_len].copy_from_slice(&title[..title_len]);
 
         SimpleWindow {
             id,
@@ -176,9 +174,7 @@ impl SimpleWindow {
     }
 
     pub fn get_state(&self) -> WindowState {
-        unsafe {
-            core::mem::transmute(self.state.load(Ordering::SeqCst))
-        }
+        WindowState::from_usize(self.state.load(Ordering::SeqCst))
     }
 
     pub fn set_state(&self, state: WindowState) {
@@ -275,6 +271,7 @@ pub trait DesktopCompositor {
 
 /// Desktop statistics
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct DesktopStats {
     pub total_windows: usize,
     pub visible_windows: usize,
@@ -282,8 +279,13 @@ pub struct DesktopStats {
     pub maximized_windows: usize,
 }
 
+impl Default for DesktopStats {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DesktopStats {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         DesktopStats {
             total_windows: 0,
@@ -312,8 +314,13 @@ pub struct CompositorCapability {
     pub can_focus: bool,
 }
 
+impl Default for CompositorCapability {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CompositorCapability {
-    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         CompositorCapability {
             can_create: false,
@@ -421,103 +428,36 @@ impl DesktopCompositor for SimpleDesktopCompositor {
     }
 }
 
-/// Simple Vec implementation for no_std
-struct Vec<T> {
-    data: *mut T,
-    len: usize,
-    capacity: usize,
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-impl<T> Vec<T> {
-    fn new() -> Self {
-        Vec {
-            data: core::ptr::null_mut(),
-            len: 0,
-            capacity: 0,
-        }
+    #[test]
+    fn test_simple_window_creation_and_state() {
+        let mut window = SimpleWindow::new(1, b"Terminal", WindowCapability::full());
+        assert_eq!(window.id(), 1);
+        assert_eq!(window.title(), b"Terminal");
+        assert_eq!(window.state(), WindowState::Normal);
+
+        assert!(window.minimize().is_ok());
+        assert_eq!(window.state(), WindowState::Minimized);
+
+        assert!(window.maximize().is_ok());
+        assert_eq!(window.state(), WindowState::Maximized);
     }
 
-    fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
+    #[test]
+    fn test_simple_desktop_compositor_operations() {
+        let mut compositor = SimpleDesktopCompositor::new(CompositorCapability::full());
+        let id = compositor.create_window(b"Browser", WindowCapability::full()).unwrap();
+        assert_eq!(id, 1);
 
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-    }
+        assert!(compositor.focus_window(id).is_ok());
+        let list = compositor.list_windows();
+        assert_eq!(list.len(), 1);
+        assert_eq!(list[0], 1);
 
-    fn len(&self) -> usize {
-        self.len
-    }
-
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
-
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
-            }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
-        }
-    }
-}
-
-// External allocator functions
-extern "C" {
-    fn alloc(size: usize) -> *mut u8;
-    fn free(ptr: *mut u8);
-}
-
-
-impl<T> core::ops::Deref for Vec<T> {
-    type Target = [T];
-    fn deref(&self) -> &Self::Target {
-        if self.data.is_null() {
-            &[]
-        } else {
-            unsafe { core::slice::from_raw_parts(self.data, self.len) }
-        }
-    }
-}
-
-impl<T> core::ops::DerefMut for Vec<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        if self.data.is_null() {
-            &mut []
-        } else {
-            unsafe { core::slice::from_raw_parts_mut(self.data, self.len) }
-        }
-    }
-}
-
-impl<'a, T> IntoIterator for &'a Vec<T> {
-    type Item = &'a T;
-    type IntoIter = core::slice::Iter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::Deref;
-        self.deref().iter()
-    }
-}
-
-
-impl<'a, T> IntoIterator for &'a mut Vec<T> {
-    type Item = &'a mut T;
-    type IntoIter = core::slice::IterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        use core::ops::DerefMut;
-        self.deref_mut().iter_mut()
+        assert!(compositor.destroy_window(id).is_ok());
+        assert_eq!(compositor.list_windows().len(), 0);
     }
 }

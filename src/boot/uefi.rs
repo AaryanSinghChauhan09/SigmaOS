@@ -1,10 +1,7 @@
+//! OOP-based UEFI Bootloader for SigmaOS
+//! Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
+
 #![no_std]
-
-/// OOP-based UEFI Bootloader with Secure Boot database checking and TPM Measured Boot for SigmaOS
-
-/// OOP-based UEFI Bootloader for SigmaOS
-/// Based on Roadmap Item: Complete UEFI Bootloader (Critical Blocker)
-
 extern crate alloc;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicUsize, Ordering};
@@ -12,10 +9,14 @@ use core::sync::atomic::{AtomicUsize, Ordering};
 pub type BootStatus = usize;
 
 #[repr(C)]
-
 #[repr(usize)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootPhase { Init = 0, LoadKernel = 1, Handoff = 2, Complete = 3 }
+pub enum BootPhase {
+    Init = 0,
+    LoadKernel = 1,
+    Handoff = 2,
+    Complete = 3,
+}
 
 impl BootPhase {
     pub fn from_usize(val: usize) -> Self {
@@ -35,19 +36,8 @@ pub enum BootError {
     Success = 0,
     LoadFailed = 1,
     HandoffFailed = 2,
-    SignatureInvalid = 3,
+    Revoked = 3,
 }
-
-/// Simulated raw UEFI Memory Descriptor conforming to UEFI spec
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BootError {
-    Success = 0,
-    LoadFailed = 1,
-    HandoffFailed = 2,
-}
-
-pub enum BootError { Success = 0, LoadFailed = 1, HandoffFailed = 2, Revoked = 3 }
 
 pub trait UEFIBootloader {
     fn phase(&self) -> BootPhase;
@@ -91,16 +81,6 @@ impl Default for SimpleUEFIBootloader {
 
 impl UEFIBootloader for SimpleUEFIBootloader {
     fn phase(&self) -> BootPhase {
-        let val = self.phase.load(Ordering::SeqCst);
-        match val {
-            0 => BootPhase::Init,
-            1 => BootPhase::LoadKernel,
-            2 => BootPhase::Handoff,
-            _ => BootPhase::Complete,
-        }
-    }
-    fn load_kernel(&mut self, _kernel_data: &[u8]) -> Result<BootStatus, BootError> {
-
         BootPhase::from_usize(self.phase.load(Ordering::SeqCst))
     }
 
@@ -281,6 +261,7 @@ impl SecureBoot for SimpleSecureBoot {
         } else {
             Err(BootError::LoadFailed)
         }
+<<<<<<< HEAD
 
             db: UefiDatabase::new(),
             tpm: TpmMeasuredBoot::new(),
@@ -309,23 +290,16 @@ impl SecureBoot for SimpleSecureBoot {
     }
 }
 
-pub struct Vec<T> { data: *mut T, len: usize, capacity: usize }
-
-impl<T> Vec<T> {
-    pub fn new() -> Self { Vec { data: core::ptr::null_mut(), len: 0, capacity: 0 } }
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity { self.grow(); }
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
-        }
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
+=======
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+>>>>>>> origin/jules-3220898152855664802-b9a4680e
     #[test]
     fn test_uefi_bootloader_lifecycle() {
         let mut loader = SimpleUEFIBootloader::new();
@@ -347,60 +321,5 @@ mod tests {
 
         // Empty data fails
         assert!(sb.verify_signature(&[]).is_err());
-    }
-}
-
-extern "C" { fn alloc(size: usize) -> *mut u8; fn free(ptr: *mut u8); }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_uefi_bootloader_lifecycle() {
-        let mut boot = SimpleUEFIBootloader::new();
-        assert_eq!(boot.phase(), BootPhase::Init);
-
-        boot.load_kernel(&[0x1, 0x2, 0x3]).unwrap();
-        assert_eq!(boot.phase(), BootPhase::LoadKernel);
-
-        boot.handoff().unwrap();
-        assert_eq!(boot.phase(), BootPhase::Complete);
-    }
-
-    #[test]
-    fn test_uefi_secure_db_signature_validation() {
-        let mut sb = SimpleSecureBoot::new();
-        let kernel_data = [0xAA; 64];
-
-        // Hash kernel data
-        let mut hash = [0u8; 32];
-        for (i, &byte) in kernel_data.iter().enumerate() {
-            hash[i % 32] = hash[i % 32].wrapping_add(byte);
-        }
-
-        // Enroll kernel signing key as revoked in dbx
-        let revoked_key = DbKey {
-            hash,
-            key_id: 2002,
-            is_revoked: true,
-        };
-        sb.db.enroll_key(revoked_key).unwrap();
-
-        // Enforcing signature check fails on revoked keys immediately
-        let check_revoked = sb.verify_signature(&kernel_data, 2002);
-        assert_eq!(check_revoked, Err(BootError::Revoked));
-
-        // Enroll authorized key in db
-        let authorized_key = DbKey {
-            hash,
-            key_id: 2001,
-            is_revoked: false,
-        };
-        sb.db.enroll_key(authorized_key).unwrap();
-
-        // Check authorized succeeds
-        let check_auth = sb.verify_signature(&kernel_data, 2001).unwrap();
-        assert!(check_auth);
     }
 }

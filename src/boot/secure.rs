@@ -5,15 +5,6 @@
 
 #![no_std]
 
-/// OOP-based Secure Boot Validation for SigmaOS
-/// Implements secure boot using OOP principles with traits and structs
-/// No dependency on external security frameworks
-/// Based on Roadmap Item 10: Secure boot & firmware validation
-
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::mem;
-use core::ptr::NonNull;
-
 extern crate alloc;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
@@ -40,54 +31,6 @@ pub enum ValidationStatus {
     Invalid = 1,
     Pending = 2,
     Failed = 3,
-}
-
-/// Custom Box implementation for no_std
-pub struct Box<T: ?Sized> {
-    ptr: NonNull<T>,
-}
-
-impl<T> Box<T> {
-    pub fn new(val: T) -> Self {
-        unsafe {
-            let ptr = alloc(mem::size_of::<T>()) as *mut T;
-            core::ptr::write(ptr, val);
-            Self { ptr: NonNull::new_unchecked(ptr) }
-        }
-    }
-}
-
-impl<T: ?Sized> Box<T> {
-    pub unsafe fn from_raw(ptr: *mut T) -> Self {
-        Self { ptr: NonNull::new_unchecked(ptr) }
-    }
-    pub fn as_ref(&self) -> &T {
-        unsafe { self.ptr.as_ref() }
-    }
-    pub fn as_mut(&mut self) -> &mut T {
-        unsafe { self.ptr.as_mut() }
-    }
-}
-
-impl<T: ?Sized> core::ops::Deref for Box<T> {
-    type Target = T;
-    fn deref(&self) -> &Self::Target {
-        self.as_ref()
-    }
-}
-
-impl<T: ?Sized> core::ops::DerefMut for Box<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_mut()
-    }
-}
-
-impl<T: ?Sized> Drop for Box<T> {
-    fn drop(&mut self) {
-        unsafe {
-            free(self.ptr.as_ptr() as *mut u8);
-        }
-    }
 }
 
 /// Component trait (OOP interface)
@@ -686,8 +629,6 @@ impl TpmMeasuredBoot {
         if pcr_idx < 16 {
             let mut current = self.pcrs[pcr_idx];
             // FNV-1a 32-bit hash step
-            current = current ^ val;
-
             current ^= val;
             current = current.wrapping_mul(16777619);
             self.pcrs[pcr_idx] = current;
@@ -784,7 +725,6 @@ impl Component for SimpleComponent {
 
         // Validate via a default safe database
         let mut uefi_db = UefiDatabase::new();
-        // Enroll current component hash so it can be verified successfully
         let db_key = DbKey {
             hash: self.hash,
             key_id: self.key_id,
@@ -936,6 +876,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
         let mut index = None;
         let mut component_type = ComponentType::Kernel;
 
+<<<<<<< HEAD
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &*self.components.data.add(i);
@@ -946,6 +887,8 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                         break;
                     }
 
+=======
+>>>>>>> origin/jules-3220898152855664802-b9a4680e
         for (i, slot) in self.components.iter().enumerate() {
             if let Some(ref component) = slot {
                 if component.id() == id {
@@ -957,9 +900,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
         }
 
         if let Some(i) = index {
-            unsafe {
-                *self.components.data.add(i) = None;
-            }
+            self.components[i] = None;
             self.stats.total_components -= 1;
             self.stats.by_type[component_type as usize] -= 1;
             Ok(())
@@ -973,6 +914,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
             return Err(SecureBootError::PermissionDenied);
         }
 
+<<<<<<< HEAD
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &mut *self.components.data.add(i);
@@ -984,6 +926,8 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                         }
                         return result;
 
+=======
+>>>>>>> origin/jules-3220898152855664802-b9a4680e
         for slot in self.components.iter_mut() {
             if let Some(ref mut component) = slot {
                 if component.id() == id {
@@ -991,6 +935,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                     if let Ok(status) = result {
                         self.update_stats(status);
                     }
+                    return result;
                 }
             }
         }
@@ -1005,17 +950,14 @@ impl SecureBootValidator for SimpleSecureBootValidator {
         let mut invalid_components = Vec::new();
         let mut status_updates = Vec::new();
 
-        for i in 0..self.components.len() {
-            unsafe {
-                let slot = &mut *self.components.data.add(i);
-                if let Some(ref mut component) = *slot {
-                    let result = component.validate();
-                    if let Ok(status) = result {
-                        if status != ValidationStatus::Valid {
-                            invalid_components.push(component.id());
-                        }
-                        self.update_stats(status);
+        for slot in self.components.iter_mut() {
+            if let Some(ref mut component) = slot {
+                let result = component.validate();
+                if let Ok(status) = result {
+                    if status != ValidationStatus::Valid {
+                        invalid_components.push(component.id());
                     }
+<<<<<<< HEAD
 
         for slot in self.components.iter_mut() {
             if let Some(ref mut component) = slot {
@@ -1024,6 +966,8 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                     if status != ValidationStatus::Valid {
                         invalid_components.push(component.id());
                     }
+=======
+>>>>>>> origin/jules-3220898152855664802-b9a4680e
                     status_updates.push(status);
                 }
             }
@@ -1037,6 +981,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
     }
 
     fn get_component(&self, id: ComponentID) -> Option<&dyn Component> {
+<<<<<<< HEAD
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &*self.components.data.add(i);
@@ -1045,6 +990,8 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                         return Some(component.as_ref());
                     }
 
+=======
+>>>>>>> origin/jules-3220898152855664802-b9a4680e
         for slot in self.components.iter() {
             if let Some(ref component) = slot {
                 if component.id() == id {
@@ -1058,6 +1005,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
     fn list_components(&self, component_type: ComponentType) -> Vec<ComponentID> {
         let mut ids = Vec::new();
 
+<<<<<<< HEAD
         for i in 0..self.components.len() {
             unsafe {
                 let slot = &*self.components.data.add(i);
@@ -1066,6 +1014,8 @@ impl SecureBootValidator for SimpleSecureBootValidator {
                         ids.push(component.id());
                     }
 
+=======
+>>>>>>> origin/jules-3220898152855664802-b9a4680e
         for slot in self.components.iter() {
             if let Some(ref component) = slot {
                 if component.component_type() == component_type {
@@ -1082,6 +1032,7 @@ impl SecureBootValidator for SimpleSecureBootValidator {
     }
 }
 
+<<<<<<< HEAD
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1316,9 +1267,44 @@ extern "C" {
     fn free(ptr: *mut u8);
 }
 
+=======
+>>>>>>> origin/jules-3220898152855664802-b9a4680e
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_unified_kernel_image_signing_and_hashing() {
+        let mut uki = UnifiedKernelImage::new(Vec::new(), Vec::new(), Vec::new());
+
+        uki.kernel_payload.push(0xDE);
+        uki.initramfs_payload.push(0xAD);
+        uki.cmdline.push(0xBE);
+
+        let hash = uki.compute_hash();
+        assert_eq!(hash, 0xDE + 0xAD + 0xBE);
+
+        let mut mock_sig = [0u8; 2592];
+        mock_sig[0] = 0x99;
+        uki.sign_image(mock_sig);
+
+        assert_eq!(uki.signature_dilithium5[0], 0x99);
+    }
+
+    #[test]
+    fn test_tpm2_pcr_measurements_and_policy_sealing() {
+        let mut tpm = Tpm2Simulator::new();
+        assert_eq!(tpm.pcr_registers[0], 0);
+
+        tpm.extend_pcr(0, 0xABCDE).unwrap();
+        let first_pcr = tpm.pcr_registers[0];
+        assert_ne!(first_pcr, 0);
+
+        let unsealed_key = tpm.unseal_key_policy(0, first_pcr).unwrap();
+        assert_eq!(unsealed_key, [0x5A; 32]);
+
+        assert!(tpm.unseal_key_policy(0, 0xBAD12345).is_err());
+    }
 
     #[test]
     fn test_uefi_secure_db_verifications() {
@@ -1326,7 +1312,6 @@ mod tests {
         let key_hash = [0x55u8; 32];
         let key_id = 9001;
 
-        // Enroll as authorized (db)
         let authorized_key = DbKey {
             hash: key_hash,
             key_id,
@@ -1334,11 +1319,9 @@ mod tests {
         };
         db.enroll_key(authorized_key).unwrap();
 
-        // Verify matches
         let result = db.verify_signature(&key_hash, key_id).unwrap();
         assert!(result);
 
-        // Enroll forbidden / revocation (dbx)
         let revoked_key = DbKey {
             hash: key_hash,
             key_id,
@@ -1346,7 +1329,6 @@ mod tests {
         };
         db.enroll_key(revoked_key).unwrap();
 
-        // Verify now returns revoked error immediately
         let check_revocation = db.verify_signature(&key_hash, key_id);
         assert_eq!(check_revocation, Err(SecureBootError::Revoked));
     }
@@ -1356,15 +1338,109 @@ mod tests {
         let mut tpm = TpmMeasuredBoot::new();
         assert_eq!(tpm.read_pcr(0), 0);
 
-        // Extend PCR0 with boot firmware hash value
         tpm.extend_pcr(0, 0x12345678);
         let val1 = tpm.read_pcr(0);
         assert_ne!(val1, 0);
 
-        // Extend again, should yield a deterministic combined hash step
         tpm.extend_pcr(0, 0xabcdef01);
         let val2 = tpm.read_pcr(0);
         assert_ne!(val2, val1);
         assert_ne!(val2, 0);
+    }
+
+    #[test]
+    fn test_tpm2_engine_multi_bank_nvram_and_events() {
+        let mut tpm = Tpm2Engine::new();
+
+        // Record measured event (extends SHA-256 and SHA-384 PCRs)
+        tpm.record_measured_event(0, 0x1, b"bootloader_signature").unwrap();
+        assert_eq!(tpm.event_log.len(), 1);
+        assert_ne!(tpm.pcr_sha256[0], [0u8; 32]);
+        assert_ne!(tpm.pcr_sha384[0], [0u8; 48]);
+        assert!(tpm.verify_event_log_integrity());
+
+        // Hierarchy Controls
+        tpm.set_hierarchy_state(TpmHierarchy::Owner, false);
+        assert!(!tpm.hierarchy_enabled[TpmHierarchy::Owner as usize]);
+
+        // NVRAM Index operations
+        tpm.nv_define_space(0x01800001, 64, true, true).unwrap();
+        tpm.nv_write(0x01800001, b"secure_secret_data").unwrap();
+        let read_data = tpm.nv_read(0x01800001).unwrap();
+        assert_eq!(&read_data[..18], b"secure_secret_data");
+
+        // Locking NVRAM
+        tpm.nv_lock(0x01800001).unwrap();
+        assert!(tpm.nv_write(0x01800001, b"tampered").is_err());
+
+        // Auth sessions
+        let session_h = tpm.start_auth_session(0x02000001, [0x01; 16]).unwrap();
+        assert_eq!(session_h, 0x02000001);
+        assert_eq!(tpm.auth_sessions.len(), 1);
+    }
+
+    #[test]
+    fn test_simple_secure_boot_validator() {
+        let mut validator = SimpleSecureBootValidator::new(ValidatorCapability::full());
+        let mut comp = SimpleComponent::new(101, b"kernel.elf", ComponentType::Kernel, ComponentCapability::full());
+        let comp_hash = [0xA1; 32];
+        comp.set_hash(&comp_hash);
+
+        let id = validator.register_component(Box::new(comp)).unwrap();
+        assert_eq!(id, 101);
+
+        let status = validator.validate_component(101).unwrap();
+        assert_eq!(status, ValidationStatus::Valid);
+
+        let stats = validator.stats();
+        assert_eq!(stats.total_components, 1);
+        assert_eq!(stats.valid_components, 1);
+    }
+
+    #[test]
+    fn test_pe_coff_header_parsing_and_trust_chain() {
+        // Construct mock PE binary data
+        let mut pe_data = [0u8; 128];
+        pe_data[0] = b'M';
+        pe_data[1] = b'Z';
+        pe_data[60] = 0x40; // e_lfanew = 0x40 (64)
+
+        let pe_off = 64;
+        pe_data[pe_off] = b'P';
+        pe_data[pe_off + 1] = b'E';
+        pe_data[pe_off + 2] = 0;
+        pe_data[pe_off + 3] = 0;
+        pe_data[pe_off + 4] = 0x64; // x86-64 machine
+        pe_data[pe_off + 5] = 0x86;
+        pe_data[pe_off + 6] = 0x03; // 3 sections
+
+        let parsed = parse_pe_coff_header(&pe_data).unwrap();
+        assert!(parsed.is_valid);
+        assert_eq!(parsed.machine_type, 0x8664);
+        assert_eq!(parsed.number_of_sections, 3);
+
+        // Trust Chain verification
+        let pk = DbKey { hash: [0x11; 32], key_id: 1, is_revoked: false };
+        let kek = DbKey { hash: [0x22; 32], key_id: 2, is_revoked: false };
+        let db_entry = DbKey { hash: [0x33; 32], key_id: 3, is_revoked: false };
+
+        let mut trust_chain = SecureBootTrustChain::new(pk);
+        trust_chain.enroll_kek(kek).unwrap();
+        trust_chain.enroll_db_entry(db_entry).unwrap();
+
+        assert!(trust_chain.verify_trust_chain(&[0x33; 32], 3).unwrap());
+
+        // Firmware security state transitions
+        let mut fw_state = UefiFirmwareSecurityState::new();
+        assert!(fw_state.secure_boot_enable);
+        assert!(fw_state.deployed_mode);
+
+        fw_state.enter_setup_mode();
+        assert!(!fw_state.secure_boot_enable);
+        assert!(fw_state.setup_mode);
+
+        fw_state.lock_user_mode();
+        assert!(fw_state.secure_boot_enable);
+        assert!(!fw_state.setup_mode);
     }
 }
