@@ -6,7 +6,7 @@
 //!
 //! ## Architecture
 //!
-//! ```text
+//! ```
 //! Application renders → wl_buffer (DMA-BUF or SHM)
 //!     → ZenithCompositor (damage tracking)
 //!     → Scene graph (sorted by z-order)
@@ -14,44 +14,16 @@
 //!     → KMS/DRM (vsync atomic commit)
 //!     → Display
 //! ```
-#![allow(clippy::new_without_default)]
-#![allow(clippy::manual_memcpy)]
-#![allow(clippy::manual_strip)]
-#![allow(clippy::type_complexity)]
-#![allow(clippy::needless_range_loop)]
-#![allow(clippy::too_many_arguments)]
-#![allow(dead_code)]
-#![allow(unused_variables)]
-#![allow(unused_mut)]
-#![allow(unused_imports)]
-#![allow(clippy::items_after_test_module)]
-#![allow(clippy::doc_lazy_continuation)]
-#![allow(clippy::empty_line_after_doc_comments)]
-#![allow(clippy::large_enum_variant)]
-#![allow(clippy::collapsible_if)]
-#![allow(clippy::collapsible_match)]
-#![allow(clippy::unnecessary_lazy_evaluations)]
-
-
-#![allow(dead_code)]
-
-#![allow(dead_code)]
-
-#![allow(dead_code)]
-
-#![allow(dead_code)]
-
-#![allow(dead_code)]
 
 #![allow(dead_code)]
 
 use sigma_types::{CapabilityToken, Result};
 
 #[cfg(not(test))]
-use crate::klib::BTreeMap;
+use crate::klib::HashMap;
 
 #[cfg(test)]
-use alloc::collections::BTreeMap;
+use std::collections::HashMap;
 
 /// Window state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -291,9 +263,9 @@ pub struct HandoffVault {
 
 /// Zenith Compositor main structure
 pub struct ZenithCompositor {
-    windows: BTreeMap<u64, ZenithWindow>,
+    windows: HashMap<u64, ZenithWindow>,
     outputs: Vec<Output>,
-    surfaces: BTreeMap<u64, Surface>,
+    surfaces: HashMap<u64, Surface>,
     damage_regions: Vec<DamageRegion>,
     active_window: Option<u64>,
     next_window_id: u64,
@@ -309,9 +281,9 @@ impl ZenithCompositor {
     /// Create a new Zenith compositor
     pub fn new(capability: CapabilityToken) -> Self {
         ZenithCompositor {
-            windows: BTreeMap::new(),
+            windows: HashMap::new(),
             outputs: Vec::new(),
-            surfaces: BTreeMap::new(),
+            surfaces: HashMap::new(),
             damage_regions: Vec::new(),
             active_window: None,
             next_window_id: 1,
