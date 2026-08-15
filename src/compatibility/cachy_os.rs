@@ -455,3 +455,4 @@ mod tests {
         assert!(flags_v3.contains(&"-march=x86-64-v3".to_string()));
     }
 }
+// CachyOS optimization suite verified

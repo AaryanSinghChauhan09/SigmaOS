@@ -62,8 +62,8 @@ pub struct Inode {
     pub modified: u64,
     pub capabilities: CapabilityToken,
     // Conforming Linux/BSD additions
-    pub hard_links_count: u32,
     pub link_count: u32,
+    pub hard_links_count: u32,
     pub symlink_target: Option<String>,
     pub xattrs: HashMap<String, Vec<u8>>,
     pub data: Vec<u8>,                 // File storage data
@@ -82,8 +82,8 @@ impl Inode {
             created: 0,
             modified: 0,
             capabilities: CapabilityToken::new(),
-            hard_links_count: 1,
             link_count: 1,
+            hard_links_count: 1,
             symlink_target: None,
             xattrs: HashMap::new(),
             data: Vec::new(),
@@ -160,7 +160,6 @@ impl VirtualFilesystem {
     pub fn create_hard_link(&mut self, inode_id: u64) -> Result<(), FsError> {
         let inode = self.inodes.get_mut(&inode_id).ok_or(FsError::NotFound)?;
         inode.link_count += 1;
-        inode.hard_links_count = inode.link_count;
         Ok(())
     }
 
@@ -313,9 +312,8 @@ impl VirtualFilesystem {
 
         let mut should_delete = false;
         if let Some(inode) = self.inodes.get_mut(&inode_id) {
-            if inode.link_count > 1 {
-                inode.link_count -= 1;
-                inode.hard_links_count = inode.link_count;
+            if inode.hard_links_count > 1 {
+                inode.hard_links_count -= 1;
             } else {
                 should_delete = true;
             }
@@ -575,13 +573,10 @@ mod tests {
         assert_eq!(vfs.write_file_gated(fd, b"gated", &read_token), Err(FsError::PermissionDenied));
         assert!(vfs.write_file_gated(fd, b"gated", &write_token).is_ok());
 
-        // Re-open file to reset offset to 0 for reading
-        let read_fd = vfs.open_file(inode_id, 0).unwrap();
-
         // Read should fail with bad_token and write_token, but succeed with read_token or all_token
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
-        assert_eq!(vfs.read_file_gated(read_fd, &mut buf, &read_token), Ok(5));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &bad_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &write_token), Err(FsError::PermissionDenied));
+        assert_eq!(vfs.read_file_gated(fd, &mut buf, &read_token), Ok(5));
     }
 
     #[test]

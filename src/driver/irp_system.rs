@@ -82,6 +82,8 @@ pub struct Irp {
     pub io_control_code: u32,
     pub stack_locations: [IoStackLocation; 10], // WDK layered device stack up to 10 frames
     pub current_location: usize,                 // 1-based index (0 is end of stack, 10 is top)
+    pub cancel_routine: Option<fn(irp: &mut Irp)>,
+    pub cancelled: bool,
 }
 
 impl Irp {
@@ -99,6 +101,8 @@ impl Irp {
             io_control_code: 0,
             stack_locations: [IoStackLocation::new(); 10],
             current_location: 10, // top-level default start location
+            cancel_routine: None,
+            cancelled: false,
         };
         irp.stack_locations[9].major_function = major_function;
         irp
@@ -109,26 +113,6 @@ impl Irp {
             Some(&self.stack_locations[self.current_location - 1])
         } else {
             None
-        }
-    }
-
-    pub fn get_next_stack_location(&mut self) -> Option<&mut IoStackLocation> {
-        if self.current_location > 1 && self.current_location <= 10 {
-            Some(&mut self.stack_locations[self.current_location - 2])
-        } else {
-            None
-        }
-    }
-
-    /// WDK: IoSetCompletionRoutine equivalent
-    pub fn set_completion_routine(
-        &mut self,
-        routine: fn(device: &DeviceObject, irp: &mut Irp, context: usize) -> IoStatus,
-        context: usize,
-    ) {
-        if let Some(next_loc) = self.get_next_stack_location() {
-            next_loc.completion_routine = Some(routine);
-            next_loc.completion_context = context;
         }
     }
 
@@ -322,6 +306,39 @@ impl IrpManager {
         status
     }
 
+    // --- Windows-style FAST_IO Execution Path ---
+    pub fn try_fast_io_read(&self, device: &DeviceObject, buffer: &mut [u8]) -> bool {
+        if device.get_power_state() != PowerState::D0Active {
+            return false;
+        }
+        unsafe {
+            if let Some(driver) = device.driver_object_ptr.as_ref() {
+                if let Some(fast_io) = driver.fast_io {
+                    if let Some(fast_read) = fast_io.fast_io_read {
+                        return fast_read(device, buffer);
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    pub fn try_fast_io_write(&self, device: &DeviceObject, buffer: &[u8]) -> bool {
+        if device.get_power_state() != PowerState::D0Active {
+            return false;
+        }
+        unsafe {
+            if let Some(driver) = device.driver_object_ptr.as_ref() {
+                if let Some(fast_io) = driver.fast_io {
+                    if let Some(fast_write) = fast_io.fast_io_write {
+                        return fast_write(device, buffer);
+                    }
+                }
+            }
+        }
+        false
+    }
+
     /// WDK: IoCallDriver equivalent
     pub fn call_driver(&self, device: &DeviceObject, irp: &mut Irp) -> IoStatus {
         if irp.current_location <= 1 {
@@ -382,6 +399,227 @@ impl IrpManager {
     }
 }
 
+// =========================================================
+// 1. Linux-style io_uring Interface (Batch & Async Execution)
+// =========================================================
+pub const IORING_OP_READ: u8 = 0;
+pub const IORING_OP_WRITE: u8 = 1;
+pub const IORING_OP_DEVICE_CONTROL: u8 = 2;
+
+#[derive(Debug, Clone, Copy)]
+pub struct SubmissionQueueEntry {
+    pub opcode: u8,
+    pub buffer: *mut u8,
+    pub len: usize,
+    pub io_control_code: u32,
+    pub user_data: u64,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct CompletionQueueEntry {
+    pub user_data: u64,
+    pub status: IoStatus,
+    pub result: usize,
+}
+
+pub struct IoUring {
+    pub sq: Vec<SubmissionQueueEntry>,
+    pub cq: Vec<CompletionQueueEntry>,
+}
+
+impl IoUring {
+    pub fn new() -> Self {
+        Self {
+            sq: Vec::new(),
+            cq: Vec::new(),
+        }
+    }
+
+    pub fn submit(&mut self, entry: SubmissionQueueEntry) {
+        self.sq.push(entry);
+    }
+
+    pub fn poll_completions(&mut self, manager: &IrpManager, device: &DeviceObject) -> usize {
+        let count = self.sq.len();
+        for entry in self.sq.drain(..) {
+            let major_func = match entry.opcode {
+                IORING_OP_READ => IRP_MJ_READ,
+                IORING_OP_WRITE => IRP_MJ_WRITE,
+                IORING_OP_DEVICE_CONTROL => IRP_MJ_DEVICE_CONTROL,
+                _ => IRP_MJ_READ,
+            };
+
+            let mut irp = Irp::new(major_func, METHOD_BUFFERED, entry.len);
+            irp.system_buffer = entry.buffer;
+            irp.io_control_code = entry.io_control_code;
+
+            let status = manager.dispatch_irp(device, &mut irp);
+            self.cq.push(CompletionQueueEntry {
+                user_data: entry.user_data,
+                status,
+                result: irp.io_status.information,
+            });
+        }
+        count
+    }
+}
+
+// =========================================================
+// 2. BSD-style Scatter-Gather Uio Struct
+// =========================================================
+#[derive(Debug, Clone, Copy)]
+pub struct UioSegment {
+    pub buffer: *mut u8,
+    pub len: usize,
+}
+
+pub struct Uio {
+    pub segments: Vec<UioSegment>,
+    pub offset: usize,
+    pub resid: usize,
+}
+
+impl Uio {
+    pub fn new(segments: Vec<UioSegment>) -> Self {
+        let resid = segments.iter().map(|s| s.len).sum();
+        Self {
+            segments,
+            offset: 0,
+            resid,
+        }
+    }
+
+    /// Read data from linear buffer into segments (scatter read)
+    pub fn copy_from_buffer(&mut self, src: &[u8]) -> usize {
+        let mut bytes_copied = 0;
+        let mut src_offset = 0;
+
+        for seg in &self.segments {
+            if bytes_copied >= src.len() || self.resid == 0 {
+                break;
+            }
+
+            let seg_ptr = seg.buffer;
+            let seg_len = seg.len;
+
+            let to_copy = std::cmp::min(seg_len, src.len() - src_offset);
+            if to_copy > 0 {
+                unsafe {
+                    std::ptr::copy_nonoverlapping(
+                        src.as_ptr().add(src_offset),
+                        seg_ptr,
+                        to_copy,
+                    );
+                }
+                src_offset += to_copy;
+                bytes_copied += to_copy;
+                self.resid = self.resid.saturating_sub(to_copy);
+            }
+        }
+        self.offset += bytes_copied;
+        bytes_copied
+    }
+
+    /// Write data from segments to linear buffer (gather write)
+    pub fn copy_to_buffer(&self, dest: &mut [u8]) -> usize {
+        let mut bytes_copied = 0;
+        let mut dest_offset = 0;
+
+        for seg in &self.segments {
+            if bytes_copied >= dest.len() {
+                break;
+            }
+
+            let seg_ptr = seg.buffer;
+            let seg_len = seg.len;
+
+            let to_copy = std::cmp::min(seg_len, dest.len() - dest_offset);
+            if to_copy > 0 {
+                unsafe {
+                    std::ptr::copy_nonoverlapping(
+                        seg_ptr,
+                        dest.as_mut_ptr().add(dest_offset),
+                        to_copy,
+                    );
+                }
+                dest_offset += to_copy;
+                bytes_copied += to_copy;
+            }
+        }
+        bytes_copied
+    }
+}
+
+// =========================================================
+// 3. BSD-style kqueue event subscriber
+// =========================================================
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KqueueFilter {
+    Read,
+    Write,
+    Complete,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Kevent {
+    pub ident: usize,
+    pub filter: KqueueFilter,
+    pub flags: u32,
+    pub data: usize,
+}
+
+pub struct IrpKqueue {
+    pub events: Vec<Kevent>,
+}
+
+impl IrpKqueue {
+    pub fn new() -> Self {
+        Self { events: Vec::new() }
+    }
+
+    pub fn register(&mut self, event: Kevent) {
+        self.events.push(event);
+    }
+
+    pub fn trigger(&mut self, ident: usize, filter: KqueueFilter, data: usize) -> usize {
+        let mut triggered_count = 0;
+        for ev in &mut self.events {
+            if ev.ident == ident && ev.filter == filter {
+                ev.data = data;
+                ev.flags |= 0x1; // EV_TRIGGERED
+                triggered_count += 1;
+            }
+        }
+        triggered_count
+    }
+}
+
+// =========================================================
+// 4. iOS/macOS Sandbox Security Entitlements
+// =========================================================
+#[derive(Debug, Clone)]
+pub struct Entitlement {
+    pub key: String,
+    pub is_privileged: bool,
+}
+
+pub fn check_irp_entitlement(
+    irp: &Irp,
+    entitlements: &[Entitlement],
+    required_key: &str,
+) -> bool {
+    if irp.major_function == IRP_MJ_DEVICE_CONTROL {
+        for ent in entitlements {
+            if ent.key == required_key && ent.is_privileged {
+                return true;
+            }
+        }
+        false
+    } else {
+        true
+    }
+}
+
 /// Security-centric Rootkit audit and driver integrity verifier
 pub struct RootkitHookDetector {
     pub verified_drivers: HashMap<String, *const DriverObject>,
@@ -437,7 +675,7 @@ mod tests {
     static mut COMPLETION_ROUTINE_CALLED: bool = false;
     static mut COMPLETION_CONTEXT_VAL: usize = 0;
 
-    fn mock_completion_routine(device: &DeviceObject, irp: &mut Irp, context: usize) -> IoStatus {
+    fn mock_completion_routine(_device: &DeviceObject, _irp: &mut Irp, context: usize) -> IoStatus {
         unsafe {
             COMPLETION_ROUTINE_CALLED = true;
             COMPLETION_CONTEXT_VAL = context;
@@ -539,7 +777,7 @@ mod tests {
         let mut dispatch_table = HashMap::new();
         dispatch_table.insert(
             IRP_MJ_WRITE,
-            (|_dev: &DeviceObject, irp: &mut Irp| {
+            (|_dev: &DeviceObject, _irp: &mut Irp| {
                 IoStatus::Success
             }) as fn(&DeviceObject, &mut Irp) -> IoStatus,
         );
@@ -548,12 +786,14 @@ mod tests {
             driver_name: "LayeredDiskDriver".to_string(),
             driver_extension: 0,
             dispatch_table,
+            fast_io: None,
         };
 
         let device = DeviceObject {
             driver_object_ptr: &driver,
             device_extension: 0,
             flags: 0,
+            power_state: AtomicU8::new(0),
         };
 
         let mut irp = Irp::new(IRP_MJ_WRITE, METHOD_BUFFERED, 1024);
@@ -572,7 +812,7 @@ mod tests {
 
         unsafe {
             assert!(COMPLETION_ROUTINE_CALLED);
-            assert_eq!(COMPLETION_CONTEXT_VAL, 1337);
+            assert_eq!(std::ptr::addr_of!(COMPLETION_CONTEXT_VAL).read(), 1337);
         }
     }
 
@@ -582,12 +822,14 @@ mod tests {
             driver_name: "TrustedFileDriver".to_string(),
             driver_extension: 0,
             dispatch_table: HashMap::new(),
+            fast_io: None,
         };
 
         let device = DeviceObject {
             driver_object_ptr: &driver,
             device_extension: 0,
             flags: 0,
+            power_state: AtomicU8::new(0),
         };
 
         let mut detector = RootkitHookDetector::new();
@@ -601,15 +843,193 @@ mod tests {
             driver_name: "TrustedFileDriver".to_string(),
             driver_extension: 0,
             dispatch_table: HashMap::new(),
+            fast_io: None,
         };
 
         let compromised_device = DeviceObject {
             driver_object_ptr: &malicious_driver,
             device_extension: 0,
             flags: 0,
+            power_state: AtomicU8::new(0),
         };
 
         // Detector must spot the pointer mismatch (untrusted driver hijacking slot)
         assert!(detector.audit_device_stack(&compromised_device));
+    }
+
+    // --- New Tests for Multi-OS Inspired Paradigms ---
+
+    static mut MOCK_CANCEL_CALLED: bool = false;
+    fn mock_cancel_routine(_irp: &mut Irp) {
+        unsafe {
+            MOCK_CANCEL_CALLED = true;
+        }
+    }
+
+    #[test]
+    fn test_irp_cancellation() {
+        let mut irp = Irp::new(IRP_MJ_READ, METHOD_BUFFERED, 128);
+        irp.set_cancel_routine(mock_cancel_routine);
+        assert!(!irp.cancelled);
+
+        irp.cancel();
+        assert!(irp.cancelled);
+        assert_eq!(irp.io_status.status, IoStatus::Cancelled);
+        unsafe {
+            assert!(MOCK_CANCEL_CALLED);
+        }
+    }
+
+    fn mock_fast_read(_device: &DeviceObject, buffer: &mut [u8]) -> bool {
+        if buffer.len() >= 4 {
+            buffer[..4].copy_from_slice(b"FAST");
+            true
+        } else {
+            false
+        }
+    }
+
+    #[test]
+    fn test_windows_fast_io() {
+        let manager = IrpManager::new();
+        let fast_io = FastIoDispatch {
+            fast_io_read: Some(mock_fast_read),
+            fast_io_write: None,
+        };
+
+        let driver = DriverObject {
+            driver_name: "FastDisk".to_string(),
+            driver_extension: 0,
+            dispatch_table: HashMap::new(),
+            fast_io: Some(fast_io),
+        };
+
+        let device = DeviceObject {
+            driver_object_ptr: &driver,
+            device_extension: 0,
+            flags: 0,
+            power_state: AtomicU8::new(0), // D0Active
+        };
+
+        let mut buf = [0u8; 8];
+        assert!(manager.try_fast_io_read(&device, &mut buf));
+        assert_eq!(&buf[..4], b"FAST");
+
+        // If the device is in Sleep mode, fast I/O should fail immediately (iOS/macOS inspired)
+        device.set_power_state(PowerState::D2Sleep);
+        assert!(!manager.try_fast_io_read(&device, &mut buf));
+    }
+
+    #[test]
+    fn test_linux_io_uring() {
+        let manager = IrpManager::new();
+        let mut uring = IoUring::new();
+
+        let mut dispatch_table = HashMap::new();
+        dispatch_table.insert(
+            IRP_MJ_READ,
+            (|_device: &DeviceObject, irp: &mut Irp| {
+                irp.io_status.information = irp.buffer_length;
+                IoStatus::Success
+            }) as fn(&DeviceObject, &mut Irp) -> IoStatus,
+        );
+
+        let driver = DriverObject {
+            driver_name: "RingDisk".to_string(),
+            driver_extension: 0,
+            dispatch_table,
+            fast_io: None,
+        };
+
+        let device = DeviceObject {
+            driver_object_ptr: &driver,
+            device_extension: 0,
+            flags: 0,
+            power_state: AtomicU8::new(0),
+        };
+
+        let mut data_buffer = [0u8; 256];
+        let sqe = SubmissionQueueEntry {
+            opcode: IORING_OP_READ,
+            buffer: data_buffer.as_mut_ptr(),
+            len: 128,
+            io_control_code: 0,
+            user_data: 4242,
+        };
+
+        uring.submit(sqe);
+        assert_eq!(uring.sq.len(), 1);
+
+        let processed = uring.poll_completions(&manager, &device);
+        assert_eq!(processed, 1);
+        assert_eq!(uring.cq.len(), 1);
+        assert_eq!(uring.cq[0].user_data, 4242);
+        assert_eq!(uring.cq[0].status, IoStatus::Success);
+        assert_eq!(uring.cq[0].result, 128);
+    }
+
+    #[test]
+    fn test_bsd_uio_scatter_gather() {
+        let mut b1 = [0u8; 4];
+        let mut b2 = [0u8; 6];
+
+        let segs = vec![
+            UioSegment { buffer: b1.as_mut_ptr(), len: 4 },
+            UioSegment { buffer: b2.as_mut_ptr(), len: 6 },
+        ];
+
+        let mut uio = Uio::new(segs);
+        assert_eq!(uio.resid, 10);
+
+        let payload = b"HELLO_WORL"; // exactly 10 bytes
+        let copied = uio.copy_from_buffer(payload);
+        assert_eq!(copied, 10);
+        assert_eq!(uio.resid, 0);
+
+        // Check scatter target buffers
+        assert_eq!(&b1, b"HELL");
+        assert_eq!(&b2, b"O_WORL");
+
+        // Gather test
+        let mut gather_dest = [0u8; 10];
+        let gathered = uio.copy_to_buffer(&mut gather_dest);
+        assert_eq!(gathered, 10);
+        assert_eq!(&gather_dest, b"HELLO_WORL");
+    }
+
+    #[test]
+    fn test_bsd_kqueue() {
+        let mut kq = IrpKqueue::new();
+        kq.register(Kevent {
+            ident: 101,
+            filter: KqueueFilter::Complete,
+            flags: 0,
+            data: 0,
+        });
+
+        let triggered = kq.trigger(101, KqueueFilter::Complete, 999);
+        assert_eq!(triggered, 1);
+        assert_eq!(kq.events[0].data, 999);
+        assert_eq!(kq.events[0].flags & 0x1, 1); // EV_TRIGGERED flag
+    }
+
+    #[test]
+    fn test_ios_sandbox_entitlements() {
+        let irp_read = Irp::new(IRP_MJ_READ, METHOD_BUFFERED, 128);
+        let irp_ioctl = Irp::new(IRP_MJ_DEVICE_CONTROL, METHOD_BUFFERED, 128);
+
+        let ents = vec![
+            Entitlement {
+                key: "com.apple.developer.driverkit.transport".to_string(),
+                is_privileged: true,
+            }
+        ];
+
+        // Non-ioctl IRPs bypass entitlement check
+        assert!(check_irp_entitlement(&irp_read, &ents, "com.apple.developer.driverkit.transport"));
+
+        // IOCTL requires specific entitlement key
+        assert!(check_irp_entitlement(&irp_ioctl, &ents, "com.apple.developer.driverkit.transport"));
+        assert!(!check_irp_entitlement(&irp_ioctl, &ents, "com.apple.developer.driverkit.pci"));
     }
 }

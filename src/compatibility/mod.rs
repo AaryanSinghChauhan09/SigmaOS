@@ -15,6 +15,10 @@ pub mod apache_ossie;
 pub mod sovereign_suite;
 pub mod gentoo;
 pub mod legacy_adapters;
+pub mod fedora;
+pub mod cachy_os;
+
+pub use legacy_adapters::{KernelPersona, SyscallAbi};
 pub use cross_platform::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, TargetPlatform, TranslationLayer,
@@ -78,4 +82,15 @@ pub use sovereign_suite::{
 pub use gentoo::{
     UseFlagManager, OpenRcRunlevel, ServiceStatus, OpenRcService, OpenRcManager,
     EbuildPackage, PortageEngine,
+};
+
+pub use fedora::{
+    DnfPackageResolver, MockChrootBuilder, KojiBuildServer, BodhiUpdateTriage,
+    SigmaChangeProposal, SigmaChangeProcessEngine, SigmaNextChannel, FedoraAluFlags,
+    FedoraAlu, SeLinuxContext, SeLinuxEngine, SystemdPresetConfigurator, AnacondaInstaller,
+};
+
+pub use cachy_os::{
+    BoreSchedulerGovernor, AnanicyManager, SchedPolicy, V4OptimizedPackageManager,
+    CachyInitramfs,
 };

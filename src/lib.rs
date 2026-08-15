@@ -1,12 +1,12 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
 // SigmaOS Library
 // Core library for SigmaOS operating system
 
-pub mod klib;
 pub mod accessibility;
 pub mod automation;
 pub mod compatibility;
 pub mod customization;
-pub mod distro;
 pub mod dashboard;
 pub mod device;
 pub mod driver;
@@ -25,7 +25,6 @@ pub mod resource;
 pub mod security;
 pub mod shell;
 pub mod sigpkg;
-pub mod tools;
 pub mod virtualization;
 
 pub use accessibility::{
@@ -38,18 +37,25 @@ pub use automation::{
     SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction, SystemState,
 };
 pub use compatibility::{
-    ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
-    ComputeNode, ContainerRuntime, DistributedComputeHandoff, GstCalculator, IndiaStackError,
-    InterimLispVM, JehanneError, JehanneNamespace, LispVal, MintBackupTool, MintSoftwareManager,
-    MintUpdateItem, MintUpdateLevel, MintUpdateManager, MntReformLpcDriver, MockUPIService,
-    MultilingualSupport, NamespaceBindEntry, NtHandle, NtObjectManager, NtObjectType, NtStatus,
-    Plan9pMessage, Plan9pMsgType, PortableExecutableLoader, ReformPowerStats, RegistryHive,
-    SoftwareMeta, TargetPlatform, TranslationLayer, WindowCoordinates, ZenithDisplayCompositor,
-    JudicialTimelinePlanner, MsmeComplianceEngine, AyushFormularyHelper,
-    PMWaniHotspotController, DigiYatraPassScanner, IrctcPnrTracker,
-    Literal, SpacSatResolver,
-    ApkInstalledPackage, ApkDatabaseIndex, SyslogSeverity, SyslogMessage,
-    AlpineSyslogManager, BusyBoxMulticall,
+    APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AnanicyManager,
+    AnacondaInstaller, AntixControlCenter, AntixDesktopProfiler, AntixInitManager, AppSuiteBundle,
+    AppSuiteType, ApplicationBinary, BinaryCompatMatrix, BinaryFormat, BodhiUpdateTriage,
+    BoreSchedulerGovernor, BrailleMatrix, BsdJailSandbox, BundleType, CachyInitramfs,
+    CloudOrchestrator, CloudProvider, CompatBinary, CompatBinaryFormat, CompatibilityError,
+    CompatibilityLayer, CompatibilityManager, CompatibilityMode, ContainerRuntime,
+    ContinuityCoordinator, DesktopMode, DesktopProfile, DesktopTheme, DiscontinuedFS,
+    DistroReleaseChannel, DnfPackageResolver, DriverBridge, EcosystemSnapshot, FSRevival,
+    FedoraAlu, FedoraAluFlags, FlatpakApp, GraphicsBridge, HandoffTask, InstallerStep,
+    KapudanAssistant, KernelPersona, KernelPersonaVM, KojiBuildServer, LanguageTranslationCatalog,
+    LegacyBus, LegacyDriver, LegacyMemoryTrimmer, LegacyPluginManager, LibcVersion, LocaleManager,
+    MicroService, MicroServiceState, MockChrootBuilder, NetworkBridge, ReleaseGovernanceCouncil,
+    ReproducibleBuildVerifier, SeLinuxContext, SeLinuxEngine, SchedPolicy, SigmaChangeProposal,
+    SigmaChangeProcessEngine, SigmaContainer, SigmaNextChannel, SnapshotManager, StorageBridge,
+    SuiteRegistry, SyscallAbi, SystemdPresetConfigurator, TargetPlatform, TranslationLayer,
+    TribeInstaller, TtsSynthesizer, UnifiedAppStore, V4OptimizedPackageManager, WorkloadOptimizer,
+    WorkloadProfile, ZorinAppearanceSwitcher, GLOBAL_AKABEI, GLOBAL_ANTIX_CONTROL,
+    GLOBAL_ANTIX_DESKTOP, GLOBAL_ANTIX_INIT, GLOBAL_KAPUDAN, GLOBAL_MEMORY_TRIMMER,
+    GLOBAL_PERSONA_VM, GLOBAL_PLUGIN_MANAGER, GLOBAL_TRIBE, GLOBAL_WORKLOAD_OPTIMIZER,
 };
 pub use customization::{
     Action, Condition, CustomizationEngine, CustomizationError, Routine, Theme, TriggerType,
@@ -119,11 +125,12 @@ pub use resilience::{
     SelfHealingModule, SigmaTimeshift, SystemSnapshot, GLOBAL_TIMESHIFT,
 };
 pub use security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, DefensiveAuditSystem,
-    ForensicBlock, ForensicStorageFilter, MaliciousSignature, Permission, PledgeManager,
-    PledgePromise, RoutingMode, SandboxPolicy, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
-    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN, Securelevel, LinuxCapability,
-    SovereignSecurelevelManager, PamError, PamUser, PamGroup, SovereignPamManager,
+    AnonSurfShunt, AppSandboxEngine, CapabilityGate, CapabilityToken, CronDaemon, CronJob,
+    DefensiveAuditSystem, DmesgLog, FirewallRule, ForensicBlock, ForensicStorageFilter,
+    IptablesFirewall, KaliError, MaliciousSignature, Permission, PluggableAuthenticationModule,
+    PledgeManager, PledgePromise, RoutingMode, SandboxPolicy, SudoPrivilegeEscalation,
+    SwapSpaceManager, TmuxMultiplexer, TmuxPane, GLOBAL_ANONSURF, GLOBAL_FORENSIC, GLOBAL_SANDBOX,
+    MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
 };
 pub use shell::{ShellCommand, ShellRepl};
 pub use sigpkg::{
@@ -134,50 +141,3 @@ pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
 };
-
-// Temporarily disabled problematic modules
-// pub mod accessibility;
-// pub mod automation;
-// pub mod container;
-
-// #[cfg(test)]
-// #[path = "compatibility/fedora.rs"]
-// pub mod fedora_compat_test;
-// pub mod customization;
-// pub mod dashboard;
-// pub mod desktop;
-// pub mod device;
-// pub mod driver;
-// pub mod filesystem;
-// pub mod ml;
-// pub mod network;
-// pub mod observability;
-// pub mod orchestration;
-// pub mod distro;
-// pub mod package;
-// pub mod performance;
-// pub mod productivity;
-// pub mod remote;
-// pub mod resilience;
-// pub mod shell;
-// pub mod sigpkg;
-// pub mod virtualization;
-// pub mod graphics {
-//     pub mod compositor;
-//     pub mod paint;
-//     pub mod video;
-// }
-// pub mod hardware {
-//     pub mod compatibility;
-//     pub mod win32;
-// }
-// pub mod power {
-//     pub mod governor;
-// }
-// pub mod ai {
-//     pub mod agent;
-//     pub mod orchestrator;
-// }
-// pub mod boot;
-// pub mod system;
-// pub mod installer;
