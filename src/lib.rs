@@ -221,6 +221,10 @@ pub use distro::{
     DragonFlyHammerFs, Hammer2Snapshot,
     VoidRunitManager, RunitServiceState, RunitService,
     SovereignAnonScrubber,
+    TlpPowerGovernor, PowerSource, CpuGovernorPolicy, TlpConfig,
+    NmtuiNetworkManager, ConnectionType, NetworkConnectionProfile,
+    FreeBsdBhyveHypervisor, BhyveVmState, BhyveVirtualMachine,
+    TailscaleWireguardMesh, WireguardPeer,
 };
 pub use desktop::{
     GraniteUiToolkit, ToastNotification, AccentColor,

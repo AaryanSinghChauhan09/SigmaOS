@@ -8,6 +8,7 @@ pub mod enterprise;
 pub mod i18n;
 pub mod manjaro;
 pub mod nextgen;
+pub mod power_network_tools;
 pub mod recovery;
 pub mod specialized;
 pub mod stable_components;
@@ -16,6 +17,12 @@ pub mod transformation_engine;
 pub mod preseed;
 pub mod linux_bsd_inspirations;
 
+pub use power_network_tools::{
+    TlpPowerGovernor, PowerSource, CpuGovernorPolicy, TlpConfig,
+    NmtuiNetworkManager, ConnectionType, NetworkConnectionProfile,
+    FreeBsdBhyveHypervisor, BhyveVmState, BhyveVirtualMachine,
+    TailscaleWireguardMesh, WireguardPeer,
+};
 pub use bsd_linux_innovations::{
     BsdStatefulPacketFilter, PfRuleAction, PfStateEntry,
     DragonFlyHammerFs, Hammer2Snapshot,
